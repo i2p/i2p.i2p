@@ -939,10 +939,22 @@ public class WebMail extends HttpServlet
 			// We have to make sure to get the state right even if
 			// the user hit the back button previously
 			if( buttonPressed( request, SEND ) ) {
-				if( sendMail( sessionObject, request ) )
+				if (sendMail(sessionObject, request)) {
+					// If we have a reference UIDL, go back to that
+					if (request.getParameter(B64UIDL) != null)
+						sessionObject.state = STATE_SHOW;
+					else
+						sessionObject.state = STATE_LIST;
+				}
+			} else if (buttonPressed(request, CANCEL)) {
+				// If we have a reference UIDL, go back to that
+				if (request.getParameter(B64UIDL) != null)
+					sessionObject.state = STATE_SHOW;
+				else
 					sessionObject.state = STATE_LIST;
-			} else if (buttonPressed( request, CANCEL ) ||
-			    buttonPressed( request, SHOW )  ||       // A param, not a button, but we could be lost
+				sessionObject.sentMail = null;	
+				sessionObject.clearAttachments();
+			} else if (buttonPressed(request, SHOW)  ||       // A param, not a button, but we could be lost
 			    buttonPressed( request, PREVPAGE ) ||    // All these buttons are not shown but we could be lost
 			    buttonPressed( request, NEXTPAGE ) ||
 			    buttonPressed( request, FIRSTPAGE ) ||
@@ -971,8 +983,9 @@ public class WebMail extends HttpServlet
 		}
 		/*
 		 * message dialog or config
+		 * Do not go through here if we were originally in NEW (handled above)
 		 */
-		if((sessionObject.state == STATE_SHOW || sessionObject.state == STATE_CONFIG) && isPOST ) {
+		else if ((sessionObject.state == STATE_SHOW || sessionObject.state == STATE_CONFIG) && isPOST ) {
 			if( buttonPressed( request, LIST ) ) { 
 				sessionObject.state = STATE_LIST;
 			} else if (buttonPressed( request, CANCEL ) ||
@@ -1533,6 +1546,15 @@ public class WebMail extends HttpServlet
 	 * process config buttons, both entering and exiting
 	 */
 	private static void processConfigButtons(SessionObject sessionObject, RequestWrapper request) {
+		if (buttonPressed(request, CONFIGURE)) {
+			sessionObject.state = STATE_CONFIG;
+			return;
+		}
+		// If no config text, we can't be on the config page,
+		// and we don't want to process the CANCEL button which
+		// is also on the compose page.
+		if (request.getParameter(CONFIG_TEXT) == null)
+			return;
 		if (buttonPressed(request, SAVE)) {
 			try {
 				String raw = request.getParameter(CONFIG_TEXT);
@@ -1588,8 +1610,6 @@ public class WebMail extends HttpServlet
 			}
 		} else if (buttonPressed(request, CANCEL)) {
 			sessionObject.state = (sessionObject.folder != null) ? STATE_LIST : STATE_AUTH;
-		} else if (buttonPressed(request, CONFIGURE)) {
-			sessionObject.state = STATE_CONFIG;
 		}
 	}
 
@@ -1741,8 +1761,11 @@ public class WebMail extends HttpServlet
 						} catch (NumberFormatException nfe) {}
 					}
 					int newPage = processFolderButtons(sessionObject, page, request);
-					// LIST is from SHOW page
-					if (newPage != page || buttonPressed(request, LIST)) {
+					// LIST is from SHOW page, SEND and CANCEL are from NEW page
+					// OFFLINE and LOGIN from login page
+					if (newPage != page || buttonPressed(request, LIST) ||
+					    buttonPressed(request, SEND) || buttonPressed(request, CANCEL) ||
+					    buttonPressed(request, LOGIN) || buttonPressed(request, OFFLINE)) {
 						// P-R-G
 						String q = '?' + CUR_PAGE + '=' + newPage;
 						sendRedirect(httpRequest, response, q);
@@ -1769,7 +1792,10 @@ public class WebMail extends HttpServlet
 			if( sessionObject.state == STATE_SHOW ) {
 				if (isPOST) {
 					String newShowUIDL = processMessageButtons(sessionObject, showUIDL, request);
-					if (newShowUIDL != null && !newShowUIDL.equals(showUIDL)) {
+					// SEND and CANCEL are from NEW page
+					if (newShowUIDL != null &&
+					    (!newShowUIDL.equals(showUIDL) ||
+					     buttonPressed(request, SEND) || buttonPressed(request, CANCEL))) {
 						// P-R-G
 						String q = '?' + B64UIDL + '=' + Base64.encode(newShowUIDL);
 						sendRedirect(httpRequest, response, q);
@@ -1877,7 +1903,8 @@ public class WebMail extends HttpServlet
 					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
 					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">");
-				if( sessionObject.state == STATE_SHOW) {
+				if( sessionObject.state == STATE_SHOW || sessionObject.state == STATE_NEW) {
+					// Store the reference UIDL on the compose form also
 					if (showUIDL != null) {
 						// reencode, as showUIDL may have changed, and also for XSS
 						b64UIDL = Base64.encode(showUIDL);
