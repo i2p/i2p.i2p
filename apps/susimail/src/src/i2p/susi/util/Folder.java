@@ -508,4 +508,22 @@ public class Folder<O extends Object> {
 			return false;
 		return elements[0].equals( element );
 	}
+	
+	/**
+	 * Returns the page this element is on, using the current sort, or 1 if not found
+	 * 
+	 * @param element
+	 * @since 0.9.33
+	 */
+	public synchronized int getPageOf(O element)
+	{
+		if (pages <= 1)
+			return 1;
+		if (elements == null)
+			return 1;
+		int i = getIndexOf(element);
+		if (i < 0)
+			return 1;
+		return 1 + (i / getPageSize());
+	}
 }

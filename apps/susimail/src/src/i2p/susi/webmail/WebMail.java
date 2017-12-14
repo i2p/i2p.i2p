@@ -119,10 +119,19 @@ public class WebMail extends HttpServlet
 	private static final String SMTP = "smtp";
 	
 	/*
+	 * GET params
+	 */
+	private static final String CUR_PAGE  = "page";
+
+	/*
 	 * hidden params
 	 */
 	private static final String SUSI_NONCE = "susiNonce";
 	private static final String B64UIDL = "b64uidl";
+	private static final String PREV_B64UIDL = "prevb64uidl";
+	private static final String NEXT_B64UIDL = "nextb64uidl";
+	private static final String PREV_PAGE_NUM = "prevpagenum";
+	private static final String NEXT_PAGE_NUM = "nextpagenum";
 
 	/*
 	 * button names
@@ -139,6 +148,7 @@ public class WebMail extends HttpServlet
 	private static final String FORWARD = "forward";
 	private static final String DELETE = "delete";
 	private static final String REALLYDELETE = "really_delete";
+	// also a GET param
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
 	private static final String RAW_ATTACHMENT = "att";
@@ -1295,13 +1305,15 @@ public class WebMail extends HttpServlet
 	private static String processMessageButtons(SessionObject sessionObject, String showUIDL, RequestWrapper request)
 	{
 		if( buttonPressed( request, PREV ) ) {
-			String uidl = sessionObject.folder.getPreviousElement(showUIDL);
+			String b64UIDL = request.getParameter(PREV_B64UIDL);
+			String uidl = Base64.decodeToString(b64UIDL);
 			if(uidl == null)
 				sessionObject.state = STATE_LIST;
 			return uidl;
 		}
 		if( buttonPressed( request, NEXT ) ) {
-			String uidl = sessionObject.folder.getNextElement(showUIDL);
+			String b64UIDL = request.getParameter(NEXT_B64UIDL);
+			String uidl = Base64.decodeToString(b64UIDL);
 			if(uidl == null)
 				sessionObject.state = STATE_LIST;
 			return uidl;
@@ -1406,9 +1418,11 @@ public class WebMail extends HttpServlet
 	/**
 	 * process buttons of folder view
 	 * @param sessionObject
+	 * @param page the current page
 	 * @param request
+	 * @param return the new page
 	 */
-	private static void processFolderButtons(SessionObject sessionObject, RequestWrapper request)
+	private static int processFolderButtons(SessionObject sessionObject, int page, RequestWrapper request)
 	{
 		/*
 		 * process paging buttons
@@ -1425,20 +1439,30 @@ public class WebMail extends HttpServlet
 			}
 		}
 		if( buttonPressed( request, PREVPAGE ) ) {
-			sessionObject.pageChanged = true;
-			sessionObject.folder.previousPage();
+			String sp = request.getParameter(PREV_PAGE_NUM);
+			if (sp != null) {
+				try {
+					page = Integer.parseInt(sp);
+					sessionObject.pageChanged = true;
+				} catch (NumberFormatException nfe) {}
+			}
 		}
 		else if( buttonPressed( request, NEXTPAGE ) ) {
-			sessionObject.pageChanged = true;
-			sessionObject.folder.nextPage();
+			String sp = request.getParameter(NEXT_PAGE_NUM);
+			if (sp != null) {
+				try {
+					page = Integer.parseInt(sp);
+					sessionObject.pageChanged = true;
+				} catch (NumberFormatException nfe) {}
+			}
 		}
 		else if( buttonPressed( request, FIRSTPAGE ) ) {
 			sessionObject.pageChanged = true;
-			sessionObject.folder.firstPage();
+			page = 1;
 		}
 		else if( buttonPressed( request, LASTPAGE ) ) {
 			sessionObject.pageChanged = true;
-			sessionObject.folder.lastPage();
+			page = sessionObject.folder.getPages();
 		}
 		else if( buttonPressed( request, DELETE ) ) {
 			int m = getCheckedItems(request).size();
@@ -1471,6 +1495,7 @@ public class WebMail extends HttpServlet
 		sessionObject.markAll = buttonPressed( request, MARKALL );
 		sessionObject.clear = buttonPressed( request, CLEAR );
 		sessionObject.invert = buttonPressed( request, INVERT );
+		return page;
 	}
 
 	/*
@@ -1707,8 +1732,23 @@ public class WebMail extends HttpServlet
 			}
 			
 			if( sessionObject.state == STATE_LIST ) {
-				if (isPOST)
-					processFolderButtons( sessionObject, request );
+				if (isPOST) {
+					int page = 1;
+					String sp = request.getParameter(CUR_PAGE);
+					if (sp != null) {
+						try {
+							page = Integer.parseInt(sp);
+						} catch (NumberFormatException nfe) {}
+					}
+					int newPage = processFolderButtons(sessionObject, page, request);
+					// LIST is from SHOW page
+					if (newPage != page || buttonPressed(request, LIST)) {
+						// P-R-G
+						String q = '?' + CUR_PAGE + '=' + newPage;
+						sendRedirect(httpRequest, response, q);
+						return;
+					}
+				}
 				processSortingButtons( sessionObject, request );
 				for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 					String uidl = it.next();
@@ -1727,8 +1767,15 @@ public class WebMail extends HttpServlet
 				b64UIDL = request.getParameter(B64UIDL);
 			String showUIDL = Base64.decodeToString(b64UIDL);
 			if( sessionObject.state == STATE_SHOW ) {
-				if (isPOST)
-					showUIDL = processMessageButtons(sessionObject, showUIDL, request);
+				if (isPOST) {
+					String newShowUIDL = processMessageButtons(sessionObject, showUIDL, request);
+					if (newShowUIDL != null && !newShowUIDL.equals(showUIDL)) {
+						// P-R-G
+						String q = '?' + B64UIDL + '=' + Base64.encode(newShowUIDL);
+						sendRedirect(httpRequest, response, q);
+						return;
+					}
+				}
 				// ?download=nnn&amp;b64uidl link (same for ?att) should be valid in any state
 				if (processDownloadLink(sessionObject, showUIDL, request, response)) {
 					// download or raw view sent, or 404
@@ -1865,6 +1912,24 @@ public class WebMail extends HttpServlet
 				out.println( "</form><div class=\"footer\"><p class=\"footer\">susimail &copy; 2004-2005 susi</p></div></div></body>\n</html>");
 				out.flush();
 		}
+	}
+
+	/**
+	 *  Redirect a POST to a GET (P-R-G), replacing the query string
+	 *  @param q starting with '?' or null
+	 *  @since 0.9.33 adapted from I2PSnarkServlet
+	 */
+	private void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String q) throws IOException {
+		String url = req.getRequestURL().toString();
+		StringBuilder buf = new StringBuilder(128);
+		int qq = url.indexOf('?');
+		if (qq >= 0)
+			url = url.substring(0, qq);
+		buf.append(url);
+		if (q.length() > 0)
+			buf.append(q.replace("&amp;", "&"));  // no you don't html escape the redirect header
+		resp.setHeader("Location", buf.toString());
+		resp.sendError(302, "Moved");
 	}
 
 	/**
@@ -2285,8 +2350,17 @@ public class WebMail extends HttpServlet
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _t("Logout") ));
 		Folder<String> folder = sessionObject.folder;
-		if (folder.getPages() > 1)
-			showPageButtons(out, folder);
+		int page = 1;
+		if (folder.getPages() > 1) {
+			String sp = request.getParameter(CUR_PAGE);
+			if (sp != null) {
+				try {
+					page = Integer.parseInt(sp);
+				} catch (NumberFormatException nfe) {}
+			}
+			folder.setCurrentPage(page);
+			showPageButtons(out, page, folder.getPages(), true);
+		}
 		out.println("</div>");
 
 
@@ -2359,7 +2433,7 @@ public class WebMail extends HttpServlet
 		if (folder.getPages() > 1 && i > 30) {
 			// show the buttons again if page is big
 			out.println("<tr class=\"bottombuttons\"><td colspan=\"9\" align=\"center\">");
-			showPageButtons(out, folder);
+			showPageButtons(out, page, folder.getPages(), false);
 			out.println("</td></tr>");
 		}
 		out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
@@ -2395,21 +2469,32 @@ public class WebMail extends HttpServlet
 	/**
 	 *  first prev next last
 	 */
-	private static void showPageButtons(PrintWriter out, Folder<?> folder) {
-		out.println(
-			"<table id=\"pagenav\"><tr><td>" +
-			( folder.isFirstPage() ?
-						button2( FIRSTPAGE, _t("First") ) + "&nbsp;" + button2( PREVPAGE, _t("Previous") ) :
-						button( FIRSTPAGE, _t("First") ) + "&nbsp;" + button( PREVPAGE, _t("Previous") ) ) +
-			"</td><td>" +
-			_t("Page {0} of {1}", folder.getCurrentPage(), folder.getPages()) +
-			"</td><td>" +
-			( folder.isLastPage() ? 
-						button2( NEXTPAGE, _t("Next") ) + "&nbsp;" + button2( LASTPAGE, _t("Last") ) :
-						button( NEXTPAGE, _t("Next") ) + "&nbsp;" + button( LASTPAGE, _t("Last") ) ) +
-			"</td></tr></table>"
-
-		);
+	private static void showPageButtons(PrintWriter out, int page, int pages, boolean outputHidden) {
+		out.println("<table id=\"pagenav\"><tr><td>");
+		if (outputHidden)
+			out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
+		String t1 = _t("First");
+		String t2 = _t("Previous");
+		if (page <= 1) {
+			out.println(button2(FIRSTPAGE, t1) + "&nbsp;" + button2(PREVPAGE, t2));
+		} else {
+			if (outputHidden)
+				out.println("<input type=\"hidden\" name=\"" + PREV_PAGE_NUM + "\" value=\"" + (page - 1) + "\">");
+			out.println(button(FIRSTPAGE, t1) + "&nbsp;" + button(PREVPAGE, t2));
+		}
+		out.println("</td><td>" +
+			_t("Page {0} of {1}", page, pages) +
+			"</td><td>");
+		t1 = _t("Next");
+		t2 = _t("Last");
+		if (page >= pages) {
+			out.println(button2(NEXTPAGE, t1) + "&nbsp;" + button2(LASTPAGE, t2));
+		} else {
+			if (outputHidden)
+				out.println("<input type=\"hidden\" name=\"" + NEXT_PAGE_NUM + "\" value=\"" + (page + 1) + "\">");
+			out.println(button(NEXTPAGE, t1) + "&nbsp;" + button(LASTPAGE, t2));
+		}
+		out.println("</td></tr></table>");
 	}
 
 	/**
@@ -2445,17 +2530,35 @@ public class WebMail extends HttpServlet
 				out.println(button(DELETE, _t("Delete")));
 		}
 		out.println(button(LOGOUT, _t("Logout") ));
-		// TODO make these GETs not POSTs so we have a consistent URL
+		// processRequest() will P-R-G the PREV and NEXT so we have a consistent URL
 		out.println("<div id=\"messagenav\">");
+		Folder<String> folder = sessionObject.folder;
 		if (hasHeader) {
-			out.println(
-				( sessionObject.folder.isFirstElement(showUIDL) ? button2(PREV, _t("Previous")) : button(PREV, _t("Previous")))
-				 + spacer);
+			String uidl = folder.getPreviousElement(showUIDL);
+			String text = _t("Previous");
+			if (uidl == null || folder.isFirstElement(showUIDL)) {
+				out.println(button2(PREV, text));
+			} else {
+				String b64UIDL = Base64.encode(uidl);
+				out.println("<input type=\"hidden\" name=\"" + PREV_B64UIDL + "\" value=\"" + b64UIDL + "\">");
+				out.println(button(PREV, text));
+			}
+			out.print(spacer);
 		}
+		int page = folder.getPageOf(showUIDL);
+		out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
 		out.println(button( LIST, _t("Back to Folder") ) + spacer);
 		if (hasHeader) {
-			out.println(
-				( sessionObject.folder.isLastElement(showUIDL) ? button2(NEXT, _t("Next")) : button(NEXT, _t("Next"))));
+			String uidl = folder.getNextElement(showUIDL);
+			String text = _t("Next");
+			if (uidl == null || folder.isLastElement(showUIDL)) {
+				out.println(button2(NEXT, text));
+			} else {
+				String b64UIDL = Base64.encode(uidl);
+				out.println("<input type=\"hidden\" name=\"" + NEXT_B64UIDL + "\" value=\"" + b64UIDL + "\">");
+				out.println(button(NEXT, text));
+			}
+			out.print(spacer);
 		}
 		out.println("</div></div>");
 		//if (Config.hasConfigFile())
