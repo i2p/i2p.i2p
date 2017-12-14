@@ -441,6 +441,7 @@ public class WebMail extends HttpServlet
 		String subject, body;
 		public StringBuilder sentMail;
 		public ArrayList<Attachment> attachments;
+		// This is only for multi-delete. Single-message delete is handled with P-R-G
 		public boolean reallyDelete;
 		String themePath, imgPath;
 		boolean isMobile;
@@ -997,7 +998,7 @@ public class WebMail extends HttpServlet
 		else if ((sessionObject.state == STATE_SHOW || sessionObject.state == STATE_CONFIG) && isPOST ) {
 			if( buttonPressed( request, LIST ) ) { 
 				sessionObject.state = STATE_LIST;
-			} else if (buttonPressed( request, CANCEL ) ||
+			} else if (
 			    buttonPressed( request, PREVPAGE ) ||    // All these buttons are not shown but we could be lost
 			    buttonPressed( request, NEXTPAGE ) ||
 			    buttonPressed( request, FIRSTPAGE ) ||
@@ -1208,6 +1209,7 @@ public class WebMail extends HttpServlet
 	private static void processGenericButtons(SessionObject sessionObject, RequestWrapper request)
 	{
 		// these two buttons are only on the folder view now
+/**** All RELOAD buttons are commented out
 		if( buttonPressed( request, RELOAD ) ) {
 			Config.reloadConfiguration();
 			int oldPageSize = sessionObject.folder.getPageSize();
@@ -1216,6 +1218,7 @@ public class WebMail extends HttpServlet
 				sessionObject.folder.setPageSize( pageSize );
 			sessionObject.info = _t("Configuration reloaded");
 		}
+****/
 		if( buttonPressed( request, REFRESH ) ) {
 			POP3MailBox mailbox = sessionObject.mailbox;
 			if (mailbox == null) {
@@ -1318,7 +1321,8 @@ public class WebMail extends HttpServlet
 	 * process buttons of message view
 	 * @param sessionObject
 	 * @param request
-	 * @return the next UIDL to see (if PREV/NEXT pushed), or null (if REALLYDELETE pushed), or showUIDL
+	 * @return the next UIDL to see (if PREV/NEXT pushed), or null (if REALLYDELETE pushed), or showUIDL,
+	 *         or "delete" (if DELETE pushed)
 	 */
 	private static String processMessageButtons(SessionObject sessionObject, String showUIDL, RequestWrapper request)
 	{
@@ -1337,7 +1341,11 @@ public class WebMail extends HttpServlet
 			return uidl;
 		}
 		
-		sessionObject.reallyDelete = buttonPressed( request, DELETE );
+		if (buttonPressed(request, DELETE)) {
+			// processRequest() will P-R-G to &delete=1
+			// We do not keep this indication in the session object.
+			return DELETE;
+		}
 		if( buttonPressed( request, REALLYDELETE ) ) {
 			sessionObject.state = STATE_LIST;
 			sessionObject.mailCache.delete(showUIDL);
@@ -1482,12 +1490,15 @@ public class WebMail extends HttpServlet
 			sessionObject.pageChanged = true;
 			page = sessionObject.folder.getPages();
 		}
-		else if( buttonPressed( request, DELETE ) ) {
+
+		if (buttonPressed(request, DELETE)) {
 			int m = getCheckedItems(request).size();
-			if (m > 0)
+			if (m > 0) {
 				sessionObject.reallyDelete = true;
-			else
+			} else {
+				sessionObject.reallyDelete = false;
 				sessionObject.error += _t("No messages marked for deletion.") + '\n';
+			}
 		}
 		else {
 			if( buttonPressed( request, REALLYDELETE ) ) {
@@ -1764,6 +1775,7 @@ public class WebMail extends HttpServlet
 					int newPage = processFolderButtons(sessionObject, page, request);
 					// LIST is from SHOW page, SEND and CANCEL are from NEW page
 					// OFFLINE and LOGIN from login page
+					// TODO - REFRESH on list page
 					if (newPage != page || buttonPressed(request, LIST) ||
 					    buttonPressed(request, SEND) || buttonPressed(request, CANCEL) ||
 					    buttonPressed(request, LOGIN) || buttonPressed(request, OFFLINE)) {
@@ -1803,7 +1815,11 @@ public class WebMail extends HttpServlet
 					    (!newShowUIDL.equals(showUIDL) ||
 					     buttonPressed(request, SEND) || buttonPressed(request, CANCEL))) {
 						// P-R-G
-						String q = '?' + B64UIDL + '=' + Base64.encode(newShowUIDL);
+						String q;
+						if (newShowUIDL.equals(DELETE))
+							q = '?' + DELETE + "=1&" + SHOW + '=' + Base64.encode(showUIDL);
+						else
+							q = '?' + SHOW + '=' + Base64.encode(newShowUIDL);
 						sendRedirect(httpRequest, response, q);
 						return;
 					}
@@ -1949,7 +1965,7 @@ public class WebMail extends HttpServlet
 					showFolder( out, sessionObject, request );
 				
 				else if( sessionObject.state == STATE_SHOW )
-					showMessage(out, sessionObject, showUIDL);
+					showMessage(out, sessionObject, showUIDL, buttonPressed(request, DELETE));
 				
 				else if( sessionObject.state == STATE_NEW )
 					showCompose( out, sessionObject, request );
@@ -2574,17 +2590,20 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @param out
 	 * @param sessionObject
+	 * @param reallyDelete was the delete button pushed, if so, show the really delete? message
 	 */
-	private static void showMessage(PrintWriter out, SessionObject sessionObject, String showUIDL)
+	private static void showMessage(PrintWriter out, SessionObject sessionObject, String showUIDL, boolean reallyDelete)
 	{
-		if( sessionObject.reallyDelete ) {
-			out.println( "<p class=\"error\">" + _t("Really delete this message?") + " " + button( REALLYDELETE, _t("Yes, really delete it!") ) + "</p>" );
+		if (reallyDelete) {
+			out.println( "<p class=\"error\">" + _t("Really delete this message?") + ' ' +
+			             button(REALLYDELETE, _t("Yes, really delete it!")) + ' ' +
+			             button(CANCEL, _t("Cancel")) +
+			             "</p>");
 		}
 		Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
 		if(!RELEASE && mail != null && mail.hasBody()) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");
-			// FIXME encoding, escaping --, etc... but disabled.
 			ReadBuffer body = mail.getBody();
 			out.println(quoteHTML(new String(body.content, body.offset, body.length)).replace("--", "&mdash;"));
 			out.println( "-->" );
