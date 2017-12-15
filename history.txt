@@ -1,3 +1,13 @@
+2017-12-15 zzz
+ * SusiMail: Don't store state in session object (ticket #1373)
+
+2017-12-14 zzz
+ * SusiMail (ticket #1373):
+   - Put more parameters in forms and use P-R-G to
+     put several parameters into the URLs
+   - Redesign search parameter handling
+   - Fix state tracking issues with delete
+
 2017-12-13 zzz
  * i2ptunnel: Add internal sockets for SMTP and POP3 (ticket #2118)
  * Util: InternalSocket improvements

@@ -100,11 +100,7 @@ public class WebMail extends HttpServlet
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
 	
-	private static final int STATE_AUTH = 1;
-	private static final int STATE_LIST = 2;
-	private static final int STATE_SHOW = 3;
-	private static final int STATE_NEW = 4;
-	private static final int STATE_CONFIG = 5;
+	private enum State { AUTH, LIST, SHOW, NEW, CONFIG }
 	
 	// TODO generate from servlet name to allow for renaming or multiple instances
 	private static final String myself = "/susimail/susimail";
@@ -135,6 +131,7 @@ public class WebMail extends HttpServlet
 	private static final String PREV_PAGE_NUM = "prevpagenum";
 	private static final String NEXT_PAGE_NUM = "nextpagenum";
 	private static final String CURRENT_SORT = "currentsort";
+	private static final String DEBUG_STATE = "currentstate";
 
 	/*
 	 * button names
@@ -432,7 +429,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class SessionObject implements HttpSessionBindingListener, NewMailListener {
 		boolean pageChanged, markAll, clear, invert;
-		int state, smtpPort;
+		int smtpPort;
 		POP3MailBox mailbox;
 		MailCache mailCache;
 		Folder<String> folder;
@@ -451,7 +448,6 @@ public class WebMail extends HttpServlet
 		
 		SessionObject()
 		{
-			state = STATE_AUTH;
 			bccToSelf = Boolean.parseBoolean(Config.getProperty( CONFIG_BCC_TO_SELF, "true" ));
 			nonces = new ArrayList<String>(MAX_NONCES + 1);
 		}
@@ -500,7 +496,7 @@ public class WebMail extends HttpServlet
 
 		/** @since 0.9.27 */
 		public boolean isValidNonce(String nonce) {
-			if (state == STATE_AUTH && LOGIN_NONCE.equals(nonce))
+			if (mailbox == null && LOGIN_NONCE.equals(nonce))
 				return true;
 			synchronized(nonces) {
 				return nonces.contains(nonce);
@@ -772,14 +768,18 @@ public class WebMail extends HttpServlet
 			line = "";
 		return line;
 	}
+
+	//// Start state change and button processing here ////
+
 	/**
 	 * 
 	 * @param sessionObject
 	 * @param request
+	 * @return new state, or null if unknown
 	 */
-	private static void processLogin( SessionObject sessionObject, RequestWrapper request )
+	private static State processLogin(SessionObject sessionObject, RequestWrapper request, State state)
 	{
-		if( sessionObject.state == STATE_AUTH ) {
+		if (state == State.AUTH) {
 			String user = request.getParameter( USER );
 			String pass = request.getParameter( PASS );
 			String host = request.getParameter( HOST );
@@ -857,7 +857,7 @@ public class WebMail extends HttpServlet
 						sessionObject.pass = pass;
 						sessionObject.host = host;
 						sessionObject.smtpPort = smtpPortNo;
-						sessionObject.state = STATE_LIST;
+						state = State.LIST;
 						MailCache mc = new MailCache(mailbox, host, pop3PortNo, user, pass);
 						sessionObject.mailCache = mc;
 						sessionObject.folder = new Folder<String>();
@@ -899,14 +899,16 @@ public class WebMail extends HttpServlet
 				}
 			}
 		}
+		return state;
 	}
 
 	/**
 	 * 
 	 * @param sessionObject
 	 * @param request
+	 * @return new state, or null if unknown
 	 */
-	private static void processLogout( SessionObject sessionObject, RequestWrapper request, boolean isPOST )
+	private static State processLogout(SessionObject sessionObject, RequestWrapper request, boolean isPOST, State state)
 	{
 		if( buttonPressed( request, LOGOUT ) && isPOST) {
 			Debug.debug(Debug.DEBUG, "LOGOUT, REMOVING SESSION");
@@ -920,11 +922,16 @@ public class WebMail extends HttpServlet
 				sessionObject.mailCache = null;
 			}
 			sessionObject.info += _t("User logged out.") + '\n';
-			sessionObject.state = STATE_AUTH;
-		} else if( sessionObject.mailbox == null  && !buttonPressed(request, CANCEL)) {
-			sessionObject.error += _t("Internal error, lost connection.") + '\n';
-			sessionObject.state = STATE_AUTH;
+			state = State.AUTH;
+		} else if (state == State.AUTH  && !buttonPressed(request, CANCEL) &&
+		           !buttonPressed(request, SAVE)) { 	
+			// AUTH will be passed in if mailbox is null
+			// Check previous state
+			Debug.debug(Debug.DEBUG, "Lost conn, prev. state was " + request.getParameter(DEBUG_STATE));
+			sessionObject.error += _t("Internal error, lost connection.") + '\n' +
+			                       _t("User logged out.") + '\n';
 		}
+		return state;
 	}
 
 	/**
@@ -934,59 +941,40 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 * @param isPOST disallow button pushes if false
+	 * @return new state, or null if unknown
 	 */
-	private static void processStateChangeButtons(SessionObject sessionObject, RequestWrapper request, boolean isPOST )
+	private static State processStateChangeButtons(SessionObject sessionObject, RequestWrapper request,
+	                                               boolean isPOST, State state)
 	{
 		/*
 		 * LOGIN/LOGOUT
 		 */
-		if( sessionObject.state == STATE_AUTH && isPOST )
-			processLogin( sessionObject, request );
+		if (isPOST)
+			state = processLogin(sessionObject, request, state);
 
-		if( sessionObject.state != STATE_AUTH )
-			processLogout( sessionObject, request, isPOST );
+		state = processLogout(sessionObject, request, isPOST, state);
 
 		/*
 		 *  compose dialog
+		 *  NEW_SUBJECT may be empty but will be non-null
 		 */
-		if( sessionObject.state == STATE_NEW && isPOST ) {
+		if (isPOST && request.getParameter(NEW_SUBJECT) != null) {
 			// We have to make sure to get the state right even if
 			// the user hit the back button previously
 			if( buttonPressed( request, SEND ) ) {
 				if (sendMail(sessionObject, request)) {
 					// If we have a reference UIDL, go back to that
 					if (request.getParameter(B64UIDL) != null)
-						sessionObject.state = STATE_SHOW;
+						state = State.SHOW;
 					else
-						sessionObject.state = STATE_LIST;
+						state = State.LIST;
 				}
 			} else if (buttonPressed(request, CANCEL)) {
 				// If we have a reference UIDL, go back to that
 				if (request.getParameter(B64UIDL) != null)
-					sessionObject.state = STATE_SHOW;
+					state = State.SHOW;
 				else
-					sessionObject.state = STATE_LIST;
-				sessionObject.sentMail = null;	
-				sessionObject.clearAttachments();
-			} else if (buttonPressed(request, SHOW)  ||       // A param, not a button, but we could be lost
-			    buttonPressed( request, PREVPAGE ) ||    // All these buttons are not shown but we could be lost
-			    buttonPressed( request, NEXTPAGE ) ||
-			    buttonPressed( request, FIRSTPAGE ) ||
-			    buttonPressed( request, LASTPAGE ) ||
-			    buttonPressed( request, SETPAGESIZE ) ||
-			    buttonPressed( request, MARKALL ) ||
-			    buttonPressed( request, CLEAR ) ||
-			    buttonPressed( request, INVERT ) ||
-			    buttonPressed( request, SORT ) ||
-			    buttonPressed( request, REFRESH ) ||
-			    buttonPressed( request, LIST )) {
-				sessionObject.state = STATE_LIST;
-				sessionObject.sentMail = null;	
-				sessionObject.clearAttachments();
-			} else if (buttonPressed( request, PREV ) ||     // All these buttons are not shown but we could be lost
-			    buttonPressed( request, NEXT )  ||
-			    buttonPressed( request, DELETE )) {
-				sessionObject.state = STATE_SHOW;
+					state = State.LIST;
 				sessionObject.sentMail = null;	
 				sessionObject.clearAttachments();
 			}
@@ -995,11 +983,9 @@ public class WebMail extends HttpServlet
 		 * message dialog or config
 		 * Do not go through here if we were originally in NEW (handled above)
 		 */
-		else if ((sessionObject.state == STATE_SHOW || sessionObject.state == STATE_CONFIG) && isPOST ) {
-			if( buttonPressed( request, LIST ) ) { 
-				sessionObject.state = STATE_LIST;
-			} else if (
-			    buttonPressed( request, PREVPAGE ) ||    // All these buttons are not shown but we could be lost
+		else if (isPOST) {
+			if (buttonPressed(request, LIST) ||
+			    buttonPressed( request, PREVPAGE ) ||
 			    buttonPressed( request, NEXTPAGE ) ||
 			    buttonPressed( request, FIRSTPAGE ) ||
 			    buttonPressed( request, LASTPAGE ) ||
@@ -1009,27 +995,32 @@ public class WebMail extends HttpServlet
 			    buttonPressed( request, INVERT ) ||
 			    buttonPressed( request, SORT ) ||
 			    buttonPressed( request, REFRESH )) {
-				sessionObject.state = STATE_LIST;
+				state = State.LIST;
+			} else if (buttonPressed(request, PREV) ||
+			           buttonPressed(request, NEXT) ||
+			           buttonPressed(request, SAVE_AS)) {
+				state = State.SHOW;
+			} else if (buttonPressed(request, DELETE) ||
+			           buttonPressed(request, REALLYDELETE)) {
+				if (request.getParameter(B64UIDL) != null)
+					state = State.SHOW;
+				else
+					state = State.LIST;
+			} else if (buttonPressed(request, CANCEL)) {
+				if (request.getParameter(B64UIDL) != null)
+					state = State.SHOW;
 			}
-		}
-
-		/*
-		 * config
-		 */
-		if (sessionObject.state == STATE_CONFIG && isPOST) {
-			if (buttonPressed(request, OFFLINE)) {       // lost
-				sessionObject.state = STATE_AUTH;
-			} else if (buttonPressed(request, LOGIN)) {  // lost
-				sessionObject.state = STATE_AUTH;
-			}
+		} else if (buttonPressed(request, DOWNLOAD) ||
+		           buttonPressed(request, RAW_ATTACHMENT)) {
+			// GET params
+			state = State.SHOW;
 		}
 
 		/*
 		 * buttons on both folder and message dialog
 		 */
-		if( sessionObject.state == STATE_SHOW || sessionObject.state == STATE_LIST ) {
 			if( isPOST && buttonPressed( request, NEW ) ) {
-				sessionObject.state = STATE_NEW;
+				state = State.NEW;
 			}
 			
 			boolean reply = false;
@@ -1040,21 +1031,24 @@ public class WebMail extends HttpServlet
 			sessionObject.body = null;
 			sessionObject.subject = null;
 			
-			if( buttonPressed( request, REPLY ) )
+			if (buttonPressed(request, REPLY)) {
 				reply = true;
-			
+				state = State.NEW;
+			}
 			if( buttonPressed( request, REPLYALL ) ) {
 				replyAll = true;
+				state = State.NEW;
 			}
 			if( buttonPressed( request, FORWARD ) ) {
 				forward = true;
+				state = State.NEW;
 			}
 			if( reply || replyAll || forward ) {
 				/*
 				 * try to find message
 				 */
 				String uidl = null;
-				if( sessionObject.state == STATE_LIST ) {
+				if( state == State.LIST ) {
 					// these buttons are now hidden on the folder page,
 					// but the idea is to use the first checked message
 					List<String> items = getCheckedItems(request);
@@ -1155,20 +1149,29 @@ public class WebMail extends HttpServlet
 							pw.flush();
 							sessionObject.body = text.toString();
 						}
-						sessionObject.state = STATE_NEW;
+						state = State.NEW;
 					}
 					else {
 						sessionObject.error += _t("Could not fetch mail body.") + '\n';
 					}
 				}
 			}
+
+		// Set state if unknown
+		if (state == null) {
+			if (request.getParameter(CONFIG_TEXT) != null || buttonPressed(request, CONFIGURE))
+				state = State.CONFIG;
+			else if (request.getParameter(SHOW) != null)
+				state = State.SHOW;
+			else
+				state = State.LIST;
 		}
 
 		/*
 		 * folder view
 		 * SHOW is the one parameter that's a link, not a button, so we allow it for GET
 		 */
-		if( sessionObject.state == STATE_LIST || sessionObject.state == STATE_SHOW) {
+		if( state == State.LIST || state == State.SHOW) {
 			/*
 			 * check if user wants to view a message
 			 */
@@ -1177,12 +1180,13 @@ public class WebMail extends HttpServlet
 				// This is the I2P Base64, not the encoder
 				String uidl = Base64.decodeToString(show);
 				if(uidl != null) {
-					sessionObject.state = STATE_SHOW;
+					state = State.SHOW;
 				} else {
 					sessionObject.error += _t("Message id not valid.") + '\n';
 				}
 			}
 		}
+		return state;
 	}
 
 	/**
@@ -1205,8 +1209,9 @@ public class WebMail extends HttpServlet
 	/**
 	 * @param sessionObject
 	 * @param request
+	 * @return new state
 	 */
-	private static void processGenericButtons(SessionObject sessionObject, RequestWrapper request)
+	private static State processGenericButtons(SessionObject sessionObject, RequestWrapper request, State state)
 	{
 		// these two buttons are only on the folder view now
 /**** All RELOAD buttons are commented out
@@ -1223,8 +1228,7 @@ public class WebMail extends HttpServlet
 			POP3MailBox mailbox = sessionObject.mailbox;
 			if (mailbox == null) {
 				sessionObject.error += _t("Internal error, lost connection.") + '\n';
-				sessionObject.state = STATE_AUTH;
-				return;
+				return State.AUTH;
 			}
 			// TODO how to do a "No new mail" message?
 			mailbox.refresh();
@@ -1236,6 +1240,7 @@ public class WebMail extends HttpServlet
 				sessionObject.folder.setElements(uidls);
 			sessionObject.pageChanged = true;
 		}
+		return state;
 	}
 
 	/**
@@ -1244,14 +1249,15 @@ public class WebMail extends HttpServlet
 	 *
 	 * @param sessionObject
 	 * @param request
+	 * @return new state, or null if unknown
 	 */
-	private static void processComposeButtons(SessionObject sessionObject, RequestWrapper request)
+	private static State processComposeButtons(SessionObject sessionObject, RequestWrapper request)
 	{
+		State state = null;
 		String filename = request.getFilename( NEW_FILENAME );
 		// We handle an attachment whether sending or uploading
 		if (filename != null &&
 		    (buttonPressed(request, NEW_UPLOAD) || buttonPressed(request, SEND))) {
-			Debug.debug(Debug.DEBUG, "Got filename in compose form: " + filename);
 			int i = filename.lastIndexOf('/');
 			if( i != - 1 )
 				filename = filename.substring( i + 1 );
@@ -1300,6 +1306,7 @@ public class WebMail extends HttpServlet
 					if (out != null) try { out.close(); } catch (IOException ioe) {}
 				}
 			}
+			state = State.NEW;
 		}
 		else if( sessionObject.attachments != null && buttonPressed( request, DELETE_ATTACHMENT ) ) {
 			for (String item : getCheckedItems(request)) {
@@ -1314,7 +1321,9 @@ public class WebMail extends HttpServlet
 					}
 				} catch (NumberFormatException nfe) {}
 			}			
+			state = State.NEW;
 		}
+		return state;
 	}
 
 	/**
@@ -1322,22 +1331,18 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 * @return the next UIDL to see (if PREV/NEXT pushed), or null (if REALLYDELETE pushed), or showUIDL,
-	 *         or "delete" (if DELETE pushed)
+	 *         or "delete" (if DELETE pushed). If null, next state should be LIST.
 	 */
 	private static String processMessageButtons(SessionObject sessionObject, String showUIDL, RequestWrapper request)
 	{
 		if( buttonPressed( request, PREV ) ) {
 			String b64UIDL = request.getParameter(PREV_B64UIDL);
 			String uidl = Base64.decodeToString(b64UIDL);
-			if(uidl == null)
-				sessionObject.state = STATE_LIST;
 			return uidl;
 		}
 		if( buttonPressed( request, NEXT ) ) {
 			String b64UIDL = request.getParameter(NEXT_B64UIDL);
 			String uidl = Base64.decodeToString(b64UIDL);
-			if(uidl == null)
-				sessionObject.state = STATE_LIST;
 			return uidl;
 		}
 		
@@ -1347,7 +1352,6 @@ public class WebMail extends HttpServlet
 			return DELETE;
 		}
 		if( buttonPressed( request, REALLYDELETE ) ) {
-			sessionObject.state = STATE_LIST;
 			sessionObject.mailCache.delete(showUIDL);
 			sessionObject.folder.removeElement(showUIDL);
 			return null;
@@ -1550,18 +1554,17 @@ public class WebMail extends HttpServlet
 	/*
 	 * process config buttons, both entering and exiting
 	 * @param isPOST disallow button pushes if false
-	 * @return true if we should go to config page
+	 * @return new state, or null if unknown
 	 */
-	private static boolean processConfigButtons(SessionObject sessionObject, RequestWrapper request, boolean isPOST) {
+	private static State processConfigButtons(SessionObject sessionObject, RequestWrapper request, boolean isPOST, State state) {
 		if (buttonPressed(request, CONFIGURE)) {
-			sessionObject.state = STATE_CONFIG;
-			return true;
+			return state.CONFIG;
 		}
 		// If no config text, we can't be on the config page,
 		// and we don't want to process the CANCEL button which
 		// is also on the compose page.
 		if (!isPOST || request.getParameter(CONFIG_TEXT) == null)
-			return false;
+			return state;
 		if (buttonPressed(request, SAVE)) {
 			try {
 				String raw = request.getParameter(CONFIG_TEXT);
@@ -1589,7 +1592,7 @@ public class WebMail extends HttpServlet
 				}
 				boolean release = !Boolean.parseBoolean(props.getProperty(CONFIG_DEBUG));
 				Debug.setLevel( release ? Debug.ERROR : Debug.DEBUG );
-				sessionObject.state = sessionObject.folder != null ? STATE_LIST : STATE_AUTH;
+				state = sessionObject.folder != null ? State.LIST : State.AUTH;
 				sessionObject.info = _t("Configuration saved");
 			} catch (IOException ioe) {
 				sessionObject.error = ioe.toString();
@@ -1604,9 +1607,9 @@ public class WebMail extends HttpServlet
 					int oldPageSize = sessionObject.folder.getPageSize();
 					if( pageSize != oldPageSize )
 						sessionObject.folder.setPageSize( pageSize );
-					sessionObject.state = STATE_LIST;
+					state = State.LIST;
 				} else {
-					sessionObject.state = STATE_AUTH;
+					state = State.AUTH;
 				}
 			} catch (IOException ioe) {
 				sessionObject.error = ioe.toString();
@@ -1614,10 +1617,12 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _t("Invalid pagesize number, resetting to default value.") + '\n';
 			}
 		} else if (buttonPressed(request, CANCEL)) {
-			sessionObject.state = (sessionObject.folder != null) ? STATE_LIST : STATE_AUTH;
+			state = (sessionObject.folder != null) ? State.LIST : State.AUTH;
 		}
-		return false;
+		return state;
 	}
+
+	//// End state change and button processing ////
 
 	/**
 	 * @param httpSession
@@ -1630,9 +1635,9 @@ public class WebMail extends HttpServlet
 		if( sessionObject == null ) {
 			sessionObject = new SessionObject();
 			httpSession.setAttribute( "sessionObject", sessionObject );
-			Debug.debug(Debug.DEBUG, "NEW session " + httpSession.getId() + " state = " + sessionObject.state);
+			Debug.debug(Debug.DEBUG, "NEW session " + httpSession.getId());
 		} else {
-			Debug.debug(Debug.DEBUG, "Existing session " + httpSession.getId() + " state = " + sessionObject.state +
+			Debug.debug(Debug.DEBUG, "Existing session " + httpSession.getId() +
 				" created " + new Date(httpSession.getCreationTime()));
 		}
 		return sessionObject;
@@ -1649,6 +1654,8 @@ public class WebMail extends HttpServlet
             return false;
         return ServletUtil.isSmallBrowser(ua);
     }
+
+	//// Start request handling here ////
 
 	/**
 	 * The entry point for all web page loads
@@ -1717,12 +1724,13 @@ public class WebMail extends HttpServlet
 					if (nonce == null || !sessionObject.isValidNonce(nonce)) {
 						// These two strings are already in the router console FormHandler,
 						// so translate with that bundle.
-						sessionObject.error = consoleGetString(
+						sessionObject.error += consoleGetString(
 							"Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.",
 							ctx)
 							+ '\n' +
 							consoleGetString("If the problem persists, verify that you have cookies enabled in your browser.",
-							ctx);
+							ctx)
+							+ '\n';
 						isPOST = false;
 					}
 				} catch (IllegalStateException ise) {
@@ -1732,14 +1740,20 @@ public class WebMail extends HttpServlet
 				}
 			}
 
-			// This must be called to add the attachment before
-			// processStateChangeButtons() sends the message
-			if(isPOST && sessionObject.state == STATE_NEW)
-				processComposeButtons( sessionObject, request );
-		
-			int oldState = sessionObject.state;
-			processStateChangeButtons( sessionObject, request, isPOST );
-			if (processConfigButtons(sessionObject, request, isPOST)) {
+			//// Start state determination and button processing
+
+			State state = null;
+			if (sessionObject.mailbox == null) {
+				state = State.AUTH;
+			} else if (isPOST) {
+				// This must be called to add the attachment before
+				// processStateChangeButtons() sends the message
+				state = processComposeButtons(sessionObject, request);
+			}		
+			state = processStateChangeButtons(sessionObject, request, isPOST, state);
+			state = processConfigButtons(sessionObject, request, isPOST, state);
+			Debug.debug(Debug.DEBUG, "Prelim. state is " + state);
+			if (state == State.CONFIG) {
 				if (isPOST) {
 					// P-R-G
 					String q = '?' + CONFIGURE;
@@ -1747,23 +1761,20 @@ public class WebMail extends HttpServlet
 					return;
 				}
 			}
-			int newState = sessionObject.state;
-			if (oldState != newState)
-				Debug.debug(Debug.DEBUG, "STATE CHANGE from " + oldState + " to " + newState);
 			// Set in web.xml
-			//if (oldState == STATE_AUTH && newState != STATE_AUTH) {
+			//if (oldState == State.AUTH && newState != State.AUTH) {
 			//	int oldIdle = httpSession.getMaxInactiveInterval();
 			//	httpSession.setMaxInactiveInterval(60*60*24);  // seconds
 			//	int newIdle = httpSession.getMaxInactiveInterval();
 			//	Debug.debug(Debug.DEBUG, "Changed idle from " + oldIdle + " to " + newIdle);
 			//}
 			
-			if( sessionObject.state != STATE_AUTH ) {
+			if( state != State.AUTH ) {
 				if (isPOST)
-				       processGenericButtons( sessionObject, request );
+				       state = processGenericButtons(sessionObject, request, state);
 			}
 			
-			if( sessionObject.state == STATE_LIST ) {
+			if( state == State.LIST ) {
 				if (isPOST) {
 					int page = 1;
 					String sp = request.getParameter(CUR_PAGE);
@@ -1801,19 +1812,21 @@ public class WebMail extends HttpServlet
 				}
 			}
 			
-			// ?show= links - this forces STATE_SHOW
+			// ?show= links - this forces State.SHOW
 			String b64UIDL = request.getParameter(SHOW);
 			// attachment links, images, next/prev/delete on show form
 			if (b64UIDL == null)
 				b64UIDL = request.getParameter(B64UIDL);
 			String showUIDL = Base64.decodeToString(b64UIDL);
-			if( sessionObject.state == STATE_SHOW ) {
+			if( state == State.SHOW ) {
 				if (isPOST) {
 					String newShowUIDL = processMessageButtons(sessionObject, showUIDL, request);
-					// SEND and CANCEL are from NEW page
-					if (newShowUIDL != null &&
-					    (!newShowUIDL.equals(showUIDL) ||
-					     buttonPressed(request, SEND) || buttonPressed(request, CANCEL))) {
+					if (newShowUIDL == null) {
+						state = State.LIST;
+						showUIDL = null;
+					} else if (!newShowUIDL.equals(showUIDL) ||
+						   buttonPressed(request, SEND) || buttonPressed(request, CANCEL)) {
+						// SEND and CANCEL are from NEW page
 						// P-R-G
 						String q;
 						if (newShowUIDL.equals(DELETE))
@@ -1825,16 +1838,16 @@ public class WebMail extends HttpServlet
 					}
 				}
 				// ?download=nnn&amp;b64uidl link (same for ?att) should be valid in any state
-				if (processDownloadLink(sessionObject, showUIDL, request, response)) {
+				if (showUIDL != null && processDownloadLink(sessionObject, showUIDL, request, response)) {
 					// download or raw view sent, or 404
 					return;
 				}
-				if (isPOST && processSaveAsLink(sessionObject, showUIDL, request, response)) {
+				if (isPOST && showUIDL != null && processSaveAsLink(sessionObject, showUIDL, request, response)) {
 					// download sent, or 404
 					return;
 				}
 				// If the last message has just been deleted then
-				// sessionObject.state = STATE_LIST and
+				// state = State.LIST and
 				// sessionObject.showUIDL = null
 				if (showUIDL != null) {
 					Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
@@ -1844,15 +1857,18 @@ public class WebMail extends HttpServlet
 					}
 				} else {
 					// can't SHOW without a UIDL
-					sessionObject.state = STATE_LIST;
+					state = State.LIST;
 				}
 			}
-			
+
+			//// End state determination, state will not change after here
+			Debug.debug(Debug.DEBUG, "Final state is " + state);
+
 			/*
 			 * update folder content
 			 */
 			Folder<String> folder = sessionObject.folder;
-			if( sessionObject.state == STATE_LIST ) {
+			if( state == State.LIST ) {
 				// get through cache so we have the disk-only ones too
 				String[] uidls = sessionObject.mailCache.getUIDLs();
 				if (uidls != null) {
@@ -1861,19 +1877,21 @@ public class WebMail extends HttpServlet
 				}
 			}
 
+			//// Begin output
+
 				PrintWriter out = response.getWriter();
 				
 				/*
 				 * build subtitle
 				 */
-				if( sessionObject.state == STATE_AUTH )
+				if( state == State.AUTH )
 					subtitle = _t("Login");
-				else if( sessionObject.state == STATE_LIST ) {
+				else if( state == State.LIST ) {
 					// mailbox.getNumMails() forces a connection, don't use it
 					// Not only does it slow things down, but a failure causes all our messages to "vanish"
 					//subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
 					subtitle = ngettext("1 Message", "{0} Messages", folder.getSize());
-				} else if( sessionObject.state == STATE_SHOW ) {
+				} else if( state == State.SHOW ) {
 					Mail mail = showUIDL != null ? sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.HEADER) : null;
 					if (mail != null && mail.hasHeader()) {
 						if (mail.shortSubject != null)
@@ -1883,9 +1901,9 @@ public class WebMail extends HttpServlet
 					} else {
 						subtitle = _t("Message not found.");
 					}
-				} else if( sessionObject.state == STATE_NEW ) {
+				} else if( state == State.NEW ) {
 					subtitle = _t("New Message");
-				} else if( sessionObject.state == STATE_CONFIG ) {
+				} else if( state == State.CONFIG ) {
 					subtitle = _t("Configuration");
 				}
 
@@ -1903,9 +1921,9 @@ public class WebMail extends HttpServlet
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
 						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css\" />\n" );
 				}
-				if(sessionObject.state != STATE_AUTH)
+				if(state != State.AUTH)
 					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css\" type=\"text/css\" media=\"print\" />");
-				if (sessionObject.state == STATE_NEW) {
+				if (state == State.NEW) {
 					// TODO cancel if to and body are empty
 					out.println(
 						"<script type=\"text/javascript\">\n" +
@@ -1915,24 +1933,26 @@ public class WebMail extends HttpServlet
 						"</script>"
 					);
 					out.println("<script src=\"/susimail/js/compose.js\" type=\"text/javascript\"></script>");
-				} else if (sessionObject.state == STATE_LIST) {
+				} else if (state == State.LIST) {
 					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
 				}
-				out.print("</head>\n<body" + (sessionObject.state == STATE_LIST ? " onload=\"deleteboxclicked()\">" : ">"));
-				String nonce = sessionObject.state == STATE_AUTH ? LOGIN_NONCE :
+				out.print("</head>\n<body" + (state == State.LIST ? " onload=\"deleteboxclicked()\">" : ">"));
+				String nonce = state == State.AUTH ? LOGIN_NONCE :
 				                                                   Long.toString(ctx.random().nextLong());
 				sessionObject.addNonce(nonce);
 				out.println(
 					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
-					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">");
-				if( sessionObject.state == STATE_SHOW || sessionObject.state == STATE_NEW) {
+					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">\n" +
+					// we use this to know if the user thought he was logged in at the time
+					"<input type=\"hidden\" name=\"" + DEBUG_STATE + "\" value=\"" + state + "\">");
+				if( state == State.SHOW || state == State.NEW) {
 					// Store the reference UIDL on the compose form also
 					if (showUIDL != null) {
 						// reencode, as showUIDL may have changed, and also for XSS
 						b64UIDL = Base64.encode(showUIDL);
 						out.println("<input type=\"hidden\" name=\"" + B64UIDL + "\" value=\"" + b64UIDL + "\">");
-					} else if (sessionObject.state == STATE_NEW) {
+					} else if (state == State.NEW) {
 						// for NEW, try to get back to the current page if we weren't replying
 						int page = 1;
 						String sp = request.getParameter(CUR_PAGE);
@@ -1958,19 +1978,19 @@ public class WebMail extends HttpServlet
 				/*
 				 * now write body
 				 */
-				if( sessionObject.state == STATE_AUTH )
+				if( state == State.AUTH )
 					showLogin( out );
 				
-				else if( sessionObject.state == STATE_LIST )
+				else if( state == State.LIST )
 					showFolder( out, sessionObject, request );
 				
-				else if( sessionObject.state == STATE_SHOW )
+				else if( state == State.SHOW )
 					showMessage(out, sessionObject, showUIDL, buttonPressed(request, DELETE));
 				
-				else if( sessionObject.state == STATE_NEW )
+				else if( state == State.NEW )
 					showCompose( out, sessionObject, request );
 				
-				else if( sessionObject.state == STATE_CONFIG )
+				else if( state == State.CONFIG )
 					showConfig(out, sessionObject);
 				
 				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
@@ -1984,7 +2004,7 @@ public class WebMail extends HttpServlet
 	 *  @param q starting with '?' or null
 	 *  @since 0.9.33 adapted from I2PSnarkServlet
 	 */
-	private void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String q) throws IOException {
+	private static void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String q) throws IOException {
 		String url = req.getRequestURL().toString();
 		StringBuilder buf = new StringBuilder(128);
 		int qq = url.indexOf('?');
@@ -1995,6 +2015,7 @@ public class WebMail extends HttpServlet
 			buf.append(q.replace("&amp;", "&"));  // no you don't html escape the redirect header
 		resp.setHeader("Location", buf.toString());
 		resp.sendError(302, "Moved");
+		Debug.debug(Debug.DEBUG, "P-R-G to " + q);
 	}
 
 	/**
