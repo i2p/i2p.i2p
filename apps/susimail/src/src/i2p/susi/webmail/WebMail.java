@@ -1235,14 +1235,17 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _t("Internal error, lost connection.") + '\n';
 				return State.AUTH;
 			}
-			// TODO how to do a "No new mail" message?
 			mailbox.refresh();
-			sessionObject.error += mailbox.lastError();
+			String error = mailbox.lastError();
+			sessionObject.error += error;
 			sessionObject.mailCache.getMail(MailCache.FetchMode.HEADER);
 			// get through cache so we have the disk-only ones too
 			String[] uidls = sessionObject.mailCache.getUIDLs();
-			if (uidls != null)
-				sessionObject.folder.addElements(Arrays.asList(uidls));
+			int added = sessionObject.folder.addElements(Arrays.asList(uidls));
+			if (added > 0)
+				sessionObject.info += ngettext("{0} new message", "{0} new messages", added);
+			else if (error.length() <= 0)
+				sessionObject.info += _t("No new messages");
 			sessionObject.pageChanged = true;
 		}
 		return state;
@@ -1886,7 +1889,7 @@ public class WebMail extends HttpServlet
 
 				// get through cache so we have the disk-only ones too
 				String[] uidls = sessionObject.mailCache.getUIDLs();
-				if (folder.addElements(Arrays.asList(uidls))) {
+				if (folder.addElements(Arrays.asList(uidls)) > 0) {
 					// we added elements, so it got sorted
 				} else {
 					// check for changed sort

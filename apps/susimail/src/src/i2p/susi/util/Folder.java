@@ -218,7 +218,7 @@ public class Folder<O extends Object> {
 	 * @return true if added
 	 */
 	public boolean addElement(O element) {
-		return addElements(Collections.singletonList(element));
+		return addElements(Collections.singletonList(element)) > 0;
 	}
 	
 	/**
@@ -226,11 +226,11 @@ public class Folder<O extends Object> {
 	 * Re-sorts the array if a sorter is set and any elements are actually added.
 	 * 
 	 * @param elems to add
-	 * @return true if any were added
+	 * @return number added
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized boolean addElements(List<O> elems) {
-		boolean shouldUpdate = false;
+	public synchronized int addElements(List<O> elems) {
+		int added = 0;
 		if (elements != null) {
 			// delay copy until required
 			List<O> list = null;
@@ -245,19 +245,19 @@ public class Folder<O extends Object> {
 				if (!found) {
 					if (list == null) {
 						list = new ArrayList<O>(Arrays.asList(elements));
-						shouldUpdate = true;
 					}
 					list.add(e);
 				}
 			}
-			if (shouldUpdate) {
+			if (list != null) {
+				added = list.size() - elements.length;
 				setElements((O[]) list.toArray(new Object[list.size()]));
 			}
 		} else if (!elems.isEmpty()) {
-			setElements((O[]) (elems.toArray(new Object[elems.size()])));
-			shouldUpdate = true;
+			added = elems.size();
+			setElements((O[]) (elems.toArray(new Object[added])));
 		}
-		return shouldUpdate;
+		return added;
 	}
 	
 	/**
