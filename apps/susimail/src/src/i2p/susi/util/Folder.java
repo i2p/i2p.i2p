@@ -39,7 +39,7 @@ import java.util.Map;
  * paging and sorting.
  * 
  * You create a folder object, set the contents with setElements(),
- * add Comparators with addSorter(), choose one with sortBy() and
+ * add Comparators with addSorter(), choose one with setSortBy() and
  * and then fetch the content of the current page with
  * currentPageIterator().
  * 
@@ -153,17 +153,20 @@ public class Folder<O extends Object> {
 
 	/**
 	 * Sorts the elements according the order given by @link addSorter()
-	 * and @link sortBy().
+	 * and @link setSortBy().
+         *
+         * @since public since 0.9.33
 	 */
-	private void sort()
+	public synchronized void sort()
 	{
-		if( currentSorter != null )
+		if (currentSorter != null && elements != null && elements.length > 1)
 			Arrays.sort( elements, currentSorter );
 	}
 	
 	/**
 	 * Set the array of objects the folder should manage.
 	 * Does NOT copy the array.
+	 * Sorts the array if a sorter set.
 	 * 
 	 * @param elements Array of Os.
 	 */
@@ -171,8 +174,7 @@ public class Folder<O extends Object> {
 	{
 		if (elements.length > 0) {
 			this.elements = elements;
-			if( currentSorter != null )
-				sort();
+			sort();
 		} else {
 			this.elements = null;
 		}
@@ -213,33 +215,49 @@ public class Folder<O extends Object> {
 	 * Add an element only if it does not already exist
 	 * 
 	 * @param element to add
+	 * @return true if added
 	 */
-	public void addElement(O element) {
-		addElements(Collections.singleton(element));
+	public boolean addElement(O element) {
+		return addElements(Collections.singletonList(element));
 	}
 	
 	/**
-	 * Add elements only if it they do not already exist
+	 * Add elements only if they do not already exist
+	 * Re-sorts the array if a sorter is set and any elements are actually added.
 	 * 
-	 * @param elems to adde
+	 * @param elems to add
+	 * @return true if any were added
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void addElements(Collection<O> elems) {
+	public synchronized boolean addElements(List<O> elems) {
+		boolean shouldUpdate = false;
 		if (elements != null) {
-			List<O> list = new ArrayList<O>(Arrays.asList(elements));
-			boolean shouldUpdate = false;
+			// delay copy until required
+			List<O> list = null;
 			for (O e : elems) {
-				if (!list.contains(e)) {
+				boolean found = false;
+				for (int i = 0; i < elements.length; i++) {
+					if (e.equals(elements[i])) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					if (list == null) {
+						list = new ArrayList<O>(Arrays.asList(elements));
+						shouldUpdate = true;
+					}
 					list.add(e);
-					shouldUpdate = true;
 				}
 			}
 			if (shouldUpdate) {
-				elements = (O[]) list.toArray(new Object[list.size()]);
-				sort();
-				update();
+				setElements((O[]) list.toArray(new Object[list.size()]));
 			}
+		} else if (!elems.isEmpty()) {
+			setElements((O[]) (elems.toArray(new Object[elems.size()])));
+			shouldUpdate = true;
 		}
+		return shouldUpdate;
 	}
 	
 	/**
@@ -303,9 +321,9 @@ public class Folder<O extends Object> {
 	
 	/**
 	 * Adds a new sorter to the folder. You can sort the folder by
-	 * calling sortBy() and choose the given id there.
+	 * calling setSortBy() and choose the given id there.
 	 * 
-	 * @param id ID to identify the Comparator with @link sortBy()
+	 * @param id ID to identify the Comparator with @link setSortBy()
 	 * @param sorter a Comparator to sort the Array given by @link setElements()
 	 */
 	public synchronized void addSorter( String id, Comparator<O> sorter )
@@ -317,16 +335,21 @@ public class Folder<O extends Object> {
 	 * Activates sorting by the choosen Comparator. The id must
 	 * match the one, which the Comparator has been stored in the
 	 * folder with @link addSorter().
+	 * Sets the sorting direction of the folder.
+	 * 
+	 * Warning, this does not do the actual sort, only addElements() and setElements() does a sort.
 	 * 
 	 * @param id ID to identify the Comparator stored with @link addSorter()
+	 * @param direction UP or DOWN. UP is reverse sort.
 	 */
-	public synchronized void sortBy( String id )
+	public synchronized void setSortBy(String id, SortOrder direction)
 	{
+		sortingDirection = direction;
 		currentSorter = sorter.get( id );
 		if (currentSorter != null) {
 			if (sortingDirection == SortOrder.UP)
 				currentSorter = Collections.reverseOrder(currentSorter);
-				currentSortID = id;
+			currentSortID = id;
 		} else {
 			currentSortID = null;
 		}
@@ -367,17 +390,6 @@ public class Folder<O extends Object> {
 	}
 ****/
 
-	/**
-	 * Sets the sorting direction of the folder.
-	 * Does not re-sort. Caller must call sortBy()
-	 * 
-	 * @param direction UP or DOWN
-	 */
-	public synchronized void setSortingDirection(SortOrder direction)
-	{
-		sortingDirection = direction;
-	}
-	
 	/**
 	 * Returns the first element of the sorted folder.
 	 * 

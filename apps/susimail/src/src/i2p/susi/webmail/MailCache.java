@@ -90,6 +90,7 @@ class MailCache {
 	 * The ones known locally, which will include any known on the server, if connected.
 	 * Will not include any marked for deletion.
 	 * 
+	 * @return non-null
 	 * @since 0.9.13
 	 */
 	public String[] getUIDLs() {
