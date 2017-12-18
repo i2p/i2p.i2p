@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
+import net.i2p.servlet.util.WriterOutputStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;

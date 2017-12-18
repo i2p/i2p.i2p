@@ -6,6 +6,7 @@ import java.util.Set;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.router.web.HelperBase;
+import net.i2p.servlet.util.WriterOutputStream;
 
 /**
  *  Dump the peer profile data if given a full B64 peer string or prefix.
