@@ -6,15 +6,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import net.i2p.data.DataHelper;
+
 /**
  * Simple lookahead buffer to keep the last K bytes in reserve,
  * configured to easily be reused.  Currently only used by the
- * ResettableGZIPInputStream
- *
+ * ResettableGZIPInputStream.
  */
 public class LookaheadInputStream extends FilterInputStream {
     private boolean _eofReached;
     private final byte[] _footerLookahead;
+    private final int size;
+    // Next byte to read.
+    private int index;
     private static final InputStream _fakeInputStream = new ByteArrayInputStream(new byte[0]);
     
     /**
@@ -29,6 +33,7 @@ public class LookaheadInputStream extends FilterInputStream {
     public LookaheadInputStream(int lookaheadSize) {
         super(_fakeInputStream);
         _footerLookahead = new byte[lookaheadSize];
+        size = lookaheadSize;
     }
     
     public boolean getEOFReached() { return _eofReached; }
@@ -37,39 +42,31 @@ public class LookaheadInputStream extends FilterInputStream {
      *  Start the LookaheadInputStream with the given input stream.
      *  Resets everything if the LookaheadInputStream was previously used.
      *  WARNING - blocking until lookaheadSize bytes are read!
+     *
+     *  @throws IOException if less than lookaheadSize bytes could be read.
      */
     public void initialize(InputStream src) throws IOException {
         in = src;
         _eofReached = false;
-        Arrays.fill(_footerLookahead, (byte)0x00);
-        int footerRead = 0;
-        while (footerRead < _footerLookahead.length) {
-            int read = in.read(_footerLookahead, footerRead, _footerLookahead.length - footerRead);
-            if (read == -1) throw new IOException("EOF reading the footer lookahead");
-            footerRead += read;
-        }
+        index = 0;
+        DataHelper.read(in, _footerLookahead);
     }
     
     @Override
     public int read() throws IOException {
         if (_eofReached) 
-            return -1; //throw new IOException("Already past the EOF");
+            return -1;
         int c = in.read();
         if (c == -1) {
             _eofReached = true;
             return -1;
         }
-        int rv = _footerLookahead[0];
-        // FIXME use an index!!!!!!!!!!!!
-        System.arraycopy(_footerLookahead, 1, _footerLookahead, 0, _footerLookahead.length-1);
-        _footerLookahead[_footerLookahead.length-1] = (byte)c;
-        if (rv < 0) rv += 256;
+        int rv = _footerLookahead[index] & 0xff;
+        _footerLookahead[index] = (byte)c;
+        index++;
+        if (index >= size)
+            index = 0;
         return rv;
-    }
-
-    @Override
-    public int read(byte buf[]) throws IOException {
-        return read(buf, 0, buf.length);
     }
 
     @Override
@@ -90,8 +87,32 @@ public class LookaheadInputStream extends FilterInputStream {
         return len;
     }
     
-    /** grab the lookahead footer */
-    public byte[] getFooter() { return _footerLookahead; }
+    /**
+     * Grab the lookahead footer.
+     * This will be of size lookaheadsize given in constructor.
+     * The last byte received will be in the last byte of the array.
+     */
+    public byte[] getFooter() {
+        if (index == 0)
+            return _footerLookahead;
+        byte[] rv = new byte[size];
+        System.arraycopy(_footerLookahead, index, rv, 0, size - index);
+        System.arraycopy(_footerLookahead, 0, rv, size - index, index);
+        return rv;
+    }
+    
+    /**
+     *  @since 0.9.33
+     */
+    @Override
+    public long skip(long n) throws IOException {
+        long rv = 0;
+        int c;
+        while (rv < n && (c = read()) >= 0) {
+            rv++;
+        }
+        return rv;
+    }
     
 /*******
     public static void main(String args[]) {
@@ -111,14 +132,17 @@ public class LookaheadInputStream extends FilterInputStream {
             for (int i = 0; i < 8; i++)
                 if (lis.getFooter()[i] != (byte)(i+24))
                     throw new RuntimeException("Error at footer " + i + " [" + lis.getFooter()[i] + "]");
-            System.out.println("Everything is fine in general");
         } catch (Exception e) {
             e.printStackTrace();
         }
         
         for (int i = 9; i < 32*1024; i++) {
-            if (!test(i)) break;
+            if (!test(i)) {
+                System.out.println("Everything is NOT fine at size=" + i);
+                break;
+            }
         }
+        System.out.println("Everything is fine in general");
     }
     
     private static boolean test(int size) {
@@ -137,7 +161,7 @@ public class LookaheadInputStream extends FilterInputStream {
             for (int i = 0; i < 8; i++)
                 if (lis.getFooter()[i] != buf[i+(size-8)])
                     throw new RuntimeException("Error at footer " + i + " [" + lis.getFooter()[i] + "]");
-            System.out.println("Everything is fine at size=" + size);
+            //System.out.println("Everything is fine at size=" + size);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
