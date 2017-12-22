@@ -82,10 +82,12 @@ public class QuotedPrintable extends Encoding {
 			for( int j = 1; j < BUFSIZE; j++ )
 				tmp[j-1] = tmp[j];
 			
-			if (c == 46 && l == 0) {
+			if ((c == '.' || c == '-') && l == 0) {
 				// leading '.' seems to get eaten by SMTP,
 				// even if more chars after it
-				String s = HexTable.table[46];
+				// just to be sure, do the same for '-'
+				// because it starts a boundary
+				String s = HexTable.table[c];
 				l = s.length();
 				out.append(s);
 			} else if (c > 32 && c < 127 && c != 61) {

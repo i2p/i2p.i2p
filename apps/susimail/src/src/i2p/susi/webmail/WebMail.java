@@ -958,6 +958,8 @@ public class WebMail extends HttpServlet
 			state = processLogin(sessionObject, request, state);
 
 		state = processLogout(sessionObject, request, isPOST, state);
+		if (state == State.AUTH)
+			return state;
 
 		/*
 		 *  compose dialog
@@ -2256,7 +2258,7 @@ public class WebMail extends HttpServlet
 			StringBuilder body = new StringBuilder(1024);
 			body.append( "From: " + from + "\r\n" );
 			Mail.appendRecipients( body, toList, "To: " );
-			Mail.appendRecipients( body, ccList, "To: " );
+			Mail.appendRecipients( body, ccList, "Cc: " );
 			body.append( "Subject: " );
 			try {
 				body.append( hl.encode( subject ) );
@@ -2684,8 +2686,16 @@ public class WebMail extends HttpServlet
 					"<tr><td align=\"right\">" + _t("From") +
 					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("Subject") +
-					":</td><td align=\"left\"><b>" + quoteHTML( mail.formattedSubject ) + "</b></td></tr>\n" +
-					"<tr><td align=\"right\">" + _t("Date") +
+					":</td><td align=\"left\"><b>" + quoteHTML( mail.formattedSubject ) + "</b></td></tr>\n");
+			if (mail.to != null) {
+				out.println("<tr><td align=\"right\">" + _t("To") +
+				            ":</td><td align=\"left\">" + buildRecipientLine(mail.to) + "</td></tr>\n");
+			}
+			if (mail.cc != null) {
+				out.println("<tr><td align=\"right\">" + _t("Cc") +
+				            ":</td><td align=\"left\">" + buildRecipientLine(mail.cc) + "</td></tr>\n");
+			}
+			out.println("<tr><td align=\"right\">" + _t("Date") +
 					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" +
 					"</table></td></tr>\n" );
@@ -2701,6 +2711,20 @@ public class WebMail extends HttpServlet
 			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Message not found.") + "</p></td></tr>\n" );
 		}
 		out.println( "</table></div>" );
+	}
+
+	/**
+	 *  TODO this is addresses only, we don't save the full line in Mail
+	 *  @since 0.9.33
+	 */
+	private static String buildRecipientLine(String[] to) {
+		StringBuilder buf = new StringBuilder(to.length * 16);
+		for (int i = 0; i < to.length; i++) {
+			buf.append(to[i]);
+			if (i < to.length - 1)
+				buf.append(", ");
+		}
+		return quoteHTML(buf.toString());
 	}
 
 	/**

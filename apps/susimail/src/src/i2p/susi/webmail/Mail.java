@@ -314,7 +314,8 @@ class Mail {
 						if( line.length() == 0 )
 							break;
 
-						if( line.startsWith( "From:" ) ) {
+						String hlc = line.toLowerCase(Locale.US);
+						if (hlc.startsWith("from:")) {
 							sender = line.substring( 5 ).trim();
 							//formattedSender = getAddress( sender );
 							shortSender = sender.replace("\"", "").trim();
@@ -330,7 +331,7 @@ class Mail {
 							if (trim)
 								shortSender += "&hellip;";  // must be after html encode
 						}
-						else if( line.startsWith( "Date:" ) ) {
+						else if (hlc.startsWith("date:")) {
 							dateString = line.substring( 5 ).trim();
 							try {
 								date = mailDateFormatter.parse( dateString );
@@ -344,7 +345,7 @@ class Mail {
 								e.printStackTrace();
 							}
 						}
-						else if( line.startsWith( "Subject:" ) ) {
+						else if (hlc.startsWith("subject:")) {
 							subject = line.substring( 8 ).trim();
 							formattedSubject = subject;
 							shortSubject = formattedSubject;
@@ -355,22 +356,45 @@ class Mail {
 							if (trim)
 								shortSubject += "&hellip;";  // must be after html encode
 						}
-						else if( line.toLowerCase(Locale.US).startsWith( "reply-to:" ) ) {
+						else if (hlc.startsWith("reply-to:")) {
 							reply = getAddress( line.substring( 9 ).trim() );
 						}
-						else if( line.startsWith( "To:" ) ) {
+						else if (hlc.startsWith("to:") ) {
 							ArrayList<String> list = new ArrayList<String>();
 							getRecipientsFromList( list, line.substring( 3 ).trim(), true );
-							to = list.toArray(new String[list.size()]);
+							if (list.isEmpty()) {
+								// don't set
+							} else if (to == null) {
+								to = list.toArray(new String[list.size()]);
+							} else if (cc == null) {
+								// Susimail bug before 0.9.33, sent 2nd To line that was really Cc
+								cc = list.toArray(new String[list.size()]);
+							} else {	
+								// add to the array, shouldn't happen
+								for (int i = 0; i < to.length; i++) {
+									list.add(i, to[i]);
+								}
+								to = list.toArray(new String[list.size()]);
+							}
 						}
-						else if( line.startsWith( "Cc:" ) ) {
+						else if (hlc.startsWith("cc:")) {
 							ArrayList<String> list = new ArrayList<String>();
 							getRecipientsFromList( list, line.substring( 3 ).trim(), true );
-							cc = list.toArray(new String[list.size()]);
-						} else if(line.equals( "X-Spam-Flag: YES" )) {
+							if (list.isEmpty()) {
+								// don't set
+							} else if (cc == null) {
+								cc = list.toArray(new String[list.size()]);
+							} else {	
+								// add to the array, shouldn't happen
+								for (int i = 0; i < cc.length; i++) {
+									list.add(i, cc[i]);
+								}
+								cc = list.toArray(new String[list.size()]);
+							}
+						} else if (hlc.equals("x-spam-flag: yes")) {
 							// TODO trust.spam.headers config
 							isSpam = true;
-						} else if(line.toLowerCase(Locale.US).startsWith("content-type:" )) {
+						} else if (hlc.startsWith("content-type:")) {
 							// this is duplicated in MailPart but
 							// we want to know if we have attachments, even if
 							// we haven't fetched the body
