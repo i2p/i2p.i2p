@@ -270,10 +270,12 @@ class Mail {
 	 */
 	public static void appendRecipients( StringBuilder buf, ArrayList<String> recipients, String prefix )
 	{
-		for( String recipient : recipients ) {
+		for (int i = 0; i < recipients.size(); i++) {
 			buf.append( prefix );
 			prefix ="\t";
-			buf.append( recipient );
+			buf.append(recipients.get(i));
+			if (i < recipients.size() - 1)
+				buf.append(',');
 			buf.append( "\r\n" );
 		}
 	}
