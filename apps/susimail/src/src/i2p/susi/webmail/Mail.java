@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import net.i2p.data.DataHelper;
 import net.i2p.util.SystemVersion;
@@ -52,8 +53,11 @@ import net.i2p.util.SystemVersion;
 class Mail {
 	
 	private static final String DATEFORMAT = "date.format";
-	
 	private static final String unknown = "unknown";
+	private static final String P1 = "^[^@< \t]+@[^> \t]+$";
+	private static final String P2 = "^<[^@< \t]+@[^> \t]+>$";
+	private static final Pattern PATTERN1 = Pattern.compile(P1);
+	private static final Pattern PATTERN2 = Pattern.compile(P2);
 
 	private int size;
 	public String sender,   // as received, trimmed only, not HTML escaped
@@ -216,9 +220,9 @@ class Mail {
 		String[] tokens = DataHelper.split(address, "[ \t]+");
 
 		for( int i = 0; i < tokens.length; i++ ) {
-			if( tokens[i].matches( "^[^@< \t]+@[^> \t]+$" ) )
+			if (PATTERN1.matcher(tokens[i]).matches())
 				return "<" + tokens[i] + ">";
-			if( tokens[i].matches( "^<[^@< \t]+@[^> \t]+>$" ) )
+			if (PATTERN2.matcher(tokens[i]).matches())
 				return tokens[i];
 		}
 		
