@@ -39,6 +39,8 @@ import net.i2p.data.DataHelper;
  *  Ref:
  *  http://en.wikipedia.org/wiki/MIME#Encoded-Word
  *  http://tools.ietf.org/html/rfc2047
+ *  https://jeffreystedfast.blogspot.com/2013/09/time-for-rant-on-mime-parsers.html
+ *  https://jeffreystedfast.blogspot.com/2013/08/why-decoding-rfc2047-encoded-headers-is.html
  *
  * @author susi
  */
@@ -51,24 +53,36 @@ public class HeaderLine extends Encoding {
 
 	private static final int BUFSIZE = 2;
 
-	public String encode( byte in[] ) throws EncodingException {
+	/**
+	 *  This will split multibyte chars across lines,
+	 *  see 4th ref above
+	 *
+	 *  @throws UnsupportedOperationException always
+	 */
+	public String encode(byte in[]) throws EncodingException {
+		throw new UnsupportedOperationException("use encode(String)");
+	}
+
+	@Override
+	public String encode(String str) throws EncodingException {
 		StringBuilder out = new StringBuilder();
-		int l = 0, buffered = 0, tmp[] = new int[BUFSIZE];
+		int l = 0, buffered = 0;
+		char tmp[] = new char[BUFSIZE];
 		boolean quoting = false;
 		boolean quote = false;
 		boolean linebreak = false;
 		StringBuilder quotedSequence = null;
-		int rest = in.length;
+		int rest = str.length();
 		int index = 0;
 		while( true ) {
 			while( rest > 0 && buffered < BUFSIZE ) {
-				tmp[buffered++] = in[index++];
+				tmp[buffered++] = str.charAt(index++);	
 				rest--;
 			}
 			if( rest == 0 && buffered == 0 )
 				break;
 			
-			int c = tmp[0];
+			char c = tmp[0];
 			buffered--;
 			for( int j = 1; j < BUFSIZE; j++ )
 				tmp[j-1] = tmp[j];
@@ -92,23 +106,46 @@ public class HeaderLine extends Encoding {
 					tmp[j-1] = tmp[j];
 			}
 			if( quote ) {
-				if( ! quoting ) {
+				// the encoded char
+				StringBuilder qc = new StringBuilder(16);
+				if (c <= 127) {
+					// single byte char
+					qc.append(HexTable.table[c]);
+				} else {
+					byte[] utf = DataHelper.getUTF8(String.valueOf(c));
+					for (int j = 0; j < utf.length; j++) {
+						int b = utf[j] & 0xff;
+						qc.append(HexTable.table[b]);
+					}
+				}
+				if (quoting) {
+					// would it be too long?
+					if (l + quotedSequence.length() + qc.length() + 2 >= 76) {
+						// close q-seq, wrap line, and start a new q-seq
+						out.append(quotedSequence);
+						out.append("?=\r\n\t");
+						l = 1;
+						quoting = false;
+					}
+				}
+				if (!quoting) {
+					// close q-seq, wrap line, and start a new q-seq
 					quotedSequence = new StringBuilder(64);
 					quotedSequence.append("=?utf-8?Q?");
 					quoting = true;
 				}
-				quotedSequence.append(HexTable.table[ c < 0 ? 256 + c : c ]);
+				quotedSequence.append(qc);
 			}
 			else {
 				if( quoting ) {
 					quotedSequence.append("?=");
 					int sl = quotedSequence.length();
-					if( l + sl > 76 ) {
+					if( l + sl >= 76 ) {
 						/*
 						 * wrap line
 						 */
 						out.append( "\r\n\t" );
-						l = 0;
+						l = 1;
 					}
 					out.append( quotedSequence );
 					l += sl;
@@ -120,11 +157,11 @@ public class HeaderLine extends Encoding {
 					l = 0;
 				}
 				else {
-					if( l > 76 ) {
+					if( l >= 76 ) {
 						out.append( "\r\n\t" );
-						l = 0;
+						l = 1;
 					}
-					out.append( (char)c );
+					out.append(c);
 					l++;
 				}
 			}
@@ -132,12 +169,12 @@ public class HeaderLine extends Encoding {
 		if( quoting ) {
 			quotedSequence.append("?=");
 			int sl = quotedSequence.length();
-			if( l + sl > 76 ) {
+			if( l + sl >= 76 ) {
 				/*
 				 * wrap line
 				 */
 				out.append( "\r\n\t" );
-				l = 0;
+				l = 1;
 			}
 			out.append( quotedSequence );
 		}
