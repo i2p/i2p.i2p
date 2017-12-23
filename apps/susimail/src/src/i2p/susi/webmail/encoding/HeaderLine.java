@@ -66,44 +66,31 @@ public class HeaderLine extends Encoding {
 	@Override
 	public String encode(String str) throws EncodingException {
 		StringBuilder out = new StringBuilder();
-		int l = 0, buffered = 0;
-		char tmp[] = new char[BUFSIZE];
+		int l = 0;
 		boolean quoting = false;
 		boolean quote = false;
 		boolean linebreak = false;
 		StringBuilder quotedSequence = null;
-		int rest = str.length();
 		int index = 0;
 		while( true ) {
-			while( rest > 0 && buffered < BUFSIZE ) {
-				tmp[buffered++] = str.charAt(index++);	
-				rest--;
-			}
-			if( rest == 0 && buffered == 0 )
+			if (index >= str.length())
 				break;
-			
-			char c = tmp[0];
-			buffered--;
-			for( int j = 1; j < BUFSIZE; j++ )
-				tmp[j-1] = tmp[j];
-			
+			char c = str.charAt(index++);
 			quote = true;
 			if( c > 32 && c < 127 && c != 61 ) {
 				quote = false;
 			}
 			else if( ( c == 32 || c == 9 ) ) {
 				quote = false;
-				if( rest == 0 && buffered == 1 )
+				if (index >= str.length())
 					quote = true;
-				if( buffered > 0 && ( tmp[0] == '\r' || tmp[0] == '\n' ) )
+				else if (str.charAt(index) == '\r' || str.charAt(index) == '\n')
 					quote = true;
 			}
-			else if( c == 13 && buffered > 0 && tmp[0] == 10 ) {
+			else if (c == '\r' && index < str.length() && str.charAt(index) == '\n') {
 				quote = false;
 				linebreak = true;
-				buffered--;
-				for( int j = 1; j < BUFSIZE; j++ )
-					tmp[j-1] = tmp[j];
+				index++;
 			}
 			if( quote ) {
 				// the encoded char
