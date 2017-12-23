@@ -195,18 +195,26 @@ public class HeaderLine extends Encoding {
 												String charset = new String(in, f1 + 1, f2 - f1 - 1, "ISO-8859-1");
 												String clc = charset.toLowerCase(Locale.US);
 												if (clc.equals("utf-8") || clc.equals("utf8")) {
-													for( int j = 0; j < tmp.length; j++ ) {
-														byte d = tmp.content[ tmp.offset + j ];
-														out.write( d == '_' ? 32 : d );
+													if (enc.equals("quoted-printable")) {
+														for( int j = 0; j < tmp.length; j++ ) {
+															byte d = tmp.content[ tmp.offset + j ];
+															out.write( d == '_' ? 32 : d );
+														}
+													} else {
+														out.write(tmp.content, tmp.offset, tmp.length);
 													}
 												} else {
 													// decode string
 													String decoded = new String(tmp.content, tmp.offset, tmp.length, charset);
 													// encode string
 													byte[] utf8 = DataHelper.getUTF8(decoded);
-													for( int j = 0; j < utf8.length; j++ ) {
-														byte d = utf8[j];
-														out.write( d == '_' ? 32 : d );
+													if (enc.equals("quoted-printable")) {
+														for( int j = 0; j < utf8.length; j++ ) {
+															byte d = utf8[j];
+															out.write( d == '_' ? 32 : d );
+														}
+													} else {
+														out.write(utf8);
 													}
 												}
 												int distance = f4 + 2 - offset;
