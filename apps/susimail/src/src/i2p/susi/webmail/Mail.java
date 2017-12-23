@@ -280,17 +280,19 @@ class Mail {
 		}
 	}
 
-	private void parseHeaders()
-	{
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-		DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	private static DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+	private static DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+	private static DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
+	static {
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it
 		TimeZone tz = SystemVersion.getSystemTimeZone();
 		localDateFormatter.setTimeZone(tz);
 		longLocalDateFormatter.setTimeZone(tz);
-		DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
-		
+	}
+
+	private void parseHeaders()
+	{
 		error = "";
 		if( header != null ) {
 
@@ -340,11 +342,13 @@ class Mail {
 						else if (hlc.startsWith("date:")) {
 							dateString = line.substring( 5 ).trim();
 							try {
-								date = mailDateFormatter.parse( dateString );
-								formattedDate = dateFormatter.format( date );
-								localFormattedDate = localDateFormatter.format( date );
-								//quotedDate = html.encode( dateString );
-								quotedDate = longLocalDateFormatter.format(date);
+								synchronized(mailDateFormatter) {
+									date = mailDateFormatter.parse( dateString );
+									formattedDate = dateFormatter.format( date );
+									localFormattedDate = localDateFormatter.format( date );
+									//quotedDate = html.encode( dateString );
+									quotedDate = longLocalDateFormatter.format(date);
+								}
 							}
 							catch (ParseException e) {
 								date = null;
