@@ -714,9 +714,17 @@ public class WebMail extends HttpServlet
 					String type = mailPart.type;
 					if (type != null && type.startsWith("image/")) {
 						// we at least show images safely...
+						String name = mailPart.filename;
+						if (name == null) {
+							name = mailPart.name;
+							if (name == null)
+								name = mailPart.description;
+						}
+						name = quoteHTML(name);
 						out.println("<img src=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
 							 mailPart.hashCode() +
-							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) + "\">");
+							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) +
+							 "\" alt=\"" + name + "\">");
 					} else if (type != null && (
 						// type list from snark
 						type.startsWith("audio/") || type.equals("application/ogg") ||
@@ -2077,8 +2085,21 @@ public class WebMail extends HttpServlet
 			}
 			if(content == null)
 				return false;
+			String name = part.filename;
+			if (name == null) {
+				name = part.name;
+				if (name == null) {
+					name = part.description;
+					if (name == null)
+						name = "part" + part.hashCode();
+				}
+			}
+			String name2 = sanitizeFilename(name);
+			String name3 = encodeFilenameRFC5987(name);
 			if (isRaw) {
 				try {
+					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
+					                   "filename*=" + name3);
 					if (part.type != null)
 						response.setContentType(part.type);
 					response.setContentLength(content.length);
@@ -2092,16 +2113,9 @@ public class WebMail extends HttpServlet
 				ZipOutputStream zip = null;
 				try {
 					zip = new ZipOutputStream( response.getOutputStream() );
-					String name;
-					if( part.filename != null )
-						name = part.filename;
-					else if( part.name != null )
-						name = part.name;
-					else
-						name = "part" + part.hashCode();
-					String name2 = sanitizeFilename(name);
 					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
-					response.addHeader( "Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"" );
+					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
+					                   "filename*=" + name3 + ".zip");
 					ZipEntry entry = new ZipEntry( name );
 					zip.putNextEntry( entry );
 					zip.write( content.content, content.offset, content.length );
@@ -2135,12 +2149,19 @@ public class WebMail extends HttpServlet
 
 		if(content == null)
 			return false;
-		String name = mail.subject != null ? sanitizeFilename(mail.subject) : "message";
+		String name;
+		if (mail.subject != null)
+			name = mail.subject.trim() + ".eml";
+		else
+			name = "message.eml";
+		String name2 = sanitizeFilename(name);
+		String name3 = encodeFilenameRFC5987(name);
 		try {
 			response.setContentType("message/rfc822");
 			response.setContentLength(content.length);
 			// cache-control?
-			response.addHeader( "Content-Disposition", "attachment; filename=\"" + name + ".eml\"" );
+			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
+			                   "filename*=" + name3);
 			response.getOutputStream().write(content.content, content.offset, content.length);
 			return true;
 		} catch (IOException e) {
@@ -2150,21 +2171,78 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
-	 * Convert the UTF-8 to ISO-8859-1 suitable for inclusion in a header.
-	 * This will result in a bunch of ??? for non-Western languages.
+	 * Convert the UTF-8 to ASCII suitable for inclusion in a header
+	 * and for use as a cross-platform filename.
+	 * Replace chars likely to be illegal in filenames,
+	 * and non-ASCII chars, with _
 	 *
-	 * @param sessionObject
-	 * @param response
-	 * @return success
+	 * Ref: RFC 6266, RFC 5987, i2psnark Storage.ILLEGAL
+	 *
 	 * @since 0.9.18
 	 */
 	private static String sanitizeFilename(String name) {
-		try {
-			name = new String(name.getBytes("ISO-8859-1"), "ISO-8859-1");
-		} catch( UnsupportedEncodingException uee ) {}
-		// strip control chars?
-		name = name.replace('"', '_');
-		return name;
+		name = name.trim();
+		StringBuilder buf = new StringBuilder(name.length());
+		for (int i = 0; i < name.length(); i++) {
+			char c = name.charAt(i);
+			// illegal filename chars
+			if (c <= 32 || c >= 0x7f ||
+			    c == '<' || c == '>' || c == ':' || c == '"' ||
+			    c == '/' || c == '\\' || c == '|' || c == '?' ||
+			    c == '*')
+				buf.append('_');
+			else
+				buf.append(c);
+		}
+		return buf.toString();
+	}
+
+	/**
+	 * Encode the UTF-8 suitable for inclusion in a header
+	 * as a RFC 5987/6266 filename* value, and for use as a cross-platform filename.
+	 * Replace chars likely to be illegal in filenames with _
+	 *
+	 * Ref: RFC 6266, RFC 5987, i2psnark Storage.ILLEGAL
+	 *
+	 * @since 0.9.33
+	 */
+	private static String encodeFilenameRFC5987(String name) {
+		name = name.trim();
+		StringBuilder buf = new StringBuilder(name.length());
+		buf.append("utf-8''");
+		for (int i = 0; i < name.length(); i++) {
+			char c = name.charAt(i);
+			// illegal filename chars
+			if (c < 32 || (c >= 0x7f && c <= 0x9f) ||
+			    c == '<' || c == '>' || c == ':' || c == '"' ||
+			    c == '/' || c == '\\' || c == '|' || c == '?' ||
+			    c == '*' ||
+			    // unicode newlines
+			    c == 0x2028 || c == 0x2029) {
+				buf.append('_');
+			} else if (c == ' ' || c == '\'' || c == '%' ||          // not in 5987 attr-char
+			           c == '(' || c == ')' || c == '@' ||           // 2616 separators
+			           c == ',' || c == ';' || c == '[' || c == ']' ||
+			           c == '=' || c == '{' || c == '}') {
+				// single byte encoding
+				buf.append('%');
+				buf.append(Integer.toHexString(c));
+			} else if (c < 0x7f) {
+				// single byte char, as-is
+				buf.append(c);
+			} else {
+				// multi-byte encoding
+				byte[] utf = DataHelper.getUTF8(String.valueOf(c));
+				for (int j = 0; j < utf.length; j++) {
+					int b = utf[j] & 0xff;
+					buf.append('%');
+					if (b < 16)
+						buf.append(0);
+					buf.append(Integer.toHexString(b));
+				}
+			}
+		}
+		return buf.toString();
 	}
 
 	/**
