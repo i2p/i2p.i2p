@@ -1,3 +1,28 @@
+2018-01-04 zzz
+ * i2psnark: Fix overflow in ratio sorter (ticket #2129)
+
+2017-12-23 zzz
+ * SusiMail:
+   - Fix filenames for inline attachments
+   - Support RFC 5987/6266 for attachment and save-as filenames
+   - Add alt tags for images
+   - Fix long encoded lines in headers
+   - Fix replacing underscores in Base 64 decoded headers
+
+2017-12-22 zzz
+ * SusiMail:
+   - Fix bug sending CC recipients as a 2nd To line
+   - Separate recipients by commas
+   - Workaround on receive side for CC bug
+   - Display To and CC lists on show page
+   - Case-insensitive handling of all mail headers
+   - Escape leading '-' in q-p encoding
+
+2017-12-16 zzz
+ * SusiMail:
+   - Sorting cleanups and fixes, only sort when required
+   - Show result after server check (ticket #2087)
+
 2017-12-15 zzz
  * SusiMail: Don't store state in session object (ticket #1373)
 
@@ -5,7 +30,7 @@
  * SusiMail (ticket #1373):
    - Put more parameters in forms and use P-R-G to
      put several parameters into the URLs
-   - Redesign search parameter handling
+   - Redesign sort parameter handling
    - Fix state tracking issues with delete
 
 2017-12-13 zzz

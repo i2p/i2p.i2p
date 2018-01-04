@@ -313,16 +313,18 @@ class Sorters {
 
     private static class RatioComparator extends Sort {
 
-        private static final long M = 128 * 1024 * 1024;
-
         public RatioComparator(boolean rev) { super(rev); }
 
         public int compareIt(Snark l, Snark r) {
-            long lt = l.getTotalLength();
-            long ld = lt > 0 ? ((M * l.getUploaded()) / lt) : 0;
-            long rt = r.getTotalLength();
-            long rd = rt > 0 ? ((M * r.getUploaded()) / rt) : 0;
-            return compLong(ld, rd);
+            double lt = l.getTotalLength();
+            double ld = lt > 0 ? (l.getUploaded() / lt) : 0d;
+            double rt = r.getTotalLength();
+            double rd = rt > 0 ? (r.getUploaded() / rt) : 0d;
+            if (ld < rd)
+                return -1;
+            if (ld > rd)
+                return 1;
+            return 0;
         }
     }
 
