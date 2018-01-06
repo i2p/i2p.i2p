@@ -50,6 +50,10 @@ public class TunnelConfig {
     // -2 or higher is valid
     private int _tunnelVariance = -3;
     private int _tunnelBackupQuantity = -1;
+    private int _tunnelDepthOut = -1;
+    private int _tunnelQuantityOut = -1;
+    private int _tunnelVarianceOut = -3;
+    private int _tunnelBackupQuantityOut = -1;
     private boolean _connectDelay;
     private String _customOptions;
     private String _proxyList;
@@ -104,22 +108,63 @@ public class TunnelConfig {
     public void setClientPort(String port) {
         _i2cpPort = (port != null ? port.trim() : null);
     }
-    /** how many hops to use for inbound tunnels */
+
+    /** how many hops to use for inbound tunnels
+     *  In or both in/out
+     */
     public void setTunnelDepth(int tunnelDepth) { 
         _tunnelDepth = tunnelDepth;
     }
-    /** how many parallel inbound tunnels to use */
+
+    /** how many parallel inbound tunnels to use
+     *  In or both in/out
+     */
     public void setTunnelQuantity(int tunnelQuantity) { 
         _tunnelQuantity = tunnelQuantity;
     }
-    /** how much randomisation to apply to the depth of tunnels */
+
+    /** how much randomisation to apply to the depth of tunnels
+     *  In or both in/out
+     */
     public void setTunnelVariance(int tunnelVariance) { 
         _tunnelVariance = tunnelVariance;
     }
-    /** how many tunnels to hold in reserve to guard against failures */
+
+    /** how many tunnels to hold in reserve to guard against failures
+     *  In or both in/out
+     */
     public void setTunnelBackupQuantity(int tunnelBackupQuantity) { 
         _tunnelBackupQuantity = tunnelBackupQuantity;
     }
+
+    /** how many hops to use for outbound tunnels
+     *  @since 0.9.33
+     */
+    public void setTunnelDepthOut(int tunnelDepth) { 
+        _tunnelDepthOut = tunnelDepth;
+    }
+
+    /** how many parallel outbound tunnels to use
+     *  @since 0.9.33
+     */
+    public void setTunnelQuantityOut(int tunnelQuantity) { 
+        _tunnelQuantityOut = tunnelQuantity;
+    }
+
+    /** how much randomisation to apply to the depth of tunnels
+     *  @since 0.9.33
+     */
+    public void setTunnelVarianceOut(int tunnelVariance) { 
+        _tunnelVarianceOut = tunnelVariance;
+    }
+
+    /** how many tunnels to hold in reserve to guard against failures
+     *  @since 0.9.33
+     */
+    public void setTunnelBackupQuantityOut(int tunnelBackupQuantity) { 
+        _tunnelBackupQuantityOut = tunnelBackupQuantity;
+    }
+
     /** what I2P session overrides should be used */
     public void setCustomOptions(String customOptions) { 
         _customOptions = (customOptions != null ? customOptions.trim() : null);
@@ -840,19 +885,27 @@ public class TunnelConfig {
     public void updateTunnelQuantities(Properties config) {
         if (_tunnelQuantity >= 0) {
             config.setProperty("option.inbound.quantity", Integer.toString(_tunnelQuantity));
-            config.setProperty("option.outbound.quantity", Integer.toString(_tunnelQuantity));
+            if (_tunnelQuantityOut < 0)
+                _tunnelQuantityOut = _tunnelQuantity;
+            config.setProperty("option.outbound.quantity", Integer.toString(_tunnelQuantityOut));
         }
         if (_tunnelDepth >= 0) {
             config.setProperty("option.inbound.length", Integer.toString(_tunnelDepth));
-            config.setProperty("option.outbound.length", Integer.toString(_tunnelDepth));
+            if (_tunnelDepthOut < 0)
+                _tunnelDepthOut = _tunnelDepth;
+            config.setProperty("option.outbound.length", Integer.toString(_tunnelDepthOut));
         }
         if (_tunnelVariance >= -2) {
             config.setProperty("option.inbound.lengthVariance", Integer.toString(_tunnelVariance));
-            config.setProperty("option.outbound.lengthVariance", Integer.toString(_tunnelVariance));
+            if (_tunnelVarianceOut < -2)
+                _tunnelVarianceOut = _tunnelVariance;
+            config.setProperty("option.outbound.lengthVariance", Integer.toString(_tunnelVarianceOut));
         }
         if (_tunnelBackupQuantity >= 0) {
             config.setProperty("option.inbound.backupQuantity", Integer.toString(_tunnelBackupQuantity));
-            config.setProperty("option.outbound.backupQuantity", Integer.toString(_tunnelBackupQuantity));
+            if (_tunnelBackupQuantityOut < 0)
+                _tunnelBackupQuantityOut = _tunnelBackupQuantity;
+            config.setProperty("option.outbound.backupQuantity", Integer.toString(_tunnelBackupQuantityOut));
         }
     }
 }

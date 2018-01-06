@@ -621,7 +621,10 @@ public class IndexBean {
     public void setClientport(String port) {
         _config.setClientPort(port);
     }
-    /** how many hops to use for inbound tunnels */
+
+    /** how many hops to use for inbound tunnels
+     *  In or both in/out
+     */
     public void setTunnelDepth(String tunnelDepth) {
         if (tunnelDepth != null) {
             try {
@@ -629,7 +632,10 @@ public class IndexBean {
             } catch (NumberFormatException nfe) {}
         }
     }
-    /** how many parallel inbound tunnels to use */
+
+    /** how many parallel inbound tunnels to use
+     *  In or both in/out
+     */
     public void setTunnelQuantity(String tunnelQuantity) {
         if (tunnelQuantity != null) {
             try {
@@ -637,7 +643,10 @@ public class IndexBean {
             } catch (NumberFormatException nfe) {}
         }
     }
-    /** how much randomisation to apply to the depth of tunnels */
+
+    /** how much randomisation to apply to the depth of tunnels
+     *  In or both in/out
+     */
     public void setTunnelVariance(String tunnelVariance) {
         if (tunnelVariance != null) {
             try {
@@ -645,7 +654,10 @@ public class IndexBean {
             } catch (NumberFormatException nfe) {}
         }
     }
-    /** how many tunnels to hold in reserve to guard against failures */
+
+    /** how many tunnels to hold in reserve to guard against failures
+     *  In or both in/out
+     */
     public void setTunnelBackupQuantity(String tunnelBackupQuantity) {
         if (tunnelBackupQuantity != null) {
             try {
@@ -653,6 +665,51 @@ public class IndexBean {
             } catch (NumberFormatException nfe) {}
         }
     }
+
+    /** how many hops to use for inbound tunnels
+     *  @since 0.9.33
+     */
+    public void setTunnelDepthOut(String tunnelDepth) {
+        if (tunnelDepth != null) {
+            try {
+                _config.setTunnelDepthOut(Integer.parseInt(tunnelDepth.trim()));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
+    /** how many parallel inbound tunnels to use
+     *  @since 0.9.33
+     */
+    public void setTunnelQuantityOut(String tunnelQuantity) {
+        if (tunnelQuantity != null) {
+            try {
+                _config.setTunnelQuantityOut(Integer.parseInt(tunnelQuantity.trim()));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
+    /** how much randomisation to apply to the depth of tunnels
+     *  @since 0.9.33
+     */
+    public void setTunnelVarianceOut(String tunnelVariance) {
+        if (tunnelVariance != null) {
+            try {
+                _config.setTunnelVarianceOut(Integer.parseInt(tunnelVariance.trim()));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
+    /** how many tunnels to hold in reserve to guard against failures
+     *  @since 0.9.33
+     */
+    public void setTunnelBackupQuantityOut(String tunnelBackupQuantity) {
+        if (tunnelBackupQuantity != null) {
+            try {
+                _config.setTunnelBackupQuantityOut(Integer.parseInt(tunnelBackupQuantity.trim()));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
     /** what I2P session overrides should be used */
     public void setNofilter_customOptions(String customOptions) { 
         _config.setCustomOptions(customOptions);

@@ -429,20 +429,44 @@ public class GeneralHelper {
         return getProperty(tunnel, "i2p.streaming.maxWindowSize", 128) == 16;
     }
 
+    /** Inbound or both in/out */
     public int getTunnelDepth(int tunnel, int defaultLength) {
         return getProperty(tunnel, "inbound.length", defaultLength);
     }
 
+    /** Inbound or both in/out */
     public int getTunnelQuantity(int tunnel, int defaultQuantity) {
         return getProperty(tunnel, "inbound.quantity", defaultQuantity);
     }
 
+    /** Inbound or both in/out */
     public int getTunnelBackupQuantity(int tunnel, int defaultBackupQuantity) {
         return getProperty(tunnel, "inbound.backupQuantity", defaultBackupQuantity);
     }
 
+    /** Inbound or both in/out */
     public int getTunnelVariance(int tunnel, int defaultVariance) {
         return getProperty(tunnel, "inbound.lengthVariance", defaultVariance);
+    }
+
+    /** @since 0.9.33 */
+    public int getTunnelDepthOut(int tunnel, int defaultLength) {
+        return getProperty(tunnel, "outbound.length", defaultLength);
+    }
+
+    /** @since 0.9.33 */
+    public int getTunnelQuantityOut(int tunnel, int defaultQuantity) {
+        return getProperty(tunnel, "outbound.quantity", defaultQuantity);
+    }
+
+    /** @since 0.9.33 */
+    public int getTunnelBackupQuantityOut(int tunnel, int defaultBackupQuantity) {
+        return getProperty(tunnel, "outbound.backupQuantity", defaultBackupQuantity);
+    }
+
+    /** @since 0.9.33 */
+    public int getTunnelVarianceOut(int tunnel, int defaultVariance) {
+        return getProperty(tunnel, "outbound.lengthVariance", defaultVariance);
     }
 
     public boolean getReduceOnIdle(int tunnel, boolean def) {

@@ -601,6 +601,7 @@ input {
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
+#tunnelDepthOut, #tunnelVarianceOut, #tunnelQuantityOut, #tunnelBackupQuantityOut,
 #localDestination, #customOptions, #leasesetKey, #name, #description, textarea[name="accessList"] {
      width: 100% !important;
      margin: 0 !important;
@@ -897,7 +898,9 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
      margin: 5px !important;
 }
 
-#tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity, #leasesetKey {
+#tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
+#tunnelDepthOut, #tunnelVarianceOut, #tunnelQuantityOut, #tunnelBackupQuantityOut,
+#leasesetKey {
      margin: 5px !important;
      width: calc(100% - 10px) !important;
 }

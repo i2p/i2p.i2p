@@ -576,6 +576,7 @@ input {
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
+#tunnelDepthOut, #tunnelVarianceOut, #tunnelQuantityOut, #tunnelBackupQuantityOut,
 #localDestination, #customOptions, #leasesetKey, #name, #description, textarea[name="accessList"] {
      width: 100% !important;
      margin: 0 !important;
@@ -865,7 +866,9 @@ input[type="file"] {
      margin: 5px !important;
 }
 
-#tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity, #leasesetKey {
+#tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
+#tunnelDepthOut, #tunnelVarianceOut, #tunnelQuantityOut, #tunnelBackupQuantityOut,
+#leasesetKey {
      margin: 5px !important;
      width: calc(100% - 10px) !important;
 }
@@ -907,7 +910,9 @@ td.tunnelDestination, td.tunnelDescription {
 /* responsive layout */
 
 @media screen and (max-width: 700px) {
-#leasesetKey, #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity, #leasesetKey {
+#tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
+#tunnelDepthOut, #tunnelVarianceOut, #tunnelQuantityOut, #tunnelBackupQuantityOut,
+#leasesetKey {
     min-width: 270px;
 }
 }

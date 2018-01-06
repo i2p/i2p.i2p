@@ -142,20 +142,44 @@ public class EditBean extends IndexBean {
         return _helper.isInteractive(tunnel);
     }
     
+    /** in or both in/out */
     public int getTunnelDepth(int tunnel, int defaultLength) {
         return _helper.getTunnelDepth(tunnel, defaultLength);
     }
     
+    /** in or both in/out */
     public int getTunnelQuantity(int tunnel, int defaultQuantity) {
         return _helper.getTunnelQuantity(tunnel, defaultQuantity);
     }
    
+    /** in or both in/out */
     public int getTunnelBackupQuantity(int tunnel, int defaultBackupQuantity) {
         return _helper.getTunnelBackupQuantity(tunnel, defaultBackupQuantity);
     }
   
+    /** in or both in/out */
     public int getTunnelVariance(int tunnel, int defaultVariance) {
         return _helper.getTunnelVariance(tunnel, defaultVariance);
+    }
+    
+    /** @since 0.9.33 */
+    public int getTunnelDepthOut(int tunnel, int defaultLength) {
+        return _helper.getTunnelDepthOut(tunnel, defaultLength);
+    }
+    
+    /** @since 0.9.33 */
+    public int getTunnelQuantityOut(int tunnel, int defaultQuantity) {
+        return _helper.getTunnelQuantityOut(tunnel, defaultQuantity);
+    }
+   
+    /** @since 0.9.33 */
+    public int getTunnelBackupQuantityOut(int tunnel, int defaultBackupQuantity) {
+        return _helper.getTunnelBackupQuantityOut(tunnel, defaultBackupQuantity);
+    }
+  
+    /** @since 0.9.33 */
+    public int getTunnelVarianceOut(int tunnel, int defaultVariance) {
+        return _helper.getTunnelVarianceOut(tunnel, defaultVariance);
     }
     
     public boolean getReduce(int tunnel) {
@@ -426,10 +450,12 @@ public class EditBean extends IndexBean {
     private static final int MAX_ADVANCED_QUANTITY = 16;
 
     /**
+     *  @param mode 0=both, 1=in, 2=out
      *  @since 0.9.7
      */
-    public String getQuantityOptions(int tunnel) {
-        int tunnelQuantity = getTunnelQuantity(tunnel, DFLT_QUANTITY);
+    public String getQuantityOptions(int tunnel, int mode) {
+        int tunnelQuantity = mode == 2 ? getTunnelQuantityOut(tunnel, DFLT_QUANTITY)
+                                       : getTunnelQuantity(tunnel, DFLT_QUANTITY);
         boolean advanced = _context.getBooleanProperty(PROP_ADVANCED);
         int maxQuantity = advanced ? MAX_ADVANCED_QUANTITY :
                                      (isClient(tunnel) ? MAX_CLIENT_QUANTITY : MAX_SERVER_QUANTITY);
@@ -441,7 +467,12 @@ public class EditBean extends IndexBean {
              if (i == tunnelQuantity)
                  buf.append(" selected=\"selected\"");
              buf.append('>');
-             buf.append(ngettext("{0} inbound, {0} outbound tunnel", "{0} inbound, {0} outbound tunnels", i));
+             if (mode == 1)
+                 buf.append(ngettext("{0} inbound tunnel", "{0} inbound tunnels", i));
+             else if (mode == 2)
+                 buf.append(ngettext("{0} outbound tunnel", "{0} outbound tunnels", i));
+             else
+                 buf.append(ngettext("{0} inbound, {0} outbound tunnel", "{0} inbound, {0} outbound tunnels", i));
              if (i <= 3) {
                  buf.append(" (");
                  if (i == 1)

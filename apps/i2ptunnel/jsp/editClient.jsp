@@ -369,7 +369,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <select id="tunnelQuantity" name="tunnelQuantity" title="<%=intl._t("Number of Tunnels in Group")%>" class="selectbox">
-                    <%=editBean.getQuantityOptions(curTunnel)%>
+                    <%=editBean.getQuantityOptions(curTunnel, 0)%>
                 </select>
             </td>
 

@@ -310,6 +310,15 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </th>
         </tr>
 
+    <% if (editBean.isAdvanced()) {
+      %><tr>
+            <th colspan="2">
+                <%=intl._t("Inbound")%>
+            </th>
+        </tr><%
+      }  // isAdvanced()
+     %>
+
         <tr>
             <td>
                 <b><%=intl._t("Length")%></b>
@@ -367,23 +376,108 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <select id="tunnelQuantity" name="tunnelQuantity" title="<%=intl._t("Number of Tunnels in Group")%>" class="selectbox">
-                    <%=editBean.getQuantityOptions(curTunnel)%>
+                    <%=editBean.getQuantityOptions(curTunnel, editBean.isAdvanced() ? 1 : 0)%>
                 </select>
             </td>
 
             <td>
                 <select id="tunnelBackupQuantity" name="tunnelBackupQuantity" title="<%=intl._t("Number of Reserve Tunnels")%>" class="selectbox">
                     <% int tunnelBackupQuantity = editBean.getTunnelBackupQuantity(curTunnel, 0);
+                   if (editBean.isAdvanced()) {
+                       // TODO ngettext
+                  %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>>0 <%=intl._t("backup tunnels")%></option>
+                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>>1 <%=intl._t("backup tunnels")%></option>
+                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>>2 <%=intl._t("backup tunnels")%></option>
+                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>>3 <%=intl._t("backup tunnels")%></option>
+                 <%
+                   } else {
                   %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 backup tunnels (0 redundancy, no added resource usage)")%></option>
                     <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 backup tunnel each direction (low redundancy, low resource usage)")%></option>
                     <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>><%=intl._t("2 backup tunnels each direction (medium redundancy, medium resource usage)")%></option>
                     <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>><%=intl._t("3 backup tunnels each direction (high redundancy, high resource usage)")%></option>
-                <% if (tunnelBackupQuantity > 3) {
+                <% } // isAdvanced()
+                   if (tunnelBackupQuantity > 3) {
                 %>    <option value="<%=tunnelBackupQuantity%>" selected="selected"><%=tunnelBackupQuantity%> <%=intl._t("backup tunnels")%></option>
                 <% }
               %></select>
             </td>
         </tr>
+
+    <% if (editBean.isAdvanced()) {
+       // repeat four options above for outbound
+      %><tr>
+            <th colspan="2">
+                <%=intl._t("Outbound")%>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <b><%=intl._t("Length")%></b>
+            </td>
+            <td>
+                <b><%=intl._t("Variance")%></b>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <select id="tunnelDepthOut" name="tunnelDepthOut" title="<%=intl._t("Length of each Tunnel")%>" class="selectbox">
+                    <% int tunnelDepthOut = editBean.getTunnelDepthOut(curTunnel, 3);
+                  %><option value="0"<%=(tunnelDepthOut == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop tunnel (no anonymity)")%></option>
+                    <option value="1"<%=(tunnelDepthOut == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 hop tunnel (low anonymity)")%></option>
+                    <option value="2"<%=(tunnelDepthOut == 2 ? " selected=\"selected\"" : "") %>><%=intl._t("2 hop tunnel (medium anonymity)")%></option>
+                    <option value="3"<%=(tunnelDepthOut == 3 ? " selected=\"selected\"" : "") %>><%=intl._t("3 hop tunnel (high anonymity)")%></option>
+                    <option value="4"<%=(tunnelDepthOut == 4 ? " selected=\"selected\"" : "") %>>4 hop tunnel</option>
+                    <option value="5"<%=(tunnelDepthOut == 5 ? " selected=\"selected\"" : "") %>>5 hop tunnel</option>
+                    <option value="6"<%=(tunnelDepthOut == 6 ? " selected=\"selected\"" : "") %>>6 hop tunnel</option>
+                    <option value="7"<%=(tunnelDepthOut == 7 ? " selected=\"selected\"" : "") %>>7 hop tunnel</option>
+                </select>
+            </td>
+            <td>
+                <select id="tunnelVarianceOut" name="tunnelVarianceOut" title="<%=intl._t("Level of Randomization for Tunnel Depth")%>" class="selectbox">
+                    <% int tunnelVarianceOut = editBean.getTunnelVarianceOut(curTunnel, 0);
+                  %><option value="0"<%=(tunnelVarianceOut  ==  0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop variance (no randomization, consistent performance)")%></option>
+                    <option value="1"<%=(tunnelVarianceOut  ==  1 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-1 hop variance (medium additive randomization, subtractive performance)")%></option>
+                    <option value="2"<%=(tunnelVarianceOut  ==  2 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-2 hop variance (high additive randomization, subtractive performance)")%></option>
+                    <option value="-1"<%=(tunnelVarianceOut == -1 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-1 hop variance (standard randomization, standard performance)")%></option>
+                    <option value="-2"<%=(tunnelVarianceOut == -2 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-2 hop variance (not recommended)")%></option>
+                <% if (tunnelVarianceOut > 2 || tunnelVarianceOut < -2) {
+                %>    <option value="<%=tunnelVarianceOut%>" selected="selected"><%= (tunnelVarianceOut > 2 ? "+ " : "+/- ") %>0-<%=tunnelVarianceOut%> <%=intl._t("hop variance")%></option>
+                <% }
+              %></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b><%=intl._t("Count")%></b>
+            </td>
+
+            <td>
+                <b><%=intl._t("Backup Count")%></b>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <select id="tunnelQuantityOut" name="tunnelQuantityOut" title="<%=intl._t("Number of Tunnels in Group")%>" class="selectbox">
+                    <%=editBean.getQuantityOptions(curTunnel, 2)%>
+                </select>
+            </td>
+            <td>
+                <select id="tunnelBackupQuantityOut" name="tunnelBackupQuantityOut" title="<%=intl._t("Number of Reserve Tunnels")%>" class="selectbox">
+                    <% int tunnelBackupQuantityOut = editBean.getTunnelBackupQuantityOut(curTunnel, 0);
+                       // TODO ngettext
+                  %><option value="0"<%=(tunnelBackupQuantityOut == 0 ? " selected=\"selected\"" : "") %>>0 <%=intl._t("backup tunnels")%></option>
+                    <option value="1"<%=(tunnelBackupQuantityOut == 1 ? " selected=\"selected\"" : "") %>>1 <%=intl._t("backup tunnels")%></option>
+                    <option value="2"<%=(tunnelBackupQuantityOut == 2 ? " selected=\"selected\"" : "") %>>2 <%=intl._t("backup tunnels")%></option>
+                    <option value="3"<%=(tunnelBackupQuantityOut == 3 ? " selected=\"selected\"" : "") %>>3 <%=intl._t("backup tunnels")%></option>
+                <% if (tunnelBackupQuantityOut > 3) {
+                %>    <option value="<%=tunnelBackupQuantityOut%>" selected="selected"><%=tunnelBackupQuantityOut%> <%=intl._t("backup tunnels")%></option>
+                <% }
+              %></select>
+            </td>
+        </tr>
+    <%
+      }  // isAdvanced() End outbound config section
+     %>
 
          <% if (!"streamrserver".equals(tunnelType)) { %>
 
