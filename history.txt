@@ -1,3 +1,7 @@
+2018-01-06 zzz
+ * i2ptunnel: Escape chars unescaped by browsers (ticket #2130)
+ * i2ptunnel, eepget: Better error message on invalid URLs (ticket #2130)
+
 2018-01-04 zzz
  * i2psnark: Fix overflow in ratio sorter (ticket #2129)
 

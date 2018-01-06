@@ -480,9 +480,43 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     // Now use the Java URI parser
                     // This will be the incoming URI but will then get modified
                     // to be the outgoing URI (with http:// if going to outproxy, otherwise without)
-                    URI requestURI;
+                    URI requestURI = null;
                     try {
-                        origRequestURI = requestURI = new URI(request);
+                        try {
+                            requestURI = new URI(request);
+                        } catch(URISyntaxException use) {
+                            // fixup []| in path/query not escaped by browsers, see ticket #2130
+                            boolean error = true;
+                            // find 3rd /
+                            int idx = 0;
+                            for (int i = 0; i < 2; i++) {
+                                idx = request.indexOf('/', idx);
+                                if (idx < 0)
+                                    break;
+                                idx++;
+                            }
+                            if (idx > 0) {
+                                String schemeHostPort = request.substring(0, idx);
+                                String rest = request.substring(idx);
+                                rest = rest.replace("[", "%5B");
+                                rest = rest.replace("]", "%5D");
+                                rest = rest.replace("|", "%7C");
+                                String testRequest = schemeHostPort + rest;
+                                if (!testRequest.equals(request)) {
+                                    try {
+                                        requestURI = new URI(testRequest);
+                                        request = testRequest;
+                                        error = false;
+                                    } catch(URISyntaxException use2) {
+                                        // didn't work, give up
+                                    }
+                                }
+                            }
+                            // guess it wasn't []|
+                            if (error)
+                                throw use;
+                        }
+                        origRequestURI = requestURI;
                         if(requestURI.getRawUserInfo() != null || requestURI.getRawFragment() != null) {
                             // these should never be sent to the proxy in the request line
                             if(_log.shouldLog(Log.WARN)) {
@@ -501,7 +535,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if(_log.shouldLog(Log.WARN)) {
                             _log.warn(getPrefix(requestId) + "Bad request [" + request + "]", use);
                         }
-                        // TODO fixup []| not escaped by browsers
                         try {
                             out.write(getErrorPage("baduri", ERR_BAD_URI).getBytes("UTF-8"));
                             String msg = use.getLocalizedMessage();
