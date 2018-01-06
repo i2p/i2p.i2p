@@ -235,17 +235,21 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public String getInboundRate() {
-        return "" + _context.bandwidthLimiter().getInboundKBytesPerSecond();
+        return Integer.toString(_context.bandwidthLimiter().getInboundKBytesPerSecond());
     }
+
     public String getOutboundRate() {
-        return "" + _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        return Integer.toString(_context.bandwidthLimiter().getOutboundKBytesPerSecond());
     }
-    public String getInboundRateBits() {
-        return kbytesToBits(_context.bandwidthLimiter().getInboundKBytesPerSecond());
+
+    public String getInboundBurstRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getInboundBurstKBytesPerSecond());
     }
-    public String getOutboundRateBits() {
-        return kbytesToBits(_context.bandwidthLimiter().getOutboundKBytesPerSecond());
+
+    public String getOutboundBurstRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getOutboundBurstKBytesPerSecond());
     }
+
     public String getShareRateBits() {
         return kbytesToBits(getShareBandwidth());
     }
@@ -253,12 +257,16 @@ public class ConfigNetHelper extends HelperBase {
         return DataHelper.formatSize(kbytes * (8 * 1024L)) + ' ' + _t("bits per second") +
                ' ' + _t("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * (1024L * 60 * 60 * 24 * 31)));
     }
+
     public String getInboundBurstRate() {
-        return "" + _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
+        return Integer.toString(_context.bandwidthLimiter().getInboundBurstKBytesPerSecond());
     }
+
     public String getOutboundBurstRate() {
-        return "" + _context.bandwidthLimiter().getOutboundBurstKBytesPerSecond();
+        return Integer.toString(_context.bandwidthLimiter().getOutboundBurstKBytesPerSecond());
     }
+
+/*
     public String getInboundBurstFactorBox() {
         int numSeconds = 1;
         int rateKBps = _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
@@ -301,10 +309,10 @@ public class ConfigNetHelper extends HelperBase {
         return buf.toString();
     }
     
-    /** removed */
     public String getEnableLoadTesting() {
         return "";
     }
+****/
     
     public String getSharePercentageBox() {
         int pct = (int) (100 * _context.router().getSharePercentage());

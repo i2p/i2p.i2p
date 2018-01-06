@@ -233,6 +233,8 @@ public class FIFOBandwidthRefiller implements Runnable {
         
         if (_inboundBurstKBytesPerSecond <= 0)
             _inboundBurstKBytesPerSecond = DEFAULT_INBOUND_BURST_BANDWIDTH;
+        if (_inboundBurstKBytesPerSecond < _inboundKBytesPerSecond)
+            _inboundBurstKBytesPerSecond = _inboundKBytesPerSecond;
         _limiter.setInboundBurstKBps(_inboundBurstKBytesPerSecond);
     }
     
@@ -250,6 +252,8 @@ public class FIFOBandwidthRefiller implements Runnable {
         
         if (_outboundBurstKBytesPerSecond <= 0)
             _outboundBurstKBytesPerSecond = DEFAULT_OUTBOUND_BURST_BANDWIDTH;
+        if (_outboundBurstKBytesPerSecond < _outboundKBytesPerSecond)
+            _outboundBurstKBytesPerSecond = _outboundKBytesPerSecond;
         _limiter.setOutboundBurstKBps(_outboundBurstKBytesPerSecond);
     }
     

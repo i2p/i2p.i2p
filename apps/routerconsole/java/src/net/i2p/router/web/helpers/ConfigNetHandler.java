@@ -43,11 +43,11 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _upnp;
     private boolean _laptop;
     private String _inboundRate;
-    private String _inboundBurstRate;
-    private String _inboundBurst;
+    //private String _inboundBurstRate;
+    //private String _inboundBurst;
     private String _outboundRate;
-    private String _outboundBurstRate;
-    private String _outboundBurst;
+    //private String _outboundBurstRate;
+    //private String _outboundBurst;
     private String _sharePct;
     private boolean _ratesOnly;
     private boolean _udpDisabled;
@@ -114,21 +114,29 @@ public class ConfigNetHandler extends FormHandler {
     public void setInboundrate(String rate) { 
         _inboundRate = (rate != null ? rate.trim() : null); 
     }
+
+/*
     public void setInboundburstrate(String rate) { 
         _inboundBurstRate = (rate != null ? rate.trim() : null); 
     }
     public void setInboundburstfactor(String factor) { 
         _inboundBurst = (factor != null ? factor.trim() : null); 
     }
+****/
+
     public void setOutboundrate(String rate) { 
         _outboundRate = (rate != null ? rate.trim() : null); 
     }
+
+/*
     public void setOutboundburstrate(String rate) { 
         _outboundBurstRate = (rate != null ? rate.trim() : null); 
     }
     public void setOutboundburstfactor(String factor) { 
         _outboundBurst = (factor != null ? factor.trim() : null); 
     }
+****/
+
     public void setSharePercentage(String pct) {
         _sharePct = (pct != null ? pct.trim() : null);
     }
@@ -487,28 +495,38 @@ public class ConfigNetHandler extends FormHandler {
             }
         }
 
-        // Since burst is now hidden in the gui, set burst to +10% for 20 seconds
+        // Since burst is now hidden in the gui, set burst to +10% for 20 seconds (prior to 0.9.33)
+        // As of 0.9.33, we set strict bandwidth limits. Specified rate is the burst rate,
+        // and we set the standard rate to 50KB or 10% lower (whichever is less).
         if ( (_inboundRate != null) && (_inboundRate.length() > 0) &&
-            !_inboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_INBOUND_BANDWIDTH))) {
-            changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, _inboundRate);
+            !_inboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH,
+                                                      Integer.toString(FIFOBandwidthRefiller.DEFAULT_INBOUND_BURST_BANDWIDTH)))) {
             try {
-                int rate = Integer.parseInt(_inboundRate) * (100 + DEF_BURST_PCT) / 100;
+                int rate = Integer.parseInt(_inboundRate);
                 int kb = DEF_BURST_TIME * rate;
-                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + rate);
-                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
-            } catch (NumberFormatException nfe) {}
-            bwUpdated = true;
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, Integer.toString(rate));
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, Integer.toString(kb));
+                rate -= Math.min(rate * DEF_BURST_PCT / 100, 50);
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, Integer.toString(rate));
+	        bwUpdated = true;
+            } catch (NumberFormatException nfe) {
+                addFormError(_t("Invalid bandwidth"));
+            }
         }
         if ( (_outboundRate != null) && (_outboundRate.length() > 0) &&
-            !_outboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BANDWIDTH))) {
-            changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, _outboundRate);
+            !_outboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH,
+                                                       Integer.toString(FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BURST_BANDWIDTH)))) {
             try {
-                int rate = Integer.parseInt(_outboundRate) * (100 + DEF_BURST_PCT) / 100;
+                int rate = Integer.parseInt(_outboundRate);
                 int kb = DEF_BURST_TIME * rate;
-                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, "" + rate);
-                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
-            } catch (NumberFormatException nfe) {}
-            bwUpdated = true;
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, Integer.toString(rate));
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, Integer.toString(kb));
+                rate -= Math.min(rate * DEF_BURST_PCT / 100, 50);
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, Integer.toString(rate));
+	        bwUpdated = true;
+            } catch (NumberFormatException nfe) {
+                addFormError(_t("Invalid bandwidth"));
+            }
         }
 
         if (bwUpdated) {
