@@ -501,8 +501,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if(_log.shouldLog(Log.WARN)) {
                             _log.warn(getPrefix(requestId) + "Bad request [" + request + "]", use);
                         }
+                        // TODO fixup []| not escaped by browsers
                         try {
                             out.write(getErrorPage("baduri", ERR_BAD_URI).getBytes("UTF-8"));
+                            String msg = use.getLocalizedMessage();
+                            if (msg != null) {
+                                out.write(DataHelper.getASCII("<p>\n"));
+                                out.write(DataHelper.getUTF8(DataHelper.escapeHTML(msg)));
+                                out.write(DataHelper.getASCII("</p>\n"));
+                            }
+                            out.write(DataHelper.getASCII("</div>\n"));
                             writeFooter(out);
                             reader.drain();
                         } catch (IOException ioe) {

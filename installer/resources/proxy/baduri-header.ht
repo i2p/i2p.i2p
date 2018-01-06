@@ -21,4 +21,3 @@ Proxy-Connection: close
 _("The request URI is invalid, and probably contains illegal characters.")
 _("If you clicked a link, check the end of the URI for any characters the browser has mistakenly added on.")
 </p>
-</div>

@@ -327,6 +327,9 @@ public class EepGet {
         try {
             nameURL = new URI(url);
         } catch (URISyntaxException e) {
+            String msg = e.getLocalizedMessage();
+            if (msg != null)
+                System.err.println(msg);
             System.err.println("Please enter a properly formed URL.");
             System.exit(1);
         }
