@@ -313,6 +313,12 @@
         <copy file="apps/susimail/susimail.war" todir="build/" />
     </target>
 
+    <!-- jar (not war) for testing only -->
+    <target name="buildSusiMailJar" depends="buildCore, buildJetty" >
+        <ant dir="apps/susimail/" target="jar" />
+        <copy file="apps/susimail/susimail.jar" todir="build/" />
+    </target>
+
     <target name="buildSusiDNS" depends="buildCore, buildJetty, buildImagegen, buildAddressbook" >
         <ant dir="apps/susidns/src" target="all" />
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
@@ -1807,11 +1813,18 @@
         <!-- note there are no router scala tests yet -->
         <ant dir="router/java/" target="scalatest.test" />
     </target>
-    <target name="test" depends="buildProperties, jbigi" >
-        <!-- both junit and scala -->
+    <!-- both junit and scala -->
+    <target name="test" depends="testCore, testRouter, testMinistreaming, testStreaming" />
+    <target name="testCore" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="test" />
+    </target>
+    <target name="testRouter" depends="buildProperties, jbigi" >
         <ant dir="router/java/" target="test" />
+    </target>
+    <target name="testMinistreaming" depends="buildProperties, jbigi" >
         <ant dir="apps/ministreaming/java/" target="test" />
+    </target>
+    <target name="testStreaming" depends="buildProperties" >
         <ant dir="apps/streaming/java/" target="test" />
     </target>
     <target name="scalatest.report" depends="buildProperties" >
