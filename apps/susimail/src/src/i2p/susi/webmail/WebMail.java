@@ -2334,12 +2334,12 @@ public class WebMail extends HttpServlet
 
 		if( ok ) {
 			StringBuilder body = new StringBuilder(1024);
+			// todo include real names, and headerline encode them
 			body.append( "From: " + from + "\r\n" );
 			Mail.appendRecipients( body, toList, "To: " );
 			Mail.appendRecipients( body, ccList, "Cc: " );
-			body.append( "Subject: " );
 			try {
-				body.append( hl.encode( subject ) );
+				body.append(hl.encode("Subject: " + subject.trim()));
 			} catch (EncodingException e) {
 				ok = false;
 				sessionObject.error += e.getMessage();

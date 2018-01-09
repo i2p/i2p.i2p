@@ -63,111 +63,156 @@ public class HeaderLine extends Encoding {
 		throw new UnsupportedOperationException("use encode(String)");
 	}
 
+	/** @since 0.9.33 */
+	private static boolean isWhiteSpace(char c) {
+		return c == ' ' || c == '\t';
+	}
+
+	/** @since 0.9.33 */
+/*
+	private static boolean isControl(char c) {
+		return (c < 32 && !isWhiteSpace(c)) ||
+		       (c >= 127 && c < 160);
+	}
+*/
+
+	/** @since 0.9.33 */
+	private static boolean isControlOrMultiByte(char c) {
+		return (c < 32 && !isWhiteSpace(c)) || c >= 127;
+	}
+
+	/** @since 0.9.33 */
+/*
+	private static boolean isSpecial(char c) {
+		return c == '(' || c == ')' || c == '<' || c == '>' ||
+		       c == '@' || c == ',' || c == ';' || c == ':' ||
+		       c == '\\' || c == '"' || c == '.' || c == '[' ||
+		       c == ']';
+	}
+*/
+
+	/** @since 0.9.33 */
+	private static boolean isPSpecial(char c) {
+		return c == '!' || c == '*' || c == '+' || c == '-' ||
+		       c == '/' || c == '=' || c == '_';
+	}
+
+	/** @since 0.9.33 */
+	private static boolean isPSafe(char c) {
+		return (c >= '0' && c <= '9') ||
+		       (c >= 'a' && c <= 'z') ||
+		       (c >= 'A' && c <= 'Z') ||
+		       isPSpecial(c);
+	}
+
+	/** @since 0.9.33 */
+/*
+	private static boolean isAtom(char c) {
+		return ! (isWhiteSpace(c) || isControl(c) || isSpecial(c));
+	}
+*/
+
+	/**
+	 *  Encode a single header line ONLY. Do NOT include the \r\n.
+	 *  Returns a string of one or more lines including the trailing \r\n.
+	 *  Field-name will not be encoded, must be less than 62 chars.
+	 *
+	 *  The fieldBody is treated as "unstructured text",
+	 *  which is suitable only for the field names "Subject" and "Comments".
+	 *  We do NOT tokenize into structured fields.
+	 *
+	 *  To make things easy, we either encode the whole field body as RFC 2047,
+	 *  or don't encode at all. If it's too long for a single line, we
+	 *  encode it, even if we didn't otherwise have to.
+	 *  We don't do quoted-string.
+	 *
+	 *  This will not split multibyte chars, including supplementary chars,
+	 *  across lines.
+	 *
+	 *  TODO this will not work for quoting structured text
+	 *  such as recipient names on the "To" and "Cc" lines.
+	 *
+	 *  @param str must start with "field-name: "
+	 */
 	@Override
 	public String encode(String str) throws EncodingException {
-		StringBuilder out = new StringBuilder();
-		int l = 0;
-		boolean quoting = false;
+		str = str.trim();
+		int l = str.indexOf(": ");
+		if (l <= 0 || l >= 64)
+			throw new EncodingException("bad 'field-name: '" + str);
+		l += 2;
 		boolean quote = false;
-		boolean linebreak = false;
-		StringBuilder quotedSequence = null;
-		int index = 0;
-		while( true ) {
-			if (index >= str.length())
-				break;
-			char c = str.charAt(index++);
+		if (str.length() > 76) {
 			quote = true;
-			if( c > 32 && c < 127 && c != 61 ) {
-				quote = false;
-			}
-			else if( ( c == 32 || c == 9 ) ) {
-				quote = false;
-				if (index >= str.length())
+		} else {
+			for (int i = l; i < str.length(); i++) {
+				char c = str.charAt(i);
+				if (isControlOrMultiByte(c) || isPSpecial(c)) {
 					quote = true;
-				else if (str.charAt(index) == '\r' || str.charAt(index) == '\n')
-					quote = true;
+					break;
+				}
 			}
-			else if (c == '\r' && index < str.length() && str.charAt(index) == '\n') {
-				quote = false;
-				linebreak = true;
-				index++;
-			}
-			if( quote ) {
-				// the encoded char
-				StringBuilder qc = new StringBuilder(16);
-				if (c <= 127) {
-					// single byte char
-					qc.append(HexTable.table[c]);
+		}
+		if (!quote)
+			return str + "\r\n";
+		// Output encoded.
+		StringBuilder out = new StringBuilder();
+		out.append(str.substring(0, l));
+		int start = l;
+		StringBuilder qc = new StringBuilder(16);
+		for (int i = start; i < str.length(); i++) {
+			// use codePointAt(), not charAt(), so supplementary chars work
+			char c = str.charAt(i);
+			// put the encoded char in the temp buffer
+			qc.setLength(0);
+			if (c <= 127) {
+				// single byte char
+				if (c == ' ') {
+					qc.append('_');
+				} else if (isPSafe(c) && c != '_' && c != '?') {
+					qc.append(c);
 				} else {
-					byte[] utf = DataHelper.getUTF8(String.valueOf(c));
-					for (int j = 0; j < utf.length; j++) {
-						int b = utf[j] & 0xff;
-						qc.append(HexTable.table[b]);
-					}
+					qc.append(HexTable.table[c]);
 				}
-				if (quoting) {
-					// would it be too long?
-					if (l + quotedSequence.length() + qc.length() + 2 >= 76) {
-						// close q-seq, wrap line, and start a new q-seq
-						out.append(quotedSequence);
-						out.append("?=\r\n\t");
-						l = 1;
-						quoting = false;
-					}
+			} else {
+				// multi-byte char, possibly supplementary
+				byte[] utf;
+				if (Character.isHighSurrogate(c) && i < str.length() - 1) {
+					// use substring() to get the whole thing if multi-char
+					utf = DataHelper.getUTF8(str.substring(i, i + 2));
+					// increment i below after start test
+				} else {
+					utf = DataHelper.getUTF8(String.valueOf(c));
 				}
-				if (!quoting) {
-					// close q-seq, wrap line, and start a new q-seq
-					quotedSequence = new StringBuilder(64);
-					quotedSequence.append("=?utf-8?Q?");
-					quoting = true;
-				}
-				quotedSequence.append(qc);
-			}
-			else {
-				if( quoting ) {
-					quotedSequence.append("?=");
-					int sl = quotedSequence.length();
-					if( l + sl >= 76 ) {
-						/*
-						 * wrap line
-						 */
-						out.append( "\r\n\t" );
-						l = 1;
-					}
-					out.append( quotedSequence );
-					l += sl;
-					quoting = false;
-				}
-				if( linebreak ) {
-					out.append( "\r\n" );
-					linebreak = false;
-					l = 0;
-				}
-				else {
-					if( l >= 76 ) {
-						out.append( "\r\n\t" );
-						l = 1;
-					}
-					out.append(c);
-					l++;
+				for (int j = 0; j < utf.length; j++) {
+					int b = utf[j] & 0xff;
+					qc.append(HexTable.table[b]);
 				}
 			}
+			// now see if we have room
+			if (i == start) {
+				out.append("=?utf-8?Q?");
+				l += 10;
+			} else {
+				// subsequent chars
+				if (l + 2 + qc.length() > 76) {
+					out.append("?=\r\n\t=?utf-8?Q?");
+					l = 11;
+				}
+			}
+			if (Character.isHighSurrogate(c) && i < str.length() - 1)
+				i++;
+			out.append(qc);
+			l += qc.length();
 		}
-		if( quoting ) {
-			quotedSequence.append("?=");
-			int sl = quotedSequence.length();
-			if( l + sl >= 76 ) {
-				/*
-				 * wrap line
-				 */
-				out.append( "\r\n\t" );
-				l = 1;
-			}
-			out.append( quotedSequence );
-		}
+		out.append("?=\r\n");
 		return out.toString();
 	}
 
+	/**
+	 *  Decode all the header lines, up through \r\n\r\n,
+	 *  and puts them in the ReadBuffer, including the \r\n\r\n
+	 */
 	public ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
 		int written = 0;
@@ -322,15 +367,46 @@ public class HeaderLine extends Encoding {
 	}
 
 /*****
-TODO put UTF-8 back and move to a unit test
 	public static void main( String[] args ) throws EncodingException {
-		String text = "Subject: test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test \r\n" +
-		"From: UTF8 <smoerebroed@mail.i2p>\r\n" +
-		"To: UTF8 <lalala@mail.i2p>\r\n";
+		test("Subject: not utf8");
+		test("Subject: a=b c+d");
+		test("Subject: está");
+		test("Subject: 🚚 ORDER SHIPPED");
+		test("12345678: 12345678901234567890123456789012345678901234567890123456789012345");
+		test("12345678: 123456789012345678901234567890123456789012345678901234567890123456");
+		test("12345678: 1234567890123456789012345678901234567890123456789012345678901234567");
+		test("12345678: 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
+		test("12345678: 12345678901234567890123456789012345678901234567890123456789012345@");
+		test("12345678: 123456789012345678901234567890123456789012345678901234567890123456@");
+		test("12345678: 123456789012345678901234567890123456789012345678901@234567890123456789");
+		test("12345678: 1234567890123456789012345678901234567890123456789012@34567890123456789");
+		test("12345678: 12345678901234567890123456789012345678901234567890123@4567890123456789");
+		test("12345678: 123456789012345678901234567890123456789012345678901234@567890123456789");
+	}
+
+	private static void test(String x) {
 		HeaderLine hl = new HeaderLine();
-		System.out.println( hl.encode( text ) );
-		System.out.println( hl.encode( "test UTF8" ) );
-		System.out.println( hl.encode( "UTF8" ) );
+		String orig = x;
+		System.out.println(x);
+		try {
+			x = hl.encode(x);
+		} catch (EncodingException e) {
+			e.printStackTrace();
+			return;
+		}
+		System.out.print(x);
+		try {
+			ReadBuffer rb = hl.decode(x);
+			String rt = DataHelper.getUTF8(rb.content, rb.offset, rb.length);
+			if (rt.equals(orig + "\r\n")) {
+				System.out.println("Test passed\n");
+			} else {
+				System.out.print(rt);
+				System.out.println("*** Test failed ***\n");
+			}
+		} catch (DecodingException e) {
+			e.printStackTrace();
+		}
 	}
 ****/
 }
