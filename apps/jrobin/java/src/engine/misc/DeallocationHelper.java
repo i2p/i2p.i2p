@@ -127,7 +127,21 @@ public class DeallocationHelper {
                         cleanerCleanMethod.invoke(cleaner);
                         success = true;
                     }
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                //} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                } catch (IllegalAccessException | RuntimeException | InvocationTargetException e) {
+                    // Replaced with RuntimeException for OpenJDK 9b181
+                    // throws a java.lang.reflect.InaccessibleObjectException extends RuntimeException which is only in Java 9
+                    // WARNING: An illegal reflective access operation has occurred
+                    // WARNING: Illegal reflective access by engine.misc.DeallocationHelper (file:/path/to/jrobin.jar) to field java.nio.DirectByteBuffer.att
+                    // WARNING: Please consider reporting this to the maintainers of engine.misc.DeallocationHelper
+                    // WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+                    // WARNING: All illegal access operations will be denied in a future release
+                    // Thread terminated unexpectedly: Shutdown task net.i2p.router.web.StatSummarizer$Shutdown
+                    // java.lang.reflect.InaccessibleObjectException: Unable to make public void jdk.internal.ref.Cleaner.clean() accessible: module java.base does not "exports jdk.internal.ref" to unnamed module @381353a0
+                    // 	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:337)
+                    // 	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:281)
+                    // 	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:198)
+                    // 	at java.base/java.lang.reflect.Method.setAccessible(Method.java:192)
                     logger.warn("The deallocation of a direct NIO buffer has failed", e);
                 } finally {
                     directByteBufferCleanerMethod.setAccessible(directByteBufferCleanerMethodWasAccessible);

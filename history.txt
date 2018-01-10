@@ -1,6 +1,17 @@
+2018-01-10 zzz
+ * Addressbook: Remove finalizers (ticket #2115)
+ * i2psnark: Fix double-escaping of '&' (ticket #2127)
+ * jrobin: Disable DeallocationHelper for Java 9
+
+2018-01-09 zzz
+ * SusiMail: Rewrite/fix subject line encoding
+
 2018-01-06 zzz
- * i2ptunnel: Escape chars unescaped by browsers (ticket #2130)
- * i2ptunnel, eepget: Better error message on invalid URLs (ticket #2130)
+ * Console: Show and set burst bandwidth (ticket #2123)
+ * i2ptunnel:
+   - Advanced config in/out tunnels separately
+   - Better error message on invalid URLs (eepget too) (ticket #2130)
+   - Escape chars unescaped by browsers (ticket #2130)
 
 2018-01-04 zzz
  * i2psnark: Fix overflow in ratio sorter (ticket #2129)

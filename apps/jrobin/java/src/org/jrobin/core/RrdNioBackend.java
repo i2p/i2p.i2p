@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
+import net.i2p.util.SystemVersion;
 
 import engine.misc.DeallocationHelper;
 
@@ -35,7 +36,8 @@ import engine.misc.DeallocationHelper;
 public class RrdNioBackend extends RrdFileBackend {
     private final SyncManager m_syncManager;
     private MappedByteBuffer m_byteBuffer = null;
-    private static final DeallocationHelper _dHelper = new DeallocationHelper();
+    // Too many ominous warnings from Java 9
+    private static final DeallocationHelper _dHelper = SystemVersion.isJava9() ? null : new DeallocationHelper();
 
     /**
      * Creates RrdFileBackend object for the given file path, backed by
@@ -105,7 +107,7 @@ public class RrdNioBackend extends RrdFileBackend {
         if (!isReadOnly()) {
             stopSchedule();
         }
-        if (m_byteBuffer != null) {
+        if (_dHelper != null && m_byteBuffer != null) {
             _dHelper.deallocate(m_byteBuffer);
             m_byteBuffer = null;
         }
