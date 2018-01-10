@@ -43,6 +43,7 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import net.i2p.data.DataHelper;
+import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -334,7 +335,7 @@ class Mail {
 								shortSender = '<' + shortSender + '>';  // add missing <> (but thunderbird doesn't...)
 							boolean trim = shortSender.length() > 35;
 							if (trim)
-								shortSender = shortSender.substring( 0, 32 ).trim();
+								shortSender = ServletUtil.truncate(shortSender, 32).trim();
 							shortSender = html.encode( shortSender );
 							if (trim)
 								shortSender += "&hellip;";  // must be after html encode
@@ -361,7 +362,7 @@ class Mail {
 							shortSubject = formattedSubject;
 							boolean trim = formattedSubject.length() > 65;
 							if (trim)
-								shortSubject = formattedSubject.substring( 0, 62 ).trim();
+								shortSubject = ServletUtil.truncate(formattedSubject, 62).trim();
 							shortSubject = html.encode( shortSubject );
 							if (trim)
 								shortSubject += "&hellip;";  // must be after html encode

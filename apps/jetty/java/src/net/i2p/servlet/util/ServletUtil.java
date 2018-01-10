@@ -61,4 +61,23 @@ public class ServletUtil {
             ua.startsWith("SEC-") || ua.startsWith("SonyEricsson") ||
             ua.startsWith("Vodafone");
     }
+
+    /**
+      * Truncate a String.
+      * Same as s.substring(0, len) except that
+      * it won't split a surrogate pair.
+      *
+      * @param s non-null
+      * @return s if shorter; s.substring(0, len) if
+      *           the char at len-1 is not a high surrogate;
+      *           s.substring(0, len+1) if it is
+      * @since 0.9.33
+      */
+    public static String truncate(String s, int len) {
+        if (s.length() <= len)
+            return s;
+        if (Character.isHighSurrogate(s.charAt(len - 1)))
+            return s.substring(0, len + 1);
+        return s.substring(0, len);
+    }
 }

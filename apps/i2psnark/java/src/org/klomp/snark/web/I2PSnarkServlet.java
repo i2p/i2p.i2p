@@ -1534,7 +1534,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String basename = snark.getBaseName();
         String fullBasename = basename;
         if (basename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
-            String start = basename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
+            String start = ServletUtil.truncate(basename, MAX_DISPLAYED_FILENAME_LENGTH);
             if (start.indexOf(' ') < 0 && start.indexOf('-') < 0) {
                 // browser has nowhere to break it
                 basename = start + HELLIP;

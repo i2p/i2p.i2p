@@ -28,6 +28,7 @@ import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.NewsHelper;
+import net.i2p.servlet.util.ServletUtil;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.PortMapper;
@@ -575,7 +576,7 @@ public class SummaryHelper extends HelperBase {
                 if (name.length() <= 32)
                     buf.append(DataHelper.escapeHTML(name));
                 else
-                    buf.append(DataHelper.escapeHTML(name.substring(0,29))).append("&hellip;");
+                    buf.append(DataHelper.escapeHTML(ServletUtil.truncate(name, 29))).append("&hellip;");
                 buf.append("</a></b></td>\n");
                 LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
