@@ -110,11 +110,6 @@ class HostTxtIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Clos
         }
     }
 
-    @Override
-    protected void finalize() {
-        close();
-    }
-
     /**
      *  The object returned by the iterator.
      */

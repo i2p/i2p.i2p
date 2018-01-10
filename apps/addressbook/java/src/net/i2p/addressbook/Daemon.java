@@ -130,9 +130,22 @@ class Daemon {
         // This also has the advantage of not flushing the NamingService's LRU cache.
         String nsClass = router.getClass().getSimpleName();
         boolean isTextFile = nsClass.equals("HostsTxtNamingService") || nsClass.equals("SingleFileNamingService");
-        Set<String> knownNames = null;
+        Set<String> knownNames;
+        if (isTextFile) {
+            // load the hostname set
+            Properties opts = new Properties();
+            opts.setProperty("file", "hosts.txt");
+            knownNames = router.getNames(opts);
+        } else {
+            knownNames = null;
+        }
+        NamingService publishedNS;
+        if (published != null) {
+            publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+        } else {
+            publishedNS = null;
+        }
 
-        NamingService publishedNS = null;
         Iterator<AddressBook> iter = subscriptions.iterator();
         while (iter.hasNext()) {
             // yes, the EepGet fetch() is done in next()
@@ -142,24 +155,39 @@ class Daemon {
             if (DEBUG && log != null && addressbook.getLocation() != null) {
                 long end = System.currentTimeMillis();
                 log.append("Fetch of " + addressbook.getLocation() + " took " + (end - start));
-                start = end;
             }
+            Iterator<Map.Entry<String, HostTxtEntry>> iter2 = addressbook.iterator();
+            try {
+                update(router, knownNames, publishedNS, addressbook, iter2, log);
+            } finally {
+                if (iter2 instanceof HostTxtIterator)
+                    ((HostTxtIterator) iter2).close();
+                addressbook.delete();
+            }
+        }  // subscriptions
+        subscriptions.write();
+    }
+
+    /**
+     *  @param knownNames only non-null if router book is a text file
+     *  @param publishedNS only non-null if we have a published address book
+     *  @since 0.9.33 split out from above
+     */
+    private static void update(NamingService router, Set<String> knownNames,
+                               NamingService publishedNS, AddressBook addressbook,
+                               Iterator<Map.Entry<String, HostTxtEntry>> iter, Log log) {
+            long start = System.currentTimeMillis();
             int old = 0, nnew = 0, invalid = 0, conflict = 0, total = 0;
             int deleted = 0;
-            for (Map.Entry<String, HostTxtEntry> entry : addressbook) {
+            while(iter.hasNext()) {
+                Map.Entry<String, HostTxtEntry> entry = iter.next();
                 total++;
                 // may be null for 'remove' entries
                 String key = entry.getKey();
                 boolean isKnown;
                 // NOT set for text file NamingService
                 Destination oldDest;
-                if (isTextFile) {
-                    if (knownNames == null) {
-                        // load the hostname set
-                        Properties opts = new Properties();
-                        opts.setProperty("file", "hosts.txt");
-                        knownNames = router.getNames(opts);
-                    }
+                if (knownNames != null) {
                     oldDest = null;
                     isKnown = key != null ? knownNames.contains(key) : null;
                 } else {
@@ -243,13 +271,11 @@ class Daemon {
                                             }
                                             // now update the published addressbook
                                             // ditto
-                                            if (published != null) {
-                                                if (publishedNS == null)
-                                                    publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                                            if (publishedNS != null) {
                                                 // FIXME this fails, no support in SFNS
                                                 success = publishedNS.addDestination(key, dest, props);
                                                 if (log != null && !success)
-                                                    log.append("Add to published address book " + published.getAbsolutePath() + " failed for " + key);
+                                                    log.append("Add to published address book " + publishedNS.getName() + " failed for " + key);
                                             }
                                             nnew++;
                                             continue;
@@ -416,12 +442,10 @@ class Daemon {
                                                                ". From: " + addressbook.getLocation());
                                             }
                                             // now update the published addressbook
-                                            if (published != null) {
-                                                if (publishedNS == null)
-                                                    publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                                            if (publishedNS != null) {
                                                 success = publishedNS.remove(poldname, dest);
                                                 if (log != null && !success)
-                                                    log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + poldname);
+                                                    log.append("Remove from published address book " + publishedNS.getName() + " failed for " + poldname);
                                             }
                                         } else {
                                             // mismatch, disallow
@@ -463,20 +487,19 @@ class Daemon {
                                     log.append("Save to naming service " + router + " failed for new key " + key);
                             }
                             // now update the published addressbook
-                            if (published != null) {
-                                if (publishedNS == null)
-                                    publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                            if (publishedNS != null) {
                                 if (allowExistingKeyInPublished)
                                     success = publishedNS.put(key, dest, props);
                                 else
                                     success = publishedNS.putIfAbsent(key, dest, props);
                                 if (log != null && !success) {
-                                    log.append("Save to published address book " + published.getAbsolutePath() + " failed for new key " + key);
+                                    log.append("Save to published address book " + publishedNS.getName() + " failed for new key " + key);
                                 }
                             }
-                            if (isTextFile)
+                            if (knownNames != null) {
                                 // keep track for later dup check
                                 knownNames.add(key);
+                            }
                             nnew++;
                         } else if (key == null) {
                             // 'remove' actions
@@ -507,12 +530,10 @@ class Daemon {
                                                                ". From: " + addressbook.getLocation());
                                             }
                                             // now update the published addressbook
-                                            if (published != null) {
-                                                if (publishedNS == null)
-                                                    publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                                            if (publishedNS != null) {
                                                 success = publishedNS.remove(poldname, pod);
                                                 if (log != null && !success)
-                                                    log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + poldname);
+                                                    log.append("Remove from published address book " + publishedNS.getName() + " failed for " + poldname);
                                             }
                                         } else if (pod2 != null) {
                                             // mismatch, disallow
@@ -551,12 +572,10 @@ class Daemon {
                                                                    ". From: " + addressbook.getLocation());
                                                 }
                                                 // now update the published addressbook
-                                                if (published != null) {
-                                                    if (publishedNS == null)
-                                                        publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                                                if (publishedNS != null) {
                                                     success = publishedNS.remove(poldname, pod);
                                                     if (log != null && !success)
-                                                        log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + poldname);
+                                                        log.append("Remove from published address book " + publishedNS.getName() + " failed for " + poldname);
                                                 }
                                             } else if (pod2 != null) {
                                                 // mismatch, disallow
@@ -586,12 +605,10 @@ class Daemon {
                                                                    ". From: " + addressbook.getLocation());
                                                 }
                                                 // now update the published addressbook
-                                                if (published != null) {
-                                                    if (publishedNS == null)
-                                                        publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                                                if (publishedNS != null) {
                                                     success = publishedNS.remove(rev, pod);
                                                     if (log != null && !success)
-                                                        log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + rev);
+                                                        log.append("Remove from published address book " + publishedNS.getName() + " failed for " + rev);
                                                 }
                                             }
                                         }
@@ -641,7 +658,7 @@ class Daemon {
                         log.append("Invalid b64 for " + key + " From: " + addressbook.getLocation());
                     invalid++;
                 }
-            }
+            }  // entries
             if (DEBUG && log != null && total > 0) {
                 log.append("Merge of " + addressbook.getLocation() + " into " + router +
                            " took " + (System.currentTimeMillis() - start) + " ms with " +
@@ -651,10 +668,7 @@ class Daemon {
                            deleted + " deleted, " +
                            invalid + " invalid, " +
                            conflict + " conflicts");
-            }  // entries
-            addressbook.delete();
-        }  // subscriptions
-        subscriptions.write();
+            }
     }
 
     /** @since 0.9.26 */

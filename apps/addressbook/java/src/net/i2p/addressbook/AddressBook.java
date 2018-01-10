@@ -133,8 +133,9 @@ class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
     public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
         Map<String, HostTxtEntry> a = null;
         File subf = null;
+        File tmp = null;
         try {
-            File tmp = SecureFile.createTempFile("addressbook", null, I2PAppContext.getGlobalContext().getTempDir());
+            tmp = SecureFile.createTempFile("addressbook", null, I2PAppContext.getGlobalContext().getTempDir());
             EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
                     proxyHost, proxyPort, 0, -1l, MAX_SUB_SIZE, tmp.getAbsolutePath(), null,
                     subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified(), null);
@@ -148,6 +149,8 @@ class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
                 tmp.delete();
             }
         } catch (IOException ioe) {
+            if (tmp != null)
+                tmp.delete();
             a = Collections.emptyMap();
         }
         this.addresses = a;
@@ -306,7 +309,17 @@ class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
     public void merge(AddressBook other, boolean overwrite, Log log) {
         if (this.addresses == null)
             throw new IllegalStateException();
-        for (Iterator<Map.Entry<String, HostTxtEntry>> iter = other.iterator(); iter.hasNext(); ) {
+        Iterator<Map.Entry<String, HostTxtEntry>> iter = other.iterator();
+        try {
+            merge2(other, iter, overwrite, log);
+        } finally {
+            if (iter instanceof HostTxtIterator)
+                ((HostTxtIterator) iter).close();
+        }
+    }
+
+    private void merge2(AddressBook other, Iterator<Map.Entry<String, HostTxtEntry>> iter, boolean overwrite, Log log) {
+        while(iter.hasNext()) {
             Map.Entry<String, HostTxtEntry> entry = iter.next();
             String otherKey = entry.getKey();
             HostTxtEntry otherValue = entry.getValue();
@@ -365,11 +378,6 @@ class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
         if (this.location == null || this.location.startsWith("http://"))
             throw new IllegalStateException();
         this.write(new File(this.location));
-    }
-
-    @Override
-    protected void finalize() {
-        delete();
     }
 
 /****
