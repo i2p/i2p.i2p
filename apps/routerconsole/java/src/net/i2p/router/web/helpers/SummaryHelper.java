@@ -315,6 +315,8 @@ public class SummaryHelper extends HelperBase {
         }
         used /= 1024*1024;
         long total = tot / (1024*1024);
+        if (used > total)
+            used = total;
         // long free = Runtime.getRuntime().freeMemory()/1024/1024;
         // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
         // return integerFormatter.format(used) + "MB / " + free + " MB";
@@ -339,6 +341,10 @@ public class SummaryHelper extends HelperBase {
             used /= 1024*1024;
         }
         long total = tot / (1024*1024);
+        if (used > total)
+            used = total;
+        if (usedPc > 100)
+            usedPc = 100;
         // long free = Runtime.getRuntime().freeMemory()/1024/1024;
         // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
         // return integerFormatter.format(used) + "MB / " + free + " MB";
