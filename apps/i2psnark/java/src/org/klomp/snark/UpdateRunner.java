@@ -186,7 +186,9 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     private void fatal(String error) {
             if (_snark != null) {
                 if (_hasMetaInfo) {
-                    _smgr.stopTorrent(_snark, true);
+                    // avoid loop stopTorrent() ... updateStatus() ... fatal() ...
+                    if (!_snark.isStopped())
+                        _smgr.stopTorrent(_snark, true);
                     String file = _snark.getName();
                     _smgr.removeTorrent(file);
                     // delete torrent file
