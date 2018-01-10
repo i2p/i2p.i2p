@@ -418,20 +418,45 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 }
             }
 
-            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_USER_AGENTS)) &&
-                headers.containsKey("User-Agent")) {
-                String ua = headers.get("User-Agent").get(0);
-                if (!ua.startsWith("MYOB")) {
+            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_USER_AGENTS))) {
+                if (headers.containsKey("User-Agent")) {
+                    String ua = headers.get("User-Agent").get(0);
+                    if (!ua.startsWith("MYOB")) {
+                        String blockAgents = opts.getProperty(OPT_USER_AGENTS);
+                        if (blockAgents != null) {
+                            String[] agents = DataHelper.split(blockAgents, ",");
+                            for (int i = 0; i < agents.length; i++) {
+                                String ag = agents[i].trim();
+                                if (ag.equals("none"))
+                                    continue;
+                                if (ag.length() > 0 && ua.contains(ag)) {
+                                    if (_log.shouldLog(Log.WARN))
+                                        _log.warn("Refusing access from: " +
+                                                  Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                                                  " with User-Agent: " + ua);
+                                    try {
+                                        socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                                    } catch (IOException ioe) {}
+                                    try {
+                                        socket.close();
+                                    } catch (IOException ioe) {}
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // no user-agent, block if blocklist contains "none"
                     String blockAgents = opts.getProperty(OPT_USER_AGENTS);
                     if (blockAgents != null) {
                         String[] agents = DataHelper.split(blockAgents, ",");
                         for (int i = 0; i < agents.length; i++) {
                             String ag = agents[i].trim();
-                            if (ag.length() > 0 && ua.contains(ag)) {
+                            if (ag.equals("none")) {
                                 if (_log.shouldLog(Log.WARN))
                                     _log.warn("Refusing access from: " +
                                               Base32.encode(peerHash.getData()) + ".b32.i2p" +
-                                              " with User-Agent: " + ua);
+                                              " with empty User-Agent");
                                 try {
                                     socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
                                 } catch (IOException ioe) {}
