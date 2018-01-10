@@ -2784,7 +2784,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String link = urlEncode(s);
         String display;
         if (s.length() <= max)
-            display = DataHelper.escapeHTML(link);
+            display = escapeHTML2(link);
         else
             display = DataHelper.escapeHTML(s.substring(0, max)) + "&hellip;";
         buf.append("<a href=\"").append(link).append("\">").append(display).append("</a>");
@@ -2799,6 +2799,24 @@ public class I2PSnarkServlet extends BasicServlet {
         return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20")
                 .replace("<", "%3C").replace(">", "%3E")
                 .replace("[", "%5B").replace("]", "%5D");
+    }
+
+    private static final String escapeChars[] = {"\"", "<", ">", "'"};
+    private static final String escapeCodes[] = {"&quot;", "&lt;", "&gt;", "&apos;"};
+
+    /**
+     * Modded from DataHelper.
+     * Does not escape ampersand. String must already have escaped ampersand.
+     * @param unescaped the unescaped string, non-null
+     * @return the escaped string
+     * @since 0.9.33
+     */
+    private static String escapeHTML2(String unescaped) {
+        String escaped = unescaped;
+        for (int i = 0; i < escapeChars.length; i++) {
+            escaped = escaped.replace(escapeChars[i], escapeCodes[i]);
+        }
+        return escaped;
     }
 
     private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
