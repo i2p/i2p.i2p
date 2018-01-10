@@ -41,13 +41,22 @@ public class ConfigNetHelper extends HelperBase {
     
     /** @return host or "unknown" */
     public String getUdpIP() {
+        String rv = _context.getProperty(UDPTransport.PROP_IP);
+        if (rv != null)
+            return rv;
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
-        if (addr == null)
-            return _t("unknown");
-        String rv = addr.getHost();
-        if (rv == null)
-            return _t("unknown");
-        return rv;
+        if (addr != null) {
+            rv = addr.getHost();
+            if (rv != null)
+                return rv;
+        }
+        addr = _context.router().getRouterInfo().getTargetAddress("NTCP");
+        if (addr != null) {
+            rv = addr.getHost();
+            if (rv != null)
+                return rv;
+        }
+        return _t("unknown");
     }
 
     /**
