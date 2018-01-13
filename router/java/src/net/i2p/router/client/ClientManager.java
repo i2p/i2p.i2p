@@ -297,7 +297,7 @@ class ClientManager {
      */
     public int destinationEstablished(ClientConnectionRunner runner, Destination dest) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("DestinationEstablished called for destination " + dest.calculateHash().toBase64());
+            _log.debug("DestinationEstablished called for destination " + dest.toBase32());
 
         synchronized (_pendingRunners) {
             _pendingRunners.remove(runner);
@@ -321,9 +321,9 @@ class ClientManager {
             }
         }
         if (rv == SessionStatusMessage.STATUS_INVALID) {
-            _log.log(Log.CRIT, "Client attempted to register duplicate destination " + dest.calculateHash().toBase64());
+            _log.log(Log.CRIT, "Client attempted to register duplicate destination " + dest.toBase32());
         } else if (rv == SessionStatusMessage.STATUS_REFUSED) {
-            _log.error("Max sessions exceeded " + dest.calculateHash().toBase64());
+            _log.error("Max sessions exceeded " + dest.toBase32());
         }
         return rv;
     }
@@ -447,7 +447,7 @@ class ClientManager {
         if (runner == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Cannot request the lease set, as we can't find a client runner for " 
-                          + dest.calculateHash().toBase64() + ".  disconnected?");
+                          + dest.toBase32() + ".  disconnected?");
             _ctx.jobQueue().addJob(onFailedJob);
         } else {
             runner.requestLeaseSet(dest.calculateHash(), set, timeout, onCreateJob, onFailedJob);

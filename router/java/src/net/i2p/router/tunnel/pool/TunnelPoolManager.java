@@ -128,7 +128,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return pool.selectTunnel();
         }
         if (_log.shouldLog(Log.ERROR))
-            _log.error("Want the inbound tunnel for " + destination.calculateHash() +
+            _log.error("Want the inbound tunnel for " + destination.toBase32() +
                      " but there isn't a pool?");
         return null;
     }
@@ -204,7 +204,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return pool.selectTunnel(closestTo);
         }
         if (_log.shouldLog(Log.ERROR))
-            _log.error("Want the inbound tunnel for " + destination.calculateHash() +
+            _log.error("Want the inbound tunnel for " + destination.toBase32() +
                      " but there isn't a pool?");
         return null;
     }
@@ -403,7 +403,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {
         Hash dest = client.calculateHash();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Building tunnels for the client " + dest + ": " + settings);
+            _log.debug("Building tunnels for the client " + client.toBase32() + ": " + settings);
         TunnelPool inbound = null;
         TunnelPool outbound = null;
 
@@ -456,7 +456,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             TunnelPool outbound = _clientOutboundPools.get(h);
             if (inbound != null || outbound != null) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("already have alias " + dest);
+                    _log.warn("already have alias " + dest.toBase32());
                 return false;
             }
             TunnelPool eInbound = _clientInboundPools.get(e);
@@ -480,7 +480,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             outbound.startup();
         }
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Added " + h + " as alias for " + e + " with settings " + settings);
+            _log.warn("Added " + dest.toBase32() + " as alias for " + existingClient.toBase32() + " with settings " + settings);
         return true;
     }
 
@@ -538,11 +538,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public synchronized void removeTunnels(Hash destination) {
         if (destination == null) return;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Removing tunnels for the client " + destination);
+            _log.debug("Removing tunnels for the client " + destination.toBase32());
         if (_context.clientManager().isLocal(destination)) {
             // race with buildTunnels() on restart of a client
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Not removing pool still registered with client manager: " + destination.toBase64(), new Exception("i did it"));
+                _log.warn("Not removing pool still registered with client manager: " + destination.toBase32(), new Exception("i did it"));
             return;
         }
         TunnelPool inbound = _clientInboundPools.remove(destination);
