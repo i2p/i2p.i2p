@@ -1,7 +1,14 @@
+2018-01-13 zzz
+ * SessionKeyManager: Clean up sessions with excess tagsets
+
 2018-01-10 zzz
  * Addressbook: Remove finalizers (ticket #2115)
- * i2psnark: Fix double-escaping of '&' (ticket #2127)
+ * /confignet: Display IP even if firewalled (ticket #2133)
+ * i2psnark:
+   - Fix double-escaping of '&' (ticket #2127)
+   - Fix infinite loop stopping update torrent (ticket #2125)
  * jrobin: Disable DeallocationHelper for Java 9
+ * /netdb: Note encrypted leasesets
 
 2018-01-09 zzz
  * SusiMail: Rewrite/fix subject line encoding
