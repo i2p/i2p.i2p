@@ -360,6 +360,10 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 session.destroySession();
             } catch (I2PSessionException ise) {}
         }
+        // do we need this here? subsession.destroySession() calls primary
+        Destination d = session.getMyDestination();
+        if (d != null)
+            _context.keyRing().remove(d.calculateHash());
     }
     
     /**
@@ -1210,6 +1214,10 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private void closeSocket() {
         if (_log.shouldLog(Log.INFO))
             _log.info(getPrefix() + "Closing the socket", new Exception("closeSocket"));
+        // maybe not the right place for this, but let's be sure
+        Destination d = _myDestination;
+        if (d != null)
+            _context.keyRing().remove(d.calculateHash());
         synchronized(_stateLock) {
             changeState(State.CLOSING);
             locked_closeSocket();
@@ -1217,6 +1225,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         synchronized (_subsessionLock) {
             for (SubSession sess : _subsessions) {
+                d = sess.getMyDestination();
+                if (d != null)
+                    _context.keyRing().remove(d.calculateHash());
                 sess.changeState(State.CLOSED);
                 sess.setSessionId(null);
                 sess.setLeaseSet(null);

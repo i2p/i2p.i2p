@@ -1,3 +1,10 @@
+2018-01-14 zzz
+ * Keyring (ticket #2108):
+   - Separate local and remote dests on /configkeyring
+   - Prohibit local changes on /configkeyring
+   - Remove local keys on tunnel shutdown or encryption disable
+   - Ensure subsession encryption setting matches primary session
+
 2018-01-13 zzz
  * SessionKeyManager: Clean up sessions with excess tagsets
 

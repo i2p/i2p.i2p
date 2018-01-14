@@ -86,6 +86,13 @@ class SubSession extends I2PSessionMuxedImpl {
     public void updateOptions(Properties options) {}
 
     /**
+     *  @since 0.9.33
+     */
+    public Properties getPrimaryOptions() {
+        return _primary.getOptions();
+    }
+
+    /**
      * Connect to the router and establish a session.  This call blocks until 
      * a session is granted.
      *

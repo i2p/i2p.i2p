@@ -12,6 +12,7 @@ package net.i2p.client.impl;
 import java.io.EOFException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
@@ -21,6 +22,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
@@ -158,17 +160,27 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
 
         leaseSet.setEncryptionKey(li.getPublicKey());
         leaseSet.setSigningKey(li.getSigningPublicKey());
-        boolean encrypt = Boolean.parseBoolean(session.getOptions().getProperty("i2cp.encryptLeaseSet"));
-        String sk = session.getOptions().getProperty("i2cp.leaseSetKey");
+        // SubSession options aren't updated via the gui, so use the primary options
+        Properties opts;
+        if (session instanceof SubSession)
+            opts = ((SubSession) session).getPrimaryOptions();
+        else
+            opts = session.getOptions();
+        boolean encrypt = Boolean.parseBoolean(opts.getProperty("i2cp.encryptLeaseSet"));
+        String sk = opts.getProperty("i2cp.leaseSetKey");
+        Hash h = dest.calculateHash();
         if (encrypt && sk != null) {
             SessionKey key = new SessionKey();
             try {
                 key.fromBase64(sk);
                 leaseSet.encrypt(key);
-                _context.keyRing().put(session.getMyDestination().calculateHash(), key);
+                _context.keyRing().put(h, key);
             } catch (DataFormatException dfe) {
                 _log.error("Bad leaseset key: " + sk);
+                _context.keyRing().remove(h);
             }
+        } else {
+            _context.keyRing().remove(h);
         }
         try {
             leaseSet.sign(session.getPrivateKey());

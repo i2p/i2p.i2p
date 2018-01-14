@@ -33,6 +33,9 @@ public class ConfigKeyringHandler extends FormHandler {
                 } catch (DataFormatException dfe) {}
                 if (h == null || h.getData() == null) {
                     addFormError(_t("Invalid destination"));
+                } else if (_context.clientManager().isLocal(h)) {
+                    // don't bother translating
+                    addFormError("Cannot add key for local destination. Enable encryption in the Hidden Services Manager.");
                 } else if (sk.getData() == null) {
                     addFormError(_t("Invalid key"));
                 } else {
@@ -42,12 +45,16 @@ public class ConfigKeyringHandler extends FormHandler {
                 }
             } else {  // Delete
                 if (h != null && h.getData() != null) {
-                    if (_context.keyRing().remove(h) != null)
+                    if (_context.clientManager().isLocal(h)) {
+                        // don't bother translating
+                        addFormError("Cannot remove key for local destination. Disable encryption in the Hidden Services Manager.");
+                    } else if (_context.keyRing().remove(h) != null) {
                         addFormNotice(_t("Key for {0} removed from keyring",
                                          Base32.encode(h.getData()) + ".b32.i2p"));
-                    else
+                    } else {
                         addFormNotice(_t("Key for {0} not found in keyring",
                                          Base32.encode(h.getData()) + ".b32.i2p"));
+                    }
                 } else {
                     addFormError(_t("Invalid destination"));
                 }

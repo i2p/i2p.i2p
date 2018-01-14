@@ -30,17 +30,31 @@ public class ConfigKeyringHelper extends HelperBase {
      */
     private void renderStatusHTML(StringWriter out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
+        buf.append("<h3>").append(_t("Local encrypted destinations")).append("</h3>");
+        render(buf, true);
+        buf.append("<h3>").append(_t("Remote encrypted destinations")).append("</h3>");
+        render(buf, false);
+        out.write(buf.toString());
+        out.flush();
+    }
+
+    /**
+     *  @since 0.9.33 moved from PersistentKeyRing
+     */
+    private void render(StringBuilder buf, boolean local) {
         buf.append("\n<table class=\"configtable\"><tr><th align=\"left\">").append(_t("Destination"))
            .append("<th align=\"left\">").append(_t("Name"))
            .append("<th align=\"left\">").append(_t("Encryption Key"))
            .append("</tr>");
         for (Map.Entry<Hash, SessionKey> e : _context.keyRing().entrySet()) {
-            buf.append("\n<tr><td>");
             Hash h = e.getKey();
+            if (local != _context.clientManager().isLocal(h))
+                continue;
+            buf.append("\n<tr><td>");
             buf.append(Base32.encode(h.getData())).append(".b32.i2p");
             buf.append("</td><td>");
             Destination dest = _context.netDb().lookupDestinationLocally(h);
-            if (dest != null && _context.clientManager().isLocal(dest)) {
+            if (dest != null && local) {
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(h);
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append(in.getDestinationNickname());
@@ -55,7 +69,5 @@ public class ConfigKeyringHelper extends HelperBase {
             buf.append("</td>\n");
         }
         buf.append("</table>\n");
-        out.write(buf.toString());
-        out.flush();
     }
 }
