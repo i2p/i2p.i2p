@@ -881,8 +881,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     @Override
     public synchronized boolean destroy() {
         close(true);
-        if (_ownDest)
-            sockMgr.destroySocketManager();
+        if (_ownDest) {
+            I2PSocketManager sm = sockMgr;
+            if (sm != null)
+                sm.destroySocketManager();
+        }
         return true;
     }
 
