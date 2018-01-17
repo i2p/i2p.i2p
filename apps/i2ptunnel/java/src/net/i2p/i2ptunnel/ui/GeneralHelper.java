@@ -662,31 +662,31 @@ public class GeneralHelper {
 
     /** all of these are @since 0.8.3 */
     public int getLimitMinute(int tunnel) {
-        return getProperty(tunnel, TunnelConfig.PROP_MAX_CONNS_MIN, 0);
+        return getProperty(tunnel, TunnelController.PROP_MAX_CONNS_MIN, TunnelController.DEFAULT_MAX_CONNS_MIN);
     }
 
     public int getLimitHour(int tunnel) {
-        return getProperty(tunnel, TunnelConfig.PROP_MAX_CONNS_HOUR, 0);
+        return getProperty(tunnel, TunnelController.PROP_MAX_CONNS_HOUR, TunnelController.DEFAULT_MAX_CONNS_HOUR);
     }
 
     public int getLimitDay(int tunnel) {
-        return getProperty(tunnel, TunnelConfig.PROP_MAX_CONNS_DAY, 0);
+        return getProperty(tunnel, TunnelController.PROP_MAX_CONNS_DAY, TunnelController.DEFAULT_MAX_CONNS_DAY);
     }
 
     public int getTotalMinute(int tunnel) {
-        return getProperty(tunnel, TunnelConfig.PROP_MAX_TOTAL_CONNS_MIN, 0);
+        return getProperty(tunnel, TunnelController.PROP_MAX_TOTAL_CONNS_MIN, TunnelController.DEFAULT_MAX_TOTAL_CONNS_MIN);
     }
 
     public int getTotalHour(int tunnel) {
-        return getProperty(tunnel, TunnelConfig.PROP_MAX_TOTAL_CONNS_HOUR, 0);
+        return getProperty(tunnel, TunnelController.PROP_MAX_TOTAL_CONNS_HOUR, 0);
     }
 
     public int getTotalDay(int tunnel) {
-        return getProperty(tunnel, TunnelConfig.PROP_MAX_TOTAL_CONNS_DAY, 0);
+        return getProperty(tunnel, TunnelController.PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
 
     public int getMaxStreams(int tunnel) {
-        return getProperty(tunnel, TunnelConfig.PROP_MAX_STREAMS, 0);
+        return getProperty(tunnel, TunnelController.PROP_MAX_STREAMS, TunnelController.DEFAULT_MAX_STREAMS);
     }
 
     /**
@@ -694,11 +694,11 @@ public class GeneralHelper {
      * @since 0.9.9
      */
     public int getPostMax(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_MAX, 0);
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_MAX, I2PTunnelHTTPServer.DEFAULT_POST_MAX);
     }
 
     public int getPostTotalMax(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX, 0);
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX, I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_MAX);
     }
 
     public int getPostCheckTime(int tunnel) {

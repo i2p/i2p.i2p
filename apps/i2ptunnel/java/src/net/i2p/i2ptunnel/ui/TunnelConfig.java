@@ -472,13 +472,13 @@ public class TunnelConfig {
     /**
      * all of these are @since 0.8.3 (moved from IndexBean)
      */
-    public static final String PROP_MAX_CONNS_MIN = "i2p.streaming.maxConnsPerMinute";
-    public static final String PROP_MAX_CONNS_HOUR = "i2p.streaming.maxConnsPerHour";
-    public static final String PROP_MAX_CONNS_DAY = "i2p.streaming.maxConnsPerDay";
-    public static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
-    public static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
-    public static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
-    public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+    public static final String PROP_MAX_CONNS_MIN = TunnelController.PROP_MAX_CONNS_MIN;
+    public static final String PROP_MAX_CONNS_HOUR = TunnelController.PROP_MAX_CONNS_HOUR;
+    public static final String PROP_MAX_CONNS_DAY = TunnelController.PROP_MAX_CONNS_DAY;
+    public static final String PROP_MAX_TOTAL_CONNS_MIN = TunnelController.PROP_MAX_TOTAL_CONNS_MIN;
+    public static final String PROP_MAX_TOTAL_CONNS_HOUR = TunnelController.PROP_MAX_TOTAL_CONNS_HOUR;
+    public static final String PROP_MAX_TOTAL_CONNS_DAY = TunnelController.PROP_MAX_TOTAL_CONNS_DAY;
+    public static final String PROP_MAX_STREAMS = TunnelController.PROP_MAX_STREAMS;
 
     public void setLimitMinute(int val) {
         _otherOptions.put(PROP_MAX_CONNS_MIN, Integer.toString(val));
@@ -607,6 +607,8 @@ public class TunnelConfig {
             // generic server stuff
             if (_targetPort >= 0)
                 config.setProperty(TunnelController.PROP_TARGET_PORT, Integer.toString(_targetPort));
+            // see TunnelController.setConfig()
+            _booleanOptions.add(TunnelController.PROP_LIMITS_SET);
             for (String p : _booleanServerOpts)
                 config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
             for (String p : _otherServerOpts) {
@@ -763,7 +765,8 @@ public class TunnelConfig {
         I2PTunnelHTTPServer.OPT_REJECT_REFERER,
         I2PTunnelHTTPServer.OPT_REJECT_USER_AGENTS,
         I2PTunnelServer.PROP_UNIQUE_LOCAL,
-        "shouldBundleReplyInfo"
+        "shouldBundleReplyInfo",
+        TunnelController.PROP_LIMITS_SET
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",

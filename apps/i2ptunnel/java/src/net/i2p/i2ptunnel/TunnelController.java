@@ -85,6 +85,25 @@ public class TunnelController implements Logging {
     public static final String PROP_TARGET_HOST = "targetHost";
     public static final String PROP_TARGET_PORT = "targetPort";
     public static final String PROP_TYPE = "type";
+    
+    /**
+     * all of these are @since 0.9.33 (moved from TunnelConfig)
+     */
+    public static final String PROP_MAX_CONNS_MIN = "i2p.streaming.maxConnsPerMinute";
+    public static final String PROP_MAX_CONNS_HOUR = "i2p.streaming.maxConnsPerHour";
+    public static final String PROP_MAX_CONNS_DAY = "i2p.streaming.maxConnsPerDay";
+    public static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
+    public static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
+    public static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
+    public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+    public static final String PROP_LIMITS_SET = "i2p.streaming.limitsManuallySet";
+    public static final int DEFAULT_MAX_CONNS_MIN = 10;
+    public static final int DEFAULT_MAX_CONNS_HOUR = 40;
+    public static final int DEFAULT_MAX_CONNS_DAY = 100;
+    public static final int DEFAULT_MAX_TOTAL_CONNS_MIN = 25;
+    public static final int DEFAULT_MAX_TOTAL_CONNS_HOUR = 0;
+    public static final int DEFAULT_MAX_TOTAL_CONNS_DAY = 0;
+    public static final int DEFAULT_MAX_STREAMS = 20;
 
     /** @since 0.9.14 */
     public static final String PFX_OPTION = "option.";
@@ -96,6 +115,20 @@ public class TunnelController implements Logging {
     private static final String OPT_SIG_TYPE = PFX_OPTION + I2PClient.PROP_SIGTYPE;
     /** @since 0.9.30 */
     private static final String OPT_ALT_PKF = PFX_OPTION + I2PTunnelServer.PROP_ALT_PKF;
+
+    /**
+     * all of these are @since 0.9.33
+     */
+    private static final String OPT_MAX_CONNS_MIN = PFX_OPTION + PROP_MAX_CONNS_MIN;
+    private static final String OPT_MAX_CONNS_HOUR = PFX_OPTION + PROP_MAX_CONNS_HOUR;
+    private static final String OPT_MAX_CONNS_DAY = PFX_OPTION + PROP_MAX_CONNS_DAY;
+    private static final String OPT_MAX_TOTAL_CONNS_MIN = PFX_OPTION + PROP_MAX_TOTAL_CONNS_MIN;
+    private static final String OPT_MAX_TOTAL_CONNS_HOUR = PFX_OPTION + PROP_MAX_TOTAL_CONNS_HOUR;
+    private static final String OPT_MAX_TOTAL_CONNS_DAY = PFX_OPTION + PROP_MAX_TOTAL_CONNS_DAY;
+    private static final String OPT_MAX_STREAMS = PFX_OPTION + PROP_MAX_STREAMS;
+    private static final String OPT_LIMITS_SET = PFX_OPTION + PROP_LIMITS_SET;
+    public static final String OPT_POST_MAX = PFX_OPTION + I2PTunnelHTTPServer.OPT_POST_MAX;
+    public static final String OPT_POST_TOTAL_MAX = PFX_OPTION + I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX;
 
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
@@ -789,6 +822,34 @@ public class TunnelController implements Logging {
                 (type.equals(TYPE_HTTP_CLIENT) && Boolean.valueOf(getSharedClient()))) {
                 if (!_config.containsKey(OPT_SIG_TYPE))
                     _config.setProperty(OPT_SIG_TYPE, PREFERRED_SIGTYPE.name());
+            }
+            if (!isClient(type)) {
+                String p1 = _config.getProperty(OPT_MAX_CONNS_MIN, "0");
+                String p2 = _config.getProperty(OPT_MAX_CONNS_HOUR, "0");
+                String p3 = _config.getProperty(OPT_MAX_CONNS_DAY, "0");
+                String p4 = _config.getProperty(OPT_MAX_TOTAL_CONNS_MIN, "0");
+                String p5 = _config.getProperty(OPT_MAX_TOTAL_CONNS_HOUR, "0");
+                String p6 = _config.getProperty(OPT_MAX_TOTAL_CONNS_DAY, "0");
+                String p7 = _config.getProperty(OPT_MAX_STREAMS, "0");
+                String p8 = _config.getProperty(OPT_LIMITS_SET, "false");
+                if (p1.equals("0") && p2.equals("0") && p3.equals("0") &&
+                    p4.equals("0") && p5.equals("0") && p6.equals("0") &&
+                    p7.equals("0") && !p8.equals("true")) {
+                    // No limits set, let's set some defaults
+                    _config.setProperty(OPT_MAX_CONNS_MIN, Integer.toString(DEFAULT_MAX_CONNS_MIN));
+                    _config.setProperty(OPT_MAX_CONNS_HOUR, Integer.toString(DEFAULT_MAX_CONNS_HOUR));
+                    _config.setProperty(OPT_MAX_CONNS_DAY, Integer.toString(DEFAULT_MAX_CONNS_DAY));
+                    _config.setProperty(OPT_MAX_TOTAL_CONNS_MIN, Integer.toString(DEFAULT_MAX_TOTAL_CONNS_MIN));
+                    _config.setProperty(OPT_MAX_STREAMS, Integer.toString(DEFAULT_MAX_STREAMS));
+                }
+                if (type.equals(TYPE_HTTP_SERVER) && !p8.equals("true")) {
+                    String p9 = _config.getProperty(OPT_POST_MAX, "0");
+                    String p10 = _config.getProperty(OPT_POST_TOTAL_MAX, "0");
+                    if (p9.equals("0") && p10.equals("0")) {
+                        _config.setProperty(OPT_POST_MAX, Integer.toString(I2PTunnelHTTPServer.DEFAULT_POST_MAX));
+                        _config.setProperty(OPT_POST_TOTAL_MAX, Integer.toString(I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_MAX));
+                    }
+                }
             }
         }
 
