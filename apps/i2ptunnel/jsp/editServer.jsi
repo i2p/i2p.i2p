@@ -1,7 +1,3 @@
-    <form method="post" action="list">
-
-<div class="panel">
-
                 <%
                 String tunnelTypeName;
                 String tunnelType;
@@ -930,5 +926,3 @@
             </td>
         </tr>
     </table>
-</div>
-    </form>

@@ -53,11 +53,19 @@ if (__invalid) {
     %>Invalid tunnel parameter<%
 } else {
     if (editBean.isInitialized()) {
+%>
+  <form method="post" action="list">
+    <div class="panel">
+<%
         if (__isClient) {
             %><%@include file="editClient.jsi" %><%
         } else {
             %><%@include file="editServer.jsi" %><%
         }
+%>
+    </div>
+  </form>
+<%
     } else {
         %><div id="notReady"><%=intl._t("Tunnels not initialized yet; please retry in a few moments.")%></div><%
     }  // isInitialized()
