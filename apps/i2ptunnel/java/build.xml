@@ -238,7 +238,7 @@
         <copy file="build/obj/net/i2p/i2ptunnel/web/EditBean.class" todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web" />
         <copy file="build/obj/net/i2p/i2ptunnel/web/IndexBean.class" todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web" />
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
-             basedir="../jsp/" excludes="web.xml, web-fragment.xml, web-out.xml, **/*.java, *.jsp">
+             basedir="../jsp/" excludes="web.xml, web-fragment.xml, web-out.xml, **/*.java, *.jsp, *.jsi">
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
@@ -253,7 +253,7 @@
 
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="build/i2ptunnel.war" >
-            <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, **/*.java, *.jsp" />
+            <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, **/*.java, *.jsp, *.jsi" />
             <srcfiles dir= "build/obj" includes="**/ui/*.class **/web/*.class" />
         </uptodate>
         <condition property="shouldListChanges2" >
@@ -337,7 +337,7 @@
     </target>
 
     <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
-        <srcfiles dir= "../jsp" includes="*.jsp, *.html, web.xml"/>
+        <srcfiles dir= "../jsp" includes="*.jsp, *.jsi, *.html, web.xml"/>
         <srcfiles dir= "src/net/i2p/i2ptunnel/web" includes="*.java"/>
     </uptodate>
 
