@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-18 09:06+0000\n"
+"POT-Creation-Date: 2018-01-18 12:13+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -6433,9 +6433,10 @@ msgid "Launch browser on router startup?"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:618
+#, java-format
 msgid ""
-"I2P's main configuration interface is this web.helpers, so for your "
-"convenience I2P can launch a web browser on startup pointing at"
+"I2P''s main configuration interface is this web console, so for your "
+"convenience I2P can launch a web browser on startup pointing at {0}."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:220
