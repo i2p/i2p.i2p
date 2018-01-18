@@ -438,21 +438,7 @@ class InternalTrayManager extends TrayManager {
      * @since 0.9.26
      */
     private void launchBrowser() {
-        String unset = "*unset*";
-        PortMapper pm = _context.portMapper();
-        String httpHost = pm.getActualHost(PortMapper.SVC_CONSOLE, unset);
-        String httpsHost = pm.getActualHost(PortMapper.SVC_HTTPS_CONSOLE, unset);
-        int httpPort = pm.getPort(PortMapper.SVC_CONSOLE, 7657);
-        int httpsPort = pm.getPort(PortMapper.SVC_HTTPS_CONSOLE, -1);
-        boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
-        String url;
-        if (httpsOnly) {
-            url = "https://" + httpsHost + ':' + httpsPort + '/';
-        } else {
-            if (httpHost.equals(unset))
-                httpHost = "127.0.0.1";
-            url = "http://" + httpHost + ':' + httpPort + '/';
-        }
+        String url = _context.portMapper().getConsoleURL();
         try {
             I2PDesktop.browse(url);
         } catch (BrowseException e1) {

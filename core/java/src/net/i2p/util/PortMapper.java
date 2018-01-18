@@ -173,6 +173,24 @@ public class PortMapper {
         return rv;
     }
 
+    /*
+     *  @return http URL unless console is https only. Default http://127.0.0.1:7657/
+     *  @since 0.9.33 consolidated from i2ptunnel and desktopgui
+     */
+    public String getConsoleURL() {
+        String unset = "*unset*";
+        String httpHost = getActualHost(SVC_CONSOLE, unset);
+        String httpsHost = getActualHost(SVC_HTTPS_CONSOLE, unset);
+        int httpPort = getPort(SVC_CONSOLE, 7657);
+        int httpsPort = getPort(SVC_HTTPS_CONSOLE, -1);
+        boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
+        if (httpsOnly)
+            return "https://" + httpsHost + ':' + httpsPort + '/';
+        if (httpHost.equals(unset))
+            httpHost = "127.0.0.1";
+        return "http://" + httpHost + ':' + httpPort + '/';
+    }
+
     /**
      *  For debugging only
      *  @since 0.9.20

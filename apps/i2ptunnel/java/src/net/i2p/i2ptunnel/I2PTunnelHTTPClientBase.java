@@ -550,19 +550,9 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             String rv = out.toString();
             // Do we need to replace http://127.0.0.1:7657 console links in the error page?
             // Get the registered host and port from the PortMapper.
-            final String unset = "*unset*";
-            final String httpHost = ctx.portMapper().getActualHost(PortMapper.SVC_CONSOLE, unset);
-            final String httpsHost = ctx.portMapper().getActualHost(PortMapper.SVC_HTTPS_CONSOLE, unset);
-            final int httpPort = ctx.portMapper().getPort(PortMapper.SVC_CONSOLE, 7657);
-            final int httpsPort = ctx.portMapper().getPort(PortMapper.SVC_HTTPS_CONSOLE, -1);
-            final boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
-            final int port = httpsOnly ? httpsPort : httpPort;
-            String host = httpsOnly ? httpsHost : httpHost;
-            if (host.equals(unset))
-                host = "127.0.0.1";
-            if (httpsOnly || port != 7657 || !host.equals("127.0.0.1")) {
-                String url = (httpsOnly ? "https://" : "http://") + host + ':' + port;
-                rv = rv.replace("http://127.0.0.1:7657", url);
+            String url = ctx.portMapper().getConsoleURL();
+            if (!url.equals("http://127.0.0.1:7657/")) {
+                rv = rv.replace("http://127.0.0.1:7657/", url);
             }
             return rv;
         } finally {

@@ -190,7 +190,7 @@ public class HomeHelper extends HelperBase {
             String url;
             if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
                 // fixup eepsite link
-                url = "http://" + _context.portMapper().getHost(PortMapper.SVC_EEPSITE, "127.0.0.1") +
+                url = "http://" + _context.portMapper().getActualHost(PortMapper.SVC_EEPSITE, "127.0.0.1") +
                       ':' + _context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658) + '/';
             } else {
                 url = app.url;

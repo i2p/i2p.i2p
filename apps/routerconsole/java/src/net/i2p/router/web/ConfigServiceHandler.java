@@ -219,6 +219,13 @@ public class ConfigServiceHandler extends FormHandler {
                (sdtg == null && (SystemVersion.isWindows() || SystemVersion.isMac()));
     }
 
+    /**
+     *  @since 0.9.33
+     */
+    public String getConsoleURL() {
+        return _context.portMapper().getConsoleURL();
+    }
+
     @Override
     protected void processForm() {
         if (_action == null) return;
@@ -348,9 +355,9 @@ public class ConfigServiceHandler extends FormHandler {
         }
         // releases <= 0.6.5 deleted the entry completely
         if (shouldLaunchBrowser && !found) {
-            int port = _context.portMapper().getPort(PortMapper.SVC_CONSOLE, RouterConsoleRunner.DEFAULT_LISTEN_PORT);
+            String url = _context.portMapper().getConsoleURL();
             ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser",
-                                                     "http://127.0.0.1:" + port + '/', 5, false);
+                                                     url, 5, false);
             clients.add(ca);
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);

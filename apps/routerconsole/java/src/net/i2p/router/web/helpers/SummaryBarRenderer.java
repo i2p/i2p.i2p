@@ -226,7 +226,7 @@ class SummaryBarRenderer {
            .append("</a>\n" +
 
                    "<a href=\"http://")
-           .append(_context.portMapper().getHost(PortMapper.SVC_EEPSITE, "127.0.0.1"))
+           .append(_context.portMapper().getActualHost(PortMapper.SVC_EEPSITE, "127.0.0.1"))
            .append(':')
            .append(_context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658))
            .append("/\" target=\"_blank\" title=\"")

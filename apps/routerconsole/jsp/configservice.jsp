@@ -83,7 +83,8 @@
 
  <h3 class="ptitle" id="browseronstart"><%=intl._t("Launch browser on router startup?")%></h3>
  <p class="infohelp">
-    <%=intl._t("I2P''s main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at {0}.", "<a href=\"http://127.0.0.1:7657/\">http://127.0.0.1:7657/</a>")%>
+    <% String consoleURL = formhandler.getConsoleURL(); %>
+    <%=intl._t("I2P''s main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at {0}.", "<a href=\"" + consoleURL + "\">" + consoleURL + "</a>")%>
  </p>
  <hr><div class="formaction" id="browserstart">
  <input type="submit" class="check" name="action" value="<%=intl._t("View console on startup")%>" >
