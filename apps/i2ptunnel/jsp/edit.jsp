@@ -33,7 +33,7 @@ if (tun != null) {
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title><%=intl._t("Hidden Services Manager")%> - <%=intl._t("Edit Client Tunnel")%></title>
+    <title><%=intl._t("Hidden Services Manager")%> - <%=(__isClient ? intl._t("Edit Client Tunnel") : intl._t("Edit Hidden Service"))%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
 

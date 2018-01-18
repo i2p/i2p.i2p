@@ -45,12 +45,12 @@
 </li></ul>
 </li><li>
 <%=intl._t("If you know and trust somebody that runs I2P, ask them to send you a reseed file generated using this page on their router console.")%>
-<%=intl._t("Then, use this page to reseed using file you received.")%>
+<%=intl._t("Then, use this page to reseed with the file you received.")%>
 <%=intl._t("First, select the file below.")%>
 <%=intl._t("Then, click \"{0}\".", intl._t("Reseed from file"))%>
 </li><li>
 <%=intl._t("If you know and trust somebody that publishes reseed files, ask them for the URL.")%>
-<%=intl._t("Then, use this page to reseed using the URL you received.")%>
+<%=intl._t("Then, use this page to reseed with the URL you received.")%>
 <%=intl._t("First, enter the URL below.")%>
 <%=intl._t("Then, click \"{0}\".", intl._t("Reseed from URL"))%>
 </li><li>
@@ -141,7 +141,7 @@
 </td></tr>
 
 <% if (reseedHelper.shouldShowHTTPSProxy()) { %>
-<tr><td align="right"><b><%=intl._t("Proxy type for https reseed URLs")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("Proxy type for HTTPS reseed URLs")%>:</b></td>
 <td><label><input type="radio" class="optbox" name="pmode" value="" <%=reseedHelper.pmodeChecked(0) %> >
 <%=intl._t("None")%></label><br>
 <label><input type="radio" class="optbox" name="pmode" value="HTTP" <%=reseedHelper.pmodeChecked(1) %> >
@@ -170,7 +170,7 @@
 <% } // shouldShowHTTPSProxy %>
 
 <% if (reseedHelper.shouldShowHTTPProxy()) { %>
-<tr><td align="right"><label for="enableproxy"><b><%=intl._t("Enable proxy for http reseed URLs?")%></b></label></td>
+<tr><td align="right"><label for="enableproxy"><b><%=intl._t("Enable proxy for HTTP reseed URLs?")%></b></label></td>
 <td><input type="checkbox" class="optbox" name="enable" id="enableproxy" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
 <tr><td align="right"><b><%=intl._t("HTTP Proxy Host")%>:</b></td>
 <td><input name="host" type="text" value="<jsp:getProperty name="reseedHelper" property="host" />" ></td></tr>
