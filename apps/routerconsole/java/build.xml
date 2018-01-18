@@ -189,15 +189,20 @@
     <target name="poupdate" depends="precompilejsp">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
+        <!-- set if unset -->
+        <property name="lg2" value="" />
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
@@ -253,30 +258,40 @@
     </target>
 
     <target name="poupdate-news" depends="extractProxyTags">
+        <!-- set if unset -->
+        <property name="lg2" value="" />
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages-news.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages-news.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages-news.sh" />
             <arg value="-p" />
         </exec>
     </target>
 
     <target name="poupdate-countries" depends="extractProxyTags">
+        <!-- set if unset -->
+        <property name="lg2" value="" />
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages-countries.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages-countries.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages-countries.sh" />
             <arg value="-p" />
         </exec>

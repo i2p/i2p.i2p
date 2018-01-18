@@ -18,16 +18,21 @@
     </target>
 
     <target name="poupdate" >
+        <!-- set if unset -->
+        <property name="lg2" value="" />
         <!-- Update the messages_*.po files.  -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <env key="LG2" value="${lg2}" />
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>

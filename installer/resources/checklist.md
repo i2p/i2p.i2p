@@ -3,8 +3,10 @@
 ## One week before
 
 - Announce string freeze on #i2p-dev
-- Update local English po files: `ant poupdate`
-- Revert non-English changes if any
+- Update local English po files: `ant poupdate-source`
+- Review changes in English po files, fix up any necessary tagged strings in Java source
+- Revert English po files with no actual changes (i.e. with line number changes only)
+- Check in remaining English po files (and any files with changed strings)
 - Push to Transifex: `tx push -s`
 - Make announcement on Transifex with checkin deadline
 
