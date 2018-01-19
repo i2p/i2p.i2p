@@ -269,9 +269,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     @Override
     protected void blockingHandle(I2PSocket socket) {
         Hash peerHash = socket.getPeerDestination().calculateHash();
+        String peerB32 = socket.getPeerDestination().toBase32();
         if (_log.shouldLog(Log.INFO))
             _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
-                      " from: " + peerHash + " port " + socket.getPort());
+                      " from: " + peerB32 + " port " + socket.getPort());
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
@@ -314,7 +315,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      try { socket.close(); } catch (IOException ioe) {}
                 }
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error while receiving the new HTTP request", ste);
+                    _log.warn("Error in the HTTP request from " + peerB32, ste);
                 return;
             } catch (EOFException eofe) {
                 try {
@@ -324,7 +325,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      try { socket.close(); } catch (IOException ioe) {}
                 }
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error while receiving the new HTTP request", eofe);
+                    _log.warn("Error in the HTTP request from " + peerB32, eofe);
                 return;
             } catch (LineTooLongException ltle) {
                 try {
@@ -334,7 +335,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      try { socket.close(); } catch (IOException ioe) {}
                 }
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error while receiving the new HTTP request", ltle);
+                    _log.warn("Error in the HTTP request from " + peerB32, ltle);
                 return;
             } catch (RequestTooLongException rtle) {
                 try {
@@ -344,7 +345,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      try { socket.close(); } catch (IOException ioe) {}
                 }
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error while receiving the new HTTP request", rtle);
+                    _log.warn("Error in the HTTP request from " + peerB32, rtle);
                 return;
             } catch (BadRequestException bre) {
                 try {
@@ -354,7 +355,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      try { socket.close(); } catch (IOException ioe) {}
                 }
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error while receiving the new HTTP request", bre);
+                    _log.warn("Error in the HTTP request from " + peerB32, bre);
                 return;
             }
             long afterHeaders = getTunnel().getContext().clock().now();
@@ -367,7 +368,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                  headers.containsKey("X-Forwarded-Host"))) {
                 if (_log.shouldLog(Log.WARN)) {
                     StringBuilder buf = new StringBuilder();
-                    buf.append("Refusing inproxy access: ").append(Base32.encode(peerHash.getData())).append(".b32.i2p");
+                    buf.append("Refusing inproxy access: ").append(peerB32);
                     List<String> h = headers.get("X-Forwarded-For");
                     if (h != null)
                         buf.append(" from: ").append(h.get(0));
@@ -403,8 +404,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                         referer = referer.substring(9);
                         if (referer.startsWith("http://") || referer.startsWith("https://")) {
                             if (_log.shouldLog(Log.WARN))
-                                _log.warn("Refusing access from: " +
-                                          Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                                _log.warn("Refusing access from: " + peerB32 +
                                           " with Referer: " + referer);
                             try {
                                 socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
@@ -431,8 +431,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                                     continue;
                                 if (ag.length() > 0 && ua.contains(ag)) {
                                     if (_log.shouldLog(Log.WARN))
-                                        _log.warn("Refusing access from: " +
-                                                  Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                                        _log.warn("Refusing access from: " + peerB32 +
                                                   " with User-Agent: " + ua);
                                     try {
                                         socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
@@ -454,8 +453,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                             String ag = agents[i].trim();
                             if (ag.equals("none")) {
                                 if (_log.shouldLog(Log.WARN))
-                                    _log.warn("Refusing access from: " +
-                                              Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                                    _log.warn("Refusing access from: " + peerB32 +
                                               " with empty User-Agent");
                                 try {
                                     socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
@@ -475,8 +473,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 command.substring(0, 5).toUpperCase(Locale.US).equals("POST ")) {
                 if (_postThrottler.shouldThrottle(peerHash)) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Refusing POST since peer is throttled: " +
-                                  Base32.encode(peerHash.getData()) + ".b32.i2p");
+                        _log.warn("Refusing POST since peer is throttled: " + peerB32);
                     try {
                         // Send a 403, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
@@ -490,7 +487,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
             
             addEntry(headers, HASH_HEADER, peerHash.toBase64());
-            addEntry(headers, DEST32_HEADER, socket.getPeerDestination().toBase32());
+            addEntry(headers, DEST32_HEADER, peerB32);
             addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
 
             // Port-specific spoofhost
@@ -581,7 +578,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 socket.close();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Error while receiving the new HTTP request from: " + Base32.encode(peerHash.getData()) + ".b32.i2p", ex);
+                _log.warn("Error in the HTTP request from: " + peerB32, ex);
         } catch (OutOfMemoryError oom) {
             // Often actually a file handle limit problem so we can safely send a response
             // java.lang.OutOfMemoryError: unable to create new native thread
