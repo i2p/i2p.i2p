@@ -192,7 +192,7 @@ class TunnelRenderer {
     }
 
     /** @since 0.9.33 */
-    private static String range(int f, int t) {
+    static String range(int f, int t) {
         return f + " - " + t + " KBps";
     }
 

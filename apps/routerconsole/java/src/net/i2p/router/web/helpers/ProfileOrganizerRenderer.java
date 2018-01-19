@@ -11,12 +11,14 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.peermanager.ProfileOrganizer;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
+import static net.i2p.router.web.helpers.TunnelRenderer.range;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
@@ -300,23 +302,23 @@ class ProfileOrganizerRenderer {
            .append("<td><b>H</b></td><td>").append(_t("Hidden")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>K</b></td><td>").append(_t("Under {0} shared bandwidth", "12KBps")).append("</td>")
-           .append("<td><b>L</b></td><td>").append(_t("{0} shared bandwidth", "12 - 32KBps")).append("</td>")
+           .append("<td><b>K</b></td><td>").append(_t("Under {0} shared bandwidth", Router.MIN_BW_L + " KBps")).append("</td>")
+           .append("<td><b>L</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_L, Router.MIN_BW_M))).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>M</b></td><td>").append(_t("{0} shared bandwidth", "32 - 64KBps")).append("</td>")
-           .append("<td><b>N</b></td><td>").append(_t("{0} shared bandwidth", "64 - 128KBps")).append("</td>")
+           .append("<td><b>M</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_M, Router.MIN_BW_N))).append("</td>")
+           .append("<td><b>N</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_N, Router.MIN_BW_O))).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>O</b></td><td>").append(_t("{0} shared bandwidth", "128 - 256KBps")).append("</td>")
-           .append("<td><b>P</b></td><td>").append(_t("{0} shared bandwidth", "256 - 2000KBps")).append("</td>")
+           .append("<td><b>O</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_O, Router.MIN_BW_P))).append("</td>")
+           .append("<td><b>P</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_P, Router.MIN_BW_X))).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
            .append("<td><b>R</b></td><td>").append(_t("Reachable")).append("</td>")
            .append("<td><b>U</b></td><td>").append(_t("Unreachable")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>X</b></td><td>").append(_t("Over {0} shared bandwidth", "2000KBps")).append("</td>")
+           .append("<td><b>X</b></td><td>").append(_t("Over {0} shared bandwidth", Router.MIN_BW_X + " KBps")).append("</td>")
            .append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td><td colspan=\"5\">").append(_t("Note: For P and X bandwidth tiers, O is included for the purpose of backward compatibility in the NetDB."))
            .append("</tr>");
