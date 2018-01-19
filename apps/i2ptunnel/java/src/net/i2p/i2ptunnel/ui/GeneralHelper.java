@@ -504,6 +504,8 @@ public class GeneralHelper {
 
     /**
      *  @param newTunnelType used if tunnel &lt; 0
+     *  @return the current type if we have a destination already,
+     *          else the default for that type of tunnel
      */
     public int getSigType(int tunnel, String newTunnelType) {
         SigType type;

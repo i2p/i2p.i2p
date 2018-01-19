@@ -1,3 +1,10 @@
+2018-01-19 zzz
+ * i2ptunnel: Prevent changing sigtype after dest creation (ticket #2128)
+
+2018-01-18 zzz
+ * Build: New poupdate-source target
+ * Util: Consolidate console URL generation in PortMapper
+
 2018-01-17 zzz
  * i2ptunnel:
    - Set defaults for limits

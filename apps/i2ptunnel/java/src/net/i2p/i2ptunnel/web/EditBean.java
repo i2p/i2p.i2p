@@ -23,6 +23,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
+import net.i2p.i2ptunnel.ui.GeneralHelper;
 import net.i2p.util.Addresses;
 
 /**
@@ -222,7 +223,16 @@ public class EditBean extends IndexBean {
     public boolean isSigTypeAvailable(int code) {
         return SigType.isAvailable(code);
     }
-    
+
+    /** @since 0.9.33 */
+    public boolean canChangeSigType(int tunnel) {
+        if (tunnel < 0)
+            return true;
+        if (getDestination(tunnel) != null)
+            return false;
+        return getTunnelStatus(tunnel) == GeneralHelper.NOT_RUNNING;
+    }
+
     /**
      *  Random keys, hidden in forms
      *  @since 0.9.18
