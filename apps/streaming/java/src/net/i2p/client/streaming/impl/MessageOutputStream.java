@@ -114,7 +114,7 @@ class MessageOutputStream extends OutputStream {
     
     @Override
     public void write(byte b[], int off, int len) throws IOException {
-        if (_closed.get()) throw new IOException("Already closed");
+        if (_closed.get()) throw new IOException("Output stream closed");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("write(b[], " + off + ", " + len + ") ");
         int cur = off;
@@ -122,7 +122,7 @@ class MessageOutputStream extends OutputStream {
         long begin = _context.clock().now();
         while (remaining > 0) {
             WriteStatus ws = null;
-            if (_closed.get()) throw new IOException("closed underneath us");
+            if (_closed.get()) throw new IOException("Output stream closed");
             // we do any waiting outside the synchronized() block because we
             // want to allow other threads to flushAvailable() whenever they want.  
             // this is the only method that *adds* to the _buf, and all 
@@ -131,7 +131,7 @@ class MessageOutputStream extends OutputStream {
                 // To simplify the code, and avoid losing data from shrinking the max size,
                 // we only update max size when current buffer is empty
                 final int maxBuffer = (_valid == 0) ? locked_updateBufferSize() : _currentBufferSize;
-                if (_buf == null) throw new IOException("closed (buffer went away)");
+                if (_buf == null) throw new IOException("Output stream closed");
                 if (_valid + remaining < maxBuffer) {
                     // simply buffer the data, no flush
                     System.arraycopy(b, cur, _buf, _valid, remaining);
@@ -342,7 +342,7 @@ class MessageOutputStream extends OutputStream {
         synchronized (_dataLock) {
             if (_buf == null) {
                 _dataLock.notifyAll();
-                throw new IOException("closed (buffer went away)");
+                throw new IOException("Output stream closed");
             }
 
             // if valid == 0 return ??? - no, this could flush a CLOSE packet too.
@@ -443,7 +443,7 @@ class MessageOutputStream extends OutputStream {
             return;
         }
         _flusher.cancel();
-        _streamError.compareAndSet(null,new IOException("Closed internally"));
+        _streamError.compareAndSet(null, new IOException("Output stream closed"));
         clearData(true);
     }
     

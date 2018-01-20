@@ -203,10 +203,10 @@ class Connection {
                 if (!_connected.get()) {
                     if (getResetReceived())
                         throw new I2PSocketException(I2PSocketException.STATUS_CONNECTION_RESET);
-                    throw new IOException("disconnected");
+                    throw new IOException("Socket closed");
                 }
                 if (_outputStream.getClosed())
-                    throw new IOException("output stream closed");
+                    throw new IOException("Output stream closed");
                 started = true;
                 // Try to keep things moving even during NACKs and retransmissions...
                 // Limit unacked packets to the window
@@ -785,7 +785,7 @@ class Connection {
         _outputStream.destroy();
         _receiver.destroy();
         _activityTimer.cancel();
-        _inputStream.streamErrorOccurred(new IOException("disconnected"));
+        _inputStream.streamErrorOccurred(new IOException("Socket closed"));
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Connection disconnect complete: "

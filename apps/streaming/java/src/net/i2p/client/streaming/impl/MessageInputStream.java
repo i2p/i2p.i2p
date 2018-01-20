@@ -298,7 +298,7 @@ class MessageInputStream extends InputStream {
                 buf.append("not ready bytes: ").append(notAvailable);
                 buf.append(" highest ready block: ").append(_highestReadyBlockId);
                 
-                _log.debug(buf.toString(), new Exception("closed"));
+                _log.debug(buf.toString(), new Exception("Input stream closed"));
             }
             _closeReceived = true;
             _dataLock.notifyAll();
@@ -410,7 +410,7 @@ class MessageInputStream extends InputStream {
         else
             expiration = -1;
         synchronized (_dataLock) {
-            if (_locallyClosed) throw new IOException("Already locally closed");
+            if (_locallyClosed) throw new IOException("Input stream closed");
             throwAnyError();
             for (int i = 0; i < length; i++) {
                 if ( (_readyDataBlocks.isEmpty()) && (i == 0) ) {
@@ -419,7 +419,7 @@ class MessageInputStream extends InputStream {
                     
                     while (_readyDataBlocks.isEmpty()) {
                         if (_locallyClosed)
-                            throw new IOException("Already closed");
+                            throw new IOException("Input stream closed");
                         
                         if ( (_notYetReadyBlocks.isEmpty()) && (_closeReceived) ) {
                             if (_log.shouldLog(Log.INFO))
@@ -524,7 +524,7 @@ class MessageInputStream extends InputStream {
     public int available() throws IOException {
         int numBytes = 0;
         synchronized (_dataLock) {
-            if (_locallyClosed) throw new IOException("Already closed");
+            if (_locallyClosed) throw new IOException("Input stream closed");
             throwAnyError();
             for (int i = 0; i < _readyDataBlocks.size(); i++) {
                 ByteArray cur = _readyDataBlocks.get(i);
