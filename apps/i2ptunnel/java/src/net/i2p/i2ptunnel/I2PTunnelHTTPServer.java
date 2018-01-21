@@ -555,6 +555,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle);
             if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
+                          " from: " + peerB32 +
                           " [" + timeToHandle +
                           ", read headers: " + (afterHeaders-afterAccept) +
                           ", socket create: " + (afterSocket-afterHeaders) +
