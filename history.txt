@@ -1,4 +1,5 @@
 2018-01-24 zzz
+ * i2psnark: Prevent commenting without comment name (ticket #2138)
  * SusiMail: Fix header corruption (ticket #2139)
 
 2018-01-19 zzz

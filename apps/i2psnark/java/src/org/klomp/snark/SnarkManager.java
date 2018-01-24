@@ -1264,13 +1264,13 @@ public class SnarkManager implements CompleteListener, ClientApp {
         if (commentName == null) {
             commentName = "";
         } else {
-            commentName = commentName.replaceAll("[\n\r<>#;]", "");
+            commentName = commentName.trim().replaceAll("[\n\r<>#;]", "");
             if (commentName.length() > Comment.MAX_NAME_LEN)
                 commentName = commentName.substring(0, Comment.MAX_NAME_LEN);
         }
         if (!_util.getCommentsName().equals(commentName)) {
             _config.setProperty(PROP_COMMENTS_NAME, commentName);
-            addMessage(_t("Comments name set to {0}.", commentName));
+            addMessage(_t("Comments name set to {0}.", '"' + commentName + '"'));
             _util.setCommentsName(commentName);
             changed = true;
         }

@@ -3544,16 +3544,17 @@ public class I2PSnarkServlet extends BasicServlet {
             Iterator<Comment> iter = null;
             int myRating = 0;
             CommentSet comments = snark.getComments();
+            boolean canRate = esc && _manager.util().getCommentsName().length() > 0;
 
             buf.append("<div id=\"snarkCommentSection\"><table class=\"snarkCommentInfo\">\n<tr><th colspan=\"3\">")
                .append(_t("Ratings and Comments"));
-            if (esc && _manager.util().getCommentsName().length() == 0) {
+            if (esc && !canRate) {
                 buf.append("&nbsp;&nbsp;&nbsp;<span id=\"nameRequired\">");
                 buf.append(_t("Author name required to rate or comment"));
                 buf.append("&nbsp;&nbsp;<a href=\"").append(_contextPath).append("/configure#configureAuthor\">[");
                 buf.append(_t("Configure"));
                 buf.append("]</a></span>");
-            } else {
+            } else if (esc) {
                 buf.append("&nbsp;&nbsp;&nbsp;<span id=\"nameRequired\"><span class=\"commentAuthorName\" title=\"")
                    .append(_t("Your author name for published comments and ratings"))
                    .append("\">");
@@ -3579,39 +3580,44 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</td></tr>\n");
 
             // new rating / comment form
-            buf.append("<tr id=\"newRating\">\n");
-            if (er) {
-                buf.append("<td>\n<select name=\"myRating\">\n");
-                for (int i = 5; i >= 0; i--) {
-                    buf.append("<option value=\"").append(i).append("\" ");
-                    if (i == myRating)
-                        buf.append("selected=\"selected\"");
-                    buf.append('>');
-                    if (i != 0) {
-                        buf.append("★ ").append(ngettext("1 star", "{0} stars", i));
-                    } else {
-                        buf.append("☆ ").append(_t("No rating"));
+            if (canRate) {
+                buf.append("<tr id=\"newRating\">\n");
+                if (er) {
+                    buf.append("<td>\n<select name=\"myRating\">\n");
+                    for (int i = 5; i >= 0; i--) {
+                        buf.append("<option value=\"").append(i).append("\" ");
+                        if (i == myRating)
+                            buf.append("selected=\"selected\"");
+                        buf.append('>');
+                        if (i != 0) {
+                            for (int j = 0; j < i; j++) {
+                                buf.append("★");
+                            }
+                            buf.append(' ').append(ngettext("1 star", "{0} stars", i));
+                        } else {
+                            buf.append("☆ ").append(_t("No rating"));
+                        }
+                        buf.append("</option>\n");
                     }
-                    buf.append("</option>\n");
+                    buf.append("</select>\n</td>");
+                } else {
+                    buf.append("<td></td>");
                 }
-                buf.append("</select>\n</td>");
-            } else {
-                buf.append("<td></td>");
+                if (esc) {
+                    buf.append("<td id=\"addCommentText\"><textarea name=\"nofilter_newComment\" cols=\"44\" rows=\"4\"></textarea></td>");
+                } else {
+                    buf.append("<td></td>");
+                }
+                buf.append("<td class=\"commentAction\"><input type=\"submit\" name=\"addComment\" value=\"");
+                if (er && esc)
+                    buf.append(_t("Rate and Comment"));
+                else if (er)
+                    buf.append(_t("Rate Torrent"));
+                else
+                    buf.append(_t("Add Comment"));
+                buf.append("\" class=\"accept\"></td>\n");
+                buf.append("</tr>\n");
             }
-            if (esc) {
-                buf.append("<td id=\"addCommentText\"><textarea name=\"nofilter_newComment\" cols=\"44\" rows=\"4\"></textarea></td>");
-            } else {
-                buf.append("<td></td>");
-            }
-            buf.append("<td class=\"commentAction\"><input type=\"submit\" name=\"addComment\" value=\"");
-            if (er && esc)
-                buf.append(_t("Rate and Comment"));
-            else if (er)
-                buf.append(_t("Rate Torrent"));
-            else
-                buf.append(_t("Add Comment"));
-            buf.append("\" class=\"accept\"></td>\n");
-            buf.append("</tr>\n");
 
             if (comments != null) {
                 synchronized(comments) {
