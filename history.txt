@@ -1,3 +1,6 @@
+2018-01-24 zzz
+ * SusiMail: Fix header corruption (ticket #2139)
+
 2018-01-19 zzz
  * i2ptunnel: Prevent changing sigtype after dest creation (ticket #2128)
 

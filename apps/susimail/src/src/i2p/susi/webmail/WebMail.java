@@ -2346,10 +2346,10 @@ public class WebMail extends HttpServlet
 			}
 			String boundary = "_=" + I2PAppContext.getGlobalContext().random().nextLong();
 			if (multipart) {
-				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: multipart/mixed; boundary=\"" + boundary + "\"\r\n\r\n" );
+				body.append( "MIME-Version: 1.0\r\nContent-type: multipart/mixed; boundary=\"" + boundary + "\"\r\n\r\n" );
 			}
 			else {
-				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: text/plain; charset=\"utf-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
+				body.append( "MIME-Version: 1.0\r\nContent-type: text/plain; charset=\"utf-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
 			}
 			try {
 				// TODO pass the text separately to SMTP and let it pick the encoding
