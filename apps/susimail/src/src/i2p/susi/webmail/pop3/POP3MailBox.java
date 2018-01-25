@@ -213,6 +213,11 @@ public class POP3MailBox implements NewMailListener {
 				sendCmds(srs);
 			} catch (IOException ioe) {
 				Debug.debug( Debug.DEBUG, "Error fetching bodies: " + ioe);
+				if (socket != null) {
+					try { socket.close(); } catch (IOException e) {}
+					socket = null;
+					connected = false;
+				}
 				// todo maybe
 			}
 		}
@@ -336,9 +341,11 @@ public class POP3MailBox implements NewMailListener {
 			try {
 				sendCmds(srs);
 				// do NOT call close() here, we included QUIT above
-				try {
-					socket.close();
-				} catch (IOException e) {}
+				if (socket != null) {
+					try { socket.close(); } catch (IOException e) {}
+					socket = null;
+					connected = false;
+				}
 				clear();
 				// result of QUIT
 				boolean success = srs.get(srs.size() - 1).result;
@@ -354,6 +361,11 @@ public class POP3MailBox implements NewMailListener {
 				//connect();
 			} catch (IOException ioe) {
 				Debug.debug( Debug.DEBUG, "Error deleting: " + ioe);
+				if (socket != null) {
+					try { socket.close(); } catch (IOException e) {}
+					socket = null;
+					connected = false;
+				}
 				// todo maybe
 			}
 		}
@@ -426,14 +438,18 @@ public class POP3MailBox implements NewMailListener {
 	 * @return true or false
 	 */
 	public boolean isConnected() {
-		if (socket == null
-			|| !socket.isConnected()
-			|| socket.isInputShutdown()
-			|| socket.isOutputShutdown()
-			|| socket.isClosed()) {
-			connected = false;
+		synchronized(synchronizer) {
+			if (socket == null) {
+				connected = false;
+			} else if (!socket.isConnected()
+				|| socket.isInputShutdown()
+				|| socket.isOutputShutdown()
+				|| socket.isClosed()) {
+				socket = null;
+				connected = false;
+			}
+			return connected;
 		}
-		return connected;
 	}
 
 	/**
@@ -671,6 +687,11 @@ public class POP3MailBox implements NewMailListener {
 			}
 			catch (IOException e1) {
 				lastError = _t("Error opening mailbox") + ": " + e1.getLocalizedMessage();
+				if (socket != null) {
+					try { socket.close(); } catch (IOException e) {}
+					socket = null;
+					connected = false;
+				}
 			}
 		}
 	}
@@ -813,6 +834,11 @@ public class POP3MailBox implements NewMailListener {
 						Debug.debug( Debug.DEBUG, "Error getting RB: " + ioe);
 						result = false;
 						sr.result = false;
+						if (socket != null) {
+							try { socket.close(); } catch (IOException e) {}
+							socket = null;
+							connected = false;
+						}
 					}
 					break;
 
@@ -824,6 +850,11 @@ public class POP3MailBox implements NewMailListener {
 						Debug.debug( Debug.DEBUG, "Error getting LS: " + ioe);
 						result = false;
 						sr.result = false;
+						if (socket != null) {
+							try { socket.close(); } catch (IOException e) {}
+							socket = null;
+							connected = false;
+						}
 					}
 					break;
 				}
@@ -868,6 +899,11 @@ public class POP3MailBox implements NewMailListener {
 			} catch (IOException e) {
 				lastError = e.toString();
 				Debug.debug( Debug.DEBUG, "sendCmdNa throws: " + e);
+				if (socket != null) {
+					try { socket.close(); } catch (IOException ioe) {}
+					socket = null;
+					connected = false;
+				}
 			}
 			connect();
 			if (connected) {
@@ -876,6 +912,11 @@ public class POP3MailBox implements NewMailListener {
 				} catch (IOException e2) {
 					lastError = e2.toString();
 					Debug.debug( Debug.DEBUG, "2nd sendCmdNa throws: " + e2);
+					if (socket != null) {
+						try { socket.close(); } catch (IOException e) {}
+						socket = null;
+						connected = false;
+					}
 				}
 			} else {
 				Debug.debug( Debug.DEBUG, "not connected after reconnect" );					
@@ -1126,9 +1167,12 @@ public class POP3MailBox implements NewMailListener {
 						}
 						sendCmd1aNoWait("QUIT");
 					}
-					socket.close();
 				} catch (IOException e) {
 					Debug.debug( Debug.DEBUG, "error closing: " + e);
+				} finally {
+					if (socket != null) {
+						try { socket.close(); } catch (IOException e) {}
+					}
 				}
 			}
 			socket = null;

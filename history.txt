@@ -1,3 +1,7 @@
+2018-01-25 zzz
+ * GeoIP 2018-01-05
+ * SusiMail: Close POP3 socket on error
+
 2018-01-24 zzz
  * i2psnark: Prevent commenting without comment name (ticket #2138)
  * SusiMail: Fix header corruption (ticket #2139)
