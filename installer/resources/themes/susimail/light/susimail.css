@@ -125,8 +125,8 @@ tr.mailbody, #message_full tr:first-child {
 }
 
 tr.mailbody td {
-     word-break: break-all;
-     word-wrap: break-word;
+     word-break: normal;
+     word-wrap: normal;
      width: 100%;
      padding: 0;
 }

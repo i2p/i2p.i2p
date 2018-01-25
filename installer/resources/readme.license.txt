@@ -22,7 +22,7 @@ Also included in this distribution are a bunch
 of third party client applications, all with
 their own dependencies.  Please see our license
 policy page for details: 
-  http://www.i2p2.de/licenses
+  https://geti2p.net/licenses
 
 One of the bundled client apps (routerconsole) 
 requires us to say:
@@ -37,4 +37,5 @@ For more information see LICENSE.txt
 in the install directory.
 
 For source, please see:
-   http://www.i2p2.de/monotone
+   https://github.com/i2p/i2p.i2p
+   https://geti2p.net/monotone
