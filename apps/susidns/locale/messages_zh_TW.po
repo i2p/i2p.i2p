@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-09-23 20:32+0000\n"
+"PO-Revision-Date: 2018-01-18 06:42+0000\n"
 "Last-Translator: 黃彥儒 <r1235613@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -358,7 +358,7 @@ msgstr "釋出"
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:201
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:205
 msgid "Subscriptions"
-msgstr ""
+msgstr "訂閱付費"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:214
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:206

@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2016
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-11-15 05:46+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -215,7 +215,7 @@ msgstr "Silinmek için seçilmiş bir kayıt yok."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:277
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:566
 msgid "Add Alternate"
-msgstr ""
+msgstr "Alternatif Ekle"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:324
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
@@ -274,7 +274,7 @@ msgstr "{0} adres defteri {1} veritabanında "
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
 #, java-format
 msgid "Host name {0} is not in  the address book."
-msgstr ""
+msgstr "{0} sunucu adı adres defterinde yok."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:261
 msgid "Manually added via SusiDNS"
@@ -333,7 +333,7 @@ msgstr "Kişisel"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:185
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:195
 msgid "Master"
-msgstr ""
+msgstr "Ana"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:208
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
@@ -381,7 +381,7 @@ msgstr "Kayıt yeri"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:253
 msgid "Export in hosts.txt format"
-msgstr "hosts.txt biçiminde verin"
+msgstr "hosts.txt biçiminde dışa aktar"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:267
 msgid "Current filter"
@@ -412,11 +412,11 @@ msgstr "Arayın"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:552
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
 msgid "Hostname"
-msgstr ""
+msgstr "Sunucu Adı"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:357
 msgid "Link (b32)"
-msgstr ""
+msgstr "Bağlantı (b32)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:359
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:556
@@ -426,11 +426,11 @@ msgstr "Hedef"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:371
 msgid "Select hosts for deletion from addressbook"
-msgstr ""
+msgstr "Adres defterinden silinecek sunucuları işaretleyin"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:406
 msgid "View larger version of identicon for this hostname"
-msgstr ""
+msgstr "Bu sunucu adı için daha büyük simge görüntülensin"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:416
 msgid "Base 32 address"
@@ -438,7 +438,7 @@ msgstr "Base 32 adresi"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:422
 msgid "Helper link to share host address with option to add to addressbook"
-msgstr ""
+msgstr "Adres defterine ekleme seçeneği ile sunucu adresini paylaşmaya yardımcı olan bağlantı."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:428
 msgid "More information on this entry"
@@ -641,15 +641,15 @@ msgstr "Notlar"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:350
 msgid "Visual Identification for"
-msgstr ""
+msgstr "Şunun için görsel tanıtıcı"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:362
 msgid "Create your own identification images"
-msgstr ""
+msgstr "Kendi tanıtım görsellerinizi oluşturun"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:364
 msgid "Launch Image Generator"
-msgstr ""
+msgstr "Görsel Üretecini Başlat"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:173
 msgid "Introduction"
@@ -685,7 +685,7 @@ msgstr "Ek sitelere kolayca abone olabilirsiniz. Yalnızca siteleri <a href=\"su
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
-msgstr ""
+msgstr "I2P adlandırmaları hakkında ayrıntılı bilgi almak için <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">özet bölümüne</a> bakın."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:207
 msgid "How does the addressbook application work?"
@@ -714,7 +714,7 @@ msgstr "Eepsite çalıştırıyorsanız ve uygun seçeneği etkinleştirdiyseniz
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
-msgstr ""
+msgstr "Yöneltici ayrıca aktarılmayan ya da yayınlanmayan bir kişisel adres defteri kullanır."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:217
 msgid ""

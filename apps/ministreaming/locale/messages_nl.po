@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Nathan Follens, 2015
+# Nathan Follens, 2015,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2018-01-26 09:25+0000\n"
 "Last-Translator: Nathan Follens\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
-msgstr "Bericht timeout"
+msgstr "Berichttime-out"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
 msgid "Failed delivery to local destination"
@@ -66,7 +66,7 @@ msgstr "Geen lokale tunnels"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
 msgid "Unsupported encryption options"
-msgstr "Niet ondersteunde versleutelingsopties"
+msgstr "Niet-ondersteunde versleutelingsopties"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
 msgid "Invalid destination"
@@ -91,4 +91,4 @@ msgstr "Verbinding gereset"
 #. Translate this one here, can't do it later
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
 msgid "Failure code"
-msgstr "Fout code"
+msgstr "Foutcode"

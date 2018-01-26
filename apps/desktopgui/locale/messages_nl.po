@@ -7,13 +7,14 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Martijn de Boer, 2016
+# Nathan Follens, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: Martijn de Boer\n"
+"PO-Revision-Date: 2018-01-26 09:36+0000\n"
+"Last-Translator: Nathan Follens\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,12 +40,12 @@ msgstr "Bezig met starten"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:55
 #: src/net/i2p/desktopgui/InternalTrayManager.java:207
 msgid "Launch I2P Browser"
-msgstr "Start I2P Browser"
+msgstr "I2P-browser starten"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
 msgid "Configure I2P System Tray"
-msgstr "Configureer I2P systeembalk"
+msgstr "I2P-systeemvak configureren"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
@@ -64,26 +65,26 @@ msgstr "I2P stoppen"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:126
 #: src/net/i2p/desktopgui/InternalTrayManager.java:278
 msgid "Restart I2P Immediately"
-msgstr "Herstart I2P direct"
+msgstr "I2P onmiddellijk herstarten"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:143
 #: src/net/i2p/desktopgui/InternalTrayManager.java:295
 msgid "Stop I2P Immediately"
-msgstr "Stop I2P direct"
+msgstr "I2P onmiddellijk stoppen"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:157
 #: src/net/i2p/desktopgui/InternalTrayManager.java:309
 msgid "Cancel I2P Shutdown"
-msgstr "Annuleer afsluiten I2P"
+msgstr "Afsluiten I2P annuleren"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:363
 #, java-format
 msgid "Shutdown in {0}"
-msgstr "Afsluiten in {0}"
+msgstr "Afsluiten over {0}"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:365
 msgid "Shutdown imminent"
-msgstr "Afsluiten op handen"
+msgstr "Wordt zo meteen afgesloten"
 
 #. status translations are in the console bundle
 #: src/net/i2p/desktopgui/InternalTrayManager.java:370
@@ -93,4 +94,4 @@ msgstr "Netwerk"
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:63
 msgid "I2P: Right-click for menu"
-msgstr "I2P: Rechts klikken voor menu"
+msgstr "I2P: rechterklik voor menu"

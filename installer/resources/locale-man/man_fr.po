@@ -5,15 +5,15 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# Towinet <owan813@laposte.net>, 2017
+# Towinet, 2017
 # French language coordinator <french.coordinator@rbox.me>, 2017
-# Tilat <tilat@emailasso.net>, 2017
+# Tilat, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: Tilat <tilat@emailasso.net>, 2017\n"
+"Last-Translator: Tilat, 2017\n"
 "Language-Team: French (https://www.transifex.com/otf/teams/12694/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -48,7 +48,7 @@ msgstr "NOM"
 #. type: Plain text
 #: man/eepget.1:5
 msgid "Eepget - I2P downloader"
-msgstr "Eepget - Téléchargeur d’I2P"
+msgstr "Eepget - Programme de téléchargement d’I2P"
 
 #. type: SH
 #: man/eepget.1:6 man/i2prouter.1:6 man/i2prouter-nowrapper.1:6

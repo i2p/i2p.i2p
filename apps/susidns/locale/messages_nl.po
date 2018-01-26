@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# D. Smits <dfsmits@gmail.com>, 2017
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Martijn de Boer, 2016
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-01-10 00:38+0000\n"
+"Last-Translator: D. Smits <dfsmits@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -223,7 +224,7 @@ msgstr "Geen items geselecteerd om te verwijderen."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:277
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:566
 msgid "Add Alternate"
-msgstr ""
+msgstr "Voeg alternatief toe"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:324
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
@@ -282,7 +283,7 @@ msgstr "{0} adresboek in {1} database"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
 #, java-format
 msgid "Host name {0} is not in  the address book."
-msgstr ""
+msgstr "Host naam {0} komt niet in het adresboek voor."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:261
 msgid "Manually added via SusiDNS"
@@ -341,7 +342,7 @@ msgstr "Privé"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:185
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:195
 msgid "Master"
-msgstr ""
+msgstr "Master"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:208
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
@@ -420,11 +421,11 @@ msgstr "Zoek"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:552
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
 msgid "Hostname"
-msgstr ""
+msgstr "Host naam"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:357
 msgid "Link (b32)"
-msgstr ""
+msgstr "Link (b32)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:359
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:556
@@ -434,11 +435,11 @@ msgstr "Destination"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:371
 msgid "Select hosts for deletion from addressbook"
-msgstr ""
+msgstr "Selecteer hosts om uit adresboek te verwijderen"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:406
 msgid "View larger version of identicon for this hostname"
-msgstr ""
+msgstr "Toon een grotere versie van het identicon voor deze hostnaam"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:416
 msgid "Base 32 address"
@@ -446,7 +447,7 @@ msgstr "Base-32 adres"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:422
 msgid "Helper link to share host address with option to add to addressbook"
-msgstr ""
+msgstr "Link naar de helper om host adressen te delen met de optie om deze toe te voegen aan het adresboek"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:428
 msgid "More information on this entry"
@@ -649,15 +650,15 @@ msgstr "Opmerkingen"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:350
 msgid "Visual Identification for"
-msgstr ""
+msgstr "Visuele identificatie voor"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:362
 msgid "Create your own identification images"
-msgstr ""
+msgstr "Maak je eigen identificatie plaatjes"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:364
 msgid "Launch Image Generator"
-msgstr ""
+msgstr "Start de plaatjes generator"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:173
 msgid "Introduction"
@@ -693,7 +694,7 @@ msgstr "Abonneren op andere sites is makkelijk, je hoeft ze gewoon toe te voegen
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
-msgstr ""
+msgstr "Voor meer informatie over de naamgeving  in I2P, zie <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">het overzicht</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:207
 msgid "How does the addressbook application work?"
@@ -722,7 +723,7 @@ msgstr "Indien ingesteld wordt het router-adresboek nu geschreven naar het \"uit
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
-msgstr ""
+msgstr "De router heeft ook een privé adresboek, welke niet wordt samengevoegd of gepubliceerd."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:217
 msgid ""

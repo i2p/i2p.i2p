@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# D. Smits <dfsmits@gmail.com>, 2017
 # foo <foo@bar>, 2009
 # Martijn de Boer, 2016
 # Nathan Follens, 2015
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-01-10 00:32+0000\n"
+"Last-Translator: D. Smits <dfsmits@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -110,7 +111,7 @@ msgstr "Je wil misschien {0}opnieuw proberen{1}."
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:52
 #: ../java/build/Proxy.java:104 ../java/build/Proxy.java:117
 msgid "You may want to retry."
-msgstr ""
+msgstr "Je wil misschien opnieuw proberen."
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:29
 #: ../java/build/Proxy.java:53 ../java/build/Proxy.java:84
@@ -148,7 +149,7 @@ msgstr "Je wil misschien {0}opnieuw proberen{1} aangezien dit een willekeurige o
 msgid ""
 "You may want to retry as this will randomly reselect an outproxy from the "
 "pool you have defined {0}here{1} (if you have more than one configured)."
-msgstr ""
+msgstr "Je wil misschien opnieuw proberen aangezien dit een willekeurige outproxy zal selecteren van de pool die je {0}hier{1} hebt gedefinieerd (als je er meer dan een hebt ingesteld) ."
 
 #: ../java/build/Proxy.java:28 ../java/build/Proxy.java:159
 #: ../java/build/Proxy.java:185 ../java/build/Proxy.java:207
@@ -501,11 +502,11 @@ msgstr "Doorgaan naar {0} zonder op te slaan"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr ""
+msgstr "Je kunt de site bekijken zonder deze op te slaan in je adresboek. Het adres wordt onthouden totdat je de I2P router herstart."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1366
 msgid "Continue without saving"
-msgstr ""
+msgstr "Doorgaan zonder opslaan"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1373
 #, java-format
@@ -516,19 +517,19 @@ msgstr "{0} opslaan in adresboek van router en doorgaan naar website"
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr ""
+msgstr "Dit adres zal worden opgeslagen in je router adresboek waar je adressen worden opgeslagen waarvoor je je hebt ingeschreven."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1376
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Master or Private address book instead."
-msgstr ""
+msgstr "Als je wilt bijhouden welke sites je handmatig hebt toegevoegd, voeg ze dan toe aan je eigen hoofdadresboek of privé adresboek"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1379
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1387
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1392
 msgid "Save & continue"
-msgstr ""
+msgstr "Opslaan & doorgaan"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1384
@@ -541,7 +542,7 @@ msgid ""
 "This address will be saved to your Master address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "Dit adres wordt opgeslagen in je hoofdadresboek. Kies deze mogelijkheid voor adressen die je apart wil houden van je router adresboek, en als je het niet erg vindt als deze worden gepubliceerd."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1389
 #, java-format
@@ -552,7 +553,7 @@ msgstr "{0} opslaan in privé-adresboek en doorgaan naar website"
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
-msgstr ""
+msgstr "Dit adres wordt opgeslagen in je privé adresboek, dit zorgt ervoor dat het nooit wordt gepubliceerd."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:175
 #, java-format

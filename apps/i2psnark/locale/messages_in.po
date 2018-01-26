@@ -4,13 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Robert Dafis <robertdafis@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-25 13:37+0000\n"
-"PO-Revision-Date: 2017-10-28 05:56+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-01-25 11:11+0000\n"
+"Last-Translator: Robert Dafis <robertdafis@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -217,11 +218,11 @@ msgstr "theme {0} dimuat."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1286
 msgid "Collapsible panels enabled."
-msgstr ""
+msgstr "Collapsible panels diaktifkan."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1288
 msgid "Collapsible panels disabled."
-msgstr ""
+msgstr "Collapsible panels dinonaktifkan."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1298
 msgid "Configuration unchanged."
@@ -1181,7 +1182,7 @@ msgstr "Aternatif"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2226
 msgid "Tracker Type"
-msgstr ""
+msgstr "Jenis Tracker"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2250
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2585
@@ -1241,17 +1242,17 @@ msgstr "Abaikan kata-kata seperti 'a' dan 'the' ketika menyortir"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2333
 msgid "Collapsible panels"
-msgstr ""
+msgstr "Collapsible panels"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2338
 msgid "Your browser does not support this feature."
-msgstr ""
+msgstr "Browser anda tidak mendukung fitur ini."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2341
 msgid ""
 "Allow the 'Add Torrent' and 'Create Torrent' panels to be collapsed, and "
 "collapse by default in non-embedded mode"
-msgstr ""
+msgstr "Membuat panel 'Tambah Torrent' dan 'Buat Torrent' menjadi collaps, dan collaps secara default dalam mode non-embedded"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2348
 msgid "Language"

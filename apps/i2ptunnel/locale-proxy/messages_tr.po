@@ -4,14 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2016
-# Ozancan Karataş <ozanc27@icloud.com>, 2015
+# Kaya Zeren <kayazeren@gmail.com>, 2016-2017
+# Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
+# zzzi2p, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
+"PO-Revision-Date: 2018-01-26 18:15+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +110,7 @@ msgstr "{0}Yeniden denemek{1} isteyebilirsiniz."
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:52
 #: ../java/build/Proxy.java:104 ../java/build/Proxy.java:117
 msgid "You may want to retry."
-msgstr ""
+msgstr "Yeniden denemek isteyebilirsiniz."
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:29
 #: ../java/build/Proxy.java:53 ../java/build/Proxy.java:84
@@ -147,7 +148,7 @@ msgstr "{2}Buradan{3} tanımladığınız çıkış sunucusu havuzundan rastgele
 msgid ""
 "You may want to retry as this will randomly reselect an outproxy from the "
 "pool you have defined {0}here{1} (if you have more than one configured)."
-msgstr ""
+msgstr "Buradan tanımladığınız çıkış sunucusu havuzundan rastgele bir seçim yaparak {0}yeniden denemek{1} isteyebilirsiniz (birden fazla sunucu ayarladıysanız)."
 
 #: ../java/build/Proxy.java:28 ../java/build/Proxy.java:159
 #: ../java/build/Proxy.java:185 ../java/build/Proxy.java:207
@@ -500,11 +501,11 @@ msgstr "Kaydetmeden {0} sitesine ilerle"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr ""
+msgstr "Adres defterine kaydetmeden sitede gezinebilirsiniz. I2P yönelticinizi yeniden başlattığınızda adres hatırlanır."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1366
 msgid "Continue without saving"
-msgstr ""
+msgstr "Kaydetmeden devam et"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1373
 #, java-format
@@ -515,19 +516,19 @@ msgstr "Yöneltici adres defterine kaydederek {0} web sitesine ilerle"
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr ""
+msgstr "Bu adres yönelticinizin abonelik temelli adresleri kaydettiği adres defterine kaydedilecek."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1376
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Master or Private address book instead."
-msgstr ""
+msgstr "El ile eklediğiniz siteleri izlemek istiyorsanız Ana ya da Kişisel adres defterinize ekleyin."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1379
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1387
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1392
 msgid "Save & continue"
-msgstr ""
+msgstr "Kaydedip devam et"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1384
@@ -540,7 +541,7 @@ msgid ""
 "This address will be saved to your Master address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "Bu adres Ana adres defterine kaydedilecek. Bu seçeneği Ana adres defterinden ayrı tutmak istediğiniz adresler için bu seçeneği işaretleyin, yayın durumuyla ilgilenilmez."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1389
 #, java-format
@@ -551,7 +552,7 @@ msgstr "Kişisel adres defterine kaydederek {0} web sitesine ilerle"
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
-msgstr ""
+msgstr "Bu adres Kişisel adres defterinize kaydedilecek ve hiç bir zaman yayınlanmayacak."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:175
 #, java-format

@@ -1,8 +1,9 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
+# 1 2 <sulyukin@gmail.com>, 2017
 # Filipp Chertiev <f@fzfx.ru>, 2017
 # Hidden Z <hiddenz@mail.i2p>, 2011
 # Maxym Mykhalchuk, 2015
@@ -10,10 +11,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-09-19 14:20+0000\n"
-"Last-Translator: Filipp Chertiev <f@fzfx.ru>\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2017-11-22 23:14+0000\n"
+"Last-Translator: 1 2 <sulyukin@gmail.com>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,8 +83,8 @@ msgstr "Для роутеров с высокой пропускнй спосо�
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Выполнять I2P-демон в ограниченной среде AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Должен ли демон I2P быть ограничен с помощью AppArmor?"
 
 #. Type: boolean
 #. Description

@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Gabriel Moura <gabriel.all@yandex.com>, 2017
 # blueboy, 2013
 # blueboy, 2015
 # blueboy, 2014
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-11-04 04:47+0000\n"
+"Last-Translator: Gabriel Moura <gabriel.all@yandex.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,7 +58,7 @@ msgstr "Nenhum"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:231
 msgid "Hashcash"
-msgstr ""
+msgstr "Hashcash"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:233
 msgid "Hidden"
@@ -81,21 +82,21 @@ msgstr "Tipo {0}"
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:258
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:261
 msgid "DSA 1024 bit"
-msgstr ""
+msgstr "DSA 1024 bit"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:191
 #, java-format
 msgid "One result for search within filtered list."
 msgid_plural "{0} results for search within filtered list."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Um resultado para pesquisa dentro da lista filtrada."
+msgstr[1] "{0} resultados para pesquisa dentro da lista filtrada."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:195
 #, java-format
 msgid "Filtered list contains 1 entry."
 msgid_plural "Filtered list contains {0} entries."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A lista filtrada contém 1 entrada."
+msgstr[1] "A lista filtrada contém {0} entradas."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:200
 #, java-format
@@ -222,7 +223,7 @@ msgstr "Nenhuma entrada foi selecionada para deleção."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:277
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:566
 msgid "Add Alternate"
-msgstr ""
+msgstr "Adicionar Alternativo"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:324
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
@@ -240,7 +241,7 @@ msgstr "ERRO: não foi possível escrever no arquivo do livro de endereços."
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
-msgstr ""
+msgstr "Envio de formulário inválido, provavelmente porque você usou o botão \"voltar\" ou \"recarregar\" no seu navegador. Por favor reenvie."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:334
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
@@ -281,7 +282,7 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
 #, java-format
 msgid "Host name {0} is not in  the address book."
-msgstr ""
+msgstr "O nome do host {0} não está no catálogo de endereços."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:261
 msgid "Manually added via SusiDNS"
@@ -332,7 +333,7 @@ msgstr "Visão geral"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:183
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:193
 msgid "Private"
-msgstr ""
+msgstr "Privado"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:206
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:198
@@ -340,7 +341,7 @@ msgstr ""
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:185
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:195
 msgid "Master"
-msgstr ""
+msgstr "Master"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:208
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
@@ -419,7 +420,7 @@ msgstr "Pesquisar"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:552
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
 msgid "Hostname"
-msgstr ""
+msgstr "Hostname"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:357
 msgid "Link (b32)"
@@ -608,7 +609,7 @@ msgstr "Chave pública"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:290
 msgid "ElGamal 2048 bit"
-msgstr ""
+msgstr "ElGamal 2048 bit"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:294
 msgid "Signing Key"
@@ -616,7 +617,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:300
 msgid "Certificate"
-msgstr ""
+msgstr "Certificado"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:306
 msgid "Added Date"
@@ -628,11 +629,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:314
 msgid "no"
-msgstr ""
+msgstr "não"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:314
 msgid "yes"
-msgstr ""
+msgstr "sim"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:318
 msgid "Source"
@@ -640,7 +641,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:324
 msgid "Last Modified"
-msgstr ""
+msgstr "Última modificação"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:330
 msgid "Notes"
@@ -656,7 +657,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:364
 msgid "Launch Image Generator"
-msgstr ""
+msgstr "Iniciar Gerador de Imagem"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:173
 msgid "Introduction"

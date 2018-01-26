@@ -1,17 +1,17 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
 # D.A. Loader <>, 2012
-# Ettore Atalan <atalanttore@googlemail.com>, 2015
+# Ettore Atalan <atalanttore@googlemail.com>, 2015,2017
 # mixxy <m1xxy@mail.i2p>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2017-12-18 18:20+0000\n"
 "Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
 "Language-Team: German (http://www.transifex.com/otf/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -56,7 +56,7 @@ msgstr "Standardmäßig ist I2P so eingestellt, dass es im Dämonmodus der unter
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Achtung: Wenn etwas anderes als das Standartmäßige 'i2psvc' hier eingetrangen ist, musst du einen Benutzernamen angeben der schon existiert !"
+msgstr "Achtung: Wenn etwas anderes als das standardmäßige 'i2psvc' hier eingetrangen ist, musst du einen Benutzernamen angeben der schon existiert."
 
 #. Type: string
 #. Description
@@ -68,7 +68,7 @@ msgstr "Arbeitsspeicher der I2P zugewiesen werden darf:"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Standartmäßig kann I2P bist zu 128 MB RAM belegen."
+msgstr "Standardmäßig kann I2P bist zu 128 MB RAM belegen."
 
 #. Type: string
 #. Description
@@ -81,8 +81,8 @@ msgstr "Router mit hoher Bandbreite, sowie vielen aktiven Torrents oder Plugins,
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Mit AppArmor beschränkten I2P-Daemon ausführen"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Soll der I2P-Daemon mit AppArmor eingeschränkt werden?"
 
 #. Type: boolean
 #. Description

@@ -1,15 +1,15 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
-# Allan Nordhøy <epost@anotheragency.no>, 2017
+# Allan Nordhøy <epost@anotheragency.no>, 2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-09-19 14:52+0000\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2018-01-24 00:16+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -79,8 +79,8 @@ msgstr "Rutere med høy båndbredde, sågar også rutere med mange aktive torren
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Kjør I2P-nissen innhegnet av AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Skal I2P-nissen innhegnes av AppArmor?"
 
 #. Type: boolean
 #. Description

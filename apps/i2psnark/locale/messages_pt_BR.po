@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-25 13:37+0000\n"
-"PO-Revision-Date: 2017-10-25 16:48+0000\n"
+"PO-Revision-Date: 2018-01-04 09:55+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -1203,7 +1203,7 @@ msgstr "Abrir"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2254
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2589
 msgid "Private"
-msgstr ""
+msgstr "Privado"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2258
 msgid "none"

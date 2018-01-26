@@ -4,15 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2015-2016
+# Kaya Zeren <kayazeren@gmail.com>, 2015-2017
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-25 13:37+0000\n"
-"PO-Revision-Date: 2017-10-25 16:48+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-11-15 05:46+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -859,7 +859,7 @@ msgstr "\"{0}\" için torrent oluşturulurken bir sorun çıktı"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1332
 #, java-format
 msgid "Cannot create a torrent for the nonexistent data: {0}"
-msgstr "Varolmayan veri için bir torrent oluşturulamaz: {0}"
+msgstr "Var olmayan veri için bir torrent oluşturulamaz: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1335
 msgid "Error creating torrent - you must enter a file or directory"
@@ -873,7 +873,7 @@ msgstr "Seçilmişleri sil"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1366
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2647
 msgid "Save tracker configuration"
-msgstr "İzleyici bilgilerini kaydet"
+msgstr "İzleyici ayarlarını kaydet"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1383
 msgid "Removed"

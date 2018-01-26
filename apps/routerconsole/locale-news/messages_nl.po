@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Nathan Follens, 2015
+# Nathan Follens, 2015,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
+"PO-Revision-Date: 2018-01-26 09:30+0000\n"
 "Last-Translator: Nathan Follens\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr "Heb {0}wat geduld{1} terwijl I2P opstart en peers zoekt."
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr "Terwijl je wacht, {0}pas je bandbreedte instellingen aan{1} op de {2}configuratie pagina{3}."
+msgstr "{0}Pas je bandbreedteinstellingen aan{1} op de {2}configuratiepagina{3} terwijl je wacht."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
@@ -50,16 +50,16 @@ msgstr "Gebruik hiervoor geen SOCKS."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "Meer informatie kan je vinden op de {0}I2P browser proxy setup pagina{1}."
+msgstr "Meer informatie kan je vinden op de {0}I2P-browserproxyconfiguratiepagina{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr "Wanneer je een \"gedeelde clients\" destination in de linker lijst hebt, {0}lees dan aub{1} onze {2}FAQ{3}."
+msgstr "{0}Lees{1} onze {2}VGV{3} wanneer je een bestemming ‘gedeelde cliënten’ in de linkerlijst hebt."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr "Wijs je IRC-cliënt naar {0}localhost:6668{1} en zeg gedag tegen ons op {2}#i2p{3}"
+msgstr "Wijs je IRC-cliënt naar {0}localhost:6668{1} en zeg hallo op {2}#i2p{3}."

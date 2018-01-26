@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2018-01-05 02:54+0000\n"
 "Last-Translator: Amir H. Firouzian\n"
 "Language-Team: Persian (http://www.transifex.com/otf/I2P/language/fa/)\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr ""
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
 msgid "Disable"
-msgstr ""
+msgstr "غیرفعال کن"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:93
 #: src/net/i2p/desktopgui/InternalTrayManager.java:245

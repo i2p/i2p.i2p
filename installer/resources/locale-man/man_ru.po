@@ -5,16 +5,18 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# yume <yumenokazu@gmail.com>, 2017
+# yume, 2017
 # Mykola Demianko <nikdemqr@gmail.com>, 2017
 # Alexander Georgievskiy <galeksandrp@gmail.com>, 2017
 # Filipp Chertiev <f@fzfx.ru>, 2017
+# 1 2 <sulyukin@gmail.com>, 2017
+# Boris Shminke, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: Filipp Chertiev <f@fzfx.ru>, 2017\n"
+"Last-Translator: Boris Shminke, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -86,6 +88,12 @@ msgid ""
 "  If supported by the remote server, eepget will instruct the server to "
 "continue the download from the point of interruption."
 msgstr ""
+"Eepget способна работать с медленными или нестабильными сетевыми "
+"подключениями; в случае неудочной загрузки из-за сетевых неполадок, будут "
+"предприниматься попытки переподключения до тех пор, пока файл не будет "
+"скачан полностью (если установлен параметр -n). Eepget отправит команду "
+"серверу на продолжение загрузки из точки прерывания, если удаленный сервер "
+"поддерживает такую возможность."
 
 #. type: SH
 #: man/eepget.1:22
@@ -96,7 +104,7 @@ msgstr "ОПЦИИ"
 #. type: Plain text
 #: man/eepget.1:25
 msgid "B<-c>"
-msgstr ""
+msgstr "B<-c>"
 
 #. type: TP
 #: man/eepget.1:25
@@ -113,18 +121,19 @@ msgstr ""
 #: man/eepget.1:31
 #, no-wrap
 msgid "Sets the etag value in the request headers."
-msgstr ""
+msgstr "Устанавливает значение etag в заголовке запроса."
 
 #. type: Plain text
 #: man/eepget.1:37
 msgid "B<-h> name=value"
-msgstr ""
+msgstr "B<-h>имя=значение"
 
 #. type: TP
 #: man/eepget.1:37
 #, no-wrap
 msgid "Adds an arbitrary request header with the given name and value."
 msgstr ""
+"Добавляет произвольный заголовок запроса с заданным именем и значением."
 
 #. type: Plain text
 #: man/eepget.1:43
@@ -138,6 +147,8 @@ msgid ""
 "Controls the progress display. B<\\ lineLen > is the length of one progress "
 "line in characters. The default is 40."
 msgstr ""
+"Контролирует отображение прогресса. B<\\ lineLen > - это длина одной строчки"
+" прогресс-бара в символах. По умолчанию равна 40."
 
 #. type: Plain text
 #: man/eepget.1:49
@@ -151,11 +162,13 @@ msgid ""
 "Controls the progress display. B<\\ markSize > is the number of bytes one "
 "'#' character represents. The default is 1024."
 msgstr ""
+"Контролирует отображение прогресса. B<\\ markSize > - это количество байт, "
+"которое означает один символ \"#\". По умолчанию равно 1024."
 
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr ""
+msgstr "В<-n> попыток"
 
 #. type: TP
 #: man/eepget.1:55
@@ -170,7 +183,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:61
 msgid "B<-o> file"
-msgstr ""
+msgstr "B<-o> файл"
 
 #. type: TP
 #: man/eepget.1:61
@@ -179,6 +192,8 @@ msgid ""
 "Sets the output file to write to. If this option is not given, the output "
 "filename will be determined by the URL."
 msgstr ""
+"Задает выходной файл для записи. Если этот параметр не указан, то имя "
+"выходного файла определяется URL-адресом."
 
 #. type: Plain text
 #: man/eepget.1:67
@@ -197,18 +212,18 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:73
 msgid "B<-t> seconds"
-msgstr ""
+msgstr "B<-t> секунд"
 
 #. type: TP
 #: man/eepget.1:73
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
-msgstr ""
+msgstr "Устанавливает тайм-аут соединения. По умолчанию 60 секунд."
 
 #. type: Plain text
 #: man/eepget.1:79
 msgid "B<-u> username"
-msgstr ""
+msgstr "B<-u> имя пользователя"
 
 #. type: TP
 #: man/eepget.1:79
@@ -219,7 +234,7 @@ msgstr "Задайте имя пользователя для авторизац
 #. type: Plain text
 #: man/eepget.1:85
 msgid "B<-x> password"
-msgstr ""
+msgstr "B<-x> пароль"
 
 #. type: TP
 #: man/eepget.1:85
@@ -228,6 +243,8 @@ msgid ""
 "Sets the password for proxy authorization, if required. If a username is "
 "specified but not a password, EepGet will prompt for the password."
 msgstr ""
+"Устанавливает пароль для авторизации на прокси, если он требуется. Если имя "
+"пользователя задано, а пароль - нет, EepGet будет запрашивать пароль."
 
 #. type: SH
 #: man/eepget.1:89
@@ -254,6 +271,8 @@ msgid ""
 "Please enter a ticket on E<.UR https://trac.i2p2.de/> the I2P trac page "
 "E<.UE .>"
 msgstr ""
+"Пожалуйста, заведите тикет на E<.UR https://trac.i2p2.de/> странице трекера "
+"I2P E<.UE .>."
 
 #. type: SH
 #: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
@@ -298,7 +317,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
-msgstr ""
+msgstr "Запускает I2P как консольное приложение от текущего пользователя."
 
 #. type: IP
 #: man/i2prouter.1:19
@@ -440,6 +459,10 @@ msgid ""
 "options.  To stop the router, use your browser to access E<.UR "
 "http://localhost:7657/> the router console E<.UE .>"
 msgstr ""
+"Вам действительно стоит использовать скрипт B<i2prouter>(1) вместо этого "
+"скрипта. У этого скрипта нет параметров. Чтобы остановить маршрутизатор, "
+"используйте свой браузер, чтобы получить доступ к  E<.UR "
+"http://localhost:7657/> консоли маршрутизатора E<.UE .>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31

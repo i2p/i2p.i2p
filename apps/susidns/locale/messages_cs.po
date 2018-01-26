@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2017-12-07 22:13+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -522,7 +522,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:237
 msgid "Options"
-msgstr ""
+msgstr "Možnosti"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:239
 msgid "File containing the list of subscriptions URLs (no need to change)"
