@@ -1,6 +1,5 @@
 package net.i2p.router.web.helpers;
 
-import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -40,8 +39,7 @@ public class ConfigKeyringHandler extends FormHandler {
                     addFormError(_t("Invalid key"));
                 } else {
                     _context.keyRing().put(h, sk);
-                    addFormNotice(_t("Key for {0} added to keyring",
-                                     Base32.encode(h.getData()) + ".b32.i2p"));
+                    addFormNotice(_t("Key for {0} added to keyring", h.toBase32()));
                 }
             } else {  // Delete
                 if (h != null && h.getData() != null) {
@@ -49,11 +47,9 @@ public class ConfigKeyringHandler extends FormHandler {
                         // don't bother translating
                         addFormError("Cannot remove key for local destination. Disable encryption in the Hidden Services Manager.");
                     } else if (_context.keyRing().remove(h) != null) {
-                        addFormNotice(_t("Key for {0} removed from keyring",
-                                         Base32.encode(h.getData()) + ".b32.i2p"));
+                        addFormNotice(_t("Key for {0} removed from keyring", h.toBase32()));
                     } else {
-                        addFormNotice(_t("Key for {0} not found in keyring",
-                                         Base32.encode(h.getData()) + ".b32.i2p"));
+                        addFormNotice(_t("Key for {0} not found in keyring", h.toBase32()));
                     }
                 } else {
                     addFormError(_t("Invalid destination"));

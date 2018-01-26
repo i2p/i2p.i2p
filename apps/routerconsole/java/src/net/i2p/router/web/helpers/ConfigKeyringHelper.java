@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
-import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -51,7 +50,7 @@ public class ConfigKeyringHelper extends HelperBase {
             if (local != _context.clientManager().isLocal(h))
                 continue;
             buf.append("\n<tr><td>");
-            buf.append(Base32.encode(h.getData())).append(".b32.i2p");
+            buf.append(h.toBase32());
             buf.append("</td><td>");
             Destination dest = _context.netDb().lookupDestinationLocally(h);
             if (dest != null && local) {

@@ -55,7 +55,6 @@ class MailPart {
 	 */
 	public final String uidl;
 	
-/// todo add UIDL to constructors, use in WebMail.showpart()
 
 	public MailPart(String uidl,  ReadBuffer readBuffer) throws DecodingException
 	{
