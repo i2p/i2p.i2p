@@ -98,7 +98,8 @@ public class GeneralHelper {
                     boolean created = SSLClientUtil.verifyKeyStore(props, OPT);
                     if (created) {
                         // config now contains new keystore props
-                        msgs.add("Created new self-signed certificate for tunnel " + getTunnelName(tcg, tunnel));
+                        String name = props.getProperty(TunnelController.PROP_NAME, "");
+                        msgs.add("Created new self-signed certificate for tunnel " + name);
                     }        
                 } catch (IOException ioe) {       
                     msgs.add("Failed to create new self-signed certificate for tunnel " +
@@ -225,9 +226,16 @@ public class GeneralHelper {
         return (tun != null && tun.getType() != null) ? tun.getType() : "";
     }
 
+    /**
+     *  @return null if unset
+     */
     public String getTunnelName(int tunnel) {
         return getTunnelName(_group, tunnel);
     }
+
+    /**
+     *  @return null if unset
+     */
     public static String getTunnelName(TunnelControllerGroup tcg, int tunnel) {
         TunnelController tun = getController(tcg, tunnel);
         return tun != null ? tun.getName() : null;

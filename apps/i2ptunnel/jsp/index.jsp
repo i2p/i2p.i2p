@@ -48,7 +48,7 @@
     <table id="statusMessagesTable">
         <tr>
             <td id="tunnelMessages">
-        <textarea id="statusMessages" rows="4" cols="60" readonly="readonly"><jsp:getProperty name="indexBean" property="messages" /></textarea>
+        <textarea id="statusMessages" rows="4" cols="60" readonly="readonly"><%=msgs%></textarea>
             </td>
         </tr>
         <tr>

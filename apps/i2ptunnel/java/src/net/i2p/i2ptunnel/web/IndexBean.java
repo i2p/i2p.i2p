@@ -283,6 +283,8 @@ public class IndexBean {
      * Executes any action requested (start/stop/etc) and dump out the 
      * messages.
      *
+     * Only call this ONCE! Or you will get duplicate tunnels on save.
+     *
      * @return HTML escaped or "" if empty
      */
     public String getMessages() {
@@ -363,7 +365,7 @@ public class IndexBean {
     
     public String getTunnelName(int tunnel) {
         String name = _helper.getTunnelName(tunnel);
-        if (name != null)
+        if (name != null && name.length() > 0)
             return DataHelper.escapeHTML(name);
         else
             return _t("New Tunnel");
@@ -666,7 +668,7 @@ public class IndexBean {
         }
     }
 
-    /** how many hops to use for inbound tunnels
+    /** how many hops to use for outbound tunnels
      *  @since 0.9.33
      */
     public void setTunnelDepthOut(String tunnelDepth) {
@@ -677,7 +679,7 @@ public class IndexBean {
         }
     }
 
-    /** how many parallel inbound tunnels to use
+    /** how many parallel outbound tunnels to use
      *  @since 0.9.33
      */
     public void setTunnelQuantityOut(String tunnelQuantity) {
@@ -688,7 +690,7 @@ public class IndexBean {
         }
     }
 
-    /** how much randomisation to apply to the depth of tunnels
+    /** how much randomisation to apply to the depth of outbound tunnels
      *  @since 0.9.33
      */
     public void setTunnelVarianceOut(String tunnelVariance) {
@@ -699,7 +701,7 @@ public class IndexBean {
         }
     }
 
-    /** how many tunnels to hold in reserve to guard against failures
+    /** how many outbound tunnels to hold in reserve to guard against failures
      *  @since 0.9.33
      */
     public void setTunnelBackupQuantityOut(String tunnelBackupQuantity) {
