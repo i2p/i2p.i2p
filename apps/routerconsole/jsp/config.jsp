@@ -60,7 +60,7 @@
         <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
 </td></tr>
 <tr><td class="infohelp" colspan="2">
-<% int share = nethelper.getShareBandwidth();
+<% int share = Math.round(nethelper.getShareBandwidth() * 1.024f);
     if (share < 12) {
         out.print("<b>");
         out.print(intl._t("NOTE"));

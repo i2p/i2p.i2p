@@ -973,19 +973,26 @@ public class Router implements RouterClock.ClockShiftListener {
     @Deprecated
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
-    /** @since 0.9.33 */
+    /** In binary (1024) Kbytes
+     *  @since 0.9.33 */
     public static final int MIN_BW_K = 0;
-    /** @since 0.9.33 */
+    /** In binary (1024) Kbytes
+     *  @since 0.9.33 */
     public static final int MIN_BW_L = 12;
-    /** @since 0.9.33 */
+    /** In binary (1024) Kbytes
+     *  @since 0.9.33 */
     public static final int MIN_BW_M = 48;
-    /** @since 0.9.33 */
+    /** In binary (1024) Kbytes
+     *  @since 0.9.33 */
     public static final int MIN_BW_N = 64;
-    /** @since 0.9.33 */
+    /** In binary (1024) Kbytes
+     *  @since 0.9.33 */
     public static final int MIN_BW_O = 128;
-    /** @since 0.9.33 */
+    /** In binary (1024) Kbytes
+     *  @since 0.9.33 */
     public static final int MIN_BW_P = 256;
-    /** @since 0.9.33 */
+    /** In binary (1024) Kbytes
+     *  @since 0.9.33 */
     public static final int MIN_BW_X = 2000;
 
     /**

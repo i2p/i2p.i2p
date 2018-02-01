@@ -224,7 +224,7 @@ public class PeerHelper extends HelperBase {
             buf.append("</span></td><td class=\"cells\" align=\"center\"><span class=\"right\">");
             if (con.getTimeSinceReceive() < 2*60*1000) {
                 float r = con.getRecvRate();
-                buf.append(formatRate(r / 1024));
+                buf.append(formatRate(r / 1000));
                 bpsRecv += r;
             } else {
                 buf.append(formatRate(0));
@@ -232,7 +232,7 @@ public class PeerHelper extends HelperBase {
             buf.append("</span>").append(THINSP).append("<span class=\"left\">");
             if (con.getTimeSinceSend() < 2*60*1000) {
                 float r = con.getSendRate();
-                buf.append(formatRate(r / 1024));
+                buf.append(formatRate(r / 1000));
                 bpsSend += r;
             } else {
                 buf.append(formatRate(0));
@@ -268,8 +268,8 @@ public class PeerHelper extends HelperBase {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
             buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>")
                .append(ngettext("{0} peer", "{0} peers", peers.size()));
-            buf.append("</b></td><td align=\"center\" nowrap><span class=\"right\"><b>").append(formatRate(bpsRecv/1024)).append("</b></span>");
-            buf.append(THINSP).append("<span class=\"left\"><b>").append(formatRate(bpsSend/1024)).append("</b></span>");
+            buf.append("</b></td><td align=\"center\" nowrap><span class=\"right\"><b>").append(formatRate(bpsRecv/1000)).append("</b></span>");
+            buf.append(THINSP).append("<span class=\"left\"><b>").append(formatRate(bpsSend/1000)).append("</b></span>");
             buf.append("</td><td align=\"right\"><b>").append(DataHelper.formatDuration2(totalUptime/peers.size()));
             buf.append("</b></td><td align=\"right\"><b>").append(DataHelper.formatDuration2(offsetTotal*1000/peers.size()));
             buf.append("</b></td><td align=\"right\"><b>").append(totalSend).append("</b></td><td align=\"right\"><b>").append(totalRecv);
@@ -634,7 +634,7 @@ public class PeerHelper extends HelperBase {
 
     private static final String formatKBps(int bps) {
         synchronized (_fmt) {
-            return _fmt.format((float)bps/1024);
+            return _fmt.format((float)bps/1000);
         }
     }
 }

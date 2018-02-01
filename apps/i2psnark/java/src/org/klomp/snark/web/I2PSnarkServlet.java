@@ -1754,7 +1754,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"percentBarOuter\">");
             out.write("<div class=\"percentBarInner\" style=\"width: " + percent + "%;\">");
             out.write("<div class=\"percentBarText\" tabindex=\"0\" title=\"");
-            out.write(percent + "% " + _t("complete") + " - " + DataHelper.formatSize2(remaining) + "B " + _t("remaining"));
+            out.write(percent + "% " + _t("complete") + "; " + DataHelper.formatSize2(remaining) + "B " + _t("remaining"));
             out.write("\">");
             out.write(formatSize(total-remaining) + thinsp(noThinsp) + formatSize(total));
             out.write("</div></div></div>");
@@ -2752,18 +2752,8 @@ public class I2PSnarkServlet extends BasicServlet {
         return null;
     }
 
-    // rounding makes us look faster :)
     private static String formatSize(long bytes) {
-        if (bytes < 5000)
-
-            // replace &nbsp; with narrow non-breaking space (&#8239;)
-            return bytes + "&#8239;B";
-        else if (bytes < 5*1024*1024)
-            return ((bytes + 512)/1024) + "&#8239;KB";
-        else if (bytes < 10*1024*1024*1024l)
-            return ((bytes + 512*1024)/(1024*1024)) + "&#8239;MB";
-        else
-            return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "&#8239;GB";
+        return DataHelper.formatSize2(bytes) + 'B';	
     }
 
     /**

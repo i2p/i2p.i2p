@@ -133,16 +133,28 @@ public class FIFOBandwidthLimiter {
     /** @return smoothed 15 second rate */
     public float getReceiveBps15s() { return _recvBps15s; }
     
-    /** The configured maximum, not the current rate */
+    /**
+     *  The configured maximum, not the current rate.
+     *  In binary K, i.e. rate / 1024.
+     */
     public int getOutboundKBytesPerSecond() { return _refiller.getOutboundKBytesPerSecond(); } 
     
-    /** The configured maximum, not the current rate */
+    /**
+     *  The configured maximum, not the current rate.
+     *  In binary K, i.e. rate / 1024.
+     */
     public int getInboundKBytesPerSecond() { return _refiller.getInboundKBytesPerSecond(); } 
     
-    /** The configured maximum, not the current rate */
+    /**
+     *  The configured maximum, not the current rate.
+     *  In binary K, i.e. rate / 1024.
+     */
     public int getOutboundBurstKBytesPerSecond() { return _refiller.getOutboundBurstKBytesPerSecond(); } 
     
-    /** The configured maximum, not the current rate */
+    /**
+     *  The configured maximum, not the current rate.
+     *  In binary K, i.e. rate / 1024.
+     */
     public int getInboundBurstKBytesPerSecond() { return _refiller.getInboundBurstKBytesPerSecond(); } 
     
     public synchronized void reinitialize() {

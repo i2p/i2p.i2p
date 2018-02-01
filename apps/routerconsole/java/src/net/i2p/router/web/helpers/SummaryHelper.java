@@ -320,7 +320,7 @@ public class SummaryHelper extends HelperBase {
         // long free = Runtime.getRuntime().freeMemory()/1024/1024;
         // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
         // return integerFormatter.format(used) + "MB / " + free + " MB";
-        return integerFormatter.format(used) + " / " + total + " MB";
+        return integerFormatter.format(used) + " / " + total + " MiB";
     }
 
     /** @since 0.9.32 */
@@ -349,7 +349,7 @@ public class SummaryHelper extends HelperBase {
         // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
         // return integerFormatter.format(used) + "MB / " + free + " MB";
         return "<div class=\"percentBarOuter\" id=\"sb_memoryBar\"><div class=\"percentBarText\">RAM: " +
-               integerFormatter.format(used) + " / " + total + " MB" +
+               integerFormatter.format(used) + " / " + total + " MiB" +
                "</div><div class=\"percentBarInner\" style=\"width: " + integerFormatter.format(usedPc) +
                "%;\"></div></div>";
     }
@@ -498,17 +498,18 @@ public class SummaryHelper extends HelperBase {
     }
 
     /**
-     *    @return "x.xx / y.yy {K|M}"
+     *  Output is decimal, not binary
+     *  @return "x.xx / y.yy {K|M}"
      */
     private static String formatPair(double in, double out) {
-        boolean mega = in >= 1024*1024 || out >= 1024*1024;
+        boolean mega = in >= 1000*1000 || out >= 1000*1000;
         // scale both the same
         if (mega) {
-            in /= 1024*1024;
-            out /= 1024*1024;
+            in /= 1000*1000;
+            out /= 1000*1000;
         } else {
-            in /= 1024;
-            out /= 1024;
+            in /= 1000;
+            out /= 1000;
         }
         // control total width
         DecimalFormat fmt;
@@ -530,9 +531,7 @@ public class SummaryHelper extends HelperBase {
     public String getInboundTransferred() {
         if (_context == null)
             return "0";
-
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
-
         return DataHelper.formatSize2(received) + 'B';
     }
 
@@ -544,7 +543,6 @@ public class SummaryHelper extends HelperBase {
     public String getOutboundTransferred() {
         if (_context == null)
             return "0";
-
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         return DataHelper.formatSize2(sent) + 'B';
     }
@@ -957,7 +955,7 @@ public class SummaryHelper extends HelperBase {
         String status = checker.getStatus();
         if (status.length() > 0) {
             // Show status message even if not running, timer in ReseedChecker should remove after 20 minutes
-            buf.append("<div class=\"sb_notice\"><i>").append(checker.getStatus()).append("</i></div>");
+            buf.append("<div class=\"sb_notice\"><i>").append(status).append("</i></div>");
         }
         if (!checker.inProgress()) {
             // If a new reseed isn't running, and the last reseed had errors, show error message

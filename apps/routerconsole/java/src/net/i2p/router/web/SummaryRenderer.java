@@ -171,7 +171,8 @@ class SummaryRenderer {
             def.setMinValue(0d);
             String name = _listener.getRate().getRateStat().getName();
             // heuristic to set K=1024
-            if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0 || name.indexOf("memory") >= 0)
+            //if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0 || name.indexOf("memory") >= 0)
+            if ((name.indexOf("Size") >= 0 || name.indexOf("memory") >= 0)
                 && !showEvents)
                 def.setBase(1024);
             if (titleOverride != null) {
@@ -192,8 +193,8 @@ class SummaryRenderer {
             }
             String path = _listener.getData().getPath();
             String dsNames[] = _listener.getData().getDsNames();
-            String plotName = null;
-            String descr = null;
+            String plotName;
+            String descr;
             if (showEvents) {
                 // include the average event count on the plot
                 plotName = dsNames[1];

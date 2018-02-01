@@ -552,7 +552,9 @@ public class LogManager implements Flushable {
             String v = size.trim().toUpperCase(Locale.US);
             if (v.length() < 2)
                 return -1;
-            if (v.endsWith("B"))
+            if (v.endsWith("IB"))
+                v = v.substring(0, v.length() - 2);
+            else if (v.endsWith("B"))
                 v = v.substring(0, v.length() - 1);
             char mod = v.charAt(v.length() - 1);
             if (!Character.isDigit(mod)) v = v.substring(0, v.length() - 1);

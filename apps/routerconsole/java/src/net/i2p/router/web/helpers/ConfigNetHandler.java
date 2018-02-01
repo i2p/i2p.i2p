@@ -502,12 +502,12 @@ public class ConfigNetHandler extends FormHandler {
             !_inboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH,
                                                       Integer.toString(FIFOBandwidthRefiller.DEFAULT_INBOUND_BURST_BANDWIDTH)))) {
             try {
-                int rate = Integer.parseInt(_inboundRate);
-                int kb = DEF_BURST_TIME * rate;
-                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, Integer.toString(rate));
-                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, Integer.toString(kb));
+                float rate = Integer.parseInt(_inboundRate) / 1.024f;
+                float kb = DEF_BURST_TIME * rate;
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, Integer.toString(Math.round(rate)));
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, Integer.toString(Math.round(kb)));
                 rate -= Math.min(rate * DEF_BURST_PCT / 100, 50);
-                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, Integer.toString(rate));
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, Integer.toString(Math.round(rate)));
 	        bwUpdated = true;
             } catch (NumberFormatException nfe) {
                 addFormError(_t("Invalid bandwidth"));
@@ -517,12 +517,12 @@ public class ConfigNetHandler extends FormHandler {
             !_outboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH,
                                                        Integer.toString(FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BURST_BANDWIDTH)))) {
             try {
-                int rate = Integer.parseInt(_outboundRate);
-                int kb = DEF_BURST_TIME * rate;
-                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, Integer.toString(rate));
-                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, Integer.toString(kb));
+                float rate = Integer.parseInt(_outboundRate) / 1.024f;
+                float kb = DEF_BURST_TIME * rate;
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, Integer.toString(Math.round(rate)));
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, Integer.toString(Math.round(kb)));
                 rate -= Math.min(rate * DEF_BURST_PCT / 100, 50);
-                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, Integer.toString(rate));
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, Integer.toString(Math.round(rate)));
 	        bwUpdated = true;
             } catch (NumberFormatException nfe) {
                 addFormError(_t("Invalid bandwidth"));

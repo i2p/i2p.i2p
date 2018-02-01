@@ -243,36 +243,46 @@ public class ConfigNetHelper extends HelperBase {
         return buf.toString();
     }
 
+    /** @return decimal */
     public String getInboundRate() {
-        return Integer.toString(_context.bandwidthLimiter().getInboundKBytesPerSecond());
+        return Integer.toString(Math.round(_context.bandwidthLimiter().getInboundKBytesPerSecond() * 1.024f));
     }
 
+    /** @return decimal */
     public String getOutboundRate() {
-        return Integer.toString(_context.bandwidthLimiter().getOutboundKBytesPerSecond());
+        return Integer.toString(Math.round(_context.bandwidthLimiter().getOutboundKBytesPerSecond() * 1.024f));
     }
 
+    /** @return decimal */
     public String getInboundBurstRateBits() {
         return kbytesToBits(_context.bandwidthLimiter().getInboundBurstKBytesPerSecond());
     }
 
+    /** @return decimal */
     public String getOutboundBurstRateBits() {
         return kbytesToBits(_context.bandwidthLimiter().getOutboundBurstKBytesPerSecond());
     }
 
+    /** @return decimal */
     public String getShareRateBits() {
         return kbytesToBits(getShareBandwidth());
     }
-    private String kbytesToBits(int kbytes) {
-        return DataHelper.formatSize(kbytes * (8 * 1024L)) + ' ' + _t("bits per second") +
-               ' ' + _t("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * (1024L * 60 * 60 * 24 * 31)));
+
+    /** @param kbytes binary K */
+    private String kbytesToBits(float kbytes) {
+        return DataHelper.formatSize2Decimal((long) (kbytes * (8 * 1024))) + _t("bits per second") +
+               "; " +
+               _t("{0}Bytes per month maximum", DataHelper.formatSize2Decimal((long) (kbytes * (1024L * 60 * 60 * 24 * 31))));
     }
 
+    /** @return decimal */
     public String getInboundBurstRate() {
-        return Integer.toString(_context.bandwidthLimiter().getInboundBurstKBytesPerSecond());
+        return Integer.toString(Math.round(_context.bandwidthLimiter().getInboundBurstKBytesPerSecond() * 1.024f));
     }
 
+    /** @return decimal */
     public String getOutboundBurstRate() {
-        return Integer.toString(_context.bandwidthLimiter().getOutboundBurstKBytesPerSecond());
+        return Integer.toString(Math.round(_context.bandwidthLimiter().getOutboundBurstKBytesPerSecond() * 1.024f));
     }
 
 /*
@@ -350,7 +360,7 @@ public class ConfigNetHelper extends HelperBase {
     public static final int DEFAULT_SHARE_KBPS = 12;
 
     /**
-     *  @return in KBytes per second
+     *  @return in binary KBytes per second
      */
     public int getShareBandwidth() {
         int irateKBps = _context.bandwidthLimiter().getInboundKBytesPerSecond();

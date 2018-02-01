@@ -684,10 +684,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         StringBuilder buf = new StringBuilder(256);
         buf.append("<br><hr class=\"debug\"><b>DHT DEBUG</b><br><hr class=\"debug\"><hr><b>TX:</b> ").append(_txPkts.get()).append(" pkts / ")
            .append(DataHelper.formatSize2(_txBytes.get())).append("B / ")
-           .append(DataHelper.formatSize2(_txBytes.get() * 1000 / uptime)).append("Bps<br>" +
+           .append(DataHelper.formatSize2Decimal(_txBytes.get() * 1000 / uptime)).append("Bps<br>" +
                    "<b>RX:</b> ").append(_rxPkts.get()).append(" pkts / ")
            .append(DataHelper.formatSize2(_rxBytes.get())).append("B / ")
-           .append(DataHelper.formatSize2(_rxBytes.get() * 1000 / uptime)).append("Bps<br>" +
+           .append(DataHelper.formatSize2Decimal(_rxBytes.get() * 1000 / uptime)).append("Bps<br>" +
                    "<b>DHT Peers:</b> ").append( _knownNodes.size()).append("<br>" +
                    "<b>Blacklisted:</b> ").append(_blacklist.size()).append("<br>" +
                    "<b>Sent tokens:</b> ").append(_outgoingTokens.size()).append("<br>" +

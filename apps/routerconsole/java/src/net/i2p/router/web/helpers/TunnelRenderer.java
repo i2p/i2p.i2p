@@ -185,7 +185,7 @@ class TunnelRenderer {
                   + "<td>&nbsp;</td></tr>");
         out.write("<tr><td>&nbsp;</td>"
                   + "<td><span class=\"tunnel_cap\"><b>P</b></span></td><td>" + _t("{0} shared bandwidth", range(Router.MIN_BW_P, Router.MIN_BW_X)) + "</td>"
-                  + "<td><span class=\"tunnel_cap\"><b>X</b></span></td><td>" + _t("Over {0} shared bandwidth", Router.MIN_BW_X + " KBps") + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>X</b></span></td><td>" + _t("Over {0} shared bandwidth", Math.round(Router.MIN_BW_X * 1.024f) + " KBps") + "</td>"
                   + "<td>&nbsp;</td></tr>");
         out.write("</tbody></table>");
 
@@ -193,7 +193,7 @@ class TunnelRenderer {
 
     /** @since 0.9.33 */
     static String range(int f, int t) {
-        return f + " - " + t + " KBps";
+        return Math.round(f * 1.024f) + " - " + (Math.round(t * 1.024f) - 1) + " KBps";
     }
 
     private static class TunnelComparator implements Comparator<HopConfig>, Serializable {
@@ -248,7 +248,7 @@ class TunnelRenderer {
                           _t("Outbound") + "\"></td>");
             out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>\n");
             int count = info.getProcessedMessagesCount();
-            out.write("<td class=\"cells\" align=\"center\">" + count + " KB</td>\n");
+            out.write("<td class=\"cells\" align=\"center\">" + count + " KiB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
                 Hash peer = info.getPeer(j);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));

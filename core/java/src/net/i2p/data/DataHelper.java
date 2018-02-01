@@ -1525,8 +1525,15 @@ public class DataHelper {
     }
 
     /**
-     * Caller should append 'B' or 'b' as appropriate
+     * This is binary, i.e. multiples of 1024.
+     * For decimal, see formatSize2Decimal().
+     *
+     * Caller should append 'B' or 'b' as appropriate.
+     *
+     * No space between the number and the letter.
      * NOTE: formatSize2() recommended in most cases for readability
+     *
+     * @return e.g. "123.05Ki"
      */
     public static String formatSize(long bytes) {
         float val = bytes;
@@ -1540,23 +1547,29 @@ public class DataHelper {
 
         String str = fmt.format(val);
         switch (scale) {
-            case 1: return str + "K";
-            case 2: return str + "M";
-            case 3: return str + "G";
-            case 4: return str + "T";
-            case 5: return str + "P";
-            case 6: return str + "E";
-            case 7: return str + "Z";
-            case 8: return str + "Y";
+            case 1: return str + "Ki";
+            case 2: return str + "Mi";
+            case 3: return str + "Gi";
+            case 4: return str + "Ti";
+            case 5: return str + "Pi";
+            case 6: return str + "Ei";
+            case 7: return str + "Zi";
+            case 8: return str + "Yi";
             default: return bytes + "";
         }
     }
 
     /**
+     * This is binary, i.e. multiples of 1024.
+     * For decimal, see formatSize2Decimal().
+     *
+     * Caller should append 'B' or 'b' as appropriate.
      * Like formatSize but with a non-breaking space after the number
      * This seems consistent with most style guides out there.
      * Use only in HTML, and not inside form values (use
      * formatSize2(bytes, false) there instead).
+     *
+     * @return e.g. "123.05&amp;#8239;Ki"
      * @since 0.7.14, uses thin non-breaking space since 0.9.31
      */
     public static String formatSize2(long bytes) {
@@ -1564,9 +1577,15 @@ public class DataHelper {
     }
 
     /**
+     * This is binary, i.e. multiples of 1024.
+     * For decimal, see formatSize2Decimal().
+     *
+     * Caller should append 'B' or 'b' as appropriate,
      * Like formatSize but with a space after the number
      * This seems consistent with most style guides out there.
+     *
      * @param nonBreaking use an HTML thin non-breaking space (&amp;#8239;)
+     * @return e.g. "123.05&amp;#8239;Ki" or "123.05 Ki"
      * @since 0.9.31
      */
     public static String formatSize2(long bytes, boolean nonBreaking) {
@@ -1581,6 +1600,56 @@ public class DataHelper {
 
         // Replace &nbsp; with thin non-breaking space &#8239; (more consistent/predictable width between fonts & point sizes)
 
+        String space = nonBreaking ? "&#8239;" : " ";
+        String str = fmt.format(val) + space;
+        switch (scale) {
+            case 1: return str + "Ki";
+            case 2: return str + "Mi";
+            case 3: return str + "Gi";
+            case 4: return str + "Ti";
+            case 5: return str + "Pi";
+            case 6: return str + "Ei";
+            case 7: return str + "Zi";
+            case 8: return str + "Yi";
+            default: return bytes + space;
+        }
+    }
+
+    /**
+     * This is decimal, i.e. multiples of 1000.
+     * For binary, see formatSize2().
+     *
+     * Caller should append 'B' or 'b' as appropriate.
+     * Like formatSize but with a space after the number
+     * This seems consistent with most style guides out there.
+     *
+     * @return e.g. "123.05&amp;#8239;K"
+     * @since 0.9.34
+     */
+    public static String formatSize2Decimal(long bytes) {
+        return formatSize2Decimal(bytes, true);
+    }
+
+    /**
+     * This is decimal, i.e. multiples of 1000.
+     * For binary, see formatSize2().
+     *
+     * Caller should append 'B' or 'b' as appropriate.
+     * Like formatSize but with a space after the number
+     * This seems consistent with most style guides out there.
+     *
+     * @param nonBreaking use an HTML thin non-breaking space (&amp;#8239;)
+     * @return e.g. "123.05&amp;#8239;K" or "123.05 K"
+     * @since 0.9.34
+     */
+    public static String formatSize2Decimal(long bytes, boolean nonBreaking) {
+        double val = bytes;
+        int scale = 0;
+        while (val >= 1000) {
+            scale++; 
+            val /= 1000;
+        }
+        DecimalFormat fmt = new DecimalFormat("##0.00");
         String space = nonBreaking ? "&#8239;" : " ";
         String str = fmt.format(val) + space;
         switch (scale) {
