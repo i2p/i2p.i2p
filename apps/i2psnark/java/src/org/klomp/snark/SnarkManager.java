@@ -2529,7 +2529,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
             return DataHelper.escapeHTML(snark.getBaseName());
         StringBuilder buf = new StringBuilder(256);
         String base = DataHelper.escapeHTML(storage.getBaseName());
-        buf.append("<a href=\"").append(_contextPath).append('/').append(base);
+        String enc = base.replace("[", "%5B").replace("]", "%5D").replace("|", "%7C");
+        buf.append("<a href=\"").append(_contextPath).append('/').append(enc);
         if (meta.getFiles() != null || !storage.complete())
             buf.append('/');
         buf.append("\">").append(base).append("</a>");
