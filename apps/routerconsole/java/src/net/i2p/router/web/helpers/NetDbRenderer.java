@@ -273,23 +273,6 @@ class NetDbRenderer {
         int ff = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
         buf.append("<tr><td><b>Known Floodfills:</b></td><td colspan=\"3\">").append(ff).append("</td></tr>\n")
            .append("<tr><td><b>Currently Floodfill?</b></td><td colspan=\"3\">").append(netdb.floodfillEnabled() ? "yes" : "no").append("</td></tr>\n");
-        if (debug) {
-            buf.append("<tr><td><b>Network data (only valid if floodfill):</b></td><td colspan=\"3\">");
-            //buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
-            if (median != null) {
-                double log2 = biLog2(median);
-                buf.append("</td></tr>")
-                   .append("<tr><td><b>Median distance (bits):</b></td><td colspan=\"3\">").append(fmt.format(log2)).append("</td></tr>\n");
-                // 2 for 4 floodfills... -1 for median
-                // this can be way off for unknown reasons
-                int total = (int) Math.round(Math.pow(2, 2 + 256 - 1 - log2));
-                buf.append("<tr><td><b>Estimated total floodfills:</b></td><td colspan=\"3\">").append(total).append("</td></tr>\n");
-                buf.append("<tr><td><b>Estimated total leasesets:</b></td><td colspan=\"3\">").append(total * rapCount / 4);
-            } else {
-                buf.append("<i>Not floodfill or no data.</i>");
-            }
-            buf.append("</td></tr>\n");
-        }
         buf.append("</table>\n");
 
         if (leases.isEmpty()) {
@@ -411,6 +394,23 @@ class NetDbRenderer {
             out.write(buf.toString());
             buf.setLength(0);
           } // for each
+          if (debug) {
+              buf.append("<table id=\"leasesetdebug\"><tr><td><b>Network data (only valid if floodfill):</b></td><td colspan=\"3\">");
+              //buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
+              if (median != null) {
+                  double log2 = biLog2(median);
+                  buf.append("</td></tr>")
+                     .append("<tr><td><b>Median distance (bits):</b></td><td colspan=\"3\">").append(fmt.format(log2)).append("</td></tr>\n");
+                  // 2 for 4 floodfills... -1 for median
+                  // this can be way off for unknown reasons
+                  int total = (int) Math.round(Math.pow(2, 2 + 256 - 1 - log2));
+                  buf.append("<tr><td><b>Estimated total floodfills:</b></td><td colspan=\"3\">").append(total).append("</td></tr>\n");
+                  buf.append("<tr><td><b>Estimated total leasesets:</b></td><td colspan=\"3\">").append(total * rapCount / 4);
+              } else {
+                  buf.append("<i>Not floodfill or no data.</i>");
+              }
+              buf.append("</td></tr></table>\n");
+          } // median table
           buf.append("</div>");
         }  // !empty
         out.write(buf.toString());

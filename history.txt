@@ -1,3 +1,10 @@
+2018-02-01 zzz
+ * Console: Fix number formatting (tickets #1912, #1913, #2126)
+ * i2psnark: URL escape fixes
+ * i2ptunnel: Reset connection if out of threads
+ * NetDB: Increase min floodfill version
+ * SusiMail: Don't duplicate Re: and Fwd: in subject
+
 * 2018-01-30 0.9.33 released
 
 2018-01-26 zzz
