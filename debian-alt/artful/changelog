@@ -1,6 +1,6 @@
-i2p (0.9.33x-1~xenial+1) xenial; urgency=medium
+i2p (0.9.33-1ubuntu1) artful; urgency=medium
 
-  * Backport to Xenial
+  * New upstream version 0.9.33
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 30 Jan 2018 12:12:12 +0000
 

@@ -47,7 +47,7 @@ Current Runtime Dependencies
   which are different than the way they are packaged for Debian.
   They are removed in the Debian source package.
 
-* libtaglibs-standard-*-java (stretch and later, zesty and later only)
+* libtaglibs-standard-*-java (stretch and later, artful and later only)
   Provides JSTL 1.2, solves the glassfish-javaee problem described below.
 
 * glassfish-javaee (wheezy, jessie, xenial and earlier only)

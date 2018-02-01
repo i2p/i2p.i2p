@@ -5,10 +5,10 @@ Standards-Version: 3.9.6
 Priority: optional
 Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
-Build-Depends: debhelper (>= 7.0.50~)
+Build-Depends: debhelper (>= 9.20160709)
  ,ant (>= 1.8)
  ,debconf
- ,openjdk-7-jdk
+ ,openjdk-8-jdk
  ,libjetty9-java
  ,libtaglibs-standard-jstlel-java
  ,libtomcat8-java
@@ -18,9 +18,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,libgetopt-java
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
- ,hardening-wrapper
  ,po-debconf
- ,dh-systemd
 
 Package: i2p
 Architecture: all
@@ -75,7 +73,7 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-9-jre-headless | openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java9-runtime-headless | java8-runtime-headless | java7-runtime-headless,
+ openjdk-9-jre-headless | openjdk-8-jre-headless | default-jre-headless | java9-runtime-headless | java8-runtime-headless,
  geoip-database,
  gettext-base,
  libgetopt-java,
