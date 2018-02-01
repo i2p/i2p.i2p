@@ -120,6 +120,9 @@ public class IterativeSearchJob extends FloodSearchJob {
             !SystemVersion.isApache() && !SystemVersion.isGNU() &&
             NativeBigInteger.isNative();
 
+    //private static final String MIN_QUERY_VERSION = SigType.EdDSA_SHA512_Ed25519.getSupportedSince();
+    private static final String MIN_QUERY_VERSION = StoreJob.MIN_STORE_VERSION;
+
     /**
      *  Lookup using exploratory tunnels
      */
@@ -319,7 +322,7 @@ public class IterativeSearchJob extends FloodSearchJob {
                 // This is also more recent than the version that supports encrypted replies,
                 // so we won't request unencrypted replies anymore either.
                 String v = ri.getVersion();
-                String since = SigType.EdDSA_SHA512_Ed25519.getSupportedSince();
+                String since = MIN_QUERY_VERSION;
                 if (VersionComparator.comp(v, since) < 0) {
                     failed(peer, false);
                     if (_log.shouldLog(Log.WARN))

@@ -173,6 +173,14 @@ class StoreJob extends JobImpl {
                         _log.info(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
                     _state.addSkipped(peer);
                     skipped++;
+                } else if (!shouldStoreTo((RouterInfo)ds)) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": Skipping old router " + peer);
+                    _state.addSkipped(peer);
+                    skipped++;
+/****
+   above shouldStoreTo() check is newer than these two checks, so we're covered
+
                 } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
                            !supportsCert((RouterInfo)ds,
                                          ((LeaseSet)_state.getData()).getDestination().getCertificate())) {
@@ -187,6 +195,7 @@ class StoreJob extends JobImpl {
                         _log.info(getJobId() + ": Skipping router that doesn't support big leasesets " + peer);
                     _state.addSkipped(peer);
                     skipped++;
+****/
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
 
@@ -525,6 +534,7 @@ class StoreJob extends JobImpl {
      * @return true if not a key cert
      * @since 0.9.12
      */
+/****
     public static boolean supportsCert(RouterInfo ri, Certificate cert) {
         if (cert.getCertificateType() != Certificate.CERTIFICATE_TYPE_KEY)
             return true;
@@ -542,14 +552,28 @@ class StoreJob extends JobImpl {
     }
 
     private static final String MIN_BIGLEASESET_VERSION = "0.9";
+****/
 
     /**
      * Does he support more than 6 leasesets?
      * @since 0.9.12
      */
-    public static boolean supportsBigLeaseSets(RouterInfo ri) {
+/****
+    private static boolean supportsBigLeaseSets(RouterInfo ri) {
         String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_BIGLEASESET_VERSION) >= 0;
+    }
+****/
+
+    public static final String MIN_STORE_VERSION = "0.9.28";
+
+    /**
+     * Is it too old?
+     * @since 0.9.33
+     */
+    static boolean shouldStoreTo(RouterInfo ri) {
+        String v = ri.getVersion();
+        return VersionComparator.comp(v, MIN_STORE_VERSION) >= 0;
     }
 
     /**

@@ -194,7 +194,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     break;
                 Hash peer = peers.get(0);
                 RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
-                if (ri != null && StoreJob.supportsCert(ri, keyCert)) {
+                //if (ri != null && StoreJob.supportsCert(ri, keyCert)) {
+                if (ri != null && StoreJob.shouldStoreTo(ri)) {
                     Set<String> peerIPs = new MaskedIPSet(getContext(), ri, IP_CLOSE_BYTES);
                     if (!_ipSet.containsAny(peerIPs)) {
                         _ipSet.addAll(peerIPs);
@@ -205,7 +206,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     }
                 } else {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info(getJobId() + ": Skipping verify w/ router that doesn't support key certs " + peer);
+                        _log.info(getJobId() + ": Skipping verify w/ router that is too old " + peer);
                 }
                 _ignore.add(peer);
             }
