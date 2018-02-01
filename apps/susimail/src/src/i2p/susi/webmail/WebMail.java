@@ -1088,7 +1088,11 @@ public class WebMail extends HttpServlet
 								sessionObject.replyTo = mail.reply;
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
 								sessionObject.replyTo = mail.sender;
-							sessionObject.subject = _t("Re:") + ' ' + mail.formattedSubject;
+							sessionObject.subject = mail.formattedSubject;
+							if (!(sessionObject.subject.startsWith("Re:") ||
+							      sessionObject.subject.startsWith(_t("Re:")))) {
+								sessionObject.subject = _t("Re:") + ' ' + sessionObject.subject;
+							}
 							StringWriter text = new StringWriter();
 							PrintWriter pw = new PrintWriter( text );
 							pw.println( _t("On {0} {1} wrote:", mail.formattedDate + " UTC", sessionObject.replyTo) );
@@ -1126,7 +1130,11 @@ public class WebMail extends HttpServlet
 								sessionObject.replyCC = buf.toString();
 						}
 						if( forward ) {
-							sessionObject.subject = _t("Fwd:") + ' ' + mail.formattedSubject;
+							sessionObject.subject = mail.formattedSubject;
+							if (!(sessionObject.subject.startsWith("Fwd:") ||
+							      sessionObject.subject.startsWith(_t("Fwd:")))) {
+								sessionObject.subject = _t("Fwd:") + ' ' + sessionObject.subject;
+							}
 							String sender = null;
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
 								sender = Mail.getAddress( mail.reply );

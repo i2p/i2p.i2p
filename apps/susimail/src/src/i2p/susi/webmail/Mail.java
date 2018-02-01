@@ -77,6 +77,7 @@ class Mail {
 	String[] to, cc;        // addresses only, enclosed by <>
 	private boolean isNew, isSpam;
 	public String contentType;
+	public String messageID; // as received, trimmed only, probably enclosed with <>, not HTML escaped
 
 	public String error;
 
@@ -282,9 +283,9 @@ class Mail {
 	}
 
 	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	private static DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-	private static DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-	private static DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
+	private static final DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+	private static final DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+	private static final DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
 	static {
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it
 		TimeZone tz = SystemVersion.getSystemTimeZone();
@@ -410,6 +411,8 @@ class Mail {
 							// we want to know if we have attachments, even if
 							// we haven't fetched the body
 							contentType = line.substring(13).trim();
+						} else if (hlc.startsWith("message-id:")) {
+							messageID = line.substring(11).trim();
 						}
 					}
 				}
