@@ -792,6 +792,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                           + key + ", leaseSet = " + leaseSet);
             return "Key does not match leaseSet.destination - " + key.toBase64();
         }
+        // todo experimental sig types
         if (!leaseSet.verifySignature()) {
             // throws UnsupportedCryptoException
             processStoreFailure(key, leaseSet);
@@ -809,11 +810,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             long age = now - earliest;
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " 
-                          + leaseSet.getDestination().calculateHash()
+                          + leaseSet.getDestination().toBase32()
                           + " first exp. " + new Date(earliest)
                           + " last exp. " + new Date(latest),
                           new Exception("Rejecting store"));
-            return "Expired leaseSet for " + leaseSet.getDestination().calculateHash()
+            return "Expired leaseSet for " + leaseSet.getDestination().toBase32()
                    + " expired " + DataHelper.formatDuration(age) + " ago";
         }
         if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE)) {
@@ -821,9 +822,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // let's not make this an error, it happens when peers have bad clocks
             if (_log.shouldLog(Log.WARN))
                 _log.warn("LeaseSet expires too far in the future: " 
-                          + leaseSet.getDestination().calculateHash()
+                          + leaseSet.getDestination().toBase32()
                           + " expires " + DataHelper.formatDuration(age) + " from now");
-            return "Future expiring leaseSet for " + leaseSet.getDestination().calculateHash()
+            return "Future expiring leaseSet for " + leaseSet.getDestination().toBase32()
                    + " expiring in " + DataHelper.formatDuration(age);
         }
         return null;
@@ -854,6 +855,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         // spoof / hash collision detection
+        // todo allow non-exp to overwrite exp
         if (rv != null && !leaseSet.getDestination().equals(rv.getDestination()))
             throw new IllegalArgumentException("LS Hash collision");
 
@@ -905,6 +907,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _log.warn("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
             return "Key does not match routerInfo.identity";
         }
+        // todo experimental sig types
         if (!routerInfo.isValid()) {
             // throws UnsupportedCryptoException
             processStoreFailure(key, routerInfo);
@@ -1042,6 +1045,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         // spoof / hash collision detection
+        // todo allow non-exp to overwrite exp
         if (rv != null && !routerInfo.getIdentity().equals(rv.getIdentity()))
             throw new IllegalArgumentException("RI Hash collision");
 
