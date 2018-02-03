@@ -40,6 +40,10 @@ public class PortMapper {
     public static final String SVC_I2CP = "I2CP";
     /** @since 0.9.23 */
     public static final String SVC_I2CP_SSL = "I2CP-SSL";
+    /** @since 0.9.34 */
+    public static final String SVC_HTTP_I2PCONTROL = "http_i2pcontrol";
+    /** @since 0.9.34 */
+    public static final String SVC_HTTPS_I2PCONTROL = "https_i2pcontrol";
 
     /**
      *  @param context unused for now
