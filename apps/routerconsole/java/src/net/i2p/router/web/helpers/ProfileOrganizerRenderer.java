@@ -173,13 +173,23 @@ class ProfileOrganizerRenderer {
             }
             buf.append("</td><td align=\"right\">").append(num(prof.getIntegrationValue()));
             buf.append("</td><td align=\"center\">");
-            if (_context.banlist().isBanlisted(peer)) buf.append(_t("Banned"));
-            if (prof.getIsFailing()) buf.append(' ').append(_t("Failing"));
-            if (_context.commSystem().wasUnreachable(peer)) buf.append(' ').append(_t("Unreachable"));
+            boolean ok = true;
+            if (_context.banlist().isBanlisted(peer)) {
+                buf.append(_t("Banned"));
+                ok = false;
+            }
+            if (prof.getIsFailing()) {
+                buf.append(' ').append(_t("Failing"));
+                ok = false;
+            }
+            if (_context.commSystem().wasUnreachable(peer)) {
+                buf.append(' ').append(_t("Unreachable"));
+                ok = false;
+            }
             RateAverages ra = RateAverages.getTemp();
             Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
             long fails = failed.computeAverages(ra, false).getTotalEventCount();
-            if (fails == 0) {
+            if (ok && fails == 0) {
                 buf.append(_t("OK"));
             } else if (fails > 0) {
                 Rate accepted = prof.getTunnelCreateResponseTime().getRate(30*60*1000);
