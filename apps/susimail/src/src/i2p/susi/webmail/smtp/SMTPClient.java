@@ -226,7 +226,7 @@ public class SMTPClient {
 	 *  @return success
 	 */
 	public boolean sendMail(String host, int port, String user, String pass, String sender,
-	                        Object[] recipients, StringBuilder body,
+	                        String[] recipients, StringBuilder body,
 	                        List<Attachment> attachments, String boundary)
 	{
 		boolean mailSent = false;

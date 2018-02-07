@@ -2,6 +2,9 @@ package i2p.susi.webmail;
 
 import i2p.susi.debug.Debug;
 import i2p.susi.webmail.Messages;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.FileBuffer;
+import i2p.susi.util.GzipFileBuffer;
 import i2p.susi.util.ReadBuffer;
 
 import java.io.BufferedInputStream;
@@ -127,7 +130,7 @@ class PersistentMailCache {
 	private boolean locked_getMail(Mail mail, boolean headerOnly) {
 		File f = getFullFile(mail.uidl);
 		if (f.exists()) {
-			ReadBuffer rb = read(f);
+			Buffer rb = read(f);
 			if (rb != null) {
 				mail.setBody(rb);
 				return true;
@@ -135,7 +138,7 @@ class PersistentMailCache {
 		}
 		f = getHeaderFile(mail.uidl);
 		if (f.exists()) {
-			ReadBuffer rb = read(f);
+			Buffer rb = read(f);
 			if (rb != null) {
 				mail.setHeader(rb);
 				return true;
@@ -156,7 +159,7 @@ class PersistentMailCache {
 	}
 
 	private boolean locked_saveMail(Mail mail) {
-		ReadBuffer rb = mail.getBody();
+		Buffer rb = mail.getBody();
 		if (rb != null) {
 			File f = getFullFile(mail.uidl);
 			if (f.exists())
@@ -249,16 +252,21 @@ class PersistentMailCache {
 	 * 
 	 * @return success
 	 */
-	private static boolean write(ReadBuffer rb, File f) {
+	private static boolean write(Buffer rb, File f) {
+		InputStream in = null;
 		OutputStream out = null;
 		try {
-			out = new BufferedOutputStream(new GZIPOutputStream(new SecureFileOutputStream(f)));
-			out.write(rb.content, rb.offset, rb.length);
+			in = rb.getInputStream();
+			GzipFileBuffer gb = new GzipFileBuffer(f);
+			out = gb.getOutputStream();
+			DataHelper.copy(in, out);
 			return true;
 		} catch (IOException ioe) {
 			Debug.debug(Debug.ERROR, "Error writing: " + f + ": " + ioe);
 			return false;
 		} finally {
+			if (in != null) 
+				try { in.close(); } catch (IOException ioe) {}
 			if (out != null) 
 				try { out.close(); } catch (IOException ioe) {}
 		}
@@ -267,28 +275,8 @@ class PersistentMailCache {
 	/**
 	 *  @return null on failure
 	 */
-	private static ReadBuffer read(File f) {
-		InputStream in = null;
-		try {
-			long len = f.length();
-			if (len > 16 * 1024 * 1024) {
-				throw new IOException("too big");
-			}
-			in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(f)));
-			ByteArrayOutputStream out = new ByteArrayOutputStream((int) len);
-			DataHelper.copy(in, out);
-			ReadBuffer rb = new ReadBuffer(out.toByteArray(), 0, out.size());
-			return rb;
-		} catch (IOException ioe) {
-			Debug.debug(Debug.ERROR, "Error reading: " + f + ": " + ioe);
-			return null;
-		} catch (OutOfMemoryError oom) {
-			Debug.debug(Debug.ERROR, "Error reading: " + f + ": " + oom);
-			return null;
-		} finally {
-			if (in != null) 
-				try { in.close(); } catch (IOException ioe) {}
-		}
+	private static Buffer read(File f) {
+		return new GzipFileBuffer(f);
 	}
 
 	/**
@@ -309,7 +297,7 @@ class PersistentMailCache {
 		}
 		if (uidl == null)
 			return null;
-		ReadBuffer rb = read(f);
+		Buffer rb = read(f);
 		if (rb == null)
 			return null;
 		Mail mail = new Mail(uidl);

@@ -23,15 +23,19 @@
  */
 package i2p.susi.webmail;
 
-import i2p.susi.util.Config;
 import i2p.susi.debug.Debug;
-import i2p.susi.util.ReadBuffer;
-import i2p.susi.webmail.encoding.DecodingException;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.Config;
+import i2p.susi.util.CountingInputStream;
+import i2p.susi.util.EOFOnMatchInputStream;
+import i2p.susi.util.MemoryBuffer;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -59,6 +63,11 @@ class Mail {
 	private static final String P2 = "^<[^@< \t]+@[^> \t]+>$";
 	private static final Pattern PATTERN1 = Pattern.compile(P1);
 	private static final Pattern PATTERN2 = Pattern.compile(P2);
+	/**
+	 *  Also used by MailPart
+	 *  See MailPart for why we don't do \r\n\r\n
+	 */
+	static final byte HEADER_MATCH[] = DataHelper.getASCII("\r\n\r");
 
 	private int size;
 	public String sender,   // as received, trimmed only, not HTML escaped
@@ -72,7 +81,7 @@ class Mail {
 		quotedDate;  // Current Locale, local time zone, longer format
 	public final String uidl;
 	public Date date;
-	private ReadBuffer header, body;
+	private Buffer header, body;
 	private MailPart part;
 	String[] to, cc;        // addresses only, enclosed by <>
 	private boolean isNew, isSpam;
@@ -100,15 +109,27 @@ class Mail {
 	 *  This may or may not contain the body also.
 	 *  @return if null, nothing has been loaded yet for this UIDL
 	 */
-	public synchronized ReadBuffer getHeader() {
+	public synchronized Buffer getHeader() {
 		return header;
 	}
 
-	public synchronized void setHeader(ReadBuffer rb) {
+	public synchronized void setHeader(Buffer rb) {
+		try {
+			setHeader(rb, rb.getInputStream(), true);
+		} catch (IOException ioe) {
+			// TODO...
+		}
+	}
+
+	/** @since 0.9.34 */
+	private synchronized String[] setHeader(Buffer rb, InputStream in, boolean closeIn) {
 		if (rb == null)
-			return;
+			return null;
 		header = rb;
-		parseHeaders();
+		String[] rv = parseHeaders(in);
+		if (closeIn)
+			rb.readComplete(true);
+		return rv;
 	}
 
 	/**
@@ -122,23 +143,40 @@ class Mail {
          *  This contains the header also.
          *  @return may be null
          */
-	public synchronized ReadBuffer getBody() {
+	public synchronized Buffer getBody() {
 		return body;
 	}
 
-	public synchronized void setBody(ReadBuffer rb) {
+	public synchronized void setBody(Buffer rb) {
 		if (rb == null)
 			return;
-		if (header == null)
-			setHeader(rb);
+		// In the common case where we have the body, we only parse the headers once.
+		// we always re-set the header, even if it was non-null before,
+		// as we have to parse them to find the start of the body
+		// and who knows, the headers could have changed.
+		//if (header == null)
+		//	setHeader(rb);
 		body = rb;
-		size = rb.length;
+		boolean success = false;
+		CountingInputStream in = null;
 		try {
-			part = new MailPart(uidl, rb);
-		} catch (DecodingException de) {
-			Debug.debug(Debug.ERROR, "Decode error: " + de);
+			in = new CountingInputStream(rb.getInputStream());
+			String[] headerLines = setHeader(rb, in, false);
+			// TODO just fail?
+			if (headerLines == null)
+				headerLines = new String[0];
+			part = new MailPart(uidl, rb, in, in, headerLines);
+			rb.readComplete(true);
+			// may only be available after reading and calling readComplete()
+			size = rb.getLength();
+			success = true;
+		} catch (IOException de) {
+			Debug.debug(Debug.ERROR, "Decode error", de);
 		} catch (RuntimeException e) {
-			Debug.debug(Debug.ERROR, "Parse error: " + e);
+			Debug.debug(Debug.ERROR, "Parse error", e);
+		} finally {
+			try { in.close(); } catch (IOException ioe) {}
+			rb.readComplete(success);
 		}
 	}
 
@@ -293,8 +331,12 @@ class Mail {
 		longLocalDateFormatter.setTimeZone(tz);
 	}
 
-	private void parseHeaders()
+	/**
+	 * @return all headers, to pass to MailPart, or null on error
+	 */
+	private String[] parseHeaders(InputStream in)
 	{
+		String[] headerLines = null;
 		error = "";
 		if( header != null ) {
 
@@ -317,10 +359,15 @@ class Mail {
 			if( ok ) {
 				
 				try {
-					ReadBuffer decoded = hl.decode( header );
-					BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), "UTF-8" ) );
-					String line;
-					while( ( line = reader.readLine() ) != null ) {
+					EOFOnMatchInputStream eofin = new EOFOnMatchInputStream(in, HEADER_MATCH);
+					MemoryBuffer decoded = new MemoryBuffer(4096);
+					hl.decode(eofin, decoded);
+					if (!eofin.wasFound())
+						Debug.debug(Debug.DEBUG, "EOF hit before \\r\\n\\r\\n in Mail");
+					// Fixme UTF-8 to bytes to UTF-8
+					headerLines = DataHelper.split(new String(decoded.getContent(), decoded.getOffset(), decoded.getLength()), "\r\n");
+					for (int j = 0; j < headerLines.length; j++) {
+						String line = headerLines[j];
 						if( line.length() == 0 )
 							break;
 
@@ -418,9 +465,11 @@ class Mail {
 				}
 				catch( Exception e ) {
 					error += "Error parsing mail header: " + e.getClass().getName() + '\n';
+					Debug.debug(Debug.ERROR, "Parse error", e);
 				}		
 			}
 		}
+		return headerLines;
 	}
 }
 

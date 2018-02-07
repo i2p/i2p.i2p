@@ -1,3 +1,12 @@
+2018-02-07 zzz
+ * SusiMail: Use input streams for reading mail (ticket #2119)
+   - Rewrite Base64, HeaderLine, and QuotedPrintable decoders
+   - Rewrite ReadBuffer class and utilities for streams
+   - ReadBuffer becomes Buffer interface with multiple implementations
+   - Rewrite Mail and MailPart to parse the headers only once
+   - Rewrite MailPart parser to use streams
+   - MailPart decoder rewrite to decode stream-to-stream
+
 2018-02-01 zzz
  * Console: Fix number formatting (tickets #1912, #1913, #2126)
  * i2psnark: URL escape fixes

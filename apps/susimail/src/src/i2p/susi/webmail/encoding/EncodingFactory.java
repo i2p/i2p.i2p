@@ -25,7 +25,7 @@ package i2p.susi.webmail.encoding;
 
 import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
-import i2p.susi.util.ReadBuffer;
+import i2p.susi.util.Buffer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -65,8 +65,6 @@ public class EncodingFactory {
 				}
 			}
 		}
-		// TEST
-		//main(null);
 	}
 
 	/**
@@ -104,7 +102,7 @@ public class EncodingFactory {
 					System.out.println(s + "\tFAIL - null encode result");
 					continue;
 				}
-				ReadBuffer rb = e.decode(enc);
+				Buffer rb = e.decode(enc);
 				if (rb == null) {
 					System.out.println(s + "\tFAIL - null decode result");
 					continue;

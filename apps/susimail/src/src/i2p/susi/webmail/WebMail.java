@@ -24,12 +24,16 @@
 package i2p.susi.webmail;
 
 import i2p.susi.debug.Debug;
+import i2p.susi.util.Buffer;
 import i2p.susi.util.Config;
+import i2p.susi.util.DecodingOutputStream;
+import i2p.susi.util.EscapeHTMLOutputStream;
+import i2p.susi.util.EscapeHTMLWriter;
 import i2p.susi.util.Folder;
 import i2p.susi.util.Folder.SortOrder;
-import i2p.susi.util.ReadBuffer;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.OutputStreamBuffer;
 import i2p.susi.webmail.Messages;
-import i2p.susi.webmail.encoding.DecodingException;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingException;
 import i2p.susi.webmail.encoding.EncodingFactory;
@@ -48,6 +52,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +81,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
+import net.i2p.servlet.util.WriterOutputStream;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
 
@@ -131,6 +137,7 @@ public class WebMail extends HttpServlet
 	private static final String PREV_PAGE_NUM = "prevpagenum";
 	private static final String NEXT_PAGE_NUM = "nextpagenum";
 	private static final String CURRENT_SORT = "currentsort";
+	private static final String CURRENT_FOLDER = "currentfolder";
 	private static final String DEBUG_STATE = "currentstate";
 
 	/*
@@ -607,14 +614,14 @@ public class WebMail extends HttpServlet
 	private static void showPart( PrintWriter out, MailPart mailPart, int level, boolean html )
 	{
 		String br = html ? "<br>\r\n" : "\r\n";
-		
+
 		if( html ) {
 			out.println( "<!-- " );
-			out.println( "Debug: Showing Mail Part with hash code " + mailPart.hashCode());
+			out.println( "Debug: Showing Mail Part at level " + level + " with hash code " + mailPart.hashCode());
 			out.println( "Debug: Mail Part headers follow");
 			for( int i = 0; i < mailPart.headerLines.length; i++ ) {
 				// fix Content-Type: multipart/alternative; boundary="----------8CDE39ECAF2633"
-				out.println( mailPart.headerLines[i].replace("--", "&mdash;") );
+				out.println( mailPart.headerLines[i].replace("--", "&#45;&#45;") );
 			}	
 			out.println( "-->" );
 		}
@@ -644,7 +651,6 @@ public class WebMail extends HttpServlet
 			boolean showBody = false;
 			boolean prepareAttachment = false;
 			String reason = "";
-			StringBuilder body = null;
 			
 			String ident = quoteHTML(
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
@@ -658,53 +664,60 @@ public class WebMail extends HttpServlet
 				 */
 				showBody = true;
 			}
-			if( showBody == false && mailPart.type != null ) {
+			if (!showBody && mailPart.type != null) {
 				if( mailPart.type.equals("text/plain")) {
 					showBody = true;
 				}
 				else
 					prepareAttachment = true;
 			}
-			if( showBody ) {			
-					String charset = mailPart.charset;
-					if( charset == null ) {
-						charset = "ISO-8859-1";
-						// don't show this in text mode which is used to include the mail in the reply or forward
-						if (html)
-							reason += _t("Warning: no charset found, fallback to US-ASCII.") + br;
-					}
-					try {
-						ReadBuffer decoded = mailPart.decode(0);
-						BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), charset ) );
-						body = new StringBuilder();
-						String line;
-						while( ( line = reader.readLine() ) != null ) {
-							body.append( quoteHTML( line ) );
-							body.append( br );
-						}
-					}
-					catch( UnsupportedEncodingException uee ) {
-						showBody = false;
-						reason = _t("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
-					}
-					catch (IOException e1) {
-						showBody = false;
-						reason += _t("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
-					}
-			}
-			if( html )
-				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
 			if( reason != null && reason.length() > 0 ) {
 				if( html )
 					out.println( "<p class=\"info\">");
 				out.println( reason );
 				if( html )
 					out.println( "</p>" );
+				reason = "";
 			}
-			if( showBody ) {
+			if( html )
+				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
+			if( showBody ) {			
 				if( html )
-					out.println( "<p class=\"mailbody\">" );
-				out.println( body.toString() );
+					out.println( "<p class=\"mailbody\"><br>" );
+				String charset = mailPart.charset;
+				if( charset == null ) {
+					charset = "ISO-8859-1";
+					// don't show this in text mode which is used to include the mail in the reply or forward
+					if (html)
+						reason = _t("Warning: no charset found, fallback to US-ASCII.") + br;
+				}
+				try {
+					Writer escaper;
+					if (html)
+						escaper = new EscapeHTMLWriter(out);
+					else
+						escaper = out;
+					Buffer ob = new OutputStreamBuffer(new DecodingOutputStream(escaper, charset));
+					mailPart.decode(0, ob);
+					// todo Finally
+					ob.writeComplete(true);
+				}
+				catch( UnsupportedEncodingException uee ) {
+					showBody = false;
+					reason = _t("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
+				}
+				catch (IOException e1) {
+					showBody = false;
+					reason += _t("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
+				}
+				if( html )
+					out.println( "<br></p>" );
+			}
+			if( reason != null && reason.length() > 0 ) {
+				// FIXME css has -32 margin
+				if( html )
+					out.println( "<p class=\"info\">");
+				out.println( reason );
 				if( html )
 					out.println( "</p>" );
 			}
@@ -758,7 +771,7 @@ public class WebMail extends HttpServlet
 		}
 		if( html ) {
 			out.println( "<!-- " );
-			out.println( "Debug: End of Mail Part with hash code " + mailPart.hashCode());
+			out.println( "Debug: End of Mail Part at level " + level + " with hash code " + mailPart.hashCode());
 			out.println( "-->" );
 		}
 	}
@@ -868,7 +881,8 @@ public class WebMail extends HttpServlet
 						sessionObject.host = host;
 						sessionObject.smtpPort = smtpPortNo;
 						state = State.LIST;
-						MailCache mc = new MailCache(mailbox, host, pop3PortNo, user, pass);
+						I2PAppContext ctx = I2PAppContext.getGlobalContext();
+						MailCache mc = new MailCache(ctx, mailbox, host, pop3PortNo, user, pass);
 						sessionObject.mailCache = mc;
 						sessionObject.folder = new Folder<String>();
 						if (!offline) {
@@ -1459,7 +1473,9 @@ public class WebMail extends HttpServlet
 			return null;
 		
 		if( part.hashCode() == hashCode )
+{
 			return part;
+}
 		
 		if( part.multipart || part.message ) {
 			for( MailPart p : part.parts ) {
@@ -2012,6 +2028,7 @@ public class WebMail extends HttpServlet
 					// UP is reverse sort. DOWN is normal sort.
 					String fullSort = curOrder == SortOrder.UP ? '-' + curSort : curSort;
 					out.println("<input type=\"hidden\" name=\"" + CURRENT_SORT + "\" value=\"" + fullSort + "\">");
+					out.println("<input type=\"hidden\" name=\"" + CURRENT_FOLDER + "\" value=\"" + PersistentMailCache.DIR_FOLDER + "\">");
 				}
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
 					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
@@ -2081,18 +2098,6 @@ public class WebMail extends HttpServlet
 	{
 		boolean shown = false;
 		if(part != null) {
-			ReadBuffer content = part.buffer;
-			
-			// we always decode, even if part.encoding is null, will default to 7bit
-			try {
-				// +2 probably for \r\n
-				content = part.decode(2);
-			} catch (DecodingException e) {
-				sessionObject.error += _t("Error decoding content: {0}", e.getMessage()) + '\n';
-				content = null;
-			}
-			if(content == null)
-				return false;
 			String name = part.filename;
 			if (name == null) {
 				name = part.name;
@@ -2110,12 +2115,15 @@ public class WebMail extends HttpServlet
 					                   "filename*=" + name3);
 					if (part.type != null)
 						response.setContentType(part.type);
-					response.setContentLength(content.length);
+					if (part.decodedLength >= 0)
+						response.setContentLength(part.decodedLength);
+					Debug.debug(Debug.DEBUG, "Sending raw attachment " + name + " length " + part.decodedLength);
 					// cache-control?
-					response.getOutputStream().write(content.content, content.offset, content.length);
+					// was 2
+					part.decode(0, new OutputStreamBuffer(response.getOutputStream()));
 					shown = true;
 				} catch (IOException e) {
-					e.printStackTrace();
+					Debug.debug(Debug.ERROR, "Error sending raw attachment " + name + " length " + part.decodedLength, e);
 				}
 			} else {
 				ZipOutputStream zip = null;
@@ -2126,13 +2134,13 @@ public class WebMail extends HttpServlet
 					                   "filename*=" + name3 + ".zip");
 					ZipEntry entry = new ZipEntry( name );
 					zip.putNextEntry( entry );
-					zip.write( content.content, content.offset, content.length );
+					// was 2
+					part.decode(0, new OutputStreamBuffer(zip));
 					zip.closeEntry();
 					zip.finish();
 					shown = true;
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Debug.debug(Debug.ERROR, "Error sending zip attachment " + name + " length " + part.decodedLength, e);
 				} finally {
 					if ( zip != null)
 						try { zip.close(); } catch (IOException ioe) {}
@@ -2153,7 +2161,7 @@ public class WebMail extends HttpServlet
 	private static boolean sendMailSaveAs(SessionObject sessionObject, Mail mail,
 						 HttpServletResponse response)
 	{
-		ReadBuffer content = mail.getBody();
+		Buffer content = mail.getBody();
 
 		if(content == null)
 			return false;
@@ -2164,17 +2172,21 @@ public class WebMail extends HttpServlet
 			name = "message.eml";
 		String name2 = sanitizeFilename(name);
 		String name3 = encodeFilenameRFC5987(name);
+		InputStream in = null;
 		try {
 			response.setContentType("message/rfc822");
-			response.setContentLength(content.length);
+			response.setContentLength(content.getLength());
 			// cache-control?
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
 			                   "filename*=" + name3);
-			response.getOutputStream().write(content.content, content.offset, content.length);
+			in = content.getInputStream();
+			DataHelper.copy(in, response.getOutputStream());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			if (in != null) try { in.close(); } catch (IOException ioe) {}
 		}
 	}
 
@@ -2376,7 +2388,7 @@ public class WebMail extends HttpServlet
 				SMTPClient relay = new SMTPClient();
 				if( relay.sendMail( sessionObject.host, sessionObject.smtpPort,
 						sessionObject.user, sessionObject.pass,
-						sender, recipients.toArray(), sessionObject.sentMail,
+						sender, recipients.toArray(new String[recipients.size()]), sessionObject.sentMail,
 				                sessionObject.attachments, boundary)) {
 					sessionObject.info += _t("Mail sent.");
 					sessionObject.sentMail = null;	
@@ -2714,8 +2726,19 @@ public class WebMail extends HttpServlet
 		if(!RELEASE && mail != null && mail.hasBody()) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");
-			ReadBuffer body = mail.getBody();
-			out.println(quoteHTML(new String(body.content, body.offset, body.length)).replace("--", "&mdash;"));
+			Buffer body = mail.getBody();
+			InputStream in = null;
+			OutputStream sout = null;
+			try {
+				in = body.getInputStream();
+				sout = new EscapeHTMLOutputStream(new WriterOutputStream(out));
+				DataHelper.copy(in, sout);
+			} catch (IOException ioe) {
+			} finally {
+				if (in != null) try { in.close(); } catch (IOException ioe) {}
+				if (sout != null) try { sout.close(); } catch (IOException ioe) {}
+				body.readComplete(true);
+			}
 			out.println( "-->" );
 		}
 		out.println("<div class=\"topbuttons\">");

@@ -25,10 +25,14 @@ package i2p.susi.webmail;
 
 import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.FileBuffer;
 import i2p.susi.util.ReadBuffer;
+import i2p.susi.util.MemoryBuffer;
 import i2p.susi.webmail.pop3.POP3MailBox;
 import i2p.susi.webmail.pop3.POP3MailBox.FetchRequest;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +41,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+
+import net.i2p.I2PAppContext;
 
 /**
  * @author user
@@ -50,16 +56,17 @@ class MailCache {
 	private final POP3MailBox mailbox;
 	private final Hashtable<String, Mail> mails;
 	private final PersistentMailCache disk;
+	private final I2PAppContext _context;
 	
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
          */
-	private static final int FETCH_ALL_SIZE = 8192;
+	private static final int FETCH_ALL_SIZE = 32*1024;
 
 	/**
 	 * @param mailbox non-null
 	 */
-	MailCache(POP3MailBox mailbox, 
+	MailCache(I2PAppContext ctx, POP3MailBox mailbox,
 		  String host, int port, String user, String pass) {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
@@ -71,6 +78,7 @@ class MailCache {
 			Debug.debug(Debug.ERROR, "Error creating disk cache: " + ioe);
 		}
 		disk = pmc;
+		_context = ctx;
 		if (disk != null)
 			loadFromDisk();
 	}
@@ -142,7 +150,8 @@ class MailCache {
 				mail.setHeader(mailbox.getHeader(uidl));
 		} else if (mode == FetchMode.ALL) {
 			if(!mail.hasBody()) {
-				ReadBuffer rb = mailbox.getBody(uidl);
+				File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
+				Buffer rb = mailbox.getBody(uidl, new FileBuffer(file));
 				if (rb != null) {
 					mail.setBody(rb);
 					if (disk != null && disk.saveMail(mail) &&
@@ -216,7 +225,7 @@ class MailCache {
 							continue;  // found on disk, woo
 						}
 					}
-					POP3Request pr = new POP3Request(mail, true);
+					POP3Request pr = new POP3Request(mail, true, new MemoryBuffer(1024));
 					fetches.add(pr);
 				} else {
 					if (mail.hasBody() &&
@@ -238,7 +247,8 @@ class MailCache {
 							continue;  // found on disk, woo
 						}
 					}
-					POP3Request pr = new POP3Request(mail, false);
+					File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
+					POP3Request pr = new POP3Request(mail, false, new FileBuffer(file));
 					fetches.add(pr);
 				} else {
 					if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
@@ -258,15 +268,14 @@ class MailCache {
 			mailbox.getBodies(bar);
 			//  Process results
 			for (POP3Request pr : fetches) {
-				ReadBuffer rb = pr.buf;
-				if (rb != null) {
+				if (pr.getSuccess()) {
 					Mail mail = pr.mail;
 					if (!mail.hasHeader())
 						mail.setNew(true);
 					if (pr.getHeaderOnly()) {
-						mail.setHeader(rb);
+						mail.setHeader(pr.getBuffer());
 					} else {
-						mail.setBody(rb);
+						mail.setBody(pr.getBuffer());
 					}
 					rv = true;
 					if (disk != null) {
@@ -326,24 +335,41 @@ class MailCache {
 	 */
 	private static class POP3Request implements FetchRequest {
 		public final Mail mail;
-		private final boolean headerOnly;
-		public ReadBuffer buf;
+		private boolean headerOnly, success;
+		public final Buffer buf;
 
-		public POP3Request(Mail m, boolean hOnly) {
+		public POP3Request(Mail m, boolean hOnly, Buffer buffer) {
 			mail = m;
 			headerOnly = hOnly;
+			buf = buffer;
 		}
 
 		public String getUIDL() {
 			return mail.uidl;
 		}
 
-		public boolean getHeaderOnly() {
+		/** @since 0.9.34 */
+		public synchronized void setHeaderOnly(boolean headerOnly) {
+			this.headerOnly = headerOnly;
+		}
+
+		public synchronized boolean getHeaderOnly() {
 			return headerOnly;
 		}
 
-		public void setBuffer(ReadBuffer buffer) {
-			buf = buffer;
+		/** @since 0.9.34 */
+		public Buffer getBuffer() {
+			return buf;
+		}
+
+		/** @since 0.9.34 */
+		public synchronized void setSuccess(boolean success) {
+			this.success = success;
+		}
+
+		/** @since 0.9.34 */
+		public synchronized boolean getSuccess() {
+			return success;
 		}
 	}
 }

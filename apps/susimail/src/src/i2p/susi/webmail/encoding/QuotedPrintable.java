@@ -24,11 +24,13 @@
 package i2p.susi.webmail.encoding;
 
 import i2p.susi.util.HexTable;
-import i2p.susi.util.ReadBuffer;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.MemoryBuffer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -136,24 +138,33 @@ public class QuotedPrintable extends Encoding {
 		}
 	}
 
-	public ReadBuffer decode(byte[] in, int offset, int length) {
-		byte[] out = new byte[length];
-		int written = 0;
-		while( length-- > 0 ) {
-			byte c = in[offset++];
+	/**
+	 * @since 0.9.34
+	 */
+	public void decode(InputStream in, Buffer bout) throws IOException {
+		OutputStream out = bout.getOutputStream();
+		while (true) {
+			int c = in.read();
+			if (c < 0)
+				break;
 			if( c == '=' ) {
-				if( length >= 2 ) {
-					byte a = in[offset];
-					byte b = in[offset + 1];
+					int a = in.read();
+					if (a < 0) {
+						out.write(c);
+						break;
+					}
+					int b = in.read();
+					if (b < 0) {
+						out.write(c);
+						out.write(a);
+						break;
+					}
 					if( ( ( a >= '0' && a <= '9' ) || ( a >= 'A' && a <= 'F' ) ) &&
 							( ( b >= '0' && b <= '9' ) || ( b >= 'A' && b <= 'F' ) ) ) {
 						/*
 						 * decode sequence
 						 */
 						// System.err.println( "decoding 0x" + (char)a + "" + (char)b );
-						length -= 2 ;
-						offset += 2;
-						
 						if( a >= '0' && a <= '9' )
 							a -= '0';
 						else if( a >= 'A' && a <= 'F' )
@@ -164,28 +175,23 @@ public class QuotedPrintable extends Encoding {
 						else if( b >= 'A' && b <= 'F' )
 							b = (byte) (b - 'A' + 10);
 						
-						out[written++]=(byte) (a*16 + b);
+						out.write(a*16 + b);
 						continue;
 					}
 					else if( a == '\r' && b == '\n' ) {
 						/*
 						 * softbreak, simply ignore it
 						 */
-						length -= 2;
-						offset += 2;
 						continue;
+					} else {
+						throw new DecodingException("Bad q-p data after '='");
 					}
-					/*
-					 * no correct encoded sequence found, ignore it and print it literally
-					 */
-				}
 			}
 			/*
 			 * print out everything else literally
 			 */
-			out[written++] = c;
+			out.write(c);
 		}
-		
-		return new ReadBuffer(out, 0, written);
+		bout.writeComplete(true);
 	}
 }

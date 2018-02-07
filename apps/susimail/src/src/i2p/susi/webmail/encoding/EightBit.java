@@ -23,7 +23,13 @@
  */
 package i2p.susi.webmail.encoding;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import i2p.susi.util.Buffer;
 import i2p.susi.util.ReadBuffer;
+
+import net.i2p.data.DataHelper;
 
 /**
  * Decode only. See encode().
@@ -51,8 +57,8 @@ public class EightBit extends Encoding {
 		throw new EncodingException("unsupported");
 	}
 
-	public ReadBuffer decode(byte[] in, int offset, int length)
-		throws DecodingException {
+	@Override
+	public Buffer decode(byte[] in, int offset, int length) {
 		return new ReadBuffer(in, offset, length);
 	}
 
@@ -60,7 +66,16 @@ public class EightBit extends Encoding {
 	 * @return in unchanged
 	 */
 	@Override
-	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
+	public Buffer decode(Buffer in) {
 		return in;
+	}
+
+	/**
+	 * Copy in to out, unchanged
+	 * @since 0.9.34
+	 */
+	public void decode(InputStream in, Buffer out) throws IOException {
+		DataHelper.copy(in, out.getOutputStream());
+		// read complete, write complete
 	}
 }
