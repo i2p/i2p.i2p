@@ -28,6 +28,7 @@ import i2p.susi.util.Buffer;
 import i2p.susi.util.Config;
 import i2p.susi.util.CountingInputStream;
 import i2p.susi.util.EOFOnMatchInputStream;
+import i2p.susi.util.FileBuffer;
 import i2p.susi.util.MemoryBuffer;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingFactory;
@@ -46,8 +47,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.util.ServletUtil;
+import net.i2p.util.RFC822Date;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -129,6 +132,16 @@ class Mail {
 		String[] rv = parseHeaders(in);
 		if (closeIn)
 			rb.readComplete(true);
+		// set a date if we didn't get one in the headers
+		if (date == null) {
+			long dateLong;
+			if (rb instanceof FileBuffer) {
+				dateLong = ((FileBuffer) rb).getFile().lastModified();
+			} else {
+				dateLong = I2PAppContext.getGlobalContext().clock().now();
+			}
+			setDate(dateLong);
+		}
 		return rv;
 	}
 
@@ -175,7 +188,7 @@ class Mail {
 		} catch (RuntimeException e) {
 			Debug.debug(Debug.ERROR, "Parse error", e);
 		} finally {
-			try { in.close(); } catch (IOException ioe) {}
+			if (in != null) try { in.close(); } catch (IOException ioe) {}
 			rb.readComplete(success);
 		}
 	}
@@ -323,12 +336,24 @@ class Mail {
 	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	private static final DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 	private static final DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-	private static final DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
 	static {
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it
 		TimeZone tz = SystemVersion.getSystemTimeZone();
 		localDateFormatter.setTimeZone(tz);
 		longLocalDateFormatter.setTimeZone(tz);
+	}
+
+	/**
+	 * @param dateLong non-negative
+	 * @since 0.9.34 pulled from parseHeaders()
+	 */
+	private void setDate(long dateLong) {
+		date = new Date(dateLong);
+		synchronized(dateFormatter) {
+			formattedDate = dateFormatter.format( date );
+			localFormattedDate = localDateFormatter.format( date );
+			quotedDate = longLocalDateFormatter.format(date);
+		}
 	}
 
 	/**
@@ -390,19 +415,9 @@ class Mail {
 						}
 						else if (hlc.startsWith("date:")) {
 							dateString = line.substring( 5 ).trim();
-							try {
-								synchronized(mailDateFormatter) {
-									date = mailDateFormatter.parse( dateString );
-									formattedDate = dateFormatter.format( date );
-									localFormattedDate = localDateFormatter.format( date );
-									//quotedDate = html.encode( dateString );
-									quotedDate = longLocalDateFormatter.format(date);
-								}
-							}
-							catch (ParseException e) {
-								date = null;
-								e.printStackTrace();
-							}
+							long dateLong = RFC822Date.parse822Date(dateString);
+							if (dateLong > 0)
+								setDate(dateLong);
 						}
 						else if (hlc.startsWith("subject:")) {
 							subject = line.substring( 8 ).trim();

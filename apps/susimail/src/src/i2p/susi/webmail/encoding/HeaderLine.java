@@ -29,6 +29,7 @@ import i2p.susi.util.Buffer;
 import i2p.susi.util.ReadBuffer;
 import i2p.susi.util.MemoryBuffer;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -210,6 +211,9 @@ public class HeaderLine extends Encoding {
 		return out.toString();
 	}
 
+	// could be 75 for quoted-printable only
+	private static final int DECODE_MAX = 256;
+
 	/**
 	 *  Decode all the header lines, up through \r\n\r\n,
 	 *  and puts them in the ReadBuffer, including the \r\n\r\n
@@ -235,10 +239,11 @@ public class HeaderLine extends Encoding {
 					break;
 			}
 			if( c == '=' ) {
-				// An encoded-word is 75 chars max including the delimiters, and must be on a single line
+				// An encoded-word should be 75 chars max including the delimiters, and must be on a single line
 				// Store the full encoded word, including =? through ?=, in the buffer
+				// Sadly, base64 can be a lot longer
 				if (encodedWord == null)
-					encodedWord = new byte[75];
+					encodedWord = new byte[DECODE_MAX];
 				int offset = 0;
 				int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 				encodedWord[offset++] = (byte) c;
@@ -246,7 +251,7 @@ public class HeaderLine extends Encoding {
 				// plus one char after the 4th '?', which should be '='
 				// We make a small attempt to pushback one char if it's not what we expect,
 				// but for the most part it gets thrown out, as RFC 2047 allows
-				for (; offset < 75; offset++) {
+				for (; offset < DECODE_MAX; offset++) {
 					c = in.read();
 					if (c == '?') {
 						if (f1 == 0)
@@ -318,12 +323,20 @@ public class HeaderLine extends Encoding {
 				if (enc != null) {
 					Encoding e = EncodingFactory.getEncoding( enc );
 					if( e != null ) {
-						// System.err.println( "encoder found" );
 						try {
 							// System.err.println( "decode(" + (f3 + 1) + "," + ( f4 - f3 - 1 ) + ")" );
 							ReadBuffer tmpIn = new ReadBuffer(encodedWord, f3 + 1, f4 - f3 - 1);
-							MemoryBuffer tmp = new MemoryBuffer(75);
-							e.decode(tmpIn, tmp);
+							MemoryBuffer tmp = new MemoryBuffer(DECODE_MAX);
+							try {
+								e.decode(tmpIn, tmp);
+							} catch (EOFException eof) {
+								// probably Base64 exceeded DECODE_MAX
+								// Keep going and output what we got, if any
+								if (Debug.getLevel() >= Debug.DEBUG) {
+									Debug.debug(Debug.DEBUG, "q-w " + enc, eof);
+									Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+								}
+							}
 							tmp.writeComplete(true);
 							// get charset
 							String charset = new String(encodedWord, f1 + 1, f2 - f1 - 1, "ISO-8859-1");
@@ -357,13 +370,15 @@ public class HeaderLine extends Encoding {
 							lastCharWasQuoted = true;
 							continue;
 						} catch (IOException e1) {
-							Debug.debug(Debug.DEBUG, "q-w", e1);
-							Debug.debug(Debug.DEBUG, "Decoder: " + enc + " Input:");
-							Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord, f3 + 1, f4 - f3 - 1));
+							Debug.debug(Debug.ERROR, "q-w " + enc, e1);
+							if (Debug.getLevel() >= Debug.DEBUG) {
+								Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+							}
 						} catch (RuntimeException e1) {
-							Debug.debug(Debug.DEBUG, "q-w", e1);
-							Debug.debug(Debug.DEBUG, "Decoder: " + enc + " Input:");
-							Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord, f3 + 1, f4 - f3 - 1));
+							Debug.debug(Debug.ERROR, "q-w " + enc, e1);
+							if (Debug.getLevel() >= Debug.DEBUG) {
+								Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+							}
 						}
 					} else {
 						// can't happen

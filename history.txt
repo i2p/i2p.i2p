@@ -1,3 +1,13 @@
+2018-02-08 zzz
+ * SusiMail:
+   - Error handling fixes
+   - More tolerant parsing of Date headers
+   - Set a date if we don't get a Date header
+   - Fix parsing long Base64 encoded headers
+   - Fix page count after changing page size
+   - Make attribute name parsing case-insensitive
+   - Import mail method for debugging
+
 2018-02-07 zzz
  * SusiMail: Use input streams for reading mail (ticket #2119)
    - Rewrite Base64, HeaderLine, and QuotedPrintable decoders

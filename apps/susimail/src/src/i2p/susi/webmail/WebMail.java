@@ -635,6 +635,20 @@ public class WebMail extends HttpServlet
 				}
 				if( chosen != null ) {
 					showPart( out, chosen, level + 1, html );
+					if (html) {
+						// DEBUG
+						for (MailPart subPart : mailPart.parts) {
+							if (chosen.equals(subPart))
+								continue;
+							out.println( "<!-- " );
+							out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with hash code " + mailPart.hashCode());
+							out.println( "Debug: Mail Part headers follow");
+							for( int i = 0; i < subPart.headerLines.length; i++ ) {
+								out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
+							}	
+							out.println( "-->" );
+						}
+					}
 					return;
 				}
 			}
@@ -1499,6 +1513,7 @@ public class WebMail extends HttpServlet
 		/*
 		 * process paging buttons
 		 */
+/**** not on the folder view any more, handled in processConfigButtons()
 		if (buttonPressed(request, SETPAGESIZE)) {
 			try {
 				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
@@ -1510,6 +1525,7 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _t("Invalid pagesize number, resetting to default value.") + '\n';
 			}
 		}
+****/
 		if( buttonPressed( request, PREVPAGE ) ) {
 			String sp = request.getParameter(PREV_PAGE_NUM);
 			if (sp != null) {
@@ -1626,7 +1642,6 @@ public class WebMail extends HttpServlet
 					File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
 					sessionObject.error += _t("Host unchanged. Edit configation file {0} to change host.", cfg.getAbsolutePath()) + '\n';
 				}
-				Config.saveConfiguration(props);
 				String ps = props.getProperty(Folder.PAGESIZE);
 				if (sessionObject.folder != null && ps != null) {
 					try {
@@ -1636,6 +1651,7 @@ public class WebMail extends HttpServlet
 							sessionObject.folder.setPageSize( pageSize );
 					} catch( NumberFormatException nfe ) {}
 				}
+				Config.saveConfiguration(props);
 				boolean release = !Boolean.parseBoolean(props.getProperty(CONFIG_DEBUG));
 				Debug.setLevel( release ? Debug.ERROR : Debug.DEBUG );
 				state = sessionObject.folder != null ? State.LIST : State.AUTH;
@@ -1646,9 +1662,6 @@ public class WebMail extends HttpServlet
 		} else if (buttonPressed(request, SETPAGESIZE)) {
 			try {
 				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
-				Properties props = Config.getProperties();
-				props.setProperty(Folder.PAGESIZE, String.valueOf(pageSize));
-				Config.saveConfiguration(props);
 				if (sessionObject.folder != null) {
 					int oldPageSize = sessionObject.folder.getPageSize();
 					if( pageSize != oldPageSize )
@@ -1657,6 +1670,9 @@ public class WebMail extends HttpServlet
 				} else {
 					state = State.AUTH;
 				}
+				Properties props = Config.getProperties();
+				props.setProperty(Folder.PAGESIZE, String.valueOf(pageSize));
+				Config.saveConfiguration(props);
 			} catch (IOException ioe) {
 				sessionObject.error = ioe.toString();
 			} catch( NumberFormatException nfe ) {
@@ -1897,15 +1913,22 @@ public class WebMail extends HttpServlet
 				}
 			}
 
-			//// End state determination, state will not change after here
-			Debug.debug(Debug.DEBUG, "Final state is " + state);
-
 			/*
 			 * update folder content
 			 * We need a valid and sorted folder for SHOW also, for the previous/next buttons
 			 */
 			Folder<String> folder = sessionObject.folder;
+			// folder could be null after an error, we can't proceed if it is
+			if (folder == null && (state == State.LIST || state == State.SHOW)) {
+				sessionObject.error += "Internal error, no folder\n";
+				state = State.AUTH;
+			}
+
+			//// End state determination, state will not change after here
+			Debug.debug(Debug.DEBUG, "Final state is " + state);
+
 			if (state == State.LIST || state == State.SHOW) {
+
 				// sort buttons are GETs
 				String oldSort = folder.getCurrentSortBy();
 				SortOrder oldOrder = folder.getCurrentSortingDirection();

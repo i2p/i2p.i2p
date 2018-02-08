@@ -202,10 +202,10 @@ class MailPart {
 					OutputStream dummy = new DummyOutputStream();
 					DataHelper.copy(eofin, dummy);  
 					if (!eofin.wasFound())
-						Debug.debug(Debug.DEBUG, "EOF hit before first boundary " + boundary);
+						Debug.debug(Debug.DEBUG, "EOF hit before first boundary " + boundary + " UIDL: " + uidl);
 					if (readBoundaryTrailer(in)) {
 						if (!eofin.wasFound())
-							Debug.debug(Debug.DEBUG, "EOF hit before first part body " + boundary);
+							Debug.debug(Debug.DEBUG, "EOF hit before first part body " + boundary + " UIDL: " + uidl);
 						tmpEnd = (int) eofin.getRead();
 						break;
 					}
@@ -220,7 +220,7 @@ class MailPart {
 					// if MailPart contains a MailPart, we may not have drained to the end
 					DataHelper.copy(eofin, DUMMY_OUTPUT);  
 					if (!eofin.wasFound())
-						Debug.debug(Debug.DEBUG, "EOF hit before end of body " + i + " boundary: " + boundary);
+						Debug.debug(Debug.DEBUG, "EOF hit before end of body " + i + " boundary: " + boundary + " UIDL: " + uidl);
 				}
 				if (readBoundaryTrailer(in))
 					break;
@@ -351,13 +351,18 @@ class MailPart {
 		return result;
 	}
 
+	/**
+	 *  @param attributeName must be lower case, will be matched case-insensitively
+	 *  @return as found, not necessarily lower case
+	 */
 	private static String getHeaderLineAttribute( String line, String attributeName )
 	{
+		String lineLC = line.toLowerCase(Locale.US);
 		String result = null;
 		int h = 0;
 		int l = attributeName.length();
 		while( true ) {
-			int i = line.indexOf( attributeName, h );
+			int i = lineLC.indexOf(attributeName, h);
 			// System.err.println( "i=" + i );
 			if( i == -1 )
 				break;
