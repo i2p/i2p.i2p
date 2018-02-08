@@ -361,7 +361,7 @@ class MailPart {
 		String result = null;
 		int h = 0;
 		int l = attributeName.length();
-		while( true ) {
+		while (result == null) {
 			int i = lineLC.indexOf(attributeName, h);
 			// System.err.println( "i=" + i );
 			if( i == -1 )
@@ -466,4 +466,29 @@ class MailPart {
 		);
 		return  buf.toString();
 	}
+
+/****
+	public static void main(String[] args) {
+		String test = "Content-Type: multipart/alternative; boundary=\"__________MIMEboundary__________\"; charset=\"UTF-8\"";
+		System.out.println(test);
+		String hlc = test.toLowerCase(Locale.US);
+		if (hlc.startsWith( "content-type: ")) {
+			System.out.println("find first attribute");
+			String x_type = getFirstAttribute(test).toLowerCase(Locale.US);
+			String x_charset = null;
+			String boundary = null;
+			System.out.println("find boundary");
+			String str = getHeaderLineAttribute(test, "boundary");
+			if( str != null )
+				boundary = str;
+			System.out.println("find charset");
+			str = getHeaderLineAttribute(test, "charset");
+			if( str != null )
+				x_charset = str.toUpperCase(Locale.US);
+			System.out.println("Type: " + x_type +
+			                   "\nBoundary: " + boundary +
+			                   "\nCharset: " + x_charset);
+		}
+	}
+****/
 }

@@ -641,7 +641,7 @@ public class WebMail extends HttpServlet
 							if (chosen.equals(subPart))
 								continue;
 							out.println( "<!-- " );
-							out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with hash code " + mailPart.hashCode());
+							out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with hash code " + subPart.hashCode());
 							out.println( "Debug: Mail Part headers follow");
 							for( int i = 0; i < subPart.headerLines.length; i++ ) {
 								out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
