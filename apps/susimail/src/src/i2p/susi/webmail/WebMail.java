@@ -357,8 +357,8 @@ public class WebMail extends HttpServlet
 		}
 		
 		protected int compare(Mail a, Mail b) {
-			String as = a.formattedSubject;
-			String bs = b.formattedSubject;
+			String as = a.subject;
+			String bs = b.subject;
 			if (as.toLowerCase().startsWith("re:")) {
 				as = as.substring(3).trim();
 			} else if (as.toLowerCase().startsWith("fwd:")) {
@@ -760,6 +760,7 @@ public class WebMail extends HttpServlet
 					        type.startsWith("video/") ||
 						(type.startsWith("text/") && !type.equals("text/html")) ||
 						type.equals("application/zip") || type.equals("application/x-gtar") ||
+						type.equals("application/x-zip-compressed") ||
 						type.equals("application/compress") || type.equals("application/gzip") ||
 						type.equals("application/x-7z-compressed") || type.equals("application/x-rar-compressed") ||
 						type.equals("application/x-tar") || type.equals("application/x-bzip2") ||
@@ -796,8 +797,8 @@ public class WebMail extends HttpServlet
 	 * 
 	 * - quote html tags
 	 * 
-	 * @param line
-	 * @return escaped string
+	 * @param line, null OK
+	 * @return escaped string or "" for null input
 	 */
 	static String quoteHTML( String line )
 	{
@@ -1118,8 +1119,10 @@ public class WebMail extends HttpServlet
 								sessionObject.replyTo = mail.reply;
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
 								sessionObject.replyTo = mail.sender;
-							sessionObject.subject = mail.formattedSubject;
+							sessionObject.subject = mail.subject;
 							if (!(sessionObject.subject.startsWith("Re:") ||
+							      sessionObject.subject.startsWith("re:") ||
+							      sessionObject.subject.startsWith("RE:") ||
 							      sessionObject.subject.startsWith(_t("Re:")))) {
 								sessionObject.subject = _t("Re:") + ' ' + sessionObject.subject;
 							}
@@ -1160,8 +1163,10 @@ public class WebMail extends HttpServlet
 								sessionObject.replyCC = buf.toString();
 						}
 						if( forward ) {
-							sessionObject.subject = mail.formattedSubject;
+							sessionObject.subject = mail.subject;
 							if (!(sessionObject.subject.startsWith("Fwd:") ||
+							      sessionObject.subject.startsWith("fwd:") ||
+							      sessionObject.subject.startsWith("FWD:") ||
 							      sessionObject.subject.startsWith(_t("Fwd:")))) {
 								sessionObject.subject = _t("Fwd:") + ' ' + sessionObject.subject;
 							}
@@ -2189,7 +2194,7 @@ public class WebMail extends HttpServlet
 		if(content == null)
 			return false;
 		String name;
-		if (mail.subject != null)
+		if (mail.subject.length() > 0)
 			name = mail.subject.trim() + ".eml";
 		else
 			name = "message.eml";
@@ -2570,6 +2575,9 @@ public class WebMail extends HttpServlet
 			//		", markAll=" + sessionObject.markAll +
 			//		", invert=" + sessionObject.invert +
 			//		", clear=" + sessionObject.clear );
+			String subj = mail.shortSubject;
+			if (subj.length() <= 0)
+				subj = "<i>" + _t("no subject") + "</i>";
 			out.println( "<tr class=\"list" + bg + "\">" +
 					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" + 
 					" onclick=\"deleteboxclicked();\" " +
@@ -2578,7 +2586,7 @@ public class WebMail extends HttpServlet
                                         // mail.shortSender and mail.shortSubject already html encoded
 					link + mail.shortSender + "</a></td><td " + jslink + ">" +
 					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _t("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
-					link + mail.shortSubject + "</a></td><td " + jslink + ">" +
+					link + subj + "</a></td><td " + jslink + ">" +
 					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _t("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td " + jslink + ">&nbsp;</td><td align=\"right\" " + jslink + ">" +
@@ -2671,7 +2679,7 @@ public class WebMail extends HttpServlet
 			             "</p>");
 		}
 		Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
-		if(!RELEASE && mail != null && mail.hasBody()) {
+		if(!RELEASE && mail != null && mail.hasBody() && mail.getBody().getLength() < 4096) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");
 			Buffer body = mail.getBody();
@@ -2738,12 +2746,17 @@ public class WebMail extends HttpServlet
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println( "<div id=\"viewmail\"><table id=\"message_full\" cellspacing=\"0\" cellpadding=\"5\">\n");
 		if (hasHeader) {
+			String subj = mail.subject;
+			if (subj.length() > 0)
+				subj = quoteHTML(subj);
+			else
+				subj = "<i>" + _t("no subject") + "</i>";
 			out.println("<tr><td colspan=\"2\"><table id=\"mailhead\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("From") +
 					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("Subject") +
-					":</td><td align=\"left\"><b>" + quoteHTML( mail.formattedSubject ) + "</b></td></tr>\n");
+					":</td><td align=\"left\"><b>" + subj + "</b></td></tr>\n");
 			if (mail.to != null) {
 				out.println("<tr><td align=\"right\">" + _t("To") +
 				            ":</td><td align=\"left\">" + buildRecipientLine(mail.to) + "</td></tr>\n");

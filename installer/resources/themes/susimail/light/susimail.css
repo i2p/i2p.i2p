@@ -356,7 +356,7 @@ table#mailbox {
 
 #mailbox td:nth-child(5) {
      white-space: normal;
-     word-break: break-all;
+     word-break: normal;
 }
 
 #mailbox th:last-child, #mailbox td:nth-child(4) {

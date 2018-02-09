@@ -74,13 +74,14 @@ class Mail {
 
 	private int size;
 	public String sender,   // as received, trimmed only, not HTML escaped
-		reply, subject, dateString,
+		reply,
+		subject,	// as received, trimmed only, not HTML escaped, non-null, default ""
+		dateString,
 		//formattedSender,    // address only, enclosed with <>, not HTML escaped
-		formattedSubject,
 		formattedDate,  // US Locale, UTC
 		localFormattedDate,  // Current Locale, local time zone
 		shortSender,    // Either name or address but not both, HTML escaped, double-quotes removed, truncated with hellip
-		shortSubject,   // HTML escaped, truncated with hellip
+		shortSubject,   // HTML escaped, truncated with hellip, non-null, default ""
 		quotedDate;  // Current Locale, local time zone, longer format
 	public final String uidl;
 	public Date date;
@@ -98,12 +99,12 @@ class Mail {
 	public Mail(String uidl) {
 		this.uidl = uidl;
 		//formattedSender = unknown;
-		formattedSubject = unknown;
+		subject = "";
 		formattedDate = unknown;
 		localFormattedDate = unknown;
-		sender = unknown;
+		sender = "";
 		shortSender = unknown;
-		shortSubject = unknown;
+		shortSubject = "";
 		quotedDate = unknown;
 		error = "";
 	}
@@ -406,9 +407,9 @@ class Mail {
 								shortSender = shortSender.substring(0, lt).trim();
 							else if (lt < 0 && shortSender.contains("@"))
 								shortSender = '<' + shortSender + '>';  // add missing <> (but thunderbird doesn't...)
-							boolean trim = shortSender.length() > 35;
+							boolean trim = shortSender.length() > 45;
 							if (trim)
-								shortSender = ServletUtil.truncate(shortSender, 32).trim();
+								shortSender = ServletUtil.truncate(shortSender, 42).trim();
 							shortSender = html.encode( shortSender );
 							if (trim)
 								shortSender += "&hellip;";  // must be after html encode
@@ -421,11 +422,10 @@ class Mail {
 						}
 						else if (hlc.startsWith("subject:")) {
 							subject = line.substring( 8 ).trim();
-							formattedSubject = subject;
-							shortSubject = formattedSubject;
-							boolean trim = formattedSubject.length() > 65;
+							shortSubject = subject;
+							boolean trim = subject.length() > 75;
 							if (trim)
-								shortSubject = ServletUtil.truncate(formattedSubject, 62).trim();
+								shortSubject = ServletUtil.truncate(subject, 72).trim();
 							shortSubject = html.encode( shortSubject );
 							if (trim)
 								shortSubject += "&hellip;";  // must be after html encode

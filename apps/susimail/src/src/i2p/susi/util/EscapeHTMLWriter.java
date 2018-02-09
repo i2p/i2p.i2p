@@ -23,6 +23,8 @@ public class EscapeHTMLWriter extends FilterWriter {
     private static final String APOS = "&apos;";
     private static final String MDASH = "&#45;";
     private static final String BR = "<br>\n";
+    private static final String EMSP = "&emsp;";
+    private static final String SP4 = "&nbsp;&nbsp;&nbsp; ";
 
 
     public EscapeHTMLWriter(Writer out) {
@@ -49,6 +51,14 @@ public class EscapeHTMLWriter extends FilterWriter {
                 break;
             case '-':
                 out.write(MDASH);
+                break;
+            case ' ':
+                // this should be breaking but non-collapsing
+                out.write(EMSP);
+                break;
+            case '\t':
+                // this should be breaking but non-collapsing
+                out.write(SP4);
                 break;
             case '\r':
                 break;
