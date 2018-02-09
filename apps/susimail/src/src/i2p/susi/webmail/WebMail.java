@@ -132,9 +132,9 @@ public class WebMail extends HttpServlet
 	 * hidden params
 	 */
 	private static final String SUSI_NONCE = "susiNonce";
-	private static final String B64UIDL = "b64uidl";
-	private static final String PREV_B64UIDL = "prevb64uidl";
-	private static final String NEXT_B64UIDL = "nextb64uidl";
+	private static final String B64UIDL = "msg";
+	private static final String PREV_B64UIDL = "prevmsg";
+	private static final String NEXT_B64UIDL = "nextmsg";
 	private static final String PREV_PAGE_NUM = "prevpagenum";
 	private static final String NEXT_PAGE_NUM = "nextpagenum";
 	private static final String CURRENT_SORT = "currentsort";
@@ -349,6 +349,8 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SubjectSorter extends SorterBase {
+		private static final String xre = _t("Re:").toLowerCase(Locale.US);
+		private static final String xfwd = _t("Fwd:").toLowerCase(Locale.US);
 		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SubjectSorter( MailCache mailCache )
@@ -359,31 +361,29 @@ public class WebMail extends HttpServlet
 		protected int compare(Mail a, Mail b) {
 			String as = a.subject;
 			String bs = b.subject;
-			if (as.toLowerCase().startsWith("re:")) {
+			String aslc = as.toLowerCase(Locale.US);
+			String bslc = bs.toLowerCase(Locale.US);
+			if (aslc.startsWith("re:") || aslc.startsWith("fw:")) {
 				as = as.substring(3).trim();
-			} else if (as.toLowerCase().startsWith("fwd:")) {
+			} else if (aslc.startsWith("fwd:")) {
 				as = as.substring(4).trim();
 			} else {
-				String xre = _t("Re:").toLowerCase();
-				if (as.toLowerCase().startsWith(xre)) {
+				if (aslc.startsWith(xre)) {
 					as = as.substring(xre.length()).trim();
 				} else {
-					String xfwd = _t("Fwd:").toLowerCase();
-					if (as.toLowerCase().startsWith(xfwd))
+					if (aslc.startsWith(xfwd))
 						as = as.substring(xfwd.length()).trim();
 				}
 			}
-			if (bs.toLowerCase().startsWith("re:")) {
+			if (bslc.startsWith("re:") || bslc.startsWith("fw:")) {
 				bs = bs.substring(3).trim();
-			} else if (bs.toLowerCase().startsWith("fwd:")) {
+			} else if (bslc.startsWith("fwd:")) {
 				bs = bs.substring(4).trim();
 			} else {
-				String xre = _t("Re:").toLowerCase();
-				if (bs.toLowerCase().startsWith(xre)) {
+				if (bslc.startsWith(xre)) {
 					bs = bs.substring(xre.length()).trim();
 				} else {
-					String xfwd = _t("Fwd:").toLowerCase();
-					if (bs.toLowerCase().startsWith(xfwd))
+					if (bslc.startsWith(xfwd))
 						bs = bs.substring(xfwd.length()).trim();
 				}
 			}
@@ -618,7 +618,7 @@ public class WebMail extends HttpServlet
 
 		if( html ) {
 			out.println( "<!-- " );
-			out.println( "Debug: Showing Mail Part at level " + level + " with hash code " + mailPart.hashCode());
+			out.println( "Debug: Showing Mail Part at level " + level + " with ID " + mailPart.getID());
 			out.println( "Debug: Mail Part headers follow");
 			for( int i = 0; i < mailPart.headerLines.length; i++ ) {
 				// fix Content-Type: multipart/alternative; boundary="----------8CDE39ECAF2633"
@@ -642,7 +642,7 @@ public class WebMail extends HttpServlet
 							if (chosen.equals(subPart))
 								continue;
 							out.println( "<!-- " );
-							out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with hash code " + subPart.hashCode());
+							out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with ID " + subPart.getID());
 							out.println( "Debug: Mail Part headers follow");
 							for( int i = 0; i < subPart.headerLines.length; i++ ) {
 								out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
@@ -751,7 +751,7 @@ public class WebMail extends HttpServlet
 						}
 						name = quoteHTML(name);
 						out.println("<img src=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
-							 mailPart.hashCode() +
+							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) +
 							 "\" alt=\"" + name + "\">");
 					} else if (type != null && (
@@ -765,14 +765,15 @@ public class WebMail extends HttpServlet
 						type.equals("application/x-7z-compressed") || type.equals("application/x-rar-compressed") ||
 						type.equals("application/x-tar") || type.equals("application/x-bzip2") ||
 						type.equals("application/pdf") || type.equals("application/x-bittorrent") ||
+						type.equals("application/pgp-encrypted") ||
 						type.equals("application/pgp-signature"))) {
 						out.println( "<a href=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
-							 mailPart.hashCode() +
+							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) + "\">" +
 							 _t("Download attachment {0}", ident) + "</a>");
 					} else {
 						out.println( "<a target=\"_blank\" href=\"" + myself + '?' + DOWNLOAD + '=' +
-							 mailPart.hashCode() +
+							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) + "\">" +
 							 _t("Download attachment {0}", ident) + "</a>" +
 							 " (" + _t("File is packed into a zipfile for security reasons.") + ')');
@@ -788,7 +789,7 @@ public class WebMail extends HttpServlet
 		}
 		if( html ) {
 			out.println( "<!-- " );
-			out.println( "Debug: End of Mail Part at level " + level + " with hash code " + mailPart.hashCode());
+			out.println( "Debug: End of Mail Part at level " + level + " with ID " + mailPart.getID());
 			out.println( "-->" );
 		}
 	}
@@ -1167,6 +1168,9 @@ public class WebMail extends HttpServlet
 							if (!(sessionObject.subject.startsWith("Fwd:") ||
 							      sessionObject.subject.startsWith("fwd:") ||
 							      sessionObject.subject.startsWith("FWD:") ||
+							      sessionObject.subject.startsWith("Fw:") ||
+							      sessionObject.subject.startsWith("fw:") ||
+							      sessionObject.subject.startsWith("FW:") ||
 							      sessionObject.subject.startsWith(_t("Fwd:")))) {
 								sessionObject.subject = _t("Fwd:") + ' ' + sessionObject.subject;
 							}
@@ -1437,9 +1441,9 @@ public class WebMail extends HttpServlet
 		}       	
 		if( str != null ) {
 			try {
-				int hashCode = Integer.parseInt( str );
+				int id = Integer.parseInt( str );
 				Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
-				MailPart part = mail != null ? getMailPartFromHashCode( mail.getPart(), hashCode ) : null;
+				MailPart part = mail != null ? getMailPartFromID(mail.getPart(), id) : null;
 				if( part != null ) {
 					if (sendAttachment(sessionObject, part, response, isRaw))
 						return true;
@@ -1484,21 +1488,20 @@ public class WebMail extends HttpServlet
 
 	/**
 	 * Recursive.
-	 * FIXME can't be bookmarked.
-	 * @param hashCode
+	 * @param id as retrieved from getID()
 	 * @return the part or null
 	 */
-	private static MailPart getMailPartFromHashCode( MailPart part, int hashCode )
+	private static MailPart getMailPartFromID(MailPart part, int id)
 	{
 		if( part == null )
 			return null;
 		
-		if( part.hashCode() == hashCode )
+		if (part.getID() == id)
 			return part;
 		
 		if( part.multipart || part.message ) {
 			for( MailPart p : part.parts ) {
-				MailPart subPart = getMailPartFromHashCode( p, hashCode );
+				MailPart subPart = getMailPartFromID(p, id);
 				if( subPart != null )
 					return subPart;
 			}
@@ -2132,7 +2135,7 @@ public class WebMail extends HttpServlet
 				if (name == null) {
 					name = part.description;
 					if (name == null)
-						name = "part" + part.hashCode();
+						name = "part" + part.getID();
 				}
 			}
 			String name2 = FilenameUtil.sanitizeFilename(name);
@@ -2679,7 +2682,7 @@ public class WebMail extends HttpServlet
 			             "</p>");
 		}
 		Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
-		if(!RELEASE && mail != null && mail.hasBody() && mail.getBody().getLength() < 4096) {
+		if(!RELEASE && mail != null && mail.hasBody() && mail.getBody().getLength() < 16384) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");
 			Buffer body = mail.getBody();

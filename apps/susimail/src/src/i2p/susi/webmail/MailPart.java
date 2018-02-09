@@ -44,6 +44,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataHelper;
 
@@ -79,6 +80,7 @@ class MailPart {
 	 *  @since 0.9.33
 	 */
 	public final String uidl;
+	private final int intID;
 	
 	/**
 	 *  @param readBuffer has zero offset for top-level MailPart.
@@ -88,9 +90,10 @@ class MailPart {
 	 *  @param hdrlines non-null for top-level MailPart, where they
 	 *         were already parsed in Mail. Null otherwise
 	 */
-	public MailPart(String uidl, Buffer readBuffer, InputStream in, ReadCounter counter, String[] hdrlines) throws IOException
+	public MailPart(String uidl, AtomicInteger id, Buffer readBuffer, InputStream in, ReadCounter counter, String[] hdrlines) throws IOException
 	{
 		this.uidl = uidl;
+		intID = id.getAndIncrement();
 		buffer = readBuffer;
 		
 		parts = new ArrayList<MailPart>(4);
@@ -219,7 +222,7 @@ class MailPart {
 					match = DataHelper.getASCII("\r\n--" + boundary);
 					eofin = new EOFOnMatchInputStream(in, counter, match);
 				}
-				MailPart newPart = new MailPart(uidl, buffer, eofin, eofin, null);
+				MailPart newPart = new MailPart(uidl, id, buffer, eofin, eofin, null);
 				parts.add( newPart );
 				tmpEnd = (int) eofin.getRead();
 				if (!eofin.wasFound()) {
@@ -233,7 +236,7 @@ class MailPart {
 			}
 		}
 		else if( message ) {
-			MailPart newPart = new MailPart(uidl, buffer, in, counter, null);
+			MailPart newPart = new MailPart(uidl, id, buffer, in, counter, null);
 			// TODO newPart doesn't save message headers we might like to display,
 			// like From, To, and Subject
 			parts.add( newPart );			
@@ -250,6 +253,15 @@ class MailPart {
 		//if (Debug.getLevel() >= Debug.DEBUG)
 		//	Debug.debug(Debug.DEBUG, "New " + this);
 	}
+
+	/**
+	 *  A value unique across all the parts of this Mail,
+	 *  and constant across restarts, so it may be part of a bookmark.
+	 *
+	 *  @since 0.9.34
+	 */
+	public int getID() { return intID; }
+
 
 	/**
 	 *  Swallow "\r\n" or "--\r\n".

@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
@@ -179,7 +180,7 @@ class Mail {
 			// TODO just fail?
 			if (headerLines == null)
 				headerLines = new String[0];
-			part = new MailPart(uidl, rb, in, in, headerLines);
+			part = new MailPart(uidl, new AtomicInteger(), rb, in, in, headerLines);
 			rb.readComplete(true);
 			// may only be available after reading and calling readComplete()
 			size = rb.getLength();
