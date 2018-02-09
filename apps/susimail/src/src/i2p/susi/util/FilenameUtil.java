@@ -124,17 +124,21 @@ public class FilenameUtil {
 							out.write(a);
 							break;
 						}
-						if( ( ( a >= '0' && a <= '9' ) || ( a >= 'A' && a <= 'F' ) ) &&
-								( ( b >= '0' && b <= '9' ) || ( b >= 'A' && b <= 'F' ) ) ) {
+						if (((a >= '0' && a <= '9') || (a >= 'A' && a <= 'F') || (a >= 'a' && a <= 'f')) &&
+						    ((b >= '0' && b <= '9') || (b >= 'A' && b <= 'F') || (b >= 'a' && b <= 'f'))) {
 							if( a >= '0' && a <= '9' )
 								a -= '0';
 							else if( a >= 'A' && a <= 'F' )
 								a = (byte) (a - 'A' + 10);
+							else if(a >= 'a' && a <= 'f')
+								a = (byte) (a - 'a' + 10);
 	
 							if( b >= '0' && b <= '9' )
 								b -= '0';
 							else if( b >= 'A' && b <= 'F' )
 								b = (byte) (b - 'A' + 10);
+							else if(b >= 'a' && b <= 'f')
+								b = (byte) (b - 'a' + 10);
 							
 							out.write(a*16 + b);
 						}
