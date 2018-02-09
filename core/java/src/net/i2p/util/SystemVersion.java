@@ -270,6 +270,15 @@ public abstract class SystemVersion {
     }
 
     /**
+     *  Runtime.getRuntime().availableProcssors()
+     *  @return never smaller than 1
+     *  @since 0.9.34
+     */
+    public static int getCores() {
+        return Runtime.getRuntime().availableProcessors();
+    }
+
+    /**
      *  The system's time zone, which is probably different from the
      *  JVM time zone, because Router changes the JVM default to GMT.
      *  It saves the old default in the context properties where we can get it.
@@ -313,6 +322,7 @@ public abstract class SystemVersion {
             System.out.println("  Version: " + getAndroidVersion());
         System.out.println("Apache   : " + isApache());
         System.out.println("ARM      : " + isARM());
+        System.out.println("Cores    : " + getCores());
         System.out.println("Gentoo   : " + isGentoo());
         System.out.println("GNU      : " + isGNU());
         System.out.println("Linux Svc: " + isLinuxService());

@@ -18,20 +18,25 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.PasswordManager;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 
 /**
@@ -107,7 +112,7 @@ class PersistentMailCache {
 	}
 
 	private Collection<Mail> locked_getMails() {
-		List<Mail> rv = new ArrayList<Mail>();
+		Queue<File> fq = new LinkedBlockingQueue<File>();
 		for (int j = 0; j < B64.length(); j++) {
 			File subdir = new File(_cacheDir, DIR_PREFIX + B64.charAt(j));
 			File[] files = subdir.listFiles();
@@ -117,13 +122,61 @@ class PersistentMailCache {
 				File f = files[i];
 				if (!f.isFile())
 					continue;
-				Mail mail = load(f);
-				if (mail != null)
-			               rv.add(mail);
+				// Threaded, handle below
+				//Mail mail = load(f);
+				//if (mail != null)
+			        //       rv.add(mail);
+				fq.offer(f);
 			}
 		}
+		int sz = fq.size();
+		if (sz <= 0)
+			return Collections.emptyList();
+		
+		// thread the read-in
+		long begin = _context.clock().now();
+		Queue<Mail> rv = new LinkedBlockingQueue<Mail>();
+		int tcnt = Math.max(1, Math.min(sz / 4, Math.min(SystemVersion.getCores(), 16)));
+		List<Thread> threads = new ArrayList<Thread>(tcnt);
+		for (int i = 0; i < tcnt; i++) {
+			Thread t = new I2PAppThread(new Loader(fq, rv), "Email loader " + i);
+			t.start();
+			threads.add(t);
+		}
+		for (int i = 0; i < tcnt; i++) {
+			try {
+				threads.get(i).join();
+			} catch (InterruptedException ie) {
+				break;
+			}
+		}
+		long end = _context.clock().now();
+		Debug.debug(Debug.DEBUG, "Loaded " + sz + " emails with " + tcnt + " threads in " + DataHelper.formatDuration(end - begin));
 		return rv;
 	}
+
+	/**
+	 * Load files from in, add mail to out
+	 * @since 0.9.34
+	 */
+	private class Loader implements Runnable {
+		private final Queue<File> _in;
+		private final Queue<Mail> _out;
+
+		public Loader(Queue<File> in, Queue<Mail> out) {
+			_in = in; _out = out;
+		}
+
+		public void run() {
+			File f;
+			while ((f = _in.poll()) != null) {
+				Mail mail = load(f);
+				if (mail != null)
+					_out.offer(mail);
+			}
+		}
+	}
+
 
 	/**
 	 * Fetch any needed data from disk.
