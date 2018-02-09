@@ -28,6 +28,9 @@ package i2p.susi.util;
  */
 public class HexTable {
 	
+	/**
+	 *  Three character strings, upper case, e.g. "=0A"
+	 */
 	public static final String[] table = new String[256];
 	
 	static {
@@ -57,4 +60,12 @@ public class HexTable {
 			return str;
 		}
 	}
+
+/****
+	public static void main(String[] args) {
+		for( int i = 0; i < 256; i++ ) {
+			System.out.println(i + ": " + table[i]);
+		}
+	}
+****/
 }

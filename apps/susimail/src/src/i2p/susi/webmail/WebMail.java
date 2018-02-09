@@ -29,6 +29,7 @@ import i2p.susi.util.Config;
 import i2p.susi.util.DecodingOutputStream;
 import i2p.susi.util.EscapeHTMLOutputStream;
 import i2p.susi.util.EscapeHTMLWriter;
+import i2p.susi.util.FilenameUtil;
 import i2p.susi.util.Folder;
 import i2p.susi.util.Folder.SortOrder;
 import i2p.susi.util.Buffer;
@@ -702,8 +703,9 @@ public class WebMail extends HttpServlet
 				if( charset == null ) {
 					charset = "ISO-8859-1";
 					// don't show this in text mode which is used to include the mail in the reply or forward
-					if (html)
-						reason = _t("Warning: no charset found, fallback to US-ASCII.") + br;
+					// Too common, don't show this at all.
+					//if (html)
+					//	reason = _t("Warning: no charset found, fallback to US-ASCII.") + br;
 				}
 				try {
 					Writer escaper;
@@ -927,7 +929,7 @@ public class WebMail extends HttpServlet
 						// we do this after the initial priming above
 						mailbox.setNewMailListener(sessionObject);
 					} else {
-						sessionObject.error += mailbox.lastError();
+						sessionObject.error += mailbox.lastError() + '\n';
 						Debug.debug(Debug.DEBUG, "LOGIN FAIL, REMOVING SESSION");
 						HttpSession session = request.getSession();
 						session.removeAttribute( "sessionObject" );
@@ -1283,7 +1285,7 @@ public class WebMail extends HttpServlet
 			}
 			mailbox.refresh();
 			String error = mailbox.lastError();
-			sessionObject.error += error;
+			sessionObject.error += error + '\n';
 			sessionObject.mailCache.getMail(MailCache.FetchMode.HEADER);
 			// get through cache so we have the disk-only ones too
 			String[] uidls = sessionObject.mailCache.getUIDLs();
@@ -1487,9 +1489,7 @@ public class WebMail extends HttpServlet
 			return null;
 		
 		if( part.hashCode() == hashCode )
-{
 			return part;
-}
 		
 		if( part.multipart || part.message ) {
 			for( MailPart p : part.parts ) {
@@ -2130,8 +2130,8 @@ public class WebMail extends HttpServlet
 						name = "part" + part.hashCode();
 				}
 			}
-			String name2 = sanitizeFilename(name);
-			String name3 = encodeFilenameRFC5987(name);
+			String name2 = FilenameUtil.sanitizeFilename(name);
+			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
 			if (isRaw) {
 				try {
 					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
@@ -2193,8 +2193,8 @@ public class WebMail extends HttpServlet
 			name = mail.subject.trim() + ".eml";
 		else
 			name = "message.eml";
-		String name2 = sanitizeFilename(name);
-		String name3 = encodeFilenameRFC5987(name);
+		String name2 = FilenameUtil.sanitizeFilename(name);
+		String name3 = FilenameUtil.encodeFilenameRFC5987(name);
 		InputStream in = null;
 		try {
 			response.setContentType("message/rfc822");
@@ -2211,81 +2211,6 @@ public class WebMail extends HttpServlet
 		} finally {
 			if (in != null) try { in.close(); } catch (IOException ioe) {}
 		}
-	}
-
-	/**
-	 * Convert the UTF-8 to ASCII suitable for inclusion in a header
-	 * and for use as a cross-platform filename.
-	 * Replace chars likely to be illegal in filenames,
-	 * and non-ASCII chars, with _
-	 *
-	 * Ref: RFC 6266, RFC 5987, i2psnark Storage.ILLEGAL
-	 *
-	 * @since 0.9.18
-	 */
-	private static String sanitizeFilename(String name) {
-		name = name.trim();
-		StringBuilder buf = new StringBuilder(name.length());
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
-			// illegal filename chars
-			if (c <= 32 || c >= 0x7f ||
-			    c == '<' || c == '>' || c == ':' || c == '"' ||
-			    c == '/' || c == '\\' || c == '|' || c == '?' ||
-			    c == '*')
-				buf.append('_');
-			else
-				buf.append(c);
-		}
-		return buf.toString();
-	}
-
-	/**
-	 * Encode the UTF-8 suitable for inclusion in a header
-	 * as a RFC 5987/6266 filename* value, and for use as a cross-platform filename.
-	 * Replace chars likely to be illegal in filenames with _
-	 *
-	 * Ref: RFC 6266, RFC 5987, i2psnark Storage.ILLEGAL
-	 *
-	 * @since 0.9.33
-	 */
-	private static String encodeFilenameRFC5987(String name) {
-		name = name.trim();
-		StringBuilder buf = new StringBuilder(name.length());
-		buf.append("utf-8''");
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
-			// illegal filename chars
-			if (c < 32 || (c >= 0x7f && c <= 0x9f) ||
-			    c == '<' || c == '>' || c == ':' || c == '"' ||
-			    c == '/' || c == '\\' || c == '|' || c == '?' ||
-			    c == '*' ||
-			    // unicode newlines
-			    c == 0x2028 || c == 0x2029) {
-				buf.append('_');
-			} else if (c == ' ' || c == '\'' || c == '%' ||          // not in 5987 attr-char
-			           c == '(' || c == ')' || c == '@' ||           // 2616 separators
-			           c == ',' || c == ';' || c == '[' || c == ']' ||
-			           c == '=' || c == '{' || c == '}') {
-				// single byte encoding
-				buf.append('%');
-				buf.append(Integer.toHexString(c));
-			} else if (c < 0x7f) {
-				// single byte char, as-is
-				buf.append(c);
-			} else {
-				// multi-byte encoding
-				byte[] utf = DataHelper.getUTF8(String.valueOf(c));
-				for (int j = 0; j < utf.length; j++) {
-					int b = utf[j] & 0xff;
-					buf.append('%');
-					if (b < 16)
-						buf.append(0);
-					buf.append(Integer.toHexString(b));
-				}
-			}
-		}
-		return buf.toString();
 	}
 
 	/**

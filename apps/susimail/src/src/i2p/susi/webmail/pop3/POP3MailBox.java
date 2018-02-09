@@ -1178,7 +1178,7 @@ public class POP3MailBox implements NewMailListener {
 						sendCmd1aNoWait("QUIT");
 					}
 				} catch (IOException e) {
-					Debug.debug( Debug.DEBUG, "error closing: " + e);
+					//Debug.debug( Debug.DEBUG, "error closing: " + e);
 				} finally {
 					if (socket != null) {
 						try { socket.close(); } catch (IOException e) {}

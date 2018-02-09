@@ -28,6 +28,7 @@ import i2p.susi.util.Buffer;
 import i2p.susi.util.CountingOutputStream;
 import i2p.susi.util.DummyOutputStream;
 import i2p.susi.util.EOFOnMatchInputStream;
+import i2p.susi.util.FilenameUtil;
 import i2p.susi.util.LimitInputStream;
 import i2p.susi.util.ReadBuffer;
 import i2p.susi.util.ReadCounter;
@@ -92,7 +93,7 @@ class MailPart {
 		this.uidl = uidl;
 		buffer = readBuffer;
 		
-		parts = new ArrayList<MailPart>();
+		parts = new ArrayList<MailPart>(4);
 
 		if (hdrlines != null) {
 			// from Mail headers
@@ -134,9 +135,14 @@ class MailPart {
 			else if( hlc.startsWith( "content-disposition: " ) ) {
 				x_disposition = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 				String str;
-				str = getHeaderLineAttribute( headerLines[i], "filename" );
-				if( str != null )
-					x_name = str;
+				str = getHeaderLineAttribute(headerLines[i], "filename*");
+				if (str != null) {
+					x_name = FilenameUtil.decodeFilenameRFC5987(str);
+				} else {
+					str = getHeaderLineAttribute(headerLines[i], "filename");
+					if (str != null)
+						x_name = str;
+				}
 			}
 			else if( hlc.startsWith( "content-type: " ) ) {
 				x_type = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);

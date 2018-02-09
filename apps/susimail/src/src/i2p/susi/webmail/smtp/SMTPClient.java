@@ -29,6 +29,7 @@ import i2p.susi.webmail.Messages;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingException;
 import i2p.susi.webmail.encoding.EncodingFactory;
+import i2p.susi.util.FilenameUtil;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -347,10 +348,18 @@ public class SMTPClient {
 						Encoding encoding = EncodingFactory.getEncoding(encodeTo);
 						if (encoding == null)
 							throw new EncodingException( _t("No Encoding found for {0}", encodeTo));
+						// ref: https://blog.nodemailer.com/2017/01/27/the-mess-that-is-attachment-filenames/
+						// ref: RFC 2231
+						// split Content-Disposition into 3 lines to maximize room
+						// TODO filename*0* for long names...
+						String name = attachment.getFileName();
+						String name2 = FilenameUtil.sanitizeFilename(name);
+						String name3 = FilenameUtil.encodeFilenameRFC5987(name);
 						out.write("\r\n--" + boundary +
 						          "\r\nContent-type: " + attachment.getContentType() +
-						          "\r\nContent-Disposition: attachment; filename=\"" + attachment.getFileName() +
-						          "\"\r\nContent-Transfer-Encoding: " + attachment.getTransferEncoding() +
+						          "\r\nContent-Disposition: attachment;\r\n\tfilename=\"" + name2 +
+						          "\";\r\n\tfilename*=" + name3 +
+						          "\r\nContent-Transfer-Encoding: " + attachment.getTransferEncoding() +
 						          "\r\n\r\n");
 						InputStream in = null;
 						try {

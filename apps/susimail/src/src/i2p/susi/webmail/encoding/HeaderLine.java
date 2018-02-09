@@ -292,14 +292,20 @@ public class HeaderLine extends Encoding {
 				//	" offset " + offset + " pushback? " + hasPushback + " pbchar(dec) " + c + '\n' +
 				//	net.i2p.util.HexDump.dump(encodedWord, 0, offset));
 				if (f4 == 0) {
-					// at most 1 byte is pushed back, the rest is discarded
+					// at most 1 byte is pushed back
 					if (f1 == 0) {
 						// This is normal
 						continue;
 					} else if (f2 == 0) {
+						// =? but no more ?
+						// output what we buffered
 						Debug.debug(Debug.DEBUG, "2nd '?' not found");
+						for (int i = 0; i < offset; i++) {
+							out.write(encodedWord[i] & 0xff);
+						}
 						continue;
 					} else if (f3 == 0) {
+						// discard what we buffered
 						Debug.debug(Debug.DEBUG, "3rd '?' not found");
 						continue;
 					} else {
@@ -326,7 +332,8 @@ public class HeaderLine extends Encoding {
 						try {
 							// System.err.println( "decode(" + (f3 + 1) + "," + ( f4 - f3 - 1 ) + ")" );
 							ReadBuffer tmpIn = new ReadBuffer(encodedWord, f3 + 1, f4 - f3 - 1);
-							MemoryBuffer tmp = new MemoryBuffer(DECODE_MAX);
+							// decoded won't be longer than encoded
+							MemoryBuffer tmp = new MemoryBuffer(f4 - f3 - 1);
 							try {
 								e.decode(tmpIn, tmp);
 							} catch (EOFException eof) {
