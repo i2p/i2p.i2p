@@ -1555,7 +1555,7 @@ public class DataHelper {
             case 6: return str + "Ei";
             case 7: return str + "Zi";
             case 8: return str + "Yi";
-            default: return bytes + "";
+            default: return Long.toString(bytes);
         }
     }
 
@@ -1589,6 +1589,9 @@ public class DataHelper {
      * @since 0.9.31
      */
     public static String formatSize2(long bytes, boolean nonBreaking) {
+        String space = nonBreaking ? "&#8239;" : " ";
+        if (bytes < 1024)
+            return bytes + space;
         double val = bytes;
         int scale = 0;
         while (val >= 1024) {
@@ -1597,10 +1600,14 @@ public class DataHelper {
         }
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
+        if (val >= 200) {
+            fmt.setMaximumFractionDigits(0);
+        } else if (val >= 20) {
+            fmt.setMaximumFractionDigits(1);
+        }
 
         // Replace &nbsp; with thin non-breaking space &#8239; (more consistent/predictable width between fonts & point sizes)
 
-        String space = nonBreaking ? "&#8239;" : " ";
         String str = fmt.format(val) + space;
         switch (scale) {
             case 1: return str + "Ki";
@@ -1643,6 +1650,9 @@ public class DataHelper {
      * @since 0.9.34
      */
     public static String formatSize2Decimal(long bytes, boolean nonBreaking) {
+        String space = nonBreaking ? "&#8239;" : " ";
+        if (bytes < 1000)
+            return bytes + space;
         double val = bytes;
         int scale = 0;
         while (val >= 1000) {
@@ -1650,7 +1660,11 @@ public class DataHelper {
             val /= 1000;
         }
         DecimalFormat fmt = new DecimalFormat("##0.00");
-        String space = nonBreaking ? "&#8239;" : " ";
+        if (val >= 200) {
+            fmt.setMaximumFractionDigits(0);
+        } else if (val >= 20) {
+            fmt.setMaximumFractionDigits(1);
+        }
         String str = fmt.format(val) + space;
         switch (scale) {
             case 1: return str + "K";

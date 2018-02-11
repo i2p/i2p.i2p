@@ -1,3 +1,17 @@
+2018-02-11 zzz
+ * Util: Number formatting tweaks (ticket #1913)
+
+2018-02-09 zzz
+ * SusiMail:
+   - Don't collapse spaces in email display (ticket #2156)
+   - Constant URL for attachments
+   - Fixes when no subject is present
+   - Filename encoding fixes
+   - Handle lower case in Q-P decode
+   - Don't show the no-charset warning
+   - Thread loading mail from disk
+   - More error handling fixes
+
 2018-02-08 zzz
  * SusiMail:
    - Error handling fixes
