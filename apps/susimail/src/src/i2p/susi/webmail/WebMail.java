@@ -83,6 +83,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.servlet.util.WriterOutputStream;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
 
@@ -107,7 +108,7 @@ public class WebMail extends HttpServlet
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
 	
-	private enum State { AUTH, LIST, SHOW, NEW, CONFIG }
+	private enum State { AUTH, LOADING, LIST, SHOW, NEW, CONFIG }
 	
 	// TODO generate from servlet name to allow for renaming or multiple instances
 	private static final String myself = "/susimail/susimail";
@@ -248,32 +249,6 @@ public class WebMail extends HttpServlet
 		RELEASE = !Boolean.parseBoolean(Config.getProperty(CONFIG_DEBUG));
 		Debug.setLevel( RELEASE ? Debug.ERROR : Debug.DEBUG );
 	}
-
-	/**
-	 * sorts Mail objects by id field
-	 * 
-	 * @author susi
-	 */
-/****
-	private static class IDSorter implements Comparator<String> {
-		private final MailCache mailCache;
-		
-		public IDSorter( MailCache mailCache )
-		{
-			this.mailCache = mailCache;
-		}
-		
-		public int compare(String arg0, String arg1) {
-			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
-			if (a == null)
-				return (b == null) ? 0 : 1;
-			if (b == null)
-				return -1;
-			return a.id - b.id;
-		}		
-	}
-****/
 
 	/**
 	 * Base for the various sorters
@@ -442,6 +417,11 @@ public class WebMail extends HttpServlet
 		POP3MailBox mailbox;
 		MailCache mailCache;
 		Folder<String> folder;
+		boolean isLoading, isFetching;
+		/** Set by threaded connector. Error or null */
+		String connectError;
+		/** Set by threaded connector. -1 if nothing to report, 0 or more after fetch complete */
+		int newMails = -1;
 		String user, pass, host, error, info;
 		String replyTo, replyCC;
 		String subject, body;
@@ -484,7 +464,9 @@ public class WebMail extends HttpServlet
 		 *
 		 *  @since 0.9.13
 		 */
-		public void foundNewMail() {
+		public void foundNewMail(boolean yes) {
+			if (!yes)
+				return;
 			MailCache mc = mailCache;
 			Folder<String> f = folder;
 			if (mc != null && f != null) {
@@ -796,9 +778,9 @@ public class WebMail extends HttpServlet
 	/**
 	 * prepare line for presentation between html tags
 	 * 
-	 * - quote html tags
+	 * Escapes html tags
 	 * 
-	 * @param line, null OK
+	 * @param line null OK
 	 * @return escaped string or "" for null input
 	 */
 	static String quoteHTML( String line )
@@ -891,61 +873,200 @@ public class WebMail extends HttpServlet
 					}
 				}
 				if( doContinue ) {
-					POP3MailBox mailbox = new POP3MailBox( host, pop3PortNo, user, pass );
-					if (offline || mailbox.connectToServer()) {
-						sessionObject.mailbox = mailbox;
-						sessionObject.user = user;
-						sessionObject.pass = pass;
-						sessionObject.host = host;
-						sessionObject.smtpPort = smtpPortNo;
-						state = State.LIST;
-						I2PAppContext ctx = I2PAppContext.getGlobalContext();
-						MailCache mc = new MailCache(ctx, mailbox, host, pop3PortNo, user, pass);
-						sessionObject.mailCache = mc;
-						sessionObject.folder = new Folder<String>();
-						if (!offline) {
-							// prime the cache, request all headers at once
-							// otherwise they are pulled one at a time
-							// during the sort in folder.setElements() below
-							mc.getMail(MailCache.FetchMode.HEADER);
-						}
-						
-						// setElements() sorts, so configure the sorting first
-						//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_SENDER, new SenderSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_SUBJECT, new SubjectSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_DATE, new DateSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_SIZE, new SizeSorter( sessionObject.mailCache ) );
-						// reverse sort, latest mail first
-						// TODO get user defaults from config
-						sessionObject.folder.setSortBy(SORT_DEFAULT, SORT_ORDER_DEFAULT);
-						// get through cache so we have the disk-only ones too
-						String[] uidls = mc.getUIDLs();
-						sessionObject.folder.setElements(uidls);
-
-						sessionObject.reallyDelete = false;
-						if (offline)
-							Debug.debug(Debug.DEBUG, "OFFLINE MODE");
-						else
-							Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
-						// we do this after the initial priming above
-						mailbox.setNewMailListener(sessionObject);
-					} else {
-						sessionObject.error += mailbox.lastError() + '\n';
-						Debug.debug(Debug.DEBUG, "LOGIN FAIL, REMOVING SESSION");
-						HttpSession session = request.getSession();
-						session.removeAttribute( "sessionObject" );
-						session.invalidate();
-						mailbox.destroy();
-						sessionObject.mailbox = null;
-						sessionObject.mailCache = null;
-						Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
-					}
+					sessionObject.smtpPort = smtpPortNo;
+					state = threadedStartup(sessionObject, offline, state,
+					                        host, pop3PortNo, user, pass);
 				}
 			}
 		}
 		return state;
 	}
+
+	/**
+	 * Starts one thread to load the emails from disk,
+	 * and in parallel starts a second thread to connect to the POP3 server
+	 * (unless user clicked the 'read mail offline' at login).
+	 * Either could finish first, but unless the local disk cache is really big,
+	 * the loading will probably finish first.
+	 *
+	 * Once the POP3 connects, it waits for the disk loader to finish, and then
+	 * does the fetching of new emails.
+	 *
+	 * The user may view the local folder once the first (loader) thread is done.
+	 *
+	 * @since 0.9.34
+	 */
+	private static State threadedStartup(SessionObject sessionObject, boolean offline, State state,
+	                                     String host, int pop3PortNo, String user, String pass) {
+		POP3MailBox mailbox = new POP3MailBox(host, pop3PortNo, user, pass);
+		I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		MailCache mc;
+		try {
+			mc = new MailCache(ctx, mailbox, host, pop3PortNo, user, pass);
+		} catch (IOException ioe) {
+			Debug.debug(Debug.ERROR, "Error creating disk cache", ioe);
+			sessionObject.error += ioe.toString() + '\n';
+			return State.AUTH;
+		}
+		Folder<String> folder = new Folder<String>();	
+		// setElements() sorts, so configure the sorting first
+		//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
+		folder.addSorter( SORT_SENDER, new SenderSorter(mc));
+		folder.addSorter( SORT_SUBJECT, new SubjectSorter(mc));
+		folder.addSorter( SORT_DATE, new DateSorter(mc));
+		folder.addSorter( SORT_SIZE, new SizeSorter(mc));
+		// reverse sort, latest mail first
+		// TODO get user defaults from config
+		folder.setSortBy(SORT_DEFAULT, SORT_ORDER_DEFAULT);
+		sessionObject.folder = folder;
+
+		sessionObject.mailbox = mailbox;
+		sessionObject.user = user;
+		sessionObject.pass = pass;
+		sessionObject.host = host;
+		sessionObject.reallyDelete = false;
+
+		// Thread the loading and the server connection.
+		// Either could finish first.
+
+		// With a mix of email (10KB median, 100KB average size),
+		// about 20 emails per second per thread loaded.
+		// thread 1: mc.loadFromDisk()
+		sessionObject.mailCache = mc;
+		sessionObject.isLoading = true;
+		boolean ok = mc.loadFromDisk(new LoadWaiter(sessionObject));
+		if (!ok)
+			sessionObject.isLoading = false;
+
+		// thread 2: mailbox.connectToServer()
+		if (offline) {
+			Debug.debug(Debug.DEBUG, "OFFLINE MODE");
+		} else {
+			sessionObject.isFetching = true;
+			if (mailbox.connectToServer(new ConnectWaiter(sessionObject)))
+				sessionObject.isFetching = false;
+		}
+
+		// wait a little while so we avoid the loading page if we can
+		if (sessionObject.isLoading) {
+			try {
+				sessionObject.wait(5000);
+			} catch (InterruptedException ie) {
+				Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+			}
+		}
+		state = sessionObject.isLoading ? State.LOADING : State.LIST;
+		return state;
+	}
+
+	/**
+	 *  Callback from MailCache.loadFromDisk()
+	 *  @since 0.9.34
+	 */
+	private static class LoadWaiter implements NewMailListener {
+		private final SessionObject _so;
+
+		public LoadWaiter(SessionObject so) {
+			_so = so;
+		}
+
+		public void foundNewMail(boolean yes) {
+			synchronized(_so) {
+				// get through cache so we have the disk-only ones too
+				MailCache mc = _so.mailCache;
+				Folder<String> f = _so.folder;
+				if (mc != null && f != null) {
+					String[] uidls = mc.getUIDLs();
+					int added = f.addElements(Arrays.asList(uidls));
+					if (added > 0)
+						_so.pageChanged = true;
+					Debug.debug(Debug.DEBUG, "Folder loaded");
+				} else {
+					Debug.debug(Debug.DEBUG, "MailCache/folder vanished?");
+				}
+				_so.isLoading = false;
+				_so.notifyAll();
+			}
+		}
+	}
+
+	/**
+	 *  Callback from POP3MailBox.connectToServer()
+	 *  @since 0.9.34
+	 */
+	private static class ConnectWaiter implements NewMailListener, Runnable {
+		private final SessionObject _so;
+		private final POP3MailBox _mb;
+
+		public ConnectWaiter(SessionObject so) {
+			_so = so;
+			_mb = _so.mailbox;
+		}
+
+		/** run this way if already connected */
+		public void run() {
+			foundNewMail(true);
+		}
+
+		/** @param connected are we? */
+		public void foundNewMail(boolean connected) {
+			MailCache mc = null;
+			Folder<String> f = null;
+			boolean found = false;
+			if (connected) {
+				Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
+				// we do this whether new mail was found or not,
+				// because we may already have UIDLs in the MailCache to fetch
+				synchronized(_so) {
+					while (_so.isLoading) {
+						try {
+							_so.wait(5000);
+						} catch (InterruptedException ie) {
+						       Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+							return;
+						}
+					}
+					mc = _so.mailCache;
+					f = _so.folder;
+				}
+				Debug.debug(Debug.DEBUG, "Done waiting for folder load");
+				// fetch the mail outside the lock
+				// TODO, would be better to add each email as we get it
+				if (mc != null && f != null) {
+					found = mc.getMail(MailCache.FetchMode.HEADER);
+				}
+			} else {
+				Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
+			}
+			synchronized(_so) {
+				if (!connected) {
+					String error = _mb.lastError();
+					if (error.length() > 0)
+						_so.connectError = error;
+					else
+						_so.connectError = _t("Error connecting to server");
+				} else if (!found) {
+					Debug.debug(Debug.DEBUG, "No new emails");
+					_so.newMails = 0;
+					_so.connectError = null;
+				} else if (mc != null && f != null) {
+					String[] uidls = mc.getUIDLs();
+					int added = f.addElements(Arrays.asList(uidls));
+					if (added > 0)
+						_so.pageChanged = true;
+					_so.newMails = added;
+					_so.connectError = null;
+					Debug.debug(Debug.DEBUG, "Added " + added + " new emails");
+				} else {
+					Debug.debug(Debug.DEBUG, "MailCache/folder vanished?");
+				}
+				_mb.setNewMailListener(_so);
+				_so.isFetching = false;
+				_so.notifyAll();
+			}
+		}
+	}
+
 
 	/**
 	 * 
@@ -1000,6 +1121,9 @@ public class WebMail extends HttpServlet
 		state = processLogout(sessionObject, request, isPOST, state);
 		if (state == State.AUTH)
 			return state;
+		// if loading, we can't get to states LIST/SHOW or it will block
+		if (sessionObject.isLoading)
+			return State.LOADING;
 
 		/*
 		 *  compose dialog
@@ -1292,18 +1416,27 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _t("Internal error, lost connection.") + '\n';
 				return State.AUTH;
 			}
-			mailbox.refresh();
-			String error = mailbox.lastError();
-			sessionObject.error += error + '\n';
-			sessionObject.mailCache.getMail(MailCache.FetchMode.HEADER);
-			// get through cache so we have the disk-only ones too
-			String[] uidls = sessionObject.mailCache.getUIDLs();
-			int added = sessionObject.folder.addElements(Arrays.asList(uidls));
-			if (added > 0)
-				sessionObject.info += ngettext("{0} new message", "{0} new messages", added);
-			else if (error.length() <= 0)
-				sessionObject.info += _t("No new messages");
-			sessionObject.pageChanged = true;
+			if (sessionObject.isFetching) {
+				// shouldn't happen, button disabled
+				return state;
+			}
+			sessionObject.isFetching = true;
+			ConnectWaiter cw = new ConnectWaiter(sessionObject);
+			if (mailbox.connectToServer(cw)) {
+				// Already connected, start a thread ourselves
+				// TODO - But if already connected, we aren't going to find anything new.
+				// We used to call refresh() from here, which closes first,
+				// but that isn't threaded.
+				Debug.debug(Debug.DEBUG, "Already connected, running CW");
+				Thread t = new I2PAppThread(cw, "Email fetcher");
+				t.start();
+			}
+			// wait if it's going to be quick
+			try {
+				sessionObject.wait(3000);
+			} catch (InterruptedException ie) {
+				Debug.debug(Debug.DEBUG, "Interrupted waiting for connect", ie);
+			}
 		}
 		return state;
 	}
@@ -1831,6 +1964,13 @@ public class WebMail extends HttpServlet
 					return;
 				}
 			}
+			if (state == State.LOADING) {
+				if (isPOST) {
+					sendRedirect(httpRequest, response, null);
+					return;
+				}
+			}
+
 			// Set in web.xml
 			//if (oldState == State.AUTH && newState != State.AUTH) {
 			//	int oldIdle = httpSession.getMaxInactiveInterval();
@@ -1856,9 +1996,10 @@ public class WebMail extends HttpServlet
 					int newPage = processFolderButtons(sessionObject, page, request);
 					// LIST is from SHOW page, SEND and CANCEL are from NEW page
 					// OFFLINE and LOGIN from login page
-					// TODO - REFRESH on list page
+					// REFRESH on list page
 					if (newPage != page || buttonPressed(request, LIST) ||
 					    buttonPressed(request, SEND) || buttonPressed(request, CANCEL) ||
+					    buttonPressed(request, REFRESH) ||
 					    buttonPressed(request, LOGIN) || buttonPressed(request, OFFLINE)) {
 						// P-R-G
 						String q = '?' + CUR_PAGE + '=' + newPage;
@@ -1972,9 +2113,11 @@ public class WebMail extends HttpServlet
 				/*
 				 * build subtitle
 				 */
-				if( state == State.AUTH )
+				if (state == State.AUTH) {
 					subtitle = _t("Login");
-				else if( state == State.LIST ) {
+				} else if (state == State.LOADING) {
+					subtitle = _t("Loading emails, please wait...");
+				} else if( state == State.LIST ) {
 					// mailbox.getNumMails() forces a connection, don't use it
 					// Not only does it slow things down, but a failure causes all our messages to "vanish"
 					//subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
@@ -2023,6 +2166,10 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/susimail/js/compose.js\" type=\"text/javascript\"></script>");
 				} else if (state == State.LIST) {
 					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
+				} else if (state == State.LOADING) {
+					// TODO JS?
+			                out.println("<meta http-equiv=\"refresh\" content=\"5;url=" + myself + "\">");
+					// TODO we don't need the form below
 				}
 				out.print("</head>\n<body" + (state == State.LIST ? " onload=\"deleteboxclicked()\">" : ">"));
 				String nonce = state == State.AUTH ? LOGIN_NONCE :
@@ -2061,10 +2208,36 @@ public class WebMail extends HttpServlet
 					out.println("<input type=\"hidden\" name=\"" + CURRENT_SORT + "\" value=\"" + fullSort + "\">");
 					out.println("<input type=\"hidden\" name=\"" + CURRENT_FOLDER + "\" value=\"" + PersistentMailCache.DIR_FOLDER + "\">");
 				}
-				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
+				boolean showRefresh = false;
+				if (sessionObject.isLoading) {
+					sessionObject.info += _t("Loading emails, please wait...") + '\n';
+					showRefresh = true;
+				}
+				if (sessionObject.isFetching) {
+					sessionObject.info += _t("Checking for new emails on server") + '\n';
+					showRefresh = true;
+				} else if (state != State.LOADING && state != State.AUTH && state != State.CONFIG) {
+					String error = sessionObject.connectError;
+					if (error != null && error.length() > 0) {
+						sessionObject.error += error + '\n';
+						sessionObject.connectError = null;
+					}
+					int added = sessionObject.newMails;
+					if (added > 0) {
+						sessionObject.info += ngettext("{0} new message", "{0} new messages", added) + '\n';
+						sessionObject.newMails = -1;
+					} else if (added == 0) {
+						sessionObject.info += _t("No new messages") + '\n';
+						sessionObject.newMails = -1;
+					}
+				}
+				if (showRefresh) {
+					sessionObject.info += _t("Refresh the page for updates") + '\n';
+				}
+				if (sessionObject.error.length() > 0) {
 					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
 				}
-				if( sessionObject.info != null && sessionObject.info.length() > 0 ) {
+				if (sessionObject.info.length() > 0) {
 					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
 				}
 				/*
@@ -2072,6 +2245,9 @@ public class WebMail extends HttpServlet
 				 */
 				if( state == State.AUTH )
 					showLogin( out );
+
+				else if (state == State.LOADING)
+					showLoading(out, sessionObject, request);
 				
 				else if( state == State.LIST )
 					showFolder( out, sessionObject, request );
@@ -2103,7 +2279,7 @@ public class WebMail extends HttpServlet
 		if (qq >= 0)
 			url = url.substring(0, qq);
 		buf.append(url);
-		if (q.length() > 0)
+		if (q != null && q.length() > 0)
 			buf.append(q.replace("&amp;", "&"));  // no you don't html escape the redirect header
 		resp.setHeader("Location", buf.toString());
 		resp.sendError(302, "Moved");
@@ -2140,6 +2316,7 @@ public class WebMail extends HttpServlet
 			}
 			String name2 = FilenameUtil.sanitizeFilename(name);
 			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
+			response.setHeader("Cache-Control", "public, max-age=604800");
 			if (isRaw) {
 				try {
 					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
@@ -2149,8 +2326,6 @@ public class WebMail extends HttpServlet
 					if (part.decodedLength >= 0)
 						response.setContentLength(part.decodedLength);
 					Debug.debug(Debug.DEBUG, "Sending raw attachment " + name + " length " + part.decodedLength);
-					// cache-control?
-					// was 2
 					part.decode(0, new OutputStreamBuffer(response.getOutputStream()));
 					shown = true;
 				} catch (IOException e) {
@@ -2207,7 +2382,7 @@ public class WebMail extends HttpServlet
 		try {
 			response.setContentType("message/rfc822");
 			response.setContentLength(content.getLength());
-			// cache-control?
+			response.setHeader("Cache-Control", "public, max-age=604800");
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
 			                   "filename*=" + name3);
 			in = content.getInputStream();
@@ -2498,6 +2673,18 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
+	 * @since 0.9.34
+	 */
+	private static void showLoading(PrintWriter out, SessionObject sessionObject, RequestWrapper request) {
+		// TODO make it pretty
+		out.println("<p><b>");
+		out.println(_t("Loading emails, please wait..."));
+		out.println("</b><p><b>");
+		out.println(_t("Refresh the page for updates"));
+		out.println("</b>");
+	}
+
+	/**
 	 * 
 	 * @param out
 	 * @param sessionObject
@@ -2513,7 +2700,7 @@ public class WebMail extends HttpServlet
 			//button( REPLYALL, _t("Reply All") ) +
 			//button( FORWARD, _t("Forward") ) + spacer +
 			//button( DELETE, _t("Delete") ) + spacer +
-		out.println(button( REFRESH, _t("Check Mail") ) + spacer);
+		out.println((sessionObject.isFetching ? button2(REFRESH, _t("Check Mail")) : button(REFRESH, _t("Check Mail"))) + spacer);
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _t("Logout") ));
@@ -2682,7 +2869,7 @@ public class WebMail extends HttpServlet
 			             "</p>");
 		}
 		Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
-		if(!RELEASE && mail != null && mail.hasBody() && mail.getBody().getLength() < 16384) {
+		if(!RELEASE && mail != null && mail.hasBody() && mail.getSize() < 16384) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");
 			Buffer body = mail.getBody();

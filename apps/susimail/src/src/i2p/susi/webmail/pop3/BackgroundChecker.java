@@ -105,12 +105,12 @@ class BackgroundChecker {
 
 	        public void run() {
 			try {
-				if (mailbox.connectToServer()) {
+				if (mailbox.blockingConnectToServer()) {
 					int found = mailbox.getNumMails();
 					if (found > 0) {
 						Debug.debug(Debug.DEBUG, "Found " + found + " mails, calling listener");
 						// may not really be new
-						mailbox.foundNewMail();
+						mailbox.foundNewMail(true);
 					}
 				}
 			} finally {		

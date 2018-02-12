@@ -86,6 +86,9 @@ class PersistentMailCache {
 
 	/**
 	 *  Use the params to generate a unique directory name.
+	 *
+	 *  Does NOT load the mails in. Caller MUST call getMails().
+	 *
 	 *  @param pass ignored
 	 *  @param folder use DIR_FOLDER
 	 */

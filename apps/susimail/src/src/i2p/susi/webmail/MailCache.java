@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.I2PAppThread;
 
 /**
  * @author user
@@ -52,51 +53,101 @@ class MailCache {
 	public enum FetchMode {
 		HEADER, ALL, CACHE_ONLY
 	}
-	
+
 	private final POP3MailBox mailbox;
 	private final Hashtable<String, Mail> mails;
 	private final PersistentMailCache disk;
 	private final I2PAppContext _context;
+	private NewMailListener _loadInProgress;
 	
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
          */
 	private static final int FETCH_ALL_SIZE = 32*1024;
 
+
 	/**
+	 * Does NOT load the mails in. Caller MUST call loadFromDisk().
+	 *
 	 * @param mailbox non-null
 	 */
 	MailCache(I2PAppContext ctx, POP3MailBox mailbox,
-		  String host, int port, String user, String pass) {
+		  String host, int port, String user, String pass) throws IOException {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
-		PersistentMailCache pmc = null;
-		try {
-			pmc = new PersistentMailCache(ctx, host, port, user, pass, PersistentMailCache.DIR_FOLDER);
-			// TODO Drafts, Sent, Trash
-		} catch (IOException ioe) {
-			Debug.debug(Debug.ERROR, "Error creating disk cache: " + ioe);
-		}
-		disk = pmc;
+		disk = new PersistentMailCache(ctx, host, port, user, pass, PersistentMailCache.DIR_FOLDER);
+		// TODO Drafts, Sent, Trash
 		_context = ctx;
-		if (disk != null)
-			loadFromDisk();
 	}
 
 	/**
+	 * Threaded. Returns immediately.
+	 * This will not access the mailbox. Mailbox need not be ready.
+	 * 
+	 * @return success false if in progress already and nml will NOT be called back, true if nml will be called back
+	 * @since 0.9.13
+	 */
+	public synchronized boolean loadFromDisk(NewMailListener nml) {
+		if (_loadInProgress != null)
+			return false;
+		Thread t = new I2PAppThread(new LoadMailRunner(nml), "Email loader");
+		_loadInProgress = nml;
+		try {
+			t.start();
+		} catch (Throwable e) {
+			_loadInProgress = null;
+			return false;
+		}
+		return true;
+	}
+
+	/** @since 0.9.34 */
+	private class LoadMailRunner implements Runnable {
+		private final NewMailListener _nml;
+
+		public LoadMailRunner(NewMailListener nml) {
+			_nml = nml;
+		}
+
+		public void run() {
+			boolean result = false;
+			try {
+				blockingLoadFromDisk();
+				if(!mails.isEmpty())
+					result = true;
+			} finally {
+				synchronized(MailCache.this) {
+					if (_loadInProgress == _nml)
+						_loadInProgress = null;
+				}
+				_nml.foundNewMail(result);
+			}
+		}
+	}
+
+	/**
+	 * Blocking. Only call once!
+	 * This will not access the mailbox. Mailbox need not be ready.
 	 * 
 	 * @since 0.9.13
 	 */
-	private void loadFromDisk() {
-		Collection<Mail> dmails = disk.getMails();
-		for (Mail mail : dmails) {
-			mails.put(mail.uidl, mail);
+	private void blockingLoadFromDisk() {
+		synchronized(mails) {
+			if (!mails.isEmpty())
+				throw new IllegalStateException();
+			Collection<Mail> dmails = disk.getMails();
+			for (Mail mail : dmails) {
+				mails.put(mail.uidl, mail);
+			}
 		}
 	}
 
 	/**
 	 * The ones known locally, which will include any known on the server, if connected.
 	 * Will not include any marked for deletion.
+	 * 
+	 * This will not access the mailbox. Mailbox need not be ready.
+	 * loadFromDisk() must have been called first.
 	 * 
 	 * @return non-null
 	 * @since 0.9.13
@@ -113,7 +164,8 @@ class MailCache {
 	}
 
 	/**
-	 * Fetch any needed data from pop3 server.
+	 * Fetch any needed data from pop3 server, unless mode is CACHE_ONLY.
+	 * Blocking unless mode is CACHE_ONLY.
 	 * 
 	 * @param uidl message id to get
 	 * @param mode CACHE_ONLY to not pull from pop server
@@ -171,6 +223,8 @@ class MailCache {
 	 * Mail objects are inserted into the requests.
 	 * After this, call getUIDLs() to get all known mail UIDLs.
 	 * MUST already be connected, otherwise returns false.
+	 * 
+	 * Blocking.
 	 * 
 	 * @param mode HEADER or ALL only
 	 * @return true if any were fetched

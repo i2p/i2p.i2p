@@ -166,6 +166,7 @@ div.attached {
 .attached img {
      border: 1px solid #cfd6ff;
      padding: 2px;
+     image-orientation: from-image;
 }
 
 td#addattach {

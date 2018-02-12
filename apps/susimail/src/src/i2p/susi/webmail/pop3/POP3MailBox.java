@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.data.DataHelper;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.InternalSocket;
 
 /**
@@ -439,7 +440,7 @@ public class POP3MailBox implements NewMailListener {
 	 * 
 	 * @return true or false
 	 */
-	public boolean isConnected() {
+	boolean isConnected() {
 		synchronized(synchronizer) {
 			if (socket == null) {
 				connected = false;
@@ -576,8 +577,8 @@ public class POP3MailBox implements NewMailListener {
 	}
 
 	/**
-	 * 
-	 *
+	 * Close (why?) and connect to server.
+	 * Blocking.
 	 */
 	public void refresh() {
 		synchronized( synchronizer ) {
@@ -599,11 +600,75 @@ public class POP3MailBox implements NewMailListener {
 	/**
 	 * Connect to pop3 server if not connected.
 	 * Does nothing if already connected.
+	 * Blocking.
+	 *
+	 * This will NOT call any configured NewMailListener,
+	 * only the one passed in. It will be called with the value
+	 * true if the connect was successful, false if not.
+	 * Call getNumMails() to see if there really was any new mail.
+	 *
+	 * After the callback is executed, the information on new mails, if any,
+	 * is available via getNumMails(), getUIDLs(), and getSize().
+	 * The connection to the server will remain open, so that
+	 * new emails may be retrieved via
+	 * getHeader(), getBody(), and getBodies().
+	 * Failure info is available via lastError().
+	 *
+	 * @return true if connected already and nml will NOT be called back, false if nml will be called back
+	 * @since 0.9.13
+	 */
+	public boolean connectToServer(NewMailListener nml) {
+		synchronized( synchronizer ) {
+			if (isConnected())
+				return true;
+		}
+		Thread t = new I2PAppThread(new ConnectRunner(nml), "POP3 Connector");
+		try {
+			t.start();
+		} catch (Throwable e) {
+			// not really, but we won't be calling the callback
+			return true;
+		}
+		return false;
+
+	}
+
+	/** @since 0.9.34 */
+	private class ConnectRunner implements Runnable {
+		private final NewMailListener _nml;
+
+		public ConnectRunner(NewMailListener nml) {
+			_nml = nml;
+		}
+
+		public void run() {
+			boolean result = false;
+			try {
+				result = blockingConnectToServer();
+			} finally {
+				_nml.foundNewMail(result);
+			}
+		}
+	}
+
+	/**
+	 * Connect to pop3 server if not connected.
+	 * Does nothing if already connected.
+	 * Blocking.
+	 *
+	 * This will NOT call any configured NewMailListener.
+	 *
+	 * After the callback is executed, the information on new mails, if any,
+	 * is available via getNumMails(), getUIDLs(), and getSize().
+	 * The connection to the server will remain open, so that
+	 * new emails may be retrieved via
+	 * getHeader(), getBody(), and getBodies().
+	 * Failure info is available via lastError().
 	 *
 	 * @return true if connected
 	 * @since 0.9.13
 	 */
-	public boolean connectToServer() {
+	boolean blockingConnectToServer() {
 		synchronized( synchronizer ) {
 			if (isConnected())
 				return true;
@@ -613,7 +678,8 @@ public class POP3MailBox implements NewMailListener {
 	}
 
 	/**
-	 * connect to pop3 server, login with USER and PASS and try STAT then
+	 * Closes any existing connection first.
+	 * Then, connect to pop3 server, login with USER and PASS and try STAT then
 	 *
 	 * Caller must sync.
 	 */
@@ -630,7 +696,7 @@ public class POP3MailBox implements NewMailListener {
 		try {
 			socket = InternalSocket.getSocket(host, port);
 		} catch (IOException e) {
-			Debug.debug( Debug.DEBUG, "Error connecting: " + e);
+			Debug.debug(Debug.DEBUG, "Error connecting", e);
 			lastError = _t("Cannot connect") + " (" + host + ':' + port + ") - " + e.getLocalizedMessage();
 			return;
 		}
@@ -640,15 +706,16 @@ public class POP3MailBox implements NewMailListener {
 				lastError = "";
 				socket.setSoTimeout(120*1000);
 				boolean ok = doHandshake();
+				boolean loginOK = false;
 				if (ok) {
 					// TODO APOP (unsupported by postman)
 					List<SendRecv> cmds = new ArrayList<SendRecv>(4);
 					cmds.add(new SendRecv("USER " + user, Mode.A1));
 					cmds.add(new SendRecv("PASS " + pass, Mode.A1));
 					socket.setSoTimeout(60*1000);
-					ok =  sendCmds(cmds);
+					loginOK =  sendCmds(cmds);
 				}
-				if (ok) {
+				if (loginOK) {
 					connected = true;
 					List<SendRecv> cmds = new ArrayList<SendRecv>(4);
 					SendRecv stat = new SendRecv("STAT", Mode.A1);
@@ -681,6 +748,12 @@ public class POP3MailBox implements NewMailListener {
 				} else {
 					if (lastError.equals(""))
 						lastError = _t("Error connecting to server");
+					if (ok && !loginOK) {
+						lastError += '\n' +
+						             _t("Mail server login failed, wrong username or password.") +
+						             '\n' +
+						             _t("Logout and then login again with the correct username and password.");
+					}
 					close();
 				}
 			}
@@ -1060,7 +1133,7 @@ public class POP3MailBox implements NewMailListener {
 	}
 
 	/**
-	 * @return The most recent error message.
+	 * @return The most recent error message. Probably not terminated with a newline.
 	 */
 	public String lastError() {
 		//Debug.debug(Debug.DEBUG, "lastError()");
@@ -1071,6 +1144,8 @@ public class POP3MailBox implements NewMailListener {
 		// translate this common error
 		if (e.trim().equals("Login failed."))
 			e = _t("Login failed");
+		else if (e.startsWith("Login failed."))
+			e = _t("Login failed") + e.substring(13);
 		return e;
 	}
 
@@ -1093,10 +1168,10 @@ public class POP3MailBox implements NewMailListener {
 	 *
 	 *  @since 0.9.13
 	 */
-	public void foundNewMail() {
+	public void foundNewMail(boolean yes) {
 		NewMailListener  nml = newMailListener;
 		if (nml != null)
-			nml.foundNewMail();
+			nml.foundNewMail(yes);
 	}
 
 	/**

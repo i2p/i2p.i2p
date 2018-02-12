@@ -1390,6 +1390,7 @@ td p.error {
      max-width: 100%;
      max-width: calc(100% - 25px);
      filter: drop-shadow(0 0 1px #999);
+     image-orientation: from-image;
 }
 
 #deleteattached input {
