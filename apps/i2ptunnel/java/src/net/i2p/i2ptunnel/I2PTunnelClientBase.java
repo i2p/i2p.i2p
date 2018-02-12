@@ -810,6 +810,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 // connecting to the router in a delay-open or
                 // close-on-idle tunnel (in connectManager() above)
                 _log.error("Uncaught error in i2ptunnel client", t);
+                try { _s.close(); } catch (IOException ioe) {}
             }
         }
     }

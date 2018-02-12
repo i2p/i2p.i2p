@@ -547,12 +547,14 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             // Never shut down.
             _clientExecutor = new TunnelControllerGroup.CustomThreadPoolExecutor();
         }
+        I2PSocket i2ps = null;
         while (open) {
             try {
+                i2ps = null;
                 I2PServerSocket ci2pss = i2pss;
                 if (ci2pss == null)
                     throw new I2PException("I2PServerSocket closed");
-                final I2PSocket i2ps = ci2pss.accept();
+                i2ps = ci2pss.accept();
                 if (i2ps == null) throw new I2PException("I2PServerSocket closed");
                 if (_usePool) {
                     try {
@@ -576,18 +578,22 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                     _log.error("Error accepting - KILLING THE TUNNEL SERVER", ipe);
                 // TODO delay and loop if internal router is soft restarting?
                 open = false;
+                if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 break;
             } catch (ConnectException ce) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error accepting", ce);
                 open = false;
+                if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 break;
             } catch(SocketTimeoutException ste) {
                 // ignored, we never set the timeout
+                if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
             } catch (RuntimeException e) {
                 // streaming borkage
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Uncaught exception accepting", e);
+                if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 // not killing the server..
                 try {
                     Thread.sleep(500);
