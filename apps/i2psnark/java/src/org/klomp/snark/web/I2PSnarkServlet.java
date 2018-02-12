@@ -1490,11 +1490,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 Sorters.setPattern(Translate.getLanguage(_manager.util().getContext()));
             else
                 Sorters.setPattern(null);
-            try {
-                Collections.sort(rv, Sorters.getComparator(sort, this));
-            } catch (IllegalArgumentException iae) {
-                // Java 7 TimSort - may be unstable
-            }
+            // Java 7 TimSort - may be unstable
+            DataHelper.sort(rv, Sorters.getComparator(sort, this));
         }
         return rv;
     }

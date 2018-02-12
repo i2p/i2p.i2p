@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterInfo;
@@ -382,12 +383,8 @@ class BuildExecutor implements Runnable {
                             // to the front of the line sometimes, to prevent being "locked up"
                             // for several minutes.
                             boolean preferEmpty = _context.random().nextInt(4) != 0;
-                            try {
-                                Collections.sort(wanted, new TunnelPoolComparator(preferEmpty));
-                            } catch (IllegalArgumentException iae) {
-                                // Java 7 TimSort - see info in TunnelPoolComparator
-                                continue;
-                            }
+                            // Java 7 TimSort - see info in TunnelPoolComparator
+                            DataHelper.sort(wanted, new TunnelPoolComparator(preferEmpty));
                         }
 
                         // force the loops to be short, since 3 consecutive tunnel build requests can take

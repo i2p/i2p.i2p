@@ -34,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
+
 /**
  * Folder object manages a array Object[] to support
  * paging and sorting.
@@ -160,7 +162,7 @@ public class Folder<O extends Object> {
 	public synchronized void sort()
 	{
 		if (currentSorter != null && elements != null && elements.length > 1)
-			Arrays.sort( elements, currentSorter );
+			DataHelper.sort(elements, currentSorter);
 	}
 	
 	/**

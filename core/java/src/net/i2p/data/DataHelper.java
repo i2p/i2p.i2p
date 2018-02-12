@@ -29,9 +29,12 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -1995,6 +1998,56 @@ public class DataHelper {
             }   
         } finally {
             cache.release(ba);
+        }
+    }
+
+    /**
+      * Same as Collections.sort(), but guaranteed not to throw an IllegalArgumentException if the
+      * sort is unstable. As of Java 7, TimSort will throw an IAE if the underlying sort order
+      * changes during the sort.
+      *
+      * This catches the IAE, retries once, and then returns.
+      * If an IAE is thrown twice, this method will return, with the list possibly unsorted.
+      *
+      * @param list the list to be sorted.
+      * @param c the comparator to determine the order of the list. A null value indicates that the elements' natural ordering should be used.
+      * @since 0.9.34
+      */
+    public static <T> void sort(List<T> list, Comparator<? super T> c) {
+        try {
+            Collections.sort(list, c);
+        } catch (IllegalArgumentException iae1) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException ie) {}
+            try {
+                Collections.sort(list, c);
+            } catch (IllegalArgumentException iae2) {}
+        }
+    }
+
+    /**
+      * Same as Arrays.sort(), but guaranteed not to throw an IllegalArgumentException if the
+      * sort is unstable. As of Java 7, TimSort will throw an IAE if the underlying sort order
+      * changes during the sort.
+      *
+      * This catches the IAE, retries once, and then returns.
+      * If an IAE is thrown twice, this method will return, with the array possibly unsorted.
+      *
+      * @param a the array to be sorted.
+      * @param c the comparator to determine the order of the array. A null value indicates that the elements' natural ordering should be used.
+      * @since 0.9.34
+      */
+    public static <T> void sort(T[] a, Comparator<? super T> c) {
+        try {
+            Arrays.sort(a, c);
+        } catch (IllegalArgumentException iae1) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException ie) {}
+            try {
+                Arrays.sort(a, c);
+            } catch (IllegalArgumentException iae2) {}
         }
     }
 }
