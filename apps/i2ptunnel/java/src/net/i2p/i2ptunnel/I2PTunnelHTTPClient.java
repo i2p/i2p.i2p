@@ -84,6 +84,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final String _proxyNonce;
 
     public static final String AUTH_REALM = "I2P HTTP Proxy";
+    private static final String UA_I2P = "User-Agent: MYOB/6.66 (AN/ON)\r\n";
+    private static final String UA_CLEARNET = "User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:58.0) Gecko/20100101 Firefox/58.0\r\n";
 
     /**
      *  These are backups if the xxx.ht error page is missing.
@@ -1059,9 +1061,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             // let's not advertise to external sites that we are from I2P
                             if(usingWWWProxy || usingInternalOutproxy) {
-                                newRequest.append("User-Agent: Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0\r\n");
+                                newRequest.append(UA_CLEARNET);
                             } else {
-                                newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
+                                newRequest.append(UA_I2P);
                             }
                         }
                     }
