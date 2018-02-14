@@ -90,7 +90,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private final static String ERR_UNAVAILABLE =
          "HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -99,22 +99,23 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<p>This I2P website is unavailable. It may be down or undergoing maintenance.</p>\n" +
          "</body></html>";
 
+    // TODO https://stackoverflow.com/questions/16022624/examples-of-http-api-rate-limiting-http-response-headers
     private final static String ERR_DENIED =
-         "HTTP/1.1 403 Denied\r\n"+
+         "HTTP/1.1 429 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
-         "<html><head><title>403 Denied</title></head>\n"+
-         "<body><h2>403 Denied</h2>\n" +
+         "<html><head><title>429 Denied</title></head>\n"+
+         "<body><h2>429 Denied</h2>\n" +
          "<p>Denied due to excessive requests. Please try again later.</p>\n" +
          "</body></html>";
 
     private final static String ERR_INPROXY =
          "HTTP/1.1 403 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -126,7 +127,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private final static String ERR_SSL =
          "HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -138,7 +139,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private final static String ERR_REQUEST_URI_TOO_LONG =
          "HTTP/1.1 414 Request URI too long\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -149,7 +150,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private final static String ERR_HEADERS_TOO_LARGE =
          "HTTP/1.1 431 Request header fields too large\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -161,7 +162,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     protected final static String ERR_REQUEST_TIMEOUT =
          "HTTP/1.1 408 Request timeout\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -172,7 +173,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private final static String ERR_BAD_REQUEST =
          "HTTP/1.1 400 Bad Request\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -475,7 +476,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Refusing POST since peer is throttled: " + peerB32);
                     try {
-                        // Send a 403, so the user doesn't get an HTTP Proxy error message
+                        // Send a 429, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
                         socket.getOutputStream().write(ERR_DENIED.getBytes("UTF-8"));
                     } catch (IOException ioe) {}

@@ -98,7 +98,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_REQUEST_DENIED =
             "HTTP/1.1 403 Access Denied\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -109,7 +109,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static byte[] ERR_TIMEOUT =
     ("HTTP/1.1 504 Gateway Timeout\r\n"+
     "Content-Type: text/html; charset=iso-8859-1\r\n"+
-    "Cache-control: no-cache\r\n\r\n"+
+    "Cache-Control: no-cache\r\n\r\n"+
     "<html><body><H1>I2P ERROR: TIMEOUT</H1>"+
     "That Destination was reachable, but timed out getting a "+
     "response.  This is likely a temporary error, so you should simply "+
@@ -121,7 +121,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_NO_OUTPROXY =
             "HTTP/1.1 503 Service Unavailable\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -132,7 +132,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_AHELPER_CONFLICT =
             "HTTP/1.1 409 Conflict\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -149,7 +149,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_AHELPER_NOTFOUND =
             "HTTP/1.1 404 Not Found\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -161,7 +161,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_AHELPER_NEW =
             "HTTP/1.1 409 New Address\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -174,7 +174,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_BAD_PROTOCOL =
             "HTTP/1.1 403 Bad Protocol\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -185,7 +185,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_BAD_URI =
             "HTTP/1.1 403 Bad URI\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -196,7 +196,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_LOCALHOST =
             "HTTP/1.1 403 Access Denied\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
@@ -206,7 +206,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_INTERNAL_SSL =
             "HTTP/1.1 403 SSL Rejected\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +

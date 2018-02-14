@@ -73,7 +73,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private static final String ERR_AUTH1 =
             "HTTP/1.1 407 Proxy Authentication Required\r\n" +
             "Content-Type: text/html; charset=UTF-8\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" + // try to get a UTF-8-encoded response back for the password
@@ -90,7 +90,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     protected final static String ERR_NO_OUTPROXY =
          "HTTP/1.1 503 No Outproxy Configured\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -101,7 +101,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     protected final static String ERR_DESTINATION_UNKNOWN =
             "HTTP/1.1 503 Service Unavailable\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
+            "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
             "\r\n" +
