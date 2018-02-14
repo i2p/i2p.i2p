@@ -84,8 +84,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final String _proxyNonce;
 
     public static final String AUTH_REALM = "I2P HTTP Proxy";
-    private static final String UA_I2P = "User-Agent: MYOB/6.66 (AN/ON)\r\n";
-    private static final String UA_CLEARNET = "User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:58.0) Gecko/20100101 Firefox/58.0\r\n";
+    private static final String UA_I2P = "User-Agent: " +
+                                         "MYOB/6.66 (AN/ON)" +
+                                         "\r\n";
+    // ESR version of Firefox, same as Tor Browser
+    private static final String UA_CLEARNET = "User-Agent: " +
+                                              "Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0" +
+                                              "\r\n";
 
     /**
      *  These are backups if the xxx.ht error page is missing.
