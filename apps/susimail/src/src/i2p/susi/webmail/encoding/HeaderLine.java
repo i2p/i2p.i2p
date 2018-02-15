@@ -25,12 +25,14 @@ package i2p.susi.webmail.encoding;
 
 import i2p.susi.debug.Debug;
 import i2p.susi.util.HexTable;
+import i2p.susi.util.Buffer;
 import i2p.susi.util.ReadBuffer;
+import i2p.susi.util.MemoryBuffer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Locale;
 
 import net.i2p.data.DataHelper;
@@ -209,161 +211,250 @@ public class HeaderLine extends Encoding {
 		return out.toString();
 	}
 
+	// could be 75 for quoted-printable only
+	private static final int DECODE_MAX = 256;
+
 	/**
 	 *  Decode all the header lines, up through \r\n\r\n,
 	 *  and puts them in the ReadBuffer, including the \r\n\r\n
 	 */
-	public ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
-		int written = 0;
-		int end = offset + length;
-		if( end > in.length )
-			throw new DecodingException( "Index out of bound." );
+	public void decode(InputStream in, Buffer bout) throws IOException {
+		OutputStream out = bout.getOutputStream();
 		boolean linebreak = false;
 		boolean lastCharWasQuoted = false;
-		int lastSkip = 0;
-		while( length-- > 0 ) {
-			byte c = in[offset++];
+		byte[] encodedWord = null;
+		// we support one char of pushback,
+		// to catch some simple malformed input
+		int pushbackChar = 0;
+		boolean hasPushback = false;
+		while (true) {
+			int c;
+			if (hasPushback) {
+				c = pushbackChar;
+				hasPushback = false;
+				//Debug.debug(Debug.DEBUG, "Loop " + count + " Using pbchar(dec) " + c);
+			} else {
+				c = in.read();
+				if (c < 0)
+					break;
+			}
 			if( c == '=' ) {
-				if( length > 0 ) {
-					if( in[offset] == '?' ) {
-						// System.err.println( "=? found at " + ( offset -1 ) );
-						// save charset position here f1+1 to f2-1
-						int f1 = offset;
-						int f2 = f1 + 1;
-						for( ; f2 < end && in[f2] != '?'; f2++ );
-						if( f2 < end ) {
-							/*
-							 * 2nd question mark found
-							 */
-							// System.err.println( "2nd ? found at " + f2 );
-							int f3 = f2 + 1;
-							for( ; f3 < end && in[f3] != '?'; f3++ );
-							if( f3 < end ) {
-								/*
-								 * 3rd question mark found
-								 */
-								// System.err.println( "3rd ? found at " + f3 );
-								int f4 = f3 + 1;
-								for( ; f4 < end && in[f4] != '?'; f4++ );
-								if( f4 < end - 1 && in[f4+1] == '=' ) {
-									/*
-									 * 4th question mark found, we are complete, so lets start
-									 */
-									String enc = ( in[f2+1] == 'Q' || in[f2+1] == 'q' ) ? "quoted-printable" : ( ( in[f2+1] == 'B' || in[f2+1] == 'b' ) ? "base64" : null );
-									// System.err.println( "4th ? found at " + f4 + ", encoding=" + enc );
-									if( enc != null ) {
-										Encoding e = EncodingFactory.getEncoding( enc );
-										if( e != null ) {
-											// System.err.println( "encoder found" );
-											ReadBuffer tmp = null;
-											try {
-												// System.err.println( "decode(" + (f3 + 1) + "," + ( f4 - f3 - 1 ) + ")" );
-												tmp = e.decode( in, f3 + 1, f4 - f3 - 1 );
-												// get charset
-												String charset = new String(in, f1 + 1, f2 - f1 - 1, "ISO-8859-1");
-												String clc = charset.toLowerCase(Locale.US);
-												if (clc.equals("utf-8") || clc.equals("utf8")) {
-													if (enc.equals("quoted-printable")) {
-														for( int j = 0; j < tmp.length; j++ ) {
-															byte d = tmp.content[ tmp.offset + j ];
-															out.write( d == '_' ? 32 : d );
-														}
-													} else {
-														out.write(tmp.content, tmp.offset, tmp.length);
-													}
-												} else {
-													// decode string
-													String decoded = new String(tmp.content, tmp.offset, tmp.length, charset);
-													// encode string
-													byte[] utf8 = DataHelper.getUTF8(decoded);
-													if (enc.equals("quoted-printable")) {
-														for( int j = 0; j < utf8.length; j++ ) {
-															byte d = utf8[j];
-															out.write( d == '_' ? 32 : d );
-														}
-													} else {
-														out.write(utf8);
-													}
-												}
-												int distance = f4 + 2 - offset;
-												offset += distance;
-												length -= distance;
-												lastCharWasQuoted = true;
-												continue;
-											} catch (IOException e1) {
-												Debug.debug(Debug.ERROR, e1.toString());
-											} catch (RuntimeException e1) {
-												Debug.debug(Debug.ERROR, e1.toString());
-											}
-										}
-									}
-								}
-							}
+				// An encoded-word should be 75 chars max including the delimiters, and must be on a single line
+				// Store the full encoded word, including =? through ?=, in the buffer
+				// Sadly, base64 can be a lot longer
+				if (encodedWord == null)
+					encodedWord = new byte[DECODE_MAX];
+				int offset = 0;
+				int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
+				encodedWord[offset++] = (byte) c;
+				// Read until we have 4 '?', stored in encodedWord positions f1, f2, f3, f4,
+				// plus one char after the 4th '?', which should be '='
+				// We make a small attempt to pushback one char if it's not what we expect,
+				// but for the most part it gets thrown out, as RFC 2047 allows
+				for (; offset < DECODE_MAX; offset++) {
+					c = in.read();
+					if (c == '?') {
+						if (f1 == 0)
+							f1 = offset;
+						else if (f2 == 0)
+							f2 = offset;
+						else if (f3 == 0)
+							f3 = offset;
+						else if (f4 == 0)
+							f4 = offset;
+					} else if (c == -1) {
+						break;
+					} else if (c == '\r' || c == '\n') {
+						pushbackChar = c;
+						hasPushback = true;
+						break;
+					} else if (offset == 1) {
+						// no '?' after '='
+						out.write('=');
+						pushbackChar = c;
+						hasPushback = true;
+						break;
+					}
+					encodedWord[offset] = (byte) c;
+					// store one past the 4th '?', presumably the '='
+					if (f4 > 0 && offset >= f4 + 1) {
+						if (c == '=') {
+							offset++;
+						} else {
+							pushbackChar = c;
+							hasPushback = true;
 						}
+						break;
 					}
 				}
-			}
+				//if (f1 > 0)
+				//	Debug.debug(Debug.DEBUG, "End of encoded word, f1 " + f1 + " f2 " + f2 + " f3 " + f3 + " f4 " + f4 +
+				//	" offset " + offset + " pushback? " + hasPushback + " pbchar(dec) " + c + '\n' +
+				//	net.i2p.util.HexDump.dump(encodedWord, 0, offset));
+				if (f4 == 0) {
+					// at most 1 byte is pushed back
+					if (f1 == 0) {
+						// This is normal
+						continue;
+					} else if (f2 == 0) {
+						// =? but no more ?
+						// output what we buffered
+						Debug.debug(Debug.DEBUG, "2nd '?' not found");
+						for (int i = 0; i < offset; i++) {
+							out.write(encodedWord[i] & 0xff);
+						}
+						continue;
+					} else if (f3 == 0) {
+						// discard what we buffered
+						Debug.debug(Debug.DEBUG, "3rd '?' not found");
+						continue;
+					} else {
+						// probably just too long, but could be end of line without the "?=".
+						// synthesize a 4th '?' in an attempt to output
+						// something, probably with some trailing garbage
+						Debug.debug(Debug.DEBUG, "4th '?' not found");
+						f4 = offset + 1;
+						// keep going and output what we have
+					}
+				}
+				/*
+				 * 4th question mark found, we are complete, so lets start
+				 */
+				String enc = (encodedWord[f2+1] == 'Q' || encodedWord[f2+1] == 'q') ?
+				             "quoted-printable" :
+				             ((encodedWord[f2+1] == 'B' || encodedWord[f2+1] == 'b') ?
+				              "base64" :
+				              null);
+				// System.err.println( "4th ? found at " + f4 + ", encoding=" + enc );
+				if (enc != null) {
+					Encoding e = EncodingFactory.getEncoding( enc );
+					if( e != null ) {
+						try {
+							// System.err.println( "decode(" + (f3 + 1) + "," + ( f4 - f3 - 1 ) + ")" );
+							ReadBuffer tmpIn = new ReadBuffer(encodedWord, f3 + 1, f4 - f3 - 1);
+							// decoded won't be longer than encoded
+							MemoryBuffer tmp = new MemoryBuffer(f4 - f3 - 1);
+							try {
+								e.decode(tmpIn, tmp);
+							} catch (EOFException eof) {
+								// probably Base64 exceeded DECODE_MAX
+								// Keep going and output what we got, if any
+								if (Debug.getLevel() >= Debug.DEBUG) {
+									Debug.debug(Debug.DEBUG, "q-w " + enc, eof);
+									Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+								}
+							}
+							tmp.writeComplete(true);
+							// get charset
+							String charset = new String(encodedWord, f1 + 1, f2 - f1 - 1, "ISO-8859-1");
+							String clc = charset.toLowerCase(Locale.US);
+							if (clc.equals("utf-8") || clc.equals("utf8")) {
+								// FIXME could be more efficient?
+								InputStream tis = tmp.getInputStream();
+								if (enc.equals("quoted-printable")) {
+									int d;
+									while ((d = tis.read()) != -1) {
+										out.write(d == '_' ? 32 : d);
+									}
+								} else {
+									DataHelper.copy(tis, out);
+								}
+							} else {
+								// FIXME could be more efficient?
+								// decode string
+								String decoded = new String(tmp.getContent(), tmp.getOffset(), tmp.getLength(), charset);
+								// encode string
+								byte[] utf8 = DataHelper.getUTF8(decoded);
+								if (enc.equals("quoted-printable")) {
+									for (int j = 0; j < utf8.length; j++) {
+										byte d = utf8[j];
+										out.write(d == '_' ? 32 : d);
+									}
+								} else {
+									out.write(utf8);
+								}
+							}
+							lastCharWasQuoted = true;
+							continue;
+						} catch (IOException e1) {
+							Debug.debug(Debug.ERROR, "q-w " + enc, e1);
+							if (Debug.getLevel() >= Debug.DEBUG) {
+								Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+							}
+						} catch (RuntimeException e1) {
+							Debug.debug(Debug.ERROR, "q-w " + enc, e1);
+							if (Debug.getLevel() >= Debug.DEBUG) {
+								Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+							}
+						}
+					} else {
+						// can't happen
+						Debug.debug(Debug.DEBUG, "No decoder for " + enc);
+					}  // e != null
+				} else {
+					Debug.debug(Debug.DEBUG, "Invalid encoding '" + (char) encodedWord[f2+1] + '\'');
+				}  // enc != null
+			}  // c == '='
 			else if( c == '\r' ) {
-				if( length > 0 && in[offset] == '\n' ) {
+				if ((c = in.read()) == '\n' ) {
 					/*
 					 * delay linebreak in case of long line
 					 */
 					linebreak = true;
-					// The ReadBuffer can contain the body too.
-					// If we just had a linebreak, we are done...
-					// don't keep parsing!
-					if( length > 2 && in[offset+1] == '\r' && in[offset+2] == '\n')
-						break;
-					length--;
-					offset++;
-					continue;
+				} else {
+					// pushback?
+					Debug.debug(Debug.DEBUG, "No \\n after \\r");
 				}
 			}
+			// swallow whitespace here if lastCharWasQuoted
 			if( linebreak ) {
 				linebreak = false;
-				if( c != ' ' && c != '\t' ) {
-					/*
-					 * new line does not start with whitespace, so its not a new part of a
-					 * long line
-					 */
-					out.write('\r');
-					out.write('\n');
-					lastSkip = 0;
-				}
-				else {
-					if( !lastCharWasQuoted )
-						out.write(' ');
+				for (int i = 0; ; i++) {
+					c = in.read();
+					if (c == -1)
+						break;
+					if (c != ' ' && c != '\t') {
+						if (i == 0) {
+							/*
+							 * new line does not start with whitespace, so its not a new part of a
+							 * long line
+							 */
+							out.write('\r');
+							out.write('\n');
+							if (c == '\r') {
+								linebreak = true;
+								in.read();    //  \n
+								break;
+							}
+						} else {
+							// treat all preceding whitespace as a single one
+							if (!lastCharWasQuoted)
+								out.write(' ');
+						}
+						pushbackChar = c;
+						hasPushback = true;
+						break;
+					}
 					/*
 					 * skip whitespace
 					 */
-					int skipped = 1;
-					while( length > 0 && ( in[offset] == ' ' || in[offset] == '\t' ) ) {
-						if( lastSkip > 0 && skipped >= lastSkip ) {
-							break;
-						}
-						offset++;
-						length--;
-						skipped++;
-					}
-					if( lastSkip == 0 && skipped > 0 ) {
-						lastSkip = skipped;
-					}
-					continue;
 				}
+				// if \r\n\r\n, we are done
+				if (linebreak)
+					break;
+			} else {
+				/*
+				 * print out everything else literally
+				 */
+				out.write(c);
+				lastCharWasQuoted = false;
 			}
-			/*
-			 * print out everything else literally
-			 */
-			out.write(c);
-			lastCharWasQuoted = false;
-		}
+		}  // while true
 		if( linebreak ) {
 			out.write('\r');
 			out.write('\n');
 		}
-			
-		return new ReadBuffer(out.toByteArray(), 0, out.size());
+		bout.writeComplete(true);
 	}
 
 /*****

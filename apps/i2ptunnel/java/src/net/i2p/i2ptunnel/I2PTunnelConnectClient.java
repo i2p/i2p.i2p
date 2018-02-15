@@ -65,7 +65,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     private final static String ERR_BAD_PROTOCOL =
          "HTTP/1.1 405 Bad Method\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
@@ -76,7 +76,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     private final static String ERR_LOCALHOST =
          "HTTP/1.1 403 Access Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
+         "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+

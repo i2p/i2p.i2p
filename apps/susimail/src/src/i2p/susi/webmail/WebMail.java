@@ -24,12 +24,17 @@
 package i2p.susi.webmail;
 
 import i2p.susi.debug.Debug;
+import i2p.susi.util.Buffer;
 import i2p.susi.util.Config;
+import i2p.susi.util.DecodingOutputStream;
+import i2p.susi.util.EscapeHTMLOutputStream;
+import i2p.susi.util.EscapeHTMLWriter;
+import i2p.susi.util.FilenameUtil;
 import i2p.susi.util.Folder;
 import i2p.susi.util.Folder.SortOrder;
-import i2p.susi.util.ReadBuffer;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.OutputStreamBuffer;
 import i2p.susi.webmail.Messages;
-import i2p.susi.webmail.encoding.DecodingException;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingException;
 import i2p.susi.webmail.encoding.EncodingFactory;
@@ -48,6 +53,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +82,8 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
+import net.i2p.servlet.util.WriterOutputStream;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
 
@@ -100,7 +108,7 @@ public class WebMail extends HttpServlet
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
 	
-	private enum State { AUTH, LIST, SHOW, NEW, CONFIG }
+	private enum State { AUTH, LOADING, LIST, SHOW, NEW, CONFIG }
 	
 	// TODO generate from servlet name to allow for renaming or multiple instances
 	private static final String myself = "/susimail/susimail";
@@ -125,12 +133,13 @@ public class WebMail extends HttpServlet
 	 * hidden params
 	 */
 	private static final String SUSI_NONCE = "susiNonce";
-	private static final String B64UIDL = "b64uidl";
-	private static final String PREV_B64UIDL = "prevb64uidl";
-	private static final String NEXT_B64UIDL = "nextb64uidl";
+	private static final String B64UIDL = "msg";
+	private static final String PREV_B64UIDL = "prevmsg";
+	private static final String NEXT_B64UIDL = "nextmsg";
 	private static final String PREV_PAGE_NUM = "prevpagenum";
 	private static final String NEXT_PAGE_NUM = "nextpagenum";
 	private static final String CURRENT_SORT = "currentsort";
+	private static final String CURRENT_FOLDER = "currentfolder";
 	private static final String DEBUG_STATE = "currentstate";
 
 	/*
@@ -242,32 +251,6 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
-	 * sorts Mail objects by id field
-	 * 
-	 * @author susi
-	 */
-/****
-	private static class IDSorter implements Comparator<String> {
-		private final MailCache mailCache;
-		
-		public IDSorter( MailCache mailCache )
-		{
-			this.mailCache = mailCache;
-		}
-		
-		public int compare(String arg0, String arg1) {
-			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
-			if (a == null)
-				return (b == null) ? 0 : 1;
-			if (b == null)
-				return -1;
-			return a.id - b.id;
-		}		
-	}
-****/
-
-	/**
 	 * Base for the various sorters
 	 * 
 	 * @since 0.9.13
@@ -341,6 +324,8 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SubjectSorter extends SorterBase {
+		private static final String xre = _t("Re:").toLowerCase(Locale.US);
+		private static final String xfwd = _t("Fwd:").toLowerCase(Locale.US);
 		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SubjectSorter( MailCache mailCache )
@@ -349,33 +334,31 @@ public class WebMail extends HttpServlet
 		}
 		
 		protected int compare(Mail a, Mail b) {
-			String as = a.formattedSubject;
-			String bs = b.formattedSubject;
-			if (as.toLowerCase().startsWith("re:")) {
+			String as = a.subject;
+			String bs = b.subject;
+			String aslc = as.toLowerCase(Locale.US);
+			String bslc = bs.toLowerCase(Locale.US);
+			if (aslc.startsWith("re:") || aslc.startsWith("fw:")) {
 				as = as.substring(3).trim();
-			} else if (as.toLowerCase().startsWith("fwd:")) {
+			} else if (aslc.startsWith("fwd:")) {
 				as = as.substring(4).trim();
 			} else {
-				String xre = _t("Re:").toLowerCase();
-				if (as.toLowerCase().startsWith(xre)) {
+				if (aslc.startsWith(xre)) {
 					as = as.substring(xre.length()).trim();
 				} else {
-					String xfwd = _t("Fwd:").toLowerCase();
-					if (as.toLowerCase().startsWith(xfwd))
+					if (aslc.startsWith(xfwd))
 						as = as.substring(xfwd.length()).trim();
 				}
 			}
-			if (bs.toLowerCase().startsWith("re:")) {
+			if (bslc.startsWith("re:") || bslc.startsWith("fw:")) {
 				bs = bs.substring(3).trim();
-			} else if (bs.toLowerCase().startsWith("fwd:")) {
+			} else if (bslc.startsWith("fwd:")) {
 				bs = bs.substring(4).trim();
 			} else {
-				String xre = _t("Re:").toLowerCase();
-				if (bs.toLowerCase().startsWith(xre)) {
+				if (bslc.startsWith(xre)) {
 					bs = bs.substring(xre.length()).trim();
 				} else {
-					String xfwd = _t("Fwd:").toLowerCase();
-					if (bs.toLowerCase().startsWith(xfwd))
+					if (bslc.startsWith(xfwd))
 						bs = bs.substring(xfwd.length()).trim();
 				}
 			}
@@ -434,6 +417,11 @@ public class WebMail extends HttpServlet
 		POP3MailBox mailbox;
 		MailCache mailCache;
 		Folder<String> folder;
+		boolean isLoading, isFetching;
+		/** Set by threaded connector. Error or null */
+		String connectError;
+		/** Set by threaded connector. -1 if nothing to report, 0 or more after fetch complete */
+		int newMails = -1;
 		String user, pass, host, error, info;
 		String replyTo, replyCC;
 		String subject, body;
@@ -476,7 +464,9 @@ public class WebMail extends HttpServlet
 		 *
 		 *  @since 0.9.13
 		 */
-		public void foundNewMail() {
+		public void foundNewMail(boolean yes) {
+			if (!yes)
+				return;
 			MailCache mc = mailCache;
 			Folder<String> f = folder;
 			if (mc != null && f != null) {
@@ -607,14 +597,14 @@ public class WebMail extends HttpServlet
 	private static void showPart( PrintWriter out, MailPart mailPart, int level, boolean html )
 	{
 		String br = html ? "<br>\r\n" : "\r\n";
-		
+
 		if( html ) {
 			out.println( "<!-- " );
-			out.println( "Debug: Showing Mail Part with hash code " + mailPart.hashCode());
+			out.println( "Debug: Showing Mail Part at level " + level + " with ID " + mailPart.getID());
 			out.println( "Debug: Mail Part headers follow");
 			for( int i = 0; i < mailPart.headerLines.length; i++ ) {
 				// fix Content-Type: multipart/alternative; boundary="----------8CDE39ECAF2633"
-				out.println( mailPart.headerLines[i].replace("--", "&mdash;") );
+				out.println( mailPart.headerLines[i].replace("--", "&#45;&#45;") );
 			}	
 			out.println( "-->" );
 		}
@@ -628,6 +618,20 @@ public class WebMail extends HttpServlet
 				}
 				if( chosen != null ) {
 					showPart( out, chosen, level + 1, html );
+					if (html) {
+						// DEBUG
+						for (MailPart subPart : mailPart.parts) {
+							if (chosen.equals(subPart))
+								continue;
+							out.println( "<!-- " );
+							out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with ID " + subPart.getID());
+							out.println( "Debug: Mail Part headers follow");
+							for( int i = 0; i < subPart.headerLines.length; i++ ) {
+								out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
+							}	
+							out.println( "-->" );
+						}
+					}
 					return;
 				}
 			}
@@ -644,7 +648,6 @@ public class WebMail extends HttpServlet
 			boolean showBody = false;
 			boolean prepareAttachment = false;
 			String reason = "";
-			StringBuilder body = null;
 			
 			String ident = quoteHTML(
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
@@ -658,53 +661,61 @@ public class WebMail extends HttpServlet
 				 */
 				showBody = true;
 			}
-			if( showBody == false && mailPart.type != null ) {
+			if (!showBody && mailPart.type != null) {
 				if( mailPart.type.equals("text/plain")) {
 					showBody = true;
 				}
 				else
 					prepareAttachment = true;
 			}
-			if( showBody ) {			
-					String charset = mailPart.charset;
-					if( charset == null ) {
-						charset = "ISO-8859-1";
-						// don't show this in text mode which is used to include the mail in the reply or forward
-						if (html)
-							reason += _t("Warning: no charset found, fallback to US-ASCII.") + br;
-					}
-					try {
-						ReadBuffer decoded = mailPart.decode(0);
-						BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), charset ) );
-						body = new StringBuilder();
-						String line;
-						while( ( line = reader.readLine() ) != null ) {
-							body.append( quoteHTML( line ) );
-							body.append( br );
-						}
-					}
-					catch( UnsupportedEncodingException uee ) {
-						showBody = false;
-						reason = _t("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
-					}
-					catch (IOException e1) {
-						showBody = false;
-						reason += _t("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
-					}
-			}
-			if( html )
-				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
 			if( reason != null && reason.length() > 0 ) {
 				if( html )
 					out.println( "<p class=\"info\">");
 				out.println( reason );
 				if( html )
 					out.println( "</p>" );
+				reason = "";
 			}
-			if( showBody ) {
+			if( html )
+				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
+			if( showBody ) {			
 				if( html )
-					out.println( "<p class=\"mailbody\">" );
-				out.println( body.toString() );
+					out.println( "<p class=\"mailbody\"><br>" );
+				String charset = mailPart.charset;
+				if( charset == null ) {
+					charset = "ISO-8859-1";
+					// don't show this in text mode which is used to include the mail in the reply or forward
+					// Too common, don't show this at all.
+					//if (html)
+					//	reason = _t("Warning: no charset found, fallback to US-ASCII.") + br;
+				}
+				try {
+					Writer escaper;
+					if (html)
+						escaper = new EscapeHTMLWriter(out);
+					else
+						escaper = out;
+					Buffer ob = new OutputStreamBuffer(new DecodingOutputStream(escaper, charset));
+					mailPart.decode(0, ob);
+					// todo Finally
+					ob.writeComplete(true);
+				}
+				catch( UnsupportedEncodingException uee ) {
+					showBody = false;
+					reason = _t("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
+				}
+				catch (IOException e1) {
+					showBody = false;
+					reason += _t("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
+				}
+				if( html )
+					out.println( "<br></p>" );
+			}
+			if( reason != null && reason.length() > 0 ) {
+				// FIXME css has -32 margin
+				if( html )
+					out.println( "<p class=\"info\">");
+				out.println( reason );
 				if( html )
 					out.println( "</p>" );
 			}
@@ -722,7 +733,7 @@ public class WebMail extends HttpServlet
 						}
 						name = quoteHTML(name);
 						out.println("<img src=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
-							 mailPart.hashCode() +
+							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) +
 							 "\" alt=\"" + name + "\">");
 					} else if (type != null && (
@@ -731,18 +742,20 @@ public class WebMail extends HttpServlet
 					        type.startsWith("video/") ||
 						(type.startsWith("text/") && !type.equals("text/html")) ||
 						type.equals("application/zip") || type.equals("application/x-gtar") ||
+						type.equals("application/x-zip-compressed") ||
 						type.equals("application/compress") || type.equals("application/gzip") ||
 						type.equals("application/x-7z-compressed") || type.equals("application/x-rar-compressed") ||
 						type.equals("application/x-tar") || type.equals("application/x-bzip2") ||
 						type.equals("application/pdf") || type.equals("application/x-bittorrent") ||
+						type.equals("application/pgp-encrypted") ||
 						type.equals("application/pgp-signature"))) {
 						out.println( "<a href=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
-							 mailPart.hashCode() +
+							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) + "\">" +
 							 _t("Download attachment {0}", ident) + "</a>");
 					} else {
 						out.println( "<a target=\"_blank\" href=\"" + myself + '?' + DOWNLOAD + '=' +
-							 mailPart.hashCode() +
+							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) + "\">" +
 							 _t("Download attachment {0}", ident) + "</a>" +
 							 " (" + _t("File is packed into a zipfile for security reasons.") + ')');
@@ -758,17 +771,17 @@ public class WebMail extends HttpServlet
 		}
 		if( html ) {
 			out.println( "<!-- " );
-			out.println( "Debug: End of Mail Part with hash code " + mailPart.hashCode());
+			out.println( "Debug: End of Mail Part at level " + level + " with ID " + mailPart.getID());
 			out.println( "-->" );
 		}
 	}
 	/**
 	 * prepare line for presentation between html tags
 	 * 
-	 * - quote html tags
+	 * Escapes html tags
 	 * 
-	 * @param line
-	 * @return escaped string
+	 * @param line null OK
+	 * @return escaped string or "" for null input
 	 */
 	static String quoteHTML( String line )
 	{
@@ -860,60 +873,200 @@ public class WebMail extends HttpServlet
 					}
 				}
 				if( doContinue ) {
-					POP3MailBox mailbox = new POP3MailBox( host, pop3PortNo, user, pass );
-					if (offline || mailbox.connectToServer()) {
-						sessionObject.mailbox = mailbox;
-						sessionObject.user = user;
-						sessionObject.pass = pass;
-						sessionObject.host = host;
-						sessionObject.smtpPort = smtpPortNo;
-						state = State.LIST;
-						MailCache mc = new MailCache(mailbox, host, pop3PortNo, user, pass);
-						sessionObject.mailCache = mc;
-						sessionObject.folder = new Folder<String>();
-						if (!offline) {
-							// prime the cache, request all headers at once
-							// otherwise they are pulled one at a time
-							// during the sort in folder.setElements() below
-							mc.getMail(MailCache.FetchMode.HEADER);
-						}
-						
-						// setElements() sorts, so configure the sorting first
-						//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_SENDER, new SenderSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_SUBJECT, new SubjectSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_DATE, new DateSorter( sessionObject.mailCache ) );
-						sessionObject.folder.addSorter( SORT_SIZE, new SizeSorter( sessionObject.mailCache ) );
-						// reverse sort, latest mail first
-						// TODO get user defaults from config
-						sessionObject.folder.setSortBy(SORT_DEFAULT, SORT_ORDER_DEFAULT);
-						// get through cache so we have the disk-only ones too
-						String[] uidls = mc.getUIDLs();
-						sessionObject.folder.setElements(uidls);
-
-						sessionObject.reallyDelete = false;
-						if (offline)
-							Debug.debug(Debug.DEBUG, "OFFLINE MODE");
-						else
-							Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
-						// we do this after the initial priming above
-						mailbox.setNewMailListener(sessionObject);
-					} else {
-						sessionObject.error += mailbox.lastError();
-						Debug.debug(Debug.DEBUG, "LOGIN FAIL, REMOVING SESSION");
-						HttpSession session = request.getSession();
-						session.removeAttribute( "sessionObject" );
-						session.invalidate();
-						mailbox.destroy();
-						sessionObject.mailbox = null;
-						sessionObject.mailCache = null;
-						Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
-					}
+					sessionObject.smtpPort = smtpPortNo;
+					state = threadedStartup(sessionObject, offline, state,
+					                        host, pop3PortNo, user, pass);
 				}
 			}
 		}
 		return state;
 	}
+
+	/**
+	 * Starts one thread to load the emails from disk,
+	 * and in parallel starts a second thread to connect to the POP3 server
+	 * (unless user clicked the 'read mail offline' at login).
+	 * Either could finish first, but unless the local disk cache is really big,
+	 * the loading will probably finish first.
+	 *
+	 * Once the POP3 connects, it waits for the disk loader to finish, and then
+	 * does the fetching of new emails.
+	 *
+	 * The user may view the local folder once the first (loader) thread is done.
+	 *
+	 * @since 0.9.34
+	 */
+	private static State threadedStartup(SessionObject sessionObject, boolean offline, State state,
+	                                     String host, int pop3PortNo, String user, String pass) {
+		POP3MailBox mailbox = new POP3MailBox(host, pop3PortNo, user, pass);
+		I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		MailCache mc;
+		try {
+			mc = new MailCache(ctx, mailbox, host, pop3PortNo, user, pass);
+		} catch (IOException ioe) {
+			Debug.debug(Debug.ERROR, "Error creating disk cache", ioe);
+			sessionObject.error += ioe.toString() + '\n';
+			return State.AUTH;
+		}
+		Folder<String> folder = new Folder<String>();	
+		// setElements() sorts, so configure the sorting first
+		//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
+		folder.addSorter( SORT_SENDER, new SenderSorter(mc));
+		folder.addSorter( SORT_SUBJECT, new SubjectSorter(mc));
+		folder.addSorter( SORT_DATE, new DateSorter(mc));
+		folder.addSorter( SORT_SIZE, new SizeSorter(mc));
+		// reverse sort, latest mail first
+		// TODO get user defaults from config
+		folder.setSortBy(SORT_DEFAULT, SORT_ORDER_DEFAULT);
+		sessionObject.folder = folder;
+
+		sessionObject.mailbox = mailbox;
+		sessionObject.user = user;
+		sessionObject.pass = pass;
+		sessionObject.host = host;
+		sessionObject.reallyDelete = false;
+
+		// Thread the loading and the server connection.
+		// Either could finish first.
+
+		// With a mix of email (10KB median, 100KB average size),
+		// about 20 emails per second per thread loaded.
+		// thread 1: mc.loadFromDisk()
+		sessionObject.mailCache = mc;
+		sessionObject.isLoading = true;
+		boolean ok = mc.loadFromDisk(new LoadWaiter(sessionObject));
+		if (!ok)
+			sessionObject.isLoading = false;
+
+		// thread 2: mailbox.connectToServer()
+		if (offline) {
+			Debug.debug(Debug.DEBUG, "OFFLINE MODE");
+		} else {
+			sessionObject.isFetching = true;
+			if (mailbox.connectToServer(new ConnectWaiter(sessionObject)))
+				sessionObject.isFetching = false;
+		}
+
+		// wait a little while so we avoid the loading page if we can
+		if (sessionObject.isLoading) {
+			try {
+				sessionObject.wait(5000);
+			} catch (InterruptedException ie) {
+				Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+			}
+		}
+		state = sessionObject.isLoading ? State.LOADING : State.LIST;
+		return state;
+	}
+
+	/**
+	 *  Callback from MailCache.loadFromDisk()
+	 *  @since 0.9.34
+	 */
+	private static class LoadWaiter implements NewMailListener {
+		private final SessionObject _so;
+
+		public LoadWaiter(SessionObject so) {
+			_so = so;
+		}
+
+		public void foundNewMail(boolean yes) {
+			synchronized(_so) {
+				// get through cache so we have the disk-only ones too
+				MailCache mc = _so.mailCache;
+				Folder<String> f = _so.folder;
+				if (mc != null && f != null) {
+					String[] uidls = mc.getUIDLs();
+					int added = f.addElements(Arrays.asList(uidls));
+					if (added > 0)
+						_so.pageChanged = true;
+					Debug.debug(Debug.DEBUG, "Folder loaded");
+				} else {
+					Debug.debug(Debug.DEBUG, "MailCache/folder vanished?");
+				}
+				_so.isLoading = false;
+				_so.notifyAll();
+			}
+		}
+	}
+
+	/**
+	 *  Callback from POP3MailBox.connectToServer()
+	 *  @since 0.9.34
+	 */
+	private static class ConnectWaiter implements NewMailListener, Runnable {
+		private final SessionObject _so;
+		private final POP3MailBox _mb;
+
+		public ConnectWaiter(SessionObject so) {
+			_so = so;
+			_mb = _so.mailbox;
+		}
+
+		/** run this way if already connected */
+		public void run() {
+			foundNewMail(true);
+		}
+
+		/** @param connected are we? */
+		public void foundNewMail(boolean connected) {
+			MailCache mc = null;
+			Folder<String> f = null;
+			boolean found = false;
+			if (connected) {
+				Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
+				// we do this whether new mail was found or not,
+				// because we may already have UIDLs in the MailCache to fetch
+				synchronized(_so) {
+					while (_so.isLoading) {
+						try {
+							_so.wait(5000);
+						} catch (InterruptedException ie) {
+						       Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+							return;
+						}
+					}
+					mc = _so.mailCache;
+					f = _so.folder;
+				}
+				Debug.debug(Debug.DEBUG, "Done waiting for folder load");
+				// fetch the mail outside the lock
+				// TODO, would be better to add each email as we get it
+				if (mc != null && f != null) {
+					found = mc.getMail(MailCache.FetchMode.HEADER);
+				}
+			} else {
+				Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
+			}
+			synchronized(_so) {
+				if (!connected) {
+					String error = _mb.lastError();
+					if (error.length() > 0)
+						_so.connectError = error;
+					else
+						_so.connectError = _t("Error connecting to server");
+				} else if (!found) {
+					Debug.debug(Debug.DEBUG, "No new emails");
+					_so.newMails = 0;
+					_so.connectError = null;
+				} else if (mc != null && f != null) {
+					String[] uidls = mc.getUIDLs();
+					int added = f.addElements(Arrays.asList(uidls));
+					if (added > 0)
+						_so.pageChanged = true;
+					_so.newMails = added;
+					_so.connectError = null;
+					Debug.debug(Debug.DEBUG, "Added " + added + " new emails");
+				} else {
+					Debug.debug(Debug.DEBUG, "MailCache/folder vanished?");
+				}
+				_mb.setNewMailListener(_so);
+				_so.isFetching = false;
+				_so.notifyAll();
+			}
+		}
+	}
+
 
 	/**
 	 * 
@@ -968,6 +1121,9 @@ public class WebMail extends HttpServlet
 		state = processLogout(sessionObject, request, isPOST, state);
 		if (state == State.AUTH)
 			return state;
+		// if loading, we can't get to states LIST/SHOW or it will block
+		if (sessionObject.isLoading)
+			return State.LOADING;
 
 		/*
 		 *  compose dialog
@@ -1088,8 +1244,10 @@ public class WebMail extends HttpServlet
 								sessionObject.replyTo = mail.reply;
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
 								sessionObject.replyTo = mail.sender;
-							sessionObject.subject = mail.formattedSubject;
+							sessionObject.subject = mail.subject;
 							if (!(sessionObject.subject.startsWith("Re:") ||
+							      sessionObject.subject.startsWith("re:") ||
+							      sessionObject.subject.startsWith("RE:") ||
 							      sessionObject.subject.startsWith(_t("Re:")))) {
 								sessionObject.subject = _t("Re:") + ' ' + sessionObject.subject;
 							}
@@ -1130,8 +1288,13 @@ public class WebMail extends HttpServlet
 								sessionObject.replyCC = buf.toString();
 						}
 						if( forward ) {
-							sessionObject.subject = mail.formattedSubject;
+							sessionObject.subject = mail.subject;
 							if (!(sessionObject.subject.startsWith("Fwd:") ||
+							      sessionObject.subject.startsWith("fwd:") ||
+							      sessionObject.subject.startsWith("FWD:") ||
+							      sessionObject.subject.startsWith("Fw:") ||
+							      sessionObject.subject.startsWith("fw:") ||
+							      sessionObject.subject.startsWith("FW:") ||
 							      sessionObject.subject.startsWith(_t("Fwd:")))) {
 								sessionObject.subject = _t("Fwd:") + ' ' + sessionObject.subject;
 							}
@@ -1253,18 +1416,27 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _t("Internal error, lost connection.") + '\n';
 				return State.AUTH;
 			}
-			mailbox.refresh();
-			String error = mailbox.lastError();
-			sessionObject.error += error;
-			sessionObject.mailCache.getMail(MailCache.FetchMode.HEADER);
-			// get through cache so we have the disk-only ones too
-			String[] uidls = sessionObject.mailCache.getUIDLs();
-			int added = sessionObject.folder.addElements(Arrays.asList(uidls));
-			if (added > 0)
-				sessionObject.info += ngettext("{0} new message", "{0} new messages", added);
-			else if (error.length() <= 0)
-				sessionObject.info += _t("No new messages");
-			sessionObject.pageChanged = true;
+			if (sessionObject.isFetching) {
+				// shouldn't happen, button disabled
+				return state;
+			}
+			sessionObject.isFetching = true;
+			ConnectWaiter cw = new ConnectWaiter(sessionObject);
+			if (mailbox.connectToServer(cw)) {
+				// Already connected, start a thread ourselves
+				// TODO - But if already connected, we aren't going to find anything new.
+				// We used to call refresh() from here, which closes first,
+				// but that isn't threaded.
+				Debug.debug(Debug.DEBUG, "Already connected, running CW");
+				Thread t = new I2PAppThread(cw, "Email fetcher");
+				t.start();
+			}
+			// wait if it's going to be quick
+			try {
+				sessionObject.wait(3000);
+			} catch (InterruptedException ie) {
+				Debug.debug(Debug.DEBUG, "Interrupted waiting for connect", ie);
+			}
 		}
 		return state;
 	}
@@ -1402,9 +1574,9 @@ public class WebMail extends HttpServlet
 		}       	
 		if( str != null ) {
 			try {
-				int hashCode = Integer.parseInt( str );
+				int id = Integer.parseInt( str );
 				Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
-				MailPart part = mail != null ? getMailPartFromHashCode( mail.getPart(), hashCode ) : null;
+				MailPart part = mail != null ? getMailPartFromID(mail.getPart(), id) : null;
 				if( part != null ) {
 					if (sendAttachment(sessionObject, part, response, isRaw))
 						return true;
@@ -1449,21 +1621,20 @@ public class WebMail extends HttpServlet
 
 	/**
 	 * Recursive.
-	 * FIXME can't be bookmarked.
-	 * @param hashCode
+	 * @param id as retrieved from getID()
 	 * @return the part or null
 	 */
-	private static MailPart getMailPartFromHashCode( MailPart part, int hashCode )
+	private static MailPart getMailPartFromID(MailPart part, int id)
 	{
 		if( part == null )
 			return null;
 		
-		if( part.hashCode() == hashCode )
+		if (part.getID() == id)
 			return part;
 		
 		if( part.multipart || part.message ) {
 			for( MailPart p : part.parts ) {
-				MailPart subPart = getMailPartFromHashCode( p, hashCode );
+				MailPart subPart = getMailPartFromID(p, id);
 				if( subPart != null )
 					return subPart;
 			}
@@ -1483,6 +1654,7 @@ public class WebMail extends HttpServlet
 		/*
 		 * process paging buttons
 		 */
+/**** not on the folder view any more, handled in processConfigButtons()
 		if (buttonPressed(request, SETPAGESIZE)) {
 			try {
 				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
@@ -1494,6 +1666,7 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _t("Invalid pagesize number, resetting to default value.") + '\n';
 			}
 		}
+****/
 		if( buttonPressed( request, PREVPAGE ) ) {
 			String sp = request.getParameter(PREV_PAGE_NUM);
 			if (sp != null) {
@@ -1610,7 +1783,6 @@ public class WebMail extends HttpServlet
 					File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
 					sessionObject.error += _t("Host unchanged. Edit configation file {0} to change host.", cfg.getAbsolutePath()) + '\n';
 				}
-				Config.saveConfiguration(props);
 				String ps = props.getProperty(Folder.PAGESIZE);
 				if (sessionObject.folder != null && ps != null) {
 					try {
@@ -1620,6 +1792,7 @@ public class WebMail extends HttpServlet
 							sessionObject.folder.setPageSize( pageSize );
 					} catch( NumberFormatException nfe ) {}
 				}
+				Config.saveConfiguration(props);
 				boolean release = !Boolean.parseBoolean(props.getProperty(CONFIG_DEBUG));
 				Debug.setLevel( release ? Debug.ERROR : Debug.DEBUG );
 				state = sessionObject.folder != null ? State.LIST : State.AUTH;
@@ -1630,9 +1803,6 @@ public class WebMail extends HttpServlet
 		} else if (buttonPressed(request, SETPAGESIZE)) {
 			try {
 				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
-				Properties props = Config.getProperties();
-				props.setProperty(Folder.PAGESIZE, String.valueOf(pageSize));
-				Config.saveConfiguration(props);
 				if (sessionObject.folder != null) {
 					int oldPageSize = sessionObject.folder.getPageSize();
 					if( pageSize != oldPageSize )
@@ -1641,6 +1811,9 @@ public class WebMail extends HttpServlet
 				} else {
 					state = State.AUTH;
 				}
+				Properties props = Config.getProperties();
+				props.setProperty(Folder.PAGESIZE, String.valueOf(pageSize));
+				Config.saveConfiguration(props);
 			} catch (IOException ioe) {
 				sessionObject.error = ioe.toString();
 			} catch( NumberFormatException nfe ) {
@@ -1791,6 +1964,13 @@ public class WebMail extends HttpServlet
 					return;
 				}
 			}
+			if (state == State.LOADING) {
+				if (isPOST) {
+					sendRedirect(httpRequest, response, null);
+					return;
+				}
+			}
+
 			// Set in web.xml
 			//if (oldState == State.AUTH && newState != State.AUTH) {
 			//	int oldIdle = httpSession.getMaxInactiveInterval();
@@ -1816,9 +1996,10 @@ public class WebMail extends HttpServlet
 					int newPage = processFolderButtons(sessionObject, page, request);
 					// LIST is from SHOW page, SEND and CANCEL are from NEW page
 					// OFFLINE and LOGIN from login page
-					// TODO - REFRESH on list page
+					// REFRESH on list page
 					if (newPage != page || buttonPressed(request, LIST) ||
 					    buttonPressed(request, SEND) || buttonPressed(request, CANCEL) ||
+					    buttonPressed(request, REFRESH) ||
 					    buttonPressed(request, LOGIN) || buttonPressed(request, OFFLINE)) {
 						// P-R-G
 						String q = '?' + CUR_PAGE + '=' + newPage;
@@ -1881,15 +2062,22 @@ public class WebMail extends HttpServlet
 				}
 			}
 
-			//// End state determination, state will not change after here
-			Debug.debug(Debug.DEBUG, "Final state is " + state);
-
 			/*
 			 * update folder content
 			 * We need a valid and sorted folder for SHOW also, for the previous/next buttons
 			 */
 			Folder<String> folder = sessionObject.folder;
+			// folder could be null after an error, we can't proceed if it is
+			if (folder == null && (state == State.LIST || state == State.SHOW)) {
+				sessionObject.error += "Internal error, no folder\n";
+				state = State.AUTH;
+			}
+
+			//// End state determination, state will not change after here
+			Debug.debug(Debug.DEBUG, "Final state is " + state);
+
 			if (state == State.LIST || state == State.SHOW) {
+
 				// sort buttons are GETs
 				String oldSort = folder.getCurrentSortBy();
 				SortOrder oldOrder = folder.getCurrentSortingDirection();
@@ -1925,9 +2113,11 @@ public class WebMail extends HttpServlet
 				/*
 				 * build subtitle
 				 */
-				if( state == State.AUTH )
+				if (state == State.AUTH) {
 					subtitle = _t("Login");
-				else if( state == State.LIST ) {
+				} else if (state == State.LOADING) {
+					subtitle = _t("Loading emails, please wait...");
+				} else if( state == State.LIST ) {
 					// mailbox.getNumMails() forces a connection, don't use it
 					// Not only does it slow things down, but a failure causes all our messages to "vanish"
 					//subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
@@ -1976,6 +2166,10 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/susimail/js/compose.js\" type=\"text/javascript\"></script>");
 				} else if (state == State.LIST) {
 					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
+				} else if (state == State.LOADING) {
+					// TODO JS?
+			                out.println("<meta http-equiv=\"refresh\" content=\"5;url=" + myself + "\">");
+					// TODO we don't need the form below
 				}
 				out.print("</head>\n<body" + (state == State.LIST ? " onload=\"deleteboxclicked()\">" : ">"));
 				String nonce = state == State.AUTH ? LOGIN_NONCE :
@@ -2012,11 +2206,38 @@ public class WebMail extends HttpServlet
 					// UP is reverse sort. DOWN is normal sort.
 					String fullSort = curOrder == SortOrder.UP ? '-' + curSort : curSort;
 					out.println("<input type=\"hidden\" name=\"" + CURRENT_SORT + "\" value=\"" + fullSort + "\">");
+					out.println("<input type=\"hidden\" name=\"" + CURRENT_FOLDER + "\" value=\"" + PersistentMailCache.DIR_FOLDER + "\">");
 				}
-				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
+				boolean showRefresh = false;
+				if (sessionObject.isLoading) {
+					sessionObject.info += _t("Loading emails, please wait...") + '\n';
+					showRefresh = true;
+				}
+				if (sessionObject.isFetching) {
+					sessionObject.info += _t("Checking for new emails on server") + '\n';
+					showRefresh = true;
+				} else if (state != State.LOADING && state != State.AUTH && state != State.CONFIG) {
+					String error = sessionObject.connectError;
+					if (error != null && error.length() > 0) {
+						sessionObject.error += error + '\n';
+						sessionObject.connectError = null;
+					}
+					int added = sessionObject.newMails;
+					if (added > 0) {
+						sessionObject.info += ngettext("{0} new message", "{0} new messages", added) + '\n';
+						sessionObject.newMails = -1;
+					} else if (added == 0) {
+						sessionObject.info += _t("No new messages") + '\n';
+						sessionObject.newMails = -1;
+					}
+				}
+				if (showRefresh) {
+					sessionObject.info += _t("Refresh the page for updates") + '\n';
+				}
+				if (sessionObject.error.length() > 0) {
 					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
 				}
-				if( sessionObject.info != null && sessionObject.info.length() > 0 ) {
+				if (sessionObject.info.length() > 0) {
 					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
 				}
 				/*
@@ -2024,6 +2245,9 @@ public class WebMail extends HttpServlet
 				 */
 				if( state == State.AUTH )
 					showLogin( out );
+
+				else if (state == State.LOADING)
+					showLoading(out, sessionObject, request);
 				
 				else if( state == State.LIST )
 					showFolder( out, sessionObject, request );
@@ -2055,7 +2279,7 @@ public class WebMail extends HttpServlet
 		if (qq >= 0)
 			url = url.substring(0, qq);
 		buf.append(url);
-		if (q.length() > 0)
+		if (q != null && q.length() > 0)
 			buf.append(q.replace("&amp;", "&"));  // no you don't html escape the redirect header
 		resp.setHeader("Location", buf.toString());
 		resp.sendError(302, "Moved");
@@ -2081,41 +2305,31 @@ public class WebMail extends HttpServlet
 	{
 		boolean shown = false;
 		if(part != null) {
-			ReadBuffer content = part.buffer;
-			
-			// we always decode, even if part.encoding is null, will default to 7bit
-			try {
-				// +2 probably for \r\n
-				content = part.decode(2);
-			} catch (DecodingException e) {
-				sessionObject.error += _t("Error decoding content: {0}", e.getMessage()) + '\n';
-				content = null;
-			}
-			if(content == null)
-				return false;
 			String name = part.filename;
 			if (name == null) {
 				name = part.name;
 				if (name == null) {
 					name = part.description;
 					if (name == null)
-						name = "part" + part.hashCode();
+						name = "part" + part.getID();
 				}
 			}
-			String name2 = sanitizeFilename(name);
-			String name3 = encodeFilenameRFC5987(name);
+			String name2 = FilenameUtil.sanitizeFilename(name);
+			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
+			response.setHeader("Cache-Control", "public, max-age=604800");
 			if (isRaw) {
 				try {
 					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
 					                   "filename*=" + name3);
 					if (part.type != null)
 						response.setContentType(part.type);
-					response.setContentLength(content.length);
-					// cache-control?
-					response.getOutputStream().write(content.content, content.offset, content.length);
+					if (part.decodedLength >= 0)
+						response.setContentLength(part.decodedLength);
+					Debug.debug(Debug.DEBUG, "Sending raw attachment " + name + " length " + part.decodedLength);
+					part.decode(0, new OutputStreamBuffer(response.getOutputStream()));
 					shown = true;
 				} catch (IOException e) {
-					e.printStackTrace();
+					Debug.debug(Debug.ERROR, "Error sending raw attachment " + name + " length " + part.decodedLength, e);
 				}
 			} else {
 				ZipOutputStream zip = null;
@@ -2126,13 +2340,13 @@ public class WebMail extends HttpServlet
 					                   "filename*=" + name3 + ".zip");
 					ZipEntry entry = new ZipEntry( name );
 					zip.putNextEntry( entry );
-					zip.write( content.content, content.offset, content.length );
+					// was 2
+					part.decode(0, new OutputStreamBuffer(zip));
 					zip.closeEntry();
 					zip.finish();
 					shown = true;
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Debug.debug(Debug.ERROR, "Error sending zip attachment " + name + " length " + part.decodedLength, e);
 				} finally {
 					if ( zip != null)
 						try { zip.close(); } catch (IOException ioe) {}
@@ -2153,104 +2367,33 @@ public class WebMail extends HttpServlet
 	private static boolean sendMailSaveAs(SessionObject sessionObject, Mail mail,
 						 HttpServletResponse response)
 	{
-		ReadBuffer content = mail.getBody();
+		Buffer content = mail.getBody();
 
 		if(content == null)
 			return false;
 		String name;
-		if (mail.subject != null)
+		if (mail.subject.length() > 0)
 			name = mail.subject.trim() + ".eml";
 		else
 			name = "message.eml";
-		String name2 = sanitizeFilename(name);
-		String name3 = encodeFilenameRFC5987(name);
+		String name2 = FilenameUtil.sanitizeFilename(name);
+		String name3 = FilenameUtil.encodeFilenameRFC5987(name);
+		InputStream in = null;
 		try {
 			response.setContentType("message/rfc822");
-			response.setContentLength(content.length);
-			// cache-control?
+			response.setContentLength(content.getLength());
+			response.setHeader("Cache-Control", "public, max-age=604800");
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
 			                   "filename*=" + name3);
-			response.getOutputStream().write(content.content, content.offset, content.length);
+			in = content.getInputStream();
+			DataHelper.copy(in, response.getOutputStream());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			if (in != null) try { in.close(); } catch (IOException ioe) {}
 		}
-	}
-
-	/**
-	 * Convert the UTF-8 to ASCII suitable for inclusion in a header
-	 * and for use as a cross-platform filename.
-	 * Replace chars likely to be illegal in filenames,
-	 * and non-ASCII chars, with _
-	 *
-	 * Ref: RFC 6266, RFC 5987, i2psnark Storage.ILLEGAL
-	 *
-	 * @since 0.9.18
-	 */
-	private static String sanitizeFilename(String name) {
-		name = name.trim();
-		StringBuilder buf = new StringBuilder(name.length());
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
-			// illegal filename chars
-			if (c <= 32 || c >= 0x7f ||
-			    c == '<' || c == '>' || c == ':' || c == '"' ||
-			    c == '/' || c == '\\' || c == '|' || c == '?' ||
-			    c == '*')
-				buf.append('_');
-			else
-				buf.append(c);
-		}
-		return buf.toString();
-	}
-
-	/**
-	 * Encode the UTF-8 suitable for inclusion in a header
-	 * as a RFC 5987/6266 filename* value, and for use as a cross-platform filename.
-	 * Replace chars likely to be illegal in filenames with _
-	 *
-	 * Ref: RFC 6266, RFC 5987, i2psnark Storage.ILLEGAL
-	 *
-	 * @since 0.9.33
-	 */
-	private static String encodeFilenameRFC5987(String name) {
-		name = name.trim();
-		StringBuilder buf = new StringBuilder(name.length());
-		buf.append("utf-8''");
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
-			// illegal filename chars
-			if (c < 32 || (c >= 0x7f && c <= 0x9f) ||
-			    c == '<' || c == '>' || c == ':' || c == '"' ||
-			    c == '/' || c == '\\' || c == '|' || c == '?' ||
-			    c == '*' ||
-			    // unicode newlines
-			    c == 0x2028 || c == 0x2029) {
-				buf.append('_');
-			} else if (c == ' ' || c == '\'' || c == '%' ||          // not in 5987 attr-char
-			           c == '(' || c == ')' || c == '@' ||           // 2616 separators
-			           c == ',' || c == ';' || c == '[' || c == ']' ||
-			           c == '=' || c == '{' || c == '}') {
-				// single byte encoding
-				buf.append('%');
-				buf.append(Integer.toHexString(c));
-			} else if (c < 0x7f) {
-				// single byte char, as-is
-				buf.append(c);
-			} else {
-				// multi-byte encoding
-				byte[] utf = DataHelper.getUTF8(String.valueOf(c));
-				for (int j = 0; j < utf.length; j++) {
-					int b = utf[j] & 0xff;
-					buf.append('%');
-					if (b < 16)
-						buf.append(0);
-					buf.append(Integer.toHexString(b));
-				}
-			}
-		}
-		return buf.toString();
 	}
 
 	/**
@@ -2376,7 +2519,7 @@ public class WebMail extends HttpServlet
 				SMTPClient relay = new SMTPClient();
 				if( relay.sendMail( sessionObject.host, sessionObject.smtpPort,
 						sessionObject.user, sessionObject.pass,
-						sender, recipients.toArray(), sessionObject.sentMail,
+						sender, recipients.toArray(new String[recipients.size()]), sessionObject.sentMail,
 				                sessionObject.attachments, boundary)) {
 					sessionObject.info += _t("Mail sent.");
 					sessionObject.sentMail = null;	
@@ -2530,6 +2673,18 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
+	 * @since 0.9.34
+	 */
+	private static void showLoading(PrintWriter out, SessionObject sessionObject, RequestWrapper request) {
+		// TODO make it pretty
+		out.println("<p><b>");
+		out.println(_t("Loading emails, please wait..."));
+		out.println("</b><p><b>");
+		out.println(_t("Refresh the page for updates"));
+		out.println("</b>");
+	}
+
+	/**
 	 * 
 	 * @param out
 	 * @param sessionObject
@@ -2545,7 +2700,7 @@ public class WebMail extends HttpServlet
 			//button( REPLYALL, _t("Reply All") ) +
 			//button( FORWARD, _t("Forward") ) + spacer +
 			//button( DELETE, _t("Delete") ) + spacer +
-		out.println(button( REFRESH, _t("Check Mail") ) + spacer);
+		out.println((sessionObject.isFetching ? button2(REFRESH, _t("Check Mail")) : button(REFRESH, _t("Check Mail"))) + spacer);
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _t("Logout") ));
@@ -2610,6 +2765,9 @@ public class WebMail extends HttpServlet
 			//		", markAll=" + sessionObject.markAll +
 			//		", invert=" + sessionObject.invert +
 			//		", clear=" + sessionObject.clear );
+			String subj = mail.shortSubject;
+			if (subj.length() <= 0)
+				subj = "<i>" + _t("no subject") + "</i>";
 			out.println( "<tr class=\"list" + bg + "\">" +
 					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" + 
 					" onclick=\"deleteboxclicked();\" " +
@@ -2618,7 +2776,7 @@ public class WebMail extends HttpServlet
                                         // mail.shortSender and mail.shortSubject already html encoded
 					link + mail.shortSender + "</a></td><td " + jslink + ">" +
 					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _t("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
-					link + mail.shortSubject + "</a></td><td " + jslink + ">" +
+					link + subj + "</a></td><td " + jslink + ">" +
 					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _t("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td " + jslink + ">&nbsp;</td><td align=\"right\" " + jslink + ">" +
@@ -2711,11 +2869,22 @@ public class WebMail extends HttpServlet
 			             "</p>");
 		}
 		Mail mail = sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.ALL);
-		if(!RELEASE && mail != null && mail.hasBody()) {
+		if(!RELEASE && mail != null && mail.hasBody() && mail.getSize() < 16384) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");
-			ReadBuffer body = mail.getBody();
-			out.println(quoteHTML(new String(body.content, body.offset, body.length)).replace("--", "&mdash;"));
+			Buffer body = mail.getBody();
+			InputStream in = null;
+			OutputStream sout = null;
+			try {
+				in = body.getInputStream();
+				sout = new EscapeHTMLOutputStream(new WriterOutputStream(out));
+				DataHelper.copy(in, sout);
+			} catch (IOException ioe) {
+			} finally {
+				if (in != null) try { in.close(); } catch (IOException ioe) {}
+				if (sout != null) try { sout.close(); } catch (IOException ioe) {}
+				body.readComplete(true);
+			}
 			out.println( "-->" );
 		}
 		out.println("<div class=\"topbuttons\">");
@@ -2767,12 +2936,17 @@ public class WebMail extends HttpServlet
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println( "<div id=\"viewmail\"><table id=\"message_full\" cellspacing=\"0\" cellpadding=\"5\">\n");
 		if (hasHeader) {
+			String subj = mail.subject;
+			if (subj.length() > 0)
+				subj = quoteHTML(subj);
+			else
+				subj = "<i>" + _t("no subject") + "</i>";
 			out.println("<tr><td colspan=\"2\"><table id=\"mailhead\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("From") +
 					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("Subject") +
-					":</td><td align=\"left\"><b>" + quoteHTML( mail.formattedSubject ) + "</b></td></tr>\n");
+					":</td><td align=\"left\"><b>" + subj + "</b></td></tr>\n");
 			if (mail.to != null) {
 				out.println("<tr><td align=\"right\">" + _t("To") +
 				            ":</td><td align=\"left\">" + buildRecipientLine(mail.to) + "</td></tr>\n");

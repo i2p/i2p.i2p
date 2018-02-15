@@ -1490,11 +1490,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 Sorters.setPattern(Translate.getLanguage(_manager.util().getContext()));
             else
                 Sorters.setPattern(null);
-            try {
-                Collections.sort(rv, Sorters.getComparator(sort, this));
-            } catch (IllegalArgumentException iae) {
-                // Java 7 TimSort - may be unstable
-            }
+            // Java 7 TimSort - may be unstable
+            DataHelper.sort(rv, Sorters.getComparator(sort, this));
         }
         return rv;
     }
@@ -2954,8 +2951,8 @@ public class I2PSnarkServlet extends BasicServlet {
         if (parent)  // always true
             buf.append("<div class=\"page\">\n<div class=\"mainsection\">");
         // for stop/start/check
-        final boolean er = isTopLevel && _manager.util().ratingsEnabled();
-        final boolean ec = isTopLevel && _manager.util().commentsEnabled(); // global setting
+        final boolean er = isTopLevel && snark != null && _manager.util().ratingsEnabled();
+        final boolean ec = isTopLevel && snark != null && _manager.util().commentsEnabled(); // global setting
         final boolean esc = ec && _manager.getSavedCommentsEnabled(snark); // per-torrent setting
         final boolean includeForm = showStopStart || showPriority || er || ec;
         if (includeForm) {
@@ -3240,7 +3237,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(_t("Resource Not found"))
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
-               .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(torrentName)
+               .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(DataHelper.escapeHTML(torrentName))
                .append("</td></tr>\n");
         }
         buf.append("</table>\n");
@@ -3251,7 +3248,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(_t("Resource Does Not Exist"))
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
-               .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(torrentName)
+               .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(DataHelper.escapeHTML(torrentName))
                .append("</td></tr></table></div></div></center>\n</body>\n</html>");
             return buf.toString();
         }

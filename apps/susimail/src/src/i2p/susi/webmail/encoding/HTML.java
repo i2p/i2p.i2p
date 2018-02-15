@@ -23,7 +23,9 @@
  */
 package i2p.susi.webmail.encoding;
 
-import i2p.susi.util.ReadBuffer;
+import java.io.InputStream;
+
+import i2p.susi.util.Buffer;
 
 /**
  * @author user
@@ -47,8 +49,7 @@ public class HTML extends Encoding {
 			   .replaceAll( "\r{0,1}\n", "<br>\r\n" );
 	}
 
-	public ReadBuffer decode(byte[] in, int offset, int length)
-		throws DecodingException {
+	public void decode(InputStream in, Buffer out) throws DecodingException {
 		throw new DecodingException("unsupported");
 	}
 }

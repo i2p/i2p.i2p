@@ -23,15 +23,20 @@
  */
 package i2p.susi.webmail;
 
-import i2p.susi.util.Config;
 import i2p.susi.debug.Debug;
-import i2p.susi.util.ReadBuffer;
-import i2p.susi.webmail.encoding.DecodingException;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.Config;
+import i2p.susi.util.CountingInputStream;
+import i2p.susi.util.EOFOnMatchInputStream;
+import i2p.susi.util.FileBuffer;
+import i2p.susi.util.MemoryBuffer;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -40,10 +45,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.util.ServletUtil;
+import net.i2p.util.RFC822Date;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -59,20 +67,26 @@ class Mail {
 	private static final String P2 = "^<[^@< \t]+@[^> \t]+>$";
 	private static final Pattern PATTERN1 = Pattern.compile(P1);
 	private static final Pattern PATTERN2 = Pattern.compile(P2);
+	/**
+	 *  Also used by MailPart
+	 *  See MailPart for why we don't do \r\n\r\n
+	 */
+	static final byte HEADER_MATCH[] = DataHelper.getASCII("\r\n\r");
 
 	private int size;
 	public String sender,   // as received, trimmed only, not HTML escaped
-		reply, subject, dateString,
+		reply,
+		subject,	// as received, trimmed only, not HTML escaped, non-null, default ""
+		dateString,
 		//formattedSender,    // address only, enclosed with <>, not HTML escaped
-		formattedSubject,
 		formattedDate,  // US Locale, UTC
 		localFormattedDate,  // Current Locale, local time zone
 		shortSender,    // Either name or address but not both, HTML escaped, double-quotes removed, truncated with hellip
-		shortSubject,   // HTML escaped, truncated with hellip
+		shortSubject,   // HTML escaped, truncated with hellip, non-null, default ""
 		quotedDate;  // Current Locale, local time zone, longer format
 	public final String uidl;
 	public Date date;
-	private ReadBuffer header, body;
+	private Buffer header, body;
 	private MailPart part;
 	String[] to, cc;        // addresses only, enclosed by <>
 	private boolean isNew, isSpam;
@@ -86,12 +100,12 @@ class Mail {
 	public Mail(String uidl) {
 		this.uidl = uidl;
 		//formattedSender = unknown;
-		formattedSubject = unknown;
+		subject = "";
 		formattedDate = unknown;
 		localFormattedDate = unknown;
-		sender = unknown;
+		sender = "";
 		shortSender = unknown;
-		shortSubject = unknown;
+		shortSubject = "";
 		quotedDate = unknown;
 		error = "";
 	}
@@ -100,15 +114,37 @@ class Mail {
 	 *  This may or may not contain the body also.
 	 *  @return if null, nothing has been loaded yet for this UIDL
 	 */
-	public synchronized ReadBuffer getHeader() {
+	public synchronized Buffer getHeader() {
 		return header;
 	}
 
-	public synchronized void setHeader(ReadBuffer rb) {
+	public synchronized void setHeader(Buffer rb) {
+		try {
+			setHeader(rb, rb.getInputStream(), true);
+		} catch (IOException ioe) {
+			// TODO...
+		}
+	}
+
+	/** @since 0.9.34 */
+	private synchronized String[] setHeader(Buffer rb, InputStream in, boolean closeIn) {
 		if (rb == null)
-			return;
+			return null;
 		header = rb;
-		parseHeaders();
+		String[] rv = parseHeaders(in);
+		if (closeIn)
+			rb.readComplete(true);
+		// set a date if we didn't get one in the headers
+		if (date == null) {
+			long dateLong;
+			if (rb instanceof FileBuffer) {
+				dateLong = ((FileBuffer) rb).getFile().lastModified();
+			} else {
+				dateLong = I2PAppContext.getGlobalContext().clock().now();
+			}
+			setDate(dateLong);
+		}
+		return rv;
 	}
 
 	/**
@@ -122,23 +158,40 @@ class Mail {
          *  This contains the header also.
          *  @return may be null
          */
-	public synchronized ReadBuffer getBody() {
+	public synchronized Buffer getBody() {
 		return body;
 	}
 
-	public synchronized void setBody(ReadBuffer rb) {
+	public synchronized void setBody(Buffer rb) {
 		if (rb == null)
 			return;
-		if (header == null)
-			setHeader(rb);
+		// In the common case where we have the body, we only parse the headers once.
+		// we always re-set the header, even if it was non-null before,
+		// as we have to parse them to find the start of the body
+		// and who knows, the headers could have changed.
+		//if (header == null)
+		//	setHeader(rb);
 		body = rb;
-		size = rb.length;
+		boolean success = false;
+		CountingInputStream in = null;
 		try {
-			part = new MailPart(uidl, rb);
-		} catch (DecodingException de) {
-			Debug.debug(Debug.ERROR, "Decode error: " + de);
+			in = new CountingInputStream(rb.getInputStream());
+			String[] headerLines = setHeader(rb, in, false);
+			// TODO just fail?
+			if (headerLines == null)
+				headerLines = new String[0];
+			part = new MailPart(uidl, new AtomicInteger(), rb, in, in, headerLines);
+			rb.readComplete(true);
+			// may only be available after reading and calling readComplete()
+			size = rb.getLength();
+			success = true;
+		} catch (IOException de) {
+			Debug.debug(Debug.ERROR, "Decode error", de);
 		} catch (RuntimeException e) {
-			Debug.debug(Debug.ERROR, "Parse error: " + e);
+			Debug.debug(Debug.ERROR, "Parse error", e);
+		} finally {
+			if (in != null) try { in.close(); } catch (IOException ioe) {}
+			rb.readComplete(success);
 		}
 	}
 
@@ -284,8 +337,7 @@ class Mail {
 
 	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	private static final DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-	private static final DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-	private static final DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
+	private static final DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 	static {
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it
 		TimeZone tz = SystemVersion.getSystemTimeZone();
@@ -293,8 +345,25 @@ class Mail {
 		longLocalDateFormatter.setTimeZone(tz);
 	}
 
-	private void parseHeaders()
+	/**
+	 * @param dateLong non-negative
+	 * @since 0.9.34 pulled from parseHeaders()
+	 */
+	private void setDate(long dateLong) {
+		date = new Date(dateLong);
+		synchronized(dateFormatter) {
+			formattedDate = dateFormatter.format( date );
+			localFormattedDate = localDateFormatter.format( date );
+			quotedDate = longLocalDateFormatter.format(date);
+		}
+	}
+
+	/**
+	 * @return all headers, to pass to MailPart, or null on error
+	 */
+	private String[] parseHeaders(InputStream in)
 	{
+		String[] headerLines = null;
 		error = "";
 		if( header != null ) {
 
@@ -317,10 +386,15 @@ class Mail {
 			if( ok ) {
 				
 				try {
-					ReadBuffer decoded = hl.decode( header );
-					BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), "UTF-8" ) );
-					String line;
-					while( ( line = reader.readLine() ) != null ) {
+					EOFOnMatchInputStream eofin = new EOFOnMatchInputStream(in, HEADER_MATCH);
+					MemoryBuffer decoded = new MemoryBuffer(4096);
+					hl.decode(eofin, decoded);
+					if (!eofin.wasFound())
+						Debug.debug(Debug.DEBUG, "EOF hit before \\r\\n\\r\\n in Mail");
+					// Fixme UTF-8 to bytes to UTF-8
+					headerLines = DataHelper.split(new String(decoded.getContent(), decoded.getOffset(), decoded.getLength()), "\r\n");
+					for (int j = 0; j < headerLines.length; j++) {
+						String line = headerLines[j];
 						if( line.length() == 0 )
 							break;
 
@@ -334,36 +408,25 @@ class Mail {
 								shortSender = shortSender.substring(0, lt).trim();
 							else if (lt < 0 && shortSender.contains("@"))
 								shortSender = '<' + shortSender + '>';  // add missing <> (but thunderbird doesn't...)
-							boolean trim = shortSender.length() > 35;
+							boolean trim = shortSender.length() > 45;
 							if (trim)
-								shortSender = ServletUtil.truncate(shortSender, 32).trim();
+								shortSender = ServletUtil.truncate(shortSender, 42).trim();
 							shortSender = html.encode( shortSender );
 							if (trim)
 								shortSender += "&hellip;";  // must be after html encode
 						}
 						else if (hlc.startsWith("date:")) {
 							dateString = line.substring( 5 ).trim();
-							try {
-								synchronized(mailDateFormatter) {
-									date = mailDateFormatter.parse( dateString );
-									formattedDate = dateFormatter.format( date );
-									localFormattedDate = localDateFormatter.format( date );
-									//quotedDate = html.encode( dateString );
-									quotedDate = longLocalDateFormatter.format(date);
-								}
-							}
-							catch (ParseException e) {
-								date = null;
-								e.printStackTrace();
-							}
+							long dateLong = RFC822Date.parse822Date(dateString);
+							if (dateLong > 0)
+								setDate(dateLong);
 						}
 						else if (hlc.startsWith("subject:")) {
 							subject = line.substring( 8 ).trim();
-							formattedSubject = subject;
-							shortSubject = formattedSubject;
-							boolean trim = formattedSubject.length() > 65;
+							shortSubject = subject;
+							boolean trim = subject.length() > 75;
 							if (trim)
-								shortSubject = ServletUtil.truncate(formattedSubject, 62).trim();
+								shortSubject = ServletUtil.truncate(subject, 72).trim();
 							shortSubject = html.encode( shortSubject );
 							if (trim)
 								shortSubject += "&hellip;";  // must be after html encode
@@ -418,9 +481,11 @@ class Mail {
 				}
 				catch( Exception e ) {
 					error += "Error parsing mail header: " + e.getClass().getName() + '\n';
+					Debug.debug(Debug.ERROR, "Parse error", e);
 				}		
 			}
 		}
+		return headerLines;
 	}
 }
 

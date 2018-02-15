@@ -1362,7 +1362,7 @@ public class EepGet {
             buf.append("-\r\n");
         }
         if (!_allowCaching) {
-            buf.append("Cache-control: no-cache\r\n" +
+            buf.append("Cache-Control: no-cache\r\n" +
                        "Pragma: no-cache\r\n");
         }
         boolean uaOverridden = false;

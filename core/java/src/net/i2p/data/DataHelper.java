@@ -29,9 +29,12 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -1555,7 +1558,7 @@ public class DataHelper {
             case 6: return str + "Ei";
             case 7: return str + "Zi";
             case 8: return str + "Yi";
-            default: return bytes + "";
+            default: return Long.toString(bytes);
         }
     }
 
@@ -1589,6 +1592,9 @@ public class DataHelper {
      * @since 0.9.31
      */
     public static String formatSize2(long bytes, boolean nonBreaking) {
+        String space = nonBreaking ? "&#8239;" : " ";
+        if (bytes < 1024)
+            return bytes + space;
         double val = bytes;
         int scale = 0;
         while (val >= 1024) {
@@ -1597,10 +1603,14 @@ public class DataHelper {
         }
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
+        if (val >= 200) {
+            fmt.setMaximumFractionDigits(0);
+        } else if (val >= 20) {
+            fmt.setMaximumFractionDigits(1);
+        }
 
         // Replace &nbsp; with thin non-breaking space &#8239; (more consistent/predictable width between fonts & point sizes)
 
-        String space = nonBreaking ? "&#8239;" : " ";
         String str = fmt.format(val) + space;
         switch (scale) {
             case 1: return str + "Ki";
@@ -1643,6 +1653,9 @@ public class DataHelper {
      * @since 0.9.34
      */
     public static String formatSize2Decimal(long bytes, boolean nonBreaking) {
+        String space = nonBreaking ? "&#8239;" : " ";
+        if (bytes < 1000)
+            return bytes + space;
         double val = bytes;
         int scale = 0;
         while (val >= 1000) {
@@ -1650,7 +1663,11 @@ public class DataHelper {
             val /= 1000;
         }
         DecimalFormat fmt = new DecimalFormat("##0.00");
-        String space = nonBreaking ? "&#8239;" : " ";
+        if (val >= 200) {
+            fmt.setMaximumFractionDigits(0);
+        } else if (val >= 20) {
+            fmt.setMaximumFractionDigits(1);
+        }
         String str = fmt.format(val) + space;
         switch (scale) {
             case 1: return str + "K";
@@ -1981,6 +1998,56 @@ public class DataHelper {
             }   
         } finally {
             cache.release(ba);
+        }
+    }
+
+    /**
+      * Same as Collections.sort(), but guaranteed not to throw an IllegalArgumentException if the
+      * sort is unstable. As of Java 7, TimSort will throw an IAE if the underlying sort order
+      * changes during the sort.
+      *
+      * This catches the IAE, retries once, and then returns.
+      * If an IAE is thrown twice, this method will return, with the list possibly unsorted.
+      *
+      * @param list the list to be sorted.
+      * @param c the comparator to determine the order of the list. A null value indicates that the elements' natural ordering should be used.
+      * @since 0.9.34
+      */
+    public static <T> void sort(List<T> list, Comparator<? super T> c) {
+        try {
+            Collections.sort(list, c);
+        } catch (IllegalArgumentException iae1) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException ie) {}
+            try {
+                Collections.sort(list, c);
+            } catch (IllegalArgumentException iae2) {}
+        }
+    }
+
+    /**
+      * Same as Arrays.sort(), but guaranteed not to throw an IllegalArgumentException if the
+      * sort is unstable. As of Java 7, TimSort will throw an IAE if the underlying sort order
+      * changes during the sort.
+      *
+      * This catches the IAE, retries once, and then returns.
+      * If an IAE is thrown twice, this method will return, with the array possibly unsorted.
+      *
+      * @param a the array to be sorted.
+      * @param c the comparator to determine the order of the array. A null value indicates that the elements' natural ordering should be used.
+      * @since 0.9.34
+      */
+    public static <T> void sort(T[] a, Comparator<? super T> c) {
+        try {
+            Arrays.sort(a, c);
+        } catch (IllegalArgumentException iae1) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException ie) {}
+            try {
+                Arrays.sort(a, c);
+            } catch (IllegalArgumentException iae2) {}
         }
     }
 }

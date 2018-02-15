@@ -4,12 +4,12 @@ import java.net.URI;
 import java.util.List;
 
 import net.i2p.router.RouterContext;
-import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
 import net.i2p.util.EepHead;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
+import net.i2p.util.RFC822Date;
 import net.i2p.util.SystemVersion;
 
 /**

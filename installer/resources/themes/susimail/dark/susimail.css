@@ -915,6 +915,7 @@ div.attached {
      border-radius: 2px;
      padding: 2px;
      background: #010;
+     image-orientation: from-image;
 }
 
 .attached p.mailbody {

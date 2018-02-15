@@ -13,13 +13,17 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  *  @since 0.9.14
  */
 public class XSSRequestWrapper extends HttpServletRequestWrapper {
     // Adapted from https://owasp-esapi-java.googlecode.com/svn/trunk/configuration/esapi/ESAPI.properties
-    private static final Pattern parameterValuePattern = Pattern.compile("^[\\p{L}\\p{Nd}.,:\\-\\/+=~\\[\\]?@_ \r\n]*$");
+    private static final String NON_WIN_PATTERN = "^[\\p{L}\\p{Nd}.,:\\-\\/+=~\\[\\]?@_ \r\n]*$";
+    // Same as above but with backslash for file paths
+    private static final String WIN_PATTERN     = "^[\\p{L}\\p{Nd}.,:\\-\\/+=~\\[\\]?@_ \r\n\\\\]*$";
+    private static final Pattern parameterValuePattern = Pattern.compile(SystemVersion.isWindows() ? WIN_PATTERN : NON_WIN_PATTERN);
     private static final Pattern headerValuePattern = Pattern.compile("^[a-zA-Z0-9()\\-=\\*\\.\\?;,+\\/:&_ ]*$");
     private static final String NOFILTER = "nofilter_";
 

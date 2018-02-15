@@ -25,7 +25,7 @@ class SOCKSServerFactory {
     private final static String ERR_REQUEST_DENIED =
         "HTTP/1.1 403 Access Denied - This is a SOCKS proxy, not a HTTP proxy\r\n" +
         "Content-Type: text/html; charset=iso-8859-1\r\n" +
-        "Cache-control: no-cache\r\n" +
+        "Cache-Control: no-cache\r\n" +
         "\r\n" +
         "<html><body><H1>I2P SOCKS PROXY ERROR: REQUEST DENIED</H1>" +
         "Your browser is misconfigured. This is a SOCKS proxy, not a HTTP proxy" +

@@ -855,6 +855,7 @@ div.attached {
 .attached img {
      border: 1px solid #443da0;
      border-radius: 2px;
+     image-orientation: from-image;
 }
 
 div#emptymailbox {

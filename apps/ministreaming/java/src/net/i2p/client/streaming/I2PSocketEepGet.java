@@ -233,7 +233,7 @@ public class I2PSocketEepGet extends EepGet {
             buf.append("-\r\n");
         }
         buf.append("Accept-Encoding: \r\n" +
-                   "Cache-control: no-cache\r\n" +
+                   "Cache-Control: no-cache\r\n" +
                    "Pragma: no-cache\r\n" +
                    "Connection: close\r\n");
         boolean uaOverridden = false;

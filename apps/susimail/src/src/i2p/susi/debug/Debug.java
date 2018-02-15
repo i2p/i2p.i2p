@@ -44,11 +44,19 @@ public class Debug {
 		return level;
 	}
 
-	public static void debug( int msgLevel, String msg )
+	public static void debug( int msgLevel, String msg ) {
+		debug(msgLevel, msg, null);
+	}
+
+	/** @since 0.9.34 */
+	public static void debug(int msgLevel, String msg, Throwable t)
 	{
-		if( msgLevel <= level )
+		if( msgLevel <= level ) {
 			System.err.println("SusiMail: " + msg);
+			if (t != null)
+				t.printStackTrace();
+		}
 		if (msgLevel <= ERROR)
-			I2PAppContext.getGlobalContext().logManager().getLog(Debug.class).error(msg);
+			I2PAppContext.getGlobalContext().logManager().getLog(Debug.class).error(msg, t);
 	}
 }

@@ -1,3 +1,42 @@
+2018-02-12 zzz
+ * SusiMail:
+   - Background email checking (ticket #2087)
+   - Set Cache-Control header for attachments
+   - Fix rotated attached images
+
+2018-02-11 zzz
+ * Util: Number formatting tweaks (ticket #1913)
+
+2018-02-09 zzz
+ * SusiMail:
+   - Don't collapse spaces in email display (ticket #2156)
+   - Constant URL for attachments
+   - Fixes when no subject is present
+   - Filename encoding fixes
+   - Handle lower case in Q-P decode
+   - Don't show the no-charset warning
+   - Thread loading mail from disk
+   - More error handling fixes
+
+2018-02-08 zzz
+ * SusiMail:
+   - Error handling fixes
+   - More tolerant parsing of Date headers
+   - Set a date if we don't get a Date header
+   - Fix parsing long Base64 encoded headers
+   - Fix page count after changing page size
+   - Make attribute name parsing case-insensitive
+   - Import mail method for debugging
+
+2018-02-07 zzz
+ * SusiMail: Use input streams for reading mail (ticket #2119)
+   - Rewrite Base64, HeaderLine, and QuotedPrintable decoders
+   - Rewrite ReadBuffer class and utilities for streams
+   - ReadBuffer becomes Buffer interface with multiple implementations
+   - Rewrite Mail and MailPart to parse the headers only once
+   - Rewrite MailPart parser to use streams
+   - MailPart decoder rewrite to decode stream-to-stream
+
 2018-02-01 zzz
  * Console: Fix number formatting (tickets #1912, #1913, #2126)
  * i2psnark: URL escape fixes

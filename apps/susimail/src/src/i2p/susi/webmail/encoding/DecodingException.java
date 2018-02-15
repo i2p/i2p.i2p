@@ -35,4 +35,11 @@ public class DecodingException extends IOException {
 		super( msg );
 	}
 
+	/**
+	 * @since 0.9.34
+	 */
+	public DecodingException(String msg, Exception cause)
+	{
+		super(msg, cause);
+	}
 }

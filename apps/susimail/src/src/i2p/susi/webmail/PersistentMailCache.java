@@ -2,6 +2,10 @@ package i2p.susi.webmail;
 
 import i2p.susi.debug.Debug;
 import i2p.susi.webmail.Messages;
+import i2p.susi.util.Buffer;
+import i2p.susi.util.FileBuffer;
+import i2p.susi.util.FixCRLFOutputStream;
+import i2p.susi.util.GzipFileBuffer;
 import i2p.susi.util.ReadBuffer;
 
 import java.io.BufferedInputStream;
@@ -14,19 +18,25 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.PasswordManager;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 
 /**
@@ -57,6 +67,7 @@ class PersistentMailCache {
 
 	private final Object _lock;
 	private final File _cacheDir;
+	private final I2PAppContext _context;
 
 	private static final String DIR_SUSI = "susimail";
 	private static final String DIR_CACHE = "cache";
@@ -65,6 +76,8 @@ class PersistentMailCache {
 	public static final String DIR_DRAFTS = "Drafts"; // MailDir-like
 	public static final String DIR_SENT = "Sent"; // MailDir-like
 	public static final String DIR_TRASH = "Trash"; // MailDir-like
+	public static final String DIR_SPAM = "Bulk Mail"; // MailDir-like
+	public static final String DIR_IMPORT = "import"; // Flat with .eml files, debug only for now
 	private static final String DIR_PREFIX = "s";
 	private static final String FILE_PREFIX = "mail-";
 	private static final String HDR_SUFFIX = ".hdr.txt.gz";
@@ -73,13 +86,20 @@ class PersistentMailCache {
 
 	/**
 	 *  Use the params to generate a unique directory name.
+	 *
+	 *  Does NOT load the mails in. Caller MUST call getMails().
+	 *
 	 *  @param pass ignored
 	 *  @param folder use DIR_FOLDER
 	 */
-	public PersistentMailCache(String host, int port, String user, String pass, String folder) throws IOException {
+	public PersistentMailCache(I2PAppContext ctx, String host, int port, String user, String pass, String folder) throws IOException {
+		_context = ctx;
 		_lock = getLock(host, port, user, pass);
 		synchronized(_lock) {
 			_cacheDir = makeCacheDirs(host, port, user, pass, folder);
+			// Debugging only for now.
+			if (folder.equals(DIR_FOLDER))
+				importMail();
 		}
 	}
 
@@ -95,7 +115,7 @@ class PersistentMailCache {
 	}
 
 	private Collection<Mail> locked_getMails() {
-		List<Mail> rv = new ArrayList<Mail>();
+		Queue<File> fq = new LinkedBlockingQueue<File>();
 		for (int j = 0; j < B64.length(); j++) {
 			File subdir = new File(_cacheDir, DIR_PREFIX + B64.charAt(j));
 			File[] files = subdir.listFiles();
@@ -105,13 +125,61 @@ class PersistentMailCache {
 				File f = files[i];
 				if (!f.isFile())
 					continue;
-				Mail mail = load(f);
-				if (mail != null)
-			               rv.add(mail);
+				// Threaded, handle below
+				//Mail mail = load(f);
+				//if (mail != null)
+			        //       rv.add(mail);
+				fq.offer(f);
 			}
 		}
+		int sz = fq.size();
+		if (sz <= 0)
+			return Collections.emptyList();
+		
+		// thread the read-in
+		long begin = _context.clock().now();
+		Queue<Mail> rv = new LinkedBlockingQueue<Mail>();
+		int tcnt = Math.max(1, Math.min(sz / 4, Math.min(SystemVersion.getCores(), 16)));
+		List<Thread> threads = new ArrayList<Thread>(tcnt);
+		for (int i = 0; i < tcnt; i++) {
+			Thread t = new I2PAppThread(new Loader(fq, rv), "Email loader " + i);
+			t.start();
+			threads.add(t);
+		}
+		for (int i = 0; i < tcnt; i++) {
+			try {
+				threads.get(i).join();
+			} catch (InterruptedException ie) {
+				break;
+			}
+		}
+		long end = _context.clock().now();
+		Debug.debug(Debug.DEBUG, "Loaded " + sz + " emails with " + tcnt + " threads in " + DataHelper.formatDuration(end - begin));
 		return rv;
 	}
+
+	/**
+	 * Load files from in, add mail to out
+	 * @since 0.9.34
+	 */
+	private class Loader implements Runnable {
+		private final Queue<File> _in;
+		private final Queue<Mail> _out;
+
+		public Loader(Queue<File> in, Queue<Mail> out) {
+			_in = in; _out = out;
+		}
+
+		public void run() {
+			File f;
+			while ((f = _in.poll()) != null) {
+				Mail mail = load(f);
+				if (mail != null)
+					_out.offer(mail);
+			}
+		}
+	}
+
 
 	/**
 	 * Fetch any needed data from disk.
@@ -127,7 +195,7 @@ class PersistentMailCache {
 	private boolean locked_getMail(Mail mail, boolean headerOnly) {
 		File f = getFullFile(mail.uidl);
 		if (f.exists()) {
-			ReadBuffer rb = read(f);
+			Buffer rb = read(f);
 			if (rb != null) {
 				mail.setBody(rb);
 				return true;
@@ -135,7 +203,7 @@ class PersistentMailCache {
 		}
 		f = getHeaderFile(mail.uidl);
 		if (f.exists()) {
-			ReadBuffer rb = read(f);
+			Buffer rb = read(f);
 			if (rb != null) {
 				mail.setHeader(rb);
 				return true;
@@ -156,7 +224,7 @@ class PersistentMailCache {
 	}
 
 	private boolean locked_saveMail(Mail mail) {
-		ReadBuffer rb = mail.getBody();
+		Buffer rb = mail.getBody();
 		if (rb != null) {
 			File f = getFullFile(mail.uidl);
 			if (f.exists())
@@ -206,8 +274,8 @@ class PersistentMailCache {
 	 *   ~/.i2p/susimail/cache/cache-xxxxx/cur/s[b64char]/mail-xxxxx.full.txt.gz
 	 *   folder1 is the base.
 	 */
-	private static File makeCacheDirs(String host, int port, String user, String pass, String folder) throws IOException {
-		File f = new SecureDirectory(I2PAppContext.getGlobalContext().getConfigDir(), DIR_SUSI);
+	private File makeCacheDirs(String host, int port, String user, String pass, String folder) throws IOException {
+		File f = new SecureDirectory(_context.getConfigDir(), DIR_SUSI);
 		if (!f.exists() && !f.mkdir())
 			throw new IOException("Cannot create " + f);
 		f = new SecureDirectory(f, DIR_CACHE);
@@ -249,16 +317,21 @@ class PersistentMailCache {
 	 * 
 	 * @return success
 	 */
-	private static boolean write(ReadBuffer rb, File f) {
+	private static boolean write(Buffer rb, File f) {
+		InputStream in = null;
 		OutputStream out = null;
 		try {
-			out = new BufferedOutputStream(new GZIPOutputStream(new SecureFileOutputStream(f)));
-			out.write(rb.content, rb.offset, rb.length);
+			in = rb.getInputStream();
+			GzipFileBuffer gb = new GzipFileBuffer(f);
+			out = gb.getOutputStream();
+			DataHelper.copy(in, out);
 			return true;
 		} catch (IOException ioe) {
 			Debug.debug(Debug.ERROR, "Error writing: " + f + ": " + ioe);
 			return false;
 		} finally {
+			if (in != null) 
+				try { in.close(); } catch (IOException ioe) {}
 			if (out != null) 
 				try { out.close(); } catch (IOException ioe) {}
 		}
@@ -267,28 +340,8 @@ class PersistentMailCache {
 	/**
 	 *  @return null on failure
 	 */
-	private static ReadBuffer read(File f) {
-		InputStream in = null;
-		try {
-			long len = f.length();
-			if (len > 16 * 1024 * 1024) {
-				throw new IOException("too big");
-			}
-			in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(f)));
-			ByteArrayOutputStream out = new ByteArrayOutputStream((int) len);
-			DataHelper.copy(in, out);
-			ReadBuffer rb = new ReadBuffer(out.toByteArray(), 0, out.size());
-			return rb;
-		} catch (IOException ioe) {
-			Debug.debug(Debug.ERROR, "Error reading: " + f + ": " + ioe);
-			return null;
-		} catch (OutOfMemoryError oom) {
-			Debug.debug(Debug.ERROR, "Error reading: " + f + ": " + oom);
-			return null;
-		} finally {
-			if (in != null) 
-				try { in.close(); } catch (IOException ioe) {}
-		}
+	private static Buffer read(File f) {
+		return new GzipFileBuffer(f);
 	}
 
 	/**
@@ -309,7 +362,7 @@ class PersistentMailCache {
 		}
 		if (uidl == null)
 			return null;
-		ReadBuffer rb = read(f);
+		Buffer rb = read(f);
 		if (rb == null)
 			return null;
 		Mail mail = new Mail(uidl);
@@ -318,5 +371,73 @@ class PersistentMailCache {
 		else
 			mail.setBody(rb);
 		return mail;
+	}
+
+	/**
+	 *  For debugging. Import .eml files from the import/ directory
+	 *  @since 0.9.34
+	 */
+	private void importMail() {
+		File importDir = new File(_cacheDir.getParentFile(), DIR_IMPORT);
+		if (importDir.exists() && importDir.isDirectory()) {
+			File[] files = importDir.listFiles();
+			if (files == null)
+				return;
+			for (int i = 0; i < files.length; i++) {
+				File f = files[i];
+				if (!f.isFile())
+					continue;
+				if (!f.getName().toLowerCase(Locale.US).endsWith(".eml"))
+					continue;
+				// Read in the headers to get the X-UIDL that Thunderbird stuck in there
+				String uidl = Long.toString(_context.random().nextLong());
+				InputStream in = null;
+				try {
+					in = new FileInputStream(f);
+					for (int j = 0; j < 20; j++) {
+						String line = DataHelper.readLine(in);
+						if (line.length() < 2)
+							break;
+						if (line.startsWith("X-UIDL:")) {
+							uidl = line.substring(7).trim();
+							break;
+						}
+					}
+				} catch (IOException ioe) {
+					Debug.debug(Debug.ERROR, "Import failed " + f, ioe);
+					continue;
+				} finally {
+					if (in != null) 
+						try { in.close(); } catch (IOException ioe) {}
+				}
+				if (uidl == null)
+					uidl = Long.toString(_context.random().nextLong());
+				File to = getFullFile(uidl);
+				if (to.exists()) {
+					Debug.debug(Debug.DEBUG, "Already have " + f + " as UIDL " + uidl);
+					f.delete();
+					continue;
+				}
+				in = null;
+				OutputStream out = null;
+				try {
+					in = new FileInputStream(f);
+					GzipFileBuffer gb = new GzipFileBuffer(to);
+					// Thunderbird exports aren't CRLF terminated
+					out = new FixCRLFOutputStream(gb.getOutputStream());
+					DataHelper.copy(in, out);
+				} catch (IOException ioe) {
+					Debug.debug(Debug.ERROR, "Import failed " + f, ioe);
+					continue;
+				} finally {
+					if (in != null) 
+						try { in.close(); } catch (IOException ioe) {}
+					if (out != null) 
+						try { out.close(); } catch (IOException ioe) {}
+				}
+				f.delete();
+				Debug.debug(Debug.DEBUG, "Imported " + f + " as UIDL " + uidl);
+	       		}
+		}
 	}
 }

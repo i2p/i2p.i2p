@@ -1,6 +1,6 @@
 HTTP/1.1 504 Gateway Timeout
 Content-Type: text/html; charset=UTF-8
-Cache-control: no-cache
+Cache-Control: no-cache
 Connection: close
 Proxy-Connection: close
 

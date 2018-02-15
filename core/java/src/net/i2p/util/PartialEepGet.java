@@ -210,7 +210,7 @@ public class PartialEepGet extends EepGet {
         buf.append(_fetchSize - 1);
         buf.append("\r\n");
 
-        buf.append("Cache-control: no-cache\r\n" +
+        buf.append("Cache-Control: no-cache\r\n" +
                    "Pragma: no-cache\r\n" +
                    "Accept-Encoding: \r\n" +
                    "Connection: close\r\n");

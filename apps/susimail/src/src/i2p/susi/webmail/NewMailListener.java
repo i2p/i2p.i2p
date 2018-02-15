@@ -7,6 +7,6 @@ package i2p.susi.webmail;
  */
 public interface NewMailListener {
     
-	public void foundNewMail();
+	public void foundNewMail(boolean yes);
 
 }

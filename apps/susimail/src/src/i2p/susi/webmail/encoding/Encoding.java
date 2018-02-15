@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 
+import i2p.susi.util.Buffer;
 import i2p.susi.util.ReadBuffer;
+import i2p.susi.util.MemoryBuffer;
 
 import net.i2p.data.DataHelper;
 
@@ -106,7 +108,7 @@ public abstract class Encoding {
 	 * @throws DecodingException 
 	 * @since 0.9.33 implementation moved from subclasses
 	 */
-	public ReadBuffer decode(byte in[]) throws DecodingException {
+	public Buffer decode(byte in[]) throws DecodingException {
 		return decode(in, 0, in.length);
 	}
 
@@ -118,7 +120,14 @@ public abstract class Encoding {
 	 * @return Output buffer containing decoded String.
 	 * @throws DecodingException 
 	 */
-	public abstract ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException;
+	public Buffer decode(byte in[], int offset, int length) throws DecodingException {
+		try {
+			ReadBuffer rb = new ReadBuffer(in, offset, length);
+			return decode(rb);
+		} catch (IOException ioe) {
+			throw new DecodingException("decode error", ioe);
+		}
+	}
 
 	/**
 	 * This implementation just converts the string to a byte array
@@ -131,7 +140,7 @@ public abstract class Encoding {
 	 * @throws DecodingException 
 	 * @since 0.9.33 implementation moved from subclasses
 	 */
-	public ReadBuffer decode(String str) throws DecodingException {
+	public Buffer decode(String str) throws DecodingException {
 		return str != null ? decode(DataHelper.getUTF8(str)) : null;
 	}
 
@@ -144,7 +153,27 @@ public abstract class Encoding {
 	 * @throws DecodingException 
 	 * @since 0.9.33 implementation moved from subclasses
 	 */
-	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
-		return decode(in.content, in.offset, in.length);
+	public Buffer decode(Buffer in) throws IOException {
+		MemoryBuffer rv = new MemoryBuffer(4096);
+		decode(in, rv);
+		return rv;
 	}
+
+	/**
+	 * @param in
+	 * @see Encoding#decode(byte[], int, int)
+	 * @throws DecodingException 
+	 * @since 0.9.34
+	 */
+	public void decode(Buffer in, Buffer out) throws IOException {
+		decode(in.getInputStream(), out);
+	}
+
+	/**
+	 * @param in
+	 * @see Encoding#decode(byte[], int, int)
+	 * @throws DecodingException 
+	 * @since 0.9.34
+	 */
+	public abstract void decode(InputStream in, Buffer out) throws IOException;
 }
