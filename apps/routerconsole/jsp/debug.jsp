@@ -76,7 +76,7 @@
         net.i2p.crypto.SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(h);
         if (skm != null) {
             out.print("<div class=\"debug_section\">");
-            out.print("<h2>" + dest.toBase32() + " Session Key Manager</h2>");
+            out.print("<h2><font size=\"-2\">" + dest.toBase32() + "</font> Session Key Manager</h2>");
             skm.renderStatusHTML(out);
             out.print("</div>");
         }
