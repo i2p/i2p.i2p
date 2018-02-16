@@ -105,6 +105,9 @@ public class TunnelController implements Logging {
     public static final int DEFAULT_MAX_TOTAL_CONNS_DAY = 0;
     public static final int DEFAULT_MAX_STREAMS = 20;
 
+    /** @since 0.9.34 */
+    public static final String PROP_LIMIT_ACTION = "i2p.streaming.limitAction";
+
     /** @since 0.9.14 */
     public static final String PFX_OPTION = "option.";
 
@@ -129,6 +132,9 @@ public class TunnelController implements Logging {
     private static final String OPT_LIMITS_SET = PFX_OPTION + PROP_LIMITS_SET;
     public static final String OPT_POST_MAX = PFX_OPTION + I2PTunnelHTTPServer.OPT_POST_MAX;
     public static final String OPT_POST_TOTAL_MAX = PFX_OPTION + I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX;
+
+    /** @since 0.9.34 */
+    private static final String OPT_LIMIT_ACTION = PFX_OPTION + PROP_LIMIT_ACTION;
 
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
@@ -800,6 +806,10 @@ public class TunnelController implements Logging {
         // is done in the I2PTunnelServer constructor.
         String type = getType();
         if (type != null) {
+            if (type.equals(TYPE_HTTP_SERVER)) {
+                if (!_config.containsKey(OPT_LIMIT_ACTION))
+                    _config.setProperty(OPT_LIMIT_ACTION, "http");
+            }
             if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");

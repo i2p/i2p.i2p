@@ -1,4 +1,11 @@
+2018-02-16 zzz
+ * i2psnark: Fix NPE on torrent not found (ticket #2167)
+ * i2ptunnel: Change POST throttle response to 429
+ * Streaming: Configurable response when over conn limits (ticket #2145)
+
 2018-02-12 zzz
+ * i2ptunnel: Close sockets
+ * Proxy: Update clearnet user-agent (ticket #2163)
  * SusiMail:
    - Background email checking (ticket #2087)
    - Set Cache-Control header for attachments

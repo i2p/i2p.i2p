@@ -52,6 +52,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _maxTotalConnsPerDay;
     private int _maxConns;
     private boolean _disableRejectLog;
+    private String _limitAction;
     
     /** state of a connection */
     private enum AckInit {
@@ -122,6 +123,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
     /** @since 0.9.4  default false */
     public static final String PROP_DISABLE_REJ_LOG = "i2p.streaming.disableRejectLogging";
+    /** @since 0.9.34 reset,drop,http, or custom string,  default reset */
+    public static final String PROP_LIMIT_ACTION = "i2p.streaming.limitAction";
     
     
     private static final int TREND_COUNT = 3;
@@ -136,6 +139,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final int DEFAULT_INACTIVITY_ACTION = INACTIVITY_ACTION_SEND;
     private static final int DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR = 1;
     private static final int DEFAULT_SLOW_START_GROWTH_RATE_FACTOR = 1;
+    private static final String DEFAULT_LIMIT_ACTION = "reset";
 
 
     /**
@@ -347,6 +351,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerHour = opts.getMaxTotalConnsPerHour();
             _maxTotalConnsPerDay = opts.getMaxTotalConnsPerDay();
             _maxConns = opts.getMaxConns();
+            _limitAction = opts.getLimitAction();
     }
     
     /**
@@ -384,6 +389,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         _maxTotalConnsPerHour = getInt(opts, PROP_MAX_TOTAL_CONNS_HOUR, 0);
         _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
         _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
+        if (opts != null)
+            _limitAction = opts.getProperty(PROP_LIMIT_ACTION, DEFAULT_LIMIT_ACTION);
+        else
+            _limitAction = DEFAULT_LIMIT_ACTION;
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
     }
@@ -453,6 +462,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
         if (opts.getProperty(PROP_MAX_STREAMS) != null)
             _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
+        if (opts.getProperty(PROP_LIMIT_ACTION) != null)
+            _limitAction = opts.getProperty(PROP_LIMIT_ACTION);
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
     }
@@ -771,6 +782,14 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public boolean isBlacklistEnabled() { return _blackListEnabled; }
     public Set<Hash> getAccessList() { return _accessList; }
     public Set<Hash> getBlacklist() { return _blackList; }
+
+    /**
+     * "reset", "drop", "http", or custom string.
+     * Default "reset".
+     *
+     * @since 0.9.34
+     */
+    public String getLimitAction() { return _limitAction; }
 
     private void initLists(ConnectionOptions opts) {
         _accessList = opts.getAccessList();

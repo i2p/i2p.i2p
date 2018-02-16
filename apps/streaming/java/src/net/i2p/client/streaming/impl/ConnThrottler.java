@@ -70,6 +70,16 @@ class ConnThrottler {
         return false;
     }
 
+    /**
+     *  Checks if individual count is over the limit by this much. Does not increment.
+     *  @since 0.9.34
+     */
+    boolean isOverBy(Hash h, int over) {
+        if (_max > 0)
+            return this.counter.count(h) >  _max + over;
+        return false;
+    }
+
     private class Cleaner implements SimpleTimer.TimedEvent {
         public void timeReached() {
             if (_totalMax > 0)
