@@ -8,9 +8,8 @@ const priorityclicked=()=>{
 	if ( sp ) updatesetallbuttons(), sp.disabled = false, sp.className = 'accept';
 }
 
-
 const updatesetallbuttons=()=>{
-	let notNorm = true, notHigh = true, notSkip = true, i = 0, state = 1, len, ele, elems = document.forms[0].elements;	
+	let notNorm = true, notHigh = true, notSkip = true, i = 0, len, ele, elems = document.forms[0].elements;	
 	for( len = elems.length ; i < len && (notNorm || notHigh || notSkip) ; ) {
 		ele = elems[i++];
 		if (ele.type == 'radio' && !ele.checked) {
