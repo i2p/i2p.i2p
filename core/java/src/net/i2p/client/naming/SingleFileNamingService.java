@@ -261,7 +261,10 @@ public class SingleFileNamingService extends NamingService {
             if (out != null) try { out.close(); } catch (IOException e) {}
             _log.error("Error adding " + hostname, ioe);
             return false;
-        } finally { releaseWriteLock(); }
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException e) {}
+            releaseWriteLock();
+        }
     }
 
     /** 
