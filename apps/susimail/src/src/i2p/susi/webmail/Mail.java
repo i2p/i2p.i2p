@@ -73,7 +73,7 @@ class Mail {
 	 */
 	static final byte HEADER_MATCH[] = DataHelper.getASCII("\r\n\r");
 
-	private int size;
+	private long size;
 	public String sender,   // as received, trimmed only, not HTML escaped
 		reply,
 		subject,	// as received, trimmed only, not HTML escaped, non-null, default ""
@@ -207,11 +207,14 @@ class Mail {
 		return part != null;
 	}
 
-	public synchronized int getSize() {
+	/**
+	 *  @return 0 if unknown
+	 */
+	public synchronized long getSize() {
 		return size;
 	}
 
-	public synchronized void setSize(int size) {
+	public synchronized void setSize(long size) {
 		if (body != null)
 			return;
 		this.size = size;

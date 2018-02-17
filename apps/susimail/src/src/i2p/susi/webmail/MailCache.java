@@ -193,7 +193,7 @@ class MailCache {
 		}
 		if (mail.markForDeletion)
 			return null;
-		int sz = mail.getSize();
+		long sz = mail.getSize();
 		if (mode == FetchMode.HEADER && sz > 0 && sz <= FETCH_ALL_SIZE)
 			mode = FetchMode.ALL;
 			
@@ -262,7 +262,7 @@ class MailCache {
 			}
 			if (mail.markForDeletion)
 				continue;
-			int sz = mail.getSize();
+			long sz = mail.getSize();
 			if (sz > 0 && sz <= FETCH_ALL_SIZE)
 				headerOnly = false;
 			if( headerOnly ) {

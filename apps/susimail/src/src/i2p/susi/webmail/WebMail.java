@@ -403,7 +403,13 @@ public class WebMail extends HttpServlet
 		}
 		
 		protected int compare(Mail a, Mail b) {
-			return a.getSize() - b.getSize();
+			long as = a.getSize();
+			long bs = b.getSize();
+			if (as > bs)
+				return 1;
+			if (as < bs)
+				return -1;
+			return 0;
 		}		
 	}
 	
@@ -2077,7 +2083,6 @@ public class WebMail extends HttpServlet
 			Debug.debug(Debug.DEBUG, "Final state is " + state);
 
 			if (state == State.LIST || state == State.SHOW) {
-
 				// sort buttons are GETs
 				String oldSort = folder.getCurrentSortBy();
 				SortOrder oldOrder = folder.getCurrentSortingDirection();
@@ -2147,13 +2152,13 @@ public class WebMail extends HttpServlet
 					"<head>\n" +
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
 					"<title>" + _t("SusiMail") + " - " + subtitle + "</title>\n" +
-					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css?" + CoreVersion.VERSION + "\">\n" );
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css?" + CoreVersion.VERSION + "\">" );
 				if (sessionObject.isMobile ) {
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
-						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css\" />\n" );
+						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css?" + CoreVersion.VERSION + "\" />" );
 				}
 				if(state != State.AUTH)
-					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css\" type=\"text/css\" media=\"print\" />");
+					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
 				if (state == State.NEW) {
 					// TODO cancel if to and body are empty
 					out.println(
@@ -2368,7 +2373,6 @@ public class WebMail extends HttpServlet
 						 HttpServletResponse response)
 	{
 		Buffer content = mail.getBody();
-
 		if(content == null)
 			return false;
 		String name;
@@ -2381,7 +2385,9 @@ public class WebMail extends HttpServlet
 		InputStream in = null;
 		try {
 			response.setContentType("message/rfc822");
-			response.setContentLength(content.getLength());
+			long sz = mail.getSize();
+			if (sz > 0 && sz <= Integer.MAX_VALUE)
+				response.setContentLength((int) sz);
 			response.setHeader("Cache-Control", "public, max-age=604800");
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
 			                   "filename*=" + name3);
@@ -2389,7 +2395,7 @@ public class WebMail extends HttpServlet
 			DataHelper.copy(in, response.getOutputStream());
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			Debug.debug(Debug.DEBUG, "Save-As", e);
 			return false;
 		} finally {
 			if (in != null) try { in.close(); } catch (IOException ioe) {}
@@ -2732,7 +2738,7 @@ public class WebMail extends HttpServlet
 		int i = 0;
 		for (Iterator<String> it = folder.currentPageIterator(); it != null && it.hasNext(); ) {
 			String uidl = it.next();
-			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FetchMode.HEADER );
+			Mail mail = sessionObject.mailCache.getMail(uidl, MailCache.FetchMode.CACHE_ONLY);
 			if (mail == null || !mail.hasHeader()) {
 				continue;
 			}
