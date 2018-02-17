@@ -155,12 +155,6 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
                 String msg = ":" + name + " 499 you :" + ex + "\r\n";
                 s.getOutputStream().write(DataHelper.getUTF8(msg));
             } catch (IOException ioe) {}
-            closeSocket(s);
-            if (i2ps != null) {
-                synchronized (sockLock) {
-                    mySockets.remove(sockLock);
-                }
-            }
         } catch (I2PException ex) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error connecting", ex);
@@ -172,10 +166,13 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
                 String msg = ":" + name + " 499 you :" + ex + "\r\n";
                 s.getOutputStream().write(DataHelper.getUTF8(msg));
             } catch (IOException ioe) {}
+        } finally {
+            // only because we are running it inline
             closeSocket(s);
             if (i2ps != null) {
+                try { i2ps.close(); } catch (IOException ioe) {}
                 synchronized (sockLock) {
-                    mySockets.remove(sockLock);
+                    mySockets.remove(i2ps);
                 }
             }
         }

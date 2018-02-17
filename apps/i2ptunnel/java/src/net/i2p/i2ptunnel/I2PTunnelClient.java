@@ -130,21 +130,16 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         } catch (IOException ex) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Error connecting", ex);
-            //l.log("Error connecting: " + ex.getMessage());
-            closeSocket(s);
-            if (i2ps != null) {
-                synchronized (sockLock) {
-                    mySockets.remove(sockLock);
-                }
-            }
         } catch (I2PException ex) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Error connecting", ex);
-            //l.log("Error connecting: " + ex.getMessage());
+        } finally {
+            // only because we are running it inline
             closeSocket(s);
             if (i2ps != null) {
+                try { i2ps.close(); } catch (IOException ioe) {}
                 synchronized (sockLock) {
-                    mySockets.remove(sockLock);
+                    mySockets.remove(i2ps);
                 }
             }
         }

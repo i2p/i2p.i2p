@@ -235,13 +235,21 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
 
     @Override
     public void run() {
+        boolean i2pReset = false;
+        boolean sockReset = false;
+        InputStream in = null;
+        OutputStream out = null;
+        InputStream i2pin = null;
+        OutputStream i2pout = null;
+        StreamForwarder toI2P = null;
+        StreamForwarder fromI2P = null;
         try {
-            InputStream in = getSocketIn();
-            OutputStream out = getSocketOut(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
+            in = getSocketIn();
+            out = getSocketOut(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
             // unimplemented in streaming
             //i2ps.setSocketErrorListener(this);
-            InputStream i2pin = i2ps.getInputStream();
-            OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
+            i2pin = i2ps.getInputStream();
+            i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
             if (initialI2PData != null) {
                 // why synchronize this? we could be in here a LONG time for large initial data
                 //synchronized (slock) {
@@ -274,8 +282,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                            + " written to the socket, starting forwarders");
             if (!(s instanceof InternalSocket))
                 in = new BufferedInputStream(in, 2*NETWORK_BUFFER_SIZE);
-            StreamForwarder toI2P = new StreamForwarder(in, i2pout, true);
-            StreamForwarder fromI2P = new StreamForwarder(i2pin, out, false);
+            toI2P = new StreamForwarder(in, i2pout, true);
+            fromI2P = new StreamForwarder(i2pin, out, false);
             toI2P.start();
             // We are already a thread, so run the second one inline
             //fromI2P.start();
@@ -288,8 +296,6 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("At least one forwarder completed, closing and joining");
             
-            boolean i2pReset = false;
-            boolean sockReset = false;
             // this task is useful for the httpclient
             if ((onTimeout != null || _onFail != null) && totalReceived <= 0) {
                 if (_log.shouldLog(Log.DEBUG))
@@ -333,31 +339,6 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 }
             }
 
-            if (i2pReset) {
-                if (_log.shouldWarn())
-                    _log.warn("Got I2P reset, resetting socket");
-                try { 
-                    s.setSoLinger(true, 0);
-                } catch (IOException ioe) {}
-                try { 
-                    s.close();
-                } catch (IOException ioe) {}
-                try { 
-                    i2ps.close();
-                } catch (IOException ioe) {}
-            } else if (sockReset) {
-                if (_log.shouldWarn())
-                    _log.warn("Got socket reset, resetting I2P socket");
-                try { 
-                    i2ps.reset();
-                } catch (IOException ioe) {}
-                try { 
-                    s.close();
-                } catch (IOException ioe) {}
-            } else {
-                // now one connection is dead - kill the other as well, after making sure we flush
-                close(out, in, i2pout, i2pin, s, i2ps, toI2P, fromI2P);
-            }
         } catch (InterruptedException ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Interrupted", ex);
@@ -385,40 +366,58 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 _log.error("Internal error", e);
         } finally {
             removeRef();
-            try {
-                if (s != null)
+            if (i2pReset) {
+                if (_log.shouldWarn())
+                    _log.warn("Got I2P reset, resetting socket");
+                try { 
+                    s.setSoLinger(true, 0);
+                } catch (IOException ioe) {}
+                try { 
                     s.close();
-            } catch (IOException ex) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Could not close java socket", ex);
-            }
-            if (i2ps != null) {
-                try {
+                } catch (IOException ioe) {}
+                try { 
                     i2ps.close();
-                } catch (IOException ex) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Could not close I2PSocket", ex);
-                }
-                // unimplemented in streaming
-                //i2ps.setSocketErrorListener(null);
+                } catch (IOException ioe) {}
+            } else if (sockReset) {
+                if (_log.shouldWarn())
+                    _log.warn("Got socket reset, resetting I2P socket");
+                try { 
+                    i2ps.reset();
+                } catch (IOException ioe) {}
+                try { 
+                    s.close();
+                } catch (IOException ioe) {}
+            } else {
+                // now one connection is dead - kill the other as well, after making sure we flush
+                try {
+                    close(out, in, i2pout, i2pin, s, i2ps, toI2P, fromI2P);
+                } catch (InterruptedException ie) {}
             }
         }
     }
     
+    /**
+     *  @param out may be null
+     *  @param in may be null
+     *  @param i2pout may be null
+     *  @param i2pin may be null
+     *  @param t1 may be null
+     *  @param t2 may be null
+     */
     protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin,
                          Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException {
-        try { 
+        if (out != null) { try { 
             out.flush(); 
-        } catch (IOException ioe) {}
-        try { 
+        } catch (IOException ioe) {} }
+        if (i2pout != null) { try { 
             i2pout.flush();
-        } catch (IOException ioe) {}
-        try { 
+        } catch (IOException ioe) {} }
+        if (in != null) { try { 
             in.close();
-        } catch (IOException ioe) {}
-        try { 
+        } catch (IOException ioe) {} }
+        if (i2pin != null) { try { 
             i2pin.close();
-        } catch (IOException ioe) {}
+        } catch (IOException ioe) {} }
         // ok, yeah, there's a race here in theory, if data comes in after flushing and before
         // closing, but its better than before...
         try { 
@@ -427,7 +426,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         try { 
             i2ps.close();
         } catch (IOException ioe) {}
-        t1.join(30*1000);
+        if (t1 != null)
+            t1.join(30*1000);
         // t2 = fromI2P now run inline
         //t2.join(30*1000);
     }

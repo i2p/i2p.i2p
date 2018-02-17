@@ -154,6 +154,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         boolean usingInternalOutproxy = false;
         Outproxy outproxy = null;
         long requestId = __requestId.incrementAndGet();
+        I2PSocket i2ps = null;
         try {
             s.setSoTimeout(INITIAL_SO_TIMEOUT);
             out = s.getOutputStream();
@@ -228,7 +229,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                                 if (_log.shouldLog(Log.WARN))
                                     _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
                                 writeErrorMessage(ERR_NO_OUTPROXY, out);
-                                s.close();
                                 return;
                             }
                             destination = currentProxy;
@@ -237,7 +237,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                          }
                     } else if (host.toLowerCase(Locale.US).equals("localhost")) {
                         writeErrorMessage(ERR_LOCALHOST, out);
-                        s.close();
                         return;
                     } else {  // full b64 address (hopefully)
                         destination = host;
@@ -292,7 +291,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
 
             if (method == null || !"CONNECT".equals(method.toUpperCase(Locale.US))) {
                 writeErrorMessage(ERR_BAD_PROTOCOL, out);
-                s.close();
                 return;
             }
             
@@ -309,7 +307,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
 
             if (destination == null) {
                 writeErrorMessage(ERR_BAD_PROTOCOL, out);
-                s.close();
                 return;
             }
             
@@ -323,7 +320,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                 }
                 out.write(DataHelper.getASCII(getAuthError(result == AuthResult.AUTH_STALE)));
-                s.close();
                 return;
             }
 
@@ -335,14 +331,13 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 else
                     header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);
                 writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination);
-                s.close();
                 return;
             }
 
             I2PSocketOptions sktOpts = getDefaultOptions();
             if (!usingWWWProxy && remotePort > 0)
                 sktOpts.setPort(remotePort);
-            I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
+            i2ps = createI2PSocket(clientDest, sktOpts);
             byte[] data = null;
             byte[] response = null;
             if (usingWWWProxy)
@@ -357,16 +352,17 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         } catch (IOException ex) {
             _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
-            closeSocket(s);
         } catch (I2PException ex) {
             _log.info("getPrefix(requestId) + Error trying to connect", ex);
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
-            closeSocket(s);
         } catch (OutOfMemoryError oom) {
             IOException ex = new IOException("OOM");
             _log.info("getPrefix(requestId) + Error trying to connect", ex);
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+        } finally {
+            // only because we are running it inline
             closeSocket(s);
+            try { i2ps.close(); } catch (IOException ioe) {}
         }
     }
 

@@ -231,7 +231,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
      * case-insensitive manner?
      *
      */
-    String cloakDest(Destination d) {
+    private String cloakDest(Destination d) {
         String hf;
         String hc;
         

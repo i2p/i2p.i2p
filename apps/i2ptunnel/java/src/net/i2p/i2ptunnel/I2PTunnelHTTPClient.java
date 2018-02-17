@@ -398,7 +398,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         String currentProxy = null;
         long requestId = __requestId.incrementAndGet();
         boolean shout = false;
-
+        I2PSocket i2ps = null;
         try {
             s.setSoTimeout(INITIAL_SO_TIMEOUT);
             out = s.getOutputStream();
@@ -555,8 +555,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             reader.drain();
                         } catch (IOException ioe) {
                             // ignore
-                        } finally {
-                            closeSocket(s);
                         }
                         return;
                     }
@@ -694,11 +692,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                                            "</p>").getBytes("UTF-8"));
                                                 writeFooter(out);
                                                 reader.drain();
-                                                // XXX: should closeSocket(s) be in a finally block?
                                             } catch (IOException ioe) {
                                                 // ignore
-                                            } finally {
-                                                closeSocket(s);
                                             }
                                             return;
                                         }
@@ -814,8 +809,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     reader.drain();
                                 } catch (IOException ioe) {
                                     // ignore
-                                } finally {
-                                    closeSocket(s);
                                 }
                                 return;
                             }
@@ -852,8 +845,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             reader.drain();
                         } catch (IOException ioe) {
                             // ignore
-                        } finally {
-                            closeSocket(s);
                         }
                         return;
                     } else if(host.contains(".") || host.startsWith("[")) {
@@ -905,8 +896,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     reader.drain();
                                 } catch (IOException ioe) {
                                     // ignore
-                                } finally {
-                                    closeSocket(s);
                                 }
                                 return;
                             }
@@ -931,8 +920,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             reader.drain();
                         } catch (IOException ioe) {
                             // ignore
-                        } finally {
-                            closeSocket(s);
                         }
                         return;
                     }   // end host name processing
@@ -1111,8 +1098,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     writeFooter(out);
                 } catch (IOException ioe) {
                     // ignore
-                } finally {
-                    closeSocket(s);
                 }
                 return;
             }
@@ -1136,8 +1121,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     writeFooter(out);
                 } catch (IOException ioe) {
                     // ignore
-                } finally {
-                    closeSocket(s);
                 }
                 return;
             }
@@ -1155,8 +1138,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     }
                 } catch (IOException ioe) {
                     // ignore
-                } finally {
-                    closeSocket(s);
                 }
                 return;
             }
@@ -1200,8 +1181,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         writeErrorMessage(header, out, targetRequest, false, destination);
                     } catch (IOException ioe) {
                         // ignore
-                    } finally {
-                        closeSocket(s);
                     }
                     return;
                 }
@@ -1257,8 +1236,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     writeErrorMessage(header, extraMessage, out, targetRequest, usingWWWProxy, destination, jumpServers);
                 } catch (IOException ioe) {
                     // ignore
-                } finally {
-                    closeSocket(s);
                 }
                 return;
             }
@@ -1270,8 +1247,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     writeErrorMessage(ERR_INTERNAL_SSL, out, targetRequest, false, destination);
                 } catch (IOException ioe) {
                     // ignore
-                } finally {
-                    closeSocket(s);
                 }
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("SSL to i2p destinations denied by configuration: " + targetRequest);
@@ -1288,8 +1263,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     writeHelperSaveForm(out, destination, ahelperKey, targetRequest, referer);
                 } catch (IOException ioe) {
                     // ignore
-                } finally {
-                    closeSocket(s);
                 }
                 return;
             }
@@ -1311,8 +1284,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         "\r\n").getBytes("UTF-8"));
                 } catch (IOException ioe) {
                     // ignore
-                } finally {
-                    closeSocket(s);
                 }
                 return;
             }
@@ -1325,7 +1296,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             I2PSocketOptions sktOpts = getDefaultOptions(opts);
             if (remotePort > 0)
                 sktOpts.setPort(remotePort);
-            I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
+            i2ps = createI2PSocket(clientDest, sktOpts);
             OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             Thread t;
             if (method.toUpperCase(Locale.US).equals("CONNECT")) {
@@ -1350,22 +1321,20 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if(_log.shouldLog(Log.INFO)) {
                 _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             }
-            //l.log("Error connecting: " + ex.getMessage());
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
-            closeSocket(s);
         } catch(I2PException ex) {
             if(_log.shouldLog(Log.INFO)) {
                 _log.info("getPrefix(requestId) + Error trying to connect", ex);
             }
-            //l.log("Error connecting: " + ex.getMessage());
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
-            closeSocket(s);
         } catch(OutOfMemoryError oom) {
             IOException ex = new IOException("OOM");
             _log.error("getPrefix(requestId) + Error trying to connect", oom);
-            //l.log("Error connecting: " + ex.getMessage());
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+        } finally {
+            // only because we are running it inline
             closeSocket(s);
+            try { i2ps.close(); } catch (IOException ioe) {}
         }
     }
 

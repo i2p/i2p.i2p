@@ -49,27 +49,27 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
     @Override
     protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin,
                          Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException {
-        try { 
+        if (i2pin != null) { try { 
             i2pin.close();
-        } catch (IOException ioe) {}
-        try { 
+        } catch (IOException ioe) {} }
+        if (i2pout != null) { try { 
             i2pout.close();
-        } catch (IOException ioe) {}
-        try { 
+        } catch (IOException ioe) {} }
+        if (in != null) { try { 
             in.close();
-        } catch (IOException ioe) {}
-        try { 
+        } catch (IOException ioe) {} }
+        if (out != null) { try { 
             out.close(); 
-        } catch (IOException ioe) {}
+        } catch (IOException ioe) {} }
         try { 
             i2ps.close();
         } catch (IOException ioe) {}
         try { 
             s.close();
         } catch (IOException ioe) {}
-        t1.join(30*1000);
+        if (t1 != null)
+            t1.join(30*1000);
         // t2 = fromI2P now run inline
         //t2.join(30*1000);
     }
-    
 }

@@ -83,18 +83,16 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
             t.run();
         } catch (IOException ex) {
             _log.error("Could not make DCC connection to " + _dest + ':' + _remotePort, ex);
-            closeSocket(s);
-            if (i2ps != null) {
-                try { i2ps.close(); } catch (IOException ioe) {}
-            }
             notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
         } catch (I2PException ex) {
             _log.error("Could not make DCC connection to " + _dest + ':' + _remotePort, ex);
+            notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
+        } finally {
+            // only because we are running it inline
             closeSocket(s);
             if (i2ps != null) {
                 try { i2ps.close(); } catch (IOException ioe) {}
             }
-            notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
         }
         stop();
     }

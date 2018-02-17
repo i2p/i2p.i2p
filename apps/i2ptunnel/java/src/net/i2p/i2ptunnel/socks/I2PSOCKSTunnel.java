@@ -6,6 +6,7 @@
  */
 package net.i2p.i2ptunnel.socks;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     }
 
     protected void clientConnectionRun(Socket s) {
+        I2PSocket destSock = null;
         try {
             try {
                 s.setSoTimeout(INITIAL_SO_TIMEOUT);
@@ -66,7 +68,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
             try {
                 s.setSoTimeout(0);
             } catch (SocketException ioe) {}
-            I2PSocket destSock = serv.getDestinationI2PSocket(this);
+            destSock = serv.getDestinationI2PSocket(this);
             Thread t = new I2PTunnelRunner(clientSock, destSock, sockLock, null, null, mySockets,
                                            (I2PTunnelRunner.FailCallback) null);
             // we are called from an unlimited thread pool, so run inline
@@ -75,7 +77,10 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
         } catch (SOCKSException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error from SOCKS connection", e);
+        } finally {
+            // only because we are running it inline
             closeSocket(s);
+            if (destSock != null) try { destSock.close(); } catch (IOException ioe) {}
         }
     }
 
