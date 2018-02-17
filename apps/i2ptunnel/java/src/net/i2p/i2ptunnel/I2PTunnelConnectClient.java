@@ -362,7 +362,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         } finally {
             // only because we are running it inline
             closeSocket(s);
-            try { i2ps.close(); } catch (IOException ioe) {}
+            if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
         }
     }
 
