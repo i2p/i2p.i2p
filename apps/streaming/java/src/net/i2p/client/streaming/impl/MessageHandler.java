@@ -22,6 +22,7 @@ class MessageHandler implements I2PSessionMuxedListener {
     private final I2PAppContext _context;
     private final Log _log;
     private final Set<I2PSocketManager.DisconnectListener> _listeners;
+    private boolean _restartPending;
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
@@ -104,7 +105,12 @@ class MessageHandler implements I2PSessionMuxedListener {
             _log.warn("I2PSession disconnected");
         _manager.disconnectAllHard();
         // kill anybody waiting in accept()
-        _manager.getConnectionHandler().setActive(false);
+        if (_restartPending) {
+            _manager.getConnectionHandler().setRestartPending();
+            _restartPending = false;
+        } else {
+            _manager.getConnectionHandler().setActive(false);
+        }
         
         for (I2PSocketManager.DisconnectListener lsnr : _listeners) {
             lsnr.sessionDisconnected();
@@ -120,8 +126,9 @@ class MessageHandler implements I2PSessionMuxedListener {
      * @param error the actual error
      */
     public void errorOccurred(I2PSession session, String message, Throwable error) {
+        _restartPending = message.contains("restart");
         if (_log.shouldLog(Log.WARN))
-            _log.warn("error occurred: " + message + "- " + error.getMessage(), error); 
+            _log.warn("error occurred: " + message, error); 
         //_manager.disconnectAllHard();
     }
     

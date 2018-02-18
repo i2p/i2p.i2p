@@ -1,3 +1,12 @@
+2018-02-18 zzz
+ * i2ptunnel: Retry accept after router soft restart (ticket #2003)
+
+2018-02-17 zzz
+ * Console: Number formatting tweaks (ticket #1913)
+ * i2psnark: folder.js cleanup (ticket #2168, PR #14)
+ * i2ptunnel: Close sockets in finally{}
+ * SusiMail: Fix mail save truncation
+
 2018-02-16 zzz
  * i2psnark: Fix NPE on torrent not found (ticket #2167)
  * i2ptunnel: Change POST throttle response to 429

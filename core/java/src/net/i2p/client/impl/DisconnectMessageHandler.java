@@ -30,7 +30,7 @@ class DisconnectMessageHandler extends HandlerImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
         String reason = ((DisconnectMessage)message).getReason();
-        session.propogateError(reason, new I2PSessionException("Disconnect Message received"));
+        session.propogateError(reason, new I2PSessionException("Disconnect Message received: " + reason));
         session.destroySession(false);
         if (reason.contains("restart")) {
             Thread t = new I2PAppThread(new Reconnector(session), "Reconnect " + session, true);
@@ -47,7 +47,7 @@ class DisconnectMessageHandler extends HandlerImpl {
         }
 
         public void run() {
-            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            try { Thread.sleep(40*1000); } catch (InterruptedException ie) {}
             _session.reconnect();
         }
     }

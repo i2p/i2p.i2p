@@ -37,6 +37,7 @@ import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.client.streaming.RouterRestartException;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
@@ -554,8 +555,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 I2PServerSocket ci2pss = i2pss;
                 if (ci2pss == null)
                     throw new I2PException("I2PServerSocket closed");
+                // returns non-null as of 0.9.17
                 i2ps = ci2pss.accept();
-                if (i2ps == null) throw new I2PException("I2PServerSocket closed");
                 if (_usePool) {
                     try {
                         _executor.execute(new Handler(i2ps));
@@ -573,10 +574,19 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                     // use only for standard servers that can't get slowlorissed! Not for http or irc
                     blockingHandle(i2ps);
                 }
+            } catch (RouterRestartException rre) {
+                // Delay and loop if router is soft restarting
+                _log.logAlways(Log.WARN, "Waiting for router restart");
+                if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
+                try {
+                    Thread.sleep(2*60*1000);
+                } catch (InterruptedException ie) {}
+                // This should be the same as before, but we have to call getServerSocket()
+                // so sockMgr will call ConnectionManager.setAllowIncomingConnections(true) again
+                i2pss = sockMgr.getServerSocket();
             } catch (I2PException ipe) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error accepting - KILLING THE TUNNEL SERVER", ipe);
-                // TODO delay and loop if internal router is soft restarting?
                 open = false;
                 if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 break;
