@@ -125,16 +125,8 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             if (expires > 0)
                 options.setDate(expires);
             boolean listenForStatus = false;
-            if (packet.isFlagSet(FLAGS_INITIAL_TAGS)) {
-                if (con != null) {
-                    if (con.isInbound())
-                        options.setSendLeaseSet(false);
-                    else if (ENABLE_STATUS_LISTEN)
-                        listenForStatus = true;
-                }
-                options.setTagsToSend(INITIAL_TAGS_TO_SEND);
-                options.setTagThreshold(MIN_TAG_THRESHOLD);
-            } else if (packet.isFlagSet(FLAGS_FINAL_TAGS)) {
+            // FINAL trumps INITIAL, in the case of SYN+CLOSE
+            if (packet.isFlagSet(FLAGS_FINAL_TAGS)) {
                 if (packet.isFlagSet(Packet.FLAG_ECHO)) {
                     // Send LS for PING, not for PONG
                     if (packet.getSendStreamId() <= 0)  // pong
@@ -142,16 +134,51 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 } else {
                     options.setSendLeaseSet(false);
                 }
-                options.setTagsToSend(FINAL_TAGS_TO_SEND);
-                options.setTagThreshold(FINAL_TAG_THRESHOLD);
+                int sendTags = FINAL_TAGS_TO_SEND;
+                int tagThresh = FINAL_TAG_THRESHOLD;
+                if (con != null) {
+                    ConnectionOptions copts = con.getOptions();
+                    int cSendTags = copts.getTagsToSend();
+                    int cTagThresh = copts.getTagThreshold();
+                    if (cSendTags < sendTags)
+                        sendTags = cSendTags;
+                    if (cTagThresh < tagThresh)
+                        tagThresh = cTagThresh;
+                }
+                options.setTagsToSend(sendTags);
+                options.setTagThreshold(tagThresh);
+            } else if (packet.isFlagSet(FLAGS_INITIAL_TAGS)) {
+                if (con != null) {
+                    if (con.isInbound())
+                        options.setSendLeaseSet(false);
+                    else if (ENABLE_STATUS_LISTEN)
+                        listenForStatus = true;
+                }
+                int sendTags = INITIAL_TAGS_TO_SEND;
+                int tagThresh = MIN_TAG_THRESHOLD;
+                if (con != null) {
+                    ConnectionOptions copts = con.getOptions();
+                    int cSendTags = copts.getTagsToSend();
+                    int cTagThresh = copts.getTagThreshold();
+                    if (cSendTags < sendTags)
+                        sendTags = cSendTags;
+                    if (cTagThresh < tagThresh)
+                        tagThresh = cTagThresh;
+                }
+                options.setTagsToSend(sendTags);
+                options.setTagThreshold(tagThresh);
             } else {
                 if (con != null) {
                     if (con.isInbound() && con.getLifetime() < 2*60*1000)
                         options.setSendLeaseSet(false);
                     // increase threshold with higher window sizes to prevent stalls
                     // after tag delivery failure
-                    int wdw = con.getOptions().getWindowSize();
+                    ConnectionOptions copts = con.getOptions();
+                    int wdw = copts.getWindowSize();
                     int thresh = Math.max(MIN_TAG_THRESHOLD, wdw * TAG_WINDOW_FACTOR);
+                    int cTagThresh = copts.getTagThreshold();
+                    if (cTagThresh < thresh)
+                        thresh = cTagThresh;
                     options.setTagThreshold(thresh);
                 }
             }

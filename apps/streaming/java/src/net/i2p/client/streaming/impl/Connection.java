@@ -920,12 +920,12 @@ class Connection {
     
     /**
      * Retrieve the current ConnectionOptions.
-     * @return the current ConnectionOptions
+     * @return the current ConnectionOptions, non-null
      */
     public ConnectionOptions getOptions() { return _options; }
     /**
      * Set the ConnectionOptions.
-     * @param opts ConnectionOptions
+     * @param opts ConnectionOptions non-null
      */
     public void setOptions(ConnectionOptions opts) { _options = opts; }
         
