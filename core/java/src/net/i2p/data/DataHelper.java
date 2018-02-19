@@ -1602,7 +1602,7 @@ public class DataHelper {
             val /= 1024;
         }
         
-        DecimalFormat fmt = new DecimalFormat("##0.00");
+        DecimalFormat fmt = new DecimalFormat("##0.##");
         if (val >= 200) {
             fmt.setMaximumFractionDigits(0);
         } else if (val >= 20) {
@@ -1662,7 +1662,7 @@ public class DataHelper {
             scale++; 
             val /= 1000;
         }
-        DecimalFormat fmt = new DecimalFormat("##0.00");
+        DecimalFormat fmt = new DecimalFormat("##0.##");
         if (val >= 200) {
             fmt.setMaximumFractionDigits(0);
         } else if (val >= 20) {
