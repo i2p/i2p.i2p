@@ -234,6 +234,22 @@ public class NtpClient {
                 return null;
             }
 
+            // More sanity checks
+            // See http://doolittle.icarus.com/ntpclient/README
+            // See RFC 4330 Sec. 5
+            if (msg.leapIndicator == 3 ||
+                msg.version < 3 ||
+                // 4 for server. Above reference is wrong, it says 3 which is client.
+                msg.mode != 4 ||
+                msg.transmitTimestamp <= 0 ||
+                // following values are in seconds, vs. 1/65536 seconds in above reference
+                Math.abs(msg.rootDelay) > 1.0d ||
+                Math.abs(msg.rootDispersion) > 1.0d) {
+                if (log != null && log.shouldWarn())
+                    log.warn("Failed sanity checks:\n" + msg);
+                return null;
+            }
+
             // KoD check (AFTER spoof checks)
             if (msg.stratum == 0) {
                 why = msg.referenceIdentifierToString();
