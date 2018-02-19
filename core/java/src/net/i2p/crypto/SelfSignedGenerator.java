@@ -85,7 +85,7 @@ public final class SelfSignedGenerator {
     }
 
     /**
-     *  @param cname the common name, non-null
+     *  @param cname the common name, non-null. Must be a hostname or email address. IP addresses will not be correctly encoded.
      *  @param ou The OU (organizational unit) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param o The O (organization)in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param l The L (city or locality) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
@@ -514,6 +514,7 @@ public final class SelfSignedGenerator {
         int wrap3len = spaceFor(TRUE.length);
         int ext3len = oid3.length + TRUE.length + spaceFor(wrap3len);
 
+        // TODO if IP address, encode as 4 or 16 bytes
         byte[] cnameBytes = DataHelper.getASCII(cname);
         int wrap41len = spaceFor(cnameBytes.length);
         // only used for CA
@@ -620,6 +621,7 @@ public final class SelfSignedGenerator {
         idx = intToASN1(rv, idx, wrap4len);
         rv[idx++] = (byte) 0x30;
         idx = intToASN1(rv, idx, wrap41len);
+        // TODO if IP address, encode as 0x87
         rv[idx++] = (byte) (isCA ? 0x82 : 0x81); // choice, dNSName or rfc822Name, IA5String implied
         idx = intToASN1(rv, idx, cnameBytes.length);
         System.arraycopy(cnameBytes, 0, rv, idx, cnameBytes.length);
