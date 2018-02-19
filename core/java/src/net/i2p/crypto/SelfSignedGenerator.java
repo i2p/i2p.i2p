@@ -477,6 +477,7 @@ public final class SelfSignedGenerator {
      *   2) Key Usage
      *   3) Basic Constraints
      *   4) Subject Alternative Name
+     *      As of 0.9.34, adds 127.0.0.1 and ::1 to the SAN also
      *   5) Authority Key Identifier
      *  (not necessarily output in that order)
      *
@@ -515,6 +516,19 @@ public final class SelfSignedGenerator {
 
         byte[] cnameBytes = DataHelper.getASCII(cname);
         int wrap41len = spaceFor(cnameBytes.length);
+        // only used for CA
+        byte[] ipv4;
+        byte[] ipv6;
+        final boolean isCA = !cname.contains("@");
+        if (isCA) {
+            ipv4 = new byte[] { 127, 0, 0, 1 };
+            ipv6 = new byte[16];
+            ipv6[15] = 1;
+            wrap41len += spaceFor(ipv4.length) + spaceFor(ipv6.length);
+        } else {
+            ipv4 = null;
+            ipv6 = null;
+        }
         int wrap4len = spaceFor(wrap41len);
         int ext4len = oid4.length + spaceFor(wrap4len);
 
@@ -523,7 +537,6 @@ public final class SelfSignedGenerator {
         int ext5len = oid5.length + spaceFor(wrap5len);
 
         int extslen = spaceFor(ext1len) + spaceFor(ext2len) + spaceFor(ext4len) + spaceFor(ext5len);
-        final boolean isCA = !cname.contains("@");
         if (isCA)
             extslen += spaceFor(ext3len);
         int seqlen = spaceFor(extslen);
@@ -602,6 +615,7 @@ public final class SelfSignedGenerator {
         System.arraycopy(oid4, 0, rv, idx, oid4.length);
         idx += oid4.length;
         // octet string wraps a sequence containing a choice 2 (DNSName) IA5String
+        // followed by two byteArrays (IP addresses)
         rv[idx++] = (byte) 0x04;
         idx = intToASN1(rv, idx, wrap4len);
         rv[idx++] = (byte) 0x30;
@@ -610,6 +624,16 @@ public final class SelfSignedGenerator {
         idx = intToASN1(rv, idx, cnameBytes.length);
         System.arraycopy(cnameBytes, 0, rv, idx, cnameBytes.length);
         idx += cnameBytes.length;
+        if (isCA) {
+            rv[idx++] = (byte) 0x87; // choice, octet string for IP address
+            idx = intToASN1(rv, idx, ipv4.length);
+            System.arraycopy(ipv4, 0, rv, idx, ipv4.length);
+            idx += ipv4.length;
+            rv[idx++] = (byte) 0x87; // choice, octet string for IP address
+            idx = intToASN1(rv, idx, ipv6.length);
+            System.arraycopy(ipv6, 0, rv, idx, ipv6.length);
+            idx += ipv6.length;
+        }
 
         return rv;
     }
