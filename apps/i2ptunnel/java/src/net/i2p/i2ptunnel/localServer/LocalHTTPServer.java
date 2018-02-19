@@ -198,6 +198,8 @@ public abstract class LocalHTTPServer {
             tbook = _t("private");
         else
             tbook = book;
+
+        String conURL = I2PAppContext.getGlobalContext().portMapper().getConsoleURL();
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
                   "Referrer-Policy: no-referrer\r\n"+
@@ -211,8 +213,8 @@ public abstract class LocalHTTPServer {
                   "<meta http-equiv=\"Refresh\" content=\"1; url=" + url + "\">\n" +
                   "</head><body>\n" +
                   "<div class=logo>\n" +
-                  "<a href=\"http://127.0.0.1:7657/\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
-                  "<a href=\"http://127.0.0.1:7657/config\">" + _t("Configuration") + "</a> <a href=\"http://127.0.0.1:7657/help.jsp\">" + _t("Help") + "</a> <a href=\"http://127.0.0.1:7657/susidns/index\">" + _t("Addressbook") + "</a>\n" +
+                  "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
+                  "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a> <a href=\"" + conURL + "susidns/index\">" + _t("Addressbook") + "</a>\n" +
                   "</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +

@@ -766,23 +766,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         Hash h1 = ConvertToHash.getHash(requestURI.getHost());
                                         Hash h2 = ConvertToHash.getHash(ahelperKey);
                                         if (h1 != null && h2 != null) {
-                                            // Do we need to replace http://127.0.0.1:7657
-                                            // Get the registered host and port from the PortMapper.
-                                            final String unset = "*unset*";
-                                            final String httpHost = _context.portMapper().getActualHost(PortMapper.SVC_CONSOLE, unset);
-                                            final String httpsHost = _context.portMapper().getActualHost(PortMapper.SVC_HTTPS_CONSOLE, unset);
-                                            final int httpPort = _context.portMapper().getPort(PortMapper.SVC_CONSOLE, 7657);
-                                            final int httpsPort = _context.portMapper().getPort(PortMapper.SVC_HTTPS_CONSOLE, -1);
-                                            final boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
-                                            final int cport = httpsOnly ? httpsPort : httpPort;
-                                            String chost = httpsOnly ? httpsHost : httpHost;
-                                            if (chost.equals(unset))
-                                                chost = "127.0.0.1";
-                                            String chostport;
-                                            if (httpsOnly || cport != 7657 || !chost.equals("127.0.0.1"))
-                                                chostport = (httpsOnly ? "https://" : "http://") + chost + ':' + cport;
-                                            else
-                                                chostport = "http://127.0.0.1:7657";
+                                            String conURL = _context.portMapper().getConsoleURL();
                                             out.write(("\n<table class=\"conflict\"><tr><th align=\"center\">" +
                                                        "<a href=\"" + trustedURL + "\">").getBytes("UTF-8"));
                                             out.write(_t("Destination for {0} in address book", requestURI.getHost()).getBytes("UTF-8"));
@@ -792,13 +776,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                             out.write(("</a></th></tr>\n<tr><td align=\"center\">" +
                                                        "<a href=\"" + trustedURL + "\">" +
                                                        "<img src=\"" +
-                                                       chostport + "/imagegen/id?s=160&amp;c=" +
+                                                       conURL + "imagegen/id?s=160&amp;c=" +
                                                        h1.toBase64().replace("=", "%3d") +
                                                       "\" width=\"160\" height=\"160\"></a>\n").getBytes("UTF-8"));
                                             out.write(("</td>\n<td align=\"center\">" +
                                                        "<a href=\"" + conflictURL + "\">" +
                                                        "<img src=\"" +
-                                                       chostport + "/imagegen/id?s=160&amp;c=" +
+                                                       conURL + "imagegen/id?s=160&amp;c=" +
                                                        h2.toBase64().replace("=", "%3d") +
                                                        "\" width=\"160\" height=\"160\"></a>\n").getBytes("UTF-8"));
                                             out.write("</td></tr></table>".getBytes("UTF-8"));
