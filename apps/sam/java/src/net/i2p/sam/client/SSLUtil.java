@@ -89,8 +89,7 @@ class SSLUtil {
     private static boolean createKeyStore(File ks, String name, Properties opts) {
         // make a random 48 character password (30 * 8 / 5)
         String keyPassword = KeyStoreUtil.randomString();
-        // and one for the cname
-        String cname = name + ".sam.i2p.net";
+        String cname = "localhost";
 
         String keyName = opts.getProperty(PROP_KEY_ALIAS);
         boolean success = KeyStoreUtil.createKeys(ks, keyName, cname, "SAM", keyPassword);
@@ -103,7 +102,7 @@ class SSLUtil {
         }
         if (success) {
             logAlways("Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
-                           "The certificate name was generated randomly, and is not associated with your " +
+                           "The certificate was generated randomly, and is not associated with your " +
                            "IP address, host name, router identity, or destination keys.");
         } else {
             error("Failed to create SAM SSL keystore.\n" +

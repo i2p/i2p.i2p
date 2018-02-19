@@ -82,8 +82,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
     private boolean createKeyStore(File ks) {
         // make a random 48 character password (30 * 8 / 5)
         String keyPassword = KeyStoreUtil.randomString();
-        // and one for the cname
-        String cname = KeyStoreUtil.randomString() + ".i2cp.i2p.net";
+        String cname = "localhost";
 
         boolean success = KeyStoreUtil.createKeys(ks, KEY_ALIAS, cname, "I2CP", keyPassword);
         if (success) {
@@ -97,7 +96,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
         }
         if (success) {
             _log.logAlways(Log.INFO, "Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
-                           "The certificate name was generated randomly, and is not associated with your " +
+                           "The certificate was generated randomly, and is not associated with your " +
                            "IP address, host name, router identity, or destination keys.");
         } else {
             _log.error("Failed to create I2CP SSL keystore.\n" +
