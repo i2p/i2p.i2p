@@ -2287,7 +2287,7 @@ public class WebMail extends HttpServlet
 		if (q != null && q.length() > 0)
 			buf.append(q.replace("&amp;", "&"));  // no you don't html escape the redirect header
 		resp.setHeader("Location", buf.toString());
-		resp.sendError(302, "Moved");
+		resp.sendError(303, "Received");
 		Debug.debug(Debug.DEBUG, "P-R-G to " + q);
 	}
 

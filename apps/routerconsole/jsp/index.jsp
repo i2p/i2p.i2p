@@ -5,7 +5,7 @@
     //  Redirect to either /home or /console, depending on configuration,
     //  while preserving any query parameters
     //
-    response.setStatus(302);
+    response.setStatus(307);
     String req = request.getRequestURL().toString();
     StringBuilder buf = new StringBuilder(128);
     if (req.endsWith("index"))

@@ -955,6 +955,7 @@ public class EepGet {
             case 302:
             case 303:
             case 307:
+            case 308:
                 _alreadyTransferred = 0;
                 rcOk = true;
                 redirect = true;
