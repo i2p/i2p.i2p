@@ -1,3 +1,19 @@
+2018-02-20 zzz
+ * Console:
+   - Redirect to HTTPS if available (ticket #2160)
+   - Change all 302s to 303 or 307
+   - Change sendError() to setStatus() for 3xx responses
+ * Crypto: Backdate selfsigned cert to allow for clock skew
+ * Eepget: Handle 308
+
+2018-02-19 zzz
+ * Console:
+   - Change trac links (ticket #2014)
+   - Change selfsigned cert cname to localhost (ticket #2160)
+ * Crypto: Add IP addresses to selfsigned cert SAN (ticket #2160)
+ * Streaming: Don't exceed configured tag settings
+ * Time: More sanity checks on NTP responses
+
 2018-02-18 zzz
  * i2ptunnel: Retry accept after router soft restart (ticket #2003)
 

@@ -117,7 +117,7 @@ class UDPEndpoint implements SocketListener {
         if (port > 0 && !TransportUtil.isValidPort(port)) {
             _log.error("Specified UDP port " + port + " is not valid, selecting a new port");
             // See isValidPort() for list
-            _log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 6000, 6665-6669, 6697, 7650-7664, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
+            _log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
             port = -1;
         }
 

@@ -19,6 +19,7 @@ import net.i2p.I2PAppContext;
  */
 public class PortMapper {
     private final ConcurrentHashMap<String, InetSocketAddress> _dir;
+    public static final String PROP_PREFER_HTTPS = "routerconsole.preferHTTPS";
 
     public static final String SVC_CONSOLE = "console";
     public static final String SVC_HTTPS_CONSOLE = "https_console";
@@ -177,22 +178,63 @@ public class PortMapper {
         return rv;
     }
 
-    /*
-     *  @return http URL unless console is https only. Default http://127.0.0.1:7657/
+    /**
+     *  If PROP_PREFER_HTTPS is true or unset,
+     *  return https URL unless console is http only. Default https://127.0.0.1:7667/
+     *  If PROP_PREFER_HTTPS is set to false,
+     *  return http URL unless console is https only. Default http://127.0.0.1:7657/
+     *
      *  @since 0.9.33 consolidated from i2ptunnel and desktopgui
      */
     public String getConsoleURL() {
+        return getConsoleURL(I2PAppContext.getGlobalContext().getBooleanPropertyDefaultTrue(PROP_PREFER_HTTPS));
+    }
+
+    /**
+     *  If preferHTTPS is true,
+     *  return https URL unless console is http only. Default https://127.0.0.1:7667/
+     *  If preferHTTPS is false,
+     *  return http URL unless console is https only. Default http://127.0.0.1:7657/
+     *
+     *  @since 0.9.34
+     */
+    public String getConsoleURL(boolean preferHTTPS) {
+        return preferHTTPS ? getHTTPSConsoleURL() : getHTTPConsoleURL();
+    }
+
+    /**
+     *  @return http URL unless console is https only. Default http://127.0.0.1:7657/
+     */
+    private String getHTTPConsoleURL() {
         String unset = "*unset*";
         String httpHost = getActualHost(SVC_CONSOLE, unset);
         String httpsHost = getActualHost(SVC_HTTPS_CONSOLE, unset);
         int httpPort = getPort(SVC_CONSOLE, 7657);
-        int httpsPort = getPort(SVC_HTTPS_CONSOLE, -1);
+        int httpsPort = getPort(SVC_HTTPS_CONSOLE);
         boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
         if (httpsOnly)
             return "https://" + httpsHost + ':' + httpsPort + '/';
         if (httpHost.equals(unset))
             httpHost = "127.0.0.1";
         return "http://" + httpHost + ':' + httpPort + '/';
+    }
+
+    /**
+     *  @return https URL unless console is http only. Default https://127.0.0.1:7667/
+     *  @since 0.9.34
+     */
+    private String getHTTPSConsoleURL() {
+        String unset = "*unset*";
+        String httpHost = getActualHost(SVC_CONSOLE, unset);
+        String httpsHost = getActualHost(SVC_HTTPS_CONSOLE, unset);
+        int httpPort = getPort(SVC_CONSOLE);
+        int httpsPort = getPort(SVC_HTTPS_CONSOLE, 7667);
+        boolean httpOnly = httpPort > 0 && httpsHost.equals(unset) && !httpHost.equals(unset);
+        if (httpOnly)
+            return "http://" + httpHost + ':' + httpPort + '/';
+        if (httpsHost.equals(unset))
+            httpsHost = "127.0.0.1";
+        return "https://" + httpsHost + ':' + httpsPort + '/';
     }
 
     /**
