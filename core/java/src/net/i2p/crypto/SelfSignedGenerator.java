@@ -44,8 +44,8 @@ import net.i2p.util.SystemVersion;
  *  All done programatically, no keytool, no BC libs, no sun classes.
  *  Ref: RFC 2459
  *
- *  This is coded to create a cert that matches what comes out of keytool
- *  exactly, even if I don't understand all of it.
+ *  This is coded to create a cert that is similar to what comes out of keytool,
+ *  even if I don't understand all of it.
  *
  *  @since 0.9.25
  */
@@ -352,8 +352,9 @@ public final class SelfSignedGenerator {
         byte[] serial = cert.getSerialNumber().toByteArray();
         if (serial.length > 255)
             throw new IllegalArgumentException();
-        long now = System.currentTimeMillis();
-        long then = now + (validDays * 24L * 60 * 60 * 1000);
+        // backdate to allow for clock skew
+        long now = System.currentTimeMillis() - (24L * 60 * 60 * 1000);
+        long then = now + ((validDays + 1) * 24L * 60 * 60 * 1000);
         // used for CRL time and revocation time
         byte[] nowbytes = getDate(now);
         // used for next CRL time
@@ -443,8 +444,9 @@ public final class SelfSignedGenerator {
         byte[] rv = new byte[32];
         rv[0] = 0x30;
         rv[1] = 30;
-        long now = System.currentTimeMillis();
-        long then = now + (validDays * 24L * 60 * 60 * 1000);
+        // backdate to allow for clock skew
+        long now = System.currentTimeMillis() - (24L * 60 * 60 * 1000);
+        long then = now + ((validDays + 1) * 24L * 60 * 60 * 1000);
         byte[] nowbytes = getDate(now);
         byte[] thenbytes = getDate(then);
         System.arraycopy(nowbytes, 0, rv, 2, 15);
@@ -723,6 +725,9 @@ public final class SelfSignedGenerator {
         return rv;
     }
 
+    /**
+     *  Note: For CLI testing, use java -jar i2p.jar su3file keygen pubkey.crt keystore.ks commonName
+     */
 /****
     public static void main(String[] args) {
         try {
