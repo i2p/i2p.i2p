@@ -52,7 +52,7 @@ if (lastmod > 0) {
     long iflast = request.getDateHeader("If-Modified-Since");
     // iflast is -1 if not present; round down file time
     if (iflast >= ((lastmod / 1000) * 1000)) {
-        response.sendError(304, "Not Modified");
+        response.setStatus(304);
         return;
     }
     response.setDateHeader("Last-Modified", lastmod);
