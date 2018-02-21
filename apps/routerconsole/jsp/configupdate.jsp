@@ -45,16 +45,18 @@
         <tr><td align="right"><b><%=formhandler._t("Update policy")%>:</b></td>
           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td></tr>
     <% }   // if canInstall %>
+    <% if (updatehelper.isAdvanced()) { %>
         <tr><td align="right"><label for="newsThroughProxy"><b><%=intl._t("Fetch news through the eepProxy?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="newsThroughProxy" /></td></tr>
+      <% if (updatehelper.canInstall()) { %>
         <tr><td align="right"><b><label for="updateThroughProxy"><%=intl._t("Update through the eepProxy?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td></tr>
-      <% if (updatehelper.isAdvanced()) { %>
+      <% }   // if canInstall %>
         <tr><td align="right"><b><%=intl._t("eepProxy host")%>:</b></td>
           <td><input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /></td>
         </tr><tr><td align="right"><b><%=intl._t("eepProxy port")%>:</b></td>
           <td><input type="text" size="10" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></td></tr>
-      <% }   // if isAdvanced %>
+    <% }   // if isAdvanced %>
     <% if (updatehelper.canInstall()) { %>
       <% if (updatehelper.isAdvanced()) { %>
         <tr><td align="right"><b><%=intl._t("Update URLs")%>:</b></td>
