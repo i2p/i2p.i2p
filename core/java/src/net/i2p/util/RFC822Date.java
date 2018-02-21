@@ -68,17 +68,32 @@ public abstract class RFC822Date {
         return OUTPUT_FORMAT.format(new Date(t));
     }
 
-/****
     public static void main(String[] args) {
         if (args.length == 1) {
             try {
-                System.out.println(to822Date(Long.parseLong(args[0])));
+                System.out.println(to822Date(Long.parseLong(args[0]) * 1000));
             } catch (NumberFormatException nfe) {
+                System.out.println("Invalid date");
                 System.out.println(nfe.toString());
             }
+        } else if (args.length == 0) {
+            long t = System.currentTimeMillis();
+            System.out.println("Current Time: " + (t/1000));
+            System.out.println(to822Date(t));
         } else {
-            System.out.println("Usage: RFC822Date numericDate");
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < args.length; i++) {
+                buf.append(args[i]);
+                if (i < args.length - 1)
+                    buf.append(' ');
+            }
+            long t = parse822Date(buf.toString());
+            if (t >= 0) {
+                System.out.println(Long.toString(t/1000));
+            } else {
+                System.out.println("Invalid date");
+                System.out.println("Usage: RFC822Date [numericDate|textualDate]");
+            }
         }
     }
-****/
 }

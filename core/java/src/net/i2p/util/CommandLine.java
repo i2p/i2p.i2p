@@ -36,6 +36,7 @@ public class CommandLine {
         "net.i2p.util.FortunaRandomSource",
         "net.i2p.util.NativeBigInteger",
         "net.i2p.util.PartialEepGet",
+        "net.i2p.util.RFC822Date",
         "net.i2p.util.ShellCommand",
         "net.i2p.util.SSLEepGet",
         "net.i2p.util.SystemVersion",
