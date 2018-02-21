@@ -162,7 +162,7 @@ class PersistentMailCache {
 	 * Load files from in, add mail to out
 	 * @since 0.9.34
 	 */
-	private class Loader implements Runnable {
+	private static class Loader implements Runnable {
 		private final Queue<File> _in;
 		private final Queue<Mail> _out;
 
@@ -345,6 +345,9 @@ class PersistentMailCache {
 	}
 
 	/**
+	 *  This is for the initial load only.
+	 *  Others will use getMail().
+	 *
 	 *  @return null on failure
 	 */
 	private static Mail load(File f) {

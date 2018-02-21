@@ -84,6 +84,7 @@ import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.servlet.util.WriterOutputStream;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.RFC822Date;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
 
@@ -2492,6 +2493,8 @@ public class WebMail extends HttpServlet
 
 		if( ok ) {
 			StringBuilder body = new StringBuilder(1024);
+			I2PAppContext ctx = I2PAppContext.getGlobalContext();
+			body.append("Date: " + RFC822Date.to822Date(ctx.clock().now()) + "\r\n");
 			// todo include real names, and headerline encode them
 			body.append( "From: " + from + "\r\n" );
 			Mail.appendRecipients( body, toList, "To: " );
@@ -2502,7 +2505,7 @@ public class WebMail extends HttpServlet
 				ok = false;
 				sessionObject.error += e.getMessage();
 			}
-			String boundary = "_=" + I2PAppContext.getGlobalContext().random().nextLong();
+			String boundary = "_=" + ctx.random().nextLong();
 			if (multipart) {
 				body.append( "MIME-Version: 1.0\r\nContent-type: multipart/mixed; boundary=\"" + boundary + "\"\r\n\r\n" );
 			}
