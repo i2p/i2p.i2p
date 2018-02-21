@@ -53,6 +53,10 @@ public final class SelfSignedGenerator {
 
     private static final boolean DEBUG = false;
 
+    // Policy Qualifier CPS URI
+    private static final String OID_QT_CPSURI = "1.3.6.1.5.5.7.2.1";
+    // Policy Qualifier User Notice
+    private static final String OID_QT_UNOTICE = "1.3.6.1.5.5.7.2.2";
     private static final String OID_CN = "2.5.4.3";
     private static final String OID_C = "2.5.4.6";
     private static final String OID_L = "2.5.4.7";
@@ -69,6 +73,10 @@ public final class SelfSignedGenerator {
     private static final String OID_BASIC = "2.5.29.19";
     // CRL number
     private static final String OID_CRLNUM = "2.5.29.20";
+    // Certificate Policy
+    private static final String OID_POLICY = "2.5.29.32";
+    // Certificate Policy - Any
+    private static final String OID_POLICY_ANY = "2.5.29.32.0";
     // Authority Key Identifier
     private static final String OID_AKI = "2.5.29.35";
 
@@ -505,7 +513,13 @@ public final class SelfSignedGenerator {
         byte[] oid3 = getEncodedOID(OID_BASIC);
         byte[] oid4 = getEncodedOID(OID_SAN);
         byte[] oid5 = getEncodedOID(OID_AKI);
+        byte[] oid6 = getEncodedOID(OID_POLICY);
+        byte[] oid7 = getEncodedOID(OID_POLICY_ANY);
+        byte[] oid8 = getEncodedOID(OID_QT_UNOTICE);
+        byte[] oid9 = getEncodedOID(OID_QT_CPSURI);
         byte[] TRUE = new byte[] { 1, 1, (byte) 0xff };
+
+        // extXlen does NOT include the 0x30 and length
 
         int wrap1len = spaceFor(sha.length);
         int ext1len = oid1.length + spaceFor(wrap1len);
@@ -539,9 +553,21 @@ public final class SelfSignedGenerator {
         int wrap5len = spaceFor(wrap51len);
         int ext5len = oid5.length + spaceFor(wrap5len);
 
+        byte[] policyTextBytes = DataHelper.getASCII("This self-signed certificate is required for secure local access to I2P services.");
+        byte[] policyURIBytes = DataHelper.getASCII("https://geti2p.net/");
+        int wrap61len = spaceFor(policyTextBytes.length); // usernotice ia5string
+        int wrap62len = oid8.length + spaceFor(wrap61len); // PQ 1 Info OID + usernotice seq.
+        int wrap63len = spaceFor(policyURIBytes.length); // uri ia5string
+        int wrap64len = oid9.length + wrap63len; // PQ 2 Info OID + ia5string
+        int wrap65len = spaceFor(wrap62len) + spaceFor(wrap64len); // qualifiers seq
+        int wrap66len = spaceFor(oid7.length + wrap65len); // PInfo elements seq
+        int wrap67len = spaceFor(wrap66len); // PInfo seq
+        int wrap68len = spaceFor(wrap67len); // Policies seq
+        int ext6len = oid6.length + spaceFor(wrap68len); // OID + octet string
+
         int extslen = spaceFor(ext1len) + spaceFor(ext2len) + spaceFor(ext4len) + spaceFor(ext5len);
         if (isCA)
-            extslen += spaceFor(ext3len);
+            extslen += spaceFor(ext3len) + spaceFor(ext6len);
         int seqlen = spaceFor(extslen);
         int totlen = spaceFor(seqlen);
         byte[] rv = new byte[totlen];
@@ -637,6 +663,47 @@ public final class SelfSignedGenerator {
             idx = intToASN1(rv, idx, ipv6.length);
             System.arraycopy(ipv6, 0, rv, idx, ipv6.length);
             idx += ipv6.length;
+        }
+
+        // Policy
+        // https://www.sysadmins.lv/blog-en/certificate-policies-extension-all-you-should-know-part-1.aspx
+        if (isCA) {
+            rv[idx++] = (byte) 0x30;
+            idx = intToASN1(rv, idx, ext6len);
+            System.arraycopy(oid6, 0, rv, idx, oid6.length);
+            idx += oid6.length;
+            rv[idx++] = (byte) 0x04;  // octet string wraps a sequence
+            idx = intToASN1(rv, idx, wrap68len);
+            rv[idx++] = (byte) 0x30;  // Policies seq
+            idx = intToASN1(rv, idx, wrap67len);
+            rv[idx++] = (byte) 0x30;  // Policy info seq
+            idx = intToASN1(rv, idx, wrap66len);
+            System.arraycopy(oid7, 0, rv, idx, oid7.length);
+            idx += oid7.length;
+            rv[idx++] = (byte) 0x30;  // Policy qualifiers seq
+            idx = intToASN1(rv, idx, wrap65len);
+
+            // This should be what IE links to as "Issuer Statement"
+            rv[idx++] = (byte) 0x30;  // Policy qualifier info 2 seq
+            idx = intToASN1(rv, idx, wrap64len);
+            System.arraycopy(oid9, 0, rv, idx, oid9.length);
+            idx += oid9.length;
+            rv[idx++] = (byte) 0x16;  // choice 0 URI ia5string
+            idx = intToASN1(rv, idx, policyURIBytes.length);
+            System.arraycopy(policyURIBytes, 0, rv, idx, policyURIBytes.length);
+            idx += policyURIBytes.length;
+
+            // User notice text
+            rv[idx++] = (byte) 0x30;  // Policy qualifier info 1 seq
+            idx = intToASN1(rv, idx, wrap62len);
+            System.arraycopy(oid8, 0, rv, idx, oid8.length);
+            idx += oid8.length;
+            rv[idx++] = (byte) 0x30;  // choice 1 notice seq.
+            idx = intToASN1(rv, idx, wrap61len);
+            rv[idx++] = (byte) 0x16;  // choice 0 ia5string
+            idx = intToASN1(rv, idx, policyTextBytes.length);
+            System.arraycopy(policyTextBytes, 0, rv, idx, policyTextBytes.length);
+            idx += policyTextBytes.length;
         }
 
         return rv;
