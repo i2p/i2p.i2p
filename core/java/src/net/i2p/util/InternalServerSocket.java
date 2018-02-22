@@ -100,10 +100,10 @@ public class InternalServerSocket extends ServerSocket {
         InternalServerSocket iss = _sockets.get(Integer.valueOf(port));
         if (iss == null)
              throw new IOException("No server for port: " + port);
-        PipedInputStream cis = new PipedInputStream(64*1024);
-        PipedInputStream sis = new PipedInputStream(64*1024);
-        PipedOutputStream cos = new PipedOutputStream(sis);
-        PipedOutputStream sos = new PipedOutputStream(cis);
+        TimeoutPipedInputStream cis = new TimeoutPipedInputStream(64*1024);
+        TimeoutPipedInputStream sis = new TimeoutPipedInputStream(64*1024);
+        PipedOutputStream cos = new TimeoutPipedOutputStream(sis);
+        PipedOutputStream sos = new TimeoutPipedOutputStream(cis);
         clientSock.setInputStream(cis);
         clientSock.setOutputStream(cos);
         iss.queueConnection(new InternalSocket(sis, sos));

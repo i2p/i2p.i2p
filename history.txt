@@ -1,3 +1,10 @@
+2018-02-22 zzz
+ * Util: Support setSoTimeout() for InternalSockets
+
+2018-02-21 zzz
+ * Console: Hide options on /configupdate if a package (ticket #2172)
+ * SusiMail: Add Date header to sent messages
+
 2018-02-20 zzz
  * Console:
    - Redirect to HTTPS if available (ticket #2160)
