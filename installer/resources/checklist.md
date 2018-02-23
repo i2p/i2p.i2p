@@ -72,7 +72,8 @@
   - `ant testcripts` to verify that all updated translations are valid
   - For any invalid that break the test, fix up the po file manually, or fix on
     tx and pull again, or (if new) comment out in .tx/config (add a comment why)
-    and delete the po file
+    and delete the po file.
+    See instructions in .tx/config for fixing up getopt properties files.
   - `installer/resources/poupdate-man.sh` to generate new man page translations
     (requires po4a package)
   - `mtn add` for any new po files
