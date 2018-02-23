@@ -702,7 +702,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(":&nbsp;");
             out.write(ngettext("1 torrent", "{0} torrents", total));
             out.write(", ");
-            out.write(DataHelper.formatSize2(stats[5]) + "B");
+            out.write(formatSize(stats[5]));
             if (_manager.util().connected() && total > 0) {
                 out.write(", ");
                 out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
@@ -732,8 +732,8 @@ public class I2PSnarkServlet extends BasicServlet {
             if (_manager.util().connected() && total > 0) {
                 out.write("    <th class=\"snarkTorrentDownloaded\" align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
                       "    <th class=\"snarkTorrentUploaded\" align=\"right\">" + formatSize(stats[1]) + "</th>\n" +
-                      "    <th class=\"snarkTorrentRateDown\" align=\"right\">" + formatSize(stats[2]) + "ps</th>\n" +
-                      "    <th class=\"snarkTorrentRateUp\" align=\"right\">" + formatSize(stats[3]) + "ps</th>\n" +
+                      "    <th class=\"snarkTorrentRateDown\" align=\"right\">" + formatSizeDec(stats[2]) + "ps</th>\n" +
+                      "    <th class=\"snarkTorrentRateUp\" align=\"right\">" + formatSizeDec(stats[3]) + "ps</th>\n" +
                       "    <th class=\"snarkTorrentAction\"></th>");
             } else {
                 out.write("<th colspan=\"5\"></th>");
@@ -1752,7 +1752,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"percentBarOuter\">");
             out.write("<div class=\"percentBarInner\" style=\"width: " + percent + "%;\">");
             out.write("<div class=\"percentBarText\" tabindex=\"0\" title=\"");
-            out.write(percent + "% " + _t("complete") + "; " + DataHelper.formatSize2(remaining) + "B " + _t("remaining"));
+            out.write(percent + "% " + _t("complete") + "; " + formatSize(remaining) + ' ' + _t("remaining"));
             out.write("\">");
             out.write(formatSize(total-remaining) + thinsp(noThinsp) + formatSize(total));
             out.write("</div></div></div>");
@@ -1785,11 +1785,11 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
         if (isRunning && needed > 0)
-            out.write(formatSize(downBps) + "ps");
+            out.write(formatSizeDec(downBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateUp\">");
         if (isRunning && isValid)
-            out.write(formatSize(upBps) + "ps");
+            out.write(formatSizeDec(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction\">");
         if (snark.isChecking()) {
@@ -1939,7 +1939,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (needed > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
                         out.write("<span class=\"unchoked\">");
-                        out.write(formatSize(peer.getDownloadRate()) + "ps</span>");
+                        out.write(formatSizeDec(peer.getDownloadRate()) + "ps</span>");
                     } else {
                         out.write("<span class=\"choked\" title=\"");
                         if (!peer.isInteresting())
@@ -1947,12 +1947,12 @@ public class I2PSnarkServlet extends BasicServlet {
                         else
                             out.write(_t("Choked (The peer is not allowing us to request pieces)"));
                         out.write("\">");
-                        out.write(formatSize(peer.getDownloadRate()) + "ps</span>");
+                        out.write(formatSizeDec(peer.getDownloadRate()) + "ps</span>");
                     }
                 } else if (!isValid) {
                     //if (peer supports metadata extension) {
                         out.write("<span class=\"unchoked\">");
-                        out.write(formatSize(peer.getDownloadRate()) + "ps</span>");
+                        out.write(formatSizeDec(peer.getDownloadRate()) + "ps</span>");
                     //} else {
                     //}
                 }
@@ -1961,7 +1961,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isValid && pct < 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
                         out.write("<span class=\"unchoked\">");
-                        out.write(formatSize(peer.getUploadRate()) + "ps</span>");
+                        out.write(formatSizeDec(peer.getUploadRate()) + "ps</span>");
                     } else {
                         out.write("<span class=\"choked\" title=\"");
                         if (!peer.isInterested())
@@ -1969,7 +1969,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         else
                             out.write(_t("Choking (We are not allowing the peer to request pieces)"));
                         out.write("\">");
-                        out.write(formatSize(peer.getUploadRate()) + "ps</span>");
+                        out.write(formatSizeDec(peer.getUploadRate()) + "ps</span>");
                     }
                 }
                 out.write("</td>\n\t");
@@ -2754,6 +2754,11 @@ public class I2PSnarkServlet extends BasicServlet {
         return DataHelper.formatSize2(bytes) + 'B';	
     }
 
+    /** @since 0.9.34 */
+    private static String formatSizeDec(long bytes) {
+        return DataHelper.formatSize2Decimal(bytes) + 'B';	
+    }
+
     /**
      * This is for a full URL. For a path only, use encodePath().
      * @since 0.7.14
@@ -3418,7 +3423,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 status += " <div class=\"percentBarOuter\">" +
                                          "<div class=\"percentBarInner\" style=\"width: " +
                                          percent + "%;\"><div class=\"percentBarText\" tabindex=\"0\" title=\"" +
-                                         DataHelper.formatSize2(remaining) + "B " + _t("remaining") +
+                                         formatSize(remaining) + ' ' + _t("remaining") +
                                          "\">" + percent + "%</div></div></div>";
                             }
 
@@ -3465,7 +3470,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 buf.append("</a>");
             buf.append("</td><td align=right class=\"snarkFileSize\">");
             if (!item.isDirectory())
-                buf.append(DataHelper.formatSize2(length)).append('B');
+                buf.append(formatSize(length));
             buf.append("</td><td class=\"snarkFileStatus\">");
             //buf.append(dfmt.format(new Date(item.lastModified())));
             buf.append(status);
