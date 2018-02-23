@@ -950,8 +950,10 @@ public class WebMail extends HttpServlet
 			Debug.debug(Debug.DEBUG, "OFFLINE MODE");
 		} else {
 			sessionObject.isFetching = true;
-			if (mailbox.connectToServer(new ConnectWaiter(sessionObject)))
+			if (!mailbox.connectToServer(new ConnectWaiter(sessionObject))) {
+				sessionObject.error += _t("Cannot connect") + '\n';
 				sessionObject.isFetching = false;
+			}
 		}
 
 		// wait a little while so we avoid the loading page if we can
@@ -1430,13 +1432,13 @@ public class WebMail extends HttpServlet
 			sessionObject.isFetching = true;
 			ConnectWaiter cw = new ConnectWaiter(sessionObject);
 			if (mailbox.connectToServer(cw)) {
-				// Already connected, start a thread ourselves
-				// TODO - But if already connected, we aren't going to find anything new.
-				// We used to call refresh() from here, which closes first,
-				// but that isn't threaded.
+				// Start a thread to wait for results
 				Debug.debug(Debug.DEBUG, "Already connected, running CW");
 				Thread t = new I2PAppThread(cw, "Email fetcher");
 				t.start();
+			} else {
+				sessionObject.error += _t("Cannot connect") + '\n';
+				sessionObject.isFetching = false;
 			}
 			// wait if it's going to be quick
 			try {
@@ -2240,11 +2242,13 @@ public class WebMail extends HttpServlet
 				if (showRefresh) {
 					sessionObject.info += _t("Refresh the page for updates") + '\n';
 				}
-				if (sessionObject.error.length() > 0) {
-					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
-				}
-				if (sessionObject.info.length() > 0) {
-					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
+				if (sessionObject.error.length() > 0 || sessionObject.info.length() > 0) {
+					out.println("<div class=\"notifications\" onclick=\"this.remove()\">");
+					if (sessionObject.error.length() > 0)
+						out.println("<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>");
+					if (sessionObject.info.length() > 0)
+						out.println("<p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p>");
+					out.println("</div>" );
 				}
 				/*
 				 * now write body
