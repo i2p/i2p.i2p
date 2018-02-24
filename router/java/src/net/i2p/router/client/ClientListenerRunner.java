@@ -24,6 +24,11 @@ import net.i2p.util.PortMapper;
  * Listen for connections on the specified port, and toss them onto the client manager's
  * set of connections once they are established.
  *
+ * This is not used for internal (in-JVM) connections - see ClientManager and QueuedClientConnectionRunner.
+ *
+ * Note that this is extended by SSLClientListenerRunner for SSL,
+ * and by DomainClientListenerRunner in Android for domain sockets.
+ *
  * @author jrandom
  */
 class ClientListenerRunner implements Runnable {
@@ -160,21 +165,17 @@ class ClientListenerRunner implements Runnable {
 
     /** give the i2cp client 5 seconds to show that they're really i2cp clients */
     protected final static int CONNECT_TIMEOUT = 5*1000;
-    private final static int LOOP_DELAY = 250;
 
     /**
      *  Verify the first byte.
-     *  The InternalSocket doesn't support SoTimeout, so use available()
-     *  instead to prevent hanging.
      */
     protected boolean validate(Socket socket) {
         try {
             InputStream is = socket.getInputStream();
-            for (int i = 0; i < CONNECT_TIMEOUT / LOOP_DELAY; i++) {
-                if (is.available() > 0)
-                    return is.read() == I2PClient.PROTOCOL_BYTE;
-                try { Thread.sleep(LOOP_DELAY); } catch (InterruptedException ie) {}
-            }
+            socket.setSoTimeout(CONNECT_TIMEOUT);
+            boolean rv = is.read() == I2PClient.PROTOCOL_BYTE;
+            socket.setSoTimeout(0);
+            return rv;
         } catch (IOException ioe) {}
         if (_log.shouldLog(Log.WARN))
              _log.warn("Peer did not authenticate themselves as I2CP quickly enough, dropping");

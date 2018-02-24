@@ -861,8 +861,7 @@ public class RouterConsoleRunner implements RouterApp {
     private boolean createKeyStore(File ks) {
         // make a random 48 character password (30 * 8 / 5)
         String keyPassword = KeyStoreUtil.randomString();
-        // and one for the cname
-        String cname = KeyStoreUtil.randomString() + ".console.i2p.net";
+        String cname = "localhost";
         boolean success = KeyStoreUtil.createKeys(ks, "console", cname, "Console", keyPassword);
         if (success) {
             success = ks.exists();
@@ -884,7 +883,7 @@ public class RouterConsoleRunner implements RouterApp {
         }
         if (success) {
             System.err.println("Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
-                               "The certificate name was generated randomly, and is not associated with your " +
+                               "The certificate was generated randomly, and is not associated with your " +
                                "IP address, host name, router identity, or destination keys.");
         } else {
             System.err.println("Failed to create console SSL keystore.\n" +

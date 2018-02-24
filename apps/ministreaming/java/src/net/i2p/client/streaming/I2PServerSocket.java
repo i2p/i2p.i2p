@@ -29,6 +29,7 @@ public interface I2PServerSocket {
      *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (e.g. the I2PSession is closed)
+     * @throws RouterRestartException (extends I2PException) if the router is apparently restarting, since 0.9.34
      * @throws ConnectException if the I2PServerSocket is closed, or if interrupted.
      *         Not actually thrown through 0.9.16; thrown as of 0.9.17
      * @throws SocketTimeoutException if a timeout was previously set with setSoTimeout and the timeout has been reached.

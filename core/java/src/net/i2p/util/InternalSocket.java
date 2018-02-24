@@ -98,11 +98,22 @@ public class InternalSocket extends Socket {
         return ("Internal socket");
     }
 
-    // ignored stuff
-    /** warning - unsupported */
+    /**
+     *  Supported as of 0.9.34, if constructed with TimeoutPipedInputStream
+     *  and TimeoutPipedOutputStream. Otherwise, does nothing.
+     *  @see TimeoutPipedInputStream
+     */
     @Override
-    public void setSoTimeout(int timeout) {}
+    public synchronized void setSoTimeout(int timeout) {
+        if (_is != null && _is instanceof TimeoutPipedInputStream)
+            ((TimeoutPipedInputStream) _is).setReadTimeout(timeout);
+    }
 
+    // ignored stuff
+
+    /**
+     *  Always returns 0, even if setSoTimeout() was called.
+     */
     @Override
     public int getSoTimeout () {
         return 0;

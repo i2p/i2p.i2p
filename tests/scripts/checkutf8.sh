@@ -55,11 +55,13 @@ do
 	fi
 done
 
+# Java properties files (when not using our DataHelper methods) must be ISO-8859-1
+# https://docs.oracle.com/javase/6/docs/api/java/util/Properties.html
 echo "Checking getopt properties files ..."
 for i in `find core/java/src/gnu/getopt -name \*.properties -type f`
 do
 	#echo "Checking $i ..."
-	iconv -f UTF8 -t UTF8 $i -o /dev/null
+	iconv -f ISO-8859-1 -t ISO-8859-1 $i -o /dev/null
         if [ $? -ne 0 ]
 	then
 		echo "********* FAILED CHECK FOR $i *************"

@@ -18,11 +18,8 @@
 <%=intl._t("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%>
 <% /* note to translators - both parameters are URLs */
 %><%=intl._t("Please report bugs on {0} or {1}.",
-          "<a href=\"http://trac.i2p2.i2p/newticket\">trac.i2p2.i2p</a>",
-          "<a href=\"https://trac.i2p2.de/newticket\">trac.i2p2.de</a>")%>
-<!--
-<%=intl._t("You may use the username \"guest\" and password \"guest\" if you do not wish to register.")%>
--->
+          "<a href=\"http://trac.i2p2.i2p/\">trac.i2p2.i2p</a>",
+          "<a href=\"https://trac.i2p2.de/\">trac.i2p2.de</a>")%>
   </td></tr>
 </tbody></table>
 

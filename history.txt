@@ -1,4 +1,48 @@
+2018-02-23 zzz
+ * Getopt: Add new translations, fix tests
+ * i2psnark: Number formatting tweaks (ticket #1913)
+ * SusiMail: Check mail fixes (ticket #2174)
+
+2018-02-22 zzz
+ * Util: Support setSoTimeout() for InternalSockets
+
+2018-02-21 zzz
+ * Console: Hide options on /configupdate if a package (ticket #2172)
+ * SusiMail: Add Date header to sent messages
+
+2018-02-20 zzz
+ * Console:
+   - Redirect to HTTPS if available (ticket #2160)
+   - Change all 302s to 303 or 307
+   - Change sendError() to setStatus() for 3xx responses
+ * Crypto: Backdate selfsigned cert to allow for clock skew
+ * Eepget: Handle 308
+
+2018-02-19 zzz
+ * Console:
+   - Change trac links (ticket #2014)
+   - Change selfsigned cert cname to localhost (ticket #2160)
+ * Crypto: Add IP addresses to selfsigned cert SAN (ticket #2160)
+ * Streaming: Don't exceed configured tag settings
+ * Time: More sanity checks on NTP responses
+
+2018-02-18 zzz
+ * i2ptunnel: Retry accept after router soft restart (ticket #2003)
+
+2018-02-17 zzz
+ * Console: Number formatting tweaks (ticket #1913)
+ * i2psnark: folder.js cleanup (ticket #2168, PR #14)
+ * i2ptunnel: Close sockets in finally{}
+ * SusiMail: Fix mail save truncation
+
+2018-02-16 zzz
+ * i2psnark: Fix NPE on torrent not found (ticket #2167)
+ * i2ptunnel: Change POST throttle response to 429
+ * Streaming: Configurable response when over conn limits (ticket #2145)
+
 2018-02-12 zzz
+ * i2ptunnel: Close sockets
+ * Proxy: Update clearnet user-agent (ticket #2163)
  * SusiMail:
    - Background email checking (ticket #2087)
    - Set Cache-Control header for attachments

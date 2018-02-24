@@ -22,7 +22,7 @@
     String stat = request.getParameter("stat");
     if (stat == null) {
         // probably because restart or shutdown was clicked
-        response.setStatus(302);
+        response.setStatus(307);
         response.setHeader("Location", "/graphs");
         return;
     }

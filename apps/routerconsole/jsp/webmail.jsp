@@ -8,7 +8,7 @@
     boolean testIFrame = tester.allowIFrame(request.getHeader("User-Agent"));
     boolean embedApp = tester.embedApps();
     if (!testIFrame || !embedApp) {
-        response.setStatus(302);
+        response.setStatus(307);
         response.setHeader("Location", "/susimail/susimail");
     } else {
 %>

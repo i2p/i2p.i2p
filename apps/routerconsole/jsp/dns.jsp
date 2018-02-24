@@ -7,7 +7,7 @@
     // CSSHelper is also pulled in by css.jsi below...
     boolean testIFrame = tester.allowIFrame(request.getHeader("User-Agent"));
     if (!testIFrame) {
-        response.setStatus(302);
+        response.setStatus(307);
         response.setHeader("Location", "/susidns/index");
     } else {
 %>

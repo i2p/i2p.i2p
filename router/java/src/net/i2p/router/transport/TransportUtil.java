@@ -239,7 +239,7 @@ public abstract class TransportUtil {
                port != 6000 &&  // lockd
                (!(port >= 6665 && port <= 6669)) && // IRC and alternates
                port != 6697 &&  // IRC+TLS
-               (!(port >= 7650 && port <= 7664)) && // standard I2P range
+               (!(port >= 7650 && port <= 7668)) && // standard I2P range
                port != 8998 &&  // mtn
                port != 9001 &&  // Tor
                port != 9030 &&  // Tor

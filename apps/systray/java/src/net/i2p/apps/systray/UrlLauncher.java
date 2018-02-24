@@ -89,7 +89,7 @@ public class UrlLauncher implements ClientApp {
         _context = context;
         _mgr = mgr;
         if (args == null || args.length <= 0)
-            args = new String[] {"http://127.0.0.1:7657/index.jsp"};
+            args = new String[] { context.portMapper().getConsoleURL() };
         _args = args;
         _shellCommand = new ShellCommand();
         _state = INITIALIZED;
@@ -355,7 +355,7 @@ public class UrlLauncher implements ClientApp {
             if (args.length > 0)
                 launcher.openUrl(args[0]);
             else
-                launcher.openUrl("http://127.0.0.1:7657/index.jsp");
+                launcher.openUrl(I2PAppContext.getGlobalContext().portMapper().getConsoleURL());
          } catch (IOException e) {}
     }
 }

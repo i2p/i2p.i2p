@@ -64,19 +64,21 @@ public class MultiRouter {
             usage();
             return;
         }
-        Scanner scan = new Scanner(args[0]);
-        if (!scan.hasNextInt()) {
-            usage();
-            scan.close();
-            return;
+        Scanner scan = null;
+        try {
+            scan = new Scanner(args[0]);
+            if (!scan.hasNextInt()) {
+                usage();
+                return;
+            }
+            nbrRouters = scan.nextInt();
+            if (nbrRouters < 0) {
+                usage();
+                return;
+            }
+        } finally {
+            if (scan != null) scan.close();
         }
-        nbrRouters = scan.nextInt();
-        if (nbrRouters < 0) {
-            usage();
-            scan.close();
-            return;
-        }
-        scan.close();
         
         _out = System.out;
 

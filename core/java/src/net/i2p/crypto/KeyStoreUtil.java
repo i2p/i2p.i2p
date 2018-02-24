@@ -458,7 +458,7 @@ public final class KeyStoreUtil {
      *
      *  @param ks path to the keystore
      *  @param alias the name of the key
-     *  @param cname e.g. randomstuff.console.i2p.net
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
      *  @param ou e.g. console
      *  @param keyPW the key password, must be at least 6 characters
      *
@@ -482,7 +482,7 @@ public final class KeyStoreUtil {
      *  @param ks path to the keystore
      *  @param ksPW the keystore password
      *  @param alias the name of the key
-     *  @param cname e.g. randomstuff.console.i2p.net
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
      *  @param ou e.g. console
      *  @param validDays e.g. 3652 (10 years)
      *  @param keyAlg e.g. DSA , RSA, EC
@@ -530,7 +530,7 @@ public final class KeyStoreUtil {
      *  @param ks path to the keystore
      *  @param ksPW the keystore password
      *  @param alias the name of the key
-     *  @param cname e.g. randomstuff.console.i2p.net
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
      *  @param ou e.g. console
      *  @param validDays e.g. 3652 (10 years)
      *  @param keyAlg e.g. DSA , RSA, EC
@@ -578,7 +578,7 @@ public final class KeyStoreUtil {
      *  @param ks path to the keystore
      *  @param ksPW the keystore password
      *  @param alias the name of the key
-     *  @param cname e.g. randomstuff.console.i2p.net
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
      *  @param ou e.g. console
      *  @param validDays e.g. 3652 (10 years)
      *  @param keyPW the key password, must be at least 6 characters

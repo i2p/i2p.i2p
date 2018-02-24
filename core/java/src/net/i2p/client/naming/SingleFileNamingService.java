@@ -252,16 +252,17 @@ public class SingleFileNamingService extends NamingService {
             if (options != null)
                 writeOptions(options, out);
             out.write('\n');
-            out.close();
             for (NamingServiceListener nsl : _listeners) { 
                 nsl.entryAdded(this, hostname, d, options);
             }
             return true;
         } catch (IOException ioe) {
-            if (out != null) try { out.close(); } catch (IOException e) {}
             _log.error("Error adding " + hostname, ioe);
             return false;
-        } finally { releaseWriteLock(); }
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException e) {}
+            releaseWriteLock();
+        }
     }
 
     /** 

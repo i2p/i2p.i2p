@@ -6,6 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.streaming.RouterRestartException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -27,6 +28,7 @@ class ConnectionHandler {
     private final SimpleTimer2 _timer;
     private volatile boolean _active;
     private int _acceptTimeout;
+    private boolean _restartPending;
     
     /** max time after receiveNewSyn() and before the matched accept() */
     private static final int DEFAULT_ACCEPT_TIMEOUT = 3*1000;
@@ -48,14 +50,27 @@ class ConnectionHandler {
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
     
+    /**
+     * The router told us it's going to restart.
+     * Call instead of setActive(false).
+     *
+     * @since 0.9.34
+     */
+    public synchronized void setRestartPending() { 
+        _restartPending = true;
+        setActive(false);
+    }
+
     public synchronized void setActive(boolean active) { 
         // FIXME active=false this only kills for one thread in accept()
         // if there are more, they won't get a poison packet.
         if (_log.shouldLog(Log.WARN))
             _log.warn("setActive(" + active + ") called, previously " + _active, new Exception("I did it"));
         // if starting, clear any old poison
-        if (active && !_active)
+        if (active && !_active) {
+            _restartPending = false;
             _synQueue.clear();
+        }
         boolean wasActive = _active;
         _active = active; 
         if (wasActive && !active) {
@@ -116,12 +131,13 @@ class ConnectionHandler {
      *                  than 1ms, wait indefinitely)
      * @return connection received. Prior to 0.9.17, or null if there was a timeout or the 
      *                  handler was shut down. As of 0.9.17, never null.
+     * @throws RouterRestartException (extends I2PException) if the router is apparently restarting, since 0.9.34
      * @throws ConnectException since 0.9.17, returned null before;
      *                  if the I2PServerSocket is closed, or if interrupted.
      * @throws SocketTimeoutException since 0.9.17, returned null before;
      *                  if a timeout was previously set with setSoTimeout and the timeout has been reached.
      */
-    public Connection accept(long timeoutMs) throws ConnectException, SocketTimeoutException {
+    public Connection accept(long timeoutMs) throws RouterRestartException, ConnectException, SocketTimeoutException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Accept("+ timeoutMs+") called");
 
@@ -137,6 +153,8 @@ class ConnectionHandler {
                         break;
                     sendReset(packet);
                 }
+                if (_restartPending)
+                    throw new RouterRestartException();
                 throw new ConnectException("ServerSocket closed");
             }
             
@@ -174,8 +192,11 @@ class ConnectionHandler {
             }
 
             if (syn != null) {
-                if (syn.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
+                if (syn.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST) {
+                    if (_restartPending)
+                        throw new RouterRestartException();
                     throw new ConnectException("ServerSocket closed");
+                }
 
                 // deal with forged / invalid syn packets in _manager.receiveConnection()
 

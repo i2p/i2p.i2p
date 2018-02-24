@@ -102,8 +102,7 @@ public class SSLClientUtil {
     private static boolean createKeyStore(File ks, String name, Properties opts, String optPfx) {
         // make a random 48 character password (30 * 8 / 5)
         String keyPassword = KeyStoreUtil.randomString();
-        // and one for the cname
-        String cname = name + ".i2ptunnel.i2p.net";
+        String cname = "localhost";
 
         String keyName = opts.getProperty(optPfx + PROP_KEY_ALIAS);
         boolean success = KeyStoreUtil.createKeys(ks, keyName, cname, "I2PTUNNEL", keyPassword);
@@ -116,7 +115,7 @@ public class SSLClientUtil {
         }
         if (success) {
             logAlways("Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
-                           "The certificate name was generated randomly, and is not associated with your " +
+                           "The certificate was generated randomly, and is not associated with your " +
                            "IP address, host name, router identity, or destination keys.");
         } else {
             error("Failed to create I2PTunnel SSL keystore.\n" +

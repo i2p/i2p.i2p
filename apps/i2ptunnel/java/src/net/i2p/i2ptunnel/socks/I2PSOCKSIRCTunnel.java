@@ -6,6 +6,7 @@
  */
 package net.i2p.i2ptunnel.socks;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,6 +48,7 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
      */
     @Override
     protected void clientConnectionRun(Socket s) {
+        I2PSocket destSock = null;
         try {
             //_log.error("SOCKS IRC Tunnel Start");
             try {
@@ -57,7 +59,7 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
             try {
                 s.setSoTimeout(0);
             } catch (SocketException ioe) {}
-            I2PSocket destSock = serv.getDestinationI2PSocket(this);
+            destSock = serv.getDestinationI2PSocket(this);
             StringBuffer expectedPong = new StringBuffer();
             int id = __clientId.incrementAndGet();
             Thread in = new I2PAppThread(new IrcInboundFilter(clientSock, destSock, expectedPong, _log),
@@ -72,7 +74,10 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
         } catch (SOCKSException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error from SOCKS connection", e);
+        } finally {
+            // only because we are running it inline
             closeSocket(s);
+            if (destSock != null) try { destSock.close(); } catch (IOException ioe) {}
         }
     }
 }

@@ -63,7 +63,8 @@ public class CodedIconRendererServlet extends HttpServlet {
                      I2PAppContext.getGlobalContext().logManager().getLog(getClass()).warn("Error writing binary image data for plugin", e);
                  }
              } else {
-                 srs.sendError(304, "Not Modified");
+                 srs.setStatus(304);
+                 srs.flushBuffer();
              }
          } else {
              //Binary data is not present but must be substituted by file on disk

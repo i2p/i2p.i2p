@@ -44,8 +44,8 @@ import net.i2p.util.SystemVersion;
  *  All done programatically, no keytool, no BC libs, no sun classes.
  *  Ref: RFC 2459
  *
- *  This is coded to create a cert that matches what comes out of keytool
- *  exactly, even if I don't understand all of it.
+ *  This is coded to create a cert that is similar to what comes out of keytool,
+ *  even if I don't understand all of it.
  *
  *  @since 0.9.25
  */
@@ -53,6 +53,10 @@ public final class SelfSignedGenerator {
 
     private static final boolean DEBUG = false;
 
+    // Policy Qualifier CPS URI
+    private static final String OID_QT_CPSURI = "1.3.6.1.5.5.7.2.1";
+    // Policy Qualifier User Notice
+    private static final String OID_QT_UNOTICE = "1.3.6.1.5.5.7.2.2";
     private static final String OID_CN = "2.5.4.3";
     private static final String OID_C = "2.5.4.6";
     private static final String OID_L = "2.5.4.7";
@@ -69,6 +73,10 @@ public final class SelfSignedGenerator {
     private static final String OID_BASIC = "2.5.29.19";
     // CRL number
     private static final String OID_CRLNUM = "2.5.29.20";
+    // Certificate Policy
+    private static final String OID_POLICY = "2.5.29.32";
+    // Certificate Policy - Any
+    private static final String OID_POLICY_ANY = "2.5.29.32.0";
     // Authority Key Identifier
     private static final String OID_AKI = "2.5.29.35";
 
@@ -85,7 +93,7 @@ public final class SelfSignedGenerator {
     }
 
     /**
-     *  @param cname the common name, non-null
+     *  @param cname the common name, non-null. Must be a hostname or email address. IP addresses will not be correctly encoded.
      *  @param ou The OU (organizational unit) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param o The O (organization)in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param l The L (city or locality) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
@@ -352,8 +360,9 @@ public final class SelfSignedGenerator {
         byte[] serial = cert.getSerialNumber().toByteArray();
         if (serial.length > 255)
             throw new IllegalArgumentException();
-        long now = System.currentTimeMillis();
-        long then = now + (validDays * 24L * 60 * 60 * 1000);
+        // backdate to allow for clock skew
+        long now = System.currentTimeMillis() - (24L * 60 * 60 * 1000);
+        long then = now + ((validDays + 1) * 24L * 60 * 60 * 1000);
         // used for CRL time and revocation time
         byte[] nowbytes = getDate(now);
         // used for next CRL time
@@ -443,8 +452,9 @@ public final class SelfSignedGenerator {
         byte[] rv = new byte[32];
         rv[0] = 0x30;
         rv[1] = 30;
-        long now = System.currentTimeMillis();
-        long then = now + (validDays * 24L * 60 * 60 * 1000);
+        // backdate to allow for clock skew
+        long now = System.currentTimeMillis() - (24L * 60 * 60 * 1000);
+        long then = now + ((validDays + 1) * 24L * 60 * 60 * 1000);
         byte[] nowbytes = getDate(now);
         byte[] thenbytes = getDate(then);
         System.arraycopy(nowbytes, 0, rv, 2, 15);
@@ -477,6 +487,7 @@ public final class SelfSignedGenerator {
      *   2) Key Usage
      *   3) Basic Constraints
      *   4) Subject Alternative Name
+     *      As of 0.9.34, adds 127.0.0.1 and ::1 to the SAN also
      *   5) Authority Key Identifier
      *  (not necessarily output in that order)
      *
@@ -502,7 +513,13 @@ public final class SelfSignedGenerator {
         byte[] oid3 = getEncodedOID(OID_BASIC);
         byte[] oid4 = getEncodedOID(OID_SAN);
         byte[] oid5 = getEncodedOID(OID_AKI);
+        byte[] oid6 = getEncodedOID(OID_POLICY);
+        byte[] oid7 = getEncodedOID(OID_POLICY_ANY);
+        byte[] oid8 = getEncodedOID(OID_QT_UNOTICE);
+        byte[] oid9 = getEncodedOID(OID_QT_CPSURI);
         byte[] TRUE = new byte[] { 1, 1, (byte) 0xff };
+
+        // extXlen does NOT include the 0x30 and length
 
         int wrap1len = spaceFor(sha.length);
         int ext1len = oid1.length + spaceFor(wrap1len);
@@ -513,8 +530,22 @@ public final class SelfSignedGenerator {
         int wrap3len = spaceFor(TRUE.length);
         int ext3len = oid3.length + TRUE.length + spaceFor(wrap3len);
 
+        // TODO if IP address, encode as 4 or 16 bytes
         byte[] cnameBytes = DataHelper.getASCII(cname);
         int wrap41len = spaceFor(cnameBytes.length);
+        // only used for CA
+        byte[] ipv4;
+        byte[] ipv6;
+        final boolean isCA = !cname.contains("@");
+        if (isCA) {
+            ipv4 = new byte[] { 127, 0, 0, 1 };
+            ipv6 = new byte[16];
+            ipv6[15] = 1;
+            wrap41len += spaceFor(ipv4.length) + spaceFor(ipv6.length);
+        } else {
+            ipv4 = null;
+            ipv6 = null;
+        }
         int wrap4len = spaceFor(wrap41len);
         int ext4len = oid4.length + spaceFor(wrap4len);
 
@@ -522,10 +553,21 @@ public final class SelfSignedGenerator {
         int wrap5len = spaceFor(wrap51len);
         int ext5len = oid5.length + spaceFor(wrap5len);
 
+        byte[] policyTextBytes = DataHelper.getASCII("This self-signed certificate is required for secure local access to I2P services.");
+        byte[] policyURIBytes = DataHelper.getASCII("https://geti2p.net/");
+        int wrap61len = spaceFor(policyTextBytes.length); // usernotice ia5string
+        int wrap62len = oid8.length + spaceFor(wrap61len); // PQ 1 Info OID + usernotice seq.
+        int wrap63len = spaceFor(policyURIBytes.length); // uri ia5string
+        int wrap64len = oid9.length + wrap63len; // PQ 2 Info OID + ia5string
+        int wrap65len = spaceFor(wrap62len) + spaceFor(wrap64len); // qualifiers seq
+        int wrap66len = spaceFor(oid7.length + wrap65len); // PInfo elements seq
+        int wrap67len = spaceFor(wrap66len); // PInfo seq
+        int wrap68len = spaceFor(wrap67len); // Policies seq
+        int ext6len = oid6.length + spaceFor(wrap68len); // OID + octet string
+
         int extslen = spaceFor(ext1len) + spaceFor(ext2len) + spaceFor(ext4len) + spaceFor(ext5len);
-        final boolean isCA = !cname.contains("@");
         if (isCA)
-            extslen += spaceFor(ext3len);
+            extslen += spaceFor(ext3len) + spaceFor(ext6len);
         int seqlen = spaceFor(extslen);
         int totlen = spaceFor(seqlen);
         byte[] rv = new byte[totlen];
@@ -602,14 +644,67 @@ public final class SelfSignedGenerator {
         System.arraycopy(oid4, 0, rv, idx, oid4.length);
         idx += oid4.length;
         // octet string wraps a sequence containing a choice 2 (DNSName) IA5String
+        // followed by two byteArrays (IP addresses)
         rv[idx++] = (byte) 0x04;
         idx = intToASN1(rv, idx, wrap4len);
         rv[idx++] = (byte) 0x30;
         idx = intToASN1(rv, idx, wrap41len);
+        // TODO if IP address, encode as 0x87
         rv[idx++] = (byte) (isCA ? 0x82 : 0x81); // choice, dNSName or rfc822Name, IA5String implied
         idx = intToASN1(rv, idx, cnameBytes.length);
         System.arraycopy(cnameBytes, 0, rv, idx, cnameBytes.length);
         idx += cnameBytes.length;
+        if (isCA) {
+            rv[idx++] = (byte) 0x87; // choice, octet string for IP address
+            idx = intToASN1(rv, idx, ipv4.length);
+            System.arraycopy(ipv4, 0, rv, idx, ipv4.length);
+            idx += ipv4.length;
+            rv[idx++] = (byte) 0x87; // choice, octet string for IP address
+            idx = intToASN1(rv, idx, ipv6.length);
+            System.arraycopy(ipv6, 0, rv, idx, ipv6.length);
+            idx += ipv6.length;
+        }
+
+        // Policy
+        // https://www.sysadmins.lv/blog-en/certificate-policies-extension-all-you-should-know-part-1.aspx
+        if (isCA) {
+            rv[idx++] = (byte) 0x30;
+            idx = intToASN1(rv, idx, ext6len);
+            System.arraycopy(oid6, 0, rv, idx, oid6.length);
+            idx += oid6.length;
+            rv[idx++] = (byte) 0x04;  // octet string wraps a sequence
+            idx = intToASN1(rv, idx, wrap68len);
+            rv[idx++] = (byte) 0x30;  // Policies seq
+            idx = intToASN1(rv, idx, wrap67len);
+            rv[idx++] = (byte) 0x30;  // Policy info seq
+            idx = intToASN1(rv, idx, wrap66len);
+            System.arraycopy(oid7, 0, rv, idx, oid7.length);
+            idx += oid7.length;
+            rv[idx++] = (byte) 0x30;  // Policy qualifiers seq
+            idx = intToASN1(rv, idx, wrap65len);
+
+            // This should be what IE links to as "Issuer Statement"
+            rv[idx++] = (byte) 0x30;  // Policy qualifier info 2 seq
+            idx = intToASN1(rv, idx, wrap64len);
+            System.arraycopy(oid9, 0, rv, idx, oid9.length);
+            idx += oid9.length;
+            rv[idx++] = (byte) 0x16;  // choice 0 URI ia5string
+            idx = intToASN1(rv, idx, policyURIBytes.length);
+            System.arraycopy(policyURIBytes, 0, rv, idx, policyURIBytes.length);
+            idx += policyURIBytes.length;
+
+            // User notice text
+            rv[idx++] = (byte) 0x30;  // Policy qualifier info 1 seq
+            idx = intToASN1(rv, idx, wrap62len);
+            System.arraycopy(oid8, 0, rv, idx, oid8.length);
+            idx += oid8.length;
+            rv[idx++] = (byte) 0x30;  // choice 1 notice seq.
+            idx = intToASN1(rv, idx, wrap61len);
+            rv[idx++] = (byte) 0x16;  // choice 0 ia5string
+            idx = intToASN1(rv, idx, policyTextBytes.length);
+            System.arraycopy(policyTextBytes, 0, rv, idx, policyTextBytes.length);
+            idx += policyTextBytes.length;
+        }
 
         return rv;
     }
@@ -697,6 +792,9 @@ public final class SelfSignedGenerator {
         return rv;
     }
 
+    /**
+     *  Note: For CLI testing, use java -jar i2p.jar su3file keygen pubkey.crt keystore.ks commonName
+     */
 /****
     public static void main(String[] args) {
         try {

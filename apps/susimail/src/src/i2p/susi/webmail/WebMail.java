@@ -84,6 +84,7 @@ import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.servlet.util.WriterOutputStream;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.RFC822Date;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
 
@@ -403,7 +404,13 @@ public class WebMail extends HttpServlet
 		}
 		
 		protected int compare(Mail a, Mail b) {
-			return a.getSize() - b.getSize();
+			long as = a.getSize();
+			long bs = b.getSize();
+			if (as > bs)
+				return 1;
+			if (as < bs)
+				return -1;
+			return 0;
 		}		
 	}
 	
@@ -943,8 +950,10 @@ public class WebMail extends HttpServlet
 			Debug.debug(Debug.DEBUG, "OFFLINE MODE");
 		} else {
 			sessionObject.isFetching = true;
-			if (mailbox.connectToServer(new ConnectWaiter(sessionObject)))
+			if (!mailbox.connectToServer(new ConnectWaiter(sessionObject))) {
+				sessionObject.error += _t("Cannot connect") + '\n';
 				sessionObject.isFetching = false;
+			}
 		}
 
 		// wait a little while so we avoid the loading page if we can
@@ -1423,13 +1432,13 @@ public class WebMail extends HttpServlet
 			sessionObject.isFetching = true;
 			ConnectWaiter cw = new ConnectWaiter(sessionObject);
 			if (mailbox.connectToServer(cw)) {
-				// Already connected, start a thread ourselves
-				// TODO - But if already connected, we aren't going to find anything new.
-				// We used to call refresh() from here, which closes first,
-				// but that isn't threaded.
+				// Start a thread to wait for results
 				Debug.debug(Debug.DEBUG, "Already connected, running CW");
 				Thread t = new I2PAppThread(cw, "Email fetcher");
 				t.start();
+			} else {
+				sessionObject.error += _t("Cannot connect") + '\n';
+				sessionObject.isFetching = false;
 			}
 			// wait if it's going to be quick
 			try {
@@ -2077,7 +2086,6 @@ public class WebMail extends HttpServlet
 			Debug.debug(Debug.DEBUG, "Final state is " + state);
 
 			if (state == State.LIST || state == State.SHOW) {
-
 				// sort buttons are GETs
 				String oldSort = folder.getCurrentSortBy();
 				SortOrder oldOrder = folder.getCurrentSortingDirection();
@@ -2147,13 +2155,13 @@ public class WebMail extends HttpServlet
 					"<head>\n" +
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
 					"<title>" + _t("SusiMail") + " - " + subtitle + "</title>\n" +
-					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css?" + CoreVersion.VERSION + "\">\n" );
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css?" + CoreVersion.VERSION + "\">" );
 				if (sessionObject.isMobile ) {
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
-						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css\" />\n" );
+						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css?" + CoreVersion.VERSION + "\" />" );
 				}
 				if(state != State.AUTH)
-					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css\" type=\"text/css\" media=\"print\" />");
+					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
 				if (state == State.NEW) {
 					// TODO cancel if to and body are empty
 					out.println(
@@ -2233,11 +2241,13 @@ public class WebMail extends HttpServlet
 				if (showRefresh) {
 					sessionObject.info += _t("Refresh the page for updates") + '\n';
 				}
-				if (sessionObject.error.length() > 0) {
-					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
-				}
-				if (sessionObject.info.length() > 0) {
-					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
+				if (sessionObject.error.length() > 0 || sessionObject.info.length() > 0) {
+					out.println("<div class=\"notifications\" onclick=\"this.remove()\">");
+					if (sessionObject.error.length() > 0)
+						out.println("<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>");
+					if (sessionObject.info.length() > 0)
+						out.println("<p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p>");
+					out.println("</div>" );
 				}
 				/*
 				 * now write body
@@ -2281,7 +2291,8 @@ public class WebMail extends HttpServlet
 		if (q != null && q.length() > 0)
 			buf.append(q.replace("&amp;", "&"));  // no you don't html escape the redirect header
 		resp.setHeader("Location", buf.toString());
-		resp.sendError(302, "Moved");
+		resp.setStatus(303);
+		resp.flushBuffer();
 		Debug.debug(Debug.DEBUG, "P-R-G to " + q);
 	}
 
@@ -2367,7 +2378,6 @@ public class WebMail extends HttpServlet
 						 HttpServletResponse response)
 	{
 		Buffer content = mail.getBody();
-
 		if(content == null)
 			return false;
 		String name;
@@ -2380,7 +2390,9 @@ public class WebMail extends HttpServlet
 		InputStream in = null;
 		try {
 			response.setContentType("message/rfc822");
-			response.setContentLength(content.getLength());
+			long sz = mail.getSize();
+			if (sz > 0 && sz <= Integer.MAX_VALUE)
+				response.setContentLength((int) sz);
 			response.setHeader("Cache-Control", "public, max-age=604800");
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
 			                   "filename*=" + name3);
@@ -2388,7 +2400,7 @@ public class WebMail extends HttpServlet
 			DataHelper.copy(in, response.getOutputStream());
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			Debug.debug(Debug.DEBUG, "Save-As", e);
 			return false;
 		} finally {
 			if (in != null) try { in.close(); } catch (IOException ioe) {}
@@ -2484,6 +2496,8 @@ public class WebMail extends HttpServlet
 
 		if( ok ) {
 			StringBuilder body = new StringBuilder(1024);
+			I2PAppContext ctx = I2PAppContext.getGlobalContext();
+			body.append("Date: " + RFC822Date.to822Date(ctx.clock().now()) + "\r\n");
 			// todo include real names, and headerline encode them
 			body.append( "From: " + from + "\r\n" );
 			Mail.appendRecipients( body, toList, "To: " );
@@ -2494,7 +2508,7 @@ public class WebMail extends HttpServlet
 				ok = false;
 				sessionObject.error += e.getMessage();
 			}
-			String boundary = "_=" + I2PAppContext.getGlobalContext().random().nextLong();
+			String boundary = "_=" + ctx.random().nextLong();
 			if (multipart) {
 				body.append( "MIME-Version: 1.0\r\nContent-type: multipart/mixed; boundary=\"" + boundary + "\"\r\n\r\n" );
 			}
@@ -2731,7 +2745,7 @@ public class WebMail extends HttpServlet
 		int i = 0;
 		for (Iterator<String> it = folder.currentPageIterator(); it != null && it.hasNext(); ) {
 			String uidl = it.next();
-			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FetchMode.HEADER );
+			Mail mail = sessionObject.mailCache.getMail(uidl, MailCache.FetchMode.CACHE_ONLY);
 			if (mail == null || !mail.hasHeader()) {
 				continue;
 			}
