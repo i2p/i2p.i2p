@@ -515,14 +515,14 @@ public class WebMail extends HttpServlet
 	private static String button( String name, String label )
 	{
 		StringBuilder buf = new StringBuilder(128);
-		buf.append("<input type=\"submit\" class=\"").append(name).append("\" name=\"")
-		   .append(name).append("\" value=\"").append(label).append('"');
+		buf.append("<input type='submit' class='").append(name).append("' name='")
+		   .append(name).append("' value='").append(label).append('"');
 		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT) || name.equals(NEW_UPLOAD))
-			buf.append(" onclick=\"cancelPopup()\"");
+			buf.append(" onclick='beforePopup=false;'");
 		// These are icons only now, via the CSS, so add a tooltip
 		if (name.equals(FIRSTPAGE) || name.equals(PREVPAGE) || name.equals(NEXTPAGE) || name.equals(LASTPAGE) ||
 		    name.equals(PREV) || name.equals(LIST) || name.equals(NEXT))
-			buf.append(" title=\"").append(label).append('"');
+			buf.append(" title='").append(label).append("'");
 		buf.append('>');
 		return buf.toString();
 	}
@@ -2157,10 +2157,9 @@ public class WebMail extends HttpServlet
 				if (state == State.NEW) {
 					// TODO cancel if to and body are empty
 					out.println(
-						"<script type=\"text/javascript\">\n" +
-							"window.onbeforeunload = function () {" +
-								"return \"" + _t("Message has not been sent. Do you want to discard it?") + "\";" +
-							"};\n" +
+						"<script type='text/javascript'>" +
+							"let beforePopup = true;"+
+							"window.addEventListener('beforeunload', (e)=>{if (beforePopup) e.returnValue=true;} );" +
 						"</script>"
 					);
 					out.println("<script src=\"/susimail/js/compose.js\" type=\"text/javascript\"></script>");
