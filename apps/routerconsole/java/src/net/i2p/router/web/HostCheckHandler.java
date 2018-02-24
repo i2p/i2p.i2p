@@ -78,6 +78,7 @@ public class HostCheckHandler extends HandlerWrapper
                        "\" to advanced configuration and restart.";
             log.logAlways(Log.WARN, s);
             httpResponse.sendError(403, s);
+            baseRequest.setHandled(true);
             return;
         }
 
@@ -92,6 +93,7 @@ public class HostCheckHandler extends HandlerWrapper
                 if (Boolean.valueOf(redir) ||
                     (redir == null && "1".equals(httpRequest.getHeader("Upgrade-Insecure-Requests")))) {
                     sendRedirect(httpsPort, httpRequest, httpResponse);
+                    baseRequest.setHandled(true);
                     return;
                 }
             }

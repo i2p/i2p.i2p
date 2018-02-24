@@ -33,7 +33,11 @@ public class XSSFilter implements Filter {
             // We need to send the error quickly, if we just throw a ServletException,
             // the data keeps coming and the connection gets reset.
             // This way we at least get the error to the browser.
-            ((HttpServletResponse)response).sendError(413, ise.getMessage());
+            try {
+                ((HttpServletResponse)response).sendError(413, ise.getMessage());
+            } catch (IllegalStateException ise2) {
+                // Committed, probably wasn't a multipart form error after all
+            }
         }
     }
 }

@@ -56,6 +56,9 @@
         <Set name="handlers">
          <Array type="org.eclipse.jetty.server.Handler">
            <Item>
+             <New id="HostChecker" class="org.klomp.snark.standalone.HostCheckHandler"/>
+           </Item>
+           <Item>
              <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
            </Item>
            <Item>

@@ -1,9 +1,12 @@
 package org.klomp.snark.standalone;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.apps.systray.UrlLauncher;
+import net.i2p.data.DataHelper;
 import net.i2p.jetty.JettyStart;
 
 /**
@@ -16,9 +19,16 @@ public class RunStandalone {
     private int _port = 8002;
     private String _host = "127.0.0.1";
     private static RunStandalone _instance;
+    static final File APP_CONFIG_FILE = new File("i2psnark-appctx.config");
 
     private RunStandalone(String args[]) throws Exception {
-        _context = I2PAppContext.getGlobalContext();
+        Properties p = new Properties();
+        if (APP_CONFIG_FILE.exists()) {
+            try {
+                DataHelper.loadProps(p, APP_CONFIG_FILE);
+            } catch (IOException ioe) {}
+        }
+        _context = new I2PAppContext(p);
         File base = _context.getBaseDir();
         File xml = new File(base, "jetty-i2psnark.xml");
         _jettyStart = new JettyStart(_context, null, new String[] { xml.getAbsolutePath() } );

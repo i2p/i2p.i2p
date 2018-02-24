@@ -50,10 +50,11 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <!-- jsp-api.jar only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
-                <!-- jetty-i2p.jar only for RunStandalone -->
+                <!-- following jars only for standalone builds -->
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
-                <!-- systray.jar only for RunStandalone -->
                 <pathelement location="../../systray/java/build/systray.jar" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
             </classpath>
         </javac>
     </target>
@@ -319,6 +320,7 @@
         <mkdir dir="./dist/webapps" />
         <copy file="../i2psnark.war" tofile="./dist/webapps/i2psnark.war" />
         <copy file="../jetty-i2psnark.xml" tofile="./dist/jetty-i2psnark.xml" />
+        <copy file="../i2psnark-appctx.config" tofile="./dist/i2psnark-appctx.config" />
         <copy file="./build/i2psnark-standalone.jar" tofile="./dist/i2psnark.jar" />
         <copy file="../readme-standalone.txt" tofile="./dist/readme.txt" />
         <!-- temp so announces work -->
