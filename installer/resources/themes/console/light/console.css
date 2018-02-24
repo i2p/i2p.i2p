@@ -3130,7 +3130,7 @@ p#pluginconfigtext {
      padding: 0;
 }
 
-#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2) {
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2) {
      background: #fafaff url(/themes/console/images/info/from_file.png) 12px center no-repeat;
      background: url(/themes/console/images/info/from_file.png) 12px center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
      padding: 10px 15px 10px 50px;
@@ -6487,6 +6487,7 @@ h3#ntcpcon, h3#udpcon {
      padding-right: 3px;
 }
 
+table#plugininstall2 td:first-child,
 table#plugininstall td:first-child {
      white-space: nowrap !important;
 }

@@ -6068,7 +6068,7 @@ p#pluginconfigtext {
      background-size: 28px 28px;
 }
 
-#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2) {
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2) {
      background: #fff url(/themes/console/images/info/from_file.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
@@ -7036,7 +7036,7 @@ input[name="pluginURL"] {
      padding-left: 5px !important;
 }
 
-#plugininstall .optionsave {
+#plugininstall .optionsave, #plugininstall2 .optionsave {
      padding-right: 0 !important;
 }
 
@@ -7085,7 +7085,7 @@ input[name="pluginURL"] {
      width: 260px;
 }
 
-#plugininstall tr:nth-child(3) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2) {
+#plugininstall tr:nth-child(3) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2) {
      background-size: 20px 20px;
      padding: 15px 0 15px 36px;
      background-position: 10px center;

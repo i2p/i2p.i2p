@@ -325,7 +325,7 @@ table#enviro td:first-child {
      text-align: right !important;
 }
 
-table#netconfig th, table#externali2cp th, table#plugininstall th, .configtable th, th.th_title {
+table#netconfig th, table#externali2cp th, table#plugininstall th, table#plugininstall2 th, .configtable th, th.th_title {
      text-align: right !important;
 }
 
@@ -457,7 +457,7 @@ select, select:hover, select:focus, select:active {
 #bandwidthconfig tr:first-child .infohelp, h3#shutdownrouter + p.infohelp, h3#restartrouter + p.infohelp, h3#systray + p.infohelp, 
 h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, table#addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
 #config_reseed.main p.infohelp, #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2), 
-#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
 p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #plugininstall .infohelp, #config_family .infohelp, 
 #joinfamily tr:nth-child(3) td:first-child, #newfamily tr:last-child td:first-child, #config_summarybar .configtable td:not(.optionsave),
 table#bugreports td.infohelp {

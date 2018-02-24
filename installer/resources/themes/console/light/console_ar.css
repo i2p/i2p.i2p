@@ -447,7 +447,7 @@ span.newtab {
      background: #fff ;
 }
 
-#plugininstall {
+#plugininstall, #plugininstall2 {
      margin: 0 0 0 -16px;
 }
 
@@ -495,7 +495,7 @@ h3#browseronstart + p.infohelp, .main#config_reseed p.infohelp,
 p#enablefullstats, p#gatherstats, #config_family .infohelp,
 #consolepass tr:first-child td, form[action="events"],
 #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2),
-#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2),
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2),
 #config_summarybar .configtable td:not(.optionsave) {
      background-position: right 12px center !important;
      padding: 15px 50px 15px 10px !important;
@@ -554,7 +554,7 @@ div.themechoice, div.langselect {
      margin-left: 16px;
 }
 
-#plugininstall {
+#plugininstall, #plugininstall2 {
      margin-right: 0 !important;
 }
 
@@ -1024,7 +1024,7 @@ label {
 #bandwidthconfig tr:first-child .infohelp, h3#shutdownrouter + p.infohelp, h3#restartrouter + p.infohelp, h3#systray + p.infohelp, 
 h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, #addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
 #config_reseed.main p.infohelp, #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2), 
-#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
 p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #plugininstall .infohelp, #config_family .infohelp, 
 #joinfamily tr:nth-child(3) td:first-child, #newfamily tr:last-child td:first-child, #config_summarybar .configtable td:not(.optionsave),
 #bugreports td.infohelp {

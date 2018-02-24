@@ -6447,7 +6447,7 @@ p.sybil_info + a[name] + .sybil_routerinfo, p.hashdist + a[name] + .sybil_router
      border-top: 1px solid #443da0;
 }
 
-#netconfig th, #externali2cp th, #plugininstall th, .configtable th, th.th_title {
+#netconfig th, #externali2cp th, #plugininstall th, #plugininstall2 th, .configtable th, th.th_title {
     text-align: left;
     padding: 5px 10px !important;
     text-transform: uppercase;
@@ -6527,7 +6527,7 @@ td.optionsave {
      background: #000;
 }
 
-#floodfillconfig form, #plugininstall form, #updateplugins form, .configtable form {
+#floodfillconfig form, #plugininstall form, #plugininstall2 form, #updateplugins form, .configtable form {
      margin-bottom: 0;
 }
 
@@ -7000,7 +7000,7 @@ form[action="events"] {
      background-size: 28px 28px;
 }
 
-#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2) {
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2) {
      background: #000 url(/themes/console/images/info/from_file.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;

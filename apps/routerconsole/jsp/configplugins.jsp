@@ -46,6 +46,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        if (clientshelper.isPluginInstallEnabled()) {
 %>
 <h3 id="pluginmanage"><a name="plugin"></a><%=intl._t("Plugin Installation")%></h3><p>
+<form action="configplugins" method="POST">
 <table id="plugininstall" class="configtable">
 <tr><td class="infohelp" colspan="2">
  <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://i2pwiki.i2p/index.php?title=Plugins\" target=\"_blank\">i2pwiki.i2p</a>")%>
@@ -54,7 +55,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <%=intl._t("Installation from URL")%>
 </th></tr>
 <tr>
-<form action="configplugins" method="POST">
 <td>
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <b>URL:</b>
@@ -65,13 +65,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <input type="submit" class="cancel" name="foo" value="<%=intl._t("Cancel")%>" />
  <input type="submit" name="action" class="download" value="<%=intl._t("Install Plugin")%>" />
 </td>
-</form>
 </tr>
+</table></form>
+<form action="configplugins" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+<table id="plugininstall2" class="configtable">
 <tr><th colspan="2">
 <a name="plugin"></a><%=intl._t("Installation from File")%>
 </th></tr>
 <tr>
-<form action="configplugins" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <td>
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <b><%=intl._t("Select xpi2p or su3 file")%>:</b>
@@ -80,9 +81,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <td class="optionsave" align="right">
 <input type="submit" name="action" class="download" value="<%=intl._t("Install Plugin from File")%>" />
 </td>
-</form>
 </tr>
 </table>
+</form>
 <%
        } // pluginInstallEnabled
        if (clientshelper.isPluginUpdateEnabled()) {
