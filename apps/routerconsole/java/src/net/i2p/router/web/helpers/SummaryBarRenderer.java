@@ -409,7 +409,7 @@ class SummaryBarRenderer {
            .append(_t("Router Info"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "</table><table id=\"sb_general\">" +
+                   "<table id=\"sb_general\">" +
                    "<tr title=\"")
            .append(_t("The version of the I2P software we are running"))
            .append("\">" +
