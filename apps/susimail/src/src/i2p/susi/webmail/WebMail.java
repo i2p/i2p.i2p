@@ -2114,6 +2114,9 @@ public class WebMail extends HttpServlet
 				}
 			}
 
+			response.setHeader("Pragma", "no-cache");
+			response.setHeader("Cache-Control","no-cache");
+
 			//// Begin output
 
 				PrintWriter out = response.getWriter();
