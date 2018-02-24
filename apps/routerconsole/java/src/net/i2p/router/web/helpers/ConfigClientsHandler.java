@@ -525,6 +525,10 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         if (!url.startsWith("file:")) {
+            if (uri.getScheme() == null || uri.getHost() == null || uri.getPath() == null || uri.getPath().length() <= 1) {
+                addFormError(_t("Bad URL {0}", url));
+                return;
+            }
             if (!verifyProxy())
                 return;
         }
