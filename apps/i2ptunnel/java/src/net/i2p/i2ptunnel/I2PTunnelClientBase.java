@@ -14,8 +14,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -700,8 +702,29 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             Properties opts = getTunnel().getClientOptions();
             boolean useSSL = Boolean.parseBoolean(opts.getProperty(PROP_USE_SSL));
             if (useSSL) {
-                // was already done in web/IndexBean.java when saving the config
-                boolean wasCreated = SSLClientUtil.verifyKeyStore(opts);
+                // was already done in GeneralHelper.updateTunnelConfig() when saving the config
+                // we should never be generating the cert here.
+                // add the local interface and all targets to the cert
+                Set<String> altNames = new HashSet<String>(4);
+                String intfc = getTunnel().listenHost;
+                if (intfc != null && !intfc.equals("0.0.0.0") && !intfc.equals("::") &&
+                    !intfc.equals("0:0:0:0:0:0:0:0"))
+                    altNames.add(intfc);
+                // We can't easily get to the targetDestination property,
+                // or the _addrs List in I2PTunnelClient, or the target argument in I2PTunnel from here,
+                // but it shouldn't matter, we should never be generating the cert here.
+                //String targets = ...
+                //if (targets != null) {
+                //    StringTokenizer tok = new StringTokenizer(targets, ", ");
+                //    while (tok.hasMoreTokens()) {
+                //        String h = tok.nextToken();
+                //        int colon = h.indexOf(':');
+                //        if (colon >= 0)
+                //            h = h.substring(0, colon);
+                //        altNames.add(h);
+                //    }
+                //}
+                boolean wasCreated = SSLClientUtil.verifyKeyStore(opts, "", altNames);
                 if (wasCreated) {
                     // From here, we can't save the config.
                     // We shouldn't get here, as SSL isn't the default, so it would

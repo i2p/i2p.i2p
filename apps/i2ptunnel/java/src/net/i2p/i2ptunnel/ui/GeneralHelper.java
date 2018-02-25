@@ -3,9 +3,11 @@ package net.i2p.i2ptunnel.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
@@ -14,6 +16,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
@@ -25,6 +28,7 @@ import net.i2p.i2ptunnel.SSLClientUtil;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.i2ptunnel.web.Messages;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
@@ -94,8 +98,30 @@ public class GeneralHelper {
             // Down in I2PTunnelClientBase it's very hard to save the config.
             //
             if (Boolean.parseBoolean(props.getProperty(OPT + I2PTunnelClientBase.PROP_USE_SSL))) {
+                // add the local interface and all targets to the cert
+                String intfc = props.getProperty(TunnelController.PROP_INTFC);
+                Set<String> altNames = new HashSet<String>(4);
+                if (intfc != null && !intfc.equals("0.0.0.0") && !intfc.equals("::") &&
+                    !intfc.equals("0:0:0:0:0:0:0:0"))
+                    altNames.add(intfc);
+                String tgts = props.getProperty(TunnelController.PROP_DEST);
+                if (tgts != null) {
+                    altNames.add(intfc);
+                    String[] hosts = DataHelper.split(tgts, "[ ,]");
+                    for (String h : hosts) {
+                        int colon = h.indexOf(':');
+                        if (colon >= 0)
+                            h = h.substring(0, colon);
+                        altNames.add(h);
+                        if (!h.endsWith(".b32.i2p")) {
+                            Hash hash = ConvertToHash.getHash(h);
+                            if (hash != null)
+                                altNames.add(hash.toBase32());
+                        }
+                    }
+                }
                 try {
-                    boolean created = SSLClientUtil.verifyKeyStore(props, OPT);
+                    boolean created = SSLClientUtil.verifyKeyStore(props, OPT, altNames);
                     if (created) {
                         // config now contains new keystore props
                         String name = props.getProperty(TunnelController.PROP_NAME, "");
