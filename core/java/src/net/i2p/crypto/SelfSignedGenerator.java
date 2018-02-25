@@ -18,8 +18,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.crypto.interfaces.DHPublicKey;
@@ -27,12 +29,15 @@ import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.DHPublicKeySpec;
 import javax.security.auth.x500.X500Principal;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import static net.i2p.crypto.SigUtil.intToASN1;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.Addresses;
 import net.i2p.util.HexDump;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFileOutputStream;
@@ -42,10 +47,12 @@ import net.i2p.util.SystemVersion;
  *  Generate keys and a selfsigned certificate, suitable for
  *  storing in a Keystore with KeyStoreUtil.storePrivateKey().
  *  All done programatically, no keytool, no BC libs, no sun classes.
- *  Ref: RFC 2459
+ *  Ref: RFC 2459, RFC 5280
  *
- *  This is coded to create a cert that is similar to what comes out of keytool,
- *  even if I don't understand all of it.
+ *  This is coded to create a cert that is similar to what comes out of keytool.
+ *
+ *  NOTE: Recommended use is via KeyStoreUtil.createKeys() and related methods.
+ *  This API may not be stable.
  *
  *  @since 0.9.25
  */
@@ -108,6 +115,29 @@ public final class SelfSignedGenerator {
      */
     public static Object[] generate(String cname, String ou, String o, String l, String st, String c,
                              int validDays, SigType type) throws GeneralSecurityException {
+        return generate(cname, null, ou, o, l, st, c, validDays, type);
+    }
+
+    /**
+     *  @param cname the common name, non-null. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
+     *  @param ou The OU (organizational unit) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param o The O (organization)in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param l The L (city or locality) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param st The ST (state or province) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param c The C (country) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *
+     *  @return length 4 array:
+     *  rv[0] is a Java PublicKey
+     *  rv[1] is a Java PrivateKey
+     *  rv[2] is a Java X509Certificate
+     *  rv[3] is a Java X509CRL
+     *
+     *  @since 0.9.34 added altNames param
+     */
+    public static Object[] generate(String cname, Set<String> altNames, String ou, String o, String l, String st, String c,
+                             int validDays, SigType type) throws GeneralSecurityException {
         SimpleDataStructure[] keys = KeyGenerator.getInstance().generateSigningKeys(type);
         SigningPublicKey pub = (SigningPublicKey) keys[0];
         SigningPrivateKey priv = (SigningPrivateKey) keys[1];
@@ -132,7 +162,7 @@ public final class SelfSignedGenerator {
         }
         byte[] sigoid = getEncodedOIDSeq(oid);
 
-        byte[] tbs = genTBS(cname, ou, o, l, st, c, validDays, sigoid, jpub);
+        byte[] tbs = genTBS(cname, altNames, ou, o, l, st, c, validDays, sigoid, jpub);
         int tbslen = tbs.length;
 
         Signature sig = DSAEngine.getInstance().sign(tbs, priv);
@@ -261,13 +291,15 @@ public final class SelfSignedGenerator {
 
     /**
      *  @param cname the common name, non-null
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
      *  @param ou The OU (organizational unit) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param o The O (organization)in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param l The L (city or locality) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param st The ST (state or province) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      *  @param c The C (country) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
      */
-    private static byte[] genTBS(String cname, String ou, String o, String l, String st, String c,
+    private static byte[] genTBS(String cname, Set<String> altNames, String ou, String o, String l, String st, String c,
                           int validDays, byte[] sigoid, PublicKey jpub) throws GeneralSecurityException {
         // a0 ???, int = 2
         byte[] version = { (byte) 0xa0, 3, 2, 1, 2 };
@@ -298,7 +330,7 @@ public final class SelfSignedGenerator {
         byte[] subject = issuer;
 
         byte[] pubbytes = jpub.getEncoded();
-        byte[] extbytes = getExtensions(pubbytes, cname);
+        byte[] extbytes = getExtensions(pubbytes, cname, altNames);
 
         int len = version.length + serial.length + sigoid.length + issuer.length +
                   validity.length + subject.length + pubbytes.length + extbytes.length;
@@ -494,9 +526,11 @@ public final class SelfSignedGenerator {
      *  Ref: RFC 5280
      *
      *  @param pubbytes bit string
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
      *  @return ASN.1 encoded object
      */
-    private static byte[] getExtensions(byte[] pubbytes, String cname) {
+    private static byte[] getExtensions(byte[] pubbytes, String cname, Set<String> altNames) {
         // RFC 2549 sec. 4.2.1.2
         // subject public key identifier is the sha1 hash of the bit string of the public key
         // without the tag, length, and igore fields
@@ -530,21 +564,27 @@ public final class SelfSignedGenerator {
         int wrap3len = spaceFor(TRUE.length);
         int ext3len = oid3.length + TRUE.length + spaceFor(wrap3len);
 
-        // TODO if IP address, encode as 4 or 16 bytes
-        byte[] cnameBytes = DataHelper.getASCII(cname);
-        int wrap41len = spaceFor(cnameBytes.length);
-        // only used for CA
-        byte[] ipv4;
-        byte[] ipv6;
+        int wrap41len = 0;
+        if (altNames == null)
+            altNames = new HashSet<String>(4);
+        else
+            altNames.remove("0:0:0:0:0:0:0:1");  // We don't want dup of "::1"
+        altNames.add(cname);
         final boolean isCA = !cname.contains("@");
         if (isCA) {
-            ipv4 = new byte[] { 127, 0, 0, 1 };
-            ipv6 = new byte[16];
-            ipv6[15] = 1;
-            wrap41len += spaceFor(ipv4.length) + spaceFor(ipv6.length);
-        } else {
-            ipv4 = null;
-            ipv6 = null;
+            altNames.add("localhost");
+            altNames.add("127.0.0.1");
+            altNames.add("::1");
+        }
+        for (String n : altNames) {
+            int len;
+            if (InetAddressUtils.isIPv4Address(n))
+                len = 4;
+            else if (InetAddressUtils.isIPv6Address(n))
+                len = 16;
+            else
+                len = n.length();
+            wrap41len += spaceFor(len);
         }
         int wrap4len = spaceFor(wrap41len);
         int ext4len = oid4.length + spaceFor(wrap4len);
@@ -643,26 +683,26 @@ public final class SelfSignedGenerator {
         idx = intToASN1(rv, idx, ext4len);
         System.arraycopy(oid4, 0, rv, idx, oid4.length);
         idx += oid4.length;
-        // octet string wraps a sequence containing a choice 2 (DNSName) IA5String
-        // followed by two byteArrays (IP addresses)
+        // octet string wraps a sequence containing the names and IP addresses
         rv[idx++] = (byte) 0x04;
         idx = intToASN1(rv, idx, wrap4len);
         rv[idx++] = (byte) 0x30;
         idx = intToASN1(rv, idx, wrap41len);
-        // TODO if IP address, encode as 0x87
-        rv[idx++] = (byte) (isCA ? 0x82 : 0x81); // choice, dNSName or rfc822Name, IA5String implied
-        idx = intToASN1(rv, idx, cnameBytes.length);
-        System.arraycopy(cnameBytes, 0, rv, idx, cnameBytes.length);
-        idx += cnameBytes.length;
-        if (isCA) {
-            rv[idx++] = (byte) 0x87; // choice, octet string for IP address
-            idx = intToASN1(rv, idx, ipv4.length);
-            System.arraycopy(ipv4, 0, rv, idx, ipv4.length);
-            idx += ipv4.length;
-            rv[idx++] = (byte) 0x87; // choice, octet string for IP address
-            idx = intToASN1(rv, idx, ipv6.length);
-            System.arraycopy(ipv6, 0, rv, idx, ipv6.length);
-            idx += ipv6.length;
+        for (String n : altNames) {
+            byte[] b;
+            if (InetAddressUtils.isIPv4Address(n) ||
+                InetAddressUtils.isIPv6Address(n)) {
+                b = Addresses.getIP(n);
+                if (b == null)  // shouldn't happen
+                    throw new IllegalArgumentException("fail " + n);
+                rv[idx++] = (byte) 0x87; // choice, octet string for IP address
+            } else {
+                b = DataHelper.getASCII(n);
+                rv[idx++] = (byte) (isCA ? 0x82 : 0x81); // choice, dNSName or rfc822Name, IA5String implied
+            }
+            idx = intToASN1(rv, idx, b.length);
+            System.arraycopy(b, 0, rv, idx, b.length);
+            idx += b.length;
         }
 
         // Policy

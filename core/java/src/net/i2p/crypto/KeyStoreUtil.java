@@ -467,7 +467,30 @@ public final class KeyStoreUtil {
      */
     public static boolean createKeys(File ks, String alias, String cname, String ou,
                                      String keyPW) {
-        return createKeys(ks, DEFAULT_KEYSTORE_PASSWORD, alias, cname, ou,
+        return createKeys(ks, DEFAULT_KEYSTORE_PASSWORD, alias, cname, null, ou,
+                          DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM, DEFAULT_KEY_SIZE, keyPW);
+    }
+
+    /**
+     *  Create a keypair and store it in the keystore at ks, creating it if necessary.
+     *  Use default keystore password, valid days, algorithm, and key size.
+     *
+     *  Warning, may take a long time.
+     *
+     *  @param ks path to the keystore
+     *  @param alias the name of the key
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
+     *  @param ou e.g. console
+     *  @param keyPW the key password, must be at least 6 characters
+     *
+     *  @return success
+     *  @since 0.9.34 added altNames param
+     */
+    public static boolean createKeys(File ks, String alias, String cname, Set<String> altNames, String ou,
+                                     String keyPW) {
+        return createKeys(ks, DEFAULT_KEYSTORE_PASSWORD, alias, cname, altNames, ou,
                           DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM, DEFAULT_KEY_SIZE, keyPW);
     }
 
@@ -494,12 +517,42 @@ public final class KeyStoreUtil {
      */
     public static boolean createKeys(File ks, String ksPW, String alias, String cname, String ou,
                                      int validDays, String keyAlg, int keySize, String keyPW) {
+        return createKeys(ks, ksPW, alias, cname, null, ou, validDays, keyAlg, keySize, keyPW);
+    }
+
+    /**
+     *  Create a keypair and store it in the keystore at ks, creating it if necessary.
+     *
+     *  For new code, the createKeysAndCRL() with the SigType argument is recommended over this one,
+     *  as it throws exceptions, and returns the certificate and CRL.
+     *
+     *  Warning, may take a long time.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password
+     *  @param alias the name of the key
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
+     *  @param ou e.g. console
+     *  @param validDays e.g. 3652 (10 years)
+     *  @param keyAlg e.g. DSA , RSA, EC
+     *  @param keySize e.g. 1024
+     *  @param keyPW the key password, must be at least 6 characters
+     *
+     *  @return success
+     *  @since 0.9.34 added altNames param
+     */
+    public static boolean createKeys(File ks, String ksPW, String alias, String cname, Set<String> altNames, String ou,
+                                     int validDays, String keyAlg, int keySize, String keyPW) {
         boolean useKeytool = I2PAppContext.getGlobalContext().getBooleanProperty("crypto.useExternalKeytool");
         if (useKeytool) {
+            if (altNames != null)
+                throw new IllegalArgumentException("can't do SAN in keytool");
             return createKeysCLI(ks, ksPW, alias, cname, ou, validDays, keyAlg, keySize, keyPW);
         } else {
             try {
-                createKeysAndCRL(ks, ksPW, alias, cname, ou, validDays, keyAlg, keySize, keyPW);
+                createKeysAndCRL(ks, ksPW, alias, cname, altNames, ou, validDays, keyAlg, keySize, keyPW);
                 return true;
             } catch (GeneralSecurityException gse) {
                 error("Create keys error", gse);
@@ -546,6 +599,46 @@ public final class KeyStoreUtil {
     public static Object[] createKeysAndCRL(File ks, String ksPW, String alias, String cname, String ou,
                                             int validDays, String keyAlg, int keySize, String keyPW)
                                                 throws GeneralSecurityException, IOException {
+        return createKeysAndCRL(ks, ksPW, alias, cname, null, ou, validDays, keyAlg, keySize, keyPW);
+    }
+
+    /**
+     *  New way - Native Java, does not call out to keytool.
+     *  Create a keypair and store it in the keystore at ks, creating it if necessary.
+     *
+     *  This returns the public key, private key, certificate, and CRL in an array.
+     *  All of these are Java classes. Keys may be converted to I2P classes with SigUtil.
+     *  The private key and selfsigned cert are stored in the keystore.
+     *  The public key may be derived from the private key with KeyGenerator.getSigningPublicKey().
+     *  The public key certificate may be stored separately with
+     *  CertUtil.saveCert() if desired.
+     *  The CRL is not stored by this method, store it with
+     *  CertUtil.saveCRL() or CertUtil.exportCRL() if desired.
+     *
+     *  Throws on all errors.
+     *  Warning, may take a long time.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password
+     *  @param alias the name of the key
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
+     *  @param ou e.g. console
+     *  @param validDays e.g. 3652 (10 years)
+     *  @param keyAlg e.g. DSA , RSA, EC
+     *  @param keySize e.g. 1024
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @return all you need:
+     *      rv[0] is a Java PublicKey
+     *      rv[1] is a Java PrivateKey
+     *      rv[2] is a Java X509Certificate
+     *      rv[3] is a Java X509CRL
+     *  @since 0.9.34 added altNames param
+     */
+    public static Object[] createKeysAndCRL(File ks, String ksPW, String alias, String cname, Set<String> altNames, String ou,
+                                            int validDays, String keyAlg, int keySize, String keyPW)
+                                                throws GeneralSecurityException, IOException {
         String algoName = getSigAlg(keySize, keyAlg);
         SigType type = null;
         for (SigType t : EnumSet.allOf(SigType.class)) {
@@ -556,7 +649,7 @@ public final class KeyStoreUtil {
         }
         if (type == null)
             throw new GeneralSecurityException("Unsupported algorithm/size: " + keyAlg + '/' + keySize);
-        return createKeysAndCRL(ks, ksPW, alias, cname, ou, validDays, type, keyPW);
+        return createKeysAndCRL(ks, ksPW, alias, cname, altNames, ou, validDays, type, keyPW);
     }
 
     /**
@@ -592,13 +685,51 @@ public final class KeyStoreUtil {
     public static Object[] createKeysAndCRL(File ks, String ksPW, String alias, String cname, String ou,
                                             int validDays, SigType type, String keyPW)
                                                 throws GeneralSecurityException, IOException {
+        return createKeysAndCRL(ks, ksPW, alias, cname, null, ou, validDays, type, keyPW);
+    }
+
+    /**
+     *  New way - Native Java, does not call out to keytool.
+     *  Create a keypair and store it in the keystore at ks, creating it if necessary.
+     *
+     *  This returns the public key, private key, certificate, and CRL in an array.
+     *  All of these are Java classes. Keys may be converted to I2P classes with SigUtil.
+     *  The private key and selfsigned cert are stored in the keystore.
+     *  The public key may be derived from the private key with KeyGenerator.getSigningPublicKey().
+     *  The public key certificate may be stored separately with
+     *  CertUtil.saveCert() if desired.
+     *  The CRL is not stored by this method, store it with
+     *  CertUtil.saveCRL() or CertUtil.exportCRL() if desired.
+     *
+     *  Throws on all errors.
+     *  Warning, may take a long time.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password
+     *  @param alias the name of the key
+     *  @param cname e.g. localhost. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
+     *  @param ou e.g. console
+     *  @param validDays e.g. 3652 (10 years)
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @return all you need:
+     *      rv[0] is a Java PublicKey
+     *      rv[1] is a Java PrivateKey
+     *      rv[2] is a Java X509Certificate
+     *      rv[3] is a Java X509CRL
+     *  @since 0.9.34 added altNames param
+     */
+    public static Object[] createKeysAndCRL(File ks, String ksPW, String alias, String cname, Set<String> altNames, String ou,
+                                            int validDays, SigType type, String keyPW)
+                                                throws GeneralSecurityException, IOException {
         File dir = ks.getParentFile();
         if (dir != null && !dir.exists()) {
             File sdir = new SecureDirectory(dir.getAbsolutePath());
             if (!sdir.mkdirs())
                 throw new IOException("Can't create directory " + dir);
         }
-        Object[] rv = SelfSignedGenerator.generate(cname, ou, "I2P", "I2P Anonymous Network", null, null, validDays, type);
+        Object[] rv = SelfSignedGenerator.generate(cname, altNames, ou, "I2P", "I2P Anonymous Network", null, null, validDays, type);
         //PublicKey jpub = (PublicKey) rv[0];
         PrivateKey jpriv = (PrivateKey) rv[1];
         X509Certificate cert = (X509Certificate) rv[2];

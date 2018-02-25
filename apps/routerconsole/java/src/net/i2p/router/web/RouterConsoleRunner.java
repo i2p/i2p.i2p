@@ -42,6 +42,8 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -516,17 +518,15 @@ public class RouterConsoleRunner implements RouterApp {
                     try {
                         // Test before we add the connector, because Jetty 6 won't start if any of the
                         // connectors are bad
-                        InetAddress test = InetAddress.getByName(host);
-                        if ((!hasIPV6) && (!(test instanceof Inet4Address)))
+                        if ((!hasIPV6) && InetAddressUtils.isIPv6Address(host))
                             throw new IOException("IPv6 addresses unsupported");
-                        if ((!hasIPV4) && (test instanceof Inet4Address))
+                        if ((!hasIPV4) && InetAddressUtils.isIPv4Address(host))
                             throw new IOException("IPv4 addresses unsupported");
                         ServerSocket testSock = null;
                         try {
                             // On Windows, this was passing and Jetty was still failing,
                             // possibly due to %scope_id ???
                             // https://issues.apache.org/jira/browse/ZOOKEEPER-667
-                            //testSock = new ServerSocket(0, 0, test);
                             // so do exactly what Jetty does in SelectChannelConnector.open()
                             testSock = new ServerSocket();
                             InetSocketAddress isa = new InetSocketAddress(host, 0);
@@ -574,7 +574,23 @@ public class RouterConsoleRunner implements RouterApp {
             }
             if (sslPort > 0) {
                 File keyStore = new File(_context.getConfigDir(), "keystore/console.ks");
-                if (verifyKeyStore(keyStore)) {
+                // Put the list of hosts together early, so we can put it in the selfsigned cert.
+                StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
+                Set<String> altNames = new HashSet<String>(4);
+                while (tok.hasMoreTokens()) {
+                    String s = tok.nextToken().trim();
+                    if (!s.equals("0.0.0.0") && !s.equals("::") &&
+                        !s.equals("0:0:0:0:0:0:0:0"))
+                        altNames.add(s);
+                }
+                String allowed = _context.getProperty(PROP_ALLOWED_HOSTS);
+                if (allowed != null) {
+                    tok = new StringTokenizer(allowed, " ,");
+                    while (tok.hasMoreTokens()) {
+                        altNames.add(tok.nextToken().trim());
+                    }
+                }
+                if (verifyKeyStore(keyStore, altNames)) {
                     // the keystore path and password
                     SslContextFactory sslFactory = new SslContextFactory(keyStore.getAbsolutePath());
                     sslFactory.setKeyStorePassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD));
@@ -585,22 +601,20 @@ public class RouterConsoleRunner implements RouterApp {
                     sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.EXCLUDE_CIPHERS.toArray(
                                                       new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
                     List<String> hosts = new ArrayList<String>(2);
-                    StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
+                    tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
                         String host = tok.nextToken().trim();
                         // doing it this way means we don't have to escape an IPv6 host with []
                         try {
                             // Test before we add the connector, because Jetty 6 won't start if any of the
                             // connectors are bad
-                            InetAddress test = InetAddress.getByName(host);
-                            if ((!hasIPV6) && (!(test instanceof Inet4Address)))
+                            if ((!hasIPV6) && InetAddressUtils.isIPv6Address(host))
                                 throw new IOException("IPv6 addresses unsupported");
-                            if ((!hasIPV4) && (test instanceof Inet4Address))
+                            if ((!hasIPV4) && InetAddressUtils.isIPv4Address(host))
                                 throw new IOException("IPv4 addresses unsupported");
                             ServerSocket testSock = null;
                             try {
                                 // see comments above
-                                //testSock = new ServerSocket(0, 0, test);
                                 testSock = new ServerSocket();
                                 InetSocketAddress isa = new InetSocketAddress(host, 0);
                                 testSock.bind(isa);
@@ -839,30 +853,28 @@ public class RouterConsoleRunner implements RouterApp {
      * @return success if it exists and we have a password, or it was created successfully.
      * @since 0.8.3
      */
-    private boolean verifyKeyStore(File ks) {
+    private boolean verifyKeyStore(File ks, Set<String> altNames) {
         if (ks.exists()) {
             boolean rv = _context.getProperty(PROP_KEY_PASSWORD) != null;
             if (!rv)
                 System.err.println("Console SSL error, must set " + PROP_KEY_PASSWORD + " in " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
             return rv;
         }
-        return createKeyStore(ks);
+        return createKeyStore(ks, altNames);
     }
 
 
     /**
-     * Call out to keytool to create a new keystore with a keypair in it.
-     * Trying to do this programatically is a nightmare, requiring either BouncyCastle
-     * libs or using proprietary Sun libs, and it's a huge mess.
+     * Create a new keystore with a keypair in it.
      *
      * @return success
      * @since 0.8.3
      */
-    private boolean createKeyStore(File ks) {
+    private boolean createKeyStore(File ks, Set<String> altNames) {
         // make a random 48 character password (30 * 8 / 5)
         String keyPassword = KeyStoreUtil.randomString();
         String cname = "localhost";
-        boolean success = KeyStoreUtil.createKeys(ks, "console", cname, "Console", keyPassword);
+        boolean success = KeyStoreUtil.createKeys(ks, "console", cname, altNames, "Console", keyPassword);
         if (success) {
             success = ks.exists();
             if (success) {
@@ -883,7 +895,8 @@ public class RouterConsoleRunner implements RouterApp {
         }
         if (success) {
             System.err.println("Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
-                               "The certificate was generated randomly, and is not associated with your " +
+                               "The certificate was generated randomly.\n" +
+                               "Unless you have changed the default settings, the certificate is not associated with your " +
                                "IP address, host name, router identity, or destination keys.");
         } else {
             System.err.println("Failed to create console SSL keystore.\n" +
