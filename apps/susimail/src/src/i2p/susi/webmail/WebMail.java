@@ -2170,7 +2170,6 @@ public class WebMail extends HttpServlet
 							"window.addEventListener('beforeunload', (e)=>{if (beforePopup) e.returnValue=true;} );" +
 						"</script>"
 					);
-					out.println("<script src=\"/susimail/js/compose.js\" type=\"text/javascript\"></script>");
 				} else if (state == State.LIST) {
 					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
 				} else if (state == State.LOADING) {
