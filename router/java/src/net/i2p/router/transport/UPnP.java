@@ -80,6 +80,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	private static final String WANCON_DEVICE = "urn:schemas-upnp-org:device:WANConnectionDevice:1";
 	private static final String WAN_IP_CONNECTION = "urn:schemas-upnp-org:service:WANIPConnection:1";
 	private static final String WAN_PPP_CONNECTION = "urn:schemas-upnp-org:service:WANPPPConnection:1";
+	/** IGD 2 flavors, since 0.9.34 */
+	private static final String ROUTER_DEVICE_2 = "urn:schemas-upnp-org:device:InternetGatewayDevice:2";
+	private static final String WAN_DEVICE_2 = "urn:schemas-upnp-org:device:WANDevice:2";
+	private static final String WANCON_DEVICE_2 = "urn:schemas-upnp-org:device:WANConnectionDevice:2";
+	private static final String WAN_IP_CONNECTION_2 = "urn:schemas-upnp-org:service:WANIPConnection:2";
+	private static final String WAN_IPV6_CONNECTION = "urn:schemas-upnp-org:service:WANIPv6FirewallControl:1";
 
 	private Device _router;
 	private Service _service;
@@ -101,6 +107,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 
 	private static final String PROP_ADVANCED = "routerconsole.advanced";
 	private static final String PROP_IGNORE = "i2np.upnp.ignore";
+	/** set to true to talk to UPnP on the same host as us, probably for testing */
+	private static final boolean ALLOW_SAME_HOST = false;
 	
 	public UPnP(I2PAppContext context) {
 		super();
@@ -203,8 +211,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
                 String name = dev.getFriendlyName();
 		if (name == null)
 			name = "???";
-		boolean isIGD = ROUTER_DEVICE.equals(dev.getDeviceType()) && dev.isRootDevice();
-		name += isIGD ? " IGD" : (" " + dev.getDeviceType());
+		String type = dev.getDeviceType();
+		boolean isIGD = (ROUTER_DEVICE.equals(type) || ROUTER_DEVICE_2.equals(type)) && dev.isRootDevice();
+		name += isIGD ? " IGD" : (' ' + type);
 		String ip = getIP(dev);
 		if (ip != null)
 			name += ' ' + ip;
@@ -216,7 +225,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				return;
 			}
 		}
-		if(!ROUTER_DEVICE.equals(dev.getDeviceType()) || !dev.isRootDevice()) {
+		if(!isIGD) {
 			if (_log.shouldLog(Log.WARN))
 				_log.warn("UP&P non-IGD device found, ignoring " + name + ' ' + dev.getDeviceType());
 			synchronized (lock) {
@@ -245,6 +254,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				}
 			}
 		}
+		Set<String> myAddresses = Addresses.getAddresses(true, false);  // yes local, no IPv6
+		if (!ignore && !ALLOW_SAME_HOST && ip != null && myAddresses.contains(ip)) {
+			ignore = true;
+			_log.logAlways(Log.WARN, "Ignoring UPnP on same host: " + name + " UDN: " + udn);
+		}
+
 		synchronized(lock) {
 			if (ignore) {
 				_otherUDNs.put(udn, name);
@@ -290,24 +305,33 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	private void discoverService() {
 		synchronized (lock) {
 			for (Device current : _router.getDeviceList()) {
-				if (!current.getDeviceType().equals(WAN_DEVICE))
+				String type = current.getDeviceType();
+				if (!(WAN_DEVICE.equals(type) || WAN_DEVICE_2.equals(type)))
 					continue;
 
 				DeviceList l = current.getDeviceList();
 				for (int i=0;i<current.getDeviceList().size();i++) {
 					Device current2 = l.getDevice(i);
-					if (!current2.getDeviceType().equals(WANCON_DEVICE))
+					type = current2.getDeviceType();
+					if (!(WANCON_DEVICE.equals(type) || WANCON_DEVICE_2.equals(type)))
 						continue;
 					
-					_service = current2.getService(WAN_IP_CONNECTION);
-					if(_service == null) {
-						if (_log.shouldLog(Log.INFO))
-							_log.info(_router.getFriendlyName()+ " does not support WAN_IP_CONNECTION");
-						_service = current2.getService(WAN_PPP_CONNECTION);
-						if(_service == null)
-							_log.error(_router.getFriendlyName()+ " doesn't export WAN_PPP_CONNECTION either; we won't be able to use it!");
+					_service = current2.getService(WAN_IP_CONNECTION_2);
+					if (_service == null) {
+						_service = current2.getService(WAN_IP_CONNECTION);
+						if (_service == null) {
+							_service = current2.getService(WAN_PPP_CONNECTION);
+							if (_service == null) {
+								if (_log.shouldWarn())
+									_log.warn(_router.getFriendlyName() + " doesn't have any recognized connection type; we won't be able to use it!");
+							}
+						}
 					}
-					
+					if (_log.shouldWarn()) {
+						Service svc2 = current2.getService(WAN_IPV6_CONNECTION);
+						if (svc2 != null)
+							_log.warn(_router.getFriendlyName() + " supports WANIPv6Connection, but we don't");
+					}
 					_serviceLacksAPM = false;
 					return;
 				}
@@ -361,7 +385,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (_router == null) return;
 			// I2P this wasn't working
 			//if(_router.equals(dev)) {
-		        if(ROUTER_DEVICE.equals(dev.getDeviceType()) &&
+			String type = dev.getDeviceType();
+		        if ((ROUTER_DEVICE.equals(type) || ROUTER_DEVICE_2.equals(type)) &&
 			   dev.isRootDevice() &&
 			   stringEquals(_router.getFriendlyName(), dev.getFriendlyName()) &&
 			   stringEquals(_router.getUDN(), udn)) {
@@ -622,6 +647,14 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		return rv;
 	}
 
+	/**
+	 *  @since 0.9.34
+	 */
+	private String toBoolean(String action, String arg, Service serv) {
+		String rv = toString(action, arg, serv);
+		return Boolean.toString("1".equals(rv));
+	}
+
 	// TODO: extend it! RTFM
 	private void listSubServices(Device dev, StringBuilder sb) {
 		ServiceList sl = dev.getServiceList();
@@ -674,16 +707,25 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				sb.append(_t("Layer 3 Forwarding"));
 				sb.append("<ul><li>").append(_t("Default Connection Service")).append(": ")
 				  .append(toString("GetDefaultConnectionService", "NewDefaultConnectionService", serv));
-			}else if(WAN_IP_CONNECTION.equals(type)){
+			} else if(WAN_IP_CONNECTION.equals(type) || WAN_IP_CONNECTION_2.equals(type)) {
 				sb.append(_t("WAN IP Connection"));
 				sb.append("<ul><li>").append(_t("Status")).append(": ")
 				  .append(toString("GetStatusInfo", "NewConnectionStatus", serv));
 				sb.append("<li>").append(_t("Uptime")).append(": ")
 				   .append(toTime("GetStatusInfo", "NewUptime", serv));
+				String error = toString("GetStatusInfo", "NewLastConnectionError", serv);
+				if (error != null && error.length() > 0 && !error.equals("ERROR_NONE"))
+					sb.append("<li>").append("Last Error").append(": ").append(error);
 				sb.append("<li>").append(_t("Type")).append(": ")
 				  .append(toString("GetConnectionTypeInfo", "NewConnectionType", serv));
 				sb.append("<li>").append(_t("External IP")).append(": ")
 				  .append(toString("GetExternalIPAddress", "NewExternalIPAddress", serv));
+			} else if(WAN_IPV6_CONNECTION.equals(type)) {
+				sb.append("WAN IPv6 Connection");
+				sb.append("<ul><li>").append("Firewall Enabled").append(": ")
+				  .append(toBoolean("GetFirewallStatus", "FirewallEnabled", serv));
+				sb.append("<li>").append("Pinhole Allowed").append(": ")
+				   .append(toBoolean("GetFirewallStatus", "InboundPinholeAllowed", serv));
 			}else if("urn:schemas-upnp-org:service:WANEthernetLinkConfig:1".equals(type)){
 				sb.append(_t("WAN Ethernet Link Configuration"));
 				sb.append("<ul><li>").append(_t("Status")).append(": ")
@@ -757,7 +799,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			return sb.toString();
 		}
 		
-		listSubDev(null, _router, sb);
+		Device router;
+		synchronized(lock) {
+			router = _router;
+		}
+		if (router != null)
+			listSubDev(null, router, sb);
 		String addr = getNATAddress();
 		sb.append("<p>");
 		if (addr != null)
