@@ -198,6 +198,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			name = "???";
 		boolean isIGD = ROUTER_DEVICE.equals(dev.getDeviceType()) && dev.isRootDevice();
 		name += isIGD ? " IGD" : (" " + dev.getDeviceType());
+		String ip = getIP(dev);
+		if (ip != null)
+			name += ' ' + ip;
 		synchronized (lock) {
 			if(isDisabled) {
 				if (_log.shouldLog(Log.WARN))
@@ -289,13 +292,13 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					if (!current2.getDeviceType().equals(WANCON_DEVICE))
 						continue;
 					
-					_service = current2.getService(WAN_PPP_CONNECTION);
+					_service = current2.getService(WAN_IP_CONNECTION);
 					if(_service == null) {
 						if (_log.shouldLog(Log.INFO))
-							_log.info(_router.getFriendlyName()+ " doesn't seems to be using PPP; we won't be able to extract bandwidth-related informations out of it.");
-						_service = current2.getService(WAN_IP_CONNECTION);
+							_log.info(_router.getFriendlyName()+ " does not support WAN_IP_CONNECTION");
+						_service = current2.getService(WAN_PPP_CONNECTION);
 						if(_service == null)
-							_log.error(_router.getFriendlyName()+ " doesn't export WAN_IP_CONNECTION either: we won't be able to use it!");
+							_log.error(_router.getFriendlyName()+ " doesn't export WAN_PPP_CONNECTION either; we won't be able to use it!");
 					}
 					
 					_serviceLacksAPM = false;
@@ -562,7 +565,35 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			return DataHelper.escapeHTML(rv);
 		}
 	}
-	
+
+	/**
+	 *  @since 0.9.34
+	 */
+	private String toLong(String action, String arg, Service serv) {
+		String rv = toString(action, arg, serv);
+		if (rv != null && rv.length() > 0) {
+			try {
+				long l = Long.parseLong(rv);
+				rv = DataHelper.formatSize2Decimal(l);
+			} catch (NumberFormatException nfe) {}
+		}
+		return rv;
+	}
+
+	/**
+	 *  @since 0.9.34
+	 */
+	private String toTime(String action, String arg, Service serv) {
+		String rv = toString(action, arg, serv);
+		if (rv != null && rv.length() > 0) {
+			try {
+				long l = Long.parseLong(rv);
+				rv = DataHelper.formatDuration2(l * 1000);
+			} catch (NumberFormatException nfe) {}
+		}
+		return rv;
+	}
+
 	// TODO: extend it! RTFM
 	private void listSubServices(Device dev, StringBuilder sb) {
 		ServiceList sl = dev.getServiceList();
@@ -575,69 +606,62 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			sb.append("<li>").append(_t("Service")).append(": ");
 			// NOTE: Group all toString() of common actions together
 			// to avoid excess fetches, since toString() caches.
-			if("urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1".equals(serv.getServiceType())){
+			String type = serv.getServiceType();
+			if("urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1".equals(type)){
 				sb.append(_t("WAN Common Interface Configuration"));
 				sb.append("<ul><li>").append(_t("Status")).append(": ")
 				  .append(toString("GetCommonLinkProperties", "NewPhysicalLinkStatus", serv));
 				sb.append("<li>").append(_t("Type")).append(": ")
 				  .append(toString("GetCommonLinkProperties", "NewWANAccessType", serv));
 				sb.append("<li>").append(_t("Upstream")).append(": ")
-				  .append(toString("GetCommonLinkProperties", "NewLayer1UpstreamMaxBitRate", serv));
+				  .append(toLong("GetCommonLinkProperties", "NewLayer1UpstreamMaxBitRate", serv)).append("bps");
 				sb.append("<li>").append(_t("Downstream")).append(": ")
-				  .append(toString("GetCommonLinkProperties", "NewLayer1DownstreamMaxBitRate", serv))
-				  .append("</li>");
-			}else if("urn:schemas-upnp-org:service:WANPPPConnection:1".equals(serv.getServiceType())){
+				  .append(toLong("GetCommonLinkProperties", "NewLayer1DownstreamMaxBitRate", serv)).append("bps");
+				if (_context.getBooleanProperty(PROP_ADVANCED)) {
+					// don't bother translating
+					sb.append("<li>").append("Sent: ")
+					  .append(toLong("GetTotalBytesSent", "NewTotalBytesSent", serv)).append('B');
+					sb.append("<li>").append("Received: ")
+					  .append(toLong("GetTotalBytesReceived", "NewTotalBytesReceived", serv)).append('B');
+					sb.append("<li>").append("Sent packets: ")
+					  .append(toLong("GetTotalPacketsSent", "NewTotalPacketsSent", serv));
+					sb.append("<li>").append("Received packets: ")
+					  .append(toLong("GetTotalPacketsReceived", "NewTotalPacketsReceived", serv));
+				}
+			}else if(WAN_PPP_CONNECTION.equals(type)){
 				sb.append(_t("WAN PPP Connection"));
 				sb.append("<ul><li>").append(_t("Status")).append(": ")
 				  .append(toString("GetStatusInfo", "NewConnectionStatus", serv));
-				String up = toString("GetStatusInfo", "NewUptime", serv);
-				if (up != null) {
-					try {
-						long uptime = Long.parseLong(up);
-						uptime *= 1000;
-						sb.append("<li>").append(_t("Uptime")).append(": ")
-						  .append(DataHelper.formatDuration2(uptime));
-					} catch (NumberFormatException nfe) {}
-				}
+				sb.append("<li>").append(_t("Uptime")).append(": ")
+				   .append(toTime("GetStatusInfo", "NewUptime", serv));
 				sb.append("<li>").append(_t("Type")).append(": ")
 				  .append(toString("GetConnectionTypeInfo", "NewConnectionType", serv));
 				sb.append("<li>").append(_t("Upstream")).append(": ")
-				  .append(toString("GetLinkLayerMaxBitRates", "NewUpstreamMaxBitRate", serv));
+				  .append(toLong("GetLinkLayerMaxBitRates", "NewUpstreamMaxBitRate", serv)).append("bps");
 				sb.append("<li>").append(_t("Downstream")).append(": ")
-				  .append(toString("GetLinkLayerMaxBitRates", "NewDownstreamMaxBitRate", serv) + "<br>");
+				  .append(toLong("GetLinkLayerMaxBitRates", "NewDownstreamMaxBitRate", serv)).append("bps");
 				sb.append("<li>").append(_t("External IP")).append(": ")
-				  .append(toString("GetExternalIPAddress", "NewExternalIPAddress", serv))
-				  .append("</li>");
-			}else if("urn:schemas-upnp-org:service:Layer3Forwarding:1".equals(serv.getServiceType())){
+				  .append(toString("GetExternalIPAddress", "NewExternalIPAddress", serv));
+			}else if("urn:schemas-upnp-org:service:Layer3Forwarding:1".equals(type)){
 				sb.append(_t("Layer 3 Forwarding"));
 				sb.append("<ul><li>").append(_t("Default Connection Service")).append(": ")
-				  .append(toString("GetDefaultConnectionService", "NewDefaultConnectionService", serv))
-				  .append("</li>");
-			}else if(WAN_IP_CONNECTION.equals(serv.getServiceType())){
+				  .append(toString("GetDefaultConnectionService", "NewDefaultConnectionService", serv));
+			}else if(WAN_IP_CONNECTION.equals(type)){
 				sb.append(_t("WAN IP Connection"));
 				sb.append("<ul><li>").append(_t("Status")).append(": ")
 				  .append(toString("GetStatusInfo", "NewConnectionStatus", serv));
-				String up = toString("GetStatusInfo", "NewUptime", serv);
-				if (up != null) {
-					try {
-						long uptime = Long.parseLong(up);
-						uptime *= 1000;
-						sb.append("<li>").append(_t("Uptime")).append(": ")
-						  .append(DataHelper.formatDuration2(uptime));
-					} catch (NumberFormatException nfe) {}
-				}
+				sb.append("<li>").append(_t("Uptime")).append(": ")
+				   .append(toTime("GetStatusInfo", "NewUptime", serv));
 				sb.append("<li>").append(_t("Type")).append(": ")
 				  .append(toString("GetConnectionTypeInfo", "NewConnectionType", serv));
 				sb.append("<li>").append(_t("External IP")).append(": ")
-				  .append(toString("GetExternalIPAddress", "NewExternalIPAddress", serv))
-				  .append("</li>");
-			}else if("urn:schemas-upnp-org:service:WANEthernetLinkConfig:1".equals(serv.getServiceType())){
+				  .append(toString("GetExternalIPAddress", "NewExternalIPAddress", serv));
+			}else if("urn:schemas-upnp-org:service:WANEthernetLinkConfig:1".equals(type)){
 				sb.append(_t("WAN Ethernet Link Configuration"));
 				sb.append("<ul><li>").append(_t("Status")).append(": ")
-				  .append(toString("GetEthernetLinkStatus", "NewEthernetLinkStatus", serv))
-				  .append("</li>");
+				  .append(toString("GetEthernetLinkStatus", "NewEthernetLinkStatus", serv));
 			} else {
-				sb.append(DataHelper.escapeHTML(serv.getServiceType())).append("<ul>");
+				sb.append(DataHelper.escapeHTML(type)).append("<ul>");
 			}
 			if (_context.getBooleanProperty(PROP_ADVANCED)) {
 				sb.append("<li>Actions");
@@ -657,8 +681,10 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		else
 			sb.append("<li>").append(_t("Subdevice")).append(": ");
 		sb.append(DataHelper.escapeHTML(dev.getFriendlyName()));
-                if (prefix == null)
-			sb.append("</p>");
+		String ip = getIP(dev);
+		if (ip != null)
+			sb.append(' ').append(ip);
+		sb.append("</p>");
 		listSubServices(dev, sb);
 		
 		DeviceList dl = dev.getDeviceList();
@@ -713,9 +739,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		int downstreamMaxBitRate = getDownstreamMaxBitRate();
 		int upstreamMaxBitRate = getUpstreamMaxBitRate();
 		if(downstreamMaxBitRate > 0)
-			sb.append("<br>").append(_t("UPnP reports the maximum downstream bit rate is {0}bits/sec", DataHelper.formatSize2(downstreamMaxBitRate)));
+			sb.append("<br>").append(_t("UPnP reports the maximum downstream bit rate is {0}bits/sec", DataHelper.formatSize2Decimal(downstreamMaxBitRate)));
 		if(upstreamMaxBitRate > 0)
-			sb.append("<br>").append(_t("UPnP reports the maximum upstream bit rate is {0}bits/sec", DataHelper.formatSize2(upstreamMaxBitRate)));
+			sb.append("<br>").append(_t("UPnP reports the maximum upstream bit rate is {0}bits/sec", DataHelper.formatSize2Decimal(upstreamMaxBitRate)));
 		synchronized(lock) {
 			for(ForwardPort port : portsToForward) {
 				sb.append("<br>");
@@ -818,6 +844,32 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	}
 
 	/**
+	*  @return IP or null
+	 * @since 0.9.34
+	 */
+	private static String getIP(Device dev) {
+		// see ControlRequest.setRequestHost()
+		String rv = null;
+		String him = dev.getURLBase();
+		if (him != null && him.length() > 0) {
+			try {
+				URI url = new URI(him);
+				rv = url.getHost();
+			} catch (URISyntaxException use) {}
+		}
+		if (rv == null) {
+			him = dev.getLocation();
+			if (him != null && him.length() > 0) {
+				try {
+					URI url = new URI(him);
+					rv = url.getHost();
+				} catch (URISyntaxException use) {}
+			}
+		}
+		return rv;
+	}
+
+	/**
 	 * Bug fix:
 	 * If the SSDP notify or search response sockets listen on more than one interface,
 	 * cybergarage can get our IP address wrong, and then we send the wrong one
@@ -834,24 +886,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 */
 	private String getOurAddress(String deflt) {
 		String rv = deflt;
-		String hisIP = null;
-		// see ControlRequest.setRequestHost()
-		String him = _router.getURLBase();
-		if (him != null && him.length() > 0) {
-			try {
-				URI url = new URI(him);
-				hisIP = url.getHost();
-			} catch (URISyntaxException use) {}
-		}
-		if (hisIP == null) {
-			him = _router.getLocation();
-			if (him != null && him.length() > 0) {
-				try {
-					URI url = new URI(him);
-					hisIP = url.getHost();
-				} catch (URISyntaxException use) {}
-			}
-		}
+		String hisIP = getIP(_router);
 		if (hisIP == null)
 			return rv;
 		try {
@@ -1087,29 +1122,34 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		long start = System.currentTimeMillis();
 		cp.start();
 		long s2 = System.currentTimeMillis();
-		System.out.println("Start took " + (s2 - start));
-		System.out.println("Searching for UPnP devices");
+		System.err.println("Start took " + (s2 - start) + "ms");
+		System.err.println("Searching for UPnP devices");
 		start = System.currentTimeMillis();
 		cp.search();
 		s2 = System.currentTimeMillis();
-		System.out.println("Search kickoff took " + (s2 - start));
-		System.out.println("Waiting 10 seconds for responses");
+		System.err.println("Search kickoff took " + (s2 - start) + "ms");
+		System.err.println("Waiting 10 seconds for responses");
 		Thread.sleep(10000);
-		//while(true) {
+
 			DeviceList list = cp.getDeviceList();
-			System.out.println("Found " + list.size() + " devices!");
+			if (list.isEmpty()) {
+				System.err.println("No UPnP devices found");
+				System.exit(1);
+			}
+			System.err.println("Found " + list.size() + " devices.");
+			System.err.println("Redirect the following output to an html file and view in a browser.");
 			StringBuilder sb = new StringBuilder();
 			Iterator<Device> it = list.iterator();
 			int i = 0;
 			while(it.hasNext()) {
 				Device device = it.next();
 				upnp.listSubDev(device.toString(), device, sb);
-				System.out.println("Here is the listing for device " + (++i) +
-				                   ": " + device.getFriendlyName() + " :");
+				System.out.println("<h3>Device " + (++i) +
+				                   ": " + DataHelper.escapeHTML(device.getFriendlyName()) + "</h3>");
 				System.out.println(sb.toString());
 				sb.setLength(0);
 			}
-		//}
+
 		System.exit(0);
 	}
 
