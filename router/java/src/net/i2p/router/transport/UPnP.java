@@ -84,7 +84,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	private Device _router;
 	private Service _service;
 	// UDN -> friendly name
-        private final Map<String, String> _otherUDNs;
+	private final Map<String, String> _otherUDNs;
+	private final Map<String, String> _eventVars;
 	private boolean isDisabled = false; // We disable the plugin if more than one IGD is found
 	private volatile boolean _serviceLacksAPM;
 	private final Object lock = new Object();
@@ -107,14 +108,17 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		_log = _context.logManager().getLog(UPnP.class);
 		portsToForward = new HashSet<ForwardPort>();
 		portsForwarded = new HashSet<ForwardPort>();
-                _otherUDNs = new HashMap<String, String>(4);
-		addDeviceChangeListener(this);
+		_otherUDNs = new HashMap<String, String>(4);
+		_eventVars = new HashMap<String, String>(4);
 	}
 	
 	public synchronized boolean runPlugin() {
+		addDeviceChangeListener(this);
+		addEventListener(this);
 		synchronized(lock) {
 			portsToForward.clear();
 			portsForwarded.clear();
+			_eventVars.clear();
 		}
 		return super.start();
 	}
@@ -123,8 +127,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 *  WARNING - Blocking up to 2 seconds
 	 */
 	public synchronized void terminate() {
+		removeDeviceChangeListener(this);
+		removeEventListener(this);
 		synchronized(lock) {
 			portsToForward.clear();
+			_eventVars.clear();
 		}
 		// this gets spun off in a thread...
 		unregisterPortMappings();
@@ -366,6 +373,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				_otherUDNs.clear();
 				_router = null;
 				_service = null;
+				_eventVars.clear();
 				_serviceLacksAPM = false;
 				if (!portsForwarded.isEmpty()) {
 					fpc = forwardCallback;
@@ -386,11 +394,31 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	
 	/**
 	 *  EventListener callback -
-	 *  unused for now - how many devices support events?
+	 *  unused for now - supported in miniupnpd as of 1.1
 	 */
 	public void eventNotifyReceived(String uuid, long seq, String varName, String value) {
-		if (_log.shouldLog(Log.WARN))
-			_log.warn("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
+		if (uuid == null || varName == null || value == null)
+			return;
+		if (varName.length() > 128 || value.length() > 128)
+			return;
+		String old = null;
+		synchronized(lock) {
+			if (_service == null || !uuid.equals(_service.getSID()))
+				return;
+			if (_eventVars.size() >= 20 && !_eventVars.containsKey(varName))
+				return;
+			old = _eventVars.put(varName, value);
+		}
+		// The following four variables are "evented":
+		// PossibleConnectionTypes: {Unconfigured IP_Routed IP_Bridged}
+		// ConnectionStatus: {Unconfigured Connecting Connected PendingDisconnect Disconnecting Disconnected}
+		// ExternalIPAddress: string
+		// PortMappingNumberOfEntries: int
+		if (!value.equals(old)) {
+			if (_log.shouldDebug())
+				_log.debug("Event: " + varName + " changed from " + old + " to " + value);
+		}
+		// call callback...
 	}
 
 	/** compare two strings, either of which could be null */
