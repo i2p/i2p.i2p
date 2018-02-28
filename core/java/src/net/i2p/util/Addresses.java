@@ -645,24 +645,19 @@ public abstract class Addresses {
     public static void main(String[] args) {
         System.out.println("External IPv4 Addresses:");
         Set<String> a = getAddresses(false, false, false);
-        for (String s : a)
-            System.out.println(s);
+        print(a);
         System.out.println("\nExternal and Local IPv4 Addresses:");
         a = getAddresses(true, false, false);
-        for (String s : a)
-            System.out.println(s);
+        print(a);
         System.out.println("\nAll External Addresses:");
         a = getAddresses(false, false, true);
-        for (String s : a)
-            System.out.println(s);
+        print(a);
         System.out.println("\nAll External and Local Addresses:");
         a = getAddresses(true, false, true);
-        for (String s : a)
-            System.out.println(s);
+        print(a);
         System.out.println("\nAll addresses:");
         a = getAddresses(true, true, true);
-        for (String s : a)
-            System.out.println(s);
+        print(a);
         System.out.println("\nIPv6 address flags:");
         for (String s : a) {
             if (!s.contains(":"))
@@ -692,6 +687,17 @@ public abstract class Addresses {
             System.out.println(buf.toString());
         }
         System.out.println("\nIs connected? " + isConnected() +
-                           "\nHas IPv6?     " + isConnectedIPv6());
+                           "\nIs conn IPv6? " + isConnectedIPv6());
+        System.out.println("Has v6 flags? " + INET6_CACHE_ENABLED);
+    }
+
+    private static void print(Set<String> a) {
+        if (a.isEmpty()) {
+            System.out.println("none");
+        } else {
+            for (String s : a) {
+                System.out.println(s);
+            }
+        }
     }
 }
