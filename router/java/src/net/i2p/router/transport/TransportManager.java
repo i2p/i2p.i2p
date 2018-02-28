@@ -14,6 +14,8 @@ import java.net.InetAddress;
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +45,17 @@ import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
+/**
+ *  Keeps track of the enabled transports.
+ *  Starts UPnP.
+ *  Pluggable transport support incomplete.
+ *
+ *  Public only for a couple things in the console and Android.
+ *  To be made package private.
+ *  Everything external should go through CommSystemFacadeImpl.
+ *  Not a public API, not for external use.
+ *
+ */
 public class TransportManager implements TransportEventListener {
     private final Log _log;
     /**
@@ -144,10 +157,10 @@ public class TransportManager implements TransportEventListener {
     
     private void removeTransport(Transport transport) {
         if (transport == null) return;
+        transport.setListener(null);
         Transport old = _transports.remove(transport.getStyle());
         if (old != null && _log.shouldLog(Log.WARN))
             _log.warn("Removing transport " + transport.getStyle());
-        transport.setListener(null);
     }
 
     private void configTransports() {
@@ -183,6 +196,26 @@ public class TransportManager implements TransportEventListener {
      *  It's the transport's job to ignore what it can't handle.
      */
     private void initializeAddress(Transport t) {
+        initializeAddress(Collections.singleton(t));
+    }
+    
+    /**
+     *  Notify all transports of ALL routable interface addresses, including IPv6.
+     *  It's the transport's job to ignore what it can't handle.
+     *  @since 0.9.34
+     */
+    void initializeAddress() {
+        initializeAddress(_transports.values());
+    }
+    
+    /**
+     *  Notify transports of ALL routable interface addresses, including IPv6.
+     *  It's the transport's job to ignore what it can't handle.
+     *  @since 0.9.34
+     */
+    private void initializeAddress(Collection<Transport> ts) {
+        if (ts.isEmpty())
+            return;
         Set<String> ipset = Addresses.getAddresses(false, true);  // non-local, include IPv6
         //
         // Avoid IPv6 temporary addresses if we have a non-temporary one
@@ -226,9 +259,11 @@ public class TransportManager implements TransportEventListener {
                 addresses.addAll(tempV6Addresses);
             }
         }
-        for (InetAddress ia : addresses) {
-            byte[] ip = ia.getAddress();
-            t.externalAddressReceived(SOURCE_INTERFACE, ip, 0);
+        for (Transport t : ts) {
+            for (InetAddress ia : addresses) {
+                byte[] ip = ia.getAddress();
+                t.externalAddressReceived(SOURCE_INTERFACE, ip, 0);
+            }
         }
     }
 
@@ -238,7 +273,7 @@ public class TransportManager implements TransportEventListener {
      * Tell all transports... but don't loop.
      *
      */
-    public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
+    void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
         for (Transport t : _transports.values()) {
             // don't loop
             if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
@@ -253,7 +288,7 @@ public class TransportManager implements TransportEventListener {
      *
      *  @since 0.9.20
      */
-    public void externalAddressRemoved(Transport.AddressSource source, boolean ipv6) {
+    void externalAddressRemoved(Transport.AddressSource source, boolean ipv6) {
         for (Transport t : _transports.values()) {
             // don't loop
             if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
@@ -265,13 +300,13 @@ public class TransportManager implements TransportEventListener {
      * callback from UPnP
      *
      */
-    public void forwardPortStatus(String style, byte[] ip, int port, int externalPort, boolean success, String reason) {
+    void forwardPortStatus(String style, byte[] ip, int port, int externalPort, boolean success, String reason) {
         Transport t = getTransport(style);
         if (t != null)
             t.forwardPortStatus(ip, port, externalPort, success, reason);
     }
 
-    public synchronized void startListening() {
+    synchronized void startListening() {
         if (_dhThread.getState() == Thread.State.NEW)
             _dhThread.start();
         // For now, only start UPnP if we have no publicly-routable addresses
@@ -307,7 +342,7 @@ public class TransportManager implements TransportEventListener {
         _context.router().rebuildRouterInfo();
     }
     
-    public synchronized void restart() {
+    synchronized void restart() {
         stopListening();
         try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
         startListening();
@@ -316,7 +351,7 @@ public class TransportManager implements TransportEventListener {
     /**
      *  Can be restarted.
      */
-    public synchronized void stopListening() {
+    synchronized void stopListening() {
         if (_upnpManager != null)
             _upnpManager.stop();
         for (Transport t : _transports.values()) {
@@ -330,14 +365,14 @@ public class TransportManager implements TransportEventListener {
      *  Cannot be restarted.
      *  @since 0.9
      */
-    public synchronized void shutdown() {
+    synchronized void shutdown() {
         stopListening();
         _dhThread.shutdown();
         Addresses.clearCaches();
         TransportImpl.clearCaches();
     }
     
-    public Transport getTransport(String style) {
+    Transport getTransport(String style) {
         return _transports.get(style);
     }
     
@@ -347,7 +382,7 @@ public class TransportManager implements TransportEventListener {
      *  @return SortedMap of style to Transport (a copy)
      *  @since 0.9.31
      */
-    public SortedMap<String, Transport> getTransports() {
+    SortedMap<String, Transport> getTransports() {
         TreeMap<String, Transport> rv = new TreeMap<String, Transport>();
         rv.putAll(_transports);
         // TODO (also synch)
@@ -359,7 +394,7 @@ public class TransportManager implements TransportEventListener {
      *  How many peers are we currently connected to, that we have
      *  sent a message to or received a message from in the last five minutes.
      */
-    public int countActivePeers() { 
+    int countActivePeers() { 
         int peers = 0;
         for (Transport t : _transports.values()) {
             peers += t.countActivePeers();
@@ -372,7 +407,7 @@ public class TransportManager implements TransportEventListener {
      *  sent a message to in the last minute.
      *  Unused for anything, to be removed.
      */
-    public int countActiveSendPeers() { 
+    int countActiveSendPeers() { 
         int peers = 0;
         for (Transport t : _transports.values()) {
             peers += t.countActiveSendPeers();
@@ -386,7 +421,7 @@ public class TransportManager implements TransportEventListener {
       *
       * @param pct percent of limit 0-100
       */
-    public boolean haveOutboundCapacity(int pct) { 
+    boolean haveOutboundCapacity(int pct) { 
         for (Transport t : _transports.values()) {
             if (t.haveCapacity(pct))
                 return true;
@@ -399,7 +434,7 @@ public class TransportManager implements TransportEventListener {
       * Are all transports well below their outbound connection limit
       * Use for throttling in the router.
       */
-    public boolean haveHighOutboundCapacity() { 
+    boolean haveHighOutboundCapacity() { 
         if (_transports.isEmpty())
             return false;
         for (Transport t : _transports.values()) {
@@ -415,7 +450,7 @@ public class TransportManager implements TransportEventListener {
       *
       * @param pct percent of limit 0-100
       */
-    public boolean haveInboundCapacity(int pct) { 
+    boolean haveInboundCapacity(int pct) { 
         for (Transport t : _transports.values()) {
             if (t.hasCurrentAddress() && t.haveCapacity(pct))
                 return true;
@@ -429,7 +464,7 @@ public class TransportManager implements TransportEventListener {
      * A positive number means our clock is ahead of theirs.
      * Note: this method returns them in whimsical order.
      */
-    public Vector<Long> getClockSkews() {
+    Vector<Long> getClockSkews() {
         Vector<Long> skews = new Vector<Long>();
         for (Transport t : _transports.values()) {
             Vector<Long> tempSkews = t.getClockSkews();
@@ -445,7 +480,7 @@ public class TransportManager implements TransportEventListener {
      *  Previously returned short, now enum as of 0.9.20
      *  @return the best status of any transport
      */
-    public Status getReachabilityStatus() { 
+    Status getReachabilityStatus() { 
         Status rv = Status.UNKNOWN;
         for (Transport t : _transports.values()) {
             Status s = t.getReachabilityStatus();
@@ -459,12 +494,12 @@ public class TransportManager implements TransportEventListener {
      * @deprecated unused
      */
     @Deprecated
-    public void recheckReachability() { 
+    void recheckReachability() { 
         for (Transport t : _transports.values())
             t.recheckReachability();
     }
 
-    public boolean isBacklogged(Hash peer) {
+    boolean isBacklogged(Hash peer) {
         for (Transport t : _transports.values()) {
             if (t.isBacklogged(peer))
                 return true;
@@ -472,7 +507,7 @@ public class TransportManager implements TransportEventListener {
         return false;
     }    
     
-    public boolean isEstablished(Hash peer) {
+    boolean isEstablished(Hash peer) {
         for (Transport t : _transports.values()) {
             if (t.isEstablished(peer))
                 return true;
@@ -486,7 +521,7 @@ public class TransportManager implements TransportEventListener {
      *
      * @since 0.9.24
      */
-    public void mayDisconnect(Hash peer) {
+    void mayDisconnect(Hash peer) {
         for (Transport t : _transports.values()) {
              t.mayDisconnect(peer);
         }
@@ -497,7 +532,7 @@ public class TransportManager implements TransportEventListener {
      * based on the last time we tried it for each transport?
      * This is NOT reset if the peer contacts us.
      */
-    public boolean wasUnreachable(Hash peer) {
+    boolean wasUnreachable(Hash peer) {
         for (Transport t : _transports.values()) {
             if (!t.wasUnreachable(peer))
                 return false;
@@ -516,14 +551,14 @@ public class TransportManager implements TransportEventListener {
      *
      * @return IPv4 or IPv6 or null
      */
-    public byte[] getIP(Hash peer) {
+    byte[] getIP(Hash peer) {
         return TransportImpl.getIP(peer);
     }    
     
     /**
      *  This forces a rebuild
      */
-    public List<RouterAddress> getAddresses() {
+    List<RouterAddress> getAddresses() {
         List<RouterAddress> rv = new ArrayList<RouterAddress>(4);
         // do this first since SSU may force a NTCP change
         for (Transport t : _transports.values())
@@ -583,14 +618,15 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
-    public TransportBid getBid(OutNetMessage msg) {
+    TransportBid getBid(OutNetMessage msg) {
         List<TransportBid> bids = getBids(msg);
         if ( (bids == null) || (bids.isEmpty()) )
             return null;
         else
             return bids.get(0);
     }
-    public List<TransportBid> getBids(OutNetMessage msg) {
+
+    List<TransportBid> getBids(OutNetMessage msg) {
         if (msg == null)
             throw new IllegalArgumentException("Null message?  no bidding on a null outNetMessage!");
         if (_context.router().getRouterInfo().equals(msg.getTarget()))
@@ -620,7 +656,7 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
-    public TransportBid getNextBid(OutNetMessage msg) {
+    TransportBid getNextBid(OutNetMessage msg) {
         int unreachableTransports = 0;
         Hash peer = msg.getTarget().getIdentity().calculateHash();
         Set<String> failedTransports = msg.getFailedTransports();
@@ -711,7 +747,11 @@ public class TransportManager implements TransportEventListener {
                 _log.warn("Error receiving message", iae);
         }
     }
-    
+
+    /**
+     *  TransportEventListener
+     *  calls UPnPManager rescan() and update()
+     */
     public void transportAddressChanged() {
         if (_upnpManager != null) {
             _upnpManager.rescan();
@@ -720,7 +760,7 @@ public class TransportManager implements TransportEventListener {
         }
     }
 
-    public List<String> getMostRecentErrorMessages() { 
+    List<String> getMostRecentErrorMessages() { 
         List<String> rv = new ArrayList<String>(16);
         for (Transport t : _transports.values()) {
             rv.addAll(t.getMostRecentErrorMessages());

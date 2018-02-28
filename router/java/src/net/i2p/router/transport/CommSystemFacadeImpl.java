@@ -618,8 +618,18 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         public void timeReached() {
              boolean good = Addresses.isConnected();
              if (_netMonitorStatus != good) {
+                 if (good)
+                     _log.logAlways(Log.INFO, "Network reconnected");
+                 else
+                     _log.error("Network disconnected");
                  _context.router().eventLog().addEvent(EventLog.NETWORK, good ? "connected" : "disconnected");
                  _netMonitorStatus = good;
+                 if (good) {
+                     // Check local addresses
+                     _manager.initializeAddress();
+                     // fire UPnP
+                     _manager.transportAddressChanged();
+                 }
              }
              reschedule(good ? LONG_DELAY : SHORT_DELAY);
         }

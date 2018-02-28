@@ -72,7 +72,7 @@ import org.freenetproject.ForwardPortStatus;
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
  */ 
-public class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
+class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private final Log _log;
 	private final I2PAppContext _context;
 	
@@ -161,6 +161,14 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		}
 	}
 	
+	/**
+	 *  As we only support a single active IGD, and we don't currently have any way
+	 *  to get any IPv6 addresses, this will return at most one IPv4 address.
+	 *
+	 *  Blocking!!!
+	 *
+	 *  @return array of length 1 containing an IPv4 address, or null
+	 */
 	public DetectedIP[] getAddress() {
 		_log.info("UP&P.getAddress() is called \\o/");
 		if(isDisabled) {
@@ -475,7 +483,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	}
 
 	/**
-	 * @return the external address the NAT thinks we have.  Blocking.
+	 * @return the external IPv4 address the NAT thinks we have.  Blocking.
 	 * null if we can't find it.
 	 */
 	private String getNATAddress() {
@@ -1241,6 +1249,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				cp.listSubDev(device.toString(), device, sb);
 				System.out.println("<h3>Device " + (++i) +
 				                   ": " + DataHelper.escapeHTML(device.getFriendlyName()) + "</h3>");
+				System.out.println("<p>UDN: " + DataHelper.escapeHTML(device.getUDN()));
+				System.out.println("<br>IP: " + getIP(device));
 				System.out.println(sb.toString());
 				sb.setLength(0);
 			}
