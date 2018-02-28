@@ -37,6 +37,8 @@ import org.cybergarage.upnp.StateVariable;
 import org.cybergarage.upnp.UPnPStatus;
 import org.cybergarage.upnp.device.DeviceChangeListener;
 import org.cybergarage.upnp.event.EventListener;
+import org.cybergarage.upnp.ssdp.SSDPPacket;
+import org.cybergarage.util.Debug;
 import org.freenetproject.DetectedIP;
 import org.freenetproject.ForwardPort;
 import org.freenetproject.ForwardPortCallback;
@@ -258,6 +260,16 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		if (!ignore && !ALLOW_SAME_HOST && ip != null && myAddresses.contains(ip)) {
 			ignore = true;
 			_log.logAlways(Log.WARN, "Ignoring UPnP on same host: " + name + " UDN: " + udn);
+		}
+
+		// IP check
+		SSDPPacket pkt = dev.getSSDPPacket();
+		if (!ignore && pkt != null) {
+			String pktIP = pkt.getRemoteAddress();
+			if (!stringEquals(ip, pktIP)) {
+				ignore = true;
+				_log.logAlways(Log.WARN, "Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn);
+			}
 		}
 
 		synchronized(lock) {
@@ -751,9 +763,14 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		else
 			sb.append("<li>").append(_t("Subdevice")).append(": ");
 		sb.append(DataHelper.escapeHTML(dev.getFriendlyName()));
-		String ip = getIP(dev);
-		if (ip != null)
-			sb.append(' ').append(ip);
+                if (prefix == null) {
+			String ip = getIP(dev);
+			if (ip != null)
+				sb.append("<br>IP: ").append(ip);
+			String udn = dev.getUDN();
+			if (udn != null)
+				sb.append("<br>UDN: ").append(DataHelper.escapeHTML(udn));
+		}
 		sb.append("</p>");
 		listSubServices(dev, sb);
 		
@@ -1192,8 +1209,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		Properties props = new Properties();
                 props.setProperty(PROP_ADVANCED, "true");
 		I2PAppContext ctx = new I2PAppContext(props);
-		UPnP upnp = new UPnP(ctx);
-		ControlPoint cp = new ControlPoint();
+		UPnP cp = new UPnP(ctx);
+		org.cybergarage.upnp.UPnP.setEnable(org.cybergarage.upnp.UPnP.USE_ONLY_IPV4_ADDR);
+		Debug.initialize(ctx);
+		cp.setHTTPPort(49152 + ctx.random().nextInt(5000));
+		cp.setSSDPPort(54152 + ctx.random().nextInt(5000));
 		long start = System.currentTimeMillis();
 		cp.start();
 		long s2 = System.currentTimeMillis();
@@ -1218,7 +1238,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			int i = 0;
 			while(it.hasNext()) {
 				Device device = it.next();
-				upnp.listSubDev(device.toString(), device, sb);
+				cp.listSubDev(device.toString(), device, sb);
 				System.out.println("<h3>Device " + (++i) +
 				                   ": " + DataHelper.escapeHTML(device.getFriendlyName()) + "</h3>");
 				System.out.println(sb.toString());
