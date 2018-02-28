@@ -24,8 +24,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -1002,12 +1000,12 @@ public class NTCPTransport extends TransportImpl {
             String h = hosts[i];
             if (h.length() <= 0)
                 continue;
-            if (InetAddressUtils.isIPv4Address(h)) {
+            if (Addresses.isIPv4Address(h)) {
                 if (v4)
                     continue;
                 v4 = true;
                 ipstrings.add(h);
-            } else if (InetAddressUtils.isIPv6Address(h)) {
+            } else if (Addresses.isIPv6Address(h)) {
                 if (v6)
                     continue;
                 v6 = true;

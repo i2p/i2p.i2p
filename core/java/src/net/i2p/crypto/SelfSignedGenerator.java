@@ -29,8 +29,6 @@ import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.DHPublicKeySpec;
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import static net.i2p.crypto.SigUtil.intToASN1;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Signature;
@@ -578,9 +576,9 @@ public final class SelfSignedGenerator {
         }
         for (String n : altNames) {
             int len;
-            if (InetAddressUtils.isIPv4Address(n))
+            if (Addresses.isIPv4Address(n))
                 len = 4;
-            else if (InetAddressUtils.isIPv6Address(n))
+            else if (Addresses.isIPv6Address(n))
                 len = 16;
             else
                 len = n.length();
@@ -690,8 +688,8 @@ public final class SelfSignedGenerator {
         idx = intToASN1(rv, idx, wrap41len);
         for (String n : altNames) {
             byte[] b;
-            if (InetAddressUtils.isIPv4Address(n) ||
-                InetAddressUtils.isIPv6Address(n)) {
+            if (Addresses.isIPv4Address(n) ||
+                Addresses.isIPv6Address(n)) {
                 b = Addresses.getIP(n);
                 if (b == null)  // shouldn't happen
                     throw new IllegalArgumentException("fail " + n);

@@ -10,10 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
-
-import org.apache.http.conn.util.InetAddressUtils;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
@@ -128,7 +127,7 @@ public class HostCheckHandler extends HandlerWrapper
         if (_listenHosts.contains(host))
             return true;
         // allow all IP addresses
-        if (InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host))
+        if (Addresses.isIPAddress(host))
             return true;
         //System.out.println(host + " not found in " + s);
         return false;

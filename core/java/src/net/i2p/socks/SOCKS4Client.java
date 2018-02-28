@@ -14,9 +14,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import static net.i2p.socks.SOCKS4Constants.*;
+import net.i2p.util.Addresses;
 
 /**
  *  A simple SOCKS 4/4a client.
@@ -73,10 +72,10 @@ public class SOCKS4Client {
             out.writeByte(Command.CONNECT);
             out.writeShort(connPort);
             boolean isIPv4;
-            if (InetAddressUtils.isIPv4Address(connHostName)) {
+            if (Addresses.isIPv4Address(connHostName)) {
                 isIPv4 = true;
                 out.write(InetAddress.getByName(connHostName).getAddress());
-            } else if (InetAddressUtils.isIPv6Address(connHostName)) {
+            } else if (Addresses.isIPv6Address(connHostName)) {
                 throw new SOCKSException("IPv6 not supported in SOCKS 4");
             } else {
                 isIPv4 = false;

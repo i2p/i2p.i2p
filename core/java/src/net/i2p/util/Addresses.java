@@ -343,8 +343,7 @@ public abstract class Addresses {
             //I2PAppContext.getGlobalContext().logManager().getLog(Addresses.class).error("lookup of " + host, new Exception("I did it"));
             try {
                 rv = InetAddress.getByName(host).getAddress();
-                if (InetAddressUtils.isIPv4Address(host) ||
-                    InetAddressUtils.isIPv6Address(host)) {
+                if (isIPAddress(host)) {
                     synchronized (_IPAddress) {
                         _IPAddress.put(host, rv);
                     }
@@ -379,8 +378,7 @@ public abstract class Addresses {
             rv = _IPAddress.get(host);
         }
         if (rv == null) {
-            if (InetAddressUtils.isIPv4Address(host) ||
-                InetAddressUtils.isIPv6Address(host)) {
+            if (isIPAddress(host)) {
                 try {
                     rv = InetAddress.getByName(host).getAddress();
                     synchronized (_IPAddress) {
@@ -407,7 +405,7 @@ public abstract class Addresses {
     public static byte[] getIP(String host, boolean preferIPv6) {
         if (host == null)
             return null;
-        if (InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host))
+        if (isIPAddress(host))
             return getIP(host);
         synchronized(_negativeCache) {
             Long when = _negativeCache.get(host);
@@ -460,7 +458,7 @@ public abstract class Addresses {
     public static List<byte[]> getIPs(String host) {
         if (host == null)
             return null;
-        if (InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host)) {
+        if (isIPAddress(host)) {
             byte[] brv = getIP(host);
             if (brv == null)
                 return null;
@@ -490,6 +488,31 @@ public abstract class Addresses {
         }
         return null;
     }
+
+    /**
+     *  @since 0.9.34
+     */
+    public static boolean isIPv4Address(String host) {
+        return InetAddressUtils.isIPv4Address(host);
+    }
+
+    /**
+     *  @since 0.9.34
+     */
+    public static boolean isIPv6Address(String host) {
+        return InetAddressUtils.isIPv6Address(host);
+    }
+
+    /**
+     *  @return true if either IPv4 or IPv6
+     *  @since 0.9.34
+     */
+    public static boolean isIPAddress(String host) {
+        return InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host);
+    }
+
+
+
 
     //////// IPv6 Cache Utils ///////
 

@@ -14,9 +14,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import static net.i2p.socks.SOCKS5Constants.*;
+import net.i2p.util.Addresses;
 
 /**
  *  A simple SOCKS 5 client.
@@ -152,9 +151,9 @@ public class SOCKS5Client {
             }
 
             int addressType;
-            if (InetAddressUtils.isIPv4Address(connHostName))
+            if (Addresses.isIPv4Address(connHostName))
                 addressType = AddressType.IPV4;
-            else if (InetAddressUtils.isIPv6Address(connHostName))
+            else if (Addresses.isIPv6Address(connHostName))
                 addressType = AddressType.IPV6;
             else
                 addressType = AddressType.DOMAINNAME;

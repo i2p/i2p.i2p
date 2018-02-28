@@ -42,8 +42,6 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -518,9 +516,9 @@ public class RouterConsoleRunner implements RouterApp {
                     try {
                         // Test before we add the connector, because Jetty 6 won't start if any of the
                         // connectors are bad
-                        if ((!hasIPV6) && InetAddressUtils.isIPv6Address(host))
+                        if ((!hasIPV6) && Addresses.isIPv6Address(host))
                             throw new IOException("IPv6 addresses unsupported");
-                        if ((!hasIPV4) && InetAddressUtils.isIPv4Address(host))
+                        if ((!hasIPV4) && Addresses.isIPv4Address(host))
                             throw new IOException("IPv4 addresses unsupported");
                         ServerSocket testSock = null;
                         try {
@@ -608,9 +606,9 @@ public class RouterConsoleRunner implements RouterApp {
                         try {
                             // Test before we add the connector, because Jetty 6 won't start if any of the
                             // connectors are bad
-                            if ((!hasIPV6) && InetAddressUtils.isIPv6Address(host))
+                            if ((!hasIPV6) && Addresses.isIPv6Address(host))
                                 throw new IOException("IPv6 addresses unsupported");
-                            if ((!hasIPV4) && InetAddressUtils.isIPv4Address(host))
+                            if ((!hasIPV4) && Addresses.isIPv4Address(host))
                                 throw new IOException("IPv4 addresses unsupported");
                             ServerSocket testSock = null;
                             try {

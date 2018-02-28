@@ -20,8 +20,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -2084,11 +2082,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     String h = hosts[i];
                     if (h.length() <= 0)
                         continue;
-                    if (InetAddressUtils.isIPv4Address(h)) {
+                    if (Addresses.isIPv4Address(h)) {
                         if (v4)
                             continue;
                         v4 = true;
-                    } else if (InetAddressUtils.isIPv6Address(h)) {
+                    } else if (Addresses.isIPv6Address(h)) {
                         if (v6)
                             continue;
                         v6 = true;
