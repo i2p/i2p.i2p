@@ -586,7 +586,7 @@ th.snarkTorrentStatus {
 
 .snarkTorrentStatus, .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
      line-height: 90%;
-     padding: 0 3px;
+     padding: 0 7px;
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {

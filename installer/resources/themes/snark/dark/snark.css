@@ -834,7 +834,7 @@ td {
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
      color: #bb7 !important;
-     padding: 0 3px;
+     padding: 0 7px;
      line-height: 90%;
 }
 

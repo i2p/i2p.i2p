@@ -672,7 +672,7 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
-     padding: 0 3px;
+     padding: 0 7px;
      line-height: 90%;
 }
 
