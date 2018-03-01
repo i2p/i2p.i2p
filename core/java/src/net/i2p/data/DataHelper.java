@@ -1951,7 +1951,7 @@ public class DataHelper {
      *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
      *
      *  @param s non-null
-     *  @param regex non-null
+     *  @param regex non-null, don't forget to enclose multiple choices with []
      *  @throws java.util.regex.PatternSyntaxException unchecked
      *  @since 0.9.24
      */
@@ -1966,7 +1966,7 @@ public class DataHelper {
      *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
      *
      *  @param s non-null
-     *  @param regex non-null
+     *  @param regex non-null, don't forget to enclose multiple choices with []
      *  @param limit result threshold
      *  @throws java.util.regex.PatternSyntaxException unchecked
      *  @since 0.9.24
@@ -1974,6 +1974,11 @@ public class DataHelper {
     public static String[] split(String s, String regex, int limit) {
         Pattern p = patterns.get(regex);
         if (p == null) {
+            // catches easy mistake, and also swapping the args by mistake
+            if (regex.length() > 1 && !regex.startsWith("[") && !regex.equals("\r\n")) {
+                //(new Exception("Warning: Split on regex: \"" + regex + "\" should probably be enclosed with []")).printStackTrace();
+                System.out.println("Warning: Split on regex: \"" + regex + "\" should probably be enclosed with []");
+            }
             p = Pattern.compile(regex);
             patterns.putIfAbsent(regex, p);
         }
