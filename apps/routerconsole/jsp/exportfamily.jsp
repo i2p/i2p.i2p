@@ -10,7 +10,7 @@ try {
     net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
     String family = ctx.getProperty("netdb.family.name");
     String keypw = ctx.getProperty("netdb.family.keyPassword");
-    String kspw = ctx.getProperty("netdb.family.keystorePassword", "changeit");
+    String kspw = ctx.getProperty("netdb.family.keystorePassword", net.i2p.crypto.KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
     if (family == null || keypw == null) {
         response.sendError(404);
         return;
