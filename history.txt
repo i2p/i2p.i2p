@@ -1,3 +1,30 @@
+2018-03-03 zzz
+ * Utils:
+   - Skip IPs of down interfaces on Windows
+   - Improve identification of temporary IPv6 addresses
+
+2018-02-28 zzz
+ * Logs: Fix lost log messages at router shutdown
+ * Tools: CLI improvements for Addresses and UPnP
+ * Transport: Rescan addresses and UPnP after network reconnection
+ * UPnP: IGD IP validation
+
+2018-02-27 zzz
+ * UPnP:
+   - Improve diagnostics
+   - Fix event listening, prep for using events
+   - Recognize IGD2 schemas (ticket #2175)
+   - Don't use IGD on same host
+   - Preliminary work for IPv6
+
+2018-02-25 zzz
+ * Crypto: Add support for more alt names in certs (tickets #2159, #2160)
+
+2018-02-24 zzz
+ * Console: Mark request handled when rejecting in HostCheckHandler
+ * i2psnark standalone: Add DNS rebinding protection
+ * XSSFilter: Catch cascaded ISE
+
 2018-02-23 zzz
  * Getopt: Add new translations, fix tests
  * i2psnark: Number formatting tweaks (ticket #1913)

@@ -16,9 +16,11 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,9 +50,13 @@ public abstract class Addresses {
     private static final int FLAG_TEMPORARY = 0x01;
     private static long _ifCacheTime;
     private static final Map<Inet6Address, Inet6Addr> _ifCache = INET6_CACHE_ENABLED ? new HashMap<Inet6Address, Inet6Addr>(8) : null;
+    /** 12 char hex lower case */
+    private static final Set<String> _macCache = new HashSet<String>();
 
     /**
      *  Do we have any non-loop, non-wildcard IPv4 address at all?
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *
      *  @since 0.9.4
      */
     public static boolean isConnected() {
@@ -60,6 +66,8 @@ public abstract class Addresses {
 
     /**
      *  Do we have any non-loop, non-wildcard IPv6 address at all?
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *
      *  @since 0.9.29
      */
     public static boolean isConnectedIPv6() {
@@ -71,7 +79,11 @@ public abstract class Addresses {
         return false;
     }
 
-    /** @return the first non-local address IPv4 address it finds, or null */
+    /**
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *
+     * @return the first non-local address IPv4 address it finds, or null
+     */
     public static String getAnyAddress() {
         SortedSet<String> a = getAddresses();
         if (!a.isEmpty())
@@ -80,6 +92,8 @@ public abstract class Addresses {
     }
 
     /**
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *
      *  @return a sorted set of all addresses, excluding
      *  IPv6, local, broadcast, multicast, etc.
      */
@@ -88,6 +102,8 @@ public abstract class Addresses {
     }
 
     /**
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *
      *  @return a sorted set of all addresses, excluding
      *  only link local and multicast
      *  @since 0.8.3
@@ -102,6 +118,8 @@ public abstract class Addresses {
      *  appropriate for external use. For example, Teredo and 6to4 addresses
      *  are included with IPv6 results. Additional validation is recommended.
      *  See e.g. TransportUtil.isPubliclyRoutable().
+     *
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
      *
      *  @return a sorted set of all addresses including wildcard
      *  @param includeLocal whether to include local
@@ -119,6 +137,8 @@ public abstract class Addresses {
      *  appropriate for external use. For example, Teredo and 6to4 addresses
      *  are included with IPv6 results. Additional validation is recommended.
      *  See e.g. TransportUtil.isPubliclyRoutable().
+     *
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
      *
      *  @return a sorted set of all addresses
      *  @param includeSiteLocal whether to include private like 192.168.x.x
@@ -159,8 +179,22 @@ public abstract class Addresses {
         try {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
             if (ifcs != null) {
+                Set<String> newMacs = new HashSet<String>(8);
                 while (ifcs.hasMoreElements()) {
                     NetworkInterface ifc = ifcs.nextElement();
+                    if (!ifc.isUp()) {
+                        // This is super-important on Windows which has 40+ down interfaces
+                        // and will also deliver IP addresses for down interfaces,
+                        // for example recently disconnected wifi.
+                        //System.out.println("Skipping, down: " + ifc.getDisplayName());
+                        continue;
+                    }
+                    try {
+                        byte[] mac = ifc.getHardwareAddress();
+                        if (mac != null && mac.length == 6) {
+                            newMacs.add(DataHelper.toString(mac));
+                        }
+                    } catch (SocketException ioe) {}
                     for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                         InetAddress addr = addrs.nextElement();
                         boolean isv4 = addr instanceof Inet4Address;
@@ -176,6 +210,12 @@ public abstract class Addresses {
                                           includeLoopbackAndWildcard, includeIPv6)) {
                             rv.add(stripScope(addr.getHostAddress()));
                         }
+                    }
+                }
+                if (!newMacs.isEmpty()) {
+                    synchronized(_macCache) {
+                        _macCache.clear();
+                        _macCache.addAll(newMacs);
                     }
                 }
             }
@@ -550,6 +590,7 @@ public abstract class Addresses {
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(IF_INET6_FILE), "ISO-8859-1"), 1024);
             String line = null;
+            StringBuilder buf = new StringBuilder(40);
             while ( (line = in.readLine()) != null) {
                 // http://tldp.org/HOWTO/html_single/Linux+IPv6-HOWTO/#PROC-NET
                 // 00000000000000000000000000000001 01 80 10 80       lo
@@ -559,7 +600,7 @@ public abstract class Addresses {
                 String as = parts[0];
                 if (as.length() != 32)
                     continue;
-                StringBuilder buf = new StringBuilder(40);
+                buf.setLength(0);
                 int i = 0;
                 while(true) {
                     buf.append(as.substring(i, i+4));
@@ -590,12 +631,14 @@ public abstract class Addresses {
 
     /**
      *  Is this address dynamic?
-     *  Returns false if unknown.
+     *  Should be reliable on Linux.
+     *  Returns best guess on Windows, Mac, and BSD, only valid if global scope.
+     *  @param addr an address of a local interface, as returned from e.g. getAddresses()
      *  @since 0.9.28
      */
     public static boolean isDynamic(Inet6Address addr) {
         if (!INET6_CACHE_ENABLED)
-            return false;
+            return isTemporary(addr);
         Inet6Addr a;
         synchronized(_ifCache) {
             refreshCache();
@@ -608,7 +651,9 @@ public abstract class Addresses {
 
     /**
      *  Is this address deprecated?
-     *  Returns false if unknown.
+     *  Should be reliable on Linux.
+     *  Returns false on Windows, Mac, and BSD.
+     *  @param addr an address of a local interface, as returned from e.g. getAddresses()
      *  @since 0.9.28
      */
     public static boolean isDeprecated(Inet6Address addr) {
@@ -626,12 +671,36 @@ public abstract class Addresses {
 
     /**
      *  Is this address temporary?
-     *  Returns false if unknown.
+     *  Should be reliable on Linux.
+     *  Returns best guess on Windows, Mac, and BSD, only valid if global scope.
+     *  @param addr an address of a local interface, as returned from e.g. getAddresses()
      *  @since 0.9.28
      */
     public static boolean isTemporary(Inet6Address addr) {
-        if (!INET6_CACHE_ENABLED)
-            return false;
+        if (!INET6_CACHE_ENABLED) {
+            // do some guessing for Win, Mac, and BSD
+            byte[] b = addr.getAddress();
+            if (b.length != 16)
+                return false;
+            if (b[8] == 0 && b[9] == 0 && b[10] == 0 && b[11] == 0)
+                return false;
+            String last3 = DataHelper.toHexString(Arrays.copyOfRange(b, 13, 16));
+            synchronized(_macCache) {
+                for (String m : _macCache) {
+                    if (m.endsWith(last3))
+                        return false;
+                }
+            }
+            // RFC 7136 Section 3 says the 'U' bit (byte[8] & 0x02) can't be relied on
+            // See also RFC 4291 Appendix A
+            // Windows doesn't do this but BSD seems to
+            if (!SystemVersion.isWindows())
+                return (b[8] & 0x02) == 0;
+            // This will often be wrong for Windows, which follows
+            // RFC 4941 Section 3.2.1, the 'U' bit is always 0.
+            // No apparent way to tell.
+            return true;
+        }
         Inet6Addr a;
         synchronized(_ifCache) {
             refreshCache();
@@ -660,6 +729,9 @@ public abstract class Addresses {
                 _ifCacheTime = 0;
             }
         }
+        synchronized(_macCache) {
+            _macCache.clear();
+        }
     }
 
     /**
@@ -679,7 +751,9 @@ public abstract class Addresses {
         a = getAddresses(true, false, true);
         print(a);
         System.out.println("\nAll addresses:");
+        long time = System.currentTimeMillis();
         a = getAddresses(true, true, true);
+        time = System.currentTimeMillis() - time;
         print(a);
         System.out.println("\nIPv6 address flags:");
         for (String s : a) {
@@ -698,22 +772,44 @@ public abstract class Addresses {
                     buf.append(" wildcard");
                 else if (addr.isLoopbackAddress())
                     buf.append(" loopback");
-                else
+                else {
                     buf.append(" global");
-                if (isTemporary(addr))
-                    buf.append(" temporary");
-                if (isDeprecated(addr))
-                    buf.append(" deprecated");
-                if (isDynamic(addr))
-                    buf.append(" dynamic");
+                    if (isTemporary(addr))
+                        buf.append(" temporary");
+                    if (isDynamic(addr))
+                        buf.append(" dynamic");
+                    if (isDeprecated(addr))
+                        buf.append(" deprecated");
+                }
             } catch (UnknownHostException uhe) {}
             System.out.println(buf.toString());
         }
+
+        System.out.println("\nMac addresses:");
+        Set<String> macs = new TreeSet<String>();
+        StringBuilder buf = new StringBuilder(17);
+        for (String m : _macCache) {
+            buf.setLength(0);
+            int i = 0;
+            while(true) {
+                buf.append(m.substring(i, i+2));
+                i += 2;
+                if (i >= 12)
+                    break;
+                buf.append(':');
+            }
+            macs.add(buf.toString());
+        }
+        print(macs);
         System.out.println("\nIs connected? " + isConnected() +
                            "\nIs conn IPv6? " + isConnectedIPv6());
         System.out.println("Has v6 flags? " + INET6_CACHE_ENABLED);
+        System.out.println("Uses v6 temp? " + getPrivacyStatus());
+        // Windows 8.1 Java 1.8.0_66 netbook appx. 200ms + 50ms/interface
+        System.out.println("scan time:    " + DataHelper.formatDuration(time));
     }
 
+    /** @since 0.9.34 */
     private static void print(Set<String> a) {
         if (a.isEmpty()) {
             System.out.println("none");
@@ -722,5 +818,62 @@ public abstract class Addresses {
                 System.out.println(s);
             }
         }
+    }
+
+    /**
+     * RFC 4941
+     * @since 0.9.34
+     */
+    private static String getPrivacyStatus() {
+        // Windows: netsh interface ipv6 show privacy
+        // Mac: sysctl net.inet6.ip6.use_tempaddr (1 is enabled)
+        if (SystemVersion.isMac() || SystemVersion.isWindows())
+            return "unknown";
+        long t = getLong("/proc/sys/net/ipv6/conf/all/use_tempaddr");
+        if (t < 0)
+            return "unknown";
+        String rv;
+        if (t == 0)
+            rv = "false";
+        else if (t == 2)
+            rv = "true";
+        else
+            rv = "unknown";
+        if (t == 2) {
+            long pref = getLong("/proc/sys/net/ipv6/conf/all/temp_prefered_lft");
+            if (pref > 0)
+                rv += ", preferred lifetime " + DataHelper.formatDuration(pref * 1000);
+            long valid = getLong("/proc/sys/net/ipv6/conf/all/temp_valid_lft");
+            if (pref > 0)
+                rv += ", valid lifetime " + DataHelper.formatDuration(valid * 1000);
+        }
+        return rv;
+    }
+
+
+    /**
+     * Return first line in a file as a long
+     * @return -1 on failure
+     * @since 0.9.34
+     */
+    private static long getLong(String s) {
+        File f = new File(s);
+        long rv = -1;
+        if (f.exists()) {
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(f), "ISO-8859-1"), 64);
+                String line = in.readLine();
+                if (line != null) {
+                    try {
+                        rv = Long.parseLong(line.trim());
+                    } catch (NumberFormatException nfe) {}
+                }
+            } catch (IOException ioe) {
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
+            }
+        }
+        return rv;
     }
 }
