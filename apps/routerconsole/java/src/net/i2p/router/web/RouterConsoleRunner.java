@@ -853,9 +853,12 @@ public class RouterConsoleRunner implements RouterApp {
      */
     private boolean verifyKeyStore(File ks, Set<String> altNames) {
         if (ks.exists()) {
+            String ksPW = _context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
+            KeyStoreUtil.logCertExpiration(ks, ksPW, 180*24*60*60*1000L);
             boolean rv = _context.getProperty(PROP_KEY_PASSWORD) != null;
             if (!rv)
-                System.err.println("Console SSL error, must set " + PROP_KEY_PASSWORD + " in " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
+                System.err.println("Console SSL error, must set " + PROP_KEY_PASSWORD + " in " +
+                                   (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
             return rv;
         }
         return createKeyStore(ks, altNames);

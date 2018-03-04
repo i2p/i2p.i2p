@@ -163,6 +163,7 @@ class SSLUtil {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             fis = new FileInputStream(ks);
             keyStore.load(fis, ksPass.toCharArray());
+            KeyStoreUtil.logCertExpiration(keyStore, ks.getAbsolutePath(), 180*24*60*60*1000L);
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(keyStore, keyPass.toCharArray());
             sslc.init(kmf.getKeyManagers(), null, I2PAppContext.getGlobalContext().random());

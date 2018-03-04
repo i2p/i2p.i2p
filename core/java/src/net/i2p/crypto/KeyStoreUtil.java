@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -29,6 +30,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Base32;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
@@ -279,6 +281,115 @@ public final class KeyStoreUtil {
             }
         } catch (GeneralSecurityException e) {}
         return count;
+    }
+
+    /**
+     *  Validate expiration for all private key certs in a key store.
+     *  Use this for keystores containing selfsigned certs where the
+     *  user will be expected to renew an expiring cert.
+     *  Use this for Jetty keystores, where we aren't doing the loading ourselves.
+     *
+     *  If a cert isn't valid, it will probably cause bigger problems later when it's used.
+     *
+     *  @param f keystore file
+     *  @param ksPW keystore password
+     *  @param expiresWithin ms if cert expires within this long, we will log a warning, e.g. 180*24*60*60*1000L
+     *  @return true if all are good, false if we logged something
+     *  @since 0.9.34
+     */
+    public static boolean logCertExpiration(File f, String ksPW, long expiresWithin) {
+        String location = f.getAbsolutePath();
+        InputStream fis = null;
+        try {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            fis = new FileInputStream(f);
+            ks.load(fis, ksPW.toCharArray());
+            return logCertExpiration(ks, location, expiresWithin);
+        } catch (IOException ioe) {
+            error("Unable to check certificates in key store " + location, ioe);
+            return false;
+        } catch (GeneralSecurityException gse) {
+            error("Unable to check certificates in key store " + location, gse);
+            return false;
+        } finally {
+            try { if (fis != null) fis.close(); } catch (IOException foo) {}
+        }
+    }
+
+    /**
+     *  Validate expiration for all private key certs in a key store.
+     *  Use this for keystores containing selfsigned certs where the
+     *  user will be expected to renew an expiring cert.
+     *  Use this for keystores we are feeding to an SSLContext and ServerSocketFactory.
+     *
+     *  We added support for self-signed certs in 0.8.3 2011-01, with a 10-year expiration.
+     *  We still don't generate them by default. We don't expect anybody's
+     *  certs to expire until 2021.
+     *
+     *  @param location the path or other identifying info, for logging only
+     *  @param expiresWithin ms if cert expires within this long, we will log a warning, e.g. 180*24*60*60*1000L
+     *  @return true if all are good, false if we logged something
+     *  @since 0.9.34
+     */
+    public static boolean logCertExpiration(KeyStore ks, String location, long expiresWithin) {
+        boolean rv = true;
+        try {
+            int count = 0;
+            for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+                if (ks.isKeyEntry(alias)) {
+                    Certificate[] cs;
+                    try {
+                        cs = ks.getCertificateChain(alias);
+                    } catch (KeyStoreException kse) {
+                        error("Unable to check certificates for \"" + alias + "\" in key store " + location, kse);
+                        rv = false;
+                        continue;
+                    }
+                    for (Certificate c : cs) {
+                        if (c != null && (c instanceof X509Certificate)) {
+                            count++;
+                            X509Certificate cert = (X509Certificate) c;
+                            try {
+                                //System.out.println("checking " + alias + " in " + location);
+                                cert.checkValidity();
+                                long expiresIn = cert.getNotAfter().getTime() - System.currentTimeMillis();
+                                //System.out.println("expiration of " + alias + " is in " + DataHelper.formatDuration(expiresIn));
+                                if (expiresIn < expiresWithin) {
+                                    Log l = I2PAppContext.getGlobalContext().logManager().getLog(KeyStoreUtil.class);
+                                    String subj = cert.getIssuerX500Principal().toString();
+                                    l.logAlways(Log.WARN, "Certificate \"" + subj + "\" in key store " + location +
+                                                          " will expire in " + DataHelper.formatDuration2(expiresIn).replace("&nbsp;", " ") +
+                                                          "\nYou should renew the certificate soon." +
+                                                          // TODO better help or tools, or autorenew
+                                                          "\nFor a local self-signed certificate, you may delete the keystore and restart," +
+                                                          " or ask for help on how to renew.");
+                                }
+                            } catch (CertificateExpiredException cee) {
+                                String subj = cert.getIssuerX500Principal().toString();
+                                error("Expired certificate \"" + subj + "\" in key store " + location +
+                                      "\nYou must renew the certificate." +
+                                      // TODO better help or tools, or autorenew
+                                      "\nFor a local self-signed certificate, you may simply delete the keystore and restart," +
+                                      "\nor ask for help on how to renew.",
+                                      null);
+                                rv = false;
+                            } catch (CertificateNotYetValidException cnyve) {
+                                String subj = cert.getIssuerX500Principal().toString();
+                                error("Not yet valid certificate \"" + subj + "\" in key store " + location, null);
+                                rv = false;
+                            }
+                        }
+                    }
+                }
+            }
+            if (count == 0)
+                error("No certificates found in key store " + location, null);
+        } catch (GeneralSecurityException e) {
+            error("Unable to check certificates in key store " + location, e);
+            rv = false;
+        }
+        return rv;
     }
 
     /**
