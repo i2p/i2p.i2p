@@ -30,9 +30,9 @@
    if (family.length() <= 0) {
        // no family yet
 %>
-<table class="configtable" id="joinfamily">
 <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<table class="configtable" id="joinfamily">
  <tr><th colspan="2"><%=intl._t("Join Existing Router Family")%></th></tr>
  <tr><td colspan="2" class="infohelp"><%=intl._t("Import the secret family key that you exported from an existing router in the family.")%></td></tr>
  <tr>
@@ -43,11 +43,11 @@
 <input type="submit" name="action" class="download" value="<%=intl._t("Join Family")%>" />
   </td>
  </tr>
-</form></table>
+</table></form>
 
-<table class="configtable" id="newfamily">
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<table class="configtable" id="newfamily">
  <tr><th colspan="2"><%=intl._t("Create New Router Family")%></th></tr>
  <tr>
   <td><b><%=intl._t("Family Name")%>:</b>
@@ -57,8 +57,7 @@
 <input type="submit" name="action" class="accept" value="<%=intl._t("Create Family")%>" />
   </td>
  </tr>
-</form>
-</table>
+</table></form>
 <%
    } else {
        // family is configured
@@ -66,8 +65,8 @@
        if (keypw.length() > 0) {
            // family is active
 %>
-<table class="configtable" id="exportfamily">
 <form action="/exportfamily" method="GET">
+<table class="configtable" id="exportfamily">
  <tr><th><%=intl._t("Export Family Key")%></th></tr>
  <tr><td><%=intl._t("Export the secret family key to be imported into other routers you control.")%></td></tr>
  <tr>
@@ -75,7 +74,7 @@
 <input type="submit" name="action" class="go" value="<%=intl._t("Export Family Key")%>" />
   </td>
  </tr>
-</form></table>
+</table></form>
 <%
        } else {
            // family is not active
@@ -85,17 +84,16 @@
 <%
        }
 %>
-<table class="configtable" id="leavefamily">
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<table class="configtable" id="leavefamily">
  <tr><th colspan="2"><%=intl._t("Leave Router Family")%></th></tr>
  <tr><td><%=intl._t("No longer be a member of the family {0}.", '"' + family + '"')%></td>
   <td class="optionsave">
 <input type="submit" name="action" class="delete" value="<%=intl._t("Leave Family")%>" />
   </td>
  </tr>
-</form>
-</table>
+</table></form>
 <%
    }
 %>
