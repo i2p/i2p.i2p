@@ -127,8 +127,7 @@ public class RouterConsoleRunner implements RouterApp {
     public static final String ENABLED = ".startOnLoad";
     private static final String PROP_KEYSTORE_PASSWORD = "routerconsole.keystorePassword";
     private static final String PROP_KEY_PASSWORD = "routerconsole.keyPassword";
-    public static final int DEFAULT_LISTEN_PORT = 7657;
-    private static final String DEFAULT_LISTEN_HOST = "127.0.0.1";
+    public static final int DEFAULT_LISTEN_PORT = PortMapper.DEFAULT_CONSOLE_PORT;
     private static final String DEFAULT_WEBAPPS_DIR = "./webapps/";
     private static final String USAGE = "Bad RouterConsoleRunner arguments, check clientApp.0.args in your clients.config file! " +
                                         "Usage: [[port host[,host]] [-s sslPort [host[,host]]] [webAppsDir]]";
@@ -199,7 +198,7 @@ public class RouterConsoleRunner implements RouterApp {
             }
         }
         if (_listenHost == null)
-           _listenHost = DEFAULT_LISTEN_HOST;
+           _listenHost = PortMapper.DEFAULT_HOST;
         if (_sslListenHost == null)
            _sslListenHost = _listenHost;
         if (_webAppsDir == null)
@@ -748,7 +747,7 @@ public class RouterConsoleRunner implements RouterApp {
                 }
             }
             if (error) {
-                String port = (_listenPort != null) ? _listenPort : ((_sslListenPort != null) ? _sslListenPort : "7657");
+                String port = (_listenPort != null) ? _listenPort : ((_sslListenPort != null) ? _sslListenPort : Integer.toString(DEFAULT_LISTEN_PORT));
                 System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
                                "If your console is still accessible at http://127.0.0.1:" + port + "/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +

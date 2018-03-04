@@ -46,6 +46,14 @@ public class PortMapper {
     /** @since 0.9.34 */
     public static final String SVC_HTTPS_I2PCONTROL = "https_i2pcontrol";
 
+    /** @since 0.9.34 */
+    public static final int DEFAULT_CONSOLE_PORT = 7657;
+    /** @since 0.9.34 */
+    public static final int DEFAULT_HTTPS_CONSOLE_PORT = 7667;
+    /** @since 0.9.34 */
+    public static final String DEFAULT_HOST = "127.0.0.1";
+
+
     /**
      *  @param context unused for now
      */
@@ -59,7 +67,7 @@ public class PortMapper {
      *  @return success, false if already registered
      */
     public boolean register(String service, int port) {
-        return register(service, "127.0.0.1", port);
+        return register(service, DEFAULT_HOST, port);
     }
 
     /**
@@ -209,18 +217,18 @@ public class PortMapper {
         String unset = "*unset*";
         String httpHost = getActualHost(SVC_CONSOLE, unset);
         String httpsHost = getActualHost(SVC_HTTPS_CONSOLE, unset);
-        int httpPort = getPort(SVC_CONSOLE, 7657);
+        int httpPort = getPort(SVC_CONSOLE, DEFAULT_CONSOLE_PORT);
         int httpsPort = getPort(SVC_HTTPS_CONSOLE);
         boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
         if (httpsOnly)
             return "https://" + httpsHost + ':' + httpsPort + '/';
         if (httpHost.equals(unset))
-            httpHost = "127.0.0.1";
+            httpHost = DEFAULT_HOST;
         return "http://" + httpHost + ':' + httpPort + '/';
     }
 
     /**
-     *  @return https URL unless console is http only. Default https://127.0.0.1:7667/
+     *  @return https URL unless console is http only. Default http://127.0.0.1:7657/
      *  @since 0.9.34
      */
     private String getHTTPSConsoleURL() {
@@ -228,12 +236,12 @@ public class PortMapper {
         String httpHost = getActualHost(SVC_CONSOLE, unset);
         String httpsHost = getActualHost(SVC_HTTPS_CONSOLE, unset);
         int httpPort = getPort(SVC_CONSOLE);
-        int httpsPort = getPort(SVC_HTTPS_CONSOLE, 7667);
+        int httpsPort = getPort(SVC_HTTPS_CONSOLE, DEFAULT_HTTPS_CONSOLE_PORT);
         boolean httpOnly = httpPort > 0 && httpsHost.equals(unset) && !httpHost.equals(unset);
         if (httpOnly)
             return "http://" + httpHost + ':' + httpPort + '/';
         if (httpsHost.equals(unset))
-            httpsHost = "127.0.0.1";
+            return "http://" + DEFAULT_HOST + ':' + DEFAULT_CONSOLE_PORT + '/';
         return "https://" + httpsHost + ':' + httpsPort + '/';
     }
 
@@ -249,7 +257,7 @@ public class PortMapper {
             InetSocketAddress ia = _dir.get(s);
             if (ia == null)
                 continue;
-            out.write("<tr><td>" + s + "<td>" + convertWildcard(ia.getHostName(), "127.0.0.1") + "<td>" + ia.getPort() + '\n');
+            out.write("<tr><td>" + s + "<td>" + convertWildcard(ia.getHostName(), DEFAULT_HOST) + "<td>" + ia.getPort() + '\n');
         }
         out.write("</table>\n");
     }
