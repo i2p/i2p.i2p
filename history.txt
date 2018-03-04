@@ -1,3 +1,7 @@
+2018-03-04 zzz
+ * i2ptunnel: Fix multipart config for /register
+ * KeyStore: Log expiration of self-signed certs
+
 2018-03-03 zzz
  * Utils:
    - Skip IPs of down interfaces on Windows
