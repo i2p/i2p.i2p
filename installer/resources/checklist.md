@@ -248,7 +248,7 @@
 
 1. See branch i2p.android.base for build instructions
 
-2. Upload to Google Play, F-Droid, and website
+2. Upload to Google Play, f-droid.i2p.io, f-droid.org, and website
 
 3. Announce on Twitter
 
