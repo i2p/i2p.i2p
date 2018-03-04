@@ -2,8 +2,7 @@
     // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
 
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
-    // edit pages need script for the delete button 'are you sure'
-    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
+    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'");
     response.setHeader("X-XSS-Protection", "1; mode=block");
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
