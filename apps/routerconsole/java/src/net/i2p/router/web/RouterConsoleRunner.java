@@ -2,7 +2,7 @@ package net.i2p.router.web;
 
 import java.awt.GraphicsEnvironment;
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -35,6 +35,7 @@ import net.i2p.router.app.RouterApp;
 import net.i2p.router.news.NewsManager;
 import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
@@ -140,6 +141,8 @@ public class RouterConsoleRunner implements RouterApp {
     private static final String THREAD_NAME = "RouterConsole Jetty";
     public static final String PROP_DTG_ENABLED = "desktopgui.enabled";
     static final String PROP_ALLOWED_HOSTS = "routerconsole.allowedHosts";
+    /** @since 0.9.34 */
+    static final FileFilter WAR_FILTER = new WarFilenameFilter();
 
     /**
      *  <pre>
@@ -763,10 +766,11 @@ public class RouterConsoleRunner implements RouterApp {
         List<String> notStarted = new ArrayList<String>();
         if (_server.isRunning()) {
             File dir = new File(_webAppsDir);
-            String fileNames[] = dir.list(WarFilenameFilter.instance());
-            if (fileNames != null) {
-                for (int i = 0; i < fileNames.length; i++) {
-                    String appName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
+            File files[] = dir.listFiles(WAR_FILTER);
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    String appName = files[i].getName();
+                    appName = appName.substring(0, appName.lastIndexOf(".war"));
                     String enabled = props.getProperty(PREFIX + appName + ENABLED);
                     if (appName.equals("addressbook")) {
                         // addressbook.war is now empty, thread is started by SusiDNS
@@ -776,7 +780,7 @@ public class RouterConsoleRunner implements RouterApp {
                         }
                     } else if (! "false".equals(enabled)) {
                         try {
-                            String path = new File(dir, fileNames[i]).getCanonicalPath();
+                            String path = files[i].getCanonicalPath();
                             WebAppStarter.startWebApp(_context, chColl, appName, path);
                             if (enabled == null) {
                                 // do this so configclients.jsp knows about all apps from reading the config
@@ -1115,11 +1119,13 @@ public class RouterConsoleRunner implements RouterApp {
 
     }
 
-    static class WarFilenameFilter implements FilenameFilter {
-        private static final WarFilenameFilter _filter = new WarFilenameFilter();
-        public static WarFilenameFilter instance() { return _filter; }
-        public boolean accept(File dir, String name) {
-            return (name != null) && (name.endsWith(".war") && !name.equals(ROUTERCONSOLE + ".war"));
+    private static class WarFilenameFilter extends FileSuffixFilter {
+        private static final String RCWAR = ROUTERCONSOLE + ".war";
+
+        public WarFilenameFilter() { super(".war"); }
+
+        public boolean accept(File file) {
+            return super.accept(file) && !file.getName().equals(RCWAR);
         }
     }
 

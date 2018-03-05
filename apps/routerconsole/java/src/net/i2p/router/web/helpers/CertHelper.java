@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.web.HelperBase;
 
@@ -37,17 +38,11 @@ public class CertHelper extends HelperBase {
             // i2ptunnel clients
             File tunnelDir = new File(_context.getConfigDir(), I2PTUNNEL_DIR);
             boolean hasTunnels = false;
-            File[] tunnels = tunnelDir.listFiles();
+            File[] tunnels = tunnelDir.listFiles(new FileSuffixFilter("i2ptunnel-", ".local.crt"));
             if (tunnels != null) {
                 for (int i = 0; i < tunnels.length; i++) {
                     File f = tunnels[i];
-                    if (!f.isFile())
-                        continue;
                     String name = f.getName();
-                    if (!name.endsWith(".local.crt"))
-                        continue;
-                    if (!name.startsWith("i2ptunnel-"))
-                        continue;
                     String b32 = name.substring(10, name.length() - 10);
                     output(_t("I2PTunnel") + ' ' + b32, f);
                     hasTunnels = true;
@@ -59,17 +54,10 @@ public class CertHelper extends HelperBase {
             // SAM
             tunnelDir = new File(dir, SAM_DIR);
             hasTunnels = false;
-            tunnels = tunnelDir.listFiles();
+            tunnels = tunnelDir.listFiles(new FileSuffixFilter("sam-", ".local.crt"));
             if (tunnels != null) {
                 for (int i = 0; i < tunnels.length; i++) {
                     File f = tunnels[i];
-                    if (!f.isFile())
-                        continue;
-                    String name = f.getName();
-                    if (!name.endsWith(".local.crt"))
-                        continue;
-                    if (!name.startsWith("sam-"))
-                        continue;
                     output("SAM", f);
                     hasTunnels = true;
                 }

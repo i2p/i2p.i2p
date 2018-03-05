@@ -30,6 +30,7 @@ import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -415,13 +416,14 @@ public class PluginStarter implements Runnable {
             File consoleDir = new File(pluginDir, "console");
             Properties wprops = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             File webappDir = new File(consoleDir, "webapps");
-            String fileNames[] = webappDir.list(RouterConsoleRunner.WarFilenameFilter.instance());
-            if (fileNames != null) {
+            File files[] = webappDir.listFiles(RouterConsoleRunner.WAR_FILTER);
+            if (files != null) {
                 if(!pluginWars.containsKey(appName))
                     pluginWars.put(appName, new ConcurrentHashSet<String>());
-                for (int i = 0; i < fileNames.length; i++) {
+                for (int i = 0; i < files.length; i++) {
                     try {
-                        String warName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
+                        String warName = files[i].getName();
+                        warName = warName.substring(0, warName.lastIndexOf(".war"));
                         //log.error("Found webapp: " + warName);
                         // check for duplicates in $I2P
                         if (Arrays.asList(STANDARD_WEBAPPS).contains(warName)) {
@@ -432,12 +434,12 @@ public class PluginStarter implements Runnable {
                         if (! "false".equals(enabled)) {
                             if (log.shouldLog(Log.INFO))
                                 log.info("Starting webapp: " + warName);
-                            String path = new File(webappDir, fileNames[i]).getCanonicalPath();
+                            String path = files[i].getCanonicalPath();
                             WebAppStarter.startWebApp(ctx, server, warName, path);
                             pluginWars.get(appName).add(warName);
                         }
                     } catch (IOException ioe) {
-                        log.error("Error resolving '" + fileNames[i] + "' in '" + webappDir, ioe);
+                        log.error("Error resolving '" + files[i] + "' in '" + webappDir, ioe);
                     }
                 }
                 // Check for iconfile in plugin.properties
@@ -460,23 +462,21 @@ public class PluginStarter implements Runnable {
         // later in the classpath.
         File localeDir = new File(pluginDir, "console/locale");
         if (localeDir.exists() && localeDir.isDirectory()) {
-            File[] files = localeDir.listFiles();
+            File[] files = localeDir.listFiles(new FileSuffixFilter(".jar"));
             if (files != null) {
                 boolean added = false;
                 for (int i = 0; i < files.length; i++) {
                     File f = files[i];
-                    if (f.getName().endsWith(".jar")) {
-                        try {
-                            addPath(f.toURI().toURL());
-                            log.info("INFO: Adding translation plugin to classpath: " + f);
-                            added = true;
-                        } catch (ClassCastException e) {
-                            log.logAlways(Log.WARN, "Java version: " + System.getProperty("java.version") +
-                                                    " does not support adding classpath element: " + f +
-                                                    " for plugin " + appName);
-                        } catch (RuntimeException e) {
-                            log.error("Plugin " + appName + " bad classpath element: " + f, e);
-                        }
+                    try {
+                        addPath(f.toURI().toURL());
+                        log.info("INFO: Adding translation plugin to classpath: " + f);
+                        added = true;
+                    } catch (ClassCastException e) {
+                        log.logAlways(Log.WARN, "Java version: " + System.getProperty("java.version") +
+                                                " does not support adding classpath element: " + f +
+                                                " for plugin " + appName);
+                    } catch (RuntimeException e) {
+                        log.error("Plugin " + appName + " bad classpath element: " + f, e);
                     }
                 }
                 if (added)

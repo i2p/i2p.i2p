@@ -19,6 +19,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 
@@ -98,13 +99,11 @@ class PersistNews {
         Log log = ctx.logManager().getLog(PersistNews.class);
         File dir = new File(ctx.getConfigDir(), DIR);
         List<NewsEntry> rv = new ArrayList<NewsEntry>();
-        File[] files = dir.listFiles();
+        File[] files = dir.listFiles(new FileSuffixFilter(PFX, SFX));
         if (files == null)
             return rv;
         for (File file : files) {
             String name = file.getName();
-            if (!name.startsWith(PFX) || !name.endsWith(SFX))
-                continue;
             XMLParser parser = new XMLParser(ctx);
             InputStream in = null;
             Node node;

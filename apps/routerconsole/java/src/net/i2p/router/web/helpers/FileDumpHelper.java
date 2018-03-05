@@ -20,6 +20,7 @@ import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.PluginStarter;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.SystemVersion;
 
@@ -97,13 +98,12 @@ public class FileDumpHelper extends HelperBase {
     }
 
     private static void dumpDir(StringBuilder buf, File dir, String suffix) {
-        File[] files = dir.listFiles();
+        File[] files = dir.listFiles(new FileSuffixFilter(suffix));
         if (files == null)
             return;
         Arrays.sort(files);
         for (int i = 0; i < files.length; i++) {
-            if (files[i].getName().endsWith(suffix))
-                dumpFile(buf, files[i]);
+            dumpFile(buf, files[i]);
         }
     }
 

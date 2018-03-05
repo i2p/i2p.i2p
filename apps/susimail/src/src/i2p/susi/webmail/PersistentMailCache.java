@@ -31,6 +31,7 @@ import java.util.zip.GZIPOutputStream;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PasswordManager;
 import net.i2p.util.SecureDirectory;
@@ -383,15 +384,11 @@ class PersistentMailCache {
 	private void importMail() {
 		File importDir = new File(_cacheDir.getParentFile(), DIR_IMPORT);
 		if (importDir.exists() && importDir.isDirectory()) {
-			File[] files = importDir.listFiles();
+			File[] files = importDir.listFiles(new FileSuffixFilter(".eml"));
 			if (files == null)
 				return;
 			for (int i = 0; i < files.length; i++) {
 				File f = files[i];
-				if (!f.isFile())
-					continue;
-				if (!f.getName().toLowerCase(Locale.US).endsWith(".eml"))
-					continue;
 				// Read in the headers to get the X-UIDL that Thunderbird stuck in there
 				String uidl = Long.toString(_context.random().nextLong());
 				InputStream in = null;

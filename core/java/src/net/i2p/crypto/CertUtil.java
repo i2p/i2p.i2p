@@ -40,6 +40,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
 
@@ -486,21 +487,17 @@ public final class CertUtil {
      */
     private static void loadCRLs(Set<X509CRL> crls, File dir) {
         if (dir.exists() && dir.isDirectory()) {
-            File[] files = dir.listFiles();
+            File[] files = dir.listFiles(new FileSuffixFilter(".crl"));
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
                     File f = files[i];
-                    if (!f.isFile())
-                        continue;
-                    if (f.getName().endsWith(".crl")) {
-                        try {
-                            X509CRL crl = loadCRL(f);
-                            crls.add(crl);
-                        } catch (IOException ioe) {
-                            error("Cannot load CRL from " + f, ioe);
-                        } catch (GeneralSecurityException crle) {
-                            error("Cannot load CRL from " + f, crle);
-                        }
+                    try {
+                        X509CRL crl = loadCRL(f);
+                        crls.add(crl);
+                    } catch (IOException ioe) {
+                        error("Cannot load CRL from " + f, ioe);
+                    } catch (GeneralSecurityException crle) {
+                        error("Cannot load CRL from " + f, crle);
                     }
                 }
             }

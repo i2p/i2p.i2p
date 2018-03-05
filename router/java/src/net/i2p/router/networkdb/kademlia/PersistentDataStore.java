@@ -11,8 +11,8 @@ package net.i2p.router.networkdb.kademlia;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +34,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -60,7 +61,7 @@ public class PersistentDataStore extends TransientDataStore {
     private static final String PROP_FLAT = "router.networkDatabase.flat";
     static final String DIR_PREFIX = "r";
     private static final String B64 = Base64.ALPHABET_I2P;
-    
+
     /**
      *  @param dbDir relative path
      */
@@ -392,7 +393,7 @@ public class PersistentDataStore extends TransientDataStore {
         private void readFiles() {
             int routerCount = 0;
 
-            File routerInfoFiles[] = _dbDir.listFiles(RouterInfoFilter.getInstance());
+            File routerInfoFiles[] = _dbDir.listFiles(RI_FILTER);
             if (_flat) {
                 if (routerInfoFiles != null) {
                     routerCount = routerInfoFiles.length;
@@ -421,7 +422,7 @@ public class PersistentDataStore extends TransientDataStore {
                 List<File> toRead = new ArrayList<File>(2048);
                 for (int j = 0; j < B64.length(); j++) {
                     File subdir = new File(_dbDir, DIR_PREFIX + B64.charAt(j));
-                    File[] files = subdir.listFiles(RouterInfoFilter.getInstance());
+                    File[] files = subdir.listFiles(RI_FILTER);
                     if (files == null)
                         continue;
                     long lastMod = subdir.lastModified();
@@ -583,7 +584,7 @@ public class PersistentDataStore extends TransientDataStore {
                 if (!subdir.exists())
                     subdir.mkdir();
             }
-            File routerInfoFiles[] = f.listFiles(RouterInfoFilter.getInstance());
+            File routerInfoFiles[] = f.listFiles(RI_FILTER);
             if (routerInfoFiles != null)
                 migrate(f, routerInfoFiles);
         }
@@ -597,7 +598,7 @@ public class PersistentDataStore extends TransientDataStore {
     private static void unmigrate(File dbdir) {
         for (int j = 0; j < B64.length(); j++) {
             File subdir = new File(dbdir, DIR_PREFIX + B64.charAt(j));
-            File[] files = subdir.listFiles(RouterInfoFilter.getInstance());
+            File[] files = subdir.listFiles(RI_FILTER);
             if (files == null)
                 continue;
             for (int i = 0; i < files.length; i++) {
@@ -627,6 +628,9 @@ public class PersistentDataStore extends TransientDataStore {
     private final static String LEASESET_SUFFIX = ".dat";
     private final static String ROUTERINFO_PREFIX = "routerInfo-";
     private final static String ROUTERINFO_SUFFIX = ".dat";
+
+    /** @since 0.9.34 */
+    public static final FileFilter RI_FILTER = new FileSuffixFilter(ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     
     private static String getLeaseSetName(Hash hash) {
         return LEASESET_PREFIX + hash.toBase64() + LEASESET_SUFFIX;
@@ -691,16 +695,6 @@ public class PersistentDataStore extends TransientDataStore {
                 _log.info("Removed router info at " + f.getAbsolutePath());
             }
             return;
-        }
-    }
-    
-    static class RouterInfoFilter implements FilenameFilter {
-        private static final FilenameFilter _instance = new RouterInfoFilter();
-        public static final FilenameFilter getInstance() { return _instance; }
-        public boolean accept(File dir, String name) {
-            if (name == null) return false;
-            name = name.toUpperCase(Locale.US);
-            return (name.startsWith(ROUTERINFO_PREFIX.toUpperCase(Locale.US)) && name.endsWith(ROUTERINFO_SUFFIX.toUpperCase(Locale.US)));
         }
     }
 }

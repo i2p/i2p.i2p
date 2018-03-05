@@ -34,6 +34,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.update.*;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -2577,14 +2578,14 @@ public class SnarkManager implements CompleteListener, ClientApp {
      */
     private boolean monitorTorrents(File dir) {
         boolean rv = true;
-        String fileNames[] = dir.list(TorrentFilenameFilter.instance());
+        File files[] = dir.listFiles(new FileSuffixFilter(".torrent"));
         List<String> foundNames = new ArrayList<String>(0);
-        if (fileNames != null) {
-            for (int i = 0; i < fileNames.length; i++) {
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
                 try {
-                    foundNames.add(new File(dir, fileNames[i]).getCanonicalPath());
+                    foundNames.add(files[i].getCanonicalPath());
                 } catch (IOException ioe) {
-                    _log.error("Error resolving '" + fileNames[i] + "' in '" + dir, ioe);
+                    _log.error("Error resolving '" + files[i] + "' in '" + dir, ioe);
                 }
             }
         }
@@ -2729,14 +2730,6 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         _config.setProperty(PROP_TRACKERS, buf.toString());
         saveConfig();
-    }
-
-    private static class TorrentFilenameFilter implements FilenameFilter {
-        private static final TorrentFilenameFilter _filter = new TorrentFilenameFilter();
-        public static TorrentFilenameFilter instance() { return _filter; }
-        public boolean accept(File dir, String name) {
-            return (name != null) && (name.endsWith(".torrent"));
-        }
     }
 
     /**

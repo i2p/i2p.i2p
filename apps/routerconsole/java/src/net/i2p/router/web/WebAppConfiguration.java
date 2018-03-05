@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.FileSuffixFilter;
 
 import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.webapp.Configuration;
@@ -180,11 +181,11 @@ public class WebAppConfiguration implements Configuration {
             // Java 9 - assume everything in lib/ is in the classpath
             // except addressbook.jar
             File libDir = new File(ctx.getBaseDir(), "lib");
-            File[] files = libDir.listFiles();
+            File[] files = libDir.listFiles(new FileSuffixFilter(".jar"));
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
                     String name = files[i].getName();
-                    if (name.endsWith(".jar") && !name.equals("addressbook.jar"))
+                    if (!name.equals("addressbook.jar"))
                         rv.add(files[i].toURI());
                 }
             }

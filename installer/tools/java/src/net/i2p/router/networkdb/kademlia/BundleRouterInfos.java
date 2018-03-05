@@ -123,7 +123,7 @@ public class BundleRouterInfos {
         List<File> toRead = new ArrayList<File>(2048);
         for (int j = 0; j < Base64.ALPHABET_I2P.length(); j++) {
             File subdir = new File(dbDir, PersistentDataStore.DIR_PREFIX + Base64.ALPHABET_I2P.charAt(j));
-            File[] files = subdir.listFiles(PersistentDataStore.RouterInfoFilter.getInstance());
+            File[] files = subdir.listFiles(PersistentDataStore.RI_FILTER);
             if (files == null)
                 continue;
             routerCount += files.length;
