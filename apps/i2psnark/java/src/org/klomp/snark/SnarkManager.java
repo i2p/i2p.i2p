@@ -330,8 +330,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
      *  Runs inline.
      */
     public void stop() {
-        if (_log.shouldWarn())
-            _log.warn("Snark stop() begin", new Exception("I did it"));
+        if (_log.shouldDebug())
+            _log.debug("Snark stop() begin", new Exception("I did it"));
         if (_umgr != null && _uhandler != null) {
             //_uhandler.shutdown();
             _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);

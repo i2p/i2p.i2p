@@ -808,6 +808,9 @@ public class Router implements RouterClock.ClockShiftListener {
             else if (_state == State.EXPL_TUNNELS_READY)
                 changeState(State.RUNNING);
         }
+        // for debugging
+        if (_log.shouldWarn())
+            _context.logManager().flush();
     }
 
     /**
@@ -822,6 +825,9 @@ public class Router implements RouterClock.ClockShiftListener {
             else if (_state == State.NETDB_READY)
                 changeState(State.RUNNING);
         }
+        // for debugging
+        if (_log.shouldWarn())
+            _context.logManager().flush();
     }
 
     /**

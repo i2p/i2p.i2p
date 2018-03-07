@@ -44,8 +44,8 @@ public class ReadConfigJob extends JobImpl {
             getContext().router().readConfig();
             _lastRead = getContext().clock().now();
             Log log = getContext().logManager().getLog(ReadConfigJob.class);
-            if (log.shouldLog(Log.WARN))
-                log.warn("Reloaded " + configFile);
+            if (log.shouldDebug())
+                log.debug("Reloaded " + configFile);
         }
         requeue(DELAY);
     }
