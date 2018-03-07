@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -39,14 +40,14 @@ public abstract class CommSystemFacade implements Service {
      *  How many peers are we currently connected to, that we have
      *  sent a message to or received a message from in the last five minutes.
      */
-    public int countActivePeers() { return 0; }
+    public abstract int countActivePeers();
 
     /**
      *  How many peers are we currently connected to, that we have
      *  sent a message to in the last minute.
      *  Unused for anything, to be removed.
      */
-    public int countActiveSendPeers() { return 0; }
+    public abstract int countActiveSendPeers();
 
     public boolean haveInboundCapacity(int pct) { return true; }
     public boolean haveOutboundCapacity(int pct) { return true; }
@@ -90,7 +91,7 @@ public abstract class CommSystemFacade implements Service {
 
     public boolean isBacklogged(Hash peer) { return false; }
     public boolean wasUnreachable(Hash peer) { return false; }
-    public boolean isEstablished(Hash peer) { return false; }
+    public abstract boolean isEstablished(Hash peer);
     public byte[] getIP(Hash dest) { return null; }
     public void queueLookup(byte[] ip) {}
     
@@ -127,6 +128,16 @@ public abstract class CommSystemFacade implements Service {
     public SortedMap<String, Transport> getTransports() {
         return new TreeMap<String, Transport>();
     }
+    
+    /**
+     *  Get all the peers we are connected to.
+     *  This should be more efficient than repeated calls to isEstablished()
+     *  if you have to check a lot.
+     *
+     *  @return the hashes of all the routers we are connected to, non-null
+     *  @since 0.9.34
+     */
+    public abstract Set<Hash> getEstablished();
     
     /** @since 0.8.13 */
     public boolean isDummy() { return true; }

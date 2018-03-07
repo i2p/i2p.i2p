@@ -11,6 +11,7 @@ package net.i2p.router.transport;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import net.i2p.data.Hash;
@@ -141,6 +142,12 @@ public interface Transport {
     /** The unique identity of this Transport */
     public String getStyle();
     
+    /**
+     * @return may or may not be modifiable; check implementation
+     * @since 0.9.34
+     */
+    public Set<Hash> getEstablished();    
+
     public int countPeers();    
     public int countActivePeers();    
     public int countActiveSendPeers();

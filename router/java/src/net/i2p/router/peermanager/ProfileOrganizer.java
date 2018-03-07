@@ -576,10 +576,11 @@ public class ProfileOrganizer {
      */
     public void selectActiveNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         if (matches.size() < howMany) {
+            Set<Hash> connected = _context.commSystem().getEstablished();
             getReadLock();
             try {
                 for (Hash peer : _notFailingPeers.keySet()) {
-                    if (!_context.commSystem().isEstablished(peer))
+                    if (!connected.contains(peer))
                         exclude.add(peer);
                 }
                 locked_selectPeers(_notFailingPeers, howMany, exclude, matches, 0);
@@ -602,12 +603,14 @@ public class ProfileOrganizer {
      */
     private void selectActiveNotFailingPeers2(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         if (matches.size() < howMany) {
-            Map<Hash, PeerProfile> activePeers = new HashMap<Hash, PeerProfile>();
+            Set<Hash> connected = _context.commSystem().getEstablished();
+            Map<Hash, PeerProfile> activePeers = new HashMap<Hash, PeerProfile>(connected.size());
             getReadLock();
             try {
-                for (Map.Entry<Hash, PeerProfile> e : _notFailingPeers.entrySet()) {
-                    if (_context.commSystem().isEstablished(e.getKey()))
-                        activePeers.put(e.getKey(), e.getValue());
+                for (Hash peer : connected) {
+                    PeerProfile prof = _notFailingPeers.get(peer);
+                    if (prof != null)
+                        activePeers.put(peer, prof);
                 }
                 locked_selectPeers(activePeers, howMany, exclude, matches, mask);
             } finally { releaseReadLock(); }

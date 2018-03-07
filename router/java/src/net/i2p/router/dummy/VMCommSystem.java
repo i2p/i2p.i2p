@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
@@ -47,6 +49,23 @@ public class VMCommSystem extends CommSystemFacade {
         _context.statManager().createRequiredRateStat("transport.sendProcessingTime", "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     
+    public int countActivePeers() { return _commSystemFacades.size() - 1; }
+
+    public int countActiveSendPeers()  { return _commSystemFacades.size() - 1; }
+
+    public boolean isEstablished(Hash peer) { return _commSystemFacades.containsKey(peer); }
+
+    public Set<Hash> getEstablished() {
+        Set<Hash> rv;
+        synchronized (_commSystemFacades) {
+            rv = new HashSet<Hash>(_commSystemFacades.keySet());
+        }
+        Hash us = _context.routerHash();
+        if (us != null)
+            rv.remove(us);
+        return rv;
+    }
+
     /**
      * The router wants us to send the given message to the peer.  Do so, or fire 
      * off the failing job.

@@ -535,6 +535,22 @@ public class NTCPTransport extends TransportImpl {
     public Collection<NTCPConnection> getPeers() {
         return _conByIdent.values();
     }
+    
+    /** 
+     * Connected peers.
+     *
+     * @return a copy, modifiable
+     * @since 0.9.34
+     */
+    public Set<Hash> getEstablished() {
+        Set<Hash> rv = new HashSet<Hash>(_conByIdent.keySet());
+        for (Map.Entry<Hash, NTCPConnection> e : _conByIdent.entrySet()) {
+            NTCPConnection con = e.getValue();
+            if (!con.isEstablished() || con.isClosed())
+                rv.remove(e.getKey());
+        }
+        return rv;
+    }
 
     /**
      * How many peers have we talked to in the last 5 minutes?

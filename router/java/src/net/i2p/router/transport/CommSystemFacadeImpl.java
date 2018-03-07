@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.Vector;
 
@@ -164,7 +165,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public boolean isEstablished(Hash peer) { 
         return _manager.isEstablished(peer); 
     }
-    
+
+    /**
+     *  @return a new set, may be modified
+     *  @since 0.9.34
+     */    
+    public Set<Hash> getEstablished() {
+        return _manager.getEstablished();
+    }
+
     @Override
     public boolean wasUnreachable(Hash peer) { 
         return _manager.wasUnreachable(peer); 

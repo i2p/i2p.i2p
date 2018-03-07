@@ -516,6 +516,24 @@ public class TransportManager implements TransportEventListener {
     }    
     
     /**
+     *  @return a new set, may be modified
+     *  @since 0.9.34
+     */
+    public Set<Hash> getEstablished() {
+        // for efficiency. NTCP is modifiable, SSU isn't
+        Transport t = _transports.get("NTCP");
+        Set<Hash> rv;
+        if (t != null)
+            rv = t.getEstablished();
+        else
+            rv = new HashSet<Hash>(256);
+        t = _transports.get("SSU");
+        if (t != null)
+            rv.addAll(t.getEstablished());
+        return rv;
+    }
+    
+    /**
      * Tell the transports that we may disconnect from this peer.
      * This is advisory only.
      *

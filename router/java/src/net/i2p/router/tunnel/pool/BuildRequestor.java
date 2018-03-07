@@ -25,7 +25,7 @@ import net.i2p.util.VersionComparator;
  */
 abstract class BuildRequestor {
     private static final List<Integer> ORDER = new ArrayList<Integer>(TunnelBuildMessage.MAX_RECORD_COUNT);
-    private static final String MIN_VARIABLE_VERSION = "0.7.12";
+    //private static final String MIN_VARIABLE_VERSION = "0.7.12";
     private static final boolean SEND_VARIABLE = true;
     private static final int SHORT_RECORDS = 4;
     private static final List<Integer> SHORT_ORDER = new ArrayList<Integer>(SHORT_RECORDS);
@@ -239,6 +239,9 @@ abstract class BuildRequestor {
     }
 
     /** @since 0.7.12 */
+/****
+we can assume everybody supports variable now...
+keep this here for the next time we change the build protocol
     private static boolean supportsVariable(RouterContext ctx, Hash h) {
         RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
         if (ri == null)
@@ -246,6 +249,7 @@ abstract class BuildRequestor {
         String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_VARIABLE_VERSION) >= 0;
     }
+****/
 
     /**
      *  If the tunnel is short enough, and everybody in the tunnel, and the
@@ -258,11 +262,15 @@ abstract class BuildRequestor {
                                                                TunnelInfo pairedTunnel, BuildExecutor exec) {
         Log log = ctx.logManager().getLog(BuildRequestor.class);
         long replyTunnel = 0;
-        Hash replyRouter = null;
+        Hash replyRouter;
         boolean useVariable = SEND_VARIABLE && cfg.getLength() <= MEDIUM_RECORDS;
+
         if (cfg.isInbound()) {
             //replyTunnel = 0; // as above
             replyRouter = ctx.routerHash();
+/****
+we can assume everybody supports variable now...
+keep this here for the next time we change the build protocol
             if (useVariable) {
                 // check the reply OBEP and all the tunnel peers except ourselves
                 if (!supportsVariable(ctx, pairedTunnel.getPeer(pairedTunnel.getLength() - 1))) {
@@ -276,9 +284,13 @@ abstract class BuildRequestor {
                     }
                 }
             }
+****/
         } else {
             replyTunnel = pairedTunnel.getReceiveTunnelId(0).getTunnelId();
             replyRouter = pairedTunnel.getPeer(0);
+/****
+we can assume everybody supports variable now
+keep this here for the next time we change the build protocol
             if (useVariable) {
                 // check the reply IBGW and all the tunnel peers except ourselves
                 if (!supportsVariable(ctx, replyRouter)) {
@@ -292,6 +304,7 @@ abstract class BuildRequestor {
                     }
                 }
             }
+****/
         }
 
         // populate and encrypt the message

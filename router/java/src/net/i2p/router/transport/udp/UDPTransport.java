@@ -1174,6 +1174,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public Collection<PeerState> getPeers() {
         return _peersByIdent.values();
     }
+    
+    /** 
+     * Connected peers.
+     *
+     * @return not a copy, do not modify
+     * @since 0.9.34
+     */
+    public Set<Hash> getEstablished() {
+        return _peersByIdent.keySet();
+    }
 
     /** 
      *  Remove and add to peersByRemoteHost map
@@ -2638,7 +2648,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     @Override
     public boolean isEstablished(Hash dest) {
-        return getPeerState(dest) != null;
+        return _peersByIdent.containsKey(dest);
     }
 
     /**
