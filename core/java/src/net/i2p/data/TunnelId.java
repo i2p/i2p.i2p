@@ -27,7 +27,7 @@ import java.io.OutputStream;
 public class TunnelId extends DataStructureImpl {
     private long _tunnelId;
     
-    public static final long MAX_ID_VALUE = (1L << 32) - 2L;
+    public static final long MAX_ID_VALUE = 0xffffffffL;
     
     public TunnelId() { 
         _tunnelId = -1;

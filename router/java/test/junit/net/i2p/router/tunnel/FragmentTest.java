@@ -161,7 +161,7 @@ public class FragmentTest {
             _context.random().nextBytes(toRouter.getData());
         }
         if (includeTunnel)
-            toTunnel = new TunnelId(_context.random().nextLong(TunnelId.MAX_ID_VALUE));
+            toTunnel = new TunnelId(1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE));
         return new PendingGatewayMessage(m, toRouter, toTunnel);
     }
     

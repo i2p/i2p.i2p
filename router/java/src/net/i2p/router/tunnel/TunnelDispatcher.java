@@ -396,7 +396,7 @@ public class TunnelDispatcher implements Service {
         long rv;
         TunnelId tid;
         do {
-            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
+            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
             tid = new TunnelId(rv);
         } while (_outboundGateways.containsKey(tid));
         return rv;
@@ -413,7 +413,7 @@ public class TunnelDispatcher implements Service {
         long rv;
         TunnelId tid;
         do {
-            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
+            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
             tid = new TunnelId(rv);
         } while (_participants.containsKey(tid));
         return rv;
@@ -430,7 +430,7 @@ public class TunnelDispatcher implements Service {
         long rv;
         TunnelId tid;
         do {
-            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
+            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
             tid = new TunnelId(rv);
         } while (_inboundGateways.containsKey(tid));
         return rv;

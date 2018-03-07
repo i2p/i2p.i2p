@@ -668,6 +668,16 @@ class BuildHandler implements Runnable {
             return;
         }
 
+        if (ourId <= 0 || ourId > TunnelId.MAX_ID_VALUE ||
+            nextId <= 0 || nextId > TunnelId.MAX_ID_VALUE) {
+            _context.statManager().addRateData("tunnel.rejectHostile", 1);
+            if (_log.shouldWarn())
+                _log.warn("Dropping build request, bad tunnel ID: " + req);
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
+            return;
+        }
+
         // Loop checks
         if ((!isOutEnd) && _context.routerHash().equals(nextPeer)) {
             _context.statManager().addRateData("tunnel.rejectHostile", 1);
