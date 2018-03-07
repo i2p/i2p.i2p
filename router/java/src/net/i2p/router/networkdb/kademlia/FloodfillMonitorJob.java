@@ -11,6 +11,8 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.transport.TransportManager;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.stat.Rate;
@@ -107,6 +109,16 @@ class FloodfillMonitorJob extends JobImpl {
             return false;
 
         if (getContext().getBooleanProperty(UDPTransport.PROP_LAPTOP_MODE))
+            return false;
+
+        // need IPv4 - The setting is the same for both SSU and NTCP, so just take the SSU one
+        if (TransportUtil.getIPv6Config(getContext(), "SSU") == TransportUtil.IPv6Config.IPV6_ONLY)
+            return false;
+
+        // need both transports
+        if (!TransportManager.isNTCPEnabled(getContext()))
+            return false;
+        if (!getContext().getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
             return false;
 
         if (getContext().commSystem().isInBadCountry())
