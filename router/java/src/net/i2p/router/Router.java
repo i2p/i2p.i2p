@@ -768,8 +768,11 @@ public class Router implements RouterClock.ClockShiftListener {
             oldState = _state;
             _state = state;
         }
-        if (_log != null && state != State.STOPPED && _log.shouldLog(Log.WARN))
+        if (_log != null && oldState != state && state != State.STOPPED && _log.shouldLog(Log.WARN)) {
             _log.warn("Router state change from " + oldState + " to " + state /* , new Exception() */ );
+            //for debugging
+            _context.logManager().flush();
+        }
     }
 
     /**
@@ -808,9 +811,6 @@ public class Router implements RouterClock.ClockShiftListener {
             else if (_state == State.EXPL_TUNNELS_READY)
                 changeState(State.RUNNING);
         }
-        // for debugging
-        if (_log.shouldWarn())
-            _context.logManager().flush();
     }
 
     /**
@@ -825,9 +825,6 @@ public class Router implements RouterClock.ClockShiftListener {
             else if (_state == State.NETDB_READY)
                 changeState(State.RUNNING);
         }
-        // for debugging
-        if (_log.shouldWarn())
-            _context.logManager().flush();
     }
 
     /**
