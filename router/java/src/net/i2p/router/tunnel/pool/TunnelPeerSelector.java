@@ -16,12 +16,17 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Router;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.transport.TransportManager;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.util.HashDistance;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
@@ -34,9 +39,19 @@ import net.i2p.util.VersionComparator;
  */
 public abstract class TunnelPeerSelector {
     protected final RouterContext ctx;
+    protected final Log log;
+
+    private static final int NTCP_V4 = 0x01;
+    private static final int SSU_V4 = 0x02;
+    private static final int ANY_V4 = NTCP_V4 | SSU_V4;
+    private static final int NTCP_V6 = 0x04;
+    private static final int SSU_V6 = 0x08;
+    private static final int ANY_V6 = NTCP_V6 | SSU_V6;
+
 
     protected TunnelPeerSelector(RouterContext context) {
         ctx = context;
+        log = ctx.logManager().getLog(getClass());
     }
 
     /**
@@ -126,7 +141,6 @@ public abstract class TunnelPeerSelector {
         if (peers == null)
             peers = I2PAppContext.getGlobalContext().getProperty("explicitPeers");
         
-        Log log = ctx.logManager().getLog(ClientPeerSelector.class);
         List<Hash> rv = new ArrayList<Hash>();
         StringTokenizer tok = new StringTokenizer(peers, ",");
         while (tok.hasMoreTokens()) {
@@ -200,7 +214,7 @@ public abstract class TunnelPeerSelector {
         //
         // Defaults changed to true for inbound only in filterUnreachable below.
 
-        Set<Hash> peers = new HashSet<Hash>(1);
+        Set<Hash> peers = new HashSet<Hash>(8);
         peers.addAll(ctx.profileOrganizer().selectPeersRecentlyRejecting());
         peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
@@ -216,7 +230,6 @@ public abstract class TunnelPeerSelector {
         }
         if (filterSlow(isInbound, isExploratory)) {
             // NOTE: filterSlow always returns true
-            Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
             char excl[] = getExcludeCaps(ctx);
             if (excl != null) {
                 FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
@@ -224,7 +237,7 @@ public abstract class TunnelPeerSelector {
                 if (known != null) {
                     for (int i = 0; i < known.size(); i++) {
                         RouterInfo peer = known.get(i);
-                        boolean shouldExclude = shouldExclude(ctx, log, peer, excl);
+                        boolean shouldExclude = shouldExclude(peer, excl);
                         if (shouldExclude) {
                             peers.add(peer.getIdentity().calculateHash());
                             continue;
@@ -327,12 +340,91 @@ public abstract class TunnelPeerSelector {
         }
         return peers;
     }
+
+    /**
+     *  Are we IPv6 only?
+     *  @since 0.9.34
+     */
+    protected boolean isIPv6Only() {
+        // The setting is the same for both SSU and NTCP, so just take the SSU one
+        return TransportUtil.getIPv6Config(ctx, "SSU") == TransportUtil.IPv6Config.IPV6_ONLY;
+    }
+
+    /**
+     *  Is NTCP disabled?
+     *  @since 0.9.34
+     */
+    protected boolean isNTCPDisabled() {
+        return !TransportManager.isNTCPEnabled(ctx);
+    }
+
+    /**
+     *  Is SSU disabled?
+     *  @since 0.9.34
+     */
+    protected boolean isSSUDisabled() {
+        return !ctx.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP);
+    }
+
+    /**
+     *  Should we allow as OBEP?
+     *  This just checks for IPv4 support.
+     *  Will return false for IPv6-only.
+     *  This is intended for tunnel candidates, where we already have
+     *  the RI. Will not force RI lookups.
+     *  Default true.
+     *
+     *  @since 0.9.34
+     */
+    private boolean allowAsOBEP(Hash h) {
+        RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
+        if (ri == null)
+            return true;
+        return canConnect(ri, ANY_V4);
+    }
+
+    /**
+     *  Should we allow as IBGW?
+     *  This just checks for IPv4 support.
+     *  Will return false for hidden or IPv6-only.
+     *  This is intended for tunnel candidates, where we already have
+     *  the RI. Will not force RI lookups.
+     *  Default true.
+     *
+     *  @since 0.9.34
+     */
+    private boolean allowAsIBGW(Hash h) {
+        RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
+        if (ri == null)
+            return true;
+        return canConnect(ANY_V4, ri);
+    }
     
     /** 
      *  Pick peers that we want to avoid for the first OB hop or last IB hop.
-     *  This is only filled in if our router sig type is not DSA.
+     *  There's several cases of importance:
+     *  <ol><li>Inbound and we are hidden -
+     *      Exclude all unless connected.
+     *      This is taken care of in ClientPeerSelector and TunnelPeerSelector selectPeers(), not here.
      *
-     *  @param isInbound unused
+     *  <li>We are IPv6-only.
+     *      Exclude all v4-only peers, unless connected
+     *      This is taken care of here.
+     *
+     *  <li>We have NTCP or SSU disabled.
+     *      Exclude all incompatible peers, unless connected
+     *      This is taken care of here.
+     *
+     *  <li>Minimum version check, if we are some brand-new sig type,
+     *      or are using some new tunnel build method.
+     *      Not currently used, but this is where to implement the checks if needed.
+     *      Make sure that ClientPeerSelector and TunnelPeerSelector selectPeers() call this when needed.
+     *  </ol>
+     *
+     *  Don't call this unless you need to.
+     *  See ClientPeerSelector and TunnelPeerSelector selectPeers().
+     *
+     *  @param isInbound
      *  @return null if none
      *  @since 0.9.17
      */
@@ -340,21 +432,34 @@ public abstract class TunnelPeerSelector {
         RouterInfo ri = ctx.router().getRouterInfo();
         if (ri == null)
             return null;
-        SigType type = ri.getIdentity().getSigType();
-        if (type == SigType.DSA_SHA1)
-            return null;
-        Set<Hash> rv = new HashSet<Hash>(1024);
+
+        // we can skip this check now, uncomment if we have some new sigtype
+        //SigType type = ri.getIdentity().getSigType();
+        //if (type == SigType.DSA_SHA1)
+        //    return null;
+
+        int ourMask = isInbound ? getInboundMask(ri) : getOutboundMask(ri);
+        Set<Hash> connected = ctx.commSystem().getEstablished();
+        Set<Hash> rv = new HashSet<Hash>(256);
         FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
         List<RouterInfo> known = fac.getKnownRouterData();
         if (known != null) {
             for (int i = 0; i < known.size(); i++) {
                 RouterInfo peer = known.get(i);
-                String v = peer.getVersion();
+                // we can skip this check now, uncomment if we have some breaking change
+                //String v = peer.getVersion();
                 // RI sigtypes added in 0.9.16
                 // SSU inbound connection bug fixed in 0.9.17, but it won't bid, so NTCP only,
                 // no need to check
-                if (VersionComparator.comp(v, "0.9.16") < 0)
-                    rv.add(peer.getIdentity().calculateHash());
+                //if (VersionComparator.comp(v, "0.9.16") < 0)
+                //    rv.add(peer.getIdentity().calculateHash());
+
+                Hash h = peer.getIdentity().calculateHash();
+                if (connected.contains(h))
+                    continue;
+                boolean canConnect = isInbound ? canConnect(peer, ourMask) : canConnect(ourMask, peer);
+                if (!canConnect)
+                    rv.add(h);
             }
         }
         return rv;
@@ -362,8 +467,7 @@ public abstract class TunnelPeerSelector {
     
     /** warning, this is also called by ProfileOrganizer.isSelectable() */
     public static boolean shouldExclude(RouterContext ctx, RouterInfo peer) {
-        Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
-        return shouldExclude(ctx, log, peer, getExcludeCaps(ctx));
+        return shouldExclude(peer, getExcludeCaps(ctx));
     }
     
     private static char[] getExcludeCaps(RouterContext ctx) {
@@ -378,9 +482,9 @@ public abstract class TunnelPeerSelector {
     }
     
     /** 0.7.8 and earlier had major message corruption bugs */
-    private static final String MIN_VERSION = "0.7.9";
+    //private static final String MIN_VERSION = "0.7.9";
 
-    private static boolean shouldExclude(RouterContext ctx, Log log, RouterInfo peer, char excl[]) {
+    private static boolean shouldExclude(RouterInfo peer, char excl[]) {
         String cap = peer.getCapabilities();
         for (int j = 0; j < excl.length; j++) {
             if (cap.indexOf(excl[j]) >= 0) {
@@ -400,9 +504,10 @@ public abstract class TunnelPeerSelector {
         // so don't exclude it based on published capacity
 
         // minimum version check
-        String v = peer.getVersion();
-        if (VersionComparator.comp(v, MIN_VERSION) < 0)
-            return true;
+        // we can skip this check now
+        //String v = peer.getVersion();
+        //if (VersionComparator.comp(v, MIN_VERSION) < 0)
+        //    return true;
 
         // uptime is always spoofed to 90m, so just remove all this
       /******
@@ -582,5 +687,353 @@ public abstract class TunnelPeerSelector {
             BigInteger rr = HashDistance.getDistance(_hash, tmp);
             return ll.compareTo(rr);
         }
+    }
+
+    /**
+     *  Connectivity check.
+     *  Check that each hop can connect to the next, including us.
+     *  Check that the OBEP is not IPv6-only, and the IBGW is
+     *  not hidden or IPv6-only.
+     *  Tells the profile manager to blame the hop, and returns false on failure.
+     *
+     *  @param tunnel ENDPOINT FIRST, GATEWAY LAST!!!!, length 2 or greater
+     *  @return ok
+     *  @since 0.9.34
+     */
+    protected boolean checkTunnel(boolean isInbound, List<Hash> tunnel) {
+        if (!checkTunnel(tunnel))
+            return false;
+        if (isInbound) {
+            Hash h = tunnel.get(tunnel.size() - 1);
+            if (!allowAsIBGW(h)) {
+                if (log.shouldWarn())
+                    log.warn("Picked IPv6-only or hidden peer for IBGW: " + h);
+                // treat as a timeout in the profile
+                // tunnelRejected() would set the last heard from time
+                ctx.profileManager().tunnelTimedOut(h);
+                return false;
+            }
+        } else {
+            Hash h = tunnel.get(0);
+            if (!allowAsOBEP(h)) {
+                if (log.shouldWarn())
+                    log.warn("Picked IPv6-only peer for OBEP: " + h);
+                // treat as a timeout in the profile
+                // tunnelRejected() would set the last heard from time
+                ctx.profileManager().tunnelTimedOut(h);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     *  Connectivity check.
+     *  Check that each hop can connect to the next, including us.
+     *
+     *  @param tunnel ENDPOINT FIRST, GATEWAY LAST!!!!
+     *  @return ok
+     *  @since 0.9.34
+     */
+    private boolean checkTunnel(List<Hash> tunnel) {
+        boolean rv = true;
+        for (int i = 0; i < tunnel.size() - 1; i++) {
+            // order is backwards!
+            Hash hf = tunnel.get(i+1);
+            Hash ht = tunnel.get(i);
+            if (!canConnect(hf, ht)) {
+                if (log.shouldWarn())
+                    log.warn("Connect check fail hop " + (i+1) + " to " + i +
+                             " in tunnel (EP<-GW): " + DataHelper.toString(tunnel));
+                // Blame them both
+                // treat as a timeout in the profile
+                // tunnelRejected() would set the last heard from time
+                Hash us = ctx.routerHash();
+                if (!hf.equals(us))
+                    ctx.profileManager().tunnelTimedOut(hf);
+                if (!ht.equals(us))
+                    ctx.profileManager().tunnelTimedOut(ht);
+                rv = false;
+                break;
+            }
+        }
+        return rv;
+    }
+
+    /**
+     *  Can "from" connect to "to" based on published addresses?
+     *
+     *  This is intended for tunnel candidates, where we already have
+     *  the RI. Will not force RI lookups.
+     *  Either from or to may be us.
+     *
+     *  This is best effort, as we can't know for sure.
+     *  Published addresses or introducers may have changed.
+     *  Even if a can't connect to b, they may already be connected
+     *  as b connected to a.
+     *
+     *  @return true if we don't have either RI
+     *  @since 0.9.34
+     */
+    private boolean canConnect(Hash from, Hash to) {
+        Hash us = ctx.routerHash();
+        if (us == null)
+            return true;
+        boolean usf = from.equals(us);
+        if (usf && ctx.commSystem().isEstablished(to))
+            return true;
+        boolean ust = to.equals(us);
+        if (ust && ctx.commSystem().isEstablished(from))
+            return true;
+        RouterInfo rt = ctx.netDb().lookupRouterInfoLocally(to);
+        if (rt == null)
+            return true;
+        RouterInfo rf = ctx.netDb().lookupRouterInfoLocally(from);
+        if (rf == null)
+            return true;
+        int ct;
+        if (ust) {
+            // to us
+            ct = getInboundMask(rt);
+        } else {
+            Collection<RouterAddress> at = rt.getAddresses();
+            // assume nothing if hidden
+            if (at.isEmpty())
+                return false;
+            ct = getConnectMask(at);
+        }
+
+        int cf;
+        if (usf) {
+            // from us
+            cf = getOutboundMask(rf);
+        } else {
+            Collection<RouterAddress> a = rf.getAddresses();
+            if (a.isEmpty()) {
+                // assume IPv4 if hidden
+                cf = NTCP_V4 | SSU_V4;
+            } else {
+                cf = getConnectMask(a);
+            }
+        }
+
+        boolean rv = (ct & cf) != 0;
+        if (!rv && log.shouldWarn()) {
+            log.warn("Cannot connect: " +
+                     (usf ? "us" : from.toString()) + " with mask " + cf + "\nto " +
+                     (ust ? "us" : to.toString()) + " with mask " + ct);
+        }
+        return rv;
+    }
+
+    /**
+     *  Can we connect to "to" based on published addresses?
+     *
+     *  This is intended for tunnel candidates, where we already have
+     *  the RI. Will not force RI lookups.
+     *
+     *  This is best effort, as we can't know for sure.
+     *  Does not check isEstablished(); do that first.
+     *
+     *  @since 0.9.34
+     */
+    private boolean canConnect(int ourMask, RouterInfo to) {
+        Collection<RouterAddress> ra = to.getAddresses();
+        // assume nothing if hidden
+        if (ra.isEmpty())
+            return false;
+        int ct = getConnectMask(ra);
+        boolean rv = (ourMask & ct) != 0;
+        //if (!rv && log.shouldWarn())
+        //    log.warn("Cannot connect: us with mask " + ourMask + " to " + to + " with mask " + ct);
+        return rv;
+    }
+
+    /**
+     *  Can "from" connect to us based on published addresses?
+     *
+     *  This is intended for tunnel candidates, where we already have
+     *  the RI. Will not force RI lookups.
+     *
+     *  This is best effort, as we can't know for sure.
+     *  Does not check isEstablished(); do that first.
+     *
+     *  @since 0.9.34
+     */
+    private boolean canConnect(RouterInfo from, int ourMask) {
+        if (ourMask == 0)
+            return false;
+        Collection<RouterAddress> ra = from.getAddresses();
+        int cf;
+        // assume v4 if hidden
+        if (ra.isEmpty())
+            cf = NTCP_V4 | SSU_V4;
+        else
+            cf = getConnectMask(ra);
+        boolean rv = (cf & ourMask) != 0;
+        //if (!rv && log.shouldWarn())
+        //    log.warn("Cannot connect: " + from + " with mask " + cf + " to us with mask " + ourMask);
+        return rv;
+    }
+
+    /**
+     *  Our inbound mask.
+     *  For most cases, we use what we published, i.e. getConnectMask()
+     *
+     *  @return bitmask for accepting connections
+     *  @since 0.9.34
+     */
+    private int getInboundMask(RouterInfo us) {
+        // to us
+        int ct = 0;
+        Status status = ctx.commSystem().getStatus();
+        switch (status) {
+            case OK:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_SNAT_IPV6_OK:
+            case IPV4_SNAT_IPV6_UNKNOWN:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case IPV4_OK_IPV6_FIREWALLED:
+            case DIFFERENT:
+            case REJECT_UNSOLICITED:
+                // use what we published
+                Collection<RouterAddress> at = us.getAddresses();
+                if (at.isEmpty())
+                    return 0;
+                ct = getConnectMask(at);
+                break;
+
+            case IPV4_DISABLED_IPV6_OK:
+            case IPV4_DISABLED_IPV6_UNKNOWN:
+            // maybe should return zero for this one?
+            case IPV4_DISABLED_IPV6_FIREWALLED:
+                // TODO look at force-firewalled settings per-transport
+                if (!isNTCPDisabled())
+                    ct |= NTCP_V6;
+                if (!isSSUDisabled())
+                    ct |= SSU_V6;
+                break;
+
+            case IPV4_OK_IPV6_UNKNOWN:
+            case DISCONNECTED:
+            case HOSED:
+            case UNKNOWN:
+            default:
+                if (!isNTCPDisabled())
+                    ct |= NTCP_V4;
+                if (!isSSUDisabled())
+                    ct |= SSU_V4;
+                break;
+        }
+        return ct;
+    }
+
+    /**
+     *  Our outbound mask.
+     *  For most cases, we use our comm system status.
+     *
+     *  @return bitmask for initiating connections
+     *  @since 0.9.34
+     */
+    private int getOutboundMask(RouterInfo us) {
+        // from us
+        int cf = 0;
+        Status status = ctx.commSystem().getStatus();
+        switch (status) {
+            case OK:
+                // use what we published, as the OK state doesn't tell us about IPv6
+                // Addresses.isConnectedIPv6() is too slow
+                Collection<RouterAddress> a = us.getAddresses();
+                if (a.isEmpty()) {
+                    // we are hidden
+                    // TODO ipv6
+                    if (!isNTCPDisabled())
+                        cf |= NTCP_V4;
+                    if (!isSSUDisabled())
+                        cf |= SSU_V4;
+                } else {
+                    cf = getConnectMask(a);
+                }
+                break;
+
+            case IPV4_OK_IPV6_FIREWALLED:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_SNAT_IPV6_OK:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                if (!isNTCPDisabled())
+                    cf |= NTCP_V4 | NTCP_V6;
+                if (!isSSUDisabled())
+                    cf |= SSU_V4 | SSU_V6;
+                break;
+
+            case IPV4_DISABLED_IPV6_OK:
+            case IPV4_DISABLED_IPV6_UNKNOWN:
+            case IPV4_DISABLED_IPV6_FIREWALLED:
+                if (!isNTCPDisabled())
+                    cf |= NTCP_V6;
+                if (!isSSUDisabled())
+                    cf |= SSU_V6;
+                break;
+
+            case DIFFERENT:
+            case IPV4_SNAT_IPV6_UNKNOWN:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case REJECT_UNSOLICITED:
+            case IPV4_OK_IPV6_UNKNOWN:
+            case DISCONNECTED:
+            case HOSED:
+            case UNKNOWN:
+            default:
+                if (!isNTCPDisabled())
+                    cf |= NTCP_V4;
+                if (!isSSUDisabled())
+                    cf |= SSU_V4;
+                break;
+        }
+        return cf;
+    }
+
+    /** prevent object churn */
+    private static final String IHOST[] = { "ihost0", "ihost1", "ihost2" };
+
+    /**
+     *  @param addrs non-empty, set your own default if empty
+     *  @return bitmask of v4/v6 NTCP/SSU
+     *  @since 0.9.34
+     */
+    private static int getConnectMask(Collection<RouterAddress> addrs) {
+        int rv = 0;
+        for (RouterAddress ra : addrs) {
+            String style = ra.getTransportStyle();
+            String host = ra.getHost();
+            if ("NTCP".equals(style)) {
+                if (host != null) {
+                    if (host.contains(":"))
+                        rv |= NTCP_V6;
+                    else
+                        rv |= NTCP_V4;
+                }
+            } else if ("SSU".equals(style)) {
+                if (host == null) {
+                    for (int i = 0; i < 2; i++) {
+                        String ihost = ra.getOption(IHOST[i]);
+                        if (ihost == null)
+                            break;
+                        if (ihost.contains(":"))
+                            rv |= SSU_V6;
+                        else
+                            rv |= SSU_V4;
+                    }
+                } else if (host.contains(":")) {
+                    rv |= SSU_V6;
+                } else {
+                    rv |= SSU_V4;
+                }
+            }
+        }
+        return rv;
     }
 }

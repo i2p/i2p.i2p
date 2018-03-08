@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
@@ -21,6 +22,17 @@ class ClientPeerSelector extends TunnelPeerSelector {
         super(context);
     }
 
+    /**
+     * Returns ENDPOINT FIRST, GATEWAY LAST!!!!
+     * In: us .. closest .. middle .. IBGW
+     * Out: OBGW .. middle .. closest .. us
+     * 
+     * @return ordered list of Hash objects (one per peer) specifying what order
+     *         they should appear in a tunnel (ENDPOINT FIRST).  This includes
+     *         the local router in the list.  If there are no tunnels or peers
+     *         to build through, and the settings reject 0 hop tunnels, this will
+     *         return null.
+     */
     public List<Hash> selectPeers(TunnelPoolSettings settings) {
         int length = getLength(settings);
         if (length < 0)
@@ -29,19 +41,36 @@ class ClientPeerSelector extends TunnelPeerSelector {
             return null;
 
         List<Hash> rv;
+        boolean isInbound = settings.isInbound();
     
         if (length > 0) {
+            // special cases
+            boolean v6Only = isIPv6Only();
+            boolean ntcpDisabled = isNTCPDisabled();
+            boolean ssuDisabled = isSSUDisabled();
+            boolean checkClosestHop = v6Only || ntcpDisabled || ssuDisabled;
+            boolean hidden = ctx.router().isHidden() ||
+                             ctx.router().getRouterInfo().getAddressCount() <= 0;
+            boolean hiddenInbound = hidden && isInbound;
+
             if (shouldSelectExplicit(settings))
                 return selectExplicit(settings, length);
         
-            Set<Hash> exclude = getExclude(settings.isInbound(), false);
+            Set<Hash> exclude = getExclude(isInbound, false);
             Set<Hash> matches = new HashSet<Hash>(length);
             if (length == 1) {
                 // closest-hop restrictions
-                Set<Hash> moreExclude = getClosestHopExclude(settings.isInbound());
-                if (moreExclude != null)
-                    exclude.addAll(moreExclude);
-                ctx.profileOrganizer().selectFastPeers(length, exclude, matches, 0);
+                if (checkClosestHop) {
+                    Set<Hash> moreExclude = getClosestHopExclude(isInbound);
+                    if (moreExclude != null)
+                        exclude.addAll(moreExclude);
+                }
+                if (hiddenInbound)
+                    ctx.profileOrganizer().selectActiveNotFailingPeers(1, exclude, matches);
+                if (matches.isEmpty()) {
+                    // ANFP does not fall back to non-connected
+                    ctx.profileOrganizer().selectFastPeers(length, exclude, matches, 0);
+                }
                 matches.remove(ctx.routerHash());
                 rv = new ArrayList<Hash>(matches);
             } else {
@@ -52,21 +81,33 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 // OBEP or IB last hop
                 // group 0 or 1 if two hops, otherwise group 0
                 Set<Hash> firstHopExclude;
-                if (!settings.isInbound()) {
+                if (isInbound) {
                     // exclude existing OBEPs to get some diversity ?
-
                     // closest-hop restrictions
-                    Set<Hash> moreExclude = getClosestHopExclude(false);
-                    if (moreExclude != null) {
-                        moreExclude.addAll(exclude);
-                        firstHopExclude = moreExclude;
+                    if (checkClosestHop) {
+                        Set<Hash> moreExclude = getClosestHopExclude(false);
+                        if (moreExclude != null) {
+                            moreExclude.addAll(exclude);
+                            firstHopExclude = moreExclude;
+                        } else {
+                            firstHopExclude = exclude;
+                        }
                     } else {
-                        firstHopExclude = exclude;
+                         firstHopExclude = exclude;
                     }
                 } else {
                     firstHopExclude = exclude;
                 }
-                ctx.profileOrganizer().selectFastPeers(1, firstHopExclude, matches, settings.getRandomKey(), length == 2 ? SLICE_0_1 : SLICE_0);
+                if (hiddenInbound) {
+                    ctx.profileOrganizer().selectActiveNotFailingPeers(1, exclude, matches);
+                    if (matches.isEmpty()) {
+                        // ANFP does not fall back to non-connected
+                        ctx.profileOrganizer().selectFastPeers(1, firstHopExclude, matches, settings.getRandomKey(), length == 2 ? SLICE_0_1 : SLICE_0);
+                    }
+                } else {
+                    // TODO exclude IPv6-only at OBEP? Caught in checkTunnel() below
+                    ctx.profileOrganizer().selectFastPeers(1, firstHopExclude, matches, settings.getRandomKey(), length == 2 ? SLICE_0_1 : SLICE_0);
+                }
                 matches.remove(ctx.routerHash());
                 exclude.addAll(matches);
                 rv.addAll(matches);
@@ -89,14 +130,16 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 }
                 // IBGW or OB first hop
                 // group 2 or 3 if two hops, otherwise group 1
-                if (settings.isInbound()) {
+                if (!isInbound) {
                     // exclude existing IBGWs to get some diversity ?
-
                     // closest-hop restrictions
-                    Set<Hash> moreExclude = getClosestHopExclude(true);
-                    if (moreExclude != null)
-                        exclude.addAll(moreExclude);
+                    if (checkClosestHop) {
+                        Set<Hash> moreExclude = getClosestHopExclude(true);
+                        if (moreExclude != null)
+                            exclude.addAll(moreExclude);
+                    }
                 }
+                // TODO exclude IPv6-only at IBGW? Caught in checkTunnel() below
                 ctx.profileOrganizer().selectFastPeers(1, exclude, matches, settings.getRandomKey(), length == 2 ? SLICE_2_3 : SLICE_1);
                 matches.remove(ctx.routerHash());
                 rv.addAll(matches);
@@ -105,10 +148,18 @@ class ClientPeerSelector extends TunnelPeerSelector {
             rv = new ArrayList<Hash>(1);
         }
         
-        if (settings.isInbound())
+        //if (length != rv.size() && log.shouldWarn())
+        //    log.warn("CPS requested " + length + " got " + rv.size() + ": " + DataHelper.toString(rv));
+        //else if (log.shouldDebug())
+        //    log.debug("EPS result: " + DataHelper.toString(rv));
+        if (isInbound)
             rv.add(0, ctx.routerHash());
         else
             rv.add(ctx.routerHash());
+        if (rv.size() > 1) {
+            if (!checkTunnel(isInbound, rv))
+                rv = null;
+        }
         return rv;
     }
 }
