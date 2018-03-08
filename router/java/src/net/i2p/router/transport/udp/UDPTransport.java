@@ -1581,8 +1581,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private boolean locked_needsRebuild() {
         if (_needsRebuild) return true; // simple enough
         if (_context.router().isHidden()) return false;
-        RouterAddress addr = getCurrentAddress(false);
-        if (introducersRequired()) {
+        boolean v6Only = getIPv6Config() == IPV6_ONLY;
+        RouterAddress addr = getCurrentAddress(v6Only);
+        if (!v6Only && introducersRequired()) {
             UDPAddress ua = new UDPAddress(addr);
             long now = _context.clock().now();
             int valid = 0;
@@ -2139,7 +2140,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         } else {
             if (!introducersRequired()) {
-                RouterAddress cur = getCurrentExternalAddress(false);
+                boolean v6Only = getIPv6Config() == IPV6_ONLY;
+                RouterAddress cur = getCurrentExternalAddress(v6Only);
                 if (cur != null)
                     host = cur.getHost();
             }

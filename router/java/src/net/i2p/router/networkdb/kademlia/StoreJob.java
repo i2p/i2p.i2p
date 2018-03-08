@@ -29,6 +29,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.tunnel.pool.ConnectChecker;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -46,6 +47,8 @@ class StoreJob extends JobImpl {
     private final long _timeoutMs;
     private final long _expiration;
     private final PeerSelector _peerSelector;
+    private final ConnectChecker _connectChecker;
+    private final int _connectMask;
 
     private final static int PARALLELIZATION = 4; // how many sent at a time
     private final static int REDUNDANCY = 4; // we want the data sent to 6 peers
@@ -75,6 +78,17 @@ class StoreJob extends JobImpl {
         _timeoutMs = timeoutMs;
         _expiration = context.clock().now() + timeoutMs;
         _peerSelector = facade.getPeerSelector();
+        if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+            _connectChecker = null;
+            _connectMask = 0;
+        } else {
+            _connectChecker = new ConnectChecker(context);
+            RouterInfo us = context.router().getRouterInfo();
+            if (us != null)
+                _connectMask = _connectChecker.getOutboundMask(us);
+            else
+                _connectMask = ConnectChecker.ANY_V4;
+        }
     }
 
     public String getName() { return "Kademlia NetDb Store";}
@@ -333,7 +347,11 @@ class StoreJob extends JobImpl {
                 sendStoreThroughClient(msg, peer, expiration);
         } else {
             getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1);
-            sendDirect(msg, peer, expiration);
+            // if we can't connect to peer directly, just send it out an exploratory tunnel
+            if (_connectChecker.canConnect(_connectMask, peer))
+                sendDirect(msg, peer, expiration);
+            else
+                sendStoreThroughGarlic(msg, peer, expiration);
         }
     }
 
@@ -347,9 +365,6 @@ class StoreJob extends JobImpl {
         msg.setReplyToken(token);
         msg.setReplyGateway(getContext().routerHash());
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
-        
         _state.addPending(peer.getIdentity().getHash());
         
         SendSuccessJob onReply = new SendSuccessJob(getContext(), peer);
@@ -357,7 +372,7 @@ class StoreJob extends JobImpl {
         StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("sending store directly to " + peer.getIdentity().getHash());
+            _log.debug(getJobId() + ": sending store directly to " + peer.getIdentity().getHash());
         OutNetMessage m = new OutNetMessage(getContext(), msg, expiration, STORE_PRIORITY, peer);
         m.setOnFailedReplyJob(onFail);
         m.setOnFailedSendJob(onFail);
@@ -388,7 +403,7 @@ class StoreJob extends JobImpl {
         msg.setReplyGateway(replyTunnel.getPeer(0));
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
+            _log.debug(getJobId() + ": send store thru expl. tunnel to " + peer.getIdentity().getHash() + "  w/ token expected " + token);
         
         _state.addPending(to);
         
@@ -618,8 +633,8 @@ class StoreJob extends JobImpl {
             getContext().statManager().addRateData("netDb.ackTime", howLong, howLong);
 
             if ( (_sendThrough != null) && (_msgSize > 0) ) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("sent a " + _msgSize + " byte netDb message through tunnel " + _sendThrough + " after " + howLong);
+                if (_log.shouldDebug())
+                    _log.debug("sent a " + _msgSize + " byte netDb message through tunnel " + _sendThrough + " after " + howLong);
                 for (int i = 0; i < _sendThrough.getLength(); i++)
                     getContext().profileManager().tunnelDataPushed(_sendThrough.getPeer(i), howLong, _msgSize);
                 _sendThrough.incrementVerifiedBytesTransferred(_msgSize);
