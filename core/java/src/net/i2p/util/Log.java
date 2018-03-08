@@ -45,14 +45,14 @@ public class Log {
     public final static String STR_CRIT = "CRIT";
 
     public static int getLevel(String level) {
-        if (level == null) return Log.CRIT;
+        if (level == null) return ERROR;
         level = level.toUpperCase(Locale.US);
         if (STR_DEBUG.startsWith(level)) return DEBUG;
         if (STR_INFO.startsWith(level)) return INFO;
         if (STR_WARN.startsWith(level)) return WARN;
         if (STR_ERROR.startsWith(level)) return ERROR;
         if (STR_CRIT.startsWith(level)) return CRIT;
-        return CRIT;
+        return ERROR;
     }
 
     public static String toLevelString(int level) {
