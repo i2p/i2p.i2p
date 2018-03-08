@@ -568,7 +568,7 @@ public final class SelfSignedGenerator {
         else
             altNames.remove("0:0:0:0:0:0:0:1");  // We don't want dup of "::1"
         altNames.add(cname);
-        final boolean isCA = !cname.contains("@");
+        final boolean isCA = !cname.contains("@") && !cname.endsWith(".family.i2p.net");
         if (isCA) {
             altNames.add("localhost");
             altNames.add("127.0.0.1");
