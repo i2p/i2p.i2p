@@ -368,15 +368,19 @@ public class RouterConsoleRunner implements RouterApp {
      *<pre>
      *	Server
      *		HandlerCollection
-     *			HostCheckHandler
+     *			HostCheckHandler (extends GzipHandler)
      *				ContextHandlerCollection
-     *					WebAppContext (i.e. ContextHandler)
+     *					LocaleWebAppHandler (routerconsole)
      *						SessionHandler
      *						SecurityHandler
      *						ServletHandler
      *							servlets...
-     *					WebAppContext
-     *					...
+     *					WebAppContext (i2psnark)
+     *					WebAppContext (i2ptunnel)
+     *					WebAppContext (imagegen)
+     *					WebAppContext (susidns)
+     *					WebAppContext (susimail)
+     *					WebAppContext (for each plugin with a .war)
      *			DefaultHandler
      *			RequestLogHandler (opt)
      *</pre>

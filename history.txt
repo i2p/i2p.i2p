@@ -1,3 +1,6 @@
+2018-03-09 zzz
+ * Console: Enable compression (ticket #2157)
+
 2018-03-08 zzz
  * Crypto: Generate non-CA cert for family
  * Router:
@@ -6,6 +9,9 @@
    - Don't select IPv6-only routers for IBGW or OBEP
    - Don't try to build tunnel if adjacent peers aren't compatible
    - Remove ancient version check in peer selectors
+   - Check for transport compatibility before direct store of RI;
+     send through tunnel if incompatible
+   - Fix repeated store of RI when IPv6-only
 
 2018-03-07 zzz
  * Router:

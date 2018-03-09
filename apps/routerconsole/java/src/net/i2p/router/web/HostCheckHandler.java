@@ -15,7 +15,7 @@ import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.HandlerWrapper;
+import org.eclipse.jetty.servlets.gzip.GzipHandler;
 
 /**
  * Block certain Host headers to prevent DNS rebinding attacks.
@@ -26,12 +26,13 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
  *
  * @since 0.9.32
  */
-public class HostCheckHandler extends HandlerWrapper
+public class HostCheckHandler extends GzipHandler
 {
     private final I2PAppContext _context;
     private final PortMapper _portMapper;
     private final Set<String> _listenHosts;
     private static final String PROP_REDIRECT = "routerconsole.redirectToHTTPS";
+    private static final String PROP_GZIP = "routerconsole.enableCompression";
 
     /**
      *  MUST call setListenHosts() afterwards.
@@ -41,6 +42,11 @@ public class HostCheckHandler extends HandlerWrapper
         _context = ctx;
         _portMapper = ctx.portMapper();
         _listenHosts = new HashSet<String>(8);
+        setMinGzipSize(64*1024);
+        if (!_context.getBooleanPropertyDefaultTrue(PROP_GZIP)) {
+            addIncludedMimeTypes("application/x-javascript", "application/xhtml+xml", "application/xml",
+                                 "image/svg+xml", "text/css", "text/html", "text/plain");
+        }
     }
     
     /**
