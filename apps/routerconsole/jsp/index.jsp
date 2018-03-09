@@ -1,6 +1,12 @@
-<%@page contentType="text/plain"%>
-<%@page pageEncoding="UTF-8"%>
 <%
+/*
+ * USE CAUTION WHEN EDITING
+ * Trailing whitespace OR NEWLINE on the last line will cause
+ * IllegalStateExceptions !!!
+ *
+ * Do not tag this file for translation.
+ */
+
     //
     //  Redirect to either /home or /console, depending on configuration,
     //  while preserving any query parameters
@@ -24,4 +30,6 @@
     if (query != null)
         buf.append('?').append(query);
     response.setHeader("Location", buf.toString());
+    // force commitment
+    response.getOutputStream().close();
 %>

@@ -10,6 +10,9 @@
     if (!testIFrame || !embedApp) {
         response.setStatus(307);
         response.setHeader("Location", "/susimail/susimail");
+        // force commitment
+        response.getOutputStream().close();
+        return;
     } else {
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">

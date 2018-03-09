@@ -1370,7 +1370,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append(p.replace("&amp;", "&"));  // no you don't html escape the redirect header
         resp.setHeader("Location", buf.toString());
         resp.setStatus(303);
-        resp.flushBuffer();
+        resp.getOutputStream().close();
     }
 
     /** @since 0.9 */

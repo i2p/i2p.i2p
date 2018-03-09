@@ -183,6 +183,6 @@ public class HostCheckHandler extends GzipHandler
         // https://w3c.github.io/webappsec-upgrade-insecure-requests/
         httpResponse.setHeader("Vary", "Upgrade-Insecure-Requests");
         httpResponse.setStatus(307);
-        httpResponse.flushBuffer();
+        httpResponse.getOutputStream().close();
     }
 }

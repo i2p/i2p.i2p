@@ -290,7 +290,7 @@ class BasicServlet extends HttpServlet
                             return true;
                         }
                         response.setStatus(304);
-                        response.flushBuffer();
+                        response.getOutputStream().close();
                         return false;
                     }
                 }

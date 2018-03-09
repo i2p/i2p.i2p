@@ -9,6 +9,9 @@
     if (!testIFrame) {
         response.setStatus(307);
         response.setHeader("Location", "/susidns/index");
+        // force commitment
+        response.getOutputStream().close();
+        return;
     } else {
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">

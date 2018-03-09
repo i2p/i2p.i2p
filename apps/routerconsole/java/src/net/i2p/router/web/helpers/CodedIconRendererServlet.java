@@ -65,7 +65,7 @@ public class CodedIconRendererServlet extends HttpServlet {
                  }
              } else {
                  srs.setStatus(304);
-                 srs.flushBuffer();
+                 srs.getOutputStream().close();
              }
          } else {
              //Binary data is not present but must be substituted by file on disk

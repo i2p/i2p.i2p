@@ -24,6 +24,8 @@
         // probably because restart or shutdown was clicked
         response.setStatus(307);
         response.setHeader("Location", "/graphs");
+        // force commitment
+        response.getOutputStream().close();
         return;
     }
 %>
