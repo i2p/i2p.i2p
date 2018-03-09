@@ -12,9 +12,13 @@ response.setHeader("Accept-Ranges", "none");
 response.setDateHeader("Expires", 0);
 response.addHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
 response.addHeader("Pragma", "no-cache");
-String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
+java.io.File base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir();
+java.io.File file = new java.io.File(base, "history.txt");
+long length = file.length();
+if (length > 0)
+    response.setHeader("Content-Length", Long.toString(length));
 try {
-    net.i2p.util.FileUtil.readFile("history.txt", base, response.getOutputStream());
+    net.i2p.util.FileUtil.readFile("history.txt", base.getAbsolutePath(), response.getOutputStream());
 } catch (java.io.IOException ioe) {
     // prevent 'Committed' IllegalStateException from Jetty
     if (!response.isCommitted()) {
