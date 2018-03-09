@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -758,6 +759,21 @@ public class Router implements RouterClock.ClockShiftListener {
         /** all done */
         STOPPED
     }
+
+    /**
+     *  For efficiency. EnumSets are bitmasks.
+     *  @since 0.9.34
+     */
+    private static final Set<State> STATES_ALIVE =
+        EnumSet.of(State.RUNNING, State.GRACEFUL_SHUTDOWN, State.STARTING_1, State.STARTING_2,
+                   State.STARTING_3, State.NETDB_READY, State.EXPL_TUNNELS_READY);
+
+    private static final Set<State> STATES_GRACEFUL =
+        EnumSet.of(State.GRACEFUL_SHUTDOWN, State.FINAL_SHUTDOWN_1, State.FINAL_SHUTDOWN_2,
+                   State.FINAL_SHUTDOWN_3, State.STOPPED);
+
+    private static final Set<State> STATES_FINAL =
+        EnumSet.of(State.FINAL_SHUTDOWN_1, State.FINAL_SHUTDOWN_2, State.FINAL_SHUTDOWN_3, State.STOPPED);
     
     /**
      *  @since 0.9.18
@@ -780,13 +796,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public boolean isAlive() {
         synchronized(_stateLock) {
-            return _state == State.RUNNING ||
-                   _state == State.GRACEFUL_SHUTDOWN ||
-                   _state == State.STARTING_1 ||
-                   _state == State.STARTING_2 ||
-                   _state == State.STARTING_3 ||
-                   _state == State.NETDB_READY ||
-                   _state == State.EXPL_TUNNELS_READY;
+            return STATES_ALIVE.contains(_state);
         }
     }
 
@@ -833,11 +843,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public boolean gracefulShutdownInProgress() {
         synchronized(_stateLock) {
-            return _state == State.GRACEFUL_SHUTDOWN ||
-                   _state == State.FINAL_SHUTDOWN_1 ||
-                   _state == State.FINAL_SHUTDOWN_2 ||
-                   _state == State.FINAL_SHUTDOWN_3 ||
-                   _state == State.STOPPED;
+            return STATES_GRACEFUL.contains(_state);
         }
     }
 
@@ -847,10 +853,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public boolean isFinalShutdownInProgress() {
         synchronized(_stateLock) {
-            return _state == State.FINAL_SHUTDOWN_1 ||
-                   _state == State.FINAL_SHUTDOWN_2 ||
-                   _state == State.FINAL_SHUTDOWN_3 ||
-                   _state == State.STOPPED;
+            return STATES_FINAL.contains(_state);
         }
     }
 
