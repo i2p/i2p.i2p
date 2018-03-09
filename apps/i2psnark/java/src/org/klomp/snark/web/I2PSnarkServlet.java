@@ -404,6 +404,7 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("X-XSS-Protection", "1; mode=block");
         resp.setHeader("X-Content-Type-Options", "nosniff");
         resp.setHeader("Referrer-Policy", "no-referrer");
+        resp.setHeader("Accept-Ranges", "none");
     }
 
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {

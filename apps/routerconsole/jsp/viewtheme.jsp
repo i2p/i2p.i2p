@@ -21,6 +21,7 @@ if (uri.endsWith(".css")) {
 } else if (uri.endsWith(".svg")) {
   response.setContentType("image/svg+xml");
 }
+response.setHeader("Accept-Ranges", "none");
 response.setHeader("X-Content-Type-Options", "nosniff");
 /*
  * User or plugin themes

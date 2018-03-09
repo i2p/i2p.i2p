@@ -1911,6 +1911,7 @@ public class WebMail extends HttpServlet
                 response.setHeader("X-XSS-Protection", "1; mode=block");
 		response.setHeader("X-Content-Type-Options", "nosniff");
 		response.setHeader("Referrer-Policy", "no-referrer");
+		response.setHeader("Accept-Ranges", "none");
 		RequestWrapper request = new RequestWrapper( httpRequest );
 		
 		SessionObject sessionObject = null;

@@ -43,6 +43,7 @@ public class CodedIconRendererServlet extends HttpServlet {
          
          srs.setContentType("image/png");
          srs.setHeader("X-Content-Type-Options", "nosniff");
+         srs.setHeader("Accept-Ranges", "none");
          srs.setDateHeader("Expires", I2PAppContext.getGlobalContext().clock().now() + 86400000l);
          srs.setHeader("Cache-Control", "public, max-age=86400");
          OutputStream os = srs.getOutputStream();

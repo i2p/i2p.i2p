@@ -24,6 +24,7 @@
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
     response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("Accept-Ranges", "none");
 %>
 <%@page pageEncoding="UTF-8"%>
 <%@page trimDirectiveWhitespaces="true"%>

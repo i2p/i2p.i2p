@@ -29,6 +29,8 @@
 <jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <link rel="icon" href="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/favicon.ico">
 <%
+   response.setHeader("Accept-Ranges", "none");
+
    // clickjacking
    if (intl.shouldSendXFrame()) {
       response.setHeader("X-Frame-Options", "SAMEORIGIN");

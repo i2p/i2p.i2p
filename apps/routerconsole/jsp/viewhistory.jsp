@@ -8,6 +8,7 @@
  */
 response.setContentType("text/plain");
 response.setHeader("X-Content-Type-Options", "nosniff");
+response.setHeader("Accept-Ranges", "none");
 response.setDateHeader("Expires", 0);
 response.addHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
 response.addHeader("Pragma", "no-cache");

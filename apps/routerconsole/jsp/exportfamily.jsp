@@ -17,6 +17,7 @@ try {
     }
     try {
         response.setDateHeader("Expires", 0);
+        response.setHeader("Accept-Ranges", "none");
         response.addHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
         response.addHeader("Pragma", "no-cache");
         String name = "family-" + family + "-secret.crt";

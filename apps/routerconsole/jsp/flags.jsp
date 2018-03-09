@@ -44,6 +44,7 @@ if (c != null &&
     if (length > 0)
         response.setHeader("Content-Length", Long.toString(length));
     response.setContentType("image/png");
+    response.setHeader("Accept-Ranges", "none");
     try {
         net.i2p.util.FileUtil.readFile(file, base, cout);
     } catch (java.io.IOException ioe) {

@@ -29,6 +29,7 @@
     response.setHeader("X-XSS-Protection", "1; mode=block");
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
+    response.setHeader("Accept-Ranges", "none");
 
 %>
 <%@page pageEncoding="UTF-8"%>

@@ -384,12 +384,14 @@ class BasicServlet extends HttpServlet
         if (lml > 0)
             response.setDateHeader("Last-Modified",lml);
 
-        if (count != -1)
-        {
-            if (count<Integer.MAX_VALUE)
+        if (count != -1) {
+            if (count <= Integer.MAX_VALUE)
                 response.setContentLength((int)count);
             else 
                 response.setHeader("Content-Length", Long.toString(count));
+            response.setHeader("Accept-Ranges", "bytes");
+        } else {
+            response.setHeader("Accept-Ranges", "none");
         }
 
         long ct = content.getCacheTime();
