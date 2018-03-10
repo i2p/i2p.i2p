@@ -96,6 +96,9 @@ public class LocaleWebAppHandler extends HandlerWrapper
                     }
                 }
             }
+        } else if (pathInContext.startsWith("/js/")) {
+            // war internal
+            httpResponse.setCharacterEncoding("ISO-8859-1");
         }
         //System.err.println("New path: " + newPath);
         super.handle(newPath, baseRequest, httpRequest, httpResponse);

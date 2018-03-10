@@ -43,9 +43,18 @@ public class HostCheckHandler extends GzipHandler
         _portMapper = ctx.portMapper();
         _listenHosts = new HashSet<String>(8);
         setMinGzipSize(64*1024);
-        if (!_context.getBooleanPropertyDefaultTrue(PROP_GZIP)) {
-            addIncludedMimeTypes("application/x-javascript", "application/xhtml+xml", "application/xml",
-                                 "image/svg+xml", "text/css", "text/html", "text/plain");
+        if (_context.getBooleanPropertyDefaultTrue(PROP_GZIP)) {
+            addIncludedMimeTypes(
+                                 // our js is very small
+                                 //"application/javascript", "application/x-javascript",
+                                 "application/xhtml+xml", "application/xml",
+                                 "image/svg+xml", "text/css", "text/html", "text/plain"
+                                );
+        } else {
+            // poorly documented, but we must put something in,
+            // if empty all are matched,
+            // see IncludeExcludeSet
+            addIncludedMimeTypes("xyzzy");
         }
     }
     
