@@ -6,6 +6,7 @@ import java.util.Set;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.web.HelperBase;
 
 public class ConfigTunnelsHelper extends HelperBase {
@@ -77,13 +78,23 @@ public class ConfigTunnelsHelper extends HelperBase {
         if (in.getLength() <= 0 ||
             in.getLength() + in.getLengthVariance() <= 0 ||
             out.getLength() <= 0 ||
-            out.getLength() + out.getLengthVariance() <= 0)
+            out.getLength() + out.getLengthVariance() <= 0) {
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">" + _t("ANONYMITY WARNING - Settings include 0-hop tunnels.") + "</font></th></tr>");
-        else if (in.getLength() <= 1 ||
+            if (TransportUtil.getIPv6Config(_context, "SSU") == TransportUtil.IPv6Config.IPV6_ONLY) {
+                // rare, don't bother translating
+                buf.append("<tr><th colspan=\"3\"><font color=\"red\">WARNING - 0-hop tunnels not recommended for IPv6-only routers.</font></th></tr>");
+            }
+            if ((in.getLength() <= 0 || in.getLength() + in.getLengthVariance() <= 0) &&
+                _context.router().isHidden()) {
+                // rare, don't bother translating
+                buf.append("<tr><th colspan=\"3\"><font color=\"red\">WARNING - Inbound 0-hop tunnels not recommended for hidden routers.</font></th></tr>");
+            }
+        } else if (in.getLength() <= 1 ||
             in.getLength() + in.getLengthVariance() <= 1 ||
             out.getLength() <= 1 ||
-            out.getLength() + out.getLengthVariance() <= 1)
+            out.getLength() + out.getLengthVariance() <= 1) {
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">" + _t("ANONYMITY WARNING - Settings include 1-hop tunnels.") + "</font></th></tr>");
+        }
         if (in.getLength() + Math.abs(in.getLengthVariance()) >= WARN_LENGTH ||
             out.getLength() + Math.abs(out.getLengthVariance()) >= WARN_LENGTH)
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">" + _t("PERFORMANCE WARNING - Settings include very long tunnels.") + "</font></th></tr>");

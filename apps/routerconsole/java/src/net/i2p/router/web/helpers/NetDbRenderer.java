@@ -15,6 +15,7 @@ import java.math.BigInteger;         // debug
 import java.text.Collator;
 import java.text.DecimalFormat;      // debug
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -647,20 +648,25 @@ class NetDbRenderer {
         buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
            .append(info.getIdentity().getSigningPublicKey().getType().toString());
         buf.append("</td></tr>\n<tr>")
-           .append("<td><b>" + _t("Address(es)") + ":</b></td>")
+           .append("<td><b>" + _t("Addresses") + ":</b></td>")
            .append("<td colspan=\"2\" class=\"netdb_addresses\">");
-        for (RouterAddress addr : info.getAddresses()) {
-            String style = addr.getTransportStyle();
-            buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b>");
-            int cost = addr.getCost();
-            if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
-                buf.append("&nbsp;<span class=\"netdb_name\">").append(_t("cost")).append("</span>: <span class=\"netdb_info\">").append("" + cost).append("</span>&nbsp;");
-            Map<Object, Object> p = addr.getOptionsMap();
-            for (Map.Entry<Object, Object> e : p.entrySet()) {
-                String name = (String) e.getKey();
-                String val = (String) e.getValue();
-                buf.append(" <span class=\"nowrap\"><span class=\"netdb_name\">").append(_t(DataHelper.stripHTML(name)))
-                   .append(":</span> <span class=\"netdb_info\">").append(DataHelper.stripHTML(val)).append("</span></span>&nbsp;");
+        Collection<RouterAddress> addrs = info.getAddresses();
+        if (addrs.isEmpty()) {
+            buf.append(_t("none"));
+        } else {
+            for (RouterAddress addr : info.getAddresses()) {
+                String style = addr.getTransportStyle();
+                buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b>");
+                int cost = addr.getCost();
+                if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
+                    buf.append("&nbsp;<span class=\"netdb_name\">").append(_t("cost")).append("</span>: <span class=\"netdb_info\">").append("" + cost).append("</span>&nbsp;");
+                Map<Object, Object> p = addr.getOptionsMap();
+                for (Map.Entry<Object, Object> e : p.entrySet()) {
+                    String name = (String) e.getKey();
+                    String val = (String) e.getValue();
+                    buf.append(" <span class=\"nowrap\"><span class=\"netdb_name\">").append(_t(DataHelper.stripHTML(name)))
+                       .append(":</span> <span class=\"netdb_info\">").append(DataHelper.stripHTML(val)).append("</span></span>&nbsp;");
+                }
             }
         }
         buf.append("</td></tr>\n");
