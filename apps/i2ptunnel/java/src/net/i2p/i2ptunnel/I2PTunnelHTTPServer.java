@@ -66,13 +66,18 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String HASH_HEADER = "X-I2P-DestHash";
     private static final String DEST64_HEADER = "X-I2P-DestB64";
     private static final String DEST32_HEADER = "X-I2P-DestB32";
-    private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER, DEST64_HEADER, DEST32_HEADER};
-    private static final String SERVER_HEADER = "Server";
-    private static final String X_POWERED_BY_HEADER = "X-Powered-By";
-    private static final String X_RUNTIME_HEADER = "X-Runtime"; // Rails
+    /** MUST ALL BE LOWER CASE */
+    private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER.toLowerCase(Locale.US),
+                                                        DEST64_HEADER.toLowerCase(Locale.US),
+                                                        DEST32_HEADER.toLowerCase(Locale.US)};
+    private static final String DATE_HEADER = "date";
+    private static final String SERVER_HEADER = "server";
+    private static final String X_POWERED_BY_HEADER = "x-powered-by";
+    private static final String X_RUNTIME_HEADER = "x-runtime"; // Rails
     // https://httpoxy.org
-    private static final String PROXY_HEADER = "Proxy";
-    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER, PROXY_HEADER};
+    private static final String PROXY_HEADER = "proxy";
+    /** MUST ALL BE LOWER CASE */
+    private static final String[] SERVER_SKIPHEADERS = {DATE_HEADER, SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER, PROXY_HEADER};
     /** timeout for first request line */
     private static final long HEADER_TIMEOUT = 15*1000;
     /** total timeout for the request and all the headers */
@@ -951,6 +956,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      *  @param socket if null, use in as InputStream
      *  @param in if null, use socket.getInputStream() as InputStream
      *  @param command out parameter, first line
+     *  @param skipHeaders MUST be lower case
      *  @throws SocketTimeoutException if timeout is reached before newline
      *  @throws EOFException if EOF is reached before newline
      *  @throws LineTooLongException if one header too long, or too many headers, or total size too big
@@ -1039,7 +1045,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 // For outgoing, we remove certain headers to improve anonymity.
                 boolean skip = false;
                 for (String skipHeader: skipHeaders) {
-                    if (skipHeader.toLowerCase(Locale.US).equals(lcName)) {
+                    if (skipHeader.equals(lcName)) {
                         skip = true;
                         break;
                     }

@@ -269,7 +269,8 @@
                   <Arg>
                     <New class="org.eclipse.jetty.server.HttpConfiguration">
                       <Set name="sendServerVersion">false</Set>
-                      <Set name="sendDateHeader">true</Set>
+                      <Set name="sendDateHeader">false</Set>
+                      <Set name="sendXPoweredBy">false</Set>
                     </New>
                   </Arg>
                 </New>
