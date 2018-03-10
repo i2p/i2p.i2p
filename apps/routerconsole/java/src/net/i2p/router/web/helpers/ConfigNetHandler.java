@@ -346,6 +346,7 @@ public class ConfigNetHandler extends FormHandler {
                     addFormError(_t("Gracefully restarting to exit Hidden Router Mode"));
             }
 
+            changes.put(Router.PROP_REBUILD_KEYS, "" + switchRequired);
             changes.put(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
 
             if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UPNP) !=

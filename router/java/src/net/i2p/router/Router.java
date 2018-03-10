@@ -114,7 +114,13 @@ public class Router implements RouterClock.ClockShiftListener {
     public final static String PROP_HIDDEN = "router.hiddenMode";
     /** this does not put an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN_HIDDEN = "router.isHidden";
+    /** New router keys at every restart. Disabled. */
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
+    /**
+     *  New router keys once only.
+     *  @since 0.9.34
+     */
+    public final static String PROP_REBUILD_KEYS = "router.rebuildKeys";
     /** deprecated, use gracefulShutdownInProgress() */
     private final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     public static final String PROP_IB_RANDOM_KEY = TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
@@ -627,6 +633,8 @@ public class Router implements RouterClock.ClockShiftListener {
         //    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
         //        killKeys();
         //}
+        if (_context.getBooleanProperty(PROP_REBUILD_KEYS))
+            killKeys();
 
         _context.messageValidator().startup();
         _context.tunnelDispatcher().startup();
@@ -1159,6 +1167,7 @@ public class Router implements RouterClock.ClockShiftListener {
             removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
             removeConfigSetting(PROP_IB_RANDOM_KEY);
             removeConfigSetting(PROP_OB_RANDOM_KEY);
+            removeConfigSetting(PROP_REBUILD_KEYS);
             saveConfig();
         }
     }
