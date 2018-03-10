@@ -31,6 +31,7 @@ class FloodfillMonitorJob extends JobImpl {
     private final Log _log;
     private final FloodfillNetworkDatabaseFacade _facade;
     private long _lastChanged;
+    private boolean _deferredFlood;
     
     private static final int REQUEUE_DELAY = 60*60*1000;
     private static final long MIN_UPTIME = 2*60*60*1000;
@@ -48,10 +49,10 @@ class FloodfillMonitorJob extends JobImpl {
     
     public String getName() { return "Monitor the floodfill pool"; }
 
-    public void runJob() {
+    public synchronized void runJob() {
         boolean wasFF = _facade.floodfillEnabled();
         boolean ff = shouldBeFloodfill();
-        _facade.setFloodfillEnabled(ff);
+        _facade.setFloodfillEnabledFromMonitor(ff);
         if (ff != wasFF) {
             if (ff) {
                 getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
@@ -60,12 +61,15 @@ class FloodfillMonitorJob extends JobImpl {
             }
             getContext().router().rebuildRouterInfo(true);
             Job routerInfoFlood = new FloodfillRouterInfoFloodJob(getContext(), _facade);
-            if(getContext().router().getUptime() < 5*60*1000) {
-                // Needed to prevent race if router.floodfillParticipant=true (not auto)
-                routerInfoFlood.getTiming().setStartAfter(getContext().clock().now() + 5*60*1000);
-                getContext().jobQueue().addJob(routerInfoFlood);
-                if(_log.shouldLog(Log.DEBUG)) {
-                    _log.logAlways(Log.DEBUG, "Deferring our FloodfillRouterInfoFloodJob run because of low uptime.");
+            if (getContext().router().getUptime() < 5*60*1000) {
+                if (!_deferredFlood) {
+                    // Needed to prevent race if router.floodfillParticipant=true (not auto)
+                    // Don't queue multiples
+                    _deferredFlood = true;
+                    routerInfoFlood.getTiming().setStartAfter(getContext().clock().now() + 5*60*1000);
+                    getContext().jobQueue().addJob(routerInfoFlood);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.logAlways(Log.DEBUG, "Deferring our FloodfillRouterInfoFloodJob run because of low uptime.");
                 }
             } else {
                 routerInfoFlood.runJob();

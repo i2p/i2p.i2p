@@ -33,6 +33,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private final Set<Hash> _verifiesInProgress;
     private FloodThrottler _floodThrottler;
     private LookupThrottler _lookupThrottler;
+    private final Job _ffMonitor;
 
     /**
      *  This is the flood redundancy. Entries are
@@ -68,12 +69,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         // for ISJ
         _context.statManager().createRateStat("netDb.RILookupDirect", "Was an iterative RI lookup sent directly?", "NetworkDatabase", new long[] { 60*60*1000 });
+        _ffMonitor = new FloodfillMonitorJob(_context, this);
     }
 
     @Override
     public synchronized void startup() {
         super.startup();
-        _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
+        _context.jobQueue().addJob(_ffMonitor);
         _lookupThrottler = new LookupThrottler();
 
         // refresh old routers
@@ -114,6 +116,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                 } catch (InterruptedException ie) {}
             }
         }
+        _context.jobQueue().removeJob(_ffMonitor);
         super.shutdown();
     }
 
@@ -278,7 +281,24 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected PeerSelector createPeerSelector() { return new FloodfillPeerSelector(_context); }
     
+    /**
+     *  Public, called from console. This wakes up the floodfill monitor,
+     *  which will rebuild the RI and log in the event log,
+     *  and call setFloodfillEnabledFromMonitor which really sets it.
+     */
     public synchronized void setFloodfillEnabled(boolean yes) {
+        if (yes != _floodfillEnabled) {
+            _context.jobQueue().removeJob(_ffMonitor);
+            _ffMonitor.getTiming().setStartAfter(_context.clock().now() + 1000);
+            _context.jobQueue().addJob(_ffMonitor);
+        }
+    }
+    
+    /**
+     *  Package private, called from FloodfillMonitorJob. This does not wake up the floodfill monitor.
+     *  @since 0.9.34
+     */
+    synchronized void setFloodfillEnabledFromMonitor(boolean yes) {
         _floodfillEnabled = yes;
         if (yes && _floodThrottler == null) {
             _floodThrottler = new FloodThrottler();
