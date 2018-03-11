@@ -141,7 +141,30 @@ public final class SelfSignedGenerator {
         SigningPrivateKey priv = (SigningPrivateKey) keys[1];
         PublicKey jpub = SigUtil.toJavaKey(pub);
         PrivateKey jpriv = SigUtil.toJavaKey(priv);
+        return generate(jpub, jpriv, priv, type, cname, altNames, ou, o, l, st, c, validDays);
+    }
 
+    /**
+     *  @param cname the common name, non-null. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
+     *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
+     *  @param ou The OU (organizational unit) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param o The O (organization)in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param l The L (city or locality) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param st The ST (state or province) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param c The C (country) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *
+     *  @return length 4 array:
+     *  rv[0] is a Java PublicKey
+     *  rv[1] is a Java PrivateKey
+     *  rv[2] is a Java X509Certificate
+     *  rv[3] is a Java X509CRL
+     *
+     *  @since 0.9.34 added altNames param
+     */
+    private static Object[] generate(PublicKey jpub, PrivateKey jpriv, SigningPrivateKey priv, SigType type,
+                                     String cname, Set<String> altNames, String ou, String o, String l, String st, String c,
+                                     int validDays) throws GeneralSecurityException {
         String oid;
         switch (type) {
             case DSA_SHA1:
@@ -220,6 +243,37 @@ public final class SelfSignedGenerator {
 
         Object[] rv = { jpub, jpriv, cert, crl };
         return rv;
+    }
+
+    /**
+     *  @param cert the old cert to be replaced
+     *  @param jpriv the private key
+     *
+     *  @return length 4 array:
+     *  rv[0] is a Java PublicKey, from cert as passed in
+     *  rv[1] is a Java PrivateKey, jpriv as passed in
+     *  rv[2] is a Java X509Certificate, new one
+     *  rv[3] is a Java X509CRL, new one
+     *
+     *  @since 0.9.34 added altNames param
+     */
+    public static Object[] renew(X509Certificate cert, PrivateKey jpriv, int validDays) throws GeneralSecurityException {
+        String cname = CertUtil.getSubjectValue(cert, "CN");
+        if (cname == null)
+            cname = "localhost";
+        String ou = CertUtil.getSubjectValue(cert, "OU");
+        String o = CertUtil.getSubjectValue(cert, "O");
+        String l = CertUtil.getSubjectValue(cert, "L");
+        String st = CertUtil.getSubjectValue(cert, "ST");
+        String c = CertUtil.getSubjectValue(cert, "C");
+        Set<String> altNames = CertUtil.getSubjectAlternativeNames(cert);
+        SigningPrivateKey priv = SigUtil.fromJavaKey(jpriv);
+        SigType type = priv.getType();
+        SigningPublicKey pub = KeyGenerator.getSigningPublicKey(priv);
+        PublicKey jpub = SigUtil.toJavaKey(pub);
+        if (type == null)
+                throw new GeneralSecurityException("Unsupported: " + jpriv);
+        return generate(jpub, jpriv, priv, type, cname, altNames, ou, o, l, st, c, validDays);
     }
 
     /**
@@ -833,8 +887,54 @@ public final class SelfSignedGenerator {
     /**
      *  Note: For CLI testing, use java -jar i2p.jar su3file keygen pubkey.crt keystore.ks commonName
      */
+    public static void main(String[] args) throws Exception {
+        if (args.length == 0) {
+            usage();
+        } else if (args[0].equals("keygen")) {
+            if (args.length >= 4)
+                SU3File.main(args);
+            else
+                usage();
+        } else if (args[0].equals("renew")) {
+            if (args.length >= 3) {
+                String ksPW, cert, ks;
+                if (args[1].equals("-p")) {
+                    ksPW = args[2];
+                    cert = args[3];
+                    ks = args[4];
+                } else {
+                    ksPW = KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
+                    cert = args[1];
+                    ks = args[2];
+                }
+                String keypw = "";
+                try {
+                    while (keypw.length() < 6) {
+                        System.out.print("Enter password for key: ");
+                        keypw = DataHelper.readLine(System.in);
+                        if (keypw == null) {
+                            System.out.println("\nEOF reading password");
+                            System.exit(1);
+                        }
+                        keypw = keypw.trim();
+                        if (keypw.length() > 0 && keypw.length() < 6)
+                            System.out.println("Key password must be at least 6 characters");
+                    }
+                } catch (IOException ioe) {
+                    System.out.println("Error asking for password");
+                    throw ioe;
+                }
+                File ksf = new File(ks);
+                X509Certificate newCert = KeyStoreUtil.renewPrivateKeyCertificate(ksf, ksPW, null, keypw, 3652);
+                CertUtil.saveCert(newCert, new File(cert));
+                System.out.println("Certificate renewed for 10 years, and stored in " + cert + " and " + ks);
+            } else {
+                usage();
+            }
+        } else {
+            usage();
+        }
 /****
-    public static void main(String[] args) {
         try {
             int i = 0;
             for (SigType t : java.util.EnumSet.allOf(SigType.class)) {
@@ -845,8 +945,14 @@ public final class SelfSignedGenerator {
         } catch (Exception e) {
             e.printStackTrace();
         }
+****/
     }
 
+    private static void usage() {
+        System.err.println("Usage: selfsignedgenerator keygen [-t type|code] [-p keystorepw] [-r crlFile.crl] publicKeyFile.crt keystore.ks localhost\n" +
+                           "       selfsignedgenerator renew  [-p keystorepw] publicKeyFile.crt keystore.ks");
+    }
+/****
     private static final void test(String name, SigType type) throws Exception {
             Object[] rv = generate("cname@example.com", "ou", "o", null, "st", "c", 3652, type);
             //PublicKey jpub = (PublicKey) rv[0];

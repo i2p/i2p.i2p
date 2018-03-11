@@ -157,6 +157,30 @@ public final class CertUtil {
     }
 
     /**
+     *  Get the set of Subject Alternative Names, including
+     *  DNSNames, RFC822Names, IPv4 and v6 addresses as strings.
+     *
+     *  see X509Certificate.getSubjectAlternativeNames()
+     *
+     *  @return non-null, empty on error or none found
+     *  @since 0.9.34
+     */
+    public static Set<String> getSubjectAlternativeNames(X509Certificate cert) {
+        Set<String> rv = new HashSet<String>(8);
+        try {
+            Collection<List<?>> c = cert.getSubjectAlternativeNames();
+            if (c != null) {
+                for (List<?> list : c) {
+                    try {
+                        rv.add((String) list.get(1));
+                    } catch (ClassCastException cce) {}
+                }
+            }
+        } catch(GeneralSecurityException gse) {}
+        return rv;
+    }
+
+    /**
      *  Get a value out of the subject distinguished name.
      *
      *  Warning - unsupported in Android (no javax.naming), returns null.

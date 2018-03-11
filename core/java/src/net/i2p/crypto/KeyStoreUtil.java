@@ -1005,7 +1005,7 @@ public final class KeyStoreUtil {
 
     /** 
      *  Export the private key and certificate chain (if any) out of a keystore.
-     *  Does NOT close the stream. Throws on all errors.
+     *  Does NOT close the output stream. Throws on all errors.
      *
      *  @param ks path to the keystore
      *  @param ksPW the keystore password, may be null
@@ -1030,6 +1030,59 @@ public final class KeyStoreUtil {
             CertUtil.exportPrivateKey(pk, certs, out);
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
+     *  Renew the the private key certificate in a keystore.
+     *  Closes the input and output streams. Throws on all errors.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key, or null to get the first one in keystore
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @param validDays new cert to expire this many days from now
+     *  @return the new certificate
+     *  @since 0.9.34
+     */
+    public static X509Certificate renewPrivateKeyCertificate(File ks, String ksPW, String alias,
+                                                             String keyPW, int validDays)
+                                                             throws GeneralSecurityException, IOException {
+        InputStream fis = null;
+        OutputStream fos = null;
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            fis = new FileInputStream(ks);
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            keyStore.load(fis, pwchars);
+            try { fis.close(); } catch (IOException ioe) {}
+            fis = null;
+            char[] keypwchars = keyPW.toCharArray();
+            if (alias == null) {
+                for (Enumeration<String> e = keyStore.aliases(); e.hasMoreElements();) {
+                    alias = e.nextElement();
+                    break;
+                }
+                if (alias == null)
+                    throw new GeneralSecurityException("no private keys found");
+            }
+            PrivateKey pk = (PrivateKey) keyStore.getKey(alias, keypwchars);
+            if (pk == null)
+                throw new GeneralSecurityException("private key not found: " + alias);
+            Certificate[] certs = keyStore.getCertificateChain(alias);
+            if (certs.length != 1)
+                throw new GeneralSecurityException("Bad cert chain length");
+            X509Certificate cert = (X509Certificate) certs[0];
+            Object[] rv = SelfSignedGenerator.renew(cert, pk, validDays);
+            cert = (X509Certificate) rv[2];
+            certs[0] = cert;
+            keyStore.setKeyEntry(alias, pk, keypwchars, certs);
+            fos = new SecureFileOutputStream(ks);
+            keyStore.store(fos, pwchars);
+            return cert;
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
 

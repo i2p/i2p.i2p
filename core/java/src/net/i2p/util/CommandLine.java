@@ -23,6 +23,7 @@ public class CommandLine {
         "net.i2p.CoreVersion",
         "net.i2p.crypto.CertUtil",
         "net.i2p.crypto.CryptoCheck",
+        "net.i2p.crypto.SelfSignedGenerator",
         "net.i2p.crypto.SU3File",
         "net.i2p.crypto.TrustedUpdate",
         "net.i2p.data.Base32",
