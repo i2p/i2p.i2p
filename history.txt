@@ -1,5 +1,17 @@
+2018-03-11 zzz
+ * Router: More peer selection fixes for hidden mode
+
+2018-03-10 zzz
+ * Console: Fix compression logic
+ * i2ptunnel: Strip server Date header
+ * NetDB: Wake up FloodfillMonitor when setting changes
+ * Router: Fix rekey after hidden config change
+
 2018-03-09 zzz
- * Console: Enable compression (ticket #2157)
+ * Console:
+   - Enable compression (ticket #2157)
+   - Close output stream on redirect
+   - Add Accept-Ranges header
 
 2018-03-08 zzz
  * Crypto: Generate non-CA cert for family

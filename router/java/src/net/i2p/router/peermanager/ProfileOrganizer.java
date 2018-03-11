@@ -571,7 +571,7 @@ public class ProfileOrganizer {
      * Caution, this does NOT cascade further to non-connected peers, so it should only
      * be used when there is a good number of connected peers.
      *
-     * @param exclude non-null
+     * @param exclude non-null, WARNING - side effect, all not-connected peers are added
      * No mask parameter, to be fixed
      */
     public void selectActiveNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {

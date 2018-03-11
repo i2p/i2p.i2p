@@ -8,6 +8,8 @@ import java.util.Set;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -65,6 +67,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         boolean hidden = nonzero && (ctx.router().isHidden() ||
                                      ctx.router().getRouterInfo().getAddressCount() <= 0);
         boolean hiddenInbound = hidden && isInbound;
+        boolean hiddenOutbound = hidden && !isInbound;
         boolean lowOutbound = nonzero && !isInbound && !ctx.commSystem().haveHighOutboundCapacity();
 
 
@@ -93,7 +96,9 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
                 // use only connected peers so we don't make more connections
                 if (log.shouldLog(Log.INFO))
                     log.info("EPS SANFP closest " + (isInbound ? "IB" : "OB") + " exclude " + closestExclude.size());
-                ctx.profileOrganizer().selectActiveNotFailingPeers(1, closestExclude, closest);
+                // SANFP adds all not-connected to exclude, so make a copy
+                Set<Hash> SANFPExclude = new HashSet<Hash>(closestExclude);
+                ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, closest);
                 if (closest.isEmpty()) {
                     // ANFP does not fall back to non-connected
                     if (log.shouldLog(Log.INFO))
@@ -115,6 +120,55 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
                 length--;
             }
         }
+
+        // furthest-hop restrictions
+        // Since we're applying orderPeers() later, we don't know
+        // which will be the furthest hop, so select the furthest one here if necessary.
+
+        Hash furthestHop = null;
+        if (hiddenOutbound && length > 0) {
+            // OBEP
+            // check for hidden and outbound, and the paired (inbound) tunnel is zero-hop
+            // if so, we need the OBEP to be connected to us, so we get the build reply back
+            // This should be rare except at startup
+            TunnelManagerFacade tmf = ctx.tunnelManager();
+            TunnelPool tp = tmf.getInboundExploratoryPool();
+            TunnelPoolSettings tps = tp.getSettings();
+            int len = tps.getLength();
+            boolean pickFurthest = true;
+            if (len <= 0 ||
+                tps.getLengthOverride() == 0 ||
+                len + tps.getLengthVariance() <= 0) {
+                // leave it true
+            } else {
+                for (TunnelInfo ti : tp.listTunnels()) {
+                    if (ti.getLength() > 1) {
+                        pickFurthest = false;
+                        break;
+                    }
+                }
+            }
+            if (pickFurthest) {
+                Set<Hash> furthest = new HashSet<Hash>(1);
+                if (log.shouldLog(Log.INFO))
+                    log.info("EPS SANFP furthest OB exclude " + exclude.size());
+                // ANFP adds all not-connected to exclude, so make a copy
+                Set<Hash> SANFPExclude = new HashSet<Hash>(exclude);
+                ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, furthest);
+                if (furthest.isEmpty()) {
+                    // ANFP does not fall back to non-connected
+                    if (log.shouldLog(Log.INFO))
+                        log.info("EPS SFP furthest OB exclude " + exclude.size());
+                    ctx.profileOrganizer().selectFastPeers(1, exclude, furthest);
+                }
+                if (!furthest.isEmpty()) {
+                    furthestHop = furthest.iterator().next();
+                    exclude.add(furthestHop);
+                    length--;
+                }
+            }
+        }
+
 
         // Don't use ff peers for exploratory tunnels to lessen exposure to netDb searches and stores
         // Hmm if they don't get explored they don't get a speed/capacity rating
@@ -152,6 +206,14 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
                 rv.add(0, closestHop);
             else
                 rv.add(closestHop);
+            length++;
+        }
+        if (furthestHop != null) {
+            // always OBEP for now, nothing special for IBGW
+            if (isInbound)
+                rv.add(furthestHop);
+            else
+                rv.add(0, furthestHop);
             length++;
         }
         //if (length != rv.size() && log.shouldWarn())

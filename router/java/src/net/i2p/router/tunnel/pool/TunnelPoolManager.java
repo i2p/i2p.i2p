@@ -730,6 +730,22 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
 
     /**
+     *  @return pool or null
+     *  @since 0.9.34
+     */
+    public TunnelPool getInboundPool(Hash client) {
+        return _clientInboundPools.get(client);
+    }
+
+    /**
+     *  @return pool or null
+     *  @since 0.9.34
+     */
+    public TunnelPool getOutboundPool(Hash client) {
+        return _clientOutboundPools.get(client);
+    }
+
+    /**
      *  Fail all outbound tunnels with this peer as first hop,
      *  and all inbound tunnels with this peer as the last hop,
      *  baecause we can't contact it any more.

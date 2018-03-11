@@ -182,6 +182,18 @@ public interface TunnelManagerFacade extends Service {
     /** for TunnelRenderer in router console */
     public TunnelPool getOutboundExploratoryPool();
 
+    /**
+     *  @return pool or null
+     *  @since 0.9.34
+     */
+    public TunnelPool getInboundPool(Hash client);
+
+    /**
+     *  @return pool or null
+     *  @since 0.9.34
+     */
+    public TunnelPool getOutboundPool(Hash client);
+
     /** @since 0.8.13 */
     public void fail(Hash peer);
 }
