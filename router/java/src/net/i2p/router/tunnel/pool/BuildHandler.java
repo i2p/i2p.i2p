@@ -170,6 +170,11 @@ class BuildHandler implements Runnable {
      *  @since 0.9.18
      */
     void init() {
+        if (_context.commSystem().isDummy()) {
+            _explState = ExplState.BOTH;
+            _context.router().setExplTunnelsReady();
+            return;
+        }
         // fixup startup state if 0-hop exploratory is allowed in either direction
         int ibl = _manager.getInboundSettings().getLength();
         int ibv = _manager.getInboundSettings().getLengthVariance();
