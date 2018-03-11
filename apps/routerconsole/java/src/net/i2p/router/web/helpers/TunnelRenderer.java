@@ -218,8 +218,9 @@ class TunnelRenderer {
         int maxLength = 1;
         for (int i = 0; i < tunnels.size(); i++) {
             TunnelInfo info = tunnels.get(i);
-            if (info.getLength() > maxLength)
-                maxLength = info.getLength();
+            int length = info.getLength();
+            if (length > maxLength)
+                maxLength = length;
         }
         out.write("<table class=\"tunneldisplay tunnels_client\"><tr><th title=\"" + _t("Inbound or outbound?") + ("\">") + _t("In/Out")
                   + "</th><th>" + _t("Expiry") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
@@ -240,7 +241,8 @@ class TunnelRenderer {
             if (timeLeft <= 0)
                 continue; // don't display tunnels in their grace period
             live++;
-            if (info.isInbound())
+            boolean isInbound = info.isInbound();
+            if (isInbound)
                 out.write("<tr><td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"" +
                           _t("Inbound") + "\"></td>");
             else
@@ -249,10 +251,17 @@ class TunnelRenderer {
             out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>\n");
             int count = info.getProcessedMessagesCount() * 1024 / 1000;
             out.write("<td class=\"cells\" align=\"center\">" + count + " KB</td>\n");
-            for (int j = 0; j < info.getLength(); j++) {
+            int length = info.getLength();
+            for (int j = 0; j < length; j++) {
                 Hash peer = info.getPeer(j);
-                TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
+                TunnelId id = (isInbound ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
                 if (_context.routerHash().equals(peer)) {
+                    if (length < maxLength && length == 1 && isInbound) {
+                        // pad before inbound zero hop
+                        for (int k = 1; k < maxLength; k++) {
+                            out.write("<td class=\"cells\" align=\"center\">&nbsp;</td>");
+                        }
+                    }
                     // Add empty content placeholders to force alignment.
                     out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer tunnel_local\" title=\"" +
                               _t("Locally hosted tunnel") + "\">" + _t("Local") + "</span>&nbsp;<span class=\"tunnel_id\" title=\"" +
@@ -265,9 +274,11 @@ class TunnelRenderer {
                               (id == null ? "" : " " + id) + "</span><b class=\"tunnel_cap\" title=\"" + _t("Bandwidth tier") + "\">" +
                               cap + "</b></span></td>");
                 }
-                if (info.getLength() < maxLength && (info.getLength() == 1 || j == info.getLength() - 2)) {
-                    for (int k = info.getLength(); k < maxLength; k++)
+                if (length < maxLength && ((length == 1 && !isInbound) || j == length - 2)) {
+                    // pad out outbound zero hop; non-zero-hop pads in middle
+                    for (int k = length; k < maxLength; k++) {
                         out.write("<td class=\"cells\" align=\"center\">&nbsp;</td>");
+                    }
                 }
             }
             out.write("</tr>\n");
