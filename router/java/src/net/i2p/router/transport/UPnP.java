@@ -71,8 +71,10 @@ import org.freenetproject.ForwardPortStatus;
  * TODO: Support multiple IGDs ?
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
+ *
+ * Public for CommandLine main()
  */ 
-class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
+public class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private final Log _log;
 	private final I2PAppContext _context;
 	
@@ -639,6 +641,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		}
 	}
 
+        private static final long UINT_MAX = (1L << 32) - 1;
+
 	/**
 	 *  @since 0.9.34
 	 */
@@ -648,6 +652,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			try {
 				long l = Long.parseLong(rv);
 				rv = DataHelper.formatSize2Decimal(l);
+                                // spec says roll over to 0 but mine doesn't
+                                if (l == UINT_MAX)
+                                    rv = "&gt; " + rv;
 			} catch (NumberFormatException nfe) {}
 		}
 		return rv;
