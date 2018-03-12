@@ -7,14 +7,21 @@
     // These are defined in Jetty 7 org.eclipse.jetty.server.Dispatcher,
     // and in Servlet 3.0 (Jetty 8) javax.servlet.RequestDispatcher,
     // just use the actual strings here to make it compatible with either
-    final Integer ERROR_CODE = (Integer) request.getAttribute("javax.servlet.error.status_code");
-    final String ERROR_URI = (String) request.getAttribute("javax.servlet.error.request_uri");
-    final String ERROR_MESSAGE = (String) request.getAttribute("javax.servlet.error.message");
-    if (ERROR_CODE != null && ERROR_MESSAGE != null) {
-        // this is deprecated but we don't want sendError()
-        //response.setStatus(ERROR_CODE.intValue(), ERROR_MESSAGE);
+    Integer ERROR_CODE = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    String ERROR_URI = (String) request.getAttribute("javax.servlet.error.request_uri");
+    String ERROR_MESSAGE = (String) request.getAttribute("javax.servlet.error.message");
+    if (ERROR_CODE != null)
         response.setStatus(ERROR_CODE.intValue());
-    }
+    else
+        ERROR_CODE = Integer.valueOf(0);
+    if (ERROR_URI != null)
+        ERROR_URI = net.i2p.data.DataHelper.escapeHTML(ERROR_URI);
+    else
+        ERROR_URI = "";
+    if (ERROR_MESSAGE != null)
+        ERROR_MESSAGE = net.i2p.data.DataHelper.escapeHTML(ERROR_MESSAGE);
+    else
+        ERROR_MESSAGE = "";
     // If it can't find the iframe or viewtheme.jsp I wonder if the whole thing blows up...
 %>
 <html><head>

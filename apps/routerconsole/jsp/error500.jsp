@@ -6,16 +6,22 @@
     // These are defined in Jetty 7 org.eclipse.jetty.server.Dispatcher,
     // and in Servlet 3.0 (Jetty 8) javax.servlet.RequestDispatcher,
     // just use the actual strings here to make it compatible with either
-    final Integer ERROR_CODE = (Integer) request.getAttribute("javax.servlet.error.status_code");
-    final String ERROR_URI = (String) request.getAttribute("javax.servlet.error.request_uri");
-    final String ERROR_MESSAGE = (String) request.getAttribute("javax.servlet.error.message");
-    final Class ERROR_CLASS = (Class) request.getAttribute("javax.servlet.error.exception_type");
+    Integer ERROR_CODE = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    String ERROR_URI = (String) request.getAttribute("javax.servlet.error.request_uri");
+    String ERROR_MESSAGE = (String) request.getAttribute("javax.servlet.error.message");
     final Throwable ERROR_THROWABLE = (Throwable) request.getAttribute("javax.servlet.error.exception");
-    if (ERROR_CODE != null && ERROR_MESSAGE != null) {
-        // this is deprecated but we don't want sendError()
-        //response.setStatus(ERROR_CODE.intValue(), ERROR_MESSAGE);
+    if (ERROR_CODE != null)
         response.setStatus(ERROR_CODE.intValue());
-    }
+    else
+        ERROR_CODE = Integer.valueOf(0);
+    if (ERROR_URI != null)
+        ERROR_URI = net.i2p.data.DataHelper.escapeHTML(ERROR_URI);
+    else
+        ERROR_URI = "";
+    if (ERROR_MESSAGE != null)
+        ERROR_MESSAGE = net.i2p.data.DataHelper.escapeHTML(ERROR_MESSAGE);
+    else
+        ERROR_MESSAGE = "";
 %>
 <html><head>
 <%@include file="css.jsi" %>
@@ -35,9 +41,6 @@
 %><%=intl._t("Please report bugs on {0} or {1}.",
           "<a href=\"http://trac.i2p2.i2p/newticket\">trac.i2p2.i2p</a>",
           "<a href=\"https://trac.i2p2.de/newticket\">trac.i2p2.de</a>")%>
-<!--
-<%=intl._t("You may use the username \"guest\" and password \"guest\" if you do not wish to register.")%>
--->
 <p><%=intl._t("Please include this information in bug reports")%>:
 </p></div><div class="sorry" id="warning2">
 <h3><%=intl._t("Error Details")%></h3>
