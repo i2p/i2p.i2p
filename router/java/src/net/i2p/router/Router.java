@@ -397,7 +397,9 @@ public class Router implements RouterClock.ClockShiftListener {
         // Apps may use this as an easy way to determine if they are in the router JVM
         // But context.isRouterContext() is even easier...
         // Both of these as of 0.7.9
-        System.setProperty("router.version", RouterVersion.VERSION);
+        // As of 0.9.34, this is FULL_VERSION, not VERSION, which was the same as CoreVersion.VERSION
+        // and thus not particularly useful.
+        System.setProperty("router.version", RouterVersion.FULL_VERSION);
 
         // crypto init may block for 10 seconds waiting for entropy
         // we want to do this before context.initAll()
