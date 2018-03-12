@@ -524,8 +524,9 @@ public class WebMail extends HttpServlet
 		StringBuilder buf = new StringBuilder(128);
 		buf.append("<input type=\"submit\" class=\"").append(name).append("\" name=\"")
 		   .append(name).append("\" value=\"").append(label).append('"');
-		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT) || name.equals(NEW_UPLOAD))
-			buf.append(" onclick=\"cancelPopup()\"");
+		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT) || name.equals(NEW_UPLOAD) ||
+		    name.equals(SETPAGESIZE) || name.equals(SAVE))  // config page
+			buf.append(" onclick=\"beforePopup=false;\"");
 		// These are icons only now, via the CSS, so add a tooltip
 		if (name.equals(FIRSTPAGE) || name.equals(PREVPAGE) || name.equals(NEXTPAGE) || name.equals(LASTPAGE) ||
 		    name.equals(PREV) || name.equals(LIST) || name.equals(NEXT))
@@ -2166,18 +2167,11 @@ public class WebMail extends HttpServlet
 				}
 				if(state != State.AUTH)
 					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
-				if (state == State.NEW) {
+				if (state == State.NEW || state == State.CONFIG) {
 					// TODO cancel if to and body are empty
-					out.println(
-						"<script type=\"text/javascript\">\n" +
-							"window.onbeforeunload = function () {" +
-								"return \"" + _t("Message has not been sent. Do you want to discard it?") + "\";" +
-							"};\n" +
-						"</script>"
-					);
-					out.println("<script src=\"/susimail/js/compose.js\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/susimail/js/compose.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				} else if (state == State.LIST) {
-					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/susimail/js/folder.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				} else if (state == State.LOADING) {
 					// TODO JS?
 			                out.println("<meta http-equiv=\"refresh\" content=\"5;url=" + myself + "\">");
