@@ -326,14 +326,7 @@ public class SMTPClient {
 			}
 			if (ok) {
 				// in-memory replace, no copies
-				int oidx = 0;
-				while (true) {
-					int idx = body.indexOf("\r\n.\r\n", oidx);
-					if (idx < 0)
-						break;
-					body.replace(idx, idx + 5, "\r\n..\r\n");
-					oidx = idx + 6;
-				}
+                                DataHelper.replace(body, "\r\n.\r\n", "\r\n..\r\n");
 				//socket.getOutputStream().write(DataHelper.getUTF8(body));
 				//socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
 				// Do it this way so we don't double the memory

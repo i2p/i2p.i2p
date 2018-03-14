@@ -615,7 +615,7 @@ public class DataHelper {
 
     /**
      *  Lower-case hex without leading zeros.
-     *  Use toString(byte[] to get leading zeros
+     *  Use toString(byte[]) to get leading zeros
      *  @param data may be null (returns "00")
      */
     public final static String toHexString(byte data[]) {
@@ -2053,6 +2053,28 @@ public class DataHelper {
             try {
                 Arrays.sort(a, c);
             } catch (IllegalArgumentException iae2) {}
+        }
+    }
+
+    /**
+      * Replace all instances of "from" with "to" in the StringBuilder buf.
+      * Same as String.replace(), but in-memory with no object churn,
+      * as long as "to" is equal size or smaller than "from", or buf has capacity.
+      * Use for large Strings or for multiple replacements in a row.
+      *
+      * @param buf contains the string to be searched
+      * @param from the string to be replaced
+      * @param to the replacement string
+      * @since 0.9.34
+      */
+    public static void replace(StringBuilder buf, String from, String to) {
+        int oidx = 0;
+        while (oidx < buf.length()) {
+            int idx = buf.indexOf(from, oidx);
+            if (idx < 0)
+                break;
+            buf.replace(idx, idx + from.length(), to);
+            oidx = idx + to.length();
         }
     }
 }
