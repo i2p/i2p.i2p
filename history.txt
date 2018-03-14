@@ -2,6 +2,7 @@
  * Console:
    - Hide links to webapps and eepsite if not running (ticket #2161)
    - Hide link to /configplugins if disabled
+   - Add error handler to webapps (ticket #2155)
  * i2ptunnel: Hide links to webapps that are not runnning (ticket #2161)
  * SusDNS: Translate svg image text (ticket #1749)
 

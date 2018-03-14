@@ -29,6 +29,15 @@
       <servlet-class>i2p.susi.dns.TranslateSVGServlet</servlet-class>
     </servlet>
 
+    <servlet>
+      <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+      <servlet-class>net.i2p.servlet.ErrorServlet</servlet-class>
+      <init-param>
+        <param-name>name</param-name>
+        <param-value>Addressbook</param-value>
+      </init-param>
+    </servlet>
+
     <servlet-mapping> 
       <servlet-name>addressbook-runner</servlet-name>
       <url-pattern>/addressbook-runner</url-pattern>
@@ -64,6 +73,17 @@
     </servlet-mapping>
 
     <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.index_jsp</servlet-name>
+        <url-pattern>/index.html</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.index_jsp</servlet-name>
+        <!-- empty pattern handles the root -->
+        <url-pattern></url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
         <servlet-name>i2p.susi.dns.jsp.export_jsp</servlet-name>
         <url-pattern>/export</url-pattern>
     </servlet-mapping>
@@ -71,6 +91,11 @@
     <servlet-mapping>
       <servlet-name>i2p.susi.dns.TranslateSVGServlet</servlet-name>
       <url-pattern>/images/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+      <url-pattern>/error</url-pattern>
     </servlet-mapping>
 
     <session-config>
@@ -82,5 +107,18 @@
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error</location>
+    </error-page>
 
 </web-app>

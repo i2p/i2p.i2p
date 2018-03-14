@@ -21,7 +21,16 @@
      <servlet-class>net.i2p.imagegen.RandomArtServlet</servlet-class>
      <load-on-startup>1</load-on-startup>
     </servlet>
-     
+
+    <servlet>
+      <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+      <servlet-class>net.i2p.servlet.ErrorServlet</servlet-class>
+      <init-param>
+        <param-name>name</param-name>
+        <param-value>imagegen</param-value>
+      </init-param>
+    </servlet>
+
     <!-- precompiled servlets -->
     
     <servlet-mapping> 
@@ -38,6 +47,12 @@
       <servlet-name>net.i2p.imagegen.RandomArtServlet</servlet-name>
       <url-pattern>/ra</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+      <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+     
     
     <!-- this webapp doesn't actually use sessions or cookies -->
     <session-config>
@@ -48,5 +63,18 @@
             <http-only>true</http-only>
         </cookie-config>
     </session-config>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error</location>
+    </error-page>
 
 </web-app>

@@ -23,10 +23,26 @@
       <file-size-threshold>131072</file-size-threshold>
     </multipart-config>
   </servlet>
+
+  <servlet>
+    <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+    <servlet-class>net.i2p.servlet.ErrorServlet</servlet-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>SusiMail</param-value>
+    </init-param>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>SusiMail</servlet-name>
     <url-pattern>/susimail</url-pattern>
   </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+    <url-pattern>/error</url-pattern>
+  </servlet-mapping>
+
   <session-config>
     <session-timeout>1440</session-timeout>
     <cookie-config>
@@ -48,25 +64,17 @@
     <param-value>SUSIMAILJSESSIONID</param-value>
   </context-param>
 
-<!--
-     Jetty 6 mulipart form handling
-     See http://docs.codehaus.org/display/JETTY/File+Upload+in+jetty6
-     and RequestWrapper.java.
-     Unused because it doesn't support content-type until Jetty 8.
-
-    <filter>
-        <filter-name>fileuploadfilter</filter-name>
-        <filter-class>org.mortbay.servlet.MultiPartFilter</filter-class>
-        <init-param>
-            <param-name>deleteFiles</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>fileuploadfilter</filter-name>
-        <url-pattern>/susimail</url-pattern>
-    </filter-mapping>
--->
+  <error-page>
+    <error-code>403</error-code>
+    <location>/error</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error</location>
+  </error-page>
 
 </web-app>

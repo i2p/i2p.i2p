@@ -106,7 +106,6 @@
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
         	<fileset dir=".">
         		<include name="WEB-INF/**/*.class"/>
-        		<include name="index.html"/>
         		<include name="svg/*"/>
         	</fileset>
             <manifest>
@@ -123,7 +122,7 @@
 
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="${project}.war">
-            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class svg/* index.html" />
+            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class svg/*" />
         </uptodate>
         <condition property="shouldListChanges" >
             <and>

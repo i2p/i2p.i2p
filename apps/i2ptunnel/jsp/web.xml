@@ -13,13 +13,32 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <servlet>
+      <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+      <servlet-class>net.i2p.servlet.ErrorServlet</servlet-class>
+      <init-param>
+        <param-name>name</param-name>
+        <param-value>Hidden Services Manager</param-value>
+      </init-param>
+    </servlet>
+
     <!-- precompiled servlets -->
 
     <!-- yeah we could do this in a handler but this is easier -->
     <servlet-mapping>
         <servlet-name>net.i2p.i2ptunnel.jsp.index_jsp</servlet-name>
-        <!-- this becomes the default so it also covers /index and /index.html -->
-        <url-pattern>/</url-pattern>
+        <!-- empty pattern handles the root -->
+        <url-pattern></url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>net.i2p.i2ptunnel.jsp.index_jsp</servlet-name>
+        <url-pattern>/index</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>net.i2p.i2ptunnel.jsp.index_jsp</servlet-name>
+        <url-pattern>/index.html</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -37,6 +56,11 @@
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+      <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
+      <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+
     <!-- this webapp doesn't actually use sessions or cookies -->
     <session-config>
         <session-timeout>
@@ -50,4 +74,17 @@
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error</location>
+    </error-page>
 </web-app>
