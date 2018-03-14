@@ -88,7 +88,7 @@
 <%=intl._t("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
 <div class="illustrate">
-<object type="image/svg+xml" data="/themes/susidns/images/how.svg">
+<object type="image/svg+xml" data="images/how.svg">
 <img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" />
 </object>
 </div>

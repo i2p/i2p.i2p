@@ -106,13 +106,8 @@
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
         	<fileset dir=".">
         		<include name="WEB-INF/**/*.class"/>
-                     <!-- pulled out of the jar in 0.7.12
-        		<include name="WEB-INF/lib/*.jar"/>
-                      -->
-        		<include name="images/*.png"/>
-        		<include name="css.css"/>
         		<include name="index.html"/>
-        		<include name="WEB-INF/classes/${project}.properties"/>
+        		<include name="svg/*"/>
         	</fileset>
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -128,7 +123,7 @@
 
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="${project}.war">
-            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class images/*.png css.css index.html WEB-INF/classes/${project}.properties" />
+            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class svg/* index.html" />
         </uptodate>
         <condition property="shouldListChanges" >
             <and>
@@ -162,7 +157,19 @@
         </javac>
     </target>
 
-    <target name="poupdate" depends="compile, precompilejsp">
+    <target name="extractSVGTags">
+        <mkdir dir="build/" />
+        <java classname="net.i2p.util.TranslateReader" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="../../../build/i2p.jar" />
+            </classpath>
+            <arg value="tag" />
+            <arg value="svg/" />
+            <arg value="build/HowSVG.java" />
+        </java>
+    </target>
+
+    <target name="poupdate" depends="compile, precompilejsp, extractSVGTags">
         <!-- Update the messages_*.po files.  -->
         <!-- set if unset -->
         <property name="lg2" value="" />

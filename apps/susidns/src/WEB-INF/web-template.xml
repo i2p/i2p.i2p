@@ -24,6 +24,11 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <servlet>
+      <servlet-name>i2p.susi.dns.TranslateSVGServlet</servlet-name>
+      <servlet-class>i2p.susi.dns.TranslateSVGServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping> 
       <servlet-name>addressbook-runner</servlet-name>
       <url-pattern>/addressbook-runner</url-pattern>
@@ -61,6 +66,11 @@
     <servlet-mapping>
         <servlet-name>i2p.susi.dns.jsp.export_jsp</servlet-name>
         <url-pattern>/export</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>i2p.susi.dns.TranslateSVGServlet</servlet-name>
+      <url-pattern>/images/*</url-pattern>
     </servlet-mapping>
 
     <session-config>

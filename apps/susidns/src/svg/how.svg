@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 960 587">
   <style>
     .a, .subs { fill: #fff; stroke-linejoin: round; stroke-width: 1.5; stroke: #000; } .b, .c, .d, .e, .f, .g { font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif; font-feature-settings: normal; font-variant-caps: normal; font-variant-ligatures: normal; font-variant-numeric: normal; text-align: center; text-anchor: middle; } .b, .c, .f, .g { font-size: 20px; } .d, .e { font-size: 30px; } .d, .f { font-weight: bold; } #space { fill: #edffff; stroke-linejoin: round; stroke-width: 1; stroke: #999; } text.tooltip:hover { fill: #090; } path.tooltip, rect.tooltip { fill: #F9FFEF; } .book:hover rect, .subscriptions:hover rect { fill: url(#hover); } .private:hover { fill: url(#hover2); } .pbook:hover rect { fill: url(#hover2); } path.tooltip:hover { fill: url(#arrow); } .private { fill: #ffffee; } .privatezone { stroke: #f00; fill: #efefd7; stroke-dasharray: 5,5; stroke-width: 1; stroke-linejoin: round; } .subs { stroke-dasharray: 3,3; stroke-width: 1; } a:hover text { cursor: pointer; fill: #f60; } a:active text { fill: #d30; } .a { filter: drop-shadow(0 0 2px rgba(64,64,64,0.5)); } .book rect:active, .pbook rect:active, #sublist:active rect { filter: none; } a { outline: none; } .hideonhover:hover #hoverhide, .hideonhover:active #hoverhide { fill: none; } .hideonhover:hover #hovershow { fill: #f60; } .hideonhover:active #hovershow { fill: #d30; } #hovershow { fill: none; }
@@ -20,45 +21,45 @@
   <path id="space" d="M31 76c-9 0-16 7-16 16v345c0 9 7 16 16 16h900c9 0 16-7 16-16v-83c0-9-7-16-16-16H492c-7 0-17-7-17-16V91c0-9-7-16-16-16z"/>
   <rect class="privatezone" width="308" height="137" x="29" y="192" ry="10"/>
   <a xlink:href="/susidns/addressbook?book=published" target="_parent" class="book">
-    <title>If SusiDNS is configured to publish your Router address book, the entries will appear in your Published address book and saved to a hosts.txt file for sharing.</title>
+    <title>_("If SusiDNS is configured to publish your Router address book, the entries will appear in your Published address book and saved to a hosts.txt file for sharing.")</title>
     <rect class="a tooltip" width="428" height="66" x="264" y="491" ry="10">
     </rect>
     <text class="b" x="477" y="531">
-      <tspan class="c" x="477" y="531">PUBLISHED ADDRESSBOOK</tspan>
+      <tspan class="c" x="477" y="531">_("Published Addressbook")</tspan>
     </text>
   </a>
   <path class="a tooltip" d="M468 418v7h19v-7zm0 16v6h19v-6zm0 15v6h19v-6zm0 15v6h-8l9 12 9 12 9-12 9-12h-8v-6z">
-    <title>To configure SusiDNS to push your Router address book to your Published address book, set "should_publish=true" on the configuration page.</title>
+    <title>_("To configure SusiDNS to push your Router address book to your Published address book, set 'should_publish=true' on the configuration page.")</title>
   </path>
   <a xlink:href="/susidns/addressbook?book=router" target="_parent" class="book">
-    <title>All hosts derived from subscriptions will appear in this address book, in addition to any you manually add here or to your Master address book.</title>
+    <title>_("All hosts derived from subscriptions will appear in this address book, in addition to any you manually add here or to your Master address book.")</title>
     <rect class="a tooltip" width="428" height="66" x="264" y="362" ry="10">
     </rect>
     <text class="b" x="477" y="403">
-      <tspan class="c" x="477" y="403">ROUTER ADDRESSBOOK</tspan>
+      <tspan class="c" x="477" y="403">_("Router Addressbook")</tspan>
     </text>
   </a>
   <a xlink:href="/susidns/addressbook?book=private" target="_parent" class="pbook">
-    <title>Hosts you manually add here will never be published. You can also add aliases to hosts in other address books here.</title>
+    <title>_("Hosts you manually add here will never be published. You can also add aliases to hosts in other address books here.")</title>
     <rect class="a private" width="279" height="66" x="44" y="228" ry="10">
     </rect>
     <text class="b" x="182" y="268">
-      <tspan class="c" x="182" y="268">PRIVATE ADDRESSBOOK</tspan>
+      <tspan class="c" x="182" y="268">_("Private Addressbook")</tspan>
     </text>
   </a>
   <text class="d tooltip" x="243" y="51">
-    <tspan class="e" x="243" y="51">LOCAL RECORDS</tspan>
-    <title>I2P applications (including the HTTP proxy) use the hosts in your local address books to resolve .i2p hostnames.</title>
+    <tspan class="e" x="243" y="51">_("Local Records")</tspan>
+    <title>_("I2P applications (including the HTTP proxy) use the hosts in your local address books to resolve .i2p hostnames.")</title>
   </text>
   <a xlink:href="/help#addressbooksubs" target="_top">
-    <title>Additional subscriptions can be found in the FAQ section of the Router help page.</title>
+    <title>_("Additional subscriptions can be found in the FAQ section of the Router help page.")</title>
     <text class="d" x="716" y="51">
-      <tspan class="e" x="716" y="51">SUBSCRIPTIONS</tspan>
+      <tspan class="e" x="716" y="51">_("Subscriptions")</tspan>
     </text>
   </a>
   <g class="subscriptions hideonhover">
   <a id="sublist" xlink:href="/susidns/subscriptions" target="_parent">
-    <title>Hosts sourced from your subscriptions are added to your Router address book, and are automatically synced (by default every 12 hours).</title>
+    <title>_("Hosts sourced from your subscriptions are added to your Router address book, and are automatically synced (by default every 12 hours).")</title>
     <rect class="subs" width="419" height="66" x="506" y="230" ry="10"/>
     <rect class="subs" width="419" height="66" x="506" y="204" ry="10"/>
     <rect class="subs" width="419" height="66" x="506" y="179" ry="10"/>
@@ -67,32 +68,32 @@
     <rect class="a tooltip" width="419" height="62" x="506" y="95" ry="10"/>
     <text class="b" x="715" y="132">
       <tspan class="c" id="hoverhide" x="715" y="132">http://i2p-projekt.i2p/hosts.txt</tspan>
-      <tspan class="c" id="hovershow" x="715" y="132">Configure Subscriptions</tspan>
+      <tspan class="c" id="hovershow" x="715" y="132">_("Configure Subscriptions")</tspan>
     </text>
   </a>
   </g>
   <a xlink:href="/susidns/addressbook?book=master" target="_parent" class="book">
-    <title>If you manually add hosts here, they will be included your Published address book (if configured).</title>
+    <title>_("If you manually add hosts here, they will be included your Published address book (if configured).")</title>
     <rect class="a tooltip" width="419" height="64" x="34" y="94" ry="10">
     </rect>
     <text class="b" x="243" y="134">
-      <tspan class="c" x="243" y="134">MASTER ADDRESSBOOK</tspan>
+      <tspan class="c" x="243" y="134">_("Master Addressbook")</tspan>
     </text>
   </a>
   <text class="f tooltip" x="817" y="389">
-    <tspan class="g" x="817" y="389">SEARCHABLE BY</tspan> <tspan class="g" x="817" y="416">I2P APPLICATIONS</tspan>
-    <title>The Master, Router and Private address books collectively serve as the DNS authority for I2P applications.</title>
+    <tspan class="g" x="817" y="389">_("Searchable by")</tspan> <tspan class="g" x="817" y="416">_("I2P applications")</tspan>
+    <title>_("The Master, Router and Private address books collectively serve as the DNS authority for I2P applications.")</title>
   </text>
   <a xlink:href="/susidns/config" target="_parent">
     <text class="f" x="817" y="518">
-      <tspan class="g" x="817" y="518">OPTIONAL, FOR</tspan> <tspan class="g" x="817" y="545">EEPSITES</tspan>
-      <title>If you configure SusiDNS to publish your Router address book, it will export a hosts.txt file containing all the hosts (by default to the root of your eepsite).</title>
+      <tspan class="g" x="817" y="518">_("Optional,")</tspan> <tspan class="g" x="817" y="545">_("for websites")</tspan>
+      <title>_("If you configure SusiDNS to publish your Router address book, it will export a hosts.txt file containing all the hosts (by default to the root of your eepsite).")</title>
     </text>
   </a>
   <path class="a tooltip" d="M382 164v133h-21l22 31 22 31 23-31 22-31h-19V164h-49z">
-    <title>Addresses manually added to your Master address book will merge with your Router address book.</title>
+    <title>_("Addresses manually added to your Master address book will merge with your Router address book.")</title>
   </path>
   <path class="a tooltip" d="M553 164v133h-21l22 31 22 31 23-31 22-31h-19V164z">
-    <title>Hosts you receive from your subscriptions will merge with your Router address book.</title>
+    <title>_("Hosts you receive from your subscriptions will merge with your Router address book.")</title>
   </path>
 </svg>

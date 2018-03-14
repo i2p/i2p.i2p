@@ -32,8 +32,13 @@ fi
 # Fast mode - update ondemond
 # set LG2 to the language you need in environment variables to enable this
 
+#
+# generated build/SVG.java from svg/how.svg
+#
+SVGFILE=build/HowSVG.java
+
 # add ../src/ so the refs will work in the po file
-JPATHS="../src/java/ ../src/tmp/"
+JPATHS="../src/java/ ../src/tmp/ $SVGFILE"
 for i in ../locale/messages_*.po
 do
 	# get language
@@ -63,6 +68,7 @@ do
 	 	echo "Updating the $i file from the tags..."
 		# extract strings from java and jsp files, and update messages.po files
 		# translate calls must be one of the forms:
+		# _("foo")
 		# _t("foo")
 		# _x("foo")
 		# intl._t("foo")
@@ -71,7 +77,7 @@ do
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_t --keyword=_x --keyword=intl._ --keyword=intl.title \
+	                 --keyword=_ --keyword=_t --keyword=_x --keyword=intl._ --keyword=intl.title \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then
