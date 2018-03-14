@@ -191,9 +191,19 @@ public class HomeHelper extends HelperBase {
         for (App app : apps) {
             String url;
             if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
+                PortMapper pm = _context.portMapper();
+                int port = pm.getPort(PortMapper.SVC_EEPSITE);
+                int sslPort = pm.getPort(PortMapper.SVC_HTTPS_EEPSITE);
+                if (port <= 0 && sslPort <= 0)
+                    continue;
                 // fixup eepsite link
-                url = "http://" + _context.portMapper().getActualHost(PortMapper.SVC_EEPSITE, "127.0.0.1") +
-                      ':' + _context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658) + '/';
+                if (sslPort > 0) {
+                    url = "https://" + pm.getActualHost(PortMapper.SVC_HTTPS_EEPSITE, "127.0.0.1") +
+                      ':' + sslPort + '/';
+                } else {
+                    url = "http://" + pm.getActualHost(PortMapper.SVC_EEPSITE, "127.0.0.1") +
+                      ':' + port + '/';
+                }
             } else {
                 url = app.url;
                 // check for disabled webapps and other things

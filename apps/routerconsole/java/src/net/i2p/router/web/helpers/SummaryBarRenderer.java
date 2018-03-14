@@ -21,7 +21,6 @@ import net.i2p.router.web.Messages;
 import net.i2p.router.web.NavHelper;
 import net.i2p.router.web.NewsHelper;
 import net.i2p.router.web.StatSummarizer;
-import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SystemVersion;
 
@@ -214,7 +213,8 @@ class SummaryBarRenderer {
 
                    "<hr class=\"b\"><table id=\"sb_services\"><tr><td>");
 
-        if (WebAppStarter.isWebAppRunning("susimail")) {
+        PortMapper pm = _context.portMapper();
+        if (pm.getPort(PortMapper.SVC_SUSIMAIL) > 0) {
            buf.append("<a href=\"/webmail\" target=\"_top\" title=\"")
            .append(_t("Anonymous webmail client"))
            .append("\">")
@@ -222,7 +222,7 @@ class SummaryBarRenderer {
            .append("</a>\n");
         }
 
-        if (WebAppStarter.isWebAppRunning("i2psnark")) {
+        if (pm.getPort(PortMapper.SVC_I2PSNARK) > 0) {
            buf.append("<a href=\"/torrents\" target=\"_top\" title=\"")
            .append(_t("Built-in anonymous BitTorrent Client"))
            .append("\">")
@@ -230,17 +230,29 @@ class SummaryBarRenderer {
            .append("</a>\n");
         }
 
-        buf.append("<a href=\"http://")
-           .append(_context.portMapper().getActualHost(PortMapper.SVC_EEPSITE, "127.0.0.1"))
+        int port = pm.getPort(PortMapper.SVC_EEPSITE);
+        int sslPort = pm.getPort(PortMapper.SVC_HTTPS_EEPSITE);
+        if (sslPort > 0 || port > 0) {
+           String svc;
+           if (sslPort > 0) {
+               buf.append("<a href=\"https://");
+               svc = PortMapper.SVC_HTTPS_EEPSITE;
+               port = sslPort;
+           } else {
+               buf.append("<a href=\"http://");
+               svc = PortMapper.SVC_EEPSITE;
+           }
+           buf.append(pm.getActualHost(svc, "127.0.0.1"))
            .append(':')
-           .append(_context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658))
+           .append(port)
            .append("/\" target=\"_blank\" title=\"")
            .append(_t("Local web server"))
            .append("\">")
            .append(nbsp(_t("Web Server")))
-           .append("</a>\n")
+           .append("</a>\n");
+        }
 
-           .append(NavHelper.getClientAppLinks(_context))
+        buf.append(NavHelper.getClientAppLinks(_context))
 
            .append("</td></tr></table>\n");
         return buf.toString();
@@ -256,7 +268,8 @@ class SummaryBarRenderer {
 
                    "<table id=\"sb_internals\"><tr><td>\n");
 
-        if (WebAppStarter.isWebAppRunning("susidns")) {
+        PortMapper pm = _context.portMapper();
+        if (pm.getPort(PortMapper.SVC_SUSIDNS) > 0) {
            buf.append("<a href=\"/dns\" target=\"_top\" title=\"")
            .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
@@ -278,7 +291,7 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Help")))
            .append("</a>\n");
 
-        if (WebAppStarter.isWebAppRunning("i2ptunnel")) {
+        if (pm.getPort(PortMapper.SVC_I2PTUNNEL) > 0) {
            buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Local Tunnels"))
            .append("\">")

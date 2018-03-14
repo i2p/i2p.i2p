@@ -1,4 +1,15 @@
+2018-03-14 zzz
+ * Console:
+   - Hide links to webapps and eepsite if not running (ticket #2161)
+   - Hide link to /configplugins if disabled
+ * i2ptunnel: Hide links to webapps that are not runnning (ticket #2161)
+ * SusDNS: Translate svg image text (ticket #1749)
+
+2018-03-12 zzz
+ * Susimail: Fix up compose.js (ticket #2176)
+
 2018-03-11 zzz
+ * Crypto: Add utils for renewing a cert in a keystore
  * Router: More peer selection fixes for hidden mode
 
 2018-03-10 zzz
