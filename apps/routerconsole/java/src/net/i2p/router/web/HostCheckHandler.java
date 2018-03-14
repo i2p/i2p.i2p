@@ -48,7 +48,9 @@ public class HostCheckHandler extends GzipHandler
                                  // our js is very small
                                  //"application/javascript", "application/x-javascript",
                                  "application/xhtml+xml", "application/xml",
-                                 "image/svg+xml", "text/css", "text/html", "text/plain"
+                                 // ditto svg
+                                 //"image/svg+xml",
+                                 "text/css", "text/html", "text/plain"
                                 );
         } else {
             // poorly documented, but we must put something in,

@@ -11,7 +11,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
-import net.i2p.util.TranslateReader;
 
 /**
  *  If news file does not exist, use file from the initialNews directory
