@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +69,15 @@ public class TranslateReader extends FilterReader {
      *  @param in UTF-8
      */
     public TranslateReader(I2PAppContext ctx, String bundle, InputStream in) throws IOException {
-        super(new BufferedReader(new InputStreamReader(in, "UTF-8")));
+        this(ctx, bundle, new BufferedReader(new InputStreamReader(in, "UTF-8")));
+    }
+
+    /**
+     *  @param bundle may be null for tagging only
+     *  @since 0.9.34
+     */
+    public TranslateReader(I2PAppContext ctx, String bundle, Reader in) throws IOException {
+        super(in);
         _ctx = ctx;
         _bundle = bundle;
         _args = new ArrayList<String>(4);

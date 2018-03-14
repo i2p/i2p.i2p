@@ -217,6 +217,9 @@
   ****/
 
             String b64 = editBean.getDestinationBase64(curTunnel);
+            net.i2p.util.PortMapper pm = net.i2p.I2PAppContext.getGlobalContext().portMapper();
+            boolean hasImagegen = pm.getPort(net.i2p.util.PortMapper.SVC_IMAGEGEN) > 0;
+            boolean hasSusiDNS = pm.getPort(net.i2p.util.PortMapper.SVC_SUSIDNS) > 0;
             if (!"".equals(b64)) {
          %>
         <tr>
@@ -231,8 +234,18 @@
          %>
 
             <td class="buttons" colspan="2">
+              <%
+                    if (hasImagegen) {
+                %>
               <a class="control" title="<%=intl._t("Generate a QR Code for this domain")%>" href="/imagegen/qr?s=320&amp;t=<%=name%>&amp;c=http%3a%2f%2f<%=name%>%2f%3fi2paddresshelper%3d<%=b64%>" target="_top"><%=intl._t("Generate QR Code")%></a>
+              <%
+                    }
+                    if (hasSusiDNS) {
+                %>
               <a class="control" title="<%=intl._t("Add to Private addressbook")%>" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>
+              <%
+                    }
+                %>
               <a class="control" title="<%=intl._t("Register, unregister or change details for hostname")%>" href="register?tunnel=<%=curTunnel%>"><%=intl._t("Registration Authentication")%></a>
             </td>
         <%
@@ -887,9 +900,17 @@
 
         <tr>
             <td class="buttons" colspan="2">
+              <%
+                    if (hasImagegen) {
+                %>
               <a class="control" title="<%=intl._t("Generate QR Code")%>" href="/imagegen/qr?s=320&amp;t=<%=name%>&amp;c=http%3a%2f%2f<%=name%>%2f%3fi2paddresshelper%3d<%=ab64%>" target="_top"><%=intl._t("Generate QR Code")%></a>
+              <%
+                    }
+                    if (hasSusiDNS) {
+                %>
               <a class="control" title="<%=intl._t("Add to Private addressbook")%>" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=ab64%>#add"><%=intl._t("Add to local addressbook")%></a>
         <%
+                    }
                 } else {
             %>
 

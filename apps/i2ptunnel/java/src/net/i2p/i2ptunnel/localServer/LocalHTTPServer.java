@@ -18,6 +18,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.util.FileUtil;
+import net.i2p.util.PortMapper;
 import net.i2p.util.Translate;
 
 /**
@@ -199,7 +200,8 @@ public abstract class LocalHTTPServer {
         else
             tbook = book;
 
-        String conURL = I2PAppContext.getGlobalContext().portMapper().getConsoleURL();
+        PortMapper pm = I2PAppContext.getGlobalContext().portMapper();
+        String conURL = pm.getConsoleURL();
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
                   "Referrer-Policy: no-referrer\r\n"+
@@ -214,8 +216,10 @@ public abstract class LocalHTTPServer {
                   "</head><body>\n" +
                   "<div class=logo>\n" +
                   "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
-                  "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a> <a href=\"" + conURL + "susidns/index\">" + _t("Addressbook") + "</a>\n" +
-                  "</div>" +
+                  "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a>").getBytes("UTF-8"));
+        if (pm.getPort(PortMapper.SVC_SUSIDNS) > 0)
+            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Addressbook") + "</a>\n").getBytes("UTF-8"));
+        out.write(("</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
                   (success ?

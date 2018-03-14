@@ -7,9 +7,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.Socket;
@@ -542,18 +544,48 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         char[] buf = new char[512];
         StringBuilder out = new StringBuilder(2048);
         try {
+            boolean hasSusiDNS = ctx.portMapper().getPort(PortMapper.SVC_SUSIDNS) > 0;
+            boolean hasI2PTunnel = ctx.portMapper().getPort(PortMapper.SVC_I2PTUNNEL) > 0;
+            if (hasSusiDNS && hasI2PTunnel) {
+                reader = new TranslateReader(ctx, BUNDLE_NAME, new FileInputStream(file));
+            } else {
+                // strip out the addressbook links
+                reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+                int len;
+                while((len = reader.read(buf)) > 0) {
+                    out.append(buf, 0, len);
+                }
+                reader.close();
+                if (!hasSusiDNS) {
+                    DataHelper.replace(out, "<a href=\"http://127.0.0.1:7657/susidns/index\">_(\"Addressbook\")</a>", "");
+                }
+                if (!hasI2PTunnel) {
+                    // there are also a couple in auth-header.ht that aren't worth stripping, for auth only
+                    DataHelper.replace(out,
+                                       "<span class=\"script\">_(\"You may want to {0}retry{1} as this will randomly reselect an outproxy from the pool you have defined {2}here{3} (if you have more than one configured).\", \"<a href=\\\"javascript:parent.window.location.reload()\\\">\", \"</a>\", \"<a href=\\\"http://127.0.0.1:7657/i2ptunnel/index.jsp\\\">\", \"</a>\")</span>",
+                                       "");
+                    DataHelper.replace(out,
+                                       "<noscript>_(\"You may want to retry as this will randomly reselect an outproxy from the pool you have defined {0}here{1} (if you have more than one configured).\", \"<a href=\\\"http://127.0.0.1:7657/i2ptunnel/index.jsp\\\">\", \"</a>\")</noscript>",
+                                       "");
+                    DataHelper.replace(out,
+                                       "_(\"If you continue to have trouble you may want to edit your outproxy list {0}here{1}.\", \"<a href=\\\"http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0\\\">\", \"</a>\")",
+                                       "");
+                }
+                String s = out.toString();
+                out.setLength(0);
+                reader = new TranslateReader(ctx, BUNDLE_NAME, new StringReader(s));
+            }
             int len;
-            reader = new TranslateReader(ctx, BUNDLE_NAME, new FileInputStream(file));
             while((len = reader.read(buf)) > 0) {
                 out.append(buf, 0, len);
             }
-            String rv = out.toString();
             // Do we need to replace http://127.0.0.1:7657 console links in the error page?
             // Get the registered host and port from the PortMapper.
             String url = ctx.portMapper().getConsoleURL();
             if (!url.equals("http://127.0.0.1:7657/")) {
-                rv = rv.replace("http://127.0.0.1:7657/", url);
+                DataHelper.replace(out, "http://127.0.0.1:7657/", url);
             }
+            String rv = out.toString();
             return rv;
         } finally {
             try {

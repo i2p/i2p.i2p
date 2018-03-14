@@ -773,19 +773,23 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                             out.write(("</a></th>\n<th align=\"center\">" +
                                                        "<a href=\"" + conflictURL + "\">").getBytes("UTF-8"));
                                             out.write(_t("Conflicting address helper destination").getBytes("UTF-8"));
-                                            out.write(("</a></th></tr>\n<tr><td align=\"center\">" +
+                                            out.write(("</a></th></tr>\n").getBytes("UTF-8"));
+                                            if (_context.portMapper().getPort(PortMapper.SVC_IMAGEGEN) > 0) {
+                                                out.write(("<tr><td align=\"center\">" +
                                                        "<a href=\"" + trustedURL + "\">" +
                                                        "<img src=\"" +
                                                        conURL + "imagegen/id?s=160&amp;c=" +
                                                        h1.toBase64().replace("=", "%3d") +
-                                                      "\" width=\"160\" height=\"160\"></a>\n").getBytes("UTF-8"));
-                                            out.write(("</td>\n<td align=\"center\">" +
+                                                      "\" width=\"160\" height=\"160\"></a>\n" +
+                                                      "</td>\n<td align=\"center\">" +
                                                        "<a href=\"" + conflictURL + "\">" +
                                                        "<img src=\"" +
                                                        conURL + "imagegen/id?s=160&amp;c=" +
                                                        h2.toBase64().replace("=", "%3d") +
-                                                       "\" width=\"160\" height=\"160\"></a>\n").getBytes("UTF-8"));
-                                            out.write("</td></tr></table>".getBytes("UTF-8"));
+                                                       "\" width=\"160\" height=\"160\"></a>\n" +
+                                                       "</td></tr>").getBytes("UTF-8"));
+                                            }
+                                            out.write("</table>".getBytes("UTF-8"));
                                         }
                                         out.write("</div>".getBytes("UTF-8"));
                                         writeFooter(out);
