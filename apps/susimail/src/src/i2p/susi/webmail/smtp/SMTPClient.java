@@ -332,7 +332,7 @@ public class SMTPClient {
 					if (idx < 0)
 						break;
 					body.replace(idx, idx + 5, "\r\n..\r\n");
-					oidx = idx;
+					oidx = idx + 6;
 				}
 				//socket.getOutputStream().write(DataHelper.getUTF8(body));
 				//socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
