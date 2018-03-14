@@ -185,7 +185,7 @@ public class ConfigClientsHandler extends FormHandler {
                         _log.error("Error stopping plugin " + app,  e);
                     }
                 } else {
-                    WebAppStarter.stopWebApp(app);
+                    WebAppStarter.stopWebApp(_context, app);
                     addFormNotice(_t("Stopped webapp {0}", app));
                 }
             }

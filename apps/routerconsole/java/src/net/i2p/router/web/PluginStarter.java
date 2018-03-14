@@ -541,7 +541,7 @@ public class PluginStarter implements Runnable {
                 Iterator <String> wars = pluginWars.get(appName).iterator();
                 while (wars.hasNext()) {
                     String warName = wars.next();
-                    WebAppStarter.stopWebApp(warName);
+                    WebAppStarter.stopWebApp(ctx, warName);
                 }
                 pluginWars.get(appName).clear();
             }

@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 
 import org.eclipse.jetty.server.Handler;
@@ -50,6 +51,7 @@ public class WebAppStarter {
     /**
      *  Adds and starts.
      *  Prior to 0.9.28, was not guaranteed to throw on failure.
+     *  Not for routerconsole.war, it's started in RouterConsoleRunner.
      *
      *  @throws Exception just about anything, caller would be wise to catch Throwable
      *  @since public since 0.9.33, was package private
@@ -64,6 +66,10 @@ public class WebAppStarter {
          // and the caller will know it failed
          wac.setThrowUnavailableOnStartupException(true);
          wac.start();
+         // Doesn't have to be right, just for presence indication
+         int port = ctx.portMapper().getPort(PortMapper.SVC_CONSOLE, PortMapper.DEFAULT_CONSOLE_PORT);
+         String host = ctx.portMapper().getActualHost(PortMapper.SVC_CONSOLE, "127.0.0.1");
+         ctx.portMapper().register(appName, host, port);
     }
 
     /**
@@ -77,7 +83,7 @@ public class WebAppStarter {
         // Jetty will happily load one context on top of another without stopping
         // the first one, so we remove any previous one here
         try {
-            stopWebApp(appName);
+            stopWebApp(ctx, appName);
         } catch (Throwable t) {}
 
         // To avoid ZipErrors from JarURLConnetion caching,
@@ -141,10 +147,11 @@ public class WebAppStarter {
      *  Throws just about anything, caller would be wise to catch Throwable
      *  @since public since 0.9.33, was package private
      */
-    public static void stopWebApp(String appName) {
+    public static void stopWebApp(RouterContext ctx, String appName) {
         ContextHandler wac = getWebApp(appName);
         if (wac == null)
             return;
+        ctx.portMapper().unregister(appName);
         try {
             // not graceful is default in Jetty 6?
             wac.stop();

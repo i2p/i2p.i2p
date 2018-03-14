@@ -45,6 +45,36 @@ public class PortMapper {
     public static final String SVC_HTTP_I2PCONTROL = "http_i2pcontrol";
     /** @since 0.9.34 */
     public static final String SVC_HTTPS_I2PCONTROL = "https_i2pcontrol";
+    /**
+     *  To indicate presence, alternative to WebAppStarter.isWebappRunning().
+     *  For actual base URL, use getConsoleURL()
+     *  @since 0.9.34
+     */
+    public static final String SVC_I2PSNARK = "i2psnark";
+    /**
+     *  To indicate presence, alternative to WebAppStarter.isWebappRunning().
+     *  For actual base URL, use getConsoleURL()
+     *  @since 0.9.34
+     */
+    public static final String SVC_I2PTUNNEL = "i2ptunnel";
+    /**
+     *  To indicate presence, alternative to WebAppStarter.isWebappRunning().
+     *  For actual base URL, use getConsoleURL()
+     *  @since 0.9.34
+     */
+    public static final String SVC_IMAGEGEN = "imagegen";
+    /**
+     *  To indicate presence, alternative to WebAppStarter.isWebappRunning().
+     *  For actual base URL, use getConsoleURL()
+     *  @since 0.9.34
+     */
+    public static final String SVC_SUSIDNS = "susidns";
+    /**
+     *  To indicate presence, alternative to WebAppStarter.isWebappRunning().
+     *  For actual base URL, use getConsoleURL()
+     *  @since 0.9.34
+     */
+    public static final String SVC_SUSIMAIL = "susimail";
 
     /** @since 0.9.34 */
     public static final int DEFAULT_CONSOLE_PORT = 7657;

@@ -1115,7 +1115,7 @@ public class RouterConsoleRunner implements RouterApp {
                     continue;
                 if (WebAppStarter.isWebAppRunning(app)) {
                     try {
-                        WebAppStarter.stopWebApp(app);
+                        WebAppStarter.stopWebApp(_context, app);
                     } catch (Throwable t) { t.printStackTrace(); }
                 }
             }
