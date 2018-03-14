@@ -26,6 +26,8 @@ public class PortMapper {
     public static final String SVC_HTTP_PROXY = "HTTP";
     public static final String SVC_HTTPS_PROXY = "HTTPS";
     public static final String SVC_EEPSITE = "eepsite";
+    /** @since 0.9.34 */
+    public static final String SVC_HTTPS_EEPSITE = "https_eepsite";
     public static final String SVC_IRC = "irc";
     public static final String SVC_SOCKS = "socks";
     public static final String SVC_TAHOE = "tahoe-lafs";
