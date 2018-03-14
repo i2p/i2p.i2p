@@ -38,6 +38,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.web.Messages;
+import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.Translate;
@@ -289,6 +290,7 @@ class NetDbRenderer {
             medianCount = rapCount / 2;
           }
 
+          boolean linkSusi = WebAppStarter.isWebAppRunning("susidns");
           long now = _context.clock().now();
           buf.append("<div class=\"leasesets_container\">");
           for (LeaseSet ls : leases) {
@@ -318,13 +320,13 @@ class NetDbRenderer {
                 if (!unpublished) {
                     host = _context.namingService().reverseLookup(dest);
                 }
-                if (unpublished || host != null) {
+                if (unpublished || host != null || !linkSusi) {
                     buf.append(" colspan=\"2\"");
                 }
                 buf.append(">");
                 String b32 = dest.toBase32();
                 buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
-                if (!unpublished) {
+                if (linkSusi && !unpublished) {
                     if (host == null) {
                         buf.append("<td class=\"addtobook\" colspan=\"2\">").append("<a title=\"").append(_t("Add to addressbook"))
                            .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
@@ -339,11 +341,15 @@ class NetDbRenderer {
                 } else {
                     String b32 = dest.toBase32();
                     buf.append("<code>").append(dest.toBase64().substring(0, 6)).append("</code></th>")
-                       .append("</tr>\n<tr>")
-                       .append("<td><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n")
-                       .append("<td class=\"addtobook\"><a title=\"").append(_t("Add to addressbook"))
+                       .append("</tr>\n<tr><td");
+                    if (!linkSusi)
+                        buf.append(" colspan=\"2\"");
+                    buf.append("><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n");
+                    if (linkSusi) {
+                       buf.append("<td class=\"addtobook\"><a title=\"").append(_t("Add to addressbook"))
                        .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
                        .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
+                    }
                 }
             }
             buf.append("</tr>\n<tr><td colspan=\"2\">\n");

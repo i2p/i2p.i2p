@@ -14,6 +14,8 @@ import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.NavHelper;
+import net.i2p.router.web.PluginStarter;
+import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.PortMapper;
 
 /**
@@ -194,6 +196,20 @@ public class HomeHelper extends HelperBase {
                       ':' + _context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658) + '/';
             } else {
                 url = app.url;
+                // check for disabled webapps and other things
+                if (url.equals("/dns")) {
+                    if (!WebAppStarter.isWebAppRunning("susidns"))
+                        continue;
+                } else if (url.equals("/webmail")) {
+                    if (!WebAppStarter.isWebAppRunning("susimail"))
+                        continue;
+                } else if (url.equals("/torrents")) {
+                    if (!WebAppStarter.isWebAppRunning("i2psnark"))
+                        continue;
+                } else if (url.equals("/configplugins")) {
+                    if (!PluginStarter.pluginsEnabled(_context))
+                        continue;
+                }
             }
             buf.append("\n<div class=\"app\">\n" +
                        "<div class=\"appimg\">" +

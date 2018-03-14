@@ -21,6 +21,7 @@ import net.i2p.router.web.Messages;
 import net.i2p.router.web.NavHelper;
 import net.i2p.router.web.NewsHelper;
 import net.i2p.router.web.StatSummarizer;
+import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SystemVersion;
 
@@ -211,21 +212,25 @@ class SummaryBarRenderer {
            .append(_t("I2P Services"))
            .append("</a></h3>\n" +
 
-                   "<hr class=\"b\"><table id=\"sb_services\"><tr><td>" +
+                   "<hr class=\"b\"><table id=\"sb_services\"><tr><td>");
 
-                   "<a href=\"/webmail\" target=\"_top\" title=\"")
+        if (WebAppStarter.isWebAppRunning("susimail")) {
+           buf.append("<a href=\"/webmail\" target=\"_top\" title=\"")
            .append(_t("Anonymous webmail client"))
            .append("\">")
            .append(nbsp(_t("Email")))
-           .append("</a>\n" +
+           .append("</a>\n");
+        }
 
-                   "<a href=\"/torrents\" target=\"_top\" title=\"")
+        if (WebAppStarter.isWebAppRunning("i2psnark")) {
+           buf.append("<a href=\"/torrents\" target=\"_top\" title=\"")
            .append(_t("Built-in anonymous BitTorrent Client"))
            .append("\">")
            .append(nbsp(_t("Torrents")))
-           .append("</a>\n" +
+           .append("</a>\n");
+        }
 
-                   "<a href=\"http://")
+        buf.append("<a href=\"http://")
            .append(_context.portMapper().getActualHost(PortMapper.SVC_EEPSITE, "127.0.0.1"))
            .append(':')
            .append(_context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658))
@@ -249,13 +254,15 @@ class SummaryBarRenderer {
            .append(_t("I2P Internals"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table id=\"sb_internals\"><tr><td>\n" +
+                   "<table id=\"sb_internals\"><tr><td>\n");
 
-                   "<a href=\"/dns\" target=\"_top\" title=\"")
+        if (WebAppStarter.isWebAppRunning("susidns")) {
+           buf.append("<a href=\"/dns\" target=\"_top\" title=\"")
            .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
            .append(nbsp(_t("Addressbook")))
            .append("</a>\n");
+        }
 
         if (!StatSummarizer.isDisabled()) {
             buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
@@ -269,15 +276,17 @@ class SummaryBarRenderer {
            .append(_t("Router Help and FAQ"))
            .append("\">")
            .append(nbsp(_t("Help")))
-           .append("</a>\n" +
+           .append("</a>\n");
 
-                   "<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+        if (WebAppStarter.isWebAppRunning("i2ptunnel")) {
+           buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Local Tunnels"))
            .append("\">")
            .append(nbsp(_t("Hidden Services Manager")))
-           .append("</a>\n" +
+           .append("</a>\n");
+        }
 
-                   "<a href=\"/logs\" target=\"_top\" title=\"")
+        buf.append("<a href=\"/logs\" target=\"_top\" title=\"")
            .append(_t("Health Report"))
            .append("\">")
            .append(nbsp(_t("Logs")))

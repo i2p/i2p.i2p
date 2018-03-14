@@ -28,6 +28,7 @@ import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.NewsHelper;
+import net.i2p.router.web.WebAppStarter;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -557,10 +558,18 @@ public class SummaryHelper extends HelperBase {
         List<Destination> clients = new ArrayList<Destination>(_context.clientManager().listClients());
 
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+        boolean link = WebAppStarter.isWebAppRunning("i2ptunnel");
+        buf.append("<h3>");
+        if (link) {
+            buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Add/remove/edit &amp; control your client and server tunnels"))
-           .append("\">").append(_t("Local Tunnels"))
-           .append("</a></h3><hr class=\"b\">");
+           .append("\">");
+        }
+        buf.append(_t("Local Tunnels"));
+        if (link) {
+           buf.append("</a>");
+        }
+        buf.append("</h3><hr class=\"b\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
             buf.append("<table id=\"sb_localtunnels\">");
