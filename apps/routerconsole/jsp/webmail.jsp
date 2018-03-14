@@ -9,7 +9,7 @@
     boolean embedApp = tester.embedApps();
     if (!testIFrame || !embedApp) {
         response.setStatus(307);
-        response.setHeader("Location", "/susimail/susimail");
+        response.setHeader("Location", "/susimail/");
         // force commitment
         response.getOutputStream().close();
         return;
@@ -34,11 +34,11 @@
 
 <%@include file="summary.jsi" %>
 
-<h1><%=intl._t("I2P Webmail")%> <span class="newtab"><a href="/susimail/susimail" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
+<h1><%=intl._t("I2P Webmail")%> <span class="newtab"><a href="/susimail/" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="webmail">
-<iframe src="/susimail/susimail" width="100%" height="100%" frameborder="0" border="0" name="susimailframe" id="susimailframe" onload="setupFrame()" allowtransparency="true">
+<iframe src="/susimail/" width="100%" height="100%" frameborder="0" border="0" name="susimailframe" id="susimailframe" onload="setupFrame()" allowtransparency="true">
 <%=intl._t("Your browser does not support iFrames.")%>
-&nbsp;<a href="/susimail/susimail"><%=intl._t("Click here to continue.")%></a>
+&nbsp;<a href="/susimail/"><%=intl._t("Click here to continue.")%></a>
 </iframe>
 </div></body></html>
 <%

@@ -174,7 +174,7 @@ This product includes software developed by the Apache Software Foundation
 <p>Another application you can see on this webpage is <a href="http://i2p-projekt.i2p/ar/docs/api/i2ptunnel">I2PTunnel</a>
 (your <a href="i2ptunnel/" target="_blank">web interface</a>) - a GPL'ed application written by mihi that
 lets you tunnel normal TCP/IP traffic over I2P (such as the eepproxy and the irc proxy).  There is also a
-<a href="http://susi.i2p/">susimail</a> web based mail client <a href="susimail/susimail">available</a> on
+web-based mail client <a href="/susimail/">available</a> on
 the console, which is a GPL'ed application written by susi23.  The addressbook application, written by
 <a href="http://ragnarok.i2p/">Ragnarok</a> helps maintain your hosts.txt files (see ./addressbook/ for
 more information).</p>

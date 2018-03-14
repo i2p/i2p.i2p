@@ -158,7 +158,7 @@ fondation Apache Software (http://www.apache.org/).</p>
 <p>Une autre application visible sur cette page: <a href="http://i2p-projekt.i2p/fr/docs/api/i2ptunnel">I2PTunnel</a>
 (votre <a href="i2ptunnel/" target="_blank">interface web</a>) sous licence GPL écrite par mihi qui vous permet de 
 mettre en tunnels le trafic normal TCP/IP sur I2P (comme les proxy eep et le proxy irc). Il y a aussi un client webmail 
-<a href="http://susi.i2p/">susimail</a> <a href="susimail/susimail">disponible</a> dans la console, qui est sous 
+<a href="/susimail/">disponible</a> dans la console, qui est sous 
 licence GPL et écrit par susi23. L'application carnet d'adresses, écrite par 
 <a href="http://ragnarok.i2p/">Ragnarok</a> gère votre fichier hosts.txt (voir ./addressbook/ pour plus de détails).</p>
 

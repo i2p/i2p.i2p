@@ -194,8 +194,8 @@ Dit product bevat software ontwikkeld door de Apache Software Foundation
 href="http://i2p-projekt.i2p/nl/docs/api/i2ptunnel">I2PTunnel</a> (je <a href="i2ptunnel/"
 target="_blank">web interface</a>) - een GPL applicatie geschreven door mihi
 die normaal TCP/IP verkeer over I2P laat tunnelen (zoals de eepproxy en de irc
-proxy). Er is ook een <a href="http://susi.i2p/">susimail</a> web based mail
-client <a href="susimail/susimail">beschikbaar</a> op de console, dit is een
+proxy). Er is ook een web based mail
+client <a href="/susimail/">beschikbaar</a> op de console, dit is een
 GPL applicatie geschreven door susi23. De adresboek applicatie, geschreven door
 <a href="http://ragnarok.i2p/">Ragnarok</a> helpt je met het beheren van je
 hosts.txt bestanden (zie ./addressbook/ voor meer informatie).</p>

@@ -112,7 +112,7 @@ public class WebMail extends HttpServlet
 	private enum State { AUTH, LOADING, LIST, SHOW, NEW, CONFIG }
 	
 	// TODO generate from servlet name to allow for renaming or multiple instances
-	private static final String myself = "/susimail/susimail";
+	private static final String myself = "/susimail/";
 	
 	/*
 	 * form keys on login page

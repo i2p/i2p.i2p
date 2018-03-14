@@ -35,7 +35,29 @@
 
   <servlet-mapping>
     <servlet-name>SusiMail</servlet-name>
+    <!-- old location /susimail/susimail -->
     <url-pattern>/susimail</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SusiMail</servlet-name>
+    <!-- empty pattern handles the root -->
+    <url-pattern></url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SusiMail</servlet-name>
+    <url-pattern>/index</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SusiMail</servlet-name>
+    <url-pattern>/index.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SusiMail</servlet-name>
+    <url-pattern>/index.html</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
