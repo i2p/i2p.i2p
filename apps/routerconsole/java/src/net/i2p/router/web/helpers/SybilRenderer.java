@@ -812,7 +812,8 @@ class SybilRenderer {
                 buf.append("<a title=\"View extended router info\" class=\"viewfullentry\" href=\"netdb?r=")
                    .append(hash.substring(0, 6)).append("\" >[").append(_t("Full entry")).append("]</a></th><th>");
             }
-            buf.append("<img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
+            if (_context.portMapper().getPort("imagegen") > 0)
+                buf.append("<img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
             buf.append("</th></tr>\n<tr><td class=\"sybilinfo_params\" colspan=\"3\"><div class=\"sybilinfo_container\">");
             if (us != null) {
                 BigInteger dist = HashDistance.getDistance(us, info.getHash());
