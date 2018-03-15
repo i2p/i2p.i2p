@@ -188,10 +188,10 @@ public class HomeHelper extends HelperBase {
         String website = _t("Web Server");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
+        PortMapper pm = _context.portMapper();
         for (App app : apps) {
             String url;
             if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
-                PortMapper pm = _context.portMapper();
                 int port = pm.getPort(PortMapper.SVC_EEPSITE);
                 int sslPort = pm.getPort(PortMapper.SVC_HTTPS_EEPSITE);
                 if (port <= 0 && sslPort <= 0)
@@ -208,13 +208,13 @@ public class HomeHelper extends HelperBase {
                 url = app.url;
                 // check for disabled webapps and other things
                 if (url.equals("/dns")) {
-                    if (!WebAppStarter.isWebAppRunning("susidns"))
+                    if (pm.getPort("susidns") <= 0)
                         continue;
                 } else if (url.equals("/webmail")) {
-                    if (!WebAppStarter.isWebAppRunning("susimail"))
+                    if (pm.getPort("susimail") <= 0)
                         continue;
                 } else if (url.equals("/torrents")) {
-                    if (!WebAppStarter.isWebAppRunning("i2psnark"))
+                    if (pm.getPort("i2psnark") <= 0)
                         continue;
                 } else if (url.equals("/configplugins")) {
                     if (!PluginStarter.pluginsEnabled(_context))
