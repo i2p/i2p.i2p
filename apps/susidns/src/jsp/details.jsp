@@ -78,6 +78,7 @@
         if (addrs == null) {
             %><p>Not found: <%=detail%></p><%
         } else {
+            boolean haveImagegen = book.haveImagegen();
             // use one nonce for all
             String nonce = book.getSerial();
             for (i2p.susi.dns.AddressBean addr : addrs) {
@@ -148,7 +149,6 @@
 <td class="destinations"><div class="destaddress" tabindex="0"><%=addr.getDestination()%></div></td>
 </tr>
 </table>
-</div>
 <div id="buttons">
 <form method="POST" action="addressbook">
 <p class="buttons">
@@ -161,7 +161,10 @@
 <input class="delete" type="submit" name="action" value="<%=intl._t("Delete Entry")%>" >
 </p>
 </form>
-</div>
+</div><%-- buttons --%>
+<%
+                if (haveImagegen) {
+%>
 <div id="visualid">
 <h3><%=intl._t("Visual Identification for")%> <span id="idAddress"><%=addr.getName()%></span></h3>
 <table>
@@ -173,18 +176,20 @@
 <td colspan="2"><a class="fakebutton" href="/imagegen" title="<%=intl._t("Create your own identification images")%>" target="_blank"><%=intl._t("Launch Image Generator")%></a></td>
 </tr>
 </table>
+</div><%-- visualid --%>
+<%
+                }  // haveImagegen
+%>
 <hr>
 <%
             }  // foreach addr
-%>
-</div>
-<%
         }  // addrs == null
     }  // detail == null
 %>
+</div><%-- book --%>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
 </div>
-</div>
+</div><%-- page --%>
 </body>
 </html>

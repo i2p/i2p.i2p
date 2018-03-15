@@ -433,4 +433,11 @@ public class NamingServiceBean extends AddressbookBean
 		getNamingService().export(out, searchProps);
 		// No post-filtering for hosts.txt naming services. It is what it is.
 	}
+
+	/**
+	 *  @since 0.9.34
+	 */
+	public boolean haveImagegen() {
+		return _context.portMapper().getPort("imagegen") > 0;
+	}
 }
