@@ -217,7 +217,11 @@ public class I2PSnarkServlet extends BasicServlet {
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
             writeMessages(out, false, peerString);
-            writeTorrents(out, req);
+            boolean canWrite;
+            synchronized(this) {
+                canWrite = _resourceBase.canWrite();
+            }
+            writeTorrents(out, req, canWrite);
             return;
         }
 
@@ -373,14 +377,14 @@ public class I2PSnarkServlet extends BasicServlet {
             writeConfigForm(out, req);
             writeTrackerForm(out, req);
         } else {
-            boolean pageOne = writeTorrents(out, req);
+            boolean canWrite;
+            synchronized(this) {
+                canWrite = _resourceBase.canWrite();
+            }
+            boolean pageOne = writeTorrents(out, req, canWrite);
             // end of mainsection div
             if (pageOne) {
                 out.write("</div><div id=\"lowersection\">\n");
-                boolean canWrite;
-                synchronized(this) {
-                    canWrite = _resourceBase.canWrite();
-                }
                 if (canWrite) {
                     writeAddForm(out, req);
                     writeSeedForm(out, req, sortedTrackers);
@@ -442,9 +446,10 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
+     *  @param canWrite is the data directory writable?
      *  @return true if on first page
      */
-    private boolean writeTorrents(PrintWriter out, HttpServletRequest req) throws IOException {
+    private boolean writeTorrents(PrintWriter out, HttpServletRequest req, boolean canWrite) throws IOException {
         /** dl, ul, down rate, up rate, peers, size */
         final long stats[] = {0,0,0,0,0,0};
         String peerParam = req.getParameter("p");
@@ -693,7 +698,7 @@ public class I2PSnarkServlet extends BasicServlet {
             Snark snark = snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
-            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, isRatSort);
+            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, isRatSort, canWrite);
         }
 
         if (total == 0) {
@@ -707,7 +712,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write(_t("Not a directory") + ": " + DataHelper.escapeHTML(dd.toString()));
                 } else if (!dd.canRead()) {
                     out.write(_t("Unreadable") + ": " + DataHelper.escapeHTML(dd.toString()));
-                } else if (!dd.canWrite()) {
+                } else if (canWrite) {
                     out.write(_t("No write permissions for data directory") + ": " + DataHelper.escapeHTML(dd.toString()));
                 } else {
                     out.write(_t("No torrents loaded."));
@@ -1525,11 +1530,12 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      *  @param stats in/out param (totals)
      *  @param statsOnly if true, output nothing, update stats only
+     *  @param canWrite is the i2psnark data directory writable?
      */
     private void displaySnark(PrintWriter out, HttpServletRequest req,
                               Snark snark, String uri, int row, long stats[], boolean showPeers,
                               boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly,
-                              boolean showRatios) throws IOException {
+                              boolean showRatios, boolean canWrite) throws IOException {
         // stats
         long uploaded = snark.getUploaded();
         stats[0] += snark.getDownloaded();
@@ -1843,7 +1849,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isDegraded)
                     out.write("</a>");
             }
-            if (isValid) {
+            if (isValid && canWrite) {
                 // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
@@ -1866,26 +1872,29 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("</a>");
             }
 
-            // Delete Button
-            // Doesnt work with Opera so use noThinsp instead of isDegraded
-            if (noThinsp)
-                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce +
-                          getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
-            else
-                out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
-            out.write(_t("Delete the .torrent file and the associated data file(s)"));
-            out.write("\" onclick=\"if (!confirm('");
-            // Can't figure out how to escape double quotes inside the onclick string.
-            // Single quotes in translate strings with parameters must be doubled.
-            // Then the remaining single quote must be escaped
-            out.write(_t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?",
-                        escapeJSString(fullBasename)));
-            out.write("')) { return false; }\"");
-            out.write(" src=\"" + _imgPath + "delete.png\" alt=\"");
-            out.write(_t("Delete"));
-            out.write("\">");
-            if (isDegraded)
-                out.write("</a>");
+            // We can delete magnets without write privs
+            if (!isValid || canWrite) {
+                // Delete Button
+                // Doesnt work with Opera so use noThinsp instead of isDegraded
+                if (noThinsp)
+                    out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce +
+                              getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
+                else
+                    out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
+                out.write(_t("Delete the .torrent file and the associated data file(s)"));
+                out.write("\" onclick=\"if (!confirm('");
+                // Can't figure out how to escape double quotes inside the onclick string.
+                // Single quotes in translate strings with parameters must be doubled.
+                // Then the remaining single quote must be escaped
+                out.write(_t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?",
+                            escapeJSString(fullBasename)));
+                out.write("')) { return false; }\"");
+                out.write(" src=\"" + _imgPath + "delete.png\" alt=\"");
+                out.write(_t("Delete"));
+                out.write("\">");
+                if (isDegraded)
+                    out.write("</a>");
+            }
         }
         out.write("</td>\n</tr>\n");
 
