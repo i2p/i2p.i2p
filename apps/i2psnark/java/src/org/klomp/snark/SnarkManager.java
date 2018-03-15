@@ -1058,13 +1058,27 @@ public class SnarkManager implements CompleteListener, ClientApp {
             } catch (NumberFormatException nfe) {}
         }
 
+        // set this before we check the data dir
+        if (areFilesPublic() != filesPublic) {
+            _config.setProperty(PROP_FILES_PUBLIC, Boolean.toString(filesPublic));
+            _util.setFilesPublic(filesPublic);
+            if (filesPublic)
+                addMessage(_t("New files will be publicly readable"));
+            else
+                addMessage(_t("New files will not be publicly readable"));
+            changed = true;
+        }
+
         if (dataDir != null && !dataDir.equals(getDataDir().getAbsolutePath())) {
             dataDir = DataHelper.stripHTML(dataDir.trim());
-            File dd = new File(dataDir);
+            File dd = areFilesPublic() ? new File(dataDir) : new SecureDirectory(dataDir);
             if (!dd.isAbsolute()) {
                 addMessage(_t("Data directory must be an absolute path") + ": " + dataDir);
-            } else if (!dd.exists()) {
-                addMessage(_t("Data directory does not exist") + ": " + dataDir);
+            } else if (!dd.exists() && !dd.mkdirs()) {
+                // save this tag for now, may need it again
+                if (false)
+                    addMessage(_t("Data directory does not exist") + ": " + dataDir);
+                addMessage(_t("Data directory cannot be created") + ": " + dataDir);
             } else if (!dd.isDirectory()) {
                 addMessage(_t("Not a directory") + ": " + dataDir);
             } else if (!dd.canRead()) {
@@ -1195,16 +1209,6 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 }
                 changed = true;
             }  // reconnect || changed options
-
-        if (areFilesPublic() != filesPublic) {
-            _config.setProperty(PROP_FILES_PUBLIC, Boolean.toString(filesPublic));
-            _util.setFilesPublic(filesPublic);
-            if (filesPublic)
-                addMessage(_t("New files will be publicly readable"));
-            else
-                addMessage(_t("New files will not be publicly readable"));
-            changed = true;
-        }
 
         if (shouldAutoStart() != autoStart) {
             _config.setProperty(PROP_AUTO_START, Boolean.toString(autoStart));

@@ -1,13 +1,17 @@
+2018-03-15 zzz
+ * i2psnark: Start even if data directory not found (ticket #2166)
+
 2018-03-14 zzz
  * Console:
    - Hide links to webapps and eepsite if not running (ticket #2161)
    - Hide link to /configplugins if disabled
    - Add error handler to webapps (ticket #2155)
  * i2ptunnel: Hide links to webapps that are not runnning (ticket #2161)
- * SusDNS: Translate svg image text (ticket #1749)
+ * SusiDNS: Translate svg image text (ticket #1749)
+ * SusiMail: Shorten URLs
 
 2018-03-12 zzz
- * Susimail: Fix up compose.js (ticket #2176)
+ * SusiMail: Fix up compose.js (ticket #2176)
 
 2018-03-11 zzz
  * Crypto: Add utils for renewing a cert in a keystore

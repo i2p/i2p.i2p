@@ -377,8 +377,14 @@ public class I2PSnarkServlet extends BasicServlet {
             // end of mainsection div
             if (pageOne) {
                 out.write("</div><div id=\"lowersection\">\n");
-                writeAddForm(out, req);
-                writeSeedForm(out, req, sortedTrackers);
+                boolean canWrite;
+                synchronized(this) {
+                    canWrite = _resourceBase.canWrite();
+                }
+                if (canWrite) {
+                    writeAddForm(out, req);
+                    writeSeedForm(out, req, sortedTrackers);
+                }
                 writeConfigLink(out);
                 // end of lowersection div
             }
@@ -692,9 +698,22 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (total == 0) {
             out.write("<tr class=\"snarkTorrentNoneLoaded\">" +
-                      "<td colspan=\"11\"><i>");
-            out.write(_t("No torrents loaded."));
-            out.write("</i></td></tr>\n");
+                      "<td colspan=\"11\">");
+            synchronized(this) {
+                File dd = _resourceBase;
+                if (!dd.exists() && !dd.mkdirs()) {
+                    out.write(_t("Data directory cannot be created") + ": " + DataHelper.escapeHTML(dd.toString()));
+                } else if (!dd.isDirectory()) {
+                    out.write(_t("Not a directory") + ": " + DataHelper.escapeHTML(dd.toString()));
+                } else if (!dd.canRead()) {
+                    out.write(_t("Unreadable") + ": " + DataHelper.escapeHTML(dd.toString()));
+                } else if (!dd.canWrite()) {
+                    out.write(_t("No write permissions for data directory") + ": " + DataHelper.escapeHTML(dd.toString()));
+                } else {
+                    out.write(_t("No torrents loaded."));
+                }
+            }
+            out.write("</td></tr>\n");
         } else /** if (snarks.size() > 1) */ {
             out.write("<tfoot><tr>\n" +
                       "    <th id=\"snarkTorrentTotals\" align=\"left\" colspan=\"6\">");
