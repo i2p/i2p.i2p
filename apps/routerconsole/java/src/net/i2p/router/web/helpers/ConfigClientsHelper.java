@@ -215,10 +215,26 @@ public class ConfigClientsHelper extends HelperBase {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
                 boolean isRunning = WebAppStarter.isWebAppRunning(app);
+                String desc;
+                // use descriptions already tagged elsewhere
+                if (app.equals("routerconsole"))
+                    desc = _t("I2P Router Console");
+                else if (app.equals("i2psnark"))
+                    desc = _t("Torrents");
+                else if (app.equals("i2ptunnel"))
+                    desc = _t("Hidden Services Manager");
+                else if (app.equals("imagegen"))
+                    desc = _t("Identification Image Generator");
+                else if (app.equals("susidns"))
+                    desc = _t("Addressbook");
+                else if (app.equals("susimail"))
+                    desc = _t("Email");
+                else
+                    desc = DataHelper.escapeHTML(app) + ".war";
                 renderForm(buf, app, app,
                            RouterConsoleRunner.ROUTERCONSOLE.equals(app) || (isRunning && !"addressbook".equals(app)),
                            "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app),
-                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), DataHelper.escapeHTML(app + ".war"),
+                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), desc,
                            false, false, false, isRunning, false, !isRunning);
             }
         }
