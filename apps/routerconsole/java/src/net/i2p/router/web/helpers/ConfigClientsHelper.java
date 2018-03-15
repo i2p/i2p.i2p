@@ -215,7 +215,8 @@ public class ConfigClientsHelper extends HelperBase {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
                 boolean isRunning = WebAppStarter.isWebAppRunning(app);
-                renderForm(buf, app, app, !"addressbook".equals(app),
+                renderForm(buf, app, app,
+                           RouterConsoleRunner.ROUTERCONSOLE.equals(app) || (isRunning && !"addressbook".equals(app)),
                            "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app),
                            RouterConsoleRunner.ROUTERCONSOLE.equals(app), DataHelper.escapeHTML(app + ".war"),
                            false, false, false, isRunning, false, !isRunning);
@@ -333,7 +334,7 @@ public class ConfigClientsHelper extends HelperBase {
                             boolean showDeleteButton, boolean showStartButton) {
         String escapedName = DataHelper.escapeHTML(name);
         buf.append("<tr><td align=\"right\">");
-        if (urlify && enabled) {
+        if (urlify) {
             String link = "/";
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(name))
                 link += escapedName + "/";
