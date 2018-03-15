@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
@@ -617,10 +618,14 @@ public final class SelfSignedGenerator {
         int ext3len = oid3.length + TRUE.length + spaceFor(wrap3len);
 
         int wrap41len = 0;
-        if (altNames == null)
-            altNames = new HashSet<String>(4);
-        else
+        // SEQUENCE doesn't have to be sorted, but let's do it for consistency,
+        // so it's platform-independent and the same after renewal
+        if (altNames == null) {
+            altNames = new TreeSet<String>();
+        } else {
+            altNames = new TreeSet<String>(altNames);
             altNames.remove("0:0:0:0:0:0:0:1");  // We don't want dup of "::1"
+        }
         altNames.add(cname);
         final boolean isCA = !cname.contains("@") && !cname.endsWith(".family.i2p.net");
         if (isCA) {
