@@ -1512,12 +1512,13 @@ public class I2PSnarkServlet extends BasicServlet {
                     sort = Integer.parseInt(ssort);
                 } catch (NumberFormatException nfe) {}
             }
+            String lang;
             if (_manager.isSmartSortEnabled())
-                Sorters.setPattern(Translate.getLanguage(_manager.util().getContext()));
+                lang = Translate.getLanguage(_manager.util().getContext());
             else
-                Sorters.setPattern(null);
+                lang = null;
             // Java 7 TimSort - may be unstable
-            DataHelper.sort(rv, Sorters.getComparator(sort, this));
+            DataHelper.sort(rv, Sorters.getComparator(sort, lang, this));
         }
         return rv;
     }
