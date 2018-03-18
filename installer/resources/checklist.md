@@ -122,7 +122,7 @@
 9. Verify that no untrusted revisions were inadvertently blessed by a trusted party:
 
     ```
-    mtn log --brief --no-graph --to t:i2p-0.9.(xx-1) | cut -d ' ' -f 2 | sort | uniq -c
+    ant revisions
     ```
 
 ### Build and test

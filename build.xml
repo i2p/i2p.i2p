@@ -508,6 +508,33 @@
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
 
+    <target name="revisions" depends="getReleaseNumber, getBuildNumber">
+        <!-- mtn log __brief __no-graph __to t:i2p-0.9.xx | cut -d ' ' -f 2 | sort | uniq -c | sort -rn -->
+        <exec executable="mtn" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
+            <arg value="log" />
+            <arg value="--brief" />
+            <arg value="--no-graph" />
+            <arg value="--to" />
+            <arg value="t:i2p-${release.number}" />
+        </exec>
+        <exec executable="cut" inputstring="${getrevisions1}" outputproperty="getrevisions2" failifexecutionfails="true" >
+            <arg value="-d" />
+            <arg value=" " />
+            <arg value="-f" />
+            <arg value="2" />
+        </exec>
+        <exec executable="sort" inputstring="${getrevisions2}" outputproperty="getrevisions3" failifexecutionfails="true" >
+        </exec>
+        <exec executable="uniq" inputstring="${getrevisions3}" outputproperty="getrevisions4" failifexecutionfails="true" >
+            <arg value="-c" />
+        </exec>
+        <exec executable="sort" inputstring="${getrevisions4}" outputproperty="getrevisions5" failifexecutionfails="true" >
+            <arg value="-rn" />
+        </exec>
+        <echo message="Revisions since ${release.number}:" />
+        <echo message="${getrevisions5}" />
+    </target>
+
     <!-- end monotone targets -->
 
     <!-- launch4j targets -->
