@@ -953,6 +953,23 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             line = null;
                             continue;
                         }
+                    } else if(lowercaseLine.startsWith("accept: ")) {
+                        if (!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT))) {
+                            // Replace with a standard one if possible
+                            boolean html = lowercaseLine.indexOf("text/html") > 0;
+                            boolean css = lowercaseLine.indexOf("text/css") > 0;
+                            boolean img = lowercaseLine.indexOf("image") > 0;
+                            if (html && !img && !css) {
+                                // firefox, tor browser
+                                line = "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+                            } else if (img && !html && !css) {
+                                // chrome
+                                line = "Accept: image/webp,image/apng,image/*,*/*;q=0.8";
+                            } else if (css && !html && !img) {
+                                // chrome, firefox
+                                line = "Accept: text/css,*/*;q=0.1";
+                            }  // else allow as-is
+                        }
                     } else if(lowercaseLine.startsWith("accept")) {
                         // strip the accept-blah headers, as they vary dramatically from
                         // browser to browser
