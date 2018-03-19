@@ -815,6 +815,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         @Override
         protected boolean shouldCompress() {
             return (_dataExpected < 0 || _dataExpected >= MIN_TO_COMPRESS) &&
+                   // must be null as we write the header in finishHeaders(), can't have two
+                   (_contentEncoding == null) &&
                    (_contentType == null ||
                     ((!_contentType.startsWith("audio/")) &&
                      (!_contentType.startsWith("image/")) &&
@@ -825,17 +827,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      (!_contentType.equals("application/x-bzip")) &&
                      (!_contentType.equals("application/x-bzip2")) &&
                      (!_contentType.equals("application/x-gzip")) &&
-                     (!_contentType.equals("application/zip")))) &&
-                   (_contentEncoding == null ||
-                    ((!_contentEncoding.equals("gzip")) &&
-                     (!_contentEncoding.equals("compress")) &&
-                     (!_contentEncoding.equals("deflate"))));
+                     (!_contentType.equals("application/zip"))));
         }
 
         @Override
         protected void finishHeaders() throws IOException {
-            //if (_log.shouldLog(Log.INFO))
-            //    _log.info("Including x-i2p-gzip as the content encoding in the response");
+            // TODO if browser supports gzip, send as gzip
             if (shouldCompress())
                 out.write(DataHelper.getASCII("Content-Encoding: x-i2p-gzip\r\n"));
             super.finishHeaders();
