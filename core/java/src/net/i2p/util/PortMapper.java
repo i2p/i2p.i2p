@@ -115,10 +115,31 @@ public class PortMapper {
     }
 
     /**
+     *  Is the service registered?
+     *
+     *  @since 0.9.34
+     */
+    public boolean isRegistered(String service) {
+        return _dir.containsKey(service);
+    }
+
+    /**
      *  Remove the service
      */
     public void unregister(String service) {
         _dir.remove(service);
+    }
+
+    /**
+     *  Remove the service,
+     *  only if it is registered with the supplied port.
+     *
+     *  @since 0.9.34
+     */
+    public void unregister(String service, int port) {
+        // not synched
+        if (getPort(service) == port)
+            _dir.remove(service);
     }
 
     /**
