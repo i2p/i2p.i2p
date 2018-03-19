@@ -28,7 +28,12 @@
  <p class="infohelp">
  <%=intl._t("Exploratory tunnel setting changes are stored in the router.config file.")%>
  <%=intl._t("Client tunnel changes are temporary and are not saved.")%>
+<%
+    net.i2p.util.PortMapper pm = net.i2p.I2PAppContext.getGlobalContext().portMapper();
+    if (pm.isRegistered(net.i2p.util.PortMapper.SVC_I2PTUNNEL)) {
+%>
  <%=intl._t("To make permanent client tunnel changes see the")%>&nbsp;<a href="/i2ptunnelmgr"><%=intl._t("i2ptunnel page")%></a>.
+<%  }  %>
  </p>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
