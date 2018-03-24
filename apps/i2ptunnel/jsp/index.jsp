@@ -36,8 +36,8 @@
 <body id="tunnelListPage">
 
 <%
-  if (indexBean.isInitialized()) {
-      String nextNonce = net.i2p.i2ptunnel.web.IndexBean.getNextNonce();
+  boolean isInitialized = indexBean.isInitialized();
+  String nextNonce = isInitialized ? net.i2p.i2ptunnel.web.IndexBean.getNextNonce() : null;
 
   // not synced, oh well
   int lastID = indexBean.getLastMessageID();
@@ -55,13 +55,20 @@
         <tr>
             <td class="buttons">
                 <a class="control" href="list"><%=intl._t("Refresh")%></a>
+<%
+  if (isInitialized) {
+%>
                 <a class="control" href="list?action=Clear&amp;msgid=<%=lastID%>&amp;nonce=<%=nextNonce%>"><%=intl._t("Clear")%></a>
+<%
+  }  // isInitialized
+%>
             </td>
         </tr>
     </table>
 </div>
 <%
   }  // !msgs.isEmpty()
+  if (isInitialized) {
 %>
 <div class="panel" id="globalTunnelControl">
     <h2><%=intl._t("Global Tunnel Control")%></h2>
