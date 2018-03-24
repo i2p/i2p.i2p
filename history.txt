@@ -1,3 +1,9 @@
+2018-03-24 zzz
+ * i2psnark: Change default sort order for some columns (ticket #2152)
+
+2018-03-19 zzz
+ * i2ptunnel: Rewrite or pass through Accept: header
+
 2018-03-15 zzz
  * i2psnark: Start even if data directory not found (ticket #2166)
 

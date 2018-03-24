@@ -542,7 +542,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</th>\n<th class=\"snarkTorrentETA\" align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             if (showSort) {
-                sort = ("4".equals(currentSort)) ? "-4" : "4";
+                sort = ("-4".equals(currentSort)) ? "4" : "-4";
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
@@ -558,16 +558,16 @@ public class I2PSnarkServlet extends BasicServlet {
         // cycle through sort by size or downloaded
         boolean isDlSort = false;
         if (showSort) {
-            if ("5".equals(currentSort)) {
-                sort = "-5";
-            } else if ("-5".equals(currentSort)) {
-                sort = "6";
-                isDlSort = true;
-            } else if ("6".equals(currentSort)) {
+            if ("-5".equals(currentSort)) {
+                sort = "5";
+            } else if ("5".equals(currentSort)) {
                 sort = "-6";
                 isDlSort = true;
+            } else if ("-6".equals(currentSort)) {
+                sort = "6";
+                isDlSort = true;
             } else {
-                sort = "5";
+                sort = "-5";
             }
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\">");
@@ -585,20 +585,20 @@ public class I2PSnarkServlet extends BasicServlet {
             // cycle through sort by uploaded or ratio
             boolean nextRatSort = false;
             if (showSort) {
-                if ("7".equals(currentSort)) {
-                    sort = "-7";
-                } else if ("-7".equals(currentSort)) {
-                    sort = "11";
-                    nextRatSort = true;
-                } else if ("11".equals(currentSort)) {
+                if ("-7".equals(currentSort)) {
+                    sort = "7";
+                } else if ("7".equals(currentSort)) {
                     sort = "-11";
                     nextRatSort = true;
-                    isRatSort = true;
                 } else if ("-11".equals(currentSort)) {
-                    sort = "7";
+                    sort = "11";
+                    nextRatSort = true;
+                    isRatSort = true;
+                } else if ("11".equals(currentSort)) {
+                    sort = "-7";
                     isRatSort = true;
                 } else {
-                    sort = "7";
+                    sort = "-7";
                 }
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
@@ -614,7 +614,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</th>\n<th class=\"snarkTorrentRateDown\" align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             if (showSort) {
-                sort = ("8".equals(currentSort)) ? "-8" : "8";
+                sort = ("-8".equals(currentSort)) ? "8" : "-8";
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
@@ -629,7 +629,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</th>\n<th class=\"snarkTorrentRateUp\" align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             if (showSort) {
-                sort = ("9".equals(currentSort)) ? "-9" : "9";
+                sort = ("-9".equals(currentSort)) ? "9" : "-9";
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
