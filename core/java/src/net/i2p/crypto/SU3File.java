@@ -700,7 +700,7 @@ public class SU3File {
     }
 
     /**
-     *  @param stype number or name
+     *  @param ctype number or name
      *  @return null if not found
      *  @since 0.9.9
      */
