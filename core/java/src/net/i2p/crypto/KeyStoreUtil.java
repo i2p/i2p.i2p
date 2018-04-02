@@ -398,10 +398,10 @@ public final class KeyStoreUtil {
      *  @return number successfully removed
      *  @since 0.9.24
      */
-    private static int removeBlacklistedCerts(KeyStore ks) {
+    private synchronized static int removeBlacklistedCerts(KeyStore ks) {
         if (SystemVersion.isAndroid())
             return 0;
-        int count = 0;
+        List<String> toRemove = new ArrayList<String>(4);
         try {
             MessageDigest md = SHA1.getInstance();
             for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
@@ -429,8 +429,7 @@ public final class KeyStoreUtil {
                             //}
                             //info("hex is: " + buf);
                             if (_blacklist.contains(new SHA1Hash(h))) {
-                                ks.deleteEntry(alias);
-                                count++;
+                                toRemove.add(alias);
                                 if (!_blacklistLogged) {
                                     // should this be a logAlways?
                                     X509Certificate xc = (X509Certificate) c;
@@ -450,9 +449,15 @@ public final class KeyStoreUtil {
                 }
             }
         } catch (GeneralSecurityException e) {}
-        if (count > 0)
+        if (!toRemove.isEmpty()) {
             _blacklistLogged = true;
-        return count;
+            for (String alias : toRemove) {
+                try {
+                    ks.deleteEntry(alias);
+                } catch (GeneralSecurityException e) {}
+            }
+        }
+        return toRemove.size();
     }
 
     /**
@@ -1235,7 +1240,7 @@ public final class KeyStoreUtil {
      *   Usage: KeyStoreUtil (loads from system keystore)
      *          KeyStoreUtil foo.ks (loads from system keystore, and from foo.ks keystore if exists, else creates empty)
      *          KeyStoreUtil certDir (loads from system keystore and all certs in certDir if exists)
-     *          KeyStoreUtil import file.ks file.key alias keypw (imxports private key from file to keystore)
+     *          KeyStoreUtil import file.ks file.key alias keypw (imports private key from file to keystore)
      *          KeyStoreUtil export file.ks alias keypw (exports private key from keystore)
      *          KeyStoreUtil keygen file.ks alias keypw (create keypair in keystore)
      *          KeyStoreUtil keygen2 file.ks alias keypw (create keypair using I2PProvider)

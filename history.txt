@@ -1,5 +1,9 @@
+2018-04-02 zzz
+ * KeyStore: Fix ConncurrentModificationException (ticket #2196)
+
 2018-03-24 zzz
  * i2psnark: Change default sort order for some columns (ticket #2152)
+ * i2ptunnel: Fix display of 'tunnels not initialized' message
 
 2018-03-19 zzz
  * i2ptunnel: Rewrite or pass through Accept: header
