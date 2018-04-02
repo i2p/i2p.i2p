@@ -32,8 +32,7 @@
         <echo message="  updater200WithJavadocAndJetty: updater including the javadocs, for display in the console, and Jetty (creates i2pupdate200.zip)" />
         <echo message="  signed-updater200WithJavadocAndJetty: Signed updater including the javadocs, for display in the console, and Jetty (creates i2pupdate.su3)" />
         <echo message="  updaterWithJetty: Updater including Jetty" />
-        <echo message="  updater200withJetty: Updater including Jetty" />
-        <echo message="  updater200withJetty: Updater including Jetty" />
+        <echo message="  updater200WithJetty: Updater including Jetty" />
         <echo message="  signed-updater200withJetty: Signed updater including Jetty" />
         <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
         <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
