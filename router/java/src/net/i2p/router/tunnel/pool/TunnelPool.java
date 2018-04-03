@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
@@ -65,8 +66,18 @@ public class TunnelPool {
         _expireSkew = _context.random().nextInt(90*1000);
         _started = System.currentTimeMillis();
         _lastRateUpdate = _started;
-        _rateName = "tunnel.Bps." +
-                    (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
+        String name;
+        if (_settings.isExploratory()) {
+            name = "exploratory";
+        } else {
+            name = _settings.getDestinationNickname();
+            // just strip HTML here rather than escape it everywhere in the console
+            if (name != null)
+                name = DataHelper.stripHTML(name);
+            else
+                name = _settings.getDestination().toBase32() + ".b32.i2p";
+        }
+        _rateName = "tunnel.Bps." + name +
                     (_settings.isInbound() ? ".in" : ".out");
         refreshSettings();
         ctx.statManager().createRateStat("tunnel.matchLease", "How often does our OBEP match their IBGW?", "Tunnels", 
