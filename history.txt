@@ -1,3 +1,6 @@
+2018-04-03 zzz
+ * Stats: Enable per-tunnel bw stats by default (tickets #2106, #2145)
+
 2018-04-02 zzz
  * KeyStore: Fix ConncurrentModificationException (ticket #2196)
 

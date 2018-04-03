@@ -102,7 +102,7 @@ public class TunnelPool {
             if (ls != null)
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
         }
-        _context.statManager().createRateStat(_rateName,
+        _context.statManager().createRequiredRateStat(_rateName,
                                "Tunnel Bandwidth (Bytes/sec)", "Tunnels", 
                                new long[] { 5*60*1000l });
     }
