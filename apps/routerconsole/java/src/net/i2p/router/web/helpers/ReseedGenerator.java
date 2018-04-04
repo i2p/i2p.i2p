@@ -3,6 +3,7 @@ package net.i2p.router.web.helpers;
 import java.io.File;
 import java.io.IOException;
 
+import net.i2p.router.networkdb.reseed.ReseedBundler;
 import net.i2p.router.web.HelperBase;
 
 /**

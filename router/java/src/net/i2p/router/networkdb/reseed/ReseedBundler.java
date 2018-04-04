@@ -1,4 +1,4 @@
-package net.i2p.router.web.helpers;
+package net.i2p.router.networkdb.reseed;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain
@@ -36,10 +36,11 @@ import net.i2p.router.RouterContext;
  *
  *  Caller must delete file when done.
  *
- *  @since 0.9.19 modified from BundleRouterInfos in installer/tools
+ *  @since 0.9.19 modified from BundleRouterInfos in installer/tools,
+ *                moved from routerconsole to net.i2p.router.networkdb.reseed in 0.9.34
  *
  */
-class ReseedBundler {
+public class ReseedBundler {
 
     private final RouterContext _context;
     private final static String ROUTERINFO_PREFIX = "routerInfo-";
