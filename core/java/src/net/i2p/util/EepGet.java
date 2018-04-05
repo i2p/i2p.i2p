@@ -1124,7 +1124,7 @@ public class EepGet {
                     increment(lookahead, cur);
             }
             
-            if (buf.length() > 1024)
+            if (buf.length() > 4096)
                 throw new IOException("Header line too long: " + buf.toString());
         }
     }

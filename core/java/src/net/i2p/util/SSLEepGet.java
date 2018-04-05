@@ -259,7 +259,7 @@ public class SSLEepGet extends EepGet {
         boolean noVerify = false;
         String proxyHost = "127.0.0.1";
         int proxyPort = 0;
-        ProxyType ptype = ProxyType.HTTP;
+        ProxyType ptype = ProxyType.NONE;
         boolean error = false;
         Getopt g = new Getopt("ssleepget", args, "p:y:sz");
         try {
@@ -283,7 +283,7 @@ public class SSLEepGet extends EepGet {
                 case 'y':
                     String y = g.getOptarg().toUpperCase(Locale.US);
                     if (y.equals("HTTP") || y.equals("HTTPS")) {
-                        // already set
+                        ptype = ProxyType.HTTP;
                     } else if (y.equals("SOCKS4")) {
                         ptype = ProxyType.SOCKS4;
                     } else if (y.equals("SOCKS5")) {
