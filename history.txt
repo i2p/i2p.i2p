@@ -1,3 +1,8 @@
+2018-04-05 zzz
+ * EepGet: Increase max header length
+ * SSLEepGet: Set default CLI proxy type back to none
+ * GeoIP update
+
 2018-04-04 zzz
  * Reseed: Move ReseedBundler from console to router (ticket #2203)
 
