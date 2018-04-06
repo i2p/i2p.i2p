@@ -63,7 +63,6 @@ HTMLFILES="\
 ./apps/BOB/src/net/i2p/BOB/package.html \
 ./apps/desktopgui/src/net/i2p/desktopgui/package.html \
 ./apps/ministreaming/java/src/net/i2p/client/streaming/package.html \
-./apps/susidns/src/index.html \
 ./apps/susimail/src/index.html \
 ./core/java/src/net/i2p/client/datagram/package.html \
 ./core/java/src/net/i2p/client/naming/package.html \

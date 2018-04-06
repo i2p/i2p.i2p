@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-18 09:06+0000\n"
-"PO-Revision-Date: 2018-01-18 09:17+0000\n"
+"POT-Creation-Date: 2018-03-28 22:55+0000\n"
+"PO-Revision-Date: 2018-03-28 23:49+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -21,169 +21,167 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: src/src/i2p/susi/webmail/MailPart.java:216
+#: src/src/i2p/susi/webmail/MailPart.java:316
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
 msgstr "Nebyl nalezen žádný enkodér pro kódování \\''{0}\\''."
 
-#: src/src/i2p/susi/webmail/WebMail.java:359
-#: src/src/i2p/susi/webmail/WebMail.java:373
-#: src/src/i2p/susi/webmail/WebMail.java:1091
+#. tagged in WebMail
+#: src/src/i2p/susi/webmail/Sorters.java:90
+#: src/src/i2p/susi/webmail/WebMail.java:1100
+#: src/src/i2p/susi/webmail/WebMail.java:1101
 msgid "Re:"
 msgstr "Odpovědět:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:363
-#: src/src/i2p/susi/webmail/WebMail.java:377
-#: src/src/i2p/susi/webmail/WebMail.java:1129
+#: src/src/i2p/susi/webmail/Sorters.java:91
+#: src/src/i2p/susi/webmail/WebMail.java:1147
+#: src/src/i2p/susi/webmail/WebMail.java:1148
 msgid "Fwd:"
 msgstr "Přeposlat:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:653
+#: src/src/i2p/susi/webmail/WebMail.java:503
 msgid "unknown"
 msgstr "neznámý"
 
-#: src/src/i2p/susi/webmail/WebMail.java:674
-msgid "Warning: no charset found, fallback to US-ASCII."
-msgstr "Upozornění: nebyla nalezena žádná znaková sada, použiji US-ASCII"
-
-#: src/src/i2p/susi/webmail/WebMail.java:688
+#: src/src/i2p/susi/webmail/WebMail.java:552
 #, java-format
 msgid "Charset \\''{0}\\'' not supported."
 msgstr "Znaková sada \\''{0}\\'' není podporována."
 
-#: src/src/i2p/susi/webmail/WebMail.java:692
+#: src/src/i2p/susi/webmail/WebMail.java:556
 #, java-format
 msgid "Part ({0}) not shown, because of {1}"
 msgstr "Část ({0}) nemohla být zobrazena, protože {1}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:742
-#: src/src/i2p/susi/webmail/WebMail.java:747
+#: src/src/i2p/susi/webmail/WebMail.java:602
+#: src/src/i2p/susi/webmail/WebMail.java:607
 #, java-format
 msgid "Download attachment {0}"
 msgstr "Stáhnou přílohu {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:748
+#: src/src/i2p/susi/webmail/WebMail.java:608
 msgid "File is packed into a zipfile for security reasons."
 msgstr "Soubor je z bezpečnostních důvodů zazipován."
 
-#: src/src/i2p/susi/webmail/WebMail.java:753
+#: src/src/i2p/susi/webmail/WebMail.java:613
 #, java-format
 msgid "Attachment ({0})."
 msgstr "Příloha ({0})."
 
-#: src/src/i2p/susi/webmail/WebMail.java:813
+#: src/src/i2p/susi/webmail/WebMail.java:673
 msgid "Need username for authentication."
 msgstr "K autentizaci je nutno zadat uživatelské jméno (username)."
 
-#: src/src/i2p/susi/webmail/WebMail.java:817
+#: src/src/i2p/susi/webmail/WebMail.java:677
 msgid "Need password for authentication."
 msgstr "K autentizaci je nutno zadat uživatelské jméno (password)."
 
-#: src/src/i2p/susi/webmail/WebMail.java:821
+#: src/src/i2p/susi/webmail/WebMail.java:681
 msgid "Need hostname for connect."
 msgstr "Pro připojení je nutno zadat jméno hosta (hostname)."
 
-#: src/src/i2p/susi/webmail/WebMail.java:826
+#: src/src/i2p/susi/webmail/WebMail.java:686
 msgid "Need port number for pop3 connect."
 msgstr "Zadejte číslo portu pro POP3."
 
-#: src/src/i2p/susi/webmail/WebMail.java:833
+#: src/src/i2p/susi/webmail/WebMail.java:693
 msgid "POP3 port number is not in range 0..65535."
 msgstr "Číslo portu pro POP3 musí být v rozmezí 0 až 65535."
 
-#: src/src/i2p/susi/webmail/WebMail.java:839
+#: src/src/i2p/susi/webmail/WebMail.java:699
 msgid "POP3 port number is invalid."
 msgstr "Číslo POP3 portu je neplatné."
 
-#: src/src/i2p/susi/webmail/WebMail.java:845
+#: src/src/i2p/susi/webmail/WebMail.java:705
 msgid "Need port number for smtp connect."
 msgstr "Zadejte číslo portup pro smtm."
 
-#: src/src/i2p/susi/webmail/WebMail.java:852
+#: src/src/i2p/susi/webmail/WebMail.java:712
 msgid "SMTP port number is not in range 0..65535."
 msgstr "Číslo portu pro SMTP musí být v rozmezí 0 až 65535."
 
-#: src/src/i2p/susi/webmail/WebMail.java:858
+#: src/src/i2p/susi/webmail/WebMail.java:718
 msgid "SMTP port number is invalid."
 msgstr "Číslo SMTP portu je neplatné."
 
-#: src/src/i2p/susi/webmail/WebMail.java:937
-#: src/src/i2p/susi/webmail/WebMail.java:945
+#: src/src/i2p/susi/webmail/WebMail.java:794
+#: src/src/i2p/susi/webmail/WebMail.java:1280
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:475
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:673
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:686
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:785
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:793
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:240
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:254
+msgid "Cannot connect"
+msgstr "Není možné se připojit"
+
+#: src/src/i2p/susi/webmail/WebMail.java:896
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:775
+msgid "Error connecting to server"
+msgstr "Chyba při připojování k serveru"
+
+#: src/src/i2p/susi/webmail/WebMail.java:939
+#: src/src/i2p/susi/webmail/WebMail.java:947
 msgid "User logged out."
 msgstr "Uživatel se odhlásil."
 
-#: src/src/i2p/susi/webmail/WebMail.java:944
-#: src/src/i2p/susi/webmail/WebMail.java:1245
+#: src/src/i2p/susi/webmail/WebMail.java:946
+#: src/src/i2p/susi/webmail/WebMail.java:1265
 msgid "Internal error, lost connection."
 msgstr "Nastala vnitřní chyba, spojení bylo ztraceno."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1094
+#: src/src/i2p/susi/webmail/WebMail.java:1105
 #, java-format
 msgid "On {0} {1} wrote:"
 msgstr "K {0} {1} napsal:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1141
+#: src/src/i2p/susi/webmail/WebMail.java:1161
 msgid "begin forwarded mail"
 msgstr "začátek přeposlaného mailu"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1163
+#: src/src/i2p/susi/webmail/WebMail.java:1183
 msgid "end forwarded mail"
 msgstr "konec přeposlaného mailu"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1170
-#: src/src/i2p/susi/webmail/WebMail.java:2785
+#: src/src/i2p/susi/webmail/WebMail.java:1190
+#: src/src/i2p/susi/webmail/WebMail.java:2818
 msgid "Could not fetch mail body."
 msgstr "Nepodařilo se načíst obsah mailu."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1200
+#: src/src/i2p/susi/webmail/WebMail.java:1220
 msgid "Message id not valid."
 msgstr "Identifikátor zprávy není platný."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1256
-#, java-format
-msgid "{0} new message"
-msgid_plural "{0} new messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: src/src/i2p/susi/webmail/WebMail.java:1258
-msgid "No new messages"
-msgstr ""
-
-#: src/src/i2p/susi/webmail/WebMail.java:1317
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:349
+#: src/src/i2p/susi/webmail/WebMail.java:1346
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:343
 #, java-format
 msgid "No Encoding found for {0}"
 msgstr "Nebylo nalezeno kódování pro {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1320
+#: src/src/i2p/susi/webmail/WebMail.java:1349
 #, java-format
 msgid "Error reading uploaded file: {0}"
 msgstr "Chyba při čtení nahraného souboru: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1407
+#: src/src/i2p/susi/webmail/WebMail.java:1436
 msgid "Attachment not found."
 msgstr "Příloha nenalezena"
 
 #. error if we get here
-#: src/src/i2p/susi/webmail/WebMail.java:1435
-#: src/src/i2p/susi/webmail/WebMail.java:1437
-#: src/src/i2p/susi/webmail/WebMail.java:1935
-#: src/src/i2p/susi/webmail/WebMail.java:2789
+#: src/src/i2p/susi/webmail/WebMail.java:1464
+#: src/src/i2p/susi/webmail/WebMail.java:1466
+#: src/src/i2p/susi/webmail/WebMail.java:1985
+#: src/src/i2p/susi/webmail/WebMail.java:2822
 msgid "Message not found."
 msgstr "E-mail nenalezen."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1486
-#: src/src/i2p/susi/webmail/WebMail.java:1639
-msgid "Invalid pagesize number, resetting to default value."
-msgstr "Neplatné hodnota velikosti stránky, použiji výchozí hodnotu."
-
-#: src/src/i2p/susi/webmail/WebMail.java:1522
+#: src/src/i2p/susi/webmail/WebMail.java:1552
 msgid "No messages marked for deletion."
 msgstr "Žádné zprávy nebyly označeny k smazání."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1539
+#: src/src/i2p/susi/webmail/WebMail.java:1569
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
@@ -191,26 +189,36 @@ msgstr[0] "Počet smazaných zpráv: 1"
 msgstr[1] "Počet smazaných zpráv: {0}"
 msgstr[2] "Počet smazaných zpráv: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1603
+#: src/src/i2p/susi/webmail/WebMail.java:1633
 #, java-format
 msgid "Host unchanged. Edit configation file {0} to change host."
 msgstr ""
 
-#: src/src/i2p/susi/webmail/WebMail.java:1618
+#: src/src/i2p/susi/webmail/WebMail.java:1648
 msgid "Configuration saved"
 msgstr "Konfigurace uložena"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1921
-#: src/src/i2p/susi/webmail/WebMail.java:2513
+#: src/src/i2p/susi/webmail/WebMail.java:1669
+msgid "Invalid pagesize number, resetting to default value."
+msgstr "Neplatné hodnota velikosti stránky, použiji výchozí hodnotu."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1969
+#: src/src/i2p/susi/webmail/WebMail.java:2515
 msgid "Login"
 msgstr "Login"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1971
+#: src/src/i2p/susi/webmail/WebMail.java:2058
+#: src/src/i2p/susi/webmail/WebMail.java:2532
+msgid "Loading emails, please wait..."
+msgstr ""
 
 #. mailbox.getNumMails() forces a connection, don't use it
 #. Not only does it slow things down, but a failure causes all our messages to
 #. "vanish"
 #. subtitle = ngettext("1 Message", "{0} Messages",
 #. sessionObject.mailbox.getNumMails());
-#: src/src/i2p/susi/webmail/WebMail.java:1926
+#: src/src/i2p/susi/webmail/WebMail.java:1976
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
@@ -218,32 +226,46 @@ msgstr[0] "zpráv: 1"
 msgstr[1] "zpráv: {0}"
 msgstr[2] "zpráv: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1933
+#: src/src/i2p/susi/webmail/WebMail.java:1983
 msgid "Show Message"
 msgstr "Ukázat zprávu"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1938
+#: src/src/i2p/susi/webmail/WebMail.java:1988
 msgid "New Message"
 msgstr "Nová zpráva"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1940
+#: src/src/i2p/susi/webmail/WebMail.java:1990
 msgid "Configuration"
 msgstr "Konfigurace"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1951
+#: src/src/i2p/susi/webmail/WebMail.java:2001
 msgid "SusiMail"
 msgstr "SusiMail"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1964
-msgid "Message has not been sent. Do you want to discard it?"
-msgstr "Zpráva nebyla odeslána. Přejete si ji vyhodit?"
+#: src/src/i2p/susi/webmail/WebMail.java:2062
+msgid "Checking for new emails on server"
+msgstr ""
 
-#: src/src/i2p/susi/webmail/WebMail.java:2083
+#: src/src/i2p/susi/webmail/WebMail.java:2072
 #, java-format
-msgid "Error decoding content: {0}"
-msgstr "Chyba při dekódování obsahu: {0}"
+msgid "{0} new message"
+msgid_plural "{0} new messages"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/src/i2p/susi/webmail/WebMail.java:2075
+msgid "No new messages"
+msgstr ""
+
+#: src/src/i2p/susi/webmail/WebMail.java:2080
+#: src/src/i2p/susi/webmail/WebMail.java:2534
+msgid "Refresh the page for updates"
+msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2261
+#: src/src/i2p/susi/webmail/WebMail.java:2621
+#: src/src/i2p/susi/webmail/WebMail.java:2794
 msgid "no subject"
 msgstr "žádný předmět"
 
@@ -261,116 +283,116 @@ msgid "No recipients found."
 msgstr "Nebyli nalezeni žádní příjemci."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2331
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:297
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:298
 #, java-format
 msgid "Email is too large, max is {0}"
 msgstr ""
 
-#: src/src/i2p/susi/webmail/WebMail.java:2373
+#: src/src/i2p/susi/webmail/WebMail.java:2375
 msgid "Mail sent."
 msgstr "Zpráva odeslána."
 
-#: src/src/i2p/susi/webmail/WebMail.java:2415
+#: src/src/i2p/susi/webmail/WebMail.java:2417
 msgid "Send"
 msgstr "Odeslat"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2416
-#: src/src/i2p/susi/webmail/WebMail.java:2636
-#: src/src/i2p/susi/webmail/WebMail.java:2702
-#: src/src/i2p/susi/webmail/WebMail.java:2838
+#: src/src/i2p/susi/webmail/WebMail.java:2418
+#: src/src/i2p/susi/webmail/WebMail.java:2653
+#: src/src/i2p/susi/webmail/WebMail.java:2719
+#: src/src/i2p/susi/webmail/WebMail.java:2871
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2459
-#: src/src/i2p/susi/webmail/WebMail.java:2562
-#: src/src/i2p/susi/webmail/WebMail.java:2764
+#: src/src/i2p/susi/webmail/WebMail.java:2461
+#: src/src/i2p/susi/webmail/WebMail.java:2576
+#: src/src/i2p/susi/webmail/WebMail.java:2797
 msgid "From"
 msgstr "Od"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2460
-#: src/src/i2p/susi/webmail/WebMail.java:2769
+#: src/src/i2p/susi/webmail/WebMail.java:2462
+#: src/src/i2p/susi/webmail/WebMail.java:2802
 msgid "To"
 msgstr "Do"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2461
-#: src/src/i2p/susi/webmail/WebMail.java:2773
+#: src/src/i2p/susi/webmail/WebMail.java:2463
+#: src/src/i2p/susi/webmail/WebMail.java:2806
 msgid "Cc"
 msgstr "Cc"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2462
+#: src/src/i2p/susi/webmail/WebMail.java:2464
 msgid "Bcc"
 msgstr "Bcc"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2463
+#: src/src/i2p/susi/webmail/WebMail.java:2465
 msgid "Bcc to self"
 msgstr "Bcc sobě"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2464
-#: src/src/i2p/susi/webmail/WebMail.java:2563
-#: src/src/i2p/susi/webmail/WebMail.java:2766
+#: src/src/i2p/susi/webmail/WebMail.java:2466
+#: src/src/i2p/susi/webmail/WebMail.java:2577
+#: src/src/i2p/susi/webmail/WebMail.java:2799
 msgid "Subject"
 msgstr "Předmět"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2467
+#: src/src/i2p/susi/webmail/WebMail.java:2469
 msgid "Add Attachment"
 msgstr "Přidat přílohu"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2467
+#: src/src/i2p/susi/webmail/WebMail.java:2469
 msgid "Add another attachment"
 msgstr "Přidat další přílohu"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2473
+#: src/src/i2p/susi/webmail/WebMail.java:2475
 msgid "Attachments"
 msgstr "Přílohy"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2482
+#: src/src/i2p/susi/webmail/WebMail.java:2484
 msgid "Delete selected attachments"
 msgstr "Smazat vybrané přílohy"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2499
+#: src/src/i2p/susi/webmail/WebMail.java:2501
 msgid "I2PMail Login"
 msgstr ""
 
 #. current postman hq length limits 16/12, new postman version 32/32
-#: src/src/i2p/susi/webmail/WebMail.java:2501
+#: src/src/i2p/susi/webmail/WebMail.java:2503
 msgid "User"
 msgstr "Uživatel"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2502
+#: src/src/i2p/susi/webmail/WebMail.java:2504
 msgid "Password"
 msgstr "Heslo"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2507
+#: src/src/i2p/susi/webmail/WebMail.java:2509
 msgid "Host"
 msgstr "Host"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2508
+#: src/src/i2p/susi/webmail/WebMail.java:2510
 msgid "POP3 Port"
 msgstr "POP3 Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2509
+#: src/src/i2p/susi/webmail/WebMail.java:2511
 msgid "SMTP Port"
 msgstr "SMTP Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2514
+#: src/src/i2p/susi/webmail/WebMail.java:2516
 msgid "Read Mail Offline"
 msgstr "Číst emaily offline"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2518
-#: src/src/i2p/susi/webmail/WebMail.java:2655
+#: src/src/i2p/susi/webmail/WebMail.java:2520
+#: src/src/i2p/susi/webmail/WebMail.java:2672
 msgid "Settings"
 msgstr "Nastavení"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2520
+#: src/src/i2p/susi/webmail/WebMail.java:2522
 msgid "Create Account"
 msgstr "Vytvořit účet"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2520
+#: src/src/i2p/susi/webmail/WebMail.java:2522
 msgid "Learn about I2P mail"
 msgstr "Více o I2P mailu"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2533
-#: src/src/i2p/susi/webmail/WebMail.java:2714
+#: src/src/i2p/susi/webmail/WebMail.java:2547
+#: src/src/i2p/susi/webmail/WebMail.java:2742
 msgid "New"
 msgstr "Nová"
 
@@ -380,178 +402,175 @@ msgstr "Nová"
 #. button( REPLYALL, _t("Reply All") ) +
 #. button( FORWARD, _t("Forward") ) + spacer +
 #. button( DELETE, _t("Delete") ) + spacer +
-#: src/src/i2p/susi/webmail/WebMail.java:2540
+#: src/src/i2p/susi/webmail/WebMail.java:2554
 msgid "Check Mail"
 msgstr "Zkontrolovat mail"
 
 #. if (Config.hasConfigFile())
 #. out.println(button( RELOAD, _t("Reload Config") ) + spacer);
-#: src/src/i2p/susi/webmail/WebMail.java:2543
-#: src/src/i2p/susi/webmail/WebMail.java:2726
-#: src/src/i2p/susi/webmail/WebMail.java:2840
+#: src/src/i2p/susi/webmail/WebMail.java:2557
+#: src/src/i2p/susi/webmail/WebMail.java:2754
+#: src/src/i2p/susi/webmail/WebMail.java:2873
 msgid "Logout"
 msgstr "Odhlásit"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2561
+#: src/src/i2p/susi/webmail/WebMail.java:2575
 msgid "Mark for deletion"
 msgstr "Označit pro smazání"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2564
-#: src/src/i2p/susi/webmail/WebMail.java:2776
+#: src/src/i2p/susi/webmail/WebMail.java:2578
+#: src/src/i2p/susi/webmail/WebMail.java:2809
 msgid "Date"
 msgstr "Datum"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2567
+#: src/src/i2p/susi/webmail/WebMail.java:2581
 msgid "Size"
 msgstr "Velikost"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2609
+#: src/src/i2p/susi/webmail/WebMail.java:2626
 msgid "Message is new"
 msgstr "Zpráva je nová"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2612
+#: src/src/i2p/susi/webmail/WebMail.java:2629
 msgid "Message has an attachment"
 msgstr "Zpráva obsahuje přílohu"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2614
+#: src/src/i2p/susi/webmail/WebMail.java:2631
 msgid "Message is spam"
 msgstr "Zpráva je spam"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2622
+#: src/src/i2p/susi/webmail/WebMail.java:2639
 msgid "No messages"
 msgstr "Žádné zprávy"
 
 #. TODO ngettext
-#: src/src/i2p/susi/webmail/WebMail.java:2634
+#: src/src/i2p/susi/webmail/WebMail.java:2651
 msgid "Really delete the marked messages?"
 msgstr "Opravdu vymazat označené zprávy?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2635
+#: src/src/i2p/susi/webmail/WebMail.java:2652
 msgid "Yes, really delete them!"
 msgstr "Ano, chci je opravdu vymazat!"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2638
+#: src/src/i2p/susi/webmail/WebMail.java:2655
 msgid "Delete Selected"
 msgstr "Smazat vybrané"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2640
+#: src/src/i2p/susi/webmail/WebMail.java:2657
 msgid "Mark All"
 msgstr "Označit vše"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2642
+#: src/src/i2p/susi/webmail/WebMail.java:2659
 msgid "Clear All"
 msgstr "Smazat vše"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2667
+#: src/src/i2p/susi/webmail/WebMail.java:2684
 msgid "First"
 msgstr "První"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2668
-#: src/src/i2p/susi/webmail/WebMail.java:2732
+#: src/src/i2p/susi/webmail/WebMail.java:2685
+#: src/src/i2p/susi/webmail/WebMail.java:2760
 msgid "Previous"
 msgstr "Předchozí"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2677
+#: src/src/i2p/susi/webmail/WebMail.java:2694
 #, java-format
 msgid "Page {0} of {1}"
 msgstr "Stránka {0}/{1}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2679
-#: src/src/i2p/susi/webmail/WebMail.java:2747
+#: src/src/i2p/susi/webmail/WebMail.java:2696
+#: src/src/i2p/susi/webmail/WebMail.java:2775
 msgid "Next"
 msgstr "Další"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2680
+#: src/src/i2p/susi/webmail/WebMail.java:2697
 msgid "Last"
 msgstr "Poslední"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2700
+#: src/src/i2p/susi/webmail/WebMail.java:2717
 msgid "Really delete this message?"
 msgstr "Opravdu chcete smazat tuto zprávu?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2701
+#: src/src/i2p/susi/webmail/WebMail.java:2718
 msgid "Yes, really delete it!"
 msgstr "Ano, opravdu ji chci smazat!"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2717
+#: src/src/i2p/susi/webmail/WebMail.java:2745
 msgid "Reply"
 msgstr "Odpovědět"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2718
+#: src/src/i2p/susi/webmail/WebMail.java:2746
 msgid "Reply All"
 msgstr "Odpovědět všem"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2719
+#: src/src/i2p/susi/webmail/WebMail.java:2747
 msgid "Forward"
 msgstr "Přeposlat"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2720
+#: src/src/i2p/susi/webmail/WebMail.java:2748
 msgid "Save As"
 msgstr "Uložit jako"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2722
-#: src/src/i2p/susi/webmail/WebMail.java:2724
+#: src/src/i2p/susi/webmail/WebMail.java:2750
+#: src/src/i2p/susi/webmail/WebMail.java:2752
 msgid "Delete"
 msgstr "Smazat"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2744
+#: src/src/i2p/susi/webmail/WebMail.java:2772
 msgid "Back to Folder"
 msgstr "Zpět do složky"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2821
+#: src/src/i2p/susi/webmail/WebMail.java:2854
 msgid "Folder Page Size"
 msgstr "Velikost stránky složky"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2824
+#: src/src/i2p/susi/webmail/WebMail.java:2857
 msgid "Set"
 msgstr "Nastavit"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2827
+#: src/src/i2p/susi/webmail/WebMail.java:2860
 msgid "Advanced Configuration"
 msgstr "Pokročilá konfigurace"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2837
+#: src/src/i2p/susi/webmail/WebMail.java:2870
 msgid "Save Configuration"
 msgstr "Uložit konfiguraci"
 
 #. this appears in the UI so translate
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:102
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:748
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:790
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:106
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:673
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:785
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:912
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:954
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1175
 msgid "No response from server"
 msgstr "Žádná odpověď od serveru"
 
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:616
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:239
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:253
-msgid "Cannot connect"
-msgstr "Není možné se připojit"
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:778
+msgid "Mail server login failed, wrong username or password."
+msgstr ""
 
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:665
-msgid "Error connecting to server"
-msgstr "Chyba při připojování k serveru"
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:780
+msgid "Logout and then login again with the correct username and password."
+msgstr ""
 
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:670
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:673
-msgid "Error opening mailbox"
-msgstr "Chyba při otevírání schránky"
-
-#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1022
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:309
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1214
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1216
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:310
 msgid "Login failed"
 msgstr "Přihlášení bylo neúspěšné"
 
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:251
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:280
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:252
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:281
 msgid "Server refused connection"
 msgstr "Server odmítá připojení"
 
 #. TODO which recipient?
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:322
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:323
 msgid "Mail rejected"
 msgstr "Email byl odmítnut"
 
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:422
-#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:425
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:374
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:377
 msgid "Error sending mail"
 msgstr "Chyba při odesílání emailu"

@@ -10,15 +10,15 @@
 # Jakob Wuhrer <pinoaffe@gmail.com>, 2016
 # Jrnr601 <jerobben@gmail.com>, 2012
 # Desirius <martinjefmeyers@gmail.com>, 2014
-# Nathan Follens, 2015-2016
+# Nathan Follens, 2015-2016,2018
 # attesor <random901@zoho.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: Nathan Follens\n"
+"PO-Revision-Date: 2018-03-04 21:03+0000\n"
+"Last-Translator: Aaldert Dijkstra <pe1nkx@zonnet.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -132,13 +132,13 @@ msgid "Brazil"
 msgstr "Brazilië"
 
 msgid "Bahamas"
-msgstr "Bahama's"
+msgstr "Bahama’s"
 
 msgid "Bhutan"
 msgstr "Bhutan"
 
 msgid "Bouvet Island"
-msgstr "Bouvet eiland"
+msgstr "Bouveteiland"
 
 msgid "Botswana"
 msgstr "Botswana"
@@ -198,13 +198,13 @@ msgid "Curaçao"
 msgstr "Curaçao"
 
 msgid "Christmas Island"
-msgstr "Christmas Eiland"
+msgstr "Christmaseiland"
 
 msgid "Cyprus"
 msgstr "Cyprus"
 
 msgid "Czech Republic"
-msgstr "Tsjechische Republiek"
+msgstr "Tsjechië"
 
 msgid "Germany"
 msgstr "Duitsland"
@@ -309,7 +309,7 @@ msgid "Greece"
 msgstr "Griekenland"
 
 msgid "South Georgia and the South Sandwich Islands"
-msgstr "Zuid-Georgië en de Zuidelijke Sandwicheilanden"
+msgstr "Zuid-Georgia en de Zuidelijke Sandwicheilanden"
 
 msgid "Guatemala"
 msgstr "Guatemala"
@@ -345,10 +345,10 @@ msgid "Ireland"
 msgstr "Ierland"
 
 msgid "Israel"
-msgstr "Israel"
+msgstr "Israël"
 
 msgid "Isle of Man"
-msgstr "Isle of Man"
+msgstr "Man"
 
 msgid "India"
 msgstr "India"
@@ -357,7 +357,7 @@ msgid "British Indian Ocean Territory"
 msgstr "Brits Territorium in de Indische Oceaan"
 
 msgid "Iraq"
-msgstr "Iraq"
+msgstr "Irak"
 
 msgid "Iran"
 msgstr "Iran"
@@ -408,13 +408,13 @@ msgid "Kuwait"
 msgstr "Koeweit"
 
 msgid "Cayman Islands"
-msgstr "Caymaneilanden"
+msgstr "Kaaimaneilanden"
 
 msgid "Kazakhstan"
 msgstr "Kazachstan"
 
 msgid "Lao People's Democratic Republic"
-msgstr "Laos Democratische Volksrepubliek"
+msgstr "Laos"
 
 msgid "Lebanon"
 msgstr "Libanon"
@@ -549,7 +549,7 @@ msgid "Niue"
 msgstr "Niue"
 
 msgid "New Zealand"
-msgstr "Nieuw Zeeland"
+msgstr "Nieuw-Zeeland"
 
 msgid "Oman"
 msgstr "Oman"
@@ -585,7 +585,7 @@ msgid "Puerto Rico"
 msgstr "Puerto Rico"
 
 msgid "Palestinian Territory"
-msgstr "de Westelijke Jordaanoever en de Gazastrook"
+msgstr "Palestina"
 
 msgid "Portugal"
 msgstr "Portugal"
@@ -600,7 +600,7 @@ msgid "Qatar"
 msgstr "Qatar"
 
 msgid "Réunion"
-msgstr "Reunion"
+msgstr "Réunion"
 
 msgid "Romania"
 msgstr "Roemenië"
@@ -609,13 +609,13 @@ msgid "Serbia"
 msgstr "Servië"
 
 msgid "Russian Federation"
-msgstr "Russche Federatie"
+msgstr "Rusland"
 
 msgid "Rwanda"
 msgstr "Rwanda"
 
 msgid "Saudi Arabia"
-msgstr "Saudi-Arabië"
+msgstr "Saoedi-Arabië"
 
 msgid "Solomon Islands"
 msgstr "Salomonseilanden"
@@ -747,13 +747,13 @@ msgid "Vatican"
 msgstr "Vaticaanstad"
 
 msgid "Saint Vincent and the Grenadines"
-msgstr "Sint Vincent en de Grenadines"
+msgstr "Saint Vincent en de Grenadines"
 
 msgid "Venezuela"
 msgstr "Venezuela"
 
 msgid "Virgin Islands"
-msgstr "Virgin-eilanden"
+msgstr "Virgineilanden"
 
 msgid "Vietnam"
 msgstr "Vietnam"
@@ -774,7 +774,7 @@ msgid "Mayotte"
 msgstr "Mayotte"
 
 msgid "South Africa"
-msgstr "Zuid Afrika"
+msgstr "Zuid-Afrika"
 
 msgid "Zambia"
 msgstr "Zambia"
