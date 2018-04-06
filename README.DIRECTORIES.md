@@ -13,9 +13,9 @@ Directory | Description
 `apps/i2psnark` | Code for i2psnark, the torrent client component in webconsole.
 `apps/i2ptunnel` | Code for the Hidden Service Manager in webconsole.
 `apps/jetty` | Jetty webserver code.
-`apps/routerconsole` | Jetty webserver code.
-`apps/sam` | Jetty webserver code.
-`apps/streaming` | Jetty webserver code.
+`apps/routerconsole` | The router console code.
+`apps/sam` | SAM service.
+`apps/streaming` | The streaming part.
 `apps/susidns` | Code for the addressbook component in the webconsole.
 `apps/susimail` | Code for the mail client component in the webconsole.
 `installer` | This directory contains the code for the installer.
