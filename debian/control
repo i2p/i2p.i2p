@@ -1,7 +1,7 @@
 Source: i2p
 Maintainer: zzz <zzz@i2pmail.org>
 Section: net
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 Priority: optional
 Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
