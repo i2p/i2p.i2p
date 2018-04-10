@@ -23,7 +23,7 @@ import java.util.Properties;
  *
  * Just FYI:
  * In the context of a BB:
- * 
+ *
  * On OSX it has to look 3 paths up, but for the other two, only one.
  *
  * OSX Path: I2PBrowser.app/Contents/MacOS/firefox
@@ -46,6 +46,7 @@ import java.util.Properties;
  *
  * @author (who to blame) Meeh
  * @version 0.2
+ * @since 0.9.35
  */
 public class PortableWorkingDir {
 
