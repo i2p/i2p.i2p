@@ -43,6 +43,7 @@ import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.CreateRouterInfoJob;
+import net.i2p.router.startup.PortableWorkingDir;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.tasks.*;
@@ -270,7 +271,11 @@ public class Router implements RouterClock.ClockShiftListener {
         // Do we copy all the data files to the new directory? default false
         String migrate = System.getProperty("i2p.dir.migrate");
         boolean migrateFiles = Boolean.parseBoolean(migrate);
-        String userDir = WorkingDir.getWorkingDir(envProps, migrateFiles);
+
+
+        String isPortableStr = System.getProperty("i2p.dir.portableMode");
+        boolean isPortable = Boolean.parseBoolean(isPortableStr);
+        String userDir = (!isPortable) ? WorkingDir.getWorkingDir(envProps, migrateFiles) : PortableWorkingDir.getWorkingDir(envProps, migrateFiles);
 
         // Use the router.config file specified in the router.configLocation property
         // (default "router.config"),
