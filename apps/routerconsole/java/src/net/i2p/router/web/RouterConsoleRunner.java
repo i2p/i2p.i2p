@@ -330,8 +330,8 @@ public class RouterConsoleRunner implements RouterApp {
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
-        boolean isJava9 = SystemVersion.isJava9();
-        if (noJava7 || noPack200 || openARM || isJava9) {
+        boolean isJava10 = SystemVersion.isJava10();
+        if (noJava7 || noPack200 || openARM || isJava10) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -354,8 +354,8 @@ public class RouterConsoleRunner implements RouterApp {
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
-            if (isJava9) {
-                s = "Java 9 support is beta, and not recommended for general use";
+            if (isJava10) {
+                s = "Java 10 support is beta, and not recommended for general use";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }

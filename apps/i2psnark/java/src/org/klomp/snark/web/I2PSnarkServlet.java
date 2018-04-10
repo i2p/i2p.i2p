@@ -712,7 +712,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write(_t("Not a directory") + ": " + DataHelper.escapeHTML(dd.toString()));
                 } else if (!dd.canRead()) {
                     out.write(_t("Unreadable") + ": " + DataHelper.escapeHTML(dd.toString()));
-                } else if (canWrite) {
+                } else if (!canWrite) {
                     out.write(_t("No write permissions for data directory") + ": " + DataHelper.escapeHTML(dd.toString()));
                 } else {
                     out.write(_t("No torrents loaded."));

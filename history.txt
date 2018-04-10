@@ -1,3 +1,10 @@
+* 2018-04-10 0.9.34 released
+
+2018-04-10 zzz
+ * Console: Change Java 9 log warning to Java 10
+ * i2psnark: Fix logic error in warning
+ * Tunnels: Fix fallback stat name
+
 2018-04-05 zzz
  * EepGet: Increase max header length
  * SSLEepGet: Set default CLI proxy type back to none
