@@ -11,7 +11,7 @@ Directory | Description
 `apps/apparmor` | Ruleset for AppArmor.
 `apps/BOB` | Code for the BOB service.
 `apps/i2psnark` | Code for i2psnark, the torrent client component in webconsole.
-`apps/i2ptunnel` | Code for the Hidden Service Manager in webconsole.
+`apps/i2ptunnel` | Code for the Hidden Service Manager, and it's GUI in webconsole.
 `apps/jetty` | Jetty webserver code.
 `apps/routerconsole` | The router console code.
 `apps/sam` | SAM service.
@@ -23,7 +23,7 @@ Directory | Description
 `core/java` | Common core code used both by the rotuer and apps.
 `core/java/src/net/i2p/app` | Code for app interface.
 `core/java/src/net/i2p/crypto` | This directory contain most of the crypto code.
-`core/java/src/net/i2p/crypto` | Client interface code (I2PClient, I2PSession etc.).
+`core/java/src/net/i2p/client` | Client interface code (I2PClient, I2PSession etc.).
 `core/java/src/net/i2p/socks` | SOCKS implementation.
 `core/java/src/net/i2p/update` | Parts of the update code.
 `core/java/src/net/i2p/util` | Utillity code like Log, FileUtil, EepGet, HexDump, and so on.
