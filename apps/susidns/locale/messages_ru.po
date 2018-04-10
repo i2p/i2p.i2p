@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-03-28 22:55+0000\n"
-"PO-Revision-Date: 2018-03-29 16:18+0000\n"
+"PO-Revision-Date: 2018-04-07 21:34+0000\n"
 "Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
@@ -790,7 +790,7 @@ msgid ""
 "If SusiDNS is configured to publish your Router address book, the entries "
 "will appear in your Published address book and saved to a hosts.txt file for"
 " sharing."
-msgstr ""
+msgstr "Если в SusiDNS настроена публикация адресной книги маршрутизатора, записи будут добавлены опубликованную адресную книгу и сохранены в общедоступном файле hosts.txt."
 
 #: build/HowSVG.java:6
 msgid "Published Addressbook"
@@ -806,7 +806,7 @@ msgstr "Чтобы настроить копирование адресной к
 msgid ""
 "All hosts derived from subscriptions will appear in this address book, in "
 "addition to any you manually add here or to your Master address book."
-msgstr ""
+msgstr "В этой адресной книге появятся все записи из всех подписок, а также все записи, добавленные вручную здесь или в основной адресной книге."
 
 #: build/HowSVG.java:9
 msgid "Router Addressbook"
@@ -816,7 +816,7 @@ msgstr "Адресная книга маршрутизатора"
 msgid ""
 "Hosts you manually add here will never be published. You can also add "
 "aliases to hosts in other address books here."
-msgstr ""
+msgstr "Узлы, которые вы добавите здесь вручную, не будут опубликованы. Здесь также можно добавить альтернативные адреса (alias) для узлов из других адресных книг."
 
 #: build/HowSVG.java:11
 msgid "Private Addressbook"
@@ -830,71 +830,71 @@ msgstr "Локальные записи"
 msgid ""
 "I2P applications (including the HTTP proxy) use the hosts in your local "
 "address books to resolve .i2p hostnames."
-msgstr ""
+msgstr "Приложения I2P (включая HTTP-прокси) используют узлы из вашей локальной адресной книги для разрешения доменов .i2p."
 
 #: build/HowSVG.java:14
 msgid ""
 "Additional subscriptions can be found in the FAQ section of the Router help "
 "page."
-msgstr ""
+msgstr "Дополнительные подписки можно найти в секции FAQ на странице помощи маршрутизатора."
 
 #: build/HowSVG.java:16
 msgid ""
 "Hosts sourced from your subscriptions are added to your Router address book,"
 " and are automatically synced (by default every 12 hours)."
-msgstr ""
+msgstr "Узлы из ваших подписок добавляются в адресную книгу маршрутизатора и периодически обновляются (по умолчанию — раз в 12 часов)."
 
 #: build/HowSVG.java:17
 msgid "Configure Subscriptions"
-msgstr ""
+msgstr "Настроить подписки"
 
 #: build/HowSVG.java:18
 msgid ""
 "If you manually add hosts here, they will be included your Published address"
 " book (if configured)."
-msgstr ""
+msgstr "Если вы добавите узлы сюда, они также попадут в публикуемую адресную книгу (если она настроена)."
 
 #: build/HowSVG.java:19
 msgid "Master Addressbook"
-msgstr ""
+msgstr "Основная адресная книга"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
-msgstr ""
+msgstr "Ищется по"
 
 #: build/HowSVG.java:21
 msgid "I2P applications"
-msgstr ""
+msgstr "Приложения I2P"
 
 #: build/HowSVG.java:22
 msgid ""
 "The Master, Router and Private address books collectively serve as the DNS "
 "authority for I2P applications."
-msgstr ""
+msgstr "Основная и приватная адресные книги, а также адресная книга маршрутизатора работают в качестве авторитетного DNS для приложений I2P."
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "Опционально,"
 
 #: build/HowSVG.java:24
 msgid "for websites"
-msgstr ""
+msgstr "для веб-сайтов"
 
 #: build/HowSVG.java:25
 msgid ""
 "If you configure SusiDNS to publish your Router address book, it will export"
 " a hosts.txt file containing all the hosts (by default to the root of your "
 "eepsite)."
-msgstr ""
+msgstr "Если в SusiDNS настроена публикация адресной книги маршрутизатора, он будет экспортировать файл hosts.txt, содержащий все узлы (по умолчанию в корень вашего eepsite)."
 
 #: build/HowSVG.java:26
 msgid ""
 "Addresses manually added to your Master address book will merge with your "
 "Router address book."
-msgstr ""
+msgstr "Адреса, добавленные в основную адресную книгу вручную, будут объединены с адресной книгой маршрутизатора."
 
 #: build/HowSVG.java:27
 msgid ""
 "Hosts you receive from your subscriptions will merge with your Router "
 "address book."
-msgstr ""
+msgstr "Узлы из подписок будут объединены с адресной книгой маршрутизатора."
