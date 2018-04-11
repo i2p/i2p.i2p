@@ -75,7 +75,7 @@ public class TunnelPool {
             if (name != null)
                 name = DataHelper.stripHTML(name);
             else
-                name = _settings.getDestination().toBase32() + ".b32.i2p";
+                name = _settings.getDestination().toBase32();
         }
         _rateName = "tunnel.Bps." + name +
                     (_settings.isInbound() ? ".in" : ".out");

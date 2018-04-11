@@ -275,7 +275,7 @@ public class Router implements RouterClock.ClockShiftListener {
 
         String isPortableStr = System.getProperty("i2p.dir.portableMode");
         boolean isPortable = Boolean.parseBoolean(isPortableStr);
-        String userDir = (!isPortable) ? WorkingDir.getWorkingDir(envProps, migrateFiles) : PortableWorkingDir.getWorkingDir(envProps, migrateFiles);
+        String userDir = (!isPortable) ? WorkingDir.getWorkingDir(envProps, migrateFiles) : PortableWorkingDir.getWorkingDir(envProps);
 
         // Use the router.config file specified in the router.configLocation property
         // (default "router.config"),

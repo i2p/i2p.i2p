@@ -1,3 +1,9 @@
+i2p (0.9.34-2ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.34
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Apr 2018 12:12:12 +0000
+
 i2p (0.9.33-1ubuntu1) artful; urgency=medium
 
   * New upstream version 0.9.33

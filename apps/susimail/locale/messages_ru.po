@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-03-28 22:55+0000\n"
-"PO-Revision-Date: 2018-03-28 23:49+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-04-07 21:38+0000\n"
+"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -215,7 +215,7 @@ msgstr "Логин"
 #: src/src/i2p/susi/webmail/WebMail.java:2058
 #: src/src/i2p/susi/webmail/WebMail.java:2532
 msgid "Loading emails, please wait..."
-msgstr ""
+msgstr "Загружается почта, пожалуйста, подождите…"
 
 #. mailbox.getNumMails() forces a connection, don't use it
 #. Not only does it slow things down, but a failure causes all our messages to
@@ -249,7 +249,7 @@ msgstr "SusiMail"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2062
 msgid "Checking for new emails on server"
-msgstr ""
+msgstr "Проверка новых писем на сервере"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2072
 #, java-format
@@ -267,7 +267,7 @@ msgstr "Нет новых сообщений"
 #: src/src/i2p/susi/webmail/WebMail.java:2080
 #: src/src/i2p/susi/webmail/WebMail.java:2534
 msgid "Refresh the page for updates"
-msgstr ""
+msgstr "Обновите страницу для получения свежей информации"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2261
 #: src/src/i2p/susi/webmail/WebMail.java:2621
@@ -554,11 +554,11 @@ msgstr "Нет ответа от сервера"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:778
 msgid "Mail server login failed, wrong username or password."
-msgstr ""
+msgstr "Не удалось войти к почтовый сервер, неправильное имя пользователя или пароль."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:780
 msgid "Logout and then login again with the correct username and password."
-msgstr ""
+msgstr "Выйдите и войдите заново, с корректным именем пользователя и паролем."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1214
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1216
