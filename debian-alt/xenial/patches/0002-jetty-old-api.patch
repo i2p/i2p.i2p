@@ -1,0 +1,26 @@
+Index: b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
+===================================================================
+--- a/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
++++ b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
+@@ -44,19 +44,12 @@ public class HostCheckHandler extends Gz
+         _listenHosts = new HashSet<String>(8);
+         setMinGzipSize(64*1024);
+         if (_context.getBooleanPropertyDefaultTrue(PROP_GZIP)) {
+-            addIncludedMimeTypes(
+-                                 // our js is very small
+-                                 //"application/javascript", "application/x-javascript",
+-                                 "application/xhtml+xml", "application/xml",
+-                                 // ditto svg
+-                                 //"image/svg+xml",
+-                                 "text/css", "text/html", "text/plain"
+-                                );
++            setMimeTypes("application/xhtml+xml,application/xml,text/css,text/html,text/plain");
+         } else {
+             // poorly documented, but we must put something in,
+             // if empty all are matched,
+             // see IncludeExcludeSet
+-            addIncludedMimeTypes("xyzzy");
++            setMimeTypes("xyzzy");
+         }
+     }
+     
