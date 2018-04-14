@@ -123,7 +123,7 @@ Installer:
         See licenses/LICENSE-Apache2.0.txt
         See licenses/NOTICE-Commons-Logging.txt
 
-        XStream (http://xstream.codehaus.org/)
+        XStream (http://xstream.github.io/)
         Copyright (c) 2003-2004, Joe Walnes
         See licenses/LICENSE-XStream.txt
 

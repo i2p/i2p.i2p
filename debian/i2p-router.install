@@ -63,12 +63,12 @@ pkg-temp/lib/systray.jar usr/share/i2p/lib
 #pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
 
 
-# uncomment if not building with either glassfish-javaee, libjakarta-taglibs-standard-java or libtaglibs-standard
+# uncomment if not building with either glassfish-javaee, libjakarta-taglibs-standard-java or libtaglibs-standard-jstlel-java
 # ubuntu and debian: everywhere
 # glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
 #pkg-temp/lib/jstl.jar usr/share/i2p/lib
 
 
-# uncomment if not building with either glassfish-javaee, libjstl1.1-java or libtaglibs-standard
+# uncomment if not building with either glassfish-javaee, libjstl1.1-java or libtaglibs-standard-jstlel-java
 # ubuntu and debian: everywhere
 #pkg-temp/lib/standard.jar usr/share/i2p/lib
