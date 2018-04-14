@@ -99,12 +99,13 @@ class CPUIDCPUInfo implements CPUInfo
     }
     
     /**
+     * Trailing Bit Manipulation (AMD feature)
      * @return true iff the CPU supports TBM.
-     * @since 0.9.26
+     * @since 0.9.26, broken before 0.9.35, fixed in 0.9.35
      */
     public boolean hasTBM()
     {
-        return (CPUID.getECXCPUFlags() & (1 << 21)) != 0; //ECX Bit 21
+        return (CPUID.getExtendedECXCPUFlags() & (1 << 21)) != 0; //Extended ECX Bit 21
     }
     
     /**

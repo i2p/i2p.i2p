@@ -109,8 +109,9 @@ public interface CPUInfo
     public boolean hasADX();
     
     /**
+     * Trailing Bit Manipulation (AMD feature)
      * @return true iff the CPU supports TBM.
-     * @since 0.9.26
+     * @since 0.9.26, broken before 0.9.35, fixed in 0.9.35
      */
     public boolean hasTBM();
 
