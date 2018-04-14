@@ -1,10 +1,13 @@
-package net.i2p.i2ptunnel.web;
+package net.i2p.i2ptunnel.ui;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Translate;
 
 /**
  * Translate strings for this package.
+ * This is for the strings in the UI. Bundles are in the war.
+ * Note that there are separate bundles for the proxy error messages
+ * in the jar, which are not accessed by this class.
  * @since 0.7.9
  */
 public class Messages {

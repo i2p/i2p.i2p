@@ -31,6 +31,7 @@ import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.i2ptunnel.ui.GeneralHelper;
+import net.i2p.i2ptunnel.ui.Messages;
 import net.i2p.i2ptunnel.ui.TunnelConfig;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;

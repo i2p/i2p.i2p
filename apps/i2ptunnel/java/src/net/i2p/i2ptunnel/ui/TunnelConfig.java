@@ -31,6 +31,9 @@ import net.i2p.util.PasswordManager;
  * Helper class to generate a valid TunnelController configuration from provided
  * settings.
  *
+ * This class is also used by Android.
+ * Maintain as a stable API and take care not to break Android.
+ *
  * @since 0.9.19 logic moved from IndexBean
  */
 public class TunnelConfig {

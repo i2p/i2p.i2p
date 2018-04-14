@@ -27,7 +27,6 @@ import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.SSLClientUtil;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
-import net.i2p.i2ptunnel.web.Messages;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -35,6 +34,9 @@ import net.i2p.util.SecureFile;
 
 /**
  * General helper functions used by all UIs.
+ *
+ * This class is also used by Android.
+ * Maintain as a stable API and take care not to break Android.
  *
  * @since 0.9.19
  */
