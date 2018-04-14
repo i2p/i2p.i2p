@@ -212,7 +212,7 @@ Applications:
      Zxing 3.3.0:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 9.2.22.v20170606:
+   Jetty 9.2.24.v20180105:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
@@ -283,8 +283,8 @@ Applications:
       Bundles systray4j-2.4.1:
       See licenses/LICENSE-LGPLv2.1.txt
 
-   Tomcat 8.5.23:
-   Copyright 1999-2017 The Apache Software Foundation
+   Tomcat 8.5.30:
+   Copyright 1999-2018 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
 

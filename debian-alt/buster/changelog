@@ -1,3 +1,59 @@
+i2p (0.9.34-1) unstable; urgency=medium
+
+  * New upstream release.
+  * d/README.Debian: Fixed a typo.
+  * d/control: Removed unnecessary comma.
+  * d/control: Added Vcs-* entries.
+  * d/po/*: Synced with the upstream.
+  * d/rules: Set javac option -source & -target to 1.8.
+	
+ -- Masayuki Hatta <mhatta@debian.org>  Thu, 12 Apr 2018 02:40:45 +0900
+
+i2p (0.9.33-2) unstable; urgency=medium
+
+  * d/control: bumped Standards-Version to 4.1.3.
+  * d/control: default-jdk is now openjdk-9-jdk so depends on and use it.
+  * d/rules: ditto.
+
+ -- Masayuki Hatta <mhatta@debian.org>  Thu, 29 Mar 2018 00:02:36 +0900
+
+i2p (0.9.33-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Now uses libtaglibs-standard-*-java instead of
+    glassfish-javaee (closes: #882489)
+  * Removed -m32 and -m64 flags for Debian builds (closes: #877042)
+  * Updated sv.po (closes: #890653)
+  * Updated ru.po (closes: #883920)
+
+ -- Masayuki Hatta <mhatta@debian.org>  Tue, 27 Mar 2018 20:05:18 +0900
+
+i2p (0.9.32-2) unstable; urgency=medium
+
+  * debian/i2p.postinst: changed logic to invoke systemctl.
+    let's see if it works with piuparts.
+  * debian/watch: updated, now it supposed to work.
+  * debian/README.Debian: fixed a typo.
+
+ -- Masayuki Hatta <mhatta@debian.org>  Sat, 18 Nov 2017 17:29:54 +0900
+
+i2p (0.9.32-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Based on 0.9.32-1ubuntu1.
+  * debian/control: removed obsoleted dh-systemd.
+  * debian/control: now depends on debhelper (>= 9.20160709).
+  * debian/control: changed Standards-Version to 4.1.1.
+  * debian/control: changed i2p-doc priority from extra to optional.
+  * debian/README.Debian: fixed port number (closes: #877022).
+  * debian/po/nl.po: updated (closes: #879135).
+  * debian/patches/0004-remove-linkrel-from-eclipse-license.patch: added.
+    to make lintian happy.
+  * debian/patches/0005-license-path-fix-patch: added.
+    codehaus is long gone, states new URL. to make lintian happy.
+
+ -- Masayuki Hatta <mhatta@debian.org>  Fri, 17 Nov 2017 19:43:29 +0900
+
 i2p (0.9.30-4) unstable; urgency=medium
 
   * Initial release for Debian (closes: #448638).
@@ -17,17 +73,41 @@ i2p (0.9.30-4) unstable; urgency=medium
   * debian/NEWS: moved to NEWS.old.
   * debian/i2p-router.lintian-overrides: added.	
   * debian/i2p.postinst: change systemctl -> deb-systemd-helper.
-  * debian/i2p.postinst: Fixed a typo (missing ")" in /etc/default/i2p).
+  * debian/i2p.postinst: fixed a typo (missing ")" in /etc/default/i2p).
 
  -- Masayuki Hatta <mhatta@debian.org>  Wed, 26 Jul 2017 13:21:41 +0900
 
 Old Changelog:
 
+i2p (0.9.34-2ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.34
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Apr 2018 12:12:12 +0000
+
+i2p (0.9.33-1ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.33
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 30 Jan 2018 12:12:12 +0000
+
+i2p (0.9.32-1ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.32
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 08 Nov 2017 12:12:12 +0000
+
+i2p (0.9.31-1ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.31
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 09 Aug 2017 12:12:12 +0000
+
 i2p (0.9.30-3ubuntu1) xenial; urgency=medium
 
   * New upstream version 0.9.30
 
- -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 03 May 2017 12:12:12 +0000
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 03 May 2017 12:12:12 +0000
 
 i2p (0.9.29-1ubuntu1) trusty; urgency=medium
 

@@ -1,0 +1,127 @@
+#!/bin/sh
+
+set -e
+
+I2PHOME=/var/lib/i2p
+I2PSYSUSER=i2psvc
+
+conffile="/etc/default/i2p"
+systemdservice="/lib/systemd/system/i2p.service"
+
+# Source debconf library -- we have a Depends line
+# to make sure it is there...
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+
+case "$1" in
+    configure|reconfigure)
+        if [ ! -e $conffile ]; then
+            echo "# Defaults for i2p initscript (/etc/init.d/i2p)" >> $conffile
+            echo "# This is a posix shell fragment" >> $conffile
+            echo >> $conffile
+            echo "# [automatically edited by postinst, do not change line format ]" >> $conffile
+            echo "# Run 'dpkg-reconfigure -plow i2p' to change these values." >> $conffile
+            echo >> $conffile
+            echo "RUN_DAEMON=" >> $conffile
+            echo "I2PUSER=" >> $conffile
+            echo "ULIMIT=" >> $conffile
+            echo "CONFINE_WITH_APPARMOR=" >> $conffile
+            echo "# The next value is also wrapper.java.maxmemory in /etc/i2p/wrapper.config" >> $conffile
+            echo "MEMORYLIMIT=" >> $conffile
+        fi
+
+        db_get i2p/daemon
+        RUN_DAEMON="$RET"
+        db_get i2p/user
+        I2PUSER="$RET"
+        db_get i2p/memory
+        MEMORYLIMIT="$RET"
+        db_get i2p/aa
+        CONFINE_WITH_APPARMOR="$RET"
+
+        cp -a -f $conffile $conffile.tmp
+
+        # If the admin deleted or commented some variables but then set them via debconf,
+        # (re-)add them to the conffile.
+        test -z "$RUN_DAEMON" || grep -Eq '^ *RUN_DAEMON=' $conffile || \
+            echo "RUN_DAEMON=" >> $conffile
+        test -z "$I2PUSER" || grep -Eq '^ *I2PUSER=' $conffile || \
+            echo "I2PUSER=" >> $conffile
+        test -z "$MEMORYLIMIT" || grep -Eq '^ *MEMORYLIMIT=' $conffile || \
+            echo "MEMORYLIMIT=" >> $conffile
+        test -z "$ULIMIT" || grep -Eq '^ *ULIMIT=' $conffile || \
+            echo "ULIMIT=" >> $conffile
+        test -z "$CONFINE_WITH_APPARMOR" || grep -Eq '^ *CONFINE_WITH_APPARMOR=' $conffile || \
+            echo "CONFINE_WITH_APPARMOR=" >> $conffile
+
+        if [ -z $RUN_DAEMON ]; then
+            RUN_DAEMON="false"
+            I2PUSER="i2psvc"
+        fi
+
+        sed -e "s/^ *RUN_DAEMON=.*/RUN_DAEMON=\"$RUN_DAEMON\"/" \
+            -e "s/^ *I2PUSER=.*/I2PUSER=\"$I2PUSER\"/" \
+            -e "s/^ *MEMORYLIMIT=.*/MEMORYLIMIT=\"$MEMORYLIMIT\"/" \
+            -e "s/^ *CONFINE_WITH_APPARMOR=.*/CONFINE_WITH_APPARMOR=\"$CONFINE_WITH_APPARMOR\"/" \
+            < $conffile > $conffile.tmp
+        mv -f $conffile.tmp $conffile
+
+        if [ -e "$systemdservice" ]; then
+            sed -e "s/User=.*/User=$I2PUSER/" < "$systemdservice" > "$systemdservice.tmp"
+            mv -f "$systemdservice.tmp" "$systemdservice"
+            chmod 0644 -f "$systemdservice"
+            if [ -d /run/systemd/system ]; then
+		systemctl --system daemon-reload || true
+		if [ $RUN_DAEMON = 'true' ]; then
+                    deb-systemd-helper enable i2p.service
+		else
+                    deb-systemd-helper disable i2p.service
+		fi
+	    fi
+        fi
+
+        sed -e "s/^ *wrapper\.java\.maxmemory=.*/wrapper\.java\.maxmemory=$MEMORYLIMIT/" \
+            < /etc/i2p/wrapper.config > /etc/i2p/wrapper.config.tmp
+        mv -f /etc/i2p/wrapper.config.tmp /etc/i2p/wrapper.config
+        chmod 0644 -f /etc/i2p/wrapper.config
+
+    # Older versions of adduser created the home directory.
+    # The version of adduser in Debian unstable does not.
+    [ -d $I2PHOME ] || mkdir -m0750 $I2PHOME
+
+    # Create user and group as a system user.
+    if getent passwd i2psvc > /dev/null 2>&1 ; then
+        groupadd -f $I2PSYSUSER || true
+        usermod -c "I2P Router Daemon" -d $I2PHOME -g $I2PSYSUSER -s "/bin/false" \
+            $I2PSYSUSER -e 1 > /dev/null 2>&1 || true
+    else
+        adduser --system --quiet --group --home $I2PHOME $I2PSYSUSER > /dev/null 2>&1
+    fi
+
+    [ -d /var/log/i2p ] || mkdir -m0750 /var/log/i2p
+    chown -f -R $I2PSYSUSER:i2psvc /var/log/i2p
+
+    # Has someone set the permissions with dpkg-statoverride? If so, obey them.
+    if ! dpkg-statoverride --list $I2PHOME > /dev/null 2>&1
+    then
+        chown -f -R $I2PSYSUSER:$I2PSYSUSER $I2PHOME
+        chmod -f u=rwx,g=rxs,o= $I2PHOME
+    fi
+
+    db_stop
+;;
+abort-upgrade|abort-remove|abort-deconfigure)
+    echo "Aborting upgrade"
+    exit 0
+    ;;
+*)
+        echo "postinst called with unknown argument \`$1'" >&2
+                exit 0
+                ;;
+esac
+
+#DEBHELPER#
+
+exit 0
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

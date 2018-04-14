@@ -1,22 +1,23 @@
 Source: i2p
 Maintainer: Masayuki Hatta <mhatta@debian.org>
 Section: net
-Standards-Version: 4.0.0
+Standards-Version: 4.1.3
 Priority: optional
 Homepage: https://geti2p.net/
-Build-Depends: debhelper (>= 7.0.50~)
+Vcs-Browser: https://salsa.debian.org/debian/i2p
+Vcs-Git: https://salsa.debian.org/debian/i2p.git
+Build-Depends: debhelper (>= 9.20160709)
  ,ant (>= 1.8)
  ,debconf
- ,openjdk-8-jdk
+ ,openjdk-9-jdk
  ,libjetty9-java (>= 9.2.22)
  ,libtaglibs-standard-jstlel-java
  ,libtomcat8-java
  ,dh-apparmor
- ,dh-systemd
  ,bash-completion
  ,gettext
  ,libgetopt-java
- ,libgmp-dev (>= 2:5.0.2)
+ ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
  ,po-debconf
 
@@ -29,9 +30,9 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  debconf,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni,
- lsb-base,
+ lsb-base (>= 3.0-6),
  service-wrapper
-Description: Invisible Internet Project - anonymous network
+Description: Invisible Internet Project (I2P) - anonymous network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
@@ -46,7 +47,7 @@ Section: java
 Priority: optional
 Depends: ${misc:Depends}, ${shlibs:Depends}, i2p-router
 Homepage: https://geti2p.net/
-Description: Invisible Internet Project - libjbigi library
+Description: Invisible Internet Project (I2P) - libjbigi library
  This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
  .
  libjbigi is a math library that is part of the I2P installation.  Use of this
@@ -57,10 +58,10 @@ Description: Invisible Internet Project - libjbigi library
 Package: i2p-doc
 Architecture: all
 Section: doc
-Priority: extra
+Priority: optional
 Depends: ${misc:Depends}
 Suggests: i2p, default-jdk-doc
-Description: Invisible Internet Project - developer documentation
+Description: Invisible Internet Project (I2P) - developer documentation
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
@@ -73,20 +74,20 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-8-jre-headless | java8-runtime-headless,
- libjetty9-java,
- libtaglibs-standard-jstlel-java,
- libtomcat8-java,
+ openjdk-9-jre-headless | openjdk-8-jre-headless | default-jre-headless | java9-runtime-headless | java8-runtime-headless,
  geoip-database,
  gettext-base,
  libgetopt-java,
+ libjetty9-java,
+ libtaglibs-standard-jstlel-java,
+ libtomcat8-java,
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
 Suggests: apparmor
  ,privoxy
  ,syndie
-Description: Invisible Internet Project - router
+Description: Invisible Internet Project (I2P) - Router
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
