@@ -24,7 +24,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     // Same as above but with backslash for file paths
     private static final String WIN_PATTERN     = "^[\\p{L}\\p{Nd}.,:\\-\\/+=~\\[\\]?@_ \r\n\\\\]*$";
     private static final Pattern parameterValuePattern = Pattern.compile(SystemVersion.isWindows() ? WIN_PATTERN : NON_WIN_PATTERN);
-    private static final Pattern headerValuePattern = Pattern.compile("^[a-zA-Z0-9()\\-=\\*\\.\\?;,+\\/:&_ ]*$");
+    private static final Pattern headerValuePattern = Pattern.compile("^[a-zA-Z0-9()\\-=\\*\\.\\?;,+\\/:&_ \"]*$");
     private static final String NOFILTER = "nofilter_";
 
     public XSSRequestWrapper(HttpServletRequest servletRequest) {
