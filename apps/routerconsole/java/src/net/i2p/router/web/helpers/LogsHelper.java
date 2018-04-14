@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Attributes;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SigType;
@@ -95,6 +96,22 @@ public class LogsHelper extends HelperBase {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             return "<p>" + _t("File location") + ": <a href=\"/wrapper.log\" target=\"_blank\">" + f.getAbsolutePath() + "</a></p></td></tr>\n<tr><td><pre id=\"servicelogs\">" + str + "</pre>";
         }
+    }
+   
+    /**
+     * @since 0.9.35
+     */
+    public String getBuiltBy() {
+        File baseDir = _context.getBaseDir();
+        File f = new File(new File(baseDir, "lib"), "i2p.jar");
+        Attributes att = FileDumpHelper.attributes(f);
+        if (att != null) {
+            String s = FileDumpHelper.getAtt(att, "Built-By");
+            if (s != null) {
+                return s;
+            }
+        }
+        return "Undefined";
     }
     
     /*****  unused

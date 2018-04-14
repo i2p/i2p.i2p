@@ -52,7 +52,8 @@
 <tr><td><b>Jbigi version:</b></td><td><%=net.i2p.util.NativeBigInteger.getJbigiVersion()%></td></tr>
 <tr><td><b>GMP version:</b></td><td><%=net.i2p.util.NativeBigInteger.getLibGMPVersion()%></td></tr>
 <tr><td><b>Encoding:</b></td><td><%=System.getProperty("file.encoding")%></td></tr>
-<tr><td><b>Charset:</b></td><td><%=java.nio.charset.Charset.defaultCharset().name()%></td></tr></tbody></table>
+<tr><td><b>Charset:</b></td><td><%=java.nio.charset.Charset.defaultCharset().name()%></td></tr>
+<tr><td><b>Built By:</b></td><td><jsp:getProperty name="logsHelper" property="builtBy" /></tbody></table>
 
 <h3 class="tabletitle"><%=intl._t("Critical Logs")%></h3>
 <table id="criticallogs" class="logtable"><tbody>

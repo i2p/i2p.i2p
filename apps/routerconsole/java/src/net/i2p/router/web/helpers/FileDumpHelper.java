@@ -193,7 +193,11 @@ public class FileDumpHelper extends HelperBase {
         }
     }
 
-    private static Attributes attributes(File f) {
+    /**
+     * @return null if not found
+     * @since pkg private since 0.9.35 for LogsHelper
+     */
+    static Attributes attributes(File f) {
         InputStream in = null;
         try {
             in = (new URL("jar:file:" + f.getAbsolutePath() + "!/META-INF/MANIFEST.MF")).openStream();
@@ -207,7 +211,12 @@ public class FileDumpHelper extends HelperBase {
         }
     }
 
-    private static String getAtt(Attributes atts, String s) {
+    /**
+     * @param atts non-null
+     * @return HTML stripped, or null if not found
+     * @since pkg private since 0.9.35 for LogsHelper
+     */
+    static String getAtt(Attributes atts, String s) {
         String rv = atts.getValue(s);
         if (rv != null)
             rv = DataHelper.stripHTML(rv);
