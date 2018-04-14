@@ -1,4 +1,12 @@
+2018-04-14 zzz
+ * Console: Add built-by to /logs (ticket #2204)
+ * CPUID: Fix TBM detection (ticket #2211)
+ * Debian updates (ticket #2027, PR #15)
+ * Jetty: Fix quote in header line tripping XSS filter (ticket #2215)
+ * SusiMail: Add folders, drafts, background sending (ticket #2087)
+
 2018-04-11 zzz
+ * Debian updates for 0.9.34
  * Jetty 9.2.24-v201801015
  * Tomcat 8.5.30
 

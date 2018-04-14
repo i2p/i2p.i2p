@@ -134,14 +134,14 @@ public class HeaderLine extends Encoding {
 	 *  TODO this will not work for quoting structured text
 	 *  such as recipient names on the "To" and "Cc" lines.
 	 *
-	 *  @param str must start with "field-name: "
+	 *  @param str must start with "field-name: ", must have non-whitespace after that
 	 */
 	@Override
 	public String encode(String str) throws EncodingException {
 		str = str.trim();
 		int l = str.indexOf(": ");
 		if (l <= 0 || l >= 64)
-			throw new EncodingException("bad 'field-name: '" + str);
+			throw new EncodingException("bad field-name: " + str);
 		l += 2;
 		boolean quote = false;
 		if (str.length() > 76) {

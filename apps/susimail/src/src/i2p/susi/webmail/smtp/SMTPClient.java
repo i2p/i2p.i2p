@@ -221,7 +221,7 @@ public class SMTPClient {
 	}
 
 	/**
-	 *  @param body without the attachments
+	 *  @param body headers and body, without the attachments
 	 *  @param attachments may be null
 	 *  @param boundary non-null if attachments is non-null
 	 *  @return success
@@ -248,6 +248,7 @@ public class SMTPClient {
 				socket.setSoTimeout(120*1000);
 				int result = sendCmd(null);
 				if (result != 220) {
+					error += _t("Error sending mail") + '\n';
 					if (result != 0)
 						error += _t("Server refused connection") + " (" + result + ")\n";
 					else
@@ -331,39 +332,7 @@ public class SMTPClient {
 				//socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
 				// Do it this way so we don't double the memory
 				out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "ISO-8859-1"));
-				out.write(body.toString());
-				// moved from WebMail so we don't bring the attachments into memory
-				// Also TODO use the 250 service extension responses to pick the best encoding
-				// and check the max total size
-				if (attachments != null && !attachments.isEmpty()) {
-					for(Attachment attachment : attachments) {
-						String encodeTo = attachment.getTransferEncoding();
-						Encoding encoding = EncodingFactory.getEncoding(encodeTo);
-						if (encoding == null)
-							throw new EncodingException( _t("No Encoding found for {0}", encodeTo));
-						// ref: https://blog.nodemailer.com/2017/01/27/the-mess-that-is-attachment-filenames/
-						// ref: RFC 2231
-						// split Content-Disposition into 3 lines to maximize room
-						// TODO filename*0* for long names...
-						String name = attachment.getFileName();
-						String name2 = FilenameUtil.sanitizeFilename(name);
-						String name3 = FilenameUtil.encodeFilenameRFC5987(name);
-						out.write("\r\n--" + boundary +
-						          "\r\nContent-type: " + attachment.getContentType() +
-						          "\r\nContent-Disposition: attachment;\r\n\tfilename=\"" + name2 +
-						          "\";\r\n\tfilename*=" + name3 +
-						          "\r\nContent-Transfer-Encoding: " + attachment.getTransferEncoding() +
-						          "\r\n\r\n");
-						InputStream in = null;
-						try {
-							in = attachment.getData();
-						 	encoding.encode(in, out);
-						} finally {
-							if (in != null) try { in.close(); } catch (IOException ioe) {}
-						}
-					}
-					out.write( "\r\n--" + boundary + "--\r\n" );
-				}
+				writeMail(out, body, attachments, boundary);
 				out.write("\r\n.\r\n");
 				out.flush();
 				socket.setSoTimeout(0);
@@ -389,6 +358,50 @@ public class SMTPClient {
 			if (out != null) try { out.close(); } catch (IOException ioe) {}
 		}
 		return mailSent;
+	}
+
+	/**
+	 *  Caller must close out
+	 *
+	 *  @param body headers and body, without the attachments
+	 *  @param attachments may be null
+	 *  @param boundary non-null if attachments is non-null
+	 */
+	public static void writeMail(Writer out, StringBuilder body,
+	                             List<Attachment> attachments, String boundary) throws IOException {
+		out.write(body.toString());
+		// moved from WebMail so we don't bring the attachments into memory
+		// Also TODO use the 250 service extension responses to pick the best encoding
+		// and check the max total size
+		if (attachments != null && !attachments.isEmpty()) {
+			for(Attachment attachment : attachments) {
+				String encodeTo = attachment.getTransferEncoding();
+				Encoding encoding = EncodingFactory.getEncoding(encodeTo);
+				if (encoding == null)
+					throw new EncodingException( _t("No Encoding found for {0}", encodeTo));
+				// ref: https://blog.nodemailer.com/2017/01/27/the-mess-that-is-attachment-filenames/
+				// ref: RFC 2231
+				// split Content-Disposition into 3 lines to maximize room
+				// TODO filename*0* for long names...
+				String name = attachment.getFileName();
+				String name2 = FilenameUtil.sanitizeFilename(name);
+				String name3 = FilenameUtil.encodeFilenameRFC5987(name);
+				out.write("\r\n--" + boundary +
+				          "\r\nContent-type: " + attachment.getContentType() +
+				          "\r\nContent-Disposition: attachment;\r\n\tfilename=\"" + name2 +
+				          "\";\r\n\tfilename*=" + name3 +
+				          "\r\nContent-Transfer-Encoding: " + attachment.getTransferEncoding() +
+				          "\r\n\r\n");
+				InputStream in = null;
+				try {
+					in = attachment.getData();
+				 	encoding.encode(in, out);
+				} finally {
+					if (in != null) try { in.close(); } catch (IOException ioe) {}
+				}
+			}
+			out.write( "\r\n--" + boundary + "--\r\n" );
+		}
 	}
 
 	/**

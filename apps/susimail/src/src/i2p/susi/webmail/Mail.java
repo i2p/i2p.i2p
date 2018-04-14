@@ -300,6 +300,23 @@ class Mail {
 	{
 		if( text != null && text.length() > 0 ) {			
 			String[] ccs = DataHelper.split(text, ",");
+			ok = getRecipientsFromList(recipients, ccs, ok);
+		}
+		return ok;
+	}
+
+	/**
+	 * A little misnamed. Adds all addresses from the elements
+	 * in text to the recipients list.
+	 * 
+	 * @param recipients out param
+	 * @param ok will be returned
+	 * @return true if ALL e-mail addresses are valid AND the in parameter was true
+	 * @since 0.9.35
+	 */
+	public static boolean getRecipientsFromList( ArrayList<String> recipients, String[] ccs, boolean ok )
+	{
+		if (ccs != null && ccs.length > 0 ) {			
 			for( int i = 0; i < ccs.length; i++ ) {
 				String recipient = ccs[i].trim();
 				if( validateAddress( recipient ) ) {

@@ -131,7 +131,7 @@ public abstract class Encoding {
 
 	/**
 	 * This implementation just converts the string to a byte array
-	 * and then calls encode(byte[]).
+	 * and then calls decode(byte[]).
 	 * Most classes will not need to override.
 	 * 
 	 * @param str

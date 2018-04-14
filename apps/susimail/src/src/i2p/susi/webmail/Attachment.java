@@ -73,6 +73,14 @@ public class Attachment {
 	}
 
 	/**
+	 * @return absolute path to the data file
+	 * @since 0.9.35
+	 */
+	public String getPath() {
+		return data.getAbsolutePath();
+	}
+
+	/**
 	 * The unencoded size
 	 * @since 0.9.33
 	 */

@@ -301,10 +301,12 @@ class MailPart {
 	}
 
 	/**
+         *  Synched because FileBuffer keeps stream open
+         *
          *  @param offset 2 for sendAttachment, 0 otherwise, probably for \r\n
 	 *  @since 0.9.13
 	 */
-	public void decode(int offset, Buffer out) throws IOException {
+	public synchronized void decode(int offset, Buffer out) throws IOException {
 		String encg = encoding;
 		if (encg == null) {
 			//throw new DecodingException("No encoding specified");
@@ -319,9 +321,7 @@ class MailPart {
 		CountingOutputStream cos = null;
 		Buffer dout = null;
 		try {
-			in = buffer.getInputStream();
-			DataHelper.skip(in, buffer.getOffset() + beginBody + offset);
-			lin = new LimitInputStream(in, end - beginBody - offset);
+			lin = getRawInputStream(offset);
 			if (decodedLength < 0) {
 				cos = new CountingOutputStream(out.getOutputStream());
 				dout = new OutputStreamBuffer(cos);
@@ -341,7 +341,6 @@ class MailPart {
 				Debug.debug(Debug.DEBUG, "Decode IOE", ioe);
 			throw ioe;
 		} finally {
-			if (in != null) try { in.close(); } catch (IOException ioe) {};
 			if (lin != null) try { lin.close(); } catch (IOException ioe) {};
 			buffer.readComplete(true);
 			// let the servlet do this
@@ -352,6 +351,39 @@ class MailPart {
 		}
 		if (cos != null)
 			decodedLength = (int) cos.getWritten();
+	}
+
+	/**
+         *  Synched because FileBuffer keeps stream open
+         *  Caller must close out
+         *
+	 *  @since 0.9.35
+	 */
+	public synchronized void outputRaw(OutputStream out) throws IOException {
+		LimitInputStream lin = null;
+		try {
+			lin = getRawInputStream(0);
+			DataHelper.copy(lin, out);
+		} catch (IOException ioe) {
+			Debug.debug(Debug.DEBUG, "Decode IOE", ioe);
+			throw ioe;
+		} finally {
+			if (lin != null) try { lin.close(); } catch (IOException ioe) {};
+			buffer.readComplete(true);
+		}
+	}
+
+	/**
+         *  Synched because FileBuffer keeps stream open
+         *  Caller must call readComplete() on buffer
+         *
+         *  @param offset 2 for sendAttachment, 0 otherwise, probably for \r\n
+	 *  @since 0.9.35
+	 */
+	private synchronized LimitInputStream getRawInputStream(int offset) throws IOException {
+		InputStream in = buffer.getInputStream();
+		DataHelper.skip(in, buffer.getOffset() + beginBody + offset);
+		return new LimitInputStream(in, end - beginBody - offset);
 	}
 
 	private static String getFirstAttribute( String line )

@@ -27,8 +27,11 @@ import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
 import i2p.susi.util.Buffer;
 import i2p.susi.util.FileBuffer;
+import i2p.susi.util.Folder;
+import i2p.susi.util.Folder.SortOrder;
 import i2p.susi.util.ReadBuffer;
 import i2p.susi.util.MemoryBuffer;
+import static i2p.susi.webmail.Sorters.*;
 import i2p.susi.webmail.pop3.POP3MailBox;
 import i2p.susi.webmail.pop3.POP3MailBox.FetchRequest;
 
@@ -43,9 +46,13 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 
 /**
+ * There's one of these for each Folder.
+ * However, only DIR_FOLDER has a non-null POP3MailBox.
+ *
  * @author user
  */
 class MailCache {
@@ -58,7 +65,11 @@ class MailCache {
 	private final Hashtable<String, Mail> mails;
 	private final PersistentMailCache disk;
 	private final I2PAppContext _context;
+	private final Folder<String> folder;
+	private final String folderName;
 	private NewMailListener _loadInProgress;
+	private boolean _isLoaded;
+	private final boolean _isDrafts;
 	
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
@@ -69,15 +80,156 @@ class MailCache {
 	/**
 	 * Does NOT load the mails in. Caller MUST call loadFromDisk().
 	 *
-	 * @param mailbox non-null
+	 * @param mailbox non-null for DIR_FOLDER; null otherwise
 	 */
-	MailCache(I2PAppContext ctx, POP3MailBox mailbox,
+	MailCache(I2PAppContext ctx, POP3MailBox mailbox, String folderName,
 		  String host, int port, String user, String pass) throws IOException {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
-		disk = new PersistentMailCache(ctx, host, port, user, pass, PersistentMailCache.DIR_FOLDER);
+		disk = new PersistentMailCache(ctx, host, port, user, pass, folderName);
 		// TODO Drafts, Sent, Trash
 		_context = ctx;
+		Folder<String> folder = new Folder<String>();	
+		// setElements() sorts, so configure the sorting first
+		//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
+		folder.addSorter(WebMail.SORT_SENDER, new SenderSorter(this));
+		folder.addSorter(WebMail.SORT_SUBJECT, new SubjectSorter(this));
+		folder.addSorter(WebMail.SORT_DATE, new DateSorter(this));
+		folder.addSorter(WebMail.SORT_SIZE, new SizeSorter(this));
+		// reverse sort, latest mail first
+		// TODO get user defaults from config
+		folder.setSortBy(WebMail.SORT_DEFAULT, WebMail.SORT_ORDER_DEFAULT);
+		this.folder = folder;
+		this.folderName = folderName;
+		_isDrafts = folderName.equals(WebMail.DIR_DRAFTS);
+	}
+
+	/**
+	 * @since 0.9.35
+	 * @return as passed in
+	 */
+	public String getFolderName() {
+		return folderName;
+	}
+
+	/**
+	 * @since 0.9.35
+	 * @return translation of name passed in
+	 */
+	public String getTranslatedName() {
+		String rv = folderName.equals(WebMail.DIR_FOLDER) ? "Inbox" : folderName;
+		return Messages.getString(rv);
+	}
+
+	/**
+	 * @since 0.9.35
+	 * @return non-null
+	 */
+	public Folder<String> getFolder() {
+		return folder;
+	}
+
+	/**
+	 * For writing a new full mail (NOT headers only)
+	 * Caller must close.
+	 * @since 0.9.35
+	 */
+	public Buffer getFullWriteBuffer(String uidl) {
+		// no locking this way
+		return disk.getFullBuffer(uidl);
+	}
+
+	/**
+	 * For writing a new full mail
+	 * @param buffer as received from getFullBuffer
+	 * @since 0.9.35
+	 */
+	public void writeComplete(String uidl, Buffer buffer, boolean success) {
+		buffer.writeComplete(success);
+		if (success) {
+			Mail mail;
+			if (_isDrafts)
+				mail = new Draft(uidl);
+			else
+				mail = new Mail(uidl);
+			mail.setBody(buffer);
+			synchronized(mails) {
+				mails.put(uidl, mail);
+			}
+			folder.addElement(uidl);
+		}
+	}
+
+	/**
+	 * @return non-null only for Drafts
+	 * @since 0.9.35
+	 */
+	public File getAttachmentDir() {
+		return disk.getAttachmentDir();
+	}
+
+	/**
+	 * Move a mail to another MailCache, neither may be DIR_DRAFTS
+	 * @return success
+	 * @since 0.9.35
+	 */
+	public boolean moveTo(String uidl, MailCache toMC) {
+		if (folderName.equals(WebMail.DIR_DRAFTS) ||
+		    toMC.getFolderName().equals(WebMail.DIR_DRAFTS))
+			return false;
+		Mail mail;
+		synchronized(mails) {
+			mail = mails.get(uidl);
+			if (mail == null)
+				return false;
+			if (!mail.hasBody())
+				return false;
+			File from = disk.getFullFile(uidl);
+			if (!from.exists())
+				return false;
+			PersistentMailCache toPMC = toMC.disk;
+			File to = toPMC.getFullFile(uidl);
+			if (to.exists())
+				return false;
+			if (!FileUtil.rename(from, to))
+				return false;
+			mails.remove(uidl);
+			folder.removeElement(uidl);
+		}
+		toMC.movedTo(mail);
+		if (mailbox != null)
+			mailbox.queueForDeletion(mail.uidl);
+		return true;
+	}
+
+	/**
+	 * Moved a mail from another MailCache
+	 * @since 0.9.35
+	 */
+	private void movedTo(Mail mail) {
+		synchronized(mails) {
+			// we must reset the body of the mail to the new FileBuffer
+			Buffer body = disk.getFullBuffer(mail.uidl);
+			mail.setBody(body);
+			mails.put(mail.uidl, mail);
+		}
+		folder.addElement(mail.uidl);
+	}
+
+	/**
+	 * Is loadFromDisk in progress?
+	 * @since 0.9.35
+	 */
+	public synchronized boolean isLoading() {
+		return _loadInProgress != null;
+	}
+
+	/**
+	 * Has loadFromDisk completed?
+	 * @since 0.9.35
+	 */
+	public synchronized boolean isLoaded() {
+		return _isLoaded;
 	}
 
 	/**
@@ -88,8 +240,9 @@ class MailCache {
 	 * @since 0.9.13
 	 */
 	public synchronized boolean loadFromDisk(NewMailListener nml) {
-		if (_loadInProgress != null)
+		if (_isLoaded || _loadInProgress != null)
 			return false;
+		Debug.debug(Debug.DEBUG, "Loading folder " + folderName);
 		Thread t = new I2PAppThread(new LoadMailRunner(nml), "Email loader");
 		_loadInProgress = nml;
 		try {
@@ -115,10 +268,12 @@ class MailCache {
 				blockingLoadFromDisk();
 				if(!mails.isEmpty())
 					result = true;
+				Debug.debug(Debug.DEBUG, "Folder loaded: " + folderName);
 			} finally {
 				synchronized(MailCache.this) {
 					if (_loadInProgress == _nml)
 						_loadInProgress = null;
+					_isLoaded = true;
 				}
 				_nml.foundNewMail(result);
 			}
@@ -133,7 +288,7 @@ class MailCache {
 	 */
 	private void blockingLoadFromDisk() {
 		synchronized(mails) {
-			if (!mails.isEmpty())
+			if (_isLoaded)
 				throw new IllegalStateException();
 			Collection<Mail> dmails = disk.getMails();
 			for (Mail mail : dmails) {
@@ -164,7 +319,8 @@ class MailCache {
 	}
 
 	/**
-	 * Fetch any needed data from pop3 server, unless mode is CACHE_ONLY.
+	 * Fetch any needed data from pop3 server, unless mode is CACHE_ONLY,
+	 * or this isn't the Inbox.
 	 * Blocking unless mode is CACHE_ONLY.
 	 * 
 	 * @param uidl message id to get
@@ -173,7 +329,6 @@ class MailCache {
 	 */
         @SuppressWarnings({"unchecked", "rawtypes"})
 	public Mail getMail(String uidl, FetchMode mode) {
-		
 		Mail mail = null, newMail = null;
 
 		/*
@@ -182,6 +337,9 @@ class MailCache {
 		synchronized(mails) {
 			mail = mails.get( uidl );
 			if( mail == null ) {
+				// if not in inbox, we can't fetch, this is what we have
+				if (mailbox == null)
+					return null;
 				newMail = new Mail(uidl);
 				// TODO really?
 				mails.put( uidl, newMail );
@@ -193,13 +351,20 @@ class MailCache {
 		}
 		if (mail.markForDeletion)
 			return null;
+		// if not in inbox, we can't fetch, this is what we have
+		if (mailbox == null)
+			return mail;
+
 		long sz = mail.getSize();
 		if (mode == FetchMode.HEADER && sz > 0 && sz <= FETCH_ALL_SIZE)
 			mode = FetchMode.ALL;
 			
 		if (mode == FetchMode.HEADER) {
-			if(!mail.hasHeader())
-				mail.setHeader(mailbox.getHeader(uidl));
+			if (!mail.hasHeader()) {
+				Buffer buf = mailbox.getHeader(uidl);
+				if (buf != null)
+					mail.setHeader(buf);
+			}
 		} else if (mode == FetchMode.ALL) {
 			if(!mail.hasBody()) {
 				File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
@@ -223,6 +388,7 @@ class MailCache {
 	 * Mail objects are inserted into the requests.
 	 * After this, call getUIDLs() to get all known mail UIDLs.
 	 * MUST already be connected, otherwise returns false.
+	 * Call only on inbox!
 	 * 
 	 * Blocking.
 	 * 
@@ -234,6 +400,10 @@ class MailCache {
 	public boolean getMail(FetchMode mode) {
 		if (mode == FetchMode.CACHE_ONLY)
 			throw new IllegalArgumentException();
+		if (mailbox == null) {
+			Debug.debug(Debug.DEBUG, "getMail() mode " + mode + " called on wrong folder " + getFolderName(), new Exception());
+			return false;
+		}
 		boolean hOnly = mode == FetchMode.HEADER;
 		
 		Collection<String> popKnown = mailbox.getUIDLs();
@@ -348,6 +518,7 @@ class MailCache {
 	 * Mark mail for deletion locally.
 	 * Send delete requests to POP3 then quit and reconnect.
 	 * No success/failure indication is returned.
+	 * Does not delete from folder.
 	 * 
 	 * @since 0.9.13
 	 */
@@ -359,6 +530,7 @@ class MailCache {
 	 * Mark mail for deletion locally.
 	 * Send delete requests to POP3 then quit and reconnect.
 	 * No success/failure indication is returned.
+	 * Does not delete from folder.
 	 * 
 	 * @since 0.9.13
 	 */
@@ -381,7 +553,8 @@ class MailCache {
 		}
 		if (toDelete.isEmpty())
 			return;
-		mailbox.queueForDeletion(toDelete);
+		if (mailbox != null)
+			mailbox.queueForDeletion(toDelete);
 	}
 
 	/**

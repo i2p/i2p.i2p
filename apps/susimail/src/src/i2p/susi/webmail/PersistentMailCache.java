@@ -52,7 +52,9 @@ import net.i2p.util.SystemVersion;
  * Exporting to a Maildir format would be just ungzipping
  * each file to a flat directory.
  *
- * TODO draft and sent folders, cached server caps and config.
+ * This class should only be accessed from MailCache.
+ *
+ * TODO cached server caps and config.
  *
  * @since 0.9.14
  */
@@ -68,17 +70,16 @@ class PersistentMailCache {
 
 	private final Object _lock;
 	private final File _cacheDir;
+	// non-null only for Drafts
+	private final File _attachmentDir;
 	private final I2PAppContext _context;
+	private final boolean _isDrafts;
 
 	private static final String DIR_SUSI = "susimail";
 	private static final String DIR_CACHE = "cache";
 	private static final String CACHE_PREFIX = "cache-";
-	public static final String DIR_FOLDER = "cur"; // MailDir-like
-	public static final String DIR_DRAFTS = "Drafts"; // MailDir-like
-	public static final String DIR_SENT = "Sent"; // MailDir-like
-	public static final String DIR_TRASH = "Trash"; // MailDir-like
-	public static final String DIR_SPAM = "Bulk Mail"; // MailDir-like
 	public static final String DIR_IMPORT = "import"; // Flat with .eml files, debug only for now
+	public static final String DIR_ATTACHMENTS = "attachments"; // Flat with draft attachment files
 	private static final String DIR_PREFIX = "s";
 	private static final String FILE_PREFIX = "mail-";
 	private static final String HDR_SUFFIX = ".hdr.txt.gz";
@@ -91,16 +92,23 @@ class PersistentMailCache {
 	 *  Does NOT load the mails in. Caller MUST call getMails().
 	 *
 	 *  @param pass ignored
-	 *  @param folder use DIR_FOLDER
+	 *  @param folder e.g. DIR_FOLDER
 	 */
 	public PersistentMailCache(I2PAppContext ctx, String host, int port, String user, String pass, String folder) throws IOException {
 		_context = ctx;
+		_isDrafts = folder.equals(WebMail.DIR_DRAFTS);
 		_lock = getLock(host, port, user, pass);
 		synchronized(_lock) {
 			_cacheDir = makeCacheDirs(host, port, user, pass, folder);
 			// Debugging only for now.
-			if (folder.equals(DIR_FOLDER))
+			File attach = null;
+			if (folder.equals(WebMail.DIR_FOLDER)) {
 				importMail();
+			} else if (folder.equals(WebMail.DIR_DRAFTS)) {
+				attach = new SecureDirectory(_cacheDir, DIR_ATTACHMENTS);
+				attach.mkdirs();
+			}
+			_attachmentDir = attach;
 		}
 	}
 
@@ -143,7 +151,7 @@ class PersistentMailCache {
 		int tcnt = Math.max(1, Math.min(sz / 4, Math.min(SystemVersion.getCores(), 16)));
 		List<Thread> threads = new ArrayList<Thread>(tcnt);
 		for (int i = 0; i < tcnt; i++) {
-			Thread t = new I2PAppThread(new Loader(fq, rv), "Email loader " + i);
+			Thread t = new I2PAppThread(new Loader(fq, rv, _isDrafts), "Email loader " + i);
 			t.start();
 			threads.add(t);
 		}
@@ -166,15 +174,17 @@ class PersistentMailCache {
 	private static class Loader implements Runnable {
 		private final Queue<File> _in;
 		private final Queue<Mail> _out;
+		private final boolean _isD;
 
-		public Loader(Queue<File> in, Queue<Mail> out) {
+		public Loader(Queue<File> in, Queue<Mail> out, boolean isDrafts) {
 			_in = in; _out = out;
+			_isD = isDrafts;
 		}
 
 		public void run() {
 			File f;
 			while ((f = _in.poll()) != null) {
-				Mail mail = load(f);
+				Mail mail = load(f, _isD);
 				if (mail != null)
 					_out.offer(mail);
 			}
@@ -296,12 +306,31 @@ class PersistentMailCache {
 		return base;
 	}
 
-	private File getHeaderFile(String uidl) {
+	public File getHeaderFile(String uidl) {
 		return getFile(uidl, HDR_SUFFIX);
 	}
 
-	private File getFullFile(String uidl) {
+	public File getFullFile(String uidl) {
 		return getFile(uidl, FULL_SUFFIX);
+	}
+
+	/**
+	 * For reading or writing a new full mail (NOT headers only).
+	 * For writing, caller MUST call writeComplete() on rv.
+	 * Does not necessarily exist.
+	 *
+	 * @since 0.9.35
+	 */
+	public GzipFileBuffer getFullBuffer(String uidl) {
+		return new GzipFileBuffer(getFile(uidl, FULL_SUFFIX));
+	}
+
+	/**
+	 * @return non-null only for Drafts
+	 * @since 0.9.35
+	 */
+	public File getAttachmentDir() {
+		return _attachmentDir;
 	}
 
 	private File getFile(String uidl, String suffix) {
@@ -351,7 +380,7 @@ class PersistentMailCache {
 	 *
 	 *  @return null on failure
 	 */
-	private static Mail load(File f) {
+	private static Mail load(File f, boolean isDrafts) {
 		String name = f.getName();
 		String uidl;
 		boolean headerOnly;
@@ -369,7 +398,11 @@ class PersistentMailCache {
 		Buffer rb = read(f);
 		if (rb == null)
 			return null;
-		Mail mail = new Mail(uidl);
+		Mail mail;
+		if (isDrafts)
+			mail = new Draft(uidl);
+		else
+			mail = new Mail(uidl);
 		if (headerOnly)
 			mail.setHeader(rb);
 		else

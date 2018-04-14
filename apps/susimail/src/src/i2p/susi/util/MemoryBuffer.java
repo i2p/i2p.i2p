@@ -86,6 +86,6 @@ public class MemoryBuffer implements Buffer {
 
 	@Override
 	public String toString() {
-		return "SB " + (content == null ? "empty" : content.length + " bytes");
+		return "MB " + (content == null ? "empty" : content.length + " bytes");
 	}
 }
