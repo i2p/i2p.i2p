@@ -1,6 +1,5 @@
 package i2p.susi.webmail;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.webmail.Messages;
 import i2p.susi.util.Buffer;
 import i2p.susi.util.FileBuffer;
@@ -33,6 +32,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 import net.i2p.util.PasswordManager;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
@@ -73,6 +73,7 @@ class PersistentMailCache {
 	// non-null only for Drafts
 	private final File _attachmentDir;
 	private final I2PAppContext _context;
+	private final Log _log;
 	private final boolean _isDrafts;
 
 	private static final String DIR_SUSI = "susimail";
@@ -96,6 +97,7 @@ class PersistentMailCache {
 	 */
 	public PersistentMailCache(I2PAppContext ctx, String host, int port, String user, String pass, String folder) throws IOException {
 		_context = ctx;
+		_log = ctx.logManager().getLog(PersistentMailCache.class);
 		_isDrafts = folder.equals(WebMail.DIR_DRAFTS);
 		_lock = getLock(host, port, user, pass);
 		synchronized(_lock) {
@@ -163,7 +165,7 @@ class PersistentMailCache {
 			}
 		}
 		long end = _context.clock().now();
-		Debug.debug(Debug.DEBUG, "Loaded " + sz + " emails with " + tcnt + " threads in " + DataHelper.formatDuration(end - begin));
+		if (_log.shouldDebug()) _log.debug("Loaded " + sz + " emails with " + tcnt + " threads in " + DataHelper.formatDuration(end - begin));
 		return rv;
 	}
 
@@ -347,7 +349,7 @@ class PersistentMailCache {
 	 * 
 	 * @return success
 	 */
-	private static boolean write(Buffer rb, File f) {
+	private boolean write(Buffer rb, File f) {
 		InputStream in = null;
 		OutputStream out = null;
 		try {
@@ -357,7 +359,7 @@ class PersistentMailCache {
 			DataHelper.copy(in, out);
 			return true;
 		} catch (IOException ioe) {
-			Debug.debug(Debug.ERROR, "Error writing: " + f + ": " + ioe);
+			_log.error("Error writing: " + f + ": " + ioe);
 			return false;
 		} finally {
 			if (in != null) 
@@ -437,7 +439,7 @@ class PersistentMailCache {
 						}
 					}
 				} catch (IOException ioe) {
-					Debug.debug(Debug.ERROR, "Import failed " + f, ioe);
+					_log.error("Import failed " + f, ioe);
 					continue;
 				} finally {
 					if (in != null) 
@@ -447,7 +449,7 @@ class PersistentMailCache {
 					uidl = Long.toString(_context.random().nextLong());
 				File to = getFullFile(uidl);
 				if (to.exists()) {
-					Debug.debug(Debug.DEBUG, "Already have " + f + " as UIDL " + uidl);
+					if (_log.shouldDebug()) _log.debug("Already have " + f + " as UIDL " + uidl);
 					f.delete();
 					continue;
 				}
@@ -460,7 +462,7 @@ class PersistentMailCache {
 					out = new FixCRLFOutputStream(gb.getOutputStream());
 					DataHelper.copy(in, out);
 				} catch (IOException ioe) {
-					Debug.debug(Debug.ERROR, "Import failed " + f, ioe);
+					_log.error("Import failed " + f, ioe);
 					continue;
 				} finally {
 					if (in != null) 
@@ -469,7 +471,7 @@ class PersistentMailCache {
 						try { out.close(); } catch (IOException ioe) {}
 				}
 				f.delete();
-				Debug.debug(Debug.DEBUG, "Imported " + f + " as UIDL " + uidl);
+				if (_log.shouldDebug()) _log.debug("Imported " + f + " as UIDL " + uidl);
 	       		}
 		}
 	}

@@ -32,7 +32,9 @@ import i2p.susi.util.Buffer;
 import i2p.susi.util.ReadBuffer;
 import i2p.susi.util.MemoryBuffer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
 
 /**
  * Interface to encode/decode content transfer encodings like quoted-printable, base64 etc.
@@ -41,6 +43,12 @@ import net.i2p.data.DataHelper;
  * @since 0.9.33 changed from interface to abstract class
  */
 public abstract class Encoding {
+	protected final Log _log;
+
+	protected Encoding() {
+		_log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+	}
+
 	public abstract String getName();
 
 	/**

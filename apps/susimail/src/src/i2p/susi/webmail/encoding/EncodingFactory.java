@@ -23,7 +23,6 @@
  */
 package i2p.susi.webmail.encoding;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
 import i2p.susi.util.Buffer;
 
@@ -32,8 +31,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.HexDump;
+import net.i2p.util.Log;
 
 /**
  * Manager class to handle content transfer encodings.
@@ -58,10 +59,11 @@ public class EncodingFactory {
 					Class<?> c = Class.forName( classNames[i] );
 					Encoding e = (Encoding) (c.getDeclaredConstructor().newInstance());
 					encodings.put( e.getName(), e );
-					//Debug.debug( Debug.DEBUG, "Registered " + e.getClass().getName() );
+					//if (_log.shouldDebug()) _log.debug("Registered " + e.getClass().getName() );
 				}
 				catch (Exception e) {
-					Debug.debug( Debug.ERROR, "Error loading class '" + classNames[i] + "', reason: " + e.getClass().getName() );
+					Log log = I2PAppContext.getGlobalContext().logManager().getLog(EncodingFactory.class);
+					log.error("Error loading class '" + classNames[i] + "'", e);
 				}
 			}
 		}

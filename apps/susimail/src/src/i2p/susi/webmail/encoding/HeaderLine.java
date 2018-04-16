@@ -23,7 +23,6 @@
  */
 package i2p.susi.webmail.encoding;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.util.HexTable;
 import i2p.susi.util.Buffer;
 import i2p.susi.util.ReadBuffer;
@@ -36,6 +35,7 @@ import java.io.OutputStream;
 import java.util.Locale;
 
 import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
 
 /**
  *  Ref:
@@ -232,7 +232,7 @@ public class HeaderLine extends Encoding {
 			if (hasPushback) {
 				c = pushbackChar;
 				hasPushback = false;
-				//Debug.debug(Debug.DEBUG, "Loop " + count + " Using pbchar(dec) " + c);
+				//if (_log.shouldDebug()) _log.debug("Loop " + count + " Using pbchar(dec) " + c);
 			} else {
 				c = in.read();
 				if (c < 0)
@@ -288,7 +288,7 @@ public class HeaderLine extends Encoding {
 					}
 				}
 				//if (f1 > 0)
-				//	Debug.debug(Debug.DEBUG, "End of encoded word, f1 " + f1 + " f2 " + f2 + " f3 " + f3 + " f4 " + f4 +
+				//	if (_log.shouldDebug()) _log.debug("End of encoded word, f1 " + f1 + " f2 " + f2 + " f3 " + f3 + " f4 " + f4 +
 				//	" offset " + offset + " pushback? " + hasPushback + " pbchar(dec) " + c + '\n' +
 				//	net.i2p.util.HexDump.dump(encodedWord, 0, offset));
 				if (f4 == 0) {
@@ -299,20 +299,20 @@ public class HeaderLine extends Encoding {
 					} else if (f2 == 0) {
 						// =? but no more ?
 						// output what we buffered
-						Debug.debug(Debug.DEBUG, "2nd '?' not found");
+						if (_log.shouldDebug()) _log.debug("2nd '?' not found");
 						for (int i = 0; i < offset; i++) {
 							out.write(encodedWord[i] & 0xff);
 						}
 						continue;
 					} else if (f3 == 0) {
 						// discard what we buffered
-						Debug.debug(Debug.DEBUG, "3rd '?' not found");
+						if (_log.shouldDebug()) _log.debug("3rd '?' not found");
 						continue;
 					} else {
 						// probably just too long, but could be end of line without the "?=".
 						// synthesize a 4th '?' in an attempt to output
 						// something, probably with some trailing garbage
-						Debug.debug(Debug.DEBUG, "4th '?' not found");
+						if (_log.shouldDebug()) _log.debug("4th '?' not found");
 						f4 = offset + 1;
 						// keep going and output what we have
 					}
@@ -339,9 +339,9 @@ public class HeaderLine extends Encoding {
 							} catch (EOFException eof) {
 								// probably Base64 exceeded DECODE_MAX
 								// Keep going and output what we got, if any
-								if (Debug.getLevel() >= Debug.DEBUG) {
-									Debug.debug(Debug.DEBUG, "q-w " + enc, eof);
-									Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+								if (_log.shouldDebug()) {
+									_log.debug("q-w " + enc, eof);
+									_log.debug(net.i2p.util.HexDump.dump(encodedWord));
 								}
 							}
 							tmp.writeComplete(true);
@@ -377,22 +377,22 @@ public class HeaderLine extends Encoding {
 							lastCharWasQuoted = true;
 							continue;
 						} catch (IOException e1) {
-							Debug.debug(Debug.ERROR, "q-w " + enc, e1);
-							if (Debug.getLevel() >= Debug.DEBUG) {
-								Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+							_log.error("q-w " + enc, e1);
+							if (_log.shouldDebug()) {
+								_log.debug(net.i2p.util.HexDump.dump(encodedWord));
 							}
 						} catch (RuntimeException e1) {
-							Debug.debug(Debug.ERROR, "q-w " + enc, e1);
-							if (Debug.getLevel() >= Debug.DEBUG) {
-								Debug.debug(Debug.DEBUG, net.i2p.util.HexDump.dump(encodedWord));
+							_log.error("q-w " + enc, e1);
+							if (_log.shouldDebug()) {
+								_log.debug(net.i2p.util.HexDump.dump(encodedWord));
 							}
 						}
 					} else {
 						// can't happen
-						Debug.debug(Debug.DEBUG, "No decoder for " + enc);
+						if (_log.shouldDebug()) _log.debug("No decoder for " + enc);
 					}  // e != null
 				} else {
-					Debug.debug(Debug.DEBUG, "Invalid encoding '" + (char) encodedWord[f2+1] + '\'');
+					if (_log.shouldDebug()) _log.debug("Invalid encoding '" + (char) encodedWord[f2+1] + '\'');
 				}  // enc != null
 			}  // c == '='
 			else if( c == '\r' ) {
@@ -403,7 +403,7 @@ public class HeaderLine extends Encoding {
 					linebreak = true;
 				} else {
 					// pushback?
-					Debug.debug(Debug.DEBUG, "No \\n after \\r");
+					if (_log.shouldDebug()) _log.debug("No \\n after \\r");
 				}
 			}
 			// swallow whitespace here if lastCharWasQuoted

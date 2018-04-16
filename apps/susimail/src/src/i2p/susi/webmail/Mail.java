@@ -23,7 +23,6 @@
  */
 package i2p.susi.webmail;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.util.Buffer;
 import i2p.susi.util.Config;
 import i2p.susi.util.CountingInputStream;
@@ -51,6 +50,7 @@ import java.util.regex.Pattern;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.util.ServletUtil;
+import net.i2p.util.Log;
 import net.i2p.util.RFC822Date;
 import net.i2p.util.SystemVersion;
 
@@ -96,6 +96,7 @@ class Mail {
 	public String error;
 
 	public boolean markForDeletion;
+	private final Log _log;
 	
 	public Mail(String uidl) {
 		this.uidl = uidl;
@@ -108,6 +109,7 @@ class Mail {
 		shortSubject = "";
 		quotedDate = unknown;
 		error = "";
+		_log = I2PAppContext.getGlobalContext().logManager().getLog(Mail.class);
 	}
 
 	/**
@@ -186,9 +188,9 @@ class Mail {
 			size = rb.getLength();
 			success = true;
 		} catch (IOException de) {
-			Debug.debug(Debug.ERROR, "Decode error", de);
+			_log.error("Decode error", de);
 		} catch (RuntimeException e) {
-			Debug.debug(Debug.ERROR, "Parse error", e);
+			_log.error("Parse error", e);
 		} finally {
 			if (in != null) try { in.close(); } catch (IOException ioe) {}
 			rb.readComplete(success);
@@ -410,7 +412,7 @@ class Mail {
 					MemoryBuffer decoded = new MemoryBuffer(4096);
 					hl.decode(eofin, decoded);
 					if (!eofin.wasFound())
-						Debug.debug(Debug.DEBUG, "EOF hit before \\r\\n\\r\\n in Mail");
+						if (_log.shouldDebug()) _log.debug("EOF hit before \\r\\n\\r\\n in Mail");
 					// Fixme UTF-8 to bytes to UTF-8
 					headerLines = DataHelper.split(new String(decoded.getContent(), decoded.getOffset(), decoded.getLength()), "\r\n");
 					for (int j = 0; j < headerLines.length; j++) {
@@ -501,7 +503,7 @@ class Mail {
 				}
 				catch( Exception e ) {
 					error += "Error parsing mail header: " + e.getClass().getName() + '\n';
-					Debug.debug(Debug.ERROR, "Parse error", e);
+					_log.error("Parse error", e);
 				}		
 			}
 		}

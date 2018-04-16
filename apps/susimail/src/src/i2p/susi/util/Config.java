@@ -23,8 +23,6 @@
  */
 package i2p.susi.util;
 
-import i2p.susi.debug.Debug;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -34,6 +32,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 
 /**
@@ -92,14 +91,15 @@ public class Config {
 	 */
 	public synchronized static void reloadConfiguration()
 	{
-		// DEBUG level logging won't work here since we haven't loaded the config yet...
+		I2PAppContext ctx = I2PAppContext.getGlobalContext();
 		properties = new Properties();
 		InputStream iv = null;
 		try {
 			iv = Config.class.getResourceAsStream("/susimail.properties");
 			properties.load(iv);
 		} catch (IOException e) {
-			Debug.debug(Debug.ERROR, "Could not open WEB-INF/classes/susimail.properties (possibly in jar), reason: " + e);
+			Log log = ctx.logManager().getLog(Config.class);
+			log.error("Could not open WEB-INF/classes/susimail.properties (possibly in jar)", e);
 		} finally {
 			if(iv != null) try { iv.close(); } catch(IOException ioe) {}
 		}
@@ -110,7 +110,8 @@ public class Config {
 				DataHelper.loadProps(config, cfg);
 			}
 		} catch (IOException e) {
-			Debug.debug(Debug.ERROR, "Could not open susimail.config, reason: " + e);
+			Log log = ctx.logManager().getLog(Config.class);
+			log.error("Could not open susimail.config", e);
 		}
 	}
 

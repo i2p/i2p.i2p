@@ -1,11 +1,11 @@
 package i2p.susi.webmail.pop3;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.webmail.WebMail;
 import i2p.susi.util.Config;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
 
@@ -18,6 +18,7 @@ class IdleCloser {
 
 	private final POP3MailBox mailbox;
 	private final SimpleTimer2.TimedEvent timer;
+	private final Log _log;
 	private volatile boolean isClosing;
 	private volatile boolean isDead;
 
@@ -31,6 +32,7 @@ class IdleCloser {
 	public IdleCloser(POP3MailBox mailbox) {
 		this.mailbox = mailbox;
 		timer = new Checker();
+		_log = I2PAppContext.getGlobalContext().logManager().getLog(IdleCloser.class);
 	}
 
 	public void cancel() {
@@ -68,14 +70,15 @@ class IdleCloser {
 				long config = getMaxIdle();
 				long idle = System.currentTimeMillis() - mailbox.getLastActivity();
 				long remaining = config - idle;
+				Log log = IdleCloser.this._log;
 				if (remaining <= 0) {
-					Debug.debug(Debug.DEBUG, "Threading close after " +
+					if (log.shouldDebug()) log.debug("Threading close after " +
 							idle + " ms idle");
 					Thread t = new Closer();
 					isClosing = true;
 					t.start();
 				} else {
-					Debug.debug(Debug.DEBUG, "Not closing after " +
+					if (log.shouldDebug()) log.debug("Not closing after " +
 							idle + " ms idle");
 					schedule(remaining + 5000);
 				}

@@ -23,7 +23,6 @@
  */
 package i2p.susi.webmail;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.util.Buffer;
 import i2p.susi.util.Config;
 import i2p.susi.util.DecodingOutputStream;
@@ -89,6 +88,7 @@ import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.servlet.util.WriterOutputStream;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 import net.i2p.util.RFC822Date;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
@@ -98,10 +98,8 @@ import net.i2p.util.Translate;
  */
 public class WebMail extends HttpServlet
 {
-	/*
-	 * set to true, if its a release build
-	 */
-	private static final boolean RELEASE;
+	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(WebMail.class);
+
 	/*
 	 * increase version number for every release
 	 */
@@ -268,8 +266,6 @@ public class WebMail extends HttpServlet
 	
 	static {
 		Config.setPrefix( "susimail" );
-		RELEASE = !Boolean.parseBoolean(Config.getProperty(CONFIG_DEBUG));
-		Debug.setLevel( RELEASE ? Debug.ERROR : Debug.DEBUG );
 	}
 
 	
@@ -299,12 +295,19 @@ public class WebMail extends HttpServlet
 		boolean bccToSelf;
 		private final List<String> nonces;
 		private static final int MAX_NONCES = 15;
+		public final Log log;
 		
-		SessionObject()
+		SessionObject(Log log)
 		{
 			bccToSelf = Boolean.parseBoolean(Config.getProperty( CONFIG_BCC_TO_SELF, "true" ));
 			nonces = new ArrayList<String>(MAX_NONCES + 1);
 			caches = new HashMap<String, MailCache>(8);
+			this.log = log;
+			String dbg = Config.getProperty(CONFIG_DEBUG);
+			if (dbg != null) {
+				boolean release = !Boolean.parseBoolean(dbg);
+				log.setMinimumPriority(release ? Log.ERROR : Log.DEBUG);
+			}
 		}
 
 		/** @since 0.9.13 */
@@ -315,7 +318,7 @@ public class WebMail extends HttpServlet
 		 * @since 0.9.13
 		 */
 		public void valueUnbound(HttpSessionBindingEvent event) {
-			Debug.debug(Debug.DEBUG, "Session unbound: " + event.getSession().getId());
+			if (log.shouldDebug()) log.debug("Session unbound: " + event.getSession().getId());
 			POP3MailBox mbox = mailbox;
 			if (mbox != null) {
 				mbox.destroy();
@@ -780,6 +783,7 @@ public class WebMail extends HttpServlet
 	                                     String host, int pop3PortNo, String user, String pass) {
 		POP3MailBox mailbox = new POP3MailBox(host, pop3PortNo, user, pass);
 		I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		Log log = sessionObject.log;
 		MailCache mc;
 		try {
 			mc = new MailCache(ctx, mailbox, DIR_FOLDER,
@@ -798,7 +802,7 @@ public class WebMail extends HttpServlet
 			                    host, pop3PortNo, user, pass);
 			sessionObject.caches.put(DIR_SPAM, mc2);
 		} catch (IOException ioe) {
-			Debug.debug(Debug.ERROR, "Error creating disk cache", ioe);
+			log.error("Error creating disk cache", ioe);
 			sessionObject.error += ioe.toString() + '\n';
 			return State.AUTH;
 		}
@@ -820,7 +824,7 @@ public class WebMail extends HttpServlet
 
 		// thread 2: mailbox.connectToServer()
 		if (offline) {
-			Debug.debug(Debug.DEBUG, "OFFLINE MODE");
+			if (log.shouldDebug()) log.debug("OFFLINE MODE");
 		} else {
 			sessionObject.isFetching = true;
 			if (!mailbox.connectToServer(new ConnectWaiter(sessionObject))) {
@@ -834,7 +838,7 @@ public class WebMail extends HttpServlet
 			try {
 				sessionObject.wait(5000);
 			} catch (InterruptedException ie) {
-				Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+				if (log.shouldDebug()) log.debug("Interrupted waiting for load", ie);
 			}
 		}
 		state = mc.isLoading() ? State.LOADING : State.LIST;
@@ -890,8 +894,9 @@ public class WebMail extends HttpServlet
 			MailCache mc = null;
 			Folder<String> f = null;
 			boolean found = false;
+			Log log = _so.log;
 			if (connected) {
-				Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
+				if (log.shouldDebug()) log.debug("CONNECTED, YAY");
 				// we do this whether new mail was found or not,
 				// because we may already have UIDLs in the MailCache to fetch
 				synchronized(_so) {
@@ -900,19 +905,19 @@ public class WebMail extends HttpServlet
 						try {
 							_so.wait(5000);
 						} catch (InterruptedException ie) {
-						       Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+						       if (log.shouldDebug()) log.debug("Interrupted waiting for load", ie);
 							return;
 						}
 					}
 				}
-				Debug.debug(Debug.DEBUG, "Done waiting for folder load");
+				if (log.shouldDebug()) log.debug("Done waiting for folder load");
 				// fetch the mail outside the lock
 				// TODO, would be better to add each email as we get it
 				if (mc != null) {
 					found = mc.getMail(MailCache.FetchMode.HEADER);
 				}
 			} else {
-				Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
+				if (log.shouldDebug()) log.debug("NOT CONNECTED, BOO");
 			}
 			synchronized(_so) {
 				if (!connected) {
@@ -922,7 +927,7 @@ public class WebMail extends HttpServlet
 					else
 						_so.connectError = _t("Error connecting to server");
 				} else if (!found) {
-					Debug.debug(Debug.DEBUG, "No new emails");
+					if (log.shouldDebug()) log.debug("No new emails");
 					_so.newMails = 0;
 					_so.connectError = null;
 				} else if (mc != null && f != null) {
@@ -932,9 +937,9 @@ public class WebMail extends HttpServlet
 						_so.pageChanged = true;
 					_so.newMails = added;
 					_so.connectError = null;
-					Debug.debug(Debug.DEBUG, "Added " + added + " new emails");
+					if (log.shouldDebug()) log.debug("Added " + added + " new emails");
 				} else {
-					Debug.debug(Debug.DEBUG, "MailCache/folder vanished?");
+					if (log.shouldDebug()) log.debug("MailCache/folder vanished?");
 				}
 				_mb.setNewMailListener(_so);
 				_so.isFetching = false;
@@ -952,8 +957,9 @@ public class WebMail extends HttpServlet
 	 */
 	private static State processLogout(SessionObject sessionObject, RequestWrapper request, boolean isPOST, State state)
 	{
+		Log log = sessionObject.log;
 		if( buttonPressed( request, LOGOUT ) && isPOST) {
-			Debug.debug(Debug.DEBUG, "LOGOUT, REMOVING SESSION");
+			if (log.shouldDebug()) log.debug("LOGOUT, REMOVING SESSION");
 			HttpSession session = request.getSession();
 			session.removeAttribute( "sessionObject" );
 			session.invalidate();
@@ -969,7 +975,7 @@ public class WebMail extends HttpServlet
 		           !buttonPressed(request, SAVE)) { 	
 			// AUTH will be passed in if mailbox is null
 			// Check previous state
-			Debug.debug(Debug.DEBUG, "Lost conn, prev. state was " + request.getParameter(DEBUG_STATE));
+			if (log.shouldDebug()) log.debug("Lost conn, prev. state was " + request.getParameter(DEBUG_STATE));
 			sessionObject.error += _t("Internal error, lost connection.") + '\n' +
 			                       _t("User logged out.") + '\n';
 		}
@@ -1002,6 +1008,7 @@ public class WebMail extends HttpServlet
 			if (mc.isLoading())
 			       return State.LOADING;
 		}
+		Log log = sessionObject.log;
 
 		/*
 		 *  compose dialog
@@ -1015,7 +1022,7 @@ public class WebMail extends HttpServlet
 				String uidl = Base64.decodeToString(request.getParameter(NEW_UIDL));
 				if (uidl == null)
 					uidl = I2PAppContext.getGlobalContext().random().nextLong() + "drft";
-				Debug.debug(Debug.DEBUG, "Save as draft: " + uidl);
+				if (log.shouldDebug()) log.debug("Save as draft: " + uidl);
 				MailCache toMC = sessionObject.caches.get(DIR_DRAFTS);
 				Writer wout = null;
 				boolean ok = false;
@@ -1030,11 +1037,11 @@ public class WebMail extends HttpServlet
 					buffer = toMC.getFullWriteBuffer(uidl);
 					wout = new BufferedWriter(new OutputStreamWriter(buffer.getOutputStream(), "ISO-8859-1"));
 					SMTPClient.writeMail(wout, draft, null, null);
-					Debug.debug(Debug.DEBUG, "Saved as draft: " + uidl);
+					if (log.shouldDebug()) log.debug("Saved as draft: " + uidl);
 					ok = true;
 				} catch (IOException ioe) {
 					sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
-					Debug.debug(Debug.DEBUG, "Unable to save as draft: " + uidl, ioe);
+					if (log.shouldDebug()) log.debug("Unable to save as draft: " + uidl, ioe);
 				} finally {
 					if (wout != null) try { wout.close(); } catch (IOException ioe) {}
 					if (buffer != null)
@@ -1052,13 +1059,13 @@ public class WebMail extends HttpServlet
 				} else if (ok && buttonPressed(request, SEND)) {
 					Draft mail = (Draft) toMC.getMail(uidl, MailCache.FetchMode.CACHE_ONLY);
 					if (mail != null) {
-						Debug.debug(Debug.DEBUG, "Send mail: " + uidl);
+						if (log.shouldDebug()) log.debug("Send mail: " + uidl);
 						ok = sendMail(sessionObject, mail);
 					} else {
 						// couldn't read it back in?
 						ok = false;
 						sessionObject.error += _t("Unable to save mail.") + '\n';
-						Debug.debug(Debug.DEBUG, "Draft readback fail: " + uidl);
+						if (log.shouldDebug()) log.debug("Draft readback fail: " + uidl);
 					}
 				}
 				if (ok) {
@@ -1070,7 +1077,7 @@ public class WebMail extends HttpServlet
 				} else {
 					state = State.NEW;
 				}
-				Debug.debug(Debug.DEBUG, "State after save as draft: " + state);
+				if (log.shouldDebug()) log.debug("State after save as draft: " + state);
 			} else if (buttonPressed(request, CANCEL)) {
 				// If we have a reference UIDL, go back to that
 				if (request.getParameter(B64UIDL) != null)
@@ -1360,11 +1367,12 @@ public class WebMail extends HttpServlet
 				// shouldn't happen, button disabled
 				return state;
 			}
+			Log log = sessionObject.log;
 			sessionObject.isFetching = true;
 			ConnectWaiter cw = new ConnectWaiter(sessionObject);
 			if (mailbox.connectToServer(cw)) {
 				// Start a thread to wait for results
-				Debug.debug(Debug.DEBUG, "Already connected, running CW");
+				if (log.shouldDebug()) log.debug("Already connected, running CW");
 				Thread t = new I2PAppThread(cw, "Email fetcher");
 				t.start();
 			} else {
@@ -1375,7 +1383,7 @@ public class WebMail extends HttpServlet
 			try {
 				sessionObject.wait(3000);
 			} catch (InterruptedException ie) {
-				Debug.debug(Debug.DEBUG, "Interrupted waiting for connect", ie);
+				if (log.shouldDebug()) log.debug("Interrupted waiting for connect", ie);
 			}
 		}
 		return state;
@@ -1771,8 +1779,12 @@ public class WebMail extends HttpServlet
 					} catch( NumberFormatException nfe ) {}
 				}
 				Config.saveConfiguration(props);
-				boolean release = !Boolean.parseBoolean(props.getProperty(CONFIG_DEBUG));
-				Debug.setLevel( release ? Debug.ERROR : Debug.DEBUG );
+				String dbg = props.getProperty(CONFIG_DEBUG);
+				if (dbg != null) {
+					boolean release = !Boolean.parseBoolean(dbg);
+					Log log = sessionObject.log;
+					log.setMinimumPriority(release ? Log.ERROR : Log.DEBUG);
+				}
 				state = folder != null ? State.LIST : State.AUTH;
 				sessionObject.info = _t("Configuration saved");
 			} catch (IOException ioe) {
@@ -1816,11 +1828,11 @@ public class WebMail extends HttpServlet
 		SessionObject sessionObject = (SessionObject)httpSession.getAttribute( "sessionObject" );
 
 		if( sessionObject == null ) {
-			sessionObject = new SessionObject();
+			sessionObject = new SessionObject(_log);
 			httpSession.setAttribute( "sessionObject", sessionObject );
-			Debug.debug(Debug.DEBUG, "NEW session " + httpSession.getId());
+			if (_log.shouldDebug()) _log.debug("NEW session " + httpSession.getId());
 		} else {
-			Debug.debug(Debug.DEBUG, "Existing session " + httpSession.getId() +
+			if (_log.shouldDebug()) _log.debug("Existing session " + httpSession.getId() +
 				" created " + new Date(httpSession.getCreationTime()));
 		}
 		return sessionObject;
@@ -1895,7 +1907,8 @@ public class WebMail extends HttpServlet
 					try {
 						sessionObject.wait(5000);
 					} catch (InterruptedException ie) {
-						Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+						Log log = sessionObject.log;
+						if (log.shouldDebug()) log.debug("Interrupted waiting for load", ie);
 					}
 				}
 			}
@@ -2001,7 +2014,7 @@ public class WebMail extends HttpServlet
 			}		
 			state = processStateChangeButtons(sessionObject, request, isPOST, state);
 			state = processConfigButtons(sessionObject, request, isPOST, state);
-			Debug.debug(Debug.DEBUG, "Prelim. state is " + state);
+			if (_log.shouldDebug()) _log.debug("Prelim. state is " + state);
 			if (state == State.CONFIG) {
 				if (isPOST) {
 					// P-R-G
@@ -2034,7 +2047,7 @@ public class WebMail extends HttpServlet
 			//	int oldIdle = httpSession.getMaxInactiveInterval();
 			//	httpSession.setMaxInactiveInterval(60*60*24);  // seconds
 			//	int newIdle = httpSession.getMaxInactiveInterval();
-			//	Debug.debug(Debug.DEBUG, "Changed idle from " + oldIdle + " to " + newIdle);
+			//	if (_log.shouldDebug()) _log.debug("Changed idle from " + oldIdle + " to " + newIdle);
 			//}
 			
 			if( state != State.AUTH ) {
@@ -2160,7 +2173,7 @@ public class WebMail extends HttpServlet
 						try {
 							sessionObject.wait(5000);
 						} catch (InterruptedException ie) {
-							Debug.debug(Debug.DEBUG, "Interrupted waiting for load", ie);
+							if (_log.shouldDebug()) _log.debug("Interrupted waiting for load", ie);
 						}
 					}
 					if ((state == State.LIST || state == State.SHOW) && mc.isLoading())
@@ -2170,7 +2183,7 @@ public class WebMail extends HttpServlet
 			Folder<String> folder = mc != null ? mc.getFolder() : null;
 
 			//// End state determination, state will not change after here
-			Debug.debug(Debug.DEBUG, "Final state is " + state);
+			if (_log.shouldDebug()) _log.debug("Final state is " + state);
 
 			if (state == State.LIST || state == State.SHOW) {
 				// mc non-null
@@ -2393,7 +2406,7 @@ public class WebMail extends HttpServlet
 		resp.setHeader("Location", buf.toString());
 		resp.setStatus(303);
 		resp.getOutputStream().close();
-		Debug.debug(Debug.DEBUG, "P-R-G to " + q);
+		//if (_log.shouldDebug()) _log.debug("P-R-G to " + q);
 	}
 
 	/**
@@ -2415,6 +2428,7 @@ public class WebMail extends HttpServlet
 	{
 		boolean shown = false;
 		if(part != null) {
+			Log log = sessionObject.log;
 			String name = part.filename;
 			if (name == null) {
 				name = part.name;
@@ -2435,11 +2449,11 @@ public class WebMail extends HttpServlet
 						response.setContentType(part.type);
 					if (part.decodedLength >= 0)
 						response.setContentLength(part.decodedLength);
-					Debug.debug(Debug.DEBUG, "Sending raw attachment " + name + " length " + part.decodedLength);
+					if (log.shouldDebug()) log.debug("Sending raw attachment " + name + " length " + part.decodedLength);
 					part.decode(0, new OutputStreamBuffer(response.getOutputStream()));
 					shown = true;
 				} catch (IOException e) {
-					Debug.debug(Debug.ERROR, "Error sending raw attachment " + name + " length " + part.decodedLength, e);
+					log.error("Error sending raw attachment " + name + " length " + part.decodedLength, e);
 				}
 			} else {
 				ZipOutputStream zip = null;
@@ -2456,7 +2470,7 @@ public class WebMail extends HttpServlet
 					zip.finish();
 					shown = true;
 				} catch (IOException e) {
-					Debug.debug(Debug.ERROR, "Error sending zip attachment " + name + " length " + part.decodedLength, e);
+					log.error("Error sending zip attachment " + name + " length " + part.decodedLength, e);
 				} finally {
 					if ( zip != null)
 						try { zip.close(); } catch (IOException ioe) {}
@@ -2500,7 +2514,8 @@ public class WebMail extends HttpServlet
 			DataHelper.copy(in, response.getOutputStream());
 			return true;
 		} catch (IOException e) {
-			Debug.debug(Debug.DEBUG, "Save-As", e);
+			Log log = sessionObject.log;
+			if (log.shouldDebug()) log.debug("Save-As", e);
 			return false;
 		} finally {
 			if (in != null) try { in.close(); } catch (IOException ioe) {}
@@ -2582,12 +2597,13 @@ public class WebMail extends HttpServlet
 			Mail.appendRecipients( body, ccList, "Cc: " );
 			// only for draft
 			Mail.appendRecipients(body, bccList, Draft.HDR_BCC);
+			Log log = sessionObject.log;
 			try {
 				body.append(hl.encode("Subject: " + subject));
 			} catch (EncodingException e) {
 				ok = false;
 				sessionObject.error += e.getMessage() + '\n';
-				Debug.debug(Debug.DEBUG, "Draft subj", e);
+				if (log.shouldDebug()) log.debug("Draft subj", e);
 			}
 			body.append("MIME-Version: 1.0\r\nContent-type: text/plain; charset=\"utf-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n");
 			try {
@@ -2598,7 +2614,7 @@ public class WebMail extends HttpServlet
 			} catch (EncodingException e) {
 				ok = false;
 				sessionObject.error += e.getMessage() + '\n';
-				Debug.debug(Debug.DEBUG, "Draft body", e);
+				if (log.shouldDebug()) log.debug("Draft body", e);
 			}
 		}			
 		return ok ? body : null;	
@@ -2739,11 +2755,12 @@ public class WebMail extends HttpServlet
 		}
 
 		public void run() {
-			Debug.debug(Debug.DEBUG, "Email send start");
+			Log log = sessionObject.log;
+			if (log.shouldDebug()) log.debug("Email send start");
 			SMTPClient relay = new SMTPClient();
 			boolean ok = relay.sendMail(host, port, user, pass, sender, recipients, body,
 			                            attachments, boundary);
-			Debug.debug(Debug.DEBUG, "Email send complete, success? " + ok);
+			if (log.shouldDebug()) log.debug("Email send complete, success? " + ok);
 			synchronized(sessionObject) {
 				if (ok) {
 					sessionObject.info += _t("Mail sent.") + '\n';
@@ -2754,7 +2771,7 @@ public class WebMail extends HttpServlet
 						waitForLoad(sessionObject, mc);
 						mc.delete(draft.uidl);
 						mc.getFolder().removeElement(draft.uidl);
-						Debug.debug(Debug.DEBUG, "Sent email deleted from drafts");
+						if (log.shouldDebug()) log.debug("Sent email deleted from drafts");
 					}
 					// now store to sent
 					mc = sessionObject.caches.get(DIR_SENT);
@@ -2770,11 +2787,11 @@ public class WebMail extends HttpServlet
 							wout = new BufferedWriter(new OutputStreamWriter(buffer.getOutputStream(), "ISO-8859-1"));
 							SMTPClient.writeMail(wout, body,
 							                     attachments, boundary);
-							Debug.debug(Debug.DEBUG, "Sent email saved to Sent");
+							if (log.shouldDebug()) log.debug("Sent email saved to Sent");
 							copyOK = true;
 						} catch (IOException ioe) {
 							sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
-							Debug.debug(Debug.DEBUG, "Sent email saved error", ioe);
+							if (log.shouldDebug()) log.debug("Sent email saved error", ioe);
 						} finally {
 							if (wout != null) try { wout.close(); } catch (IOException ioe) {}
 							if (buffer != null)
@@ -2863,7 +2880,8 @@ public class WebMail extends HttpServlet
 				return;
 			}
 			String newUIDL = Base64.decodeToString(b64UIDL);
-			Debug.debug(Debug.DEBUG, "Show draft: " + newUIDL);
+			Log log = sessionObject.log;
+			if (log.shouldDebug()) log.debug("Show draft: " + newUIDL);
 			if (newUIDL != null)
 				draft = (Draft) drafts.getMail(newUIDL, MailCache.FetchMode.CACHE_ONLY);
 			if (draft != null) {
@@ -3101,7 +3119,7 @@ public class WebMail extends HttpServlet
 			if( sessionObject.clear )
 				idChecked = false;
 
-			//Debug.debug( Debug.DEBUG, "check" + i + ": checkId=" + checkId + ", idChecked=" + idChecked + ", pageChanged=" + sessionObject.pageChanged +
+			//if (_log.shouldDebug()) _log.debug("check" + i + ": checkId=" + checkId + ", idChecked=" + idChecked + ", pageChanged=" + sessionObject.pageChanged +
 			//		", markAll=" + sessionObject.markAll +
 			//		", invert=" + sessionObject.invert +
 			//		", clear=" + sessionObject.clear );
@@ -3243,7 +3261,8 @@ public class WebMail extends HttpServlet
 			             "</p>");
 		}
 		Mail mail = mc.getMail(showUIDL, MailCache.FetchMode.ALL);
-		if(!RELEASE && mail != null && mail.hasBody() && mail.getSize() < 16384) {
+		boolean debug = Boolean.parseBoolean(Config.getProperty(CONFIG_DEBUG));
+		if(debug && mail != null && mail.hasBody() && mail.getSize() < 16384) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");
 			Buffer body = mail.getBody();

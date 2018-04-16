@@ -23,7 +23,6 @@
  */
 package i2p.susi.webmail;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
 import i2p.susi.util.Buffer;
 import i2p.susi.util.FileBuffer;
@@ -48,6 +47,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 
 /**
  * There's one of these for each Folder.
@@ -70,6 +70,7 @@ class MailCache {
 	private NewMailListener _loadInProgress;
 	private boolean _isLoaded;
 	private final boolean _isDrafts;
+	private final Log _log;
 	
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
@@ -84,6 +85,7 @@ class MailCache {
 	 */
 	MailCache(I2PAppContext ctx, POP3MailBox mailbox, String folderName,
 		  String host, int port, String user, String pass) throws IOException {
+		_log = ctx.logManager().getLog(MailCache.class);
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
 		disk = new PersistentMailCache(ctx, host, port, user, pass, folderName);
@@ -242,7 +244,7 @@ class MailCache {
 	public synchronized boolean loadFromDisk(NewMailListener nml) {
 		if (_isLoaded || _loadInProgress != null)
 			return false;
-		Debug.debug(Debug.DEBUG, "Loading folder " + folderName);
+		if (_log.shouldDebug()) _log.debug("Loading folder " + folderName);
 		Thread t = new I2PAppThread(new LoadMailRunner(nml), "Email loader");
 		_loadInProgress = nml;
 		try {
@@ -268,7 +270,7 @@ class MailCache {
 				blockingLoadFromDisk();
 				if(!mails.isEmpty())
 					result = true;
-				Debug.debug(Debug.DEBUG, "Folder loaded: " + folderName);
+				if (_log.shouldDebug()) _log.debug("Folder loaded: " + folderName);
 			} finally {
 				synchronized(MailCache.this) {
 					if (_loadInProgress == _nml)
@@ -401,7 +403,7 @@ class MailCache {
 		if (mode == FetchMode.CACHE_ONLY)
 			throw new IllegalArgumentException();
 		if (mailbox == null) {
-			Debug.debug(Debug.DEBUG, "getMail() mode " + mode + " called on wrong folder " + getFolderName(), new Exception());
+			if (_log.shouldDebug()) _log.debug("getMail() mode " + mode + " called on wrong folder " + getFolderName(), new Exception());
 			return false;
 		}
 		boolean hOnly = mode == FetchMode.HEADER;
@@ -439,7 +441,7 @@ class MailCache {
 				if(!mail.hasHeader()) {
 					if (disk != null) {
 						if (disk.getMail(mail, true)) {
-							Debug.debug(Debug.DEBUG, "Loaded header from disk cache: " + uidl);
+							if (_log.shouldDebug()) _log.debug("Loaded header from disk cache: " + uidl);
 							// note that disk loaded the full body if it had it
 							if (mail.hasBody() &&
 								!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
@@ -462,7 +464,7 @@ class MailCache {
 				if(!mail.hasBody()) {
 					if (disk != null) {
 						if (disk.getMail(mail, false)) {
-							Debug.debug(Debug.DEBUG, "Loaded body from disk cache: " + uidl);
+							if (_log.shouldDebug()) _log.debug("Loaded body from disk cache: " + uidl);
 							// note that disk loaded the full body if it had it
 							if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
 								// we already have it, send delete

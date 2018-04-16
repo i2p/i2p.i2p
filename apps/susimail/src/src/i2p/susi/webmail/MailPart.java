@@ -23,7 +23,6 @@
  */
 package i2p.susi.webmail;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.util.Buffer;
 import i2p.susi.util.CountingOutputStream;
 import i2p.susi.util.DummyOutputStream;
@@ -46,7 +45,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
 
 /**
  * @author susi23
@@ -68,6 +69,7 @@ class MailPart {
 	public final List<MailPart> parts;
 	public final boolean multipart, message;
 	public final Buffer buffer;
+	private final Log _log;
 
 	/**
 	 *  the decoded length if known, else -1
@@ -92,6 +94,7 @@ class MailPart {
 	 */
 	public MailPart(String uidl, AtomicInteger id, Buffer readBuffer, InputStream in, ReadCounter counter, String[] hdrlines) throws IOException
 	{
+		_log = I2PAppContext.getGlobalContext().logManager().getLog(MailPart.class);
 		this.uidl = uidl;
 		intID = id.getAndIncrement();
 		buffer = readBuffer;
@@ -113,7 +116,7 @@ class MailPart {
 			MemoryBuffer decodedHeaders = new MemoryBuffer(4096);
 			EncodingFactory.getEncoding("HEADERLINE").decode(eofin, decodedHeaders);
 			if (!eofin.wasFound())
-				Debug.debug(Debug.DEBUG, "EOF hit before \\r\\n\\r\\n in MailPart");
+				if (_log.shouldDebug()) _log.debug("EOF hit before \\r\\n\\r\\n in MailPart");
 			// Fixme UTF-8 to bytes to UTF-8
 			headerLines = DataHelper.split(new String(decodedHeaders.getContent(), decodedHeaders.getOffset(), decodedHeaders.getLength()), "\r\n");
 		}
@@ -193,7 +196,7 @@ class MailPart {
 			// swallow the \n
 			int c = in.read();
 			if (c != '\n')
-				Debug.debug(Debug.DEBUG, "wasn't a \\n, it was " + c);
+				if (_log.shouldDebug()) _log.debug("wasn't a \\n, it was " + c);
 			beginBody = (int) counter.getRead();
 		}
 
@@ -211,10 +214,10 @@ class MailPart {
 					OutputStream dummy = new DummyOutputStream();
 					DataHelper.copy(eofin, dummy);  
 					if (!eofin.wasFound())
-						Debug.debug(Debug.DEBUG, "EOF hit before first boundary " + boundary + " UIDL: " + uidl);
+						if (_log.shouldDebug()) _log.debug("EOF hit before first boundary " + boundary + " UIDL: " + uidl);
 					if (readBoundaryTrailer(in)) {
 						if (!eofin.wasFound())
-							Debug.debug(Debug.DEBUG, "EOF hit before first part body " + boundary + " UIDL: " + uidl);
+							if (_log.shouldDebug()) _log.debug("EOF hit before first part body " + boundary + " UIDL: " + uidl);
 						tmpEnd = (int) eofin.getRead();
 						break;
 					}
@@ -229,7 +232,7 @@ class MailPart {
 					// if MailPart contains a MailPart, we may not have drained to the end
 					DataHelper.copy(eofin, DUMMY_OUTPUT);  
 					if (!eofin.wasFound())
-						Debug.debug(Debug.DEBUG, "EOF hit before end of body " + i + " boundary: " + boundary + " UIDL: " + uidl);
+						if (_log.shouldDebug()) _log.debug("EOF hit before end of body " + i + " boundary: " + boundary + " UIDL: " + uidl);
 				}
 				if (readBoundaryTrailer(in))
 					break;
@@ -251,7 +254,7 @@ class MailPart {
 			decodedLength = end - beginBody;
 		}
 		//if (Debug.getLevel() >= Debug.DEBUG)
-		//	Debug.debug(Debug.DEBUG, "New " + this);
+		//	if (_log.shouldDebug()) _log.debug("New " + this);
 	}
 
 	/**
@@ -269,13 +272,13 @@ class MailPart {
 	 *
 	 *  @return true if end of input
 	 */
-	private static boolean readBoundaryTrailer(InputStream in) throws IOException {
+	private boolean readBoundaryTrailer(InputStream in) throws IOException {
 		int c = in.read();
 		if (c == '-') {
 			// end of parts with this boundary
 			c = in.read();
 			if (c != '-') {
-				Debug.debug(Debug.DEBUG, "Unexpected char after boundary-: " + c);
+				if (_log.shouldDebug()) _log.debug("Unexpected char after boundary-: " + c);
 				return true;
 			}
 			c = in.read();
@@ -283,19 +286,19 @@ class MailPart {
 				return true;
 			}
 			if (c != '\r') {
-				Debug.debug(Debug.DEBUG, "Unexpected char after boundary--: " + c);
+				if (_log.shouldDebug()) _log.debug("Unexpected char after boundary--: " + c);
 				return true;
 			}
 			c = in.read();
 			if (c != '\n')
-				Debug.debug(Debug.DEBUG, "Unexpected char after boundary--\\r: " + c);
+				if (_log.shouldDebug()) _log.debug("Unexpected char after boundary--\\r: " + c);
 			return true;
 		} else if (c == '\r') {
 			c = in.read();
 			if (c != '\n')
-				Debug.debug(Debug.DEBUG, "Unexpected char after boundary\\r: " + c);
+				if (_log.shouldDebug()) _log.debug("Unexpected char after boundary\\r: " + c);
 		} else {
-			Debug.debug(Debug.DEBUG, "Unexpected char after boundary: " + c);
+			if (_log.shouldDebug()) _log.debug("Unexpected char after boundary: " + c);
 		}
 		return c == -1;
 	}
@@ -310,7 +313,7 @@ class MailPart {
 		String encg = encoding;
 		if (encg == null) {
 			//throw new DecodingException("No encoding specified");
-			Debug.debug(Debug.DEBUG, "Warning: no transfer encoding found, fallback to 7bit.");
+			if (_log.shouldDebug()) _log.debug("Warning: no transfer encoding found, fallback to 7bit.");
 			encg = "7bit";       
 		}
 		Encoding enc = EncodingFactory.getEncoding(encg);
@@ -332,13 +335,13 @@ class MailPart {
 			//dout.getOutputStream().flush();
 		} catch (IOException ioe) {
 			if (lin != null)
-				Debug.debug(Debug.DEBUG, "Decode IOE at in position " + lin.getRead()
+				if (_log.shouldDebug()) _log.debug("Decode IOE at in position " + lin.getRead()
 				            + " offset " + offset, ioe);
 			else if (cos != null)
-				Debug.debug(Debug.DEBUG, "Decode IOE at out position " + cos.getWritten()
+				if (_log.shouldDebug()) _log.debug("Decode IOE at out position " + cos.getWritten()
 				            + " offset " + offset, ioe);
 			else
-				Debug.debug(Debug.DEBUG, "Decode IOE", ioe);
+				if (_log.shouldDebug()) _log.debug("Decode IOE", ioe);
 			throw ioe;
 		} finally {
 			if (lin != null) try { lin.close(); } catch (IOException ioe) {};
@@ -365,7 +368,7 @@ class MailPart {
 			lin = getRawInputStream(0);
 			DataHelper.copy(lin, out);
 		} catch (IOException ioe) {
-			Debug.debug(Debug.DEBUG, "Decode IOE", ioe);
+			if (_log.shouldDebug()) _log.debug("Decode IOE", ioe);
 			throw ioe;
 		} finally {
 			if (lin != null) try { lin.close(); } catch (IOException ioe) {};

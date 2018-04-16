@@ -1,6 +1,5 @@
 package i2p.susi.webmail.pop3;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.webmail.WebMail;
 import i2p.susi.util.Config;
 
@@ -12,6 +11,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
 
@@ -27,6 +27,7 @@ class BackgroundChecker {
 	private final SimpleTimer2.TimedEvent timer;
 	private volatile boolean isChecking;
 	private volatile boolean isDead;
+	private final Log _log;
 
 	private static final int DEFAULT_CHECK_MINUTES = 3*60;
 	private static final int MIN_CHECK_MINUTES = 15;
@@ -41,6 +42,7 @@ class BackgroundChecker {
 		this.mailbox = mailbox;
 		toDelete = new ConcurrentHashSet<String>();
 		timer = new Checker();
+		_log = I2PAppContext.getGlobalContext().logManager().getLog(BackgroundChecker.class);
 	}
 
 	public Collection<String> getQueued() {
@@ -53,14 +55,14 @@ class BackgroundChecker {
 		timer.cancel();
 	}
 
-	private static long getCheckTime() {
+	private long getCheckTime() {
 		int minutes = DEFAULT_CHECK_MINUTES;
 		String con = Config.getProperty(WebMail.CONFIG_CHECK_MINUTES);
 		if (con != null) {
 			try {
 				int mins = Integer.parseInt(con);
 				// allow shorter for testing
-				if (mins < MIN_CHECK_MINUTES && Debug.getLevel() != Debug.DEBUG)
+				if (mins < MIN_CHECK_MINUTES && !_log.shouldDebug())
 					mins = MIN_CHECK_MINUTES;
 				minutes = mins;
 			} catch (NumberFormatException nfe) {}
@@ -81,17 +83,17 @@ class BackgroundChecker {
 				long idle = System.currentTimeMillis() - mailbox.getLastActivity();
 				long last = System.currentTimeMillis() - mailbox.getLastChecked();
 				if (idle >= MIN_IDLE && last >= MIN_SINCE) {
-					Debug.debug(Debug.DEBUG, "Threading check for mail after " +
+					if (_log.shouldDebug()) _log.debug("Threading check for mail after " +
 							idle + " ms idle and " + last + " since last check");
 					Thread t = new Getter();
 					isChecking = true;
 					t.start();
 				} else {
-					Debug.debug(Debug.DEBUG, "Not checking after " +
+					if (_log.shouldDebug()) _log.debug("Not checking after " +
 							idle + " ms idle and " + last + " since last check");
 				}
 			} else {
-				Debug.debug(Debug.DEBUG, "Not checking, still connected");
+				if (_log.shouldDebug()) _log.debug("Not checking, still connected");
 			}
 			schedule(getCheckTime());
 		}
@@ -108,7 +110,7 @@ class BackgroundChecker {
 				if (mailbox.blockingConnectToServer()) {
 					int found = mailbox.getNumMails();
 					if (found > 0) {
-						Debug.debug(Debug.DEBUG, "Found " + found + " mails, calling listener");
+						if (_log.shouldDebug()) _log.debug("Found " + found + " mails, calling listener");
 						// may not really be new
 						mailbox.foundNewMail(true);
 					}

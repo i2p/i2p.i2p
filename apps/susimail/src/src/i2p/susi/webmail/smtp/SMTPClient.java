@@ -23,7 +23,6 @@
  */
 package i2p.susi.webmail.smtp;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.webmail.Attachment;
 import i2p.susi.webmail.Messages;
 import i2p.susi.webmail.encoding.Encoding;
@@ -41,8 +40,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.InternalSocket;
+import net.i2p.util.Log;
 
 /**
  * @author susi
@@ -63,6 +64,7 @@ public class SMTPClient {
 	 */
 	public static final long BINARY_MAX_SIZE = (long) ((DEFAULT_MAX_SIZE * 57.0d / 78) - 32*1024);
 
+	private final Log _log;
 	private Socket socket;
 	public String error;
 	private String lastResponse;
@@ -79,6 +81,7 @@ public class SMTPClient {
 	{
 		error = "";
 		lastResponse = "";
+		_log = I2PAppContext.getGlobalContext().logManager().getLog(SMTPClient.class);
 	}
 	
 	/**
@@ -121,7 +124,7 @@ public class SMTPClient {
 	 */
 	private void sendCmdNoWait(String cmd) throws IOException
 	{
-		Debug.debug( Debug.DEBUG, "SMTP sendCmd(" + cmd +")" );
+		if (_log.shouldDebug()) _log.debug("SMTP sendCmd(" + cmd +")" );
 		
 		if( socket == null )
 			throw new IOException("no socket");
@@ -141,7 +144,7 @@ public class SMTPClient {
 	{
 		int rv = 0;
 		if (supportsPipelining) {
-			Debug.debug(Debug.DEBUG, "SMTP pipelining " + cmds.size() + " commands");
+			if (_log.shouldDebug()) _log.debug("SMTP pipelining " + cmds.size() + " commands");
 			try {
 				for (SendExpect cmd : cmds) {
 					sendCmdNoWait(cmd.send);
@@ -168,7 +171,7 @@ public class SMTPClient {
 				rv++;
 			}
 		}
-		Debug.debug(Debug.DEBUG, "SMTP success in " + rv + " of " + cmds.size() + " commands");
+		if (_log.shouldDebug()) _log.debug("SMTP success in " + rv + " of " + cmds.size() + " commands");
 		return rv;
 	}
 
@@ -193,7 +196,7 @@ public class SMTPClient {
 			InputStream in = socket.getInputStream();
 			StringBuilder buf = new StringBuilder(128);
 			while (DataHelper.readLine(in, buf)) {
-				Debug.debug(Debug.DEBUG, "SMTP rcv \"" + buf.toString().trim() + '"');
+				if (_log.shouldDebug()) _log.debug("SMTP rcv \"" + buf.toString().trim() + '"');
 				int len = buf.length();
 				if (len < 4) {
 					result = 0;
@@ -266,16 +269,16 @@ public class SMTPClient {
 					for (String c : caps) {
 						if (c.equals("PIPELINING")) {
 							supportsPipelining = true;
-							Debug.debug(Debug.DEBUG, "Server supports pipelining");
+							if (_log.shouldDebug()) _log.debug("Server supports pipelining");
 						} else if (c.startsWith("SIZE ")) {
 							try {
 								maxSize = Long.parseLong(c.substring(5));
-								Debug.debug(Debug.DEBUG, "Server max size: " + maxSize);
+								if (_log.shouldDebug()) _log.debug("Server max size: " + maxSize);
 							} catch (NumberFormatException nfe) {}
 						} else if (c.equals("8BITMIME")) {
 							// unused, see encoding/EightBit.java
 							eightBitMime = true;
-							Debug.debug(Debug.DEBUG, "Server supports 8bitmime");
+							if (_log.shouldDebug()) _log.debug("Server supports 8bitmime");
 						}
 					}
 				} else {
@@ -284,7 +287,7 @@ public class SMTPClient {
 				}
 			}
 			if (ok && maxSize < DEFAULT_MAX_SIZE) {
-				Debug.debug(Debug.DEBUG, "Rechecking with new max size");
+				if (_log.shouldDebug()) _log.debug("Rechecking with new max size");
 				// recalculate whether we'll fit
 				// copied from WebMail
 				long total = body.length();
