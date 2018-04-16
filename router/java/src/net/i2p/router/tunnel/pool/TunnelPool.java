@@ -130,6 +130,15 @@ public class TunnelPool {
         }
     }
 
+    /** 
+     *  RateStat name for the bandwidth graph
+     *  @return non-null
+     *  @since 0.9.35
+     */
+    public String getRateName() {
+        return _rateName;
+    }
+
     private void refreshSettings() {
         if (!_settings.isExploratory())
             return; // don't override client specified settings
