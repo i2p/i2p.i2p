@@ -352,7 +352,7 @@ class TunnelRenderer {
             }
         }
         if (live <= 0)
-            out.write("<div class=\"statusnotes\"><center><b>" + _t("No tunnels; waiting for the grace period to end.") + "</b></center></div>\n");
+            out.write("<div class=\"statusnotes\"><center><b>" + _t("none") + "</b></center></div>\n");
         out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" +
                   DataHelper.formatSize2Decimal(processedIn*1024) + "B " + _t("in") + ", " +
                   DataHelper.formatSize2Decimal(processedOut*1024) + "B " + _t("out") + "</b></center></div>");

@@ -278,8 +278,8 @@ class NetDbRenderer {
         buf.append("</table>\n");
 
         if (leases.isEmpty()) {
-          if (!debug)
-              buf.append("<div id=\"noleasesets\"><i>").append(_t("No Leasesets currently active.")).append("</i></div>");
+            //if (!debug)
+            //    buf.append("<div id=\"noleasesets\"><i>").append(_t("No Leasesets currently active.")).append("</i></div>");
         } else {
           if (debug) {
             // Find the center of the RAP leasesets
