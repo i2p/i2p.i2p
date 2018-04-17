@@ -971,12 +971,18 @@ public class WebMail extends HttpServlet
 			}
 			sessionObject.info += _t("User logged out.") + '\n';
 			state = State.AUTH;
-		} else if (state == State.AUTH  && !buttonPressed(request, CANCEL) &&
-		           !buttonPressed(request, SAVE)) { 	
+		} else if (state == State.AUTH  &&
+			   !buttonPressed(request, CANCEL) && !buttonPressed(request, SAVE) &&
+			   !buttonPressed(request, LOGIN) &&
+			   (isPOST ||
+			    request.getParameter(CURRENT_FOLDER) != null ||
+			    request.getParameter(B64UIDL) != null ||
+			    request.getParameter(NEW_UIDL) != null ||
+			    request.getParameter(CUR_PAGE) != null)) {
 			// AUTH will be passed in if mailbox is null
 			// Check previous state
 			if (log.shouldDebug()) log.debug("Lost conn, prev. state was " + request.getParameter(DEBUG_STATE));
-			sessionObject.error += _t("Internal error, lost connection.") + '\n' +
+			sessionObject.error += // _t("Internal error, lost connection.") + '\n' +
 			                       _t("User logged out.") + '\n';
 		}
 		return state;
