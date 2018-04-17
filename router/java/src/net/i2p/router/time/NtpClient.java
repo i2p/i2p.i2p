@@ -41,7 +41,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Addresses;
+import net.i2p.util.DNSOverHTTPS;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
@@ -73,6 +76,8 @@ public class NtpClient {
     private static final int MIN_PKT_LEN = 48;
     // IP:reason for servers that sent us a kiss of death
     private static final Map<String, String> kisses = new ConcurrentHashMap<String, String>(2);
+    private static final String PROP_USE_DNS_OVER_HTTPS = "time.useDNSOverHTTPS";
+    private static final boolean DEFAULT_USE_DNS_OVER_HTTPS = true;
 
     /**
      * Query the ntp servers, returning the current time from first one we find
@@ -144,23 +149,42 @@ public class NtpClient {
      */
     private static long[] currentTimeAndStratum(String serverName, int timeout, boolean preferIPv6, Log log) {
         DatagramSocket socket = null;
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        boolean useDNSOverHTTPS = ctx.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
         try {
             // Send request
             InetAddress address;
             if (preferIPv6) {
-                InetAddress[] addrs = InetAddress.getAllByName(serverName);
-                if (addrs == null || addrs.length == 0)
-                    throw new UnknownHostException();
-                address = null;
-                for (int i = 0; i < addrs.length; i++) {
-                    if (addrs[i] instanceof Inet6Address) {
-                        address = addrs[i];
-                        break;
+                String ip = null;
+                if (useDNSOverHTTPS) {
+                    DNSOverHTTPS doh = new DNSOverHTTPS(ctx);
+                    ip = doh.lookup(serverName, DNSOverHTTPS.Type.V6_PREFERRED);
+                }
+                if (ip != null) {
+                    address = InetAddress.getByName(ip);
+                } else {
+                    // fallback to regular DNS
+                    InetAddress[] addrs = InetAddress.getAllByName(serverName);
+                    if (addrs == null || addrs.length == 0)
+                        throw new UnknownHostException();
+                    address = null;
+                    for (int i = 0; i < addrs.length; i++) {
+                        if (addrs[i] instanceof Inet6Address) {
+                            address = addrs[i];
+                            break;
+                        }
+                        if (address == null)
+                            address = addrs[0];
                     }
-                    if (address == null)
-                        address = addrs[0];
                 }
             } else {
+                if (useDNSOverHTTPS) {
+                    DNSOverHTTPS doh = new DNSOverHTTPS(ctx);
+                    String ip = doh.lookup(serverName, DNSOverHTTPS.Type.V4_ONLY);
+                    if (ip != null)
+                        serverName = ip;
+                }
+                // fallback to regular DNS
                 address = InetAddress.getByName(serverName);
             }
             String who = address.getHostAddress();

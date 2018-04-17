@@ -32,6 +32,7 @@ public class CommandLine {
         "net.i2p.time.BuildTime",
         "net.i2p.util.Addresses",
         "net.i2p.util.ConvertToHash",
+        "net.i2p.util.DNSOverHTTPS",
         "net.i2p.util.EepGet",
         "net.i2p.util.EepHead",
         "net.i2p.util.FileUtil",

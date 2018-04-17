@@ -1,5 +1,7 @@
 2018-04-17 zzz
  * Console: Fix sidebar status when updating plugin (ticket #2137)
+ * Reseed, NTP: Use DNSoverHTTPS (ticket #2201)
+ * SusiMail: Fix error message on login page
 
 2018-04-16 zzz
  * Console: Add links to bandwidth graphs on /tunnels

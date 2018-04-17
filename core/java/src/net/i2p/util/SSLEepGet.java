@@ -101,6 +101,8 @@ public class SSLEepGet extends EepGet {
     private final ProxyType _proxyType;
 
     private static final String CERT_DIR = "certificates/ssl";
+    private static final String PROP_USE_DNS_OVER_HTTPS = "eepget.useDNSOverHTTPS";
+    private static final boolean DEFAULT_USE_DNS_OVER_HTTPS = true;
 
     /**
      *  Not all may be supported.
@@ -706,6 +708,17 @@ public class SSLEepGet extends EepGet {
                 if (port == -1)
                     port = 443;
 
+                String originalHost = host;
+                boolean useDNSOverHTTPS = _context.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
+                // This duplicates checks in DNSOverHTTPS.lookup() but do it here too so
+                // we don't even construct it if we don't need it
+                if (useDNSOverHTTPS && !host.equals("dns.google.com") && !Addresses.isIPAddress(host)) {
+                    DNSOverHTTPS doh = new DNSOverHTTPS(_context, getSSLState());
+                    String ip = doh.lookup(host);
+                    if (ip != null)
+                        host = ip;
+                }
+
                 if (_shouldProxy) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Connecting to " + _proxyType + " proxy");
@@ -757,7 +770,7 @@ public class SSLEepGet extends EepGet {
                 I2PSSLSocketFactory.setProtocolsAndCiphers(socket);
                 if (!_bypassVerification) {
                     try {
-                        I2PSSLSocketFactory.verifyHostname(_context, socket, host);
+                        I2PSSLSocketFactory.verifyHostname(_context, socket, originalHost);
                     } catch (SSLException ssle) {
                         if (_saveCerts > 0 && _stm != null)
                             saveCerts(host, _stm);
