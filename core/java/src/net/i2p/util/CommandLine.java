@@ -29,6 +29,7 @@ public class CommandLine {
         "net.i2p.data.Base32",
         "net.i2p.data.Base64",
         "net.i2p.data.PrivateKeyFile",
+        "net.i2p.time.BuildTime",
         "net.i2p.util.Addresses",
         "net.i2p.util.ConvertToHash",
         "net.i2p.util.EepGet",
