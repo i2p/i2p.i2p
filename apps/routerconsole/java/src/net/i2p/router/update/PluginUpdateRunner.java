@@ -133,6 +133,17 @@ class PluginUpdateRunner extends UpdateRunner {
                 _mgr.notifyTaskFailed(this, _errMsg, null);
         }
 
+    /**
+     *  Overridden to change the "Updating I2P" text in super
+     *  @since 0.9.35
+     */
+    @Override
+    public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
+        long d = currentWrite + bytesTransferred;
+        String status = "<b>" + _t("Downloading plugin") + ": " + _appName + "</b>";
+        _mgr.notifyProgress(this, status, d, d + bytesRemaining);
+    }
+
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             if (!(_xpi2pURL.startsWith("file:") || _method == UpdateMethod.FILE))
