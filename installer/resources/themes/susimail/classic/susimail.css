@@ -630,13 +630,14 @@ input.offline:hover, input.offline:focus {
      background: url(/themes/susimail/images/offline_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-input.list {
+input.list, input.moveto, input.switchto {
      background: #eee url(/themes/susimail/images/folder.png) no-repeat 7px center;
      background: url(/themes/susimail/images/folder.png) no-repeat 7px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 8px 5px 24px;
 }
 
-input.list:hover, input.list:focus {
+input.list:hover, input.moveto:hover, input.switchto:hover,
+input.list:focus, input.moveto:focus, input.switchto:focus {
      background: #eee url(/themes/susimail/images/folder-open.png) no-repeat 7px center;
      background: url(/themes/susimail/images/folder-open.png) no-repeat 7px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }

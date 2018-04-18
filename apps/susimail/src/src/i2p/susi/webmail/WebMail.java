@@ -3195,7 +3195,7 @@ public class WebMail extends HttpServlet
 		out.println("<table id=\"pagenav\"><tr><td>");
 		String name = folderName.equals(DIR_FOLDER) ? "Inbox" : folderName;
 		out.println(_t("Folder") + ": " + _t(name) + "&nbsp;&nbsp;&nbsp;&nbsp;");  // TODO css to center it
-		out.println(button(SWITCH_TO, _t("Change to Folder")));
+		out.println(button(SWITCH_TO, _t("Change to Folder") + ':'));
 		showFolderSelect(out, folderName, false);
 		if (pages > 1) {
 			if (outputHidden)
@@ -3230,7 +3230,9 @@ public class WebMail extends HttpServlet
 	 *  @since 0.9.35
 	 */
 	private static void showFolderSelect(PrintWriter out, String currentName, boolean disableCurrent) {
-		out.println("<select name=\"" + NEW_FOLDER + "\">");
+		out.println("<select name=\"" + NEW_FOLDER +
+		            "\" class=\"select" + (disableCurrent ? "1" : "2") +
+		            "\">");
 		for (int i = 0; i < DIRS.length; i++) {
 			String dir = DIRS[i];
 			if (currentName.equals(dir)) {
@@ -3297,7 +3299,7 @@ public class WebMail extends HttpServlet
 			if (mail.hasBody() && !mc.getFolderName().equals(DIR_DRAFTS)) {
 				// can't move unless has body
 				// can't move from drafts
-				out.println(button(MOVE_TO, _t("Move to Folder")));
+				out.println(button(MOVE_TO, _t("Move to Folder") + ':'));
 				showFolderSelect(out, mc.getFolderName(), true);
 			}
 			if (sessionObject.reallyDelete)

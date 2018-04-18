@@ -607,13 +607,13 @@ input.offline:hover {
      background: url(/themes/susimail/images/offline_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
-input.list {
+input.list, input.moveto, input.switchto {
      background: #eee url(/themes/susimail/images/folder.png) no-repeat 6px center;
      background: url(/themes/susimail/images/folder.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 24px;
 }
 
-input.list:hover {
+input.list:hover, input.moveto:hover, input.switchto:hover {
      background: #eee url(/themes/susimail/images/folder-open.png) no-repeat 6px center;
      background: url(/themes/susimail/images/folder-open.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
@@ -1174,6 +1174,7 @@ h3#config {
      float: none !important;
 }
 
+.topbuttons select.select1,
 .topbuttons input.new, .topbuttons input.refresh, .topbuttons input.logout,
 .topbuttons input.reply, .topbuttons input.replyall, .topbuttons input.forward, .topbuttons input.saveas, .topbuttons input.delete {
      float: left;
