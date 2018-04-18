@@ -2,6 +2,7 @@ package i2p.susi.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -28,11 +29,18 @@ public class DecodingOutputStream extends OutputStream {
 
     /**
      *  @param out UTF-8
+     *  @throws UnsupportedEncodingException (an IOException) on unknown charset
      */
-    public DecodingOutputStream(Writer out, String charset) {
+    public DecodingOutputStream(Writer out, String charset) throws UnsupportedEncodingException {
         super();
         _out = out;
-        _dc = Charset.forName(charset).newDecoder();
+        try {
+            _dc = Charset.forName(charset).newDecoder();
+        } catch (IllegalArgumentException iae) {
+            UnsupportedEncodingException uee = new UnsupportedEncodingException("Unsupported charset \"" + charset + '"');
+            uee.initCause(iae);
+            throw uee;
+        }
         _bb = ByteBuffer.allocate(1024);
         _cb = CharBuffer.allocate(1024);
     }						

@@ -472,7 +472,7 @@ class MailPart {
 					/*
 					 * no " found and no ;
 					 */
-					result = line.substring( j + 1 );
+					result = line.substring( j + 1 ).trim();
 				}
 			}
 		}

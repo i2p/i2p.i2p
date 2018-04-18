@@ -2898,8 +2898,8 @@ public class WebMail extends HttpServlet
 				cc = arrayToCSV(draft.cc);
 				bcc = arrayToCSV(draft.getBcc());
 				StringWriter body = new StringWriter(1024);
-				Buffer ob = new OutputStreamBuffer(new DecodingOutputStream(body, "UTF-8"));
 				try {
+					Buffer ob = new OutputStreamBuffer(new DecodingOutputStream(body, "UTF-8"));
 					draft.getPart().decode(0, ob);
 				} catch (IOException ioe) {
 					sessionObject.error += "Draft decode error: " + ioe.getMessage() + '\n';
