@@ -1220,6 +1220,7 @@ public class WebMail extends HttpServlet
 							 */
 							StringBuilder buf = new StringBuilder();
 							String pad = "";
+							// TODO original recipients should be in the To: line, not the CC: line
 							if( mail.to != null ) {
 								for( int i = 0; i < mail.to.length; i++ ) {
 									buf.append( pad );
@@ -1262,22 +1263,10 @@ public class WebMail extends HttpServlet
 							pw.println();
 							pw.println( "---- " + _t("begin forwarded mail") + " ----" );
 							pw.println( "From: " + sender );
-							if( mail.to != null ) {
-								String pad = "To: ";
-								for( int i = 0; i < mail.to.length; i++ ) {
-									pw.println( pad );
-									pw.println(mail.to[i]);
-									pad = "    ";
-								}
-							}
-							if( mail.cc != null ) {
-								String pad = "Cc: ";
-								for( int i = 0; i < mail.cc.length; i++ ) {
-									pw.println( pad );
-									pw.println(mail.cc[i]);
-									pad = "    ";
-								}
-							}
+							if (mail.to != null && mail.to.length > 0)
+								Mail.appendRecipients(pw, mail.to, "To: ");
+							if (mail.cc != null && mail.cc.length > 0)
+								Mail.appendRecipients(pw, mail.cc, "Cc: ");
 							if( mail.dateString != null )
 								pw.print( "Date: " + mail.dateString );
 							pw.println();
@@ -1286,13 +1275,14 @@ public class WebMail extends HttpServlet
 							pw.flush();
 							sessionObject.body = text.toString();
 						}
+						// TODO store as draft here, then P-R-G
 						state = State.NEW;
 					}
 					else {
 						sessionObject.error += _t("Could not fetch mail body.") + '\n';
-					}
-				}
-			}
+					} // part != null
+				} // uidl != null
+			}  // reply/fwd
 
 		// Set state if unknown
 		if (state == null) {
@@ -2099,7 +2089,12 @@ public class WebMail extends HttpServlet
 			}
 
 			if (state == State.NEW) {
-				if (isPOST) {
+				// TODO we can't P-R-G for reply/fwd or we lose the form data;
+				// must store immediately as draft in PCSB above, before enabling P-R-G
+				if (isPOST &&
+				    !(buttonPressed(request, REPLY) ||
+				      buttonPressed(request, REPLYALL) ||
+				      buttonPressed(request, FORWARD))) {
 					String q = '?' + NEW_UIDL;
 					String newUIDL = request.getParameter(NEW_UIDL);
 					if (newUIDL != null)
@@ -2400,7 +2395,7 @@ public class WebMail extends HttpServlet
 	 *  @param q starting with '?' or null
 	 *  @since 0.9.33 adapted from I2PSnarkServlet
 	 */
-	private static void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String q) throws IOException {
+	private void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String q) throws IOException {
 		String url = req.getRequestURL().toString();
 		StringBuilder buf = new StringBuilder(128);
 		int qq = url.indexOf('?');
@@ -2412,7 +2407,7 @@ public class WebMail extends HttpServlet
 		resp.setHeader("Location", buf.toString());
 		resp.setStatus(303);
 		resp.getOutputStream().close();
-		//if (_log.shouldDebug()) _log.debug("P-R-G to " + q);
+		if (_log.shouldDebug()) _log.debug("P-R-G to " + q);
 	}
 
 	/**

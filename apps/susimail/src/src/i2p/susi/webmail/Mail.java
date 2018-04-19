@@ -37,6 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -341,6 +342,7 @@ class Mail {
 	/**
 	 * Adds all items from the list
 	 * to the builder, separated by tabs.
+	 * This is for SMTP/POP.
 	 * 
 	 * @param buf out param
 	 * @param prefix prepended to the addresses
@@ -355,6 +357,31 @@ class Mail {
 				buf.append(',');
 			buf.append( "\r\n" );
 		}
+	}
+
+	/**
+	 * Adds all items from the array
+	 * to the builder, separated by commas
+	 * This is for display of a forwarded email.
+	 * 
+	 * @param prefix prepended to the addresses, includes trailing ": "
+	 * @since 0.9.35
+	 */
+	public static void appendRecipients(PrintWriter out, String[] recipients, String prefix)
+	{
+		StringBuilder buf = new StringBuilder(120);
+		buf.append(prefix);
+		for (int i = 0; i < recipients.length; i++) {
+			buf.append(recipients[i]);
+			if (i < recipients.length - 1)
+				buf.append(", ");
+			if (buf.length() > 75) {
+				out.println(buf);
+				buf.setLength(0);
+			}
+		}
+		if (buf.length() > 0)
+			out.println(buf);
 	}
 
 	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");

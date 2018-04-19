@@ -1,3 +1,11 @@
+2018-04-19 zzz
+ * SusiMail:
+   - Fix reply/forward filling in compose form
+   - Better formatting of addresses in forwarded mail
+
+2018-04-18 zzz
+ * SusiMail: Fix unhandled decoding exception
+
 2018-04-17 zzz
  * Console: Fix sidebar status when updating plugin (ticket #2137)
  * Reseed, NTP: Use DNSoverHTTPS (ticket #2201)
