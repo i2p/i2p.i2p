@@ -1025,31 +1025,8 @@ public class WebMail extends HttpServlet
 				String uidl = Base64.decodeToString(request.getParameter(NEW_UIDL));
 				if (uidl == null)
 					uidl = I2PAppContext.getGlobalContext().random().nextLong() + "drft";
-				if (log.shouldDebug()) log.debug("Save as draft: " + uidl);
-				MailCache toMC = sessionObject.caches.get(DIR_DRAFTS);
-				Writer wout = null;
-				boolean ok = false;
-				Buffer buffer = null;
-				try {
-					if (toMC == null)
-						throw new IOException("No Drafts folder?");
-					waitForLoad(sessionObject, toMC);
-					StringBuilder draft = composeDraft(sessionObject, request);
-					if (draft == null)
-						throw new IOException("Draft compose error");  // composeDraft added error messages
-					buffer = toMC.getFullWriteBuffer(uidl);
-					wout = new BufferedWriter(new OutputStreamWriter(buffer.getOutputStream(), "ISO-8859-1"));
-					SMTPClient.writeMail(wout, draft, null, null);
-					if (log.shouldDebug()) log.debug("Saved as draft: " + uidl);
-					ok = true;
-				} catch (IOException ioe) {
-					sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
-					if (log.shouldDebug()) log.debug("Unable to save as draft: " + uidl, ioe);
-				} finally {
-					if (wout != null) try { wout.close(); } catch (IOException ioe) {}
-					if (buffer != null)
-						toMC.writeComplete(uidl, buffer, ok);
-				}
+				StringBuilder draft = composeDraft(sessionObject, request);
+				boolean ok = saveDraft(sessionObject, uidl, draft);
 				if (ok) {
 					sessionObject.replyTo = null;
 					sessionObject.replyCC = null;
@@ -1060,7 +1037,8 @@ public class WebMail extends HttpServlet
 				if (ok && buttonPressed(request, SAVE_AS_DRAFT)) {
 					sessionObject.info += _t("Draft saved.") + '\n';
 				} else if (ok && buttonPressed(request, SEND)) {
-					Draft mail = (Draft) toMC.getMail(uidl, MailCache.FetchMode.CACHE_ONLY);
+					MailCache toMC = sessionObject.caches.get(DIR_DRAFTS);
+					Draft mail = toMC != null ? (Draft) toMC.getMail(uidl, MailCache.FetchMode.CACHE_ONLY) : null;
 					if (mail != null) {
 						if (log.shouldDebug()) log.debug("Send mail: " + uidl);
 						ok = sendMail(sessionObject, mail);
@@ -2526,23 +2504,41 @@ public class WebMail extends HttpServlet
 	 *
 	 * We do no validation of recipients, total length, sender, etc. here.
 	 *
-	 * @param sessionObject only for error messages. All data is in the request.
+	 * @param sessionObject only for error messages and attachments. All other data is in the request.
 	 * @param request
 	 * @return null on error
+	 * @since 0.9.35
 	 */
 	private static StringBuilder composeDraft(SessionObject sessionObject, RequestWrapper request) {
-		boolean ok = true;
-		
 		String from = request.getParameter( NEW_FROM );
 		String to = request.getParameter( NEW_TO );
 		String cc = request.getParameter( NEW_CC );
 		String bcc = request.getParameter( NEW_BCC );
 		String subject = request.getParameter(NEW_SUBJECT);
+		String text = request.getParameter( NEW_TEXT, "" );
+		List<Attachment> attachments = sessionObject.attachments;
+		return composeDraft(sessionObject, from, to, cc, bcc, subject, text, sessionObject.attachments);
+	}
+
+	/**
+	 * Take the data from the parameters, and put it in a StringBuilder
+	 * suitable for writing out as a Draft.
+	 *
+	 * We do no validation of recipients, total length, sender, etc. here.
+	 * All params except session may be null.
+	 *
+	 * @param sessionObject only for error messages. All data is in the parameters.
+	 * @return null on error
+	 * @since 0.9.35
+	 */
+	private static StringBuilder composeDraft(SessionObject sessionObject,
+	                                          String from, String to, String cc, String bcc,
+	                                          String subject, String text, List<Attachment> attachments) {
+		boolean ok = true;
 		if (subject == null || subject.trim().length() <= 0)
 		    subject = _t("no subject");
 		else
 		    subject = subject.trim();
-		String text = request.getParameter( NEW_TEXT, "" );
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 		if (fixed) {
@@ -2568,11 +2564,11 @@ public class WebMail extends HttpServlet
 
 		StringBuilder body = null;
 		if( ok ) {
-			boolean multipart = sessionObject.attachments != null && !sessionObject.attachments.isEmpty();
+			boolean multipart = attachments != null && !attachments.isEmpty();
 			if (multipart) {
 				// use Draft just to write out attachment headers
 				Draft draft = new Draft("");
-				for(Attachment a : sessionObject.attachments) {
+				for(Attachment a : attachments) {
 					draft.addAttachment(a);
 				}
 				body = draft.encodeAttachments();
@@ -2610,6 +2606,42 @@ public class WebMail extends HttpServlet
 		}			
 		return ok ? body : null;	
 	}			
+
+	/**
+	 * Write out the draft.
+	 *
+	 * @param sessionObject only for error messages.
+	 * @return success
+	 * @since 0.9.35
+	 */
+	private static boolean saveDraft(SessionObject sessionObject, String uidl, StringBuilder draft) {
+		Log log = sessionObject.log;
+		if (log.shouldDebug()) log.debug("Save as draft: " + uidl);
+		MailCache toMC = sessionObject.caches.get(DIR_DRAFTS);
+		Writer wout = null;
+		boolean ok = false;
+		Buffer buffer = null;
+		try {
+			if (toMC == null)
+				throw new IOException("No Drafts folder?");
+			waitForLoad(sessionObject, toMC);
+			if (draft == null)
+				throw new IOException("Draft compose error");  // composeDraft added error messages
+			buffer = toMC.getFullWriteBuffer(uidl);
+			wout = new BufferedWriter(new OutputStreamWriter(buffer.getOutputStream(), "ISO-8859-1"));
+			SMTPClient.writeMail(wout, draft, null, null);
+			if (log.shouldDebug()) log.debug("Saved as draft: " + uidl);
+			ok = true;
+		} catch (IOException ioe) {
+			sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
+			if (log.shouldDebug()) log.debug("Unable to save as draft: " + uidl, ioe);
+		} finally {
+			if (wout != null) try { wout.close(); } catch (IOException ioe) {}
+			if (buffer != null)
+				toMC.writeComplete(uidl, buffer, ok);
+		}
+		return ok;
+	}
 
 	/**
 	 * Take the data from the request, and put it in a StringBuilder
