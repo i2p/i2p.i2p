@@ -196,7 +196,6 @@ public class WebMail extends HttpServlet
 	private static final String NEW_TEXT = "new_text";
 	private static final String NEW_FILENAME = "new_filename";
 	private static final String NEW_UPLOAD = "new_upload";
-	private static final String NEW_BCC_TO_SELF = "new_bcc_to_self";
 	
 	private static final String LIST = "list";
 	private static final String PREV = "prev";
@@ -247,7 +246,7 @@ public class WebMail extends HttpServlet
 	private static final String CONFIG_COMPOSER_COLS = "composer.cols";
 	private static final String CONFIG_COMPOSER_ROWS = "composer.rows";
 
-	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
+	private static final String CONFIG_COPY_TO_SENT = "composer.copy.to.sent";
 	static final String CONFIG_LEAVE_ON_SERVER = "pop3.leave.on.server";
 	public static final String CONFIG_BACKGROUND_CHECK = "pop3.check.enable";
 	public static final String CONFIG_CHECK_MINUTES = "pop3.check.interval.minutes";
@@ -292,14 +291,12 @@ public class WebMail extends HttpServlet
 		public boolean reallyDelete;
 		String themePath, imgPath;
 		boolean isMobile;
-		boolean bccToSelf;
 		private final List<String> nonces;
 		private static final int MAX_NONCES = 15;
 		public final Log log;
 		
 		SessionObject(Log log)
 		{
-			bccToSelf = Boolean.parseBoolean(Config.getProperty( CONFIG_BCC_TO_SELF, "true" ));
 			nonces = new ArrayList<String>(MAX_NONCES + 1);
 			caches = new HashMap<String, MailCache>(8);
 			this.log = log;
@@ -2566,13 +2563,6 @@ public class WebMail extends HttpServlet
 		Mail.getRecipientsFromList( ccList, cc, ok );
 		Mail.getRecipientsFromList( bccList, bcc, ok );
 		
-		String bccToSelf = request.getParameter( NEW_BCC_TO_SELF );
-		boolean toSelf = "1".equals(bccToSelf);
-		// save preference in session
-		sessionObject.bccToSelf = toSelf;
-		if (toSelf && sender != null && sender.length() > 0 && !bccList.contains(sender))
-			bccList.add( sender );
-		
 		Encoding qp = EncodingFactory.getEncoding( "quoted-printable" );
 		Encoding hl = EncodingFactory.getEncoding( "HEADERLINE" );
 
@@ -2775,28 +2765,31 @@ public class WebMail extends HttpServlet
 						if (log.shouldDebug()) log.debug("Sent email deleted from drafts");
 					}
 					// now store to sent
-					mc = sessionObject.caches.get(DIR_SENT);
-					if (mc != null) {
-						waitForLoad(sessionObject, mc);
-						I2PAppContext ctx = I2PAppContext.getGlobalContext();
-						String uidl = ctx.random().nextLong() + "sent";
-						Writer wout = null;
-						boolean copyOK = false;
-						Buffer buffer = null;
-						try {
-							buffer = mc.getFullWriteBuffer(uidl);
-							wout = new BufferedWriter(new OutputStreamWriter(buffer.getOutputStream(), "ISO-8859-1"));
-							SMTPClient.writeMail(wout, body,
-							                     attachments, boundary);
-							if (log.shouldDebug()) log.debug("Sent email saved to Sent");
-							copyOK = true;
-						} catch (IOException ioe) {
-							sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
-							if (log.shouldDebug()) log.debug("Sent email saved error", ioe);
-						} finally {
-							if (wout != null) try { wout.close(); } catch (IOException ioe) {}
-							if (buffer != null)
-								mc.writeComplete(uidl, buffer, copyOK);
+					// if configured (default true)
+					if (Boolean.parseBoolean(Config.getProperty(CONFIG_COPY_TO_SENT, "true"))) {
+						mc = sessionObject.caches.get(DIR_SENT);
+						if (mc != null) {
+							waitForLoad(sessionObject, mc);
+							I2PAppContext ctx = I2PAppContext.getGlobalContext();
+							String uidl = ctx.random().nextLong() + "sent";
+							Writer wout = null;
+							boolean copyOK = false;
+							Buffer buffer = null;
+							try {
+								buffer = mc.getFullWriteBuffer(uidl);
+								wout = new BufferedWriter(new OutputStreamWriter(buffer.getOutputStream(), "ISO-8859-1"));
+								SMTPClient.writeMail(wout, body,
+								                     attachments, boundary);
+								if (log.shouldDebug()) log.debug("Sent email saved to Sent");
+								copyOK = true;
+							} catch (IOException ioe) {
+								sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
+								if (log.shouldDebug()) log.debug("Sent email saved error", ioe);
+							} finally {
+								if (wout != null) try { wout.close(); } catch (IOException ioe) {}
+								if (buffer != null)
+									mc.writeComplete(uidl, buffer, copyOK);
+							}
 						}
 					}
 				} else {
@@ -2957,7 +2950,6 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _t("To") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + quoteHTML(to) + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Cc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + quoteHTML(cc) + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + quoteHTML(bcc) + "\"></td></tr>\n" +
-				"<tr><td align=\"right\"><label for=\"bcctoself\">" + _t("Bcc to self") + ":</label></td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" id=\"bcctoself\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + quoteHTML(subject) + "\"></td></tr>\n" +
 				"<tr><td></td><td align=\"left\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea></td></tr>" +
 				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
