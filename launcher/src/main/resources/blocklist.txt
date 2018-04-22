@@ -1,0 +1,122 @@
+#
+# If you have a 'split' directory installation, with configuration
+# files in ~/.i2p (Linux), %APPDATA%\I2P (Windows),
+# or /Users/(user)/Library/Application Support/i2p (Mac), be sure to
+# edit the file in the configuration directory, NOT the install directory.
+# When running as a Linux daemon, the configuration directory is /var/lib/i2p
+# and the install directory is /usr/share/i2p .
+# When running as a Windows service, the configuration directory is \ProgramData\i2p
+# and the install directory is \Program Files\i2p .
+#
+# The file in the install directory will be overwritten when you update I2P.
+# As of release 0.9.18, the router reads and merges the files in the install directory
+# and the config directory. Additionally, if the advanded configuration
+# router.blocklist.file=/path/to/otherlist.txt is set, this file will be
+# read in and merged as well.
+#
+# If there is no blocklist.txt file in the configuration directory, create it and
+# add entries as desired.
+#
+#
+# Blocking is enabled by default.
+# To disable blocking, set router.blocklist.enable=false on configadvanced.jsp.
+#
+# Add additional entries as desired, sorting not required.
+# This file is only read at router startup.
+# To manually block a router after startup, use the form on http://127.0.0.1:7657/configpeer.jsp
+# Warning - a large list will increase memory usage.
+# Please do not block too broadly, it will segment and harm the network.
+# For example, http://www.bluetack.co.uk/config/splist.zip is very broad and includes Tor users, it is not recommended.
+# A more reasonable list: http://www.bluetack.co.uk/config/level1.zip
+# Note: bluetack blocklists now require a subscription. See https://forum.transmissionbt.com/viewtopic.php?f=2&t=15652
+#
+# We have included the bogons from http://www.team-cymru.org/Services/Bogons/http.html ,
+# but you will have to update your blocklist manually if the bogon list changes.
+# You must update this list yourself, it is not overwritten by the update process.
+#
+#   * Acceptable formats (IPV4 only):
+#   *   #comment (# must be in column 1)
+#   *   comment:IP-IP
+#   *   comment:morecomments:IP-IP
+#   *   (comments also allowed before any of the following)
+#   *   IP-IP
+#   *   IP/masklength
+#   *   IP
+#   *   hostname (DNS looked up at list readin time, not dynamically, so may not be much use)
+#   *   44-byte Base64 router hash
+#   *
+#   * Acceptable formats (IPV6 only):
+#   *   comment:IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+#   *   IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+#   *
+#   * No whitespace allowed after the last ':'.
+#   *
+#   * For further information and downloads:
+#   *   http://www.bluetack.co.uk/forums/index.php?autocom=faq&CODE=02&qid=17
+#   *   http://blocklist.googlepages.com/
+#   *   http://www.team-cymru.org/Services/Bogons/http.html
+#
+Chinese Floodfill Flooder:159.226.40.7
+Friend of the Chinese Floodfill Flooder:159.226.40.3
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:0.0.0.0/8
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:10.0.0.0/8
+<a href="http://tools.ietf.org/html/rfc6598">Shared Address Space</a>:100.64.0.0/10
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:127.0.0.0/8
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:169.254.0.0/16
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:172.16.0.0/12
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.0.0.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.0.2.0/24
+<a href="http://tools.ietf.org/html/rfc3068">6to4 Anycast</a>:192.88.99.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.168.0.0/16
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.18.0.0/15
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.51.100.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:203.0.113.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:224.0.0.0/3
+Sybil:45.32.60.71
+Sybil:45.32.62.37
+Sybil:45.32.125.149
+Sybil:45.32.152.247
+Sybil:45.63.50.207
+Sybil:45.63.76.128
+Sybil:45.76.47.3
+Sybil:45.76.98.64
+Sybil:45.76.112.208
+Sybil:45.76.129.193
+Sybil:45.76.152.150
+Sybil:45.77.29.172
+Sybil:45.77.132.75
+Sybil:47.88.6.66
+Sybil:47.88.7.8
+Sybil:47.88.136.46
+Sybil:47.88.136.86
+Sybil:47.88.138.200
+Sybil:47.88.159.58
+Sybil:47.88.169.149
+Sybil:47.89.38.177
+Sybil:47.90.1.15
+Sybil:47.90.1.26
+Sybil:47.90.120.30
+Sybil:47.208.97.112
+Sybil:104.156.254.54
+Sybil:104.207.153.96
+Sybil:108.61.251.143
+Sybil:133.130.124.185
+Sybil:150.95.128.165
+Sybil:150.95.134.159
+Sybil:150.95.144.95
+Sybil:150.95.147.89
+Sybil:150.95.153.220
+Sybil:163.44.149.31
+Sybil:2001;df6;b800;1128;a163;44;149;310
+Sybil:2001;19f0;4400;4376;5400;ff;fe47;bcbd
+Sybil:2001;19f0;5801;1d4;5400;ff;fe38;a26e
+Sybil:2001;19f0;5c01;1df;5400;ff;fe3e;ba8f
+Sybil:2001;19f0;7001;cb;5400;ff;fe47;c952
+Sybil:2001;19f0;7001;d99;5400;ff;fe41;829c
+Sybil:2001;19f0;7402;24d;5400;ff;fe41;9153
+Sybil:2400;8500;1302;816;a150;95;128;165b
+Sybil:2400;8500;1302;802;a133;130;124;1855
+Sybil:2400;8500;1302;819;a150;95;134;1590
+Sybil:2400;8500;1302;824;a150;95;144;951
+Sybil:2400;8500;1302;825;150;95;147;89
+Sybil:2400;8500;1302;828;a150;95;153;2202
