@@ -282,8 +282,6 @@ public class WebMail extends HttpServlet
 		/** Set by threaded connector. -1 if nothing to report, 0 or more after fetch complete */
 		int newMails = -1;
 		String user, pass, host, error = "", info = "";
-		String replyTo, replyCC;
-		String subject, body;
 		// Just convenience to pass from PSCB to P-R-G
 		String draftUIDL;
 		// TODO Map of UIDL to List
@@ -1029,10 +1027,6 @@ public class WebMail extends HttpServlet
 				StringBuilder draft = composeDraft(sessionObject, request);
 				boolean ok = saveDraft(sessionObject, uidl, draft);
 				if (ok) {
-					sessionObject.replyTo = null;
-					sessionObject.replyCC = null;
-					sessionObject.subject = null;
-					sessionObject.body = null;
 					sessionObject.clearAttachments();
 				}
 				if (ok && buttonPressed(request, SAVE_AS_DRAFT)) {
@@ -1066,10 +1060,6 @@ public class WebMail extends HttpServlet
 					state = State.SHOW;
 				else
 					state = State.LIST;
-				sessionObject.replyTo = null;
-				sessionObject.replyCC = null;
-				sessionObject.subject = null;
-				sessionObject.body = null;
 				if (buttonPressed(request, DRAFT_EXISTS))
 					sessionObject.clearAttachments();
 				else
@@ -1126,10 +1116,6 @@ public class WebMail extends HttpServlet
 			boolean reply = false;
 			boolean replyAll = false;
 			boolean forward = false;
-			sessionObject.replyTo = null;
-			sessionObject.replyCC = null;
-			sessionObject.body = null;
-			sessionObject.subject = null;
 			
 			if (buttonPressed(request, REPLY)) {
 				reply = true;
@@ -2955,17 +2941,6 @@ public class WebMail extends HttpServlet
 				out.println("<input type=\"hidden\" name=\"" + DRAFT_EXISTS + "\" value=\"1\">");
 			}
 		}
-		if (draft == null) {
-			// populate from session object, as saved in processStateChangeButtons()
-			if (sessionObject.replyTo != null)
-				to = sessionObject.replyTo;
-			if (sessionObject.replyCC != null)
-				cc = sessionObject.replyCC;
-			if (sessionObject.subject != null)
-				subject = sessionObject.subject;
-			if (sessionObject.body != null)
-				text = sessionObject.body;
-		}
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 		
@@ -2990,11 +2965,6 @@ public class WebMail extends HttpServlet
 				from += '<' + user + '@' + domain + '>';
 			}
 		}
-		
-		sessionObject.replyTo = null;
-		sessionObject.replyCC = null;
-		sessionObject.subject = null;
-		sessionObject.body = null;
 		
 		out.println( "<div id=\"composemail\"><table id=\"newmail\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
