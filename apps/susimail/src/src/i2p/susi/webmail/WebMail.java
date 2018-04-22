@@ -31,8 +31,8 @@ import i2p.susi.util.EscapeHTMLWriter;
 import i2p.susi.util.FilenameUtil;
 import i2p.susi.util.Folder;
 import i2p.susi.util.Folder.SortOrder;
-import i2p.susi.util.Buffer;
 import i2p.susi.util.OutputStreamBuffer;
+import i2p.susi.util.StringBuilderWriter;
 import i2p.susi.webmail.Messages;
 import static i2p.susi.webmail.Sorters.*;
 import i2p.susi.webmail.encoding.Encoding;
@@ -54,7 +54,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.text.Collator;
@@ -285,6 +284,8 @@ public class WebMail extends HttpServlet
 		String user, pass, host, error = "", info = "";
 		String replyTo, replyCC;
 		String subject, body;
+		// Just convenience to pass from PSCB to P-R-G
+		String draftUIDL;
 		// TODO Map of UIDL to List
 		public ArrayList<Attachment> attachments;
 		// This is only for multi-delete. Single-message delete is handled with P-R-G
@@ -1164,22 +1165,26 @@ public class WebMail extends HttpServlet
 					 */
 					MailPart part = mail != null ? mail.getPart() : null;
 					if (part != null) {
+						StringBuilderWriter text = new StringBuilderWriter();
+						String from = null, to = null, cc = null, bcc = null, subject = null;
+						List<Attachment> attachments = null;
 						if( reply || replyAll ) {
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
-								sessionObject.replyTo = mail.reply;
+								to = mail.reply;
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
-								sessionObject.replyTo = mail.sender;
-							sessionObject.subject = mail.subject;
-							if (!(sessionObject.subject.startsWith("Re:") ||
-							      sessionObject.subject.startsWith("re:") ||
-							      sessionObject.subject.startsWith("RE:") ||
-							      sessionObject.subject.startsWith(_t("Re:")))) {
-								sessionObject.subject = _t("Re:") + ' ' + sessionObject.subject;
+								to = mail.sender;
+							else
+								to = "";
+							subject = mail.subject;
+							if (!(subject.startsWith("Re:") ||
+							      subject.startsWith("re:") ||
+							      subject.startsWith("RE:") ||
+							      subject.startsWith(_t("Re:")))) {
+								subject = _t("Re:") + ' ' + subject;
 							}
-							StringWriter text = new StringWriter();
 							PrintWriter pw = new PrintWriter( text );
-							pw.println( _t("On {0} {1} wrote:", mail.formattedDate + " UTC", sessionObject.replyTo) );
-							StringWriter text2 = new StringWriter();
+							pw.println( _t("On {0} {1} wrote:", mail.formattedDate + " UTC", to));
+							StringBuilderWriter text2 = new StringBuilderWriter();
 							PrintWriter pw2 = new PrintWriter( text2 );
 							showPart( pw2, part, 0, TEXT_ONLY );
 							pw2.flush();
@@ -1187,7 +1192,6 @@ public class WebMail extends HttpServlet
 							for( int i = 0; i < lines.length; i++ )
 								pw.println( "> " + lines[i] );
 							pw.flush();
-							sessionObject.body = text.toString();
 						}
 						if( replyAll ) {
 							/*
@@ -1211,19 +1215,19 @@ public class WebMail extends HttpServlet
 								}
 							}
 							if( buf.length() > 0 )
-								sessionObject.replyCC = buf.toString();
+								cc = buf.toString();
 						}
 						if( forward ) {
 							// TODO attachments are not forwarded
-							sessionObject.subject = mail.subject;
-							if (!(sessionObject.subject.startsWith("Fwd:") ||
-							      sessionObject.subject.startsWith("fwd:") ||
-							      sessionObject.subject.startsWith("FWD:") ||
-							      sessionObject.subject.startsWith("Fw:") ||
-							      sessionObject.subject.startsWith("fw:") ||
-							      sessionObject.subject.startsWith("FW:") ||
-							      sessionObject.subject.startsWith(_t("Fwd:")))) {
-								sessionObject.subject = _t("Fwd:") + ' ' + sessionObject.subject;
+							subject = mail.subject;
+							if (!(subject.startsWith("Fwd:") ||
+							      subject.startsWith("fwd:") ||
+							      subject.startsWith("FWD:") ||
+							      subject.startsWith("Fw:") ||
+							      subject.startsWith("fw:") ||
+							      subject.startsWith("FW:") ||
+							      subject.startsWith(_t("Fwd:")))) {
+								subject = _t("Fwd:") + ' ' + subject;
 							}
 							String sender = null;
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
@@ -1231,7 +1235,6 @@ public class WebMail extends HttpServlet
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
 								sender = Mail.getAddress( mail.sender );
 							
-							StringWriter text = new StringWriter();
 							PrintWriter pw = new PrintWriter( text );
 							pw.println();
 							pw.println();
@@ -1248,9 +1251,19 @@ public class WebMail extends HttpServlet
 							showPart( pw, part, 0, TEXT_ONLY );
 							pw.println( "----  " + _t("end forwarded mail") + "  ----" );
 							pw.flush();
-							sessionObject.body = text.toString();
 						}
-						// TODO store as draft here, then P-R-G
+						// Store as draft here, put draft UIDL in sessionObject,
+						// then P-R-G in processRequest()
+						StringBuilder draft = composeDraft(sessionObject, from, to, cc, bcc,
+						                                   subject, text.toString(), attachments);
+						String draftuidl = I2PAppContext.getGlobalContext().random().nextLong() + "drft";
+						boolean ok = saveDraft(sessionObject, draftuidl, draft);
+						if (ok) {
+							sessionObject.draftUIDL = draftuidl;
+						} else {
+							sessionObject.error += _t("Unable to save mail.") + '\n';
+							log.error("Unable to save as draft: " + draftuidl);
+						}
 						state = State.NEW;
 					}
 					else {
@@ -2064,14 +2077,21 @@ public class WebMail extends HttpServlet
 			}
 
 			if (state == State.NEW) {
-				// TODO we can't P-R-G for reply/fwd or we lose the form data;
-				// must store immediately as draft in PCSB above, before enabling P-R-G
-				if (isPOST &&
-				    !(buttonPressed(request, REPLY) ||
-				      buttonPressed(request, REPLYALL) ||
-				      buttonPressed(request, FORWARD))) {
+				if (isPOST) {
 					String q = '?' + NEW_UIDL;
-					String newUIDL = request.getParameter(NEW_UIDL);
+					String newUIDL;
+					if (buttonPressed(request, REPLY) ||
+					    buttonPressed(request, REPLYALL) ||
+					    buttonPressed(request, FORWARD)) {
+						// stuffed in by PCSB
+						newUIDL = sessionObject.draftUIDL;
+						if (newUIDL != null) {
+							newUIDL = Base64.encode(newUIDL);
+							sessionObject.draftUIDL = null;
+						}
+					} else {
+						newUIDL = request.getParameter(NEW_UIDL);
+					}
 					if (newUIDL != null)
 						q += '=' + newUIDL;
 					sendRedirect(httpRequest, response, q);
@@ -2917,7 +2937,7 @@ public class WebMail extends HttpServlet
 				to = arrayToCSV(draft.to);
 				cc = arrayToCSV(draft.cc);
 				bcc = arrayToCSV(draft.getBcc());
-				StringWriter body = new StringWriter(1024);
+				StringBuilderWriter body = new StringBuilderWriter(1024);
 				try {
 					Buffer ob = new OutputStreamBuffer(new DecodingOutputStream(body, "UTF-8"));
 					draft.getPart().decode(0, ob);

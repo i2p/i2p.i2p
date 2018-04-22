@@ -25,13 +25,13 @@ package i2p.susi.webmail.encoding;
 
 import i2p.susi.util.Buffer;
 import i2p.susi.util.MemoryBuffer;
+import i2p.susi.util.StringBuilderWriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.io.Writer;
 
 /**
@@ -50,7 +50,7 @@ public class Base64 extends Encoding {
 	public String encode( byte in[] ) throws EncodingException
 	{
 		try {
-			StringWriter strBuf = new StringWriter();
+			Writer strBuf = new StringBuilderWriter();
 			encode(new ByteArrayInputStream(in), strBuf);
 			return strBuf.toString();
 		}catch (IOException e) {
