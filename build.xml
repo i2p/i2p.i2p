@@ -21,6 +21,8 @@
         <echo message="  installer-osx: build the GUI installer (OSX only)" />
         <echo message="  installer-windows: build the GUI installer (Windows only)" />
         <echo message="  installer-nowindows: build the GUI installer (all but Windows)" />
+        <echo message="  osxLauncher: build the Mac OS X router/GUI launcher (OSX only)" />
+        <echo message="  bbLauncher: build the Browser Bundle router launcher" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   Package the built files in i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updater200: Updater compressed with pack200 (creates i2pupdate200.zip, 60% smaller)" />
