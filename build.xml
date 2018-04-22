@@ -297,6 +297,28 @@
         </script>
     </target>
 
+    <target name="bbLauncher" depends="build">
+        <sequential>
+            <exec executable="sbt" dir="launcher" failonerror="true">
+                <arg value="browserbundle:clean" />
+            </exec>
+            <exec executable="sbt" dir="launcher" failonerror="true">
+                <arg value="browserbundle:assembly" />
+            </exec>
+        </sequential>
+    </target>
+
+    <target name="osxLauncher" depends="build">
+        <sequential>
+            <exec executable="sbt" dir="launcher" failonerror="true">
+                <arg value="macosx:clean" />
+            </exec>
+            <exec executable="sbt" dir="launcher" failonerror="true">
+                <arg value="macosx:assembly" />
+            </exec>
+        </sequential>
+    </target>
+
     <target name="buildBOB" depends="buildStreaming" >
         <ant dir="apps/BOB/" target="jar" />
         <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
