@@ -1,3 +1,10 @@
+2018-04-22 zzz
+ * SusiMail: Include attachments when forwarding (ticket #2087)
+
+2018-04-21 zzz
+ * SusiMail: Remove Bcc-to-self feature, replace with
+   copy-to-sent config (ticket #2087)
+
 2018-04-19 zzz
  * SusiMail:
    - Fix reply/forward filling in compose form

@@ -28,6 +28,7 @@ import i2p.susi.util.Config;
 import i2p.susi.util.DecodingOutputStream;
 import i2p.susi.util.EscapeHTMLOutputStream;
 import i2p.susi.util.EscapeHTMLWriter;
+import i2p.susi.util.FileBuffer;
 import i2p.susi.util.FilenameUtil;
 import i2p.susi.util.Folder;
 import i2p.susi.util.Folder.SortOrder;
@@ -1203,8 +1204,41 @@ public class WebMail extends HttpServlet
 							if( buf.length() > 0 )
 								cc = buf.toString();
 						}
+						I2PAppContext ctx = I2PAppContext.getGlobalContext();
 						if( forward ) {
-							// TODO attachments are not forwarded
+							List<MailPart> parts = part.parts;
+							if (!parts.isEmpty()) {
+								// Copy each valid attachment from the mail to a file
+								// in Drafts/attachments and add to list
+								// This is similar to the add attachment code in processComposeButtons()
+								attachments = new ArrayList<Attachment>(parts.size());
+								MailCache drafts = sessionObject.caches.get(DIR_DRAFTS);
+								for (MailPart mp : parts) {
+									if (mp.name == null || mp.type == null || mp.encoding == null) {
+										if (log.shouldDebug())
+											log.debug("skipping fwd att: " + mp);
+										continue;
+									}
+									String temp = "susimail-attachment-" + ctx.random().nextLong();
+									File f;
+									if (drafts != null) {
+										f = new File(drafts.getAttachmentDir(), temp);
+									} else {
+										f = new File(ctx.getTempDir(), temp);
+									}
+									Buffer out = new FileBuffer(f);
+									boolean ok = false;
+									try {
+										mp.decode(0, out);
+										ok = true;
+										attachments.add(new Attachment(mp.name, mp.type, mp.encoding, f));
+									} catch (IOException e) {
+										sessionObject.error += _t("Error reading uploaded file: {0}", e.getMessage()) + '\n';
+									} finally {
+										out.writeComplete(ok);
+									}
+								}
+							}
 							subject = mail.subject;
 							if (!(subject.startsWith("Fwd:") ||
 							      subject.startsWith("fwd:") ||
@@ -1242,7 +1276,7 @@ public class WebMail extends HttpServlet
 						// then P-R-G in processRequest()
 						StringBuilder draft = composeDraft(sessionObject, from, to, cc, bcc,
 						                                   subject, text.toString(), attachments);
-						String draftuidl = I2PAppContext.getGlobalContext().random().nextLong() + "drft";
+						String draftuidl = ctx.random().nextLong() + "drft";
 						boolean ok = saveDraft(sessionObject, draftuidl, draft);
 						if (ok) {
 							sessionObject.draftUIDL = draftuidl;
