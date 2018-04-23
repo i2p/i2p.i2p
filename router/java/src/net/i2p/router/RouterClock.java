@@ -150,7 +150,10 @@ public class RouterClock extends Clock {
                 _alreadyChanged) {
 
                 // Try calculating peer clock skew
-                long currentPeerClockSkew = ((RouterContext)_context).commSystem().getFramedAveragePeerClockSkew(33);
+                // This may get called very early at startup, before RouterContext.initAll() is completed,
+                // so the comm system may be null. Avoid NPE.
+                CommSystemFacade csf = ((RouterContext)_context).commSystem();
+                long currentPeerClockSkew = (csf != null) ? csf.getFramedAveragePeerClockSkew(33) : 0;
 
                     // Predict the effect of applying the proposed clock offset
                     long predictedPeerClockSkew = currentPeerClockSkew + delta;
