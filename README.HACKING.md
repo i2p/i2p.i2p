@@ -30,3 +30,8 @@ of hints of how this is peaced together lies there.
 
 Check out [README.MONOTONECHEATSHEET.md](README.MONOTONECHEATSHEET.md) file.
 
+## SBT Behind proxy
+
+Seems it's a hassle behind SOCKSv5. But for use of HTTP proxy to fetch 
+dependencies and such, please edit `export SBT_OPTS="$SBT_OPTS -Dhttp.proxyHost=myproxy-Dhttp.proxyPort=myport"` 
+to have correct values for your system, then execute it before you start SBT.
