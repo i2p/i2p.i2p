@@ -17,6 +17,10 @@ FAQ: https://geti2p.net/faq
 API: http://docs.i2p-projekt.de/javadoc/
 or run 'ant javadoc' then start at build/javadoc/index.html
 
+## How to contribute / Hack on I2P
+
+Please check out [README.HACKING.md](README.HACKING.md)
+
 ## Building packages from source
 
 To get development branch from source control: https://geti2p.net/newdevelopers
