@@ -1169,8 +1169,9 @@ public class EepGet {
      * @return HTTP response code (200, 206, other)
      */
     private int handleStatus(String line) {
+        line = line.trim();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Status line: [" + line.trim() + "]");
+            _log.debug("Status line: [" + line + "]");
         String[] toks = DataHelper.split(line, " ", 3);
         if (toks.length < 2) {
             if (_log.shouldLog(Log.WARN))
