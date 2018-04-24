@@ -18,7 +18,7 @@ of Gradle and SBT in the end when we know what kind of structure we want.
 
 If you're new at this, which we all was at one point, I'll have some tips.
 
-* Check out our [README.DIRECTORIES.md](README.DIRECTORIES.md) to learn ore 
+* Check out our [DIRECTORIES.md](DIRECTORIES.md) to learn ore 
 about where you'll find I2P's different parts in the codebase.
 
 * For me (Meeh), it worked well to run `find . -type f -name '*Runner.java'` 
@@ -28,7 +28,7 @@ of hints of how this is peaced together lies there.
 
 ## The .. Monotone part
 
-Check out [README.MONOTONECHEATSHEET.md](README.MONOTONECHEATSHEET.md) file.
+Check out [MONOTONECHEATSHEET.md](MONOTONECHEATSHEET.md) file.
 
 ## SBT Behind proxy
 

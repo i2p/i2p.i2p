@@ -19,7 +19,7 @@ or run 'ant javadoc' then start at build/javadoc/index.html
 
 ## How to contribute / Hack on I2P
 
-Please check out [README.HACKING.md](README.HACKING.md)
+Please check out [HACKING.md](docs/HACKING.md) and other documents in the docs directory.
 
 ## Building packages from source
 
