@@ -4,6 +4,7 @@
       - It copies certificates, locale and manuals
       - It copies jar and war files to the bundle
   * Added new entries to mtn-ignore so we avoid any PEBCAK with commiting build directories
+  * Added an SBT AutoPlugin named IconHelper to generate valid ICNS images for Mac OS X
 
 2018-04-23 meeh
   * Added launchers for Browser Bundle and Mac OS X
