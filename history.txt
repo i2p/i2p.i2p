@@ -1,3 +1,6 @@
+2018-04-23 meeh
+  * Added launchers for Browser Bundle and Mac OS X
+
 2018-04-22 zzz
  * SusiMail: Include attachments when forwarding (ticket #2087)
 
@@ -1982,7 +1985,7 @@ Prop from i2p.i2p.zzz.gmp6-prop:
 2016-02-22 zzz
  * Console: Improve news CSS (ticket #1710)
  * Crypto: Blacklist certificates by SHA1 hash, not by serial/CN/OU
- * I2CP: Improve client error message when internal router connection fails 
+ * I2CP: Improve client error message when internal router connection fails
  * Graphs: Increase font size
  * Transports: Increase default max inbound bandwidth,
    increase minimum in/out bandwidths
@@ -2980,7 +2983,7 @@ Prop from i2p.i2p.zzz.test2:
    - Decrease overload threshold
 
 2015-03-13 dg
- * Router: create router.integratedPeers (floodfills) stat, and 
+ * Router: create router.integratedPeers (floodfills) stat, and
    allow graphing of it.
 
 2015-03-08 zzz
@@ -2995,7 +2998,7 @@ Prop from i2p.i2p.zzz.test2:
    database from 2015-02-04.
 
 2015-02-15 dg
- * FloodfillMonitorJob: 
+ * FloodfillMonitorJob:
    - Use lifetime average value for job lag
    - Change the job lag limit to less than 25ms
    - Consider and set the limit of backlogged tunnels to less than 5
@@ -4303,7 +4306,7 @@ Prop from i2p.i2p.zzz.outproxy:
  * Update: All updates via torrent
 
 2014-01-25 zab
- * Move OutNetMessage buffer preparation to the Writer threads 
+ * Move OutNetMessage buffer preparation to the Writer threads
    (Ticket #1183)
  * Up version to -1
 
@@ -5731,7 +5734,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2012-10-24 zzz
  * I2PSnark:
    - Fix several partial piece (temp file) leaks
-   - Don't lose all DHT peers if we stop quickly	
+   - Don't lose all DHT peers if we stop quickly
    - Explore a kbucket if it's less than 3/4 full
 
 2012-10-24 str4d
@@ -6176,7 +6179,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
  * SSU MTU (ticket #682):
    - Use local MTU detection
    - i2np.udp.mtu now sets max MTU, not initial MTU
-   - Put local MTU in netDb 
+   - Put local MTU in netDb
    - Fix receive MTU calculations
    - Track remote MTU based on actual received packet size
    - Display local MTU on peers page
