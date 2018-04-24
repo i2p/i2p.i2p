@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
 
+scalaVersion in Global := "2.11.11"
 
 resolvers ++= Seq(
   DefaultMavenRepository,
@@ -40,6 +41,7 @@ lazy val macosx = (project in file("macosx"))
 lazy val root = (project in file("."))
   .aggregate(browserbundle, macosx)
 
+scalacOptions in Compile := Seq("-deprecated")
 
 fork := true
 

@@ -17,6 +17,10 @@ lazy val i2pBuildDir = new File("./../build")
 lazy val warsForCopy = i2pBuildDir.list.filter { f => f.endsWith(".war") }
 lazy val jarsForCopy = i2pBuildDir.list.filter { f => f.endsWith(".jar") }
 
+convertToICNSTask := {
+  println("TODO")
+}
+
 buildAppBundleTask := {
   println(s"Building Mac OS X bundle for I2P version ${i2pVersion}.")
   bundleBuildPath.mkdir()
