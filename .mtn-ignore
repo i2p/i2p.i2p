@@ -50,6 +50,14 @@ core/c/jcpuid/msvc/*.user
 # Build property overrides
 override.properties
 
+# Launcher build paths
+launchers/macosx/target
+launchers/browserbundle/target
+launchers/macosx/project/target
+launchers/browserbundle/project/target
+launchers/target
+launchers/project/target
+
 # Reporting
 sloccount.sc
 ^reports/
