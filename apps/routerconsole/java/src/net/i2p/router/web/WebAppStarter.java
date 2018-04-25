@@ -53,6 +53,8 @@ public class WebAppStarter {
      *  Prior to 0.9.28, was not guaranteed to throw on failure.
      *  Not for routerconsole.war, it's started in RouterConsoleRunner.
      *
+     *  As of 0.9.34, the appName will be registered with the PortMapper.
+     *
      *  @throws Exception just about anything, caller would be wise to catch Throwable
      *  @since public since 0.9.33, was package private
      */
@@ -165,7 +167,12 @@ public class WebAppStarter {
         } catch (IllegalStateException ise) {}
     }
 
-    /** @since public since 0.9.33; was package private */
+    /**
+     *  As of 0.9.34, the appName will be registered with the PortMapper,
+     *  and PortMapper.isRegistered() will be more efficient than this.
+     *
+     *  @since public since 0.9.33; was package private
+     */
     public static boolean isWebAppRunning(String appName) {
         ContextHandler wac = getWebApp(appName);
         if (wac == null)

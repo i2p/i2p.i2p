@@ -290,7 +290,7 @@ class NetDbRenderer {
             medianCount = rapCount / 2;
           }
 
-          boolean linkSusi = WebAppStarter.isWebAppRunning("susidns");
+          boolean linkSusi = _context.portMapper().isRegistered("susidns");
           long now = _context.clock().now();
           buf.append("<div class=\"leasesets_container\">");
           for (LeaseSet ls : leases) {

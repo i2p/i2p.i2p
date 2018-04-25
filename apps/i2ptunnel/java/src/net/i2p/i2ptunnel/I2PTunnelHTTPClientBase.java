@@ -544,8 +544,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         char[] buf = new char[512];
         StringBuilder out = new StringBuilder(2048);
         try {
-            boolean hasSusiDNS = ctx.portMapper().getPort(PortMapper.SVC_SUSIDNS) > 0;
-            boolean hasI2PTunnel = ctx.portMapper().getPort(PortMapper.SVC_I2PTUNNEL) > 0;
+            boolean hasSusiDNS = ctx.portMapper().isRegistered(PortMapper.SVC_SUSIDNS);
+            boolean hasI2PTunnel = ctx.portMapper().isRegistered(PortMapper.SVC_I2PTUNNEL);
             if (hasSusiDNS && hasI2PTunnel) {
                 reader = new TranslateReader(ctx, BUNDLE_NAME, new FileInputStream(file));
             } else {

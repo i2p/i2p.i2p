@@ -558,7 +558,7 @@ public class SummaryHelper extends HelperBase {
         List<Destination> clients = new ArrayList<Destination>(_context.clientManager().listClients());
 
         StringBuilder buf = new StringBuilder(512);
-        boolean link = WebAppStarter.isWebAppRunning("i2ptunnel");
+        boolean link = _context.portMapper().isRegistered("i2ptunnel");
         buf.append("<h3>");
         if (link) {
             buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
@@ -898,7 +898,7 @@ public class SummaryHelper extends HelperBase {
         if ((avail || unsignedAvail || devSU3Avail) &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress() &&
-            _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) > 0 &&  // assume using proxy for now
+            _context.portMapper().isRegistered(PortMapper.SVC_HTTP_PROXY) &&  // assume using proxy for now
             getAction() == null &&
             getUpdateNonce() == null) {
                 if (needSpace)

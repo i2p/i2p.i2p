@@ -774,7 +774,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                                        "<a href=\"" + conflictURL + "\">").getBytes("UTF-8"));
                                             out.write(_t("Conflicting address helper destination").getBytes("UTF-8"));
                                             out.write(("</a></th></tr>\n").getBytes("UTF-8"));
-                                            if (_context.portMapper().getPort(PortMapper.SVC_IMAGEGEN) > 0) {
+                                            if (_context.portMapper().isRegistered(PortMapper.SVC_IMAGEGEN)) {
                                                 out.write(("<tr><td align=\"center\">" +
                                                        "<a href=\"" + trustedURL + "\">" +
                                                        "<img src=\"" +
