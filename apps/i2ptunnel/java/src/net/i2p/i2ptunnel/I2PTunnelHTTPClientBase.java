@@ -821,11 +821,12 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private static String getFooter() {
         // The css is hiding this div for now, but we'll keep it here anyway
         // Tag the strings below for translation if we unhide it.
-        StringBuilder buf = new StringBuilder(128);
-        buf.append("<div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ")
-           .append(new Date().toString())
-           .append("</i></div>\n</body>\n</html>\n");
-        return buf.toString();
+        //StringBuilder buf = new StringBuilder(128);
+        //buf.append("<div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ")
+        //   .append(new Date().toString())
+        //   .append("</i></div>\n</body>\n</html>\n");
+        //return buf.toString();
+        return "</body>\n</html>\n";
     }
 
     /**
