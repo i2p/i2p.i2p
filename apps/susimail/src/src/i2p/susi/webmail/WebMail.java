@@ -628,7 +628,11 @@ public class WebMail extends HttpServlet
 						type.equals("application/x-tar") || type.equals("application/x-bzip2") ||
 						type.equals("application/pdf") || type.equals("application/x-bittorrent") ||
 						type.equals("application/pgp-encrypted") ||
-						type.equals("application/pgp-signature"))) {
+						type.equals("application/pgp-signature") ||
+						(type.equals("application/octet-stream") &&
+						 ((mailPart.filename != null && mailPart.filename.endsWith(".asc")) ||
+						  (mailPart.name != null && mailPart.name.endsWith(".asc"))))
+						                   )) {
 						out.println( "<a href=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
 							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) + "\">" +
