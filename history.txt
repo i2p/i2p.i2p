@@ -1,3 +1,7 @@
+2018-04-27 zzz
+  * Tunnels: Fix and consolidate allow-zero-hop logic,
+    prevent zero-hop client tunnels when no active peers
+
 2018-04-24 meeh
   * Mac OS X launcher is still WIP, but:
     - Building the I2P.app bundle is mostly done
@@ -5,6 +9,10 @@
       - It copies jar and war files to the bundle
   * Added new entries to mtn-ignore so we avoid any PEBCAK with commiting build directories
   * Added an SBT AutoPlugin named IconHelper to generate valid ICNS images for Mac OS X
+
+2018-04-23 zzz
+ * Clock: Fix early NPE via DoH
+ * EepGet: Handle HTTP response line with no status text
 
 2018-04-23 meeh
   * Added launchers for Browser Bundle and Mac OS X

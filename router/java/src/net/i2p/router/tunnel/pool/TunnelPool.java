@@ -176,8 +176,7 @@ public class TunnelPool {
     TunnelInfo selectTunnel() { return selectTunnel(true); }
 
     private TunnelInfo selectTunnel(boolean allowRecurseOnFail) {
-        boolean avoidZeroHop = getSettings().getLength() > 0 &&
-                               getSettings().getLength() + getSettings().getLengthVariance() > 0;
+        boolean avoidZeroHop = !_settings.getAllowZeroHop();
         
         long period = curPeriod();
         synchronized (_tunnels) {
@@ -243,7 +242,7 @@ public class TunnelPool {
             }
         }
         
-        if (_alive && _settings.getAllowZeroHop())
+        if (_alive && !avoidZeroHop)
             buildFallback();
         if (allowRecurseOnFail)
             return selectTunnel(false); 
@@ -264,8 +263,7 @@ public class TunnelPool {
      * @since 0.8.10
      */
     TunnelInfo selectTunnel(Hash closestTo) {
-        boolean avoidZeroHop = getSettings().getLength() > 0 &&
-                               getSettings().getLength() + getSettings().getLengthVariance() > 0;
+        boolean avoidZeroHop = !_settings.getAllowZeroHop();
         TunnelInfo rv = null;
         synchronized (_tunnels) {
             if (!_tunnels.isEmpty()) {
@@ -659,13 +657,6 @@ public class TunnelPool {
             return false;
 
         if (_settings.getAllowZeroHop()) {
-            if ( (_settings.getLength() + _settings.getLengthVariance() > 0) && 
-                 (!_settings.isExploratory()) &&
-                 (_context.profileOrganizer().countActivePeers() > 0) ) {
-                // if it is a client tunnel pool and our variance doesn't allow 0 hop, prefer failure to
-                // 0 hop operation (unless our router is offline)
-                return false;
-            }
             if (_log.shouldLog(Log.INFO))
                 _log.info(toString() + ": building a fallback tunnel (usable: " + usable + " needed: " + quantity + ")");
             
@@ -847,7 +838,7 @@ public class TunnelPool {
         }
         int wanted = getAdjustedTotalQuantity();
         
-        boolean allowZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) <= 0);
+        boolean allowZeroHop = _settings.getAllowZeroHop();
           
         /**
          * This algorithm builds based on the previous average length of time it takes
