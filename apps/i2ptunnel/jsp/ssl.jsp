@@ -100,6 +100,111 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     if (name == null || name.equals(""))
         name = editBean.getTunnelName(curTunnel);
     if (!"new".equals(tunnelType)) {
+        // POST handling
+        String action = request.getParameter("action");
+        if (action != null) {
+            String nonce = request.getParameter("nonce");
+            String newpw = request.getParameter("nofilter_keyPassword");
+            String appNum = request.getParameter("clientAppNumber");
+            String ksPath = request.getParameter("nofilter_ksPath");
+            String jettySSLConfigPath = request.getParameter("nofilter_jettySSLFile");
+            if (newpw != null) {
+                newpw = newpw.trim();
+                if (newpw.length() <= 0)
+                    newpw = null;
+            }
+            if (!editBean.haveNonce(nonce)) {
+                out.println(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
+                            + ' ' +
+                            intl._t("If the problem persists, verify that you have cookies enabled in your browser."));
+            } else if (!action.equals("Generate")) {
+                out.println("Unknown form action");
+            } else if (newpw == null) {
+                out.println("Password required");
+            } else if (appNum == null || ksPath == null || jettySSLConfigPath == null) {
+                out.println("Missing parameters");
+            } else if (b32.length() <= 0) {
+                out.println("No destination set - start tunnel first");
+            } else if (name == null || !name.endsWith(".i2p")) {
+                out.println("No hostname set - go back and configure");
+            } else {
+                boolean ok = true;
+
+                // generate selfsigned cert
+                java.util.Set<String> altNames = new java.util.HashSet<String>(4);
+                altNames.add(b32);
+                altNames.add(name);
+                if (!name.startsWith("www."))
+                    altNames.add("www." + name);
+                if (altb32 != null && altb32.length() > 0)
+                    altNames.add(altb32);
+                File ks = new File(ksPath);
+                ok = net.i2p.crypto.KeyStoreUtil.createKeys(ks, "eepsite", name, altNames, b32, newpw);
+                if (ok) {
+                     out.println("Created selfsigned cert");
+                }
+
+                // rewrite jetty-ssl.xml
+                if (ok) {
+                    String obf = org.eclipse.jetty.util.security.Password.obfuscate(newpw);
+                    File f = new File(jettySSLConfigPath);
+                    try {
+                        org.eclipse.jetty.xml.XmlParser.Node root;
+                        root = net.i2p.jetty.JettyXmlConfigurationParser.parse(f);
+                        //JettyXmlConfigurationParser.setValue(root, "KeyStorePassword", ...);
+                        JettyXmlConfigurationParser.setValue(root, "KeyManagerPassword", obf);
+                        JettyXmlConfigurationParser.setValue(root, "TrustStorePassword", obf);
+                        File fb = new File(jettySSLConfigPath + ".bkup");
+                        if (fb.exists())
+                            fb = new File(jettySSLConfigPath + '-' + System.currentTimeMillis() + ".bkup");
+                        ok = net.i2p.util.FileUtil.copy(f, fb, false, true);
+                        if (ok) {
+                            java.io.Writer w = null;
+                            try {
+                                w = new java.io.OutputStreamWriter(new net.i2p.util.SecureFileOutputStream(f), "UTF-8");
+                                w.write(root.toString());
+                            } catch (java.io.IOException ioe) {
+                                ioe.printStackTrace();
+                                ok = false;
+                            } finally {
+                                if (w != null) try { w.close(); } catch (java.io.IOException ioe2) {}
+                            }
+                        }
+                    } catch (org.xml.sax.SAXException saxe) {
+                        saxe.printStackTrace();
+                        out.println(DataHelper.escapeHTML(saxe.getMessage()));
+                        ok = false;
+                    }
+                }
+
+                // rewrite clients.config
+                boolean isSSLEnabled = Boolean.parseBoolean(request.getParameter("isSSLEnabled"));
+                if (ok && !isSSLEnabled) {
+                }
+
+                // stop and restart jetty
+
+                // stop tunnel
+                if (ok) {
+
+                }
+
+                // rewrite i2ptunnel.config
+                if (ok) {
+
+                }
+
+                // restart tunnel
+                if (ok) {
+
+                }
+
+                if (ok) {
+                    out.println(intl. _t("Configuration changes saved"));
+                }
+            }
+        }
+
 %>
 
 <form method="post" action="ssl" accept-charset="UTF-8">
@@ -374,6 +479,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 }  // isPWDefault
 %>
 <tr><td colspan="7"><b><%=intl._t("Password")%>:</b>
+<input type="hidden" name="clientAppNumber" value="<%=i%>" />
+<input type="hidden" name="isSSLEnabled" value="<%=isEnabled%>" />
+<input type="hidden" name="nofilter_ksPath" value="<%=ksPath%>" />
+<input type="hidden" name="nofilter_jettySSLFile" value="<%=jettySSLFile%>" />
 <input type="password" name="nofilter_keyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
 </td></tr>
 <tr><td class="buttons" colspan="7">

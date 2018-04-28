@@ -134,8 +134,11 @@ public class IndexBean {
         }
     }
 
-    /** do we know this nonce? @since 0.8.1 */
-    private static boolean haveNonce(String nonce) {
+    /**
+      * do we know this nonce?
+      * @since 0.8.1 public since 0.9.35
+      */
+    public static boolean haveNonce(String nonce) {
         synchronized (_nonces) {
             return _nonces.contains(nonce);
         }

@@ -120,6 +120,12 @@ public class JettyXmlConfigurationParser
                 if (aname != null && aname.toLowerCase(Locale.US).equals(nameLC)) {
                     // Node doesn't support set() or remove() but it does have clear()
                     n.clear();
+                    // work around bug in XmlParser.Node.add(int, Object)
+                    // where it will AIOOBE when calling add(String) after clear() after add(String)
+                    // because the _lastString field isn't reset to false
+                    // so we need to add a non-String object and then clear again.
+                    n.add(Integer.valueOf(0));
+                    n.clear();
                     n.add(value);
                     return true;
                 }
