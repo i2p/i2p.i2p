@@ -99,16 +99,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
     if (name == null || name.equals(""))
         name = editBean.getTunnelName(curTunnel);
-%>
-                <input type="hidden" name="tunnel" value="<%=curTunnel%>" />
-                <input type="hidden" name="nonce" value="<%=net.i2p.i2ptunnel.web.IndexBean.getNextNonce()%>" />
-                <input type="hidden" name="type" value="<%=tunnelType%>" />
-                <input type="submit" class="default" name="action" value="Save changes" />
-<%
     if (!"new".equals(tunnelType)) {
 %>
 
-<form method="post" action="ssl?tunnel=<%=curTunnel%>" accept-charset="UTF-8">
+<form method="post" action="ssl" accept-charset="UTF-8">
+<input type="hidden" name="tunnel" value="<%=curTunnel%>" />
+<input type="hidden" name="nonce" value="<%=net.i2p.i2ptunnel.web.IndexBean.getNextNonce()%>" />
+<input type="hidden" name="type" value="<%=tunnelType%>" />
+<input type="submit" class="default" name="action" value="Save changes" />
 <table>
 <tr><td colspan="4" class="infohelp"><%=intl._t("Experts only!")%> Beta!</td></tr>
 <tr><td colspan="4"><b><%=intl._t("Tunnel name")%>:</b> <%=editBean.getTunnelName(curTunnel)%></td></tr>
@@ -374,6 +372,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <tr><td colspan="7">Jetty SSL cert passwords are not the default</td></tr>
 <%
                 }  // isPWDefault
+%>
+<tr><td colspan="7"><b><%=intl._t("Password")%>:</b>
+<input type="password" name="nofilter_keyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
+</td></tr>
+<tr><td class="buttons" colspan="7">
+<button id="controlSave" class="control" type="submit" name="action" value="Generate"><%=intl._t("Generate certificate")%></button>
+</td></tr>
+<%
             }  // canConfigure
         }  // for client
     } catch (java.io.IOException ioe) { ioe.printStackTrace(); }
