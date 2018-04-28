@@ -396,7 +396,6 @@
                 <pathelement location="../../jetty/jettylib/tomcat-util.jar" />
                 <pathelement location="../../jetty/jettylib/tomcat-util-scan.jar" />
 
-                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
@@ -435,7 +434,6 @@
                 <pathelement location="../../jetty/jettylib/tomcat-util.jar" />
                 <pathelement location="../../jetty/jettylib/tomcat-util-scan.jar" />
 
-                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
