@@ -214,7 +214,7 @@ public class I2PDefaultServlet extends DefaultServlet
         
         String encodedBase = hrefEncodeURI(base);
         
-        DateFormat dfmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
+        DateFormat dfmt = new SimpleDateFormat(FORMAT, Locale.UK);
         TimeZone utc = TimeZone.getTimeZone("GMT");
         dfmt.setTimeZone(utc);
         for (int i=0 ; i< ls.length ; i++)
