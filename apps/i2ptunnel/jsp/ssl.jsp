@@ -146,7 +146,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
                 // rewrite jetty-ssl.xml
                 if (ok) {
-                    String obf = org.eclipse.jetty.util.security.Password.obfuscate(newpw);
+                    String obf = JettyXmlConfigurationParser.obfuscate(newpw);
                     File f = new File(jettySSLConfigPath);
                     try {
                         org.eclipse.jetty.xml.XmlParser.Node root;
@@ -162,7 +162,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                             java.io.Writer w = null;
                             try {
                                 w = new java.io.OutputStreamWriter(new net.i2p.util.SecureFileOutputStream(f), "UTF-8");
-                                w.write(root.toString());
+                                w.write("<!-- Modified by SSL Wizard -->\n");
+                                JettyXmlConfigurationParser.write(root, w);
+                                out.println("Jetty configuration updated");
                             } catch (java.io.IOException ioe) {
                                 ioe.printStackTrace();
                                 ok = false;
@@ -180,6 +182,24 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 // rewrite clients.config
                 boolean isSSLEnabled = Boolean.parseBoolean(request.getParameter("isSSLEnabled"));
                 if (ok && !isSSLEnabled) {
+                    File f = new File(ctx.getConfigDir(), "clients.config");
+                    java.util.Properties p = new net.i2p.util.OrderedProperties();
+                    try {
+                        DataHelper.loadProps(p, f);
+                        String k = "clientApp." + appNum + ".args";
+                        String v = p.getProperty(k);
+                        if (v == null) {
+                            ok = false;
+                        } else {
+                            v += " \"" + jettySSLConfigPath + '"';
+                            p.setProperty(k, v);
+                            DataHelper.storeProps(p, f);
+                            out.println("Jetty SSL enabled");
+                        }
+                    } catch (java.io.IOException ioe) {
+                        ioe.printStackTrace();
+                        ok = false;
+                    }
                 }
 
                 // stop and restart jetty
@@ -367,7 +387,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     jettyFile = new File(arg);
                     if (!jettyFile.isAbsolute())
                         jettyFile = new File(ctx.getConfigDir(), arg);
-                    jettySSLFileInArgs = true;
                 } else if (arg.endsWith("jetty-ssl.xml")) {
                     jettySSLFile = new File(arg);
                     if (!jettySSLFile.isAbsolute())

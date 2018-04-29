@@ -20,12 +20,15 @@ package net.i2p.jetty;
 
 import java.io.IOException;
 import java.io.File;
+import java.io.Writer;
 import java.net.URL;
 import java.util.Locale;
 
 import org.eclipse.jetty.util.Loader;
+import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.eclipse.jetty.xml.XmlParser;
+import org.eclipse.jetty.xml.XmlParser.Attribute;
 import org.eclipse.jetty.xml.XmlParser.Node;
 import org.xml.sax.SAXException;
 
@@ -136,5 +139,56 @@ public class JettyXmlConfigurationParser
             }
         }
         return false;
+    }
+
+    /**
+     *  Write out the XML.
+     *  Adapted from Node.toString().
+     *  That synchronized method caused classpath issues when called from the webapp.
+     *  Also add newlines here for readability.
+     */
+    public static void write(Node node, Writer out) throws IOException {
+        out.write('<');
+        String tag = node.getTag();
+        out.write(tag);
+
+        Attribute[] attrs = node.getAttributes();
+        if (attrs != null) {
+            for (int i = 0; i < attrs.length; i++) {
+                out.write(' ');
+                out.write(attrs[i].getName());
+                out.write("=\"");
+                out.write(attrs[i].getValue());
+                out.write('"');
+            }
+        }
+
+        int size = node.size();
+        if (size > 0) {
+            out.write(">");
+            for (int i = 0; i < size; i++) {
+                Object o = node.get(i);
+                if (o == null)
+                    continue;
+                if (o instanceof Node) {
+                    write((Node) o, out);
+                } else {
+                    out.write(o.toString());
+                }
+            }
+            out.write("</");
+            out.write(tag);
+            out.write(">\n");
+        } else {
+            out.write("/>\n");
+        }
+    }
+
+    /**
+     *  Obfuscate a password for storage in the XML
+     *  @return a string starting with "OBF:"
+     */
+    public static String obfuscate(String s) {
+        return Password.obfuscate(s);
     }
 }
