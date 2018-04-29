@@ -189,6 +189,18 @@ public class JettyXmlConfigurationParser
      *  @return a string starting with "OBF:"
      */
     public static String obfuscate(String s) {
+        if (s.startsWith("OBF:"))
+            return s;
         return Password.obfuscate(s);
+    }
+
+    /**
+     *  De-Obfuscate a password from the XML
+     *  @param s a string starting with "OBF:"
+     */
+    public static String deobfuscate(String s) {
+        if (!s.startsWith("OBF:"))
+            return s;
+        return Password.deobfuscate(s);
     }
 }

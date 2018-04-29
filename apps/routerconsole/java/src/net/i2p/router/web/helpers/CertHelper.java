@@ -22,7 +22,7 @@ public class CertHelper extends HelperBase {
     private static final String CONSOLE = "console/console.local.crt";
     private static final String I2PTUNNEL_DIR = "i2ptunnel";
     private static final String SAM_DIR = "sam";
-    private static final String EEPSITE = "eepsite/etc/keystore.ks";
+    private static final String EEPSITE_DIR = "eepsite";
 
     public String getSummary() {
         File dir = new File(_context.getConfigDir(), DIR);
@@ -31,9 +31,9 @@ public class CertHelper extends HelperBase {
             _out.write(_t("Local SSL Certificates"));
             _out.write("</h3>\n");
             // console
-            output("Console", new File(dir, CONSOLE));
+            output(_t("Router Console"), new File(dir, CONSOLE));
             // I2CP
-            output("I2CP", new File(dir, I2CP));
+            output(_t("I2CP"), new File(dir, I2CP));
 
             // i2ptunnel clients
             File tunnelDir = new File(_context.getConfigDir(), I2PTUNNEL_DIR);
@@ -58,12 +58,27 @@ public class CertHelper extends HelperBase {
             if (tunnels != null) {
                 for (int i = 0; i < tunnels.length; i++) {
                     File f = tunnels[i];
-                    output("SAM", f);
+                    output(_t("SAM"), f);
                     hasTunnels = true;
                 }
             }
             if (!hasTunnels)
                 output(_t("SAM"), null);
+
+            // Eepsite
+            tunnelDir = new File(dir, EEPSITE_DIR);
+            hasTunnels = false;
+            tunnels = tunnelDir.listFiles(new FileSuffixFilter(".crt"));
+            if (tunnels != null) {
+                for (int i = 0; i < tunnels.length; i++) {
+                    File f = tunnels[i];
+                    String name = f.getName();
+                    output(_t("Website") + ' ' + name.substring(0, name.length() - 4), f);
+                    hasTunnels = true;
+                }
+            }
+            if (!hasTunnels)
+                output(_t("Website"), null);
 
             // Family
             _out.write("<h3>");
@@ -74,19 +89,6 @@ public class CertHelper extends HelperBase {
                 File f = new File(dir, "family");
                 f = new File(f, family + ".crt");
                 output(_t("Family") + ": " + DataHelper.escapeHTML(family), f);
-            } else {
-                _out.write("<p>");
-                _out.write(_t("none"));
-                _out.write("</p>\n");
-            }
-
-            // Eepsite
-            _out.write("<h3>");
-            _out.write(_t("Website"));
-            _out.write("</h3>\n");
-            File ks = new File(_context.getConfigDir(), EEPSITE);
-            if (ks.exists()) {
-                // TODO
             } else {
                 _out.write("<p>");
                 _out.write(_t("none"));

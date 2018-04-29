@@ -9,7 +9,7 @@
     response.setHeader("Accept-Ranges", "none");
 
 %><%@page pageEncoding="UTF-8"
-%><%@page contentType="text/html" import="java.io.File,net.i2p.crypto.KeyStoreUtil,net.i2p.data.DataHelper,net.i2p.jetty.JettyXmlConfigurationParser"
+%><%@page contentType="text/html" import="java.io.File,java.io.IOException,net.i2p.crypto.KeyStoreUtil,net.i2p.data.DataHelper,net.i2p.jetty.JettyXmlConfigurationParser"
 %><%@page
 %><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -105,6 +105,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         if (action != null) {
             String nonce = request.getParameter("nonce");
             String newpw = request.getParameter("nofilter_keyPassword");
+            String kspw = request.getParameter("nofilter_obfKeyStorePassword");
             String appNum = request.getParameter("clientAppNumber");
             String ksPath = request.getParameter("nofilter_ksPath");
             String jettySSLConfigPath = request.getParameter("nofilter_jettySSLFile");
@@ -112,6 +113,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 newpw = newpw.trim();
                 if (newpw.length() <= 0)
                     newpw = null;
+            }
+            if (kspw != null) {
+                kspw = JettyXmlConfigurationParser.deobfuscate(kspw);
+            } else {
+                kspw = net.i2p.crypto.KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
             }
             if (!editBean.haveNonce(nonce)) {
                 out.println(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
@@ -139,19 +145,42 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 if (altb32 != null && altb32.length() > 0)
                     altNames.add(altb32);
                 File ks = new File(ksPath);
-                ok = net.i2p.crypto.KeyStoreUtil.createKeys(ks, "eepsite", name, altNames, b32, newpw);
-                if (ok) {
-                     out.println("Created selfsigned cert");
+                try {
+                    Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
+                                                                               3652, "EC", 256, newpw);
+                    out.println("Created selfsigned cert");
+                    // save cert
+                    java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) rv[2];
+                    File f = new net.i2p.util.SecureFile(ctx.getConfigDir(), "certificates");
+                    if (!f.exists())
+                        f.mkdir();
+                    f = new net.i2p.util.SecureFile(f, "eepsite");
+                    if (!f.exists())
+                        f.mkdir();
+                    f = new net.i2p.util.SecureFile(f, b32 + ".crt");
+                    if (f.exists()) {
+                        File fb = new File(f.getParentFile(), b32 + ".crt-" + System.currentTimeMillis() + ".bkup");
+                        net.i2p.util.FileUtil.copy(f, fb, false, true);
+                    }
+                    ok = net.i2p.crypto.CertUtil.saveCert(cert, f);
+                    out.println("selfsigned cert stored");
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                    ok = false;
+                } catch (java.security.GeneralSecurityException gse) {
+                    gse.printStackTrace();
+                    ok = false;
                 }
 
                 // rewrite jetty-ssl.xml
                 if (ok) {
                     String obf = JettyXmlConfigurationParser.obfuscate(newpw);
+                    String obfkspw = JettyXmlConfigurationParser.obfuscate(kspw);
                     File f = new File(jettySSLConfigPath);
                     try {
                         org.eclipse.jetty.xml.XmlParser.Node root;
-                        root = net.i2p.jetty.JettyXmlConfigurationParser.parse(f);
-                        //JettyXmlConfigurationParser.setValue(root, "KeyStorePassword", ...);
+                        root = JettyXmlConfigurationParser.parse(f);
+                        JettyXmlConfigurationParser.setValue(root, "KeyStorePassword", obfkspw);
                         JettyXmlConfigurationParser.setValue(root, "KeyManagerPassword", obf);
                         JettyXmlConfigurationParser.setValue(root, "TrustStorePassword", obf);
                         File fb = new File(jettySSLConfigPath + ".bkup");
@@ -165,11 +194,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                                 w.write("<!-- Modified by SSL Wizard -->\n");
                                 JettyXmlConfigurationParser.write(root, w);
                                 out.println("Jetty configuration updated");
-                            } catch (java.io.IOException ioe) {
+                            } catch (IOException ioe) {
                                 ioe.printStackTrace();
                                 ok = false;
                             } finally {
-                                if (w != null) try { w.close(); } catch (java.io.IOException ioe2) {}
+                                if (w != null) try { w.close(); } catch (IOException ioe2) {}
                             }
                         }
                     } catch (org.xml.sax.SAXException saxe) {
@@ -196,7 +225,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                             DataHelper.storeProps(p, f);
                             out.println("Jetty SSL enabled");
                         }
-                    } catch (java.io.IOException ioe) {
+                    } catch (IOException ioe) {
                         ioe.printStackTrace();
                         ok = false;
                     }
@@ -410,7 +439,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             if (jettyFile != null && jettyFile.exists()) {
                 try {
                     org.eclipse.jetty.xml.XmlParser.Node root;
-                    root = net.i2p.jetty.JettyXmlConfigurationParser.parse(jettyFile);
+                    root = JettyXmlConfigurationParser.parse(jettyFile);
                     host = JettyXmlConfigurationParser.getValue(root, "host");
                     port = JettyXmlConfigurationParser.getValue(root, "port");
                 } catch (org.xml.sax.SAXException saxe) {
@@ -421,7 +450,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             if (jettySSLFile.exists()) {
                 try {
                     org.eclipse.jetty.xml.XmlParser.Node root;
-                    root = net.i2p.jetty.JettyXmlConfigurationParser.parse(jettySSLFile);
+                    root = JettyXmlConfigurationParser.parse(jettySSLFile);
                     ksPW = JettyXmlConfigurationParser.getValue(root, "KeyStorePassword");
                     kmPW = JettyXmlConfigurationParser.getValue(root, "KeyManagerPassword");
                     tsPW = JettyXmlConfigurationParser.getValue(root, "TrustStorePassword");
@@ -503,6 +532,15 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <input type="hidden" name="nofilter_ksPath" value="<%=ksPath%>" />
 <input type="hidden" name="nofilter_jettySSLFile" value="<%=jettySSLFile%>" />
 <input type="password" name="nofilter_keyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
+<%
+                if (ksPW != null) {
+                    if (!ksPW.startsWith("OBF:"))
+                        ksPW = JettyXmlConfigurationParser.obfuscate(ksPW);
+%>
+<input type="hidden" name="nofilter_obfKeyStorePassword" value="<%=ksPW%>" />
+<%
+                }
+%>
 </td></tr>
 <tr><td class="buttons" colspan="7">
 <button id="controlSave" class="control" type="submit" name="action" value="Generate"><%=intl._t("Generate certificate")%></button>
@@ -510,7 +548,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
             }  // canConfigure
         }  // for client
-    } catch (java.io.IOException ioe) { ioe.printStackTrace(); }
+    } catch (IOException ioe) { ioe.printStackTrace(); }
 %>
 <tr><td colspan="4">
   <div class="displayText" tabindex="0" title="<%=intl._t("yyy")%>"></div>
