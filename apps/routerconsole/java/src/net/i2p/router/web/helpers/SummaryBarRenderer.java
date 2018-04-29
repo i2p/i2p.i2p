@@ -214,7 +214,7 @@ class SummaryBarRenderer {
                    "<hr class=\"b\"><table id=\"sb_services\"><tr><td>");
 
         PortMapper pm = _context.portMapper();
-        if (pm.getPort(PortMapper.SVC_SUSIMAIL) > 0) {
+        if (pm.isRegistered(PortMapper.SVC_SUSIMAIL)) {
            buf.append("<a href=\"/webmail\" target=\"_top\" title=\"")
            .append(_t("Anonymous webmail client"))
            .append("\">")
@@ -222,7 +222,7 @@ class SummaryBarRenderer {
            .append("</a>\n");
         }
 
-        if (pm.getPort(PortMapper.SVC_I2PSNARK) > 0) {
+        if (pm.isRegistered(PortMapper.SVC_I2PSNARK)) {
            buf.append("<a href=\"/torrents\" target=\"_top\" title=\"")
            .append(_t("Built-in anonymous BitTorrent Client"))
            .append("\">")
@@ -269,7 +269,7 @@ class SummaryBarRenderer {
                    "<table id=\"sb_internals\"><tr><td>\n");
 
         PortMapper pm = _context.portMapper();
-        if (pm.getPort(PortMapper.SVC_SUSIDNS) > 0) {
+        if (pm.isRegistered(PortMapper.SVC_SUSIDNS)) {
            buf.append("<a href=\"/dns\" target=\"_top\" title=\"")
            .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
@@ -291,7 +291,7 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Help")))
            .append("</a>\n");
 
-        if (pm.getPort(PortMapper.SVC_I2PTUNNEL) > 0) {
+        if (pm.isRegistered(PortMapper.SVC_I2PTUNNEL)) {
            buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Local Tunnels"))
            .append("\">")

@@ -68,6 +68,11 @@
     </servlet-mapping>
 
     <servlet-mapping>
+        <servlet-name>net.i2p.i2ptunnel.jsp.ssl_jsp</servlet-name>
+        <url-pattern>/ssl</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
       <servlet-name>net.i2p.servlet.ErrorServlet</servlet-name>
       <url-pattern>/error</url-pattern>
     </servlet-mapping>

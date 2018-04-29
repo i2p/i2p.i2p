@@ -208,13 +208,13 @@ public class HomeHelper extends HelperBase {
                 url = app.url;
                 // check for disabled webapps and other things
                 if (url.equals("/dns")) {
-                    if (pm.getPort("susidns") <= 0)
+                    if (!pm.isRegistered("susidns"))
                         continue;
                 } else if (url.equals("/webmail")) {
-                    if (pm.getPort("susimail") <= 0)
+                    if (!pm.isRegistered("susimail"))
                         continue;
                 } else if (url.equals("/torrents")) {
-                    if (pm.getPort("i2psnark") <= 0)
+                    if (!pm.isRegistered("i2psnark"))
                         continue;
                 } else if (url.equals("/configplugins")) {
                     if (!PluginStarter.pluginsEnabled(_context))

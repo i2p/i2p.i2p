@@ -149,6 +149,15 @@ public class ErrorServlet extends HttpServlet {
         out.println("</div></body></html>");
         out.close();
     }
+    
+    /**
+     *  Needed if the errored page was a POST
+     *  @since 0.9.35
+     */
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
 
     /**
      *  Override for specific cases.

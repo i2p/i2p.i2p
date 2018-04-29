@@ -228,7 +228,7 @@
          was set individually in wrapper.config, we rename and combine the jars as follows:
          jasper.jar : jasper-runtime.jar
          jasper-el.jar + el-api.jar : commons-el.jar
-         tomcat-juli.jar : Add to commons-logging.jar
+         tomcat-juli.jar : Add to jasper-runtime.jar
          empty jar : jasper-compiler.jar
          Also, take NOTICE and LICENSE out of each one, we bundle those separately.
 
@@ -340,7 +340,6 @@
             destdir="./build/obj" >
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
-                <pathelement location="./jettylib/commons-logging.jar" />
                 <pathelement location="./jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="./jettylib/javax.servlet.jar" />
                 <pathelement location="./jettylib/jetty-http.jar" />
@@ -361,7 +360,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../core/java/build/i2p.jar:./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-security.jar:./jettylib/jetty-servlet.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar" >
+            classpath="../../core/java/build/i2p.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-security.jar:./jettylib/jetty-servlet.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>

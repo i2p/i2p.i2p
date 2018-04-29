@@ -56,7 +56,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../../core/java/build/i2p.jar:build/i2ptunnel.jar:../../jetty/jettylib/jetty-i2p.jar:../../jetty/jettylib/jetty-xml.jar" >
+            classpath="../../../core/java/build/i2p.jar:build/i2ptunnel.jar:../../jetty/jettylib/jetty-i2p.jar:../../jetty/jettylib/jetty-util.jar:../../jetty/jettylib/jetty-xml.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -318,7 +318,6 @@
                 <pathelement location="../../jetty/jettylib/tomcat-util-scan.jar" />
 
                 <pathelement location="../../jetty/jettylib/jasper-el.jar" />
-                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
@@ -353,8 +352,8 @@
                 <pathelement location="../../jetty/jettylib/tomcat-util.jar" />
                 <pathelement location="../../jetty/jettylib/tomcat-util-scan.jar" />
 
-                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />

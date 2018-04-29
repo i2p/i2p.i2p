@@ -577,7 +577,7 @@ public class ConfigClientsHandler extends FormHandler {
         boolean rv = !
             (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
              proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
-             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0);
+             !_context.portMapper().isRegistered(PortMapper.SVC_HTTP_PROXY));
         if (!rv)
             addFormError(_t("HTTP client proxy tunnel must be running"));
         return rv;

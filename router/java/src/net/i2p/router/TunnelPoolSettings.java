@@ -79,7 +79,7 @@ public class TunnelPoolSettings {
     private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = 0;
     //private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = isSlow ? 0 : 1;
 
-    public static final boolean DEFAULT_ALLOW_ZERO_HOP = true;
+    public static final boolean DEFAULT_ALLOW_ZERO_HOP = false;
     public static final int     DEFAULT_IP_RESTRICTION = 2;    // class B (/16)
     private static final int MIN_PRIORITY = -25;
     private static final int MAX_PRIORITY = 25;
@@ -161,16 +161,29 @@ public class TunnelPoolSettings {
     
     /**
      * If there are no tunnels to build with, will this pool allow 0 hop tunnels?
+     *
      * Always true for exploratory.
-     * Generally true for client, but should probably be ignored...
-     * use getLength() + getLengthVariance() &gt; 0 instead.
+     * Prior to 0.9.35, generally true for client.
+     * As of 0.9.35, generally false for client, but true if
+     * getLength() + Math.min(getLengthVariance(), 0) &lt;= 0,
+     * OR if getLengthOverride() == 0
+     * OR if setAllowZeroHop(true) was called or set in properties.
      */
-    public boolean getAllowZeroHop() { return _allowZeroHop; }
+    public boolean getAllowZeroHop() {
+        return _allowZeroHop ||
+               _length + Math.min(_lengthVariance, 0) <= 0 ||
+               _lengthOverride == 0;
+    }
 
     /**
      * If there are no tunnels to build with, will this pool allow 0 hop tunnels?
      * No effect on exploratory (always true)
+     *
+     * @param ok if true, getAllowZeroHop() will always return true
+     *           if false, getAllowZeroHop will return as documented.
+     * @deprecated unused
      */
+    @Deprecated
     public void setAllowZeroHop(boolean ok) {
         if (!_isExploratory)
             _allowZeroHop = ok;

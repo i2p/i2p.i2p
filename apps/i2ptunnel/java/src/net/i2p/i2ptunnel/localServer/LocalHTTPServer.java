@@ -217,7 +217,7 @@ public abstract class LocalHTTPServer {
                   "<div class=logo>\n" +
                   "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
                   "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a>").getBytes("UTF-8"));
-        if (pm.getPort(PortMapper.SVC_SUSIDNS) > 0)
+        if (pm.isRegistered(PortMapper.SVC_SUSIDNS))
             out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Addressbook") + "</a>\n").getBytes("UTF-8"));
         out.write(("</div>" +
                   "<div class=warning id=warning>\n" +

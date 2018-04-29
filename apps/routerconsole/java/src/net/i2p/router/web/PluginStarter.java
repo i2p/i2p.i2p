@@ -172,7 +172,7 @@ public class PluginStarter implements Runnable {
         int proxyPort = ConfigUpdateHandler.proxyPort(ctx);
         if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
             proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
-            ctx.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+            !ctx.portMapper().isRegistered(PortMapper.SVC_HTTP_PROXY)) {
             mgr.notifyComplete(null, Messages.getString("Plugin update check failed", ctx) +
                                      " - " +
                                      Messages.getString("HTTP client proxy tunnel must be running", ctx));

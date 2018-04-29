@@ -438,6 +438,6 @@ public class NamingServiceBean extends AddressbookBean
 	 *  @since 0.9.34
 	 */
 	public boolean haveImagegen() {
-		return _context.portMapper().getPort("imagegen") > 0;
+		return _context.portMapper().isRegistered("imagegen");
 	}
 }

@@ -28,7 +28,6 @@
 		<pathelement location="lib/jstl.jar" />
 		<pathelement location="lib/standard.jar" />
 		<pathelement location="${lib}/jasper-runtime.jar" />
-		<pathelement location="${lib}/commons-logging.jar" />
 		<pathelement location="${lib}/jetty-util.jar" />
 		<pathelement location="${ant.home}/lib/ant.jar" />
 		<pathelement location="../../../core/java/build/i2p.jar" />
