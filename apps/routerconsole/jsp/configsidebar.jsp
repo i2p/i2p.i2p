@@ -30,9 +30,9 @@ input.default {
 <jsp:setProperty name="summaryhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h3 class="tabletitle"><%=intl._t("Refresh Interval")%></h3>
+<form action="" method="POST">
 <table class="configtable">
  <tr>
-<form action="" method="POST">
   <td>
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="0">
@@ -42,9 +42,9 @@ input.default {
   <td class="optionsave">
  <input type="submit" name="action" class="accept" value="<%=intl._t("Save")%>" >
   </td>
-</form>
  </tr>
 </table>
+</form>
 
 <h3 class="tabletitle"><%=intl._t("Customize Summary Bar")%></h3>
 <form action="" method="POST">

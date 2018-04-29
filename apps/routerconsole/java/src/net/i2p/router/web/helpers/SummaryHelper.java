@@ -1006,6 +1006,8 @@ public class SummaryHelper extends HelperBase {
             if (config == null)
                 config = _context.getProperty(PROP_SUMMARYBAR + "default", isAdvanced() ? DEFAULT_FULL_ADVANCED : DEFAULT_FULL);
         }
+        if (config.length() <= 0)
+            return Collections.emptyList();
         return Arrays.asList(DataHelper.split(config, SS));
     }
 
@@ -1081,14 +1083,17 @@ public class SummaryHelper extends HelperBase {
            .append("</th></tr>\n");
         for (String section : sections) {
             int i = sections.indexOf(section);
+            String name = sectionNames.get(section);
+            if (name == null)
+                continue;
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" id=\"")
-               .append(sectionNames.get(section))
+               .append(name)
                .append("\" name=\"delete_")
                .append(i)
                .append("\"></td><td align=\"left\"><label for=\"")
-               .append(sectionNames.get(section))
+               .append(name)
                .append("\">")
-               .append(_t(sectionNames.get(section)))
+               .append(_t(name))
                .append("</label></td><td align=\"right\"><input type=\"hidden\" name=\"order_")
                .append(i).append('_').append(section)
                .append("\" value=\"")
@@ -1151,8 +1156,11 @@ public class SummaryHelper extends HelperBase {
            .append("</option>\n");
 
         for (String s : sortedSections) {
+            String name = sectionNames.get(s);
+            if (name == null)
+                continue;
             buf.append("<option value=\"").append(s).append("\">")
-               .append(sectionNames.get(s)).append("</option>\n");
+               .append(name).append("</option>\n");
         }
 
         buf.append("</select>\n" +

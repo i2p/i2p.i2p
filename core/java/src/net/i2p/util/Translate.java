@@ -43,6 +43,10 @@ public abstract class Translate {
 
     /** lang in routerconsole.lang property, else current locale */
     public static String getString(String key, I2PAppContext ctx, String bun) {
+        if (key == null) {
+            (new NullPointerException("null translation string")).printStackTrace();
+            return "";
+        }
         String lang = getLanguage(ctx);
         if (lang.equals("en"))
             return key;

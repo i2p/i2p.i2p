@@ -1950,6 +1950,9 @@ public class DataHelper {
      *  Same as s.split(regex) but caches the compiled pattern for speed.
      *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
      *
+     *  Note: For an input "" this returns [""], not a zero-length array.
+     *  This is the same behavior as String.split().
+     *
      *  @param s non-null
      *  @param regex non-null, don't forget to enclose multiple choices with []
      *  @throws java.util.regex.PatternSyntaxException unchecked
@@ -1964,6 +1967,9 @@ public class DataHelper {
     /**
      *  Same as s.split(regex, limit) but caches the compiled pattern for speed.
      *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
+     *
+     *  Note: For an input "" this returns [""], not a zero-length array.
+     *  This is the same behavior as String.split().
      *
      *  @param s non-null
      *  @param regex non-null, don't forget to enclose multiple choices with []
