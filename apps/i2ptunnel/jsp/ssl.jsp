@@ -50,6 +50,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
   net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
   if (!ctx.isRouterContext()) {
       %>Unsupported in app context<%
+  } else if (curTunnel < 0) {
+      %>Tunnel not found<% 
+  } else if (editBean.isClient(curTunnel)) {
+      %>Not supported for client tunnels<%
   } else if (editBean.isInitialized()) {
 
 %>
@@ -58,15 +62,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     String tunnelTypeName;
     String tunnelType;
     boolean valid = false;
-    if (curTunnel >= 0) {
-        tunnelTypeName = editBean.getTunnelType(curTunnel);
-        tunnelType = editBean.getInternalType(curTunnel);
-      %><h2><%=intl._t("SSL Wizard")%> (<%=editBean.getTunnelName(curTunnel)%>)</h2><% 
-    } else {
-        tunnelTypeName = "new";
-        tunnelType = "new";
-      %><h2>Fail</h2><p>Tunnel not found</p><% 
-    }
+    tunnelTypeName = editBean.getTunnelType(curTunnel);
+    tunnelType = editBean.getInternalType(curTunnel);
+%><h2><%=intl._t("SSL Wizard")%> (<%=editBean.getTunnelName(curTunnel)%>)</h2><% 
 
     // set a bunch of variables for the current configuration
     String b64 = editBean.getDestinationBase64(curTunnel);
@@ -100,6 +98,41 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     if (name == null || name.equals(""))
         name = editBean.getTunnelName(curTunnel);
     if (!"new".equals(tunnelType)) {
+        // build tables for vhost and targets
+        java.util.TreeSet<Integer> ports = new java.util.TreeSet<Integer>();
+        java.util.Map<Integer, String> tgts = new java.util.HashMap<Integer, String>(4);
+        java.util.Map<Integer, String> spoofs = new java.util.HashMap<Integer, String>(4);
+        String custom = editBean.getCustomOptions(curTunnel);
+        String[] opts = DataHelper.split(custom, "[, ]");
+        for (int i = 0; i < opts.length; i++) {
+            String opt = opts[i];
+            boolean isTgt = false;
+            if (opt.startsWith("targetForPort.")) {
+                opt = opt.substring("targetForPort.".length());
+                isTgt = true;
+            } else if (opt.startsWith("spoofedHost.")) {
+                opt = opt.substring("spoofedHost.".length());
+            } else {
+                 continue;
+            }
+            int eq = opt.indexOf('=');
+            if (eq <= 0)
+                 continue;
+            int port;
+            try {
+                port = Integer.parseInt(opt.substring(0, eq));
+            } catch (NumberFormatException nfe) {
+                 continue;
+            }
+            String tgt = opt.substring(eq + 1);
+            Integer iport = Integer.valueOf(port);
+            ports.add(iport);
+            if (isTgt)
+                tgts.put(iport, tgt);
+            else
+                spoofs.put(iport, tgt);
+        }
+
         // POST handling
         String action = request.getParameter("action");
         if (action != null) {
@@ -109,6 +142,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             String appNum = request.getParameter("clientAppNumber");
             String ksPath = request.getParameter("nofilter_ksPath");
             String jettySSLConfigPath = request.getParameter("nofilter_jettySSLFile");
+            String host = request.getParameter("jettySSLHost");
+            String port = request.getParameter("jettySSLPort");
             if (newpw != null) {
                 newpw = newpw.trim();
                 if (newpw.length() <= 0)
@@ -119,7 +154,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             } else {
                 kspw = net.i2p.crypto.KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
             }
-            if (!editBean.haveNonce(nonce)) {
+            if (!net.i2p.i2ptunnel.web.IndexBean.haveNonce(nonce)) {
                 out.println(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                             + ' ' +
                             intl._t("If the problem persists, verify that you have cookies enabled in your browser."));
@@ -127,7 +162,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 out.println("Unknown form action");
             } else if (newpw == null) {
                 out.println("Password required");
-            } else if (appNum == null || ksPath == null || jettySSLConfigPath == null) {
+            } else if (appNum == null || ksPath == null || jettySSLConfigPath == null || host == null || port == null) {
                 out.println("Missing parameters");
             } else if (b32.length() <= 0) {
                 out.println("No destination set - start tunnel first");
@@ -144,6 +179,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     altNames.add("www." + name);
                 if (altb32 != null && altb32.length() > 0)
                     altNames.add(altb32);
+                altNames.addAll(spoofs.values());
                 File ks = new File(ksPath);
                 try {
                     Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
@@ -233,19 +269,76 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
                 // stop and restart jetty
 
-                // stop tunnel
-                if (ok) {
-
-                }
 
                 // rewrite i2ptunnel.config
-                if (ok) {
-
-                }
-
-                // restart tunnel
-                if (ok) {
-
+                Integer i443 = Integer.valueOf(443);
+                if (ok && !tgts.containsKey(i443)) {
+                    // update table for display
+                    tgts.put(i443, host + ':' + port);
+                    ports.add(i443);
+                    // add ssl config
+                    custom += " targetForPort.443=" + host + ':' + port;
+                    editBean.setNofilter_customOptions(custom);
+                    // copy over existing settings
+                    // we only set the applicable server settings
+                    editBean.setTunnel(tun);
+                    editBean.setType(tunnelType);
+                    editBean.setName(editBean.getTunnelName(curTunnel));
+                    editBean.setTargetHost(editBean.getTargetHost(curTunnel));
+                    editBean.setTargetPort(editBean.getTargetPort(curTunnel));
+                    editBean.setSpoofedHost(editBean.getSpoofedHost(curTunnel));
+                    editBean.setPrivKeyFile(editBean.getPrivateKeyFile(curTunnel));
+                    editBean.setAltPrivKeyFile(editBean.getAltPrivateKeyFile(curTunnel));
+                    editBean.setNofilter_description(editBean.getTunnelDescription(curTunnel));
+                    editBean.setTunnelDepth(Integer.toString(editBean.getTunnelDepth(curTunnel, 3)));
+                    editBean.setTunnelQuantity(Integer.toString(editBean.getTunnelQuantity(curTunnel, 2)));
+                    editBean.setTunnelBackupQuantity(Integer.toString(editBean.getTunnelBackupQuantity(curTunnel, 0)));
+                    editBean.setTunnelVariance(Integer.toString(editBean.getTunnelVariance(curTunnel, 0)));
+                    editBean.setTunnelDepthOut(Integer.toString(editBean.getTunnelDepthOut(curTunnel, 3)));
+                    editBean.setTunnelQuantityOut(Integer.toString(editBean.getTunnelQuantityOut(curTunnel, 2)));
+                    editBean.setTunnelBackupQuantityOut(Integer.toString(editBean.getTunnelBackupQuantityOut(curTunnel, 0)));
+                    editBean.setTunnelVarianceOut(Integer.toString(editBean.getTunnelVarianceOut(curTunnel, 0)));
+                    editBean.setReduceCount(Integer.toString(editBean.getReduceCount(curTunnel)));
+                    editBean.setReduceTime(Integer.toString(editBean.getReduceTime(curTunnel)));
+                    editBean.setCert(Integer.toString(editBean.getCert(curTunnel)));
+                    editBean.setLimitMinute(Integer.toString(editBean.getLimitMinute(curTunnel)));
+                    editBean.setLimitHour(Integer.toString(editBean.getLimitHour(curTunnel)));
+                    editBean.setLimitDay(Integer.toString(editBean.getLimitDay(curTunnel)));
+                    editBean.setTotalMinute(Integer.toString(editBean.getTotalMinute(curTunnel)));
+                    editBean.setTotalHour(Integer.toString(editBean.getTotalHour(curTunnel)));
+                    editBean.setTotalDay(Integer.toString(editBean.getTotalDay(curTunnel)));
+                    editBean.setMaxStreams(Integer.toString(editBean.getMaxStreams(curTunnel)));
+                    editBean.setPostMax(Integer.toString(editBean.getPostMax(curTunnel)));
+                    editBean.setPostTotalMax(Integer.toString(editBean.getPostTotalMax(curTunnel)));
+                    editBean.setPostCheckTime(Integer.toString(editBean.getPostCheckTime(curTunnel)));
+                    editBean.setPostBanTime(Integer.toString(editBean.getPostBanTime(curTunnel)));
+                    editBean.setPostTotalBanTime(Integer.toString(editBean.getPostTotalBanTime(curTunnel)));
+                    editBean.setUserAgents(editBean.getUserAgents(curTunnel));
+                    editBean.setEncryptKey(editBean.getEncryptKey(curTunnel));
+                    editBean.setAccessMode(editBean.getAccessMode(curTunnel));
+                    editBean.setAccessList(editBean.getAccessList(curTunnel));
+                    editBean.setKey1(editBean.getKey1(curTunnel));
+                    editBean.setKey2(editBean.getKey2(curTunnel));
+                    editBean.setKey3(editBean.getKey3(curTunnel));
+                    editBean.setKey4(editBean.getKey4(curTunnel));
+                    if (editBean.getMultihome(curTunnel))
+                        editBean.setMultihome("");
+                    if (editBean.getReduce(curTunnel))
+                        editBean.setReduce("");
+                    if (editBean.getEncrypt(curTunnel))
+                        editBean.setEncrypt("");
+                    if (editBean.getUniqueLocal(curTunnel))
+                        editBean.setUniqueLocal("");
+                    if (editBean.isRejectInproxy(curTunnel))
+                        editBean.setRejectInproxy("");
+                    if (editBean.isRejectReferer(curTunnel))
+                        editBean.setRejectReferer("");
+                    if (editBean.isRejectUserAgents(curTunnel))
+                        editBean.setRejectUserAgents("");
+                    editBean.setNonce(nonce);
+                    editBean.setAction("Save changes");
+                    String msg = editBean.getMessages();
+                    out.println(msg);
                 }
 
                 if (ok) {
@@ -293,40 +386,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <tr><th><%=intl._t("Route From I2P Port")%></th><th><%=intl._t("With Virtual Host")%></th><th><%=intl._t("Via SSL?")%></th><th><%=intl._t("To Server Host:Port")%></th></tr>
 <tr><td><%=intl._t("Default")%></td><td><%=name%></td><td><%=sslToTarget%></td><td><%=targetLink%></td></tr>
 <%
-    // build tables for vhost and targets
-    java.util.TreeSet<Integer> ports = new java.util.TreeSet<Integer>();
-    java.util.Map<Integer, String> tgts = new java.util.HashMap<Integer, String>(4);
-    java.util.Map<Integer, String> spoofs = new java.util.HashMap<Integer, String>(4);
-    String custom = editBean.getCustomOptions(curTunnel);
-    String[] opts = DataHelper.split(custom, "[, ]");
-    for (int i = 0; i < opts.length; i++) {
-        String opt = opts[i];
-        boolean isTgt = false;
-        if (opt.startsWith("targetForPort.")) {
-            opt = opt.substring("targetForPort.".length());
-            isTgt = true;
-        } else if (opt.startsWith("spoofedHost.")) {
-            opt = opt.substring("spoofedHost.".length());
-        } else {
-             continue;
-        }
-        int eq = opt.indexOf('=');
-        if (eq <= 0)
-             continue;
-        int port;
-        try {
-            port = Integer.parseInt(opt.substring(0, eq));
-        } catch (NumberFormatException nfe) {
-             continue;
-        }
-        String tgt = opt.substring(eq + 1);
-        Integer iport = Integer.valueOf(port);
-        ports.add(iport);
-        if (isTgt)
-            tgts.put(iport, tgt);
-        else
-            spoofs.put(iport, tgt);
-    }
     // output vhost and targets
     for (Integer port : ports) {
         boolean ssl = sslToTarget;
@@ -462,7 +521,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     // tsPW may be null
                     File ksFile = null;
                     boolean tsIsKs = true;
-                    boolean ksArgs = ksPW != null && kmPW != null && ksPath != null;
+                    boolean ksArgs = ksPW != null && kmPW != null && ksPath != null && sslHost != null && sslPort != null;
                     /** 2015+ installs */
                     final String DEFAULT_KSPW_1 = KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
                     final String DEFAULT_KMPW_1 = "myKeyPassword";
@@ -531,6 +590,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <input type="hidden" name="isSSLEnabled" value="<%=isEnabled%>" />
 <input type="hidden" name="nofilter_ksPath" value="<%=ksPath%>" />
 <input type="hidden" name="nofilter_jettySSLFile" value="<%=jettySSLFile%>" />
+<input type="hidden" name="jettySSLHost" value="<%=sslHost%>" />
+<input type="hidden" name="jettySSLPort" value="<%=sslPort%>" />
 <input type="password" name="nofilter_keyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
 <%
                 if (ksPW != null) {
