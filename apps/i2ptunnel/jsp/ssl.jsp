@@ -181,6 +181,16 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     altNames.add(altb32);
                 altNames.addAll(spoofs.values());
                 File ks = new File(ksPath);
+                if (ks.exists()) {
+                    // old ks if any must be moved or deleted, as any keys
+                    // under different alias for a different chain will confuse jetty
+                    File ksb = new File(ksPath + ".bkup");
+                    if (ksb.exists())
+                        ksb = new File(ksPath + '-' + System.currentTimeMillis() + ".bkup");
+                    boolean rok = net.i2p.util.FileUtil.rename(ks, ksb);
+                    if (!rok)
+                        ks.delete();
+                }
                 try {
                     Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
                                                                                3652, "EC", 256, newpw);
@@ -199,12 +209,17 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         net.i2p.util.FileUtil.copy(f, fb, false, true);
                     }
                     ok = net.i2p.crypto.CertUtil.saveCert(cert, f);
-                    out.println("selfsigned cert stored");
+                    if (ok)
+                        out.println("selfsigned cert stored");
+                    else
+                        out.println("selfsigned cert store failed");
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
+                    out.println("selfsigned cert store failed " + ioe);
                     ok = false;
                 } catch (java.security.GeneralSecurityException gse) {
                     gse.printStackTrace();
+                    out.println("selfsigned cert store failed " + gse);
                     ok = false;
                 }
 
@@ -216,9 +231,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     try {
                         org.eclipse.jetty.xml.XmlParser.Node root;
                         root = JettyXmlConfigurationParser.parse(f);
+                        JettyXmlConfigurationParser.setValue(root, "KeyStorePath", ksPath);
+                        JettyXmlConfigurationParser.setValue(root, "TrustStorePath", ksPath);
                         JettyXmlConfigurationParser.setValue(root, "KeyStorePassword", obfkspw);
+                        JettyXmlConfigurationParser.setValue(root, "TrustStorePassword", obfkspw);
                         JettyXmlConfigurationParser.setValue(root, "KeyManagerPassword", obf);
-                        JettyXmlConfigurationParser.setValue(root, "TrustStorePassword", obf);
                         File fb = new File(jettySSLConfigPath + ".bkup");
                         if (fb.exists())
                             fb = new File(jettySSLConfigPath + '-' + System.currentTimeMillis() + ".bkup");
@@ -227,7 +244,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                             java.io.Writer w = null;
                             try {
                                 w = new java.io.OutputStreamWriter(new net.i2p.util.SecureFileOutputStream(f), "UTF-8");
-                                w.write("<!-- Modified by SSL Wizard -->\n");
+                                w.write("<?xml version=\"1.0\"?>\n" +
+                                        "<!DOCTYPE Configure PUBLIC \"-//Jetty//Configure//EN\" \"http://www.eclipse.org/jetty/configure.dtd\">\n\n" +
+                                        "<!-- Modified by SSL Wizard -->\n\n");
                                 JettyXmlConfigurationParser.write(root, w);
                                 out.println("Jetty configuration updated");
                             } catch (IOException ioe) {
@@ -236,6 +255,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                             } finally {
                                 if (w != null) try { w.close(); } catch (IOException ioe2) {}
                             }
+                        } else {
+                            out.println("Jetty configuration backup failed");
                         }
                     } catch (org.xml.sax.SAXException saxe) {
                         saxe.printStackTrace();
