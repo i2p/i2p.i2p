@@ -18,6 +18,13 @@ import java.io.{File, InputStream}
   */
 object DeployProfile {
 
+
+  /**
+    * This function will find the executing jar. "myself"
+    * @return
+    */
+  def executingJarFile = getClass().getProtectionDomain().getCodeSource().getLocation()
+
   /**
     * This joins two paths in a cross platform way. Meaning it takes care of either we use
     * \\ or / as directory separator. It returns the resulting path in a string.

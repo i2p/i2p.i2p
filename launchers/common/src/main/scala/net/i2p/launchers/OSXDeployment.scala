@@ -76,11 +76,6 @@ class OSXDeployment extends
     OSXDefaults.getOSXBaseDirectory.getAbsolutePath
   ) {
 
-  /**
-    * This function will find the executing jar. "myself"
-    * @return
-    */
-  def executingJarFile = getClass().getProtectionDomain().getCodeSource().getLocation()
 
 
   /**
@@ -125,7 +120,7 @@ class OSXDeployment extends
     */
   def copyDirFromRes(dir: File): Unit = {
     // A small hack
-    val zipFile = new ZipFile(executingJarFile.getFile)
+    val zipFile = new ZipFile(DeployProfile.executingJarFile.getFile)
     zipFile.entries().asScala.toList.filter(_.toString.startsWith(dir.getPath)).filter(!_.isDirectory).map { entry =>
       new File(DeployProfile.pathJoin(baseDir,entry.getName)).getParentFile.mkdirs()
       if (entry.isDirectory) {
