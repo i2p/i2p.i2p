@@ -107,7 +107,14 @@ class OSXDeployment extends
       "revocations",
       "router",
       "ssl"
-    ),subDirectories=true)
+    ),subDirectories=true),
+    new FDObjDir("themes",List(
+      "console",
+      "imagegen",
+      "snark",
+      "susidns",
+      "susimail"
+    ),true)
   )
 
   /**
@@ -116,11 +123,16 @@ class OSXDeployment extends
     * @param dir
     * @return
     */
-  def copyDirFromRes(dir: File) = {
+  def copyDirFromRes(dir: File): Unit = {
     // A small hack
     val zipFile = new ZipFile(executingJarFile.getFile)
     zipFile.entries().asScala.toList.filter(_.toString.startsWith(dir.getPath)).filter(!_.isDirectory).map { entry =>
-      copyBaseFileResToDisk(entry.getName, getClass.getResourceAsStream("/".concat(entry.getName)))
+      new File(DeployProfile.pathJoin(baseDir,entry.getName)).getParentFile.mkdirs()
+      if (entry.isDirectory) {
+        createFileOrDirectory(new File(DeployProfile.pathJoin(baseDir,entry.getName)), true)
+      } else {
+        copyBaseFileResToDisk(entry.getName, getClass.getResourceAsStream("/".concat(entry.getName)))
+      }
     }
   }
 
@@ -132,19 +144,20 @@ class OSXDeployment extends
     * @param isDir
     * @return
     */
-  def createFileOrDirectory(file: File, isDir: Boolean = false) = {
+  def createFileOrDirectory(file: File, isDir: Boolean = false): Unit = {
     if (file != null) {
       println(s"createFileOrDirectory(${file},${isDir})")
       try {
+        // Make sure subject exists if directory
         if (!new File(DeployProfile.pathJoin(baseDir,file.getPath)).exists()) {
-          if (isDir) {
-            // Handle dir
-            new File(DeployProfile.pathJoin(baseDir,file.getPath)).mkdirs()
-            copyDirFromRes(file)
-          } else {
-            // Handle file
-            copyBaseFileResToDisk(file.getPath, getClass.getResourceAsStream("/".concat(file.getName)))
-          }
+          if (isDir) new File(DeployProfile.pathJoin(baseDir,file.getPath)).mkdirs()
+        }
+        if (isDir) {
+          // Handle dir
+          copyDirFromRes(file)
+        } else {
+          // Handle file
+          copyBaseFileResToDisk(file.getPath, getClass.getResourceAsStream("/".concat(file.getName)))
         }
       } catch {
         case ex:IOException => println(s"Error! Exception ${ex}")
