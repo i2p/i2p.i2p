@@ -1,6 +1,7 @@
 package net.i2p
 
 import net.i2p.router.Router
+import net.i2p.launchers.OSXDeployment
 import java.io.File
 
 /**
@@ -34,6 +35,8 @@ import java.io.File
 object MacOSXRouterLauncherApp extends App {
 
   val i2pBaseBundleDir = new File(new File("."), "../Resources/i2pbase")
+
+  new OSXDeployment()
 
   Router.main(args)
 }

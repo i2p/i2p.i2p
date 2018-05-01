@@ -2,6 +2,7 @@ package net.i2p
 
 import java.io.{File, InputStream}
 
+import net.i2p.launchers.DeployProfile
 import net.i2p.router.Router
 import org.json4s._
 import org.json4s.native.JsonMethods._

@@ -1,19 +1,9 @@
-package net.i2p
+package net.i2p.launchers
 
 import java.io.{File, InputStream}
-/**
-  *
-  * The purpose of this class is to copy files from the i2p "default config" directory
-  * and to a "current config" directory relative to the browser bundle.
-  *
-  * @author Meeh
-  * @version 0.0.1
-  * @since 0.9.35
-  */
-class DeployProfile(confDir: String, baseDir: String) {
-  import java.nio.file.{Paths, Files}
-  import java.nio.charset.StandardCharsets
 
+
+object DeployProfile {
 
   /**
     * This joins two paths in a cross platform way. Meaning it takes care of either we use
@@ -25,6 +15,21 @@ class DeployProfile(confDir: String, baseDir: String) {
     * @return String
     */
   def pathJoin(parent:String,child:String): String = new File(new File(parent), child).getPath
+}
+
+/**
+  *
+  * The purpose of this class is to copy files from the i2p "default config" directory
+  * and to a "current config" directory relative to the browser bundle - but this class is
+  * also used by the OSX launcher since it shares common properties like that the bundle has
+  * to be read only.
+  *
+  * @author Meeh
+  * @version 0.0.1
+  * @since 0.9.35
+  */
+class DeployProfile(val confDir: String, val baseDir: String) {
+  import java.nio.file.{Files, Paths}
 
   /**
     * This function copies resources from the fatjar to the config directory of i2p.
@@ -35,7 +40,21 @@ class DeployProfile(confDir: String, baseDir: String) {
     */
   def copyFileResToDisk(fStr: String) = Files.copy(
     getClass.getResource("/".concat(fStr)).getContent.asInstanceOf[InputStream],
-    Paths.get(pathJoin(confDir, fStr)).normalize()
+    Paths.get(DeployProfile.pathJoin(confDir, fStr)).normalize()
+  )
+
+
+  /**
+    * This function copies resources from the fatjar to the config directory of i2p.
+    *
+    * @since 0.9.35
+    * @param path
+    * @param is
+    * @return Unit
+    */
+  def copyBaseFileResToDisk(path: String, is: InputStream) = Files.copy(
+    is,
+    Paths.get(DeployProfile.pathJoin(baseDir, path)).normalize()
   )
 
   /**

@@ -57,6 +57,8 @@ launchers/macosx/project/target
 launchers/browserbundle/project/target
 launchers/target
 launchers/project/target
+launchers/common/target
+launchers/output
 
 # Reporting
 sloccount.sc

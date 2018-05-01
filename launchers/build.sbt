@@ -20,6 +20,11 @@ lazy val commonSettings = Seq(
   packageDescription := "Blabla"
 )
 
+lazy val common = (project in file("common"))
+  .settings(
+    commonSettings,
+    name         := "LauncherCommon"
+  )
 
 lazy val browserbundle = (project in file("browserbundle"))
   .settings(
@@ -27,7 +32,7 @@ lazy val browserbundle = (project in file("browserbundle"))
     name         := "RouterLaunchApp",
     assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
     mainClass in assembly := Some("net.i2p.RouterLauncherApp")
-  )
+  ).dependsOn(common)
 
 lazy val macosx = (project in file("macosx"))
   .settings(
@@ -35,11 +40,11 @@ lazy val macosx = (project in file("macosx"))
     name         := "MacI2PLauncher",
     assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
     mainClass in assembly := Some("net.i2p.MacOSXRouterLauncherApp")
-  )
+  ).dependsOn(common)
 
 
 lazy val root = (project in file("."))
-  .aggregate(browserbundle, macosx)
+  .aggregate(common, browserbundle, macosx)
 
 scalacOptions in Compile := Seq("-deprecated")
 
