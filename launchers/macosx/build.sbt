@@ -20,12 +20,39 @@ lazy val staticFiles = List(
   "webapps.config"
 )
 
-// Pointing the resources directory to the "installer" directory
-resourceDirectory in Compile := baseDirectory.value / ".." / ".." / "installer" / "resources"
 lazy val resDir = new File("./../installer/resources")
 lazy val i2pBuildDir = new File("./../build")
 lazy val warsForCopy = i2pBuildDir.list.filter { f => f.endsWith(".war") }
 lazy val jarsForCopy = i2pBuildDir.list.filter { f => f.endsWith(".jar") }
+
+
+
+
+// Pointing the resources directory to the "installer" directory
+resourceDirectory in Compile := baseDirectory.value / ".." / ".." / "installer" / "resources"
+
+// Unmanaged classpath will be available at compile time
+unmanagedClasspath in Compile ++= Seq(
+  baseDirectory.value / ".." / ".." / "build" / "*.jar",
+  baseDirectory.value / ".." / ".." / "router" / "java" / "src"
+)
+
+// Please note the difference between browserbundle, this has
+// the "in Compile" which limit it's scope to that.
+//unmanagedBase in Compile := baseDirectory.value / ".." / ".." / "build"
+
+libraryDependencies ++= Seq(
+  "net.i2p" % "router" % i2pVersion % Compile
+)
+
+
+//assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
+
+assemblyJarName in assembly := s"${name.value}-${version.value}"
+
+
+// TODO: MEEH: Add assemblyExcludedJars and load the router from own jar files, to handle upgrades better.
+// In fact, most likely the bundle never would need an update except for the router jars/wars.
 
 convertToICNSTask := {
   println("TODO")
@@ -36,10 +63,10 @@ buildAppBundleTask := {
   bundleBuildPath.mkdir()
   val paths = Map[String,File](
     "execBundlePath" -> new File(bundleBuildPath, "I2P.app/Contents/MacOS"),
-     "resBundlePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources"),
-     "i2pbaseBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase"),
+    "resBundlePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources"),
+    "i2pbaseBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase"),
     "i2pJarsBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase/lib"),
-     "webappsBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase/webapps")
+    "webappsBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase/webapps")
   )
   paths.map { case (s,p) => p.mkdirs() }
   val dirsToCopy = List("certificates","locale","man")
@@ -60,22 +87,3 @@ buildAppBundleTask := {
   warsForCopy.map { w => IO.copyFile( new File(i2pBuildDir, w), new File(paths.get("webappsBunldePath").get, w) ) }
   warsForCopy.map { j => IO.copyFile( new File(i2pBuildDir, j), new File(paths.get("i2pJarsBunldePath").get, j) ) }
 }
-
-// Unmanaged classpath will be available at compile time
-unmanagedClasspath in Compile ++= Seq(
-  baseDirectory.value / ".." / ".." / "build" / "*.jar",
-  baseDirectory.value / ".." / ".." / "router" / "java" / "src"
-)
-
-// Please note the difference between browserbundle, this has
-// the "in Compile" which limit it's scope to that.
-//unmanagedBase in Compile := baseDirectory.value / ".." / ".." / "build"
-
-libraryDependencies ++= Seq(
-  "net.i2p" % "router" % i2pVersion % Compile
-)
-
-
-//assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
-
-assemblyJarName in assembly := s"${name.value}-${version.value}"
