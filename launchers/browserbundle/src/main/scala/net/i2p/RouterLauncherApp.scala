@@ -2,10 +2,8 @@ package net.i2p
 
 import java.io.{File, InputStream}
 
+//import net.i2p.Router
 import net.i2p.launchers.DeployProfile
-import net.i2p.router.Router
-import org.json4s._
-import org.json4s.native.JsonMethods._
 
 /**
   *
@@ -104,7 +102,7 @@ object RouterLauncherApp extends App {
 
   //ErrorUtils.printError(s"Starting up with arguments ${(args mkString ", ")}",":)")
 
-  Router.main(args)
+  //Router.main(args)
 }
 
 

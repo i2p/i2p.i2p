@@ -1,8 +1,9 @@
 package net.i2p
 
-import net.i2p.router.Router
-import net.i2p.launchers.{OSXDefaults, OSXDeployment}
 import java.io.File
+
+import collection.JavaConverters._
+import net.i2p.launchers.{OSXDefaults, OSXDeployment}
 
 /**
   *
@@ -34,12 +35,21 @@ import java.io.File
   */
 object MacOSXRouterLauncherApp extends App {
 
-  val i2pBaseDir = new File(OSXDefaults.getOSXBaseDirectory)
+  val i2pBaseDir = OSXDefaults.getOSXBaseDirectory
+
 
   new OSXDeployment()
 
   // Change directory to base dir
   System.setProperty("user.dir", i2pBaseDir.getAbsolutePath)
 
-  Router.main(args)
+  val i2pJarDir = new File(i2pBaseDir.getAbsolutePath, "lib")
+  i2pJarDir.list().toList.map { jar => {
+    val jarFile = new File(i2pJarDir, jar)
+    println(s"Loading jar: ${jarFile.toURI.toURL} => ${MacOSXRouterLauncher.addJarToClassPath(jarFile.toURI.toURL)}")
+
+  } }
+
+  MacOSXRouterLauncher.runRouter(args)
+  //net.i2p.Router.main(args)
 }

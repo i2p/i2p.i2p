@@ -31,24 +31,17 @@ lazy val jarsForCopy = i2pBuildDir.list.filter { f => f.endsWith(".jar") }
 // Pointing the resources directory to the "installer" directory
 resourceDirectory in Compile := baseDirectory.value / ".." / ".." / "installer" / "resources"
 
+// Unmanaged base will be included in a fat jar
+unmanagedBase in Compile := baseDirectory.value / ".." / ".." / "build"
+
 // Unmanaged classpath will be available at compile time
 unmanagedClasspath in Compile ++= Seq(
-  baseDirectory.value / ".." / ".." / "build" / "*.jar",
-  baseDirectory.value / ".." / ".." / "router" / "java" / "src"
+  baseDirectory.value / ".." / ".." / "build" / "*.jar"
 )
-
-// Please note the difference between browserbundle, this has
-// the "in Compile" which limit it's scope to that.
-//unmanagedBase in Compile := baseDirectory.value / ".." / ".." / "build"
-
-libraryDependencies ++= Seq(
-  "net.i2p" % "router" % i2pVersion % Compile
-)
-
 
 //assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
 
-assemblyJarName in assembly := s"${name.value}-${version.value}"
+assemblyJarName in assembly := s"OSXLauncher"
 
 
 // TODO: MEEH: Add assemblyExcludedJars and load the router from own jar files, to handle upgrades better.
@@ -71,6 +64,10 @@ buildAppBundleTask := {
   paths.map { case (s,p) => p.mkdirs() }
   val dirsToCopy = List("certificates","locale","man")
 
+  val launcherBinary = Some(assembly.value)
+  launcherBinary.map { l => IO.copyFile( new File(l.toString), new File(paths.get("execBundlePath").get, "I2P") ) }
+
+
   /**
     *
     * First of, if "map" is unknown for you - shame on you :p
@@ -85,5 +82,5 @@ buildAppBundleTask := {
     */
   dirsToCopy.map { d => IO.copyDirectory( new File(resDir, d), new File(paths.get("i2pbaseBunldePath").get, d) ) }
   warsForCopy.map { w => IO.copyFile( new File(i2pBuildDir, w), new File(paths.get("webappsBunldePath").get, w) ) }
-  warsForCopy.map { j => IO.copyFile( new File(i2pBuildDir, j), new File(paths.get("i2pJarsBunldePath").get, j) ) }
+  jarsForCopy.map { j => IO.copyFile( new File(i2pBuildDir, j), new File(paths.get("i2pJarsBunldePath").get, j) ) }
 }

@@ -31,7 +31,10 @@ lazy val browserbundle = (project in file("browserbundle"))
     commonSettings,
     name         := "RouterLaunchApp",
     assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
-    mainClass in assembly := Some("net.i2p.RouterLauncherApp")
+    mainClass in assembly := Some("net.i2p.RouterLauncherApp"),
+    libraryDependencies ++= Seq(
+      "org.json4s" %% "json4s-native" % "3.5.3"
+    )
   ).dependsOn(common)
 
 lazy val macosx = (project in file("macosx"))
@@ -52,3 +55,4 @@ fork := true
 
 run / javaOptions += "-Xmx512M"
 run / connectInput := true
+

@@ -1,8 +1,5 @@
 
 
-libraryDependencies ++= Seq(
-  "org.json4s" %% "json4s-native" % "3.5.3"
-)
 
 assemblyExcludedJars in assembly := {
   val donts = List(

@@ -1,7 +1,13 @@
 package net.i2p.launchers
 
 import java.io.{File, IOException}
+import java.nio.file.FileAlreadyExistsException
 import java.util.zip.ZipFile
+
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import java.nio.file.Files.copy
+import java.nio.file.Paths.get
+
 import collection.JavaConverters._
 
 /**
@@ -120,14 +126,19 @@ class OSXDeployment extends
     */
   def copyDirFromRes(dir: File): Unit = {
     // A small hack
-    val zipFile = new ZipFile(DeployProfile.executingJarFile.getFile)
-    zipFile.entries().asScala.toList.filter(_.toString.startsWith(dir.getPath)).filter(!_.isDirectory).map { entry =>
-      new File(DeployProfile.pathJoin(baseDir,entry.getName)).getParentFile.mkdirs()
-      if (entry.isDirectory) {
-        createFileOrDirectory(new File(DeployProfile.pathJoin(baseDir,entry.getName)), true)
-      } else {
-        copyBaseFileResToDisk(entry.getName, getClass.getResourceAsStream("/".concat(entry.getName)))
+    try {
+      val zipFile = new ZipFile(DeployProfile.executingJarFile.getFile)
+      zipFile.entries().asScala.toList.filter(_.toString.startsWith(dir.getPath)).filter(!_.isDirectory).map { entry =>
+        new File(DeployProfile.pathJoin(baseDir,entry.getName)).getParentFile.mkdirs()
+        if (entry.isDirectory) {
+          createFileOrDirectory(new File(DeployProfile.pathJoin(baseDir,entry.getName)), true)
+        } else {
+          copyBaseFileResToDisk(entry.getName, getClass.getResourceAsStream("/".concat(entry.getName)))
+        }
       }
+    } catch {
+      case ex:IOException => println(s"Error! Exception ${ex}")
+      case _:FileAlreadyExistsException => {} // Ignored
     }
   }
 
@@ -156,12 +167,36 @@ class OSXDeployment extends
         }
       } catch {
         case ex:IOException => println(s"Error! Exception ${ex}")
+        case _:FileAlreadyExistsException => {} // Ignored
       }
     }
   }
 
   if (!new File(baseDir).exists()) {
     new File(baseDir).mkdirs()
+  }
+
+  implicit def toPath (filename: String) = get(filename)
+
+  val selfFile = new File(DeployProfile.executingJarFile.getFile)
+  val selfDir = selfFile.getParentFile
+  val resDir = new File(selfDir.getParent, "Resources")
+  val i2pBaseBundleDir = new File(resDir, "i2pbase")
+  val i2pBundleJarDir = new File(i2pBaseBundleDir, "lib")
+
+  val i2pBaseDir = OSXDefaults.getOSXBaseDirectory
+  val i2pDeployJarDir = new File(i2pBaseDir, "lib")
+  if (!i2pDeployJarDir.exists()) {
+    i2pDeployJarDir.mkdirs()
+    i2pBundleJarDir.list().toList.map {
+      jar => {
+        copy (
+          DeployProfile.pathJoin(i2pBundleJarDir.getAbsolutePath, jar),
+          DeployProfile.pathJoin(i2pDeployJarDir.getAbsolutePath, jar),
+          REPLACE_EXISTING)
+        println(s"Copied ${jar} to right place")
+      }
+    }
   }
 
   /**
@@ -184,12 +219,15 @@ class OSXDeployment extends
         // Case subject is a file/resource
       case Left(is) => {
         // Write file
-        if (!new File(DeployProfile.pathJoin(baseDir, fd.getPath)).exists()) {
+        val f = DeployProfile.pathJoin(baseDir, fd.getPath)
+        println(s"f: ${f.toString}")
+        if (!new File(f).exists()) {
           //println(s"copyBaseFileResToDisk(${fd.getPath})")
           try {
             copyBaseFileResToDisk(fd.getPath, is)
           } catch {
             case ex:IOException => println(s"Error! Exception ${ex}")
+            case _:FileAlreadyExistsException => {} // Ignored
           }
         }
       }
