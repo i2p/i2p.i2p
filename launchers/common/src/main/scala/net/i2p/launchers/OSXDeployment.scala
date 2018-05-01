@@ -157,6 +157,12 @@ class OSXDeployment extends
   }
 
   /**
+    * Please note that in Scala, the constructor body is same as class body.
+    * What's defined outside of methods is considered constructor code and
+    * executed as it.
+    *
+    *
+    *
     * a map function work as a loop with some built in security
     * for "null" objects.
     * What happens here is "for each staticFilesFromResources" do =>
@@ -165,26 +171,30 @@ class OSXDeployment extends
     *
     * the match case is controlling the flow based upon which type of object it is.
     */
-  staticFilesFromResources.map { fd => fd.getContent match {
-    case Left(is) => {
-      // Write file
-      if (!new File(DeployProfile.pathJoin(baseDir, fd.getPath)).exists()) {
-        println(s"copyBaseFileResToDisk(${fd.getPath})")
-        try {
-          copyBaseFileResToDisk(fd.getPath, is)
-        } catch {
-          case ex:IOException => println(s"Error! Exception ${ex}")
+  staticFilesFromResources.map {
+    fd => fd.getContent match {
+        // Case subject is a file/resource
+      case Left(is) => {
+        // Write file
+        if (!new File(DeployProfile.pathJoin(baseDir, fd.getPath)).exists()) {
+          println(s"copyBaseFileResToDisk(${fd.getPath})")
+          try {
+            copyBaseFileResToDisk(fd.getPath, is)
+          } catch {
+            case ex:IOException => println(s"Error! Exception ${ex}")
+          }
         }
       }
-    }
-    case Right(dir) => {
-      // Ensure directory
-      println(s"Directory(${fd.getPath})")
-      if (!new File(DeployProfile.pathJoin(baseDir,fd.getPath)).exists()) {
-        new File(DeployProfile.pathJoin(baseDir,fd.getPath)).mkdirs()
+        // Case subject is a directory
+      case Right(dir) => {
+        // Ensure directory
+        println(s"Directory(${fd.getPath})")
+        if (!new File(DeployProfile.pathJoin(baseDir,fd.getPath)).exists()) {
+          new File(DeployProfile.pathJoin(baseDir,fd.getPath)).mkdirs()
+        }
+        dir.map { f => createFileOrDirectory(f,fd.filesIsDirectories) }
       }
-      dir.map { f => createFileOrDirectory(f,fd.filesIsDirectories) }
     }
-  } }
+  }
 
 }

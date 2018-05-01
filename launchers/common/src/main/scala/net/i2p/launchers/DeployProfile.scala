@@ -3,6 +3,19 @@ package net.i2p.launchers
 import java.io.{File, InputStream}
 
 
+/**
+  *
+  * This is a singleton ish style. It's an object - it was never a class.
+  * However it has a class-"brother/sister"
+  *
+  * objects like this should be considered like containers for java's
+  * public static methods.
+  *
+  * Many classes/objects benefits from pathJoin, so therefore it's defined
+  * as an "public static method".
+  *
+  * @since 0.9.35
+  */
 object DeployProfile {
 
   /**
