@@ -146,7 +146,7 @@ class OSXDeployment extends
     */
   def createFileOrDirectory(file: File, isDir: Boolean = false): Unit = {
     if (file != null) {
-      println(s"createFileOrDirectory(${file},${isDir})")
+      //println(s"createFileOrDirectory(${file},${isDir})")
       try {
         // Make sure subject exists if directory
         if (!new File(DeployProfile.pathJoin(baseDir,file.getPath)).exists()) {
@@ -190,7 +190,7 @@ class OSXDeployment extends
       case Left(is) => {
         // Write file
         if (!new File(DeployProfile.pathJoin(baseDir, fd.getPath)).exists()) {
-          println(s"copyBaseFileResToDisk(${fd.getPath})")
+          //println(s"copyBaseFileResToDisk(${fd.getPath})")
           try {
             copyBaseFileResToDisk(fd.getPath, is)
           } catch {
@@ -201,7 +201,7 @@ class OSXDeployment extends
         // Case subject is a directory
       case Right(dir) => {
         // Ensure directory
-        println(s"Directory(${fd.getPath})")
+        //println(s"Directory(${fd.getPath})")
         if (!new File(DeployProfile.pathJoin(baseDir,fd.getPath)).exists()) {
           new File(DeployProfile.pathJoin(baseDir,fd.getPath)).mkdirs()
         }
