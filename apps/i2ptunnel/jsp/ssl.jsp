@@ -303,13 +303,29 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
                 // rewrite i2ptunnel.config
                 Integer i443 = Integer.valueOf(443);
-                if (ok && !tgts.containsKey(i443)) {
-                    // update table for display
-                    tgts.put(i443, host + ':' + port);
-                    ports.add(i443);
-                    // add ssl config
-                    // TODO action = disable
-                    custom += " targetForPort.443=" + host + ':' + port;
+                boolean addtgt = ok && !tgts.containsKey(i443) && !action.equals("Disable");
+                boolean deltgt = ok && tgts.containsKey(i443) && action.equals("Disable");
+                if (addtgt || deltgt) {
+                    if (addtgt) {
+                        // update table for display
+                        tgts.put(i443, host + ':' + port);
+                        ports.add(i443);
+                        // add ssl config
+                        custom += " targetForPort.443=" + host + ':' + port;
+                    } else {
+                        // update table for display
+                        tgts.remove(i443);
+                        ports.remove(i443);
+                        // remove ssl config
+                        StringBuilder newCust = new StringBuilder(custom.length());
+                        for (int i = 0; i < opts.length; i++) {
+                             String opt = opts[i];
+                             if (opt.startsWith("targetForPort.443="))
+                                 continue;
+                             newCust.append(opt).append(' ');
+                        }
+                        custom = newCust.toString().trim();
+                    }
                     editBean.setNofilter_customOptions(custom);
                     // copy over existing settings
                     // we only set the applicable server settings
@@ -666,9 +682,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         }
     } catch (IOException ioe) { ioe.printStackTrace(); }
 %>
-<tr><td colspan="4">
-  <div class="displayText" tabindex="0" title="<%=intl._t("yyy")%>"></div>
-</td></tr>
 </table>
 </form>
 <%
