@@ -72,9 +72,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     // todo
     String altb32 = editBean.getAltDestHashBase32(curTunnel);
     String name = editBean.getSpoofedHost(curTunnel);
+    // non-null, default 127.0.0.1
     String targetHost = editBean.getTargetHost(curTunnel);
-    if (targetHost != null && targetHost.indexOf(':') >= 0)
+    if (targetHost.indexOf(':') >= 0)
         targetHost = '[' + targetHost + ']';
+    // non-null, default ""
     String targetPort = editBean.getTargetPort(curTunnel);
     int intPort = 0;
     try {
@@ -158,9 +160,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 out.println(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                             + ' ' +
                             intl._t("If the problem persists, verify that you have cookies enabled in your browser."));
-            } else if (!action.equals("Generate")) {
+            } else if (!action.equals("Generate") && !action.equals("Enable") && !action.equals("Disable")) {
                 out.println("Unknown form action");
-            } else if (newpw == null) {
+            } else if (action.equals("Generate") && newpw == null) {
                 out.println("Password required");
             } else if (appNum == null || ksPath == null || jettySSLConfigPath == null || host == null || port == null) {
                 out.println("Missing parameters");
@@ -168,102 +170,106 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 out.println("No destination set - start tunnel first");
             } else if (name == null || !name.endsWith(".i2p")) {
                 out.println("No hostname set - go back and configure");
+            } else if (intPort <= 0) {
+                out.println("No target port set - go back and configure");
             } else {
                 boolean ok = true;
 
-                // generate selfsigned cert
-                java.util.Set<String> altNames = new java.util.HashSet<String>(4);
-                altNames.add(b32);
-                altNames.add(name);
-                if (!name.startsWith("www."))
-                    altNames.add("www." + name);
-                if (altb32 != null && altb32.length() > 0)
-                    altNames.add(altb32);
-                altNames.addAll(spoofs.values());
-                File ks = new File(ksPath);
-                if (ks.exists()) {
-                    // old ks if any must be moved or deleted, as any keys
-                    // under different alias for a different chain will confuse jetty
-                    File ksb = new File(ksPath + ".bkup");
-                    if (ksb.exists())
-                        ksb = new File(ksPath + '-' + System.currentTimeMillis() + ".bkup");
-                    boolean rok = net.i2p.util.FileUtil.rename(ks, ksb);
-                    if (!rok)
-                        ks.delete();
-                }
-                try {
-                    Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
-                                                                               3652, "EC", 256, newpw);
-                    out.println("Created selfsigned cert");
-                    // save cert
-                    java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) rv[2];
-                    File f = new net.i2p.util.SecureFile(ctx.getConfigDir(), "certificates");
-                    if (!f.exists())
-                        f.mkdir();
-                    f = new net.i2p.util.SecureFile(f, "eepsite");
-                    if (!f.exists())
-                        f.mkdir();
-                    f = new net.i2p.util.SecureFile(f, b32 + ".crt");
-                    if (f.exists()) {
-                        File fb = new File(f.getParentFile(), b32 + ".crt-" + System.currentTimeMillis() + ".bkup");
-                        net.i2p.util.FileUtil.copy(f, fb, false, true);
+                if (action.equals("Generate")) {
+                    // generate selfsigned cert
+                    java.util.Set<String> altNames = new java.util.HashSet<String>(4);
+                    altNames.add(b32);
+                    altNames.add(name);
+                    if (!name.startsWith("www."))
+                        altNames.add("www." + name);
+                    if (altb32 != null && altb32.length() > 0)
+                        altNames.add(altb32);
+                    altNames.addAll(spoofs.values());
+                    File ks = new File(ksPath);
+                    if (ks.exists()) {
+                        // old ks if any must be moved or deleted, as any keys
+                        // under different alias for a different chain will confuse jetty
+                        File ksb = new File(ksPath + ".bkup");
+                        if (ksb.exists())
+                            ksb = new File(ksPath + '-' + System.currentTimeMillis() + ".bkup");
+                        boolean rok = net.i2p.util.FileUtil.rename(ks, ksb);
+                        if (!rok)
+                            ks.delete();
                     }
-                    ok = net.i2p.crypto.CertUtil.saveCert(cert, f);
-                    if (ok)
-                        out.println("selfsigned cert stored");
-                    else
-                        out.println("selfsigned cert store failed");
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                    out.println("selfsigned cert store failed " + ioe);
-                    ok = false;
-                } catch (java.security.GeneralSecurityException gse) {
-                    gse.printStackTrace();
-                    out.println("selfsigned cert store failed " + gse);
-                    ok = false;
-                }
-
-                // rewrite jetty-ssl.xml
-                if (ok) {
-                    String obf = JettyXmlConfigurationParser.obfuscate(newpw);
-                    String obfkspw = JettyXmlConfigurationParser.obfuscate(kspw);
-                    File f = new File(jettySSLConfigPath);
                     try {
-                        org.eclipse.jetty.xml.XmlParser.Node root;
-                        root = JettyXmlConfigurationParser.parse(f);
-                        JettyXmlConfigurationParser.setValue(root, "KeyStorePath", ksPath);
-                        JettyXmlConfigurationParser.setValue(root, "TrustStorePath", ksPath);
-                        JettyXmlConfigurationParser.setValue(root, "KeyStorePassword", obfkspw);
-                        JettyXmlConfigurationParser.setValue(root, "TrustStorePassword", obfkspw);
-                        JettyXmlConfigurationParser.setValue(root, "KeyManagerPassword", obf);
-                        File fb = new File(jettySSLConfigPath + ".bkup");
-                        if (fb.exists())
-                            fb = new File(jettySSLConfigPath + '-' + System.currentTimeMillis() + ".bkup");
-                        ok = net.i2p.util.FileUtil.copy(f, fb, false, true);
-                        if (ok) {
-                            java.io.Writer w = null;
-                            try {
-                                w = new java.io.OutputStreamWriter(new net.i2p.util.SecureFileOutputStream(f), "UTF-8");
-                                w.write("<?xml version=\"1.0\"?>\n" +
-                                        "<!DOCTYPE Configure PUBLIC \"-//Jetty//Configure//EN\" \"http://www.eclipse.org/jetty/configure.dtd\">\n\n" +
-                                        "<!-- Modified by SSL Wizard -->\n\n");
-                                JettyXmlConfigurationParser.write(root, w);
-                                out.println("Jetty configuration updated");
-                            } catch (IOException ioe) {
-                                ioe.printStackTrace();
-                                ok = false;
-                            } finally {
-                                if (w != null) try { w.close(); } catch (IOException ioe2) {}
-                            }
-                        } else {
-                            out.println("Jetty configuration backup failed");
+                        Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
+                                                                                   3652, "EC", 256, newpw);
+                        out.println("Created selfsigned cert");
+                        // save cert
+                        java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) rv[2];
+                        File f = new net.i2p.util.SecureFile(ctx.getConfigDir(), "certificates");
+                        if (!f.exists())
+                            f.mkdir();
+                        f = new net.i2p.util.SecureFile(f, "eepsite");
+                        if (!f.exists())
+                            f.mkdir();
+                        f = new net.i2p.util.SecureFile(f, b32 + ".crt");
+                        if (f.exists()) {
+                            File fb = new File(f.getParentFile(), b32 + ".crt-" + System.currentTimeMillis() + ".bkup");
+                            net.i2p.util.FileUtil.copy(f, fb, false, true);
                         }
-                    } catch (org.xml.sax.SAXException saxe) {
-                        saxe.printStackTrace();
-                        out.println(DataHelper.escapeHTML(saxe.getMessage()));
+                        ok = net.i2p.crypto.CertUtil.saveCert(cert, f);
+                        if (ok)
+                            out.println("selfsigned cert stored");
+                        else
+                            out.println("selfsigned cert store failed");
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                        out.println("selfsigned cert store failed " + ioe);
+                        ok = false;
+                    } catch (java.security.GeneralSecurityException gse) {
+                        gse.printStackTrace();
+                        out.println("selfsigned cert store failed " + gse);
                         ok = false;
                     }
-                }
+
+                    // rewrite jetty-ssl.xml
+                    if (ok) {
+                        String obf = JettyXmlConfigurationParser.obfuscate(newpw);
+                        String obfkspw = JettyXmlConfigurationParser.obfuscate(kspw);
+                        File f = new File(jettySSLConfigPath);
+                        try {
+                            org.eclipse.jetty.xml.XmlParser.Node root;
+                            root = JettyXmlConfigurationParser.parse(f);
+                            JettyXmlConfigurationParser.setValue(root, "KeyStorePath", ksPath);
+                            JettyXmlConfigurationParser.setValue(root, "TrustStorePath", ksPath);
+                            JettyXmlConfigurationParser.setValue(root, "KeyStorePassword", obfkspw);
+                            JettyXmlConfigurationParser.setValue(root, "TrustStorePassword", obfkspw);
+                            JettyXmlConfigurationParser.setValue(root, "KeyManagerPassword", obf);
+                            File fb = new File(jettySSLConfigPath + ".bkup");
+                            if (fb.exists())
+                                fb = new File(jettySSLConfigPath + '-' + System.currentTimeMillis() + ".bkup");
+                            ok = net.i2p.util.FileUtil.copy(f, fb, false, true);
+                            if (ok) {
+                                java.io.Writer w = null;
+                                try {
+                                    w = new java.io.OutputStreamWriter(new net.i2p.util.SecureFileOutputStream(f), "UTF-8");
+                                    w.write("<?xml version=\"1.0\"?>\n" +
+                                            "<!DOCTYPE Configure PUBLIC \"-//Jetty//Configure//EN\" \"http://www.eclipse.org/jetty/configure.dtd\">\n\n" +
+                                            "<!-- Modified by SSL Wizard -->\n\n");
+                                    JettyXmlConfigurationParser.write(root, w);
+                                    out.println("Jetty configuration updated");
+                                } catch (IOException ioe) {
+                                    ioe.printStackTrace();
+                                    ok = false;
+                                } finally {
+                                    if (w != null) try { w.close(); } catch (IOException ioe2) {}
+                                }
+                            } else {
+                                out.println("Jetty configuration backup failed");
+                            }
+                        } catch (org.xml.sax.SAXException saxe) {
+                            saxe.printStackTrace();
+                            out.println(DataHelper.escapeHTML(saxe.getMessage()));
+                            ok = false;
+                        }
+                    }
+                }  // action == Generate
 
                 // rewrite clients.config
                 boolean isSSLEnabled = Boolean.parseBoolean(request.getParameter("isSSLEnabled"));
@@ -277,10 +283,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         if (v == null) {
                             ok = false;
                         } else {
-                            v += " \"" + jettySSLConfigPath + '"';
-                            p.setProperty(k, v);
-                            DataHelper.storeProps(p, f);
-                            out.println("Jetty SSL enabled");
+                            // TODO use net.i2p.i2ptunnel.web.SSLHelper.parseArgs(v) instead?
+                            // TODO action = disable
+                            if (!v.contains(jettySSLConfigPath)) {
+                                v += " \"" + jettySSLConfigPath + '"';
+                                p.setProperty(k, v);
+                                DataHelper.storeProps(p, f);
+                                out.println("Jetty SSL enabled");
+                            }
                         }
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
@@ -298,6 +308,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     tgts.put(i443, host + ':' + port);
                     ports.add(i443);
                     // add ssl config
+                    // TODO action = disable
                     custom += " targetForPort.443=" + host + ':' + port;
                     editBean.setNofilter_customOptions(custom);
                     // copy over existing settings
@@ -456,6 +467,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     File clientsConfig = new File(configDir, "clients.config");
     java.util.Properties clientProps = new java.util.Properties();
     try {
+        boolean foundClientConfig = false;
         DataHelper.loadProps(clientProps, clientsConfig);
         for (int i = 0; i < 100; i++) {
             String prop = "clientApp." + i + ".main";
@@ -503,6 +515,25 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     jettySSLFileInArgs = true;
                 }
             }  // for arg in argList
+            if (jettyFile == null || !jettyFile.exists())
+                continue;
+            try {
+                org.eclipse.jetty.xml.XmlParser.Node root;
+                root = JettyXmlConfigurationParser.parse(jettyFile);
+                host = JettyXmlConfigurationParser.getValue(root, "host");
+                port = JettyXmlConfigurationParser.getValue(root, "port");
+                // now check if host/port match the tunnel
+                if (!targetPort.equals(port))
+                    continue;
+                if (!targetHost.equals(host) && !"0.0.0.0".equals(host) && !"::".equals(host) &&
+                    !((targetHost.equals("127.0.0.1") && "localhost".equals(host)) ||
+                      (targetHost.equals("localhost") && "127.0.0.1".equals(host))))
+                    continue;
+            } catch (org.xml.sax.SAXException saxe) {
+                saxe.printStackTrace();
+                error = DataHelper.escapeHTML(saxe.getMessage());
+                continue;
+            }
             if (jettySSLFile == null && !argList.isEmpty()) {
                 String arg = argList.get(0);
                 File f = new File(arg);
@@ -516,17 +547,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             boolean kmDflt = false;
             boolean tsDflt = false;
             boolean ksExists = false;
-            if (jettyFile != null && jettyFile.exists()) {
-                try {
-                    org.eclipse.jetty.xml.XmlParser.Node root;
-                    root = JettyXmlConfigurationParser.parse(jettyFile);
-                    host = JettyXmlConfigurationParser.getValue(root, "host");
-                    port = JettyXmlConfigurationParser.getValue(root, "port");
-                } catch (org.xml.sax.SAXException saxe) {
-                    saxe.printStackTrace();
-                    error = DataHelper.escapeHTML(saxe.getMessage());
-                }
-            }
             if (jettySSLFile.exists()) {
                 try {
                     org.eclipse.jetty.xml.XmlParser.Node root;
@@ -568,9 +588,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 }
             }
             boolean canConfigure = jettySSLFileExists;
-            boolean isEnabled = canConfigure && jettySSLFileInArgs;
+            boolean isEnabled = canConfigure && jettySSLFileInArgs && ksExists && ports.contains(Integer.valueOf(443));
             boolean isPWDefault = kmDflt || !ksExists;
-
+            foundClientConfig = true;
             // now start the output for this client
 
 %>
@@ -587,33 +607,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <tr><td colspan="7">Cannot configure, no Jetty SSL configuration template exists</td></tr>
 <%
             } else {
-                if (isEnabled) {
 %>
-<tr><td colspan="7">Jetty SSL is enabled</td></tr>
-<%
-                } else {
-%>
-<tr><td colspan="7">Jetty SSL is not enabled</td></tr>
-<%
-                }  // isEnabled
-                if (isPWDefault) {
-%>
-<tr><td colspan="7">Jetty SSL cert passwords are the default</td></tr>
-<%
-                } else {
-%>
-<tr><td colspan="7">Jetty SSL cert passwords are not the default</td></tr>
-<%
-                }  // isPWDefault
-%>
-<tr><td colspan="7"><b><%=intl._t("Password")%>:</b>
+<tr><td colspan="7">
 <input type="hidden" name="clientAppNumber" value="<%=i%>" />
 <input type="hidden" name="isSSLEnabled" value="<%=isEnabled%>" />
 <input type="hidden" name="nofilter_ksPath" value="<%=ksPath%>" />
 <input type="hidden" name="nofilter_jettySSLFile" value="<%=jettySSLFile%>" />
 <input type="hidden" name="jettySSLHost" value="<%=sslHost%>" />
 <input type="hidden" name="jettySSLPort" value="<%=sslPort%>" />
-<input type="password" name="nofilter_keyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
 <%
                 if (ksPW != null) {
                     if (!ksPW.startsWith("OBF:"))
@@ -625,11 +626,44 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 %>
 </td></tr>
 <tr><td class="buttons" colspan="7">
-<button id="controlSave" class="control" type="submit" name="action" value="Generate"><%=intl._t("Generate certificate")%></button>
+<%
+                if (isEnabled && !isPWDefault) {
+%>
+<b><%=intl._t("SSL is enabled")%></b>
+<button id="controlSave" class="control" type="submit" name="action" value="Disable"><%=intl._t("Disable SSL")%></button>
+<%
+                } else if (!isPWDefault) {
+%>
+<b><%=intl._t("SSL is disabled")%></b>
+<button id="controlSave" class="control" type="submit" name="action" value="Enable"><%=intl._t("Enable SSL")%></button>
+<%
+                } else {
+%>
+<b><%=intl._t("Password")%>:</b>
+<input type="password" name="nofilter_keyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
+<%
+                    if (isEnabled) {
+%>
+<button id="controlSave" class="control" type="submit" name="action" value="Generate"><%=intl._t("Generate new SSL certificate")%></button>
+<%
+                    } else {
+%>
+<button id="controlSave" class="control" type="submit" name="action" value="Generate"><%=intl._t("Generate SSL certificate and enable")%></button>
+<%
+                    }
+                }
+%>
 </td></tr>
 <%
+                break;
             }  // canConfigure
         }  // for client
+        if (!foundClientConfig) {
+%>
+<tr><td colspan="7">Cannot configure, no Jetty client found in clients.config that matches this tunnel</td></tr>
+<tr><td colspan="7">Support for non-Jetty servers TBD</td></tr>
+<%
+        }
     } catch (IOException ioe) { ioe.printStackTrace(); }
 %>
 <tr><td colspan="4">
