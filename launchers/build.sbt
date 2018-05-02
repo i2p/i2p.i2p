@@ -41,8 +41,7 @@ lazy val macosx = (project in file("macosx"))
   .settings(
     commonSettings,
     name         := "MacI2PLauncher",
-    assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
-    mainClass in assembly := Some("net.i2p.MacOSXRouterLauncherApp")
+    mainClass in assembly := Some("net.i2p.launchers.osx.LauncherAppMain")
   ).dependsOn(common)
 
 

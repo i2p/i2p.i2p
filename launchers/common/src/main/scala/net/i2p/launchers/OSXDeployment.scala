@@ -137,8 +137,8 @@ class OSXDeployment extends
         }
       }
     } catch {
-      case ex:IOException => println(s"Error! Exception ${ex}")
       case _:FileAlreadyExistsException => {} // Ignored
+      case ex:IOException => println(s"Error! Exception ${ex}")
     }
   }
 
@@ -166,8 +166,8 @@ class OSXDeployment extends
           copyBaseFileResToDisk(file.getPath, getClass.getResourceAsStream("/".concat(file.getName)))
         }
       } catch {
-        case ex:IOException => println(s"Error! Exception ${ex}")
         case _:FileAlreadyExistsException => {} // Ignored
+        case ex:IOException => println(s"Error! Exception ${ex}")
       }
     }
   }

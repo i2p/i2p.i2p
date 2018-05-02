@@ -1,6 +1,7 @@
 package net.i2p.launchers
 
-import java.io.{File, InputStream}
+import java.io.{File, IOException, InputStream}
+import java.nio.file.FileAlreadyExistsException
 
 
 /**
@@ -58,10 +59,13 @@ class DeployProfile(val confDir: String, val baseDir: String) {
     * @param fStr
     * @return Unit
     */
-  def copyFileResToDisk(fStr: String) = Files.copy(
+  def copyFileResToDisk(fStr: String) = try { Files.copy(
     getClass.getResource("/".concat(fStr)).getContent.asInstanceOf[InputStream],
     Paths.get(DeployProfile.pathJoin(confDir, fStr)).normalize()
-  )
+  )} catch {
+    case _:FileAlreadyExistsException => {} // Ignored
+    case ex:IOException => println(s"Error! Exception ${ex}")
+  }
 
 
   /**
@@ -72,10 +76,13 @@ class DeployProfile(val confDir: String, val baseDir: String) {
     * @param is
     * @return Unit
     */
-  def copyBaseFileResToDisk(path: String, is: InputStream) = Files.copy(
+  def copyBaseFileResToDisk(path: String, is: InputStream) = try { Files.copy(
     is,
     Paths.get(DeployProfile.pathJoin(baseDir, path)).normalize()
-  )
+  )} catch {
+    case _:FileAlreadyExistsException => {} // Ignored
+    case ex:IOException => println(s"Error! Exception ${ex}")
+  }
 
   /**
     * Filter function for finding missing required files.

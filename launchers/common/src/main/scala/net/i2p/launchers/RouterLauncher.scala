@@ -1,6 +1,7 @@
 package net.i2p.launchers
 
-import java.net.URL
+import java.io.File
+
 
 /**
   * A abstract class is kind of like an java interface.
@@ -9,10 +10,7 @@ import java.net.URL
   * @since 0.9.35
   */
 abstract class RouterLauncher {
-
-  def getClassLoader: ClassLoader
-
-  def addJarToClassPath(url: URL): Boolean
+  def runRouter(basePath: File, args: Array[String]): Unit
 
   def runRouter(args: Array[String]): Unit
 }
