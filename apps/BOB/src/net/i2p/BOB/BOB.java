@@ -38,6 +38,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import net.i2p.client.I2PClient;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
 
 /**
@@ -131,6 +132,7 @@ public class BOB implements Runnable, ClientApp {
 	// no longer used.
 	// private static int maxConnections = 0;
 
+	private final I2PAppContext _context;
 	private final Logger _log;
 	private final ClientAppManager _mgr;
 	private final String[] _args;
@@ -158,6 +160,7 @@ public class BOB implements Runnable, ClientApp {
 	 *  @since 0.9.10
 	 */
 	public BOB(I2PAppContext context, ClientAppManager mgr, String[] args) {
+		_context = context;
 		// If we were run from command line, log to stdout
 		boolean logToStdout = false;
 		URL classResource = BOB.class.getResource("BOB.class");
@@ -218,7 +221,7 @@ public class BOB implements Runnable, ClientApp {
 		{
 			File cfg = new File(configLocation);
 			if (!cfg.isAbsolute()) {
-				cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
+				cfg = new File(_context.getConfigDir(), configLocation);
 			}
 			FileInputStream fi = null;
 			try {
@@ -275,7 +278,7 @@ public class BOB implements Runnable, ClientApp {
 		if (save) {
 			File cfg = new File(configLocation);
 			if (!cfg.isAbsolute()) {
-				cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
+				cfg = new File(_context.getConfigDir(), configLocation);
 			}
 			FileOutputStream fo = null;
 			try {
@@ -316,6 +319,8 @@ public class BOB implements Runnable, ClientApp {
 		_log.info("BOB is now running.");
 		if (_mgr != null)
 			_mgr.register(this);
+		_context.portMapper().register(PortMapper.SVC_BOB, props.getProperty(PROP_BOB_HOST),
+		                               Integer.parseInt(props.getProperty(PROP_BOB_PORT)));
 
 		int i = 0;
 		boolean g = false;
@@ -353,6 +358,7 @@ public class BOB implements Runnable, ClientApp {
 			changeState(STOPPING, e);
 		} finally {
 			_log.info("BOB is now shutting down...");
+			_context.portMapper().unregister(PortMapper.SVC_BOB);
 			// Clean up everything.
 			try {
 				listener.close();
