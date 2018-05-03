@@ -299,7 +299,63 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 }
 
                 // stop and restart jetty
-
+                // this only works if running already, else it isn't registered
+                net.i2p.app.ClientAppManager cmgr = ctx.clientAppManager();
+                net.i2p.app.ClientApp jstart = cmgr.getRegisteredApp("Jetty");
+                if (ok && jstart != null) {
+                    String fullname = jstart.getDisplayName();
+                    if (fullname.contains(jettySSLConfigPath) ||
+                        fullname.contains(jettySSLConfigPath.replace("jetty-ssl.xml", "jetty.xml"))) {
+                        // ok, this is probably the right ClientApp
+                        net.i2p.app.ClientAppState state = jstart.getState();
+                        if (state == net.i2p.app.ClientAppState.RUNNING) {
+                            try {
+                                // app becomes untracked,
+                                // see workaround in RouterAppManager
+                                jstart.shutdown(null);
+                                for (int i = 0; i < 20; i++) {
+                                    state = jstart.getState();
+                                    if (state == net.i2p.app.ClientAppState.STOPPED) {
+                                        if (i < 4) {
+                                            try { Thread.sleep(1000); } catch (InterruptedException ie) { break; }
+                                        }
+                                        out.println("Jetty server stopped");
+                                        break;
+                                    }
+                                    try { Thread.sleep(250); } catch (InterruptedException ie) { break; }
+                                }
+                                if (state != net.i2p.app.ClientAppState.STOPPED)
+                                    out.println("Jetty server stop failed");
+                            } catch (Throwable t) {
+                                out.println("Jetty server stop failed: " + t);
+                            }
+                        }
+                        if (state == net.i2p.app.ClientAppState.STOPPED) {
+                            try {
+                                jstart.startup();
+                                for (int i = 0; i < 20; i++) {
+                                    state = jstart.getState();
+                                    if (state == net.i2p.app.ClientAppState.RUNNING) {
+                                        out.println("Jetty server started");
+                                        break;
+                                    }
+                                    try { Thread.sleep(250); } catch (InterruptedException ie) { break; }
+                                }
+                                if (state != net.i2p.app.ClientAppState.RUNNING)
+                                    out.println("Jetty server start failed");
+                            } catch (Throwable t) {
+                                out.println("Jetty server start failed: " + t);
+                                ok = false;
+                            }
+                        }
+                    } else {
+                        out.println("Unable to restart Jetty server");
+                        out.println("You must start (or stop and restart) the Jetty server on <a href=\"/configclients\">the configure clients page</a>");
+                    }
+                } else if (ok) {
+                    out.println("Unable to restart Jetty server");
+                    out.println("You must start (or stop and restart) the Jetty server on <a href=\"/configclients\">the configure clients page</a>");
+                }
 
                 // rewrite i2ptunnel.config
                 Integer i443 = Integer.valueOf(443);

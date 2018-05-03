@@ -113,7 +113,7 @@ public class JettyStart implements ClientApp {
     }
 
     public synchronized void startup() {
-        if (_state != INITIALIZED)
+        if (_state != INITIALIZED && _state != STOPPED && _state != START_FAILED)
             return;
         if (_jettys.isEmpty()) {
             changeState(START_FAILED);
