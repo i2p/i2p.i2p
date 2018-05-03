@@ -108,7 +108,7 @@ HTMLFILES="\
 echo 'Checking XML files....................'
 for i in $XMLFILES
 do
-	echo "Checking $i ..."
+	#echo "Checking $i ..."
 	xmllint --noout $i
         if [ $? -ne 0 ]
 	then
@@ -120,7 +120,7 @@ done
 echo 'Checking HTML files....................'
 for i in $HTMLFILES
 do
-	echo "Checking $i ..."
+	#echo "Checking $i ..."
 	xmllint --html --noout $i
 	# FIXME html mode never exits with an error code
 	# ... but it does output errors

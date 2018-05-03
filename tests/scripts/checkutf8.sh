@@ -34,7 +34,7 @@ DIRS="\
 
 for i in `find $DIRS -maxdepth 1 -type f`
 do
-	echo "Checking $i ..."
+	#echo "Checking $i ..."
 	iconv -f UTF8 -t UTF8 $i -o /dev/null
         if [ $? -ne 0 ]
 	then
@@ -43,12 +43,12 @@ do
 	fi
 done
 
-echo "Checking all Java files ..."
-for i in `find . -name \*.java -type f`
+echo "Checking all Java and Scala files ..."
+for i in `find . \( -name \*.java -o -name \*.scala \) -type f`
 do
 	#echo "Checking $i ..."
 	iconv -f UTF8 -t UTF8 $i -o /dev/null
-        if [ $? -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "********* FAILED CHECK FOR $i *************"
 		FAIL=1
