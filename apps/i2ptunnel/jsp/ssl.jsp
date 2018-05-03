@@ -273,7 +273,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
                 // rewrite clients.config
                 boolean isSSLEnabled = Boolean.parseBoolean(request.getParameter("isSSLEnabled"));
-                if (ok && !isSSLEnabled) {
+                boolean addssl = ok && !isSSLEnabled && !action.equals("Disable");
+                boolean delssl = ok && isSSLEnabled && action.equals("Disable");
+                if (addssl || delssl) {
                     File f = new File(ctx.getConfigDir(), "clients.config");
                     java.util.Properties p = new net.i2p.util.OrderedProperties();
                     try {
@@ -282,14 +284,27 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         String v = p.getProperty(k);
                         if (v == null) {
                             ok = false;
-                        } else {
+                        } else if (addssl) {
                             // TODO use net.i2p.i2ptunnel.web.SSLHelper.parseArgs(v) instead?
-                            // TODO action = disable
                             if (!v.contains(jettySSLConfigPath)) {
                                 v += " \"" + jettySSLConfigPath + '"';
                                 p.setProperty(k, v);
                                 DataHelper.storeProps(p, f);
                                 out.println("Jetty SSL enabled");
+                            }
+                        } else {
+                            // action = disable
+                            boolean save = false;
+                            java.util.List<String> argList = net.i2p.i2ptunnel.web.SSLHelper.parseArgs(v);
+                            if (argList.remove(jettySSLConfigPath)) {
+                                StringBuilder buf = new StringBuilder(v.length());
+                                for (String arg : argList) {
+                                     buf.append(arg).append(' ');
+                                }
+                                v = buf.toString().trim();
+                                p.setProperty(k, v);
+                                DataHelper.storeProps(p, f);
+                                out.println("Jetty SSL disabled");
                             }
                         }
                     } catch (IOException ioe) {
