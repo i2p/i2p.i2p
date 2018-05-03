@@ -3,6 +3,7 @@ package net.i2p.util;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.InetSocketAddress;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -305,7 +306,7 @@ public class PortMapper {
     public void renderStatusHTML(Writer out) throws IOException {
         List<String> services = new ArrayList<String>(_dir.keySet());
         out.write("<h2 id=\"debug_portmapper\">Port Mapper</h2><table id=\"portmapper\"><tr><th>Service<th>Host<th>Port\n");
-        Collections.sort(services);
+        Collections.sort(services, Collator.getInstance());
         for (String s : services) {
             InetSocketAddress ia = _dir.get(s);
             if (ia == null)

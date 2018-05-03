@@ -2,6 +2,7 @@ package net.i2p.router.startup;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.text.Collator;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -208,7 +209,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
             String[] val = entry.getValue();
             list.add("[<b>" + key.getName() + "</b>] = [" + key.getClass().getName() + ' ' + Arrays.toString(val) + "] <i>" + key.getState() + "</i><br>");
         }
-        Collections.sort(list);
+        Collections.sort(list, Collator.getInstance());
         for (String e : list) {
             buf.append(e);
         }
@@ -225,7 +226,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
             ClientApp val = entry.getValue();
             list.add("[<b>" + key + "</b>] = [" + val.getClass().getName() + "]<br>");
         }
-        Collections.sort(list);
+        Collections.sort(list, Collator.getInstance());
         for (String e : list) {
             buf.append(e);
         }
