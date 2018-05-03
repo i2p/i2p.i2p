@@ -355,7 +355,7 @@ public class RouterConsoleRunner implements RouterApp {
                 System.out.println("Warning: " + s);
             }
             if (isJava10) {
-                s = "Java 10 support is beta, and not recommended for general use";
+                s = "Java 10/11 support is beta, and not recommended for general use";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
