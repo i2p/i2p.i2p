@@ -513,11 +513,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 %>
 <tr><th colspan="4"><%=intl._t("Incoming I2P Port Routing")%></th></tr>
 <tr><th><%=intl._t("Route From I2P Port")%></th><th><%=intl._t("With Virtual Host")%></th><th><%=intl._t("Via SSL?")%></th><th><%=intl._t("To Server Host:Port")%></th></tr>
-<tr><td><%=intl._t("Default")%></td><td><%=name%></td><td><%=sslToTarget%></td><td><%=targetLink%></td></tr>
+<tr><td><a href="http://<%=b32%>/"><%=intl._t("Default")%></a></td><td><%=name%></td><td><%=sslToTarget%></td><td><%=targetLink%></td></tr>
 <%
     // output vhost and targets
     for (Integer port : ports) {
         boolean ssl = sslToTarget;
+        boolean sslPort = false;
         String spoof = spoofs.get(port);
         if (spoof == null)
             spoof = name;
@@ -527,6 +528,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             if (altb32 != null && altb32.length() > 0)
                 spoof += "<br />" + altb32;
             ssl = true;
+            sslPort = true;
         }
         String tgt = tgts.get(port);
         if (tgt != null) {
@@ -540,8 +542,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         } else {
             tgt = targetLink;
         }
+        String portTgt = sslPort ? "https" : "http";
 %>
-<tr><td><%=port%></td><td><%=spoof%></td><td><%=ssl%></td><td><%=tgt%></td></tr>
+<tr><td><a href="<%=portTgt%>://<%=b32%>:<%=port%>/"><%=port%></a></td><td><%=spoof%></td><td><%=ssl%></td><td><%=tgt%></td></tr>
 <%
     }
 %>
@@ -759,7 +762,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         }  // for client
         if (!foundClientConfig) {
 %>
-<tr><td colspan="4">Cannot configure, no Jetty client found in clients.config that matches this tunnel</td></tr>
+<tr><td colspan="4">Cannot configure, no Jetty server found in clients.config that matches this tunnel</td></tr>
 <tr><td colspan="4">Support for non-Jetty servers TBD</td></tr>
 <%
         }

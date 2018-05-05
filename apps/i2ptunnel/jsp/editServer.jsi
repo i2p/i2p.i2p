@@ -247,6 +247,13 @@
                     }
                 %>
               <a class="control" title="<%=intl._t("Register, unregister or change details for hostname")%>" href="register?tunnel=<%=curTunnel%>"><%=intl._t("Registration Authentication")%></a>
+              <%
+                    if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+                %>
+              <a class="control" title="<%=intl._t("HTTPS configuration")%>" href="ssl?tunnel=<%=curTunnel%>"><%=intl._t("SSL Wizard")%></a>
+              <%
+                    }
+                %>
             </td>
         <%
                 } else {
