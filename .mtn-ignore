@@ -59,6 +59,7 @@ launchers/target
 launchers/project/target
 launchers/common/target
 launchers/output
+launchers/project/project
 
 # Reporting
 sloccount.sc

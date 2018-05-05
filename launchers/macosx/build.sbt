@@ -1,14 +1,12 @@
-import sbtassembly.AssemblyPlugin.defaultShellScript
-import sbt._
-import Keys._
-import sbt.io.IO
-import java.io.File
+import java.io.{File, FileNotFoundException, FileOutputStream}
+import java.util.zip._
 
 lazy val i2pVersion = "0.9.34"
 
 lazy val cleanAllTask = taskKey[Unit]("Clean up and remove the OSX bundle")
 lazy val buildAppBundleTask = taskKey[Unit](s"Build an Mac OS X bundle for I2P ${i2pVersion}.")
-lazy val bundleBuildPath = file("./output")
+lazy val buildDeployZipTask = taskKey[String](s"Build an zipfile with base directory for I2P ${i2pVersion}.")
+lazy val bundleBuildPath = new File("./output")
 
 lazy val staticFiles = List(
   "blocklist.txt",
@@ -32,7 +30,7 @@ def defaultOSXLauncherShellScript(javaOpts: Seq[String] = Seq.empty): Seq[String
   Seq(
     "#!/usr/bin/env sh",
     s"""
-       |echo "Yo"
+       |echo "I2P - Mac OS X Launcher starting up"
        |export I2P=$$HOME/Library/I2P
        |for jar in `ls $${I2P}/lib/*.jar`; do
        |  if [ ! -z $$CP ]; then
@@ -66,7 +64,6 @@ assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       "-Dwrapper.logfile.loglevel=DEBUG",
       "-Dwrapper.java.pidfile=/tmp/routerjvm.pid",
       "-Dwrapper.console.loglevel=DEBUG",
-      "-Djava.awt.headless=true",
       "-Di2p.dir.base=$I2P",
       "-Djava.library.path=$I2P"
     )))
@@ -92,36 +89,66 @@ cleanAllTask := {
   IO.delete(bundleBuildPath)
 }
 
+buildDeployZipTask := {
+  println(s"Starting the zip file build process. This might take a while..")
+  if (!bundleBuildPath.exists()) bundleBuildPath.mkdir()
+  val sourceDir = i2pBuildDir
+  def recursiveListFiles(f: File): Array[File] = {
+    val these = f.listFiles
+    these ++ these.filter { f => f.isDirectory }.flatMap(recursiveListFiles).filter(!_.isDirectory)
+  }
+  def zip(out: String, files: Iterable[String]) = {
+    import java.io.{ BufferedInputStream, FileInputStream, FileOutputStream }
+    import java.util.zip.{ ZipEntry, ZipOutputStream }
+
+    val zip = new ZipOutputStream(new FileOutputStream(out))
+
+    files.foreach { name =>
+      val fname = sourceDir.toURI.relativize(new File(name).toURI).toString
+      //println(s"Zipping ${fname}")
+      if (!new File(name).isDirectory) {
+        zip.putNextEntry(new ZipEntry(fname))
+        val in = new BufferedInputStream(new FileInputStream(name))
+        var b = in.read()
+        while (b > -1) {
+          zip.write(b)
+          b = in.read()
+        }
+        in.close()
+        zip.closeEntry()
+      }
+    }
+    zip.close()
+  }
+  val fileList = recursiveListFiles(sourceDir.getCanonicalFile).toList
+  val zipFileName = new File(bundleBuildPath, "i2pbase.zip").getCanonicalPath
+  zip(zipFileName, fileList.map { f => f.toString }.toIterable)
+  zipFileName.toString
+}
+
 buildAppBundleTask := {
   println(s"Building Mac OS X bundle for I2P version ${i2pVersion}.")
-  bundleBuildPath.mkdir()
+  if (!bundleBuildPath.exists()) bundleBuildPath.mkdir()
   val paths = Map[String,File](
     "execBundlePath" -> new File(bundleBuildPath, "I2P.app/Contents/MacOS"),
-    "resBundlePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources"),
-    "i2pbaseBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase"),
-    "i2pJarsBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase/lib"),
-    "webappsBunldePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources/i2pbase/webapps")
+    "resBundlePath" -> new File(bundleBuildPath, "I2P.app/Contents/Resources")
   )
   paths.map { case (s,p) => p.mkdirs() }
-  val dirsToCopy = List("certificates","locale","man")
 
   val launcherBinary = Some(assembly.value)
   launcherBinary.map { l => IO.copyFile( new File(l.toString), new File(paths.get("execBundlePath").get, "I2P") ) }
 
 
-  /**
-    *
-    * First of, if "map" is unknown for you - shame on you :p
-    *
-    * It's a loop basically where it loops through a list/array
-    * with the current indexed item as subject.
-    *
-    * The code bellow takes the different lists and
-    * copy all the directories or files from the i2p.i2p build dir,
-    * and into the bundle so the launcher will know where to find i2p.
-    *
-    */
-  dirsToCopy.map  { d => IO.copyDirectory( new File(resDir, d), new File(paths.get("i2pbaseBunldePath").get, d) ) }
-  warsForCopy.map { w => IO.copyFile( new File(new File(i2pBuildDir, "webapps"), w), new File(paths.get("webappsBunldePath").get, w) ) }
-  jarsForCopy.map { j => IO.copyFile( new File(new File(i2pBuildDir, "lib"), j), new File(paths.get("i2pJarsBunldePath").get, j) ) }
+  val plistFile = new File("./macosx/Info.plist")
+  if (plistFile.exists()) {
+    println(s"Adding Info.plist...")
+    IO.copyFile(plistFile, new File(bundleBuildPath, "I2P.app/Contents/Info.plist"))
+  }
+
+  val zipFilePath = Some(buildDeployZipTask.value)
+
+  val zipFileOrigin = new File(zipFilePath.get)
+  IO.copyFile(zipFileOrigin, new File(paths.get("resBundlePath").get, "i2pbase.zip"))
+  println(s"Zip placed into bundle :)")
+
 }

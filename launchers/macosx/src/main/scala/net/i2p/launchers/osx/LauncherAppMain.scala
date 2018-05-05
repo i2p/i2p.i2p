@@ -1,8 +1,15 @@
 package net.i2p.launchers.osx
 
+import java.awt.SystemTray
 import java.io.File
 
-import net.i2p.launchers.{DeployProfile, OSXDefaults, OSXDeployment}
+import net.i2p.launchers.{CompleteDeployment, OSXDefaults}
+
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.sys.process.Process
+import scala.util.{Failure, Success}
 
 /**
   *
@@ -36,14 +43,53 @@ object LauncherAppMain extends App {
 
   val i2pBaseDir = OSXDefaults.getOSXBaseDirectory
 
-  new OSXDeployment()
+  val selfDirPath = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath).getParentFile
 
+  // Tricky to get around, but feels hard to use a "var" which means mutable..
+  // It's like cursing in the church... Worse.
+  var sysTray: Option[SystemTrayManager] = None
+
+  val deployment = new CompleteDeployment(new File(selfDirPath.getPath, "../Resources/i2pbase.zip"), i2pBaseDir)
+
+  val depProc = deployment.makeDeployment
   // Change directory to base dir
   System.setProperty("user.dir", i2pBaseDir.getAbsolutePath)
 
+  // System shutdown hook
+  sys.ShutdownHookThread {
+    println("exiting launcher process")
+  }
+
+  Await.ready(depProc, 60000 millis)
+
+  println("I2P Base Directory Extracted.")
+
   try {
-    MacOSXRouterLauncher.runRouter(i2pBaseDir, args)
+    val routerProcess: Future[Process] = MacOSXRouterLauncher.runRouter(i2pBaseDir, args)
+
+    if (SystemTray.isSupported) {
+      sysTray = Some(new SystemTrayManager)
+    }
+
+    routerProcess onComplete {
+      case Success(forkResult) => {
+        println(s"Router started successfully!")
+        try {
+          val routerPID = MacOSXRouterLauncher.pid(forkResult)
+          println(s"PID is ${routerPID}")
+        } catch {
+          case ex:java.lang.RuntimeException => println(s"Minor error: ${ex.getMessage}")
+        }
+        if (!sysTray.isEmpty) sysTray.get.setRunning(true)
+      }
+      case Failure(fail) => {
+        println(s"Router failed to start, error is: ${fail.toString}")
+      }
+    }
+
+    //Await.result(routerProcess, 5000 millis)
+
   } finally {
-    System.out.println("Exit.")
+    System.out.println("Exit?")
   }
 }

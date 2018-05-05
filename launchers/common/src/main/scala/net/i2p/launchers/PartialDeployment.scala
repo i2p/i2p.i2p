@@ -12,7 +12,9 @@ import collection.JavaConverters._
 
 /**
   *
-  * OSXDeployment
+  * NOTE: Work in progress: Originally written for OSX launcher - but will be used in BB launcher.
+  *
+  * PartialXDeployment
   *
   * This class can be a bit new for java developers. In Scala, when inherit other classes,
   * you would need to define their arguments if the super class only has constructors taking arguments.
@@ -76,7 +78,7 @@ import collection.JavaConverters._
   * @author Meeh
   * @since 0.9.35
   */
-class OSXDeployment extends
+class PartialDeployment extends
   DeployProfile(
     OSXDefaults.getOSXConfigDirectory.getAbsolutePath,
     OSXDefaults.getOSXBaseDirectory.getAbsolutePath

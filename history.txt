@@ -1,3 +1,14 @@
+2018-05-06 meeh
+ * launchers:
+   - rewritten some logic
+   - made CompleteDeployment which extracts i2pbase.zip
+   - made a SBT task that creates i2pbase.zip
+   - after the hassle I had even getting an JRE7, short: OSX assumes JRE8+
+   - started on a class SystemTrayManager which also holds router state info for menu item filter
+   - "ant osxLauncher" produces now a valid app bundle under launchers/output
+ * Updated ant and made osxLauncher work again (first time triggers SBT dl if not already installed.)
+ * monotone ignore file update
+
 2018-05-05 zzz
  * i2ptunnel:
    - Link to SSL wizard

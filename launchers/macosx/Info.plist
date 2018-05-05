@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>I2P</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Public Domain</string>
+	<key>CFBundleGetInfoString</key>
+	<string>0.9.35-experimental</string>
+	<key>CFBundleIconFile</key>
+	<string>i2p</string>
+	<key>CFBundleIdentifier</key>
+	<string>net.i2p</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>I2P</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.0.1</string>
+	<key>CFBundleSignature</key>
+	<string>I2P</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1</string>
+	<key>NSAppleScriptEnabled</key>
+	<true/>
+	<key>CGDisableCoalescedUpdates</key>
+	<true/>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5</string>
+	<key>CFBundleDisplayName</key>
+	<string>I2P</string>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>i386</key>
+		<string>10.5.0</string>
+		<key>x86_64</key>
+		<string>10.6.0</string>
+	</dict>
+    <key>LSUIElement</key>
+    <string>1</string>
+</dict>
+</plist>

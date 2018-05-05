@@ -2,6 +2,9 @@ package net.i2p.launchers
 
 import java.io.File
 
+import scala.concurrent.Future
+import scala.sys.process.Process
+
 
 /**
   * A abstract class is kind of like an java interface.
@@ -10,7 +13,7 @@ import java.io.File
   * @since 0.9.35
   */
 abstract class RouterLauncher {
-  def runRouter(basePath: File, args: Array[String]): Unit
+  def runRouter(basePath: File, args: Array[String]): Future[Process]
 
-  def runRouter(args: Array[String]): Unit
+  def runRouter(args: Array[String]): Future[Process]
 }

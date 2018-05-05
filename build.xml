@@ -301,22 +301,22 @@
 
     <target name="bbLauncher" depends="build">
         <sequential>
-            <exec executable="sbt" dir="launcher" failonerror="true">
+            <exec executable="sbt" dir="launchers" failonerror="true">
                 <arg value="browserbundle:clean" />
             </exec>
-            <exec executable="sbt" dir="launcher" failonerror="true">
+            <exec executable="sbt" dir="launchers" failonerror="true">
                 <arg value="browserbundle:assembly" />
             </exec>
         </sequential>
     </target>
 
-    <target name="osxLauncher" depends="build">
+    <target name="osxLauncher" depends="build,preppkg-osx">
         <sequential>
-            <exec executable="sbt" dir="launcher" failonerror="true">
-                <arg value="macosx:clean" />
+            <exec executable="sbt" dir="launchers" failonerror="true">
+                <arg value="macosx:cleanAllTask" />
             </exec>
-            <exec executable="sbt" dir="launcher" failonerror="true">
-                <arg value="macosx:assembly" />
+            <exec executable="sbt" dir="launchers" failonerror="true">
+                <arg value="macosx:buildAppBundleTask" />
             </exec>
         </sequential>
     </target>
@@ -907,7 +907,7 @@
             <classpath>
                 <pathelement location="build/i2p.jar" />
                 <pathelement location="build/router.jar" />
-                <pathelement location="${junit.home}/junit4.jar" />
+                <pathelement location="${junit.home}/ant-junit4.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
             </classpath>
             <!--
