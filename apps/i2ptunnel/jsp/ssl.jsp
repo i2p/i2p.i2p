@@ -89,9 +89,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     if (shouldLinkify) {
         String url = "://" + clientTgt + "\">" + clientTgt + "</a>";
         if (sslToTarget)
-            targetLink = "<a href=\"https" + url;
+            targetLink = "<a target=\"_top\" href=\"https" + url;
         else
-            targetLink = "<a href=\"http" + url;
+            targetLink = "<a target=\"_top\" href=\"http" + url;
     }
     net.i2p.util.PortMapper pm = ctx.portMapper();
     int jettyPort = pm.getPort(net.i2p.util.PortMapper.SVC_EEPSITE);
@@ -367,11 +367,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         }
                     } else {
                         //msgs.append("Unable to restart Jetty server\n");
-                        msgs.append("You must start the Jetty server on <a href=\"/configclients\">the configure clients page</a>.\n");
+                        msgs.append("You must start the Jetty server on <a target=\"_top\" href=\"/configclients\">the configure clients page</a>.\n");
                     }
                 } else if (ok) {
                     //msgs.append("Unable to restart Jetty server\n");
-                    msgs.append("You must start the Jetty server on <a href=\"/configclients\">the configure clients page</a>.\n");
+                    msgs.append("You must start the Jetty server on <a target=\"_top\" href=\"/configclients\">the configure clients page</a>.\n");
                 }
 
                 // rewrite i2ptunnel.config
@@ -456,6 +456,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         editBean.setRejectReferer("");
                     if (editBean.isRejectUserAgents(curTunnel))
                         editBean.setRejectUserAgents("");
+                    if (editBean.startAutomatically(curTunnel))
+                        editBean.setStartOnLoad("");
                     editBean.setNonce(nonce);
                     editBean.setAction("Save changes");
                     String msg = editBean.getMessages();
@@ -513,7 +515,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 %>
 <tr><th colspan="4"><%=intl._t("Incoming I2P Port Routing")%></th></tr>
 <tr><th><%=intl._t("Route From I2P Port")%></th><th><%=intl._t("With Virtual Host")%></th><th><%=intl._t("Via SSL?")%></th><th><%=intl._t("To Server Host:Port")%></th></tr>
-<tr><td><a href="http://<%=b32%>/"><%=intl._t("Default")%></a></td><td><%=name%></td><td><%=sslToTarget%></td><td><%=targetLink%></td></tr>
+<tr><td><a target="_top" href="http://<%=b32%>/"><%=intl._t("Default")%></a></td><td><%=name%></td><td><%=sslToTarget%></td><td><%=targetLink%></td></tr>
 <%
     // output vhost and targets
     for (Integer port : ports) {
@@ -535,16 +537,16 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             if (shouldLinkify) {
                 String url = "://" + tgt + "\">" + tgt + "</a>";
                 if (ssl)
-                    tgt = "<a href=\"https" + url;
+                    tgt = "<a target=\"_top\" href=\"https" + url;
                 else
-                    tgt = "<a href=\"http" + url;
+                    tgt = "<a target=\"_top\" href=\"http" + url;
             }
         } else {
             tgt = targetLink;
         }
         String portTgt = sslPort ? "https" : "http";
 %>
-<tr><td><a href="<%=portTgt%>://<%=b32%>:<%=port%>/"><%=port%></a></td><td><%=spoof%></td><td><%=ssl%></td><td><%=tgt%></td></tr>
+<tr><td><a target="_top" href="<%=portTgt%>://<%=b32%>:<%=port%>/"><%=port%></a></td><td><%=spoof%></td><td><%=ssl%></td><td><%=tgt%></td></tr>
 <%
     }
 %>
@@ -597,6 +599,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
             boolean jettySSLFileInArgs = false;
             boolean jettySSLFileExists = false;
+            boolean jettySSLFileValid = false;
             boolean jettySSLFilePWSet = false;
             File jettyFile = null, jettySSLFile = null;
             String ksPW = null, kmPW = null, tsPW = null;
@@ -650,6 +653,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             boolean tsDflt = false;
             boolean ksExists = false;
             if (jettySSLFile.exists()) {
+                jettySSLFileExists = true;
                 try {
                     org.eclipse.jetty.xml.XmlParser.Node root;
                     root = JettyXmlConfigurationParser.parse(jettySSLFile);
@@ -672,7 +676,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     final String DEFAULT_KSPW_2 = "OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4";
                     final String DEFAULT_KMPW_2 = "OBF:1u2u1wml1z7s1z7a1wnl1u2g";
                     if (ksArgs) {
-                        jettySSLFileExists = true;
+                        jettySSLFileValid = true;
                         ksDflt = ksPW.equals(DEFAULT_KSPW_1) || ksPW.equals(DEFAULT_KSPW_2);
                         kmDflt = kmPW.equals(DEFAULT_KMPW_1) || kmPW.equals(DEFAULT_KMPW_2);
                         ksFile = new File(ksPath);
@@ -689,7 +693,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     error = DataHelper.escapeHTML(saxe.getMessage());
                 }
             }
-            boolean canConfigure = jettySSLFileExists;
+            boolean canConfigure = jettySSLFileExists && jettySSLFileValid;
             boolean isEnabled = canConfigure && jettySSLFileInArgs && ksExists && ports.contains(Integer.valueOf(443));
             boolean isPWDefault = kmDflt || !ksExists;
             foundClientConfig = true;
@@ -704,10 +708,19 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 %>
     </td><td><%=start%></td><td><%=ssl%></td></tr>
 <%
-            if (!canConfigure) {
+            if (!jettySSLFileExists) {
 %>
-<tr><td colspan="4">Cannot configure, no Jetty SSL configuration template exists</td></tr>
+<tr><td colspan="4">Cannot configure, Jetty SSL configuration file does not exist: <%=jettySSLFile.toString()%></td></tr>
 <%
+            } else if (!jettySSLFileValid) {
+%>
+<tr><td colspan="4">Cannot configure, Jetty SSL configuration file is too old or invalid: <%=jettySSLFile.toString()%></td></tr>
+<%
+                if (error.length() > 0) {
+%>
+<tr><td colspan="4"><%=error%></td></tr>
+<%
+                }
             } else {
 %>
 <tr><td colspan="4">
@@ -741,7 +754,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
                 } else {
 %>
-<b><%=intl._t("Password")%>:</b>
+<b><%=intl._t("New Certificate Password")%>:</b>
 <input type="password" name="nofilter_keyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
 <%
                     if (isEnabled) {
