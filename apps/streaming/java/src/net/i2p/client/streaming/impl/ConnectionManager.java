@@ -290,7 +290,8 @@ class ConnectionManager {
                 return null;
             }
 
-            boolean reset = resp == null || resp.equals("reset") || resp.length() <= 0;
+            boolean reset = resp == null || resp.equals("reset") || resp.length() <= 0 ||
+                            synPacket.getLocalPort() == 443;
             boolean http = !reset && "http".equals(resp);
             boolean custom = !(reset || http);
             String sendResponse;
