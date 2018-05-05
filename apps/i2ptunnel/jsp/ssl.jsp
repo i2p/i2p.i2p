@@ -138,6 +138,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         // POST handling
         String action = request.getParameter("action");
         if (action != null) {
+            StringBuilder msgs = new StringBuilder();
             String nonce = request.getParameter("nonce");
             String newpw = request.getParameter("nofilter_keyPassword");
             String kspw = request.getParameter("nofilter_obfKeyStorePassword");
@@ -157,21 +158,22 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 kspw = net.i2p.crypto.KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
             }
             if (!net.i2p.i2ptunnel.web.IndexBean.haveNonce(nonce)) {
-                out.println(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
-                            + ' ' +
-                            intl._t("If the problem persists, verify that you have cookies enabled in your browser."));
+                msgs.append(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."))
+                    .append('\n')
+                    .append(intl._t("If the problem persists, verify that you have cookies enabled in your browser."))
+                    .append('\n');
             } else if (!action.equals("Generate") && !action.equals("Enable") && !action.equals("Disable")) {
-                out.println("Unknown form action");
+                msgs.append("Unknown form action\n");
             } else if (action.equals("Generate") && newpw == null) {
-                out.println("Password required");
+                msgs.append("Password required\n");
             } else if (appNum == null || ksPath == null || jettySSLConfigPath == null || host == null || port == null) {
-                out.println("Missing parameters");
+                msgs.append("Missing parameters\n");
             } else if (b32.length() <= 0) {
-                out.println("No destination set - start tunnel first");
+                msgs.append("No destination set - start tunnel first\n");
             } else if (name == null || !name.endsWith(".i2p")) {
-                out.println("No hostname set - go back and configure");
+                msgs.append("No hostname set - go back and configure\n");
             } else if (intPort <= 0) {
-                out.println("No target port set - go back and configure");
+                msgs.append("No target port set - go back and configure\n");
             } else {
                 boolean ok = true;
 
@@ -199,7 +201,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     try {
                         Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
                                                                                    3652, "EC", 256, newpw);
-                        out.println("Created selfsigned cert");
+                        msgs.append("Created selfsigned cert\n");
                         // save cert
                         java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) rv[2];
                         File f = new net.i2p.util.SecureFile(ctx.getConfigDir(), "certificates");
@@ -215,16 +217,16 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         }
                         ok = net.i2p.crypto.CertUtil.saveCert(cert, f);
                         if (ok)
-                            out.println("selfsigned cert stored");
+                            msgs.append("selfsigned cert stored\n");
                         else
-                            out.println("selfsigned cert store failed");
+                            msgs.append("selfsigned cert store failed\n");
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
-                        out.println("selfsigned cert store failed " + ioe);
+                        msgs.append("selfsigned cert store failed ").append(DataHelper.escapeHTML(ioe.toString())).append('\n');
                         ok = false;
                     } catch (java.security.GeneralSecurityException gse) {
                         gse.printStackTrace();
-                        out.println("selfsigned cert store failed " + gse);
+                        msgs.append("selfsigned cert store failed ").append(DataHelper.escapeHTML(gse.toString())).append('\n');
                         ok = false;
                     }
 
@@ -253,7 +255,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                                             "<!DOCTYPE Configure PUBLIC \"-//Jetty//Configure//EN\" \"http://www.eclipse.org/jetty/configure.dtd\">\n\n" +
                                             "<!-- Modified by SSL Wizard -->\n\n");
                                     JettyXmlConfigurationParser.write(root, w);
-                                    out.println("Jetty configuration updated");
+                                    msgs.append("Jetty configuration updated\n");
                                 } catch (IOException ioe) {
                                     ioe.printStackTrace();
                                     ok = false;
@@ -261,11 +263,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                                     if (w != null) try { w.close(); } catch (IOException ioe2) {}
                                 }
                             } else {
-                                out.println("Jetty configuration backup failed");
+                                msgs.append("Jetty configuration backup failed");
                             }
                         } catch (org.xml.sax.SAXException saxe) {
                             saxe.printStackTrace();
-                            out.println(DataHelper.escapeHTML(saxe.getMessage()));
+                            msgs.append("Jetty config parse failed ").append(DataHelper.escapeHTML(saxe.toString())).append('\n');
                             ok = false;
                         }
                     }
@@ -290,7 +292,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                                 v += " \"" + jettySSLConfigPath + '"';
                                 p.setProperty(k, v);
                                 DataHelper.storeProps(p, f);
-                                out.println("Jetty SSL enabled");
+                                msgs.append("Jetty SSL enabled\n");
                             }
                         } else {
                             // action = disable
@@ -304,7 +306,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                                 v = buf.toString().trim();
                                 p.setProperty(k, v);
                                 DataHelper.storeProps(p, f);
-                                out.println("Jetty SSL disabled");
+                                msgs.append("Jetty SSL disabled\n");
                             }
                         }
                     } catch (IOException ioe) {
@@ -334,15 +336,15 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                                         if (i < 4) {
                                             try { Thread.sleep(1000); } catch (InterruptedException ie) { break; }
                                         }
-                                        out.println("Jetty server stopped");
+                                        msgs.append("Jetty server stopped\n");
                                         break;
                                     }
                                     try { Thread.sleep(250); } catch (InterruptedException ie) { break; }
                                 }
                                 if (state != net.i2p.app.ClientAppState.STOPPED)
-                                    out.println("Jetty server stop failed");
+                                    msgs.append("Jetty server stop failed\n");
                             } catch (Throwable t) {
-                                out.println("Jetty server stop failed: " + t);
+                                msgs.append("Jetty server stop failed: " + t + '\n');
                             }
                         }
                         if (state == net.i2p.app.ClientAppState.STOPPED) {
@@ -351,25 +353,25 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                                 for (int i = 0; i < 20; i++) {
                                     state = jstart.getState();
                                     if (state == net.i2p.app.ClientAppState.RUNNING) {
-                                        out.println("Jetty server started");
+                                        msgs.append("Jetty server restarted\n");
                                         break;
                                     }
                                     try { Thread.sleep(250); } catch (InterruptedException ie) { break; }
                                 }
                                 if (state != net.i2p.app.ClientAppState.RUNNING)
-                                    out.println("Jetty server start failed");
+                                    msgs.append("Jetty server start failed\n");
                             } catch (Throwable t) {
-                                out.println("Jetty server start failed: " + t);
+                                msgs.append("Jetty server start failed: " + t + '\n');
                                 ok = false;
                             }
                         }
                     } else {
-                        out.println("Unable to restart Jetty server");
-                        out.println("You must start (or stop and restart) the Jetty server on <a href=\"/configclients\">the configure clients page</a>");
+                        //msgs.append("Unable to restart Jetty server\n");
+                        msgs.append("You must start the Jetty server on <a href=\"/configclients\">the configure clients page</a>.\n");
                     }
                 } else if (ok) {
-                    out.println("Unable to restart Jetty server");
-                    out.println("You must start (or stop and restart) the Jetty server on <a href=\"/configclients\">the configure clients page</a>");
+                    //msgs.append("Unable to restart Jetty server\n");
+                    msgs.append("You must start the Jetty server on <a href=\"/configclients\">the configure clients page</a>.\n");
                 }
 
                 // rewrite i2ptunnel.config
@@ -457,14 +459,22 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     editBean.setNonce(nonce);
                     editBean.setAction("Save changes");
                     String msg = editBean.getMessages();
-                    out.println(msg);
-                }
-
-                if (ok) {
-                    out.println(intl. _t("Configuration changes saved"));
+                    msgs.append(msg);
                 }
             }
-        }
+%>
+<div class="panel" id="messages">
+    <h2><%=intl._t("Status Messages")%></h2>
+    <table id="statusMessagesTable">
+        <tr>
+            <td id="tunnelMessages">
+        <textarea id="statusMessages" rows="4" cols="60" readonly="readonly"><%=msgs%></textarea>
+            </td>
+        </tr>
+    </table>
+</div>
+<%
+        } // action != null
 
 %>
 
@@ -535,6 +545,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
     }
 %>
+<%--
 <tr><th colspan="4"><%=intl._t("Add Port Routing")%></th></tr>
 <tr><td>
     <input type="text" size="6" maxlength="5" id="i2pPort" name="i2pPort" title="<%=intl._t("Specify the port the server is running on")%>" value="" class="freetext port" placeholder="required" />
@@ -546,8 +557,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     <input type="text" size="20" name="targetHost" title="<%=intl._t("Hostname or IP address of the target server")%>" value="<%=targetHost%>" class="freetext host" /> :
     <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=intl._t("Specify the port the server is running on")%>" value="" class="freetext port" placeholder="required" />
 </td></tr>
-<tr><th colspan="4"><%=intl._t("Jetty Clients")%></th></tr>
-<tr><th><%=intl._t("Client")%></th><th><%=intl._t("Configuration Files")%></th><th><%=intl._t("Enabled?")%></th><th><%=intl._t("SSL Enabled?")%></th><th><%=intl._t("KS Exists?")%></th><th><%=intl._t("KS Dflt PW?")%></th><th><%=intl._t("Privkey Dflt PW?")%></th></tr>
+--%>
+<tr><th colspan="4"><%=intl._t("Jetty Server")%></th></tr>
+<tr><th><%=intl._t("Server")%></th><th><%=intl._t("Configuration Files")%></th><th><%=intl._t("Enabled?")%></th><th><%=intl._t("SSL Enabled?")%></th></tr>
 <%
     // Now try to find the Jetty server in clients.config
     File configDir = ctx.getConfigDir();
@@ -687,15 +699,15 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %><%=DataHelper.escapeHTML(arg)%><br /><%
             }
 %>
-    </td><td><%=start%></td><td><%=ssl%></td><td><%=ksExists%> <%=error%></td><td><%=ksDflt%></td><td><%=kmDflt%></td></tr>
+    </td><td><%=start%></td><td><%=ssl%></td></tr>
 <%
             if (!canConfigure) {
 %>
-<tr><td colspan="7">Cannot configure, no Jetty SSL configuration template exists</td></tr>
+<tr><td colspan="4">Cannot configure, no Jetty SSL configuration template exists</td></tr>
 <%
             } else {
 %>
-<tr><td colspan="7">
+<tr><td colspan="4">
 <input type="hidden" name="clientAppNumber" value="<%=i%>" />
 <input type="hidden" name="isSSLEnabled" value="<%=isEnabled%>" />
 <input type="hidden" name="nofilter_ksPath" value="<%=ksPath%>" />
@@ -712,7 +724,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 }
 %>
 </td></tr>
-<tr><td class="buttons" colspan="7">
+<tr><td class="buttons" colspan="4">
 <%
                 if (isEnabled && !isPWDefault) {
 %>
@@ -747,8 +759,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         }  // for client
         if (!foundClientConfig) {
 %>
-<tr><td colspan="7">Cannot configure, no Jetty client found in clients.config that matches this tunnel</td></tr>
-<tr><td colspan="7">Support for non-Jetty servers TBD</td></tr>
+<tr><td colspan="4">Cannot configure, no Jetty client found in clients.config that matches this tunnel</td></tr>
+<tr><td colspan="4">Support for non-Jetty servers TBD</td></tr>
 <%
         }
     } catch (IOException ioe) { ioe.printStackTrace(); }
