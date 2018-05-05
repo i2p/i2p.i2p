@@ -1,0 +1,54 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[{*.bat,**/*.bat,installer/resources/proxy/*.ht}]
+end_of_line = crlf
+
+[**/*.css]
+indent_size = 5
+
+[{history.txt,LICENSE.txt}]
+indent_size = 3
+
+[**/.project]
+indent_style = tab
+
+[README.txt]
+indent_style = tab
+
+[apps/BOB/**/*.java]
+indent_style = tab
+
+[apps/routerconsole/jsp/{createreseed.jsp,exportfamily.jsp,flags.jsp,index.jsp,viewhistory.jsp,viewrouterlog.jsp,viewstat.jsp,viewtheme.jsp,viewwrapperlog.jsp}]
+insert_final_newline = false
+
+[apps/susimail/**/{*.java,*.js}]
+indent_style = tab
+
+[apps/susimail/**/{Attachments.java,MailPart.java,WebMail.java}]
+end_of_line = crlf
+
+[core/java/src/com/nettgryppa/**/*.java]
+indent_size = 2
+
+[core/java/src/gnu/**/*.java]
+indent_size = 2
+
+[core/java/src/gnu/getopt/*.properties]
+charset = iso-8859-1
+
+[core/java/src/net/minidev/**/*.java]
+indent_style = tab
+
+[router/java/src/org/cybergarage/**/*.java]
+indent_style = tab
+
+[router/java/src/org/freenetproject/*.java]
+indent_style = tab
