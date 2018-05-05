@@ -600,6 +600,9 @@ public class TunnelConfig {
             if (_port >= 0)
                 config.setProperty(TunnelController.PROP_LISTEN_PORT, Integer.toString(_port));
             config.setProperty(TunnelController.PROP_SHARED, _sharedClient + "");
+            // see I2PTunnelHTTPClient
+            if (TunnelController.TYPE_HTTP_CLIENT.equals(_type))
+                _booleanOptions.add(I2PTunnelHTTPClient.PROP_SSL_SET);
             for (String p : _booleanClientOpts)
                 config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
             for (String p : _otherClientOpts) {
@@ -759,7 +762,8 @@ public class TunnelConfig {
         I2PTunnelHTTPClient.PROP_USER_AGENT,
         I2PTunnelHTTPClient.PROP_REFERER,
         I2PTunnelHTTPClient.PROP_ACCEPT,
-        I2PTunnelHTTPClient.PROP_INTERNAL_SSL
+        I2PTunnelHTTPClient.PROP_INTERNAL_SSL,
+        I2PTunnelHTTPClient.PROP_SSL_SET
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,

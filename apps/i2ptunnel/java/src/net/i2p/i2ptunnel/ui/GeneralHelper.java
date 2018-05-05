@@ -661,8 +661,13 @@ public class GeneralHelper {
         return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_ACCEPT);
     }
 
+    /**
+     *  As of 0.9.35, default true, and overridden to true unless
+     *  PROP_SSL_SET is set
+     */
     public boolean getAllowInternalSSL(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_INTERNAL_SSL, true) ||
+               !getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_SSL_SET, true);
     }
 
     public boolean getMultihome(int tunnel) {

@@ -371,8 +371,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public static final String PROP_SSL_OUTPROXIES = "i2ptunnel.httpclient.SSLOutproxies";
     /** @since 0.9.14 */
     public static final String PROP_ACCEPT = "i2ptunnel.httpclient.sendAccept";
-    /** @since 0.9.14 */
+    /** @since 0.9.14, overridden to true as of 0.9.35 unlesss PROP_SSL_SET is set */
     public static final String PROP_INTERNAL_SSL = "i2ptunnel.httpclient.allowInternalSSL";
+    /** @since 0.9.35 */
+    public static final String PROP_SSL_SET = "sslManuallySet";
 
     /**
      *
@@ -1245,9 +1247,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 return;
             }
 
+            // as of 0.9.35, allowInternalSSL defaults to true, and overridden to true unless PROP_SSL_SET is set
             if (method.toUpperCase(Locale.US).equals("CONNECT") &&
                 !usingWWWProxy &&
-                !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_INTERNAL_SSL))) {
+                getTunnel().getClientOptions().getProperty(PROP_SSL_SET) != null &&
+                !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_INTERNAL_SSL, "true"))) {
                 try {
                     writeErrorMessage(ERR_INTERNAL_SSL, out, targetRequest, false, destination);
                 } catch (IOException ioe) {
