@@ -49,6 +49,8 @@ public final class KeyStoreUtil {
     public static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String DEFAULT_KEY_ALGORITHM = "RSA";
     private static final int DEFAULT_KEY_SIZE = 2048;
+    private static final String DEFAULT_CA_KEY_ALGORITHM = "EC";
+    private static final int DEFAULT_CA_KEY_SIZE = 256;
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
 
     static {
@@ -570,6 +572,9 @@ public final class KeyStoreUtil {
      *  Create a keypair and store it in the keystore at ks, creating it if necessary.
      *  Use default keystore password, valid days, algorithm, and key size.
      *
+     *  As of 0.9.35, default algorithm and size depends on cname. If it appears to be
+     *  a CA, it will use EC/256. Otherwise, it will use RSA/2048.
+     *
      *  Warning, may take a long time.
      *
      *  @param ks path to the keystore
@@ -583,13 +588,20 @@ public final class KeyStoreUtil {
      */
     public static boolean createKeys(File ks, String alias, String cname, String ou,
                                      String keyPW) {
+        final boolean isCA = !cname.contains("@") && !cname.endsWith(".family.i2p.net") &&
+                             SigType.ECDSA_SHA256_P256.isAvailable();
+        final String alg = isCA ? DEFAULT_CA_KEY_ALGORITHM : DEFAULT_KEY_ALGORITHM;
+        final int sz = isCA ? DEFAULT_CA_KEY_SIZE : DEFAULT_KEY_SIZE;
         return createKeys(ks, DEFAULT_KEYSTORE_PASSWORD, alias, cname, null, ou,
-                          DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM, DEFAULT_KEY_SIZE, keyPW);
+                          DEFAULT_KEY_VALID_DAYS, alg, sz, keyPW);
     }
 
     /**
      *  Create a keypair and store it in the keystore at ks, creating it if necessary.
      *  Use default keystore password, valid days, algorithm, and key size.
+     *
+     *  As of 0.9.35, default algorithm and size depends on cname. If it appears to be
+     *  a CA, it will use EC/256. Otherwise, it will use RSA/2048.
      *
      *  Warning, may take a long time.
      *
@@ -606,8 +618,12 @@ public final class KeyStoreUtil {
      */
     public static boolean createKeys(File ks, String alias, String cname, Set<String> altNames, String ou,
                                      String keyPW) {
+        final boolean isCA = !cname.contains("@") && !cname.endsWith(".family.i2p.net") &&
+                             SigType.ECDSA_SHA256_P256.isAvailable();
+        final String alg = isCA ? DEFAULT_CA_KEY_ALGORITHM : DEFAULT_KEY_ALGORITHM;
+        final int sz = isCA ? DEFAULT_CA_KEY_SIZE : DEFAULT_KEY_SIZE;
         return createKeys(ks, DEFAULT_KEYSTORE_PASSWORD, alias, cname, altNames, ou,
-                          DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM, DEFAULT_KEY_SIZE, keyPW);
+                          DEFAULT_KEY_VALID_DAYS, alg, sz, keyPW);
     }
 
     /**
