@@ -199,8 +199,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                             ks.delete();
                     }
                     try {
+                        boolean haveEC = net.i2p.crypto.SigType.ECDSA_SHA256_P256.isAvailable();
+                        String alg = haveEC ? "EC" : "RSA";
+                        int sz = haveEC ? 256 : 2048;
                         Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
-                                                                                   3652, "EC", 256, newpw);
+                                                                                   3652, alg, sz, newpw);
                         msgs.append("Created selfsigned cert\n");
                         // save cert
                         java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) rv[2];
