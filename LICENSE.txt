@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGES.
 LICENSES
 --------
 
-Core (i2p.jar):
+Core API (i2p.jar):
 Public domain except as listed below:
 
    ElGamal and DSA code:
@@ -65,6 +65,7 @@ Public domain except as listed below:
    See licenses/LICENSE-HashCash.txt
 
    GettextResource from gettext v0.19.8:
+   (not included in most distribution packages)
    Copyright (C) 2001, 2007 Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
 
@@ -72,15 +73,12 @@ Public domain except as listed below:
    Contains some code Copyright 2006 Sun Microsystems, Inc.
    See licenses/LICENSE-InstallCert.txt
 
-   BlockFile:
-   Copyright (c) 2006, Matthew Estes
-   See licenses/LICENSE-BlockFile.txt
-
    SipHashInline:
    Copyright 2012  Hiroshi Nakamura <nahi@ruby-lang.org>
    See licenses/LICENSE-Apache2.0.txt
 
    Getopt:
+   (not included in most distribution packages)
    Copyright (c) 1998 by Aaron M. Renn (arenn@urbanophile.com)
    See licenses/LICENSE-LGPLv2.1.txt
 
@@ -103,15 +101,12 @@ Public domain except as listed below:
    Copyright (C) 2003-2010 Satoshi Konno
    See licenses/LICENSE-UPnP.txt
 
-   GeoIP: GeoLite databases are licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
-   http://creativecommons.org/licenses/by-sa/3.0/
-   This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/
-
    GeoIP API 1.3.1:
    See licenses/LICENSE-LGPLv2.1.txt
 
 
 Installer:
+   (not included in distribution packages)
    Launch4j 3.0.1:
    (Launch4j is only included in the upstream source package and Windows binaries.
     Not applicable for non-Windows binaries or Debian/Launchpad packages.)
@@ -152,17 +147,27 @@ Installer:
    Copyright (c) 2001-2008 Julien Ponge
    See licenses/LICENSE-Apache2.0.txt
 
+
+GeoIP Data:
+   (not included in most distribution packages)
+   GeoLite databases are licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+   http://creativecommons.org/licenses/by-sa/3.0/
+   This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/
+   See licenses/LICENSE-GeoIP.txt
+
 Launchers:
+   (not included in distribution packages)
    Copyright (c) 2002-2018 EPFL, Lausanne / Lightbend, Inc. , unless otherwise specified.
    See licenses/LICENSE-Scala.md
 
 Java Service Wrapper Community Edition 32-bit 3.5.34:
+   (not included in most distribution packages)
    Copyright (C) 1999-2017 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
 
 Jbigi Libraries (jbigi.jar):
-   JNI code public domain.
+   JNI code: public domain.
 
    GMP 4.3.2 / 5.0.2:
    Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
@@ -173,41 +178,47 @@ Jbigi Libraries (jbigi.jar):
 
 Applications:
 
-   Addressbook:
+   Addressbook (addressbook.jar):
    Copyright (c) 2004 Ragnarok
    See licenses/LICENSE-Addressbook.txt
+     BlockFile:
+       Copyright (c) 2006, Matthew Estes
+       See licenses/LICENSE-BlockFile.txt
 
-   BOB:
+   BOB (BOB.jar):
    Copyright (C) sponge
    See licenses/COPYING-BOB.txt
 
-   Desktopgui
+   Desktopgui (desktopgui.jar):
    Copyright (c) Mathias De Maré
    See licenses/LICENSE-DesktopGUI.txt
 
-   I2PSnark:
+   Glassfish Standard Tag Library (JSTL) 1.2 (commons-el.jar):
+   (not included in most distribution packages)
+   Common Development and Distribution License (CDDL) version 1.0 + GNU General Public License (GPL) version 2
+   See https://glassfish.dev.java.net/public/CDDL+GPL.html
+   See licenses/LICENSE-GPLv2.txt
+
+   I2PSnark (i2psnark.jar, i2psnark.war):
    Copyright (C) 2003 Mark J. Wielaard
    GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
-       Silk icons: See licenses/LICENSE-SilkIcons.txt
 
-   I2PTunnel:
+   I2PTunnel (i2ptunnel.jar, i2ptunnel.war):
    (c) 2003 - 2004 mihi
    GPLv2 (or any later version) with exception.
    See licenses/LICENSE-I2PTunnel.txt
    See licenses/LICENSE-GPLv2.txt
+     I2PTunnel SOCKS Proxy:
+       Copyright (c) 2004 by human
+       GPLv2 (or any later version) with exception.
+       See licenses/LICENSE-I2PTunnel.txt
+       See licenses/LICENSE-GPLv2.txt
+     I2PTunnel UDP and Streamr (i2ptunnel.jar):
+       By welterde.
+       See licenses/LICENSE-GPLv2.txt
 
-   I2PTunnel SOCKS Proxy:
-   Copyright (c) 2004 by human
-   GPLv2 (or any later version) with exception.
-   See licenses/LICENSE-I2PTunnel.txt
-   See licenses/LICENSE-GPLv2.txt
-
-   I2PTunnel UDP and Streamr:
-   By welterde.
-   See licenses/LICENSE-GPLv2.txt
-
-   Imagegen:
+   Imagegen (imagegen.war):
      Identicon:
        Copyright (c) 2007-2014 Don Park <donpark@docuverse.com>
        See licenses/LICENSE-Identicon.txt
@@ -218,13 +229,14 @@ Applications:
      Zxing 3.3.0:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 9.2.24.v20180105:
+   Jetty 9.2.24.v20180105 (jetty-*.jar, org.mortbay.*.jar):
+   (not included in most distribution packages, except for jetty-i2p.jar)
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
    See licenses/LICENSE-ECLIPSE-1.0.html
 
-   JRobin 1.6.0-1:
+   JRobin 1.6.0-1 (jrobin.jar):
    Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor.
    Copyright (c) 2011 The OpenNMS Group, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
@@ -232,64 +244,58 @@ Applications:
    Copyright (c) 2006-2016 Julien Gouesse
    See licenses/LICENSE-GPLv2.txt
 
-   Ministreaming Lib:
+   Ministreaming Lib (mstreaming.jar):
    By mihi.
    See licenses/LICENSE-BSD.txt
 
-   Proxyscript:
+   Proxyscript (i2pProxy.pac):
+   (not included in distribution packages)
    By Cervantes.
    Public domain.
 
-   Router console:
+   Router console (routerconsole.jar, routerconsole.war):
    Public domain.
+
+   Router Console themes:
        Flag icons:
          - Jersey and EU flag icons: public domain, courtesy Xrmap flag
            collection http://www.arvernes.com/wiki/index.php/Xrmap
          - Guernsey and Isle of Man flags from the Open Clip Art Library, released into the public domain
          - Curaçao, courtesy of David Benbennick, released into the public domain
          - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
-       Silk icons: See licenses/LICENSE-SilkIcons.txt
        FatCow icons: See licenses/LICENSE-FatCowIcons.txt
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
-
-       GeoIP Data:
-       This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/
-       See licenses/LICENSE-GeoIP.txt
 
    Router Console and I2PSnark themes:
    "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
    Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155
+       Silk icons: See licenses/LICENSE-SilkIcons.txt
 
    I2PSnark light theme:
    "Creative Commons Cat" licensed under a Creative Commons Attribution 3.0 Unported License.
    Original photo by Boaz Arad. http://www.luxphile.com/2011/01/creative-commons-cat.html
 
-   SAM:
+   SAM (sam.jar):
    Public domain.
 
-   Streaming Lib:
+   Streaming Lib (streaming.jar):
    Public domain.
 
-   SusiDNS:
+   SusiDNS (susidns.war):
    Copyright (C) 2005 <susi23@mail.i2p>
    GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
-       Uses Glassfish Standard Tag Library (JSTL) 1.2:
-       Common Development and Distribution License (CDDL) version 1.0 + GNU General Public License (GPL) version 2
-       See https://glassfish.dev.java.net/public/CDDL+GPL.html
-       See licenses/LICENSE-GPLv2.txt
 
-   SusiMail:
+   SusiMail (susimail.war):
    Copyright (C) 2004-2005  <susi23@mail.i2p>
    GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
 
-   Systray:
+   Systray (systray.jar):
    Public domain.
-      Bundles systray4j-2.4.1:
-      See licenses/LICENSE-LGPLv2.1.txt
 
-   Tomcat 8.5.30:
+   Tomcat 8.5.30 (jasper-runtime.jar):
+   (not included in most distribution packages)
    Copyright 1999-2018 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
