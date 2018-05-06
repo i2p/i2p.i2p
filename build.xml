@@ -907,7 +907,7 @@
             <classpath>
                 <pathelement location="build/i2p.jar" />
                 <pathelement location="build/router.jar" />
-                <pathelement location="${junit.home}/ant-junit4.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
             </classpath>
             <!--
