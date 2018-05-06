@@ -301,10 +301,10 @@
 
     <target name="bbLauncher" depends="build">
         <sequential>
-            <exec executable="sbt" dir="launchers" failonerror="true">
+            <exec executable="./sbt" dir="launchers" failonerror="true">
                 <arg value="browserbundle:clean" />
             </exec>
-            <exec executable="sbt" dir="launchers" failonerror="true">
+            <exec executable="./sbt" dir="launchers" failonerror="true">
                 <arg value="browserbundle:assembly" />
             </exec>
         </sequential>
@@ -312,10 +312,10 @@
 
     <target name="osxLauncher" depends="build,preppkg-osx">
         <sequential>
-            <exec executable="sbt" dir="launchers" failonerror="true">
+            <exec executable="./sbt" dir="launchers" failonerror="true">
                 <arg value="macosx:cleanAllTask" />
             </exec>
-            <exec executable="sbt" dir="launchers" failonerror="true">
+            <exec executable="./sbt" dir="launchers" failonerror="true">
                 <arg value="macosx:buildAppBundleTask" />
             </exec>
         </sequential>
@@ -1112,7 +1112,7 @@
 	    <!--
 	    	Less common, but they pollute my workspace here, so we
             	might as well nuke these as well. Are there any others?
-            	
+
             	!!??? Why don't we just nuke "**/*~" ???!!
 
             	++Sponge
