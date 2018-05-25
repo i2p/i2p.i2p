@@ -1,3 +1,6 @@
+2018-05-25 zzz
+ * Console: Fix changes to wrong tunnel on /configtunnels (ticket #2227)
+
 2018-05-06 meeh
  * launchers:
    - rewritten some logic
@@ -11,7 +14,7 @@
 
 2018-05-05 zzz
  * i2ptunnel:
-   - Link to SSL wizard
+   - Link to SSL wizard (ticket #2159)
    - Enable SSL to i2p hosts by default
  * Streaming: Don't send HTTP response on an HTTPS connection
 

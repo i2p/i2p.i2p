@@ -76,7 +76,13 @@ public class ConfigTunnelsHandler extends FormHandler {
                 continue;
             }
             
-            in.setLength(getInt(_settings.get(index + ".depthInbound")));
+            Object di = _settings.get(index + ".depthInbound");
+            if (di == null) {
+                // aliased pools
+                index++;
+                continue;
+            }
+            in.setLength(getInt(di));
             out.setLength(getInt(_settings.get(index + ".depthOutbound")));
             in.setLengthVariance(getInt(_settings.get(index + ".varianceInbound")));
             out.setLengthVariance(getInt(_settings.get(index + ".varianceOutbound")));
