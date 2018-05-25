@@ -267,6 +267,11 @@ public class IndexBean {
         return _t("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "...";
     }
     
+    /**
+     * Only call this ONCE! Or you will get duplicate tunnels on save.
+     *
+     * @return not HTML escaped, or "" if empty
+     */
     private String saveChanges() {
         // FIXME name will be HTML escaped twice
         return getMessages(_helper.saveTunnel(_tunnel, _config));
@@ -300,7 +305,7 @@ public class IndexBean {
             try {
                 String result = processAction();
                 if (result.length() > 0)
-                    buf.append(processAction()).append('\n');
+                    buf.append(result).append('\n');
             } catch (RuntimeException e) {
                 _log.log(Log.CRIT, "Error processing " + _action, e);
                 buf.append("Error: ").append(e.toString()).append('\n');
@@ -1208,12 +1213,8 @@ public class IndexBean {
     /** New key */
     private String generateNewEncryptionKey() {
         TunnelController tun = getController(_tunnel);
-        Properties config = getConfig();
         if (tun == null) {
             // creating new
-            tun = new TunnelController(config, "", true);
-            _group.addController(tun);
-            saveChanges();
         } else if (tun.getIsRunning() || tun.getIsStarting()) {
             return "Tunnel must be stopped before modifying leaseset encryption key";
         }

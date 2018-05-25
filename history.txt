@@ -1,5 +1,6 @@
 2018-05-25 zzz
  * Console: Fix changes to wrong tunnel on /configtunnels (ticket #2227)
+ * i2ptunnel: Fix dup tunnels clicking generate on new tunnel (ticket #2225)
 
 2018-05-06 meeh
  * launchers:
