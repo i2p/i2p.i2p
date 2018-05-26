@@ -1,6 +1,12 @@
 2018-05-26 zzz
  * /confignet: Reorganize (ticket #2217)
  * /configsidebar: Tag sections for translation; sort unselected sections by translated name
+ * i2psnark:
+   - Hide "0 Bps" if no peers (ticket #2152)
+   - Hide peers button if no peers (ticket #2152)
+   - Hide column 1 icon for peers (ticket #1996)
+ * i2ptunnel: Retry accept after server socket closed (ticket #2003)
+ * Jetty: Skip files with [] in default servlet listing
  * Router: Fix wrapper.config path in OOM message when installed as
    Debian package, but not running as a service (ticket #2223)
  * Summary Bar: Change header from "I2P Updates" to "Update Status" (ticket #2137)

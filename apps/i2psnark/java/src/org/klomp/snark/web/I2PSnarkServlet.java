@@ -495,21 +495,31 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</a>");
         out.write("</th>\n<th class=\"snarkTorrentStatus\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write(" <a href=\"" + _contextPath + '/');
-            if (peerParam != null) {
-                // disable peer view
-                out.write(getQueryString(req, "", null, null));
-                out.write("\">");
-                tx = _t("Hide Peers");
-                out.write(toThemeImg("hidepeers", tx, tx));
-            } else {
-                // enable peer view
-                out.write(getQueryString(req, "1", null, null));
-                out.write("\">");
-                tx = _t("Show Peers");
-                out.write(toThemeImg("showpeers", tx, tx));
+            boolean hasPeers = false;
+            int end = Math.min(start + pageSize, snarks.size());
+            for (int i = start; i < end; i++) {
+                if (snarks.get(i).getPeerCount() > 0) {
+                    hasPeers = true;
+                    break;
+                }
             }
-            out.write("</a>\n");
+            if (hasPeers) {
+                out.write(" <a href=\"" + _contextPath + '/');
+                if (peerParam != null) {
+                    // disable peer view
+                    out.write(getQueryString(req, "", null, null));
+                    out.write("\">");
+                    tx = _t("Hide Peers");
+                    out.write(toThemeImg("hidepeers", tx, tx));
+                } else {
+                    // enable peer view
+                    out.write(getQueryString(req, "1", null, null));
+                    out.write("\">");
+                    tx = _t("Show Peers");
+                    out.write(toThemeImg("showpeers", tx, tx));
+                }
+                out.write("</a>\n");
+            }
         }
         out.write("</th>\n<th colspan=\"2\" align=\"left\">");
         // cycle through sort by name or type
