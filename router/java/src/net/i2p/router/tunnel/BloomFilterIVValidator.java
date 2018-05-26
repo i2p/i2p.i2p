@@ -4,6 +4,7 @@ import java.io.File;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.tasks.OOMListener;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.Log;
@@ -102,27 +103,20 @@ class BloomFilterIVValidator implements IVValidator {
     private void warn(long maxMemory, int KBps, long recMaxMem, int threshKBps) {
         if (SystemVersion.isAndroid())
             return;
-        // Can't find any System property or wrapper property that gives
-        // you the actual config file path, have to guess
-        String path;
-        if (SystemVersion.isLinuxService()) {
-            path = "/etc/i2p";
-        } else {
-            path = _context.getBaseDir().toString();
-        }
+        String path = OOMListener.getWrapperConfigPath(_context);
         String msg =
             "Configured for " + DataHelper.formatSize(KBps *1024L) +
             "Bps share bandwidth but only " +
             DataHelper.formatSize(maxMemory) + "B available memory.";
         if (_context.hasWrapper()) {
             msg += " Recommend increasing wrapper.java.maxmemory in " +
-                   path + File.separatorChar + "wrapper.config";
+                   path;
         } else if (!SystemVersion.isWindows()) {
             msg += " Recommend increasing MAXMEMOPT in " +
-                   path + File.separatorChar + "runplain.sh or /usr/bin/i2prouter-nowrapper";
+                   _context.getBaseDir() + File.separatorChar + "runplain.sh or /usr/bin/i2prouter-nowrapper";
         } else {
             msg += " Recommend running the restartable version of I2P, and increasing wrapper.java.maxmemory in " +
-                   path + File.separatorChar + "wrapper.config";
+                   path;
         }
         // getMaxMemory() returns significantly lower than wrapper config, so add 10%
         msg += " to at least " + (recMaxMem * 11 / 10 / (1024*1024)) + " (MB)" +
