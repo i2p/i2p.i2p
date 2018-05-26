@@ -219,7 +219,27 @@ public class I2PDefaultServlet extends DefaultServlet
         dfmt.setTimeZone(utc);
         for (int i=0 ; i< ls.length ; i++)
         {
-            Resource item = res.addPath(ls[i]);
+            Resource item;
+            try {
+                item = res.addPath(ls[i]);
+            } catch (IOException ioe) { 
+                System.out.println("Skipping file in directory listing: " + ioe.getMessage());
+                continue;
+            } catch (RuntimeException re) { 
+                // Jetty bug, addPath() argument must be unencoded,
+                // but does not escape [],so it throws an unchecked exception:
+                //
+                // java.nio.file.InvalidPathException:
+                // Illegal character in path at index xx: file:/home/.../[test].txt: [test].txt
+                //   at org.eclipse.jetty.util.resource.FileResource.addPath(FileResource.java:213)
+                //   ...
+                //
+                //  Catch here and continue so we show the rest of the listing,
+                // and don't output the full path in the error page
+                // TODO actually handle it
+                System.out.println("Skipping file in directory listing: " + re.getMessage());
+                continue;
+            }
             
             buf.append("\n<TR><TD><A HREF=\"");
             String path=URIUtil.addPaths(encodedBase,URIUtil.encodePath(ls[i]));
@@ -231,7 +251,6 @@ public class I2PDefaultServlet extends DefaultServlet
             
             buf.append("\">");
             buf.append(deTag(ls[i]));
-            buf.append("&nbsp;");
             buf.append("</A></TD><TD ALIGN=right>");
             buf.append(item.length());
             buf.append(" bytes&nbsp;</TD><TD>");
