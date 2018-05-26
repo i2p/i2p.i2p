@@ -1,6 +1,9 @@
 2018-05-26 zzz
+ * /configsidebar: Tag sections for translation; sort unselected sections by translated name
  * Router: Fix wrapper.config path in OOM message when installed as
    Debian package, but not running as a service (ticket #2223)
+ * Summary Bar: Change header from "I2P Updates" to "Update Status" (ticket #2137)
+ * Utils: Disable DNSoverHTTPS by default (ticket #2201)
 
 2018-05-25 zzz
  * Console: Fix changes to wrong tunnel on /configtunnels (ticket #2227)

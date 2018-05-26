@@ -38,27 +38,27 @@ class SummaryBarRenderer {
 
     static {
         Map<String, String> aMap = new HashMap<String, String>();;
-        aMap.put("HelpAndFAQ", "Help &amp; FAQ");
-        aMap.put("I2PServices", "I2P Services");
-        aMap.put("I2PInternals", "I2P Internals");
-        aMap.put("RouterInfo", "Router Information");
-        aMap.put("ShortRouterInfo", "Short Router Information");
-        aMap.put("AdvancedRouterInfo", "Router Information (advanced)");
-        aMap.put("MemoryBar", "Memory Usage Bar");
-        aMap.put("NetworkReachability", "Network Reachability");
-        aMap.put("UpdateStatus", "Update Status");
-        aMap.put("RestartStatus", "Restart Status");
-        aMap.put("Peers", "Peers");
-        aMap.put("PeersAdvanced", "Peers (advanced)");
-        aMap.put("FirewallAndReseedStatus", "Firewall &amp; Reseed Status");
-        aMap.put("Bandwidth", "Bandwidth");
-        aMap.put("BandwidthGraph", "Bandwidth Graph (experimental)");
-        aMap.put("Tunnels", "Tunnels");
-        aMap.put("Congestion", "Congestion");
-        aMap.put("TunnelStatus", "Tunnel Status");
-        aMap.put("Destinations", "Local Tunnels");
-        aMap.put("NewsHeadings", "News &amp; Updates");
-        aMap.put("Advanced", "Advanced Console Links");
+        aMap.put("HelpAndFAQ", _x("Help &amp; FAQ"));
+        aMap.put("I2PServices", _x("I2P Services"));
+        aMap.put("I2PInternals", _x("I2P Internals"));
+        aMap.put("RouterInfo", _x("Router Information"));
+        aMap.put("ShortRouterInfo", _x("Router Information (brief)"));
+        aMap.put("AdvancedRouterInfo", _x("Router Information (advanced)"));
+        aMap.put("MemoryBar", _x("Memory Usage Bar"));
+        aMap.put("NetworkReachability", _x("Network Reachability"));
+        aMap.put("UpdateStatus", _x("Update Status"));
+        aMap.put("RestartStatus", _x("Restart Status"));
+        aMap.put("Peers", _x("Peers"));
+        aMap.put("PeersAdvanced", _x("Peers (advanced)"));
+        aMap.put("FirewallAndReseedStatus", _x("Firewall &amp; Reseed Status"));
+        aMap.put("Bandwidth", _x("Bandwidth"));
+        aMap.put("BandwidthGraph", _x("Bandwidth Graph"));
+        aMap.put("Tunnels", _x("Tunnels"));
+        aMap.put("Congestion", _x("Congestion"));
+        aMap.put("TunnelStatus", _x("Tunnel Status"));
+        aMap.put("Destinations", _x("Local Tunnels"));
+        aMap.put("NewsHeadings", _x("News &amp; Updates"));
+        aMap.put("Advanced", _x("Advanced Links"));
         SECTION_NAMES = Collections.unmodifiableMap(aMap);
     }
 
@@ -606,7 +606,7 @@ class SummaryBarRenderer {
         buf.append("<h3><a href=\"/configupdate\" target=\"_top\" title=\"")
            .append(_t("Configure I2P Updates"))
            .append("\">")
-           .append(_t("I2P Update"))
+           .append(_t("Update Status"))
            .append("</a></h3><hr class=\"b\">\n");
         buf.append(updateStatus);
         return buf.toString();
@@ -1012,6 +1012,11 @@ class SummaryBarRenderer {
             buf.append("</div>\n");
         }
         return buf.toString();
+    }
+
+    /** tag only */
+    private static final String _x(String s) {
+        return s;
     }
 
     /** translate a string */

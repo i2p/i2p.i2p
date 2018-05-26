@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -1052,7 +1052,8 @@ public class SummaryHelper extends HelperBase {
         String[] allSections = SummaryBarRenderer.ALL_SECTIONS;
         Map<String, String> sectionNames = SummaryBarRenderer.SECTION_NAMES;
         List<String> sections = getSummaryBarSections("default");
-        TreeSet<String> sortedSections = new TreeSet<String>();
+        // translated section name to section id
+        TreeMap<String, String> sortedSections = new TreeMap<String, String>(Collator.getInstance());
 
         // Forward-convert old section names
         int pos = sections.indexOf("General");
@@ -1066,8 +1067,11 @@ public class SummaryHelper extends HelperBase {
 
         for (int i = 0; i < allSections.length; i++) {
             String section = allSections[i];
-            if (!sections.contains(section))
-                sortedSections.add(section);
+            if (!sections.contains(section)) {
+                String name = sectionNames.get(section);
+                if (name != null)
+                    sortedSections.put(_t(name), section);
+            }
         }
 
         String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
@@ -1155,10 +1159,9 @@ public class SummaryHelper extends HelperBase {
            .append(_t("Select a section to add"))
            .append("</option>\n");
 
-        for (String s : sortedSections) {
-            String name = sectionNames.get(s);
-            if (name == null)
-                continue;
+        for (Map.Entry<String, String> e : sortedSections.entrySet()) {
+            String name = e.getKey();
+            String s = e.getValue();
             buf.append("<option value=\"").append(s).append("\">")
                .append(name).append("</option>\n");
         }
