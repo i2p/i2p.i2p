@@ -77,7 +77,7 @@ public class NtpClient {
     // IP:reason for servers that sent us a kiss of death
     private static final Map<String, String> kisses = new ConcurrentHashMap<String, String>(2);
     private static final String PROP_USE_DNS_OVER_HTTPS = "time.useDNSOverHTTPS";
-    private static final boolean DEFAULT_USE_DNS_OVER_HTTPS = true;
+    private static final boolean DEFAULT_USE_DNS_OVER_HTTPS = false;
 
     /**
      * Query the ntp servers, returning the current time from first one we find

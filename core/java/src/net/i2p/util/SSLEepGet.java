@@ -102,7 +102,7 @@ public class SSLEepGet extends EepGet {
 
     private static final String CERT_DIR = "certificates/ssl";
     private static final String PROP_USE_DNS_OVER_HTTPS = "eepget.useDNSOverHTTPS";
-    private static final boolean DEFAULT_USE_DNS_OVER_HTTPS = true;
+    private static final boolean DEFAULT_USE_DNS_OVER_HTTPS = false;
 
     /**
      *  Not all may be supported.
