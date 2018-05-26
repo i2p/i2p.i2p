@@ -1811,11 +1811,11 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
-        if (isRunning && needed > 0)
+        if (isRunning && needed > 0 && (downBps > 0 || curPeers > 0))
             out.write(formatSizeDec(downBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateUp\">");
-        if (isRunning && isValid)
+        if (isRunning && isValid && (upBps > 0 || curPeers > 0))
             out.write(formatSizeDec(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction\">");
