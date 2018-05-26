@@ -76,6 +76,7 @@
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" >
             <manifest>
+                <attribute name="Class-Path" value="i2p.jar streaming.jar" />
                 <attribute name="Specification-Title" value="I2P Streaming API" />
                 <attribute name="Specification-Version" value="${release.number}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
