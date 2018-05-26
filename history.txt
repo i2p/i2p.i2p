@@ -1,4 +1,5 @@
 2018-05-26 zzz
+ * /confignet: Reorganize (ticket #2217)
  * /configsidebar: Tag sections for translation; sort unselected sections by translated name
  * Router: Fix wrapper.config path in OOM message when installed as
    Debian package, but not running as a service (ticket #2223)

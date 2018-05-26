@@ -161,6 +161,16 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     /**
+     * default true
+     * @since 0.9.35
+     */
+    public String getUdpEnabledChecked() {
+        if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
+            return CHECKED;
+        return "";
+    }
+
+    /**
      *  This isn't updated for the new statuses, but it's commented out in the jsp.
      *  @deprecated unused, to be fixed if needed
      */

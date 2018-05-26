@@ -148,7 +148,7 @@ public class ConfigNetHandler extends FormHandler {
     
     /** @since 0.8.13 */
     public void setDisableUDP(String foo) {
-        _udpDisabled = true;
+        _udpDisabled = "disabled".equals(foo);
     }
     
     /** @since IPv6 */

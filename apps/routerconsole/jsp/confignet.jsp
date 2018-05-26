@@ -26,8 +26,13 @@
  <table id="netconfig" class="configtable">
  <tr>
   <td class="infohelp">
- <b><%=intl._t("The default settings will work for most people.")%></b> 
- <%=intl._t("Changing these settings will restart your router.")%>
+ <b><%=intl._t("The default settings will work for most people.")%>
+ <%=intl._t("Changing these settings will restart your router.")%></b>
+  </td>
+ </tr>
+ <tr>
+  <td class="infohelp">
+   <b><%=intl._t("Do not reveal your port numbers to anyone, as they can be used to discover your IP address.")%></b>
   </td>
  </tr>
  <tr>
@@ -61,71 +66,64 @@
   </td>
  </tr>
  <tr>
-  <th id="ipchange"><%=intl._t("Action when IP changes")%></th>
- </tr>
- <tr>
   <td>
-    <label><input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> >
-    <%=intl._t("Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity")%>
-    (<i><%=intl._t("Experimental")%></i>)</label>
-  </td>
- </tr>
- <tr>
-  <th id="ipv4config"><%=intl._t("IPv4 Configuration")%></th>
- </tr>
- <tr>
-  <td>
+ <b class="suboption"><%=intl._t("IPv4 Configuration")%>:</b><br>
     <label><input type="checkbox" class="optbox" name="IPv4Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv4FirewalledChecked" /> >
     <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%></label>
   </td>
  </tr>
  <tr>
-  <th id="ipv6config"><%=intl._t("IPv6 Configuration")%></th>
- </tr>
- <tr>
   <td>
-    <label><input type="checkbox" class="optbox" name="IPv6Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv6FirewalledChecked" /> >
-    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%></label><br>
-    <label><input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
-    <%=intl._t("Disable IPv6")%></label><br>
-    <label><input type="radio" class="optbox" name="ipv6" value="enable" <%=nethelper.getIPv6Checked("enable") %> >
-    <%=intl._t("Enable IPv6")%></label><br>
+ <b class="suboption"><%=intl._t("IPv6 Configuration")%>:</b><br>
     <label><input type="radio" class="optbox" name="ipv6" value="preferIPv4" <%=nethelper.getIPv6Checked("preferIPv4") %> >
     <%=intl._t("Prefer IPv4 over IPv6")%></label><br>
     <label><input type="radio" class="optbox" name="ipv6" value="preferIPv6" <%=nethelper.getIPv6Checked("preferIPv6") %> >
     <%=intl._t("Prefer IPv6 over IPv4")%></label><br>
+    <label><input type="radio" class="optbox" name="ipv6" value="enable" <%=nethelper.getIPv6Checked("enable") %> >
+    <%=intl._t("Enable IPv6")%></label><br>
+    <label><input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
+    <%=intl._t("Disable IPv6")%></label><br>
     <label><input type="radio" class="optbox" name="ipv6" value="only" <%=nethelper.getIPv6Checked("only") %> >
     <%=intl._t("Use IPv6 only (disable IPv4)")%>
-    (<i><%=intl._t("Experimental")%></i>)</label>
+    <i>(<%=intl._t("Experimental")%>)</i></label><br>
+    <label><input type="checkbox" class="optbox" name="IPv6Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv6FirewalledChecked" /> >
+    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%></label>
+  </td>
+ </tr>
+ <tr>
+  <td>
+ <b class="suboption"><%=intl._t("Action when IP changes")%>:</b><br>
+    <label><input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> >
+    <%=intl._t("Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity")%>
+    <i>(<%=intl._t("Experimental")%>)</i></label>
   </td>
  </tr>
  <tr>
   <th id="udpconfig"><%=intl._t("UDP Configuration")%></th>
  </tr>
  <tr>
-  <td class="infowarn">
-   <b><%=intl._t("Do not reveal your port numbers to anyone, as they can be used to discover your IP address.")%></b>
-  </td>
- </tr>
- <tr>
   <td>
- <b><%=intl._t("UDP port:")%></b>
+ <b class="suboption"><%=intl._t("UDP port:")%></b><br>
+ <label><input type="radio" class="optbox" name="disableUDP" value="enabled" <%=nethelper.getUdpEnabledChecked() %> >
+ <%=intl._t("Specify Port")%>:</label>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" ><br>
- <label><input type="checkbox" class="optbox" name="disableUDP" value="disabled" <%=nethelper.getUdpDisabledChecked() %> >
+ <label><input type="radio" class="optbox" name="disableUDP" value="disabled" <%=nethelper.getUdpDisabledChecked() %> >
  <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that blocks outbound UDP)")%></i></label>
   </td>
  </tr>
-<% /********
-<!-- let's keep this simple...
-<input type="checkbox" class="optbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
- Require SSU introductions
- <i>(Enable if you cannot open your firewall)</i>
- </p><p>
- Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br>
--->
-*********/ %>
  <tr>
   <th id="tcpconfig"><%=intl._t("TCP Configuration")%></th>
+ </tr>
+ <tr>
+  <td>
+ <b class="suboption"><%=intl._t("Externally reachable TCP port")%>:</b><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> >
+    <%=intl._t("Specify Port")%>:</label>
+    <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" ><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> >
+    <%=intl._t("Use the same port configured for UDP")%>
+    <i>(<%=intl._t("currently")%> <jsp:getProperty name="nethelper" property="udpPort" />)</i></label>
+  </td>
  </tr>
  <tr>
   <td>
@@ -136,26 +134,13 @@
     <%=intl._t("if we are not firewalled")%></label><br>
     <label><input type="radio" class="optbox" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> >
     <%=intl._t("Always use auto-detected IP address (Not firewalled)")%></label><br>
-    <label><input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> >
-    <%=intl._t("Specify hostname or IP")%>:</label>
-    <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" ><br>
     <label><input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> >
     <%=intl._t("Disable inbound (Firewalled)")%></label><br>
     <label><input type="radio" class="optbox" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> >
-    <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that throttles or blocks outbound TCP)")%></i></label>
-  </td>
- </tr>
- <tr>
-  <th id="externaltcp"><%=intl._t("Externally reachable TCP port")%></th>
- </tr>
- <tr>
-  <td>
-    <label><input type="radio" class="optbox" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> >
-    <%=intl._t("Use the same port configured for UDP")%>
-    <i>(<%=intl._t("currently")%> <jsp:getProperty name="nethelper" property="udpPort" />)</i></label><br>
-    <label><input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> >
-    <%=intl._t("Specify Port")%>:</label>
-    <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" >
+    <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that throttles or blocks outbound TCP)")%></i></label><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> >
+    <%=intl._t("Specify hostname or IP")%>:</label>
+    <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" >
   </td>
  </tr>
  <tr>
@@ -165,32 +150,4 @@
   </td>
  </tr>
 </table>
-
-<% /********
-<!-- let's keep this simple...
-<input type="submit" name="recheckReachability" value="Check network reachability..." />
-</p>
--->
-*********/ %>
-<% /********
-      <!--
- <b>Dynamic Router Keys: </b>
- <input type="checkbox" class="optbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br>
- <p>
- This setting causes your router identity to be regenerated every time your IP address
- changes. If you have a dynamic IP this option can speed up your reintegration into
- the network (since people will have banned your old router identity), and, for
- very weak adversaries, help frustrate trivial
- <a href="http://www.i2p.net/how_threatmodel#intersection">intersection
- attacks</a> against the NetDB.  Your different router identities would only be
- 'hidden' among other I2P users at your ISP, and further analysis would link
- the router identities further.</p>
- <p>Note that when I2P detects an IP address change, it will automatically
- initiate a restart in order to rekey and to disconnect from peers before they
- update their profiles - any long lasting client connections will be disconnected,
- though such would likely already be the case anyway, since the IP address changed.
- </p>
- <br>
--->
-*********/ %>
 </form></div></body></html>
