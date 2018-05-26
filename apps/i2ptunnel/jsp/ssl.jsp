@@ -489,12 +489,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <input type="hidden" name="type" value="<%=tunnelType%>" />
 <input type="submit" class="default" name="action" value="Save changes" />
 <table>
-<tr><td colspan="4" class="infohelp"><%=intl._t("Experts only!")%> Beta!</td></tr>
-<tr><td colspan="4"><b><%=intl._t("Tunnel name")%>:</b> <%=editBean.getTunnelName(curTunnel)%></td></tr>
+<tr><td colspan="4" class="infohelp"><%=intl._t("Experts only!")%></td></tr>
 <%
       if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
 %>
-<tr><td colspan="4"><b><%=intl._t("Website name")%>:</b> <%=editBean.getSpoofedHost(curTunnel)%></td></tr>
+<tr><td colspan="4"><b><%=intl._t("Website Hostname")%>:</b> <%=editBean.getSpoofedHost(curTunnel)%></td></tr>
 <%
        }
        if (b64 == null || b64.length() < 516) {
@@ -515,10 +514,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr><td><%=intl._t("Alt Base 32")%>: <%=altb32%></td></tr>
 <%
     }  // altb32
+    final String CHECK = "&nbsp;&nbsp;&#x2714;";
 %>
+<tr><td colspan="4"></td></tr>
 <tr><th colspan="4"><%=intl._t("Incoming I2P Port Routing")%></th></tr>
-<tr><th><%=intl._t("Route From I2P Port")%></th><th><%=intl._t("With Virtual Host")%></th><th><%=intl._t("Via SSL?")%></th><th><%=intl._t("To Server Host:Port")%></th></tr>
-<tr><td><a target="_top" href="http://<%=b32%>/"><%=intl._t("Default")%></a></td><td><%=name%></td><td><%=sslToTarget%></td><td><%=targetLink%></td></tr>
+<tr><th><%=intl._t("I2P Port")%></th><th><%=intl._t("Virtual Host")%></th><th><%=intl._t("SSL")%></th><th><%=intl._t("Server")%></th></tr>
+<tr><td><a target="_top" href="http://<%=b32%>/"><%=intl._t("Default")%></a></td><td><%=name%></td><td><%=(sslToTarget ? CHECK : "")%></td><td><%=targetLink%></td></tr>
 <%
     // output vhost and targets
     for (Integer port : ports) {
@@ -549,7 +550,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         }
         String portTgt = sslPort ? "https" : "http";
 %>
-<tr><td><a target="_top" href="<%=portTgt%>://<%=b32%>:<%=port%>/"><%=port%></a></td><td><%=spoof%></td><td><%=ssl%></td><td><%=tgt%></td></tr>
+<tr><td><a target="_top" href="<%=portTgt%>://<%=b32%>:<%=port%>/"><%=port%></a></td><td><%=spoof%></td><td><%=(ssl ? CHECK : "")%></td><td><%=tgt%></td></tr>
 <%
     }
 %>
@@ -566,8 +567,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=intl._t("Specify the port the server is running on")%>" value="" class="freetext port" placeholder="required" />
 </td></tr>
 --%>
+<tr><td colspan="4"></td></tr>
 <tr><th colspan="4"><%=intl._t("Jetty Server")%></th></tr>
-<tr><th><%=intl._t("Server")%></th><th><%=intl._t("Configuration Files")%></th><th><%=intl._t("Enabled?")%></th><th><%=intl._t("SSL Enabled?")%></th></tr>
+<tr><th><%=intl._t("Server")%></th><th><%=intl._t("Configuration Files")%></th><th><%=intl._t("Enabled")%></th><th><%=intl._t("SSL")%></th></tr>
 <%
     // Now try to find the Jetty server in clients.config
     File configDir = ctx.getConfigDir();
@@ -709,7 +711,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %><%=DataHelper.escapeHTML(arg)%><br /><%
             }
 %>
-    </td><td><%=start%></td><td><%=ssl%></td></tr>
+    </td><td><%=(start ? CHECK : "")%></td><td><%=(ssl ? CHECK : "")%></td></tr>
 <%
             if (!jettySSLFileExists) {
 %>
