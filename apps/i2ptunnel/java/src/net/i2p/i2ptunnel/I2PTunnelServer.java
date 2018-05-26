@@ -593,9 +593,13 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             } catch (ConnectException ce) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error accepting", ce);
-                open = false;
                 if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
-                break;
+                try {
+                    Thread.sleep(2*60*1000);
+                } catch (InterruptedException ie) {}
+                // Server socket possbily closed out from under us, perhaps as part of a router restart;
+                // wait a while and try to get a new socket
+                i2pss = sockMgr.getServerSocket();
             } catch(SocketTimeoutException ste) {
                 // ignored, we never set the timeout
                 if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
