@@ -89,7 +89,6 @@ class MailCache {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
 		disk = new PersistentMailCache(ctx, host, port, user, pass, folderName);
-		// TODO Drafts, Sent, Trash
 		_context = ctx;
 		Folder<String> folder = new Folder<String>();	
 		// setElements() sorts, so configure the sorting first
@@ -373,7 +372,7 @@ class MailCache {
 				Buffer rb = mailbox.getBody(uidl, new FileBuffer(file));
 				if (rb != null) {
 					mail.setBody(rb);
-					if (disk != null && disk.saveMail(mail) &&
+					if (disk.saveMail(mail) &&
 					    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
 						mailbox.queueForDeletion(mail.uidl);
 					}
@@ -439,17 +438,15 @@ class MailCache {
 				headerOnly = false;
 			if( headerOnly ) {
 				if(!mail.hasHeader()) {
-					if (disk != null) {
-						if (disk.getMail(mail, true)) {
-							if (_log.shouldDebug()) _log.debug("Loaded header from disk cache: " + uidl);
-							// note that disk loaded the full body if it had it
-							if (mail.hasBody() &&
-								!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
-								// we already have it, send delete
-								mailbox.queueForDeletion(mail.uidl);
-							}
-							continue;  // found on disk, woo
+					if (disk.getMail(mail, true)) {
+						if (_log.shouldDebug()) _log.debug("Loaded header from disk cache: " + uidl);
+						// note that disk loaded the full body if it had it
+						if (mail.hasBody() &&
+							!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+							// we already have it, send delete
+							mailbox.queueForDeletion(mail.uidl);
 						}
+						continue;  // found on disk, woo
 					}
 					POP3Request pr = new POP3Request(mail, true, new MemoryBuffer(1024));
 					fetches.add(pr);
@@ -462,16 +459,14 @@ class MailCache {
 				}
 			} else {
 				if(!mail.hasBody()) {
-					if (disk != null) {
-						if (disk.getMail(mail, false)) {
-							if (_log.shouldDebug()) _log.debug("Loaded body from disk cache: " + uidl);
-							// note that disk loaded the full body if it had it
-							if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
-								// we already have it, send delete
-								mailbox.queueForDeletion(mail.uidl);
-							}
-							continue;  // found on disk, woo
+					if (disk.getMail(mail, false)) {
+						if (_log.shouldDebug()) _log.debug("Loaded body from disk cache: " + uidl);
+						// note that disk loaded the full body if it had it
+						if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+							// we already have it, send delete
+							mailbox.queueForDeletion(mail.uidl);
 						}
+						continue;  // found on disk, woo
 					}
 					File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
 					POP3Request pr = new POP3Request(mail, false, new FileBuffer(file));
@@ -504,11 +499,9 @@ class MailCache {
 						mail.setBody(pr.getBuffer());
 					}
 					rv = true;
-					if (disk != null) {
-						if (disk.saveMail(mail) && mail.hasBody() &&
-						    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
-							mailbox.queueForDeletion(mail.uidl);
-						}
+					if (disk.saveMail(mail) && mail.hasBody() &&
+					    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+						mailbox.queueForDeletion(mail.uidl);
 					}
 				}
 			}
@@ -539,8 +532,7 @@ class MailCache {
 	public void delete(Collection<String> uidls) {
 		List<String> toDelete = new ArrayList<String>(uidls.size());
 		for (String uidl : uidls) {
-			if (disk != null)
-				disk.deleteMail(uidl);
+			disk.deleteMail(uidl);
 			synchronized(mails) {
 				Mail mail = mails.get(uidl);
 				if (mail == null)
