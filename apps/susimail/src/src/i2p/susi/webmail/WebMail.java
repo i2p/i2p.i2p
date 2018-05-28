@@ -893,7 +893,6 @@ public class WebMail extends HttpServlet
 		/** @param connected are we? */
 		public void foundNewMail(boolean connected) {
 			MailCache mc = null;
-			Folder<String> f = null;
 			boolean found = false;
 			Log log = _so.log;
 			if (connected) {
@@ -931,7 +930,7 @@ public class WebMail extends HttpServlet
 					if (log.shouldDebug()) log.debug("No new emails");
 					_so.newMails = 0;
 					_so.connectError = null;
-				} else if (mc != null && f != null) {
+				} else if (mc != null) {
 					String[] uidls = mc.getUIDLs();
 					int added = mc.getFolder().addElements(Arrays.asList(uidls));
 					if (added > 0)
@@ -940,7 +939,7 @@ public class WebMail extends HttpServlet
 					_so.connectError = null;
 					if (log.shouldDebug()) log.debug("Added " + added + " new emails");
 				} else {
-					if (log.shouldDebug()) log.debug("MailCache/folder vanished?");
+					if (log.shouldDebug()) log.debug("MailCache vanished?");
 				}
 				_mb.setNewMailListener(_so);
 				_so.isFetching = false;
@@ -2092,7 +2091,8 @@ public class WebMail extends HttpServlet
 							str = request.getParameter(NEW_FOLDER);
 						if (str == null)
 							str = request.getParameter(CURRENT_FOLDER);
-						if (str != null && !str.equals(DIR_FOLDER))
+						// always go to inbox after SEND
+						if (str != null && !str.equals(DIR_FOLDER) && !buttonPressed(request, SEND))
 							q += '&' + CURRENT_FOLDER + '=' + str;
 						sendRedirect(httpRequest, response, q);
 						return;
@@ -2790,7 +2790,7 @@ public class WebMail extends HttpServlet
 				Runnable es = new EmailSender(sessionObject, draft, sender,
 				                              recipients.toArray(new String[recipients.size()]),
 				                              body, attachments, boundary);
-				Thread t = new I2PAppThread(es, "Email fetcher");
+				Thread t = new I2PAppThread(es, "Email sender");
 				sessionObject.info += _t("Sending mail.") + '\n';
 				t.start();
 			}
@@ -3244,6 +3244,7 @@ public class WebMail extends HttpServlet
 		out.println(_t("Folder") + ": " + _t(name) + "&nbsp;&nbsp;&nbsp;&nbsp;");  // TODO css to center it
 		out.println(button(SWITCH_TO, _t("Change to Folder") + ':'));
 		showFolderSelect(out, folderName, false);
+		out.println("</td><td>");
 		if (pages > 1) {
 			if (outputHidden)
 				out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");

@@ -92,10 +92,10 @@ class DelayedDeleter {
 
 	        public void run() {
 			try {
-				List<String> uidls = new ArrayList<String>(toDelete);
-				Collection<String> deleted = mailbox.delete(uidls);
-				if (_log.shouldDebug()) _log.debug("Deleted " + deleted.size() + " of " + toDelete.size() + " mails");
-				toDelete.removeAll(deleted);
+				int origSize = toDelete.size();
+				mailbox.deletePending(false);
+				int delSize = origSize - toDelete.size();
+				if (_log.shouldDebug()) _log.debug("Deleted " + delSize + " of " + origSize + " mails");
 			} finally {		
 				isDeleting = false;
 				if (!isDead)

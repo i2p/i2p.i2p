@@ -315,60 +315,31 @@ public class POP3MailBox implements NewMailListener {
 	}
 
 	/**
-	 * Delete all at once and close. Does not reconnect.
-	 * Do NOT call performDelete() after this.
-	 * Returns all UIDLs successfully deleted OR were not known by the server.
+	 * Delete all pending deletions at once.
+	 * If previously connected, leaves connected.
+	 * If not previously connected, closes connection when done.
 	 * 
+	 * @param noWait fire-and-forget mode, only if connected
 	 * @since 0.9.13
 	 */
-	Collection<String> delete(Collection<String> uidls) {
-		List<String> rv = new ArrayList<String>(uidls.size());
-		List<SendRecv> srs = new ArrayList<SendRecv>(uidls.size() + 1);
+	void deletePending(boolean noWait) {
+		Collection<String> uidls = delayedDeleter.getQueued();
+		if (uidls.isEmpty())
+			return;
 		synchronized( synchronizer ) {
 			try {
-				// we must be connected to know the UIDL to ID mapping
-				checkConnection();
-			} catch (IOException ioe) {
-				if (_log.shouldDebug()) _log.debug("Error deleting", ioe);
-				return rv;
-			}
-			for (String uidl : uidls) {
-				int id = getIDfromUIDL(uidl);
-				if (id < 0) {
-					// presumed already deleted
-					rv.add(uidl);
-					continue;
-				}
-				SendRecv sr = new SendRecv("DELE " + id, Mode.A1);
-				sr.savedObject = uidl;
-				srs.add(sr);
-			}
-			if (srs.isEmpty())
-				return rv;
-			// TODO don't quit now, just set timer to quit later
-			SendRecv quit = new SendRecv("QUIT", Mode.A1);
-			srs.add(quit);
-			try {
-				sendCmds(srs);
-				// do NOT call close() here, we included QUIT above
-				if (socket != null) {
-					try { socket.close(); } catch (IOException e) {}
-					socket = null;
-					connected = false;
-				}
-				clear();
-				// result of QUIT
-				boolean success = srs.get(srs.size() - 1).result;
-				if (success) {
-					for (int i = 0; i < srs.size() - 1; i++) {
-						SendRecv sr = srs.get(i);
-						// ignore sr.result, if it failed it's because
-						// it's already deleted
-						rv.add((String) sr.savedObject);
+				if (isConnected()) {
+					doDelete(noWait);
+				} else {
+					// calls connect() which calls doDelete()
+					checkConnection();
+					sendCmd1a("QUIT");
+					if (socket != null) {
+						try { socket.close(); } catch (IOException e) {}
+						socket = null;
+						connected = false;
 					}
 				}
-				// why reconnect?
-				//connect();
 			} catch (IOException ioe) {
 				if (_log.shouldDebug()) _log.debug("Error deleting", ioe);
 				if (socket != null) {
@@ -376,10 +347,8 @@ public class POP3MailBox implements NewMailListener {
 					socket = null;
 					connected = false;
 				}
-				// todo maybe
 			}
 		}
-		return rv;
 	}
 	
 	/**
@@ -841,7 +810,7 @@ public class POP3MailBox implements NewMailListener {
 	}
 
 	/**
-	 * Send STAT, UIDL, LIST. Must be connected.
+	 * Send STAT, UIDL, LIST, and DELE for all pending. Must be connected.
 	 * Caller must sync.
 	 * Leaves socket connected. Caller must close on IOE.
 	 * 
@@ -874,9 +843,64 @@ public class POP3MailBox implements NewMailListener {
 			updateSizes(list.ls);
 		else
 			if (_log.shouldDebug()) _log.debug("LIST failed");
+
+		// delete all pending deletions
+		doDelete(false);
+
 		if (socket != null) try { socket.setSoTimeout(300*1000); } catch (IOException ioe) {}
 		return ok;
         }
+
+	/**
+	 * Send DELE for all pending deletions. Must be connected.
+	 * Caller must sync.
+	 * Leaves socket connected. Caller must close on IOE.
+	 * 
+	 * @param noWait fire-and-forget mode
+	 * @throws IOException
+	 * @since 0.9.35 pulled out of delete()
+	 */
+	private void doDelete(boolean noWait) throws IOException {
+		// delete all pending deletions
+		Collection<String> uidls = delayedDeleter.getQueued();
+		if (uidls.isEmpty())
+			return;
+		List<SendRecv> cmds = new ArrayList<SendRecv>(uidls.size());
+		for (String uid : uidls) {
+			int id = getIDfromUIDL(uid);
+			if (id < 0) {
+				// presumed already deleted
+				delayedDeleter.removeQueued(uid);
+				continue;
+			}
+			if (noWait) {
+				sendCmd1aNoWait("DELE " + id);
+				delayedDeleter.removeQueued(uid);
+				uidlToID.remove(uid);
+				sizes.remove(Integer.valueOf(id));
+			} else {
+				SendRecv sr = new SendRecv("DELE " + id, Mode.A1);
+				sr.savedObject = uid;
+				cmds.add(sr);
+			}
+		}
+		if (!cmds.isEmpty()) {
+			// ignore rv
+			sendCmds(cmds);
+			// use isConnected() as a proxy for success
+			if (isConnected()) {
+				for (SendRecv sr : cmds) {
+					// ignore sr.result, if it failed it's because
+					// it's already deleted
+					String uid = (String) sr.savedObject;
+					delayedDeleter.removeQueued(uid);
+					Integer id = uidlToID.remove(uid);
+					if (id != null)
+						sizes.remove(id);
+				}
+			}
+		}
+	}
 	
 	/**
 	 * send command to pop3 server (and expect single line answer)
@@ -1291,33 +1315,11 @@ public class POP3MailBox implements NewMailListener {
 				idleCloser.cancel();
 			if (socket != null && socket.isConnected()) {
 				try {
-					Collection<String> toDelete = delayedDeleter.getQueued();
-					Map<String, Integer> sendDelete = new HashMap<String, Integer>(toDelete.size());
-					for (String uidl : toDelete) {
-						int id = getIDfromUIDL(uidl);
-						if (id >= 0) {
-							sendDelete.put(uidl, Integer.valueOf(id));
-						}
-					}
+					deletePending(!shouldWait);
 					if (shouldWait) {
-						if (!sendDelete.isEmpty()) {
-							// Verify deleted, remove from the delete queue
-							// this does the quit and close
-							Collection<String> deleted = delete(sendDelete.keySet());
-							for (String uidl : deleted) {
-								delayedDeleter.removeQueued(uidl);
-							}
-						} else {
-							sendCmd1a("QUIT");
-						}
+						sendCmd1a("QUIT");
 						if (_log.shouldDebug()) _log.debug("close() with wait complete");
 					} else {
-						if (!sendDelete.isEmpty()) {
-							// spray and pray the deletions, don't remove from delete queue
-							for (Integer id : sendDelete.values()) {
-								sendCmd1aNoWait("DELE " + id);
-							}
-						}
 						sendCmd1aNoWait("QUIT");
 					}
 				} catch (IOException e) {

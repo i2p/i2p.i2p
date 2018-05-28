@@ -509,6 +509,7 @@ button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      filter: drop-shadow(0 0 1px #89f);
 }
 
+select,
 button, input[type="submit"], input[type="reset"] {
      padding: 5px;
      border-radius: 2px;
@@ -630,7 +631,7 @@ input.offline:hover, input.offline:focus {
      background: url(/themes/susimail/images/offline_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-input.list, input.moveto, input.switchto {
+input.list, input.moveto, #pagenav input.switchto {
      background: #eee url(/themes/susimail/images/folder.png) no-repeat 7px center;
      background: url(/themes/susimail/images/folder.png) no-repeat 7px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 8px 5px 24px;

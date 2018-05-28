@@ -595,6 +595,7 @@ input[type=submit]::-moz-focus-inner, input.cancel::-moz-focus-inner {
      box-shadow: none;
 }
 
+select,
 input[type=submit], input.cancel {
      color: #4e47bf;
      background: #000;
@@ -1071,7 +1072,7 @@ input.offline:hover, input.offline:focus {
      background: #000 url(/themes/susimail/images/offline_hover.png) no-repeat 6px center !important;
 }
 
-input.list, input.moveto, input.switchto {
+input.list, input.moveto, #pagenav input.switchto {
      background: #000 url(/themes/susimail/images/folder.png) no-repeat 6px center !important;
      background: url(/themes/susimail/images/folder.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      padding: 5px 7px 5px 23px !important;
