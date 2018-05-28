@@ -3439,10 +3439,6 @@ div.themechoice {
      padding: 5px 10px 8px 5px;
 }
 
-#themeoptions br {
-     display: none;
-}
-
 #themeoptions label {
      white-space: nowrap;
      margin: 1px 10px 1px 0 !important;

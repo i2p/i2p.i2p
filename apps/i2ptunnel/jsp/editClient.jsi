@@ -655,7 +655,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="<%=intl._t("List of helper URLs to offer jumplinks from the web proxy error page when a host is not found in your addressbook")%>" wrap="off" spellcheck="false"><%=editBean.getJumpList(curTunnel)%></textarea>
+                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="<%=intl._t("List of helper URLs providing jump links when a host is not found in your addressbook")%>" wrap="off" spellcheck="false"><%=editBean.getJumpList(curTunnel)%></textarea>
             </td>
         </tr>
 
@@ -669,7 +669,7 @@
 
         <tr>
             <td colspan="2">
-                <input type="text" id="customOptions" name="nofilter_customOptions" size="60" title="<%=intl._t("Advanced options to control tunnel priority etc")%>" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" spellcheck="false"/>
+                <input type="text" id="customOptions" name="nofilter_customOptions" size="60" title="<%=intl._t("Advanced tunnel, streaming, and I2CP options")%>" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" spellcheck="false"/>
             </td>
         </tr>
 

@@ -1157,6 +1157,10 @@ table#pagenav td:first-child {
      width: 49%;
 }
 
+table#pagenav td:nth-child(2) {
+     padding-left: 35px;
+}
+
 table#pagenav td:last-child {
      text-align: left;
      width: 49%;

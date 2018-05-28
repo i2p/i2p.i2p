@@ -49,15 +49,15 @@ public class ConfigUIHelper extends HelperBase {
             buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Force the mobile console to be used"))
-           .append("</label></br>\n");
+           .append("</label><br>\n");
         boolean embedApps = _context.getBooleanProperty(CSSHelper.PROP_EMBED_APPS);
         buf.append("<label title=\"")
-           .append(_t("Enabling the Universal Themeing option is recommended when embedding these applications"))
+           .append(_t("Enabling the Universal Theming option is recommended when embedding these applications"))
            .append("\"><input type=\"checkbox\" name=\"embedApps\" ");
         if (embedApps)
             buf.append(CHECKED);
         buf.append("value=\"1\">")
-           .append(_t("Embed I2PSnark and I2PMail in the console"))
+           .append(_t("Embed Email and Torrent applications in the console"))
            .append("</label></div>\n");
         return buf.toString();
     }

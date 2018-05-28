@@ -1645,15 +1645,12 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (remaining == 0) {
                     img = "seeding";
                     txt = _t("Seeding");
-                    tooltip = _t("Seeding to {0} of {1} peers in swarm", curPeers, knownPeers);
+                    tooltip = ngettext("Seeding to {0} peer", "Seeding to {0} peers", knownPeers);
                 } else {
                     // partial
                     img = "complete";
                     txt = _t("Complete");
                     tooltip = txt;
-                    if (curPeers > 0) {
-                        tooltip = txt + " (" + _t("Seeding to {0} of {1} peers in swarm", curPeers, knownPeers) + ")";
-                    }
                 }
                 if (curPeers > 0 && !showPeers) {
                     statusString = toThemeImg(img, "", tooltip) + "</td>" +
@@ -1679,12 +1676,12 @@ public class I2PSnarkServlet extends BasicServlet {
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             } else if (isRunning && curPeers > 0 && downBps > 0) {
-                statusString = toThemeImg("downloading", "", _t("OK") + " (" + _t("Downloading from {0} of {1} peers in swarm", curPeers, knownPeers) + ")") + "</td>" +
+                statusString = toThemeImg("downloading", "", _t("OK") + ", " + ngettext("Downloading from {0} peer", "Downloading from {0} peers", curPeers)) + "</td>" +
                                "<td class=\"snarkTorrentStatus\"><b>" + _t("OK") +
                                ":</b> " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             } else if (isRunning && curPeers > 0 && !showPeers) {
-                statusString = toThemeImg("stalled", "", _t("Stalled") + " (" + _t("Connected to {0} of {1} peers in swarm", curPeers, knownPeers) + ")") + "</td>" +
+                statusString = toThemeImg("stalled", "", _t("Stalled") + " (" + ngettext("Connected to {0} peer", "Connected to {0} peers", curPeers)) + "</td>" +
                                "<td class=\"snarkTorrentStatus\"><b>" + _t("Stalled") +
                                ":</b> <a href=\"" + uri + getQueryString(req, b64, null, null) + '#' + b64Short + "\">" +
                                curPeers + thinsp(noThinsp) +
@@ -1892,7 +1889,7 @@ public class I2PSnarkServlet extends BasicServlet {
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
-                out.write(_t("Delete the .torrent file and the associated data file(s)"));
+                out.write(_t("Delete the .torrent file and the associated data files"));
                 out.write("\" onclick=\"if (!confirm('");
                 // Can't figure out how to escape double quotes inside the onclick string.
                 // Single quotes in translate strings with parameters must be doubled.
@@ -2502,7 +2499,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(":<td colspan=\"2\"><input type=\"text\" name=\"upLimit\" class=\"r\" value=\""
                   + _manager.util().getMaxUploaders() + "\" size=\"4\" maxlength=\"3\""
                   + " title=\"");
-        out.write(_t("Maximum number of peers to upload to"));
+        out.write(_t("Maximum number of peers for uploading"));
         out.write("\"> ");
         out.write(_t("peers"));
         out.write("\n" +
@@ -2527,7 +2524,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" id=\"useOpenTrackers\" value=\"true\" "
                   + (useOpenTrackers ? "checked " : "")
                   + "title=\"");
-        out.write(_t("Announce torrents to open trackers as well as tracker(s) listed in the torrent file"));
+        out.write(_t("Announce torrents to open trackers as well as trackers listed in the torrent file"));
         out.write("\" ></td></tr>\n" +
 
                   "<tr><td><label for=\"useDHT\">");
@@ -3271,7 +3268,7 @@ public class I2PSnarkServlet extends BasicServlet {
                            .append("\">\n");
                     else
                         buf.append("\" class=\"reload\" title=\"")
-                           .append(_t("Check integrity of the downloaded file(s)"))
+                           .append(_t("Check integrity of the downloaded files"))
                            .append("\">\n");
                 }
                 buf.append("</td></tr>\n");

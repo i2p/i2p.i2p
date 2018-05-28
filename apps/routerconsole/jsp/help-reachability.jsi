@@ -13,7 +13,7 @@
      <%=intl._t("As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error.")%>&nbsp;
      <%=intl._t("However, if it appears consistently, you should check whether both your external and internal firewalls are open for your port.")%>&nbsp; 
      <%=intl._t("I2P will work fine when firewalled, there is no reason for concern. When firewalled, the router uses \"introducers\" to relay inbound connections.")%>&nbsp;
-     <%=intl._t("However, you will get more participating traffic and help the network more if you can open your firewall(s).")%>&nbsp;
+     <%=intl._t("However, you will get more participating traffic and help the network if you open your firewall.")%>&nbsp;
      <%=intl._t("If you think you have already done so, remember that you may have both a hardware and a software firewall, or be behind an additional, institutional firewall you cannot control.")%>&nbsp;
      <%=intl._t("Also, some routers cannot correctly forward both TCP and UDP on a single port, or may have other limitations or bugs that prevent them from passing traffic through to I2P.")%>
   </li>

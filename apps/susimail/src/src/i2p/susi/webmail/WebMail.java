@@ -2284,7 +2284,7 @@ public class WebMail extends HttpServlet
 				out.println( "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>\n" +
 					"<head>\n" +
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
-					"<title>" + _t("SusiMail") + " - " + subtitle + "</title>\n" +
+					"<title>" + _t("Email") + " - " + subtitle + "</title>\n" +
 					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css?" + CoreVersion.VERSION + "\">" );
 				if (sessionObject.isMobile ) {
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
@@ -2307,7 +2307,9 @@ public class WebMail extends HttpServlet
 				                                                   Long.toString(ctx.random().nextLong());
 				sessionObject.addNonce(nonce);
 				out.println(
-					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
+					"<div class=\"page\">" +
+					// hidden by CSS
+					//"<div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
 					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">\n" +
 					// we use this to know if the user thought he was logged in at the time
@@ -3045,7 +3047,7 @@ public class WebMail extends HttpServlet
 		String pop3 = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
 		
-		out.println( "<div id=\"dologin\"><h1>" + _t("I2PMail Login") + "</h1><table cellspacing=\"3\" cellpadding=\"5\">\n" +
+		out.println( "<div id=\"dologin\"><h1>" + _t("Email Login") + "</h1><table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
 			"<tr><td align=\"right\" width=\"30%\">" + _t("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
@@ -3244,8 +3246,8 @@ public class WebMail extends HttpServlet
 		out.println(_t("Folder") + ": " + _t(name) + "&nbsp;&nbsp;&nbsp;&nbsp;");  // TODO css to center it
 		out.println(button(SWITCH_TO, _t("Change to Folder") + ':'));
 		showFolderSelect(out, folderName, false);
-		out.println("</td><td>");
 		if (pages > 1) {
+			out.println("</td><td>");
 			if (outputHidden)
 				out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
 			String t1 = _t("First");

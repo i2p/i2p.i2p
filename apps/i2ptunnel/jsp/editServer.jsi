@@ -564,7 +564,7 @@
             </td>
 
             <td>
-                <label title="<%=intl._t("Deny accesseses with referers (probably from inproxies)")%>"><input value="1" type="checkbox" name="rejectReferer"<%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label><input value="1" type="checkbox" name="rejectReferer"<%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Block Accesses containing Referers")%></label>
             </td>
         </tr>
@@ -942,7 +942,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                <input type="text" class="freetext" id="customOptions" name="nofilter_customOptions" size="60" title="<%=intl._t("Advanced options to control tunnel priority etc")%>" value="<%=editBean.getCustomOptions(curTunnel)%>" />
+                <input type="text" class="freetext" id="customOptions" name="nofilter_customOptions" size="60" title="<%=intl._t("Advanced tunnel, streaming, and I2CP options")%>" value="<%=editBean.getCustomOptions(curTunnel)%>" />
             </td>
         </tr>
 

@@ -888,6 +888,10 @@ table#pagenav td:first-child {
 }
 
 table#pagenav td:nth-child(2) {
+     padding-left: 35px;
+}
+
+table#pagenav td:nth-child(3) {
      text-align: center !important;
      min-width: 100px;
 }

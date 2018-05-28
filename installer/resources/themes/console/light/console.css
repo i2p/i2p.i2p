@@ -4707,10 +4707,6 @@ body.iframed {
      padding: 5px 10px 5px 5px;
 }
 
-#themeoptions br {
-     display: none;
-}
-
 #themeoptions label {
      white-space: nowrap;
      margin: 2px 10px 2px 0 !important;

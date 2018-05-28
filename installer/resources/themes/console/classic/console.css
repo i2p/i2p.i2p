@@ -4663,10 +4663,6 @@ body.iframed {
      padding: 5px 10px 5px 5px;
 }
 
-#themeoptions br {
-     display: none;
-}
-
 #themeoptions label {
      white-space: nowrap;
      margin: 4px 10px 4px 0 !important;
