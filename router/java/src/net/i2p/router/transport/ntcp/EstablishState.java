@@ -123,7 +123,7 @@ class EstablishState {
     private boolean _failedBySkew;
     
     private static final int MIN_RI_SIZE = 387;
-    private static final int MAX_RI_SIZE = 2048;
+    private static final int MAX_RI_SIZE = 3072;
 
     private static final int AES_SIZE = 16;
     private static final int XY_SIZE = 256;
@@ -256,14 +256,6 @@ class EstablishState {
         while (_state == State.IB_INIT && src.hasRemaining()) {
             byte c = src.get();
             _X[_received++] = c;
-            //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv x" + (int)c + " received=" + _received);
-            //if (_received >= _X.length) {
-            //    if (isCheckInfo(_context, _context.routerHash(), _X)) {
-            //        _context.statManager().addRateData("ntcp.inboundCheckConnection", 1);
-            //        fail("Incoming connection was a check connection");
-            //        return;
-            //    }
-            //}
             if (_received >= XY_SIZE)
                 changeState(State.IB_GOT_X);
         }
@@ -272,7 +264,6 @@ class EstablishState {
             _received++;
             byte c = src.get();
             _hX_xor_bobIdentHash[i] = c;
-            //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv bih" + (int)c + " received=" + _received);
             if (i >= HXY_SIZE - 1)
                 changeState(State.IB_GOT_HX);
         }
@@ -287,12 +278,6 @@ class EstablishState {
                 byte[] realXor = SimpleByteCache.acquire(HXY_SIZE);
                 _context.sha().calculateHash(_X, 0, XY_SIZE, realXor, 0);
                 xor32(_context.routerHash().getData(), realXor);
-                //if (_log.shouldLog(Log.DEBUG)) {
-                    //_log.debug(prefix()+"_X = " + Base64.encode(_X));
-                //    _log.debug(prefix()+"hx = " + Base64.encode(hX.getData()));
-                //    _log.debug(prefix()+"bih=" + Base64.encode(_context.routerHash().getData()));
-                //    _log.debug(prefix()+"xor=" + Base64.encode(realXor));
-                //}
                 if (!DataHelper.eq(realXor, _hX_xor_bobIdentHash)) {
                     SimpleByteCache.release(realXor);
                     _context.statManager().addRateData("ntcp.invalidHXxorBIH", 1);
@@ -327,11 +312,8 @@ class EstablishState {
                     System.arraycopy(hxy, 0, toEncrypt, 0, HXY_SIZE);
                     byte tsB[] = DataHelper.toLong(4, _tsB);
                     System.arraycopy(tsB, 0, toEncrypt, HXY_SIZE, tsB.length);
-                    //DataHelper.toLong(toEncrypt, hxy.getData().length, 4, _tsB);
                     _context.random().nextBytes(toEncrypt, HXY_SIZE + 4, 12);
                     if (_log.shouldLog(Log.DEBUG)) {
-                        //_log.debug(prefix()+"Y="+Base64.encode(_Y));
-                        //_log.debug(prefix()+"x+y="+Base64.encode(xy));
                         _log.debug(prefix()+"h(x+y)="+Base64.encode(hxy));
                         _log.debug(prefix() + "tsb = " + _tsB);
                         _log.debug(prefix()+"unencrypted H(X+Y)+tsB+padding: " + Base64.encode(toEncrypt));
@@ -364,8 +346,6 @@ class EstablishState {
                 _state == State.IB_GOT_RI_SIZE ||
                 _state == State.IB_GOT_RI) && src.hasRemaining()) {
 
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug(prefix()+"Encrypted bytes available (" + src.hasRemaining() + ")");
                 // Collect a 16-byte block
                 while (_curEncryptedOffset < AES_SIZE && src.hasRemaining()) {
                     _curEncrypted[_curEncryptedOffset++] = src.get();
@@ -375,8 +355,6 @@ class EstablishState {
                 if (_curEncryptedOffset >= AES_SIZE) {
                     _context.aes().decrypt(_curEncrypted, 0, _curDecrypted, 0, _dh.getSessionKey(),
                                            _prevEncrypted, 0, AES_SIZE);
-                    //if (_log.shouldLog(Log.DEBUG))
-                    //    _log.debug(prefix() + "full block read and decrypted: ");
 
                     byte swap[] = _prevEncrypted;
                     _prevEncrypted = _curEncrypted;
@@ -406,8 +384,6 @@ class EstablishState {
                     } catch (IOException ioe) {
                         if (_log.shouldLog(Log.ERROR)) _log.error(prefix()+"Error writing to the baos?", ioe);
                     }
-                    //if (_log.shouldLog(Log.DEBUG))
-                    //    _log.debug(prefix()+"subsequent block decrypted (" + _sz_aliceIdent_tsA_padding_aliceSig.size() + ")");
 
                     if (_state == State.IB_GOT_RI_SIZE &&
                         _sz_aliceIdent_tsA_padding_aliceSig.size() >= 2 + _aliceIdentSize) {
@@ -487,7 +463,6 @@ class EstablishState {
         while (_state == State.OB_SENT_X && src.hasRemaining()) {
             byte c = src.get();
             _Y[_received++] = c;
-            //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv x" + (int)c + " received=" + _received);
             if (_received >= XY_SIZE) {
                 try {
                     _dh.setPeerPublicValue(_Y);
@@ -510,8 +485,6 @@ class EstablishState {
             _received++;
             byte c = src.get();
             _e_hXY_tsB[i] = c;
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug(prefix() + "recv _e_hXY_tsB " + (int)c + " received=" + _received);
             if (i+1 >= HXY_TSB_PAD_SIZE) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix() + "received _e_hXY_tsB fully");
                 byte hXY_tsB[] = new byte[HXY_TSB_PAD_SIZE];
@@ -521,8 +494,6 @@ class EstablishState {
                 System.arraycopy(_Y, 0, XY, XY_SIZE, XY_SIZE);
                 byte[] h = SimpleByteCache.acquire(HXY_SIZE);
                 _context.sha().calculateHash(XY, 0, XY_SIZE + XY_SIZE, h, 0);
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug(prefix() + "h(XY)=" + h.toBase64());
                 if (!DataHelper.eq(h, 0, hXY_tsB, 0, HXY_SIZE)) {
                     SimpleByteCache.release(h);
                     _context.statManager().addRateData("ntcp.invalidHXY", 1);
@@ -576,15 +547,7 @@ class EstablishState {
                 DataHelper.toLong(preSign, XY_SIZE + XY_SIZE + HXY_SIZE, 4, _tsA);
                 DataHelper.toLong(preSign, XY_SIZE + XY_SIZE + HXY_SIZE + 4, 4, _tsB);
                 // hXY_tsB has 12 bytes of padding (size=48, tsB=4 + hXY=32)
-                //System.arraycopy(hXY_tsB, hXY_tsB.length-12, preSign, _X.length+_Y.length+Hash.HASH_LENGTH+4+4, 12);
-                //byte sigPad[] = new byte[padSig];
-                //_context.random().nextBytes(sigPad);
-                //System.arraycopy(sigPad, 0, preSign, _X.length+_Y.length+Hash.HASH_LENGTH+4+4, padSig);
                 Signature sig = _context.dsa().sign(preSign, _context.keyManager().getSigningPrivateKey());
-
-                //if (_log.shouldLog(Log.DEBUG)) {
-                //    _log.debug(prefix()+"signing " + Base64.encode(preSign));
-                //}
 
                 byte ident[] = _context.router().getRouterInfo().getIdentity().toByteArray();
                 // handle variable signature size
@@ -605,11 +568,6 @@ class EstablishState {
                 _context.aes().encrypt(preEncrypt, 0, _prevEncrypted, 0, _dh.getSessionKey(),
                                        _hX_xor_bobIdentHash, _hX_xor_bobIdentHash.length-AES_SIZE, preEncrypt.length);
 
-                //if (_log.shouldLog(Log.DEBUG)) {
-                    //_log.debug(prefix() + "unencrypted response to Bob: " + Base64.encode(preEncrypt));
-                    //_log.debug(prefix() + "encrypted response to Bob: " + Base64.encode(_prevEncrypted));
-                //}
-                // send 'er off (when the bw limiter says, etc)
                 changeState(State.OB_SENT_RI);
                 _transport.getPumper().wantsWrite(_con, _prevEncrypted);
             }
@@ -641,14 +599,11 @@ class EstablishState {
                                src.hasRemaining() + " off=" + off + " recv=" + _received + ")");
             }
             while (_state == State.OB_SENT_RI && src.hasRemaining()) {
-                //if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix()+"recv bobSig received=" + _received);
                 _e_bobSig[off++] = src.get();
                 _received++;
 
                 if (off >= _e_bobSig.length) {
                     changeState(State.OB_GOT_SIG);
-                    //if (_log.shouldLog(Log.DEBUG))
-                    //    _log.debug(prefix() + "received E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev): " + Base64.encode(_e_bobSig));
                     byte bobSig[] = new byte[_e_bobSig.length];
                     _context.aes().decrypt(_e_bobSig, 0, bobSig, 0, _dh.getSessionKey(),
                                            _e_hXY_tsB, HXY_TSB_PAD_SIZE - AES_SIZE, _e_bobSig.length);
@@ -759,8 +714,6 @@ class EstablishState {
      */
     private void readAliceRouterIdentity() {
         byte b[] = _sz_aliceIdent_tsA_padding_aliceSig.toByteArray();
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug(prefix()+"decrypted sz(etc) data: " + Base64.encode(b));
 
         try {
             int sz = _aliceIdentSize;
@@ -825,10 +778,6 @@ class EstablishState {
             //baos.write(b, 2+sz+4, b.length-2-sz-4-Signature.SIGNATURE_BYTES);
 
             byte toVerify[] = baos.toByteArray();
-            //if (_log.shouldLog(Log.DEBUG)) {
-            //    _log.debug(prefix()+"checking " + Base64.encode(toVerify, 0, AES_SIZE));
-            //    //_log.debug(prefix()+"check pad " + Base64.encode(b, 2+sz+4, 12));
-            //}
 
             // handle variable signature size
             SigType type = _aliceIdent.getSigningPublicKey().getType();
@@ -1053,63 +1002,6 @@ class EstablishState {
     }
 
     /**
-     * a check info connection will receive 256 bytes containing:
-     * - 32 bytes of uninterpreted, ignored data
-     * - 1 byte size
-     * - that many bytes making up the local router's IP address (as reached by the remote side)
-     * - 2 byte port number that the local router was reached on
-     * - 4 byte i2p network time as known by the remote side (seconds since the epoch)
-     * - uninterpreted padding data, up to byte 223
-     * - xor of the local router's identity hash and the SHA256 of bytes 32 through bytes 223
-     *
-     * @return should always be false since nobody ever sends a check info message
-     *
-     */
-/*****
-    private static boolean isCheckInfo(I2PAppContext ctx, Hash us, byte first256[]) {
-        Log log = ctx.logManager().getLog(EstablishState.class);
-        int off = 32; // ignore the first 32 bytes
-
-        byte[] xor = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-        ctx.sha().calculateHash(first256, off, first256.length-32-off, xor, 0);
-        xor32(us.getData(), xor);
-        //if (log.shouldLog(Log.DEBUG))
-        //    log.debug("check hash: " + h.toBase64() + " xor: " + Base64.encode(xor));
-        if (DataHelper.eq(xor, 0, first256, first256.length-32, 32)) {
-            SimpleByteCache.release(xor);
-            // ok, data is as expected
-            // parse our IP/port/etc out of the first256
-            int ipSize = (int)DataHelper.fromLong(first256, off, 1);
-            off++;
-            byte ip[] = new byte[ipSize];
-            System.arraycopy(first256, off, ip, 0, ipSize);
-            try {
-                InetAddress ourIP = InetAddress.getByAddress(ip);
-                off += ipSize;
-                int port = (int)DataHelper.fromLong(first256, off, 2);
-                off += 2;
-                long now = DataHelper.fromLong(first256, off, 4);
-                off += 4;
-                long skewSeconds = (ctx.clock().now()/1000)-now;
-                if (log.shouldLog(Log.INFO))
-                    log.info("Check info received: our IP: " + ourIP + " our port: " + port
-                             + " skew: " + skewSeconds + " s");
-            } catch (UnknownHostException uhe) {
-                // ipSize is invalid
-                if (log.shouldLog(Log.WARN))
-                    log.warn("Invalid IP received on check connection (size: " + ipSize + ")");
-            }
-            return true;
-        } else {
-            SimpleByteCache.release(xor);
-            if (log.shouldLog(Log.DEBUG))
-                log.debug("Not a checkInfo connection");
-            return false;
-        }
-    }
-*****/
-
-    /**
      *  @since 0.9.8
      */
     private static class VerifiedEstablishState extends EstablishState {
@@ -1144,47 +1036,6 @@ class EstablishState {
 
         @Override public String toString() { return "FailedEstablishState: ";}
     }
-
-    /** @deprecated unused */
-/*********
-    public static void checkHost(String args[]) {
-        if (args.length != 3) {
-            System.err.println("Usage: EstablishState ipOrHostname portNum peerHashBase64");
-            return;
-        }
-        try {
-            I2PAppContext ctx = I2PAppContext.getGlobalContext();
-            String host = args[0];
-            int port = Integer.parseInt(args[1]);
-            byte peer[] = Base64.decode(args[2]);
-            Socket s = new Socket(host, port);
-            OutputStream out = s.getOutputStream();
-            byte toSend[] = new byte[256];
-            ctx.random().nextBytes(toSend);
-            int off = 32;
-            byte ip[] = s.getInetAddress().getAddress();
-            DataHelper.toLong(toSend, off, 1, ip.length);
-            off++;
-            System.arraycopy(ip, 0, toSend, off, ip.length);
-            off += ip.length;
-            DataHelper.toLong(toSend, off, 2, port);
-            off += 2;
-            long now = ctx.clock().now()/1000;
-            DataHelper.toLong(toSend, off, 4, now);
-            off += 4;
-            Hash h = ctx.sha().calculateHash(toSend, 32, toSend.length-32-32);
-            DataHelper.xor(peer, 0, h.getData(), 0, toSend, toSend.length-32, peer.length);
-            System.out.println("check hash: " + h.toBase64());
-
-            out.write(toSend);
-            out.flush();
-            try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-            s.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-*******/
 
 /*******
     public static void main(String args[]) {
