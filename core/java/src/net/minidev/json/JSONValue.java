@@ -42,7 +42,7 @@ import net.minidev.json.reader.JsonWriterI;
  * The most commonly use methode are {@link #parse(String)}
  * {@link #toJSONString(Object)}
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 public class JSONValue {
 	/**

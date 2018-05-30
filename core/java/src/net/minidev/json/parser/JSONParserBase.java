@@ -35,7 +35,7 @@ import java.util.Map;
  * @see JSONParserMemory
  * @see JSONParserStream
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 abstract class JSONParserBase {
 	protected char c;

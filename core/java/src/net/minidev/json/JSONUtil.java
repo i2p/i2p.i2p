@@ -17,7 +17,7 @@ package net.minidev.json;
  * limitations under the License.
  */
 /**
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 public class JSONUtil {
 	public static String getSetterName(String key) {

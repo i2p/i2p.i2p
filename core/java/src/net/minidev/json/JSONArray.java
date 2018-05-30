@@ -24,8 +24,8 @@ import net.minidev.json.reader.JsonWriter;
 /**
  * A JSON array. JSONObject supports java.util.List interface.
  * 
- * @author FangYidong<fangyidong@yahoo.com.cn>
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author FangYidong fangyidong@yahoo.com.cn
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 public class JSONArray extends ArrayList<Object> implements List<Object>, JSONAwareEx, JSONStreamAwareEx {
 	private static final long serialVersionUID = 9106884089231309568L;

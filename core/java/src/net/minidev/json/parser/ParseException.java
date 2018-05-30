@@ -18,7 +18,7 @@ package net.minidev.json.parser;
 /**
  * ParseException explains why and where the error occurs in source JSON text.
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 public class ParseException extends Exception {
 	private static final long serialVersionUID = 8879024178584091857L;

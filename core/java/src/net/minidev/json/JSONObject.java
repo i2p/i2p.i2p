@@ -25,8 +25,8 @@ import net.minidev.json.reader.JsonWriter;
  * A JSON object. Key value pairs are unordered. JSONObject supports
  * java.util.Map interface.
  * 
- * @author FangYidong<fangyidong@yahoo.com.cn>
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author FangYidong fangyidong@yahoo.com.cn
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 public class JSONObject extends HashMap<String, Object> implements JSONAware, JSONAwareEx, JSONStreamAwareEx {
 	private static final long serialVersionUID = -503443796854799292L;

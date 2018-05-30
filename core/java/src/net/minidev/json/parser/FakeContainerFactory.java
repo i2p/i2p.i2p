@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Fake Container factory used for JSon check and SaX parsing
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 public class FakeContainerFactory implements ContainerFactory {
 	public FackList list;

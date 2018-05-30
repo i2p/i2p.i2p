@@ -23,7 +23,7 @@ import java.io.IOException;
  * 
  * @see org.xml.sax.ContentHandler
  * 
- * @author FangYidong<fangyidong@yahoo.com.cn>
+ * @author FangYidong fangyidong@yahoo.com.cn
  */
 public interface ContentHandler {
 	/**

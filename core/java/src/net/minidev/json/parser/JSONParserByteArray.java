@@ -20,7 +20,7 @@ import static net.minidev.json.parser.ParseException.ERROR_UNEXPECTED_EOF;
 /**
  * Parser for JSON text. Please note that JSONParser is NOT thread-safe.
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 class JSONParserByteArray extends JSONParserMemory {
 	private byte[] in;

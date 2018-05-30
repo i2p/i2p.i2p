@@ -28,8 +28,8 @@ import java.util.Properties;
  *
  * OSX Path: I2PBrowser.app/Contents/MacOS/firefox
  *
- * OSX => ../../../I2PBrowser-Data/I2P
- * Linux/Windows => ../I2PBrowser-Data/I2P
+ * OSX =&gt; ../../../I2PBrowser-Data/I2P
+ * Linux/Windows =&gt; ../I2PBrowser-Data/I2P
  *
  * ---- However,
  *
@@ -40,7 +40,7 @@ import java.util.Properties;
  * Base directory is where we usually find the wrapper config (on normal installs) together with jars and
  * static files in an I2P installation.
  *
- * Portable uses both, with the key usage being that I2P is extracted from <whatever> to a base directory,
+ * Portable uses both, with the key usage being that I2P is extracted from (whatever) to a base directory,
  * but still has it's config separate in the working directory.
  *
  *

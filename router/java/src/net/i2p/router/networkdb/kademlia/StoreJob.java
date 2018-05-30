@@ -580,6 +580,7 @@ class StoreJob extends JobImpl {
     }
 ****/
 
+    /** */
     public static final String MIN_STORE_VERSION = "0.9.28";
 
     /**

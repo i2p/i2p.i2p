@@ -25,7 +25,7 @@ import net.minidev.json.JSONObject;
 /**
  * Container factory for creating containers for JSON object and JSON array.
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 public interface ContainerFactory {
 	/**

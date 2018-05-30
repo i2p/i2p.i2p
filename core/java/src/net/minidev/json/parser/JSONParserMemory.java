@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * Parser for JSON text. Please note that JSONParser is NOT thread-safe.
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  * @see JSONParserString
  * @see JSONParserByteArray
  */

@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * protected class used to stored Internal methods
  * 
- * @author Uriel Chemouni <uchemouni@gmail.com>
+ * @author Uriel Chemouni uchemouni@gmail.com
  */
 class JStylerObj {
 
