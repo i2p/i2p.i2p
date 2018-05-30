@@ -1101,6 +1101,7 @@ public class WebMail extends HttpServlet
 					state = State.SHOW;
 			} else if (buttonPressed(request, SWITCH_TO)) {
 					state = State.LIST;
+					sessionObject.reallyDelete = false;
 			}
 		} else if (buttonPressed(request, DOWNLOAD) ||
 		           buttonPressed(request, RAW_ATTACHMENT)) {
@@ -1503,6 +1504,13 @@ public class WebMail extends HttpServlet
 		}
 		
 		if (buttonPressed(request, DELETE)) {
+			MailCache mc = getCurrentMailCache(sessionObject, request);
+			if (mc != null && mc.getFolderName().equals(DIR_TRASH)) {
+				// Delete from Trash does not require confirmation
+				mc.delete(showUIDL);
+				mc.getFolder().removeElement(showUIDL);
+				return null;
+			}
 			// processRequest() will P-R-G to &delete=1
 			// We do not keep this indication in the session object.
 			return DELETE;
@@ -1674,38 +1682,44 @@ public class WebMail extends HttpServlet
 			sessionObject.pageChanged = true;
 			Folder<String> folder = getCurrentFolder(sessionObject, request);
 			page = (folder != null) ? folder.getPages() : 1;
-		}
-
-		if (buttonPressed(request, DELETE)) {
-			int m = getCheckedItems(request).size();
+		} else if (buttonPressed(request, DELETE) ||
+		           buttonPressed(request, REALLYDELETE)) {
+			List<String> b64uidls = getCheckedItems(request);
+			int m = b64uidls.size();
 			if (m > 0) {
-				sessionObject.reallyDelete = true;
-			} else {
-				sessionObject.reallyDelete = false;
-				sessionObject.error += _t("No messages marked for deletion.") + '\n';
-			}
-		}
-		else {
-			if( buttonPressed( request, REALLYDELETE ) ) {
-				List<String> toDelete = new ArrayList<String>();
-				for (String b64UIDL : getCheckedItems(request)) {
-					// This is the I2P Base64, not the encoder
-					String uidl = Base64.decodeToString(b64UIDL);
-					if (uidl != null)
-						toDelete.add(uidl);
-				}
-				int numberDeleted = toDelete.size();
-				if (numberDeleted > 0) {
-					MailCache mc = getCurrentMailCache(sessionObject, request);
-					if (mc != null) {
+				MailCache mc = getCurrentMailCache(sessionObject, request);
+				if (mc == null) {
+					sessionObject.error += "Internal error, no folder\n";
+					sessionObject.reallyDelete = false;
+				} else if (mc.getFolderName().equals(DIR_TRASH) ||
+				           buttonPressed(request, REALLYDELETE)) {
+					// Delete from Trash does not require confirmation
+					List<String> toDelete = new ArrayList<String>(m);
+					for (String b64UIDL : b64uidls) {
+						// This is the I2P Base64, not the encoder
+						String uidl = Base64.decodeToString(b64UIDL);
+						if (uidl != null)
+							toDelete.add(uidl);
+					}
+					int numberDeleted = toDelete.size();
+					if (numberDeleted > 0) {
 						mc.delete(toDelete);
 						mc.getFolder().removeElements(toDelete);
 						sessionObject.pageChanged = true;
 						sessionObject.info += ngettext("1 message deleted.", "{0} messages deleted.", numberDeleted);
+					} else {
+						sessionObject.error += _t("No messages marked for deletion.") + '\n';
 					}
-					//sessionObject.error += _t("Error deleting message: {0}", sessionObject.mailbox.lastError()) + '\n';
+					sessionObject.reallyDelete = false;
+				} else {
+					// show 'really delete' message
+					sessionObject.reallyDelete = true;
 				}
+			} else {
+				sessionObject.reallyDelete = false;
+				sessionObject.error += _t("No messages marked for deletion.") + '\n';
 			}
+		} else if (buttonPressed(request, CLEAR)) {
 			sessionObject.reallyDelete = false;
 		}
 		
