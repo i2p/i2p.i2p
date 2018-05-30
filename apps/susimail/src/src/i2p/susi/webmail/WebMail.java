@@ -2349,14 +2349,8 @@ public class WebMail extends HttpServlet
 				}
 				boolean showRefresh = false;
 				if (mc != null && mc.isLoading()) {
-					// not += so it doesn't cascade
-					sessionObject.info = _t("Loading emails, please wait...") + '\n';
-					if (sessionObject.isFetching)
-						sessionObject.info += _t("Checking for new emails on server") + '\n';
 					showRefresh = true;
 				} else if (sessionObject.isFetching) {
-					// not += so it doesn't cascade
-					sessionObject.info = _t("Checking for new emails on server") + '\n';
 					showRefresh = true;
 				} else if (state != State.LOADING && state != State.AUTH && state != State.CONFIG) {
 					String error = sessionObject.connectError;
@@ -2373,15 +2367,22 @@ public class WebMail extends HttpServlet
 						sessionObject.newMails = -1;
 					}
 				}
-				if (showRefresh) {
-					sessionObject.info += _t("Refresh the page for updates") + '\n';
-				}
-				if (sessionObject.error.length() > 0 || sessionObject.info.length() > 0) {
+				if (showRefresh || sessionObject.error.length() > 0 || sessionObject.info.length() > 0) {
 					out.println("<div class=\"notifications\" onclick=\"this.remove()\">");
 					if (sessionObject.error.length() > 0)
 						out.println("<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>");
-					if (sessionObject.info.length() > 0)
-						out.println("<p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p>");
+					if (sessionObject.info.length() > 0 || showRefresh) {
+						out.println("<p class=\"info\"><b>");
+						if (mc != null && mc.isLoading())
+							out.println(_t("Loading emails, please wait...") + "<br>");
+						if (sessionObject.isFetching)
+							out.println(_t("Checking for new emails on server") + "<br>");
+						if (showRefresh)
+						        out.println(_t("Refresh the page for updates") + "<br>");
+						if (sessionObject.info.length() > 0)
+							out.println(quoteHTML(sessionObject.info).replace("\n", "<br>"));
+						out.println("</b></p>");
+					}
 					out.println("</div>" );
 				}
 				/*
