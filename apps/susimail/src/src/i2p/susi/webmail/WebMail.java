@@ -896,7 +896,6 @@ public class WebMail extends HttpServlet
 			boolean found = false;
 			Log log = _so.log;
 			if (connected) {
-				if (log.shouldDebug()) log.debug("CONNECTED, YAY");
 				// we do this whether new mail was found or not,
 				// because we may already have UIDLs in the MailCache to fetch
 				synchronized(_so) {
@@ -916,9 +915,8 @@ public class WebMail extends HttpServlet
 				if (mc != null) {
 					found = mc.getMail(MailCache.FetchMode.HEADER);
 				}
-			} else {
-				if (log.shouldDebug()) log.debug("NOT CONNECTED, BOO");
 			}
+			if (log.shouldDebug()) log.debug("CW.FNM connected? " + connected + " found? " + found);
 			synchronized(_so) {
 				if (!connected) {
 					String error = _mb.lastError();
@@ -1378,10 +1376,7 @@ public class WebMail extends HttpServlet
 			sessionObject.isFetching = true;
 			ConnectWaiter cw = new ConnectWaiter(sessionObject);
 			if (mailbox.connectToServer(cw)) {
-				// Start a thread to wait for results
-				if (log.shouldDebug()) log.debug("Already connected, running CW");
-				Thread t = new I2PAppThread(cw, "Email fetcher");
-				t.start();
+				// mailbox will callback to cw
 			} else {
 				sessionObject.error += _t("Cannot connect") + '\n';
 				sessionObject.isFetching = false;
