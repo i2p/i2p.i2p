@@ -18,6 +18,7 @@
 		<pathelement location="${lib}/javax.servlet.jar"/>
 
                 <!-- following jars only present for debian builds -->
+                <pathelement location="${lib}/commons-logging.jar" />
                 <pathelement location="${lib}/jsp-api.jar" />
                 <pathelement location="${lib}/tomcat-api.jar" />
                 <pathelement location="${lib}/tomcat-util.jar" />

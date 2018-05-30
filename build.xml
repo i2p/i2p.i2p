@@ -854,16 +854,19 @@
                 <pathelement location="installer/java/src" />
             </sourcepath>
             <classpath>
+                <!-- warning, some entries are needed for Debian builds only -->
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="apps/jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-http.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-security.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-servlet.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-servlets.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-start.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-util.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-webapp.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-xml.jar" />
+                <pathelement location="apps/jetty/jettylib/tomcat-api.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
                 <!-- following are only for debian builds -->
@@ -2360,7 +2363,14 @@
         </exec>
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
+            <fileset dir="../i2p-${Extended.Version}/installer/c/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/doc/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/Start I2P Router.app/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
@@ -2368,9 +2378,14 @@
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docs" />
+            <fileset dir="../i2p-${Extended.Version}/launchers" />
+            <file name="../i2p-${Extended.Version}/.travis.yml" />
+            <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
             <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
             <fileset dir="../i2p-${Extended.Version}/gradle" />
+            <file name="../i2p-${Extended.Version}/gradlew" />
             <file name="../i2p-${Extended.Version}/gradlew.bat" />
             <file name="../i2p-${Extended.Version}/gradle.properties" />
             <file name="../i2p-${Extended.Version}/settings.gradle" />
@@ -2399,14 +2414,7 @@
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}">
                 <include name="**/**" />
                 <exclude name="debian/**"/>
-                <exclude name="debian-alt/**"/>
                 <exclude name="**/*.sh"/>
-                <exclude name="installer/resources/geoip.txt"/>
-                <exclude name="installer/resources/geoipv6.dat.gz"/>
-                <exclude name="apps/jetty/jetty-distribution-*/**"/>
-                <exclude name="apps/jetty/apache-tomcat-*/**"/>
-                <exclude name="apps/susidns/src/lib/jstl.jar" />
-                <exclude name="apps/susidns/src/lib/standard.jar" />
                 <!-- anything added above, add in debian-release-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
@@ -2435,7 +2443,14 @@
         </exec>
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
+            <fileset dir="../i2p-${Extended.Version}/installer/c/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/doc/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/Start I2P Router.app/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
@@ -2443,6 +2458,10 @@
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docs" />
+            <fileset dir="../i2p-${Extended.Version}/launchers" />
+            <file name="../i2p-${Extended.Version}/.travis.yml" />
+            <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
             <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
             <fileset dir="../i2p-${Extended.Version}/gradle" />
@@ -2478,18 +2497,7 @@
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}">
                 <include name="**/**" />
                 <exclude name="debian/**"/>
-                <exclude name="debian-alt/**"/>
                 <exclude name="**/*.sh"/>
-                <exclude name="installer/resources/geoip.txt"/>
-                <exclude name="installer/resources/geoipv6.dat.gz"/>
-          <!--
-                <exclude name="apps/jetty/jetty-distribution-*/**"/>
-                <exclude name="apps/jetty/apache-tomcat-*/**"/>
-           -->
-          <!--
-                <exclude name="apps/susidns/src/lib/jstl.jar" />
-           -->
-                <exclude name="apps/susidns/src/lib/standard.jar" />
                 <!-- anything added above, add in debian-release-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
@@ -2520,7 +2528,14 @@
         </exec>
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
+            <fileset dir="../i2p-${Extended.Version}/installer/c/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/doc/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/Start I2P Router.app/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
@@ -2528,6 +2543,10 @@
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docs" />
+            <fileset dir="../i2p-${Extended.Version}/launchers" />
+            <file name="../i2p-${Extended.Version}/.travis.yml" />
+            <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
             <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
             <fileset dir="../i2p-${Extended.Version}/gradle" />
@@ -2554,16 +2573,7 @@
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}">
                 <include name="**/**" />
                 <exclude name="debian/**"/>
-                <exclude name="debian-alt/**"/>
                 <exclude name="**/*.sh"/>
-                <exclude name="installer/resources/geoip.txt"/>
-                <exclude name="installer/resources/geoipv6.dat.gz"/>
-                <exclude name="apps/jetty/jetty-distribution-*/**"/>
-                <exclude name="apps/jetty/apache-tomcat-*/**"/>
-              <!--
-                <exclude name="apps/susidns/src/lib/jstl.jar" />
-               -->
-                <exclude name="apps/susidns/src/lib/standard.jar" />
                 <!-- anything added above, add in debian-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}" filemode="755">
@@ -2590,7 +2600,14 @@
         </exec>
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
+            <fileset dir="../i2p-${Extended.Version}/installer/c/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/doc/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/Start I2P Router.app/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
@@ -2598,6 +2615,10 @@
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docs" />
+            <fileset dir="../i2p-${Extended.Version}/launchers" />
+            <file name="../i2p-${Extended.Version}/.travis.yml" />
+            <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
             <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
             <fileset dir="../i2p-${Extended.Version}/gradle" />
@@ -2622,14 +2643,7 @@
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}">
                 <include name="**/**" />
                 <exclude name="debian/**"/>
-                <exclude name="debian-alt/**"/>
                 <exclude name="**/*.sh"/>
-                <exclude name="installer/resources/geoip.txt"/>
-                <exclude name="installer/resources/geoipv6.dat.gz"/>
-                <exclude name="apps/jetty/jetty-distribution-*/**"/>
-                <exclude name="apps/jetty/apache-tomcat-*/**"/>
-                <exclude name="apps/susidns/src/lib/jstl.jar" />
-                <exclude name="apps/susidns/src/lib/standard.jar" />
                 <!-- anything added above, add in debian-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}" filemode="755">

@@ -390,6 +390,7 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
 
                 <!-- following jars only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-el.jar" />
