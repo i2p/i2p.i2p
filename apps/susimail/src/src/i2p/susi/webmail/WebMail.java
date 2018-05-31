@@ -3356,18 +3356,18 @@ public class WebMail extends HttpServlet
 				button( REPLYALL, _t("Reply All") ) +
 				button( FORWARD, _t("Forward") ) +
 				button( SAVE_AS, _t("Save As")));
-			if (mail.hasBody() && !mc.getFolderName().equals(DIR_DRAFTS)) {
-				// can't move unless has body
-				// can't move from drafts
-				out.println(button(MOVE_TO, _t("Move to Folder") + ':'));
-				showFolderSelect(out, mc.getFolderName(), true);
-			}
 			if (sessionObject.reallyDelete)
 				out.println(button2(DELETE, _t("Delete")));
 			else
 				out.println(button(DELETE, _t("Delete")));
 		}
 		out.println(button(LOGOUT, _t("Logout") ));
+		if (mail.hasBody() && !mc.getFolderName().equals(DIR_DRAFTS)) {
+			// can't move unless has body
+			// can't move from drafts
+			out.println(button(MOVE_TO, _t("Move to Folder") + ':'));
+			showFolderSelect(out, mc.getFolderName(), true);
+		}
 		// processRequest() will P-R-G the PREV and NEXT so we have a consistent URL
 		out.println("<div id=\"messagenav\">");
 		Folder<String> folder = mc.getFolder();

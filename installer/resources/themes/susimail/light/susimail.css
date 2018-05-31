@@ -1175,6 +1175,12 @@ h3#config {
      float: none !important;
 }
 
+input.moveto {
+     float: left;
+     margin-left: 14px;
+     margin-top: 2px !important;
+}
+
 .topbuttons select.select1,
 .topbuttons input.new, .topbuttons input.refresh, .topbuttons input.logout,
 .topbuttons input.reply, .topbuttons input.replyall, .topbuttons input.forward, .topbuttons input.saveas, .topbuttons input.delete {
