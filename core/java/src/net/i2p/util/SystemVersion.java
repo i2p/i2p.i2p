@@ -46,6 +46,7 @@ public abstract class SystemVersion {
     private static final boolean _oneDotEight;
     private static final boolean _oneDotNine;
     private static final boolean _oneDotTen;
+    private static final boolean _oneDotEleven;
     private static final int _androidSDK;
 
     static {
@@ -91,6 +92,7 @@ public abstract class SystemVersion {
             _oneDotEight = false;
             _oneDotNine = false;
             _oneDotTen = false;
+            _oneDotEleven = false;
         } else {
             String version = System.getProperty("java.version");
             // handle versions like "8-ea" or "9-internal"
@@ -102,6 +104,7 @@ public abstract class SystemVersion {
             _oneDotNine = _oneDotEight && VersionComparator.comp(version, "1.9") >= 0;
             // Starting 2018, versions are YY.M, this works for that also
             _oneDotTen = _oneDotNine && VersionComparator.comp(version, "1.10") >= 0;
+            _oneDotEleven = _oneDotTen && VersionComparator.comp(version, "1.11") >= 0;
         }
     }
 
@@ -220,6 +223,15 @@ public abstract class SystemVersion {
     }
 
     /**
+     *
+     *  @return true if Java 11 or higher, false for Android.
+     *  @since 0.9.35
+     */
+    public static boolean isJava11() {
+        return _oneDotEleven;
+    }
+
+    /**
      * This isn't always correct.
      * http://stackoverflow.com/questions/807263/how-do-i-detect-which-kind-of-jre-is-installed-32bit-vs-64bit
      * http://mark.koli.ch/2009/10/javas-osarch-system-property-is-the-bitness-of-the-jre-not-the-operating-system.html
@@ -317,6 +329,7 @@ public abstract class SystemVersion {
         System.out.println("Java 8   : " + isJava8());
         System.out.println("Java 9   : " + isJava9());
         System.out.println("Java 10  : " + isJava10());
+        System.out.println("Java 11  : " + isJava11());
         System.out.println("Android  : " + isAndroid());
         if (isAndroid())
             System.out.println("  Version: " + getAndroidVersion());

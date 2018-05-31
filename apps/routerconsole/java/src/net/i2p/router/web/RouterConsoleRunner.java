@@ -330,8 +330,8 @@ public class RouterConsoleRunner implements RouterApp {
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
-        boolean isJava10 = SystemVersion.isJava10();
-        if (noJava7 || noPack200 || openARM || isJava10) {
+        boolean isJava11 = SystemVersion.isJava11();
+        if (noJava7 || noPack200 || openARM || isJava11) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -354,7 +354,7 @@ public class RouterConsoleRunner implements RouterApp {
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
-            if (isJava10) {
+            if (isJava11) {
                 s = "Java 10/11 support is beta, and not recommended for general use";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
