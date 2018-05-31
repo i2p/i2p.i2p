@@ -48,6 +48,7 @@ public class NamingServiceBean extends AddressbookBean
 {
 	private static final String DEFAULT_NS = "BlockfileNamingService";
 	private String detail;
+	private String notes;
 
 	private boolean isDirect() {
 		return getBook().equals("published");
@@ -359,8 +360,62 @@ public class NamingServiceBean extends AddressbookBean
 		return message;
 	}
 
+	/**
+	 *  @since 0.9.35
+	 */
+        public void saveNotes() {
+		if (action == null || !action.equals(_t("Save Notes")) ||
+		    destination == null || detail == null || isDirect() ||
+		    notes == null ||
+		    serial == null || !serial.equals(lastSerial))
+			return;
+		Properties nsOptions = new Properties();
+		List<Properties> propsList = new ArrayList<Properties>(4);
+		nsOptions.setProperty("list", getFileName());
+		List<Destination> dests = getNamingService().lookupAll(detail, nsOptions, propsList);
+		if (dests == null)
+			return;
+		for (int i = 0; i < dests.size(); i++) {
+			if (!dests.get(i).toBase64().equals(destination))
+				continue;
+			Properties props = propsList.get(i);
+			byte[] nbytes = DataHelper.getUTF8(notes);
+                        if (nbytes.length > 255) {
+				// violently truncate, possibly splitting a char
+				byte[] newbytes = new byte[255];
+				System.arraycopy(nbytes, 0, newbytes, 0, 255);
+				notes = DataHelper.getUTF8(newbytes);
+				// drop replacement char or split pair
+				int last = notes.length() - 1;
+				char lastc = notes.charAt(last);
+				if (lastc == (char) 0xfffd || Character.isHighSurrogate(lastc))
+					notes = notes.substring(0, last);
+			}
+			props.setProperty("notes", notes);
+			props.setProperty("list", getFileName());
+                        String now = Long.toString(_context.clock().now());
+                       	props.setProperty("m", now);
+			if (dests.size() > 1) {
+				// we don't have any API to update properties on a single dest
+				// so remove and re-add
+				getNamingService().remove(detail, dests.get(i), nsOptions);
+				getNamingService().addDestination(detail, dests.get(i), props);
+			} else {
+				getNamingService().put(detail, dests.get(i), props);
+			}
+			return;
+		}
+	}
+
 	public void setH(String h) {
 		this.detail = DataHelper.stripHTML(h);
+	}
+
+	/**
+	 *  @since 0.9.35
+	 */
+	public void setNofilter_notes(String n) {
+		notes = n;
 	}
 
 	public AddressBean getLookup() {

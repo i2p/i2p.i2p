@@ -1,4 +1,21 @@
+2018-05-31 zzz
+ * Console:
+   - Fix CSS preventing ordered lists (ticket #2075)
+   - Change Java 10 warning to Java 11,
+ * SusiDNS: Add notes form (ticket #1433)
+
+2018-05-30 zzz
+ * Debian build fixes, remove things from source package
+ * NTCP: Cleanup, prep for NTCP2, increase max RI size
+ * SusiMail:
+   - Button and CSS fixes
+   - Don't require confirmation to delete from Trash,
+   - Clear reallydelete flag when clicking cancel or change folder
+   - Fix dup ConnectWaiter run, lack of failure message
+   - Fix persistent loading/fetching/refresh messages
+
 2018-05-28 zzz
+ * Console: Tagged string fixes (ticket #2017)
  * SusiMail: (ticket #2087)
    - Send deletions after connect so emails don't come back after a move
    - Fix fetches in check mail

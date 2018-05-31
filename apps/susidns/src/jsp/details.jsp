@@ -73,6 +73,8 @@
     if (detail == null) {
         %><p>No host specified</p><%
     } else {
+        // process save notes form
+        book.saveNotes();
         detail = net.i2p.data.DataHelper.stripHTML(detail);
         java.util.List<i2p.susi.dns.AddressBean> addrs = book.getLookupAll();
         if (addrs == null) {
@@ -85,6 +87,11 @@
                 String b32 = addr.getB32();
 %>
 <jsp:setProperty name="book" property="trClass"	value="0" />
+<form method="POST" action="details">
+<input type="hidden" name="book" value="${book.book}">
+<input type="hidden" name="serial" value="<%=nonce%>">
+<input type="hidden" name="h" value="<%=detail%>">
+<input type="hidden" name="destination" value="<%=addr.getDestination()%>">
 <table class="book" id="host_details" cellspacing="0" cellpadding="5">
 <tr class="list${book.trClass}">
 <td><%=intl._t("Hostname")%></td>
@@ -141,14 +148,16 @@
 <td><%=addr.getModded()%></td>
 </tr>
 <tr class="list${book.trClass}">
-<td><%=intl._t("Notes")%></td>
-<td><%=addr.getNotes()%></td>
-</tr>
-<tr class="list${book.trClass}">
 <td><%=intl._t("Destination")%></td>
 <td class="destinations"><div class="destaddress" tabindex="0"><%=addr.getDestination()%></div></td>
 </tr>
+<tr class="list${book.trClass}">
+<td><%=intl._t("Notes")%><br>
+<input class="accept" type="submit" name="action" value="<%=intl._t("Save Notes")%>"></td>
+<td><textarea name="nofilter_notes" rows="3" style="height:6em" wrap="off" cols="70"><%=addr.getNotes()%></textarea></td>
+</tr>
 </table>
+</form>
 <div id="buttons">
 <form method="POST" action="addressbook">
 <p class="buttons">

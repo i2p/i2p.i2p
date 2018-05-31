@@ -33,6 +33,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
+import net.i2p.data.DataHelper;
 
 public class AddressBean
 {
@@ -209,7 +210,7 @@ public class AddressBean
 
 	/** @since 0.8.7 */
 	public String getNotes() {
-		return getProp("notes");
+		return DataHelper.escapeHTML(getProp("notes"));
 	}
 
 	/**
