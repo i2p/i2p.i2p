@@ -2078,12 +2078,12 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .main ul {
+     list-style-type: square;
      margin: -10px 0 10px -10px;
 }
 
 .main li {
      padding: 0 0 5px 0;
-     list-style: square;
      word-wrap: break-word;
      margin-right: 20px;
 }

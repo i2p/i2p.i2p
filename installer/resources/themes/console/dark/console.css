@@ -1686,9 +1686,12 @@ a:active tt {
      color: #f90;
 }
 
+.main ul {
+     list-style-type: square;
+}
+
 div.main li {
      text-align: left;
-     list-style: square;
      margin: 2px 0 2px 30px;
      padding: 2px 20px 2px 0;
      word-wrap: break-word;
