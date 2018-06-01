@@ -366,7 +366,6 @@ public class NamingServiceBean extends AddressbookBean
         public void saveNotes() {
 		if (action == null || !action.equals(_t("Save Notes")) ||
 		    destination == null || detail == null || isDirect() ||
-		    notes == null ||
 		    serial == null || !serial.equals(lastSerial))
 			return;
 		Properties nsOptions = new Properties();
@@ -379,19 +378,25 @@ public class NamingServiceBean extends AddressbookBean
 			if (!dests.get(i).toBase64().equals(destination))
 				continue;
 			Properties props = propsList.get(i);
-			byte[] nbytes = DataHelper.getUTF8(notes);
-                        if (nbytes.length > 255) {
-				// violently truncate, possibly splitting a char
-				byte[] newbytes = new byte[255];
-				System.arraycopy(nbytes, 0, newbytes, 0, 255);
-				notes = DataHelper.getUTF8(newbytes);
-				// drop replacement char or split pair
-				int last = notes.length() - 1;
-				char lastc = notes.charAt(last);
-				if (lastc == (char) 0xfffd || Character.isHighSurrogate(lastc))
-					notes = notes.substring(0, last);
+			if (notes != null && notes.length() > 0) {
+				byte[] nbytes = DataHelper.getUTF8(notes);
+	                        if (nbytes.length > 255) {
+					// violently truncate, possibly splitting a char
+					byte[] newbytes = new byte[255];
+					System.arraycopy(nbytes, 0, newbytes, 0, 255);
+					notes = DataHelper.getUTF8(newbytes);
+					// drop replacement char or split pair
+					int last = notes.length() - 1;
+					char lastc = notes.charAt(last);
+					if (lastc == (char) 0xfffd || Character.isHighSurrogate(lastc))
+						notes = notes.substring(0, last);
+				}
+				props.setProperty("notes", notes);
+			} else {
+				// not working
+				//props.remove("notes");
+				props.setProperty("notes", "");
 			}
-			props.setProperty("notes", notes);
 			props.setProperty("list", getFileName());
                         String now = Long.toString(_context.clock().now());
                        	props.setProperty("m", now);

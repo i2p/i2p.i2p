@@ -83,15 +83,18 @@
             boolean haveImagegen = book.haveImagegen();
             // use one nonce for all
             String nonce = book.getSerial();
+            boolean showNotes = !book.getBook().equals("published");
             for (i2p.susi.dns.AddressBean addr : addrs) {
                 String b32 = addr.getB32();
 %>
 <jsp:setProperty name="book" property="trClass"	value="0" />
+<% if (showNotes) { %>
 <form method="POST" action="details">
 <input type="hidden" name="book" value="${book.book}">
 <input type="hidden" name="serial" value="<%=nonce%>">
 <input type="hidden" name="h" value="<%=detail%>">
 <input type="hidden" name="destination" value="<%=addr.getDestination()%>">
+<% }  // showNotes  %>
 <table class="book" id="host_details" cellspacing="0" cellpadding="5">
 <tr class="list${book.trClass}">
 <td><%=intl._t("Hostname")%></td>
@@ -132,32 +135,38 @@
 <td><%=addr.getCert()%></td>
 </tr>
 <tr class="list${book.trClass}">
-<td><%=intl._t("Added Date")%></td>
-<td><%=addr.getAdded()%></td>
-</tr>
-<tr class="list${book.trClass}">
 <td><%=intl._t("Validated")%></td>
 <td><%=addr.isValidated() ? intl._t("yes") : intl._t("no")%></td>
 </tr>
+<% if (showNotes) { %>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Source")%></td>
 <td><%=addr.getSource()%></td>
 </tr>
 <tr class="list${book.trClass}">
+<td><%=intl._t("Added Date")%></td>
+<td><%=addr.getAdded()%></td>
+</tr>
+<tr class="list${book.trClass}">
 <td><%=intl._t("Last Modified")%></td>
 <td><%=addr.getModded()%></td>
 </tr>
+<% }  // showNotes  %>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Destination")%></td>
 <td class="destinations"><div class="destaddress" tabindex="0"><%=addr.getDestination()%></div></td>
 </tr>
+<% if (showNotes) { %>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Notes")%><br>
 <input class="accept" type="submit" name="action" value="<%=intl._t("Save Notes")%>"></td>
 <td><textarea name="nofilter_notes" rows="3" style="height:6em" wrap="off" cols="70"><%=addr.getNotes()%></textarea></td>
 </tr>
+<% }  // showNotes  %>
 </table>
+<% if (showNotes) { %>
 </form>
+<% }  // showNotes  %>
 <div id="buttons">
 <form method="POST" action="addressbook">
 <p class="buttons">
