@@ -226,6 +226,13 @@ abstract class EstablishBase implements EstablishState {
         }
     }
 
+    /**
+     *  Get the NTCP version
+     *  @return 1, 2, or 0 if unknown
+     *  @since 0.9.35
+     */
+    public abstract int getVersion();
+
     /** Anything left over in the byte buffer after verification is extra
      *
      *  All data must be copied out of the buffer as Reader.processRead()
@@ -337,12 +344,16 @@ abstract class EstablishBase implements EstablishState {
             _state = State.VERIFIED;
         }
 
-        @Override public void prepareOutbound() {
-            Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
+        public int getVersion() { return 1; }
+
+        @Override
+        public void prepareOutbound() {
+            Log log = RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
 
-        @Override public String toString() { return "VerifiedEstablishState: ";}
+        @Override
+        public String toString() { return "VerifiedEstablishState: ";}
     }
 
     /**
@@ -355,12 +366,16 @@ abstract class EstablishBase implements EstablishState {
             _state = State.CORRUPT;
         }
 
-        @Override public void prepareOutbound() {
-            Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
+        public int getVersion() { return 1; }
+
+        @Override
+        public void prepareOutbound() {
+            Log log = RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
 
-        @Override public String toString() { return "FailedEstablishState: ";}
+        @Override
+        public String toString() { return "FailedEstablishState: ";}
     }
 
     /**

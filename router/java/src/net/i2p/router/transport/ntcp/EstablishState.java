@@ -50,6 +50,13 @@ interface EstablishState {
     public byte[] getExtraBytes();
 
     /**
+     *  Get the NTCP version
+     *  @return 1, 2, or 0 if unknown
+     *  @since 0.9.35
+     */
+    public int getVersion();
+
+    /**
      *  Release resources on timeout.
      *  @param e may be null
      *  @since 0.9.16

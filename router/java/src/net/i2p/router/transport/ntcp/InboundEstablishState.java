@@ -21,7 +21,7 @@ import net.i2p.util.SimpleByteCache;
 
 /**
  *
- *  We are Bob
+ *  NTCP 1 or 2. We are Bob.
  *
  */
 class InboundEstablishState extends EstablishBase {
@@ -68,6 +68,13 @@ class InboundEstablishState extends EstablishBase {
             return; // nothing to receive
         receiveInbound(src);
     }
+
+    /**
+     *  Get the NTCP version
+     *  @return 1, 2, or 0 if unknown
+     *  @since 0.9.35
+     */
+    public int getVersion() { return 1; }
 
     /**
      *  we are Bob, so receive these bytes as part of an inbound connection

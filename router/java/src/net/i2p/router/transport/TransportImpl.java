@@ -660,45 +660,54 @@ public abstract class TransportImpl implements Transport {
      *  @since IPv6
      */
     protected List<RouterAddress> getTargetAddresses(RouterInfo target) {
-        List<RouterAddress> rv = target.getTargetAddresses(getStyle());
+        List<RouterAddress> rv;
+        String alt = getAltStyle();
+        if (alt != null)
+            rv = target.getTargetAddresses(getStyle(), alt);
+        else
+            rv = target.getTargetAddresses(getStyle());
         if (rv.isEmpty())
             return rv;
-        // Shuffle so everybody doesn't use the first one
-        if (rv.size() > 1)
+        if (rv.size() > 1) {
+            // Shuffle so everybody doesn't use the first one
             Collections.shuffle(rv, _context.random());
-        TransportUtil.IPv6Config config = getIPv6Config();
-        int adj;
-        switch (config) {
-              case IPV6_DISABLED:
-                adj = 10;
-              /**** IPv6 addresses will be rejected in isPubliclyRoutable()
-                for (Iterator<RouterAddress> iter = rv.iterator(); iter.hasNext(); ) {
-                    byte[] ip = iter.next().getIP();
-                    if (ip != null && ip.length == 16)
-                        iter.remove();
-                }
-               ****/
-                break;
-              case IPV6_NOT_PREFERRED:
-                adj = 1; break;
-              default:
-              case IPV6_ENABLED:
-                adj = 0; break;
-              case IPV6_PREFERRED:
-                adj = -1; break;
-              case IPV6_ONLY:
-                adj = -10;
-              /**** IPv6 addresses will be rejected in isPubliclyRoutable()
-                for (Iterator<RouterAddress> iter = rv.iterator(); iter.hasNext(); ) {
-                    byte[] ip = iter.next().getIP();
-                    if (ip != null && ip.length == 4)
-                        iter.remove();
-                }
-               ****/
-                break;
-        }
-        if (rv.size() > 1)
+            TransportUtil.IPv6Config config = getIPv6Config();
+            int adj;
+            switch (config) {
+                  case IPV6_DISABLED:
+                    adj = 10;
+                  /**** IPv6 addresses will be rejected in isPubliclyRoutable()
+                    for (Iterator<RouterAddress> iter = rv.iterator(); iter.hasNext(); ) {
+                        byte[] ip = iter.next().getIP();
+                        if (ip != null && ip.length == 16)
+                            iter.remove();
+                    }
+                   ****/
+                    break;
+
+                  case IPV6_NOT_PREFERRED:
+                    adj = 1; break;
+                  default:
+
+                  case IPV6_ENABLED:
+                    adj = 0; break;
+
+                  case IPV6_PREFERRED:
+                    adj = -1; break;
+
+                  case IPV6_ONLY:
+                    adj = -10;
+                  /**** IPv6 addresses will be rejected in isPubliclyRoutable()
+                    for (Iterator<RouterAddress> iter = rv.iterator(); iter.hasNext(); ) {
+                        byte[] ip = iter.next().getIP();
+                        if (ip != null && ip.length == 4)
+                            iter.remove();
+                    }
+                   ****/
+                    break;
+            }
             Collections.sort(rv, new AddrComparator(adj));
+        }
         return rv;
     }
 
@@ -975,6 +984,13 @@ public abstract class TransportImpl implements Transport {
             return _IPMap.get(peer);
         }
     }
+
+    /**
+     * An alternate supported style, or null.
+     * @return null, override to add support
+     * @since 0.9.35
+     */
+    public String getAltStyle() { return null; }
 
     /**
      *  @since 0.9.3

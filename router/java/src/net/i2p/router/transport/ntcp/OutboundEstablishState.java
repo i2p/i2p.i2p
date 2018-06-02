@@ -18,7 +18,7 @@ import net.i2p.util.SimpleByteCache;
 
 /**
  *
- *  We are Alice
+ *  NTCP 1 only. We are Alice.
  *
  */
 class OutboundEstablishState extends EstablishBase {
@@ -47,6 +47,13 @@ class OutboundEstablishState extends EstablishBase {
             return; // nothing to receive
         receiveOutbound(src);
     }
+
+    /**
+     *  Get the NTCP version
+     *  @return 1
+     *  @since 0.9.35
+     */
+    public int getVersion() { return 1; }
 
     /**
      *  We are Alice, so receive these bytes as part of an outbound connection.

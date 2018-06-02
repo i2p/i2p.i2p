@@ -201,8 +201,10 @@ public class NTCPConnection implements Closeable {
     /**
      * Create an outbound unconnected NTCP connection
      *
+     * @param version must be 1 or 2
      */
-    public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer, RouterAddress remAddr) {
+    public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer,
+                          RouterAddress remAddr, int version) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _created = ctx.clock().now();
@@ -216,7 +218,10 @@ public class NTCPConnection implements Closeable {
         //_outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
         _outbound = new PriBlockingQueue<OutNetMessage>(ctx, "NTCP-Connection", 32);
         _isInbound = false;
-        _establishState = new OutboundEstablishState(ctx, transport, this);
+        //if (version == 1)
+            _establishState = new OutboundEstablishState(ctx, transport, this);
+        //else
+        //    _establishState = // TODO
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
         _inboundListener = new InboundListener();

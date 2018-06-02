@@ -490,6 +490,23 @@ public class RouterInfo extends DatabaseEntry {
         }
         return ret;
     }
+    
+    /**
+     *  For multiple addresses per-transport (IPv4 or IPv6)
+     *  Return addresses matching either of two styles
+     *
+     *  @return non-null
+     *  @since 0.9.35
+     */
+    public List<RouterAddress> getTargetAddresses(String transportStyle1, String transportStyle2) {
+        List<RouterAddress> ret = new ArrayList<RouterAddress>(_addresses.size());
+        for (RouterAddress addr :  _addresses) {
+            String style = addr.getTransportStyle();
+            if (style.equals(transportStyle1) || style.equals(transportStyle2))
+                ret.add(addr);
+        }
+        return ret;
+    }
 
     /**
      * Actually validate the signature
