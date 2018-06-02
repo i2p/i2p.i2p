@@ -446,6 +446,37 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
 
     /**
+     *  Read the message with a short 9-byte header.
+     *  THe header consists of a one-byte type, 4-byte ID, and a 4-byte expiration in seconds only.
+     *  Used by NTCP2 only!
+     *  @since 0.9.35
+     */
+    public static I2NPMessage fromRawByteArrayNTCP2(I2PAppContext ctx, byte buffer[], int offset,
+                                                    int len, I2NPMessageHandler handler) throws I2NPMessageException {
+        int type = buffer[offset] & 0xff;
+        offset++;
+        I2NPMessage msg = createMessage(ctx, type);
+        if (msg == null)
+            throw new I2NPMessageException("Unknown message type: " + type);
+
+        try {
+            long id = DataHelper.fromLong(buffer, offset, 4);
+            offset += 4;
+            // January 19 2038? No, unsigned, good until Feb. 7 2106
+            // in seconds, round up so we don't lose time every hop
+            long expiration = (DataHelper.fromLong(buffer, offset, 4) * 1000) + 500;
+            offset += 4;
+            int dataSize = len - 9;
+            msg.readMessage(buffer, offset, dataSize, type, handler);
+            msg.setUniqueId(id);
+            msg.setMessageExpiration(expiration);
+            return msg;
+        } catch (IllegalArgumentException iae) {
+            throw new I2NPMessageException("Corrupt message (negative expiration)", iae);
+        }
+    }
+
+    /**
      * Yes, this is fairly ugly, but its the only place it ever happens.
      *
      * @return non-null, returns an UnknownI2NPMessage if unknown type
