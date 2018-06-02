@@ -214,6 +214,19 @@ class TunnelRenderer {
     }
 
     /** @since 0.9.35 */
+    private static class TunnelInfoComparator implements Comparator<TunnelInfo>, Serializable {
+         public int compare(TunnelInfo l, TunnelInfo r) {
+             long le = l.getExpiration();
+             long re = r.getExpiration();
+             if (le < re)
+                 return -1;
+             if (le > re)
+                 return 1;
+             return 0;
+        }
+    }
+
+    /** @since 0.9.35 */
     private void writeGraphLinks(Writer out, TunnelPool in, TunnelPool outPool) throws IOException {
         if (in == null || outPool == null)
             return;
@@ -247,13 +260,19 @@ class TunnelRenderer {
     }
 
     private void renderPool(Writer out, TunnelPool in, TunnelPool outPool) throws IOException {
-        List<TunnelInfo> tunnels = null;
-        if (in == null)
+        Comparator<TunnelInfo> comp = new TunnelInfoComparator();
+        List<TunnelInfo> tunnels;
+        if (in == null) {
             tunnels = new ArrayList<TunnelInfo>();
-        else
+        } else {
             tunnels = in.listTunnels();
-        if (outPool != null)
-            tunnels.addAll(outPool.listTunnels());
+            Collections.sort(tunnels, comp);
+        }
+        if (outPool != null) {
+            List<TunnelInfo> otunnels = outPool.listTunnels();
+            Collections.sort(otunnels, comp);
+            tunnels.addAll(otunnels);
+        }
 
         long processedIn = (in != null ? in.getLifetimeProcessed() : 0);
         long processedOut = (outPool != null ? outPool.getLifetimeProcessed() : 0);
