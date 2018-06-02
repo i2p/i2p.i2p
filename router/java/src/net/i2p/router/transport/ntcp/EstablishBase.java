@@ -47,6 +47,7 @@ import net.i2p.util.SimpleByteCache;
  * isCheckInfo()
  * NOTE: Check info is unused.
  *
+ * @since 0.9.35 pulled out of EstablishState
  */
 abstract class EstablishBase implements EstablishState {
     
@@ -104,7 +105,7 @@ abstract class EstablishBase implements EstablishState {
     protected static final int HXY_SIZE = 32;  //Hash.HASH_LENGTH;
     protected static final int HXY_TSB_PAD_SIZE = HXY_SIZE + 4 + 12;  // 48
 
-    protected static final Object _stateLock = new Object();
+    protected final Object _stateLock = new Object();
     protected State _state;
 
     protected enum State {

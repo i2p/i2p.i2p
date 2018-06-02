@@ -23,6 +23,7 @@ import net.i2p.util.SimpleByteCache;
  *
  *  NTCP 1 or 2. We are Bob.
  *
+ *  @since 0.9.35 pulled out of EstablishState
  */
 class InboundEstablishState extends EstablishBase {
 

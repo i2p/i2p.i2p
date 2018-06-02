@@ -20,6 +20,7 @@ import net.i2p.util.SimpleByteCache;
  *
  *  NTCP 1 only. We are Alice.
  *
+ *  @since 0.9.35 pulled out of EstablishState
  */
 class OutboundEstablishState extends EstablishBase {
     
