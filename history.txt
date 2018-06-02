@@ -1,3 +1,10 @@
+2018-06-02 zzz
+ * Console: Sort tunnels within pools by expiration (ticket #2232)
+ * NTCP: Refactor EstablishState in prep for NTCP2
+
+2018-06-01 zzz
+ * SusiDNS: Fix deleting notes (ticket #1433)
+
 2018-05-31 zzz
  * Console:
    - Fix CSS preventing ordered lists (ticket #2075)

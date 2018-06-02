@@ -190,7 +190,7 @@ public class NTCPConnection implements Closeable {
         _isInbound = true;
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
-        _establishState = new EstablishState(ctx, transport, this);
+        _establishState = new InboundEstablishState(ctx, transport, this);
         _conKey = key;
         _conKey.attach(this);
         _inboundListener = new InboundListener();
@@ -216,7 +216,7 @@ public class NTCPConnection implements Closeable {
         //_outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
         _outbound = new PriBlockingQueue<OutNetMessage>(ctx, "NTCP-Connection", 32);
         _isInbound = false;
-        _establishState = new EstablishState(ctx, transport, this);
+        _establishState = new OutboundEstablishState(ctx, transport, this);
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
         _inboundListener = new InboundListener();
@@ -309,7 +309,7 @@ public class NTCPConnection implements Closeable {
         NTCPConnection rv = _transport.inboundEstablished(this);
         _nextMetaTime = _establishedOn + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
         _nextInfoTime = _establishedOn + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
-        _establishState = EstablishState.VERIFIED;
+        _establishState = EstablishBase.VERIFIED;
         return rv;
     }
 
@@ -427,7 +427,7 @@ public class NTCPConnection implements Closeable {
     private synchronized NTCPConnection locked_close(boolean allowRequeue) {
         if (_chan != null) try { _chan.close(); } catch (IOException ioe) { }
         if (_conKey != null) _conKey.cancel();
-        _establishState = EstablishState.FAILED;
+        _establishState = EstablishBase.FAILED;
         NTCPConnection old = _transport.removeCon(this);
         _transport.getReader().connectionClosed(this);
         _transport.getWriter().connectionClosed(this);
@@ -532,7 +532,7 @@ public class NTCPConnection implements Closeable {
             _log.debug("Outbound established, prevWriteEnd: " + Base64.encode(prevWriteEnd) + " prevReadEnd: " + Base64.encode(prevReadEnd));
 
         _establishedOn = _context.clock().now();
-        _establishState = EstablishState.VERIFIED;
+        _establishState = EstablishBase.VERIFIED;
         _transport.markReachable(getRemotePeer().calculateHash(), false);
         boolean msgs = !_outbound.isEmpty();
         _nextMetaTime = _establishedOn + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
