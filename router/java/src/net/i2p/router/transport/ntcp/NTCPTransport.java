@@ -120,7 +120,7 @@ public class NTCPTransport extends TransportImpl {
     private boolean _enableNTCP2;
     private static final String NTCP2_PROTO_SHORT = "NXK2CS";
     private static final String OPT_NTCP2_SK = 'N' + NTCP2_PROTO_SHORT + "2s";
-    private static final int NTCP2_INT_VERSION = 2;
+    static final int NTCP2_INT_VERSION = 2;
     private static final String NTCP2_VERSION = Integer.toString(NTCP2_INT_VERSION);
     /** b64 static private key */
     private static final String PROP_NTCP2_SP = "i2np.ntcp2.sp";
@@ -1089,6 +1089,15 @@ public class NTCPTransport extends TransportImpl {
      * @since 0.9.35
      */
     boolean isNTCP2Enabled() { return _enableNTCP2; }
+
+    /**
+     * The static priv key
+     *
+     * @since 0.9.35
+     */
+    byte[] getNTCP2StaticPrivkey() {
+        return _ntcp2StaticPrivkey;
+    }
 
     /**
      * Get the valid NTCP version of this NTCP address.

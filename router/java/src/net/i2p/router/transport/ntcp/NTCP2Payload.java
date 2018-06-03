@@ -124,7 +124,7 @@ class NTCP2Payload {
      *  @param payload writes to it starting at off
      *  @return the new offset
      */
-    public int writePayload(byte[] payload, int off, List<Block> blocks) {
+    public static int writePayload(byte[] payload, int off, List<Block> blocks) {
         for (Block block : blocks) {
             off = block.write(payload, off);
         }
