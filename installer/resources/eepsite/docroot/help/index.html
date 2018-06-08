@@ -30,19 +30,23 @@
 
     <h2>Quick Guide to Anonymous Webserving on I2P</h2>
 
-    <p>This is your own anonymous I2P webserver ("eepsite"). To serve your own content, simply edit the files in the webserver's
-      root directory and they'll be reachable by others once you follow the instructions below.
+    <p>
+      This is your own anonymous I2P webserver (traditionally referred to as an <i>eepsite</i>) To serve your own content, simply 
+      edit the files in the webserver's root directory and they'll be reachable by others once you follow the instructions below.
     </p>
 
-    <p>The webserver's root directory can be found in the following location:
+    <p>The webserver's root directory can be found in the following locations, depending on your Operating System:
     </p>
 
     <ul>
-      <li><code>~/.i2p/eepsite/docroot/</code> <b>(Linux)</b>
+      <li> <b>Linux</b><br>
+        <code>~/.i2p/eepsite/docroot/</code>
       </li>
-      <li><code>%APPDATA%\I2P\eepsite\docroot\</code> <b>(Windows)</b>
+      <li> <b>Windows</b><br>
+        <code>%APPDATA%\I2P\eepsite\docroot\</code>
       </li>        
-      <li><code>/Users/(user)/Library/Application Support/i2p</code> <b>(Mac)</b>
+      <li> <b>Mac</b><br>
+        <code>/Users/(user)/Library/Application Support/i2p</code>
       </li>
     </ul>
 
@@ -58,20 +62,23 @@
 
     <h2>How to set up and announce your hidden service website</h2>
 
-    <p>Your website is stopped by default. After you start it, it will be difficult for other people to find because it
-      doesn't have a name and they don't have your really long Base64 key. You could just tell people that really long
-      key, but thankfully I2P has an address book and several easy ways to tell people about your website. Here's detailed
-      instructions.
+     <p>Your website is stopped by default. After you start your I2P Webserver
+      tunnel, it will be difficult for other people to find - it can only be
+      accessed with your Base64 string or with the b32, which is a SHA256 hash
+      of the Base64 string. You could just tell people that really long key,
+      but thankfully I2P has an address book and several easy ways to tell
+      people about your website. Here are detailed instructions.
     </p>
 
     <ul>
       <li>Pick a name for your website (<i>something</i>.i2p). Use all lower-case. You may wish to check first in your own
-         router's address book
-         <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">here</a>, or the file
-         <code>i2p/hosts.txt</code> to see if your name is already taken. Enter the new name for your website on the
-         <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Hidden Service Configuration page</a> where it says
-         "Website name". This will replace the default "mysite.i2p". Also, check the "Auto Start" box. Your website will
-         now start every time you start your router. Be sure to click "Save".
+        router's address book
+        <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">here</a>, or the file
+        <code>i2p/hosts.txt</code> to see if your name is already taken. Enter the new name for your website on the
+        <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Hidden Service Configuration page</a> where it says
+        "Website name". This will replace the default "mysite.i2p". Also, if you would like your I2P Webserver tunnel 
+        to be automatically started when you start I2P, check the "Auto Start" box. Your website will now start every time 
+        you start your router. Be sure to click "Save".
       </li>
       <li>Click the start button for your website on the
          <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">main Hidden Service Manager page</a>. You should now see
@@ -91,14 +98,17 @@
       </li>
       <li>Before you tell the world about your new website, you should add some content. Go to the following directory and 
          replace the index.html redirect page with your own content:
-         <ul>
-           <li><code>~/.i2p/eepsite/docroot/</code> <b>(Linux)</b>
-           </li>
-           <li><code>%APPDATA%\I2P\eepsite\docroot\</code> <b>(Windows)</b>
-           </li>
-           <li><code>/Users/(user)/Library/Application Support/i2p</code> <b>(Mac)</b>
-           </li>
-           </ul>
+        <ul>
+          <li> <b>Linux</b><br>
+            <code>~/.i2p/eepsite/docroot/</code>
+          </li>
+          <li> <b>Windows</b><br>
+            <code>%APPDATA%\I2P\eepsite\docroot\</code>
+          </li>        
+          <li> <b>Mac</b><br>
+            <code>/Users/(user)/Library/Application Support/i2p</code>
+          </li>
+        </ul>
       </li>
     </ul>            
 
@@ -139,16 +149,16 @@
     <ul>
       <li><code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)
       </li>
-      <li><code>http://i2host.i2p/cgi-bin/i2hostetag</code> (<a href="http://i2host.i2p/cgi-bin/i2hostetag" target="_blank">i2host.i2p</a>)
-      </li>
+      <!--<li><code>http://i2host.i2p/cgi-bin/i2hostetag</code> (<a href="http://i2host.i2p/cgi-bin/i2hostetag" target="_blank">i2host.i2p</a>)
+      </li>-->
       <li><code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)
       </li>
     </ul>
     
     <p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection
       service. This will work within a few minutes of your entering the key to an address book on the same site. Test
-      it yourself first by entering <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> or 
-      <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>something</i>.i2p</code> into your browser. 
+      it yourself first by entering <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> <!--or 
+      <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>something</i>.i2p</code>--> into your browser. 
       Once it's working, you can tell others to use it.
     </p>
 <!--
@@ -163,8 +173,7 @@
     </p>
 
     <ul>
-      <li>Post a message on the <a href="http://forum.i2p/viewforum.php?f=16" target="_blank">Eepsite announce forum</a> on
-        <a href="http://forum.i2p/" target="_blank">forum.i2p</a>.
+      <li>Post a message on the <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> telling everyone about your new I2P website!
       </li>
       <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.
       </li>
@@ -242,7 +251,7 @@
         <hr>
 
         <div class="footnote">
-          Document last edited: July 2016.
+          Document last edited: June 2018.
        </div>
 
   </div>
