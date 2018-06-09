@@ -72,7 +72,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
     public FetchAndAdd(I2PAppContext ctx, SnarkManager mgr, String url, File dataDir) {
         // magnet constructor
         super(mgr.util(), "Torrent download",
-              null, null, null, null, null, false, null);
+              null, null, null, null, null, null);
         _ctx = ctx;
         _log = ctx.logManager().getLog(FetchAndAdd.class);
         _mgr = mgr;

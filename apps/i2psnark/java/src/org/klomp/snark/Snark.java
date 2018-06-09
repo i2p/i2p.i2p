@@ -300,19 +300,24 @@ public class Snark
 
   /**
    * multitorrent
+   *
+   * Will not start itself. Caller must call startTorrent() if desired.
+   *
    * @throws RuntimeException via fatal()
    */
   public Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
-        ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
+        ConnectionAcceptor connectionAcceptor, String rootDir)
   {
       this(util, torrent, ip, user_port, slistener, clistener, complistener,
-           peerCoordinatorSet, connectionAcceptor, start, rootDir, null);
+           peerCoordinatorSet, connectionAcceptor, rootDir, null);
   }
 
   /**
    * multitorrent
+   *
+   * Will not start itself. Caller must call startTorrent() if desired.
    *
    * @param baseFile if null, use rootDir/torrentName; if non-null, use it instead
    * @throws RuntimeException via fatal()
@@ -321,7 +326,7 @@ public class Snark
   public Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
-        ConnectionAcceptor connectionAcceptor, boolean start, String rootDir, File baseFile)
+        ConnectionAcceptor connectionAcceptor, String rootDir, File baseFile)
   {
     if (slistener == null)
       slistener = this;
@@ -482,13 +487,12 @@ public class Snark
     savedUploaded = (completeListener != null) ? completeListener.getSavedUploaded(this) : 0;
     if (completeListener != null)
         _comments = completeListener.getSavedComments(this);
-
-    if (start)
-        startTorrent();
   }
 
   /**
    *  multitorrent, magnet
+   *
+   *  Will not start itself. Caller must call startTorrent() if desired.
    *
    *  @param torrent a fake name for now (not a file name)
    *  @param ih 20-byte info hash
@@ -498,7 +502,7 @@ public class Snark
    */
   public Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
-        ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
+        ConnectionAcceptor connectionAcceptor, String rootDir)
   {
     completeListener = complistener;
     _util = util;
@@ -516,9 +520,6 @@ public class Snark
     // All we have is an infoHash
     // meta remains null
     // storage remains null
-
-    if (start)
-        startTorrent();
   }
 
   private static byte[] generateID() {

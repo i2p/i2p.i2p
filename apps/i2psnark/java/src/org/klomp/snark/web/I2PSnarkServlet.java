@@ -3914,7 +3914,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 } catch (Throwable t) { t.printStackTrace(); }
             }
         }
-         snark.updatePiecePriorities();
+        snark.updatePiecePriorities();
         _manager.saveTorrentStatus(snark);
     }
 

@@ -1,6 +1,14 @@
+2018-06-09 zzz
+ * eepsite: Fix up help page in prep for translation (ticket #2214)
+ * i2psnark: Fix torrent ignoring priority settings when
+   autostart is enabled (ticket #2229)
+
 2018-06-02 zzz
  * Console: Sort tunnels within pools by expiration (ticket #2232)
- * NTCP: Refactor EstablishState in prep for NTCP2
+ * NTCP:
+   - Refactor EstablishState in prep for NTCP2
+   - Initial NTCP2 RI and payload code, disabled for now
+   - Fix state lock, should not have been static
 
 2018-06-01 zzz
  * SusiDNS: Fix deleting notes (ticket #1433)

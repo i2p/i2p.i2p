@@ -1555,11 +1555,13 @@ public class SnarkManager implements CompleteListener, ClientApp {
                         _log.info("New Snark, torrent: " + filename + " base: " + baseFile);
                     torrent = new Snark(_util, filename, null, -1, null, null, this,
                                         _peerCoordinatorSet, _connectionAcceptor,
-                                        shouldAutoStart(), dataDir.getPath(), baseFile);
+                                        dataDir.getPath(), baseFile);
                     loadSavedFilePriorities(torrent);
                     synchronized (_snarks) {
                         _snarks.put(filename, torrent);
                     }
+                    if (shouldAutoStart())
+                        torrent.startTorrent();
                 } catch (IOException ioe) {
                     // close before rename/delete for windows
                     if (fis != null) try { fis.close(); fis = null; } catch (IOException ioe2) {}
@@ -1660,7 +1662,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         String dirPath = dataDir != null ? dataDir.getAbsolutePath() : getDataDir().getPath();
         Snark torrent = new Snark(_util, name, ih, trackerURL, listener,
                                   _peerCoordinatorSet, _connectionAcceptor,
-                                  false, dirPath);
+                                  dirPath);
 
         synchronized (_snarks) {
             Snark snark = getTorrentByInfoHash(ih);
