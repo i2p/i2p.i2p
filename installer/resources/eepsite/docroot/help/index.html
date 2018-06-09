@@ -30,18 +30,18 @@
       To serve your own content, simply edit the files in the webserver's root directory and the site will be public once you follow the instructions below.
     </p>
 
-    <p>The webserver's root directory can be found in the following locations, depending on your operating system:
+    <p id="dir">The webserver's root directory can be found in one of the following locations, depending on your operating system:
     </p>
 
     <ul>
-      <li> <b>Linux</b><br>
+      <li><b>Linux</b><br>
         Standard install: <code>~/.i2p/eepsite/docroot/</code><br>
-        Package install, running as a service: <code>~/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Package install, running as a service: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
       </li>
-      <li> <b>Windows</b><br>
+      <li><b>Windows</b><br>
         <code>%APPDATA%\I2P\eepsite\docroot\</code>
       </li>        
-      <li> <b>Mac</b><br>
+      <li><b>Mac</b><br>
         <code>/Users/(user)/Library/Application Support/i2p</code>
       </li>
     </ul>
@@ -84,30 +84,18 @@
          Click "Add" to add the destination to your address book.
       </li>
       <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
-          Hopefully it worked.
+          Hopefully it worked!
       </li>
       <li>Before you tell the world about your new website, you should add some content.
-         Go to the following directory and  replace the index.html redirect page with your own content:
-        <ul>
-          <li> <b>Linux</b><br>
-            <code>~/.i2p/eepsite/docroot/</code>
-          </li>
-          <li> <b>Windows</b><br>
-            <code>%APPDATA%\I2P\eepsite\docroot\</code>
-          </li>        
-          <li> <b>Mac</b><br>
-            <code>/Users/(user)/Library/Application Support/i2p</code>
-          </li>
-        </ul>
+          Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.
       </li>
     </ul>            
 
-    <p>Virtual folders work, so you may host files from a subdirectory without explicitly needing to provide a page  with links to files. 
-      You can change the appearance of the directory listing by supplying an edited jetty-dir.css file 
-      for each of the directories you are serving, demonstrated <a href="lib/">here</a>.
-      The  <a href="lib/resources">resources sub-directory</a> (containing filetype images for the directory listing) 
-      reverts to the default style.
-      If you need a template for a basic site, feel free to borrow and adapt  <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!
+    <p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files. 
+      You may change the appearance of the directory by supplying an edited <a href="lib/jetty-dir.css">jetty-dir.css</a> file for each directory.
+      The <a href="lib/">lib</a> subdirectory demonstrates a custom style.
+      The <a href="lib/resources">resources</a> subdirectory demonstrates the default style.
+      If you need a template for a basic site, feel free to adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">associated content</a>.
     </p>
 
     <p>If you're returned to this page after editing the content, try clearing your browser's web cache:</p>
@@ -198,7 +186,7 @@
              <ul>
                 <li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a>
                 </li>
-                <li>Anonymously via your resident <a href="irc://127.0.0.1:6668/i2p-help">I2P IRC tunnel</a>.</li>
+                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
              </ul>
             <li>The project forum <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.
             </li>

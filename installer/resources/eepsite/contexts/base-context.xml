@@ -15,10 +15,10 @@ to serve static html files and images.
     <Arg>org.eclipse.jetty.servlet.Default.cacheControl</Arg>
     <Arg>max-age=3600,public</Arg>
   </Call>
-  <!-- change to true to allow directory listings -->
+  <!-- change to false to disallow directory listings -->
   <Call name="setInitParameter">
     <Arg>org.eclipse.jetty.servlet.Default.dirAllowed</Arg>
-    <Arg>false</Arg>
+    <Arg>true</Arg>
   </Call>
   <Call name="setMimeTypes">
     <Arg>
