@@ -101,9 +101,9 @@
     <p>If you're returned to this page after editing the content, try clearing your browser's web cache:</p>
 
     <ul>
-      <li>in <b>Firefox</b> via: Preferences ➜ Advanced ➜ Network ➜ Cached Web Content ➜ Clear Now</li>
-      <li>in <b>Chrome/Chromium</b> via: Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data...</li>
-      <li> in <b>Opera</b> via: Settings ➜ Privacy ➜ Clear browsing data...
+      <li><b>Firefox</b> via: Preferences ➜ Advanced ➜ Network ➜ Cached Web Content ➜ Clear Now</li>
+      <li><b>Chrome/Chromium</b> via: Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data...</li>
+      <li><b>Opera</b> via: Settings ➜ Privacy ➜ Clear browsing data...
     </ul>
 
     <h2>Register your own I2P Domain</h2>
@@ -111,14 +111,13 @@
     <p>Now it's time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/ " target="_blank">stats.i2p</a> or <a href="http://no.i2p/" target="_blank">no.i2p</a>. 
       That is, you must enter your website name and key into a web interface on one or more of these sites.
       Here is <a href="http://stats.i2p/i2p/addkey.html" target="_blank">the key entry form</a> at stats.i2p.
-      You will need your <b>Authentication String</b> for the next step, this can be found on the <b>Registration Authentication</b> page which is linked to on the Hidden Service configuration page.
+      You will need your <b>Authentication String</b> for the next step, this can be found on the <b>Registration Authentication</b> page which is linked from the Hidden Service configuration page.
       Copy the entire authentication string and paste it on the key entry page. 
-      Enter an optional name.
       Describe your site briefly, this step is recommended. 
       If your site is a HTTP service, leave the checkbox selected - if not unselect it.
       Read through the Terms of Service carefully.
       Click the "Submit" button at the bottom of the page.
-      Check to see if it reports the key was added.
+      Verify the submission was successful.
       Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply typing <i>something</i>.i2p into their browser.</p>
     <h2>Adding Addressbook Subscriptions</h2>
 
@@ -169,21 +168,15 @@
         <p>Beware that a poorly configured webserver or web appplication can leak potentially compromising information such as 
           your real IP address or server details that may reduce your anonymity or assist a hacker.
           We recommend using the default server unless you feel comfortable doing server administration.
-          Please carry out some research into securing your web server prior to placing it online.
+          Please ensure your web server is secure prior to placing it online.
           There are plenty of guides online, for example if you search for "nginx security hardening guide" you will find a number of guides that have good recommendations.
+        </p> 
 
-          We will point out one major issue with the <b>Apache</b> web server:
-          The <code>mod_status</code> and <code>mod_info</code> Apache modules are known to be enabled by default on some operating systems, these expose various forms of internal data which can lead to serious compromise of anonymity when used on an anonymous network like I2P.
-          Removing the lines from your Apache configuration file where these modules are loaded is the easiest way to prevent these issues.
+        <p>There is one important issue with the <b>Apache</b> web server.
+          The <code>mod_status</code> and <code>mod_info</code> Apache modules are enabled by default on some operating systems.
+          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
+          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.
         </p>
-
-        <ul>
-           <li><a href="https://geekflare.com/apache-web-server-hardening-security/" target="_blank">Apache Web Server Security Guide</a>
-           </li>
-           <li><a href="https://geekflare.com/nginx-webserver-security-hardening-guide/" target="_blank">Nginx Web Server Security Guide</a>
-           </li>
-           <li><a href="https://www.wordfence.com/learn/how-to-harden-wordpress-sites/" target="_blank">How to Harden Your WordPress Site</a></li>
-        </ul>         
 
         <h2>Further Assistance</h2>
 
@@ -203,11 +196,11 @@
             </li>
         </ul>
 
+        <hr>
         <div class="notify">
           This page, the project website and the router console need translations!
           Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.
         </div>
-       
         <hr>
 
   </div>
