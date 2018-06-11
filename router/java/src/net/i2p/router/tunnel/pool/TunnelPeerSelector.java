@@ -105,7 +105,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             String peers = opts.getProperty("explicitPeers");
             if (peers == null)
                 peers = ctx.getProperty("explicitPeers");
-            if (peers != null)
+            // only one out of 4 times so we don't break completely if peer doesn't build one
+            if (peers != null && ctx.random().nextInt(4) == 0)
                 return true;
         }
         return false;
