@@ -34,6 +34,9 @@ public class ConfigFamilyHandler extends FormHandler {
                 addFormError("Family already configured: " + family);
             } else if (family.contains("/") || family.contains("\\")) {
                 addFormError("Bad characters in Family: " + family);
+            } else if (family.length() > 32) {
+                // let's enforce some sanity
+                addFormError("Family too long, 32 chars max: " + family);
             } else if (_context.router().saveConfig(FamilyKeyCrypto.PROP_FAMILY_NAME, family.trim())) {
                 addFormNotice(_t("Configuration saved successfully."));
                 addFormError(_t("Restart required to take effect"));
