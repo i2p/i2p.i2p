@@ -230,7 +230,12 @@ abstract class BuildRequestor {
             }
             OutNetMessage outMsg = new OutNetMessage(ctx, msg, ctx.clock().now() + FIRST_HOP_TIMEOUT, PRIORITY, peer);
             outMsg.setOnFailedSendJob(new TunnelBuildFirstHopFailJob(ctx, pool, cfg, exec));
-            ctx.outNetMessagePool().add(outMsg);
+            try {
+                ctx.outNetMessagePool().add(outMsg);
+            } catch (RuntimeException re) {
+                log.error("failed sending build message", re);
+                return false;
+            }
         }
         //if (log.shouldLog(Log.DEBUG))
         //    log.debug("Tunnel build message " + msg.getUniqueId() + " created in " + createTime
