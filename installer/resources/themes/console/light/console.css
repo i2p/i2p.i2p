@@ -7528,9 +7528,11 @@ body {
 
 @media screen and (min-width: 1400px) {
 #help #changelog pre:not(old) {
+/*
      columns: 550px auto;
      column-gap: 25px;
      column-rule: 1px solid rgba(64, 64, 128, 0.5);
+*/
      margin-left: -10px !important;
      padding-left: 10px;
      padding-bottom: 5px;

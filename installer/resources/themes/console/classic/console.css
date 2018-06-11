@@ -7416,9 +7416,11 @@ table.sybil_routerinfo:last-child {
 
 @media screen and (min-width: 1400px) {
 #help #changelog pre:not(old) {
+/*
      columns: 560px auto;
      column-gap: 40px;
      column-rule: 1px dotted #abf;
+*/
      margin-left: 0;
      padding-left: 10px;
 }

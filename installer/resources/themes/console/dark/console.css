@@ -7252,9 +7252,11 @@ td.optionsave {
 }
 
 .main#help #changelog pre:not(old) {
+/*
      columns: 550px auto;
      column-gap: 40px;
      column-rule: 1px dotted #151;
+*/
      margin-left: 0;
      padding-left: 10px;
      width: calc(100% - 22px) !important;
