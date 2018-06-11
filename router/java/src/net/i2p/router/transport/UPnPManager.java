@@ -58,6 +58,9 @@ class UPnPManager {
     // 30 minutes is also the default "lease time" in cybergarage.
     // It expires after 31 minutes.
     private static final long RESCAN_LONG_DELAY = 14*60*1000;
+    // make these generic so we don't advertise we're running I2P
+    private static final String TCP_PORT_NAME = "TCP";
+    private static final String UDP_PORT_NAME = "UDP";
 
     public UPnPManager(RouterContext context, TransportManager manager) {
         _context = context;
@@ -208,16 +211,20 @@ class UPnPManager {
         for (TransportManager.Port entry : ports) {
             String style = entry.style;
             int port = entry.port;
-            int protocol = -1;
-            if ("SSU".equals(style))
+            int protocol;
+            String name;
+            if ("SSU".equals(style)) {
                 protocol = ForwardPort.PROTOCOL_UDP_IPV4;
-            else if ("NTCP".equals(style))
+                name = UDP_PORT_NAME;
+            } else if ("NTCP".equals(style)) {
                 protocol = ForwardPort.PROTOCOL_TCP_IPV4;
-            else
+                name = TCP_PORT_NAME;
+            } else {
                 continue;
+            }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding: " + style + " " + port);
-            ForwardPort fp = new ForwardPort(style, false, protocol, port);
+            ForwardPort fp = new ForwardPort(name, false, protocol, port);
             forwards.add(fp);
         }
         // non-blocking
