@@ -718,6 +718,7 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      border-bottom: 1px solid #171;
      border-right: 1px solid #171;
      background: linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%);
+     color: #494;
 }
 
 .page td[colspan="2"] {
@@ -1032,9 +1033,9 @@ div#prefsave {
 
 #pagenav input[type="submit"] {
      font-size: 0;
-     width: 24px !important;
+     /*width: 24px !important;*/
      min-width: 24px !important;
-     height: 24px;
+     /*height: 24px;*/
      margin: 3px !important;
 }
 
@@ -1155,7 +1156,7 @@ body, td, textarea, input, div, p.mailbody, select, button, input[type="submit"]
 }
 
 #pagenav input {
-     font-size: 0 !important;
+     /*font-size: 0 !important;*/
 }
 
 .topbuttons input[type="submit"], .topbuttons input[type="reset"] {
