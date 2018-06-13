@@ -147,6 +147,7 @@ public class BuildTime {
     }
 
     public static void main(String[] args) {
+        System.out.println("Hard earliest: " + new Date(EARLIEST_LONG));
         long date = getEarliestTime();
         System.out.println("Earliest date: " + new Date(date));
         date = getBuildTime();
