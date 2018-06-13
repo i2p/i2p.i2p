@@ -1,3 +1,7 @@
+2018-06-13 zzz
+ * NTCP: Fix clearing of write interest ops on
+   inbound establishment (ticket #2237)
+
 2018-06-09 zzz
  * eepsite: Fix up help page in prep for translation (ticket #2214)
  * i2psnark: Fix torrent ignoring priority settings when

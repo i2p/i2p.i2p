@@ -679,7 +679,7 @@ public class NTCPConnection implements Closeable {
      * as it occurs in the selector thread)
      */
     public void outboundConnected() {
-        _conKey.interestOps(SelectionKey.OP_READ);
+        _conKey.interestOps(_conKey.interestOps() | SelectionKey.OP_READ);
         // schedule up the beginning of our handshaking by calling prepareNextWrite on the
         // writer thread pool
         _transport.getWriter().wantsWrite(this, "outbound connected");
