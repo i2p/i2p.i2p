@@ -511,7 +511,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
     if (altb32 != null && altb32.length() > 0) {
 %>
-        <tr><td><%=intl._t("Alt Base 32")%>: <%=altb32%></td></tr>
+        <tr><td><b><%=intl._t("Alt Base 32")%>:</b> <%=altb32%></td></tr>
 <%
     }  // altb32
     final String CHECK = "&nbsp;&nbsp;&#x2714;";
@@ -780,8 +780,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         }  // for client
         if (!foundClientConfig) {
 %>
-<tr><td colspan="4">Cannot configure, no Jetty server found in clients.config that matches this tunnel</td></tr>
-<tr><td colspan="4">Support for non-Jetty servers TBD</td></tr>
+<tr><td colspan="4">Cannot configure, no Jetty server found in <a href="/configclients">client configurations</a> that matches this tunnel</td></tr>
+<tr><td colspan="4">Support for non-Jetty servers will be added in a future release</td></tr>
 <%
         }
     } catch (IOException ioe) { ioe.printStackTrace(); }
