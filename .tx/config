@@ -441,6 +441,30 @@ trans.ru_RU = installer/resources/locale-man/man_ru.po
 trans.sv_SE = installer/resources/locale-man/man_sv.po
 trans.zh_CN = installer/resources/locale-man/man_zh.po
 
+[I2P.eepsite]
+;;
+;; For any new translations, add links in index.html
+;; and copy new flags in build.xml preppkg-base target
+;;
+type = HTML
+source_file = installer/resources/eepsite/docroot/help/index.html
+source_lang = en
+trans.de = installer/resources/eepsite/docroot/help/index_de.html
+trans.es = installer/resources/eepsite/docroot/help/index_es.html
+trans.fr = installer/resources/eepsite/docroot/help/index_fr.html
+trans.nl = installer/resources/eepsite/docroot/help/index_nl.html
+trans.ru_RU = installer/resources/eepsite/docroot/help/index_ru.html
+trans.sv_SE = installer/resources/eepsite/docroot/help/index_sv.html
+trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
+
+[I2P.ztest]
+;;
+;; TESTING ONLY
+;;
+type = HTML
+source_file = installer/resources/readme/readme.html
+source_lang = en
+
 [main]
 host = https://www.transifex.com
 
