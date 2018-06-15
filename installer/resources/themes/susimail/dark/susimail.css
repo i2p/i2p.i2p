@@ -1033,10 +1033,10 @@ div#prefsave {
 
 #pagenav input[type="submit"] {
      font-size: 0;
-     /*width: 24px !important;*/
+     width: 24px !important;
      min-width: 24px !important;
-     /*height: 24px;*/
-     margin: 3px !important;
+     height: 24px;
+     margin: 3px;
 }
 
 #pagenav input[type="submit"]::-moz-focus-inner {
@@ -1128,6 +1128,23 @@ div#prefsave {
      background-size: 12px 12px !important;
 }
 
+input.switchto {
+     background: #000 url(/themes/susimail/images/folder.png) center center no-repeat !important;
+     background-size: 12px 12px !important;
+     margin: -34px 3px 5px 3px !important;
+}
+
+input.switchto:hover,
+input.switchto:focus {
+     background: #000 url(/themes/susimail/images/folder-open.png) center center no-repeat !important;
+     background-size: 12px 12px !important;
+     border: 1px solid #f60;
+}
+
+select {
+     margin: 11px 3px 3px 5px;
+}
+
 /* end pagenav */
 
 /* responsive layout */
@@ -1156,7 +1173,7 @@ body, td, textarea, input, div, p.mailbody, select, button, input[type="submit"]
 }
 
 #pagenav input {
-     /*font-size: 0 !important;*/
+     font-size: 0 !important;
 }
 
 .topbuttons input[type="submit"], .topbuttons input[type="reset"] {

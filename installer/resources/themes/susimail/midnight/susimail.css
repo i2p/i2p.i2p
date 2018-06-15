@@ -1082,6 +1082,10 @@ input.list, input.moveto, #pagenav input.switchto {
      padding: 5px 7px 5px 23px !important;
 }
 
+#pagenav input.switchto {
+     margin: -31px 3px 5px 3px !important;
+}
+
 input.list:hover, input.moveto:hover, input.switchto:hover,
 input.list:focus, input.moveto:focus, input.switchto:focus {
      background: #000 url(/themes/susimail/images/folder-open.png) no-repeat 6px center !important;
