@@ -222,7 +222,8 @@ public class NTCPTransport extends TransportImpl {
         _nearCapacityCostBid = new SharedBid(105);
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
 
-        _enableNTCP2 = ctx.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
+        //_enableNTCP2 = ctx.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
+        _enableNTCP2 = false;
         if (_enableNTCP2) {
             boolean shouldSave = false;
             byte[] priv = null;
