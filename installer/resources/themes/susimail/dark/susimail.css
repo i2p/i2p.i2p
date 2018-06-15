@@ -1,6 +1,5 @@
 /* Susimail "Camo" theme (aka "dark") */
 /* Author: dr|z3d */
-/* Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
 /* Droid Sans font family and css3 compliant browser recommended for optimal results */
 
 html {
@@ -151,9 +150,9 @@ div.topbuttons {
      margin: -1px -1px -4px -1px;
      border-bottom: 1px solid #494;
      box-shadow: inset 0 0 0 1px #000;
-     background: #000 url(images/hatter_med.png) left bottom no-repeat;
-     background: url(images/hatter_med.png) left bottom no-repeat, linear-gradient(to bottom, #002000 0%, #000 100%);
-     background: url(images/hatter_med.png) left bottom no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #002000, #000 75%) !important;
+     background: #000;
+     background: linear-gradient(to bottom, #002000 0%, #000 100%);
+     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #002000, #000 75%) !important;
      background: repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.5) 2px, rgba(0,64,0,0.5) 4px), linear-gradient(to bottom, rgba(0,32,0,0.5), rgba(0,0,0,0.8)), url(/themes/console/dark/images/camotile2.png) top left !important;
      box-shadow: inset 0 0 0 2px #000;
 }
@@ -746,8 +745,8 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      box-shadow: inset 0 0 0 1px #000, inset 0 0 2px 1px #020;
      background: #001000;
      background: linear-gradient(to bottom, #000 0%, #010 50%);
-     background: url(images/hatter_med.png) right bottom no-repeat, repeating-linear-gradient(135deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), linear-gradient(to bottom, #030 0%, #020);
-     background: url(images/hatter_med.png) right bottom no-repeat, linear-gradient(to bottom, #000 0%, #001000 90%);
+     background: repeating-linear-gradient(135deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), linear-gradient(to bottom, #030 0%, #020);
+     background: linear-gradient(to bottom, #000 0%, #001000 90%);
      background-blend-mode: normal, darken, darken, normal;
      background-blend-mode: difference, normal;
 

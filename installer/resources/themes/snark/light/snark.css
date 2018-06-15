@@ -1,7 +1,6 @@
 /* I2PSnark theme "Light" aka Corporat */
 /* Cat That Got The Cream Edition */
 /* Author: dr|z3d */
-/* Thanks to http://www.luxphile.com/2011/01/creative-commons-cat.html for the kitty image */
 
 body {
      color: #31334f;
@@ -264,8 +263,8 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      height: 57px;
      width: auto;
      min-width: 810px;
-     background: #eef url(images/kitty.png) no-repeat scroll right bottom;
-     background: url(images/kitty.png) no-repeat right center, linear-gradient(to bottom, #fff, #eef);
+     background: #eef;
+     background: linear-gradient(to bottom, #fff, #eef);
      border-top: 1px solid #7778bf;
      border-bottom: 1px solid #7778bf;
      box-shadow: inset 0 0 1px #fff;

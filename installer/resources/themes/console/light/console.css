@@ -1349,8 +1349,8 @@ p:empty + .sb_notice {
 }
 
 .news, .main#news, .main#proof, .main#oldconsole, #warning2 {
-     background: #f8f8ff url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom;
-     background: linear-gradient(to bottom, rgba(248,248,255,0.5), rgba(240,240,255,0.5)), url(/themes/snark/ubergine/images/hat.png) no-repeat right bottom, repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #f8f8ff !important;
+     background: #f8f8ff;
+     background: linear-gradient(to bottom, rgba(248,248,255,0.5), rgba(240,240,255,0.5)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #f8f8ff !important;
      background-size: 100% 100%, auto 160px, 100% 100% !important;
 }
 
@@ -2180,7 +2180,7 @@ h3#graphdisplay {
      border-radius: 2px;
      border: 1px solid #7778bf;
      background: #eef;
-     background: url(/themes/snark/ubergine/images/hat.png) bottom right no-repeat, linear-gradient(to right, #fafaff, #eef);
+     background: linear-gradient(to right, #fafaff, #eef);
      background-size: auto 100%, 100% 100%;
      font-weight: bold;
      box-shadow: inset 0 0 0 1px #fff;
@@ -2189,7 +2189,7 @@ h3#graphdisplay {
 }
 
 .main#config_update .messages {
-     background: url(/themes/console/images/info/newspaper.png) 12px center no-repeat, url(/themes/snark/ubergine/images/hat.png) bottom right no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: url(/themes/console/images/info/newspaper.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, auto 100%, 100% 100% !important;
 }
@@ -6227,7 +6227,7 @@ h3#ntcpcon, h3#udpcon {
 }
 
 #help #volunteer, #wrapperlogs pre {
-     background: linear-gradient(to bottom, #fafaff, rgba(248,248,255,0.3)), url(/themes/snark/ubergine/images/hat.png) no-repeat right -3px bottom -3px / auto 80%, repeating-linear-gradient(135deg, rgba(252,252,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fafaff 5px) #fafaff !important;
+     background: linear-gradient(to bottom, #fafaff, rgba(248,248,255,0.3)), repeating-linear-gradient(135deg, rgba(252,252,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fafaff 5px) #fafaff !important;
      box-shadow: inset 0 0 0 1px #fff;
 }
 
@@ -8111,7 +8111,7 @@ to {
 }
 
 #help #volunteer {
-     background: #f3f3ff url(/themes/snark/ubergine/images/hat.png) no-repeat right -3px bottom -3px !important;
+     background: #f3f3ff !important;
      background-size: auto 80%;
 }
 

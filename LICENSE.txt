@@ -267,8 +267,7 @@ Applications:
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
 
    Router Console and I2PSnark themes:
-   "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
-   Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155
+   Some images licensed under a Creative Commons 2.0 license.
        Silk icons: See licenses/LICENSE-SilkIcons.txt
 
    I2PSnark light theme:

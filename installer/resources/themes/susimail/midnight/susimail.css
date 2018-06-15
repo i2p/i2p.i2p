@@ -1,5 +1,4 @@
 /* Susimail "Midnight" by dr|z3d */
-/* Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
 /* Droid Sans font family and css3 compliant browser recommended for optimal results */
 
 html {
@@ -153,8 +152,8 @@ div.topbuttons {
      margin-top: -1px;
      margin: -1px -1px -4px -1px;
      border-bottom: 1px solid #443da0;
-     background: #000 url(images/hatter_med.png) left bottom no-repeat;
-     background: url(images/hatter_med.png) left bottom no-repeat, linear-gradient(to bottom, #020020 0%, #0100100%);
+     background: #000;
+     background: linear-gradient(to bottom, #020020 0%, #0100100%);
      background-size: 144px 100px, 100% 100% !important;
 }
 
@@ -693,7 +692,7 @@ div#dologin {
      background: #010010;
      border-radius: 2px;
      background: linear-gradient(to bottom, #000000, #060050%, #0100100%);
-     background: url(images/hatter_med.png) right bottom no-repeat, linear-gradient(to bottom, #000000, #000600 50%, #000010 100%);
+     background: linear-gradient(to bottom, #000000, #000600 50%, #000010 100%);
 }
 
 #dologin h1 {

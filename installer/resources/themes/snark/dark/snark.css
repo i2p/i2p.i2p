@@ -254,8 +254,8 @@ _:-ms-lang(x), .snarknavbar {
      color: #69f;
      box-shadow: inset 0 0 0 1px #000;
      border-bottom: 1px solid #494;
-     background: #000 url(images/hat.png) no-repeat scroll right bottom;
-     background: url(images/hat.png) no-repeat scroll right bottom, linear-gradient(to bottom, #010, #000);
+     background: #000;
+     background: linear-gradient(to bottom, #010, #000);
      background-size: auto 95%, 100% 100%;
      background-blend-mode: screen;
 }
@@ -270,7 +270,7 @@ _:-ms-lang(x), .snarknavbar {
 
 /* MS Edge fix */
 _:-ms-lang(x), .snarkMessages {
-     background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, linear-gradient(to bottom, #010, #000);
+     background: linear-gradient(to bottom, #010, #000);
      background-size: auto 95%;
 }
 

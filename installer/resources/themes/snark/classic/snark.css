@@ -198,15 +198,15 @@ body.iframed {
      padding: 3px 5px;
      text-align: left;
      border-bottom: 1px solid #89f;
-     background: url(images/hat.png) bottom right no-repeat #ddf;
-     background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, #eff3ff, #e9efff);
-     background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, rgba(239, 243, 255, 0.7), rgba(233, 239, 255, 0.7));
+     background: #ddf;
+     background: linear-gradient(to bottom, #eff3ff, #e9efff);
+     background: linear-gradient(to bottom, rgba(239, 243, 255, 0.7), rgba(233, 239, 255, 0.7));
      box-shadow: inset 0 0 0 1px #f2f2ff;
 }
 
 .iframed .snarkMessages {
-     background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, #e3e3ff, #ddf);
-     background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, rgba(227, 227, 255, 0.7), rgba(221, 221, 255, 0.7));
+     background: linear-gradient(to bottom, #e3e3ff, #ddf);
+     background: linear-gradient(to bottom, rgba(227, 227, 255, 0.7), rgba(221, 221, 255, 0.7));
 }
 
 .snarkMessages:hover, .snarkMessages:focus {

@@ -290,7 +290,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
      overflow: hidden;
      height: 56px;
      width: auto;
-     background: #3f3833 url(images/hat.png) no-repeat scroll right center;
+     background: #3f3833;
      background: url(images/whippy.png) no-repeat scroll right 5px bottom -7px, linear-gradient(to bottom, #5f554d, #3f3833);
      background-size: auto 105%, 100% 100%;
 }

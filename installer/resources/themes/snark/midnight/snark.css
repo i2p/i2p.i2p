@@ -226,8 +226,8 @@ body.iframed {
      text-align: left;
      color: #778;
      border-bottom: 1px solid #443da0;
-     background: #000 url(images/hat.png) no-repeat scroll right top;
-     background: url(images/hat.png) no-repeat scroll right top, linear-gradient(to bottom, #002, #001);
+     background: #000;
+     background: linear-gradient(to bottom, #002, #001);
      background-size: auto 110%;
      background-blend-mode: luminosity;
 }

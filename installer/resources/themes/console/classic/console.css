@@ -2058,9 +2058,8 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      color: #2c354f;
      min-width: 540px;
      background: #eef;
-     background: #eef url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom !important;
-     background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, url(images/bg0.png) repeat scroll top left !important;
-     background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right -3px bottom -5px, linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.1)) top -1px center, url(images/bg0.png) top -3px center !important;
+     background: url(images/bg0.png) repeat scroll top left !important;
+     background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.1)) top -1px center, url(images/bg0.png) top -3px center !important;
      background-size: auto 180px, 100% 100%, 120px 120px !important;
      box-shadow: inset 0 0 0 1px #e8e8f5;
 }
@@ -5654,7 +5653,7 @@ h3.stats {
 #volunteer {
      margin-top: 20px !important;
      padding-bottom: 0 !important;
-     background: linear-gradient(to bottom, rgba(230,230,255,0.5), rgba(230,230,255,0.5)), url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom !important;
+     background: linear-gradient(to bottom, rgba(230,230,255,0.5), rgba(230,230,255,0.5)) !important;
      background-size: 100% 100%, auto 75% !important;
 }
 
