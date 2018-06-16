@@ -7,6 +7,7 @@ package net.i2p.router.transport;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,7 +53,8 @@ public class GeoIPv6 {
      *
      * @param search a sorted array of IPs to search
      * @return an array of country codes, same order as the search param,
-     *         or a zero-length array on failure
+     *         or a zero-length array on total failure.
+     *         Individual array elements will be null for lookup failure of that item.
      */
     public static String[] readGeoIPFile(I2PAppContext context, Long[] search, Map<String, String> codeCache) {
         Log log = context.logManager().getLog(GeoIPv6.class);
@@ -72,7 +74,8 @@ public class GeoIPv6 {
      *
      * @param search a sorted array of IPs to search
      * @return an array of country codes, same order as the search param,
-     *         or a zero-length array on failure
+     *         or a zero-length array on total failure.
+     *         Individual array elements will be null for lookup failure of that item.
      */
     private static String[] readGeoIPFile(File geoFile, Long[] search, Map<String, String> codeCache, Log log) {
         String[] rv = new String[search.length];
@@ -88,7 +91,14 @@ public class GeoIPv6 {
             // skip timestamp and comments
             DataHelper.skip(in, HEADER_LEN - MAGIC.length());
             byte[] buf = new byte[18];
-            while (DataHelper.read(in, buf) == 18 && idx < search.length) {
+            while (idx < search.length) {
+                try {
+                    DataHelper.read(in, buf);
+                } catch (EOFException eofe) {
+                    // normal,
+                    // we could hit the end before finding everything
+                    break;
+                }
                 long ip1 = readLong(buf, 0);
                 long ip2 = readLong(buf, 8);
                 while (idx < search.length && search[idx].longValue() < ip1) {
