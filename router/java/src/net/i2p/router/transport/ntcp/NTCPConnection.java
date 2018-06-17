@@ -471,7 +471,12 @@ public class NTCPConnection implements Closeable {
      * toss the message onto the connection's send queue
      */
     public void send(OutNetMessage msg) {
-        _outbound.offer(msg);
+        if (!_outbound.offer(msg)) {
+            if (_log.shouldWarn())
+                _log.warn("outbound queue full on " + this + ", dropping message " + msg);
+            _transport.afterSend(msg, false, false, msg.getLifetime());
+            return;
+        }
         boolean noOutbound = (getCurrentOutbound() == null);
         if (isEstablished() && noOutbound)
             _transport.getWriter().wantsWrite(this, "enqueued");
