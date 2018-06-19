@@ -53,7 +53,7 @@ class OutboundMessageFragments {
     /**
      *  Avoid sync in add() if possible (not 100% reliable)
      */
-    private boolean _isWaiting;
+    private volatile boolean _isWaiting;
 
     private volatile boolean _alive;
     private final PacketBuilder _builder;
