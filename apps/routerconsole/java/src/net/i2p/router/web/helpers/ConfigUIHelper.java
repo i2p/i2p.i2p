@@ -19,20 +19,20 @@ public class ConfigUIHelper extends HelperBase {
         String current = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         Set<String> themes = themeSet();
         for (String theme : themes) {
-            buf.append("<label for=\"").append(theme).append("\"><div class=\"themechoice\">")
-               .append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
+            buf.append("<label for=\"").append(theme).append("\"><div class=\"themechoice\">" +
+                       "<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
                 buf.append(CHECKED);
-            buf.append("value=\"").append(theme).append("\" id=\"").append(theme).append("\">")
-               .append("<object height=\"48\" width=\"48\" data=\"/themes/console/").append(theme).append("/images/thumbnail.png\">")
-               .append("<img height=\"48\" width=\"48\" alt=\"\" src=\"/themes/console/images/thumbnail.png\">")
-               .append("</object><br>")
-               .append("<div class=\"themelabel\">").append(_t(theme)).append("</div>")
-               .append("</div></label>\n");
+            buf.append("value=\"").append(theme).append("\" id=\"").append(theme).append("\">" +
+                       "<object height=\"48\" width=\"48\" data=\"/themes/console/").append(theme).append("/images/thumbnail.png\">" +
+                       "<img height=\"48\" width=\"48\" alt=\"\" src=\"/themes/console/images/thumbnail.png\">" +
+                       "</object><br>" +
+                       "<div class=\"themelabel\">").append(_t(theme)).append("</div>" +
+                       "</div></label>\n");
         }
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
-        buf.append("</div><div id=\"themeoptions\">");
-        buf.append("<label><input type=\"checkbox\" name=\"universalTheming\" ");
+        buf.append("</div><div id=\"themeoptions\">" +
+                   "<label><input type=\"checkbox\" name=\"universalTheming\" ");
         if (universalTheming)
             buf.append(CHECKED);
         buf.append("value=\"1\">")
@@ -176,9 +176,9 @@ public class ConfigUIHelper extends HelperBase {
             buf.append("<label for=\"").append(lang).append("\"><div class=\"langselect\"><input type=\"radio\" class=\"optbox\" name=\"lang\" ");
             if (lang.equals(current))
                 buf.append(CHECKED);
-            buf.append("value=\"").append(lang).append("\" id=\"").append(lang).append("\">")
-               .append("<img height=\"48\" width=\"48\" alt=\"\" src=\"/flags.jsp?s=48&c=").append(langs[i][1]).append("\">")
-               .append("<div class=\"ui_lang\">");
+            buf.append("value=\"").append(lang).append("\" id=\"").append(lang).append("\">" +
+                       "<img height=\"48\" width=\"48\" alt=\"\" src=\"/flags.jsp?s=48&amp;c=").append(langs[i][1]).append("\">" +
+                       "<div class=\"ui_lang\">");
             int under = lang.indexOf('_');
             String slang = (under > 0) ? lang.substring(0, under) : lang;
             buf.append(langs[i][2]);
@@ -223,13 +223,13 @@ public class ConfigUIHelper extends HelperBase {
                    .append("</label></td></tr>\n");
             }
         }
-        buf.append("<tr><td id=\"pw_adduser\" align=\"left\" colspan=\"3\">")
-           .append("<b>").append(_t("Username")).append(":</b> ")
-           .append("<input type=\"text\" name=\"name\">")
-           .append("<b>").append(_t("Password")).append(":</b> ")
-           .append("<input type=\"password\" size=\"40\" name=\"nofilter_pw\">")
-           .append("</td></tr>")
-           .append("</table>\n");
+        buf.append("<tr><td id=\"pw_adduser\" align=\"left\" colspan=\"3\">" +
+                   "<b>").append(_t("Username")).append(":</b> " +
+                   "<input type=\"text\" name=\"name\">" +
+                   "<b>").append(_t("Password")).append(":</b> " +
+                   "<input type=\"password\" size=\"40\" name=\"nofilter_pw\">" +
+                   "</td></tr>" +
+                   "</table>\n");
         return buf.toString();
     }
 }
