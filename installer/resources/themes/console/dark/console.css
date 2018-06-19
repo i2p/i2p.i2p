@@ -4496,7 +4496,6 @@ table[id$="logs"] ul {
      font: bold 8.5pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", monospace;
      line-height: 120%;
      text-align: left;
-     display: inline-block;
      width: 100%;
      word-break: break-all;
 }

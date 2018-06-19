@@ -2361,7 +2361,6 @@ table#wrapperlogs {
      font-size: 8.5pt;
      line-height: 130%;
      text-align: left;
-     display: inline-block;
      width: calc(100% - 48px);
      padding-top: 1px !important;
 }

@@ -6162,7 +6162,6 @@ p#enablefullstats, p#gatherstats {
      font: 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      line-height: 130%;
      text-align: left;
-     display: inline-block;
      width: 100%;
 }
 
