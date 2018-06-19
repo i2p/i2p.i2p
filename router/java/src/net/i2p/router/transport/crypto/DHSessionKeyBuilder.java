@@ -598,5 +598,9 @@ public class DHSessionKeyBuilder {
         public InvalidPublicParameterException(String msg) {
             super(msg);
         }
+        /** @since 0.9.35 */
+        public InvalidPublicParameterException(String msg, Throwable t) {
+            super(msg, t);
+        }
     }
 }
