@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,6 +165,13 @@ public class GraphHelper extends FormHandler {
             boolean hideLegend = _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND);
 
             if (hasTx && hasRx && !_showEvents) {
+                // remove individual tx/rx graphs if displaying combined
+                for (Iterator<SummaryListener> iter = ordered.iterator(); iter.hasNext(); ) {
+                    SummaryListener lsnr = iter.next();
+                    String title = lsnr.getRate().getRateStat().getName();
+                    if (title.equals("bw.sendRate") || title.equals("bw.recvRate"))
+                        iter.remove();
+                }
                 _out.write("<a href=\"graph?stat=bw.combined"
                            + "&amp;c=" + (3 * _periodCount )
                            + "&amp;w=" + (3 * _width)
