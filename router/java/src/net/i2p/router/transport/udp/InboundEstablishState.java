@@ -180,7 +180,11 @@ class InboundEstablishState {
      */
     public synchronized void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
         if (_sessionKey != null) return;
-        _keyBuilder.setPeerPublicValue(_receivedX);
+        try {
+            _keyBuilder.setPeerPublicValue(_receivedX);
+        } catch (IllegalStateException ise) {
+            throw new DHSessionKeyBuilder.InvalidPublicParameterException("reused keys?", ise);
+        }
         _sessionKey = _keyBuilder.getSessionKey();
         ByteArray extra = _keyBuilder.getExtraBytes();
         _macKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);

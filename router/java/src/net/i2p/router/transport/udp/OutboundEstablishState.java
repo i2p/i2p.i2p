@@ -383,7 +383,11 @@ class OutboundEstablishState {
         if (_sessionKey != null) return;
         if (_keyBuilder == null)
             throw new DHSessionKeyBuilder.InvalidPublicParameterException("Illegal state - never generated a key builder");
-        _keyBuilder.setPeerPublicValue(_receivedY);
+        try {
+            _keyBuilder.setPeerPublicValue(_receivedY);
+        } catch (IllegalStateException ise) {
+            throw new DHSessionKeyBuilder.InvalidPublicParameterException("reused keys?", ise);
+        }
         _sessionKey = _keyBuilder.getSessionKey();
         ByteArray extra = _keyBuilder.getExtraBytes();
         _macKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);

@@ -1,4 +1,19 @@
+2018-06-19 zzz
+ * SSU: Set volatile on field (ticket #2260)
+
+2018-06-17 zzz
+ * NTCP: Log and fail messages on outbound queue overflow
+
+2018-06-16 zzz
+ * GeoIP: Don't log error when reading to the end
+   of the geoipv6.dat file
+
+2018-06-15 zzz
+ * i2ptunnel: Add new irc server
+ * SusiMail: CSS fixes (ticket #2242)
+
 2018-06-13 zzz
+ * Console: po-update
  * NTCP: Fix clearing of write interest ops on
    inbound establishment (ticket #2237)
 
