@@ -58,7 +58,7 @@ public class PluginStarter implements Runnable {
     public static final String ENABLED = ".startOnLoad";
     public static final String DELETED = "deleted";
     public static final String PLUGIN_DIR = "plugins";
-    private static final String[] STANDARD_WEBAPPS = { "i2psnark", "i2ptunnel", "susidns",
+    private static final String[] STANDARD_WEBAPPS = { "i2psnark", "i2ptunnel", "imagegen", "susidns",
                                                        "susimail", "addressbook", "routerconsole" };
     private static final String[] STANDARD_THEMES = { "images", "light", "dark", "classic",
                                                       "midnight" };
