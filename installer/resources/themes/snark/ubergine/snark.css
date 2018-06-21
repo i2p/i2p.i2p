@@ -89,9 +89,6 @@ body {
      min-width: 600px;
      width: 70%;
      text-align: center;
-     position: sticky;
-     top: -2px;
-     z-index: 999;
      transition: ease width 0.5s 0.5s;
 }
 

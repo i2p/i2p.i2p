@@ -133,9 +133,6 @@ th a:active, th a:visited:active, td a:active, td a:visited:active {
 .snarknavbar {
      margin: -11px 0 10px 0 !important;
      padding: 13px 10px 12px;
-     position: sticky;
-     top: -2px;
-     z-index: 999;
      min-width: 900px;
      width: 70%;
      border: 1px solid #2f1b0c;

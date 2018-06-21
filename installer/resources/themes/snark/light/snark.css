@@ -113,9 +113,6 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      width: calc(100% - 22px);
      text-align: center;
      background: linear-gradient(to bottom, #fafaff 50%, #eef 51%, #eef 100%);
-     position: sticky;
-     top: -1px;
-     z-index: 999;
  }
 
 .iframed .snarknavbar {

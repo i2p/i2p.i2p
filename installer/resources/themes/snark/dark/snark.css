@@ -99,9 +99,6 @@ body, input, select, .snarkCommentInfo textarea, textarea[name="i2cpOpts"] {
 
 .snarknavbar {
      min-width: 888px;
-     z-index: 999;
-     position: sticky;
-     top: -1px;
      margin: 0 0 -6px !important;
      padding: 9px 0 8px;
      text-align: center;

@@ -85,9 +85,6 @@ body.iframed {
      border: 1px solid #443da0;
      border-radius: 2px 2px 0 0;
      background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
-     position: sticky;
-     top: -1px;
-     z-index: 999;
 }
 
 .iframed .snarknavbar {
