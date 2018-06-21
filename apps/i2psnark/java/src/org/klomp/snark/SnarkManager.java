@@ -2678,6 +2678,14 @@ public class SnarkManager implements CompleteListener, ClientApp {
         return rv;
     }
 
+    /**
+     *  Has the default tracker list been modified?
+     *  @since 0.9.35
+     */
+    public boolean hasModifiedTrackers() { 
+        return _config.containsKey(PROP_TRACKERS);
+    }
+
     /** @since 0.9 */
     private void initTrackerMap() {
         String trackers = _config.getProperty(PROP_TRACKERS);
