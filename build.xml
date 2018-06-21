@@ -1326,7 +1326,7 @@
             <fileset dir="installer/resources/eepsite/" excludes="**/.placeholder" />
         </copy>
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
-            <fileset dir="installer/resources/icons/flags/" includes="cn.png de.png es.png fr.png ir.png it.png jp.png nl.png ru.png se.png us.png" />
+            <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png ir.png it.png jp.png nl.png pl.png pt.png ru.png se.png us.png" />
         </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy todir="pkg-temp/docs/icons/flags" >

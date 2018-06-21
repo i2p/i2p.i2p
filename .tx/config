@@ -94,6 +94,7 @@ trans.zh_TW = apps/routerconsole/locale/messages_zh_TW.po
 source_file = apps/routerconsole/locale-news/messages_en.po
 source_lang = en
 trans.ar = apps/routerconsole/locale-news/messages_ar.po
+trans.az = apps/routerconsole/locale-news/messages_az.po
 trans.cs = apps/routerconsole/locale-news/messages_cs.po
 trans.de = apps/routerconsole/locale-news/messages_de.po
 trans.el = apps/routerconsole/locale-news/messages_el.po
@@ -128,6 +129,7 @@ trans.zh_TW = apps/routerconsole/locale-news/messages_zh_TW.po
 type = PO
 source_file = apps/routerconsole/locale-countries/messages_en.po
 source_lang = en
+trans.az = apps/routerconsole/locale-countries/messages_az.po
 trans.ca = apps/routerconsole/locale-countries/messages_ca.po
 trans.da = apps/routerconsole/locale-countries/messages_da.po
 trans.de = apps/routerconsole/locale-countries/messages_de.po
@@ -225,6 +227,7 @@ trans.zh_TW = apps/susidns/locale/messages_zh_TW.po
 source_file = apps/desktopgui/locale/messages_en.po
 source_lang = en
 trans.ar = apps/desktopgui/locale/messages_ar.po
+trans.az = apps/desktopgui/locale/messages_az.po
 trans.bg = apps/desktopgui/locale/messages_bg.po
 trans.ca = apps/desktopgui/locale/messages_ca.po
 trans.cs = apps/desktopgui/locale/messages_cs.po
@@ -262,6 +265,7 @@ trans.zh_CN = apps/desktopgui/locale/messages_zh.po
 source_file = apps/susimail/locale/messages_en.po
 source_lang = en
 trans.ar = apps/susimail/locale/messages_ar.po
+trans.az = apps/susimail/locale/messages_az.po
 trans.cs = apps/susimail/locale/messages_cs.po
 trans.da = apps/susimail/locale/messages_da.po
 trans.de = apps/susimail/locale/messages_de.po
@@ -296,6 +300,7 @@ trans.zh_TW = apps/susimail/locale/messages_zh_TW.po
 [I2P.debconf]
 source_file = debian/po/templates.pot
 source_lang = en
+trans.az = debian/po/az.po
 trans.cs = debian/po/cs.po
 trans.de = debian/po/de.po
 trans.el = debian/po/el.po
@@ -326,6 +331,7 @@ trans.zh_TW = debian/po/zh_TW.po
 [I2P.i2prouter-script]
 source_file = installer/resources/locale/po/messages_en.po
 source_lang = en
+trans.az = installer/resources/locale/po/messages_az.po
 trans.ca = installer/resources/locale/po/messages_ca.po
 trans.de = installer/resources/locale/po/messages_de.po
 trans.es = installer/resources/locale/po/messages_es.po
@@ -367,6 +373,7 @@ trans.zh_CN = installer/resources/locale/po/messages_zh.po
 source_file = core/java/src/gnu/getopt/MessagesBundle.properties
 source_lang = en
 type = PROPERTIES
+trans.az = core/java/src/gnu/getopt/MessagesBundle_az.properties
 trans.cs = core/java/src/gnu/getopt/MessagesBundle_cs.properties
 trans.de = core/java/src/gnu/getopt/MessagesBundle_de.properties
 trans.es = core/java/src/gnu/getopt/MessagesBundle_es.properties
@@ -398,6 +405,7 @@ trans.zh_TW = core/java/src/gnu/getopt/MessagesBundle_zh_TW.properties
 [I2P.streaming]
 source_file = apps/ministreaming/locale/messages_en.po
 source_lang = en
+trans.az = apps/ministreaming/locale/messages_az.po
 trans.ca = apps/ministreaming/locale/messages_ca.po
 trans.cs = apps/ministreaming/locale/messages_cs.po
 trans.de = apps/ministreaming/locale/messages_de.po
@@ -450,12 +458,18 @@ type = HTML
 source_file = installer/resources/eepsite/docroot/help/index.html
 source_lang = en
 trans.de = installer/resources/eepsite/docroot/help/index_de.html
-trans.es = installer/resources/eepsite/docroot/help/index_es.html
+;; not yet translated on TX, use old page
+;;trans.es = installer/resources/eepsite/docroot/help/index_es.html
 trans.fr = installer/resources/eepsite/docroot/help/index_fr.html
-trans.nl = installer/resources/eepsite/docroot/help/index_nl.html
+;; not yet translated on TX, use old page
+;;trans.nl = installer/resources/eepsite/docroot/help/index_nl.html
+trans.pl = installer/resources/eepsite/docroot/help/index_nl.html
+trans.pt = installer/resources/eepsite/docroot/help/index_nl.html
 trans.ru_RU = installer/resources/eepsite/docroot/help/index_ru.html
-trans.sv_SE = installer/resources/eepsite/docroot/help/index_sv.html
-trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
+;; not yet translated on TX, use old page
+;;trans.sv_SE = installer/resources/eepsite/docroot/help/index_sv.html
+;; not yet translated on TX, use old page
+;;trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
 
 [I2P.ztest]
 ;;

@@ -106,6 +106,7 @@ public class ConfigUIHelper extends HelperBase {
         //
         { "en", "us", "English", null },
         { "ar", "lang_ar", "Arabic ﻉﺮﺒﻳﺓ", null },
+        { "az", "az", "Azerbaijani", null },
         { "cs", "cz", "Čeština", null },
         { "zh", "cn", "Chinese 中文", null },
         { "zh_TW", "tw", "Chinese 中文", "Taiwan" },

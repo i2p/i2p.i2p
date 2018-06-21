@@ -61,6 +61,7 @@
   <div class="langbox" id="langbox">
     <a href="/home?lang=en&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=us" title="English" alt="English"></a>
     <a href="/home?lang=ar&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=lang_ar" title="Arabic عربية" alt="Arabic عربية"></a>
+    <a href="/home?lang=az&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=az" title="Azerbaijani" alt="Azerbaijani"></a>
     <a href="/home?lang=cs&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=cz" title="Čeština" alt="Čeština"></a>
     <a href="/home?lang=zh&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=cn" title="Chinese 中文" alt="Chinese 中文"></a>
     <a href="/home?lang=zh_TW&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=tw" title="Chinese 中文 (Taiwan)" alt="Chinese 中文 (Taiwan)"></a>
@@ -74,7 +75,8 @@
     <a href="/home?lang=in&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=id" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
     <a href="/home?lang=it&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=it" title="Italiano" alt="Italiano"></a>
     <a href="/home?lang=ja&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=jp" title="Japanese 日本語" alt="Japanese 日本語"></a>
-    <a href="/home?lang=ko&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=kr" title="Korean 한국어" alt="Korean 한국어"></a><br>
+<br>
+    <a href="/home?lang=ko&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=kr" title="Korean 한국어" alt="Korean 한국어"></a>
     <a href="/home?lang=mg&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=mg" title="Malagasy" alt="Malagasy"></a>
     <a href="/home?lang=hu&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=hu" title="Magyar" alt="Magyar"></a>
     <a href="/home?lang=nb&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=no" title="Norsk (bokmål)" alt="Norsk (bokmål)"></a>
