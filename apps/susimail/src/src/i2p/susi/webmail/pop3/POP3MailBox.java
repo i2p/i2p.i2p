@@ -1316,11 +1316,13 @@ public class POP3MailBox implements NewMailListener {
 			if (socket != null && socket.isConnected()) {
 				try {
 					deletePending(!shouldWait);
-					if (shouldWait) {
-						sendCmd1a("QUIT");
-						if (_log.shouldDebug()) _log.debug("close() with wait complete");
-					} else {
-						sendCmd1aNoWait("QUIT");
+					if (socket != null && socket.isConnected()) {
+						if (shouldWait) {
+							sendCmd1a("QUIT");
+							if (_log.shouldDebug()) _log.debug("close() with wait complete");
+						} else {
+							sendCmd1aNoWait("QUIT");
+						}
 					}
 				} catch (IOException e) {
 					//if (_log.shouldDebug()) _log.debug("error closing: " + e);

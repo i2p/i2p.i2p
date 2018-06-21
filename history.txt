@@ -1,4 +1,11 @@
+2018-06-21 zzz
+ * Console: Add Azerbaijani
+ * SusiMail: Fix NPE on logout (ticket #2266)
+
 2018-06-19 zzz
+ * Console:
+   - Restore line breaks in copy/pasted logs (ticket #2078)
+   - Don't show individual tx/rx graphs if showing combined graph (ticket #2106)
  * SSU: Set volatile on field (ticket #2260)
 
 2018-06-17 zzz
