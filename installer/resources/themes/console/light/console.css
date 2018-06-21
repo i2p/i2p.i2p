@@ -2417,7 +2417,7 @@ table#wrapperlogs {
 }
 
 #enviro, table[id$="logs"] {
-     font-size: 9pt !important;
+     font-size: 8pt !important;
      padding: 10px;
 }
 
@@ -2429,8 +2429,8 @@ table#wrapperlogs {
 }
 
 #enviro td {
-     padding-top: 5px;
-     padding-bottom: 5px;
+     padding-top: 4px;
+     padding-bottom: 4px;
 }
 
 #enviro:hover td {
@@ -7950,8 +7950,8 @@ th.options {
 }
 
 #enviro td {
-     padding-top: 6px;
-     padding-bottom: 6px;
+     padding-top: 4px;
+     padding-bottom: 4px;
 }
 
 #enviro td:last-child b {

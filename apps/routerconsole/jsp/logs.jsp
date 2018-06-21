@@ -35,23 +35,23 @@
 <tr><td><b>Servlet version:</b></td><td><%=getServletInfo()%></td></tr>
 <tr><td><b>JSTL version:</b></td><td><jsp:getProperty name="logsHelper" property="jstlVersion" /></td></tr>
 <tr><td><b>Platform:</b></td><td><%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%></td></tr>
+<tr><td><b>Processor:</b></td><td>
 <%
    boolean isX86 = net.i2p.util.SystemVersion.isX86();
-   if (isX86) {
-%><tr><td><b>Jcpuid version:</b></td><td><%=freenet.support.CPUInformation.CPUID.getJcpuidVersion()%></td></tr>
-<%
-   }
-%><tr><td><b>Processor:</b></td><td>
-<%
    if (isX86) {
 %> <%=net.i2p.util.NativeBigInteger.cpuModel()%>
 <%
    }
 %> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)</td></tr>
-<tr><td><b>Jbigi:</b></td><td><%=net.i2p.util.NativeBigInteger.loadStatus()%></td></tr>
-<tr><td><b>Jbigi version:</b></td><td><%=net.i2p.util.NativeBigInteger.getJbigiVersion()%></td></tr>
+<tr><td><b>JBigI status:</b></td><td><%=net.i2p.util.NativeBigInteger.loadStatus()%></td></tr>
 <tr><td><b>GMP version:</b></td><td><%=net.i2p.util.NativeBigInteger.getLibGMPVersion()%></td></tr>
-<tr><td><b>Encoding:</b></td><td><%=System.getProperty("file.encoding")%></td></tr>
+<tr><td><b>JBigI version:</b></td><td><%=net.i2p.util.NativeBigInteger.getJbigiVersion()%></td></tr>
+<%
+   if (isX86) {
+%><tr><td><b>JCpuId version:</b></td><td><%=freenet.support.CPUInformation.CPUID.getJcpuidVersion()%></td></tr>
+<%
+   }
+%><tr><td><b>Encoding:</b></td><td><%=System.getProperty("file.encoding")%></td></tr>
 <tr><td><b>Charset:</b></td><td><%=java.nio.charset.Charset.defaultCharset().name()%></td></tr>
 <tr><td><b>Built By:</b></td><td><jsp:getProperty name="logsHelper" property="builtBy" /></tbody></table>
 

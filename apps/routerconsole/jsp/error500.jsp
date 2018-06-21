@@ -45,7 +45,7 @@
 </p></div><div class="sorry" id="warning2">
 <h3><%=intl._t("Error Details")%></h3>
 <p>
-<%=intl._t("Error {0}", ERROR_CODE)%>: <%=ERROR_URI%> <%=ERROR_MESSAGE%>
+<%=intl._t("Error {0}", ERROR_CODE)%>: <%=ERROR_URI%> - <%=ERROR_MESSAGE%>
 </p><p>
 <%
     if (ERROR_THROWABLE != null) {
@@ -72,7 +72,7 @@
 <b>Servlet version:</b> <%=getServletInfo()%><br>
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
-<b>Jbigi:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
+<b>JBigI status:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
 <b>Encoding:</b> <%=System.getProperty("file.encoding")%><br>
 <b>Charset:</b> <%=java.nio.charset.Charset.defaultCharset().name()%></p>
 <p><%=intl._t("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%></p>
