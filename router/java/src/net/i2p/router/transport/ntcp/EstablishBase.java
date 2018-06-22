@@ -106,7 +106,7 @@ abstract class EstablishBase implements EstablishState {
     protected static final int HXY_TSB_PAD_SIZE = HXY_SIZE + 4 + 12;  // 48
 
     protected final Object _stateLock = new Object();
-    protected State _state;
+    protected volatile State _state;
 
     protected enum State {
         OB_INIT,
