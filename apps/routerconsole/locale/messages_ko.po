@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-28 22:55+0000\n"
-"PO-Revision-Date: 2018-03-28 23:48+0000\n"
-"Last-Translator: SEPT____ <xpressengine3@mail.beo.kr>\n"
+"POT-Creation-Date: 2018-06-13 18:18+0000\n"
+"PO-Revision-Date: 2018-06-13 18:36+0000\n"
+"Last-Translator: 이피시소리 <pcsori@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,15 +83,15 @@ msgstr[0] "{0} 년"
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1466
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1513
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:418
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:831
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:837
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:852
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:859
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:866
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:875
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:882
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:889
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:896
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:833
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:839
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:854
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:861
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:868
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:877
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:884
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:891
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:898
 msgid "n/a"
 msgstr "n/a"
 
@@ -138,13 +138,13 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1065
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1120
 #: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:52
-#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:79
-#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:92
-#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:122
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:94
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:124
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:661
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1005
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:612
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:168
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:179
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:374
 msgid "none"
 msgstr "없음"
 
@@ -153,12 +153,12 @@ msgid "IPs Permanently Banned"
 msgstr "영구적으로 차단된 IP"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1075
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:101
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:112
 msgid "From"
 msgstr "으로부터"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1077
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:102
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:113
 msgid "To"
 msgstr "에게"
 
@@ -421,7 +421,7 @@ msgid "Unreachable on any transport"
 msgstr "어떤 트랜스포트에도 도달하지 못함"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:801
-#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:297
+#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:304
 msgid "UPnP is not enabled"
 msgstr "UPnP가 활성화되지 않았습니다"
 
@@ -503,7 +503,7 @@ msgid "Subdevice"
 msgstr "서브 디바이스"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:807
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:548
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:551
 msgid "UPnP Status"
 msgstr "UPnP 상태"
 
@@ -553,12 +553,6 @@ msgstr "{0} 포트 {1,number,#####} 가 UPnP에 의해 성공적으로 포워딩
 #, java-format
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
 msgstr "{0} 포트 {1,number,#####} 가 UPnP에 의해 포워딩 되지 않았습니다."
-
-#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:561
-#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:877
-#, java-format
-msgid "Excessive clock skew: {0}"
-msgstr "지나친 클럭 스큐: {0}"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
@@ -637,8 +631,8 @@ msgid "Update verified"
 msgstr "업데이트 확인됨"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1400
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:189
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:306
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:200
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:317
 #, java-format
 msgid "from {0}"
 msgstr "{0}에서"
@@ -731,153 +725,157 @@ msgstr "파일 {0}에서 설치 실패. 복사 실패함."
 msgid "Downloading plugin from {0}"
 msgstr "{0}에서 플러그인 다운로드중"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:139
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:143
+msgid "Downloading plugin"
+msgstr ""
+
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:150
 msgid "Plugin downloaded"
 msgstr "플러그인 다운로드됨"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:144
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:513
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:155
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:524
 #, java-format
 msgid "Cannot create plugin directory {0}"
 msgstr "플러그인 디렉토리 {0}를 생성할 수 없습니다"
 
 #. updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' '
 #. + signer + "</b>");
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:205
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:214
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:318
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:216
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:225
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:329
 #, java-format
 msgid "Plugin from {0} contains an invalid key"
 msgstr "{0}의 플러그인이 잘못된 키를 포함하고 있습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:247
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:257
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:271
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:329
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:258
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:268
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:282
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:340
 #, java-format
 msgid "Plugin signature verification of {0} failed"
 msgstr "{0}의 플러그인 서명 확인이 실패했습니다."
 
 #. don't display signer, we're really checking the key not the signer name
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:280
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:291
 msgid "Plugin not installed - signer is untrusted"
 msgstr "플러그인 설치안됨 - 신뢰되지 않는 서명자"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:345
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:356
 #, java-format
 msgid "Plugin from {0} is corrupt"
 msgstr "{0}의 플러그인에 오류가 있습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:355
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:366
 #, java-format
 msgid "Plugin from {0} does not contain the required configuration file"
 msgstr "{0}의 플러그인이 요구되는 설정 파일을 포함하지 않습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:377
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:388
 #, java-format
 msgid "Plugin from {0} has invalid name or version"
 msgstr "{0}의 플러그인이 잘못된 이름이나 버전을 포함하고 있습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:382
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:393
 #, java-format
 msgid "Plugin {0} has mismatched versions"
 msgstr "플러그인 {0}: 잘못된 버전입니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:393
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:404
 #: ../java/src/net/i2p/router/web/PluginStarter.java:329
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
 msgstr "플러그인이 I2P {0} 또는 더 높은 버전을 요구합니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:401
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:412
 #: ../java/src/net/i2p/router/web/PluginStarter.java:339
 #, java-format
 msgid "This plugin requires Java version {0} or higher"
 msgstr "플러그인이 자바 {0} 또는 더 높은 버전을 요구합니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:410
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:421
 msgid ""
 "Downloaded plugin is for new installs only, but the plugin is already "
 "installed"
 msgstr "플러그인 다운로드는 새로 설치하는것 만을 지원합니다. 플러그인이 이미 설치되어 있습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:420
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:431
 msgid "Installed plugin does not contain the required configuration file"
 msgstr "설치된 플러그인이 요구되는 설정파일을 가지고있지 않습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:428
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:439
 msgid "Signature of downloaded plugin does not match installed plugin"
 msgstr "다운로드한 플러그인의 서명이 설치된 플러그인과 일치하지 않습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:435
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:446
 #, java-format
 msgid "Downloaded plugin version {0} is not newer than installed plugin"
 msgstr "다운로드 한 플러그인 {0} 이 인스톨된 플러그인보다 오래됬습니다."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:442
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:453
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or higher"
 msgstr "플러그인 업데이트가 {0} 또는 더 높은 플러그인 버전을 요구합니다."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:449
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:460
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or lower"
 msgstr "플러그인 업데이트가 {0} 또는 더 낮은 플러그인 버전을 요구합니다."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:457
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:468
 #: ../java/src/net/i2p/router/web/PluginStarter.java:350
 #, java-format
 msgid "Plugin requires Jetty version {0} or higher"
 msgstr "플러그인이 Jetty 버전 {0} 또는 더 높은 버전을 요구합니다."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:464
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:471
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:475
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:482
 #: ../java/src/net/i2p/router/web/PluginStarter.java:361
 #: ../java/src/net/i2p/router/web/PluginStarter.java:371
 #, java-format
 msgid "Plugin requires Jetty version {0} or lower"
 msgstr "플러그인이 Jetty 버전 {0} 또는 더 낮은 버전을 요구합니다."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:480
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:491
 #, java-format
 msgid "Cannot copy plugin to directory {0}"
 msgstr "디렉토리 {0} 으로 플러그인을 복사할 수 없습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:490
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:501
 msgid "Plugin will be installed on next restart."
 msgstr "플러그인은 다음 재시작 때 설치될 것입니다."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:508
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:519
 msgid "Plugin is for upgrades only, but the plugin is not installed"
 msgstr "플러그인은 업데이트만 가능합니다. 그러나 해당 플러그인이 설치되어 있지 않습니다."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:521
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:532
 #, java-format
 msgid "Failed to install plugin in {0}"
 msgstr "{0}에 플러그인을 설치할 수 없습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:528
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:556
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:539
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:567
 #, java-format
 msgid "Plugin {0} installed"
 msgstr "플러그인 {0} 이 설치됬습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:547
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:558
 #, java-format
 msgid "Plugin {0} installed and started"
 msgstr "플러그인 {0}이 설치되고 시작됬습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:550
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:561
 #, java-format
 msgid "Plugin {0} installed but failed to start, check logs"
 msgstr "플러그인 {0} 이 설치됬으니 시작할 수 없습니다. 로그를 확인하세요."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:552
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:563
 #, java-format
 msgid "Plugin {0} installed but failed to start"
 msgstr "플러그인 {0}이 설치됬으니 시작할 수 없습니다"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:564
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:575
 #, java-format
 msgid "Failed to download plugin from {0}"
 msgstr "{0}에서 플러그인을 다운할 수 없습니다"
@@ -1152,9 +1150,9 @@ msgstr "시스템 트레이 비활성화"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:391
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:640
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:39
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:84
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:103
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:42
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:87
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:106
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:359
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:125
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:120
@@ -1181,9 +1179,9 @@ msgstr "설정이 성공적으로 저장됬습니다"
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:95
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:118
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:642
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:41
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:86
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:105
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:44
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:89
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:108
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:418
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:133
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:187
@@ -1417,29 +1415,44 @@ msgstr "지금 차단 해제"
 msgid "Local SSL Certificates"
 msgstr "로컬 SSL 증명서"
 
+#. console
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:34
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:239
+msgid "Router Console"
+msgstr "라우터 콘솔"
+
+#. I2CP
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:36
+#: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
+msgid "I2CP"
+msgstr "I2CP"
+
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:47
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:52
 #: ../java/strings/Strings.java:63
 msgid "I2PTunnel"
 msgstr "I2P터널"
 
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:61
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:66
 msgid "SAM"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:70
-msgid "Local Router Family Certificate"
-msgstr "로컬 라우터 패밀리 증명서"
-
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:76
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:218
-msgid "Family"
-msgstr "패밀리"
-
-#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:85
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:81
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:316
 msgid "Website"
 msgstr "웹사이트"
+
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:85
+msgid "Local Router Family Certificate"
+msgstr "로컬 라우터 패밀리 증명서"
+
+#: ../java/src/net/i2p/router/web/helpers/CertHelper.java:91
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:218
+msgid "Family"
+msgstr "패밀리"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:73
 msgid "Error updating the configuration - please see the error logs"
@@ -1574,7 +1587,7 @@ msgid "No plugin URL specified."
 msgstr "플러그인 URL 특정되지 않음"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:430
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:48
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:51
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:83
 msgid "You must enter a file"
 msgstr "파일을 입력해야 합니다"
@@ -1759,23 +1772,23 @@ msgstr ""
 msgid "You must enter a family name"
 msgstr "패밀리 이름을 입력해야 합니다"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:38
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:102
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:41
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:105
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:185
 msgid "Configuration saved successfully."
 msgstr "설정 성공적으로 저장"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:43
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:46
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:553
 msgid "Join Family"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:89
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:91
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:92
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:94
 msgid "Load from file failed"
 msgstr "파일 로드 실패"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:96
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:99
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:596
 msgid "Leave Family"
 msgstr ""
@@ -1783,7 +1796,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:23
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:25
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:27
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1146
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1155
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:554
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:574
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:590
@@ -1793,7 +1806,7 @@ msgstr "선택된 항목 삭제"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:24
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:26
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1164
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1175
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:552
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:560
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:572
@@ -1894,7 +1907,7 @@ msgstr "목적지"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:45
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:248
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1078
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1084
 msgid "Name"
 msgstr "이름"
 
@@ -1930,7 +1943,7 @@ msgstr ""
 #. http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
 #. but pink instead of yellow for WARN
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:134
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:151
 msgid "CRIT"
 msgstr "위험"
 
@@ -1939,24 +1952,24 @@ msgid "DEBUG"
 msgstr "디버그"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:136
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:153
 msgid "ERROR"
 msgstr "오류"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:141
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:158
 msgid "INFO"
 msgstr "정보"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:138
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:155
 msgid "WARN"
 msgstr "경고"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:90
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:210
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:246
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1076
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1082
 msgid "Remove"
 msgstr "삭제"
 
@@ -1966,6 +1979,7 @@ msgstr "추가할 클래스 선택"
 
 #. stat groups for stats.jsp
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:54
 #: ../java/strings/Strings.java:58
 msgid "Bandwidth"
 msgstr "대역폭"
@@ -2037,6 +2051,7 @@ msgid "UI"
 msgstr "UI"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:31
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:56
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:329
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:842
 #: ../java/strings/Strings.java:73
@@ -2056,6 +2071,7 @@ msgid "Logging"
 msgstr "로깅"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:51
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:317
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:628
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:692
@@ -2068,10 +2084,6 @@ msgstr "피어"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:411
 msgid "Stats"
 msgstr "통계"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
-msgid "I2CP"
-msgstr "I2CP"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
 msgid "Plugins"
@@ -2097,7 +2109,7 @@ msgstr "라우터 패밀리"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:536
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:573
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:541
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:704
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:699
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:734
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:630
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:571
@@ -2227,15 +2239,15 @@ msgstr ""
 msgid "Updated bandwidth limits"
 msgstr "대역폭 제한 업데이트 완료"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:239
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:249
 msgid "Add host name or IP"
 msgstr "호스트네임 또는 IP 추가"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:273
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:283
 msgid "bits per second"
 msgstr "초당 bits"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:275
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:285
 #, java-format
 msgid "{0}Bytes per month maximum"
 msgstr ""
@@ -2490,15 +2502,15 @@ msgstr "섹션 순서 저장됨."
 #. the count isn't really correct anyway, since we don't check for actual
 #. changes
 #. addFormNotice("Updated settings for " + updated + " pools.");
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:131
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:137
 msgid "Updated settings for all pools."
 msgstr "모든 풀의 설정 저장됨."
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:136
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:142
 msgid "Exploratory tunnel configuration saved successfully."
 msgstr "예비 터널 설정이 성공적으로 저장됬습니다."
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:138
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:144
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:87
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:122
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:140
@@ -2521,67 +2533,67 @@ msgid_plural "{0} tunnels"
 msgstr[0] "{0} 터널"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:35
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:39
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:42
 msgid "Exploratory tunnels"
 msgstr "예비 터널"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:53
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:55
 #, java-format
 msgid "Client tunnels for {0}"
 msgstr "{0} 클라이언트 터널"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:82
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:84
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
 msgstr "익명 경고 - 설정이 0단계 터널을 포함합니다"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:96
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:98
 msgid "ANONYMITY WARNING - Settings include 1-hop tunnels."
 msgstr "익명 경고 - 설정이 1단계 터널을 포함합니다"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:100
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:102
 msgid "PERFORMANCE WARNING - Settings include very long tunnels."
 msgstr "퍼포먼스 경고 - 설정이 아주 긴 터널을 포함합니다"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:103
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:105
 msgid "PERFORMANCE WARNING - Settings include high tunnel quantities."
 msgstr "퍼포먼스 경고 - 설정이 많은 양의 터널을 포함합니다."
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:105
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:107
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:213
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:407
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:247
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:301
 msgid "Inbound"
 msgstr "수신"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:105
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:107
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:215
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:409
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:250
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:302
 msgid "Outbound"
 msgstr "송신"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:111
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:113
 msgid "Length"
 msgstr "길이"
 
 #. tunnel depth variance
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:128
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:130
 msgid "Randomization"
 msgstr "랜덤화"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:153
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:155
 msgid "Quantity"
 msgstr "양"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:171
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:173
 msgid "Backup quantity"
 msgstr "백업 양"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:193
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:195
 msgid "Inbound options"
 msgstr "수신 옵션"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:205
+#: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:207
 msgid "Outbound options"
 msgstr "송신 옵션"
 
@@ -2640,12 +2652,12 @@ msgstr "모바일 콘솔 사용하도록 강제"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:55
 msgid ""
-"Enabling the Universal Themeing option is recommended when embedding these "
+"Enabling the Universal Theming option is recommended when embedding these "
 "applications"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:60
-msgid "Embed I2PSnark and I2PMail in the console"
+msgid "Embed Email and Torrent applications in the console"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:204
@@ -2875,6 +2887,7 @@ msgid "All times are UTC."
 msgstr "모든 시간들은 UTC 시간입니다."
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:378
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:244
 msgid "Configure Graph Display"
 msgstr "그래프 디스플레이 설정"
 
@@ -3011,11 +3024,6 @@ msgstr ""
 msgid "Manage Plugins"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:239
-msgid "Router Console"
-msgstr "라우터 콘솔"
-
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:227
 msgid "Built-in anonymous BitTorrent Client"
@@ -3079,25 +3087,22 @@ msgstr "커뮤니티 포럼"
 msgid "I2P Forum"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:62
-msgid ""
-"A public anonymous Git hosting site - supports pulling via Git and HTTP and "
-"pushing via SSH"
-msgstr "공개 익명 GIT 호스팅 사이트 - GIT와 HTTP로 Pull 지원. SSH로 Push 지원."
-
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:64
 msgid "Anonymous wiki - share the knowledge"
 msgstr "익명 위키 - 지식을 공유하세요"
 
+#. "git.repo.i2p" + S + _x("A public anonymous Git hosting site - supports
+#. pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/"
+#. + S + I + "git-logo.png" + S +
 #. "hiddengate [ru]" + S + _x("Russian I2P-related wiki") + S +
 #. "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:64
 msgid "I2P Wiki"
 msgstr "I2P 위키"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:70
-msgid "Free eepsite hosting with PHP and MySQL"
-msgstr "PHP와 MYSQL을 지원하는 공짜 EEPSite 호스팅"
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:71
+msgid "Encrypted I2P Pastebin"
+msgstr ""
 
 #. "Ident " + _x("Microblog") + S + _x("Your premier microblogging service on
 #. I2P") + S + "http://id3nt.i2p/" + S + I + "ident_icon_blue.png" + S +
@@ -3109,14 +3114,8 @@ msgstr "PHP와 MYSQL을 지원하는 공짜 EEPSite 호스팅"
 #. + I + "education.png" + S +
 #. "killyourtv.i2p" + S + _x("Debian and Tahoe-LAFS repositories") + S +
 #. "http://killyourtv.i2p/" + S + I + "television_delete.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:70
-msgid "Open4You"
-msgstr ""
-
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:71
-msgid "Encrypted I2P Pastebin"
-msgstr ""
-
+#. _x("Open4You") + S + _x("Free eepsite hosting with PHP and MySQL") + S +
+#. "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:71
 msgid "Pastebin"
 msgstr "Pastebin"
@@ -3263,16 +3262,16 @@ msgstr "대기중"
 msgid "Summary"
 msgstr "요약"
 
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:71
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:96
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:72
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:97
 msgid "File location"
 msgstr "파일 위치"
 
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:93
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:94
 msgid "File not found"
 msgstr "파일 발견되지 않음"
 
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:111
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:128
 msgid "No log messages"
 msgstr "로그 메세지 없음"
 
@@ -3304,7 +3303,7 @@ msgid "LeaseSets"
 msgstr "리즈셋"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:210
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:801
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:803
 #: ../java/strings/Strings.java:69
 msgid "Router"
 msgstr "라우터"
@@ -3321,10 +3320,6 @@ msgstr ""
 msgid "Configure Floodfill Participation"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:282
-msgid "No Leasesets currently active."
-msgstr ""
-
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:300
 msgid "LeaseSet"
 msgstr "리즈셋"
@@ -3334,7 +3329,7 @@ msgid "Encrypted"
 msgstr "암호화 됨"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:305
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:267
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:332
 msgid "Local"
 msgstr "로컬"
 
@@ -3370,7 +3365,7 @@ msgstr "리즈"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:385
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:386
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:226
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:289
 msgid "Gateway"
 msgstr "게이트웨이"
 
@@ -3401,7 +3396,7 @@ msgid "Country"
 msgstr "국가"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:621
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:798
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:800
 msgid "Our info"
 msgstr "내 정보"
 
@@ -3414,14 +3409,14 @@ msgid "View extended router info"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:634
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:813
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:815
 msgid "Full entry"
 msgstr "모든 항목"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:640
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:312
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:234
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:904
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:906
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:478
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:477
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fnl_jsp.java:477
@@ -3431,22 +3426,22 @@ msgid "Hidden"
 msgstr "숨겨짐"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:640
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:904
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:906
 msgid "Updated"
 msgstr "업데이트됨"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:642
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:647
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:656
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:850
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:857
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:864
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:873
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:880
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:887
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:894
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:905
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:658
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:852
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:859
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:866
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:875
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:882
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:889
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:896
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:907
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:909
 #, java-format
 msgid "{0} ago"
 msgstr "{0} 전"
@@ -3455,17 +3450,17 @@ msgstr "{0} 전"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:645
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:651
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:994
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:907
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:909
 msgid "Published"
 msgstr "게시됨"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:654
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:909
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:911
 msgid "Signing Key"
 msgstr "키 사인"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:657
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:912
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:914
 msgid "Addresses"
 msgstr "주소록"
 
@@ -3591,7 +3586,7 @@ msgstr "대기"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:136
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:194
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:359
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:225
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:288
 msgid "In/Out"
 msgstr "In/Out"
 
@@ -3606,7 +3601,7 @@ msgstr "해당 연결이 신뢰된 시간"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:137
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:195
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:364
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1111
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1120
 msgid "Up"
 msgstr "업"
 
@@ -4038,11 +4033,11 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:320
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:323
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:324
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:179
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:180
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:183
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:184
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:187
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:190
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:191
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:194
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:195
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:198
 #, java-format
 msgid "{0} shared bandwidth"
 msgstr ""
@@ -4052,7 +4047,7 @@ msgid "Reachable"
 msgstr "접근가능"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:331
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:188
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:199
 #, java-format
 msgid "Over {0} shared bandwidth"
 msgstr ""
@@ -4206,6 +4201,7 @@ msgid "Events in peak period"
 msgstr "정점 기간동안의 이벤트"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:226
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:243
 msgid "Graph Data"
 msgstr "그래프 데이터"
 
@@ -4218,13 +4214,89 @@ msgstr "그래프 이벤트 횟수"
 msgid "Lifetime average value"
 msgstr "전기간 평균 값"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:147
-msgid "I2P Router Help &amp; FAQ"
-msgstr "I2P 라우터 도움말 &amp; FAQ"
-
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:41
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:149
 msgid "Help &amp; FAQ"
 msgstr "도움말 &amp; FAQ"
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:42
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:211
+msgid "I2P Services"
+msgstr "I2P 서비스"
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:43
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:266
+msgid "I2P Internals"
+msgstr "i2P 내부"
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:44
+msgid "Router Information"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:45
+msgid "Router Information (brief)"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:46
+msgid "Router Information (advanced)"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:47
+msgid "Memory Usage Bar"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:48
+msgid "Network Reachability"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:49
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:609
+msgid "Update Status"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:50
+msgid "Restart Status"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:52
+msgid "Peers (advanced)"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:53
+msgid "Firewall &amp; Reseed Status"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:55
+msgid "Bandwidth Graph"
+msgstr "대역폭 그래프"
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:57
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:892
+msgid "Congestion"
+msgstr "혼잡"
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:58
+msgid "Tunnel Status"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:296
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:568
+msgid "Local Tunnels"
+msgstr "로컬 터널"
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:60
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:965
+msgid "News &amp; Updates"
+msgstr "뉴스 &amp; 업데이트"
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:61
+msgid "Advanced Links"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:147
+msgid "I2P Router Help &amp; FAQ"
+msgstr "I2P 라우터 도움말 &amp; FAQ"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:155
 msgid "A guide to some of the less-used configuration settings"
@@ -4298,10 +4370,6 @@ msgid ""
 "services"
 msgstr "클라이언트와 웹앱 시작 설정 (서비스); 수동으로 휴면 서비스 시작"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:211
-msgid "I2P Services"
-msgstr "I2P 서비스"
-
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:249
 msgid "Local web server"
 msgstr "로컬 웹 서버"
@@ -4309,10 +4377,6 @@ msgstr "로컬 웹 서버"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:264
 msgid "Configure I2P Router"
 msgstr "I2P 라우터 설정"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:266
-msgid "I2P Internals"
-msgstr "i2P 내부"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:282
 msgid "Graph router performance"
@@ -4325,11 +4389,6 @@ msgstr "그래프"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:289
 msgid "Router Help and FAQ"
 msgstr ""
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:296
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:568
-msgid "Local Tunnels"
-msgstr "로컬 터널"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:303
 msgid "Health Report"
@@ -4522,10 +4581,6 @@ msgstr "I2P를 업데이트하려면 자바를 {0} 또는 이상으로 업데이
 msgid "Configure I2P Updates"
 msgstr "I2P 업데이트 설정"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:609
-msgid "I2P Update"
-msgstr "I2P 업데이트"
-
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:634
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:698
 msgid "Peers we've been talking to in the last few minutes/last hour"
@@ -4637,10 +4692,6 @@ msgstr "비율 공유"
 msgid "What's in the router's job queue?"
 msgstr "라우터의 일감 대기열에 무엇이 있나요?"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:892
-msgid "Congestion"
-msgstr "혼잡"
-
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:897
 msgid "Indicates router performance"
 msgstr "라우터 퍼포먼스 보이기"
@@ -4672,10 +4723,6 @@ msgstr "터널에 참여한 다른 라우터의 리퀘스트를 큐에 넣었습
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:929
 msgid "Backlog"
 msgstr "백로그"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:965
-msgid "News &amp; Updates"
-msgstr "뉴스 &amp; 업데이트"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:225
 msgid "ERR-Client Manager I2CP Error - check logs"
@@ -4840,195 +4887,188 @@ msgstr ""
 msgid "Reseed"
 msgstr "재시드"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1080
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1086
 msgid "Order"
 msgstr "정렬"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1101
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1110
 msgid "Top"
 msgstr "위"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1106
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1115
 msgid "Move to top"
 msgstr "위로 이동"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1116
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1125
 msgid "Move up"
 msgstr "위로"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1124
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1133
 msgid "Down"
 msgstr "아래"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1129
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1138
 msgid "Move down"
 msgstr "아래로 이동"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1134
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1143
 msgid "Bottom"
 msgstr "밑"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1139
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1148
 msgid "Move to bottom"
 msgstr "밑으로 이동"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1150
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1159
 msgid "Select a section to add"
 msgstr "추가할 섹션 선택"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:39
+#. links are set to float:right in CSS so they will be displayed in reverse
+#. order
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:44
 msgid "Configure tunnels"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:39
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:68
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:84
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:44
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:76
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:95
 msgid "configure"
 msgstr "설정"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:66
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:82
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:73
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:93
 msgid "Client tunnels for"
 msgstr "클라이언트 터널:"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:68
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:84
+#. links are set to float:right in CSS so they will be displayed in reverse
+#. order
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:76
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:95
 msgid "Configure tunnels for session"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:70
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:86
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:80
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:97
 msgid "dead"
 msgstr "죽음"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:95
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:106
 msgid "Participating tunnels"
 msgstr "참가중인 터널"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:101
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:112
 msgid "Receive on"
 msgstr "받음:"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:102
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:113
 msgid "Expiration"
 msgstr "만료"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:102
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:113
 msgid "Send on"
 msgstr "보냄:"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:103
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:114
 msgid "Rate"
 msgstr "비율"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:103
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:114
 msgid "Role"
 msgstr "역할"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:103
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:226
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:114
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:289
 msgid "Usage"
 msgstr "사용량"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:124
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:133
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:268
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:273
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:135
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:144
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:333
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:338
 msgid "Tunnel identity"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:144
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:155
 msgid "grace period"
 msgstr "유예 기간"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:154
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:165
 msgid "Outbound Endpoint"
 msgstr "송신 엔드포인트"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:156
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:167
 msgid "Inbound Gateway"
 msgstr "수신 게이트웨이"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:158
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:232
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:169
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:295
 msgid "Participant"
 msgstr "참가자"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:164
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:175
 #, java-format
 msgid "Limited display to the {0} tunnels with the highest usage"
 msgstr "사용도가 높은 {0} 터널에 표시를 제한"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:166
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:177
 msgid "Inactive participating tunnels"
 msgstr "참가 터널 비활성화"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:169
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:310
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:180
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:375
 msgid "Lifetime bandwidth usage"
 msgstr "전체 대역폭 사용량"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:171
+#. bwShare > 12
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:182
 msgid "Not enough shared bandwidth to build participating tunnels."
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:172
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:503
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:183
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:505
 msgid "Configure"
 msgstr ""
 
 #. renderPeers(out);
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:176
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:187
 msgid "Bandwidth Tiers"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:225
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:288
 msgid "Inbound or outbound?"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:226
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:289
 msgid "Expiry"
 msgstr "만료"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:229
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:292
 msgid "Participants"
 msgstr "참가"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:235
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
 msgid "Endpoint"
 msgstr "종점"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:267
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:332
 msgid "Locally hosted tunnel"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:269
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:274
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:334
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:339
 msgid "Bandwidth tier"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:296
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:304
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:361
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:369
 msgid "Build in progress"
 msgstr "구축중"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:296
-msgid "inbound"
-msgstr "수신"
-
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:304
-msgid "outbound"
-msgstr "송신"
-
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:309
-msgid "No tunnels; waiting for the grace period to end."
-msgstr "터널없음; 끝나기를 기다리는 중."
-
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:311
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:376
 msgid "in"
 msgstr "안"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:312
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:377
 msgid "out"
 msgstr "밖"
 
@@ -5450,7 +5490,7 @@ msgstr "대역폭을 공유할수록, 더 많은 익명성과 네트워크 성�
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:603
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:564
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:539
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:702
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:697
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:550
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:571
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:730
@@ -5853,168 +5893,169 @@ msgstr ""
 msgid "Configuration Help"
 msgstr "설정 도움말"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:544
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:545
 msgid "Changing these settings will restart your router."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:546
-msgid "UPnP Configuration"
-msgstr "UPnP 설정"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:552
-msgid "Enable UPnP to open firewall ports"
-msgstr "방화벽 포트를 열기위해 UPnP 활성화"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:554
-msgid "IP Configuration"
-msgstr "IP 설정"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:556
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:654
-msgid "Externally reachable hostname or IP address"
-msgstr "외부로 접근 가능한 호스트네임 또는 IP 주소"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:560
-msgid "Use all auto-detect methods"
-msgstr "모든 자동감지 사용"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:564
-msgid "Disable UPnP IP address detection"
-msgstr "UPnP IP 주소 감지 비활성화"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:568
-msgid "Ignore local interface IP address"
-msgstr "로컬 인터페이스 IP 주소 무시"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:572
-msgid "Use SSU IP address detection only"
-msgstr "SSU IP 주소 감지만 사용"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:576
-msgid "Hidden mode - do not publish IP"
-msgstr "히든 모드 - IP를 게시하지 않습니다"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:578
-msgid "(prevents participating traffic)"
-msgstr "(참가 트래픽 방지)"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:582
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:672
-msgid "Specify hostname or IP"
-msgstr "호스트이름 또는 IP 명시"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:586
-msgid "Action when IP changes"
-msgstr "IP 변경되면 활동"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:590
-msgid ""
-"Laptop mode - Change router identity and UDP port when IP changes for "
-"enhanced anonymity"
-msgstr "노트북 모드 - 더 나은 익명성을 위해 IP가 변경되면 라우터 신원과 UDP 포트를 변경합니다"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:592
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:626
-msgid "Experimental"
-msgstr "실험적"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:594
-msgid "IPv4 Configuration"
-msgstr "IPv4 설정"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:598
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:604
-msgid "Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)"
-msgstr "수신 비활성화 (캐리어-그레이드 NAT 또는 DS-Lite에 방화벽됨)"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:600
-msgid "IPv6 Configuration"
-msgstr "IPv6 설정"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:608
-msgid "Disable IPv6"
-msgstr "IPv6 비활성화"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:612
-msgid "Enable IPv6"
-msgstr "IPv6 활성화"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:616
-msgid "Prefer IPv4 over IPv6"
-msgstr "IPv4 > iPV6"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:620
-msgid "Prefer IPv6 over IPv4"
-msgstr "IPv6 > IPv4"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:624
-msgid "Use IPv6 only (disable IPv4)"
-msgstr "IPv6만 사용 (IPv4 비활성화)"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:628
-msgid "UDP Configuration"
-msgstr ""
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:630
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:547
 msgid ""
 "Do not reveal your port numbers to anyone, as they can be used to discover "
 "your IP address."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:632
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:549
+msgid "UPnP Configuration"
+msgstr "UPnP 설정"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:555
+msgid "Enable UPnP to open firewall ports"
+msgstr "방화벽 포트를 열기위해 UPnP 활성화"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:557
+msgid "IP Configuration"
+msgstr "IP 설정"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:559
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:665
+msgid "Externally reachable hostname or IP address"
+msgstr "외부로 접근 가능한 호스트네임 또는 IP 주소"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:563
+msgid "Use all auto-detect methods"
+msgstr "모든 자동감지 사용"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:567
+msgid "Disable UPnP IP address detection"
+msgstr "UPnP IP 주소 감지 비활성화"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:571
+msgid "Ignore local interface IP address"
+msgstr "로컬 인터페이스 IP 주소 무시"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:575
+msgid "Use SSU IP address detection only"
+msgstr "SSU IP 주소 감지만 사용"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:579
+msgid "Hidden mode - do not publish IP"
+msgstr "히든 모드 - IP를 게시하지 않습니다"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:581
+msgid "(prevents participating traffic)"
+msgstr "(참가 트래픽 방지)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:585
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:693
+msgid "Specify hostname or IP"
+msgstr "호스트이름 또는 IP 명시"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:589
+msgid "IPv4 Configuration"
+msgstr "IPv4 설정"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:593
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:621
+msgid "Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)"
+msgstr "수신 비활성화 (캐리어-그레이드 NAT 또는 DS-Lite에 방화벽됨)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:595
+msgid "IPv6 Configuration"
+msgstr "IPv6 설정"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:599
+msgid "Prefer IPv4 over IPv6"
+msgstr "IPv4 > iPV6"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:603
+msgid "Prefer IPv6 over IPv4"
+msgstr "IPv6 > IPv4"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:607
+msgid "Enable IPv6"
+msgstr "IPv6 활성화"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:611
+msgid "Disable IPv6"
+msgstr "IPv6 비활성화"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:615
+msgid "Use IPv6 only (disable IPv4)"
+msgstr "IPv6만 사용 (IPv4 비활성화)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:617
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:629
+msgid "Experimental"
+msgstr "실험적"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:623
+msgid "Action when IP changes"
+msgstr "IP 변경되면 활동"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:627
+msgid ""
+"Laptop mode - Change router identity and UDP port when IP changes for "
+"enhanced anonymity"
+msgstr "노트북 모드 - 더 나은 익명성을 위해 IP가 변경되면 라우터 신원과 UDP 포트를 변경합니다"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:631
+msgid "UDP Configuration"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:633
 msgid "UDP port:"
 msgstr "UDP 포트:"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:638
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:682
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:637
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:653
+msgid "Specify Port"
+msgstr "포트 명시"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:643
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:687
 msgid "Completely disable"
 msgstr "완전히 비활성화"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:640
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:645
 msgid "(select only if behind a firewall that blocks outbound UDP)"
 msgstr "(송신 UDP를 막는 방화벽 뒤에 있다면 선택하세요)"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:652
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:647
 msgid "TCP Configuration"
 msgstr "TCP 설정"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:658
-msgid "Use auto-detected IP address"
-msgstr "자동 IP 주소 감지 사용"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:660
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:692
-msgid "currently"
-msgstr "현재"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:664
-msgid "if we are not firewalled"
-msgstr "방화벽에 막히지 않으면"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:668
-msgid "Always use auto-detected IP address (Not firewalled)"
-msgstr "자동 IP 주소 감지 언제나 사용 (방화벽에 막히지 않음)"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:678
-msgid "Disable inbound (Firewalled)"
-msgstr "수신 비활성화 (방화벽에 막힘)"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:684
-msgid ""
-"(select only if behind a firewall that throttles or blocks outbound TCP)"
-msgstr "(송신 TCP를 막거나 조절하는 방화벽 뒤에 있다면 선택하세요)"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:686
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:649
 msgid "Externally reachable TCP port"
 msgstr "외부접근 가능한 TCP 포트"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:690
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:659
 msgid "Use the same port configured for UDP"
 msgstr "UDP와 같은 포트 설정을 사용하세요"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:698
-msgid "Specify Port"
-msgstr "포트 명시"
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:661
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:671
+msgid "currently"
+msgstr "현재"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:669
+msgid "Use auto-detected IP address"
+msgstr "자동 IP 주소 감지 사용"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:675
+msgid "if we are not firewalled"
+msgstr "방화벽에 막히지 않으면"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:679
+msgid "Always use auto-detected IP address (Not firewalled)"
+msgstr "자동 IP 주소 감지 언제나 사용 (방화벽에 막히지 않음)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:683
+msgid "Disable inbound (Firewalled)"
+msgstr "수신 비활성화 (방화벽에 막힘)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:689
+msgid ""
+"(select only if behind a firewall that throttles or blocks outbound TCP)"
+msgstr "(송신 TCP를 막거나 조절하는 방화벽 뒤에 있다면 선택하세요)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:222
 msgid "config peers"
@@ -7130,9 +7171,9 @@ msgstr "I2P는 방화벽에 막힌 상태에서도 잘 작동합니다. 방화�
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fru_jsp.java:467
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:493
 msgid ""
-"However, you will get more participating traffic and help the network more "
-"if you can open your firewall(s)."
-msgstr "하지만 방화벽(들)을 열어둔다면 더 많은 트래픽 참가와 네트워크 도움을 줄  수 있을겁니다."
+"However, you will get more participating traffic and help the network if you"
+" open your firewall."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:470
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:469
@@ -7536,27 +7577,27 @@ msgid ""
 "reports"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:495
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:497
 msgid "Critical Logs"
 msgstr "치명적 로그"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:499
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:501
 msgid "Router Logs"
 msgstr "라우터 로그"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:501
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:503
 msgid "Configure router logging options"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:507
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:509
 msgid "Event Logs"
 msgstr "이벤트 로그"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:509
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:511
 msgid "View event logs"
 msgstr "이벤트 로그 보기"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:511
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:513
 msgid "Service (Wrapper) Logs"
 msgstr "서비스 (Wrapper) 로그"
 

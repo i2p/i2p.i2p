@@ -457,6 +457,7 @@ trans.zh_CN = installer/resources/locale-man/man_zh.po
 type = HTML
 source_file = installer/resources/eepsite/docroot/help/index.html
 source_lang = en
+trans.az = installer/resources/eepsite/docroot/help/index_az.html
 trans.de = installer/resources/eepsite/docroot/help/index_de.html
 ;; not yet translated on TX, use old page
 ;;trans.es = installer/resources/eepsite/docroot/help/index_es.html

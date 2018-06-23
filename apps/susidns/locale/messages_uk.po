@@ -20,75 +20,75 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-28 22:55+0000\n"
-"PO-Revision-Date: 2018-03-28 23:49+0000\n"
+"POT-Creation-Date: 2018-06-13 18:18+0000\n"
+"PO-Revision-Date: 2018-06-13 18:36+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: uk_UA\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:131
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:132
 #, java-format
 msgid "Host name \"{0}\" contains illegal character {1}"
 msgstr "Назва хоста \"{0}\" містить недопустимий символ {1}"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:144
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:146
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:153
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:145
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:147
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:154
 #, java-format
 msgid "Host name cannot start with \"{0}\""
 msgstr "Назва хоста не може починатись з \"{0}\""
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:148
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:150
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:149
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:151
 #, java-format
 msgid "Host name cannot end with \"{0}\""
 msgstr "Назва хоста не може закінчуватись на \"{0}\""
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:155
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:156
 #, java-format
 msgid "Host name cannot contain \"{0}\""
 msgstr "Назва хоста не може містити \"{0}\""
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:158
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:159
 #, java-format
 msgid ""
 "Host name \"{0}\" requires conversion to ASCII but the conversion library is"
 " unavailable in this JVM"
 msgstr "Назва хосту  \"{0}\" потребує коверсію у ASCII але конверсаційна бібліотека недоступна у цьому JVM"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:223
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:224
 msgid "None"
 msgstr "Немає"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:231
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:232
 msgid "Hashcash"
 msgstr "Hashcash"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:233
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:234
 msgid "Hidden"
 msgstr "Прихований"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:235
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:236
 msgid "Signed"
 msgstr "Залогінений"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:237
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:238
 msgid "Key"
 msgstr "Ключ"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:239
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:264
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:240
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:265
 #, java-format
 msgid "Type {0}"
 msgstr "Тип {0}"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:251
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:258
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:261
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:252
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:259
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:262
 msgid "DSA 1024 bit"
 msgstr "DSA 1024 біт"
 
@@ -99,6 +99,7 @@ msgid_plural "{0} results for search within filtered list."
 msgstr[0] "{0} результат для пошуку у відфільтрованому списку."
 msgstr[1] "{0} результати для пошуку у відфільтрованому списку."
 msgstr[2] "{0} результатів для пошуку у відфільтрованому списку."
+msgstr[3] "{0} результатів для пошуку у відфільтрованому списку."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:195
 #, java-format
@@ -107,6 +108,7 @@ msgid_plural "Filtered list contains {0} entries."
 msgstr[0] "Фільтрований список містить {0} запис."
 msgstr[1] "Фільтрований список містить {0} записи."
 msgstr[2] "Фільтрований список містить {0} записів."
+msgstr[3] "Фільтрований список містить {0} записів."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:200
 #, java-format
@@ -115,6 +117,7 @@ msgid_plural "{0} results for search."
 msgstr[0] "{0} результат пошуку."
 msgstr[1] "{0} результатів пошуку."
 msgstr[2] "{0} результатів пошуку."
+msgstr[3] "{0} результатів пошуку."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:209
 #, java-format
@@ -123,6 +126,7 @@ msgid_plural "Address book contains {0} entries."
 msgstr[0] "Адресна книга містить {0} запис"
 msgstr[1] "Адресна книга містить {0} запису"
 msgstr[2] "Адресна книга містить {0} записів."
+msgstr[3] "Адресна книга містить {0} записів."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:225
 #, java-format
@@ -130,27 +134,27 @@ msgid "Showing {0} of {1}"
 msgstr "Показано {0} з {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:247
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:248
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:235
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:249
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:627
 msgid "Add"
 msgstr "Додати"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:247
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:258
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:235
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:619
 msgid "Replace"
 msgstr "Перемістити"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:257
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:246
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
 msgstr "Назва хосту {0} уже є в адресній книзі, не змінено."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:259
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:249
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:250
 #, java-format
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
@@ -158,88 +162,89 @@ msgid ""
 msgstr "Назва хосту {0} уже є в адресній книзі з іншим призначенням. Клікніть \"Замінити\" для перезапису."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:272
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 #, java-format
 msgid "Destination added for {0}."
 msgstr "Доданий адрес для {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:274
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:280
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:281
 #, java-format
 msgid "Destination changed for {0}."
 msgstr "Змінений адрес для {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:276
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:282
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
 msgid "Warning - host name does not end with \".i2p\""
 msgstr "Попередження - назва хосту не закінчується на \".i2p\""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:281
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:290
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:291
 msgid "Invalid Base 64 destination."
 msgstr "Неправильна Base 64 адреса."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:296
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:297
 #, java-format
 msgid "Invalid host name \"{0}\"."
 msgstr "Неправильна назва хосту \"{0}\"."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:290
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:299
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:300
 msgid "Please enter a host name and destination"
 msgstr "Будь ласка, введіть ім'я хоста і призначення"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:294
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:315
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:307
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:341
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:350
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:304
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:342
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:381
 msgid "Delete Entry"
 msgstr "Видалити запис"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:294
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:304
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:541
 msgid "Delete Selected"
 msgstr "Видалити вибрані"
 
 #. parameter is a host name
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:308
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:333
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:334
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "Призначення {0} видалено."
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:311
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:336
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:337
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
 msgstr[0] "{0} призначення видалено."
 msgstr[1] "{0}  призначення видалено."
 msgstr[2] "{0} призначень видалено."
+msgstr[3] "{0} призначень видалено."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:338
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:339
 msgid "No entries selected to delete."
 msgstr "Не виділено записів для видалення"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:317
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:246
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:256
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:263
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:277
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:235
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:257
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:264
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:623
 msgid "Add Alternate"
 msgstr "Додати альтернативу"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:324
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:346
 msgid "Address book saved."
 msgstr "Адресна книга збережена"
 
@@ -249,7 +254,7 @@ msgstr "ПОМИЛКА: Не вдалось зберегти файл адрес
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:332
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:349
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:350
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:161
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
@@ -258,7 +263,7 @@ msgstr "Форма не прийнята, скоріше всього це ві�
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:334
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:351
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:352
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:163
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
@@ -287,29 +292,34 @@ msgstr "Перезавантажити"
 msgid "Configuration reloaded."
 msgstr "Налаштування перезавантажені."
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:106
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:107
 #, java-format
 msgid "{0} address book in {1} database"
 msgstr "{0} адресна книга у  {1} базі даних"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:248
 #, java-format
 msgid "Host name {0} is not in  the address book."
 msgstr "Хост {0} відсутній в адресній книзі."
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:261
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:262
 msgid "Manually added via SusiDNS"
 msgstr "Додано вручну через SusiDNS"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:287
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:288
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
 msgstr "Не вдалося додати адресу призначення для {0} до служби імен {1}"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:324
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:325
 #, java-format
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "Не вдалося видалити адресу призначення для {0} із служби імен {1}"
+
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:367
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:363
+msgid "Save Notes"
+msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
@@ -430,7 +440,7 @@ msgstr "Шукати"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:371
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:609
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:238
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:255
 msgid "Hostname"
 msgstr ""
 
@@ -440,7 +450,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:375
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:613
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:338
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:353
 msgid "Destination"
 msgstr "Адрес призначення"
 
@@ -595,79 +605,79 @@ msgstr "Назва використовуваної теми (за замовч�
 msgid "addressbook"
 msgstr "адресна книга"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:252
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:269
 msgid "Encoded Name"
 msgstr "Кодоване ім’я"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:266
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:283
 msgid "Base 32 Address"
 msgstr "Base 32 Адреса"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:274
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:291
 msgid "Base 64 Hash"
 msgstr "Base 64 Hash"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:280
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:297
 msgid "Address Helper"
 msgstr "Address Helper"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:286
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:303
 msgid "link"
 msgstr "посилання"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:290
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:307
 msgid "Public Key"
 msgstr "Публічний ключ"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:292
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:309
 msgid "ElGamal 2048 bit"
 msgstr "2048-бітне шифрування Ель-Гамаля"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:296
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:313
 msgid "Signing Key"
 msgstr "Підписуючий ключ"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:302
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:319
 msgid "Certificate"
 msgstr "Сертифікат"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:308
-msgid "Added Date"
-msgstr "Дата додавання"
-
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:325
 msgid "Validated"
 msgstr "Перевірено"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:316
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:327
 msgid "no"
 msgstr "ні"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:316
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:327
 msgid "yes"
 msgstr "так"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:320
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:333
 msgid "Source"
 msgstr "Джерело"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:326
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:339
+msgid "Added Date"
+msgstr "Дата додавання"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:345
 msgid "Last Modified"
 msgstr "Останній раз оновлено"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:332
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:361
 msgid "Notes"
 msgstr "Нотатки"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:357
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:388
 msgid "Visual Identification for"
 msgstr ""
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:369
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:400
 msgid "Create your own identification images"
 msgstr ""
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:371
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:402
 msgid "Launch Image Generator"
 msgstr ""
 

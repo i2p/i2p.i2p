@@ -1,3 +1,8 @@
+2018-06-23 zzz
+ * Pull translation updates from Transifex
+ * New Azerbaijani translations
+ * GeoIPv6 update from MaxMind 2018-06-04
+
 2018-06-21 zzz
  * Console: Add Azerbaijani
  * SusiMail: Fix NPE on logout (ticket #2266)

@@ -7,7 +7,7 @@
 # bassmax, 2014
 # Boxoa590, 2013
 # foo <foo@bar>, 2009
-# French language coordinator <french.coordinator@rbox.me>, 2017
+# French language coordinator <french.coordinator@rbox.me>, 2017-2018
 # Boxoa590, 2013
 # Towinet, 2014,2016
 # zzzi2p, 2016-2017
@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-10-25 17:50+0000\n"
+"PO-Revision-Date: 2018-06-08 13:26+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "Félicitations pour votre installation d’I2P !"
+msgstr "Félicitations, vous avez installé I2P !"
 
 msgid "Welcome to I2P!"
 msgstr "Bienvenue à I2P !"

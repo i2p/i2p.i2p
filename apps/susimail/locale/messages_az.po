@@ -1,0 +1,621 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the susimail package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Nikafn <appone6@gmail.com>, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-13 18:18+0000\n"
+"PO-Revision-Date: 2018-06-20 13:16+0000\n"
+"Last-Translator: Nikafn <appone6@gmail.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/otf/I2P/language/az/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: az\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/src/i2p/susi/webmail/MailPart.java:321
+#, java-format
+msgid "No encoder found for encoding \\''{0}\\''."
+msgstr "Kodlaşdırma üçün heç bir kodlayıcı tapılmadı \\''{0}\\''."
+
+#. tagged in WebMail
+#: src/src/i2p/susi/webmail/Sorters.java:90
+#: src/src/i2p/susi/webmail/WebMail.java:1171
+#: src/src/i2p/susi/webmail/WebMail.java:1172
+msgid "Re:"
+msgstr "Re:"
+
+#: src/src/i2p/susi/webmail/Sorters.java:91
+#: src/src/i2p/susi/webmail/WebMail.java:1251
+#: src/src/i2p/susi/webmail/WebMail.java:1252
+msgid "Fwd:"
+msgstr "Fwd:"
+
+#. MailDir-like
+#: src/src/i2p/susi/webmail/WebMail.java:219
+msgid "Drafts"
+msgstr "Layihələr"
+
+#. MailDir-like
+#: src/src/i2p/susi/webmail/WebMail.java:220
+msgid "Sent"
+msgstr "Göndər"
+
+#. MailDir-like
+#: src/src/i2p/susi/webmail/WebMail.java:221
+msgid "Trash"
+msgstr "Sil"
+
+#. MailDir-like
+#: src/src/i2p/susi/webmail/WebMail.java:222
+msgid "Bulk Mail"
+msgstr "Qrup Email-i"
+
+#. untranslated, translate on use
+#: src/src/i2p/susi/webmail/WebMail.java:226
+msgid "Inbox"
+msgstr "Daxil olanlar"
+
+#: src/src/i2p/susi/webmail/WebMail.java:536
+msgid "unknown"
+msgstr "Tanınmayan"
+
+#: src/src/i2p/susi/webmail/WebMail.java:585
+#, java-format
+msgid "Charset \\''{0}\\'' not supported."
+msgstr "Kodlaşdırma \\''{0}\\'' dəstəklənmir. "
+
+#: src/src/i2p/susi/webmail/WebMail.java:589
+#, java-format
+msgid "Part ({0}) not shown, because of {1}"
+msgstr " ({0}) səbəbindən {1} hissə göstərilmir"
+
+#: src/src/i2p/susi/webmail/WebMail.java:639
+#: src/src/i2p/susi/webmail/WebMail.java:644
+#, java-format
+msgid "Download attachment {0}"
+msgstr "Qoşmanı endir {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:645
+msgid "File is packed into a zipfile for security reasons."
+msgstr "Təhlükəsizlik məqsədi ilə fayl zip faylında saxlanılır."
+
+#: src/src/i2p/susi/webmail/WebMail.java:650
+#, java-format
+msgid "Attachment ({0})."
+msgstr "Qoşma ({0})."
+
+#: src/src/i2p/susi/webmail/WebMail.java:710
+msgid "Need username for authentication."
+msgstr "Təsdiqləmək üçün istifadəçi adı lazımdır."
+
+#: src/src/i2p/susi/webmail/WebMail.java:714
+msgid "Need password for authentication."
+msgstr "Təsdiqləmək üçün şifrə lazımdır."
+
+#: src/src/i2p/susi/webmail/WebMail.java:718
+msgid "Need hostname for connect."
+msgstr "Qoşulmaq üçün hostun adı lazımdır. "
+
+#: src/src/i2p/susi/webmail/WebMail.java:723
+msgid "Need port number for pop3 connect."
+msgstr "Pop3 bağlantısı üçün port nömrəsinə ehtiyac var."
+
+#: src/src/i2p/susi/webmail/WebMail.java:730
+msgid "POP3 port number is not in range 0..65535."
+msgstr "POP3 port nömrəsi 0..65535 aralığında deyil."
+
+#: src/src/i2p/susi/webmail/WebMail.java:736
+msgid "POP3 port number is invalid."
+msgstr "POP3 port nömrəsi xətalıdır."
+
+#: src/src/i2p/susi/webmail/WebMail.java:742
+msgid "Need port number for smtp connect."
+msgstr "Smtp əlaqəsi üçün port nömrəsinə ehtiyac var."
+
+#: src/src/i2p/susi/webmail/WebMail.java:749
+msgid "SMTP port number is not in range 0..65535."
+msgstr "SMTP port nömrəsi 0..65535 aralığında deyil. "
+
+#: src/src/i2p/susi/webmail/WebMail.java:755
+msgid "SMTP port number is invalid."
+msgstr "SMTP port nömrəsi xətalıdır. "
+
+#: src/src/i2p/susi/webmail/WebMail.java:832
+#: src/src/i2p/susi/webmail/WebMail.java:1382
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:446
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:644
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:657
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:716
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:754
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:762
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:243
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:258
+msgid "Cannot connect"
+msgstr "Qoşulmur "
+
+#: src/src/i2p/susi/webmail/WebMail.java:926
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:744
+msgid "Error connecting to server"
+msgstr "Serverə qoşulma xətası"
+
+#. _t("Internal error, lost connection.") + '\n' +
+#: src/src/i2p/susi/webmail/WebMail.java:970
+#: src/src/i2p/susi/webmail/WebMail.java:984
+msgid "User logged out."
+msgstr "İstifadəçi sistemdən çıxıb."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1035
+msgid "Draft saved."
+msgstr "Layihə saxlanıldı."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1045
+#: src/src/i2p/susi/webmail/WebMail.java:1286
+#: src/src/i2p/susi/webmail/WebMail.java:2692
+#: src/src/i2p/susi/webmail/WebMail.java:2874
+msgid "Unable to save mail."
+msgstr "Məktubu saxlamaq alınmır."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1175
+#, java-format
+msgid "On {0} {1} wrote:"
+msgstr "{0} {1} -də yazılıb:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1238
+#: src/src/i2p/susi/webmail/WebMail.java:1459
+#, java-format
+msgid "Error reading uploaded file: {0}"
+msgstr "Yüklənilən faylların oxunma xətası: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1264
+msgid "begin forwarded mail"
+msgstr "Məktubu yönləndirməyə başlat"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1274
+msgid "end forwarded mail"
+msgstr "məktubun yönləndirilməsini bitir "
+
+#: src/src/i2p/susi/webmail/WebMail.java:1292
+#: src/src/i2p/susi/webmail/WebMail.java:3434
+msgid "Could not fetch mail body."
+msgstr "Məktubu yükləmək mümkün olmadı."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1324
+msgid "Message id not valid."
+msgstr "İsmarışın id-si etibarsızdır."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1369
+msgid "Internal error, lost connection."
+msgstr "Daxili xəta, bağlantı kəsilib."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1456
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:384
+#, java-format
+msgid "No Encoding found for {0}"
+msgstr "{0} üçün kodlama tapılmadı"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1575
+msgid "Attachment not found."
+msgstr "Qoşma tapılmadı."
+
+#. error if we get here
+#: src/src/i2p/susi/webmail/WebMail.java:1604
+#: src/src/i2p/susi/webmail/WebMail.java:1606
+#: src/src/i2p/susi/webmail/WebMail.java:2280
+#: src/src/i2p/susi/webmail/WebMail.java:3438
+msgid "Message not found."
+msgstr "İsmarış tapılmadı."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1709
+#, java-format
+msgid "1 message deleted."
+msgid_plural "{0} messages deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/src/i2p/susi/webmail/WebMail.java:1711
+#: src/src/i2p/susi/webmail/WebMail.java:1720
+msgid "No messages marked for deletion."
+msgstr "Silinmək üçün heç bir ismarış işarələnməyib."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1785
+#, java-format
+msgid "Host unchanged. Edit configation file {0} to change host."
+msgstr "Host dəyişmədi. Hostu dəyişdirmək üçün {0} quraşdırma faylını redaktə edin."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1805
+msgid "Configuration saved"
+msgstr "Quraşdırma saxlandı"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1827
+msgid "Invalid pagesize number, resetting to default value."
+msgstr "Yanlış səhifə ölçüsünün nömrəsi, standart dəyərinə yeniləmək."
+
+#: src/src/i2p/susi/webmail/WebMail.java:2258
+#: src/src/i2p/susi/webmail/WebMail.java:3074
+msgid "Login"
+msgstr "Daxil ol"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2260
+#: src/src/i2p/susi/webmail/WebMail.java:2386
+#: src/src/i2p/susi/webmail/WebMail.java:3091
+msgid "Loading emails, please wait..."
+msgstr "Email-lər yüklənir, lütfən gözləyin..."
+
+#: src/src/i2p/susi/webmail/WebMail.java:2268
+#, java-format
+msgid "1 Message"
+msgid_plural "{0} Messages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/src/i2p/susi/webmail/WebMail.java:2270
+#: src/src/i2p/susi/webmail/WebMail.java:3211
+msgid "No messages"
+msgstr "İsmarış yoxdur"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2278
+msgid "Show Message"
+msgstr "İsmarışı göstər"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2283
+msgid "New Message"
+msgstr "Yeni ismarış"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2285
+msgid "Configuration"
+msgstr "Quraşdırma"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2296
+msgid "Email"
+msgstr "Email"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2372
+#, java-format
+msgid "{0} new message"
+msgid_plural "{0} new messages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/src/i2p/susi/webmail/WebMail.java:2375
+msgid "No new messages"
+msgstr "Yeni ismarış yoxdur"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2388
+msgid "Checking for new emails on server"
+msgstr "Serverdə yeni email-lərin yoxlanılması"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2390
+#: src/src/i2p/susi/webmail/WebMail.java:3093
+msgid "Refresh the page for updates"
+msgstr "Yeniləmələr üçün səhifəni yeniləyin"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2595
+#: src/src/i2p/susi/webmail/WebMail.java:3193
+#: src/src/i2p/susi/webmail/WebMail.java:3410
+msgid "no subject"
+msgstr "mövzu yoxdur"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2729
+msgid "Found no valid sender address."
+msgstr "Etibarlı göndərici ünvanı tapmadı."
+
+#: src/src/i2p/susi/webmail/WebMail.java:2735
+#, java-format
+msgid "Found no valid address in \\''{0}\\''."
+msgstr "\\''{0}\\'' da etibarlı ünvan tapılmadı."
+
+#: src/src/i2p/susi/webmail/WebMail.java:2749
+msgid "No recipients found."
+msgstr "Heç bir qəbuledici tapılmadı."
+
+#: src/src/i2p/susi/webmail/WebMail.java:2763
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:302
+#, java-format
+msgid "Email is too large, max is {0}"
+msgstr "Email çox böyükdür, maksimum {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2806
+#: src/src/i2p/susi/webmail/WebMail.java:2886
+msgid "Sending mail."
+msgstr "Məktub göndərilir."
+
+#: src/src/i2p/susi/webmail/WebMail.java:2811
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:254
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:346
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:349
+msgid "Error sending mail"
+msgstr "Email göndərilərkən xəta "
+
+#: src/src/i2p/susi/webmail/WebMail.java:2845
+msgid "Mail sent."
+msgstr "Məktub göndərildi."
+
+#: src/src/i2p/susi/webmail/WebMail.java:2936
+msgid "Send"
+msgstr "Göndər"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2937
+msgid "Save as Draft"
+msgstr "Layihə kimi saxla"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2938
+#: src/src/i2p/susi/webmail/WebMail.java:3225
+#: src/src/i2p/susi/webmail/WebMail.java:3328
+#: src/src/i2p/susi/webmail/WebMail.java:3488
+msgid "Cancel"
+msgstr "Ləğv et"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3021
+#: src/src/i2p/susi/webmail/WebMail.java:3145
+#: src/src/i2p/susi/webmail/WebMail.java:3413
+msgid "From"
+msgstr "Etibarən"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3022
+#: src/src/i2p/susi/webmail/WebMail.java:3418
+msgid "To"
+msgstr "Qədər"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3023
+#: src/src/i2p/susi/webmail/WebMail.java:3422
+msgid "Cc"
+msgstr "Cc"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3024
+msgid "Bcc"
+msgstr "Bcc"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3025
+#: src/src/i2p/susi/webmail/WebMail.java:3146
+#: src/src/i2p/susi/webmail/WebMail.java:3415
+msgid "Subject"
+msgstr "Mövzu"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3028
+msgid "Add Attachment"
+msgstr "Qoşmanı əlavə et"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3028
+msgid "Add another attachment"
+msgstr "Başqa qoşmanı əlavə et"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3034
+msgid "Attachments"
+msgstr "Qoşmalar"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3043
+msgid "Delete selected attachments"
+msgstr "Seçilmiş qoşmaları sil"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3060
+msgid "Email Login"
+msgstr "Email girişi"
+
+#. current postman hq length limits 16/12, new postman version 32/32
+#: src/src/i2p/susi/webmail/WebMail.java:3062
+msgid "User"
+msgstr "İstifadəçi"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3063
+msgid "Password"
+msgstr "Şifrə"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3068
+msgid "Host"
+msgstr "Host"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3069
+msgid "POP3 Port"
+msgstr "POP3 Port"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3070
+msgid "SMTP Port"
+msgstr "SMTP Port"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3075
+msgid "Read Mail Offline"
+msgstr "Məktubu oflayn oxu"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3079
+#: src/src/i2p/susi/webmail/WebMail.java:3244
+msgid "Settings"
+msgstr "Tənzimləmələr"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3081
+msgid "Create Account"
+msgstr "Hesab yarat"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3081
+msgid "Learn about I2P mail"
+msgstr "I2P məktub haqda öyrən"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3106
+#: src/src/i2p/susi/webmail/WebMail.java:3352
+msgid "New"
+msgstr "Yeni"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3116
+msgid "Check Mail"
+msgstr "Emaili yoxla"
+
+#. if (Config.hasConfigFile())
+#. out.println(button( RELOAD, _t("Reload Config") ) + spacer);
+#: src/src/i2p/susi/webmail/WebMail.java:3126
+#: src/src/i2p/susi/webmail/WebMail.java:3364
+#: src/src/i2p/susi/webmail/WebMail.java:3490
+msgid "Logout"
+msgstr "Çıxış"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3144
+msgid "Mark for deletion"
+msgstr "Silinmə üçün işarələ"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3147
+#: src/src/i2p/susi/webmail/WebMail.java:3425
+msgid "Date"
+msgstr "Tarix"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3150
+msgid "Size"
+msgstr "Ölçü"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3198
+msgid "Message is new"
+msgstr "İsmarış yenidir"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3201
+msgid "Message has an attachment"
+msgstr "İsmarışın bir əlavəsi var"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3203
+msgid "Message is spam"
+msgstr "İsmarış spamdır"
+
+#. TODO ngettext
+#: src/src/i2p/susi/webmail/WebMail.java:3223
+msgid "Really delete the marked messages?"
+msgstr "İşarələnmiş ismarışlar həqiqətən də silinsinmi?"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3224
+msgid "Yes, really delete them!"
+msgstr "Bəli, həqiqətən onları silin!"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3227
+msgid "Delete Selected"
+msgstr "Seçilənləri sil"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3229
+msgid "Mark All"
+msgstr "Hamısını işarələ"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3231
+msgid "Clear All"
+msgstr "Hamısını təmizlə"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3256
+msgid "Folder"
+msgstr "Qovluq"
+
+#. TODO css to center it
+#: src/src/i2p/susi/webmail/WebMail.java:3257
+msgid "Change to Folder"
+msgstr "Qovluğu dəyişdir"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3263
+msgid "First"
+msgstr "İlk"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3264
+#: src/src/i2p/susi/webmail/WebMail.java:3376
+msgid "Previous"
+msgstr "Əvvəlki"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3273
+#, java-format
+msgid "Page {0} of {1}"
+msgstr "{0} səhifədən {1}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3275
+#: src/src/i2p/susi/webmail/WebMail.java:3391
+msgid "Next"
+msgstr "Növbəti"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3276
+msgid "Last"
+msgstr "Sonuncu"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3326
+msgid "Really delete this message?"
+msgstr "İsmarış həqiqətən də silinsinmi?"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3327
+msgid "Yes, really delete it!"
+msgstr "Bəli, sil!"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3355
+msgid "Reply"
+msgstr "Cavab ver"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3356
+msgid "Reply All"
+msgstr "Hamısına cavab ver"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3357
+msgid "Forward"
+msgstr "Forward"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3358
+msgid "Save As"
+msgstr "kimi Yadda saxla"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3360
+#: src/src/i2p/susi/webmail/WebMail.java:3362
+msgid "Delete"
+msgstr "Sil"
+
+#. can't move unless has body
+#. can't move from drafts
+#: src/src/i2p/susi/webmail/WebMail.java:3368
+msgid "Move to Folder"
+msgstr "Qovluğa köçür"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3388
+msgid "Back to Folder"
+msgstr "Qovluğa qayıt"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3471
+msgid "Folder Page Size"
+msgstr "Qovluq səhifə ölçüsü"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3474
+msgid "Set"
+msgstr "Quraşdır"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3477
+msgid "Advanced Configuration"
+msgstr "Yüksək quraşdırma"
+
+#: src/src/i2p/susi/webmail/WebMail.java:3487
+msgid "Save Configuration"
+msgstr "Quraşdırmanı saxla"
+
+#. this appears in the UI so translate
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:108
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:644
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:754
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:936
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:978
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1199
+msgid "No response from server"
+msgstr "Serverdən cavab yoxdur"
+
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
+msgid "Mail server login failed, wrong username or password."
+msgstr "Email serverinə giriş uğursuz oldu, istifadəçi adı və ya şifrə yanlışdır."
+
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
+msgid "Logout and then login again with the correct username and password."
+msgstr "Sistemdən çıxın və düzgün istifadəçi adı və şifrə ilə yenidən daxil olun. "
+
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
+#: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:314
+msgid "Login failed"
+msgstr "Giriş alınmadı"
+
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:256
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:285
+msgid "Server refused connection"
+msgstr "Server qoşulmaqdan imtina etdi "
+
+#. TODO which recipient?
+#: src/src/i2p/susi/webmail/smtp/SMTPClient.java:327
+msgid "Mail rejected"
+msgstr "Email qəbul edilmədi"

@@ -313,7 +313,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr "Contrôler le service d’I2P."
+msgstr "Contrôler le service I2P."
 
 #. type: IP
 #: man/i2prouter.1:15
@@ -337,7 +337,7 @@ msgstr "B<start>"
 #. type: Plain text
 #: man/i2prouter.1:21
 msgid "Starts the I2P service."
-msgstr "Démarre le service d’I2P."
+msgstr "Démarre le service I2P."
 
 #. type: IP
 #: man/i2prouter.1:23
@@ -348,7 +348,7 @@ msgstr "B<stop>"
 #. type: Plain text
 #: man/i2prouter.1:25
 msgid "Stops the I2P service."
-msgstr "Arrête le service d’I2P."
+msgstr "Arrête le service I2P."
 
 #. type: IP
 #: man/i2prouter.1:27
@@ -359,7 +359,7 @@ msgstr "B<restart>"
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr "Arrête le service d’I2P et le démarre ensuite."
+msgstr "Arrête le service I2P et le démarre ensuite."
 
 #. type: IP
 #: man/i2prouter.1:31
@@ -371,7 +371,7 @@ msgstr "B<condrestart>"
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
 msgstr ""
-"Redémarrer le service d’I2P seulement s’il est déjà en cours d’exécution."
+"Redémarrer le service I2P seulement s’il est déjà en cours d’exécution."
 
 #. type: IP
 #: man/i2prouter.1:35
@@ -418,7 +418,7 @@ msgstr "B<status>"
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr "Imprime l’état d’exécution du service d’I2P."
+msgstr "Imprime l’état d’exécution du service I2P."
 
 #. type: IP
 #: man/i2prouter.1:51

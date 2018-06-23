@@ -1,0 +1,94 @@
+# I2P
+# Copyright (C) 2014 The I2P Project
+# This file is distributed under the same license as the streaming package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Nikafn <appone6@gmail.com>, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2018-04-07 21:51+0000\n"
+"Last-Translator: Nikafn <appone6@gmail.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/otf/I2P/language/az/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: az\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
+msgid "Message timeout"
+msgstr "İsmarışın vaxtının bitməsi"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
+msgid "Failed delivery to local destination"
+msgstr "Yerli hədəfə çatdırılma alınmadı"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
+msgid "Local router failure"
+msgstr "Yerli istiqamətləndirici xətası"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:78
+msgid "Local network failure"
+msgstr "Yerli şəbəkə xətası"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
+msgid "Session closed"
+msgstr "Sessiya bağlandı"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
+msgid "Invalid message"
+msgstr "Yanlış ismarış"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
+msgid "Invalid message options"
+msgstr "Yanlış ismarış seçimləri"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
+msgid "Buffer overflow"
+msgstr ""
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
+msgid "Message expired"
+msgstr "İsmarışın müddəti bitdi"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
+msgid "Local lease set invalid"
+msgstr "Yerli icarə dəsti yanlışdır"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
+msgid "No local tunnels"
+msgstr "Yerli tunel yoxdur"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
+msgid "Unsupported encryption options"
+msgstr "Dəstəklənməyən şifrələmə seçimləri"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
+msgid "Invalid destination"
+msgstr "Yanlış hədəf"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
+msgid "Destination lease set expired"
+msgstr "Hədəf icarə dəstinin müddəti bitdi"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
+msgid "Destination lease set not found"
+msgstr "Hədəf icarə dəsti tapılmadı"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
+msgid "Local destination shutdown"
+msgstr "Yerli hədəfin bağlanması"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
+msgid "Connection was reset"
+msgstr "Bağlantı sıfırlandı"
+
+#. Translate this one here, can't do it later
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
+msgid "Failure code"
+msgstr "Xəta kodu"

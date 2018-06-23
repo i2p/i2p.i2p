@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<title>I2P Anonim vebserver</title>
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="lib/eepsite.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+   <div class="main">
+
+   <div class="langbar">
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+<a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+<a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+<a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+<a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+<a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+</div>
+
+    <h1>I2P Anonim vebserver</h1>
+
+    <h2>I2P-də Anonim Vebserver üçün Qayda</h2>
+
+    <p>Bu, sizin anonim I2P vebserverinizdir (ənənəvi olaraq <i> eepsite</i> kimi istinad edilir).
+ Öz məzmununuza xidmət etmək üçün sadəcə vebserverin əsas qovluğundakı faylları redaktə edin və aşağıdakı təlimatları izlədikdə sayt açıq olacaq.</p>
+
+    <p id="dir">Əməliyyat sisteminizdən asılı olaraq, Vebserver-in əsas qovluğunu aşağıdakı yerlərdən birində tapa bilərsiniz:</p>
+
+    <ul>
+<li><code><b>Linux</b><br>
+ Standart quraşdırma:<code>~/.i2p/eepsite/docroot/</code><br>
+ Xidmət kimi çalışan Paket quraşdırma: /var/lib/i2p/i2p-config/eepsite/docroot/</code></li>
+      <li>
+<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+</li>        
+      <li>
+<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+</li>
+    </ul>
+<p>I2P-də gizli xidmətlər ".b32.i2p" ilə bitən Base32 ünvanı və ya uzun Base64 sətri olaraq göstərilən təyinat yeri vasitəsilə nəzərdən keçirilir. 
+       Aşağıdakı təlimatları izləyib, qeydiyyatdan keçənə qədər Base32-dən hostun adı kimi istifadə etmək olar.
+       Təyinat yeri bir qədər IP ünvanına bənzəyir və <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Xidmət Quraşdırması səhifəsində</a> göstərilir.</p>
+
+    <p>Aşağıdakı təlimatlarda saytınıza "mysite.i2p" kimi adın təyin edilməsi və başqalarının istifadəsinin təmin edilməsi barədə ətraflı məlumat verilir. 
+         Saytınıza yerli olaraq <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a> ünvanından gələ bilərsiniz.</p>
+
+    <h2>Gizli xidmətinizi necə qurmaq və elan etmək olar</h2>
+
+     <p>Vebserveriniz standart olaraq işləyir, lakin gizli xidmət tunelinə başlayana kimi başqaları tərəfindən girilə bilməz. 
+     I2P Vebserver tunelinizə başladıqdan sonra digər insanların tapması çətin olacaq
+     Giriş yalnız uzun Təyinat yeri və ya Təyinat yerinin hash-i olan qısa Base32 ünvanı (.b32.i2p) vasitəsilə mümkündür.
+     Siz insanlara sadəcə Təyinat yeri və ya Base32 ünvanını deyə bilərdiniz, lakin xoşbəxtlikdən I2P-nin ünvan kitabı və insanlara sayt haqqında məlumat verən bir neçə asan yolu var.
+     Burada ətraflı təlimat verilib.</p>
+
+    <ul>
+<li>Aşağı registrdən istifadə edərək saytınıza ad (<i>something</i>.i2p) seçin.
+Adınınzın istifadə olunub-olunmadığını bilmək üçün əvvəlcə istiqamətləndiricinizin <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">ünvan kitabında</a> yoxlaya bilərsiniz.  
+<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Xidmət Quraşdırması səhifəsində</a> "Sayt adı" qeyd olunan yerdə saytınızın yeni adını daxil edin. 
+Bu,  standart "mysite.i2p" əvəzləyəcək. 
+Əgər I2P işə düşəndə I2P Vebserver tunelinizin avtomatik başlamasını istəyirsinizsə, "Avtomatik Başlama" qutusunu işarələyin. 
+İstiqamətləndiricinizi hər başlatğınızda saytınız da başlayacaq.
+ "Saxla" düyməsini klikləyin.</li>
+      <li>
+<a href="http://127.0.0.1:7657/i2ptunnel/">Əsas Gizli Xidmət İdarəçisi səhifəsindəki</a>vebserver tuneliniz üçün başlanğıc düyməsini basın.
+ İndi siz onu <a href="http://127.0.0.1:7657/">I2P İstiqamətləndirici Konsolunun</a> sol tərəfində "Yerli tunellər"in altında görməlisiniz.
+Saytınız artıq işləyir.</li>
+      <li>
+<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Xidmət Quraşdırması səhifəsində</a> bütün yerli təyinat yerlərini seçin və kopyalayın.
+ Hamısını kopyaladığınızdan əmin olun, 500-dən çox simvoldur.</li>
+      <li>Adı daxil edin və təyinat yerini <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">ünvan kitabınıza</a> yapışdırın.
+ Yeni girişi saxlamaq üçün "Əlavə et" düyməsini klikləyin.</li>
+      <li>Brauzerinizdə saytınızın adını daxil edin (<i>something</i>.i2p) və daha sonra buraya qayıtmalısınız.
+Ümid edirik işə yaradı!</li>
+      <li>Dünyaya yeni saytınız haqqında məlumat verməzdən öncə məzmun əlavə etməlisiniz.
+<a href="#dir">Yuxarıda göstərilən </a>serverin əsas kataloquna gedin və index.html yönəltmə səhifəsini məzmununuzla əvəzləyin. </li>
+    </ul>
+<p>Qovluq siyahısı aktivdir, beləliklə, fayllara keçid verən bir səhifə təqdim etmədən faylları alt qovluqdan qəbul edə bilərsiniz. 
+Hər bir qovluğun görünüşünü redaktə edilmiş <a href="lib/jetty-dir.css">jetty-dir.css</a> faylı ilə dəyişə bilərsiniz. 
+<a href="lib/">Lib alt qovluğu</a> xüsusi bir üslub nümayiş etdirir. 
+<a href="lib/resources">Resurs alt qovlluğu</a> standart üslüb nümayiş etdirir.
+Baza saytı üçün şablona ehtiyacınız varsa, <a href="pagetemplate.html">bu səhifəni</a> və <a href="lib/">əlaqəli məzmundan</a> yararlanmaqdan çəkinməyin. </p>
+
+    <p>Məzmunun redaktəsindn sonra bu səhifəyə geri qayıtmısınızsa, brauzerinizin veb keşini təmizləməyə çalışın:</p>
+
+    <ul>
+<li>
+<b>Firefox: </b>➜Nizamlamalar➜ Yüksək ➜ Keşlənmiş veb məzmunu ➜ İndi təmizlə</li>
+      <li>
+<b>Chrome/Chromium:</b>Tənzimləmələr ➜Təkmilləşmiş Tənzimləmələr ➜Məxfilik ➜Baxış məlumatını təmizlə</li>
+      <li>
+<b>Opera:</b>Tənzimləmələr ➜ Məxfilik ➜ Baxış məlumatını təmizlə</li>
+    </ul>
+<h2>I2P Domenini qeyd et</h2>
+
+    <p>İndi saytınızı <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> və ya <a href="http://no.i2p/" target="_blank">no.i2p</a> kimi saytın yerləşdiyi I2P ünvan kitabına əlavə etməyin vaxtıdır. 
+Bu saytların bir və ya bir neçəsinə saytınızın adını və Təyinat yerini (ya da Qeydiyyatı Təsdiqləmə sətrini) daxil etməlisiniz.</p>
+<p>Bəzi qeydiyyat saytları Təyinat yerini tələb edir.
+ Əgər belədirsə, <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Xidmət Quraşdırması səhifəsində</a> bütün Yerli təyinat yerlərini seçin və kopyalayın.
+ Hamısını kopyaladığınızdan əmin olun, simvollar 500-dən çoxdur.</p>
+<p><a href="http://stats.i2p/i2p/addkey.html" target="_blank">Stats.i2p</a> də daxil olmaqla, bəzi qeydiyyat saytları Qeydiyyatı Təsdiqləmə sətrini tələb edir.
+O, <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Gizli Xidmət Quraşdırması səhifəsi</a> ilə əlaqəli <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Qeydiyyatı Təsdiqləmə səhifəsində</a> yerləşir.
+Qeydiyyatı Təsdiqləmə sətrini kopyalayıb, qeydiyyat səhifəsinə yapışdırın.
+ Hamısını kopyaladığınızdan əmin olun, simvollar 500-dən çoxdur.
+ Sayt tələb edirsə, saytınızı qısaca təsvir edin.
+ Saytınız HTTP xidmətidirsə, yoxlama qutusunu seçin, əgər deyilsə, seçməyin. </p>
+<p>Bütün qeydiyyat saytları üçün İstifadə Şərtlərini diqqətlə oxuyun.
+ "Göndər" düyməsini klikləyin.
+ Təqdimatın müvəffəqiyyətli olduğunu doğrulayın.
+ Bir çox istiqamətləndirici mütəmadi olaraq bu saytlardan ünvanlı kitab yeniləmələrini əldə etdiyindən, digərləri brauzerlərinə yalnız hostname ünvanınızı daxil etməklə, saytınızı bir neçə saat ərzində  tapa biləcəklər.</p>
+
+    <h2>Ünvan Kitabı Abunəliyi Əlavə Olunur</h2>
+
+    <p>Ünvan kitab yeniləmələrindən danışarkən, abunə siyahınıza daha çox ünvan kitabını əlavə etmək yaxşı olardı.
+ <a href="http://127.0.0.1:7657/susidns/subscriptions">Abunələrin Quraşdırılması səhifəsinə</a> keçin və avtomatik olaraq yenilənən yeni host siyahısına bir və ya daha çoxunu əlavə edin:</p>
+
+    <ul>
+<li>
+<code>http://stats.i2p/cgi-bin/newhosts.txt</code>(<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+      <li>
+<code>http://no.i2p/export/alive-hosts.txt</code>(<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+    </ul>
+<p>Tələsirsinizsə və bir neçə saat gözləyə bilmirsinizsə, adamlara "keçid" ünvanı dəyişmə xidmətindən istifadə etmələrini söyləyin.  
+ Bu,  hostname-in eyni saytda qeydiyyatından bir neçə dəqiqə sonra işləyəcək.
+ Brauzerinizə <code>http: //stats.i2p/cgi-bin/jump.cgi? A = <i>something</i>.i2p</code> daxil edərək, özünüzü sınayın.
+ Çalışdıqdan sonra başqalarına da istifadə edə biləcəklərini söyləyə bilərsiniz.</p>
+
+    <p>Bəzi adamlar yeni eepsites-lar üçün <a href="http://identiguy.i2p/" target="_blank">Identiguy-ın eepsite statusu siyahısı</a> və ya <a href="http://no.i2p/browse/" target="_blank">no.i2p-nin aktiv host siyahısı</a> kimi saytların siyahısını yoxlayır, beləcə saytınız trafik yığa bilər.
+İnsanlara izah etməyin fərqli yolları var. Məsələn:</p>
+
+    <ul>
+<li>
+<a href="http://i2pforum.i2p/" target="_blank">I2P forumuna</a> ismarış göndərərək yeni I2P saytınız haqqında hər kəsə xəbər verin!</li>
+      <li>Bu haqda istifadəçilərə IRC-də # i2p və ya # i2p-chat kanallarında məlumat verin.</li>
+      <li>Bunu <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index-ə</a> qoyun</li>
+    </ul>
+<p>Unutmayın ki, bəzi saytlar uzun təyinat yerinə yapışdırılmasını məsləhət görür.
+ İstəsəniz bunu edə bilərsiniz, amma qeydiyyat xidmətində hostname-ni uğurla qeydiyyatdan keçirmisinizsə, onu keçid xidməti ilə sınamısınızsa və təbliğat üçün ünvan kitabının yeniləməsini 24 saat gözləməsinizsə, buna ehtiyac olmamalıdır. </p>
+
+    <h2>Saytınızı saxlamaq üçün alternativ vebserverdən istifadə </h2>
+
+    <p>Bu sayt (və I2P  istiqamətləndirici konsol) <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty vebserverində</a> işləyir, ancaq məzmununuzu saxlamaq üçün fərqli vebserverdən istifadə etmək istəyə bilərsiniz.
+ Anonimliyinizi qorumaq üçün vebserverinizin yalnız localhost (127.0.0.1) -dən əlaqələrə icazə verəcək şəkildə quraşdırıldığından və vebserverinizin anonimliyinizi pozacaq məlumatları yaymadığından əmin olun.</p>
+
+     <p>I2P-də istifadə etmək məqsədilə vebserverinizi quraşdırmaq üçün ya mövcud vebserver tunelindən istifadə edə və <a href="http://127.0.0.1:7657/configclients">standart vebserverin işinə mane ola</a> və ya <a href="http://127.0.0.1:7657/i2ptunnelmgr">Gizli Xidmətlər İdarəçisində</a> yeni HTTP Server tuneli yarada bilərsiniz.
+Vebserver üçün quraşdırılmış dinləmə portunun (standart olaraq 7658) Gizli Xidmətlər tənzimləmələrində də quraşdırıldığında əmin olun.
+Məsələn, vebserveriniz 127.0.0.1 port 80-də standart olaraq dinlənirsə, xidmətin Gizli Xidmət İdarəçisi tənzimləmələri səhifəsindəki Hədəf portunun da 80 portuna quraşdırılnmasını təmin etməlisiniz.</p> 
+
+        <p>Zəif quraşdırılmış vebserver və ya veb tətbiqi potensial təhlükəli məlumatları sızdıra bilər
+ məsələn, anonimliyinizi azaldacaq və ya hakerə kömək edəcək real IP ünvanı və ya server detalları.
+ Server administrasiyasını idarə etmək rahat deyilsə,  standart serverdən istifadə etməyi məsləhət görürük.
+Vebserverinizin internetə yerləşdirilməsindən əvvəl təhlükəsiz olmasını təmin edin.
+ Çoxlu online təlimatlar var, məsələn, "nginx təhlükəsizliyi sərtləşdirmə təlimatı" nı axtarırsınızsa,  yaxşı tövsiyələr verən bir sıra təlimatlar tapa bilərsiniz.</p> 
+
+        <p>Apache vebserveri ilə əlaqədar əhəmiyyətli məsələ var.
+<code>Mod_status</code> və <code>mod_info</code> Apache modulları bəzi əməliyyat sistemlərində standart olaraq aktiv edilir.
+ Bu modullar anonim şəbəkədə istifadə edildikdə anonimliyi ciddi təhlükə altına qoyacaq daxili məlumatları ifşa edə bilər.
+Bu modulların yükləndiyi quraşdırma faylında xətlərin təmizlənməsi bu məsələlərin qarşısını almağın ən asan yoludur.</p>
+
+    <h2>Əlavə Yardım</h2>
+
+        <p>Sualınız varsa,  aşağıdakı yerlər dəstək üçün mövcuddur:</p>
+
+        <ul>
+<li>IRC dəstək kanalımız:<ul>
+<li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
+                <li>Anonim olaraq yerli <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunelindən</a> istifadə edin.</li>
+             </ul>
+</li>
+<li>Layihə forumu <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hostinq təlimatı</a></li>
+        </ul>
+<hr>
+<div class="notify">Bu səhifə, layihə saytı və istiqamətləndirici konsol tərcümə olunmalıdı!
+ Lütfən<a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">layihəyə qoşulmaqla</a> və ya <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">tərcümə etməklə</a> kömək edin.</div>
+        <hr>
+</div>
+</body>
+</html>

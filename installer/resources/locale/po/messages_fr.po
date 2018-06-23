@@ -5,14 +5,14 @@
 # 
 # Translators:
 # Boxoa590, 2013
-# French language coordinator <french.coordinator@rbox.me>, 2017
+# French language coordinator <french.coordinator@rbox.me>, 2017-2018
 # Boxoa590, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2017-10-25 17:50+0000\n"
+"PO-Revision-Date: 2018-06-14 19:25+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "En attente de $APP_LONG_NAME"
 #: ../i2prouter:1070
 #, sh-format
 msgid "WARNING: $APP_LONG_NAME may have failed to start."
-msgstr "AVERTISSEMENT : échec possible de démarrage de $APP_LONG_NAME."
+msgstr "AVERTISSEMENT : Échec possible de démarrage de $APP_LONG_NAME."
 
 #: ../i2prouter:1084 ../i2prouter:1112 ../i2prouter:1318 ../i2prouter:1607
 msgid "Must be root to perform this action."
