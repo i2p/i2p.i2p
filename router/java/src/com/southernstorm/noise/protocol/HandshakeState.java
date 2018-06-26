@@ -28,13 +28,15 @@ import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.ShortBufferException;
 
+import net.i2p.router.transport.crypto.X25519KeyFactory;
+
 /**
  * Interface to a Noise handshake.
  */
 public class HandshakeState implements Destroyable {
 
-	private SymmetricState symmetric;
-	private boolean isInitiator;
+	private final SymmetricState symmetric;
+	private final boolean isInitiator;
 	private DHState localKeyPair;
 	private DHState localEphemeral;
 	private DHState localHybrid;
@@ -44,11 +46,12 @@ public class HandshakeState implements Destroyable {
 	private DHState fixedEphemeral;
 	private DHState fixedHybrid;
 	private int action;
-	private int requirements;
-	private short[] pattern;
+	private final int requirements;
 	private int patternIndex;
-	private byte[] preSharedKey;
-	private byte[] prologue;
+        // not supported
+	private static final byte[] preSharedKey = null;
+        // not supported
+	private static final byte[] prologue = null;
 
 	/**
 	 * Enumerated value that indicates that the handshake object
@@ -132,11 +135,39 @@ public class HandshakeState implements Destroyable {
 	 */
 	private static final int FALLBACK_POSSIBLE = 0x40;
 
+	public static final String protocolName = "Noise_XKaesobfse+hs2+hs3_25519_ChaChaPoly_SHA256";
+	private static final String prefix;
+	private static final String patternId;
+	private static String dh;
+	private static final String cipher;
+	private static final String hash;
+	private static final short[] pattern;
+
+	static {
+		// Parse the protocol name into its components.
+		String[] components = protocolName.split("_");
+		if (components.length != 5)
+			throw new IllegalArgumentException("Protocol name must have 5 components");
+		prefix = components[0];
+		patternId = components[1].substring(0, 2);
+		dh = components[2];
+		cipher = components[3];
+		hash = components[4];
+		if (!prefix.equals("Noise") && !prefix.equals("NoisePSK"))
+			throw new IllegalArgumentException("Prefix must be Noise or NoisePSK");
+		pattern = Pattern.lookup(patternId);
+		if (pattern == null)
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		if (!dh.equals("25519"))
+			throw new IllegalArgumentException("Unknown Noise DH algorithm name: " + dh);
+	}
+
 	/**
 	 * Creates a new Noise handshake.
+	 * Noise protocol name is hardcoded.
 	 * 
-	 * @param protocolName The name of the Noise protocol.
 	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER.
+	 * @param xdh The key pair factory for ephemeral keys
 	 * 
 	 * @throws IllegalArgumentException The protocolName is not
 	 * formatted correctly, or the role is not recognized.
@@ -144,23 +175,8 @@ public class HandshakeState implements Destroyable {
 	 * @throws NoSuchAlgorithmException One of the cryptographic algorithms
 	 * that is specified in the protocolName is not supported.
 	 */
-	public HandshakeState(String protocolName, int role) throws NoSuchAlgorithmException
+	public HandshakeState(int role, X25519KeyFactory xdh) throws NoSuchAlgorithmException
 	{
-		// Parse the protocol name into its components.
-		String[] components = protocolName.split("_");
-		if (components.length != 5)
-			throw new IllegalArgumentException("Protocol name must have 5 components");
-		String prefix = components[0];
-		String patternId = components[1];
-		String dh = components[2];
-		String hybrid = null;
-		String cipher = components[3];
-		String hash = components[4];
-		if (!prefix.equals("Noise") && !prefix.equals("NoisePSK"))
-			throw new IllegalArgumentException("Prefix must be Noise or NoisePSK");
-		pattern = Pattern.lookup(patternId);
-		if (pattern == null)
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		short flags = pattern[0];
 		int extraReqs = 0;
 		if ((flags & Pattern.FLAG_REMOTE_REQUIRED) != 0 && patternId.length() > 1)
@@ -169,24 +185,13 @@ public class HandshakeState implements Destroyable {
 			// Reverse the pattern flags so that the responder is "local".
 			flags = Pattern.reverseFlags(flags);
 		}
-		int index = dh.indexOf('+');
-		if (index != -1) {
-			// The DH name has two components: regular and hybrid.
-			hybrid = dh.substring(index + 1);
-			dh = dh.substring(0, index);
-			if ((flags & Pattern.FLAG_LOCAL_HYBRID) == 0 || (flags & Pattern.FLAG_REMOTE_HYBRID) == 0)
-				throw new IllegalArgumentException("Hybrid function specified for non-hybrid pattern");
-		} else {
-			if ((flags & Pattern.FLAG_LOCAL_HYBRID) != 0 || (flags & Pattern.FLAG_REMOTE_HYBRID) != 0)
-				throw new IllegalArgumentException("Hybrid function not specified for hybrid pattern");
-		}
 
 		// Check that the role is correctly specified.
 		if (role != INITIATOR && role != RESPONDER)
 			throw new IllegalArgumentException("Role must be initiator or responder");
 
 		// Initialize this object.  This will also create the cipher and hash objects.
-		symmetric = new SymmetricState(protocolName, cipher, hash);
+		symmetric = new SymmetricState(cipher, hash);
 		isInitiator = (role == INITIATOR);
 		action = NO_ACTION;
 		requirements = extraReqs | computeRequirements(flags, prefix, role, false);
@@ -194,28 +199,14 @@ public class HandshakeState implements Destroyable {
 		
 		// Create the DH objects that we will need later.
 		if ((flags & Pattern.FLAG_LOCAL_STATIC) != 0)
-			localKeyPair = Noise.createDH(dh);
+			localKeyPair = new Curve25519DHState(xdh);
 		if ((flags & Pattern.FLAG_LOCAL_EPHEMERAL) != 0)
-			localEphemeral = Noise.createDH(dh);
-		if ((flags & Pattern.FLAG_LOCAL_HYBRID) != 0)
-			localHybrid = Noise.createDH(hybrid);
+			localEphemeral = new Curve25519DHState(xdh);
 		if ((flags & Pattern.FLAG_REMOTE_STATIC) != 0)
-			remotePublicKey = Noise.createDH(dh);
+			remotePublicKey = new Curve25519DHState(xdh);
 		if ((flags & Pattern.FLAG_REMOTE_EPHEMERAL) != 0)
-			remoteEphemeral = Noise.createDH(dh);
-		if ((flags & Pattern.FLAG_REMOTE_HYBRID) != 0)
-			remoteHybrid = Noise.createDH(hybrid);
+			remoteEphemeral = new Curve25519DHState(xdh);
 		
-		// We cannot use hybrid algorithms like New Hope for ephemeral or static keys,
-		// as the unbalanced nature of the algorithm only works with "f" and "ff" tokens.
-		if (localKeyPair instanceof DHStateHybrid)
-			throw new NoSuchAlgorithmException("Cannot use '" + localKeyPair.getDHName() + "' for static keys");
-		if (localEphemeral instanceof DHStateHybrid)
-			throw new NoSuchAlgorithmException("Cannot use '" + localEphemeral.getDHName() + "' for ephemeral keys");
-		if (remotePublicKey instanceof DHStateHybrid)
-			throw new NoSuchAlgorithmException("Cannot use '" + remotePublicKey.getDHName() + "' for static keys");
-		if (remoteEphemeral instanceof DHStateHybrid)
-			throw new NoSuchAlgorithmException("Cannot use '" + remoteEphemeral.getDHName() + "' for ephemeral keys");
 	}
 
 	/**
@@ -236,91 +227,6 @@ public class HandshakeState implements Destroyable {
 	public int getRole()
 	{
 		return isInitiator ? INITIATOR : RESPONDER;
-	}
-
-	/**
-	 * Determine if this handshake needs a pre-shared key value
-	 * and one has not been configured yet.
-	 * 
-	 * @return true if a pre-shared key is needed; false if not.
-	 */
-	public boolean needsPreSharedKey()
-	{
-		if (preSharedKey != null)
-			return false;
-		else
-			return (requirements & PSK_REQUIRED) != 0;
-	}
-	
-	/**
-	 * Determine if this object has already been configured with a
-	 * pre-shared key.
-	 * 
-	 * @return true if the pre-shared key has already been configured;
-	 * false if one is not needed or it has not been configured yet.
-	 */
-	public boolean hasPreSharedKey()
-	{
-		return preSharedKey != null;
-	}
-
-	/**
-	 * Sets the pre-shared key for this handshake.
-	 * 
-	 * @param key Buffer containing the pre-shared key value.
-	 * @param offset Offset into the buffer of the first byte of the key.
-	 * @param length The length of the pre-shared key, which must be 32.
-	 * 
-	 * @throws IllegalArgumentException The length is not 32.
-	 * 
-	 * @throws UnsupportedOperationException Pre-shared keys are not
-	 * supported for this handshake type.
-	 * 
-	 * @throws IllegalStateException The handshake has already started,
-	 * so the pre-shared key can no longer be set.
-	 */
-	public void setPreSharedKey(byte[] key, int offset, int length)
-	{
-		if (length != 32) {
-			throw new IllegalArgumentException
-				("Pre-shared keys must be 32 bytes in length");
-		}
-		if ((requirements & PSK_REQUIRED) == 0) {
-			throw new UnsupportedOperationException
-				("Pre-shared keys are not supported for this handshake");
-		}
-		if (action != NO_ACTION) {
-			throw new IllegalStateException
-				("Handshake has already started; cannot set pre-shared key");
-		}
-		if (preSharedKey != null) {
-			Noise.destroy(preSharedKey);
-			preSharedKey = null;
-		}
-		preSharedKey = Noise.copySubArray(key, offset, length);
-	}
-	
-	/**
-	 * Sets the prologue for this handshake.
-	 * 
-	 * @param prologue Buffer containing the prologue value.
-	 * @param offset Offset into the buffer of the first byte of the prologue.
-	 * @param length The length of the prologue in bytes.
-	 * 
-	 * @throws IllegalStateException The handshake has already started,
-	 * so the prologue can no longer be set.
-	 */
-	public void setPrologue(byte[] prologue, int offset, int length)
-	{
-		if (action != NO_ACTION) {
-			throw new IllegalStateException
-				("Handshake has already started; cannot set prologue");
-		}
-		if (this.prologue != null) {
-			Noise.destroy(this.prologue);
-			this.prologue = null;
-		}
-		this.prologue = Noise.copySubArray(prologue, offset, length);
 	}
 	
 	/**
@@ -406,60 +312,6 @@ public class HandshakeState implements Destroyable {
 			return false;
 	}
 
-	/**
-	 * Gets the DHState object containing a fixed local ephemeral
-	 * key value for this handshake.
-	 * 
-	 * @return The fixed ephemeral key object, or null if a local
-	 * ephemeral key is not required by this handshake.
-	 * 
-	 * This function is intended for testing only.  It can be used
-	 * to establish a fixed ephemeral key for test vectors.  This
-	 * function should not be used in real applications.
-	 */
-	public DHState getFixedEphemeralKey()
-	{
-		if (fixedEphemeral != null)
-			return fixedEphemeral;
-		if (localEphemeral == null)
-			return null;
-		try {
-			fixedEphemeral = Noise.createDH(localEphemeral.getDHName());
-		} catch (NoSuchAlgorithmException e) {
-			// This shouldn't happen - the local ephemeral key would
-			// have already been created with the same name!
-			fixedEphemeral = null;
-		}
-		return fixedEphemeral;
-	}
-
-	/**
-	 * Gets the DHState object containing a fixed local hybrid
-	 * key value for this handshake.
-	 * 
-	 * @return The fixed hybrid key object, or null if a local
-	 * hybrid key is not required by this handshake.
-	 * 
-	 * This function is intended for testing only.  It can be used
-	 * to establish a fixed hybrid key for test vectors.  This
-	 * function should not be used in real applications.
-	 */
-	public DHState getFixedHybridKey()
-	{
-		if (fixedHybrid != null)
-			return fixedHybrid;
-		if (localHybrid == null)
-			return null;
-		try {
-			fixedHybrid = Noise.createDH(localHybrid.getDHName());
-		} catch (NoSuchAlgorithmException e) {
-			// This shouldn't happen - the local hybrid key would
-			// have already been created with the same name!
-			fixedHybrid = null;
-		}
-		return fixedHybrid;
-	}
-
 	// Empty value for when the prologue is not supplied.
 	private static final byte[] emptyPrologue = new byte [0];
 
@@ -481,7 +333,7 @@ public class HandshakeState implements Destroyable {
 	 * @see #getAction()
 	 * @see #writeMessage(byte[], int, byte[], int, int)
 	 * @see #readMessage(byte[], int, int, byte[], int)
-	 * @see #fallback()
+	 * see #fallback()
 	 */
 	public void start()
 	{
@@ -504,20 +356,12 @@ public class HandshakeState implements Destroyable {
 			if (remotePublicKey == null || !remotePublicKey.hasPublicKey())
 				throw new IllegalStateException("Remote static key required");
 		}
-		if ((requirements & PSK_REQUIRED) != 0) {
-			if (preSharedKey == null)
-				throw new IllegalStateException("Pre-shared key required");
-		}
 		
 		// Hash the prologue value.
 		if (prologue != null)
 			symmetric.mixHash(prologue, 0, prologue.length);
 		else
 			symmetric.mixHash(emptyPrologue, 0, 0);
-		
-		// Hash the pre-shared key into the chaining key and handshake hash.
-		if (preSharedKey != null)
-			symmetric.mixPreSharedKey(preSharedKey);
 		
 		// Mix the pre-supplied public keys into the handshake hash.
 		if (isInitiator) {
@@ -551,151 +395,6 @@ public class HandshakeState implements Destroyable {
 			action = WRITE_MESSAGE;
 		else
 			action = READ_MESSAGE;
-	}
-
-	/**
-	 * Falls back to the "XXfallback" handshake pattern.
-	 * 
-	 * This function is intended used to help implement the "Noise Pipes" protocol.
-	 * It resets a HandshakeState object with the original handshake pattern
-	 * (usually "IK"), converting it into an object with the handshake pattern
-	 * "XXfallback".  Information from the previous session such as the local
-	 * keypair, the initiator's ephemeral key, the prologue value, and the
-	 * pre-shared key, are passed to the new session.
-	 *
-	 * Once the fallback has been initiated, the application can set
-	 * new values for the handshake parameters if the values from the
-	 * previous session do not apply.  For example, the application may
-	 * use a different prologue for the fallback than for the original
-	 * session.
-	 *
-	 * After setting any new parameters, the application calls start()
-	 * again to restart the handshake from where it left off before the fallback.
-	 *
-	 * Note that this function reverses the roles of initiator and responder.
-	 * 
-	 * @throws UnsupportedOperationException The current handshake pattern
-	 * is not compatible with "XXfallback".
-	 * 
-	 * @throws IllegalStateException The previous protocol has not started
-	 * or it has not reached the fallback position yet.
-	 * 
-	 * @throws NoSuchAlgorithmException One of the cryptographic algorithms
-	 * that is specified in the new protocolName is not supported.
-	 * 
-	 * @see #start()
-	 */
-	public void fallback() throws NoSuchAlgorithmException
-	{
-		fallback("XXfallback");
-	}
-
-	/**
-	 * Falls back to another handshake pattern.
-	 * 
-	 * @param patternName The name of the pattern to fall back to;
-	 * e.g. "XXfallback", "NXfallback", etc.
-	 * 
-	 * This function resets a HandshakeState object with the original
-	 * handshake pattern, and converts it into an object with the new handshake
-	 * patternName.  Information from the previous session such as the local
-	 * keypair, the initiator's ephemeral key, the prologue value, and the
-	 * pre-shared key, are passed to the new session.
-	 *
-	 * Once the fallback has been initiated, the application can set
-	 * new values for the handshake parameters if the values from the
-	 * previous session do not apply.  For example, the application may
-	 * use a different prologue for the fallback than for the original
-	 * session.
-	 *
-	 * After setting any new parameters, the application calls start()
-	 * again to restart the handshake from where it left off before the fallback.
-	 *
-	 * The new pattern may have greater key requirements than the original;
-	 * for example changing from "NK" from "XXfallback" requires that the
-	 * initiator's static public key be set.  The application is responsible for
-	 * setting any extra keys before calling start().
-	 *
-	 * Note that this function reverses the roles of initiator and responder.
-	 * 
-	 * @throws UnsupportedOperationException The current handshake pattern
-	 * is not compatible with the patternName, or patternName is not a
-	 * fallback pattern.
-	 * 
-	 * @throws IllegalStateException The previous protocol has not started
-	 * or it has not reached the fallback position yet.
-	 * 
-	 * @throws NoSuchAlgorithmException One of the cryptographic algorithms
-	 * that is specified in the new protocolName is not supported.
-	 * 
-	 * @see #start()
-	 */
-	public void fallback(String patternName) throws NoSuchAlgorithmException
-	{
-		// The original pattern must end in "K" for fallback to be possible.
-		if ((requirements & FALLBACK_POSSIBLE) == 0)
-			throw new UnsupportedOperationException("Previous handshake pattern does not support fallback");
-
-		// Check that "patternName" supports fallback.
-		short[] newPattern = Pattern.lookup(patternName);
-		if (newPattern == null || (newPattern[0] & Pattern.FLAG_REMOTE_EPHEM_REQ) == 0)
-			throw new UnsupportedOperationException("New pattern is not a fallback pattern");
-
-	    // The initiator should be waiting for a return message from the
-	    // responder, and the responder should have failed on the first
-	    // handshake message from the initiator.  We also allow the
-	    // responder to fallback after processing the first message
-	    // successfully; it decides to always fall back anyway.
-		if (isInitiator) {
-			if ((action != FAILED && action != READ_MESSAGE) || !localEphemeral.hasPublicKey())
-				throw new IllegalStateException("Initiator cannot fall back from this state");
-		} else {
-			if ((action != FAILED && action != WRITE_MESSAGE) || !remoteEphemeral.hasPublicKey())
-				throw new IllegalStateException("Responder cannot fall back from this state");
-		}
-		
-		// Format a new protocol name for the fallback variant
-		// and recreate the SymmetricState object.
-		String[] components = symmetric.getProtocolName().split("_");
-		components[1] = patternName;
-		StringBuilder builder = new StringBuilder();
-		builder.append(components[0]);
-		for (int index = 1; index < components.length; ++index) {
-			builder.append('_');
-			builder.append(components[index]);
-		}
-		String name = builder.toString();
-		SymmetricState newSymmetric = new SymmetricState(name, components[3], components[4]);
-		symmetric.destroy();
-		symmetric = newSymmetric;
-		
-		// Convert the HandshakeState to the "XXfallback" pattern.
-		if (isInitiator) {
-			if (remoteEphemeral != null)
-				remoteEphemeral.clearKey();
-			if (remoteHybrid != null)
-				remoteHybrid.clearKey();
-			if (remotePublicKey != null)
-				remotePublicKey.clearKey();
-			isInitiator = false;
-		} else {
-			if (localEphemeral != null)
-				localEphemeral.clearKey();
-			if (localHybrid != null)
-				localHybrid.clearKey();
-			if ((newPattern[0] & Pattern.FLAG_REMOTE_REQUIRED) == 0 && remotePublicKey != null)
-				remotePublicKey.clearKey();
-			isInitiator = true;
-		}
-		action = NO_ACTION;
-		pattern = newPattern;
-		patternIndex = 1;
-		short flags = pattern[0];
-		if (!isInitiator) {
-			// Reverse the pattern flags so that the responder is "local".
-			flags = Pattern.reverseFlags(flags);
-		}
-		requirements = computeRequirements(flags, components[0], isInitiator ? INITIATOR : RESPONDER, true);
 	}
 
 	/**
@@ -795,9 +494,9 @@ public class HandshakeState implements Destroyable {
 				switch (token) {
 					case Pattern.E:
 					{
-			            // Generate a local ephemeral keypair and add the public
-			            // key to the message.  If we are running fixed vector tests,
-			            // then the ephemeral key may have already been provided.
+						// Generate a local ephemeral keypair and add the public
+						// key to the message.  If we are running fixed vector tests,
+						// then the ephemeral key may have already been provided.
 						if (localEphemeral == null)
 							throw new IllegalStateException("Pattern definition error");
 						if (fixedEphemeral == null)
@@ -811,7 +510,7 @@ public class HandshakeState implements Destroyable {
 						symmetric.mixHash(message, messagePosn, len);
 
 						// If the protocol is using pre-shared keys, then also mix
-			            // the local ephemeral key into the chaining key.
+						// the local ephemeral key into the chaining key.
 						if (preSharedKey != null)
 							symmetric.mixKey(message, messagePosn, len);
 						messagePosn += len;
@@ -820,7 +519,7 @@ public class HandshakeState implements Destroyable {
 
 					case Pattern.S:
 					{
-			            // Encrypt the local static public key and add it to the message.
+						// Encrypt the local static public key and add it to the message.
 						if (localKeyPair == null)
 							throw new IllegalStateException("Pattern definition error");
 						len = localKeyPair.getPublicKeyLength();
@@ -856,52 +555,6 @@ public class HandshakeState implements Destroyable {
 							mixDH(localKeyPair, remoteEphemeral);
 						else
 							mixDH(localEphemeral, remotePublicKey);
-					}
-					break;
-
-					case Pattern.SS:
-					{
-						// DH operation with initiator and responder static keys.
-						mixDH(localKeyPair, remotePublicKey);
-					}
-					break;
-					
-					case Pattern.F:
-					{
-			            // Generate a local hybrid keypair and add the public
-			            // key to the message.  If we are running fixed vector tests,
-			            // then a fixed hybrid key may have already been provided.
-						if (localHybrid == null)
-							throw new IllegalStateException("Pattern definition error");
-						if (localHybrid instanceof DHStateHybrid) {
-							// The DH object is something like New Hope which needs to
-							// generate keys relative to the other party's public key.
-							DHStateHybrid hybrid = (DHStateHybrid)localHybrid;
-							if (fixedHybrid == null)
-								hybrid.generateKeyPair(remoteHybrid);
-							else
-								hybrid.copyFrom(fixedHybrid, remoteHybrid);
-						} else {
-							if (fixedHybrid == null)
-								localHybrid.generateKeyPair();
-							else
-								localHybrid.copyFrom(fixedHybrid);
-						}
-						len = localHybrid.getPublicKeyLength();
-						if (space < len)
-							throw new ShortBufferException();
-						macLen = symmetric.getMACLength();
-						if (space < (len + macLen))
-							throw new ShortBufferException();
-						localHybrid.getPublicKey(message, messagePosn);
-						messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, len);
-					}
-					break;
-					
-					case Pattern.FF:
-					{
-						// DH operation with initiator and responder hybrid keys.
-						mixDH(localHybrid, remoteHybrid);
 					}
 					break;
 
@@ -993,7 +646,7 @@ public class HandshakeState implements Destroyable {
 				switch (token) {
 					case Pattern.E:
 					{
-			            // Save the remote ephemeral key and hash it.
+						// Save the remote ephemeral key and hash it.
 						if (remoteEphemeral == null)
 							throw new IllegalStateException("Pattern definition error");
 						len = remoteEphemeral.getPublicKeyLength();
@@ -1002,15 +655,15 @@ public class HandshakeState implements Destroyable {
 						symmetric.mixHash(message, messageOffset, len);
 						remoteEphemeral.setPublicKey(message, messageOffset);
 						if (remoteEphemeral.isNullPublicKey()) {
-			                // The remote ephemeral key is null, which means that it is
-			                // not contributing anything to the security of the session
-			                // and is in fact downgrading the security to "none at all"
-			                // in some of the message patterns.  Reject all such keys.
+							// The remote ephemeral key is null, which means that it is
+							// not contributing anything to the security of the session
+							// and is in fact downgrading the security to "none at all"
+							// in some of the message patterns.  Reject all such keys.
 							throw new BadPaddingException("Null remote public key");
 						}
 
 						// If the protocol is using pre-shared keys, then also mix
-			            // the remote ephemeral key into the chaining key.
+						// the remote ephemeral key into the chaining key.
 						if (preSharedKey != null)
 							symmetric.mixKey(message, messageOffset, len);
 						messageOffset += len;
@@ -1065,47 +718,6 @@ public class HandshakeState implements Destroyable {
 					}
 					break;
 	
-					case Pattern.SS:
-					{
-						// DH operation with initiator and responder static keys.
-						mixDH(localKeyPair, remotePublicKey);
-					}
-					break;
-					
-					case Pattern.F:
-					{
-						// Decrypt and read the remote hybrid ephemeral key.
-						if (remoteHybrid == null)
-							throw new IllegalStateException("Pattern definition error");
-						if (remoteHybrid instanceof DHStateHybrid) {
-							// The DH object is something like New Hope.  The public key
-							// length may need to change based on whether we already have
-							// generated a local hybrid keypair or not.
-							((DHStateHybrid)remoteHybrid).specifyPeer(localHybrid);
-						}
-						len = remoteHybrid.getPublicKeyLength();
-						macLen = symmetric.getMACLength();
-						if (space < (len + macLen))
-							throw new ShortBufferException();
-						byte[] temp = new byte [len];
-						try {
-							if (symmetric.decryptAndHash(message, messageOffset, temp, 0, len + macLen) != len)
-								throw new ShortBufferException();
-							remoteHybrid.setPublicKey(temp, 0);
-						} finally {
-							Noise.destroy(temp);
-						}
-						messageOffset += len + macLen;
-					}
-					break;
-	
-					case Pattern.FF:
-					{
-						// DH operation with initiator and responder hybrid keys.
-						mixDH(localHybrid, remoteHybrid);
-					}
-					break;
-
 					default:
 					{
 						// Unknown token code.  Abort.
@@ -1235,7 +847,7 @@ public class HandshakeState implements Destroyable {
 	 */
 	private static int computeRequirements(short flags, String prefix, int role, boolean isFallback)
 	{
-		int requirements = 0;
+	    int requirements = 0;
 	    if ((flags & Pattern.FLAG_LOCAL_STATIC) != 0) {
 	        requirements |= LOCAL_REQUIRED;
 	    }
@@ -1252,9 +864,83 @@ public class HandshakeState implements Destroyable {
 	        if (isFallback)
 	            requirements |= FALLBACK_PREMSG;
 	    }
-	    if (prefix.equals("NoisePSK")) {
-	        requirements |= PSK_REQUIRED;
-	    }
 	    return requirements;
+	}
+
+	/**
+	 *  I2P for mixing in padding in messages 1 and 2
+	 */
+	public void mixHash(byte[] data, int offset, int length) {
+		symmetric.mixHash(data, offset, length);
+	}
+
+	/**
+	 *  I2P for getting chaining key for siphash calc
+	 *  @return a copy
+	 */
+	public byte[] getChainingKey() {
+		return symmetric.getChainingKey();
+	}
+
+	/**
+	 *  I2P for getting current hash for siphash calculation
+	 *  @return NOT a copy, do not modify
+	 */
+	public byte[] getHash() {
+		return symmetric.getHandshakeHash();
+	}
+
+	/**
+	 *  I2P debug
+	 */
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append("Handshake State:\n");
+		buf.append(symmetric.toString());
+
+		byte[] tmp = new byte[32];
+
+		DHState dh = localKeyPair;
+		buf.append("Local static public key (s) :      ");
+		if (dh != null && dh.hasPublicKey()) {
+			dh.getPublicKey(tmp, 0);
+			buf.append(net.i2p.data.Base64.encode(tmp));
+		} else {
+			buf.append("null");
+		}
+		buf.append('\n');
+
+		dh = remotePublicKey;
+		buf.append("Remote static public key (rs) :    ");
+		if (dh != null && dh.hasPublicKey()) {
+			dh.getPublicKey(tmp, 0);
+			buf.append(net.i2p.data.Base64.encode(tmp));
+		} else {
+			buf.append("null");
+		}
+		buf.append('\n');
+
+		dh = localEphemeral;
+		buf.append("Local ephemeral public key (e) :   ");
+		if (dh != null && dh.hasPublicKey()) {
+			dh.getPublicKey(tmp, 0);
+			buf.append(net.i2p.data.Base64.encode(tmp));
+		} else {
+			buf.append("null");
+		}
+		buf.append('\n');
+
+		dh = remoteEphemeral;
+		buf.append("Remote ephemeral public key (re) : ");
+		if (dh != null && dh.hasPublicKey()) {
+			dh.getPublicKey(tmp, 0);
+			buf.append(net.i2p.data.Base64.encode(tmp));
+		} else {
+			buf.append("null");
+		}
+		buf.append('\n');
+
+		return buf.toString();
 	}
 }

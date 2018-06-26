@@ -40,22 +40,22 @@ public final class Curve25519 {
 	// Numbers modulo 2^255 - 19 are broken up into ten 26-bit words.
 	private static final int NUM_LIMBS_255BIT = 10;
 	private static final int NUM_LIMBS_510BIT = 20;
-	private int[] x_1;
-	private int[] x_2;
-	private int[] x_3;
-	private int[] z_2;
-	private int[] z_3;
-	private int[] A;
-	private int[] B;
-	private int[] C;
-	private int[] D;
-	private int[] E;
-	private int[] AA;
-	private int[] BB;
-	private int[] DA;
-	private int[] CB;
-	private long[] t1;
-	private int[] t2;
+	private final int[] x_1;
+	private final int[] x_2;
+	private final int[] x_3;
+	private final int[] z_2;
+	private final int[] z_3;
+	private final int[] A;
+	private final int[] B;
+	private final int[] C;
+	private final int[] D;
+	private final int[] E;
+	private final int[] AA;
+	private final int[] BB;
+	private final int[] DA;
+	private final int[] CB;
+	private final long[] t1;
+	private final int[] t2;
 
 	/**
 	 * Constructs the temporary state holder for Curve25519 evaluation.
@@ -188,7 +188,7 @@ public final class Curve25519 {
 		}
 
 		// At this point "x" will either be the answer or it will be the
-	    // answer plus (2^255 - 19).  Perform a trial subtraction to
+		// answer plus (2^255 - 19).  Perform a trial subtraction to
 		// complete the reduction process.
 		reduceQuick(result);
 	}

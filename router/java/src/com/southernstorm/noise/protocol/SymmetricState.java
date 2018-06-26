@@ -36,15 +36,41 @@ import javax.crypto.ShortBufferException;
  */
 class SymmetricState implements Destroyable {
 	
-	private String name;
-	private CipherState cipher;
-	private MessageDigest hash;
-	private byte[] ck;
-	private byte[] h;
-	private byte[] prev_h;
+	// precalculated hash of the Noise name
+	private static final byte[] INIT_HASH;
+
+	static {
+		byte[] protocolNameBytes;
+		try {
+			protocolNameBytes = HandshakeState.protocolName.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// If UTF-8 is not supported, then we are definitely in trouble!
+			throw new UnsupportedOperationException("UTF-8 encoding is not supported");
+		}
+		INIT_HASH = new byte[32];
+		if (protocolNameBytes.length <= 32) {
+			System.arraycopy(protocolNameBytes, 0, INIT_HASH, 0, protocolNameBytes.length);
+			Arrays.fill(INIT_HASH, protocolNameBytes.length, 32, (byte)0);
+		} else {
+			try {
+				MessageDigest hash = Noise.createHash("SHA256");
+				hash.update(protocolNameBytes, 0, protocolNameBytes.length);
+				hash.digest(INIT_HASH, 0, 32);
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		}
+	}
+
+	private final CipherState cipher;
+	private final MessageDigest hash;
+	private final byte[] ck;
+	private final byte[] h;
+	private final byte[] prev_h;
 
 	/**
 	 * Constructs a new symmetric state object.
+	 * Noise protocol name is hardcoded.
 	 * 
 	 * @param protocolName The name of the Noise protocol, which is assumed to be valid.
 	 * @param cipherName The name of the cipher within protocolName.
@@ -53,9 +79,8 @@ class SymmetricState implements Destroyable {
 	 * @throws NoSuchAlgorithmException The cipher or hash algorithm in the
 	 * protocol name is not supported.
 	 */
-	public SymmetricState(String protocolName, String cipherName, String hashName) throws NoSuchAlgorithmException
+	public SymmetricState(String cipherName, String hashName) throws NoSuchAlgorithmException
 	{
-		name = protocolName;
 		cipher = Noise.createCipher(cipherName);
 		hash = Noise.createHash(hashName);
 		int hashLength = hash.getDigestLength();
@@ -63,21 +88,7 @@ class SymmetricState implements Destroyable {
 		h = new byte [hashLength];
 		prev_h = new byte [hashLength];
 		
-		byte[] protocolNameBytes;
-		try {
-			protocolNameBytes = protocolName.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// If UTF-8 is not supported, then we are definitely in trouble!
-			throw new UnsupportedOperationException("UTF-8 encoding is not supported");
-		}
-		
-		if (protocolNameBytes.length <= hashLength) {
-			System.arraycopy(protocolNameBytes, 0, h, 0, protocolNameBytes.length);
-			Arrays.fill(h, protocolNameBytes.length, h.length, (byte)0);
-		} else {
-			hashOne(protocolNameBytes, 0, protocolNameBytes.length, h, 0, h.length);
-		}
-		
+		System.arraycopy(INIT_HASH, 0, h, 0, hashLength);
 		System.arraycopy(h, 0, ck, 0, hashLength);
 	}
 
@@ -88,7 +99,7 @@ class SymmetricState implements Destroyable {
 	 */
 	public String getProtocolName()
 	{
-		return name;
+		return HandshakeState.protocolName;
 	}
 	
 	/**
@@ -311,31 +322,11 @@ class SymmetricState implements Destroyable {
 
 	@Override
 	public void destroy() {
-		if (cipher != null) {
-			cipher.destroy();
-			cipher = null;
-		}
-		if (hash != null) {
-			// The built-in fallback implementations are destroyable.
-			// JCA/JCE implementations aren't, so try reset() instead.
-			if (hash instanceof Destroyable)
-				((Destroyable)hash).destroy();
-			else
-				hash.reset();
-			hash = null;
-		}
-		if (ck != null) {
-			Noise.destroy(ck);
-			ck = null;
-		}
-		if (h != null) {
-			Noise.destroy(h);
-			h = null;
-		}
-		if (prev_h != null) {
-			Noise.destroy(prev_h);
-			prev_h = null;
-		}
+		cipher.destroy();
+		hash.reset();
+		Noise.destroy(ck);
+		Noise.destroy(h);
+		Noise.destroy(prev_h);
 	}
 
 	/**
@@ -481,4 +472,59 @@ class SymmetricState implements Destroyable {
 			Noise.destroy(tempHash);
 		}
 	}
+
+	/**
+	 *  I2P for getting chaining key for siphash calculation
+	 *  @return a copy
+	 */
+	public byte[] getChainingKey() {
+		byte[] rv = new byte[ck.length];
+		System.arraycopy(ck, 0, rv, 0, ck.length);
+		return rv;
+	}
+
+	/**
+	 *  I2P debug
+	 */
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append("  Symmetric State:\n" +
+		           "    ck: ");
+		buf.append(net.i2p.data.Base64.encode(ck));
+		buf.append("\n" +
+		           "    h:  ");
+		buf.append(net.i2p.data.Base64.encode(h));
+		buf.append('\n');
+		buf.append(cipher.toString());
+		return buf.toString();
+	}
+
+/****
+    private static final int LENGTH = 33;
+
+    public static void main(String args[]) throws Exception {
+        net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
+        byte[] rand = new byte[32];
+        byte[] data = new byte[LENGTH];
+        byte[] out = new byte[32];
+        System.out.println("Warmup");
+        int RUNS = 25000;
+        SymmetricState ss = new SymmetricState("ChaChaPoly", "SHA256");
+        for (int i = 0; i < RUNS; i++) {
+            ctx.random().nextBytes(rand);
+            ctx.random().nextBytes(data);
+            ss.hmac(rand, 0, 32, data, 0, LENGTH, out, 0, 32);
+        }
+        System.out.println("Start");
+        RUNS = 500000;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < RUNS; i++) {
+            ss.hmac(rand, 0, 32, data, 0, LENGTH, out, 0, 32);
+        }
+        long time = System.currentTimeMillis() - start;
+        System.out.println("Time for " + RUNS + " HMAC-SHA256 computations:");
+        System.out.println("Noise time (ms): " + time);
+    }
+****/
 }

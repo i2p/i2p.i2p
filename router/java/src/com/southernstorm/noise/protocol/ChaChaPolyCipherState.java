@@ -33,14 +33,16 @@ import com.southernstorm.noise.crypto.Poly1305;
 /**
  * Implements the ChaChaPoly cipher for Noise.
  */
-class ChaChaPolyCipherState implements CipherState {
+public class ChaChaPolyCipherState implements CipherState {
 
-	private Poly1305 poly;
-	private int[] input;
-	private int[] output;
-	private byte[] polyKey;
-	long n;
+	private final Poly1305 poly;
+	private final int[] input;
+	private final int[] output;
+	private final byte[] polyKey;
+	private long n;
 	private boolean haskey;
+	// I2P debug to be removed
+	private byte[] initialKey;
 	
 	/**
 	 * Constructs a new cipher state for the "ChaChaPoly" algorithm.
@@ -80,6 +82,9 @@ class ChaChaPolyCipherState implements CipherState {
 
 	@Override
 	public void initializeKey(byte[] key, int offset) {
+		// I2P debug to be removed
+		initialKey = new byte[32];
+		System.arraycopy(key, 0, initialKey, 0, 32);
 		ChaChaCore.initKey256(input, key, offset);
 		n = 0;
 		haskey = true;
@@ -286,5 +291,40 @@ class ChaChaPolyCipherState implements CipherState {
 	@Override
 	public void setNonce(long nonce) {
 		n = nonce;
+	}
+
+	/**
+	 *  I2P debug to be removed
+	 *  @return null if none yet
+	 */
+	public byte[] getKey() {
+		if (!haskey)
+			return null;
+		return initialKey;
+	}
+
+	/**
+	 *  I2P debug
+	 */
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append("  Cipher State:\n" +
+		           "    nonce: ");
+		buf.append(n);
+		buf.append("\n" +
+		           "    init key: ");
+		// I2P debug to be removed
+		if (haskey)
+			buf.append(net.i2p.data.Base64.encode(initialKey));
+		else
+			buf.append("null");
+		buf.append("\n    poly key: ");
+		if (haskey)
+			buf.append(net.i2p.data.Base64.encode(polyKey));
+		else
+			buf.append("null");
+		buf.append('\n');
+		return buf.toString();
 	}
 }

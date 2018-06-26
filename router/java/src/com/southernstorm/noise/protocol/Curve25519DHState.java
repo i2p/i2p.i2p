@@ -22,27 +22,32 @@
 
 package com.southernstorm.noise.protocol;
 
+import java.security.KeyPair;
 import java.util.Arrays;
 
 import com.southernstorm.noise.crypto.Curve25519;
+
+import net.i2p.router.transport.crypto.X25519KeyFactory;
 
 /**
  * Implementation of the Curve25519 algorithm for the Noise protocol.
  */
 class Curve25519DHState implements DHState {
 
-	private byte[] publicKey;
-	private byte[] privateKey;
+	private final byte[] publicKey;
+	private final byte[] privateKey;
 	private int mode;
+	private final X25519KeyFactory _xdh;
 
 	/**
 	 * Constructs a new Diffie-Hellman object for Curve25519.
 	 */
-	public Curve25519DHState()
+	public Curve25519DHState(X25519KeyFactory xdh)
 	{
 		publicKey = new byte [32];
 		privateKey = new byte [32];
 		mode = 0;
+		_xdh = xdh;
 	}
 
 	@Override
@@ -72,8 +77,9 @@ class Curve25519DHState implements DHState {
 
 	@Override
 	public void generateKeyPair() {
-		Noise.random(privateKey);
-		Curve25519.eval(publicKey, 0, privateKey, null);
+		KeyPair kp = _xdh.getKeys();
+		System.arraycopy(kp.getPrivate().getEncoded(), 0, privateKey, 0, 32);
+		System.arraycopy(kp.getPublic().getEncoded(), 0, publicKey, 0, 32);
 		mode = 0x03;
 	}
 

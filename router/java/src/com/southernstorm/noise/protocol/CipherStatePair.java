@@ -69,10 +69,7 @@ public final class CipherStatePair implements Destroyable {
 	 */
 	public void senderOnly()
 	{
-		if (recv != null) {
-			recv.destroy();
-			recv = null;
-		}
+		recv.destroy();
 	}
 	
 	/**
@@ -82,10 +79,7 @@ public final class CipherStatePair implements Destroyable {
 	 */
 	public void receiverOnly()
 	{
-		if (send != null) {
-			send.destroy();
-			send = null;
-		}
+		send.destroy();
 	}
 	
 	/**

@@ -32,12 +32,12 @@ import com.southernstorm.noise.protocol.Destroyable;
 public final class Poly1305 implements Destroyable {
 
 	// The 130-bit intermediate values are broken up into five 26-bit words.
-	private byte[] nonce;
-	private byte[] block;
-	private int[] h;
-	private int[] r;
-	private int[] c;
-	private long[] t;
+	private final byte[] nonce;
+	private final byte[] block;
+	private final int[] h;
+	private final int[] r;
+	private final int[] c;
+	private final long[] t;
 	private int posn;
 
 	/**
@@ -319,9 +319,9 @@ public final class Poly1305 implements Destroyable {
 	public void destroy() {
 		Arrays.fill(nonce, (byte)0);
 		Arrays.fill(block, (byte)0);
-		Arrays.fill(h, (int)0);
-		Arrays.fill(r, (int)0);
-		Arrays.fill(c, (int)0);
+		Arrays.fill(h, 0);
+		Arrays.fill(r, 0);
+		Arrays.fill(c, 0);
 		Arrays.fill(t, (long)0);
 	}
 }
