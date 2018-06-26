@@ -11,21 +11,34 @@
  *  flags.jsp?c=de => icons/flags/de.png
  *  flags.jsp?c=de&s=48 => icons/flags48x48/de.png
  *  with headers set so the browser caches.
+ *
+ *  As of 0.9.36:
+ *  All new and changed flags must go in the flags16x11/ dir,
+ *  which will be checked first by flags.jsp.
+ *  The flags/ dir is the original set from famfamfam,
+ *  which may be symlinked in package installs.
+ *
  */
 String c = request.getParameter("c");
 if (c != null &&
     (c.length() == 2 || c.length() == 7) &&
     c.replaceAll("[a-z0-9_]", "").length() == 0) {
-    String flagSet = "flags";
+    String flagSet = "flags16x11";
     String s = request.getParameter("s");
     if ("48".equals(s)) {
         flagSet = "flags48x48";
     }
     java.io.OutputStream cout = response.getOutputStream();
-    String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
-    String file = "docs" + java.io.File.separatorChar + "icons" + java.io.File.separatorChar +
-                  flagSet + java.io.File.separatorChar + c + ".png";
+    String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
+                  java.io.File.separatorChar +
+                  "docs" + java.io.File.separatorChar + "icons";
+    String file = flagSet + java.io.File.separatorChar + c + ".png";
     java.io.File ffile = new java.io.File(base, file);
+    if (!ffile.exists()) {
+        // fallback to flags dir, which will be symlinked to /usr/share/flags/countries/16x11 for package builds
+        file = "flags" + java.io.File.separatorChar + c + ".png";
+        ffile = new java.io.File(base, file);
+    }
     long lastmod = ffile.lastModified();
     if (lastmod > 0) {
         long iflast = request.getDateHeader("If-Modified-Since");

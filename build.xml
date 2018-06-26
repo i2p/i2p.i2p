@@ -1330,10 +1330,8 @@
         </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy todir="pkg-temp/docs/icons/flags" >
+          <!-- base flags/ dir only. flags16x11/ and flags48x48/ dirs already copied by prepConsoleDocs target -->
           <fileset dir="installer/resources/icons/flags" />
-        </copy>
-        <copy todir="pkg-temp/docs/icons/flags48x48" >
-          <fileset dir="installer/resources/icons/flags48x48" />
         </copy>
     </target>
 
@@ -1496,10 +1494,14 @@
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy/" includes="*.ht" />
-          <!-- lang_ar.png added in 0.8.4; a1,a2,je, and eu.png added in 0.8.9; gg.png added in 0.8.10;
-               im.png added in 0.8.12; cw.png added in 0.9.5; ap,bl,bq,ss,sx added in 0.9.21;
-               lang_gl added in 0.9.28; a0.png added in 0.9.31 -->
-          <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png icons/flags/cw.png icons/flags/ap.png icons/flags/bl.png icons/flags/bq.png icons/flags/ss.png icons/flags/sx.png icons/flags/lang_gl.png icons/flags/a0.png" />
+          <!--
+               As of 0.9.36:
+               All new and changed flags must go in the flags16x11/ dir,
+               which will be checked first by flags.jsp.
+               The flags/ dir is the original set from famfamfam,
+               which may be symlinked in package installs.
+           -->
+          <fileset dir="installer/resources/" includes="icons/flags16x11/*" />
           <!-- flags48x48 added in 0.9.32 -->
           <fileset dir="installer/resources/" includes="icons/flags48x48/*" />
         </copy>
@@ -2726,11 +2728,8 @@
 				<fileset dir="installer/resources/themes/console/images/" />
 			</copy>
 			<!-- FLAGs for language icon (not for ip)-->
-			<copy todir="pkg-temp/docs/icons/flags" >
-				<fileset dir="installer/resources/icons/flags/" includes="cn.png,de.png,fr.png,nl.png,ru.png,se.png,us.png" />
-			</copy>
-			<copy todir="pkg-temp/docs/icons/flags48x48" >
-				<fileset dir="installer/resources/icons/flags48x48" />
+			<copy todir="pkg-temp/docs/icons" >
+				<fileset dir="installer/resources/icons" />
 			</copy>
 		<mkdir dir="pkg-temp/webapps" />
 			<copy todir="pkg-temp/webapps/">
