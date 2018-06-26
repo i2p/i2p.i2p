@@ -190,6 +190,7 @@ public class PeerHelper extends HelperBase {
                    "<th><a href=\"#def.dir\" title=\"").append(_t("Direction/Introduction"))
                    .append("\">").append(_t("Dir")).append("</a></th>" +
                    "<th>").append(_t("IPv6")).append("</th>" +
+                   "<th>").append(_t("Version")).append("</th>" +
                    "<th align=\"right\"><a href=\"#def.idle\">").append(_t("Idle")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.rate\">").append(_t("In/Out")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.up\">").append(_t("Up")).append("</a></th>" +
@@ -218,6 +219,7 @@ public class PeerHelper extends HelperBase {
                 buf.append("<span class=\"backlogged\">&#x2714;</span>");
             else
                 buf.append("");
+            buf.append("</td><td class=\"cells peeripv6\" align=\"center\">").append(con.getVersion());
             buf.append("</td><td class=\"cells\" align=\"center\"><span class=\"right\">");
             buf.append(DataHelper.formatDuration2(con.getTimeSinceReceive()));
             buf.append("</span>").append(THINSP).append("<span class=\"left\">").append(DataHelper.formatDuration2(con.getTimeSinceSend()));
