@@ -48,6 +48,7 @@ import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.tasks.*;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.stat.RateStat;
@@ -1172,6 +1173,8 @@ public class Router implements RouterClock.ClockShiftListener {
         synchronized(_configFileLock) {
             removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
             removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+            removeConfigSetting(NTCPTransport.PROP_NTCP2_SP);
+            removeConfigSetting(NTCPTransport.PROP_NTCP2_IV);
             removeConfigSetting(PROP_IB_RANDOM_KEY);
             removeConfigSetting(PROP_OB_RANDOM_KEY);
             removeConfigSetting(PROP_REBUILD_KEYS);
