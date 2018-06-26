@@ -52,3 +52,6 @@ indent_style = tab
 
 [router/java/src/org/freenetproject/*.java]
 indent_style = tab
+
+[router/java/src/com/southernstorm/**/*.java]
+indent_style = tab
