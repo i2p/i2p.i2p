@@ -181,6 +181,24 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
 
     /**
+     *  If we are floodfill AND the key is not throttled,
+     *  flood it, otherwise don't.
+     *
+     *  @return if we did
+     *  @since 0.9.36 for NTCP2
+     */
+    public boolean floodConditional(DatabaseEntry ds) {
+        if (!floodfillEnabled())
+            return false;
+        if (shouldThrottleFlood(ds.getHash())) {
+            _context.statManager().addRateData("netDb.floodThrottled", 1);
+            return false;
+        }
+        flood(ds);
+        return true;
+    }
+
+    /**
      *  Send to a subset of all floodfill peers.
      *  We do this to implement Kademlia within the floodfills, i.e.
      *  we flood to those closest to the key.
