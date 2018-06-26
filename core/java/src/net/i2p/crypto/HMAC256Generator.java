@@ -128,10 +128,12 @@ public final class HMAC256Generator extends HMACGenerator {
      *
      */
 /****
+    private static final int LENGTH = 33;
+
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         byte[] rand = new byte[32];
-        byte[] data = new byte[1500];
+        byte[] data = new byte[LENGTH];
         Key keyObj = new SecretKeySpec(rand, "HmacSHA256");
         SessionKey key = new SessionKey(rand);
 

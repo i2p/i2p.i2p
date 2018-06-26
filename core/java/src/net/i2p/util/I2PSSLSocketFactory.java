@@ -144,6 +144,7 @@ public class I2PSSLSocketFactory {
     /**
      *  We exclude everything that Java 8 disables by default, plus some others.
      *  ref: http://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html
+     *  See also: https://developer.android.com/reference/javax/net/ssl/SSLSocket.html
      *  Unmodifiable.
      *  Public for RouterConsoleRunner.
      *  @since 0.9.16

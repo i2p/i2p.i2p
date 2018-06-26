@@ -27,6 +27,7 @@ public class HexDump {
 
     private static final int FORMAT_OFFSET_PADDING = 8;
     private static final int FORMAT_BYTES_PER_ROW = 16;
+    private static final int OUTPUT_BYTES_PER_ROW = 79;
     private static final byte[] HEXCHARS = DataHelper.getASCII("0123456789abcdef");
 
     /**
@@ -35,14 +36,7 @@ public class HexDump {
      * @param data Data to be dumped
      */
     public static String dump(byte[] data) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        try {
-            dump(data, 0, data.length, out);
-            return out.toString("ISO-8859-1");
-        } catch (IOException e) {
-            throw new RuntimeException("no 8859?", e);
-        }
+        return dump(data, 0, data.length);
     }
 
     /**
@@ -53,7 +47,8 @@ public class HexDump {
      * @param len  Number of bytes of <code>data</code> to be dumped
      */
     public static String dump(byte[] data, int off, int len) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int outlen = OUTPUT_BYTES_PER_ROW * (len + FORMAT_BYTES_PER_ROW - 1) / FORMAT_BYTES_PER_ROW;
+        ByteArrayOutputStream out = new ByteArrayOutputStream(outlen);
 
         try {
             dump(data, off, len, out);

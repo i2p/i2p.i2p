@@ -94,7 +94,9 @@ public class DataHelper {
             "family", "family.key", "family.sig",
             // BlockfileNamingService
             "version", "created", "upgraded", "lists",
-            "a", "m", "s", "v"
+            "a", "m", "s", "v", "notes",
+            // NTCP2 RouterAddress options
+            "i"
         };
         _propertiesKeyCache = new HashMap<String, String>(keys.length);
         for (int i = 0; i < keys.length; i++) {
@@ -670,7 +672,7 @@ public class DataHelper {
         }
         
         if (rv < 0)
-            throw new DataFormatException("fromLong got a negative? " + rv + " numBytes=" + numBytes);
+            throw new DataFormatException("readLong got a negative? " + rv + " numBytes=" + numBytes);
         return rv;
     }
     

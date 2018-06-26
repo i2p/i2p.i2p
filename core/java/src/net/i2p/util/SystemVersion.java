@@ -340,12 +340,12 @@ public abstract class SystemVersion {
         System.out.println("GNU      : " + isGNU());
         System.out.println("Linux Svc: " + isLinuxService());
         System.out.println("Mac      : " + isMac());
+        System.out.println("Max mem  : " + getMaxMemory());
         System.out.println("OpenJDK  : " + isOpenJDK());
         System.out.println("Slow     : " + isSlow());
         System.out.println("Windows  : " + isWindows());
         System.out.println("Wrapper  : " + hasWrapper());
         System.out.println("x86      : " + isX86());
-        System.out.println("Max mem  : " + getMaxMemory());
 
     }
 }

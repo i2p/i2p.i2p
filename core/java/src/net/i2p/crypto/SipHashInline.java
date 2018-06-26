@@ -211,4 +211,25 @@ public final class SipHashInline {
         // }
         return v0 ^ v1 ^ v2 ^ v3;
     }
+
+    /**
+     *  Test vectors from https://www.131002.net/siphash/siphash.pdf
+     */
+/****
+    public static void main(String[] args) {
+        long k0 = 0x0706050403020100L;
+        long k1 = 0x0f0e0d0c0b0a0908L;
+        byte[] data = new byte[15];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = (byte) i;
+        }
+        long result = hash24(k0, k1, data);
+        long expect = 0xa129ca6149be45e5L;
+        if (result == expect)
+            System.out.println("PASS");
+        else
+            System.out.println("FAIL expect " + Long.toString(expect, 16) +
+                               " got " + Long.toString(result, 16));
+    }
+****/
 }
