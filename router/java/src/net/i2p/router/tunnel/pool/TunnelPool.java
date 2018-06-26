@@ -305,7 +305,7 @@ public class TunnelPool {
     /**
      * Return a list of tunnels in the pool
      *
-     * @return list of TunnelInfo objects
+     * @return A copy of the list of TunnelInfo objects
      */
     public List<TunnelInfo> listTunnels() {
         synchronized (_tunnels) {

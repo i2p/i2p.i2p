@@ -572,8 +572,7 @@ public class DHSessionKeyBuilder {
          */
         public void returnUnused(DHSessionKeyBuilder builder) {
             if (builder.getPeerPublicValue() != null) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("builder returned used");
+                _log.error("builder returned used", new Exception());
                 return;
             }
             _context.statManager().addRateData("crypto.DHReused", 1);

@@ -72,7 +72,6 @@ class SymmetricState implements Destroyable {
 	 * Constructs a new symmetric state object.
 	 * Noise protocol name is hardcoded.
 	 * 
-	 * @param protocolName The name of the Noise protocol, which is assumed to be valid.
 	 * @param cipherName The name of the cipher within protocolName.
 	 * @param hashName The name of the hash within protocolName.
 	 * 

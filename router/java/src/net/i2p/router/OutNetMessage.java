@@ -371,12 +371,12 @@ public class OutNetMessage implements CDPQEntry {
             buf.append(getMessageType());
             buf.append(" ID ").append(_messageId);
         }
-        buf.append(" expiring on ").append(new Date(_expiration));
+        buf.append(" expiring ").append(new Date(_expiration));
         buf.append(" priority ").append(_priority);
         if (_failedTransports != null)
-            buf.append(" failed delivery on transports ").append(_failedTransports);
+            buf.append(" failed transports: ").append(_failedTransports);
         if (_target == null)
-            buf.append(" targetting no one in particular...");
+            buf.append(" (null target)");
         else
             buf.append(" targetting ").append(_target.getIdentity().getHash().toBase64());
         if (_onReply != null)

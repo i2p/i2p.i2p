@@ -157,11 +157,9 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
-     * Retrieve the approximate date on which the info was published 
-     * (essentially a version number for the routerInfo structure, except that
-     * it also contains freshness information - whether or not the router is
-     * currently publishing its information).  This should be used to help expire
-     * old routerInfo structures
+     * Retrieve the timestamp on which the info was published,
+     * essentially a version number for the RouterInfo.
+     * This should be used to expire old RouterInfo structures.
      *
      */
     public long getPublished() {
