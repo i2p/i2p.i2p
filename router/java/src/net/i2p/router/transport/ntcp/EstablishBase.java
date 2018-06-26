@@ -9,6 +9,11 @@ import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 
 /**
+ * Inbound NTCP 1 or 2. Outbound NTCP 1 only.
+ * OutboundNTCP2State does not extend this.
+ *
+ * NTCP 1 establishement overview:
+ *
  * Handle the 4-phase establishment, which is as follows:
  *
  * <pre>
@@ -33,7 +38,7 @@ import net.i2p.util.SimpleByteCache;
  *    X, Y: 256 byte DH keys
  *    H(): 32 byte SHA256 Hash
  *    E(data, session key, IV): AES256 Encrypt
- *    S(): 40 byte DSA Signature
+ *    S(): 40 byte DSA Signature, or length as implied by sig type
  *    tsA, tsB: timestamps (4 bytes, seconds since epoch)
  *    sk: 32 byte Session key
  *    sz: 2 byte size of Alice identity to follow
@@ -85,17 +90,11 @@ abstract class EstablishBase implements EstablishState {
 
     /** bytes received so far */
     protected int _received;
-    private byte _extra[];
 
     protected final DHSessionKeyBuilder _dh;
 
     protected final NTCPTransport _transport;
     protected final NTCPConnection _con;
-    /** error causing the corruption */
-    private String _err;
-    /** exception causing the error */
-    private Exception _e;
-    private boolean _failedBySkew;
     
     protected static final int MIN_RI_SIZE = 387;
     protected static final int MAX_RI_SIZE = 3072;
@@ -132,6 +131,42 @@ abstract class EstablishBase implements EstablishState {
         IB_GOT_RI_SIZE,
         /** got 1, sent 2, got 3 */
         IB_GOT_RI,
+
+        /**
+         * Next state IB_NTCP2_GOT_X
+         * @since 0.9.36
+         */
+        IB_NTCP2_INIT,
+        /**
+         * Got Noise part of msg 1
+         * Next state IB_NTCP2_GOT_PADDING or IB_NTCP2_READ_RANDOM on fail
+         * @since 0.9.36
+         */
+        IB_NTCP2_GOT_X,
+        /**
+         * Got msg 1 incl. padding
+         * Next state IB_NTCP2_SENT_Y
+         * @since 0.9.36
+         */
+        IB_NTCP2_GOT_PADDING,
+        /**
+         * Sent msg 2 and padding
+         * Next state IB_NTCP2_GOT_RI
+         * @since 0.9.36
+         */
+        IB_NTCP2_SENT_Y,
+        /**
+         * Got msg 3
+         * Next state VERIFIED
+         * @since 0.9.36
+         */
+        IB_NTCP2_GOT_RI,
+        /**
+         * Got msg 1 and failed AEAD
+         * Next state CORRUPT
+         * @since 0.9.36
+         */
+        IB_NTCP2_READ_RANDOM,
 
         /** OB: got and verified 4; IB: got and verified 3 and sent 4 */
         VERIFIED,
@@ -178,13 +213,13 @@ abstract class EstablishBase implements EstablishState {
     }
 
     /**
-     * parse the contents of the buffer as part of the handshake.  if the
-     * handshake is completed and there is more data remaining, the data are
-     * copieed out so that the next read will be the (still encrypted) remaining
-     * data (available from getExtraBytes)
+     * Parse the contents of the buffer as part of the handshake.
      *
      * All data must be copied out of the buffer as Reader.processRead()
      * will return it to the pool.
+     *
+     * If there are additional data in the buffer after the handshake is complete,
+     * the EstablishState is responsible for passing it to NTCPConnection.
      */
     public synchronized void receive(ByteBuffer src) {
         synchronized(_stateLock) {    
@@ -201,11 +236,6 @@ abstract class EstablishBase implements EstablishState {
      * queueing up the write of the first part of the handshake
      */
     public void prepareOutbound() {}
-
-    /**
-     *  Was this connection failed because of clock skew?
-     */
-    public synchronized boolean getFailedBySkew() { return _failedBySkew; }
 
     /** did the handshake fail for some reason? */
     public boolean isCorrupt() {
@@ -234,31 +264,6 @@ abstract class EstablishBase implements EstablishState {
      */
     public abstract int getVersion();
 
-    /** Anything left over in the byte buffer after verification is extra
-     *
-     *  All data must be copied out of the buffer as Reader.processRead()
-     *  will return it to the pool.
-     *
-     *  State must be VERIFIED.
-     *  Caller must synch.
-     */
-    protected void prepareExtra(ByteBuffer buf) {
-        int remaining = buf.remaining();
-        if (remaining > 0) {
-            _extra = new byte[remaining];
-            buf.get(_extra);
-            _received += remaining;
-        }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(prefix() + "prepare extra " + remaining + " (total received: " + _received + ")");
-    }
-
-    /**
-     * if complete, this will contain any bytes received as part of the
-     * handshake that were after the actual handshake.  This may return null.
-     */
-    public synchronized byte[] getExtraBytes() { return _extra; }
-
     /**
      *  Release resources on timeout.
      *  @param e may be null
@@ -281,12 +286,12 @@ abstract class EstablishBase implements EstablishState {
                 return;
             changeState(State.CORRUPT);
         }
-        _failedBySkew = bySkew;
-        _err = reason;
-        _e = e;
         if (_log.shouldLog(Log.WARN))
-            _log.warn(prefix()+"Failed to establish: " + _err, e);
+            _log.warn(prefix() + "Failed to establish: " + reason, e);
+        if (!bySkew)
+            _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1);
         releaseBufs(false);
+        // con.close()?
     }
 
     /**
@@ -303,10 +308,6 @@ abstract class EstablishBase implements EstablishState {
             _transport.returnUnused(_dh);
     }
 
-    public synchronized String getError() { return _err; }
-
-    public synchronized Exception getException() { return _e; }
-    
     /**
      *  XOR a into b. Modifies b. a is unmodified.
      *  @param a 32 bytes
@@ -328,7 +329,7 @@ abstract class EstablishBase implements EstablishState {
             buf.append("IBES ");
         else
             buf.append("OBES ");
-        buf.append(System.identityHashCode(this));
+        buf.append(_con.toString());
         buf.append(' ').append(_state);
         if (_con.isEstablished()) buf.append(" established");
         buf.append(": ");
@@ -347,10 +348,20 @@ abstract class EstablishBase implements EstablishState {
 
         public int getVersion() { return 1; }
 
+        /*
+         * @throws IllegalStateException always
+         */
+        @Override
+        public void receive(ByteBuffer src) {
+            throw new IllegalStateException("receive() " + src.remaining() + " on verified state, doing nothing!");
+        }
+
+        /*
+         * @throws IllegalStateException always
+         */
         @Override
         public void prepareOutbound() {
-            Log log = RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
-            log.warn("prepareOutbound() on verified state, doing nothing!");
+            throw new IllegalStateException("prepareOutbound() on verified state, doing nothing!");
         }
 
         @Override
@@ -369,10 +380,20 @@ abstract class EstablishBase implements EstablishState {
 
         public int getVersion() { return 1; }
 
+        /*
+         * @throws IllegalStateException always
+         */
+        @Override
+        public void receive(ByteBuffer src) {
+            throw new IllegalStateException("receive() " + src.remaining() + " on failed state, doing nothing!");
+        }
+
+        /*
+         * @throws IllegalStateException always
+         */
         @Override
         public void prepareOutbound() {
-            Log log = RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
-            log.warn("prepareOutbound() on verified state, doing nothing!");
+            throw new IllegalStateException("prepareOutbound() on failed state, doing nothing!");
         }
 
         @Override

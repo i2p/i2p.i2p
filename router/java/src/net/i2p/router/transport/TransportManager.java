@@ -37,6 +37,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
@@ -68,6 +69,7 @@ public class TransportManager implements TransportEventListener {
     private final RouterContext _context;
     private final UPnPManager _upnpManager;
     private final DHSessionKeyBuilder.PrecalcRunner _dhThread;
+    private final X25519KeyFactory _xdhThread;
 
     /** default true */
     public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
@@ -75,6 +77,9 @@ public class TransportManager implements TransportEventListener {
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
+
+    private static final String PROP_NTCP2_ENABLE = "i2np.ntcp2.enable";
+    private static final boolean DEFAULT_NTCP2_ENABLE = false;
 
     private static final String PROP_ADVANCED = "routerconsole.advanced";
     
@@ -98,6 +103,9 @@ public class TransportManager implements TransportEventListener {
         else
             _upnpManager = null;
         _dhThread = new DHSessionKeyBuilder.PrecalcRunner(context);
+        boolean enableNTCP2 = isNTCPEnabled(context) &&
+                              context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
+        _xdhThread = enableNTCP2 ? new X25519KeyFactory(context) : null;
     }
 
     /**
@@ -172,7 +180,7 @@ public class TransportManager implements TransportEventListener {
             initializeAddress(udp);
         }
         if (isNTCPEnabled(_context)) {
-            Transport ntcp = new NTCPTransport(_context, _dhThread);
+            Transport ntcp = new NTCPTransport(_context, _dhThread, _xdhThread);
             addTransport(ntcp);
             initializeAddress(ntcp);
             if (udp != null) {
@@ -309,6 +317,8 @@ public class TransportManager implements TransportEventListener {
     synchronized void startListening() {
         if (_dhThread.getState() == Thread.State.NEW)
             _dhThread.start();
+        if (_xdhThread != null && _xdhThread.getState() == Thread.State.NEW)
+            _xdhThread.start();
         // For now, only start UPnP if we have no publicly-routable addresses
         // so we don't open the listener ports to the world.
         // Maybe we need a config option to force on? Probably not.
@@ -719,6 +729,7 @@ public class TransportManager implements TransportEventListener {
                 _context.banlist().banlistRouterForever(peer, _x("Unsupported signature type"));
             } else if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
                 // Don't banlist if we aren't talking to anybody, as we may have a network connection issue
+                // TODO if we are IPv6 only, ban for longer
                 boolean incompat = false;
                 RouterInfo us = _context.router().getRouterInfo();
                 if (us != null) {

@@ -149,8 +149,6 @@ class Reader {
             if ((buf = con.getNextReadBuf()) == null)
                 return;
             EstablishState est = con.getEstablishState();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Processing read buffer as an establishment for " + con + " with [" + est + "]");
             
             if (est.isComplete()) {
                 // why is it complete yet !con.isEstablished?
@@ -163,20 +161,13 @@ class Reader {
             est.receive(buf);
             EventPumper.releaseBuf(buf);
             if (est.isCorrupt()) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("closing connection on establishment because: " +est.getError(), est.getException());
-                if (!est.getFailedBySkew())
-                    _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1);
                 con.close();
                 return;
             }
-            if (est.isComplete() && est.getExtraBytes() != null)
-                con.recvEncryptedI2NP(ByteBuffer.wrap(est.getExtraBytes()));
+            // EstablishState is responsible for passing "extra" data to the con
         }
         while (!con.isClosed() && (buf = con.getNextReadBuf()) != null) {
             // decrypt the data and push it into an i2np message
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Processing read buffer as part of an i2np message (" + buf.remaining() + " bytes)");
             con.recvEncryptedI2NP(buf);
             EventPumper.releaseBuf(buf);
         }

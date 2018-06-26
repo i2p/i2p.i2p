@@ -283,6 +283,8 @@ class EventPumper implements Runnable {
                                      con.getTimeSinceReceive() > expire) {
                                     // we haven't sent or received anything in a really long time, so lets just close 'er up
                                     con.close();
+                                    if (_log.shouldInfo())
+                                        _log.info("Failsafe or expire close for " + con);
                                     failsafeCloses++;
                                 }
                             } catch (CancelledKeyException cke) {
@@ -300,6 +302,7 @@ class EventPumper implements Runnable {
                     }
                 } else {
                     // another 100% CPU workaround 
+                    // TODO remove or only if we appear to be looping with no interest ops
                     if ((loopCount % 512) == 511) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("EventPumper throttle " + loopCount + " loops in " +
@@ -549,7 +552,9 @@ class EventPumper implements Runnable {
                 chan.socket().setKeepAlive(true);
 
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
-            new NTCPConnection(_context, _transport, chan, ckey);
+            NTCPConnection con = new NTCPConnection(_context, _transport, chan, ckey);
+            ckey.attach(con);
+            _transport.establishing(con);
         } catch (IOException ioe) {
             _log.error("Error accepting", ioe);
         }
@@ -565,6 +570,7 @@ class EventPumper implements Runnable {
             if (connected) {
                 if (shouldSetKeepAlive(chan))
                     chan.socket().setKeepAlive(true);
+                // key was already set when the channel was created, why do it again here?
                 con.setKey(key);
                 con.outboundConnected();
                 _context.statManager().addRateData("ntcp.connectSuccessful", 1);
@@ -619,7 +625,7 @@ class EventPumper implements Runnable {
                         ByteArray ba = new ByteArray(ip);
                         count = _blockedIPs.increment(ba);
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Blocking IP " + Addresses.toString(ip) + " with count " + count + ": " + con);
+                            _log.warn("EOF on inbound before receiving any, blocking IP " + Addresses.toString(ip) + " with count " + count + ": " + con);
                     } else {
                         count = 1;
                         if (_log.shouldLog(Log.WARN))
@@ -682,11 +688,11 @@ class EventPumper implements Runnable {
                     ByteArray ba = new ByteArray(ip);
                     count = _blockedIPs.increment(ba);
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Blocking IP " + Addresses.toString(ip) + " with count " + count + ": " + con);
+                        _log.warn("Blocking IP " + Addresses.toString(ip) + " with count " + count + ": " + con, ioe);
                 } else {
                     count = 1;
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("IOE on inbound before receiving any: " + con);
+                        _log.warn("IOE on inbound before receiving any: " + con, ioe);
                 }
                 _context.statManager().addRateData("ntcp.dropInboundNoMessage", count);
             } else {
