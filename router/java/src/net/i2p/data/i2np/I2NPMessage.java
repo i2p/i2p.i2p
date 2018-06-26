@@ -127,15 +127,43 @@ public interface I2NPMessage extends DataStructure {
      * write the message to the buffer, returning the number of bytes written.
      * the data is formatted so as to be self contained, with the type, size,
      * expiration, unique id, as well as a checksum bundled along.  
-     * Full 16 byte header.
+     * Full 16 byte header for NTCP 1.
+     *
+     * @return the length written
      */
     public int toByteArray(byte buffer[]);
+
+    /** 
+     * write the message to the buffer, returning the number of bytes written.
+     * the data is formatted so as to be self contained, with the type, size,
+     * expiration, unique id, as well as a checksum bundled along.  
+     * Full 16 byte header for NTCP 1.
+     *
+     * @param off the offset to start writing at
+     * @return the new offset (NOT the length)
+     * @since 0.9.36
+     */
+    public int toByteArray(byte buffer[], int off);
 
     /**
      * write the message to the buffer, returning the number of bytes written.
      * the data is is not self contained - it does not include the size,
      * unique id, or any checksum, but does include the type and expiration.
-     * Short 5 byte header.
+     * Short 5 byte header for SSU.
+     *
+     * @return the length written
      */
     public int toRawByteArray(byte buffer[]);
+
+    /**
+     * write the message to the buffer, returning the number of bytes written.
+     * the data is is not self contained - it does not include the size,
+     * unique id, or any checksum, but does include the type and expiration.
+     * Short 9 byte header for NTCP 2.
+     *
+     * @param off the offset to start writing at
+     * @return the new offset (NOT the length)
+     * @since 0.9.36
+     */
+    public int toRawByteArrayNTCP2(byte buffer[], int off);
 }

@@ -50,10 +50,6 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                         + 2 // payload length
                         + CHECKSUM_LENGTH;
 
-    // Whether SSU used the full header or a truncated header.
-    // We are stuck with the short header, can't change it now.
-    //private static final boolean RAW_FULL_SIZE = false;
-
     /** unused */
     private static final Map<Integer, Builder> _builders = new ConcurrentHashMap<Integer, Builder>(1);
 
@@ -292,9 +288,6 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *  Used by SSU only!
      */
     public synchronized int getRawMessageSize() {
-        //if (RAW_FULL_SIZE)
-        //    return getMessageSize();
-        //else
             return calculateWrittenLength()+5;
     }
 
@@ -310,16 +303,38 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         return data;
     }
 
+    /** 
+     * write the message to the buffer, returning the number of bytes written.
+     * the data is formatted so as to be self contained, with the type, size,
+     * expiration, unique id, as well as a checksum bundled along.  
+     * Full 16 byte header for NTCP 1.
+     *
+     * @return the length written
+     */
     public int toByteArray(byte buffer[]) {
-        try {
-            int writtenLen = writeMessageBody(buffer, HEADER_LENGTH);
-            int payloadLen = writtenLen - HEADER_LENGTH;
-            byte[] h = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-            _context.sha().calculateHash(buffer, HEADER_LENGTH, payloadLen, h, 0);
+        return toByteArray(buffer, 0);
+    }
 
-            int off = 0;
+    /** 
+     * write the message to the buffer, returning the number of bytes written.
+     * the data is formatted so as to be self contained, with the type, size,
+     * expiration, unique id, as well as a checksum bundled along.  
+     * Full 16 byte header for NTCP 1.
+     *
+     * @param off the offset to start writing at
+     * @return the new offset (NOT the length)
+     * @since 0.9.36 with off param
+     */
+    public int toByteArray(byte buffer[], int off) {
+        int start = off;
+        try {
+            int rv = writeMessageBody(buffer, off + HEADER_LENGTH);
+            int payloadLen = rv - (off + HEADER_LENGTH);
+            byte[] h = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+            _context.sha().calculateHash(buffer, off + HEADER_LENGTH, payloadLen, h, 0);
+
             DataHelper.toLong(buffer, off, 1, getType());
-            off += 1;
+            off++;
 
             // Lazy initialization of value
             if (_uniqueId < 0) {
@@ -335,7 +350,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             System.arraycopy(h, 0, buffer, off, CHECKSUM_LENGTH);
             SimpleByteCache.release(h);
 
-            return writtenLen;
+            return rv;
         } catch (I2NPMessageException ime) {
             _context.logManager().getLog(getClass()).log(Log.CRIT, "Error writing", ime);
             throw new IllegalStateException("Unable to serialize the message " + getClass().getSimpleName(), ime);
@@ -347,42 +362,53 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
 
     /**
      * write the message body to the output array, starting at the given index.
-     * @return the index into the array after the last byte written
+     * @return the index into the array after the last byte written (NOT the length)
      */
     protected abstract int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException;
-
-    /*
-    protected int toByteArray(byte out[], byte[][] prefix, byte[][] suffix) throws I2NPMessageException {
-        int curIndex = 0;
-        for (int i = 0; i < prefix.length; i++) {
-            System.arraycopy(prefix[i], 0, out, curIndex, prefix[i].length);
-            curIndex += prefix[i].length;
-        }
-
-        curIndex = writeMessageBody(out, curIndex);
-
-        for (int i = 0; i < suffix.length; i++) {
-            System.arraycopy(suffix[i], 0, out, curIndex, suffix[i].length);
-            curIndex += suffix[i].length;
-        }
-
-        return curIndex;
-    }
-     */
-
 
     /**
      *  Write the message with a short 5-byte header.
      *  THe header consists of a one-byte type and a 4-byte expiration in seconds only.
      *  Used by SSU only!
+     *
+     *  @return the new written length
      */
     public int toRawByteArray(byte buffer[]) {
-        //if (RAW_FULL_SIZE)
-        //    return toByteArray(buffer);
         try {
             int off = 0;
             DataHelper.toLong(buffer, off, 1, getType());
             off += 1;
+            // January 19 2038? No, unsigned, good until Feb. 7 2106
+            // in seconds, round up so we don't lose time every hop
+            DataHelper.toLong(buffer, off, 4, (_expiration + 500) / 1000);
+            off += 4;
+            return writeMessageBody(buffer, off);
+        } catch (I2NPMessageException ime) {
+            _context.logManager().getLog(getClass()).log(Log.CRIT, "Error writing", ime);
+            throw new IllegalStateException("Unable to serialize the message " + getClass().getSimpleName(), ime);
+        }
+    }
+
+    /**
+     * write the message to the buffer, returning the number of bytes written.
+     * the data is is not self contained - it does not include the size,
+     * unique id, or any checksum, but does include the type and expiration.
+     * Short 9 byte header for NTCP 2.
+     *
+     * @param off the offset to start writing at
+     * @return the new offset (NOT the length)
+     * @since 0.9.36
+     */
+    public int toRawByteArrayNTCP2(byte buffer[], int off) {
+        try {
+            DataHelper.toLong(buffer, off, 1, getType());
+            off += 1;
+            // Lazy initialization of value
+            if (_uniqueId < 0) {
+                _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
+            }
+            DataHelper.toLong(buffer, off, 4, _uniqueId);
+            off += 4;
             // January 19 2038? No, unsigned, good until Feb. 7 2106
             // in seconds, round up so we don't lose time every hop
             DataHelper.toLong(buffer, off, 4, (_expiration + 500) / 1000);
@@ -420,16 +446,6 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         int type = buffer[offset] & 0xff;
         offset++;
         I2NPMessage msg = createMessage(ctx, type);
-        if (msg == null)
-            throw new I2NPMessageException("Unknown message type: " + type);
-        //if (RAW_FULL_SIZE) {
-        //    try {
-        //        msg.readBytes(buffer, type, offset);
-        //    } catch (IOException ioe) {
-        //        throw new I2NPMessageException("Error reading the " + msg, ioe);
-        //    }
-        //    return msg;
-        //}
 
         try {
             // January 19 2038? No, unsigned, good until Feb. 7 2106
@@ -456,8 +472,6 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         int type = buffer[offset] & 0xff;
         offset++;
         I2NPMessage msg = createMessage(ctx, type);
-        if (msg == null)
-            throw new I2NPMessageException("Unknown message type: " + type);
 
         try {
             long id = DataHelper.fromLong(buffer, offset, 4);
