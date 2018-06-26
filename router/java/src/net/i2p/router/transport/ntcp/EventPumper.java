@@ -178,7 +178,6 @@ class EventPumper implements Runnable {
         while (_alive && _selector.isOpen()) {
             try {
                 loopCount++;
-                runDelayedEvents();
 
                 try {
                     int count = _selector.select(SELECTOR_LOOP_DELAY);
@@ -189,6 +188,7 @@ class EventPumper implements Runnable {
                         // does clear() do anything useful?
                         selected.clear();
                     }
+                    runDelayedEvents();
                 } catch (ClosedSelectorException cse) {
                     continue;
                 } catch (IOException ioe) {
