@@ -18,7 +18,7 @@ public class CoreVersion {
     /** deprecated */
     public final static String ID = "Monotone";
 
-    public final static String VERSION = "0.9.34";
+    public final static String VERSION = "0.9.35";
 
     /**
      *  For Vuze.

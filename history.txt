@@ -1,3 +1,5 @@
+* 2018-06-26 0.9.35 released
+
 2018-06-23 zzz
  * Pull translation updates from Transifex
  * New Azerbaijani translations
