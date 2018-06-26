@@ -230,9 +230,12 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
     /**
      *  The remote port.
      *  @param port 0 - 65535
+     *  @throws IllegalArgumentException
      *  @since 0.8.9
      */
     public void setPort(int port) {
+        if (port < 0 || port > 65535)
+            throw new IllegalArgumentException("bad port");
         _remotePort = port;
     }
 
@@ -251,9 +254,12 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      *  Nonzero means you will get traffic ONLY for that port, use with care,
      *  as most applications do not specify a remote port.
      *  @param port 0 - 65535
+     *  @throws IllegalArgumentException
      *  @since 0.8.9
      */
     public void setLocalPort(int port) {
+        if (port < 0 || port > 65535)
+            throw new IllegalArgumentException("bad port");
         _localPort = port;
     }
 }
