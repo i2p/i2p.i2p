@@ -2,6 +2,7 @@ package net.i2p.router.transport.ntcp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -20,6 +21,8 @@ import net.i2p.data.router.RouterInfo;
  */
 class NTCP2Payload {
 
+    public static final int BLOCK_HEADER_SIZE = 3;
+
     private static final int BLOCK_DATETIME = 0;
     private static final int BLOCK_OPTIONS = 1;
     private static final int BLOCK_ROUTERINFO = 2;
@@ -27,12 +30,39 @@ class NTCP2Payload {
     private static final int BLOCK_TERMINATION = 4;
     private static final int BLOCK_PADDING = 254;
 
+    /**
+     *  For all callbacks, recommend throwing exceptions only from the handshake.
+     *  Exceptions will get thrown out of processPayload() and prevent
+     *  processing of succeeding blocks.
+     */
     public interface PayloadCallback {
-        public void gotDateTime(long time);
-        public void gotI2NP(I2NPMessage msg);
-        public void gotOptions(byte[] options, boolean isHandshake);
-        public void gotRI(RouterInfo ri, boolean isHandshake);
-        public void gotTermination(int reason);
+        public void gotDateTime(long time) throws DataFormatException;
+
+        public void gotI2NP(I2NPMessage msg) throws I2NPMessageException;
+
+        /**
+         *  @param isHandshake true only for message 3 part 2
+         */
+        public void gotOptions(byte[] options, boolean isHandshake) throws DataFormatException;
+
+        /**
+         *  @param ri will already be validated
+         *  @param isHandshake true only for message 3 part 2
+         */
+        public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException;
+
+        /**
+         *  @param lastReceived in theory could wrap around to negative, but very unlikely
+         */
+        public void gotTermination(int reason, long lastReceived);
+
+        /**
+         *  For stats.
+         *  @param paddingLength the number of padding bytes, not including the 3-byte block header
+         *  @param frameLength the total size of the frame, including all blocks and block headers
+         */
+        public void gotPadding(int paddingLength, int frameLength);
+
         public void gotUnknown(int type, int len);
     }
 
@@ -45,21 +75,31 @@ class NTCP2Payload {
      *  @throws I2NPMessageException on parsing of I2NP block
      */
     public static int processPayload(I2PAppContext ctx, PayloadCallback cb,
-                                     byte[] payload, int length, boolean isHandshake)
+                                     byte[] payload, int off, int length, boolean isHandshake)
                                     throws IOException, DataFormatException, I2NPMessageException {
         int blocks = 0;
-        boolean gotRI = false;
         boolean gotPadding = false;
-        int i = 0;
-        while (i < length) {
+        boolean gotTermination = false;
+        int i = off;
+        final int end = off + length;
+        while (i < end) {
             int type = payload[i++] & 0xff;
             if (gotPadding)
                 throw new IOException("Illegal block after padding: " + type);
+            if (gotTermination && type != BLOCK_PADDING)
+                throw new IOException("Illegal block after termination: " + type);
+            if (isHandshake && blocks == 0 && type != BLOCK_ROUTERINFO)
+                throw new IOException("Illegal first block in handshake: " + type);
             int len = (int) DataHelper.fromLong(payload, i, 2);
             i += 2;
-            if (i + len > length)
-                throw new IOException("Block runs over frame");
+            if (i + len > end) {
+                throw new IOException("Block " + blocks + " type " + type + " length " + len +
+                                      " at offset " + (i - 3 - off) + " runs over frame of size " + length +
+                                      '\n' + net.i2p.util.HexDump.dump(payload, off, length));
+            }
             switch (type) {
+                // don't modify i inside switch
+
                 case BLOCK_DATETIME:
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
@@ -70,19 +110,17 @@ class NTCP2Payload {
                     break;
 
                 case BLOCK_OPTIONS:
-                    byte[] options = null;
+                    byte[] options = new byte[len];
+                    System.arraycopy(payload, i, options, 0, len);
                     cb.gotOptions(options, isHandshake);
                     break;
 
                 case BLOCK_ROUTERINFO:
                     int flag = payload[i] & 0xff;
                     RouterInfo alice = new RouterInfo();
-                    // TODO limit
                     ByteArrayInputStream bais = new ByteArrayInputStream(payload, i + 1, len - 1);
                     alice.readBytes(bais, true);
-                    // TODO validate Alice static key, pass back somehow
-                    cb.gotRI(alice, isHandshake);
-                    gotRI = true;
+                    cb.gotRI(alice, isHandshake, (flag & 0x01) != 0);
                     break;
 
                 case BLOCK_I2NP:
@@ -95,14 +133,17 @@ class NTCP2Payload {
                 case BLOCK_TERMINATION:
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len != 9)
+                    if (len < 9)
                         throw new IOException("Bad length for TERMINATION: " + len);
-                    int rsn = payload[i] & 0xff;
-                    cb.gotTermination(rsn);
+                    long last = fromLong8(payload, i);
+                    int rsn = payload[i + 8] & 0xff;
+                    cb.gotTermination(rsn, last);
+                    gotTermination = true;
                     break;
 
                 case BLOCK_PADDING:
                     gotPadding = true;
+                    cb.gotPadding(len, length);
                     break;
 
                 default:
@@ -115,8 +156,8 @@ class NTCP2Payload {
             i += len;
             blocks++;
         }
-        if (isHandshake && !gotRI)
-            throw new IOException("No RI block in handshake");
+        if (isHandshake && blocks == 0)
+            throw new IOException("No blocks in handshake");
         return blocks;
     }
 
@@ -131,6 +172,10 @@ class NTCP2Payload {
         return off;
     }
 
+    /**
+     *  Base class for blocks to be transmitted.
+     *  Not used for receive; we use callbacks instead.
+     */
     public static abstract class Block {
         private final int type;
 
@@ -138,23 +183,46 @@ class NTCP2Payload {
             type = ttype;
         }
 
+        /** @return new offset */
         public int write(byte[] tgt, int off) {
             tgt[off++] = (byte) type;
-            DataHelper.toLong(tgt, off, 2, getDataLength());
-            return writeData(tgt, off + 2);
+            // we do it this way so we don't call getDataLength(),
+            // which may be inefficient
+            // off is where the length goes
+            int rv = writeData(tgt, off + 2);
+            DataHelper.toLong(tgt, off, 2, rv - (off + 2));
+            return rv;
         }
 
+        /**
+         *  @return the size of the block, including the 3 byte header (type and size)
+         */
+        public int getTotalLength() {
+            return BLOCK_HEADER_SIZE + getDataLength();
+        }
+
+        /**
+         *  @return the size of the block, NOT including the 3 byte header (type and size)
+         */
         public abstract int getDataLength();
 
+        /** @return new offset */
         public abstract int writeData(byte[] tgt, int off);
+
+        @Override
+        public String toString() {
+            return "Payload block type " + type + " length " + getDataLength();
+        }
     }
 
     public static class RIBlock extends Block {
         private final byte[] data;
+        private final boolean f;
 
-        public RIBlock(RouterInfo ri) {
+        public RIBlock(RouterInfo ri, boolean flood) {
             super(BLOCK_ROUTERINFO);
             data = ri.toByteArray();
+            f = flood;
         }
 
         public int getDataLength() {
@@ -162,50 +230,55 @@ class NTCP2Payload {
         }
 
         public int writeData(byte[] tgt, int off) {
-            tgt[off++] = 0;    // flag
+            tgt[off++] = (byte) (f ? 1 : 0);    // flag
             System.arraycopy(data, 0, tgt, off, data.length);
             return off + data.length;
         }
     }
 
     public static class I2NPBlock extends Block {
-        private final byte[] data;
+        private final I2NPMessage m;
 
         public I2NPBlock(I2NPMessage msg) {
             super(BLOCK_I2NP);
-            data = msg.toByteArray();
+            m = msg;
         }
 
         public int getDataLength() {
-            return data.length - 7;
+            return m.getMessageSize() - 7;
         }
 
         public int writeData(byte[] tgt, int off) {
-            // type, ID, first 4 bytes of exp
-            System.arraycopy(data, 0, tgt, off, 9);
-            // skip last 4 bytes of exp, sz, checksum
-            System.arraycopy(data, 16, tgt, off + 9, data.length - 16);
-            return off + data.length - 7;
+            return m.toRawByteArrayNTCP2(tgt, off);
         }
     }
 
     public static class PaddingBlock extends Block {
-        private final byte[] data;
+        private final int sz;
+        private final I2PAppContext ctx;
 
-        public PaddingBlock(I2PAppContext ctx, int size) {
+        /** with zero-filled data */
+        public PaddingBlock(int size) {
+            this(null, size);
+        }
+
+        /** with random data */
+        public PaddingBlock(I2PAppContext context, int size) {
             super(BLOCK_PADDING);
-            data = new byte[size];
-            if (size > 0)
-                ctx.random().nextBytes(data);
+            sz = size;
+            ctx = context;
         }
 
         public int getDataLength() {
-            return data.length;
+            return sz;
         }
 
         public int writeData(byte[] tgt, int off) {
-            System.arraycopy(tgt, off, data, 0, data.length);
-            return off + data.length;
+            if (ctx != null)
+                ctx.random().nextBytes(tgt, off, sz);
+            else
+                Arrays.fill(tgt, off, off + sz, (byte) 0);
+            return off + sz;
         }
     }
 
@@ -224,6 +297,78 @@ class NTCP2Payload {
         public int writeData(byte[] tgt, int off) {
             DataHelper.toLong(tgt, off, 4, now / 1000);
             return off + 4;
+        }
+    }
+
+    public static class OptionsBlock extends Block {
+        private final byte[] opts;
+
+        public OptionsBlock(byte[] options) {
+            super(BLOCK_OPTIONS);
+            opts = options;
+        }
+
+        public int getDataLength() {
+            return opts.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(opts, 0, tgt, off, opts.length);
+            return off + opts.length;
+        }
+    }
+
+    public static class TerminationBlock extends Block {
+        private final byte rsn;
+        private final long rcvd;
+
+        public TerminationBlock(int reason, long lastReceived) {
+            super(BLOCK_TERMINATION);
+            rsn = (byte) reason;
+            rcvd = lastReceived;
+        }
+
+        public int getDataLength() {
+            return 9;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            toLong8(tgt, off, rcvd);
+            tgt[off + 8] = rsn;
+            return off + 9;
+        }
+    }
+
+    /**
+     * Big endian.
+     * Same as DataHelper.fromLong(src, offset, 8) but allows negative result
+     *
+     * Package private for NTCP2Payload.
+     *
+     * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.36
+     */
+    private static long fromLong8(byte src[], int offset) {
+        long rv = 0;
+        int limit = offset + 8;
+        for (int i = offset; i < limit; i++) {
+            rv <<= 8;
+            rv |= src[i] & 0xFF;
+        }
+        return rv;
+    }
+    
+    /**
+     * Big endian.
+     * Same as DataHelper.toLong(target, offset, 8, value) but allows negative value
+     *
+     * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.36
+     */
+    private static void toLong8(byte target[], int offset, long value) {
+        for (int i = offset + 7; i >= offset; i--) {
+            target[i] = (byte) value;
+            value >>= 8;
         }
     }
 }
