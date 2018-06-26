@@ -1,4 +1,4 @@
-package net.i2p.router.web.helpers;
+package net.i2p.router.web.servlets;
 
 import java.io.File;
 import java.io.IOException;

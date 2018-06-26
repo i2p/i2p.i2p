@@ -123,7 +123,7 @@
     <target name="jar1" depends="compile, bundle-news, bundle-countries, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
-        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/*">
+        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*">
             <manifest>
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <!-- very old installs don't have i2psnark,jstl,standard in the classpath... not added in WebAppConfiguration any more -->
@@ -327,14 +327,14 @@
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
-            <classes dir="./build/obj" includes="net/i2p/router/web/helpers/*" />
+            <classes dir="./build/obj" includes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*" />
         </war>
     </target>
 
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="build/routerconsole.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, *.css, **/*.java, *.jsp, *.jsi" />
-            <srcfiles dir= "build/obj" includes="net/i2p/router/web/helpers/*.class" />
+            <srcfiles dir= "build/obj" includes="net/i2p/router/web/helpers/*.class net/i2p/router/web/servlets/*.class" />
         </uptodate>
         <condition property="shouldListChanges" >
             <and>
