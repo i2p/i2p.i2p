@@ -17,11 +17,11 @@ Min version	Max version	Uses src pkg	Copied to Debian
 precise		saucy   	precise		wheezy
 trusty		wily		precise		jessie
 xenial		yakkety		xenial		--
-artful		bionic		artful		stretch, buster, sid
+artful		cosmic		artful		stretch, buster, sid
 
 
-Prep
-----
+Prep (first time only)
+----------------------
 
 - Make a launchpad account
 - Log into launchpad
@@ -48,11 +48,12 @@ Prep
 - you need the following packages
   sudo apt-get install devscripts dput dh_systemd bash-completion
 
-- check out clean copy of release:
-  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-0.9.xx
 
 Generate files to upload
 ------------------------
+
+- check out clean copy of release:
+  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-0.9.xx
 
 - export TZ=UTC
 - cd i2p.i2p.foobar
@@ -68,11 +69,13 @@ Generate files to upload
     run gpg -K to list your private keys
 - ant debian-release-tarball (this is currently for artful and higher)
   (ant precise-release-tarball for precise thru wily... only do this once for both the precise and trusty build)
-  (ant xenial-release-tarball for xenial and yakkety)
+  (ant xenial-release-tarball for xenial)
   this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
   and a tarball ../i2p_0.9.XX.orig.tar.bz2
 - cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
 - cp debian-alt/(series)/(other files besides changelog) to ../i2p-0.9.XX-0-xxxxxxxx/debian/
+- (if you build trusty after precise, cp debian/i2p.postinst ../i2p-0.9.XX-0-xxxxxxxx/debian/
+  since precise modifies it but trusty does not)
 - cd ../i2p-0.9.XX-0-xxxxxxxx/
 - Note: If building for precise/trusty and you are on yakkety or higher without Java 7,
   make a symlink so debuild will work: cd /var/lib/jvm; sudo ln -s java-8-openjdk-amd64/ java-7-openjdk-amd64
@@ -160,6 +163,8 @@ from the "ant precise-release-tarball" source.
 
 Creating milestone, release, and uploading files
 ----------------------------------------------
+
+You may do this either before or after doing the Launchpad builds.
 
 You must first create a milestone, then create a release
 and attach it to the milestone.

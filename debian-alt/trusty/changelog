@@ -1,3 +1,9 @@
+i2p (0.9.35p-2~trusty+1) trusty; urgency=medium
+
+  * Backport to Trusty
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 27 Jun 2018 12:12:12 +0000
+
 i2p (0.9.34p-2~trusty+1) trusty; urgency=medium
 
   * Backport to Trusty
