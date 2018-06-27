@@ -451,8 +451,9 @@ trans.zh_CN = installer/resources/locale-man/man_zh.po
 
 [I2P.eepsite]
 ;;
-;; For any new translations, add links in index.html
-;; and copy new flags in build.xml preppkg-base target
+;; For any new translations, add links in index.html,
+;; and copy new flags in build.xml copyflags-unlesspkg target,
+;; and add to debian/i2p-router.links and debian-alt/*/i2p-router.links
 ;;
 type = HTML
 source_file = installer/resources/eepsite/docroot/help/index.html

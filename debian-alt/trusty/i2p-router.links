@@ -76,6 +76,23 @@ usr/share/java/libintl.jar usr/share/i2p/lib/libintl.jar
 usr/share/java/gnu-getopt.jar usr/share/i2p/lib/gnu-getopt.jar
 
 
+# comment out if not building with famfamfam-flag-png
+# ubuntu: trusty+
+# debian: everywhere
+usr/share/flags/countries/16x11 usr/share/i2p/docs/icons/flags
+usr/share/flags/countries/16x11/az.png usr/share/i2p/eepsite/docroot/help/lib/az.png
+usr/share/flags/countries/16x11/cn.png usr/share/i2p/eepsite/docroot/help/lib/cn.png
+usr/share/flags/countries/16x11/de.png usr/share/i2p/eepsite/docroot/help/lib/de.png
+usr/share/flags/countries/16x11/es.png usr/share/i2p/eepsite/docroot/help/lib/es.png
+usr/share/flags/countries/16x11/fr.png usr/share/i2p/eepsite/docroot/help/lib/fr.png
+usr/share/flags/countries/16x11/nl.png usr/share/i2p/eepsite/docroot/help/lib/nl.png
+usr/share/flags/countries/16x11/pl.png usr/share/i2p/eepsite/docroot/help/lib/pl.png
+usr/share/flags/countries/16x11/pt.png usr/share/i2p/eepsite/docroot/help/lib/pt.png
+usr/share/flags/countries/16x11/ru.png usr/share/i2p/eepsite/docroot/help/lib/ru.png
+usr/share/flags/countries/16x11/se.png usr/share/i2p/eepsite/docroot/help/lib/se.png
+usr/share/flags/countries/16x11/us.png usr/share/i2p/eepsite/docroot/help/lib/us.png
+
+
 # comment out if not building with libhttpclient-java and libhttpcore-java
 # 2 MB of dependencies vs. 20 KB of copied source
 # Requires 4.4 or higher.

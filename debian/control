@@ -79,7 +79,8 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  libgetopt-java,
  libjetty9-java,
  libtaglibs-standard-jstlel-java,
- libtomcat8-java
+ libtomcat8-java,
+ famfamfam-flag-png
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu

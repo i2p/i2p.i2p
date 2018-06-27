@@ -151,6 +151,9 @@ endif
 	@mkdir -p $(CURDIR)/core/java/build
 	ln -sf /usr/share/java/gnu-getopt.jar $(CURDIR)/core/java/build/gnu-getopt.jar
 
+	@# debian: everywhere; ubuntu: trusty+
+	@/bin/echo -e "with-famfamfam-flag-png=true" >> $(CURDIR)/override.properties
+
 	@# 2 MB of dependencies vs. 20 KB of copied source
 	@# Requires 4.4 or higher.
 	@# Debian: Not in wheezy/jessie

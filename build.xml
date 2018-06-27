@@ -1279,7 +1279,7 @@
     </target>
 
     <!-- see targets below for conditional copying -->
-    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, truncatehistory">
+    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, copyflags-unlesspkg, truncatehistory">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
         <delete>
@@ -1325,10 +1325,13 @@
         <copy todir="pkg-temp/eepsite/" >
             <fileset dir="installer/resources/eepsite/" excludes="**/.placeholder" />
         </copy>
+        <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
+    </target>
+
+    <target name="copyflags-unlesspkg" unless="${with-famfamfam-flag-png}" >
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
             <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png ir.png it.png jp.png nl.png pl.png pt.png ru.png se.png us.png" />
         </copy>
-        <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy todir="pkg-temp/docs/icons/flags" >
           <!-- base flags/ dir only. flags16x11/ and flags48x48/ dirs already copied by prepConsoleDocs target -->
           <fileset dir="installer/resources/icons/flags" />
@@ -2410,6 +2413,7 @@
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
             <!-- libjakarta-taglibs-standard-java or glassfish-javaee or libtaglibs-standard -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/icons/flags" />
             <!-- anything added above, add in debian-release-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2493,6 +2497,7 @@
            -->
             <!-- libjakarta-taglibs-standard-java or glassfish-javaee -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
+            <!-- famfamfam-flag-png is in trusty but not precise, so leave them in the source package for both -->
             <!-- anything added above, add in debian-release-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2569,6 +2574,7 @@
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
            -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/icons/flags" />
             <!-- anything added above, add in debian-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2639,6 +2645,7 @@
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-8.5.30" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
+            <fileset dir="../i2p-${Extended.Version}/installer/resources/icons/flags" />
             <!-- anything added above, add in debian-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
