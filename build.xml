@@ -439,14 +439,19 @@
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
 
-    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
+    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber, setBuildTimestamp" >
         <!-- default if not set above -->
         <property name="workspace.version" value="unknown" />
+        <!-- default if not set by setBuildTimestamp -->
+        <property name="build.timestamp" value="reproducible" />
+        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
+        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
+    </target>
+
+    <target name="setBuildTimestamp" unless="${build.reproducible}" >
         <tstamp>
             <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
         </tstamp>
-        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
-        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
     </target>
 
     <target name="buildWEB" depends="buildRouterConsole" >
@@ -806,6 +811,7 @@
             use="true"
             splitindex="true"
             failonerror="true"
+            additionalparam="-notimestamp"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:net.minidev.json:net.minidev.json.*" />
@@ -880,7 +886,6 @@
             <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
-        <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
 
     <target name="javadoc-zip" depends="javadoc">
