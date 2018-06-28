@@ -406,6 +406,7 @@ class UDPPacket implements CDQEntry {
     public static UDPPacket acquire(RouterContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
+            PacketFactory.context = ctx;
             rv = _packetCache.tryAcquire();
             rv.init(ctx);
         }
