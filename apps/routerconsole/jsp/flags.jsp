@@ -28,7 +28,6 @@ if (c != null &&
     if ("48".equals(s)) {
         flagSet = "flags48x48";
     }
-    java.io.OutputStream cout = response.getOutputStream();
     String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
                   java.io.File.separatorChar +
                   "docs" + java.io.File.separatorChar + "icons";
@@ -58,8 +57,14 @@ if (c != null &&
         response.setHeader("Content-Length", Long.toString(length));
     response.setContentType("image/png");
     response.setHeader("Accept-Ranges", "none");
+    java.io.FileInputStream fin = null;
+    java.io.OutputStream cout = response.getOutputStream();
     try {
-        net.i2p.util.FileUtil.readFile(file, base, cout);
+        // flags dir may be a symlink, which readFile will reject
+        // We carefully vetted the "c" value above.
+        //net.i2p.util.FileUtil.readFile(file, base, cout);
+        fin = new java.io.FileInputStream(ffile);
+        net.i2p.data.DataHelper.copy(fin, cout);
     } catch (java.io.IOException ioe) {
         // prevent 'Committed' IllegalStateException from Jetty
         if (!response.isCommitted()) {
@@ -70,6 +75,9 @@ if (c != null &&
             // Jetty doesn't log this
             throw ioe;
         }
+    } finally {
+        if (fin != null) 
+            try { fin.close(); } catch (java.io.IOException ioe) {}
     }
 } else {
     /*
