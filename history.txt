@@ -1,3 +1,10 @@
+2018-06-30 zzz
+  * Console: Fix reading flags when symlinked (ticket #2270)
+  * Router: Reselect jbigi lib when processor changes (ticket #2277)
+
+2018-06-28 zzz
+  * Debian: Initial work on reproducible builds (ticket #2279)
+
 2018-06-27 zzz
   * Debian: Add dependency for famfamfam-flag-png (ticket #2270)
 

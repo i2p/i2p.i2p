@@ -14,8 +14,10 @@ import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -25,6 +27,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import gnu.getopt.Getopt;
 
+import freenet.support.CPUInformation.CPUID;
+import freenet.support.CPUInformation.UnknownCPUException;
 import net.i2p.client.impl.I2PSessionImpl;
 import net.i2p.crypto.SigUtil;
 import net.i2p.data.Base64;
@@ -54,6 +58,7 @@ import net.i2p.router.util.EventLog;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.ByteCache;
+import net.i2p.util.FileUtil;
 import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
@@ -129,6 +134,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public static final String PROP_OB_RANDOM_KEY = TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
     private static final String EVENTLOG = "eventlog.txt";
     private static final String PROP_JBIGI = "jbigi.loadedResource";
+    private static final String PROP_JBIGI_PROCESSOR = "jbigi.lastProcessor";
     public static final String UPDATE_FILE = "i2pupdate.zip";
         
     private static final int SHUTDOWN_WAIT_SECS = 60;
@@ -1219,12 +1225,65 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Could block for 10 seconds or forever
      */
     private void warmupCrypto() {
+        String oldLoaded = _context.getProperty(PROP_JBIGI);
+        String oldProcessor = _context.getProperty(PROP_JBIGI_PROCESSOR);
+        String processor = null;
+        if (SystemVersion.isX86()) {
+            // Check to see if processor changed since last time we ran,
+            // or if we detected a different processor model due to CPUID code changes,
+            // or if we changed 32/64 bit.
+            // If so, delete the old jbigi.so file, to protect against a JVM crash.
+            // We do this before calling elGamalEngine(), which calls NBI.
+            // We take care not to access the NBI class yet.
+            try {
+                processor = CPUID.getInfo().getCPUModelString();
+                if (SystemVersion.is64Bit())
+                    processor += "/64";
+                if (oldProcessor != null && !oldProcessor.equals(processor)) {
+                    // delete old so file
+                    boolean isWin = SystemVersion.isWindows();
+                    boolean isMac = SystemVersion.isMac();
+                    String osName = System.getProperty("os.name").toLowerCase(Locale.US);
+                    // only do this on these OSes
+                    boolean goodOS = isWin || isMac ||
+                                     osName.contains("linux") || osName.contains("freebsd");
+                    File jbigiJar = new File(_context.getBaseDir(), "lib/jbigi.jar");
+                    if (goodOS && jbigiJar.exists() && _context.getBaseDir().canWrite()) {
+                        String libPrefix = isWin ? "" : "lib";
+                        String libSuffix = isWin ? ".dll" : isMac ? ".jnilib" : ".so";
+                        File jbigiLib = new File(_context.getBaseDir(), libPrefix + "jbigi" + libSuffix);
+                        if (jbigiLib.canWrite()) {
+                            String path = jbigiLib.getAbsolutePath();
+                            boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                            if (success) {
+                                success = jbigiLib.delete();
+                                if (success) {
+                                    System.out.println("Processor change detected, moved jbigi library to " +
+                                                       path + ".bak");
+                                    System.out.println("Check logs for successful installation of new library");
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (UnknownCPUException e) {}
+        }
         _context.random().nextBoolean();
         // Instantiate to fire up the YK refiller thread
         _context.elGamalEngine();
         String loaded = NativeBigInteger.getLoadedResourceName();
-        if (loaded != null)
-            saveConfig(PROP_JBIGI, loaded);
+        Map<String, String> changes = null;
+        if (loaded != null && !loaded.equals(oldLoaded)) {
+            changes = new HashMap<String, String>(2);
+            changes.put(PROP_JBIGI, loaded);
+        }
+        if (processor != null && !processor.equals(oldProcessor)) {
+            if (changes == null)
+                changes = new HashMap<String, String>(1);
+            changes.put(PROP_JBIGI_PROCESSOR, processor);
+        }
+        if (changes != null)
+            saveConfig(changes, null);
     }
     
     /** shut down after all tunnels are gone */
