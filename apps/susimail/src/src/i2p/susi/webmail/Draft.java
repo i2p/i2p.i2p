@@ -25,7 +25,7 @@ import i2p.susi.webmail.encoding.EncodingFactory;
 class Draft extends Mail {
 
 	private final List<Attachment> attachments;
-	String[] bcc;        // addresses only, enclosed by <>
+	private String[] bcc;        // addresses only, enclosed by <>
 	private static final String HDR_ATTACH = "X-I2P-Attachment: ";
 	public static final String HDR_BCC = "Bcc: ";
 	
