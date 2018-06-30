@@ -322,16 +322,19 @@ public class I2PAppContext {
         } else {
             _appDir = _routerDir;
         }
-        /******
-        (new Exception("Initialized by")).printStackTrace();
-        System.err.println("Base directory:   " + _baseDir.getAbsolutePath());
-        System.err.println("Config directory: " + _configDir.getAbsolutePath());
-        System.err.println("Router directory: " + _routerDir.getAbsolutePath());
-        System.err.println("App directory:    " + _appDir.getAbsolutePath());
-        System.err.println("Log directory:    " + _logDir.getAbsolutePath());
-        System.err.println("PID directory:    " + _pidDir.getAbsolutePath());
-        System.err.println("Temp directory:   " + getTempDir().getAbsolutePath());
-        ******/
+        String isPortableStr = System.getProperty("i2p.dir.portableMode");
+        boolean isPortable = Boolean.parseBoolean(isPortableStr);
+        if (isPortable) {
+            // In portable we like debug information :)
+            //(new Exception("Initialized by")).printStackTrace();
+            System.err.println("Base directory:   " + _baseDir.getAbsolutePath());
+            System.err.println("Config directory: " + _configDir.getAbsolutePath());
+            System.err.println("Router directory: " + _routerDir.getAbsolutePath());
+            System.err.println("App directory:    " + _appDir.getAbsolutePath());
+            System.err.println("Log directory:    " + _logDir.getAbsolutePath());
+            System.err.println("PID directory:    " + _pidDir.getAbsolutePath());
+            System.err.println("Temp directory:   " + getTempDir().getAbsolutePath());
+        }
 
         if (doInit) {
             // Bad practice, sets a static field to this in constructor.
