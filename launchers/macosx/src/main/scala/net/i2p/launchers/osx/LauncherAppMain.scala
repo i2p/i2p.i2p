@@ -87,8 +87,6 @@ object LauncherAppMain extends App {
       }
     }
 
-    //Await.result(routerProcess, 5000 millis)
-
   } finally {
     System.out.println("Exit?")
   }

@@ -1,7 +1,7 @@
 import java.io.{File, FileNotFoundException, FileOutputStream}
 import java.util.zip._
 
-lazy val i2pVersion = "0.9.34"
+lazy val i2pVersion = "0.9.35"
 
 lazy val cleanAllTask = taskKey[Unit]("Clean up and remove the OSX bundle")
 lazy val buildAppBundleTask = taskKey[Unit](s"Build an Mac OS X bundle for I2P ${i2pVersion}.")
@@ -24,7 +24,7 @@ lazy val i2pBuildDir = new File("./../pkg-temp")
 lazy val warsForCopy = new File(i2pBuildDir, "webapps").list.filter { f => f.endsWith(".war") }
 lazy val jarsForCopy = new File(i2pBuildDir, "lib").list.filter { f => f.endsWith(".jar") }
 
-
+// TODO: Meeh: To be removed - logic is moved to obj-cpp
 def defaultOSXLauncherShellScript(javaOpts: Seq[String] = Seq.empty): Seq[String] = {
   val javaOptsString = javaOpts.map(_ + " ").mkString
   Seq(
@@ -137,13 +137,6 @@ buildAppBundleTask := {
 
   val launcherBinary = Some(assembly.value)
   launcherBinary.map { l => IO.copyFile( new File(l.toString), new File(paths.get("execBundlePath").get, "I2P") ) }
-
-
-  val plistFile = new File("./macosx/Info.plist")
-  if (plistFile.exists()) {
-    println(s"Adding Info.plist...")
-    IO.copyFile(plistFile, new File(bundleBuildPath, "I2P.app/Contents/Info.plist"))
-  }
 
   val zipFilePath = Some(buildDeployZipTask.value)
 

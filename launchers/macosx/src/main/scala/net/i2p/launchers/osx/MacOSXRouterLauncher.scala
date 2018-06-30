@@ -17,50 +17,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 object MacOSXRouterLauncher extends RouterLauncher {
 
-  def pid(p: Process): Long = {
-    val procField = p.getClass.getDeclaredField("p")
-    procField.synchronized {
-      procField.setAccessible(true)
-      val proc = procField.get(p)
-      try {
-        proc match {
-          case unixProc
-            if unixProc.getClass.getName == "java.lang.UNIXProcess" => {
-            val pidField = unixProc.getClass.getDeclaredField("pid")
-            pidField.synchronized {
-              pidField.setAccessible(true)
-              try {
-                pidField.getLong(unixProc)
-              } finally {
-                pidField.setAccessible(false)
-              }
-            }
-          }
-          case procImpl:java.lang.Process => {
-            val f: Field = p.getClass().getDeclaredField("p")
-            val f2: Field = f.get(p).getClass.getDeclaredField("pid")
-            try {
-              f.setAccessible(true)
-              f2.setAccessible(true)
-              val pid = f2.getLong(p)
-              pid
-            } finally {
-              f2.setAccessible(false)
-              f.setAccessible(false)
-            }
-          }
-          // If someone wants to add support for Windows processes,
-          // this would be the right place to do it:
-          case _ => throw new RuntimeException(
-            "Cannot get PID of a " + proc.getClass.getName)
-        }
-      } finally {
-        procField.setAccessible(false)
-      }
-    }
-  }
-
-
   // ??? equals "throw not implemented" IIRC - it compiles at least :)
   override def runRouter(args: Array[String]): Future[Process] = ???
 
