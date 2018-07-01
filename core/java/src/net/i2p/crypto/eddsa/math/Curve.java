@@ -19,6 +19,7 @@ public class Curve implements Serializable {
 
     private final GroupElement zeroP2;
     private final GroupElement zeroP3;
+    private final GroupElement zeroP3PrecomputedDouble;
     private final GroupElement zeroPrecomp;
 
     public Curve(Field f, byte[] d, FieldElement I) {
@@ -30,7 +31,8 @@ public class Curve implements Serializable {
         FieldElement zero = f.ZERO;
         FieldElement one = f.ONE;
         zeroP2 = GroupElement.p2(this, zero, one, one);
-        zeroP3 = GroupElement.p3(this, zero, one, one, zero);
+        zeroP3 = GroupElement.p3(this, zero, one, one, zero, false);
+        zeroP3PrecomputedDouble = GroupElement.p3(this, zero, one, one, zero, true);
         zeroPrecomp = GroupElement.precomp(this, one, one, zero);
     }
 
@@ -56,6 +58,8 @@ public class Curve implements Serializable {
             return zeroP2;
         case P3:
             return zeroP3;
+        case P3PrecomputedDouble:
+            return zeroP3PrecomputedDouble;
         case PRECOMP:
             return zeroPrecomp;
         default:
@@ -64,9 +68,7 @@ public class Curve implements Serializable {
     }
 
     public GroupElement createPoint(byte[] P, boolean precompute) {
-        GroupElement ge = new GroupElement(this, P);
-        if (precompute)
-            ge.precompute(true);
+        GroupElement ge = new GroupElement(this, P, precompute);
         return ge;
     }
 

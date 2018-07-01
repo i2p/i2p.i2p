@@ -11,6 +11,8 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
 import net.i2p.crypto.eddsa.math.Curve;
@@ -54,6 +56,8 @@ import net.i2p.crypto.eddsa.math.ScalarOps;
  *
  */
 public final class EdDSAEngine extends Signature {
+    public static final String SIGNATURE_ALGORITHM = "NONEwithEdDSA";
+
     private MessageDigest digest;
     private ByteArrayOutputStream baos;
     private EdDSAKey key;
@@ -76,14 +80,14 @@ public final class EdDSAEngine extends Signature {
     private static class OneShotSpec implements AlgorithmParameterSpec {}
 
     /**
-     * No specific hash requested, allows any EdDSA key.
+     * No specific EdDSA-internal hash requested, allows any EdDSA key.
      */
     public EdDSAEngine() {
-        super("EdDSA");
+        super(SIGNATURE_ALGORITHM);
     }
 
     /**
-     * Specific hash requested, only matching keys will be allowed.
+     * Specific EdDSA-internal hash requested, only matching keys will be allowed.
      * @param digest the hash algorithm that keys must have to sign or verify.
      */
     public EdDSAEngine(MessageDigest digest) {
@@ -147,6 +151,16 @@ public final class EdDSAEngine extends Signature {
                 }
             } else if (!key.getParams().getHashAlgorithm().equals(digest.getAlgorithm()))
                 throw new InvalidKeyException("Key hash algorithm does not match chosen digest");
+        } else if (publicKey.getClass().getName().equals("sun.security.x509.X509Key")) {
+            // X509Certificate will sometimes contain an X509Key rather than the EdDSAPublicKey itself; the contained
+            // key is valid but needs to be instanced as an EdDSAPublicKey before it can be used.
+            EdDSAPublicKey parsedPublicKey;
+            try {
+                parsedPublicKey = new EdDSAPublicKey(new X509EncodedKeySpec(publicKey.getEncoded()));
+            } catch (InvalidKeySpecException ex) {
+                throw new InvalidKeyException("cannot handle X.509 EdDSA public key: " + publicKey.getAlgorithm());
+            }
+            engineInitVerify(parsedPublicKey);
         } else {
             throw new InvalidKeyException("cannot identify EdDSA public key: " + publicKey.getClass());
         }
@@ -311,6 +325,8 @@ public final class EdDSAEngine extends Signature {
      *  sig = sign()
      *</pre>
      *
+     * @param data the message to be signed
+     * @return the signature
      * @throws SignatureException if update() already called
      * @see #ONE_SHOT_MODE
      * @since 0.9.25
@@ -330,6 +346,10 @@ public final class EdDSAEngine extends Signature {
      *  sig = sign()
      *</pre>
      *
+     * @param data byte array containing the message to be signed
+     * @param off the start of the message inside data
+     * @param len the length of the message
+     * @return the signature
      * @throws SignatureException if update() already called
      * @see #ONE_SHOT_MODE
      * @since 0.9.25
@@ -351,6 +371,9 @@ public final class EdDSAEngine extends Signature {
      *  ok = verify(signature)
      *</pre>
      *
+     * @param data the message that was signed
+     * @param signature of the message
+     * @return true if the signature is valid, false otherwise
      * @throws SignatureException if update() already called
      * @see #ONE_SHOT_MODE
      * @since 0.9.25
@@ -370,6 +393,11 @@ public final class EdDSAEngine extends Signature {
      *  ok = verify(signature)
      *</pre>
      *
+     * @param data byte array containing the message that was signed
+     * @param off the start of the message inside data
+     * @param len the length of the message
+     * @param signature of the message
+     * @return true if the signature is valid, false otherwise
      * @throws SignatureException if update() already called
      * @see #ONE_SHOT_MODE
      * @since 0.9.25
@@ -389,6 +417,11 @@ public final class EdDSAEngine extends Signature {
      *  ok = verify(signature, sigoff, siglen)
      *</pre>
      *
+     * @param data the message that was signed
+     * @param signature byte array containing the signature
+     * @param sigoff the start of the signature
+     * @param siglen the length of the signature
+     * @return true if the signature is valid, false otherwise
      * @throws SignatureException if update() already called
      * @see #ONE_SHOT_MODE
      * @since 0.9.25
@@ -408,6 +441,13 @@ public final class EdDSAEngine extends Signature {
      *  ok = verify(signature, sigoff, siglen)
      *</pre>
      *
+     * @param data byte array containing the message that was signed
+     * @param off the start of the message inside data
+     * @param len the length of the message
+     * @param signature byte array containing the signature
+     * @param sigoff the start of the signature
+     * @param siglen the length of the signature
+     * @return true if the signature is valid, false otherwise
      * @throws SignatureException if update() already called
      * @see #ONE_SHOT_MODE
      * @since 0.9.25

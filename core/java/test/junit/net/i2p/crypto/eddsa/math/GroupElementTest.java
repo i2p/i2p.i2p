@@ -760,7 +760,7 @@ public class GroupElementTest {
         GroupElement A = new GroupElement(curve, Utils.hexToBytes("d4cf8595571830644bd14af416954d09ab7159751ad9e0f7a6cbd92379e71a66"));
         GroupElement B = ed25519.getB();
         GroupElement geZero = curve.getZero(GroupElement.Representation.P3);
-        geZero.precompute(false);
+        //geZero.precompute(false);
 
         // 0 * GE(0) + 0 * GE(0) = GE(0)
         assertThat(geZero.doubleScalarMultiplyVariableTime(geZero, zero, zero),
@@ -802,7 +802,7 @@ public class GroupElementTest {
             // Arrange:
             final GroupElement basePoint = ed25519.getB();
             final GroupElement g = MathUtils.getRandomGroupElement();
-            g.precompute(false);
+            //g.precompute(false);
             final FieldElement f1 = MathUtils.getRandomFieldElement();
             final FieldElement f2 = MathUtils.getRandomFieldElement();
 

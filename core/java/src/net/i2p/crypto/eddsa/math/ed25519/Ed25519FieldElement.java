@@ -51,12 +51,12 @@ public class Ed25519FieldElement extends FieldElement {
      * TODO-CR BR: h is allocated via new, probably not a good idea. Do we need the copying into temp variables if we do that?
      * <p>
      * Preconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      * <li>|g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      * </ul><p>
      * Postconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
      * </ul>
      *
@@ -80,12 +80,12 @@ public class Ed25519FieldElement extends FieldElement {
      * TODO-CR BR: See above.
      * <p>
      * Preconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      * <li>|g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      * </ul><p>
      * Postconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
      * </ul>
      *
@@ -107,11 +107,11 @@ public class Ed25519FieldElement extends FieldElement {
      * TODO-CR BR: see above.
      * <p>
      * Preconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      * </ul><p>
      * Postconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      * </ul>
      *
@@ -131,14 +131,14 @@ public class Ed25519FieldElement extends FieldElement {
      * Can overlap h with f or g.
      * <p>
      * Preconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|f| bounded by
      * 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
      * <li>|g| bounded by
      * 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
      * </ul><p>
      * Postconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|h| bounded by
      * 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
      * </ul><p>
@@ -382,11 +382,11 @@ public class Ed25519FieldElement extends FieldElement {
      * Can overlap h with f.
      * <p>
      * Preconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|f| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
      * </ul><p>
      * Postconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
      * </ul><p>
      * See {@link #multiply(FieldElement)} for discussion
@@ -538,11 +538,11 @@ public class Ed25519FieldElement extends FieldElement {
      * Can overlap h with f.
      * <p>
      * Preconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|f| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
      * </ul><p>
      * Postconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
      * </ul><p>
      * See {@link #multiply(FieldElement)} for discussion
@@ -932,6 +932,30 @@ public class Ed25519FieldElement extends FieldElement {
 
         // 2^252 - 3
         return multiply(t0);
+    }
+
+    /**
+     * Constant-time conditional move. Well, actually it is a conditional copy.
+     * Logic is inspired by the SUPERCOP implementation at:
+     *   https://github.com/floodyberry/supercop/blob/master/crypto_sign/ed25519/ref10/fe_cmov.c
+     *
+     * @param val the other field element.
+     * @param b must be 0 or 1, otherwise results are undefined.
+     * @return a copy of this if b == 0, or a copy of val if b == 1.
+     * @since 0.9.36
+     */
+    @Override
+    public FieldElement cmov(FieldElement val, int b) {
+        Ed25519FieldElement that = (Ed25519FieldElement) val;
+        b = -b;
+        int[] result = new int[10];
+        for (int i = 0; i < 10; i++) {
+            result[i] = this.t[i];
+            int x = this.t[i] ^ that.t[i];
+            x &= b;
+            result[i] ^= x;
+        }
+        return new Ed25519FieldElement(this.f, result);
     }
 
     @Override

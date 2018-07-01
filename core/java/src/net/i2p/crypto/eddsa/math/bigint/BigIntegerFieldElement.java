@@ -93,6 +93,16 @@ public class BigIntegerFieldElement extends FieldElement implements Serializable
         return pow(f.getQm5d8());
     }
 
+    /**
+     * @since 0.9.36
+     */
+    @Override
+    public FieldElement cmov(FieldElement val, int b) {
+        // Not constant-time, but it doesn't really matter because none of the underlying BigInteger operations
+        // are either, so there's not much point in trying hard here ...
+        return b == 0 ? this : val;
+    }
+
     @Override
     public int hashCode() {
         return bi.hashCode();

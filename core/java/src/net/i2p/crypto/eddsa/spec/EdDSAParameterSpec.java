@@ -25,6 +25,10 @@ public class EdDSAParameterSpec implements AlgorithmParameterSpec, Serializable 
     private final GroupElement B;
 
     /**
+     *  @param curve the curve
+     *  @param hashAlgo the JCA string for the hash algorithm
+     *  @param sc the parameter L represented as ScalarOps
+     *  @param B the parameter B
      *  @throws IllegalArgumentException if hash algorithm is unsupported or length is wrong
      */
     public EdDSAParameterSpec(Curve curve, String hashAlgo,

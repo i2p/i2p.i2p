@@ -40,6 +40,11 @@ public class GroupElement implements Serializable {
         P2,
         /** Extended (P^3): (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT */
         P3,
+        /**
+         * Can only be requested.  Results in P3 representation but also populates dblPrecmp.
+         * @since 0.9.36
+         */
+        P3PrecomputedDouble,
         /** Completed (P x P): ((X:Z),(Y:T)) satisfying x=X/Z, y=Y/T */
         P1P1,
         /** Precomputed (Duif): (y+x,y-x,2dxy) */
@@ -81,7 +86,29 @@ public class GroupElement implements Serializable {
             final FieldElement Y,
             final FieldElement Z,
             final FieldElement T) {
-        return new GroupElement(curve, Representation.P3, X, Y, Z, T);
+        return p3(curve, X, Y, Z, T, false);
+    }
+
+    /**
+     * Creates a new group element in P3 representation, potentially with pre-computation.
+     *
+     * @param curve The curve.
+     * @param X The X coordinate.
+     * @param Y The Y coordinate.
+     * @param Z The Z coordinate.
+     * @param T The T coordinate.
+     * @param precomputeDoubleOnly If true, populate dblPrecmp, else set to null.
+     * @return The group element in P3 representation.
+     * @since 0.9.36
+     */
+    public static GroupElement p3(
+            final Curve curve,
+            final FieldElement X,
+            final FieldElement Y,
+            final FieldElement Z,
+            final FieldElement T,
+            final boolean precomputeDoubleOnly) {
+        return new GroupElement(curve, Representation.P3, X, Y, Z, T, precomputeDoubleOnly);
     }
 
     /**
@@ -175,7 +202,7 @@ public class GroupElement implements Serializable {
      * <p>
      * Variable is package private only so that tests run.
      */
-    GroupElement[][] precmp;
+    final GroupElement[][] precmp;
 
     /**
      * Precomputed table for {@link #doubleScalarMultiplyVariableTime(GroupElement, byte[], byte[])},
@@ -183,10 +210,10 @@ public class GroupElement implements Serializable {
      * <p>
      * Variable is package private only so that tests run.
      */
-    GroupElement[] dblPrecmp;
+    final GroupElement[] dblPrecmp;
 
     /**
-     * Creates a group element for a curve.
+     * Creates a group element for a curve, without any pre-computation.
      *
      * @param curve The curve.
      * @param repr The representation used to represent the group element.
@@ -202,12 +229,37 @@ public class GroupElement implements Serializable {
             final FieldElement Y,
             final FieldElement Z,
             final FieldElement T) {
+        this(curve, repr, X, Y, Z, T, false);
+    }
+
+    /**
+     * Creates a group element for a curve, with optional pre-computation.
+     *
+     * @param curve The curve.
+     * @param repr The representation used to represent the group element.
+     * @param X The X coordinate.
+     * @param Y The Y coordinate.
+     * @param Z The Z coordinate.
+     * @param T The T coordinate.
+     * @param precomputeDouble If true, populate dblPrecmp, else set to null.
+     * @since 0.9.36
+     */
+    public GroupElement(
+            final Curve curve,
+            final Representation repr,
+            final FieldElement X,
+            final FieldElement Y,
+            final FieldElement Z,
+            final FieldElement T,
+            final boolean precomputeDouble) {
         this.curve = curve;
         this.repr = repr;
         this.X = X;
         this.Y = Y;
         this.Z = Z;
         this.T = T;
+        this.precmp = null;
+        this.dblPrecmp = precomputeDouble ? precomputeDouble() : null;
     }
 
     /**
@@ -215,8 +267,28 @@ public class GroupElement implements Serializable {
      * <p>
      * A point (x,y) is encoded by storing y in bit 0 to bit 254 and the sign of x in bit 255.
      * x is recovered in the following way:
-     * <p><ul>
+     * </p><ul>
      * <li>x = sign(x) * sqrt((y^2 - 1) / (d * y^2 + 1)) = sign(x) * sqrt(u / v) with u = y^2 - 1 and v = d * y^2 + 1.
+     * <li>Setting  = (u * v^3) * (u * v^7)^((q - 5) / 8) one has ^2 = +-(u / v).
+     * <li>If v *  = -u multiply  with i=sqrt(-1).
+     * <li>Set x := .
+     * <li>If sign(x) != bit 255 of s then negate x.
+     * </ul>
+     *
+     * @param curve The curve.
+     * @param s The encoded point.
+     */
+    public GroupElement(final Curve curve, final byte[] s) {
+        this(curve, s, false);
+    }
+
+    /**
+     * Creates a group element for a curve from a given encoded point.  With optional pre-computation.
+     * <p>
+     * A point (x,y) is encoded by storing y in bit 0 to bit 254 and the sign of x in bit 255.
+     * x is recovered in the following way:
+     * </p><ul>
+     * <li>x = sign(x) * \sqrt{(y^2 - 1) / (d * y^2 + 1)} = sign(x) * \sqrt{u / v} with u = y^2 - 1 and v = d * y^2 + 1.
      * <li>Setting β = (u * v^3) * (u * v^7)^((q - 5) / 8) one has β^2 = +-(u / v).
      * <li>If v * β = -u multiply β with i=sqrt(-1).
      * <li>Set x := β.
@@ -225,8 +297,10 @@ public class GroupElement implements Serializable {
      *
      * @param curve The curve.
      * @param s The encoded point.
+     * @param precomputeSingleAndDouble If true, populate both precmp and dblPrecmp, else set both to null.
+     * @since 0.9.36
      */
-    public GroupElement(final Curve curve, final byte[] s) {
+    public GroupElement(final Curve curve, final byte[] s, boolean precomputeSingleAndDouble) {
         FieldElement x, y, yy, u, v, v3, vxx, check;
         y = curve.getField().fromByteArray(s);
         yy = y.square();
@@ -241,7 +315,7 @@ public class GroupElement implements Serializable {
         v3 = v.square().multiply(v);
 
         // x = (v3^2)vu, aka x = uv^7
-        x = v3.square().multiply(v).multiply(u);    
+        x = v3.square().multiply(v).multiply(u);
 
         //  x = (uv^7)^((q-5)/8)
         x = x.pow22523();
@@ -269,6 +343,13 @@ public class GroupElement implements Serializable {
         this.Y = y;
         this.Z = curve.getField().ONE;
         this.T = this.X.multiply(this.Y);
+        if (precomputeSingleAndDouble) {
+            precmp = precomputeSingle();
+            dblPrecmp = precomputeDouble();
+        } else {
+            precmp = null;
+            dblPrecmp = null;
+        }
     }
 
     /**
@@ -368,6 +449,16 @@ public class GroupElement implements Serializable {
     }
 
     /**
+     * Converts the group element to the P3 representation, with dblPrecmp populated.
+     *
+     * @return The group element in the P3 representation.
+     * @since 0.9.36
+     */
+    public GroupElement toP3PrecomputeDouble() {
+        return toRep(Representation.P3PrecomputedDouble);
+    }
+
+    /**
      * Converts the group element to the CACHED representation.
      *
      * @return The group element in the CACHED representation.
@@ -382,7 +473,7 @@ public class GroupElement implements Serializable {
      * r = p
      * <p>
      * Supported conversions:
-     * <p><ul>
+     * </p><ul>
      * <li>P3 -> P2
      * <li>P3 -> CACHED (1 multiply, 1 add, 1 subtract)
      * <li>P1P1 -> P2 (3 multiply)
@@ -416,7 +507,9 @@ public class GroupElement implements Serializable {
                     case P2:
                         return p2(this.curve, this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T));
                     case P3:
-                        return p3(this.curve, this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y));
+                        return p3(this.curve, this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y), false);
+                    case P3PrecomputedDouble:
+                        return p3(this.curve, this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y), true);
                     case P1P1:
                         return p1p1(this.curve, this.X, this.Y, this.Z, this.T);
                     default:
@@ -442,51 +535,49 @@ public class GroupElement implements Serializable {
     }
 
     /**
-     * Precomputes several tables.
-     * <p>
-     * The precomputed tables are used for {@link #scalarMultiply(byte[])}
-     * and {@link #doubleScalarMultiplyVariableTime(GroupElement, byte[], byte[])}.
-     *
-     * @param precomputeSingle should the matrix for scalarMultiply() be precomputed?
+     * Precomputes table for {@link #scalarMultiply(byte[])}.
+     * @since 0.9.36 split out from precompute()
      */
-    public synchronized void precompute(final boolean precomputeSingle) {
-        GroupElement Bi;
-
-        if (precomputeSingle && this.precmp == null) {
-            // Precomputation for single scalar multiplication.
-            this.precmp = new GroupElement[32][8];
-            // TODO-CR BR: check that this == base point when the method is called.
-            Bi = this;
-            for (int i = 0; i < 32; i++) {
-                GroupElement Bij = Bi;
-                for (int j = 0; j < 8; j++) {
-                    final FieldElement recip = Bij.Z.invert();
-                    final FieldElement x = Bij.X.multiply(recip);
-                    final FieldElement y = Bij.Y.multiply(recip);
-                    this.precmp[i][j] = precomp(this.curve, y.add(x), y.subtract(x), x.multiply(y).multiply(this.curve.get2D()));
-                    Bij = Bij.add(Bi.toCached()).toP3();
-                }
-                // Only every second summand is precomputed (16^2 = 256)
-                for (int k = 0; k < 8; k++) {
-                    Bi = Bi.add(Bi.toCached()).toP3();
-                }
+    private GroupElement[][] precomputeSingle() {
+        // Precomputation for single scalar multiplication.
+        GroupElement[][] precmp = new GroupElement[32][8];
+        // TODO-CR BR: check that this == base point when the method is called.
+        GroupElement Bi = this;
+        for (int i = 0; i < 32; i++) {
+            GroupElement Bij = Bi;
+            for (int j = 0; j < 8; j++) {
+                final FieldElement recip = Bij.Z.invert();
+                final FieldElement x = Bij.X.multiply(recip);
+                final FieldElement y = Bij.Y.multiply(recip);
+                precmp[i][j] = precomp(this.curve, y.add(x), y.subtract(x), x.multiply(y).multiply(this.curve.get2D()));
+                Bij = Bij.add(Bi.toCached()).toP3();
+            }
+            // Only every second summand is precomputed (16^2 = 256)
+            for (int k = 0; k < 8; k++) {
+                Bi = Bi.add(Bi.toCached()).toP3();
             }
         }
+        return precmp;
+    }
 
+    /**
+     * Precomputes table for {@link #doubleScalarMultiplyVariableTime(GroupElement, byte[], byte[])}.
+     * @since 0.9.36 split out from precompute()
+     */
+    private GroupElement[] precomputeDouble() {
         // Precomputation for double scalar multiplication.
         // P,3P,5P,7P,9P,11P,13P,15P
-        if (this.dblPrecmp != null)
-            return;
-        this.dblPrecmp = new GroupElement[8];
-        Bi = this;
+        GroupElement[] dblPrecmp = new GroupElement[8];
+        GroupElement Bi = this;
         for (int i = 0; i < 8; i++) {
             final FieldElement recip = Bi.Z.invert();
             final FieldElement x = Bi.X.multiply(recip);
             final FieldElement y = Bi.Y.multiply(recip);
-            this.dblPrecmp[i] = precomp(this.curve, y.add(x), y.subtract(x), x.multiply(y).multiply(this.curve.get2D()));
+            dblPrecmp[i] = precomp(this.curve, y.add(x), y.subtract(x), x.multiply(y).multiply(this.curve.get2D()));
             // Bi = edwards(B,edwards(B,Bi))
             Bi = this.add(this.add(Bi.toCached()).toP3().toCached()).toP3();
         }
+        return dblPrecmp;
     }
 
     /**
@@ -496,7 +587,7 @@ public class GroupElement implements Serializable {
      * r in P x P representation:
      * <p>
      * r = ((X' : Z'), (Y' : T')) where
-     * <p><ul>
+     * </p><ul>
      * <li>X' = (X + Y)^2 - (Y^2 + X^2)
      * <li>Y' = Y^2 + X^2
      * <li>Z' = y^2 - X^2
@@ -505,7 +596,7 @@ public class GroupElement implements Serializable {
      * r converted from P x P to P^2 representation:
      * <p>
      * r = (X'' : Y'' : Z'') where
-     * <p><ul>
+     * </p><ul>
      * <li>X'' = X' * Z' = ((X + Y)^2 - Y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
      * <li>Y'' = Y' * T' = (Y^2 + X^2) * (2 * Z^2 - (y^2 - X^2))
      * <li>Z'' = Z' * T' = (y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
@@ -548,14 +639,14 @@ public class GroupElement implements Serializable {
      * r in P x P representation:
      * <p>
      * r = ((X' : Z'), (Y' : T')) where
-     * <p><ul>
+     * </p><ul>
      * <li>X' = (Y1 + X1) * q.X - (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)) * 1/Z2
      * <li>Y' = (Y1 + X1) * q.X + (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) + (Y1 - X1) * (Y2 - X2)) * 1/Z2
      * <li>Z' = 2 * Z1 + T1 * q.Z = 2 * Z1 + T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 + 2 * d * T1 * T2) * 1/Z2
      * <li>T' = 2 * Z1 - T1 * q.Z = 2 * Z1 - T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 - 2 * d * T1 * T2) * 1/Z2
      * </ul><p>
      * Setting A = (Y1 - X1) * (Y2 - X2), B = (Y1 + X1) * (Y2 + X2), C = 2 * d * T1 * T2, D = 2 * Z1 * Z2 we get
-     * <p><ul>
+     * </p><ul>
      * <li>X' = (B - A) * 1/Z2
      * <li>Y' = (B + A) * 1/Z2
      * <li>Z' = (D + C) * 1/Z2
@@ -564,7 +655,7 @@ public class GroupElement implements Serializable {
      * r converted from P x P to P^2 representation:
      * <p>
      * r = (X'' : Y'' : Z'' : T'') where
-     * <p><ul>
+     * </p><ul>
      * <li>X'' = X' * Z' = (B - A) * (D + C) * 1/Z2^2
      * <li>Y'' = Y' * T' = (B + A) * (D - C) * 1/Z2^2
      * <li>Z'' = Z' * T' = (D + C) * (D - C) * 1/Z2^2
@@ -634,14 +725,14 @@ public class GroupElement implements Serializable {
      * r = p + q where p = this = (X1 : Y1 : Z1 : T1), q = (q.X, q.Y, q.Z, q.T) = (Y2 + X2, Y2 - X2, Z2, 2 * d * T2)
      * <p>
      * r in P x P representation:
-     * <p><ul>
+     * </p><ul>
      * <li>X' = (Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)
      * <li>Y' = (Y1 + X1) * (Y2 + X2) + (Y1 - X1) * (Y2 - X2)
      * <li>Z' = 2 * Z1 * Z2 + 2 * d * T1 * T2
      * <li>T' = 2 * Z1 * T2 - 2 * d * T1 * T2
      * </ul><p>
      * Setting A = (Y1 - X1) * (Y2 - X2), B = (Y1 + X1) * (Y2 + X2), C = 2 * d * T1 * T2, D = 2 * Z1 * Z2 we get
-     * <p><ul>
+     * </p><ul>
      * <li>X' = (B - A)
      * <li>Y' = (B + A)
      * <li>Z' = (D + C)
@@ -708,7 +799,7 @@ public class GroupElement implements Serializable {
     public GroupElement negate() {
         if (this.repr != Representation.P3)
             throw new UnsupportedOperationException();
-        return this.curve.getZero(Representation.P3).sub(toCached()).toP3();
+        return this.curve.getZero(Representation.P3).sub(toCached()).toP3PrecomputeDouble();
     }
 
     @Override
@@ -804,19 +895,10 @@ public class GroupElement implements Serializable {
      *
      * @param u The group element to return if b == 1.
      * @param b in {0, 1}
-     * @return u if b == 1; this if b == 0; null otherwise.
+     * @return u if b == 1; this if b == 0; Results undefined if b is not in {0, 1}.
      */
     GroupElement cmov(final GroupElement u, final int b) {
-        GroupElement ret = null;
-        for (int i = 0; i < b; i++) {
-            // Only for b == 1
-            ret = u;
-        }
-        for (int i = 0; i < 1-b; i++) {
-            // Only for b == 0
-            ret = this;
-        }
-        return ret;
+        return precomp(curve, X.cmov(u.X, b), Y.cmov(u.Y, b), Z.cmov(u.Z, b));
     }
 
     /**
@@ -873,22 +955,16 @@ public class GroupElement implements Serializable {
         final byte[] e = toRadix16(a);
 
         GroupElement h = this.curve.getZero(Representation.P3);
-        synchronized(this) {
-            // TODO: Get opinion from a crypto professional.
-            // This should in practice never be necessary, the only point that
-            // this should get called on is EdDSA's B.
-            //precompute();
-            for (i = 1; i < 64; i += 2) {
-                t = select(i/2, e[i]);
-                h = h.madd(t).toP3();
-            }
+        for (i = 1; i < 64; i += 2) {
+            t = select(i/2, e[i]);
+            h = h.madd(t).toP3();
+        }
 
-            h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
+        h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
 
-            for (i = 0; i < 64; i += 2) {
-                t = select(i/2, e[i]);
-                h = h.madd(t).toP3();
-            }
+        for (i = 0; i < 64; i += 2) {
+            t = select(i/2, e[i]);
+            h = h.madd(t).toP3();
         }
 
         return h;
@@ -965,14 +1041,8 @@ public class GroupElement implements Serializable {
             if (aslide[i] != 0 || bslide[i] != 0) break;
         }
 
-        synchronized(this) {
-            // TODO-CR BR strange comment below.
-            // TODO: Get opinion from a crypto professional.
-            // This should in practice never be necessary, the only point that
-            // this should get called on is EdDSA's B.
-            //precompute();
-            for (; i >= 0; --i) {
-                GroupElement t = r.dbl();
+        for (; i >= 0; --i) {
+            GroupElement t = r.dbl();
 
                 if (aslide[i] > 0) {
                     t = t.toP3().madd(A.dblPrecmp[aslide[i]/2]);
@@ -986,8 +1056,7 @@ public class GroupElement implements Serializable {
                     t = t.toP3().msub(this.dblPrecmp[(-bslide[i])/2]);
                 }
 
-                r = t.toP2();
-            }
+            r = t.toP2();
         }
 
         return r;

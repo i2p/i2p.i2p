@@ -21,6 +21,8 @@ public class EdDSAPrivateKeySpec implements KeySpec {
     private final EdDSAParameterSpec spec;
 
     /**
+     *  @param seed the private key
+     *  @param spec the parameter specification for this key
      *  @throws IllegalArgumentException if seed length is wrong or hash algorithm is unsupported
      */
     public EdDSAPrivateKeySpec(byte[] seed, EdDSAParameterSpec spec) {
@@ -58,6 +60,7 @@ public class EdDSAPrivateKeySpec implements KeySpec {
      *  Initialize directly from the hash.
      *  getSeed() will return null if this constructor is used.
      *
+     *  @param spec the parameter specification for this key
      *  @param h the private key
      *  @throws IllegalArgumentException if hash length is wrong
      *  @since 0.9.27 (GitHub issue #17)
