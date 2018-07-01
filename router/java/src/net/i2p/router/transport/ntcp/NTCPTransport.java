@@ -51,6 +51,7 @@ import net.i2p.router.transport.crypto.X25519PublicKey;
 import net.i2p.router.transport.crypto.X25519PrivateKey;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -132,6 +133,7 @@ public class NTCPTransport extends TransportImpl {
     public static final String PROP_NTCP2_IV = "i2np.ntcp2.iv";
     private static final int NTCP2_IV_LEN = OutboundNTCP2State.IV_SIZE;
     private static final int NTCP2_KEY_LEN = OutboundNTCP2State.KEY_SIZE;
+    private static final long MIN_DOWNTIME_TO_REKEY = 30*24*60*60*1000L;
     private final boolean _enableNTCP2;
     private final byte[] _ntcp2StaticPubkey;
     private final byte[] _ntcp2StaticPrivkey;
@@ -238,9 +240,19 @@ public class NTCPTransport extends TransportImpl {
             byte[] priv = null;
             byte[] iv = null;
             String b64IV = null;
-            String s = ctx.getProperty(PROP_NTCP2_SP);
-            if (s != null) {
-                priv = Base64.decode(s);
+            String s = null;
+            // try to determine if we've been down for 30 days or more
+            // no stopping, no crashes, and only one start (this one)
+            EventLog el = _context.router().eventLog();
+            long since = _context.clock().now() - MIN_DOWNTIME_TO_REKEY;
+            boolean shouldRekey = el.getEvents(EventLog.STOPPED, since).isEmpty() &&
+                                  el.getEvents(EventLog.CRASHED, since).isEmpty() &&
+                                  el.getEvents(EventLog.STARTED, since).size() <= 1;
+            if (!shouldRekey) {
+                s = ctx.getProperty(PROP_NTCP2_SP);
+                if (s != null) {
+                    priv = Base64.decode(s);
+                }
             }
             if (priv == null || priv.length != NTCP2_KEY_LEN) {
                 KeyPair keys = xdh.getKeys();

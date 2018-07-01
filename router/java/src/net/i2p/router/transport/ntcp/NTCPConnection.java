@@ -197,8 +197,8 @@ public class NTCPConnection implements Closeable {
     static final int REASON_SIGFAIL = 15;
     static final int REASON_S_MISMATCH = 16;
     static final int REASON_BANNED = 17;
-    static final int PADDING_MIN_DEFAULT_INT = 1;
-    static final int PADDING_MAX_DEFAULT_INT = 2;
+    static final int PADDING_MIN_DEFAULT_INT = 0;
+    static final int PADDING_MAX_DEFAULT_INT = 1;
     private static final float PADDING_MIN_DEFAULT = PADDING_MIN_DEFAULT_INT / 16.0f;
     private static final float PADDING_MAX_DEFAULT = PADDING_MAX_DEFAULT_INT / 16.0f;
     static final int DUMMY_DEFAULT = 0;
@@ -207,7 +207,8 @@ public class NTCPConnection implements Closeable {
                                                                      PADDING_MIN_DEFAULT, PADDING_MAX_DEFAULT,
                                                                      DUMMY_DEFAULT, DUMMY_DEFAULT,
                                                                      DELAY_DEFAULT, DELAY_DEFAULT);
-    private static final int MIN_PADDING_RANGE = 64;
+    private static final int MIN_PADDING_RANGE = 16;
+    private static final int MAX_PADDING_RANGE = 128;
     private NTCP2Options _paddingConfig;
     private int _version;
     private CipherState _sender;
@@ -902,13 +903,16 @@ public class NTCPConnection implements Closeable {
                 // reduce min to enforce minimum range if possible
                 min = Math.max(0, min - (MIN_PADDING_RANGE - range));
                 range = max - min;
+            } else if (range > MAX_PADDING_RANGE) {
+                // Don't send too much, no matter what the config says
+                range = MAX_PADDING_RANGE;
             }
             int padlen = min;
             if (range > 0)
                 padlen += _context.random().nextInt(1 + range);
             if (_log.shouldWarn())
                 _log.warn("Padding params:" +
-                          " size: " + size +
+                          " data size: " + size +
                           " avail: " + availForPad +
                           " minSend: " + minSend +
                           " maxSend: " + maxSend +
