@@ -1,5 +1,10 @@
+2018-07-04 zzz
+ * NTCP: Don't advertise interface address when configured for force-firewalled
+
 2018-07-01 zzz
+ * Build: Move Jetty/Tomcat version properties to top-level build.xml
  * Crypto: Backport EdDSA versions 0.2/0.3 from github
+ * NTCP2: Adjust padding defaults and size calculation
 
 2018-06-30 zzz
   * Console: Fix reading flags when symlinked (ticket #2270)

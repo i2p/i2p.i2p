@@ -402,7 +402,8 @@ public class NTCPTransport extends TransportImpl {
                     con.close();
                     afterSend(msg, false);
                 } catch (IllegalStateException ise) {
-                    _log.error("Failed opening a channel", ise);
+                    if (_log.shouldWarn())
+                        _log.warn("Failed opening a channel", ise);
                     afterSend(msg, false);
                 }
             } else {
@@ -771,6 +772,8 @@ public class NTCPTransport extends TransportImpl {
         else
             // received by externalAddressReceived() from TransportManager
             port = _ssuPort;
+        boolean isFixedOrForceFirewalled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true")
+                                           .toLowerCase(Locale.US).equals("false");
         RouterAddress myAddress = bindAddress(port);
         if (myAddress != null) {
             // fixed interface, or bound to the specified host
@@ -778,7 +781,7 @@ public class NTCPTransport extends TransportImpl {
         } else if (addr != null) {
             // specified host, bound to wildcard
             replaceAddress(addr);
-        } else if (port > 0) {
+        } else if (port > 0 && !isFixedOrForceFirewalled) {
             // all detected interfaces
             Collection<InetAddress> addrs = getSavedLocalAddresses();
             if (!addrs.isEmpty()) {

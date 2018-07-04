@@ -83,7 +83,7 @@ public abstract class TransportImpl implements Transport {
      */
     public TransportImpl(RouterContext context) {
         _context = context;
-        _log = _context.logManager().getLog(TransportImpl.class);
+        _log = _context.logManager().getLog(getClass());
 
         _context.statManager().createRateStat("transport.sendMessageFailureLifetime", "How long the lifetime of messages that fail are?", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRequiredRateStat("transport.sendMessageSize", "Size of sent messages (bytes)", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
