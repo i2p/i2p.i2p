@@ -28,7 +28,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
-import net.i2p.router.util.TryCache;
+import net.i2p.util.TryCache;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
@@ -462,7 +462,7 @@ class EventPumper implements Runnable {
      *  High-frequency path in thread.
      */
     private ByteBuffer acquireBuf() {
-        return _bufferCache.tryAcquire();
+        return _bufferCache.acquire();
     }
     
     /**
@@ -471,7 +471,7 @@ class EventPumper implements Runnable {
      *  High-frequency path in thread.
      */
     public static void releaseBuf(ByteBuffer buf) {
-        _bufferCache.tryRelease(buf);
+        _bufferCache.release(buf);
     }
     
     private void processAccept(SelectionKey key) {

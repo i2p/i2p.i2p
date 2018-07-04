@@ -1,4 +1,4 @@
-package net.i2p.router.util;
+package net.i2p.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class TryCache<T> {
     /**
      * @return a cached or newly created item from this cache
      */
-    public T tryAcquire() {
+    public T acquire() {
         T rv = null;
         if (lock.tryLock()) {
             try {
@@ -64,7 +64,7 @@ public class TryCache<T> {
      * the cache has reached capacity or it's lock is held by
      * another thread.
      */
-    public void tryRelease(T item) {
+    public void release(T item) {
         if (lock.tryLock()) {
             try {
                 if (items.size() < capacity) {

@@ -12,7 +12,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.util.CDQEntry;
-import net.i2p.router.util.TryCache;
+import net.i2p.util.TryCache;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -407,7 +407,7 @@ class UDPPacket implements CDQEntry {
         UDPPacket rv = null;
         if (CACHE) {
             PacketFactory.context = ctx;
-            rv = _packetCache.tryAcquire();
+            rv = _packetCache.acquire();
             rv.init(ctx);
         }
         if (rv == null)
@@ -439,7 +439,7 @@ class UDPPacket implements CDQEntry {
         }
         if (!CACHE)
             return;
-        _packetCache.tryRelease(this);
+        _packetCache.release(this);
     }
     
     /**
