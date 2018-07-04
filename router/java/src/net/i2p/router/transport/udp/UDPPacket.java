@@ -447,8 +447,10 @@ class UDPPacket implements CDQEntry {
      *  @since 0.9.2
      */
     public static void clearCache() {
-        if (CACHE)
+        if (CACHE) {
+            PacketFactory.context = null;
             _packetCache.clear();
+        }
     }
 
     private synchronized void verifyNotReleased() {
