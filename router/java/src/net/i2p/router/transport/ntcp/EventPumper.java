@@ -471,6 +471,7 @@ class EventPumper implements Runnable {
      *  High-frequency path in thread.
      */
     public static void releaseBuf(ByteBuffer buf) {
+        buf.clear();
         _bufferCache.release(buf);
     }
     
