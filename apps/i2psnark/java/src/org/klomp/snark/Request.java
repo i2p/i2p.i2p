@@ -53,6 +53,25 @@ class Request
   }
 
   /**
+   * Dummy Request for PeerState.returnPartialPieces().
+   * len will be zero.
+   *
+   * @param piece Piece number requested.
+   * @param off the offset in the array.
+   * @since 0.9.36
+   */
+  Request(PartialPiece piece, int off)
+  {
+    this.piece = piece;
+    this.off = off;
+    this.len = 0;
+
+    // Sanity check
+    if (off < 0 || off > piece.getLength())
+      throw new IndexOutOfBoundsException("Illegal Request " + toString());
+  }
+
+  /**
    *  @since 0.9.1
    */
   public void read(DataInputStream din) throws IOException {

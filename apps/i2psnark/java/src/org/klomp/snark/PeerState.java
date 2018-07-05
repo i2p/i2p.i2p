@@ -546,7 +546,7 @@ class PeerState implements DataLoader
               synchronized(pp) {
                   int dl = pp.getDownloaded();
                   if (req.off != dl)
-                      req = new Request(pp, dl, 1);
+                      req = new Request(pp, dl);
               }
               rv.add(req);
           }

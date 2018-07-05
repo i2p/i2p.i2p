@@ -112,7 +112,7 @@ class PartialPiece implements Comparable<PartialPiece> {
      *  as set by setDownloaded() or read().
      */
 
-    public Request getRequest() {
+    public synchronized Request getRequest() {
         return new Request(this, this.off, Math.min(this.pclen - this.off, PeerState.PARTSIZE));
     }
 
@@ -131,7 +131,7 @@ class PartialPiece implements Comparable<PartialPiece> {
     /**
      *  How many bytes are good - as set by setDownloaded() or read()
      */
-    public int getDownloaded() {
+    public synchronized int getDownloaded() {
          return this.off;
     }
 
@@ -141,7 +141,7 @@ class PartialPiece implements Comparable<PartialPiece> {
      *  Any chunks after a 'hole' will be lost.
      *  @since 0.9.1
      */
-    public void setDownloaded(int offset) {
+    public synchronized void setDownloaded(int offset) {
          this.off = offset;
     }
 
