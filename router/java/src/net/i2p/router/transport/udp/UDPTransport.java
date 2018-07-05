@@ -1739,7 +1739,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
 
-    public TransportBid bid(RouterInfo toAddress, long dataSize) {
+    public TransportBid bid(RouterInfo toAddress, int dataSize) {
         if (dataSize > OutboundMessageState.MAX_MSG_SIZE) {
             // NTCP max is lower, so msg will get dropped
             return null;

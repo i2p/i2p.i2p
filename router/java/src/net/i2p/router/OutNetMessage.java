@@ -36,7 +36,7 @@ public class OutNetMessage implements CDPQEntry {
     private final int _messageTypeId;
     /** cached message ID, for use after we discard the message */
     private final long _messageId;
-    private final long _messageSize;
+    private final int _messageSize;
     private final int _priority;
     private final long _expiration;
     private Job _onSend;
@@ -200,14 +200,17 @@ public class OutNetMessage implements CDPQEntry {
      *  @return the simple class name
      */
     public String getMessageType() {
-        I2NPMessage msg = _message;
-        return msg != null ? msg.getClass().getSimpleName() : "null";
+        return _message != null ? _message.getClass().getSimpleName() : "null";
     }
 
     public int getMessageTypeId() { return _messageTypeId; }
     public long getMessageId() { return _messageId; }
     
-    public long getMessageSize() {
+    /**
+     * How large the message is, including the full 16 byte header.
+     * Transports with different header sizes should adjust.
+     */
+    public int getMessageSize() {
         return _messageSize;
     }
     

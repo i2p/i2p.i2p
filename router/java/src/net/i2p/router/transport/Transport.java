@@ -28,7 +28,16 @@ import net.i2p.router.OutNetMessage;
  *
  */
 public interface Transport {
-    public TransportBid bid(RouterInfo toAddress, long dataSize);
+
+    /**
+     *
+     * @param dataSize assumes full 16-byte header, transports should
+     *        adjust as necessary
+     * @return a bid or null if unwilling to send
+     *
+     */
+    public TransportBid bid(RouterInfo toAddress, int dataSize);
+
     /**
      * Asynchronously send the message as requested in the message and, if the
      * send is successful, queue up any msg.getOnSendJob job, and register it

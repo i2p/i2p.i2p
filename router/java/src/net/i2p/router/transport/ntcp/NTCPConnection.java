@@ -161,11 +161,11 @@ public class NTCPConnection implements Closeable {
      *  Needs to be fixed. But SSU can handle it?
      *  In the meantime, don't let the transport bid on big messages.
      */
-    public static final int BUFFER_SIZE = 16*1024;
+    static final int BUFFER_SIZE = 16*1024;
     private static final int MAX_DATA_READ_BUFS = 16;
     private static final ByteCache _dataReadBufs = ByteCache.getInstance(MAX_DATA_READ_BUFS, BUFFER_SIZE);
     /** 2 bytes for length and 4 for CRC */
-    public static final int MAX_MSG_SIZE = BUFFER_SIZE - (2 + 4);
+    static final int NTCP1_MAX_MSG_SIZE = BUFFER_SIZE - (2 + 4);
 
     private static final int INFO_PRIORITY = OutNetMessage.PRIORITY_MY_NETDB_STORE_LOW;
     private static final String FIXED_RI_VERSION = "0.9.12";
@@ -174,12 +174,19 @@ public class NTCPConnection implements Closeable {
     
     //// NTCP2 things
 
+    /** See spec. Max Noise payload 65535,
+     *  minus 16 byte MAC and 3 byte block header.
+     *  Includes 9-byte I2NP header.
+     */
+    static final int NTCP2_MAX_MSG_SIZE = 65516;
     private static final int PADDING_RAND_MIN = 16;
     private static final int PADDING_MAX = 64;
     private static final int SIP_IV_LENGTH = 8;
     private static final int NTCP2_FAIL_READ = 1024;
     private static final long NTCP2_FAIL_TIMEOUT = 10*1000;
     private static final long NTCP2_TERMINATION_CLOSE_DELAY = 50;
+    // don't make combined messages too big, to minimize latency
+    private static final int NTCP2_PREFERRED_PAYLOAD_MAX = 5000;
     static final int REASON_UNSPEC = 0;
     static final int REASON_TERMINATION = 1;
     static final int REASON_TIMEOUT = 2;
@@ -832,14 +839,12 @@ public class NTCPConnection implements Closeable {
                 _transport.afterSend(msg, false, false, msg.getLifetime());
             }
             _currentOutbound.add(msg);
-            // don't make combined msgs too big to minimize latency
-            final int MAX_MSG_SIZE = 5000;
             I2NPMessage m = msg.getMessage();
             Block block = new NTCP2Payload.I2NPBlock(m);
             blocks.add(block);
             size += block.getTotalLength();
             // now add more (maybe)
-            if (size < MAX_MSG_SIZE) {
+            if (size < NTCP2_PREFERRED_PAYLOAD_MAX) {
                 // keep adding as long as we will be under 5 KB
                 while (true) {
                     msg = _outbound.peek();
@@ -847,7 +852,7 @@ public class NTCPConnection implements Closeable {
                         break;
                     m = msg.getMessage();
                     int msz = m.getMessageSize() - 7;
-                    if (size + msz > MAX_MSG_SIZE)
+                    if (size + msz > NTCP2_PREFERRED_PAYLOAD_MAX)
                         break;
                     OutNetMessage msg2 = _outbound.poll();
                     if (msg2 == null)
