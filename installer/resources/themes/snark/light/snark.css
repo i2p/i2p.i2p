@@ -2187,7 +2187,7 @@ hr.debug:last-child {
 }
 
 .commentText {
-     white-space: normal;
+     white-space: normal !important;
      text-align: justify;
      width: 90%;
 }

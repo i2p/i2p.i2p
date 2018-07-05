@@ -2579,7 +2579,7 @@ input.toggle_input, input.toggle_input:checked { /* hide checkbox and use label 
 }
 
 .commentText {
-     white-space: normal;
+     white-space: normal !important;
      text-align: justify;
      width: 90%;
 }

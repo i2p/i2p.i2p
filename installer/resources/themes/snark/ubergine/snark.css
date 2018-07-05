@@ -2594,7 +2594,7 @@ input#toggle_debug:checked + label + #dhtDebugInner {
 }
 
 .commentText {
-     white-space: normal;
+     white-space: normal !important;
      text-align: justify;
      width: 90%;
 }

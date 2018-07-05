@@ -2485,7 +2485,7 @@ td#bwHelp a {
 }
 
 .commentText {
-     white-space: normal;
+     white-space: normal !important;
      text-align: justify;
      padding-right: 0;
 }
