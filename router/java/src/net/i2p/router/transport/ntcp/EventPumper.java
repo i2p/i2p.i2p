@@ -471,6 +471,11 @@ class EventPumper implements Runnable {
      *  High-frequency path in thread.
      */
     public static void releaseBuf(ByteBuffer buf) {
+        // double check
+        if (buf.capacity() < BUF_SIZE) {
+            I2PAppContext.getGlobalContext().logManager().getLog(EventPumper.class).error("Bad size " + buf.capacity(), new Exception());
+            return;
+        }
         buf.clear();
         _bufferCache.release(buf);
     }
