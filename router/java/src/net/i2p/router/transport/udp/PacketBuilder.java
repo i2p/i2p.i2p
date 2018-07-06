@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -290,7 +291,7 @@ class PacketBuilder {
      * @return null on error
      */
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer,
-                                 List<Long> ackIdsRemaining, int newAckCount,
+                                 Collection<Long> ackIdsRemaining, int newAckCount,
                                  List<ACKBitfield> partialACKsRemaining) {
         List<Fragment> frags = Collections.singletonList(new Fragment(state, fragment));
         return buildPacket(frags, peer, ackIdsRemaining, newAckCount, partialACKsRemaining);
@@ -302,7 +303,7 @@ class PacketBuilder {
      *  @since 0.9.16
      */
     public UDPPacket buildPacket(List<Fragment> fragments, PeerState peer,
-                                 List<Long> ackIdsRemaining, int newAckCount,
+                                 Collection<Long> ackIdsRemaining, int newAckCount,
                                  List<ACKBitfield> partialACKsRemaining) {
         StringBuilder msg = null;
         if (_log.shouldLog(Log.INFO)) {

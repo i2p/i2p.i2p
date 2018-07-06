@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -386,7 +387,7 @@ class OutboundMessageFragments {
         int piggybackedPartialACK = partialACKBitfields.size();
         // getCurrentFullACKs() already makes a copy, do we need to copy again?
         // YES because buildPacket() now removes them (maybe)
-        List<Long> remaining = new ArrayList<Long>(msgIds);
+        Set<Long> remaining = new HashSet<Long>(msgIds);
 
         // build the list of fragments to send
         List<Fragment> toSend = new ArrayList<Fragment>(8);
