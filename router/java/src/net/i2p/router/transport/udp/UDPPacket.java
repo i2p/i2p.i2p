@@ -12,6 +12,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.util.CDQEntry;
+import net.i2p.util.TryCache;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -45,18 +46,25 @@ class UDPPacket implements CDQEntry {
     // private boolean _isInbound;
     private FIFOBandwidthLimiter.Request _bandwidthRequest;
   
+    private static class PacketFactory implements TryCache.ObjectFactory<UDPPacket> {
+        static RouterContext context;
+        public UDPPacket newInstance() {
+            return new UDPPacket(context);
+        }
+    }
+    
     //  Warning - this mixes contexts in a multi-router JVM
-    private static final Queue<UDPPacket> _packetCache;
+    private static final TryCache<UDPPacket> _packetCache;
+    private static final TryCache.ObjectFactory<UDPPacket> _packetFactory;
     private static final boolean CACHE = true;
-    private static final int MIN_CACHE_SIZE = 64;
     private static final int MAX_CACHE_SIZE = 256;
     static {
         if (CACHE) {
-            long maxMemory = SystemVersion.getMaxMemory();
-            int csize = (int) Math.max(MIN_CACHE_SIZE, Math.min(MAX_CACHE_SIZE, maxMemory / (1024*1024)));
-            _packetCache = new LinkedBlockingQueue<UDPPacket>(csize);
+            _packetFactory = new PacketFactory();
+            _packetCache = new TryCache<>(_packetFactory, MAX_CACHE_SIZE);
         } else {
             _packetCache = null;
+            _packetFactory = null;
         }
     }
     
@@ -398,18 +406,9 @@ class UDPPacket implements CDQEntry {
     public static UDPPacket acquire(RouterContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
-            rv = _packetCache.poll();
-            if (rv != null) {
-                synchronized(rv) {
-                    if (!rv._released) {
-                        Log log = rv._context.logManager().getLog(UDPPacket.class);
-                        log.error("Unreleased cached packet", new Exception());
-                        rv = null;
-                    } else {
-                        rv.init(ctx);
-                    }
-                }
-            }
+            PacketFactory.context = ctx;
+            rv = _packetCache.acquire();
+            rv.init(ctx);
         }
         if (rv == null)
             rv = new UDPPacket(ctx);
@@ -440,7 +439,7 @@ class UDPPacket implements CDQEntry {
         }
         if (!CACHE)
             return;
-        _packetCache.offer(this);
+        _packetCache.release(this);
     }
     
     /**
@@ -448,8 +447,10 @@ class UDPPacket implements CDQEntry {
      *  @since 0.9.2
      */
     public static void clearCache() {
-        if (CACHE)
+        if (CACHE) {
+            PacketFactory.context = null;
             _packetCache.clear();
+        }
     }
 
     private synchronized void verifyNotReleased() {
