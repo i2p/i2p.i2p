@@ -407,26 +407,8 @@ public class RouterConsoleRunner implements RouterApp {
         if (!workDirCreated)
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
 
-        // NOTE
-        // This code was added by Meeh @ 22 Apr 2018 for use in the browser bundle.
-        // In the case of a portable mode, the jar in question isn't routerconsole.jar but itself.
-        String isPortableStr = System.getProperty("i2p.dir.portableMode");
-        boolean isPortable = Boolean.parseBoolean(isPortableStr);
-
-        String routerConsoleJar = "";
         // so Jetty can find WebAppConfiguration
-        if (isPortable) {
-            try {
-                routerConsoleJar = new File(RouterConsoleRunner.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath();
-            } catch (URISyntaxException e) {
-                // This shouln't be able to happen.
-                System.err.println("ERROR: Fatal portable error, can't locate where I (jarfile) am.");
-                return; // Yes, cancel at this point.
-            }
-        } else {
-            routerConsoleJar = _context.getBaseDir() + "/lib/routerconsole.jar";
-        }
-        System.setProperty("jetty.class.path", routerConsoleJar);
+        System.setProperty("jetty.class.path", _context.getBaseDir() + "/lib/routerconsole.jar");
         // FIXME
         // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03487.html
         //_server.setGracefulShutdown(1000);
