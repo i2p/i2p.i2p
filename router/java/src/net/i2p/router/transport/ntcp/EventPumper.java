@@ -73,7 +73,6 @@ class EventPumper implements Runnable {
         }
     }
     
-    private static final TryCache<ByteBuffer> _bufferCache = new TryCache<>(new BufferFactory(), MAX_CACHE_SIZE);
 
     /** 
      * every few seconds, iterate across all ntcp connections just to make sure
@@ -105,6 +104,8 @@ class EventPumper implements Runnable {
         long maxMemory = SystemVersion.getMaxMemory();
         MIN_BUFS = (int) Math.max(MIN_MINB, Math.min(MAX_MINB, 1 + (maxMemory / (16*1024*1024))));
     }
+    
+    private static final TryCache<ByteBuffer> _bufferCache = new TryCache<>(new BufferFactory(), MIN_BUFS);
 
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
         _context = ctx;

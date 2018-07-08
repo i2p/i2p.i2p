@@ -57,11 +57,14 @@ class UDPPacket implements CDQEntry {
     private static final TryCache<UDPPacket> _packetCache;
     private static final TryCache.ObjectFactory<UDPPacket> _packetFactory;
     private static final boolean CACHE = true;
+    private static final int MIN_CACHE_SIZE = 64;
     private static final int MAX_CACHE_SIZE = 256;
     static {
         if (CACHE) {
+            long maxMemory = SystemVersion.getMaxMemory();
+            int csize = (int) Math.max(MIN_CACHE_SIZE, Math.min(MAX_CACHE_SIZE, maxMemory / (1024*1024)));
             _packetFactory = new PacketFactory();
-            _packetCache = new TryCache<>(_packetFactory, MAX_CACHE_SIZE);
+            _packetCache = new TryCache<>(_packetFactory, csize);
         } else {
             _packetCache = null;
             _packetFactory = null;
