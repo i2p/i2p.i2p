@@ -28,6 +28,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.util.TryCache;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
@@ -53,7 +54,7 @@ class EventPumper implements Runnable {
     private final NTCPTransport _transport;
     private final ObjectCounter<ByteArray> _blockedIPs;
     private long _expireIdleWriteTime;
-    private boolean _useDirect;
+    private static boolean _useDirect;
     
     /**
      *  This probably doesn't need to be bigger than the largest typical
@@ -63,13 +64,16 @@ class EventPumper implements Runnable {
     private static final int BUF_SIZE = 8*1024;
     private static final int MAX_CACHE_SIZE = 64;
 
-    /**
-     *  Read buffers. (write buffers use wrap())
-     *  Shared if there are multiple routers in the JVM
-     *  Note that if the routers have different PROP_DIRECT settings this will have a mix,
-     *  so don't do that.
-     */
-    private static final LinkedBlockingQueue<ByteBuffer> _bufCache = new LinkedBlockingQueue<ByteBuffer>(MAX_CACHE_SIZE);
+    private static class BufferFactory implements TryCache.ObjectFactory<ByteBuffer> {
+        public ByteBuffer newInstance() {
+            if (_useDirect) 
+                return ByteBuffer.allocateDirect(BUF_SIZE);
+            else
+                return ByteBuffer.allocate(BUF_SIZE);
+        }
+    }
+    
+    private static final TryCache<ByteBuffer> _bufferCache = new TryCache<>(new BufferFactory(), MAX_CACHE_SIZE);
 
     /** 
      * every few seconds, iterate across all ntcp connections just to make sure
@@ -319,13 +323,7 @@ class EventPumper implements Runnable {
                 }
 
 
-                // Clear the cache if the user changes the setting,
-                // so we can test the effect.
-                boolean newUseDirect = _context.getBooleanProperty(PROP_DIRECT);
-                if (_useDirect != newUseDirect) {
-                    _useDirect = newUseDirect;
-                    _bufCache.clear();
-                }
+                _useDirect = _context.getBooleanProperty(PROP_DIRECT);
             } catch (RuntimeException re) {
                 _log.error("Error in the event pumper", re);
             }
@@ -363,7 +361,6 @@ class EventPumper implements Runnable {
         _wantsRead.clear();
         _wantsRegister.clear();
         _wantsWrite.clear();
-        _bufCache.clear();
     }
     
     /**
@@ -462,26 +459,10 @@ class EventPumper implements Runnable {
     }
 
     /**
-     *  How many to keep in reserve.
-     *  Shared if there are multiple routers in the JVM
-     */
-    private static int _numBufs = MIN_BUFS;
-    private static int __consecutiveExtra;
-
-    /**
      *  High-frequency path in thread.
      */
     private ByteBuffer acquireBuf() {
-        ByteBuffer rv = _bufCache.poll();
-        // discard buffer if _useDirect setting changes
-        if (rv == null || rv.isDirect() != _useDirect) {
-            if (_useDirect)
-                rv = ByteBuffer.allocateDirect(BUF_SIZE);
-            else
-                rv = ByteBuffer.allocate(BUF_SIZE);
-            _numBufs++;
-        }
-        return rv;
+        return _bufferCache.acquire();
     }
     
     /**
@@ -496,21 +477,7 @@ class EventPumper implements Runnable {
             return;
         }
         buf.clear();
-        int extra = _bufCache.size();
-        boolean cached = extra < _numBufs;
-
-        // TODO always offer if direct?
-        if (cached) {
-            _bufCache.offer(buf);
-            if (extra > MIN_BUFS) {
-                __consecutiveExtra++;
-                if (__consecutiveExtra >= 20) {
-                    if (_numBufs > MIN_BUFS)
-                        _numBufs--;
-                    __consecutiveExtra = 0;
-                }
-            }
-        }
+        _bufferCache.release(buf);
     }
     
     private void processAccept(SelectionKey key) {
