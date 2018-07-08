@@ -459,7 +459,7 @@ tfoot th {
      font-size: 8pt !important;
 }
 
-.snarkTrackerDetails, .snarkTorrentDetails {
+.snarkTrackerDetails, .snarkTorrentDetails, .snarkCommentDetails {
      width: 16px !important;
      text-align: center !important;
      font-weight: bold;
@@ -467,7 +467,7 @@ tfoot th {
      padding-right: 0 !important;
 }
 
-.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkDirInfo td:first-child img {
+.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkCommentDetails img, .snarkDirInfo td:first-child img {
      padding: 3px !important;
      border: 1px solid transparent !important;
      margin: 0 !important;
@@ -484,6 +484,7 @@ tfoot th {
 
 .snarkTrackerDetails a:hover img, .snarkTrackerDetails a:focus img,
 .snarkTorrentDetails a:hover img, .snarkTorrentDetails a:focus img,
+.snarkCommentDetails a:hover img, .snarkCommentDetails a:focus img,
 .snarkDirInfo td:first-child a:hover img, .snarkDirInfo td:first-child a:focus img {
      border: 1px solid #f60 !important;
      border-radius: 2px;
@@ -493,7 +494,7 @@ tfoot th {
      filter: none !important;
 }
 
-.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkDirInfo td:first-child a:active img {
+.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkCommentDetails a:active img, .snarkDirInfo td:first-child a:active img {
      border: 1px solid #f90 !important;
      box-shadow: inset 2px 2px 3px 3px #000;
      transform: scale(0.9);
@@ -2882,7 +2883,7 @@ textarea[name="i2cpOpts"] {
      margin: 1px 2px !important;
 }
 
-.snarkTrackerDetails, .SnarkTorrentDetails {
+.snarkTrackerDetails, .SnarkTorrentDetails, .snarkCommentDetails {
      width: 1% !important;
 }
 
@@ -3009,7 +3010,7 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img,
      padding: 1px 0;
 }
 
-.snarkTorrentDetails {
+.snarkCommentDetails {
      padding-left: 8px;
 }
 
@@ -3023,7 +3024,7 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img,
      color: transparent !important;
 }
 
-.snarkTorrentDetails {
+.snarkCommentDetails {
      padding-left: 3px !important;
 }
 

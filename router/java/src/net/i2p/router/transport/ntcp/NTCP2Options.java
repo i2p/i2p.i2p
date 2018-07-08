@@ -63,8 +63,8 @@ class NTCP2Options {
     @Override
     public String toString() {
         return "Padding options: send min/max %: (" + (_sendMin * 100) + ", " + (_sendMax * 100) +
-               ") recv min/max %: ( " + (_recvMin * 100) + ", " + (_recvMax * 100) +
-               ") dummy send/recv B/s: ( " + _sendDummy + ", " + _recvDummy +
-               ") delay send/recv ms: ( " + _sendDelay + ", " + _recvDelay + ')';
+               ") recv min/max %: (" + (_recvMin * 100) + ", " + (_recvMax * 100) +
+               ") dummy send/recv B/s: (" + _sendDummy + ", " + _recvDummy +
+               ") delay send/recv ms: (" + _sendDelay + ", " + _recvDelay + ')';
     }
 }

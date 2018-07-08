@@ -518,7 +518,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("</a>\n");
             }
         }
-        out.write("</th>\n<th colspan=\"2\" align=\"left\">");
+        out.write("</th>\n<th colspan=\"3\" align=\"left\">");
         // cycle through sort by name or type
         boolean isTypeSort = false;
         if (showSort) {
@@ -710,7 +710,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (total == 0) {
             out.write("<tr class=\"snarkTorrentNoneLoaded\">" +
-                      "<td colspan=\"11\">");
+                      "<td colspan=\"12\">");
             synchronized(this) {
                 File dd = _resourceBase;
                 if (!dd.exists() && !dd.mkdirs()) {
@@ -728,7 +728,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</td></tr>\n");
         } else /** if (snarks.size() > 1) */ {
             out.write("<tfoot><tr>\n" +
-                      "    <th id=\"snarkTorrentTotals\" align=\"left\" colspan=\"6\">");
+                      "    <th id=\"snarkTorrentTotals\" align=\"left\" colspan=\"7\">");
             out.write("<span id=\"totals\">");
             out.write(_t("Totals"));
             out.write(":&nbsp;");
@@ -774,7 +774,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (dht != null) {
                 if (showDebug) {
                     out.write("</tr>\n<tr class=\"dhtDebug\">" +
-                              "<th colspan=\"11\">" +
+                              "<th colspan=\"12\">" +
                               "<div id=\"dhtDebugPanel\">" +
                               "<input class=\"toggle_input\" id=\"toggle_debug\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_debug\">");
                     out.write(toThemeImg("debug"));
@@ -1703,10 +1703,10 @@ public class I2PSnarkServlet extends BasicServlet {
 
         out.write("<tr class=\"" + rowClass + "\" id=\"" + b64Short + "\">" +
                   "<td class=\"snarkGraphicStatus\" align=\"center\">");
-        out.write(statusString + "</td>\n\t");
+        out.write(statusString);
 
         // (i) icon column
-        out.write("<td class=\"snarkTrackerDetails\">");
+        out.write("</td>\n<td class=\"snarkTrackerDetails\">");
         if (isValid) {
             String announce = meta.getAnnounce();
             if (announce == null)
@@ -1745,6 +1745,21 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</a>");
         } else {
             out.write(toImg(icon));
+        }
+
+        // Comment icon column
+        out.write("</td>\n<td class=\"snarkCommentDetails\">");
+        if (isValid) {
+            CommentSet comments = snark.getComments();
+            if (comments != null && !comments.isEmpty()) {
+                StringBuilder buf = new StringBuilder(128);
+                buf.append("<a href=\"").append(encodedBaseName)
+                   .append("/#snarkCommentSection\" title=\"").append(_t("Comments"))
+                   .append("\">");
+                toThemeImg(buf, "comment", "", "");
+                buf.append("</a>");
+                out.write(buf.toString());
+            }
         }
 
         // Torrent name column
@@ -1912,7 +1927,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     continue;
                 out.write("<tr class=\"peerinfo " + rowClass + "\"><td class=\"snarkGraphicStatus\" title=\"");
                 out.write(_t("Peer attached to swarm"));
-                out.write("\"></td><td colspan=\"4\">");
+                out.write("\"></td><td colspan=\"5\">");
                 PeerID pid = peer.getPeerID();
                 String ch = pid != null ? pid.toString().substring(0, 4) : "????";
                 String client;
@@ -2010,7 +2025,7 @@ public class I2PSnarkServlet extends BasicServlet {
                           "<td class=\"snarkTorrentAction\">" +
                           "</td></tr>\n\t");
                 if (showDebug)
-                    out.write("<tr class=\"debuginfo " + rowClass + "\"><td class=\"snarkGraphicStatus\"></td><td colspan=\"10\">" + peer.getSocket() + "</td></tr>");
+                    out.write("<tr class=\"debuginfo " + rowClass + "\"><td class=\"snarkGraphicStatus\"></td><td colspan=\"11\">" + peer.getSocket() + "</td></tr>");
             }
         }
     }
