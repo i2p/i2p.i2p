@@ -1,3 +1,16 @@
+2018-07-08 zzz
+ * NTCP2: Avoid possible NPEs (ticket #2286)
+
+2018-07-06 zzz
+ * NTCP: Read all available data when able (ticket #2243)
+ * SSU: Change remaining acks from List to Set (ticket #2258)
+
+2018-07-05 zzz
+ * i2psnark:
+   - Fix IOOBE when stopping torrent that is allocating (ticket #2273)
+   - Fix comments wrapping (ticket #2284)
+ * NTCP2: Increase max message size
+
 2018-07-04 zzz
  * NTCP: Don't advertise interface address when configured for force-firewalled
 

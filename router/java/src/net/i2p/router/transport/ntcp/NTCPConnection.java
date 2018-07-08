@@ -186,7 +186,8 @@ public class NTCPConnection implements Closeable {
     private static final long NTCP2_FAIL_TIMEOUT = 10*1000;
     private static final long NTCP2_TERMINATION_CLOSE_DELAY = 50;
     // don't make combined messages too big, to minimize latency
-    private static final int NTCP2_PREFERRED_PAYLOAD_MAX = 5000;
+    // Tunnel data msgs are 1024 + 4 + 9 + 3 = 1040, allow 5
+    private static final int NTCP2_PREFERRED_PAYLOAD_MAX = 5 * 1040;
     static final int REASON_UNSPEC = 0;
     static final int REASON_TERMINATION = 1;
     static final int REASON_TIMEOUT = 2;
@@ -897,34 +898,7 @@ public class NTCPConnection implements Closeable {
         }
         int availForPad = BUFFER_SIZE - (size + NTCP2Payload.BLOCK_HEADER_SIZE);
         if (availForPad > 0) {
-            // what we want to send, calculated in proportion to data size
-            int minSend = (int) (size * _paddingConfig.getSendMin());
-            int maxSend = (int) (size * _paddingConfig.getSendMax());
-            // the absolute min and max we can send
-            int min = Math.min(minSend, availForPad);
-            int max = Math.min(maxSend, availForPad);
-            int range = max - min;
-            if (range < MIN_PADDING_RANGE) {
-                // reduce min to enforce minimum range if possible
-                min = Math.max(0, min - (MIN_PADDING_RANGE - range));
-                range = max - min;
-            } else if (range > MAX_PADDING_RANGE) {
-                // Don't send too much, no matter what the config says
-                range = MAX_PADDING_RANGE;
-            }
-            int padlen = min;
-            if (range > 0)
-                padlen += _context.random().nextInt(1 + range);
-            if (_log.shouldWarn())
-                _log.warn("Padding params:" +
-                          " data size: " + size +
-                          " avail: " + availForPad +
-                          " minSend: " + minSend +
-                          " maxSend: " + maxSend +
-                          " min: " + min +
-                          " max: " + max +
-                          " range: " + range +
-                          " padlen: " + padlen);
+            int padlen = getPaddingSize(size, availForPad);
             // all zeros is fine here
             //Block block = new NTCP2Payload.PaddingBlock(_context, padlen);
             Block block = new NTCP2Payload.PaddingBlock(padlen);
@@ -937,10 +911,54 @@ public class NTCPConnection implements Closeable {
     /**
      *  NTCP2 only
      *
+     *  @param dataSize the total size of the data we are sending
+     *  @param availForPad the available size for padding, not including padding block header,
+     *                     must be greater than zero
+     *  @return min 0 max availForPad
+     *  @since 0.9.36
+     */
+    private int getPaddingSize(int dataSize, int availForPad) {
+        // what we want to send, calculated in proportion to data size
+        int minSend = (int) (dataSize * _paddingConfig.getSendMin());
+        int maxSend = (int) (dataSize * _paddingConfig.getSendMax());
+        // the absolute min and max we can send
+        int min = Math.min(minSend, availForPad);
+        int max = Math.min(maxSend, availForPad);
+        int range = max - min;
+        if (range < MIN_PADDING_RANGE) {
+            // reduce min to enforce minimum range if possible
+            min = Math.max(0, min - (MIN_PADDING_RANGE - range));
+            range = max - min;
+        } else if (range > MAX_PADDING_RANGE) {
+            // Don't send too much, no matter what the config says
+            range = MAX_PADDING_RANGE;
+        }
+        int padlen = min;
+        if (range > 0)
+            padlen += _context.random().nextInt(1 + range);
+        if (_log.shouldWarn())
+            _log.warn("Padding params:" +
+                      " data size: " + dataSize +
+                      " avail: " + availForPad +
+                      " minSend: " + minSend +
+                      " maxSend: " + maxSend +
+                      " min: " + min +
+                      " max: " + max +
+                      " range: " + range +
+                      " padlen: " + padlen);
+        return padlen;
+    }
+
+    /**
+     *  NTCP2 only
+     *
      *  @since 0.9.36
      */
     private void sendOurRouterInfo(boolean shouldFlood) {
-        sendRouterInfo(_context.router().getRouterInfo(), shouldFlood);
+        RouterInfo ri = _context.router().getRouterInfo();
+        if (ri == null)
+            return;
+        sendRouterInfo(ri, shouldFlood);
     }
 
     /**
@@ -953,18 +971,27 @@ public class NTCPConnection implements Closeable {
         if (_log.shouldWarn())
             _log.warn("Sending router info for: " + ri.getHash() + " flood? " + shouldFlood);
         List<Block> blocks = new ArrayList<Block>(2);
-        int plen = 2;
         Block block = new NTCP2Payload.RIBlock(ri, shouldFlood);
-        plen += block.getTotalLength();
+        int size = block.getTotalLength();
+        if (size > BUFFER_SIZE) {
+            if (_log.shouldWarn())
+                _log.warn("RI too big: " + ri);
+            return;
+        }
         blocks.add(block);
-        int padlen = 1 + _context.random().nextInt(PADDING_MAX);
-        // all zeros is fine here
-        //block = new NTCP2Payload.PaddingBlock(_context, padlen);
-        block = new NTCP2Payload.PaddingBlock(padlen);
-        plen += block.getTotalLength();
-        blocks.add(block);
-        byte[] tmp = new byte[plen];
-        sendNTCP2(tmp, blocks);
+        int availForPad = BUFFER_SIZE - (size + NTCP2Payload.BLOCK_HEADER_SIZE);
+        if (availForPad > 0) {
+            int padlen = getPaddingSize(size, availForPad);
+            // all zeros is fine here
+            //block = new NTCP2Payload.PaddingBlock(_context, padlen);
+            block = new NTCP2Payload.PaddingBlock(padlen);
+            size += block.getTotalLength();
+            blocks.add(block);
+        }
+        // use a "read buf" for the temp array
+        ByteArray dataBuf = acquireReadBuf();
+        sendNTCP2(dataBuf.getData(), blocks);
+        releaseReadBuf(dataBuf);
     }
 
     /**
@@ -978,18 +1005,21 @@ public class NTCPConnection implements Closeable {
         if (_log.shouldWarn())
             _log.warn("Sending termination, reason: " + reason + ", vaild frames rcvd: " + validFramesRcvd);
         List<Block> blocks = new ArrayList<Block>(2);
-        int plen = 2;
         Block block = new NTCP2Payload.TerminationBlock(reason, validFramesRcvd);
-        plen += block.getTotalLength();
+        int plen = block.getTotalLength();
         blocks.add(block);
-        int padlen = 1 + _context.random().nextInt(PADDING_MAX);
-        // all zeros is fine here
-        //block = new NTCP2Payload.PaddingBlock(_context, padlen);
-        block = new NTCP2Payload.PaddingBlock(padlen);
-        plen += block.getTotalLength();
-        blocks.add(block);
-        byte[] tmp = new byte[plen];
-        sendNTCP2(tmp, blocks);
+        int padlen = getPaddingSize(plen, PADDING_MAX);
+        if (padlen > 0) {
+            // all zeros is fine here
+            //block = new NTCP2Payload.PaddingBlock(_context, padlen);
+            block = new NTCP2Payload.PaddingBlock(padlen);
+            plen += block.getTotalLength();
+            blocks.add(block);
+        }
+        // use a "read buf" for the temp array
+        ByteArray dataBuf = acquireReadBuf();
+        sendNTCP2(dataBuf.getData(), blocks);
+        releaseReadBuf(dataBuf);
     }
 
     /**
@@ -998,10 +1028,15 @@ public class NTCPConnection implements Closeable {
      *  passes it to the pumper for writing.
      *
      *  @param tmp to be used for output of NTCP2Payload.writePayload(),
-     *         must have room for 2 byte length and block output
+     *         must have room for block output. May be released immediately on return.
      *  @since 0.9.36
      */
     private synchronized void sendNTCP2(byte[] tmp, List<Block> blocks) {
+        if (_sender == null) {
+            if (_log.shouldWarn())
+                _log.warn("sender gone", new Exception());
+            return;
+        }
         int payloadlen = NTCP2Payload.writePayload(tmp, 0, blocks);
         int framelen = payloadlen + OutboundNTCP2State.MAC_SIZE;
         // TODO use a buffer
@@ -2039,9 +2074,6 @@ public class NTCPConnection implements Closeable {
             _transport.messageReceived(msg, _remotePeer, null, timeToRecv, size);
             _lastReceiveTime = _context.clock().now();
             _messagesRead.incrementAndGet();
-            // TEST send back. null RI for target, not necesary
-            //if (_context.getBooleanProperty("i2np.ntcp2.loopback"))
-            //  send(new OutNetMessage(_context, msg, _context.clock().now() + 10*1000, OutNetMessage.PRIORITY_MY_DATA, null));
         }
 
         public void gotOptions(byte[] options, boolean isHandshake) {
