@@ -22,14 +22,20 @@ rule ar
 rule cleanup
   command = rm -fr *.o clauncher I2PLauncher.app
 
+# TODO: There must exists a cleaner way to solve this.
 rule bundledir
-  command = mkdir -p I2PLauncher.app/Contents/{MacOS,Resources,Frameworks} && cp Info.plist I2PLauncher.app/Contents/Info.plist
+  command = mkdir -p I2PLauncher.app/Contents/{MacOS,Resources,Frameworks} $
+    && cp Info.plist I2PLauncher.app/Contents/Info.plist $
+    && cp base.zip I2PLauncher.app/Contents/Resources/base.zip
 
 rule copytobundledir
   command = cp clauncher I2PLauncher.app/Contents/MacOS/I2PLauncher
 
 rule copyimgtobundle
   command = cp ItoopieTransparent.png I2PLauncher.app/Contents/Resources/ItoopieTransparent.png
+
+rule builddir
+  command = mkdir -p build
 
 build main.o: cxx main.mm
 build StatusItemButton.o: cxx StatusItemButton.mm
@@ -43,4 +49,5 @@ build copytobundle: copytobundledir | bundle clauncher
 build clauncher: link main.o StatusItemButton.o JavaRunner.o
 
 build appbundle: copyimgtobundle | clauncher bundle copytobundle
-#build all: clauncher
+
+default appbundle

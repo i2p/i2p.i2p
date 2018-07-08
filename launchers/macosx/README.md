@@ -6,3 +6,4 @@ However, this is a thin wrapper launching both Mac OS X trayicon and the I2P rou
 
 More code will be merged in, it's just a f* mess which Meeh needs to clean up and move into repo.
 
+`./fullBuild.sh` triggers Ant jobs and prepare the base.zip, as well as starting the ninja build.

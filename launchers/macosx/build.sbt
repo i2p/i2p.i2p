@@ -8,41 +8,12 @@ lazy val buildAppBundleTask = taskKey[Unit](s"Build an Mac OS X bundle for I2P $
 lazy val buildDeployZipTask = taskKey[String](s"Build an zipfile with base directory for I2P ${i2pVersion}.")
 lazy val bundleBuildPath = new File("./output")
 
-lazy val staticFiles = List(
-  "blocklist.txt",
-  "clients.config",
-  "continents.txt",
-  "countries.txt",
-  "hosts.txt",
-  "geoip.txt",
-  "router.config",
-  "webapps.config"
-)
 
 lazy val resDir = new File("./../installer/resources")
 lazy val i2pBuildDir = new File("./../pkg-temp")
 lazy val warsForCopy = new File(i2pBuildDir, "webapps").list.filter { f => f.endsWith(".war") }
 lazy val jarsForCopy = new File(i2pBuildDir, "lib").list.filter { f => f.endsWith(".jar") }
 
-// TODO: Meeh: To be removed - logic is moved to obj-cpp
-def defaultOSXLauncherShellScript(javaOpts: Seq[String] = Seq.empty): Seq[String] = {
-  val javaOptsString = javaOpts.map(_ + " ").mkString
-  Seq(
-    "#!/usr/bin/env sh",
-    s"""
-       |echo "I2P - Mac OS X Launcher starting up"
-       |export I2P=$$HOME/Library/I2P
-       |for jar in `ls $${I2P}/lib/*.jar`; do
-       |  if [ ! -z $$CP ]; then
-       |      CP=$${CP}:$${jar};
-       |  else
-       |      CP=$${jar}
-       |  fi
-       |done
-       |export CLASSPATH=$$CP
-       |exec java -jar $javaOptsString$$JAVA_OPTS "$$0" "$$@"""".stripMargin,
-    "")
-}
 
 // Pointing the resources directory to the "installer" directory
 resourceDirectory in Compile := baseDirectory.value / ".." / ".." / "installer" / "resources"
@@ -55,22 +26,10 @@ unmanagedClasspath in Compile ++= Seq(
   baseDirectory.value / ".." / ".." / "pkg-temp" / "lib" / "*.jar"
 )
 
-assemblyOption in assembly := (assemblyOption in assembly).value.copy(
-  prependShellScript = Some(defaultOSXLauncherShellScript(
-    Seq(
-      "-Xmx512M",
-      "-Xms128m",
-      "-Dwrapper.logfile=/tmp/router.log",
-      "-Dwrapper.logfile.loglevel=DEBUG",
-      "-Dwrapper.java.pidfile=/tmp/routerjvm.pid",
-      "-Dwrapper.console.loglevel=DEBUG",
-      "-Di2p.dir.base=$I2P",
-      "-Djava.library.path=$I2P"
-    )))
-)
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false, includeDependency = false)
 
 
-assemblyJarName in assembly := s"OSXLauncher"
+assemblyJarName in assembly := s"launcher.jar"
 
 assemblyExcludedJars in assembly := {
   val cp = (fullClasspath in assembly).value
