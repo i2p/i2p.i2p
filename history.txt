@@ -1,5 +1,7 @@
 2018-07-08 zzz
+ * i2psnark: Add comment icon (ticket #2278)
  * NTCP2: Avoid possible NPEs (ticket #2286)
+ * Transport: More efficient caching (ticket #2263)
 
 2018-07-06 zzz
  * NTCP: Read all available data when able (ticket #2243)

@@ -478,7 +478,7 @@ th.snarkTorrentStatus {
      margin-right: 3px !important;
 }
 
-.snarkTrackerDetails, .SnarkTorrentDetails {
+.snarkTrackerDetails, .SnarkTorrentDetails, .snarkCommentDetails {
      width: 1%;
      padding: 2px 0;
 }
@@ -656,7 +656,7 @@ td:first-child {
      opacity: 1;
 }
 
-.snarkTrackerDetails, .snarkTorrentDetails {
+.snarkTrackerDetails, .snarkTorrentDetails, .snarkCommentDetails {
      width: 16px !important;
      text-align: center !important;
      font-weight: bold;
@@ -664,7 +664,7 @@ td:first-child {
      padding-right: 0 !important;
 }
 
-.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkDirInfo td:first-child img {
+.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkCommentDetails img, .snarkDirInfo td:first-child img {
      padding: 3px !important;
      margin: 0 1px !important;
      width: 16px;
@@ -674,6 +674,7 @@ td:first-child {
 
 .snarkTrackerDetails a:hover img, .snarkTrackerDetails a:focus img,
 .snarkTorrentDetails a:hover img, .snarkTorrentDetails a:focus img,
+.snarkCommentDetails a:hover img, .snarkCommentDetails a:focus img,
 .snarkDirInfo td:not(.parentdir):first-child a:hover img, .snarkDirInfo td:not(.parentdir):first-child a:focus img {
      border: 1px solid #f60 !important;
      border-radius: 2px;
@@ -683,7 +684,7 @@ td:first-child {
      filter: none !important;
 }
 
-.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkDirInfo td:not(.parentdir):first-child a:active img {
+.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkCommentDetails a:active img, .snarkDirInfo td:not(.parentdir):first-child a:active img {
      border: 1px solid #212 !important;
      box-shadow: inset 3px 3px 2px 1px #202;
      background: #414;
@@ -3231,7 +3232,7 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img,
      max-width: 18px;
 }
 
-.snarkTorrentDetails {
+.snarkCommentDetails {
      width: 34px !important;
      text-align: right !important;
      padding-right: 0 !important;
@@ -3249,7 +3250,7 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img,
      display: none !important;
 }
 
-.snarkTorrentDetails {
+.snarkCommentDetails {
      padding-left: 8px;
 }
 

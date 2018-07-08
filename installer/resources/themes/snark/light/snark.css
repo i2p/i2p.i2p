@@ -487,7 +487,11 @@ tfoot th {
      text-align: left;
 }
 
-.snarkTorrents thead th:nth-child(3), .snarkTorrents thead th:nth-child(7) {
+.snarkTorrents thead th:nth-child(3) {
+     text-align: center !important;
+}
+
+.snarkTorrents thead th:nth-child(7) {
      text-align: right !important;
 }
 
@@ -553,7 +557,7 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
      color: #f60;
 }
 
-.snarkTrackerDetails, .snarkTorrentDetails {
+.snarkTrackerDetails, .snarkTorrentDetails, .snarkCommentDetails {
      width: 16px !important;
      text-align: center !important;
      font-weight: bold;
@@ -561,7 +565,7 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
      padding-right: 0 !important;
 }
 
-.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkDirInfo td:first-child img {
+.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkCommentDetails img, .snarkDirInfo td:first-child img {
      margin: 0;
      padding: 3px !important;
      max-width: 16px;
@@ -571,6 +575,7 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
 
 .snarkTrackerDetails a:hover img, .snarkTrackerDetails a:focus img,
 .snarkTorrentDetails a:hover img, .snarkTorrentDetails a:focus img,
+.snarkCommentDetails a:hover img, .snarkCommentDetails a:focus img,
 .snarkDirInfo td:first-child a:hover img, .snarkDirInfo td:first-child a:focus img {
      border: 1px solid #f60 !important;
      border-radius: 2px;
@@ -580,7 +585,7 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
      mix-blend-mode: normal;
 }
 
-.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkDirInfo td:first-child a:active img {
+.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkCommentDetails a:active img, .snarkDirInfo td:first-child a:active img {
      box-shadow: inset 2px 2px 2px #99f;
      transform: scale(0.9);
 }
@@ -2382,7 +2387,7 @@ _:-ms-lang(x), *, *:hover, *:focus, input, input:hover, input:focus, a:hover, a:
      display: none;
 }
 
-.snarkGraphicStatus img, .snarkTrackerDetails img, .snarkTorrentDetails img {
+.snarkGraphicStatus img, .snarkTrackerDetails img, .snarkTorrentDetails img, .snarkCommentDetails img {
      max-height: 14px !important;
      width: auto;
 }
