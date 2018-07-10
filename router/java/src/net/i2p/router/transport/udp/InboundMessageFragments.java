@@ -260,7 +260,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         // By calling add(), this also is a failsafe against possible
         // races in OutboundMessageFragments.
         if (newAck && from.getOutboundMessageCount() > 0)
-            _outbound.add(from);
+            _outbound.add(from, 0);
 
         return rv;
     }
