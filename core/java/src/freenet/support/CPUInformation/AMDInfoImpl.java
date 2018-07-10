@@ -477,6 +477,23 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
                modelString = "Ryzen model " + model;
           }
           break;
+
+        // http://lkml.iu.edu/hypermail/linux/kernel/1806.1/00730.html
+        // untested
+          case 24: {
+            isK6Compatible = true;
+            isK6_2_Compatible = true;
+            isK6_3_Compatible = true;
+            isAthlonCompatible = true;
+            isAthlon64Compatible = true;
+            // Pending testing of the bulldozer jbigi
+            //isPiledriverCompatible = true;
+            //isSteamrollerCompatible = true;
+            //isExcavatorCompatible = true;
+            //isBulldozerCompatible = true;
+            modelString = "Hygon Dhyana model " + model;
+          }
+          break;
         }
         return modelString;
     }
