@@ -102,6 +102,17 @@
         <res id="XInfoPanel.info" src="installer/resources/start-i2p.txt" />
     </resources>
 
+    <dynamicvariables>
+        <variable name="datamodel" value="${SYSTEM_sun_arch_data_model}"/>
+    </dynamicvariables>
+
+    <conditions>
+        <condition type="variable" id="is64bit">
+            <name>datamodel</name>
+            <value>64</value>
+        </condition>
+    </conditions>
+
     <panels>
         <panel classname="HelloPanel"/>
         <panel classname="InfoPanel"/>
@@ -115,9 +126,9 @@
         <!--
          Using the condition this way, the panel is shown on everything *but* Windows.
          -->
-    <panel classname="XInfoPanel" condition="!izpack.windowsinstall" />
-    <panel classname="SimpleFinishPanel"/>
-</panels>
+        <panel classname="XInfoPanel" condition="!izpack.windowsinstall" />
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
 
     <packs>
         <pack name="Base" required="yes">
@@ -135,13 +146,6 @@
             <parsable targetfile="$INSTALL_PATH/eepget.bat" type="shell" os="windows" />
             <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell"> <os family="unix" /> </parsable>
             <parsable targetfile="$INSTALL_PATH/Start I2P Router.app/Contents/MacOS/i2prouter" type="shell" os="mac" />
-
-            <conditions>
-                <condition type="variable" id="is64bit">
-                    <name>SYSTEM_sun_arch_data_model</name>
-                    <value>64</value>
-                </condition>
-            </conditions>
 
             <!-- postinstall stuff for windows -->
             <!-- Wrapper for 32bit Windows JVM -->

@@ -125,9 +125,13 @@ https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491730/GUI+Preferences
         <variable name="DesktopShortcutCheckboxEnabled" value="true" />
     </variables>
 
+    <dynamicvariables>
+        <variable name="datamodel" value="${SYSTEM[sun.arch.data.model]}"/>
+    </dynamicvariables>
+
     <conditions>
         <condition type="variable" id="is64bit">
-            <name>SYSTEM[sun.arch.data.model]</name>
+            <name>datamodel</name>
             <value>64</value>
         </condition>
     </conditions>

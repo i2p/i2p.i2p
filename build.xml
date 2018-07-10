@@ -24,6 +24,7 @@
         <echo message="  installer-osx: build the GUI installer (OSX only)" />
         <echo message="  installer-windows: build the GUI installer (Windows only)" />
         <echo message="  installer-nowindows: build the GUI installer (all but Windows)" />
+        <echo message="  installer5, installer5-linux, installer5-nowindows, installer5-windows: use IzPack 5" />
         <echo message="  osxLauncher: build the Mac OS X router/GUI launcher (OSX only)" />
         <echo message="  bbLauncher: build the Browser Bundle router launcher" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
@@ -79,7 +80,7 @@
             <echo message="  devscripts libjetty9-java libtomcat8-java libtaglibs-standard-jstlel-java libgetopt-java"  />
             <echo message=" " />
             <echo message="The following command will install the additional runtime dependencies:" />
-            <echo message="sudo apt-get install libecj-java geoip-database" />
+            <echo message="sudo apt-get install geoip-database famfamfam-flag-png" />
             <echo message=" " />
             <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
             <echo message="to patch the source and build the packages." />
@@ -1804,9 +1805,16 @@
     </target>
 
     <!-- Custom installers -->
+    <!-- IzPack 4 -->
     <target name="installer-nowindows" depends="clean, preppkg-nowindows, izpack-patches" >
         <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
+    <!-- IzPack 5 -->
+    <target name="installer5-nowindows" depends="ensureIzpack5, clean, preppkg-nowindows" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
+        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
@@ -1815,9 +1823,16 @@
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
+    <!-- IzPack 4 -->
     <target name="installer-linux" depends="clean, preppkg-linux-only, izpack-patches" >
         <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
+    <!-- IzPack 5 -->
+    <target name="installer5-linux" depends="ensureIzpack5, clean, preppkg-linux-only" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
+        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
