@@ -3,6 +3,7 @@
    - Fix wrapper selection on Windows 10
    - Add support for IzPack 5
  * SSU: Sync/notify improvements (ticket #2260)
+ * Util: Convert more caches to TryCache (ticket #2263)
 
 2018-07-08 zzz
  * i2psnark: Add comment icon (ticket #2278)

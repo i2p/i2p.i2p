@@ -1,9 +1,6 @@
 package net.i2p.util;
 
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Like ByteCache but works directly with byte arrays, not ByteArrays.
@@ -18,9 +15,6 @@ public final class SimpleByteCache {
     private static final ConcurrentHashMap<Integer, SimpleByteCache> _caches = new ConcurrentHashMap<Integer, SimpleByteCache>(8);
 
     private static final int DEFAULT_SIZE = 64;
-
-    /** up to this, use ABQ to minimize object churn and for performance; above this, use LBQ for two locks */
-    private static final int MAX_FOR_ABQ = 64;
 
     /**
      * Get a cache responsible for arrays of the given size
@@ -60,38 +54,32 @@ public final class SimpleByteCache {
             bc.clear();
     }
 
-    /** list of available and available entries */
-    private Queue<byte[]> _available;
-    private int _maxCached;
+    private final TryCache<byte[]> _available;
     private final int _entrySize;
     
+    /** @since 0.9.36 */
+    private static class ByteArrayFactory implements TryCache.ObjectFactory<byte[]> {
+        private final int sz;
+
+        ByteArrayFactory(int entrySize) {
+            sz = entrySize;
+        }
+
+        public byte[] newInstance() {
+            return new byte[sz];
+        }
+    }
+
     private SimpleByteCache(int maxCachedEntries, int entrySize) {
-        _maxCached = maxCachedEntries;
-        _available = createQueue();
+        _available = new TryCache(new ByteArrayFactory(entrySize), maxCachedEntries);
         _entrySize = entrySize;
     }
     
     private void resize(int maxCachedEntries) {
-        if (_maxCached >= maxCachedEntries) return;
-        _maxCached = maxCachedEntries;
-        // make a bigger one, move the cached items over
-        Queue<byte[]> newLBQ = createQueue();
-        byte[] ba;
-        while ((ba = _available.poll()) != null)
-            newLBQ.offer(ba);
-        _available = newLBQ;
+        // _available is now final, and getInstance() is not used anywhere,
+        // all call sites just use static acquire()
     }
     
-    /**
-     *  @return LBQ or ABQ
-     *  @since 0.9.2
-     */
-    private Queue<byte[]> createQueue() {
-        if (_entrySize <= MAX_FOR_ABQ)
-            return new ArrayBlockingQueue<byte[]>(_maxCached);
-        return new LinkedBlockingQueue<byte[]>(_maxCached);
-    }
-
     /**
      * Get the next available array, either from the cache or a brand new one
      */
@@ -99,14 +87,11 @@ public final class SimpleByteCache {
         return getInstance(size).acquire();
     }
 
-    /**
+     /**
      * Get the next available array, either from the cache or a brand new one
      */
     private byte[] acquire() {
-        byte[] rv = _available.poll();
-        if (rv == null)
-            rv = new byte[_entrySize];
-        return rv;
+        return _available.acquire();
     }
     
     /**
@@ -126,7 +111,7 @@ public final class SimpleByteCache {
             return;
         // should be safe without this
         //Arrays.fill(entry, (byte) 0);
-        _available.offer(entry);
+        _available.release(entry);
     }
     
     /**
