@@ -104,7 +104,7 @@ fi
 
 chmod 755 ./eepget
 rm -rf ./icons ./lib/wrapper
-rm -f ./lib/*.dll /*.bat ./*.cmd ./*.exe ./utility.jar
+rm -f ./lib/*.dll ./*.bat ./*.cmd ./*.exe ./utility.jar
 
 if [ ! `echo $HOST_OS  |grep osx` ]; then
     rm -rf ./Start\ I2P\ Router.app

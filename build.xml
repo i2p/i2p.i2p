@@ -1762,18 +1762,36 @@
         <ant dir="installer/java" target="build" />
     </target>
 
+    <!-- IzPack 4 -->
     <target name="installer" depends="preppkg, buildProperties, util-list-changes, izpack-patches, buildUtilityJar" >
-        <!--
-          Force 1.5 pack200 output
-          Doesnt work!
-          http://jira.codehaus.org/browse/IZPACK-404
-          http://forums.sun.com/thread.jspa?threadID=773439
-          http://bfo.co.uk/blog/2010/05/13/combining_ant_jar_signatures_and_pack200.html
-        <property name="com.sun.java.util.jar.pack.package.majver" value="150" />
-        <property name="com.sun.java.util.jar.pack.package.minver" value="7" />
-        -->
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <ant target="installerexe" />
+    </target>
 
+    <!-- IzPack 5 -->
+    <target name="ensureIzpack5" >
+        <!-- set if unset -->
+        <property name="izpack5.home" value="${user.home}/IzPack" />
+        <condition property="izpack5.available" >
+            <available file="${izpack5.home}" type="dir" />
+        </condition>
+        <fail message="Error - IzPack 5.1.x must be installed at ${izpack5.home}, or set izpack5.home=/PATH/TO/IzPack in override.properties, or download from http://izpack.org/downloads/ and install" >
+            <condition>
+                <not>
+                    <isset property="izpack5.available" />
+                </not>
+            </condition>
+        </fail>
+        <path id="izpack5.lib.path">
+            <fileset dir="${izpack5.home}/lib" includes="*.jar"/>
+        </path>
+        <taskdef name="izpack5"
+                 classpathref="izpack5.lib.path"
+                 classname="com.izforge.izpack.ant.IzPackTask" />
+    </target>
+
+    <target name="installer5" depends="ensureIzpack5, preppkg, buildProperties, util-list-changes, buildUtilityJar" >
+        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
     </target>
 
@@ -1845,9 +1863,19 @@
         <delete dir="pkg-temp" includes="eepget i2prouter INSTALL-headless.txt osid postinstall.sh runplain.sh" />
     </target>
 
+    <!-- IzPack 4 -->
     <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches, buildUtilityJar" >
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <ant target="installerexe" />
+        <delete file="${basedir}/install.jar" />
+        <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows.exe" />
+    </target>
+
+    <!-- IzPack 5 -->
+    <target name="installer5-windows" depends="ensureIzpack5, clean, preppkg-windows-only, util-list-changes, buildUtilityJar" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
+        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
         <delete file="${basedir}/install.jar" />
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows.exe" />

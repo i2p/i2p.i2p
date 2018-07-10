@@ -106,6 +106,7 @@
 6. Change revision in:
   - `history.txt`
   - `installer/install.xml`
+  - `installer/install5.xml`
   - `core/java/src/net/i2p/CoreVersion.java`
   - `router/java/src/net/i2p/router/RouterVersion.java`
     - (change to BUILD = 0 and EXTRA = "")
