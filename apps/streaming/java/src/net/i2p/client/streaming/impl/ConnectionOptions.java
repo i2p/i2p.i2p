@@ -155,9 +155,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
 
     /**
      *  If PROTO is enforced, we cannot communicate with destinations earlier than version 0.7.1.
+     *  Default true as of 0.9.36.
      *  @since 0.9.1
      */
-    private static final boolean DEFAULT_ENFORCE_PROTO = false;
+    private static final boolean DEFAULT_ENFORCE_PROTO = true;
 
     private final int _trend[] = new int[TREND_COUNT];
 
@@ -523,7 +524,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     
     /**
      * Do we receive all traffic, or only traffic marked with I2PSession.PROTO_STREAMING (6) ?
-     * Default false.
+     * Default true.
      * If PROTO is enforced, we cannot communicate with destinations earlier than version 0.7.1
      * (released March 2009), which is when streaming started sending the PROTO_STREAMING indication.
      * Set to true if you are running multiple protocols on a single Destination.

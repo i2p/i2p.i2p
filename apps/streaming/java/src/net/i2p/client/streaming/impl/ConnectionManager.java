@@ -97,11 +97,10 @@ class ConnectionManager {
         _connectionHandler = new ConnectionHandler(_context, this, _timer);
         _tcbShare = new TCBShare(_context, _timer);
         // PROTO_ANY is for backward compatibility (pre-0.7.1)
-        // TODO change proto to PROTO_STREAMING someday.
-        // Right now we get everything, and rely on Datagram to specify PROTO_UDP.
         // PacketQueue has sent PROTO_STREAMING since the beginning of mux support (0.7.1)
         // As of 0.9.1, new option to enforce streaming protocol, off by default
         // As of 0.9.1, listen on configured port (default 0 = all)
+        // enforce protocol default changed to true in 0.9.36
         int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
         _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
         _outboundQueue = new PacketQueue(_context, _timer);
