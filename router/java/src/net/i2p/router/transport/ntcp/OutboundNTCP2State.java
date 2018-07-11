@@ -442,7 +442,7 @@ class OutboundNTCP2State implements EstablishState {
         tk = new SessionKey(temp_key);
         byte[] ask_master = doHMAC(ctx, tk, ASK);
         byte[] tmp = new byte[32 + SIPHASH.length];
-        byte[] hash = state.getHash();
+        byte[] hash = state.getHandshakeHash();
         System.arraycopy(hash, 0, tmp, 0, 32);
         System.arraycopy(SIPHASH, 0, tmp, 32, SIPHASH.length); 
         tk = new SessionKey(ask_master);
