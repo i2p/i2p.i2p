@@ -573,7 +573,6 @@ public class Storage implements Closeable
       for (int i = 0; i < rv.length; i++) {
           pcEnd += piece_size;
           int pri = _torrentFiles.get(file).priority;
-          // TODO if (_inOrder) ...
           while (fileEnd <= pcEnd && file < _torrentFiles.size() - 1) {
               file++;
               TorrentFile tf = _torrentFiles.get(file);
@@ -583,6 +582,25 @@ public class Storage implements Closeable
                   pri = tf.priority;
           }
           rv[i] = pri;
+      }
+      if (_inOrder) {
+          // Do a second pass to set the priority of the pieces within each file
+          // this only works because MAX_PIECES * MAX_FILES_PER_TORRENT < Integer.MAX_VALUE
+          // the base file priority
+          int pri = PRIORITY_SKIP;
+          for (int i = 0; i < rv.length; i++) {
+              int val = rv[i];
+              if (val <= PRIORITY_NORMAL)
+                  continue;
+              if (val != pri) {
+                  pri = val;
+                  // new file
+                  rv[i] *= MAX_PIECES;
+              } else {
+                  // same file, decrement priority from previous piece
+                  rv[i] = rv[i-1] - 1;
+              }
+          }
       }
       return rv;
   }
