@@ -25,11 +25,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -517,9 +520,17 @@ public class Storage implements Closeable
       if (complete() || metainfo.getFiles() == null)
           return;
       if (yes) {
-          int sz = _torrentFiles.size();
+          List<TorrentFile> sorted = _torrentFiles;
+          int sz = sorted.size();
+          if (sz > 1) {
+              sorted = new ArrayList<TorrentFile>(sorted);
+              Collections.sort(sorted, new FileNameComparator());
+          }
           for (int i = 0; i < sz; i++) {
-              _torrentFiles.get(i).priority = sz - i;
+              TorrentFile tf = sorted.get(i);
+              // higher number is higher priority
+              if (tf.priority >= PRIORITY_NORMAL)
+                  tf.priority = sz - i;
           }
       } else {
           for (TorrentFile tf : _torrentFiles) {
@@ -527,6 +538,20 @@ public class Storage implements Closeable
                   tf.priority = PRIORITY_NORMAL;
           }
       }
+  }
+
+  /**
+   *  Sort with locale comparator.
+   *  (not using TorrentFile.compareTo())
+   *  @since 0.9.36
+   */
+  private static class FileNameComparator implements Comparator<TorrentFile>, Serializable {
+
+     private final Collator c = Collator.getInstance();
+
+     public int compare(TorrentFile l, TorrentFile r) {
+         return c.compare(l.toString(), r.toString());
+     }
   }
 
   /**
