@@ -16,28 +16,48 @@
 #include <glob.h>
 #include <vector>
 
+
+#define DEF_I2P_VERSION "0.9.35"
+#define APPDOMAIN "net.i2p.launcher"
+#define NSAPPDOMAIN @APPDOMAIN
+#define CFAPPDOMAIN CFSTR(APPDOMAIN)
+#define APP_IDSTR @"I2P Launcher"
+
+
 using namespace neither;
+
+using maybeAnRouterRunner = std::experimental::optional<RouterTask*>;
+
 
 extern JvmListSharedPtr gRawJvmList;
 
 // DO NOT ACCESS THIS GLOBAL VARIABLE DIRECTLY.
-maybeAnRouterRunner globalRouterStatus = maybeAnRouterRunner{};
+static std::mutex globalRouterStatusMutex;
+static maybeAnRouterRunner globalRouterStatus = maybeAnRouterRunner{};
 
-maybeAnRouterRunner getGlobalRouterObject()
-{
-    std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
-    return globalRouterStatus;
-}
+maybeAnRouterRunner getGlobalRouterObject();
+void setGlobalRouterObject(RouterTask* newRouter);
 
-void setGlobalRouterObject(RouterTask* newRouter)
-{
-    std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
-    globalRouterStatus.emplace(newRouter);
-}
+@class ExtractMetaInfo;
+@interface ExtractMetaInfo : NSObject
+@property (strong) NSString* i2pBase;
+@property (strong) NSString* javaBinary;
+@property (strong) NSString* zipFile;
+@property (strong) NSString* jarFile;
+@end
 
+inline void sendUserNotification(NSString* title, NSString* informativeText, NSImage* contentImage = NULL, bool makeSound = false) {
+  NSUserNotification *userNotification = [[[NSUserNotification alloc] init] autorelease];
 
+  userNotification.title = title;
+  userNotification.informativeText = informativeText;
+  if (contentImage != NULL) userNotification.contentImage = contentImage;
+  if (makeSound) userNotification.soundName = NSUserNotificationDefaultSoundName;
 
-std::vector<std::string> globVector(const std::string& pattern){
+  [[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:userNotification];
+};
+
+inline std::vector<std::string> globVector(const std::string& pattern){
     glob_t glob_result;
     glob(pattern.c_str(),GLOB_TILDE,NULL,&glob_result);
     std::vector<std::string> files;
@@ -63,6 +83,7 @@ std::vector<std::string> globVector(const std::string& pattern){
 - (void) btnPressedAction:(id)sender;
 - (void) menuWillOpen:(NSMenu *)menu;
 
+- (void) openRouterConsoleBtnHandler: (NSMenuItem *) menuItem;
 - (void) startJavaRouterBtnHandler: (NSMenuItem *) menuItem;
 - (void) restartJavaRouterBtnHandler: (NSMenuItem *) menuItem;
 - (void) stopJavaRouterBtnHandler: (NSMenuItem *) menuItem;
@@ -85,6 +106,9 @@ std::vector<std::string> globVector(const std::string& pattern){
 @property (strong) NSUserDefaults *userPreferences;
 @property BOOL enableLogging;
 @property BOOL enableVerboseLogging;
+@property (copy) NSImage *contentImage NS_AVAILABLE(10_9, NA);
+- (void)extractI2PBaseDir:(ExtractMetaInfo *)metaInfo completion:(void(^)(BOOL success, NSError *error))completion;
+- (void)startupI2PRouter:(ExtractMetaInfo *)metaInfo;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification;
 - (void)applicationWillTerminate:(NSNotification *)aNotification;
 - (void)setApplicationDefaultPreferences;

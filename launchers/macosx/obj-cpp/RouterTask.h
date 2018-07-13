@@ -30,8 +30,12 @@
 @property (strong) NSMutableData *totalLogData;
 @property (strong) NSPipe *processPipe;
 @property (strong) NSFileHandle *input;
+@property (atomic) BOOL userRequestedRestart;
 - (instancetype) initWithOptions : (RTaskOptions*) options;
 - (int) execute;
+- (void) requestShutdown;
+- (void) requestRestart;
+- (BOOL) isRunning;
 - (int) getPID;
 @end
 

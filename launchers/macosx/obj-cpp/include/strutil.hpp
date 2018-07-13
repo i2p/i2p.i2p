@@ -14,7 +14,7 @@
 #include <CoreFoundation/CFArray.h>
 #include <CoreFoundation/CFString.h>
 
-std::string strprintf(const char *fromat, ...)
+inline std::string strprintf(const char *fromat, ...)
 {
 	std::string s;
 	s.resize(128); // best guess
@@ -37,7 +37,7 @@ std::string strprintf(const char *fromat, ...)
 	return s; // move semantics FTW
 }
 
-std::string extractString(CFStringRef value)
+inline std::string extractString(CFStringRef value)
 {
   const char * data = CFStringGetCStringPtr(value, kCFStringEncodingUTF8);
   if (data != NULL)
@@ -56,7 +56,7 @@ std::string extractString(CFStringRef value)
 using std::experimental::optional;
 
 // Use CFStringRef instead of NSString*, otherwise disable ARC
-optional<CFStringRef> optionalString(bool val) {
+inline optional<CFStringRef> optionalString(bool val) {
     optional<CFStringRef> myOptString;
     if(val) {
         // Cast to corresponding CoreFoundation object

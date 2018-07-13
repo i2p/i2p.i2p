@@ -26,12 +26,6 @@
 using namespace subprocess;
 using namespace neither;
 
-using maybeAnRouterRunner = std::experimental::optional<RouterTask*>;
-
-extern std::mutex globalRouterStatusMutex;
-extern maybeAnRouterRunner globalRouterStatus;
-
-
 #define DEF_MIN_JVM_VER "1.7+"
 
 class JvmVersion

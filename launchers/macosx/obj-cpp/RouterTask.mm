@@ -6,6 +6,7 @@
 
 #include "optional.hpp"
 #include "subprocess.hpp"
+#include "PidWatcher.h"
 
 #import <AppKit/AppKit.h>
 
@@ -14,8 +15,10 @@
 
 @implementation RouterTask
 
+
 - (instancetype) initWithOptions : (RTaskOptions*) options
 {
+    self.userRequestedRestart = FALSE;
     self.input = [NSFileHandle fileHandleWithStandardInput];
     self.routerTask = [NSTask new];
     self.processPipe = [NSPipe new];
@@ -27,6 +30,9 @@
     [self.routerTask setEnvironment: envDict];
     [self.routerTask setStandardOutput:self.processPipe];
 	[self.routerTask setStandardError:self.processPipe];
+    [self.routerTask setTerminationHandler:^(NSTask* task) {
+        NSLog(@"termHandler triggered!");
+    }];
 /*
     self.readLogHandle = [self.processPipe fileHandleForReading];
     NSData *inData = nil;
@@ -40,10 +46,26 @@
     return self;
 }
 
+- (void) requestShutdown
+{
+    [self.routerTask interrupt];
+}
+
+- (void) requestRestart
+{
+    self.userRequestedRestart = TRUE;
+}
+
+- (BOOL) isRunning
+{
+    return self.routerTask.running;
+}
+
 - (int) execute
 {
     //@try {
         [self.routerTask launch];
+        watchPid([self.routerTask processIdentifier]);
         [self.input waitForDataInBackgroundAndNotify];
         [[self.processPipe fileHandleForReading] waitForDataInBackgroundAndNotify];
         [[NSNotificationCenter defaultCenter] addObserverForName:NSFileHandleDataAvailableNotification
@@ -83,8 +105,6 @@
 
 
 using namespace subprocess;
-
-std::mutex globalRouterStatusMutex;
 
 const std::vector<NSString*> JavaRunner::defaultStartupFlags {
     @"-Xmx512M",

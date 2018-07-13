@@ -1,5 +1,6 @@
 cxx = clang++
-cflags = -std=c++14 -g -Wall -I./include -I./include/neither -I/usr/local/include -I/usr/include -Wno-unused-variable -mmacosx-version-min=10.10
+cflags = -std=c++14 -g -Wall -I./include -I./include/neither -I/usr/local/include -I/usr/include $
+    -Wno-unused-function -Wno-incomplete-implementation -Wno-unused-variable -mmacosx-version-min=10.10
 ldflags = -framework CoreFoundation -framework Foundation -framework Cocoa -g -rdynamic
 
 
