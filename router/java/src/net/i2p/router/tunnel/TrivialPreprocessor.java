@@ -34,7 +34,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * (since ByteCache only maintains once instance for each size)
      * Used in BatchedPreprocessor; see add'l comments there
      */
-    protected static final ByteCache _dataCache = ByteCache.getInstance(32, PREPROCESSED_SIZE);
+    protected static final ByteCache _dataCache = ByteCache.getInstance(512, PREPROCESSED_SIZE);
 
     public TrivialPreprocessor(RouterContext ctx) {
         _context = ctx;

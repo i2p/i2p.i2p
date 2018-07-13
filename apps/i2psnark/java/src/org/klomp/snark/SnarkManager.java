@@ -105,6 +105,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     private static final String PROP_META_UPLOADED = "uploaded";
     private static final String PROP_META_ADDED = "added";
     private static final String PROP_META_COMPLETED = "completed";
+    private static final String PROP_META_INORDER = "inOrder";
     private static final String PROP_META_MAGNET = "magnet";
     private static final String PROP_META_MAGNET_DN = "magnet_dn";
     private static final String PROP_META_MAGNET_TR = "magnet_tr";
@@ -1759,7 +1760,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                 return false;
             } else if (bitfield != null) {
-                saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, true); // no file priorities
+                saveTorrentStatus(metainfo, bitfield, null, false, baseFile, true, 0, true); // no file priorities
             }
             // so addTorrent won't recheck            
             if (filename == null) {
@@ -1898,19 +1899,21 @@ public class SnarkManager implements CompleteListener, ClientApp {
             return;
         Properties config = getConfig(snark);
         String pri = config.getProperty(PROP_META_PRIORITY);
-        if (pri == null)
-            return;
-        int filecount = metainfo.getFiles().size();
-        int[] rv = new int[filecount];
-        String[] arr = DataHelper.split(pri, ",");
-        for (int i = 0; i < filecount && i < arr.length; i++) {
-            if (arr[i].length() > 0) {
-                try {
-                    rv[i] = Integer.parseInt(arr[i]);
-                } catch (Throwable t) {}
+        if (pri != null) {
+            int filecount = metainfo.getFiles().size();
+            int[] rv = new int[filecount];
+            String[] arr = DataHelper.split(pri, ",");
+            for (int i = 0; i < filecount && i < arr.length; i++) {
+                if (arr[i].length() > 0) {
+                    try {
+                        rv[i] = Integer.parseInt(arr[i]);
+                    } catch (Throwable t) {}
+                }
             }
+            storage.setFilePriorities(rv);
         }
-        storage.setFilePriorities(rv);
+        boolean inOrder = Boolean.parseBoolean(config.getProperty(PROP_META_INORDER));
+        storage.setInOrder(inOrder);
     }
 
     /**
@@ -2017,7 +2020,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         Storage storage = snark.getStorage();
         if (meta == null || storage == null)
             return;
-        saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(),
+        saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(), storage.getInOrder(),
                           storage.getBase(), storage.getPreserveFileNames(),
                           snark.getUploaded(), snark.isStopped(), comments);
     }
@@ -2034,24 +2037,24 @@ public class SnarkManager implements CompleteListener, ClientApp {
      * @param priorities may be null
      * @param base may be null
      */
-    private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
+    private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, boolean inOrder,
                                    File base, boolean preserveNames, long uploaded, boolean stopped) {
-        saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded, stopped, null);
+        saveTorrentStatus(metainfo, bitfield, priorities, inOrder, base, preserveNames, uploaded, stopped, null);
     }
 
     /*
      * @param comments null for no change
      * @since 0.9.31
      */
-    private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
+    private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, boolean inOrder,
                                    File base, boolean preserveNames, long uploaded, boolean stopped,
                                    Boolean comments) {
         synchronized (_configLock) {
-            locked_saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded, stopped, comments);
+            locked_saveTorrentStatus(metainfo, bitfield, priorities, inOrder, base, preserveNames, uploaded, stopped, comments);
         }
     }
 
-    private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
+    private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, boolean inOrder,
                                           File base, boolean preserveNames, long uploaded, boolean stopped,
                                           Boolean comments) {
         byte[] ih = metainfo.getInfoHash();
@@ -2077,6 +2080,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         config.setProperty(PROP_META_UPLOADED, Long.toString(uploaded));
         boolean running = !stopped;
         config.setProperty(PROP_META_RUNNING, Boolean.toString(running));
+        config.setProperty(PROP_META_INORDER, Boolean.toString(inOrder));
         if (base != null)
             config.setProperty(PROP_META_BASE, base.getAbsolutePath());
         if (comments != null)
@@ -2095,7 +2099,9 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 // generate string like -5,,4,3,,,,,,-2 where no number is zero.
                 StringBuilder buf = new StringBuilder(2 * priorities.length);
                 for (int i = 0; i < priorities.length; i++) {
-                    if (priorities[i] != 0)
+                    // only output if !inOrder || !skipped so the string isn't too long
+                    if (priorities[i] != 0 &&
+                        (!inOrder || priorities[i] < 0))
                         buf.append(Integer.toString(priorities[i]));
                     if (i != priorities.length - 1)
                         buf.append(',');
@@ -2443,7 +2449,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         MetaInfo meta = snark.getMetaInfo();
         Storage storage = snark.getStorage();
         if (meta != null && storage != null)
-            saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(),
+            saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(), storage.getInOrder(),
                               storage.getBase(), storage.getPreserveFileNames(), snark.getUploaded(), 
                               snark.isStopped());
     }
@@ -2467,7 +2473,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 snark.stopTorrent();
                 return null;
             }
-            saveTorrentStatus(meta, storage.getBitField(), null,
+            saveTorrentStatus(meta, storage.getBitField(), null, false,
                               storage.getBase(), storage.getPreserveFileNames(), 0, 
                               snark.isStopped());
             // temp for addMessage() in case canonical throws

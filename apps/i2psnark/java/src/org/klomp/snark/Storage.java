@@ -25,11 +25,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +75,7 @@ public class Storage implements Closeable
   private final boolean _preserveFileNames;
   private boolean changed;
   private volatile boolean _isChecking;
+  private boolean _inOrder;
   private final AtomicInteger _allocateCount = new AtomicInteger();
   private final AtomicInteger _checkProgress = new AtomicInteger();
 
@@ -82,6 +86,8 @@ public class Storage implements Closeable
   /** The maximum number of pieces in a torrent. */
   public static final int MAX_PIECES = 32*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
+  public static final int PRIORITY_SKIP = -9;
+  public static final int PRIORITY_NORMAL = 0;
 
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap<String, String>();
 
@@ -145,7 +151,7 @@ public class Storage implements Closeable
     _torrentFiles = getFiles(baseFile);
     
     long total = 0;
-    ArrayList<Long> lengthsList = new ArrayList<Long>();
+    ArrayList<Long> lengthsList = new ArrayList<Long>(_torrentFiles.size());
     for (TorrentFile tf : _torrentFiles)
       {
         long length = tf.length;
@@ -178,7 +184,7 @@ public class Storage implements Closeable
     bitfield = new BitField(pieces);
     needed = 0;
 
-    List<List<String>> files = new ArrayList<List<String>>();
+    List<List<String>> files = new ArrayList<List<String>>(_torrentFiles.size());
     for (TorrentFile tf : _torrentFiles)
       {
         List<String> file = new ArrayList<String>();
@@ -495,6 +501,60 @@ public class Storage implements Closeable
   }
 
   /**
+   *  @return as last set, default false
+   *  @since 0.9.36
+   */
+  public boolean getInOrder() {
+      return _inOrder;
+  }
+
+  /**
+   *  Call AFTER setFilePriorites() so we know what's skipped
+   *  @param yes enable or not
+   *  @since 0.9.36
+   */
+  public void setInOrder(boolean yes) {
+      if (yes == _inOrder)
+          return;
+      _inOrder = yes;
+      if (complete() || metainfo.getFiles() == null)
+          return;
+      if (yes) {
+          List<TorrentFile> sorted = _torrentFiles;
+          int sz = sorted.size();
+          if (sz > 1) {
+              sorted = new ArrayList<TorrentFile>(sorted);
+              Collections.sort(sorted, new FileNameComparator());
+          }
+          for (int i = 0; i < sz; i++) {
+              TorrentFile tf = sorted.get(i);
+              // higher number is higher priority
+              if (tf.priority >= PRIORITY_NORMAL)
+                  tf.priority = sz - i;
+          }
+      } else {
+          for (TorrentFile tf : _torrentFiles) {
+              if (tf.priority > PRIORITY_NORMAL)
+                  tf.priority = PRIORITY_NORMAL;
+          }
+      }
+  }
+
+  /**
+   *  Sort with locale comparator.
+   *  (not using TorrentFile.compareTo())
+   *  @since 0.9.36
+   */
+  private static class FileNameComparator implements Comparator<TorrentFile>, Serializable {
+
+     private final Collator c = Collator.getInstance();
+
+     public int compare(TorrentFile l, TorrentFile r) {
+         return c.compare(l.toString(), r.toString());
+     }
+  }
+
+  /**
    *  Call setPriority() for all changed files first,
    *  then call this.
    *  Set the piece priority to the highest priority
@@ -523,6 +583,25 @@ public class Storage implements Closeable
           }
           rv[i] = pri;
       }
+      if (_inOrder) {
+          // Do a second pass to set the priority of the pieces within each file
+          // this only works because MAX_PIECES * MAX_FILES_PER_TORRENT < Integer.MAX_VALUE
+          // the base file priority
+          int pri = PRIORITY_SKIP;
+          for (int i = 0; i < rv.length; i++) {
+              int val = rv[i];
+              if (val <= PRIORITY_NORMAL)
+                  continue;
+              if (val != pri) {
+                  pri = val;
+                  // new file
+                  rv[i] *= MAX_PIECES;
+              } else {
+                  // same file, decrement priority from previous piece
+                  rv[i] = rv[i-1] - 1;
+              }
+          }
+      }
       return rv;
   }
 
@@ -544,7 +623,7 @@ public class Storage implements Closeable
       long rv = 0;
       final int end = pri.length - 1;
       for (int i = 0; i <= end; i++) {
-          if (pri[i] <= -9 && !bitfield.get(i)) {
+          if (pri[i] <= PRIORITY_SKIP && !bitfield.get(i)) {
               rv += (i != end) ? piece_size : metainfo.getPieceLength(i);
           }
       }

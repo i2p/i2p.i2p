@@ -2931,7 +2931,8 @@ public class I2PSnarkServlet extends BasicServlet {
             if (val != null) {
                 String nonce = val[0];
                 if (String.valueOf(_nonce).equals(nonce)) {
-                    if (postParams.get("savepri") != null) {
+                    if (postParams.get("savepri") != null ||
+                        postParams.get("setInOrderEnabled") != null) {
                         savePriorities(snark, postParams);
                     } else if (postParams.get("addComment") != null) {
                         saveComments(snark, postParams);
@@ -2974,7 +2975,8 @@ public class I2PSnarkServlet extends BasicServlet {
         }
 
         boolean showStopStart = snark != null;
-        boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete() &&
+        Storage storage = snark != null ? snark.getStorage() : null;
+        boolean showPriority = storage != null && !storage.complete() &&
                                r.isDirectory();
 
         StringBuilder buf=new StringBuilder(4096);
@@ -3036,13 +3038,13 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
-            if (snark.getStorage() != null) {
+            if (storage != null) {
                 buf.append("<tr><td>");
                 toThemeImg(buf, "file");
                 buf.append("</td><td><b>")
                    .append(_t("Data location"))
                    .append(":</b> ")
-                   .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
+                   .append(DataHelper.escapeHTML(storage.getBase().getPath()))
                    .append("</td></tr>\n");
             }
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
@@ -3285,6 +3287,23 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 buf.append("</td></tr>\n");
             }
+
+            boolean showInOrder = storage != null && !storage.complete() &&
+                                  meta != null && meta.getFiles() != null && meta.getFiles().size() > 1;
+            if (showInOrder) {
+                buf.append("<tr id=\"torrentOrderControl\"><td colspan=\"2\">");
+                buf.append(_t("Download files in order"));
+                buf.append(":<label><input type=\"checkbox\" class=\"optbox\" name=\"enableInOrder\" id=\"enableInOrder\" ");
+                if (storage.getInOrder())
+                    buf.append("checked=\"checked\"");
+                buf.append(">&nbsp;");
+                buf.append(_t("Enable for this torrent"));
+                buf.append("</label>" +
+                           "<input type=\"submit\" name=\"setInOrderEnabled\" value=\"");
+                buf.append(_t("Save Preference"));
+                buf.append("\" class=\"accept\">" +
+                           "</td></tr>\n");
+            }
         } else {
             // snark == null
             // shouldn't happen
@@ -3323,7 +3342,6 @@ public class I2PSnarkServlet extends BasicServlet {
             return buf.toString();
         }
 
-        Storage storage = snark != null ? snark.getStorage() : null;
         List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
         // precompute remaining for all files for efficiency
         long[] remainingArray = (storage != null) ? storage.remaining() : null;
@@ -3424,6 +3442,7 @@ public class I2PSnarkServlet extends BasicServlet {
         //                                               DateFormat.MEDIUM);
         boolean showSaveButton = false;
         boolean rowEven = true;
+        boolean inOrder = storage != null && storage.getInOrder();
         for (Sorters.FileAndIndex fai : fileList)
         {
             //String encoded = encodePath(ls[i].getName());
@@ -3447,7 +3466,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 complete = true;
                 //status = toImg("tick") + ' ' + _t("Directory");
             } else {
-                if (snark == null || snark.getStorage() == null) {
+                if (storage == null) {
                     // Assume complete, perhaps he removed a completed torrent but kept a bookmark
                     complete = true;
                     status = toImg("cancel") + ' ' + _t("Torrent not found?");
@@ -3527,16 +3546,18 @@ public class I2PSnarkServlet extends BasicServlet {
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
                 if ((!complete) && (!item.isDirectory())) {
-                    buf.append("<label class=\"priorityHigh\" title=\"").append(_t("Download file at high priority")).append("\">" +
-                               "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
-                    if (priority > 0)
-                        buf.append("checked=\"checked\"");
-                    buf.append('>')
-                       .append(_t("High")).append("</label>");
+                    if (!inOrder) {
+                        buf.append("<label class=\"priorityHigh\" title=\"").append(_t("Download file at high priority")).append("\">" +
+                                   "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
+                        if (priority > 0)
+                            buf.append("checked=\"checked\"");
+                        buf.append('>')
+                           .append(_t("High")).append("</label>");
+                    }
 
                     buf.append("<label class=\"priorityNormal\" title=\"").append(_t("Download file at normal priority")).append("\">" +
                                "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
-                    if (priority == 0)
+                    if (priority == 0 || (inOrder && priority >= 0))
                         buf.append("checked=\"checked\"");
                     buf.append('>')
                        .append(_t("Normal")).append("</label>");
@@ -3555,9 +3576,12 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         if (showSaveButton) {
             buf.append("<thead><tr id=\"setPriority\"><th class=\"headerpriority\" colspan=\"5\">" +
-                       "<span class=\"script\"><a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">")
-               .append(toImg("clock_red")).append(_t("Set all high")).append("</a>\n" +
-                       "<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">")
+                       "<span class=\"script\">");
+            if (!inOrder) {
+                buf.append("<a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">")
+                   .append(toImg("clock_red")).append(_t("Set all high")).append("</a>\n");
+            }
+            buf.append("<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">")
                .append(toImg("clock")).append(_t("Set all normal")).append("</a>\n" +
                        "<a class=\"control\" id=\"setallskip\" href=\"javascript:void(null);\" onclick=\"setallskip();\">")
                .append(toImg("cancel")).append(_t("Skip all")).append("</a></span>\n" +
@@ -3926,6 +3950,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 } catch (Throwable t) { t.printStackTrace(); }
             }
         }
+        if (postParams.get("setInOrderEnabled") != null)
+            storage.setInOrder(postParams.get("enableInOrder") != null);
         snark.updatePiecePriorities();
         _manager.saveTorrentStatus(snark);
     }

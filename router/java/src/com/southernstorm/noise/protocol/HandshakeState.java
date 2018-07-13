@@ -883,14 +883,6 @@ public class HandshakeState implements Destroyable {
 	}
 
 	/**
-	 *  I2P for getting current hash for siphash calculation
-	 *  @return NOT a copy, do not modify
-	 */
-	public byte[] getHash() {
-		return symmetric.getHandshakeHash();
-	}
-
-	/**
 	 *  I2P debug
 	 */
 	@Override
