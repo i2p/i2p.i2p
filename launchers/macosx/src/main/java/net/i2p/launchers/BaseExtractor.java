@@ -21,45 +21,56 @@ import java.util.zip.ZipFile;
  */
 public class BaseExtractor extends EnvCheck {
 
-    private void runExtract(String zipFilename, String destinationPath) {
+    public boolean printDebug = false;
+
+    public void runExtract(String zipFilename) {
+        String destinationPath = this.baseDirPath;
         try(ZipFile file = new ZipFile(zipFilename)) {
             FileSystem fileSystem = FileSystems.getDefault();
             Enumeration<? extends ZipEntry> entries = file.entries();
-            Files.createDirectory(fileSystem.getPath(destinationPath));
+
+            try {
+                Files.createDirectory(fileSystem.getPath(destinationPath));
+            } catch (IOException e) {
+                // It's OK to fail here.
+            }
+
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
+                if (printDebug) System.out.println("Found entry: "+entry.toString());
                 if (entry.isDirectory()) {
-                    System.out.println("Creating Directory:" + destinationPath + entry.getName());
-                    Files.createDirectories(fileSystem.getPath(destinationPath + entry.getName()));
+                    if (printDebug) System.out.println("Creating Directory:" + destinationPath + "/" + entry.getName());
+                    Files.createDirectories(fileSystem.getPath(destinationPath + "/" + entry.getName()));
                 } else {
                     InputStream is = file.getInputStream(entry);
                     BufferedInputStream bis = new BufferedInputStream(is);
-                    String uncompressedFileName = destinationPath + entry.getName();
+                    String uncompressedFileName = destinationPath + "/" + entry.getName();
                     Path uncompressedFilePath = fileSystem.getPath(uncompressedFileName);
                     Files.createFile(uncompressedFilePath);
                     FileOutputStream fileOutput = new FileOutputStream(uncompressedFileName);
                     while (bis.available() > 0) fileOutput.write(bis.read());
                     fileOutput.close();
-                    System.out.println("Written :" + entry.getName());
+                    if (printDebug) System.out.println("Written :" + entry.getName());
                 }
             }
         } catch (IOException e) {
             //
+            System.err.println("Exception in extractor!");
+            System.err.println(e.toString());
         }
     }
 
     public BaseExtractor(String[] args) {
         super(args);
-
-        if (args.length == 2) {
-            if ("extract".equals(args[0])) {
-                // Start extract
-
-            }this.runExtract(System.getProperty("i2p.base.zip"),this.baseDirPath);
-        }
     }
 
     public static void main(String[] args) {
-        new BaseExtractor(args);
+        System.out.println("Starting extraction");
+        BaseExtractor be = new BaseExtractor(args);
+        String debug = System.getProperty("print.debug");
+        if (debug != null) {
+            be.printDebug = true;
+        }
+        be.runExtract(System.getProperty("i2p.base.zip"));
     }
 }

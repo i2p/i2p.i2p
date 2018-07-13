@@ -26,6 +26,8 @@
 	<string>I2P</string>
 	<key>CFBundleVersion</key>
 	<string>0.0.1</string>
+    <key>NSUserNotificationAlertStyle</key>
+    <string>alert</string>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>CGDisableCoalescedUpdates</key>

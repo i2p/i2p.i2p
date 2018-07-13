@@ -9,8 +9,44 @@
 
 #include "StatusItemButton.h"
 #include "JavaHelper.h"
+#include "RouterTask.h"
+#include "neither/maybe.hpp"
+#include "optional.hpp"
+#include "subprocess.hpp"
+#include <glob.h>
+#include <vector>
+
+using namespace neither;
 
 extern JvmListSharedPtr gRawJvmList;
+
+// DO NOT ACCESS THIS GLOBAL VARIABLE DIRECTLY.
+maybeAnRouterRunner globalRouterStatus = maybeAnRouterRunner{};
+
+maybeAnRouterRunner getGlobalRouterObject()
+{
+    std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
+    return globalRouterStatus;
+}
+
+void setGlobalRouterObject(RouterTask* newRouter)
+{
+    std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
+    globalRouterStatus.emplace(newRouter);
+}
+
+
+
+std::vector<std::string> globVector(const std::string& pattern){
+    glob_t glob_result;
+    glob(pattern.c_str(),GLOB_TILDE,NULL,&glob_result);
+    std::vector<std::string> files;
+    for(unsigned int i=0;i<glob_result.gl_pathc;++i){
+        files.push_back(std::string(glob_result.gl_pathv[i]));
+    }
+    globfree(&glob_result);
+    return files;
+}
 
 @interface MenuBarCtrl : NSObject <StatusItemButtonDelegate, NSMenuDelegate>
 @property BOOL enableLogging;
@@ -55,6 +91,8 @@ extern JvmListSharedPtr gRawJvmList;
 - (void)userChooseJavaHome;
 - (AppDelegate *)initWithArgc:(int)argc argv:(const char **)argv;
 - (NSString *)userSelectJavaHome:(JvmListPtr)rawJvmList;
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
+                               shouldPresentNotification:(NSUserNotification *)notification;
 @end
 
 
