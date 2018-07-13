@@ -1,3 +1,10 @@
+2018-07-10 zzz
+ * Installer (ticket #1864):
+   - Fix wrapper selection on Windows 10
+   - Add support for IzPack 5
+ * SSU: Sync/notify improvements (ticket #2260)
+ * Util: Convert more caches to TryCache (ticket #2263)
+
 2018-07-08 zzz
  * i2psnark: Add comment icon (ticket #2278)
  * NTCP2: Avoid possible NPEs (ticket #2286)

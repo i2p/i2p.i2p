@@ -343,8 +343,6 @@ class NTCP2Payload {
      * Big endian.
      * Same as DataHelper.fromLong(src, offset, 8) but allows negative result
      *
-     * Package private for NTCP2Payload.
-     *
      * @throws ArrayIndexOutOfBoundsException
      * @since 0.9.36
      */

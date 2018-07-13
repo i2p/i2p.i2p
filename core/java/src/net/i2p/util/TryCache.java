@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author zab
  *
  * @param <T>
+ * @since 0.9.36
  */
 public class TryCache<T> {
 
@@ -24,9 +25,10 @@ public class TryCache<T> {
     }
     
     private final ObjectFactory<T> factory;
-    private final int capacity;
-    private final List<T> items;
-    private final Lock lock = new ReentrantLock();
+    protected final int capacity;
+    protected final List<T> items;
+    protected final Lock lock = new ReentrantLock();
+    protected long _lastUnderflow;
     
     /**
      * @param factory to be used for creating new instances
@@ -47,6 +49,8 @@ public class TryCache<T> {
             try {
                 if (!items.isEmpty()) {
                     rv = items.remove(items.size() - 1);
+                } else {
+                    _lastUnderflow = System.currentTimeMillis();
                 }
             } finally {
                 lock.unlock();

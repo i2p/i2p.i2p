@@ -310,7 +310,8 @@ public class CPUID {
             return new VIAInfoImpl();
         if(!isX86)
             throw new UnknownCPUException("Failed to read CPU information from the system. The CPUID instruction exists on x86 CPUs only.");
-        if(id.equals("AuthenticAMD"))
+        // http://lkml.iu.edu/hypermail/linux/kernel/1806.1/00730.html
+        if(id.equals("AuthenticAMD") || id.equals("HygonGenuine"))
             return new AMDInfoImpl();
         if(id.equals("GenuineIntel"))
             return new IntelInfoImpl();
