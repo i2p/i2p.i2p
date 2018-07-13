@@ -1,5 +1,5 @@
 cxx = clang++
-cflags = -std=c++14 -g -Wall -I./include -I/usr/local/include -I/usr/include -Wno-unused-variable -mmacosx-version-min=10.10
+cflags = -std=c++14 -g -Wall -I./include -I./include/neither -I/usr/local/include -I/usr/include -Wno-unused-variable -mmacosx-version-min=10.10
 ldflags = -framework CoreFoundation -framework Foundation -framework Cocoa -g -rdynamic
 
 
@@ -26,7 +26,8 @@ rule cleanup
 rule bundledir
   command = mkdir -p I2PLauncher.app/Contents/{MacOS,Resources,Frameworks} $
     && cp Info.plist I2PLauncher.app/Contents/Info.plist $
-    && cp base.zip I2PLauncher.app/Contents/Resources/base.zip
+    && cp base.zip I2PLauncher.app/Contents/Resources/base.zip $
+    && cp ../target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar I2PLauncher.app/Contents/Resources/launcher.jar
 
 rule copytobundledir
   command = cp clauncher I2PLauncher.app/Contents/MacOS/I2PLauncher
@@ -39,14 +40,14 @@ rule builddir
 
 build main.o: cxx main.mm
 build StatusItemButton.o: cxx StatusItemButton.mm
-build JavaRunner.o: cxx JavaRunner.cpp
+build RouterTask.o: cxx RouterTask.mm
 
 build clean: cleanup
 
 build bundle: bundledir
 build copytobundle: copytobundledir | bundle clauncher
 
-build clauncher: link main.o StatusItemButton.o JavaRunner.o
+build clauncher: link main.o StatusItemButton.o RouterTask.o
 
 build appbundle: copyimgtobundle | clauncher bundle copytobundle
 

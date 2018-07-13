@@ -21,20 +21,22 @@ resourceDirectory in Compile := baseDirectory.value / ".." / ".." / "installer" 
 // Unmanaged base will be included in a fat jar
 unmanagedBase in Compile := baseDirectory.value / ".." / ".." / "pkg-temp" / "lib"
 
+
 // Unmanaged classpath will be available at compile time
 unmanagedClasspath in Compile ++= Seq(
-  baseDirectory.value / ".." / ".." / "pkg-temp" / "lib" / "*.jar"
+    baseDirectory.value / ".." / ".." / "pkg-temp" / "lib" / "*.jar"
 )
 
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false, includeDependency = false)
 
-
-assemblyJarName in assembly := s"launcher.jar"
-
 assemblyExcludedJars in assembly := {
-  val cp = (fullClasspath in assembly).value
-  cp filter { c => jarsForCopy.toList.contains(c.data.getName) }
+    val cp = (fullClasspath in assembly).value
+    cp filter { c => jarsForCopy.toList.contains(c.data.getName) }
 }
+
+/*
+
+assemblyJarName in assembly := s"package.jar"
 
 // TODO: MEEH: Add assemblyExcludedJars and load the router from own jar files, to handle upgrades better.
 // In fact, most likely the bundle never would need an update except for the router jars/wars.
@@ -104,3 +106,4 @@ buildAppBundleTask := {
   println(s"Zip placed into bundle :)")
 
 }
+*/

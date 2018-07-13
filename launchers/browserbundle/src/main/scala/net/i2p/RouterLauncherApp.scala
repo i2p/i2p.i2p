@@ -62,7 +62,7 @@ object RouterLauncherApp extends App {
   val configPath = Option(System.getProperty("i2p.dir.config")).getOrElse(System.getenv("I2PCONFIG"))
 
   println(s"basePath => ${basePath}\nconfigPath => ${configPath}")
-
+/*
   object ErrorUtils {
     def errorMessageInJson(message: String, solution: String) : JObject = JObject(
       List(
@@ -91,7 +91,7 @@ object RouterLauncherApp extends App {
   if (!new File(basePath).exists()) ErrorUtils.printErrorAndExit("I2P Base path don't exist", "Reinstall the Browser Bundle")
   if (!new File(configPath).exists()) ErrorUtils.printErrorAndExit("I2P Config path don't exist", "Delete your config directory for the Browser Bundle")
 
-
+*/
   val deployer = new DeployProfile(configPath,basePath)
   deployer.verifyExistenceOfConfig()
 

@@ -7,7 +7,6 @@
 #include <cstring>
 #include <sstream>
 #include <list>
-#include <experimental/optional>
 #include <stdlib.h>
 
 #include <Foundation/Foundation.h>
@@ -18,10 +17,19 @@
 #include <CoreFoundation/CFArray.h>
 #include <CoreFoundation/CFString.h>
 
+#include "optional.hpp"
 #include "strutil.hpp"
 #include "subprocess.hpp"
+#include "neither/maybe.hpp"
+#include "RouterTask.h"
 
 using namespace subprocess;
+using namespace neither;
+
+using maybeAnRouterRunner = std::experimental::optional<RouterTask*>;
+
+extern std::mutex globalRouterStatusMutex;
+extern maybeAnRouterRunner globalRouterStatus;
 
 
 #define DEF_MIN_JVM_VER "1.7+"
@@ -133,7 +141,7 @@ static void processJvmPlistEntries (const void* item, void* context) {
         auto d = extractString((CFStringRef)value);
         currentJvm->JVMPlatformVersion = trim_copy(d);
       }
-      
+
     }
   };
 
@@ -150,7 +158,7 @@ static void listAllJavaInstallsAvailable()
 {
   auto javaHomeRes = check_output({"/usr/libexec/java_home","-v",DEF_MIN_JVM_VER,"-X"});
   CFDataRef javaHomes = CFDataCreate(NULL, (const UInt8 *)javaHomeRes.buf.data(), strlen(javaHomeRes.buf.data()));
-  
+
   //CFErrorRef err;
   CFPropertyListRef propertyList = CFPropertyListCreateWithData(kCFAllocatorDefault, javaHomes, kCFPropertyListImmutable, NULL, NULL);
   /*if (err)

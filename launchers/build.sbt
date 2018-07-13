@@ -40,8 +40,8 @@ lazy val browserbundle = (project in file("browserbundle"))
 lazy val macosx = (project in file("macosx"))
   .settings(
     commonSettings,
-    name         := "RouterPack.jar",
-    mainClass in assembly := Some("net.i2p.launchers.osx.LauncherAppMain")
+    name         := "routerLauncher",
+    mainClass in assembly := Some("net.i2p.launchers.SimpleOSXLauncher")
   ).dependsOn(common)
 
 
