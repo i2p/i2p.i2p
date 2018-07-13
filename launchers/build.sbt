@@ -48,7 +48,8 @@ lazy val macosx = (project in file("macosx"))
 lazy val root = (project in file("."))
   .aggregate(common, browserbundle, macosx)
 
-scalacOptions in Compile := Seq("-deprecated")
+javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
+scalacOptions in Compile := Seq("-deprecated","-target:jvm-1.7")
 
 fork := true
 

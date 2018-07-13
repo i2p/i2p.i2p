@@ -21,12 +21,13 @@ rule ar
   description = AR $out
 
 rule cleanup
-  command = rm -fr *.o clauncher I2PLauncher.app
+  command = rm -fr *.o clauncher I2PLauncher.app base.zip
 
 # TODO: There must exists a cleaner way to solve this.
 rule bundledir
   command = mkdir -p I2PLauncher.app/Contents/{MacOS,Resources,Frameworks} $
     && cp Info.plist I2PLauncher.app/Contents/Info.plist $
+    && cd ../../../pkg-temp && zip -r7 ../base.zip * && cd - && mv ../../../base.zip base.zip  $
     && cp base.zip I2PLauncher.app/Contents/Resources/base.zip $
     && cp ../target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar I2PLauncher.app/Contents/Resources/launcher.jar
 
