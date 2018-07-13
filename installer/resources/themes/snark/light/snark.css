@@ -2048,14 +2048,23 @@ hr.debug:last-child {
      margin: 8px;
 }
 
-#torrentInfoControl td, #setPriority th {
+#torrentInfoControl td, #torrentOrderControl td, #setPriority th {
      text-align: right !important;
      padding: 5px !important;
      background: linear-gradient(to bottom, #fff, #eef) !important;
 }
 
+#torrentOrderControl td {
+     background: #eef !important;
+}
+
 #torrentInfoControl input {
      display: inline;
+}
+
+#enableInOrder {
+     margin-left: 8px;
+     margin-right: 20px;
 }
 
 #setPriority th {

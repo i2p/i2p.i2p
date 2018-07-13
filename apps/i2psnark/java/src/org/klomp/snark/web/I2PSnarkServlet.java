@@ -3285,25 +3285,23 @@ public class I2PSnarkServlet extends BasicServlet {
                            .append(_t("Check integrity of the downloaded files"))
                            .append("\">\n");
                 }
+                boolean showInOrder = storage != null && !storage.complete() &&
+                                      meta != null && meta.getFiles() != null && meta.getFiles().size() > 1;
+                if (showInOrder) {
+                    buf.append("</td></tr>\n" +
+                               "<tr id=\"torrentOrderControl\"><td colspan=\"2\">");
+                    buf.append(_t("Download files in order"));
+                    buf.append(":<input type=\"checkbox\" class=\"optbox\" name=\"enableInOrder\" id=\"enableInOrder\" ");
+                    if (storage.getInOrder())
+                        buf.append("checked=\"checked\"");
+                    buf.append(">" +
+                               "<input type=\"submit\" name=\"setInOrderEnabled\" value=\"");
+                    buf.append(_t("Save Preference"));
+                    buf.append("\" class=\"accept\">");
+                }
                 buf.append("</td></tr>\n");
             }
 
-            boolean showInOrder = storage != null && !storage.complete() &&
-                                  meta != null && meta.getFiles() != null && meta.getFiles().size() > 1;
-            if (showInOrder) {
-                buf.append("<tr id=\"torrentOrderControl\"><td colspan=\"2\">");
-                buf.append(_t("Download files in order"));
-                buf.append(":<label><input type=\"checkbox\" class=\"optbox\" name=\"enableInOrder\" id=\"enableInOrder\" ");
-                if (storage.getInOrder())
-                    buf.append("checked=\"checked\"");
-                buf.append(">&nbsp;");
-                buf.append(_t("Enable for this torrent"));
-                buf.append("</label>" +
-                           "<input type=\"submit\" name=\"setInOrderEnabled\" value=\"");
-                buf.append(_t("Save Preference"));
-                buf.append("\" class=\"accept\">" +
-                           "</td></tr>\n");
-            }
         } else {
             // snark == null
             // shouldn't happen

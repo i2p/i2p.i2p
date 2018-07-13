@@ -836,18 +836,27 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
      user-select: all;
 }
 
-#torrentInfoControl td {
+#torrentInfoControl td, #torrentOrderControl td {
      text-align: right !important;
      border-top: 1px solid #101;
 }
 
-#torrentInfoControl td, #setPriority th {
+#torrentInfoControl td, #torrentOrderControl td, #setPriority th {
      box-shadow: inset 0 0 0 1px #303;
 }
 
 #torrentInfoControl td, #setPriority th {
      background: linear-gradient(to bottom, #202, #101);
      padding: 8px 5px !important;
+}
+
+#torrentOrderControl td {
+     background: #101;
+}
+
+#enableInOrder {
+     margin-left: 8px;
+     margin-right: 20px;
 }
 
 .SnarkTorrentInfo, .snarkDirInfo {

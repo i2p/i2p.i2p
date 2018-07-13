@@ -1,3 +1,6 @@
+2018-07-13 zzz
+ * i2psnark: Add sequential order option (ticket #2234)
+
 2018-07-10 zzz
  * Installer (ticket #1864):
    - Fix wrapper selection on Windows 10

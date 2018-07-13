@@ -601,11 +601,16 @@ th.snarkTorrentStatus {
      min-width: 85px;
 }
 
-#torrentInfoControl td, #setPriority th {
+#torrentInfoControl td, #torrentOrderControl td, #setPriority th {
      text-align: right !important;
      padding: 11px 8px 10px !important;
      background: none !important;
      box-shadow: inset 0 0 0 1px #030;
+}
+
+#enableInOrder {
+     margin-left: 8px;
+     margin-right: 20px;
 }
 
 #setPriority th {
@@ -682,7 +687,7 @@ th.snarkTorrentStatus {
      border-bottom: 1px solid #494 !important;
 }
 
-#setPriority, #torrentInfoControl, .commentAction[colspan="5"] {
+#setPriority, #torrentInfoControl, #torrentOrderControl, .commentAction[colspan="5"] {
      background: url(/themes/console/dark/images/camotile2.png) repeat scroll center bottom #001100 !important;
      background: repeating-linear-gradient(135deg, #000 1px, #000 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, rgba(0,200,0,0.5) 2px, rgba(0,200,0,0.5) 4px), url(/themes/console/dark/images/camotile2.png) top left repeat !important;
      background-blend-mode: exclusion, darken, normal;
@@ -690,7 +695,7 @@ th.snarkTorrentStatus {
      border-bottom: 1px solid #494 !important;
 }
 
-_:-ms-lang(x), #setPriority, #torrentInfoControl {
+_:-ms-lang(x), #setPriority, #torrentInfoControl, #torrentOrderControl {
      background: url(/themes/console/dark/images/camotile2.png) repeat scroll center bottom #001100 !important;
 }
 

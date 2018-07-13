@@ -919,11 +919,20 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
      border-top: 1px solid #6f533e;
 }
 
-#torrentInfoControl td {
+#torrentInfoControl td, #torrentOrderControl td {
      border-bottom: none !important;
      background: linear-gradient(to bottom, #efefef, #cfc7c2);
      text-align: right !important;
      padding-right: 8px !important;
+}
+
+#torrentOrderControl td {
+     background: #cfc7c2;
+}
+
+#enableInOrder {
+     margin-left: 8px;
+     margin-right: 20px;
 }
 
 .snarkDirInfo {

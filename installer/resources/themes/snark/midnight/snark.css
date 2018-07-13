@@ -350,6 +350,15 @@ thead th, #torrentInfoControl td {
      background: linear-gradient(to bottom, #121225, #00000d) !important;
 }
 
+#torrentOrderControl td {
+     background: #00000d !important;
+}
+
+#enableInOrder {
+     margin-left: 8px;
+     margin-right: 20px;
+}
+
 th:first-child {
      text-align: left !important;
 }

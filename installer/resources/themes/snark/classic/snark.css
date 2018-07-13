@@ -616,11 +616,20 @@ tt {
      border-top: 1px solid #89f !important;
 }
 
-#torrentInfoControl td {
+#torrentInfoControl td, #torrentOrderControl td {
      padding: 7px 5px !important;
      text-align: right !important;
      border-top: 1px solid #89f !important;
      background: linear-gradient(to bottom, #fff, #eef);
+}
+
+#torrentOrderControl td {
+     background: #eef;
+}
+
+#enableInOrder {
+     margin-left: 8px;
+     margin-right: 20px;
 }
 
 .SnarkTorrentInfo {
