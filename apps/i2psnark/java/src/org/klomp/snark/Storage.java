@@ -788,9 +788,29 @@ public class Storage implements Closeable
   {
       if (_torrentFiles.isEmpty())
           throw new IOException("Storage not checked yet");
-      for (TorrentFile tf : _torrentFiles) {
-          if (!tf.RAFfile.exists())
-              throw new IOException("File does not exist: " + tf);
+      for (int i = 0; i < _torrentFiles.size(); i++) {
+          TorrentFile tf = _torrentFiles.get(i);
+          if (!tf.RAFfile.exists()) {
+              // File should exist when we get here, but could have vanished
+              List<List<String>> files = metainfo.getFiles();
+              if (files != null) {
+                  createFileFromNames(_base, files.get(i), _util.getFilesPublic());
+              } else {
+                  if (!_base.createNewFile())
+                      throw new IOException("File '" + tf.name + "' was deleted, unable to recreate");
+              }
+              synchronized(tf) {
+                  tf.allocateFile();
+                  // close as we go so we don't run out of file descriptors
+                  try {
+                      tf.closeRAF();
+                  } catch (IOException ioe) {}
+              }
+              String msg = "File '" + tf.name + "' was deleted, must be downloaded again";
+              if (listener != null)
+                  listener.addMessage(msg);
+              _log.error(msg);
+          }
       }
   }
 
@@ -1023,18 +1043,32 @@ public class Storage implements Closeable
     // Make sure all files are available and of correct length
     // The files should all exist as they have been created with zero length by createFilesFromNames()
     long lengthProgress = 0;
-    for (TorrentFile tf : _torrentFiles)
-      {
+    for (int i = 0; i < _torrentFiles.size(); i++) {
+        TorrentFile tf = _torrentFiles.get(i);
         long length = tf.RAFfile.length();
         lengthProgress += tf.length;
-        if(tf.RAFfile.exists() && length == tf.length)
-          {
+        boolean exists = tf.RAFfile.exists();
+        if (exists && length == tf.length) {
             if (listener != null)
               listener.storageAllocated(this, length);
             _checkProgress.set(0);
             resume = true; // XXX Could dynamicly check
+        } else if (length == 0) {
+          if (!exists) {
+              // File should exist when we get here, but could have vanished
+              // and we're now doing a recheck
+              List<List<String>> files = metainfo.getFiles();
+              if (files != null) {
+                  createFileFromNames(_base, files.get(i), _util.getFilesPublic());
+              } else {
+                  if (!_base.createNewFile())
+                      throw new IOException("File '" + tf.name + "' was deleted, unable to recreate");
+              }
+              String msg = "File '" + tf.name + "' was deleted, must be downloaded again";
+              if (listener != null)
+                  listener.addMessage(msg);
+              _log.error(msg);
           }
-        else if (length == 0) {
           changed = true;
           synchronized(tf) {
               allocateFile(tf);
@@ -1505,6 +1539,8 @@ public class Storage implements Closeable
        *  This creates a (presumably) sparse file so that reads won't fail with IOE.
        *  Sets isSparse[nr] = true. balloonFile(nr) should be called later to
        *  defrag the file.
+       *
+       *  File MUST exist or will throw IOE
        *
        *  This calls openRAF(); caller must synchronize and call closeRAF().
        */

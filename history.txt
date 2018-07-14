@@ -1,3 +1,6 @@
+2018-07-14 zzz
+ * i2psnark: Recreate deleted files on recheck/reopen (ticket #2125)
+
 2018-07-13 zzz
  * i2psnark: Add sequential order option (ticket #2234)
 
