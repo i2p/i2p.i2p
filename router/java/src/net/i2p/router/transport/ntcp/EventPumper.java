@@ -54,7 +54,7 @@ class EventPumper implements Runnable {
     private final NTCPTransport _transport;
     private final ObjectCounter<ByteArray> _blockedIPs;
     private long _expireIdleWriteTime;
-    private static boolean _useDirect;
+    private static final boolean _useDirect = false;
     
     /**
      *  This probably doesn't need to be bigger than the largest typical
@@ -82,6 +82,7 @@ class EventPumper implements Runnable {
      * the time to iterate across them to check a few flags shouldn't be a problem.
      */
     private static final long FAILSAFE_ITERATION_FREQ = 2*1000l;
+    private static final int FAILSAFE_LOOP_COUNT = 512;
     private static final long SELECTOR_LOOP_DELAY = 200;
     private static final long BLOCKED_IP_FREQ = 3*60*1000;
 
@@ -93,9 +94,12 @@ class EventPumper implements Runnable {
     /**
      *  Do we use direct buffers for reading? Default false.
      *  NOT recommended as we don't keep good track of them so they will leak.
+     *
+     *  Unsupported, set _useDirect above.
+     *
      *  @see java.nio.ByteBuffer
      */
-    private static final String PROP_DIRECT = "i2np.ntcp.useDirectBuffers";
+    //private static final String PROP_DIRECT = "i2np.ntcp.useDirectBuffers";
 
     private static final int MIN_MINB = 4;
     private static final int MAX_MINB = 12;
@@ -178,6 +182,7 @@ class EventPumper implements Runnable {
      */
     public void run() {
         int loopCount = 0;
+        int failsafeLoopCount = FAILSAFE_LOOP_COUNT;
         long lastFailsafeIteration = System.currentTimeMillis();
         long lastBlockedIPClear = lastFailsafeIteration;
         while (_alive && _selector.isOpen()) {
@@ -214,9 +219,13 @@ class EventPumper implements Runnable {
                     lastFailsafeIteration = now;
                     try {
                         Set<SelectionKey> all = _selector.keys();
-                        _context.statManager().addRateData("ntcp.pumperKeySetSize", all.size());
+                        int lastKeySetSize = all.size();
+                        _context.statManager().addRateData("ntcp.pumperKeySetSize", lastKeySetSize);
                         _context.statManager().addRateData("ntcp.pumperLoopsPerSecond", loopCount / (FAILSAFE_ITERATION_FREQ / 1000));
+                        // reset the failsafe loop counter,
+                        // and recalculate the max loops before failsafe sleep, based on number of keys
                         loopCount = 0;
+                        failsafeLoopCount = Math.max(FAILSAFE_LOOP_COUNT, 2 * lastKeySetSize);
                         
                         int failsafeWrites = 0;
                         int failsafeCloses = 0;
@@ -308,7 +317,7 @@ class EventPumper implements Runnable {
                 } else {
                     // another 100% CPU workaround 
                     // TODO remove or only if we appear to be looping with no interest ops
-                    if ((loopCount % 512) == 511) {
+                    if ((loopCount % failsafeLoopCount) == failsafeLoopCount - 1) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("EventPumper throttle " + loopCount + " loops in " +
                                       (now - lastFailsafeIteration) + " ms");
@@ -322,9 +331,6 @@ class EventPumper implements Runnable {
                     _blockedIPs.clear();
                     lastBlockedIPClear = now;
                 }
-
-
-                _useDirect = _context.getBooleanProperty(PROP_DIRECT);
             } catch (RuntimeException re) {
                 _log.error("Error in the event pumper", re);
             }

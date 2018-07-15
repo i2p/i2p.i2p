@@ -1,3 +1,6 @@
+2018-07-15 zzz
+ * NTCP: Increase failsafe sleep threshold (ticket #2251)
+
 2018-07-14 zzz
  * i2psnark: Recreate deleted files on recheck/reopen (ticket #2125)
 
