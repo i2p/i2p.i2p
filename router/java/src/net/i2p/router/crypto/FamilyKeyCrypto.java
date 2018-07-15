@@ -486,4 +486,35 @@ public class FamilyKeyCrypto {
             throw new GeneralSecurityException("Error loading family key " + _fname, ioe);
         }
     }
+
+    /** @since 0.9.36 */
+    public static void main(String[] args) {
+        if (args.length != 2) {
+            System.err.println("Usage: FamilyKeyCrypto keystore.ks familyname");
+            System.exit(1);
+        }
+        File ks = new File(args[0]);
+        if (ks.exists()) {
+            System.err.println("Keystore already exists: " + ks);
+            System.exit(1);
+        }
+        String fname = args[1];
+        String cname = fname + CN_SUFFIX;
+        String keyPassword = KeyStoreUtil.randomString();
+        try {
+            KeyStoreUtil.createKeysAndCRL(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, fname, cname, "family",
+                                          DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM,
+                                          DEFAULT_KEY_SIZE, keyPassword);
+            System.out.println("Family keys generated and saved in " + ks + '\n' +
+                               "Copy to " + KS_DIR + '/' + KEYSTORE_PREFIX + fname + KEYSTORE_SUFFIX + " in the i2p configuration directory\n" +
+                               "Family key configuration for router.config:\n" +
+                               PROP_FAMILY_NAME + '=' +  fname + '\n' +
+                               PROP_KEYSTORE_PASSWORD + '=' + KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD + '\n' +
+                               PROP_KEY_PASSWORD + '=' + keyPassword);
+        } catch (Exception e) {
+            System.err.println("Failed");
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 }
