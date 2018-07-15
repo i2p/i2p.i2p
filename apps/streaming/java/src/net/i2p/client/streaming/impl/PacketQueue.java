@@ -147,6 +147,10 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 }
                 options.setTagsToSend(sendTags);
                 options.setTagThreshold(tagThresh);
+                // CLOSE, RESET, and PING packets unlikely to have a large payload
+                // and most of the rest of the packet is
+                // uncompressible: stream ids, signature
+                options.setGzip(packet.getPayloadSize() > 50);
             } else if (packet.isFlagSet(FLAGS_INITIAL_TAGS)) {
                 if (con != null) {
                     if (con.isInbound())
@@ -167,6 +171,11 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 }
                 options.setTagsToSend(sendTags);
                 options.setTagThreshold(tagThresh);
+                // SYN packets are likely to have compressible payload, even if
+                // conn gzip option is false (e.g. snark bitfield, HTTP headers).
+                // If they don't have a large payload, most of the rest of the packet
+                // is uncompressible: stream ids, destination and signature
+                options.setGzip(packet.getPayloadSize() > 50);
             } else {
                 if (con != null) {
                     if (con.isInbound() && con.getLifetime() < 2*60*1000)

@@ -217,7 +217,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
                                SessionKey keyUsed, Set<SessionTag> tagsSent, long expires,
                                int proto, int fromPort, int toPort, int flags)
                    throws I2PSessionException {
-        payload = prepPayload(payload, offset, size, proto, fromPort, toPort);
+        payload = prepPayload(payload, offset, size, proto, fromPort, toPort, SendMessageOptions.GzipOption.DEFAULT);
         if (_noEffort)
             return sendNoEffort(dest, payload, expires, flags);
         else
@@ -242,7 +242,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
                                int proto, int fromPort, int toPort, SendMessageOptions options) throws I2PSessionException {
-        payload = prepPayload(payload, offset, size, proto, fromPort, toPort);
+        payload = prepPayload(payload, offset, size, proto, fromPort, toPort, options.getGzip());
         //if (_noEffort) {
             sendNoEffort(dest, payload, options);
             return true;
@@ -266,7 +266,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
     public long sendMessage(Destination dest, byte[] payload, int offset, int size,
                             int proto, int fromPort, int toPort,
                             SendMessageOptions options, SendMessageStatusListener listener) throws I2PSessionException {
-        payload = prepPayload(payload, offset, size, proto, fromPort, toPort);
+        payload = prepPayload(payload, offset, size, proto, fromPort, toPort, options.getGzip());
         long nonce = _sendMessageNonce.incrementAndGet();
         long expires = Math.max(_context.clock().now() + 60*1000L, options.getTime());
         MessageState state = new MessageState(_context, nonce, this, expires, listener);
@@ -279,11 +279,19 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
      * @return gzip compressed payload, ready to send
      * @since 0.9.14
      */
-    private byte[] prepPayload(byte[] payload, int offset, int size, int proto, int fromPort, int toPort) throws I2PSessionException {
+    private byte[] prepPayload(byte[] payload, int offset, int size, int proto,
+                               int fromPort, int toPort,
+                               SendMessageOptions.GzipOption gzo) throws I2PSessionException {
         verifyOpen();
         updateActivity();
 
-        if (shouldCompress(size))
+        boolean docompress;
+        if (gzo == SendMessageOptions.GzipOption.DEFAULT)
+            docompress = shouldCompress(size);
+        else
+            docompress = gzo == SendMessageOptions.GzipOption.GZIP_ON;
+
+        if (docompress)
             payload = DataHelper.compress(payload, offset, size);
         else
             payload = DataHelper.compress(payload, offset, size, DataHelper.NO_COMPRESSION);

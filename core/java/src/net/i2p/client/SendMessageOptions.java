@@ -12,9 +12,14 @@ import net.i2p.data.DateAndFlags;
  *  Static methods are for OutboundClientMessageOneShotJob to decode the
  *  flags field on the router side.
  *
+ *  GzipOption flags are as of 0.9.36, are client-side only, and are
+ *  not included in the flags field or sent to the router.
+ *
  *  @since 0.9.2
  */
 public class SendMessageOptions extends DateAndFlags {
+
+    private GzipOption _gzip = GzipOption.DEFAULT;
 
     /** all subject to change */
 
@@ -204,5 +209,34 @@ public class SendMessageOptions extends DateAndFlags {
           case 0:
             return Reliability.DEFAULT;
         }
+    }
+
+    /**
+     *  Overrides i2cp.gzip session option and size threshold
+     *  for this message only.
+     *
+     *  @since 0.9.36
+     */
+    public enum GzipOption { DEFAULT, GZIP_OFF, GZIP_ON }
+
+    /**
+     *  Overrides i2cp.gzip session option and size threshold
+     *  for this message only.
+     *
+     *  @return non-null, DEFAULT unless setGzip() was called
+     *  @since 0.9.36
+     */
+    public GzipOption getGzip() {
+        return _gzip;
+    }
+
+    /**
+     *  Overrides i2cp.gzip session option and size threshold
+     *  for this message only.
+     *
+     *  @since 0.9.36
+     */
+    public void setGzip(boolean yes) {
+        _gzip = yes? GzipOption.GZIP_ON : GzipOption.GZIP_OFF;
     }
 }
