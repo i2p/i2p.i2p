@@ -1,5 +1,10 @@
+2018-07-16 zzz
+ * Console: Fix HTML error on /configservice w/o wrapper
+
 2018-07-15 zzz
+ * I2CP: Add option for forcing gzip on/off per-message
  * NTCP: Increase failsafe sleep threshold (ticket #2251)
+ * Router: Add CLI tool to generate family keys
 
 2018-07-14 zzz
  * i2psnark: Recreate deleted files on recheck/reopen (ticket #2125)

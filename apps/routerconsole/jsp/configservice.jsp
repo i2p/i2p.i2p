@@ -39,9 +39,11 @@
  <hr><div class="formaction" id="restart">
  <input type="submit" class="reload" name="action" value="<%=intl._t("Graceful restart")%>" >
  <input type="submit" class="reload" name="action" value="<%=intl._t("Hard restart")%>" >
- <% } %></div>
-
-<% if (formhandler.shouldShowSystray()) { %>
+ </div>
+<%
+    }
+    if (formhandler.shouldShowSystray()) {
+%>
  <h3 class="ptitle" id="systray"><%=intl._t("Systray integration")%></h3>
  <p class="infohelp"><%=intl._t("Control the system tray icon")%></p>
  <hr><div class="formaction" id="systray">
@@ -69,11 +71,14 @@
  <% } %>
 
  <h3 class="ptitle" id="servicedebug"><%=intl._t("Debugging")%>&nbsp;<a href="/jobs">[<%=intl._t("View the job queue")%>]</a></h3>
-<% if (System.getProperty("wrapper.version") != null) { %>
  <p class="infohelp">
-    <%=intl._t("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%></p>
- <hr>
+<% if (System.getProperty("wrapper.version") != null) { %>
+    <%=intl._t("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%>
+<% } else { // hack to make layout work for non-wrapper %>
+    &nbsp;
 <% } %>
+ </p>
+ <hr>
  <div class="formaction" id="dumpthreads">
  <input type="submit" class="reload" name="action" value="<%=intl._t("Force GC")%>" >
 <% if (System.getProperty("wrapper.version") != null) { %>
