@@ -52,7 +52,19 @@
 		</javac>
 	</target>
 
-    <target name="precompilejsp" unless="precompilejsp.uptodate">
+    <target name="verifylibtaglibs" if="${with-libtaglibs-standard}" >
+        <!-- lib/jstlel.jar should be a symlink to the package jar.
+           - If the package jar is not there, we will still compile fine but it won't run,
+           - so catch it here.
+          -->
+        <fail message="libtaglibs-standard-jstlel-java package must be installed for debian builds">
+            <condition>
+                <not><available file="lib/jstlel.jar" type="file"/></not>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="precompilejsp" depends="verifylibtaglibs" unless="precompilejsp.uptodate">
         <delete file="WEB-INF/web-fragment.xml" />
         <delete file="WEB-INF/web-out.xml" />
     	<mkdir dir="${tmp}" />
