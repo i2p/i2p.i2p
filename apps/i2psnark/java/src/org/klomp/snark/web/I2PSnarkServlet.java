@@ -3286,11 +3286,14 @@ public class I2PSnarkServlet extends BasicServlet {
                            .append("\">\n");
                 }
                 boolean showInOrder = storage != null && !storage.complete() &&
-                                      meta != null && meta.getFiles() != null && meta.getFiles().size() > 1;
+                                      meta != null;
                 if (showInOrder) {
                     buf.append("</td></tr>\n" +
                                "<tr id=\"torrentOrderControl\"><td colspan=\"2\">");
-                    buf.append(_t("Download files in order"));
+                    String txt = (meta.getFiles() != null && meta.getFiles().size() > 1) ?
+                                 _t("Download files in order") :
+                                 _t("Download pieces in order");
+                    buf.append(txt);
                     buf.append(":<input type=\"checkbox\" class=\"optbox\" name=\"enableInOrder\" id=\"enableInOrder\" ");
                     if (storage.getInOrder())
                         buf.append("checked=\"checked\"");

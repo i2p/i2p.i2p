@@ -440,9 +440,9 @@ public class Storage implements Closeable
    */
   public int getPriority(int fileIndex) {
       if (complete() || metainfo.getFiles() == null)
-          return 0;
+          return PRIORITY_NORMAL;
       if (fileIndex < 0 || fileIndex >= _torrentFiles.size())
-          return 0;
+          return PRIORITY_NORMAL;
       return _torrentFiles.get(fileIndex).priority;
   }
 
@@ -488,7 +488,7 @@ public class Storage implements Closeable
   void setFilePriorities(int[] p) {
       if (p == null) {
           for (TorrentFile tf : _torrentFiles) {
-              tf.priority = 0;
+              tf.priority = PRIORITY_NORMAL;
           }
       } else {
           int sz = _torrentFiles.size();
@@ -517,7 +517,7 @@ public class Storage implements Closeable
       if (yes == _inOrder)
           return;
       _inOrder = yes;
-      if (complete() || metainfo.getFiles() == null)
+      if (complete())
           return;
       if (yes) {
           List<TorrentFile> sorted = _torrentFiles;
@@ -560,11 +560,11 @@ public class Storage implements Closeable
    *  Set the piece priority to the highest priority
    *  of all files spanning the piece.
    *  Caller must pass array to the PeerCoordinator.
-   *  @return null on error, if complete, or if only one file
+   *  @return null on error, if complete, or if only one file and inOrder not set.
    *  @since 0.8.1
    */
   public int[] getPiecePriorities() {
-      if (complete() || metainfo.getFiles() == null)
+      if (complete() || (metainfo.getFiles() == null && !_inOrder))
           return null;
       int[] rv = new int[metainfo.getPieces()];
       int file = 0;
