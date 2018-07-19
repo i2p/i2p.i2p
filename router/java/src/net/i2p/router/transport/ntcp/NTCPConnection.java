@@ -892,8 +892,8 @@ public class NTCPConnection implements Closeable {
                 blocks.add(block);
                 size += sz;
                 _nextInfoTime = now + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("SENDING NTCP2 RI block");
+                if (_log.shouldDebug())
+                    _log.debug("SENDING NTCP2 RI block");
             } // else wait until next time
         }
         int availForPad = BUFFER_SIZE - (size + NTCP2Payload.BLOCK_HEADER_SIZE);
@@ -936,8 +936,8 @@ public class NTCPConnection implements Closeable {
         int padlen = min;
         if (range > 0)
             padlen += _context.random().nextInt(1 + range);
-        if (_log.shouldWarn())
-            _log.warn("Padding params:" +
+        if (_log.shouldDebug())
+            _log.debug("Padding params:" +
                       " data size: " + dataSize +
                       " avail: " + availForPad +
                       " minSend: " + minSend +
@@ -968,8 +968,8 @@ public class NTCPConnection implements Closeable {
      */
     private void sendRouterInfo(RouterInfo ri, boolean shouldFlood) {
         // no synch needed, sendNTCP2() is synched
-        if (_log.shouldWarn())
-            _log.warn("Sending router info for: " + ri.getHash() + " flood? " + shouldFlood);
+        if (_log.shouldDebug())
+            _log.debug("Sending router info for: " + ri.getHash() + " flood? " + shouldFlood);
         List<Block> blocks = new ArrayList<Block>(2);
         Block block = new NTCP2Payload.RIBlock(ri, shouldFlood);
         int size = block.getTotalLength();
@@ -1002,8 +1002,8 @@ public class NTCPConnection implements Closeable {
     private void sendTermination(int reason, int validFramesRcvd) {
         // TODO add param to clear queues?
         // no synch needed, sendNTCP2() is synched
-        if (_log.shouldWarn())
-            _log.warn("Sending termination, reason: " + reason + ", vaild frames rcvd: " + validFramesRcvd);
+        if (_log.shouldInfo())
+            _log.info("Sending termination, reason: " + reason + ", vaild frames rcvd: " + validFramesRcvd);
         List<Block> blocks = new ArrayList<Block>(2);
         Block block = new NTCP2Payload.TerminationBlock(reason, validFramesRcvd);
         int plen = block.getTotalLength();
@@ -1033,8 +1033,8 @@ public class NTCPConnection implements Closeable {
      */
     private synchronized void sendNTCP2(byte[] tmp, List<Block> blocks) {
         if (_sender == null) {
-            if (_log.shouldWarn())
-                _log.warn("sender gone", new Exception());
+            if (_log.shouldInfo())
+                _log.info("sender gone", new Exception());
             return;
         }
         int payloadlen = NTCP2Payload.writePayload(tmp, 0, blocks);
@@ -1053,7 +1053,7 @@ public class NTCPConnection implements Closeable {
         long sipIV = SipHashInline.hash24(_sendSipk1, _sendSipk2, _sendSipIV);
         enc[0] = (byte) ((framelen >> 8) ^ (sipIV >> 8));
         enc[1] = (byte) (framelen ^ sipIV);
-        if (_log.shouldWarn()) {
+        if (_log.shouldDebug()) {
             StringBuilder buf = new StringBuilder(256);
             buf.append("Sending ").append(blocks.size())
                .append(" blocks in ").append(framelen)
@@ -1061,7 +1061,7 @@ public class NTCPConnection implements Closeable {
             for (int i = 0; i < blocks.size(); i++) {
                 buf.append("\n    ").append(i).append(": ").append(blocks.get(i).toString());
             }
-            _log.warn(buf.toString());
+            _log.debug(buf.toString());
         }
         _transport.getPumper().wantsWrite(this, enc);
         toLong8LE(_sendSipIV, 0, sipIV);
@@ -1816,8 +1816,6 @@ public class NTCPConnection implements Closeable {
         _sendSipk2 = fromLong8LE(sip_ba, 8);
         _sendSipIV = new byte[SIP_IV_LENGTH];
         System.arraycopy(sip_ba, 16, _sendSipIV, 0, SIP_IV_LENGTH);
-        if (_log.shouldWarn())
-            _log.warn("Send SipHash keys: " + _sendSipk1 + ' ' + _sendSipk2 + ' ' + Base64.encode(_sendSipIV));
         _establishState = EstablishBase.VERIFIED;
         _establishedOn = _context.clock().now();
         _nextMetaTime = Long.MAX_VALUE;
@@ -1849,8 +1847,8 @@ public class NTCPConnection implements Closeable {
         _sendSipk2 = fromLong8LE(sip_send, 8);
         _sendSipIV = new byte[SIP_IV_LENGTH];
         System.arraycopy(sip_send, 16, _sendSipIV, 0, SIP_IV_LENGTH);
-        if (_log.shouldWarn())
-            _log.warn("Send SipHash keys: " + _sendSipk1 + ' ' + _sendSipk2 + ' ' + Base64.encode(_sendSipIV));
+        if (_log.shouldDebug())
+            _log.debug("Send SipHash keys: " + _sendSipk1 + ' ' + _sendSipk2 + ' ' + Base64.encode(_sendSipIV));
         _clockSkew = clockSkew;
         _establishState = EstablishBase.VERIFIED;
         _establishedOn = _context.clock().now();
@@ -1892,8 +1890,8 @@ public class NTCPConnection implements Closeable {
             _sipk1 = fromLong8LE(keyData, 0);
             _sipk2 = fromLong8LE(keyData, 8);
             System.arraycopy(keyData, 16, _sipIV, 0, SIP_IV_LENGTH);
-            if (_log.shouldWarn())
-                _log.warn("Recv SipHash keys: " + _sipk1 + ' ' + _sipk2 + ' ' + Base64.encode(_sipIV));
+            if (_log.shouldDebug())
+                _log.debug("Recv SipHash keys: " + _sipk1 + ' ' + _sipk2 + ' ' + Base64.encode(_sipIV));
         }
 
         public void receive(ByteBuffer buf) {
@@ -1949,8 +1947,8 @@ public class NTCPConnection implements Closeable {
                     if (_dataBuf != null && _dataBuf.getData().length == BUFFER_SIZE)
                         releaseReadBuf(_dataBuf);
                     if (_framelen > BUFFER_SIZE) {
-                        if (_log.shouldWarn())
-                            _log.warn("Allocating big ByteArray: " + _framelen);
+                        if (_log.shouldInfo())
+                            _log.info("Allocating big ByteArray: " + _framelen);
                         byte[] data = new byte[_framelen];
                         _dataBuf = new ByteArray(data);
                     } else {
@@ -1995,8 +1993,8 @@ public class NTCPConnection implements Closeable {
          *  @return success, false for fatal error (AEAD) only
          */
         private boolean decryptAndProcess(byte[] data, int off) {
-            if (_log.shouldWarn())
-                _log.warn("Decrypting frame " + _frameCount + " with " + _framelen + " bytes");
+            if (_log.shouldDebug())
+                _log.debug("Decrypting frame " + _frameCount + " with " + _framelen + " bytes");
             try {
                 _rcvr.decryptWithAd(null, data, off, data, off, _framelen);
             } catch (GeneralSecurityException gse) {
@@ -2008,8 +2006,8 @@ public class NTCPConnection implements Closeable {
             try {
                 int blocks = NTCP2Payload.processPayload(_context, this, data, off,
                                                          _framelen - OutboundNTCP2State.MAC_SIZE, false);
-                if (_log.shouldWarn())
-                    _log.warn("Processed " + blocks + " blocks in frame");
+                if (_log.shouldDebug())
+                    _log.debug("Processed " + blocks + " blocks in frame");
                 _blockCount += blocks;
             } catch (IOException ioe) {
                 if (_log.shouldWarn())
@@ -2038,8 +2036,8 @@ public class NTCPConnection implements Closeable {
         //// PayloadCallbacks
 
         public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
-            if (_log.shouldWarn())
-                _log.warn("Got updated RI");
+            if (_log.shouldDebug())
+                _log.debug("Got updated RI");
             _messagesRead.incrementAndGet();
             try {
                 Hash h = ri.getHash();
@@ -2047,11 +2045,11 @@ public class NTCPConnection implements Closeable {
                 if (flood && !ri.equals(old)) {
                     FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
                     if (fndf.floodConditional(ri)) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Flooded the RI: " + h);
+                        if (_log.shouldDebug())
+                            _log.debug("Flooded the RI: " + h);
                     } else {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Flood request but we didn't: " + h);
+                        if (_log.shouldInfo())
+                            _log.info("Flood request but we didn't: " + h);
                     }
                 }
             } catch (IllegalArgumentException iae) {
@@ -2060,15 +2058,15 @@ public class NTCPConnection implements Closeable {
         }
 
         public void gotDateTime(long time) {
-            if (_log.shouldWarn())
-                _log.warn("Got updated datetime block");
+            if (_log.shouldDebug())
+                _log.debug("Got updated datetime block");
             receiveTimestamp((time + 500) / 1000);
             // update skew
         }
 
         public void gotI2NP(I2NPMessage msg) {
-            if (_log.shouldWarn())
-                _log.warn("Got I2NP msg: " + msg);
+            if (_log.shouldDebug())
+                _log.debug("Got I2NP msg: " + msg);
             long timeToRecv = 0; // _context.clock().now() - _stateBegin;
             int size = 100; // FIXME
             _transport.messageReceived(msg, _remotePeer, null, timeToRecv, size);
@@ -2093,16 +2091,16 @@ public class NTCPConnection implements Closeable {
             NTCP2Options hisPadding = new NTCP2Options(tmin, tmax, rmin, rmax,
                                                        tdummy, rdummy, tdelay, rdelay);
             _paddingConfig = OUR_PADDING.merge(hisPadding);
-            if (_log.shouldWarn())
-                _log.warn("Got padding options:" +
+            if (_log.shouldDebug())
+                _log.debug("Got padding options:" +
                           "\nhis padding options: " + hisPadding +
                           "\nour padding options: " + OUR_PADDING +
                           "\nmerged config is:    " + _paddingConfig);
         }
 
         public void gotTermination(int reason, long lastReceived) {
-            if (_log.shouldWarn())
-                _log.warn("Got Termination: " + reason + " total rcvd: " + lastReceived);
+            if (_log.shouldInfo())
+                _log.info("Got Termination: " + reason + " total rcvd: " + lastReceived);
             _terminated = true;
             close();
         }
@@ -2113,8 +2111,8 @@ public class NTCPConnection implements Closeable {
         }
 
         public void gotPadding(int paddingLength, int frameLength) {
-            if (_log.shouldWarn())
-                _log.warn("Got " + paddingLength +
+            if (_log.shouldDebug())
+                _log.debug("Got " + paddingLength +
                           " bytes padding in " + frameLength +
                           " byte frame; ratio: " + (((float) paddingLength) / ((float) frameLength)) +
                           " configured min: " + _paddingConfig.getRecvMin() +

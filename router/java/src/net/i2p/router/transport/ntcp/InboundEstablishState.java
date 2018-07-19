@@ -646,8 +646,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             byte options[] = new byte[OPTIONS1_SIZE];
             try {
                 _handshakeState.start();
-                if (_log.shouldWarn())
-                    _log.warn("After start: " + _handshakeState.toString());
+                if (_log.shouldDebug())
+                    _log.debug("After start: " + _handshakeState.toString());
                 _handshakeState.readMessage(_X, 0, MSG1_SIZE, options, 0);
             } catch (GeneralSecurityException gse) {
                 // Read a random number of bytes, store wanted in _padlen1
@@ -668,8 +668,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 fail("Bad msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE), re);
                 return;
             }
-            if (_log.shouldWarn())
-                _log.warn("After msg 1: " + _handshakeState.toString());
+            if (_log.shouldDebug())
+                _log.debug("After msg 1: " + _handshakeState.toString());
             int v = options[1] & 0xff;
             if (v != NTCPTransport.NTCP2_INT_VERSION) {
                 fail("Bad version: " + v);
@@ -738,8 +738,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 return;
             changeState(State.IB_NTCP2_GOT_PADDING);
             _handshakeState.mixHash(_X, 0, _padlen1);
-            if (_log.shouldWarn())
-                _log.warn("After mixhash padding " + _padlen1 + " msg 1: " + _handshakeState.toString());
+            if (_log.shouldDebug())
+                _log.debug("After mixhash padding " + _padlen1 + " msg 1: " + _handshakeState.toString());
             _received = 0;
             if (src.hasRemaining()) {
                 // Inbound conn can never have extra data after msg 1
@@ -778,8 +778,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 fail("Bad msg 3", re);
                 return;
             }
-            if (_log.shouldWarn())
-                _log.warn("After msg 3: " + _handshakeState.toString());
+            if (_log.shouldDebug())
+                _log.debug("After msg 3: " + _handshakeState.toString());
             try {
                 // calls callbacks below
                 NTCP2Payload.processPayload(_context, this, payload, 0, _msg3p2len - MAC_SIZE, true);
@@ -840,16 +840,16 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             fail("Bad msg 2 out", re);
             return;
         }
-        if (_log.shouldWarn())
-            _log.warn("After msg 2: " + _handshakeState.toString());
+        if (_log.shouldDebug())
+            _log.debug("After msg 2: " + _handshakeState.toString());
         Hash h = _context.routerHash();
         SessionKey bobHash = new SessionKey(h.getData());
         _context.aes().encrypt(tmp, 0, tmp, 0, bobHash, _prevEncrypted, KEY_SIZE);
         if (padlen2 > 0) {
             _context.random().nextBytes(tmp, MSG2_SIZE, padlen2);
             _handshakeState.mixHash(tmp, MSG2_SIZE, padlen2);
-            if (_log.shouldWarn())
-                _log.warn("After mixhash padding " + padlen2 + " msg 2: " + _handshakeState.toString());
+            if (_log.shouldDebug())
+                _log.debug("After mixhash padding " + padlen2 + " msg 2: " + _handshakeState.toString());
         }
 
         changeState(State.IB_NTCP2_SENT_Y);
@@ -872,6 +872,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         CipherStatePair ckp = _handshakeState.split();
         CipherState rcvr = ckp.getReceiver();
         CipherState sender = ckp.getSender();
+        // debug, to be removed
         byte[] k_ab = rcvr.getKey();
         byte[] k_ba = sender.getKey();
 
@@ -885,8 +886,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 _log.warn("Failed msg3p2, code " + _msg3p2FailReason + " for " + this);
             _con.failInboundEstablishment(sender, sip_ba, _msg3p2FailReason);
         } else {
-            if (_log.shouldWarn()) {
-                _log.warn("Finished establishment for " + this +
+            if (_log.shouldDebug()) {
+                _log.debug("Finished establishment for " + this +
                           "\nGenerated ChaCha key for A->B: " + Base64.encode(k_ab) +
                           "\nGenerated ChaCha key for B->A: " + Base64.encode(k_ba) +
                           "\nGenerated SipHash key for A->B: " + Base64.encode(sip_ab) +
@@ -963,11 +964,11 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             if (flood && !ri.equals(old)) {
                 FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
                 if (fndf.floodConditional(ri)) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Flooded the RI: " + h);
+                    if (_log.shouldDebug())
+                        _log.debug("Flooded the RI: " + h);
                 } else {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Flood request but we didn't: " + h);
+                    if (_log.shouldInfo())
+                        _log.info("Flood request but we didn't: " + h);
                 }
             }
         } catch (IllegalArgumentException iae) {

@@ -216,8 +216,8 @@ class OutboundNTCP2State implements EstablishState {
         // output to _tmp
         try {
             _handshakeState.start();
-            if (_log.shouldWarn())
-                _log.warn("After start: " + _handshakeState.toString());
+            if (_log.shouldDebug())
+                _log.debug("After start: " + _handshakeState.toString());
             _handshakeState.writeMessage(_tmp, 0, options, 0, OPTIONS1_SIZE);
         } catch (GeneralSecurityException gse) {
             // buffer length error
@@ -231,8 +231,8 @@ class OutboundNTCP2State implements EstablishState {
             fail("Bad msg 1 out", re);
             return;
         }
-        if (_log.shouldWarn())
-            _log.warn("After msg 1: " + _handshakeState.toString());
+        if (_log.shouldDebug())
+            _log.debug("After msg 1: " + _handshakeState.toString());
 
         // encrypt key before writing
         _context.aes().encrypt(_tmp, 0, _tmp, 0, _bobHash, _bobIV, KEY_SIZE);
@@ -242,8 +242,8 @@ class OutboundNTCP2State implements EstablishState {
         if (padlen1 > 0) {
             _context.random().nextBytes(_tmp, MSG1_SIZE, padlen1);
             _handshakeState.mixHash(_tmp, MSG1_SIZE, padlen1);
-            if (_log.shouldWarn())
-                _log.warn("After mixhash padding " + padlen1 + " msg 1: " + _handshakeState.toString());
+            if (_log.shouldDebug())
+                _log.debug("After mixhash padding " + padlen1 + " msg 1: " + _handshakeState.toString());
         }
 
         changeState(State.OB_SENT_X);
@@ -285,8 +285,8 @@ class OutboundNTCP2State implements EstablishState {
                 fail("Bad msg 2, Y = " + Base64.encode(_tmp, 0, KEY_SIZE), re);
                 return;
             }
-            if (_log.shouldWarn())
-                _log.warn("After msg 2: " + _handshakeState.toString());
+            if (_log.shouldDebug())
+                _log.debug("After msg 2: " + _handshakeState.toString());
             _padlen2 = (int) DataHelper.fromLong(options2, 2, 2);
             long tsB = DataHelper.fromLong(options2, 8, 4);
             long now = _context.clock().now();
@@ -310,8 +310,8 @@ class OutboundNTCP2State implements EstablishState {
                 return;
             if (_padlen2 > 0) {
                 _handshakeState.mixHash(_tmp, 0, _padlen2);
-                if (_log.shouldWarn())
-                    _log.warn("After mixhash padding " + _padlen2 + " msg 2: " + _handshakeState.toString());
+                if (_log.shouldDebug())
+                    _log.debug("After mixhash padding " + _padlen2 + " msg 2: " + _handshakeState.toString());
             }
             changeState(State.OB_GOT_PADDING);
             if (src.hasRemaining()) {
@@ -384,11 +384,11 @@ class OutboundNTCP2State implements EstablishState {
             return;
         }
         // send it all at once
-        if (_log.shouldWarn())
-            _log.warn("Sending msg3, part 1 is:\n" + net.i2p.util.HexDump.dump(tmp, 0, MSG3P1_SIZE));
+        if (_log.shouldDebug())
+            _log.debug("Sending msg3, part 1 is:\n" + net.i2p.util.HexDump.dump(tmp, 0, MSG3P1_SIZE));
         _transport.getPumper().wantsWrite(_con, tmp);
-        if (_log.shouldWarn())
-            _log.warn("After msg 3: " + _handshakeState.toString());
+        if (_log.shouldDebug())
+            _log.debug("After msg 3: " + _handshakeState.toString());
         setDataPhase();
     }
 
@@ -404,6 +404,7 @@ class OutboundNTCP2State implements EstablishState {
         CipherStatePair ckp = _handshakeState.split();
         CipherState rcvr = ckp.getReceiver();
         CipherState sender = ckp.getSender();
+        // debug, to be removed
         byte[] k_ab = sender.getKey();
         byte[] k_ba = rcvr.getKey();
 
@@ -412,8 +413,8 @@ class OutboundNTCP2State implements EstablishState {
         byte[] sip_ab = sipkeys[0];
         byte[] sip_ba = sipkeys[1];
 
-        if (_log.shouldWarn()) {
-            _log.warn("Finished establishment for " + this +
+        if (_log.shouldDebug()) {
+            _log.debug("Finished establishment for " + this +
                       "\nGenerated ChaCha key for A->B: " + Base64.encode(k_ab) +
                       "\nGenerated ChaCha key for B->A: " + Base64.encode(k_ba) +
                       "\nGenerated SipHash key for A->B: " + Base64.encode(sip_ab) +
