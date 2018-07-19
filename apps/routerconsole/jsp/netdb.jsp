@@ -35,5 +35,6 @@
  <jsp:setProperty name="netdbHelper" property="cost" value="<%=request.getParameter(\"cost\")%>" />
  <jsp:setProperty name="netdbHelper" property="mtu" value="<%=request.getParameter(\"mtu\")%>" />
  <jsp:setProperty name="netdbHelper" property="ssucaps" value="<%=request.getParameter(\"ssucaps\")%>" />
+ <jsp:setProperty name="netdbHelper" property="transport" value="<%=request.getParameter(\"tr\")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div></body></html>

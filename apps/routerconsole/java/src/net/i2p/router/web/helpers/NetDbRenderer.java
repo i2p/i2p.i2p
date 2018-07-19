@@ -94,7 +94,8 @@ class NetDbRenderer {
     public void renderRouterInfoHTML(Writer out, String routerPrefix, String version,
                                      String country, String family, String caps,
                                      String ip, String sybil, int port, SigType type,
-                                     String mtu, String ipv6, String ssucaps, int cost) throws IOException {
+                                     String mtu, String ipv6, String ssucaps,
+                                     String tr, int cost) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
         if (".".equals(routerPrefix)) {
@@ -124,6 +125,7 @@ class NetDbRenderer {
                     (country != null && country.equals(_context.commSystem().getCountry(key))) ||
                     (family != null && family.equals(ri.getOption("family"))) ||
                     (caps != null && ri.getCapabilities().contains(caps)) ||
+                    (tr != null && ri.getTargetAddress(tr) != null) ||
                     (type != null && type == ri.getIdentity().getSigType())) {
                     renderRouterInfo(buf, ri, false, true);
                     if (sybil != null)
@@ -704,7 +706,7 @@ class NetDbRenderer {
         int rv = 0;
         for (RouterAddress addr : info.getAddresses()) {
             String style = addr.getTransportStyle();
-            if (style.equals("NTCP")) {
+            if (style.equals("NTCP") || style.equals("NTCP2")) {
                 rv |= NTCP;
             } else if (style.equals("SSU")) {
                 if (addr.getOption("iport0") != null)

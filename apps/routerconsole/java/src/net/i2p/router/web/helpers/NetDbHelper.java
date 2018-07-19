@@ -1,6 +1,8 @@
 package net.i2p.router.web.helpers;
 
 import java.io.IOException;
+import java.util.Locale;
+
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.router.web.HelperBase;
@@ -9,7 +11,7 @@ public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
     private String _version;
     private String _country;
-    private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6;
+    private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6, _transport;
     private int _full, _port, _cost;
     private boolean _lease;
     private boolean _debug;
@@ -121,6 +123,12 @@ public class NetDbHelper extends HelperBase {
             _ssucaps = DataHelper.stripHTML(f);  // XSS
     }
 
+    /** @since 0.9.36 */
+    public void setTransport(String f) {
+        if (f != null && f.length() > 0)
+            _transport = DataHelper.stripHTML(f).toUpperCase(Locale.US);
+    }
+
     /** @since 0.9.28 */
     public void setCost(String f) {
         try {
@@ -157,10 +165,10 @@ public class NetDbHelper extends HelperBase {
             if (_routerPrefix != null || _version != null || _country != null ||
                 _family != null || _caps != null || _ip != null || _sybil != null ||
                 _port != 0 || _type != null || _mtu != null || _ipv6 != null ||
-                _ssucaps != null || _cost != 0)
+                _ssucaps != null || _transport != null || _cost != 0)
                 renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country,
                                               _family, _caps, _ip, _sybil, _port, _type,
-                                              _mtu, _ipv6, _ssucaps, _cost);
+                                              _mtu, _ipv6, _ssucaps, _transport, _cost);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
             else if (_full == 3)
@@ -244,7 +252,7 @@ public class NetDbHelper extends HelperBase {
     private void renderLookupForm() throws IOException {
         _out.write("<form action=\"/netdb\" method=\"GET\">\n" + 
                    "<table id=\"netdblookup\"><tr><th colspan=\"3\">Network Database Search</th></tr>\n" +
-                   "<tr><td colspan=\"3\" class=\"subheading\"><b>Select one search field <i>only</i>:</b></td></tr>\n" +
+                   "<tr><td colspan=\"3\" class=\"subheading\"><b>Enter one search field <i>only</i>:</b></td></tr>\n" +
                    "<tr><td>Capabilities:</td><td><input type=\"text\" name=\"caps\"></td><td>e.g. f or XOfR</td></tr>\n" +
                    "<tr><td>Cost:</td><td><input type=\"text\" name=\"cost\"></td><td></td></tr>\n" +
                    "<tr><td>Country Code:</td><td><input type=\"text\" name=\"c\"></td><td>e.g. ru</td></tr>\n" +
@@ -256,6 +264,7 @@ public class NetDbHelper extends HelperBase {
                    "<tr><td>Port Number:</td><td><input type=\"text\" name=\"port\"></td><td></td></tr>\n" +
                    "<tr><td>Signature Type:</td><td><input type=\"text\" name=\"type\"></td><td></td></tr>\n" +
                    "<tr><td>SSU Capabilities:</td><td><input type=\"text\" name=\"ssucaps\"></td><td></td></tr>\n" +
+                   "<tr><td>Transport:</td><td><input type=\"text\" name=\"tr\"></td><td></td></tr>\n" +
                    "<tr><td>Router Version:</td><td><input type=\"text\" name=\"v\"></td><td></td></tr>\n" +
                    "<tr><td colspan=\"3\" class=\"subheading\"><b>Add Sybil analysis (must pick one above):</b></td></tr>\n" +
                    "<tr><td>Sybil close to:</td><td><input type=\"text\" name=\"sybil2\"></td><td>Router hash, dest hash, b32, or from address book</td>\n" +
