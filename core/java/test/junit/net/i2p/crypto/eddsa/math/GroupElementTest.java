@@ -23,7 +23,7 @@ public class GroupElementTest {
     static final byte[] BYTES_TENZERO = Utils.hexToBytes("0000000000000000000000000000000000000000000000000000000000000000");
     static final byte[] BYTES_ONETEN = Utils.hexToBytes("0a00000000000000000000000000000000000000000000000000000000000080");
 
-    static final EdDSANamedCurveSpec ed25519 = EdDSANamedCurveTable.getByName("ed25519-sha-512");
+    static final EdDSANamedCurveSpec ed25519 = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.ED_25519);
     static final Curve curve = ed25519.getCurve();
 
     static final FieldElement ZERO = curve.getField().ZERO;
@@ -62,6 +62,20 @@ public class GroupElementTest {
     @Test
     public void testP3() {
         final GroupElement t = GroupElement.p3(curve, ZERO, ONE, ONE, ZERO);
+        assertThat(t.curve, is(equalTo(curve)));
+        assertThat(t.repr, is(GroupElement.Representation.P3));
+        assertThat(t.X, is(ZERO));
+        assertThat(t.Y, is(ONE));
+        assertThat(t.Z, is(ONE));
+        assertThat(t.T, is(ZERO));
+    }
+
+    /**
+     * Test method for {@link GroupElement#p3(Curve, FieldElement, FieldElement, FieldElement, FieldElement, boolean)}.
+     */
+    @Test
+    public void testP3WithExplicitFlag() {
+        final GroupElement t = GroupElement.p3(curve, ZERO, ONE, ONE, ZERO, false);
         assertThat(t.curve, is(equalTo(curve)));
         assertThat(t.repr, is(GroupElement.Representation.P3));
         assertThat(t.X, is(ZERO));
@@ -118,6 +132,20 @@ public class GroupElementTest {
     @Test
     public void testGroupElementCurveRepresentationFieldElementFieldElementFieldElementFieldElement() {
         final GroupElement t = new GroupElement(curve, GroupElement.Representation.P3, ZERO, ONE, ONE, ZERO);
+        assertThat(t.curve, is(equalTo(curve)));
+        assertThat(t.repr, is(GroupElement.Representation.P3));
+        assertThat(t.X, is(ZERO));
+        assertThat(t.Y, is(ONE));
+        assertThat(t.Z, is(ONE));
+        assertThat(t.T, is(ZERO));
+    }
+
+    /**
+     * Test method for {@link GroupElement#GroupElement(Curve, GroupElement.Representation, FieldElement, FieldElement, FieldElement, FieldElement, boolean)}.
+     */
+    @Test
+    public void testGroupElementCurveRepresentationFieldElementFieldElementFieldElementFieldElementWithExplicitFlag() {
+        final GroupElement t = new GroupElement(curve, GroupElement.Representation.P3, ZERO, ONE, ONE, ZERO, false);
         assertThat(t.curve, is(equalTo(curve)));
         assertThat(t.repr, is(GroupElement.Representation.P3));
         assertThat(t.X, is(ZERO));
@@ -380,6 +408,29 @@ public class GroupElementTest {
         }
     }
 
+    @Test
+    public void toP3PrecomputeDoubleReturnsExpectedResultIfGroupElementHasP1P1Representation() {
+        for (int i=0; i<10; i++) {
+            // Arrange:
+            final GroupElement g = MathUtils.toRepresentation(MathUtils.getRandomGroupElement(), GroupElement.Representation.P1P1);
+
+            // Act:
+            final GroupElement h1 = g.toP3PrecomputeDouble();
+            final GroupElement h2 = MathUtils.toRepresentation(g, GroupElement.Representation.P3PrecomputedDouble);
+
+            // Assert:
+            Assert.assertThat(h1, IsEqual.equalTo(h2));
+            Assert.assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P3));
+            Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
+            Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
+            Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
+            Assert.assertThat(h1.getT(), IsEqual.equalTo(g.getX().multiply(g.getY())));
+            Assert.assertThat(h1.precmp, IsNull.nullValue());
+            Assert.assertThat(h1.dblPrecmp, IsNull.notNullValue());
+            Assert.assertThat(h1.dblPrecmp, IsEqual.equalTo(h2.dblPrecmp));
+        }
+    }
+
     @Test (expected = IllegalArgumentException.class)
     public void toCachedThrowsIfGroupElementHasP2Representation() {
         // Arrange:
@@ -451,7 +502,7 @@ public class GroupElementTest {
     // endregion
 
     /**
-     * Test method for {@link GroupElement#precompute(boolean)}.
+     * Test method for precomputation.
      */
     @Test
     public void testPrecompute() {
@@ -736,7 +787,7 @@ public class GroupElementTest {
     // This test is slow (~6s) due to math utils using an inferior algorithm to calculate the result.
     @Test
     public void scalarMultiplyBasePointReturnsExpectedResult() {
-        for (int i=0; i<100; i++) {
+        for (int i=0; i<10; i++) {
             // Arrange:
             final GroupElement basePoint = ed25519.getB();
             final FieldElement f = MathUtils.getRandomFieldElement();
@@ -759,8 +810,7 @@ public class GroupElementTest {
         byte[] a = Utils.hexToBytes("d072f8dd9c07fa7bc8d22a4b325d26301ee9202f6db89aa7c3731529e37e437c");
         GroupElement A = new GroupElement(curve, Utils.hexToBytes("d4cf8595571830644bd14af416954d09ab7159751ad9e0f7a6cbd92379e71a66"));
         GroupElement B = ed25519.getB();
-        GroupElement geZero = curve.getZero(GroupElement.Representation.P3);
-        //geZero.precompute(false);
+        GroupElement geZero = curve.getZero(GroupElement.Representation.P3PrecomputedDouble);
 
         // 0 * GE(0) + 0 * GE(0) = GE(0)
         assertThat(geZero.doubleScalarMultiplyVariableTime(geZero, zero, zero),
@@ -798,11 +848,10 @@ public class GroupElementTest {
     // This test is slow (~6s) due to math utils using an inferior algorithm to calculate the result.
     @Test
     public void doubleScalarMultiplyVariableTimeReturnsExpectedResult() {
-        for (int i=0; i<50; i++) {
+        for (int i=0; i<10; i++) {
             // Arrange:
             final GroupElement basePoint = ed25519.getB();
-            final GroupElement g = MathUtils.getRandomGroupElement();
-            //g.precompute(false);
+            final GroupElement g = MathUtils.getRandomGroupElement(true);
             final FieldElement f1 = MathUtils.getRandomFieldElement();
             final FieldElement f2 = MathUtils.getRandomFieldElement();
 
