@@ -4,7 +4,7 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
-            exclude 'com'
+            exclude 'com/maxmind'
         }
     }
     test {
