@@ -477,11 +477,7 @@ public class NTCPConnection implements Closeable {
             _log.logCloseLoop("NTCPConnection", this);
             return;
         }
-        if (_version == 2) {
-            // for debugging
-            if (_log.shouldWarn())
-                _log.warn("Closing connection " + toString(), new Exception("cause"));
-        } else if (_log.shouldLog(Log.INFO)) {
+        if (_log.shouldLog(Log.INFO)) {
             _log.info("Closing connection " + toString(), new Exception("cause"));
         }
         NTCPConnection toClose = locked_close(allowRequeue);
@@ -1784,8 +1780,8 @@ public class NTCPConnection implements Closeable {
         finishEstablishment(sender, receiver, sip_ba, sip_ab, clockSkew);
         if (hisPadding != null) {
             _paddingConfig = OUR_PADDING.merge(hisPadding);
-            if (_log.shouldWarn())
-                _log.warn("Got padding options:" +
+            if (_log.shouldDebug())
+                _log.debug("Got padding options:" +
                           "\nhis padding options: " + hisPadding +
                           "\nour padding options: " + OUR_PADDING +
                           "\nmerged config is:    " + _paddingConfig);
