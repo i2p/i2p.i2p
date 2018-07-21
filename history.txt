@@ -1,3 +1,13 @@
+2018-07-21 zzz
+ * Build: Add check for libtaglibs package in debian builds
+ * Console: Add netdb search by transport
+ * i2psnark: Sequential order option for single-file torrents (ticket #2234)
+ * NTCP2:
+   - Fix error sending large message (ticket #2286)
+   - Fix NPE after handshake failure (ticket #2286)
+   - Reduce log levels
+ * Tests: Backport EdDSA junit changes; fixes NPE in 2 tests
+
 2018-07-16 zzz
  * Console: Fix HTML error on /configservice w/o wrapper
 

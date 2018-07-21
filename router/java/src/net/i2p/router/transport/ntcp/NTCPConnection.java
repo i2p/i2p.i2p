@@ -905,7 +905,8 @@ public class NTCPConnection implements Closeable {
             blocks.add(block);
             size += block.getTotalLength();
         }
-        sendNTCP2(buf.unencrypted, blocks);
+        byte[] tmp = size <= BUFFER_SIZE ? buf.unencrypted : new byte[size];
+        sendNTCP2(tmp, blocks);
     }
 
     /**
@@ -1820,6 +1821,7 @@ public class NTCPConnection implements Closeable {
         _establishedOn = _context.clock().now();
         _nextMetaTime = Long.MAX_VALUE;
         _nextInfoTime = Long.MAX_VALUE;
+        _paddingConfig = OUR_PADDING;
         sendTermination(reason, 0);
         try { Thread.sleep(NTCP2_TERMINATION_CLOSE_DELAY); } catch (InterruptedException ie) {}
         close();
