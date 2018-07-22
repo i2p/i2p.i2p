@@ -111,11 +111,15 @@ class NetDbRenderer {
                     ipMode = 2;
                 } else if (ip.endsWith("/8")) {
                     ipMode = 3;
+                } else if (ip.indexOf(':') > 0) {
+                    ipMode = 4;
                 }
-                for (int i = 0; i < ipMode; i++) {
-                    int last = ip.substring(0, ip.length() - 1).lastIndexOf('.');
-                    if (last > 0)
-                        ip = ip.substring(0, last + 1);
+                if (ipMode > 0 && ipMode < 4) {
+                    for (int i = 0; i < ipMode; i++) {
+                        int last = ip.substring(0, ip.length() - 1).lastIndexOf('.');
+                        if (last > 0)
+                            ip = ip.substring(0, last + 1);
+                    }
                 }
             }
             for (RouterInfo ri : routers) {

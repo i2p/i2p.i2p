@@ -258,7 +258,7 @@ public class NetDbHelper extends HelperBase {
                    "<tr><td>Country Code:</td><td><input type=\"text\" name=\"c\"></td><td>e.g. ru</td></tr>\n" +
                    "<tr><td>Router Family:</td><td><input type=\"text\" name=\"fam\"></td><td></td></tr>\n" +
                    "<tr><td>Hash Prefix:</td><td><input type=\"text\" name=\"r\"></td><td></td></tr>\n" +
-                   "<tr><td>IP or Hostname:</td><td><input type=\"text\" name=\"ip\"></td><td>host name, IPv4, or IPv6, /24,/16,/8 suffixes optional for IPv4</td></tr>\n" +
+                   "<tr><td>IP or Hostname:</td><td><input type=\"text\" name=\"ip\"></td><td>host name, IPv4, or IPv6, /24,/16,/8 suffixes optional for IPv4, prefix ok for IPv6</td></tr>\n" +
                    "<tr><td>IPv6 Prefix:</td><td><input type=\"text\" name=\"ipv6\"></td><td></td></tr>\n" +
                    "<tr><td>MTU:</td><td><input type=\"text\" name=\"mtu\"></td><td></td></tr>\n" +
                    "<tr><td>Port Number:</td><td><input type=\"text\" name=\"port\"></td><td></td></tr>\n" +
