@@ -57,6 +57,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     /** how long we expect _sz_aliceIdent_tsA_padding_aliceSig to be when its full */
     private int _sz_aliceIdent_tsA_padding_aliceSigSize;
 
+    private boolean _released;
+
     //// NTCP2 things
 
     private HandshakeState _handshakeState;
@@ -518,7 +520,10 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             // rather than doing the whole handshake
             if(ip != null)
                _context.blocklist().add(ip);
-            fail("Peer is banlisted forever: " + aliceHash);
+            if (getVersion() < 2)
+                fail("Peer is banlisted forever: " + aliceHash);
+            else if (_log.shouldWarn())
+                _log.warn("Peer is banlisted forever: " + aliceHash);
             _msg3p2FailReason = NTCPConnection.REASON_BANNED;
             return false;
         }
@@ -544,7 +549,10 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                                              aliceHash,
                                                _x("Excessive clock skew: {0}"));
             _transport.setLastBadSkew(_peerSkew);
-            fail("Clocks too skewed (" + diff + " ms)", null, true);
+            if (getVersion() < 2)
+                fail("Clocks too skewed (" + diff + " ms)", null, true);
+            else if (_log.shouldWarn())
+                _log.warn("Clocks too skewed (" + diff + " ms)");
             _msg3p2FailReason = NTCPConnection.REASON_SKEW;
             return false;
         } else if (_log.shouldLog(Log.DEBUG)) {
@@ -784,13 +792,15 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 // calls callbacks below
                 NTCP2Payload.processPayload(_context, this, payload, 0, _msg3p2len - MAC_SIZE, true);
             } catch (IOException ioe) {
-                fail("Bad msg 3 payload", ioe);
+                if (_log.shouldWarn())
+                    _log.warn("Bad msg 3 payload", ioe);
                 // probably payload frame/block problems
                 // setDataPhase() will send termination
                 if (_msg3p2FailReason < 0)
                     _msg3p2FailReason = NTCPConnection.REASON_FRAMING;
             } catch (DataFormatException dfe) {
-                fail("Bad msg 3 payload", dfe);
+                if (_log.shouldWarn())
+                    _log.warn("Bad msg 3 payload", dfe);
                 // probably RI problems
                 // setDataPhase() will send termination
                 if (_msg3p2FailReason < 0)
@@ -798,7 +808,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 _context.statManager().addRateData("ntcp.invalidInboundSignature", 1);
             } catch (I2NPMessageException ime) {
                 // shouldn't happen, no I2NP msgs in msg3p2
-                fail("Bad msg 3 payload", ime);
+                if (_log.shouldWarn())
+                    _log.warn("Bad msg 3 payload", ime);
                 // setDataPhase() will send termination
                 if (_msg3p2FailReason < 0)
                     _msg3p2FailReason = 0;
@@ -858,11 +869,18 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     }
 
     /**
-     *  KDF for NTCP2 data phase,
-     *  then calls con.finishInboundEstablishment(),
-     *  passing over the final keys and states to the con.
+     *  KDF for NTCP2 data phase.
      *
-     *  This changes the state to VERIFIED.
+     *  If _msg3p2FailReason is less than zero,
+     *  this calls con.finishInboundEstablishment(),
+     *  passing over the final keys and states to the con,
+     *  and changes the state to VERIFIED.
+     *
+     *  Otherwise, it calls con.failInboundEstablishment(),
+     *  which will send a termination message,
+     *  and changes the state to CORRUPT.
+     *
+     *  If you don't call this, call fail().
      *
      *  @param buf possibly containing "extra" data for data phase
      *  @since 0.9.36
@@ -885,6 +903,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             if (_log.shouldWarn())
                 _log.warn("Failed msg3p2, code " + _msg3p2FailReason + " for " + this);
             _con.failInboundEstablishment(sender, sip_ba, _msg3p2FailReason);
+            changeState(State.CORRUPT);
         } else {
             if (_log.shouldDebug()) {
                 _log.debug("Finished establishment for " + this +
@@ -1031,6 +1050,9 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
      */
     @Override
     protected void releaseBufs(boolean isVerified) {
+        if (_released)
+            return;
+        _released = true;
         super.releaseBufs(isVerified);
         // Do not release _curEncrypted if verified, it is passed to
         // NTCPConnection to use as the IV
