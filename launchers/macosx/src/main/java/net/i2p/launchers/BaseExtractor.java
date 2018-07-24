@@ -2,6 +2,7 @@ package net.i2p.launchers;
 
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +48,7 @@ public class BaseExtractor extends EnvCheck {
                     String uncompressedFileName = destinationPath + "/" + entry.getName();
                     Path uncompressedFilePath = fileSystem.getPath(uncompressedFileName);
                     Files.createFile(uncompressedFilePath);
-                    FileOutputStream fileOutput = new FileOutputStream(uncompressedFileName);
+                    BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(uncompressedFileName));
                     while (bis.available() > 0) fileOutput.write(bis.read());
                     fileOutput.close();
                     if (printDebug) System.out.println("Written :" + entry.getName());
