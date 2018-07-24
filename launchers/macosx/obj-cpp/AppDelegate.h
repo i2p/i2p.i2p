@@ -7,9 +7,9 @@
 
 #include <Cocoa/Cocoa.h>
 
+#include "RouterTask.h"
 #include "StatusItemButton.h"
 #include "JavaHelper.h"
-#include "RouterTask.h"
 #include "neither/maybe.hpp"
 #include "optional.hpp"
 #include "subprocess.hpp"
@@ -26,24 +26,33 @@
 
 using namespace neither;
 
-using maybeAnRouterRunner = std::experimental::optional<RouterTask*>;
+@class ExtractMetaInfo;
+using maybeAnRouterRunner = std::experimental::optional<I2PRouterTask*>;
 
+std::vector<std::string> buildClassPath(std::string basePath);
 
 extern JvmListSharedPtr gRawJvmList;
 
 // DO NOT ACCESS THIS GLOBAL VARIABLE DIRECTLY.
 static std::mutex globalRouterStatusMutex;
 static maybeAnRouterRunner globalRouterStatus = maybeAnRouterRunner{};
+static bool isRuterRunning = false;
 
 maybeAnRouterRunner getGlobalRouterObject();
-void setGlobalRouterObject(RouterTask* newRouter);
+void setGlobalRouterObject(I2PRouterTask* newRouter);
+bool getGlobalRouterIsRunning();
+void setGlobalRouterIsRunning(bool running);
 
-@class ExtractMetaInfo;
 @interface ExtractMetaInfo : NSObject
-@property (strong) NSString* i2pBase;
-@property (strong) NSString* javaBinary;
-@property (strong) NSString* zipFile;
-@property (strong) NSString* jarFile;
+@property (copy) NSString* i2pBase;
+@property (copy) NSString* javaBinary;
+@property (copy) NSString* zipFile;
+@property (copy) NSString* jarFile;
+@end
+
+@class I2PStatusMenu;
+@interface I2PStatusMenu : NSMenu
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
 @end
 
 inline void sendUserNotification(NSString* title, NSString* informativeText, NSImage* contentImage = NULL, bool makeSound = false) {
@@ -68,10 +77,21 @@ inline std::vector<std::string> globVector(const std::string& pattern){
     return files;
 }
 
+inline std::string getDefaultBaseDir()
+{
+  // Figure out base directory
+  const char* pathFromHome = "/Users/%s/Library/I2P";
+  auto username = getenv("USER");
+  char buffer[strlen(pathFromHome)+strlen(username)];
+  sprintf(buffer, pathFromHome, username);
+  std::string i2pBaseDir(buffer);
+  return i2pBaseDir;
+}
+
 @interface MenuBarCtrl : NSObject <StatusItemButtonDelegate, NSMenuDelegate>
 @property BOOL enableLogging;
 @property BOOL enableVerboseLogging;
-@property (strong) NSMenu *menu;
+@property (strong) I2PStatusMenu *menu;
 @property (strong) StatusItemButton* statusBarButton;
 @property (strong) NSUserDefaults *userPreferences;
 @property (strong, nonatomic) NSImage * image;
@@ -81,7 +101,7 @@ inline std::vector<std::string> globVector(const std::string& pattern){
 - (void) statusItemButtonRightClick: (StatusItemButton *) button;
 - (void) statusBarImageBtnClicked;
 - (void) btnPressedAction:(id)sender;
-- (void) menuWillOpen:(NSMenu *)menu;
+- (void) menuWillOpen:(I2PStatusMenu *)menu;
 
 - (void) openRouterConsoleBtnHandler: (NSMenuItem *) menuItem;
 - (void) startJavaRouterBtnHandler: (NSMenuItem *) menuItem;
@@ -91,7 +111,7 @@ inline std::vector<std::string> globVector(const std::string& pattern){
 // Methods
 - (MenuBarCtrl *) init;
 - (void) dealloc;
-- (NSMenu *) createStatusBarMenu;
+- (I2PStatusMenu *) createStatusBarMenu;
 @end
 
 @protocol MenuBarCtrlDelegate
@@ -106,9 +126,10 @@ inline std::vector<std::string> globVector(const std::string& pattern){
 @property (strong) NSUserDefaults *userPreferences;
 @property BOOL enableLogging;
 @property BOOL enableVerboseLogging;
+@property ExtractMetaInfo *metaInfo;
 @property (copy) NSImage *contentImage NS_AVAILABLE(10_9, NA);
-- (void)extractI2PBaseDir:(ExtractMetaInfo *)metaInfo completion:(void(^)(BOOL success, NSError *error))completion;
-- (void)startupI2PRouter:(ExtractMetaInfo *)metaInfo;
+- (void)extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion;
+- (void)startupI2PRouter;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification;
 - (void)applicationWillTerminate:(NSNotification *)aNotification;
 - (void)setApplicationDefaultPreferences;
@@ -118,59 +139,6 @@ inline std::vector<std::string> globVector(const std::string& pattern){
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
                                shouldPresentNotification:(NSUserNotification *)notification;
 @end
-
-
-/*
-
-
-@implementation CNSStatusBarCtrl
--(id)initWithSysTray:(I2PCtrlSysIcon *)sys
-{
-  self = [super init];
-  if (self) {
-    item = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
-    menu = 0;
-    systray = sys;
-    imageCell = [[NSImageView alloc] initWithParent:self];
-    [item setView: imageCell];
-    [item setHidden: NO];
-    CFShow(CFSTR("CNSStatusBarCtrl::initWithSysTray executed"));
-  }
-  return self;
-}
--(NSStatusItem*)item {
-    return item;
-}
--(void)dealloc {
-  [[NSStatusBar systemStatusBar] removeStatusItem:item];
-  [[NSNotificationCenter defaultCenter] removeObserver:imageCell];
-  [imageCell release];
-  [item release];
-  [super dealloc];
-}
-@end
-
-
-class CSystemTrayIcon
-{
-public:
-  CSystemTrayIcon(I2PCtrlSysIcon *sys)
-  {
-    item = [[CNSStatusBarCtrl alloc] initWithSysTray:sys];
-    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:item];
-    const int menuHeight = [[NSStatusBar systemStatusBar] thickness];
-    printf("menuHeight: %d\n", menuHeight);
-    [[[item item] view] setHidden: NO];
-  }
-  ~CSystemTrayIcon()
-  {
-    [[[item item] view] setHidden: YES];
-    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:nil];
-    [item release];
-  }
-  CNSStatusBarCtrl *item;
-};
-*/
 
 
 #endif

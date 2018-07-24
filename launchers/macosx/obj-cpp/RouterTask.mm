@@ -13,12 +13,19 @@
 @implementation RTaskOptions
 @end
 
-@implementation RouterTask
+@implementation I2PRouterTask
 
+
+- (void)routerStdoutData:(NSNotification *)notification
+{
+    NSLog(@"%@", [[NSString alloc] initWithData:[notification.object availableData] encoding:NSUTF8StringEncoding]);
+    [notification.object waitForDataInBackgroundAndNotify];
+}
 
 - (instancetype) initWithOptions : (RTaskOptions*) options
 {
-    self.userRequestedRestart = FALSE;
+    self.userRequestedRestart = NO;
+    self.isRouterRunning = NO;
     self.input = [NSFileHandle fileHandleWithStandardInput];
     self.routerTask = [NSTask new];
     self.processPipe = [NSPipe new];
@@ -30,8 +37,22 @@
     [self.routerTask setEnvironment: envDict];
     [self.routerTask setStandardOutput:self.processPipe];
 	[self.routerTask setStandardError:self.processPipe];
+
+    NSFileHandle *stdoutFileHandle = [self.processPipe fileHandleForReading];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+        selector:@selector(routerStdoutData:)
+        name:NSFileHandleDataAvailableNotification
+        object:stdoutFileHandle];
+
+    [stdoutFileHandle waitForDataInBackgroundAndNotify];
+
     [self.routerTask setTerminationHandler:^(NSTask* task) {
         NSLog(@"termHandler triggered!");
+        NSBundle *launcherBundle = [NSBundle mainBundle];
+        auto iconImage = [launcherBundle pathForResource:@"ItoopieTransparent" ofType:@"png"];
+        sendUserNotification(APP_IDSTR, @"I2P Router has stopped", [NSImage imageNamed:iconImage]);
+        // Cleanup
+        self.isRouterRunning = NO;
     }];
 /*
     self.readLogHandle = [self.processPipe fileHandleForReading];
@@ -53,7 +74,8 @@
 
 - (void) requestRestart
 {
-    self.userRequestedRestart = TRUE;
+    self.userRequestedRestart = YES;
+    kill([self.routerTask processIdentifier], SIGHUP);
 }
 
 - (BOOL) isRunning
@@ -63,35 +85,17 @@
 
 - (int) execute
 {
-    //@try {
+    @try {
         [self.routerTask launch];
         watchPid([self.routerTask processIdentifier]);
-        [self.input waitForDataInBackgroundAndNotify];
-        [[self.processPipe fileHandleForReading] waitForDataInBackgroundAndNotify];
-        [[NSNotificationCenter defaultCenter] addObserverForName:NSFileHandleDataAvailableNotification
-                                                          object:[self.processPipe fileHandleForReading] queue:nil
-                                                      usingBlock:^(NSNotification *note)
-         {
-             // Read from shell output
-             NSData *outData = [[self.processPipe fileHandleForReading] availableData];
-             NSString *outStr = [[NSString alloc] initWithData:outData encoding:NSUTF8StringEncoding];
-             if ([outStr length] > 1) {
-                 NSLog(@"output: %@", outStr);
-             }
-
-             // Continue waiting for shell output.
-             [[self.processPipe fileHandleForReading] waitForDataInBackgroundAndNotify];
-         }];
-         //[self.routerTask waitUntilExit];
-        //NSThread *thr = [[NSThread alloc] initWithTarget:self.routerTask selector:@selector(launch) object:nil];
-        //[self.routerTask waitUntilExit];
+        self.isRouterRunning = YES;
         return 1;
-    /*}
+    }
     @catch (NSException *e)
 	{
 		NSLog(@"Expection occurred %@", [e reason]);
         return 0;
-	}*/
+	}
 }
 
 - (int) getPID

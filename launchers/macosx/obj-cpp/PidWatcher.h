@@ -3,33 +3,12 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <unistd.h>
 #include <sys/event.h>
-#include <functional>
 
 #include "neither/either.hpp"
 #include "AppDelegate.h"
 
 using callbackType = void (CFFileDescriptorRef, CFOptionFlags, void *);
 using HandleFunction = std::function<void(int)>;
-/*
-class CallbackWrapper
-{
-    CallbackWrapper(HandleFunction func) : mCallback(func);
-    void operator(CFFileDescriptorRef fdref, CFOptionFlags callBackTypes, void *info) {
-        struct kevent kev;
-        int fd = CFFileDescriptorGetNativeDescriptor(fdref);
-        kevent(fd, NULL, 0, &kev, 1, NULL);
-        // take action on death of process here
-        NSLog(@"process with pid '%u' died\n", (unsigned int)kev.ident);
-
-        mCallback(0);
-        CFFileDescriptorInvalidate(fdref);
-        CFRelease(fdref);
-    }
-
-private:
-    HandleFunction mCallback;
-};
-*/
 
 static void noteProcDeath(CFFileDescriptorRef fdref, CFOptionFlags callBackTypes, void *info) {
     struct kevent kev;

@@ -30,6 +30,7 @@
 #include "JavaHelper.h"
 #include "fn.h"
 #include "optional.hpp"
+#include "portcheck.h"
 
 #define debug(format, ...) CFShow([NSString stringWithFormat:format, ## __VA_ARGS__]);
 
@@ -42,6 +43,10 @@ JvmListSharedPtr gRawJvmList = nullptr;
 @interface AppDelegate () <NSUserNotificationCenterDelegate, NSApplicationDelegate>
 @end
 
+std::vector<std::string> buildClassPath(std::string basePath)
+{
+    return globVector(basePath+std::string("/lib/*.jar"));
+}
 
 maybeAnRouterRunner getGlobalRouterObject()
 {
@@ -49,44 +54,36 @@ maybeAnRouterRunner getGlobalRouterObject()
     return globalRouterStatus;
 }
 
-void setGlobalRouterObject(RouterTask* newRouter)
+void setGlobalRouterObject(I2PRouterTask* newRouter)
 {
     std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
     globalRouterStatus.emplace(newRouter);
 }
 
+
+pthread_mutex_t mutex;
+
+bool getGlobalRouterIsRunning()
+{
+    pthread_mutex_lock(&mutex);
+    bool current = isRuterRunning;
+    pthread_mutex_unlock(&mutex);
+    return current;
+}
+void setGlobalRouterIsRunning(bool running)
+{
+    pthread_mutex_lock(&mutex);
+    isRuterRunning = running;
+    pthread_mutex_unlock(&mutex);
+}
+
 std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir) {
-/*
-  NSLog(@"Arguments: %@", [NSString stringWithUTF8String:arguments.c_str()]);
-  auto launchLambda = [](JavaRunner *javaRun) {
-    javaRun->javaProcess->start_process();
-    auto pid = javaRun->javaProcess->pid();
-    std::cout << "I2P Router process id = " << pid << std::endl;
-
-    // Blocking
-    javaRun->javaProcess->wait();
-  };
-  auto callbackAfterExit = [](){
-    printf("Callback after exit\n");
-  };
-  NSLog(@"Still fine!");
-
-  setGlobalRouterObject(new JavaRunner{ javaBin, arguments, i2pBaseDir, std::move(launchLambda), std::move(callbackAfterExit) });
-
-  NSLog(@"Still fine!");
-  return std::async(std::launch::async, [&]{
-      getGlobalRouterObject().value()->execute();
-      return 0;
-    });
-*/
-    //CFShow(arguments);
-
     @try {
         RTaskOptions* options = [RTaskOptions alloc];
         options.binPath = javaBin;
         options.arguments = arguments;
         options.i2pBaseDir = i2pBaseDir;
-        auto instance = [[[RouterTask alloc] initWithOptions: options] autorelease];
+        auto instance = [[[I2PRouterTask alloc] initWithOptions: options] autorelease];
         setGlobalRouterObject(instance);
         //NSThread *thr = [[NSThread alloc] initWithTarget:instance selector:@selector(execute) object:nil];
         [instance execute];
@@ -112,6 +109,15 @@ void openUrl(NSString* url)
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString: url]];
 }
 
+@implementation I2PStatusMenu
+
+- (BOOL)validateMenuItem:(NSMenuItem *)item
+{
+  NSLog(@"item is: %@",item);
+  return YES;
+}
+
+@end
 
 @implementation MenuBarCtrl
 
@@ -148,6 +154,8 @@ void openUrl(NSString* url)
 - (void) startJavaRouterBtnHandler: (NSMenuItem *) menuItem
 {
   NSLog(@"Clicked startJavaRouterBtnHandler");
+  AppDelegate *appDelegate = (AppDelegate *)[[NSApplication sharedApplication] delegate];
+  [appDelegate startupI2PRouter];
 }
 
 - (void) restartJavaRouterBtnHandler: (NSMenuItem *) menuItem
@@ -210,9 +218,9 @@ void openUrl(NSString* url)
   [self.menu release];
 }
 
-- (NSMenu *)createStatusBarMenu
+- (I2PStatusMenu *)createStatusBarMenu
 {
-  NSMenu *menu = [[NSMenu alloc] init];
+  I2PStatusMenu *menu = [[I2PStatusMenu alloc] init];
   [menu setAutoenablesItems:NO];
 
   NSMenuItem *openConsoleI2Pbtn =
@@ -271,10 +279,10 @@ void openUrl(NSString* url)
 
 @implementation AppDelegate
 
-- (void)extractI2PBaseDir:(ExtractMetaInfo *)metaInfo completion:(void(^)(BOOL success, NSError *error))completion
+- (void)extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion
 {
-  std::string basePath([metaInfo.i2pBase UTF8String]);
-  NSParameterAssert(metaInfo.i2pBase);
+  std::string basePath([self.metaInfo.i2pBase UTF8String]);
+  NSParameterAssert(self.metaInfo.i2pBase);
   NSError *error = NULL;
   BOOL success;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -286,10 +294,10 @@ void openUrl(NSString* url)
     basearg += basePath;
 
     std::string zippath("-Di2p.base.zip=");
-    zippath += [metaInfo.zipFile UTF8String];
+    zippath += [self.metaInfo.zipFile UTF8String];
 
     std::string jarfile("-cp ");
-    jarfile += [metaInfo.jarFile UTF8String];
+    jarfile += [self.metaInfo.jarFile UTF8String];
 
     // Create directory
     mkdir(basePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
@@ -305,7 +313,7 @@ void openUrl(NSString* url)
     cli.push_back("net.i2p.launchers.BaseExtractor");
 
     //auto charCli = map(cli, [](std::string str){ return str.c_str(); });
-    std::string execStr = [metaInfo.javaBinary UTF8String];
+    std::string execStr = [self.metaInfo.javaBinary UTF8String];
     for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
 
     NSLog(@"Trying cmd: %@", [NSString stringWithUTF8String:execStr.c_str()]);
@@ -337,16 +345,12 @@ void openUrl(NSString* url)
   });
 }
 
-- (void)startupI2PRouter:(ExtractMetaInfo *)metaInfo
+- (void)startupI2PRouter
 {
-  std::string basePath([metaInfo.i2pBase UTF8String]);
-  auto buildClassPath = [](std::string basePath) -> std::vector<std::string> {
-      return globVector(basePath+std::string("/lib/*.jar"));
-  };
-    // Expect base to be extracted by now.
+  std::string basePath([self.metaInfo.i2pBase UTF8String]);
 
-    // Get paths
-    NSBundle *launcherBundle = [NSBundle mainBundle];
+  // Get paths
+  NSBundle *launcherBundle = [NSBundle mainBundle];
   auto jarList = buildClassPath(basePath);
   std::string classpathStrHead = "-classpath";
   std::string classpathStr = "";
@@ -371,12 +375,12 @@ void openUrl(NSString* url)
     argList.push_back([NSString stringWithUTF8String:classpathStrHead.c_str()]);
     argList.push_back([NSString stringWithUTF8String:classpathStr.c_str()]);
     argList.push_back(@"net.i2p.router.Router");
-    auto javaBin = std::string([metaInfo.javaBinary UTF8String]);
+    auto javaBin = std::string([self.metaInfo.javaBinary UTF8String]);
 
 
     sendUserNotification(APP_IDSTR, @"I2P Router is starting up!", self.contentImage);
-    auto nsJavaBin = metaInfo.javaBinary;
-    auto nsBasePath = metaInfo.i2pBase;
+    auto nsJavaBin = self.metaInfo.javaBinary;
+    auto nsBasePath = self.metaInfo.i2pBase;
     NSArray* arrArguments = [NSArray arrayWithObjects:&argList[0] count:argList.size()];
     startupRouter(nsJavaBin, arrArguments, nsBasePath);
     //if (self.enableVerboseLogging) NSLog(@"Defaults: %@", [pref dictionaryRepresentation]);
@@ -434,7 +438,8 @@ void openUrl(NSString* url)
     @"lastI2PVersion" : (NSString *)CFSTR(DEF_I2P_VERSION),
     @"enableLogging": @true,
     @"enableVerboseLogging": @true,
-    @"autoStartRouter": @true
+    @"autoStartRouter": @true,
+    @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
   }];
   if (self.enableVerboseLogging) NSLog(@"Default JVM home preference set to: %@", (NSString *)cfDefaultHome);
 
@@ -468,11 +473,8 @@ void openUrl(NSString* url)
   // In case we are unbundled, make us a proper UI application
   [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
   [NSApp activateIgnoringOtherApps:YES];
-  //auto prefArray = CFPreferencesCopyKeyList(CFAPPDOMAIN, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost);
-  //CFShow(prefArray);
   auto javaHomePref = [self.userPreferences stringForKey:@"javaHome"];
   if (self.enableVerboseLogging) NSLog(@"Java home from preferences: %@", javaHomePref);
-
 
   // This is the only GUI the user experience on a regular basis.
   self.menuBarCtrl = [[MenuBarCtrl alloc] init];
@@ -482,13 +484,8 @@ void openUrl(NSString* url)
 
   NSLog(@"We should have started the statusbar object by now...");
 
-  // Figure out base directory
-  const char* pathFromHome = "/Users/%s/Library/I2P";
-  auto username = getenv("USER");
-  char buffer[strlen(pathFromHome)+strlen(username)];
-  sprintf(buffer, pathFromHome, username);
-  std::string i2pBaseDir(buffer);
-  if (self.enableVerboseLogging) printf("Home directory is: %s\n", buffer);
+  std::string i2pBaseDir(getDefaultBaseDir());
+  //if (self.enableVerboseLogging) printf("Home directory is: %s\n", buffer);
 
 
   //[statusBarButton setAction:@selector(itemClicked:)];
@@ -499,57 +496,57 @@ void openUrl(NSString* url)
   self.menuBarCtrl.enableLogging = self.enableLogging;
   self.menuBarCtrl.enableVerboseLogging = self.enableVerboseLogging;
 
+
+
+  if (port_check() != 0)
+  {
+    NSLog(@"Seems i2p is already running - I will not start the router (port 7657 is in use..)");
+    return;
+  }
+
   if (self.enableVerboseLogging) NSLog(@"processinfo %@", [[NSProcessInfo processInfo] arguments]);
 
-  auto getJavaHomeLambda = [&pref,&self]() -> std::string {
-      NSString* val = @"";
-      val = [pref stringForKey:@"javaHome"];
-      if (val == NULL) val = @"";
-      if (self.enableVerboseLogging) NSLog(@"Javahome: %@", val);
-      return std::string([val UTF8String]);;
-  };
-
-  auto getJavaBin = [&getJavaHomeLambda]() -> std::string {
-      // Get Java home
-    auto javaHome = getJavaHomeLambda();
+  auto getJavaBin = [&pref,&self]() -> std::string {
+    // Get Java home
+    NSString* val = @"";
+    val = [pref stringForKey:@"javaHome"];
+    if (val == NULL) val = @"";
+    if (self.enableVerboseLogging) NSLog(@"Javahome: %@", val);
+    auto javaHome = std::string([val UTF8String]);
     trim(javaHome); // Trim to remove endline
     auto javaBin = std::string(javaHome);
     javaBin += "/bin/java"; // Append java binary to path.
     return javaBin;
   };
 
-  auto buildClassPath = [](std::string basePath) -> std::vector<std::string> {
-      return globVector(basePath+std::string("/lib/*.jar"));
-  };
 
-
-  auto metaInfo = [ExtractMetaInfo alloc];
-  metaInfo.i2pBase = [NSString stringWithUTF8String:buffer];
-  metaInfo.javaBinary = [NSString stringWithUTF8String:getJavaBin().c_str()];
-  metaInfo.jarFile = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
-  metaInfo.zipFile = [launcherBundle pathForResource:@"base" ofType:@"zip"];
+  self.metaInfo = [[ExtractMetaInfo alloc] init];
+  self.metaInfo.i2pBase = [NSString stringWithUTF8String:i2pBaseDir.c_str()];
+  self.metaInfo.javaBinary = [NSString stringWithUTF8String:getJavaBin().c_str()];
+  self.metaInfo.jarFile = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
+  self.metaInfo.zipFile = [launcherBundle pathForResource:@"base" ofType:@"zip"];
 
   std::string basearg("-Di2p.dir.base=");
   basearg += i2pBaseDir;
 
   std::string jarfile("-cp ");
-  jarfile += [metaInfo.zipFile UTF8String];
+  jarfile += [self.metaInfo.zipFile UTF8String];
 
   struct stat sb;
-  if ( !(stat(buffer, &sb) == 0 && S_ISDIR(sb.st_mode)) )
+  if ( !(stat(i2pBaseDir.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) )
   {
     // I2P is not extracted.
     if (self.enableVerboseLogging) NSLog(@"I2P Directory don't exists!");
 
-    [self extractI2PBaseDir: metaInfo completion:^(BOOL success, NSError *error) {
+    [self extractI2PBaseDir:^(BOOL success, NSError *error) {
         //__typeof__(self) strongSelf = weakSelf;
         //if (strongSelf == nil) return;
-        [self startupI2PRouter:metaInfo];
+        [self startupI2PRouter];
     }];
 
   } else {
       if (self.enableVerboseLogging) NSLog(@"I2P directory found!");
-      [self startupI2PRouter:metaInfo];
+      [self startupI2PRouter];
   }
 
 }

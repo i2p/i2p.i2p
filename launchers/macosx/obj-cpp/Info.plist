@@ -11,7 +11,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>0.9.35-experimental</string>
 	<key>CFBundleIconFile</key>
-	<string>i2p</string>
+	<string>images/AppIcon.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>net.i2p.launcher</string>
 	<key>CFBundleInfoDictionaryVersion</key>

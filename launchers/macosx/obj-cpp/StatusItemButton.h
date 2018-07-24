@@ -2,6 +2,12 @@
 
 #import <Cocoa/Cocoa.h>
 
+/**
+ *
+ * This is a class representing the "image" in the systray.
+ *
+ *
+ * **/
 @class StatusItemButton;
 
 @protocol StatusItemButtonDelegate <NSObject>

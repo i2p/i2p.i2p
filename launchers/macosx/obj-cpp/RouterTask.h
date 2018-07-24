@@ -14,22 +14,21 @@
 
 
 @class RTaskOptions;
-
 @interface RTaskOptions : NSObject
 @property (strong) NSString* binPath;
 @property (strong) NSArray<NSString *>* arguments;
 @property (strong) NSString* i2pBaseDir;
 @end
 
-@class RouterTask;
-
-@interface RouterTask : NSObject
+@class I2PRouterTask;
+@interface I2PRouterTask : NSObject
 @property (strong) NSTask* routerTask;
 @property (strong) NSUserDefaults *userPreferences;
 @property (strong) NSFileHandle *readLogHandle;
 @property (strong) NSMutableData *totalLogData;
 @property (strong) NSPipe *processPipe;
 @property (strong) NSFileHandle *input;
+@property (atomic) BOOL isRouterRunning;
 @property (atomic) BOOL userRequestedRestart;
 - (instancetype) initWithOptions : (RTaskOptions*) options;
 - (int) execute;
@@ -37,6 +36,7 @@
 - (void) requestRestart;
 - (BOOL) isRunning;
 - (int) getPID;
+- (void)routerStdoutData:(NSNotification *)notification;
 @end
 
 
@@ -47,6 +47,8 @@ class JavaRunner;
 
 typedef std::function<void(void)> fp_t;
 typedef std::function<void(JavaRunner *ptr)> fp_proc_t;
+
+
 
 /**
  *
