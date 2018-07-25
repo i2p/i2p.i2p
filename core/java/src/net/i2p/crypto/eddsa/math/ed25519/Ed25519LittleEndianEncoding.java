@@ -16,7 +16,7 @@ public class Ed25519LittleEndianEncoding extends Encoding {
      * The idea for the modulo p reduction algorithm is as follows:
      * <p>
      * Assumption:
-     * <p><ul>
+     * </p><ul>
      * <li>p = 2^255 - 19
      * <li>h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 &lt;= |hi| &lt; 2^27 for all i=0,...,9.
      * <li>h congruent r modulo p, i.e. h = r + q * p for some suitable 0 &lt;= r &lt; p and an integer q.
@@ -211,7 +211,7 @@ public class Ed25519LittleEndianEncoding extends Encoding {
      * Return false if x is in {0,2,4,...,q-1}
      * <p>
      * Preconditions:
-     * <p><ul>
+     * </p><ul>
      * <li>|x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
      * </ul>
      *
