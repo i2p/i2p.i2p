@@ -65,19 +65,25 @@ public class ServletUtil {
     /**
       * Truncate a String.
       * Same as s.substring(0, len) except that
-      * it won't split a surrogate pair.
+      * it won't split a surrogate pair or at a ZWJ.
       *
       * @param s non-null
+      * @param len greater than zero
       * @return s if shorter; s.substring(0, len) if
-      *           the char at len-1 is not a high surrogate;
-      *           s.substring(0, len+1) if it is
+      *           the char at len-1 is not a high surrogate
+      *           or the char at len-1 or len is not a zero-width joiner;
+      *           s.substring(0, len+1 or len+2) if it is
       * @since 0.9.33
       */
     public static String truncate(String s, int len) {
         if (s.length() <= len)
             return s;
-        if (Character.isHighSurrogate(s.charAt(len - 1)))
+        char c = s.charAt(len - 1);
+        // https://en.wikipedia.org/wiki/Zero-width_joiner
+        if (Character.isHighSurrogate(c) || c == 0x200D)
             return s.substring(0, len + 1);
+        if (s.charAt(len) == 0x200D)
+            return s.substring(0, len + 2);
         return s.substring(0, len);
     }
 }
