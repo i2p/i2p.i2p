@@ -1034,6 +1034,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         opts.setDate(_context.clock().now() + 60*1000);
         opts.setTagsToSend(SEND_CRYPTO_TAGS);
         opts.setTagThreshold(LOW_CRYPTO_TAGS);
+        opts.setGzip(false);
         if (!repliable)
             opts.setSendLeaseSet(false);
         try {
