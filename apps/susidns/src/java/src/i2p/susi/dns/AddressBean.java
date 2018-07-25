@@ -108,7 +108,7 @@ public class AddressBean
 	private static final char DOT4 = 0xFF61;
 
 	/**
-	 * Ref: java.net.IDN and RFC 3940
+	 * Ref: java.net.IDN and RFC 3490
 	 * @param host will be converted to lower case
 	 * @return name converted to lower case and punycoded if necessary
 	 * @throws IllegalArgumentException on various errors or if IDN is needed but not available
