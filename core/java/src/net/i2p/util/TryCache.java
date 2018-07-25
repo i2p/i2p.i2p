@@ -15,6 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class TryCache<T> {
 
+    private static final boolean DEBUG_DUP = false;
+
     /**
      * Something that creates objects of the type cached by this cache
      *
@@ -71,8 +73,21 @@ public class TryCache<T> {
     public void release(T item) {
         if (lock.tryLock()) {
             try {
+                if (DEBUG_DUP) {
+                    for (int i = 0; i < items.size(); i++) {
+                        // use == not equals() because ByteArray.equals()
+                        if (items.get(i) == item) {
+                            net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(TryCache.class).log(Log.CRIT,
+                                "dup release of " + item.getClass(), new Exception("I did it"));
+                            return;
+                        }
+                    }
+                }
                 if (items.size() < capacity) {
-                    items.add(item);
+                    if (DEBUG_DUP)
+                        items.add(0, item);
+                    else
+                        items.add(item);
                 }
             } finally {
                 lock.unlock();
