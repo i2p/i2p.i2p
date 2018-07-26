@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
+import net.i2p.util.SystemVersion;
 import net.i2p.router.web.HelperBase;
 
 public class NetDbHelper extends HelperBase {
@@ -12,11 +13,15 @@ public class NetDbHelper extends HelperBase {
     private String _version;
     private String _country;
     private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6, _transport;
-    private int _full, _port, _cost;
+    private int _full, _port, _cost, _page;
+    private int _limit = DEFAULT_LIMIT;
     private boolean _lease;
     private boolean _debug;
     private boolean _graphical;
     private SigType _type;
+
+    private static final int DEFAULT_LIMIT = SystemVersion.isARM() ? 250 : 500;
+    private static final int DEFAULT_PAGE = 0;
     
     private static final String titles[] =
                                           {_x("Summary"),                       // 0
@@ -146,6 +151,26 @@ public class NetDbHelper extends HelperBase {
         _debug = "2".equals(l);
         _lease = _debug || "1".equals(l);
     }
+
+    /** @since 0.9.36 */
+    public void setLimit(String f) {
+        try {
+            _limit = Integer.parseInt(f);
+            if (_limit <= 0)
+                _limit = Integer.MAX_VALUE;
+            else if (_limit <= 10)
+                _limit = 10;
+        } catch (NumberFormatException nfe) {}
+    }
+
+    /** @since 0.9.36 */
+    public void setPage(String f) {
+        try {
+            _page = Integer.parseInt(f) - 1;
+            if (_page < 0)
+                _page = 0;
+        } catch (NumberFormatException nfe) {}
+    }
     
     /**
      *  call for non-text-mode browsers
@@ -166,7 +191,8 @@ public class NetDbHelper extends HelperBase {
                 _family != null || _caps != null || _ip != null || _sybil != null ||
                 _port != 0 || _type != null || _mtu != null || _ipv6 != null ||
                 _ssucaps != null || _transport != null || _cost != 0)
-                renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country,
+                renderer.renderRouterInfoHTML(_out, _limit, _page,
+                                              _routerPrefix, _version, _country,
                                               _family, _caps, _ip, _sybil, _port, _type,
                                               _mtu, _ipv6, _ssucaps, _transport, _cost);
             else if (_lease)
@@ -176,7 +202,7 @@ public class NetDbHelper extends HelperBase {
             else if (_full == 4)
                 renderLookupForm();
             else
-                renderer.renderStatusHTML(_out, _full);
+                renderer.renderStatusHTML(_out, _limit, _page, _full);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

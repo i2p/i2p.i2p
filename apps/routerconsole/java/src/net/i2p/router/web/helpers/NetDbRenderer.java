@@ -86,12 +86,14 @@ class NetDbRenderer {
     /**
      *  One String must be non-null
      *
+     *  @param page zero-based
      *  @param routerPrefix may be null. "." for our router only
      *  @param version may be null
      *  @param country may be null
      *  @param family may be null
      */
-    public void renderRouterInfoHTML(Writer out, String routerPrefix, String version,
+    public void renderRouterInfoHTML(Writer out, int pageSize, int page,
+                                     String routerPrefix, String version,
                                      String country, String family, String caps,
                                      String ip, String sybil, int port, SigType type,
                                      String mtu, String ipv6, String ssucaps,
@@ -101,6 +103,44 @@ class NetDbRenderer {
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
+            StringBuilder ubuf = new StringBuilder();
+            if (routerPrefix != null)
+                ubuf.append("&amp;r=").append(routerPrefix);
+            if (version != null)
+                ubuf.append("&amp;v=").append(version);
+            if (country != null)
+                ubuf.append("&amp;c=").append(country);
+            if (family != null)
+                ubuf.append("&amp;fam=").append(family);
+            if (caps != null)
+                ubuf.append("&amp;caps=").append(caps);
+            if (tr != null)
+                ubuf.append("&amp;tr=").append(tr);
+            if (type != null)
+                ubuf.append("&amp;type=").append(type);
+            if (ip != null)
+                ubuf.append("&amp;ip=").append(ip);
+            if (port != 0)
+                ubuf.append("&amp;port=").append(port);
+            if (mtu != null)
+                ubuf.append("&amp;mtu=").append(mtu);
+            if (ipv6 != null)
+                ubuf.append("&amp;ipv6=").append(ipv6);
+            if (ssucaps != null)
+                ubuf.append("&amp;ssucaps=").append(ssucaps);
+            if (cost != 0)
+                ubuf.append("&amp;cost=").append(cost);
+            if (sybil != null)
+                ubuf.append("&amp;sybil=").append(sybil);
+            if (page > 0) {
+                buf.append("<div class=\"netdbnotfound\">" +
+                           "<a href=\"/netdb?pg=").append(page)
+                   .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
+                buf.append(_t("Previous Page"));
+                buf.append("</a>&nbsp;&nbsp;&nbsp;");
+                buf.append(_t("Page")).append(' ').append(page + 1);
+                buf.append("</div>");
+            }
             boolean notFound = true;
             Set<RouterInfo> routers = _context.netDb().getRouters();
             int ipMode = 0;
@@ -122,6 +162,11 @@ class NetDbRenderer {
                     }
                 }
             }
+            int toSkip = pageSize * page;
+            int skipped = 0;
+            int written = 0;
+            boolean morePages = false;
+            outerloop:
             for (RouterInfo ri : routers) {
                 Hash key = ri.getIdentity().getHash();
                 if ((routerPrefix != null && key.toBase64().startsWith(routerPrefix)) ||
@@ -131,6 +176,14 @@ class NetDbRenderer {
                     (caps != null && ri.getCapabilities().contains(caps)) ||
                     (tr != null && ri.getTargetAddress(tr) != null) ||
                     (type != null && type == ri.getIdentity().getSigType())) {
+                    if (skipped < toSkip) {
+                        skipped++;
+                        continue;
+                    }
+                    if (written++ >= pageSize) {
+                        morePages = true;
+                        break;
+                    }
                     renderRouterInfo(buf, ri, false, true);
                     if (sybil != null)
                         sybils.add(key);
@@ -139,6 +192,14 @@ class NetDbRenderer {
                     for (RouterAddress ra : ri.getAddresses()) {
                         if (ipMode == 0) {
                             if (ip.equals(ra.getHost())) {
+                                if (skipped < toSkip) {
+                                    skipped++;
+                                    break;
+                                }
+                                if (written++ >= pageSize) {
+                                    morePages = true;
+                                    break outerloop;
+                                }
                                 renderRouterInfo(buf, ri, false, true);
                                 if (sybil != null)
                                     sybils.add(key);
@@ -148,6 +209,14 @@ class NetDbRenderer {
                         } else {
                             String host = ra.getHost();
                             if (host != null && host.startsWith(ip)) {
+                                if (skipped < toSkip) {
+                                    skipped++;
+                                    break;
+                                }
+                                if (written++ >= pageSize) {
+                                    morePages = true;
+                                    break outerloop;
+                                }
                                 renderRouterInfo(buf, ri, false, true);
                                 if (sybil != null)
                                     sybils.add(key);
@@ -159,6 +228,14 @@ class NetDbRenderer {
                 } else if (port != 0) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         if (port == ra.getPort()) {
+                            if (skipped < toSkip) {
+                                skipped++;
+                                break;
+                            }
+                            if (written++ >= pageSize) {
+                                morePages = true;
+                                break outerloop;
+                            }
                             renderRouterInfo(buf, ri, false, true);
                             if (sybil != null)
                                 sybils.add(key);
@@ -169,6 +246,14 @@ class NetDbRenderer {
                 } else if (mtu != null) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         if (mtu.equals(ra.getOption("mtu"))) {
+                            if (skipped < toSkip) {
+                                skipped++;
+                                break;
+                            }
+                            if (written++ >= pageSize) {
+                                morePages = true;
+                                break outerloop;
+                            }
                             renderRouterInfo(buf, ri, false, true);
                             if (sybil != null)
                                 sybils.add(key);
@@ -180,6 +265,14 @@ class NetDbRenderer {
                     for (RouterAddress ra : ri.getAddresses()) {
                         String host = ra.getHost();
                         if (host != null && host.startsWith(ipv6)) {
+                            if (skipped < toSkip) {
+                                skipped++;
+                                break;
+                            }
+                            if (written++ >= pageSize) {
+                                morePages = true;
+                                break outerloop;
+                            }
                             renderRouterInfo(buf, ri, false, true);
                             if (sybil != null)
                                 sybils.add(key);
@@ -192,6 +285,14 @@ class NetDbRenderer {
                         if (!"SSU".equals(ra.getTransportStyle()))
                             continue;
                         if (ssucaps.equals(ra.getOption("caps"))) {
+                            if (skipped < toSkip) {
+                                skipped++;
+                                break;
+                            }
+                            if (written++ >= pageSize) {
+                                morePages = true;
+                                break outerloop;
+                            }
                             renderRouterInfo(buf, ri, false, true);
                             if (sybil != null)
                                 sybils.add(key);
@@ -202,6 +303,14 @@ class NetDbRenderer {
                 } else if (cost != 0) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         if (cost == ra.getCost()) {
+                            if (skipped < toSkip) {
+                                skipped++;
+                                break;
+                            }
+                            if (written++ >= pageSize) {
+                                morePages = true;
+                                break outerloop;
+                            }
                             renderRouterInfo(buf, ri, false, true);
                             if (sybil != null)
                                 sybils.add(key);
@@ -223,6 +332,22 @@ class NetDbRenderer {
                 else if (family != null)
                     buf.append(_t("Family")).append(' ').append(family);
                 buf.append(' ').append(_t("not found in network database"));
+                buf.append("</div>");
+            } else if (page > 0 || morePages) {
+                buf.append("<div class=\"netdbnotfound\">");
+                if (page > 0) {
+                    buf.append("<a href=\"/netdb?pg=").append(page)
+                       .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
+                    buf.append(_t("Previous Page"));
+                    buf.append("</a>&nbsp;&nbsp;&nbsp;");
+                }
+                buf.append(_t("Page")).append(' ').append(page + 1);
+                if (morePages) {
+                    buf.append("&nbsp;&nbsp;&nbsp;<a href=\"/netdb?pg=").append(page + 2)
+                       .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
+                    buf.append(_t("Next Page"));
+                    buf.append("</a>");
+                }
                 buf.append("</div>");
             }
         }
@@ -450,7 +575,7 @@ class NetDbRenderer {
     /**
      *  @param mode 0: charts only; 1: full routerinfos; 2: abbreviated routerinfos
      */
-    public void renderStatusHTML(Writer out, int mode) throws IOException {
+    public void renderStatusHTML(Writer out, int pageSize, int page, int mode) throws IOException {
         if (!_context.netDb().isInitialized()) {
             out.write("<div id=\"notinitialized\">");
             out.write(_t("Not initialized"));
@@ -466,8 +591,29 @@ class NetDbRenderer {
         boolean showStats = full || shortStats;  // this means show the router infos
         Hash us = _context.routerHash();
 
+        Set<RouterInfo> routers = new TreeSet<RouterInfo>(new RouterInfoComparator());
+        routers.addAll(_context.netDb().getRouters());
+        int toSkip = pageSize * page;
+        boolean nextpg = routers.size() > toSkip + pageSize;
         StringBuilder buf = new StringBuilder(8192);
-        if (showStats) {
+        if (showStats && (page > 0 || nextpg)) {
+            buf.append("<div class=\"netdbnotfound\">");
+            if (page > 0) {
+                buf.append("<a href=\"/netdb?f=").append(mode).append("&amp;pg=").append(page)
+                   .append("&amp;ps=").append(pageSize).append("\">");
+                buf.append(_t("Previous Page"));
+                buf.append("</a>&nbsp;&nbsp;&nbsp;");
+            }
+            buf.append(_t("Page")).append(' ').append(page + 1);
+            if (nextpg) {
+                buf.append("&nbsp;&nbsp;&nbsp;<a href=\"/netdb?f=").append(mode).append("&amp;pg=").append(page + 2)
+                   .append("&amp;ps=").append(pageSize).append("\">");
+                buf.append(_t("Next Page"));
+                buf.append("</a>");
+            }
+            buf.append("</div>");
+        }
+        if (showStats && page == 0) {
             RouterInfo ourInfo = _context.router().getRouterInfo();
             renderRouterInfo(buf, ourInfo, true, true);
             out.write(buf.toString());
@@ -478,13 +624,22 @@ class NetDbRenderer {
         ObjectCounter<String> countries = new ObjectCounter<String>();
         int[] transportCount = new int[TNAMES.length];
 
-        Set<RouterInfo> routers = new TreeSet<RouterInfo>(new RouterInfoComparator());
-        routers.addAll(_context.netDb().getRouters());
+        int skipped = 0;
+        int written = 0;
+        boolean morePages = false;
         for (RouterInfo ri : routers) {
             Hash key = ri.getIdentity().getHash();
             boolean isUs = key.equals(us);
             if (!isUs) {
                 if (showStats) {
+                    if (skipped < toSkip) {
+                        skipped++;
+                        continue;
+                    }
+                    if (written++ >= pageSize) {
+                        morePages = true;
+                        break;
+                    }
                     renderRouterInfo(buf, ri, false, full);
                     out.write(buf.toString());
                     buf.setLength(0);
@@ -497,6 +652,21 @@ class NetDbRenderer {
                     countries.increment(country);
                 transportCount[classifyTransports(ri)]++;
             }
+        }
+        if (showStats && (page > 0 || morePages)) {
+            buf.append("<div class=\"netdbnotfound\">");
+            if (page > 0) {
+                buf.append("<a href=\"/netdb?f=").append(mode).append("&amp;pg=").append(page).append("&amp;ps=").append(pageSize).append("\">");
+                buf.append(_t("Previous Page"));
+                buf.append("</a>&nbsp;&nbsp;&nbsp;");
+            }
+            buf.append(_t("Page")).append(' ').append(page + 1);
+            if (morePages) {
+                buf.append("&nbsp;&nbsp;&nbsp;<a href=\"/netdb?f=").append(mode).append("&amp;pg=").append(page + 2).append("&amp;ps=").append(pageSize).append("\">");
+                buf.append(_t("Next Page"));
+                buf.append("</a>");
+            }
+            buf.append("</div>");
         }
         long end = System.currentTimeMillis();
         if (log.shouldWarn())
