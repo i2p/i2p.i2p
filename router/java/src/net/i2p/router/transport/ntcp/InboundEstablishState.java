@@ -147,17 +147,28 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             receiveInboundNTCP2(src);
             return;
         }
-        // TODO if less than 64, buffer and decide later?
         if (_state == State.IB_INIT && src.hasRemaining()) {
             int remaining = src.remaining();
-            if (remaining < NTCP1_MSG1_SIZE && _transport.isNTCP2Enabled()) {
-                // NTCP2
-                // TODO can't change our mind later if we get more than 287
-                _con.setVersion(2);
-                changeState(State.IB_NTCP2_INIT);
-                receiveInboundNTCP2(src);
-                // releaseBufs() will return the unused DH
-                return;
+            if (_transport.isNTCP2Enabled()) {
+                if (remaining + _received < MSG1_SIZE) {
+                    // Less than 64 total received, so we defer the NTCP 1 or 2 decision.
+                    // Buffer in _X.
+                    // Stay in the IB_INIT state, and wait for more data.
+                    src.get(_X, _received, remaining);
+                    _received += remaining;
+                    if (_log.shouldWarn())
+                        _log.warn("Short buffer got " + remaining + " total now " + _received + " on " + this);
+                    return;
+                }
+                if (remaining + _received < NTCP1_MSG1_SIZE) {
+                    // Less than 288 total received, assume NTCP2
+                    // TODO can't change our mind later if we get more than 287
+                    _con.setVersion(2);
+                    changeState(State.IB_NTCP2_INIT);
+                    receiveInboundNTCP2(src);
+                    // releaseBufs() will return the unused DH
+                    return;
+                }
             }
             int toGet = Math.min(remaining, XY_SIZE - _received);
             src.get(_X, _received, toGet);
@@ -620,7 +631,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             src.get(_X, _received, toGet);
             _received += toGet;
             if (_received < MSG1_SIZE) {
-                // TODO if we got less than 64 should we even be here?
+                // Won't get here, now handled in receiveInbound()
                 if (_log.shouldWarn())
                     _log.warn("Short buffer got " + toGet + " total now " + _received);
                 return;
