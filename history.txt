@@ -1,3 +1,8 @@
+2018-07-27 zzz
+ * Console: Split netdb output into pages
+ * Router: Implement router.rejectStartupTime config (ticket #2285)
+ * Transport: Defer NTCP 1/2 classifiation until receiving 64 bytes
+
 2018-07-21 zzz
  * Build: Add check for libtaglibs package in debian builds
  * Console: Add netdb search by transport

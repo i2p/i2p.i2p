@@ -19,6 +19,7 @@ public class RouterThrottleImpl implements RouterThrottle {
     protected final RouterContext _context;
     private final Log _log;
     private volatile String _tunnelStatus;
+    private final long _rejectStartupTime;
     
     /** 
      * arbitrary hard limit - if it's taking this long to get 
@@ -33,6 +34,7 @@ public class RouterThrottleImpl implements RouterThrottle {
     public static final int DEFAULT_MAX_TUNNELS = 10*1000;
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
     private static final long DEFAULT_REJECT_STARTUP_TIME = 10*60*1000;
+    private static final long MIN_REJECT_STARTUP_TIME = 90*1000;
     private static final String PROP_REJECT_STARTUP_TIME = "router.rejectStartupTime";
     private static final int DEFAULT_MIN_THROTTLE_TUNNELS = SystemVersion.isAndroid() ? 100 :
                                                             SystemVersion.isARM() ? 500 : 1000;
@@ -53,7 +55,8 @@ public class RouterThrottleImpl implements RouterThrottle {
         _context = context;
         _log = context.logManager().getLog(RouterThrottleImpl.class);
         setTunnelStatus();
-        _context.simpleTimer2().addEvent(new ResetStatus(), 5*1000 + _context.getProperty(PROP_REJECT_STARTUP_TIME, DEFAULT_REJECT_STARTUP_TIME));
+        _rejectStartupTime = Math.max(MIN_REJECT_STARTUP_TIME, _context.getProperty(PROP_REJECT_STARTUP_TIME, DEFAULT_REJECT_STARTUP_TIME));
+        _context.simpleTimer2().addEvent(new ResetStatus(), 5*1000 + _rejectStartupTime);
         _context.statManager().createRateStat("router.throttleNetworkCause", "How lagged the jobQueue was when an I2NP was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleNetDbCause", "How lagged the jobQueue was when a networkDb request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelCause", "How lagged the jobQueue was when a tunnel request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -135,7 +138,7 @@ public class RouterThrottleImpl implements RouterThrottle {
         }
         
         // Don't use CRIT because we don't want peers to think we're failing
-        if (_context.router().getUptime() < DEFAULT_REJECT_STARTUP_TIME) {
+        if (_context.router().getUptime() < _rejectStartupTime) {
             setTunnelStatus(_x("Rejecting tunnels: Starting up"));
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
