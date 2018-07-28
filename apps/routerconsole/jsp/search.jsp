@@ -4,9 +4,13 @@
    // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
    if (request.getCharacterEncoding() == null)
        request.setCharacterEncoding("UTF-8");
+   String i2pcontextId = null;
+   try {
+       i2pcontextId = (String) session.getAttribute("i2p.contextId");
+   } catch (IllegalStateException ise) {}
 %>
 <jsp:useBean class="net.i2p.router.web.helpers.SearchHelper" id="searchhelper" scope="request" />
-<jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="searchhelper" property="contextId" value="<%=i2pcontextId%>" />
 <jsp:setProperty name="searchhelper" property="engine" value="<%=request.getParameter(\"engine\")%>" />
 <jsp:setProperty name="searchhelper" property="query" value="<%=request.getParameter(\"query\")%>" />
 <html><head></head><body><b>

@@ -21,7 +21,7 @@
 
 %>
 <jsp:useBean id="stathelper" class="net.i2p.router.web.helpers.StatHelper" />
-<jsp:setProperty name="stathelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="stathelper" property="contextId" value="<%=i2pcontextId%>" />
 <jsp:setProperty name="stathelper" property="peer" value="<%=peerB64%>" />
 <% stathelper.storeWriter(out); %>
 <h2><%=intl._t("Profile for peer {0}", peerB64)%></h2>

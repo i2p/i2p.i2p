@@ -11,14 +11,14 @@
     String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
 %>
 <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
-<jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="newshelper" property="contextId" value="<%=i2pcontextId%>" />
 <%
     java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
 %>
  <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
- <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
 
 <div class="routersummaryouter">
  <div class="routersummary">
@@ -55,7 +55,7 @@
 
 <div class="main" id="home">
 <jsp:useBean class="net.i2p.router.web.helpers.HomeHelper" id="homehelper" scope="request" />
-<jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="homehelper" property="contextId" value="<%=i2pcontextId%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
 <div class="welcome" title="<%=intl._t("Click a flag to select a language. Click 'Configure UI' below to change it later.")%>">
   <div class="langbox" id="langbox">
@@ -109,7 +109,7 @@
         <button type="submit" value="search" class="search"><%=intl._t("Search")%></button>
       </td><td align="left">
         <jsp:useBean class="net.i2p.router.web.helpers.SearchHelper" id="searchhelper" scope="request" />
-        <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+        <jsp:setProperty name="searchhelper" property="contextId" value="<%=i2pcontextId%>" />
         <jsp:getProperty name="searchhelper" property="selector" />
       </td></tr></table>
     </form>

@@ -13,7 +13,7 @@
 <h1><%=intl._t("I2P Network Database")%></h1>
 <div class="main" id="netdb">
  <jsp:useBean class="net.i2p.router.web.helpers.NetDbHelper" id="netdbHelper" scope="request" />
- <jsp:setProperty name="netdbHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="netdbHelper" property="contextId" value="<%=i2pcontextId%>" />
 <%
     netdbHelper.storeWriter(out);
     if (allowIFrame)

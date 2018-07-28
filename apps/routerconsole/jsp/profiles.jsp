@@ -13,7 +13,7 @@
 <h1><%=intl._t("I2P Network Peer Profiles")%></h1>
 <div class="main" id="profiles"><div class="wideload">
  <jsp:useBean class="net.i2p.router.web.helpers.ProfilesHelper" id="profilesHelper" scope="request" />
- <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="profilesHelper" property="contextId" value="<%=i2pcontextId%>" />
 <%
     profilesHelper.storeWriter(out);
     if (allowIFrame)

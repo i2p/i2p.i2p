@@ -10,7 +10,8 @@
      */
 
     // This initializes the RouterContext - must be the first thing
-    formhandler.setContextId((String)session.getAttribute("i2p.contextId"));
+    // i2pcontextId set in css.jsi
+    formhandler.setContextId(i2pcontextId);
 
     // Prevents any saves via GET
     formhandler.storeMethod(request.getMethod());

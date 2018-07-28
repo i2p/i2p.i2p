@@ -12,7 +12,7 @@
 <%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigFamilyHelper" id="familyHelper" scope="request" />
-<jsp:setProperty name="familyHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="familyHelper" property="contextId" value="<%=i2pcontextId%>" />
 <h1><%=intl._t("I2P Router Family Configuration")%></h1>
 <div class="main" id="config_family">
 <%@include file="confignav.jsi" %>

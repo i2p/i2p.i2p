@@ -12,7 +12,7 @@
 <%@include file="summary.jsi" %><h1><%=intl._t("I2P Router Job Queue")%></h1>
 <div class="main" id="jobs">
  <jsp:useBean class="net.i2p.router.web.helpers.JobQueueHelper" id="jobQueueHelper" scope="request" />
- <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=i2pcontextId%>" />
  <% jobQueueHelper.storeWriter(out); %>
  <jsp:getProperty name="jobQueueHelper" property="jobQueueSummary" />
 </div></body></html>

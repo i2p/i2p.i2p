@@ -10,7 +10,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigLoggingHelper" id="logginghelper" scope="request" />
-<jsp:setProperty name="logginghelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="logginghelper" property="contextId" value="<%=i2pcontextId%>" />
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Logging Configuration")%></h1>

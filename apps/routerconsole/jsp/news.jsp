@@ -12,7 +12,7 @@
 <h1><%=intl._t("Latest News")%></h1>
 <div class="main" id="news">
 <jsp:useBean class="net.i2p.router.web.NewsFeedHelper" id="feedHelper" scope="request" />
-<jsp:setProperty name="feedHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="feedHelper" property="contextId" value="<%=i2pcontextId%>" />
 <% feedHelper.setLimit(0); %>
 <div id="newspage">
 <jsp:getProperty name="feedHelper" property="entries" />

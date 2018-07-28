@@ -20,7 +20,7 @@ input.default {
 <%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper" scope="request" />
-<jsp:setProperty name="uihelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="uihelper" property="contextId" value="<%=i2pcontextId%>" />
 
 <h1><%=uihelper._t("I2P UI Configuration")%></h1>
 <div class="main" id="config_ui">

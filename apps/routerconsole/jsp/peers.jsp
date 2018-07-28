@@ -13,7 +13,7 @@
 <h1><%=intl._t("I2P Network Peers")%></h1>
 <div class="main" id="peers">
  <jsp:useBean class="net.i2p.router.web.helpers.PeerHelper" id="peerHelper" scope="request" />
- <jsp:setProperty name="peerHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="peerHelper" property="contextId" value="<%=i2pcontextId%>" />
  <% peerHelper.storeWriter(out); %>
  <jsp:setProperty name="peerHelper" property="urlBase" value="peers.jsp" />
  <jsp:setProperty name="peerHelper" property="sort" value="<%=request.getParameter(\"sort\") != null ? request.getParameter(\"sort\") : \"\"%>" />

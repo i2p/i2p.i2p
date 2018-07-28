@@ -2,7 +2,13 @@
 <%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="tester" scope="request" />
-<jsp:setProperty name="tester" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<%
+   String i2pcontextId1 = null;
+   try {
+       i2pcontextId1 = (String) session.getAttribute("i2p.contextId");
+   } catch (IllegalStateException ise) {}
+%>
+<jsp:setProperty name="tester" property="contextId" value="<%=i2pcontextId1%>" />
 <%
     // CSSHelper is also pulled in by css.jsi below...
     boolean testIFrame = tester.allowIFrame(request.getHeader("User-Agent"));

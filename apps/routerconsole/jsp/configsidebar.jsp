@@ -27,7 +27,7 @@ input.default {
     formhandler.setMovingAction();
 %>
 <jsp:useBean class="net.i2p.router.web.helpers.SummaryHelper" id="summaryhelper" scope="request" />
-<jsp:setProperty name="summaryhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="summaryhelper" property="contextId" value="<%=i2pcontextId%>" />
 
 <h3 class="tabletitle"><%=intl._t("Refresh Interval")%></h3>
 <form action="" method="POST">

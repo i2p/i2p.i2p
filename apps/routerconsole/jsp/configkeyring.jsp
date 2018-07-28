@@ -17,7 +17,7 @@
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigKeyringHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigKeyringHelper" id="keyringhelper" scope="request" />
- <jsp:setProperty name="keyringhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="keyringhelper" property="contextId" value="<%=i2pcontextId%>" />
 <p id="keyringhelp" class="infohelp">
  <%=intl._t("The router keyring is used to decrypt encrypted leaseSets.")%>
  <%=intl._t("The keyring may contain keys for local or remote encrypted destinations.")%></p>

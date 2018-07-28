@@ -6,7 +6,7 @@
  */
 %>
 <jsp:useBean class="net.i2p.router.web.helpers.SummaryHelper" id="helper" scope="request" />
-<jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="helper" property="contextId" value="<%=i2pcontextId%>" />
 <jsp:setProperty name="helper" property="action" value="<%=request.getParameter(\"action\")%>" />
 <jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter(\"updateNonce\")%>" />
 <jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter(\"consoleNonce\")%>" />
@@ -34,7 +34,7 @@
 %>
 <jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
 <jsp:setProperty name="update" property="*" />
-<jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="update" property="contextId" value="<%=i2pcontextId%>" />
 <%
     // moved to java for ease of translation
     helper.renderSummaryBar();

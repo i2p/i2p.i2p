@@ -24,7 +24,7 @@ input.default {
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigHomeHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.HomeHelper" id="homehelper" scope="request" />
-<jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="homehelper" property="contextId" value="<%=i2pcontextId%>" />
 
 <h3 class="tabletitle"><%=intl._t("Default Home Page")%></h3>
 <form action="" method="POST">

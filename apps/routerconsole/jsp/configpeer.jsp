@@ -14,7 +14,7 @@
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigPeerHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigPeerHelper" id="peerhelper" scope="request" />
- <jsp:setProperty name="peerhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="peerhelper" property="contextId" value="<%=i2pcontextId%>" />
  <% String peer = "";
     if (request.getParameter("peer") != null)
         peer = net.i2p.data.DataHelper.stripHTML(request.getParameter("peer"));  // XSS
@@ -63,7 +63,7 @@
  </form>
  <a name="banlist"> </a><h3 id="bannedpeers"><%=intl._t("Banned Peers")%></h3>
  <jsp:useBean class="net.i2p.router.web.helpers.ProfilesHelper" id="profilesHelper" scope="request" />
- <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="profilesHelper" property="contextId" value="<%=i2pcontextId%>" />
  <% profilesHelper.storeWriter(out); %>
  <jsp:getProperty name="profilesHelper" property="banlistSummary" />
  <h3 class="tabletitle"><%=intl._t("Banned IPs")%></h3>

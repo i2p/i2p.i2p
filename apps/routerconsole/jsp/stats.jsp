@@ -11,7 +11,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.OldConsoleHelper" id="oldhelper" scope="request" />
-<jsp:setProperty name="oldhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="oldhelper" property="contextId" value="<%=i2pcontextId%>" />
 <% oldhelper.storeWriter(out); %>
 <jsp:setProperty name="oldhelper" property="full" value="<%=request.getParameter(\"f\")%>" />
  <h1><%=intl._t("I2P Router Statistics")%></h1>

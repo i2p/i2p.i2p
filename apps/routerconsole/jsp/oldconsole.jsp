@@ -14,7 +14,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.OldConsoleHelper" id="conhelper" scope="request" />
-<jsp:setProperty name="conhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="conhelper" property="contextId" value="<%=i2pcontextId%>" />
 <% conhelper.storeWriter(out); %>
  <h1>I2P Router &raquo; Old Console</h1>
 <div class="main" id="oldconsole"><p>

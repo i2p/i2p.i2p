@@ -20,13 +20,18 @@
    // the response prior to including this file, so it should be
    // near the top
 
-   if (request.getParameter("i2p.contextId") != null) {
-       session.setAttribute("i2p.contextId", request.getParameter("i2p.contextId"));
-   }
+   String i2pcontextId = request.getParameter("i2p.contextId");
+   try {
+       if (i2pcontextId != null) {
+           session.setAttribute("i2p.contextId", i2pcontextId);
+       } else {
+           i2pcontextId = (String) session.getAttribute("i2p.contextId");
+       }
+   } catch (IllegalStateException ise) {}
 %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
-<jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="intl" property="contextId" value="<%=i2pcontextId%>" />
 <link rel="icon" href="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/favicon.ico">
 <%
    response.setHeader("Accept-Ranges", "none");

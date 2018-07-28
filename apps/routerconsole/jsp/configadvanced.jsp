@@ -13,7 +13,7 @@
 <%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigAdvancedHelper" id="advancedhelper" scope="request" />
-<jsp:setProperty name="advancedhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="advancedhelper" property="contextId" value="<%=i2pcontextId%>" />
 
 <h1><%=intl._t("I2P Advanced Configuration")%></h1>
 <div class="main" id="config_advanced">

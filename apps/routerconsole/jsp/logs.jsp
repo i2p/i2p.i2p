@@ -28,7 +28,7 @@
 <tr><td><b>I2P version:</b></td><td><%=net.i2p.router.RouterVersion.FULL_VERSION%></td></tr>
 <tr><td><b>Java version:</b></td><td><%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%> (<%=System.getProperty("java.runtime.name")%> <%=System.getProperty("java.runtime.version")%>)</td></tr>
  <jsp:useBean class="net.i2p.router.web.helpers.LogsHelper" id="logsHelper" scope="request" />
- <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="logsHelper" property="contextId" value="<%=i2pcontextId%>" />
 <jsp:getProperty name="logsHelper" property="unavailableCrypto" />
 <tr><td><b>Wrapper version:</b></td><td><%=System.getProperty("wrapper.version", "none")%></td></tr>
 <tr><td><b>Server version:</b></td><td><jsp:getProperty name="logsHelper" property="jettyVersion" /></td></tr>
