@@ -128,6 +128,7 @@ class Sorters {
     private static class TorrentNameComparator implements Comparator<Snark>, Serializable {
 
         private final Pattern _p;
+        private static final Collator _c = Collator.getInstance();
 
         /** @param lang may be null */
         private TorrentNameComparator(String lang) {
@@ -155,7 +156,7 @@ class Sorters {
                 if (m.matches())
                     rs = rs.substring(m.group(1).length());
             }
-            return Collator.getInstance().compare(ls, rs);
+            return _c.compare(ls, rs);
         }
     }
 
@@ -207,10 +208,10 @@ class Sorters {
             long remaining = snark.getRemainingLength(); 
             if (snark.isStopped()) {
                 if (remaining < 0)
-                    return 0;
+                    return 10;
                 if (remaining > 0)
                     return 5;
-                return 10;
+                return 0;
             }
             if (snark.isStarting())
                 return 15;

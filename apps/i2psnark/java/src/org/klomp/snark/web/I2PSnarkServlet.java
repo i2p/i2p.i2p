@@ -479,7 +479,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String currentSort = req.getParameter("sort");
         boolean showSort = total > 1;
         out.write("<tr><th class=\"snarkGraphicStatus\">");
-        String sort = ("2".equals(currentSort)) ? "-2" : "2";
+        String sort = ("-2".equals(currentSort)) ? "2" : "-2";
         if (showSort) {
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\">");
