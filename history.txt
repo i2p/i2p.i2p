@@ -1,3 +1,7 @@
+2018-07-28 zzz
+ * Console: Catch ISE in get/setAttribute() (ticket #1529)
+ * Streaming: Throw exception on read timeout (ticket #2292)
+
 2018-07-27 zzz
  * Console: Split netdb output into pages
  * Router: Implement router.rejectStartupTime config (ticket #2285)

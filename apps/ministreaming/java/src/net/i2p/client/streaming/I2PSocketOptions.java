@@ -37,7 +37,8 @@ public interface I2PSocketOptions {
     /**
      * What is the longest we'll block on the input stream while waiting
      * for more data.  If this value is exceeded, the read() throws 
-     * InterruptedIOException - FIXME doesn't really, returns -1 or 0 instead.
+     * SocketTimeoutException as of 0.9.36.
+     * Prior to that, the read() returned -1 or 0.
      *
      * WARNING: Default -1 (unlimited), which is probably not what you want.
      *
@@ -48,7 +49,8 @@ public interface I2PSocketOptions {
     /**
      * What is the longest we'll block on the input stream while waiting
      * for more data.  If this value is exceeded, the read() throws 
-     * InterruptedIOException - FIXME doesn't really, returns -1 or 0 instead.
+     * SocketTimeoutException as of 0.9.36.
+     * Prior to that, the read() returned -1 or 0.
      *
      * WARNING: Default -1 (unlimited), which is probably not what you want.
      *
