@@ -100,11 +100,6 @@ public class WebMail extends HttpServlet
 {
 	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(WebMail.class);
 
-	/*
-	 * increase version number for every release
-	 */
-	private static final int version = 13;
-	
 	private static final long serialVersionUID = 1L;
 	private static final String LOGIN_NONCE = Long.toString(I2PAppContext.getGlobalContext().random().nextLong());
 	
@@ -258,6 +253,9 @@ public class WebMail extends HttpServlet
 	private static final String RC_PROP_FORCE_MOBILE_CONSOLE = "routerconsole.forceMobileConsole";
 	private static final String CONFIG_THEME = "theme";
 	private static final String DEFAULT_THEME = "light";
+	/** From CSSHelper */
+	private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
+	private static final boolean DEFAULT_DISABLE_OLD = false;
 
 	private static final String spacer = ""; /* this is best done with css */
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
@@ -1948,22 +1946,31 @@ public class WebMail extends HttpServlet
 		I2PAppContext ctx = I2PAppContext.getGlobalContext();
 		// Fetch routerconsole theme (or use our default if it doesn't exist)
 		String theme = ctx.getProperty(RC_PROP_THEME, DEFAULT_THEME);
-		// Apply any override
-		theme = Config.getProperty(CONFIG_THEME, theme);
 		boolean universalTheming = ctx.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
 		if (universalTheming) {
-			// Fetch routerconsole theme (or use our default if it doesn't exist)
-			theme = ctx.getProperty(RC_PROP_THEME, DEFAULT_THEME);
 			// Ensure that theme exists
-			String[] themes = getThemes();
+			String[] themes = getThemes(ctx);
 			boolean themeExists = false;
 			for (int i = 0; i < themes.length; i++) {
-				if (themes[i].equals(theme))
+				if (themes[i].equals(theme)) {
 					themeExists = true;
+					break;
+				}
 			}
 			if (!themeExists) {
 				theme = DEFAULT_THEME;
 			}
+		} else {
+			// Apply any override
+			theme = Config.getProperty(CONFIG_THEME, theme);
+		}
+		// remap deprecated themes
+		if (theme.equals("midnight")) {
+			if (ctx.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+				theme = "dark";
+		} else if (theme.equals("classic")) {
+			if (ctx.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+				theme = "light";
 		}
 		boolean forceMobileConsole = ctx.getBooleanProperty(RC_PROP_FORCE_MOBILE_CONSOLE);
 		boolean isMobile = (forceMobileConsole || isMobile(httpRequest.getHeader("User-Agent")));
@@ -3520,20 +3527,24 @@ public class WebMail extends HttpServlet
      * Get all themes
      * @return String[] -- Array of all the themes found.
      */
-    private static String[] getThemes() {
-            String[] themes = null;
-            // "docs/themes/susimail/"
-            File dir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs/themes/susimail");
+    private static String[] getThemes(I2PAppContext ctx) {
+            String[] themes;
+            File dir = new File(ctx.getBaseDir(), "docs/themes/susimail");
             FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
-            // Walk the themes dir, collecting the theme names, and append them to the map
             File[] dirnames = dir.listFiles(fileFilter);
             if (dirnames != null) {
-                themes = new String[dirnames.length];
-                for(int i = 0; i < dirnames.length; i++) {
-                    themes[i] = dirnames[i].getName();
-                }
+		List<String> th = new ArrayList<String>(dirnames.length);
+		boolean skipOld = ctx.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD);
+		for (int i = 0; i < dirnames.length; i++) {
+			String name = dirnames[i].getName();
+			if (skipOld && (name.equals("midnight") || name.equals("classic")))
+				continue;
+			th.add(name);
+		}
+		themes = th.toArray(new String[th.size()]);
+            } else {
+                themes = new String[0];
             }
-            // return the map.
             return themes;
     }
 }

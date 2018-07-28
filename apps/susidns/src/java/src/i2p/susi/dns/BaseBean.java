@@ -3,6 +3,8 @@ package i2p.susi.dns;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -24,10 +26,13 @@ public class BaseBean
     private static final String PRIVATE_BOOK = "private_addressbook";
     private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
 
-    public static final String RC_PROP_THEME_NAME = "routerconsole.theme";
-    public static final String PROP_THEME_NAME = "theme";
-    public static final String DEFAULT_THEME = "light";
-    public static final String BASE_THEME_PATH = "/themes/susidns/";
+    private static final String RC_PROP_THEME_NAME = "routerconsole.theme";
+    private static final String PROP_THEME_NAME = "theme";
+    private static final String DEFAULT_THEME = "light";
+    private static final String BASE_THEME_PATH = "/themes/susidns/";
+    /** From CSSHelper */
+    private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
+    private static final boolean DEFAULT_DISABLE_OLD = false;
     public static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
     private static final String ADDRESSBOOK_DIR = "addressbook";
     private static final String CONFIG_FILE = "config.txt";
@@ -93,12 +98,22 @@ public class BaseBean
         String theme = _context.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
         // Apply any override
         theme = properties.getProperty(PROP_THEME_NAME, theme);
+        // remap deprecated themes
+        if (theme.equals("midnight")) {
+            if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+                theme = "dark";
+        } else if (theme.equals("classic")) {
+            if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+                theme = "light";
+        }
         // Ensure that theme exists
         String[] themes = getThemes();
         boolean themeExists = false;
         for (int i = 0; i < themes.length; i++) {
-            if (themes[i].equals(theme))
+            if (themes[i].equals(theme)) {
                 themeExists = true;
+                break;
+            }
         }
         if (!themeExists)
             theme = DEFAULT_THEME;
@@ -112,19 +127,23 @@ public class BaseBean
      * @since 0.9.2
      */
     public String[] getThemes() {
-            String[] themes = null;
-            // "docs/themes/susidns/"
+            String[] themes;
             File dir = new File(_context.getBaseDir(), "docs/themes/susidns");
             FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
-            // Walk the themes dir, collecting the theme names, and append them to the map
             File[] dirnames = dir.listFiles(fileFilter);
             if (dirnames != null) {
-                themes = new String[dirnames.length];
-                for(int i = 0; i < dirnames.length; i++) {
-                    themes[i] = dirnames[i].getName();
+                List<String> th = new ArrayList<String>(dirnames.length);
+                boolean skipOld = _context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD);
+                for (int i = 0; i < dirnames.length; i++) {
+                    String name = dirnames[i].getName();
+                    if (skipOld && (name.equals("midnight") || name.equals("classic")))
+                        continue;
+                    th.add(name);
                 }
+                themes = th.toArray(new String[th.size()]);
+            } else {
+                themes = new String[0];
             }
-            // return the map.
             return themes;
     }
 

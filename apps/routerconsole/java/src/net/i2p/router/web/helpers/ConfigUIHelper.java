@@ -11,12 +11,23 @@ import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.RouterConsoleRunner;
 
+/**
+ *  Helper for /configui
+ */
 public class ConfigUIHelper extends HelperBase {
 
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<div id=\"availablethemes\">");
         String current = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        // remap deprecated themes
+        if (current.equals("midnight")) {
+            if (_context.getProperty(CSSHelper.PROP_DISABLE_OLD, CSSHelper.DEFAULT_DISABLE_OLD))
+                current = "dark";
+        } else if (current.equals("classic")) {
+            if (_context.getProperty(CSSHelper.PROP_DISABLE_OLD, CSSHelper.DEFAULT_DISABLE_OLD))
+                current = "light";
+        }
         Set<String> themes = themeSet();
         for (String theme : themes) {
             buf.append("<label for=\"").append(theme).append("\"><div class=\"themechoice\">" +
@@ -71,10 +82,16 @@ public class ConfigUIHelper extends HelperBase {
          File[] files = dir.listFiles();
          if (files == null)
              return rv;
+         boolean skipOld = _context.getProperty(CSSHelper.PROP_DISABLE_OLD, CSSHelper.DEFAULT_DISABLE_OLD);
          for (int i = 0; i < files.length; i++) {
+             if (!files[i].isDirectory())
+                 continue;
              String name = files[i].getName();
-             if (files[i].isDirectory() && ! name.equals("images"))
-                 rv.add(name);
+             if (name.equals("images"))
+                 continue;
+             if (skipOld && (name.equals("midnight") || name.equals("classic")))
+                 continue;
+             rv.add(name);
          }
          // user themes
          Set<String> props = _context.getPropertyNames();

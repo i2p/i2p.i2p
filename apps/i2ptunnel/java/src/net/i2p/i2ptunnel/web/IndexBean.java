@@ -77,8 +77,11 @@ public class IndexBean {
     private static final List<String> _nonces = new ArrayList<String>(MAX_NONCES + 1);
     private static final UIMessages _messages = new UIMessages(100);
 
-    public static final String PROP_THEME_NAME = "routerconsole.theme";
-    public static final String DEFAULT_THEME = "light";
+    private static final String PROP_THEME_NAME = "routerconsole.theme";
+    private static final String DEFAULT_THEME = "light";
+    /** From CSSHelper */
+    private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
+    private static final boolean DEFAULT_DISABLE_OLD = false;
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
     private static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
@@ -336,6 +339,14 @@ public class IndexBean {
     
     public String getTheme() {
         String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+        // remap deprecated themes
+        if (theme.equals("midnight")) {
+            if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+                theme = "dark";
+        } else if (theme.equals("classic")) {
+            if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+                theme = "light";
+        }
         return "/themes/console/" + theme + "/";
     }
 

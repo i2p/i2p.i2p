@@ -31,6 +31,9 @@ public class CSSHelper extends HelperBase {
     public static final String PROP_FORCE_MOBILE_CONSOLE = "routerconsole.forceMobileConsole";
     /** @since 0.9.32 */
     public static final String PROP_EMBED_APPS = "routerconsole.embedApps";
+    /** @since 0.9.36 */
+    public static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
+    public static final boolean DEFAULT_DISABLE_OLD = false;
 
     private static final String _consoleNonce = Long.toString(RandomSource.getInstance().nextLong());
 
@@ -44,13 +47,22 @@ public class CSSHelper extends HelperBase {
 
     public String getTheme(String userAgent) {
         String url = BASE_THEME_PATH;
-        if (userAgent != null && (userAgent.contains("MSIE") && !userAgent.contains("Trident/6"))) {
+        if (userAgent != null && userAgent.contains("MSIE") && !userAgent.contains("Trident/6") &&
+            !_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD)) {
             url += FORCE + "/";
         } else {
             // This is the first thing to use _context on most pages
             if (_context == null)
                 throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
             String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+            // remap deprecated themes
+            if (theme.equals("midnight")) {
+                if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+                    theme = "dark";
+            } else if (theme.equals("classic")) {
+                if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
+                    theme = "light";
+            }
             url += theme + "/";
         }
         return url;
