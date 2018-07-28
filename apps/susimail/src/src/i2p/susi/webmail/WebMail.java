@@ -1839,15 +1839,23 @@ public class WebMail extends HttpServlet
 	 */
 	private synchronized SessionObject getSessionObject( HttpSession httpSession )
 	{
-		SessionObject sessionObject = (SessionObject)httpSession.getAttribute( "sessionObject" );
-
+		SessionObject sessionObject = null;
+		try {
+			sessionObject = (SessionObject)httpSession.getAttribute("sessionObject");
+		} catch (IllegalStateException ise) {}
 		if( sessionObject == null ) {
 			sessionObject = new SessionObject(_log);
-			httpSession.setAttribute( "sessionObject", sessionObject );
+			try {
+				httpSession.setAttribute("sessionObject", sessionObject);
+			} catch (IllegalStateException ise) {}
 			if (_log.shouldDebug()) _log.debug("NEW session " + httpSession.getId());
 		} else {
-			if (_log.shouldDebug()) _log.debug("Existing session " + httpSession.getId() +
-				" created " + new Date(httpSession.getCreationTime()));
+			if (_log.shouldDebug()) {
+				try {
+					_log.debug("Existing session " + httpSession.getId() +
+					           " created " + new Date(httpSession.getCreationTime()));
+				} catch (IllegalStateException ise) {}
+			}
 		}
 		return sessionObject;
 	}
