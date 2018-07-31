@@ -1927,8 +1927,9 @@ public class PeerState {
         if (_dead)
             return false;
         
+        final long messageId = bitfield.getMessageId();
         if (bitfield.receivedComplete()) {
-            return acked(bitfield.getMessageId());
+            return acked(messageId);
         }
     
         OutboundMessageState state = null;
@@ -1936,7 +1937,7 @@ public class PeerState {
         synchronized (_outboundMessages) {
             for (Iterator<OutboundMessageState> iter = _outboundMessages.iterator(); iter.hasNext(); ) {
                 state = iter.next();
-                if (state.getMessageId() == bitfield.getMessageId()) {
+                if (state.getMessageId() == messageId) {
                     boolean complete = state.acked(bitfield);
                     if (complete) {
                         isComplete = true;
