@@ -423,10 +423,7 @@ public class PeerHelper extends HelperBase {
             if (cfs > 0) {
                 if (!appended) buf.append("<br>");
                 buf.append(" <i>");
-                if (cfs == 1)
-                    buf.append(_t("1 fail"));
-                else
-                    buf.append(_t("{0} fails", cfs));
+                buf.append(ngettext("{0} fail", "{0} fails", cfs));
                 buf.append("</i>");
                 appended = true;
             }
