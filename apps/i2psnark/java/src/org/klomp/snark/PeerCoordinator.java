@@ -75,6 +75,7 @@ class PeerCoordinator implements PeerListener
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
   final static int MAX_UPLOADERS = 8;
   public static final long MAX_INACTIVE = 8*60*1000;
+  public static final long MAX_SEED_INACTIVE = 2*60*1000;
 
   /**
    * Approximation of the number of current uploaders (unchoked peers),
@@ -496,7 +497,7 @@ class PeerCoordinator implements PeerListener
     synchronized(peers)
       {
         Peer old = peerIDInList(peer.getPeerID(), peers);
-        if ( (old != null) && (old.getInactiveTime() > MAX_INACTIVE) ) {
+        if (old != null && old.getInactiveTime() > old.getMaxInactiveTime()) {
             // idle for 8 minutes, kill the old con (32KB/8min = 68B/sec minimum for one block)
             if (_log.shouldLog(Log.WARN))
               _log.warn("Remomving old peer: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
@@ -592,8 +593,10 @@ class PeerCoordinator implements PeerListener
         // thus there is an additional check in connected()
         need_more = (!peer.isConnected()) && peersize < getMaxConnections();
         // Check if we already have this peer before we build the connection
-        Peer old = peerIDInList(peer.getPeerID(), peers);
-        need_more = need_more && ((old == null) || (old.getInactiveTime() > MAX_INACTIVE));
+        if (need_more) {
+            Peer old = peerIDInList(peer.getPeerID(), peers);
+            need_more = old == null || old.getInactiveTime() > old.getMaxInactiveTime();
+        }
       }
 
     if (need_more)
@@ -629,9 +632,9 @@ class PeerCoordinator implements PeerListener
       }
     if (_log.shouldLog(Log.DEBUG)) {
       if (peer.isConnected())
-        _log.info("Add peer already connected: " + peer);
+        _log.debug("Add peer already connected: " + peer);
       else
-        _log.info("Connections: " + peersize + "/" + getMaxConnections()
+        _log.debug("Connections: " + peersize + "/" + getMaxConnections()
                   + " not accepting extra peer: " + peer);
     }
     return false;

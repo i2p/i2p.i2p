@@ -96,7 +96,7 @@ class PeerCheckerTask implements Runnable
                 continue;
               }
 
-            if (peer.getInactiveTime() > PeerCoordinator.MAX_INACTIVE) {
+            if (peer.getInactiveTime() > peer.getMaxInactiveTime()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Disconnecting peer idle " +
                               DataHelper.formatDuration(peer.getInactiveTime()) + ": " + peer);

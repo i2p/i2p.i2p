@@ -25,11 +25,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.Log;
+
+import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 
 class PeerState implements DataLoader
 {
@@ -242,14 +246,33 @@ class PeerState implements DataLoader
     }  // synch
 
     boolean interest = listener.gotBitField(peer, bitfield);
-    setInteresting(interest);
     if (bitfield.complete() && !interest) {
         // They are seeding and we are seeding,
         // why did they contact us? (robert)
         // Dump them quick before we send our whole bitmap
+
+        // If we both support comments, allow it
+        if (listener.getUtil().utCommentsEnabled()) {
+            Map<String, BEValue> handshake = peer.getHandshakeMap();
+            if (handshake != null) {
+                BEValue bev = handshake.get("m");
+                if (bev != null) {
+                    try {
+                        if (bev.getMap().get(ExtensionHandler.TYPE_COMMENT) != null) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Allowing seed that connects to seeds for comments: " + peer);
+                            setInteresting(interest);
+                            return;
+                        }
+                    } catch (InvalidBEncodingException ibee) {}
+                }
+            }
+        }
         if (_log.shouldLog(Log.WARN))
             _log.warn("Disconnecting seed that connects to seeds: " + peer);
         peer.disconnect(true);
+    } else {
+        setInteresting(interest);
     }
   }
 

@@ -79,6 +79,7 @@ public class Peer implements Comparable<Peer>
   private long uploaded_old[] = {-1,-1,-1};
   private long downloaded_old[] = {-1,-1,-1};
 
+  private static final byte[] HANDSHAKE = DataHelper.getASCII("BitTorrent protocol");
   //  bytes per bt spec:                         0011223344556677
   private static final long OPTION_EXTENSION = 0x0000000000100000l;
   private static final long OPTION_FAST      = 0x0000000000000004l;
@@ -343,8 +344,8 @@ public class Peer implements Comparable<Peer>
     dout = new DataOutputStream(out);
     
     // Handshake write - header
-    dout.write(19);
-    dout.write("BitTorrent protocol".getBytes("UTF-8"));
+    dout.write(HANDSHAKE.length);
+    dout.write(HANDSHAKE);
     // Handshake write - options
     long myOptions = OPTION_EXTENSION;
     // we can't handle HAVE_ALL or HAVE_NONE if we don't know the number of pieces
@@ -365,17 +366,15 @@ public class Peer implements Comparable<Peer>
     
     // Handshake read - header
     byte b = din.readByte();
-    if (b != 19)
+    if (b != HANDSHAKE.length)
       throw new IOException("Handshake failure, expected 19, got "
                             + (b & 0xff) + " on " + sock);
     
-    byte[] bs = new byte[19];
+    byte[] bs = new byte[HANDSHAKE.length];
     din.readFully(bs);
-    String bittorrentProtocol = new String(bs, "UTF-8");
-    if (!"BitTorrent protocol".equals(bittorrentProtocol))
+    if (!Arrays.equals(HANDSHAKE, bs))
       throw new IOException("Handshake failure, expected "
-                            + "'BitTorrent protocol', got '"
-                            + bittorrentProtocol + "'");
+                            + "'BitTorrent protocol'");
     
     // Handshake read - options
     options = din.readLong();
@@ -683,6 +682,13 @@ public class Peer implements Comparable<Peer>
       } else {
           return -1; //"no state";
       }
+  }
+  
+  /** @since 0.9.36 */
+  public long getMaxInactiveTime() {
+      return isCompleted() && !isInteresting() ?
+             PeerCoordinator.MAX_SEED_INACTIVE :
+             PeerCoordinator.MAX_INACTIVE;
   }
 
   /**
