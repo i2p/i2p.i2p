@@ -1,3 +1,8 @@
+2018-08-02 zzz
+ * i2psnark: Don't disconnect seeds if comments enabled (ticket #2288)
+ * NTCP2: Send termination on idle timeout
+ * Streaming: More efficient copying in MessageInputStream
+
 2018-07-28 zzz
  * Console: Catch ISE in get/setAttribute() (ticket #1529)
  * Streaming: Throw exception on read timeout (ticket #2292)
