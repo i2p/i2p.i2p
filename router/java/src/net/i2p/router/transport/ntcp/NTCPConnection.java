@@ -915,6 +915,11 @@ public class NTCPConnection implements Closeable {
      *  @since 0.9.36
      */
     private int getPaddingSize(int dataSize, int availForPad) {
+        // since we're calculating with percentages, get at least a
+        // 0-16 range with the default 0% min 6% max,
+        // even for small dataSize.
+        if (dataSize < 256)
+            dataSize = 256;
         // what we want to send, calculated in proportion to data size
         int minSend = (int) (dataSize * _paddingConfig.getSendMin());
         int maxSend = (int) (dataSize * _paddingConfig.getSendMax());
