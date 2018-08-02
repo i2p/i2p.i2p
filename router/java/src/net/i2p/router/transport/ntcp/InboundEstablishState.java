@@ -901,9 +901,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         CipherStatePair ckp = _handshakeState.split();
         CipherState rcvr = ckp.getReceiver();
         CipherState sender = ckp.getSender();
-        // debug, to be removed
-        byte[] k_ab = rcvr.getKey();
-        byte[] k_ba = sender.getKey();
 
         // Data phase SipHash keys
         byte[][] sipkeys = generateSipHashKeys(_context, _handshakeState);
@@ -918,8 +915,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         } else {
             if (_log.shouldDebug()) {
                 _log.debug("Finished establishment for " + this +
-                          "\nGenerated ChaCha key for A->B: " + Base64.encode(k_ab) +
-                          "\nGenerated ChaCha key for B->A: " + Base64.encode(k_ba) +
                           "\nGenerated SipHash key for A->B: " + Base64.encode(sip_ab) +
                           "\nGenerated SipHash key for B->A: " + Base64.encode(sip_ba));
             }

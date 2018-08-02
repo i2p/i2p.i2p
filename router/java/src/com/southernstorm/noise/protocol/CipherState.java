@@ -155,9 +155,4 @@ public interface CipherState extends Destroyable {
 	 * value goes backwards then security may be compromised.
 	 */
 	void setNonce(long nonce);
-
-	/**
-	 *  I2P debug to be removed
-	 */
-	public byte[] getKey();
 }
