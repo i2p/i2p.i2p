@@ -1024,7 +1024,7 @@ public class NTCPConnection implements Closeable {
         // TODO add param to clear queues?
         // no synch needed, sendNTCP2() is synched
         if (_log.shouldInfo())
-            _log.info("Sending termination, reason: " + reason + ", vaild frames rcvd: " + validFramesRcvd);
+            _log.info("Sending termination, reason: " + reason + ", vaild frames rcvd: " + validFramesRcvd + " on " + this);
         List<Block> blocks = new ArrayList<Block>(2);
         Block block = new NTCP2Payload.TerminationBlock(reason, validFramesRcvd);
         int plen = block.getTotalLength();
@@ -1932,8 +1932,11 @@ public class NTCPConnection implements Closeable {
         }
 
         public void receive(ByteBuffer buf) {
-            if (_terminated)
+            if (_terminated) {
+                if (_log.shouldWarn())
+                    _log.warn("Got " + buf.remaining() + " after termination on " + NTCPConnection.this);
                 return;
+            }
             while (buf.hasRemaining()) {
                 if (_received == -2) {
                     _recvLen[0] = buf.get();
@@ -1953,7 +1956,8 @@ public class NTCPConnection implements Closeable {
                     _framelen = (int) DataHelper.fromLong(_recvLen, 0, 2);
                     if (_framelen < OutboundNTCP2State.MAC_SIZE) {
                         if (_log.shouldWarn())
-                            _log.warn("Short frame length: " + _framelen);
+                            _log.warn("Short frame length: " + _framelen + " on " + NTCPConnection.this);
+                        destroy();
                         // set a random length, then close
                         delayedClose(buf, _frameCount);
                         return;
@@ -1972,6 +1976,7 @@ public class NTCPConnection implements Closeable {
                     boolean ok = decryptAndProcess(data, pos);
                     buf.position(pos + _framelen);
                     if (!ok) {
+                        // decryptAndProcess called destroy() and set _terminated
                         delayedClose(buf, _frameCount);
                         return;
                     }
@@ -2023,7 +2028,8 @@ public class NTCPConnection implements Closeable {
         /**
          *  Decrypts in place.
          *  Length is _framelen
-         *  Side effects: Sets _received = -2, increments _frameCount and _blockCount if valid
+         *  Side effects: Sets _received = -2, increments _frameCount and _blockCount if valid,
+         *  calls destroy() and sets _terminated if termination block received or if invalid.
          *
          *  Does not call close() on failure. Caller MUST call delayedClose() if this returns false.
          *
@@ -2037,9 +2043,12 @@ public class NTCPConnection implements Closeable {
             } catch (GeneralSecurityException gse) {
                 // TODO set a random length, then close
                 if (_log.shouldWarn())
-                    _log.warn("Bad AEAD data phase frame " + _frameCount + " on " + NTCPConnection.this, gse);
+                    _log.warn("Bad AEAD data phase frame " + _frameCount +
+                              " with " + _framelen + " bytes on " + NTCPConnection.this, gse);
+                destroy();
                 return false;
             }
+            // no payload processing errors in the data phase are fatal
             try {
                 int blocks = NTCP2Payload.processPayload(_context, this, data, off,
                                                          _framelen - OutboundNTCP2State.MAC_SIZE, false);
@@ -2059,10 +2068,12 @@ public class NTCPConnection implements Closeable {
             }
             _received = -2;
             _frameCount++;
-            return !_terminated;
+            return true;
         }
 
         public void destroy() {
+            if (_log.shouldInfo())
+                _log.info("NTCP2 read state destroy() on " + NTCPConnection.this, new Exception("I did it"));
             if (_dataBuf != null && _dataBuf.getData().length == BUFFER_SIZE)
                 releaseReadBuf(_dataBuf);
             _dataBuf = null;
@@ -2139,14 +2150,14 @@ public class NTCPConnection implements Closeable {
 
         public void gotTermination(int reason, long lastReceived) {
             if (_log.shouldInfo())
-                _log.info("Got Termination: " + reason + " total rcvd: " + lastReceived);
-            _terminated = true;
+                _log.info("Got Termination: " + reason + " total rcvd: " + lastReceived + " on " + NTCPConnection.this);
+            // close() calls destroy() sets _terminated
             close();
         }
 
         public void gotUnknown(int type, int len) {
             if (_log.shouldWarn())
-                _log.warn("Got unknown block type " + type + " length " + len);
+                _log.warn("Got unknown block type " + type + " length " + len + " on " + NTCPConnection.this);
         }
 
         public void gotPadding(int paddingLength, int frameLength) {
@@ -2164,6 +2175,9 @@ public class NTCPConnection implements Closeable {
      * with a brief timeout, and then fail.
      * This replaces _curReadState, so no more messages will be received.
      *
+     * Call this only on data phase AEAD failure.
+     * For other failures, use sendTermination().
+     *
      * @param buf possibly with data remaining
      * @param validFramesRcvd to be sent in termination message
      * @since 0.9.36
@@ -2173,12 +2187,14 @@ public class NTCPConnection implements Closeable {
         int remaining = toRead - buf.remaining();
         if (remaining > 0) {
             if (_log.shouldWarn())
-                _log.warn("delayed close after AEAD failure, to read: " + toRead);
+                _log.warn("delayed close, AEAD failure after " + validFramesRcvd +
+                          " good frames, to read: " + toRead + " on " + this, new Exception("I did it"));
             _curReadState = new NTCP2FailState(toRead, validFramesRcvd);
             _curReadState.receive(buf);
         } else {
             if (_log.shouldWarn())
-                _log.warn("immediate close after AEAD failure and reading " + toRead);
+                _log.warn("immediate close, AEAD failure after " + validFramesRcvd +
+                          " good frames and reading " + toRead + " on " + this, new Exception("I did it"));
             sendTermination(REASON_AEAD, validFramesRcvd);
         }
     }
@@ -2214,7 +2230,7 @@ public class NTCPConnection implements Closeable {
                 // only do this once
                 _read = Integer.MIN_VALUE;
                 if (_log.shouldWarn())
-                    _log.warn("close after AEAD failure and reading " + _toRead);
+                    _log.warn("close after AEAD failure and reading " + _toRead + " on " + NTCPConnection.this);
                 sendTermination(REASON_AEAD, _validFramesRcvd);
             }
         }
@@ -2227,7 +2243,7 @@ public class NTCPConnection implements Closeable {
             // only do this once
             _read = Integer.MIN_VALUE;
             if (_log.shouldWarn())
-                _log.warn("timeout after AEAD failure waiting for more data");
+                _log.warn("timeout after AEAD failure waiting for more data on " + NTCPConnection.this);
             sendTermination(REASON_AEAD, _validFramesRcvd);
         }
 
