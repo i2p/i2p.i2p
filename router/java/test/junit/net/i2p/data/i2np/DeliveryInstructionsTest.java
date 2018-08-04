@@ -9,10 +9,13 @@ package net.i2p.data.i2np;
  */
 
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.StructureTest;
 import net.i2p.data.TunnelId;
+
+import org.junit.Test;
 
 /**
  * Test harness for loading / storing DeliveryInstructions objects
@@ -20,6 +23,25 @@ import net.i2p.data.TunnelId;
  * @author jrandom
  */
 public class DeliveryInstructionsTest extends StructureTest {
+
+    /**
+     *  Override because DI doesn't support input/output streams any more
+     */
+    @Override
+    @Test
+    public void testStructure() throws Exception{
+        DeliveryInstructions orig = (DeliveryInstructions) createDataStructure();
+        byte[] temp = new byte[100];
+        int len = orig.writeBytes(temp, 0);
+
+        DeliveryInstructions ds = (DeliveryInstructions) createStructureToRead();
+        ds.readBytes(temp, 0);
+        byte[] temp2 = new byte[100];
+        int len2 = ds.writeBytes(temp2, 0);
+        assert(len2 == len);
+        assert(DataHelper.eq(temp, 0, temp2, 0, len));
+    }
+
     public DataStructure createDataStructure() throws DataFormatException {
         DeliveryInstructions instructions = new DeliveryInstructions();
 		//instructions.setDelayRequested(true);
