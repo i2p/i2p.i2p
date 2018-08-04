@@ -61,28 +61,8 @@ public class GarlicClove extends DataStructureImpl {
      *  @throws UnsupportedOperationException always
      */
     @Deprecated
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
+    public void readBytes(InputStream in) {
         throw new UnsupportedOperationException();
-/****
-        _instructions = new DeliveryInstructions();
-        _instructions.readBytes(in);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read instructions: " + _instructions);
-        try {
-            _msg = _handler.readMessage(in);
-        } catch (I2NPMessageException ime) {
-            throw new DataFormatException("Unable to read the message from a garlic clove", ime);
-        }
-        _cloveId = DataHelper.readLong(in, 4);
-        _expiration = DataHelper.readDate(in);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
-        //_certificate = new Certificate();
-        //_certificate.readBytes(in);
-        _certificate = Certificate.create(in);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read cert: " + _certificate);
-****/
     }
 
     /**

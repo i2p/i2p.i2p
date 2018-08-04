@@ -160,61 +160,14 @@ public class DeliveryInstructions extends DataStructureImpl {
      */
     @Deprecated
     public void setDelaySeconds(long seconds) { _delaySeconds = seconds; }
-    
+
     /**
      * @deprecated unused
+     * @throws UnsupportedOperationException always
      */
     @Deprecated
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-        long flags = DataHelper.readLong(in, 1);
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("Read flags: " + flags + " mode: " +  flagMode(flags));
-        
-     /****
-        if (flagEncrypted(flags)) {
-            SessionKey k = new SessionKey();
-            k.readBytes(in);
-            setEncryptionKey(k);
-            setEncrypted(true);
-        } else {
-            setEncrypted(false);
-        }
-      ****/
-        
-        setDeliveryMode(flagMode(flags));
-        switch (flagMode(flags)) {
-            case FLAG_MODE_LOCAL:
-                break;
-            case FLAG_MODE_DESTINATION:
-                //Hash destHash = new Hash();
-                //destHash.readBytes(in);
-                Hash destHash = Hash.create(in);
-                setDestination(destHash);
-                break;
-            case FLAG_MODE_ROUTER:
-                //Hash routerHash = new Hash();
-                //routerHash.readBytes(in);
-                Hash routerHash = Hash.create(in);
-                setRouter(routerHash);
-                break;
-            case FLAG_MODE_TUNNEL:
-                //Hash tunnelRouterHash = new Hash();
-                //tunnelRouterHash.readBytes(in);
-                Hash tunnelRouterHash = Hash.create(in);
-                setRouter(tunnelRouterHash);
-                TunnelId id = new TunnelId();
-                id.readBytes(in);
-                setTunnelId(id);
-                break;
-        }
-        
-        if (flagDelay(flags)) {
-            long delay = DataHelper.readLong(in, 4);
-            setDelayRequested(true);
-            setDelaySeconds(delay);
-        } else {
-            setDelayRequested(false);
-        }
+    public void readBytes(InputStream in) {
+        throw new UnsupportedOperationException();
     }
     
     public int readBytes(byte data[], int offset) throws DataFormatException {
@@ -573,11 +526,6 @@ public class DeliveryInstructions extends DataStructureImpl {
 
         @Override
         public void setDelaySeconds(long seconds) {
-            throw new RuntimeException("immutable");
-        }
-
-        @Override
-        public void readBytes(InputStream in) throws DataFormatException, IOException {
             throw new RuntimeException("immutable");
         }
 

@@ -9,7 +9,6 @@ package net.i2p.data.i2np;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
@@ -49,26 +48,6 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
         super(context);
     }
     
-    /**
-     *  @deprecated unused
-     *  @throws UnsupportedOperationException
-     */
-    @Deprecated
-    @Override
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     *  @deprecated unused
-     *  @throws UnsupportedOperationException
-     */
-    @Deprecated
-    @Override
-    public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
-        throw new UnsupportedOperationException();
-    }
-
     /**
      *  Ignore, but save, the checksum, to be used later if necessary.
      *

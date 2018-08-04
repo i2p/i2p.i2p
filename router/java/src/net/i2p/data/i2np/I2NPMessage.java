@@ -9,7 +9,6 @@ package net.i2p.data.i2np;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import net.i2p.data.DataStructure;
 
@@ -31,26 +30,6 @@ public interface I2NPMessage extends DataStructure {
      */
     public static final int MAX_SIZE = 64*1024;
     
-    /**
-     * Read the body into the data structures, after the initial type byte, using
-     * the current class's format as defined by the I2NP specification
-     *
-     * Unused - All transports provide encapsulation and so we have byte arrays available.
-     *
-     * @param in stream to read from
-     *           starting at type if type is &lt; 0 (16 byte header)
-     *           starting at ID if type is &gt;= 0 (15 byte header)
-     * @param type I2NP message type. If less than zero, read the type from data
-     * @param buffer scratch buffer to be used when reading and parsing
-     * @return size of the message read (including headers)
-     * @throws I2NPMessageException if the stream doesn't contain a valid message
-     *          that this class can read.
-     * @throws IOException if there is a problem reading from the stream
-     * @deprecated unused
-     */
-    @Deprecated
-    public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException;
-
     /**
      * Read the body into the data structures, after the initial type byte, using
      * the current class's format as defined by the I2NP specification

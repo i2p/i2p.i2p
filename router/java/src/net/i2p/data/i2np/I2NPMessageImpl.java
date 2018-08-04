@@ -72,91 +72,15 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
 
     /**
-     *  Read the whole message but only if it's exactly 1024 bytes.
+     *  Read the whole message.
      *  Unused - All transports provide encapsulation and so we have byte arrays available.
      *
      *  @deprecated unused
+     *  @throws UnsupportedOperationException always
      */
     @Deprecated
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-        try {
-            readBytes(in, -1, new byte[1024]);
-        } catch (I2NPMessageException ime) {
-            throw new DataFormatException("Bad bytes", ime);
-        }
-    }
-
-    /**
-     *  Read the header, then read the rest into buffer, then call
-     *  readMessage in the implemented message type
-     *
-     *  This does a copy from the stream to the buffer, so if you already
-     *  have a byte array, use the other readBytes() instead.
-     *
-     *<pre>
-     *  Specifically:
-     *    1 byte type (if caller didn't read already, as specified by the type param
-     *    4 byte ID
-     *    8 byte expiration
-     *    2 byte size
-     *    1 byte checksum
-     *    size bytes of payload (read by readMessage() in implementation)
-     *</pre>
-     *
-     *  Unused - All transports provide encapsulation and so we have byte arrays available.
-     *
-     *  @param type the message type or -1 if we should read it here
-     *  @param buffer temp buffer to use
-     *  @return total length of the message
-     *  @deprecated unused
-     */
-    @Deprecated
-    public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
-        try {
-            if (type < 0)
-                type = (int)DataHelper.readLong(in, 1);
-            _uniqueId = DataHelper.readLong(in, 4);
-            _expiration = DataHelper.readLong(in, DataHelper.DATE_LENGTH);
-            int size = (int)DataHelper.readLong(in, 2);
-            byte checksum[] = new byte[CHECKSUM_LENGTH];
-            int read = DataHelper.read(in, checksum);
-            if (read != CHECKSUM_LENGTH)
-                throw new I2NPMessageException("checksum is too small [" + read + "]");
-            //Hash h = new Hash();
-            //h.readBytes(in);
-            if (buffer.length < size) {
-                if (size > MAX_SIZE) throw new I2NPMessageException("size=" + size);
-                buffer = new byte[size];
-            }
-
-            int cur = 0;
-            while (cur < size) {
-                int numRead = in.read(buffer, cur, size- cur);
-                if (numRead == -1) {
-                    throw new I2NPMessageException("Payload is too short [" + numRead + ", wanted " + size + "]");
-                }
-                cur += numRead;
-            }
-
-            byte[] calc = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-            _context.sha().calculateHash(buffer, 0, size, calc, 0);
-            //boolean eq = calc.equals(h);
-            boolean eq = DataHelper.eq(checksum, 0, calc, 0, CHECKSUM_LENGTH);
-            SimpleByteCache.release(calc);
-            if (!eq)
-                throw new I2NPMessageException("Bad checksum on " + size + " byte I2NP " + getClass().getSimpleName());
-
-            //long start = _context.clock().now();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
-            readMessage(buffer, 0, size, type);
-            //long time = _context.clock().now() - start;
-            //if (time > 50)
-            //    _context.statManager().addRateData("i2np.readTime", time, time);
-            return CHECKSUM_LENGTH + 1 + 2 + 4 + DataHelper.DATE_LENGTH + size;
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error reading the message header", dfe);
-        }
+    public void readBytes(InputStream in) {
+        throw new UnsupportedOperationException();
     }
 
     /**
