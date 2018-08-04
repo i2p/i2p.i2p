@@ -53,9 +53,9 @@ public class DeliveryInstructions extends DataStructureImpl {
     
     /** @deprecated unused */
     @Deprecated
-    private final static long FLAG_ENCRYPTED = 128;
-    private final static long FLAG_MODE = 96;
-    private final static long FLAG_DELAY = 16;
+    private final static int FLAG_ENCRYPTED = 128;
+    private final static int FLAG_MODE = 96;
+    private final static int FLAG_DELAY = 16;
     
     /**
      *  Immutable local instructions, no options
@@ -241,40 +241,38 @@ public class DeliveryInstructions extends DataStructureImpl {
 ****/
     
     /** high bits */
-    private static int flagMode(long flags) {
-        long v = flags & FLAG_MODE;
+    private static int flagMode(int flags) {
+        int v = flags & FLAG_MODE;
         v >>>= 5;
         return (int)v;
     }
     
     /**  unused */
-    private static boolean flagDelay(long flags) {
+    private static boolean flagDelay(int flags) {
         return (0 != (flags & FLAG_DELAY));
     }
     
-    private long getFlags() {
-        long val = 0L;
+    private int getFlags() {
+        int val = 0;
      /****
         if (getEncrypted())
             val = val | FLAG_ENCRYPTED;
       ****/
-        long fmode = 0;
         switch (getDeliveryMode()) {
             case FLAG_MODE_LOCAL:
                 break;
             case FLAG_MODE_DESTINATION:
-                fmode = FLAG_MODE_DESTINATION << 5;
+                val = FLAG_MODE_DESTINATION << 5;
                 break;
             case FLAG_MODE_ROUTER:
-                fmode = FLAG_MODE_ROUTER << 5;
+                val = FLAG_MODE_ROUTER << 5;
                 break;
             case FLAG_MODE_TUNNEL:
-                fmode = FLAG_MODE_TUNNEL << 5;
+                val = FLAG_MODE_TUNNEL << 5;
                 break;
         }
-        val = val | fmode;
         if (getDelayRequested())
-            val = val | FLAG_DELAY;
+            val |= FLAG_DELAY;
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("getFlags() = " + val);
         return val;
@@ -389,7 +387,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     @Deprecated
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ( (_deliveryMode < 0) || (_deliveryMode > FLAG_MODE_TUNNEL) ) throw new DataFormatException("Invalid data: mode = " + _deliveryMode);
-        long flags = getFlags();
+        int flags = getFlags();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
         //               + " =?= " + flagMode(flags));
@@ -406,7 +404,7 @@ public class DeliveryInstructions extends DataStructureImpl {
      */
     public int writeBytes(byte target[], int offset) {
         if ( (_deliveryMode < 0) || (_deliveryMode > FLAG_MODE_TUNNEL) ) throw new IllegalStateException("Invalid data: mode = " + _deliveryMode);
-        long flags = getFlags();
+        int flags = getFlags();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
         //               + " =?= " + flagMode(flags));
