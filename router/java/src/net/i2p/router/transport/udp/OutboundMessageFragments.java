@@ -211,7 +211,7 @@ class OutboundMessageFragments {
      * There are larger chances of adding the PeerState "behind" where
      * the iterator is now... but these issues are the same as before concurrentification.
      *
-     * @param the minimum size we can send, or 0 to always notify
+     * @param size the minimum size we can send, or 0 to always notify
      * @since 0.8.9
      */
     public void add(PeerState peer, int size) {
