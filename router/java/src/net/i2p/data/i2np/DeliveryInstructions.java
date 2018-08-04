@@ -411,8 +411,7 @@ public class DeliveryInstructions extends DataStructureImpl {
         //    _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
         //               + " =?= " + flagMode(flags));
         int origOffset = offset;
-        DataHelper.toLong(target, offset, 1, flags);
-        offset++;
+        target[offset++] = (byte) flags;
         offset += getAdditionalInfo(target, offset);
         return offset - origOffset;
     }

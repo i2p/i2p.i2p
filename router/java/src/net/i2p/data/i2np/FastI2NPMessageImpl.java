@@ -150,8 +150,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
             }
             int payloadLen = writtenLen - HEADER_LENGTH;
             int off = 0;
-            DataHelper.toLong(buffer, off, 1, getType());
-            off += 1;
+            buffer[off++] = (byte) getType();
             DataHelper.toLong(buffer, off, 4, _uniqueId);
             off += 4;
             DataHelper.toLong(buffer, off, DataHelper.DATE_LENGTH, _expiration);

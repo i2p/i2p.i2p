@@ -48,7 +48,7 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
             throw new I2NPMessageException("Not large enough (too short by " + remaining + ")");
         if (RECORD_COUNT <= 0 || RECORD_COUNT > MAX_RECORD_COUNT)
             throw new I2NPMessageException("Bad record count " + RECORD_COUNT);
-        DataHelper.toLong(out, curIndex++, 1, RECORD_COUNT);
+        out[curIndex++] = (byte) RECORD_COUNT;
         // can't call super, written length check will fail
         //return super.writeMessageBody(out, curIndex + 1);
         for (int i = 0; i < RECORD_COUNT; i++) {

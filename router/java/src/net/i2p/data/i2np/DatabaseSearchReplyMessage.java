@@ -103,8 +103,7 @@ public class DatabaseSearchReplyMessage extends FastI2NPMessageImpl {
 
         System.arraycopy(_key.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
         curIndex += Hash.HASH_LENGTH;
-        DataHelper.toLong(out, curIndex, 1, _peerHashes.size());
-        curIndex++;
+        out[curIndex++] = (byte) _peerHashes.size();
         for (int i = 0; i < getNumReplies(); i++) {
             System.arraycopy(getReply(i).getData(), 0, out, curIndex, Hash.HASH_LENGTH);
             curIndex += Hash.HASH_LENGTH;

@@ -257,8 +257,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             byte[] h = SimpleByteCache.acquire(Hash.HASH_LENGTH);
             _context.sha().calculateHash(buffer, off + HEADER_LENGTH, payloadLen, h, 0);
 
-            DataHelper.toLong(buffer, off, 1, getType());
-            off++;
+            buffer[off++] = (byte) getType();
 
             // Lazy initialization of value
             if (_uniqueId < 0) {
@@ -300,8 +299,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public int toRawByteArray(byte buffer[]) {
         try {
             int off = 0;
-            DataHelper.toLong(buffer, off, 1, getType());
-            off += 1;
+            buffer[off++] = (byte) getType();
             // January 19 2038? No, unsigned, good until Feb. 7 2106
             // in seconds, round up so we don't lose time every hop
             DataHelper.toLong(buffer, off, 4, (_expiration + 500) / 1000);
@@ -325,8 +323,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      */
     public int toRawByteArrayNTCP2(byte buffer[], int off) {
         try {
-            DataHelper.toLong(buffer, off, 1, getType());
-            off += 1;
+            buffer[off++] = (byte) getType();
             // Lazy initialization of value
             if (_uniqueId < 0) {
                 _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
