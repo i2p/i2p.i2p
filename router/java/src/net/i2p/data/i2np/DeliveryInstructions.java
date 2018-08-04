@@ -383,20 +383,11 @@ public class DeliveryInstructions extends DataStructureImpl {
     
     /**
      * @deprecated unused
+     * @throws UnsupportedOperationException always
      */
     @Deprecated
-    public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ( (_deliveryMode < 0) || (_deliveryMode > FLAG_MODE_TUNNEL) ) throw new DataFormatException("Invalid data: mode = " + _deliveryMode);
-        int flags = getFlags();
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
-        //               + " =?= " + flagMode(flags));
-        byte additionalInfo[] = getAdditionalInfo();
-        out.write((byte) flags);
-        if (additionalInfo != null) {
-            out.write(additionalInfo);
-            out.flush();
-        }
+    public void writeBytes(OutputStream out) {
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -529,11 +520,6 @@ public class DeliveryInstructions extends DataStructureImpl {
         @Override
         public int readBytes(byte data[], int offset) throws DataFormatException {
             throw new RuntimeException("immutable");
-        }
-
-        @Override
-        public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-            out.write((byte) 0);
         }
 
         @Override

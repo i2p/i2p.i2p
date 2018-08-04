@@ -9,7 +9,6 @@ package net.i2p.data.i2np;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -93,16 +92,6 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
         if (VERIFY_TEST && _log.shouldLog(Log.INFO))
             _log.info("Ignored c/s " + getClass().getSimpleName());
         return cur - offset;
-    }
-    
-    /**
-     *  @deprecated unused
-     *  @throws UnsupportedOperationException
-     */
-    @Deprecated
-    @Override
-    public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        throw new UnsupportedOperationException();
     }
     
     /**
