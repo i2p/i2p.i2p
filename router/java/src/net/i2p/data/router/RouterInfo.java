@@ -549,11 +549,15 @@ public class RouterInfo extends DatabaseEntry {
         // can't set the digest until we know the sig type
         InputStream din;
         MessageDigest digest;
+        SigType type = _identity.getSigningPublicKey().getType();
+        // Even if not verifying, we have to construct a Signature object
+        // below, which will fail for null type.
+        if (type == null)
+            throw new DataFormatException("unknown sig type");
         if (verifySig) {
-            SigType type = _identity.getSigningPublicKey().getType();
             if (type != SigType.EdDSA_SHA512_Ed25519) {
                 // This won't work for EdDSA
-                digest = _identity.getSigningPublicKey().getType().getDigestInstance();
+                digest = type.getDigestInstance();
                 // TODO any better way?
                 digest.update(_identity.toByteArray());
                 din = new DigestInputStream(in, digest);
@@ -572,14 +576,16 @@ public class RouterInfo extends DatabaseEntry {
         //else
         //    _published = when.getTime();
         _published = DataHelper.readLong(din, 8);
-        int numAddresses = (int) DataHelper.readLong(din, 1);
+        // EOF will be thrown in properties read below
+        int numAddresses = din.read();
         for (int i = 0; i < numAddresses; i++) {
             RouterAddress address = new RouterAddress();
             address.readBytes(din);
             _addresses.add(address);
         }
-        int numPeers = (int) DataHelper.readLong(din, 1);
-        if (numPeers == 0) {
+        // EOF will be thrown in properties read below
+        int numPeers = din.read();
+        if (numPeers <= 0) {
             _peers = null;
         } else {
             _peers = new HashSet<Hash>(numPeers);
@@ -590,14 +596,13 @@ public class RouterInfo extends DatabaseEntry {
             }
         }
         DataHelper.readProperties(din, _options);
-        _signature = new Signature(_identity.getSigningPublicKey().getType());
+        _signature = new Signature(type);
         _signature.readBytes(in);
 
         if (verifySig) {
-            SigType type = _identity.getSigningPublicKey().getType();
             if (type != SigType.EdDSA_SHA512_Ed25519) {
                 // This won't work for EdDSA
-                SimpleDataStructure hash = _identity.getSigningPublicKey().getType().getHashInstance();
+                SimpleDataStructure hash = type.getHashInstance();
                 hash.setData(digest.digest());
                 _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
                 _validated = true;

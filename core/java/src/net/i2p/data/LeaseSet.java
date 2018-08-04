@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.SigType;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
@@ -327,9 +328,15 @@ public class LeaseSet extends DatabaseEntry {
         _destination = Destination.create(in);
         _encryptionKey = PublicKey.create(in);
         // revocation signing key must be same type as the destination signing key
-        _signingKey = new SigningPublicKey(_destination.getSigningPublicKey().getType());
+        SigType type = _destination.getSigningPublicKey().getType();
+        // Even if not verifying, we have to construct a Signature object
+        // below, which will fail for null type.
+        if (type == null)
+            throw new DataFormatException("unknown sig type");
+        _signingKey = new SigningPublicKey(type);
+        // EOF will be thrown in signature read below
         _signingKey.readBytes(in);
-        int numLeases = (int) DataHelper.readLong(in, 1);
+        int numLeases = in.read();
         if (numLeases > MAX_LEASES)
             throw new DataFormatException("Too many leases - max is " + MAX_LEASES);
         //_version = DataHelper.readLong(in, 4);
@@ -339,7 +346,7 @@ public class LeaseSet extends DatabaseEntry {
             addLease(lease);
         }
         // signature must be same type as the destination signing key
-        _signature = new Signature(_destination.getSigningPublicKey().getType());
+        _signature = new Signature(type);
         _signature.readBytes(in);
     }
     
