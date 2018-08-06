@@ -1,0 +1,6 @@
+#!/bin/sh -e
+
+# dh_link isn't overwriting old dir
+/bin/rm -rf /usr/share/i2p/docs/icons/flags
+
+#DEBHELPER# 
