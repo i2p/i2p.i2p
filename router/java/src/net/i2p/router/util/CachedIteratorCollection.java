@@ -1,8 +1,4 @@
-// Extend `java.util.AbstractCollection` to create a collection that can be iterated over without creation of a new
-// object
-
-// https://docs.oracle.com/javase/7/docs/api/java/util/AbstractCollection.html
-
+// The Node class below is derived from Java's LinkedList.java
 /*
  * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -27,7 +23,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-// The Node class below is from Java's LinkedList.java
 
 package net.i2p.router.util;
 
@@ -37,6 +32,14 @@ import java.util.NoSuchElementException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
+
+/**
+ * Extend java.util.AbstractCollection to create a collection that can be
+ * iterated over without creation of a new object
+ *
+ * @since 0.9.36
+ *
+ */
 
 public class CachedIteratorCollection<E> extends AbstractCollection<E> {
 
@@ -60,18 +63,18 @@ public class CachedIteratorCollection<E> extends AbstractCollection<E> {
         Node<E> next;
         Node<E> prev;
 
-        Node(Node<E> prev, E element, Node<E> next) {
+        Node(Node<E> prev, E element) {
             this.item = element;
             this.prev = prev;
-            this.next = next;
+            this.next = null;
         }
     }
 
     // First Node in the AbstractCollectionTest object
-    private transient Node<E> first;
+    private transient Node<E> first = null;
 
     // Last Node in the AbstractCollectionTest object
-    private transient Node<E> last;
+    private transient Node<E> last = null;
 
     /**
      * Default constructor
@@ -85,14 +88,13 @@ public class CachedIteratorCollection<E> extends AbstractCollection<E> {
      */
     @Override
     public boolean add(E element) {
+        final Node<E> newNode = new Node<>(null, element);
         if (this.size == 0) {
-            final Node<E> newNode = new Node<>(null, element, null);
             this.first = newNode;
             this.last = newNode;
         } else {
-            final Node<E> newLast = new Node<>(this.last, element, null);
-            this.last.next = newLast;
-            this.last = newLast;
+            this.last.next = newNode;
+            this.last = newNode;
         }
         this.size++;
         log.debug("CachedIteratorAbstractCollection: Element added");
@@ -205,5 +207,7 @@ public class CachedIteratorCollection<E> extends AbstractCollection<E> {
     /**
      * Return size of current LinkedListTest object
      */
-    public int size() { return this.size; }
+    public int size() {
+        return this.size;
+    }
 }
