@@ -1,0 +1,209 @@
+// Extend `java.util.AbstractCollection` to create a collection that can be iterated over without creation of a new
+// object
+
+// https://docs.oracle.com/javase/7/docs/api/java/util/AbstractCollection.html
+
+/*
+ * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+// The Node class below is from Java's LinkedList.java
+
+package net.i2p.router.util;
+
+import java.util.AbstractCollection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
+public class CachedIteratorAbstractCollection<E> extends AbstractCollection<E> {
+
+    // FOR DEBUGGING & LOGGING PURPOSES
+    Log log = I2PAppContext.getGlobalContext().logManager().getLog(CachedIteratorAbstractCollection.class);
+
+    // Cached Iterator object
+    private final CachedIterator iterator = new CachedIterator();
+
+    // Size of the AbstractCollectionTest object
+    private transient int size = 0;
+
+    /**
+     * Node object that contains:
+     * (1) Data object
+     * (2) Link to previous Node object
+     * (3) Link to next Node object
+     */
+    private static class Node<E> {
+        E item;
+        Node<E> next;
+        Node<E> prev;
+
+        Node(Node<E> prev, E element, Node<E> next) {
+            this.item = element;
+            this.prev = prev;
+            this.next = next;
+        }
+    }
+
+    // First Node in the AbstractCollectionTest object
+    private transient Node<E> first;
+
+    // Last Node in the AbstractCollectionTest object
+    private transient Node<E> last;
+
+    /**
+     * Default constructor
+     */
+    public CachedIteratorAbstractCollection() {
+    }
+
+    /**
+     * Adds a data object (element) as a Node and sets previous/next pointers accordingly
+     *
+     */
+    @Override
+    public boolean add(E element) {
+        if (this.size == 0) {
+            final Node<E> newNode = new Node<>(null, element, null);
+            this.first = newNode;
+            this.last = newNode;
+        } else {
+            final Node<E> newLast = new Node<>(this.last, element, null);
+            this.last.next = newLast;
+            this.last = newLast;
+        }
+        this.size++;
+        log.debug("CachedIteratorAbstractCollection: Element added");
+        return true;
+    }
+
+    /**
+     *  Clears the AbstractCollectionTest object, all pointers reset to 'null'
+     *
+     */
+    @Override
+    public void clear() {
+        this.first = null;
+        this.last = null;
+        this.size = 0;
+        iterator.reset();
+        log.debug("CachedIteratorAbstractCollection: Cleared");
+    }
+
+    /**
+     *  Iterator: Resets and returns CachedIterator
+     *
+     */
+    public Iterator<E> iterator() {
+        iterator.reset();
+        return iterator;
+    }
+
+    /**
+     *  Inner CachedIterator class - implements hasNext(), next() & remove()
+     *
+     */
+    private class CachedIterator implements Iterator<E> {
+
+        private transient boolean nextCalled;
+
+        // Iteration Index
+        private transient Node<E> itrIndexNode = first;
+
+        // Methods to support iteration
+
+        /**
+         * Reset iteration
+         */
+        private void reset() {
+            itrIndexNode = first;
+            nextCalled = false;
+        }
+
+        /**
+         *  If nextCalled is true (i.e. next() has been called at least once),
+         *  remove() will remove the last returned Node
+         *
+         */
+        @Override
+        public void remove() {
+            if (nextCalled) {
+                if (itrIndexNode != null) {
+                    if (itrIndexNode.prev.prev != null) {
+                        itrIndexNode.prev = itrIndexNode.prev.prev;
+                        itrIndexNode.prev.next = itrIndexNode;
+                    } else {
+                        itrIndexNode.prev = null;
+                        first = itrIndexNode;
+                    }
+                } else {
+                    if (last.prev != null) {
+                        last.prev.next = null;
+                        last = last.prev;
+                    } else {
+                        nextCalled = false;
+                        clear();
+                        log.debug("CachedIteratorAbstractCollection: Element Removed");
+                        return;
+                    }
+                }
+                size--;
+                nextCalled = false;
+                log.debug("CachedIteratorAbstractCollection: Element Removed");
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        /**
+         *  Returns true as long as current Iteration Index Node (itrIndexNode)
+         *  is non-null
+         *
+         */
+        public boolean hasNext() {
+            return itrIndexNode != null;
+        }
+
+        /**
+         * Returns the next node in the iteration
+         *
+         */
+        public E next() {
+            if (this.hasNext()) {
+                Node<E> node = itrIndexNode;
+                itrIndexNode = itrIndexNode.next;
+                nextCalled = true;
+                return node.item;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+    }
+
+    /**
+     * Return size of current LinkedListTest object
+     */
+    public int size() { return this.size; }
+}
