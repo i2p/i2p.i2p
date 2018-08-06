@@ -38,10 +38,10 @@ import java.util.NoSuchElementException;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-public class CachedIteratorAbstractCollection<E> extends AbstractCollection<E> {
+public class CachedIteratorCollection<E> extends AbstractCollection<E> {
 
     // FOR DEBUGGING & LOGGING PURPOSES
-    Log log = I2PAppContext.getGlobalContext().logManager().getLog(CachedIteratorAbstractCollection.class);
+    Log log = I2PAppContext.getGlobalContext().logManager().getLog(CachedIteratorCollection.class);
 
     // Cached Iterator object
     private final CachedIterator iterator = new CachedIterator();
@@ -76,7 +76,7 @@ public class CachedIteratorAbstractCollection<E> extends AbstractCollection<E> {
     /**
      * Default constructor
      */
-    public CachedIteratorAbstractCollection() {
+    public CachedIteratorCollection() {
     }
 
     /**
