@@ -44,7 +44,7 @@ import net.i2p.util.Log;
 public class CachedIteratorCollection<E> extends AbstractCollection<E> {
 
     // FOR DEBUGGING & LOGGING PURPOSES
-    Log log = I2PAppContext.getGlobalContext().logManager().getLog(CachedIteratorCollection.class);
+    //Log log = I2PAppContext.getGlobalContext().logManager().getLog(CachedIteratorCollection.class);
 
     // Cached Iterator object
     private final CachedIterator iterator = new CachedIterator();
@@ -88,16 +88,15 @@ public class CachedIteratorCollection<E> extends AbstractCollection<E> {
      */
     @Override
     public boolean add(E element) {
-        final Node<E> newNode = new Node<>(null, element);
+        final Node<E> newNode = new Node<>(last, element);
         if (this.size == 0) {
             this.first = newNode;
-            this.last = newNode;
         } else {
             this.last.next = newNode;
-            this.last = newNode;
         }
+        this.last = newNode;
         this.size++;
-        log.debug("CachedIteratorAbstractCollection: Element added");
+        //log.debug("CachedIteratorAbstractCollection: Element added");
         return true;
     }
 
@@ -111,7 +110,7 @@ public class CachedIteratorCollection<E> extends AbstractCollection<E> {
         this.last = null;
         this.size = 0;
         iterator.reset();
-        log.debug("CachedIteratorAbstractCollection: Cleared");
+        //log.debug("CachedIteratorAbstractCollection: Cleared");
     }
 
     /**
@@ -152,28 +151,40 @@ public class CachedIteratorCollection<E> extends AbstractCollection<E> {
         @Override
         public void remove() {
             if (nextCalled) {
+                // Are we at the end of the collection? If so itrIndexNode will
+                // be null
                 if (itrIndexNode != null) {
-                    if (itrIndexNode.prev.prev != null) {
+                    // The Node we are trying to remove is itrIndexNode.prev
+                    // Is there a Node before itrIndexNode.prev?
+                    if (itrIndexNode != first.next) {
+                        // Set current itrIndexNode's prev to Node N-2
                         itrIndexNode.prev = itrIndexNode.prev.prev;
+                        // Then set Node N-2's next to current itrIndexNode,
+                        // this drops all references to the Node being removed
                         itrIndexNode.prev.next = itrIndexNode;
                     } else {
+                        // There is no N-2 Node, we are removing the first Node
+                        // in the collection
                         itrIndexNode.prev = null;
                         first = itrIndexNode;
                     }
                 } else {
+                    // itrIndexNode is null, we are at the end of the collection
+                    // Are there any items before the Node that is being removed?
                     if (last.prev != null) {
                         last.prev.next = null;
                         last = last.prev;
                     } else {
+                        // There are no more items, clear() the collection
                         nextCalled = false;
                         clear();
-                        log.debug("CachedIteratorAbstractCollection: Element Removed");
+                        //log.debug("CachedIteratorAbstractCollection: Element Removed");
                         return;
                     }
                 }
                 size--;
                 nextCalled = false;
-                log.debug("CachedIteratorAbstractCollection: Element Removed");
+                //log.debug("CachedIteratorAbstractCollection: Element Removed");
             } else {
                 throw new IllegalStateException();
             }
