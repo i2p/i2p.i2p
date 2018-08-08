@@ -473,9 +473,9 @@ trans.ru_RU = installer/resources/eepsite/docroot/help/index_ru.html
 ;; not yet translated on TX, use old page
 ;;trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
 
-[I2P.ztest]
+[I2P.readme]
 ;;
-;; TESTING ONLY
+;; Text on /console
 ;;
 type = HTML
 source_file = installer/resources/readme/readme.html
