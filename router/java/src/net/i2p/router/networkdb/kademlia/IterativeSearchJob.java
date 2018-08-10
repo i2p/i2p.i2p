@@ -165,8 +165,8 @@ public class IterativeSearchJob extends FloodSearchJob {
     @Override
     public void runJob() {
         if (_facade.isNegativeCached(_key)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Negative cached, not searching: " + _key);
+            if (_log.shouldInfo())
+                _log.info("Negative cached, not searching: " + _key);
             failed();
             return;
         }
@@ -325,8 +325,8 @@ public class IterativeSearchJob extends FloodSearchJob {
                 String since = MIN_QUERY_VERSION;
                 if (VersionComparator.comp(v, since) < 0) {
                     failed(peer, false);
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn(getJobId() + ": not sending query to old version " + v + ": " + peer);
+                    if (_log.shouldInfo())
+                        _log.info(getJobId() + ": not sending query to old version " + v + ": " + peer);
                     return;
                 }
             }
