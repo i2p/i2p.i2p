@@ -439,8 +439,8 @@ public class I2PAppContext {
                         System.err.println("ERROR: Could not create temp dir " + _tmpDir.getAbsolutePath());
                 }
             }
+            return _tmpDir;
         }
-        return _tmpDir;
     }
 
     /** don't rely on deleteOnExit() */
