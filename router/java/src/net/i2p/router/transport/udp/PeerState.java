@@ -11,14 +11,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.util.CachedIteratorArrayList;
-import net.i2p.router.util.CoDelPriorityBlockingQueue;
+import net.i2p.router.util.CachedIteratorCollection;
 import net.i2p.router.util.PriBlockingQueue;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
@@ -210,7 +208,7 @@ public class PeerState {
      *  Mostly messages that have been transmitted and are awaiting acknowledgement,
      *  although there could be some that have not been sent yet.
      */
-    private final List<OutboundMessageState> _outboundMessages;
+    private final CachedIteratorCollection<OutboundMessageState> _outboundMessages;
 
     /**
      *  Priority queue of messages that have not yet been sent.
@@ -370,7 +368,7 @@ public class PeerState {
         _rtt = INIT_RTT;
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap<Long, InboundMessageState>(8);
-        _outboundMessages = new CachedIteratorArrayList<OutboundMessageState>(32);
+        _outboundMessages = new CachedIteratorCollection<OutboundMessageState>();
         //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
         _outboundQueue = new PriBlockingQueue<OutboundMessageState>(ctx, "UDP-PeerState", 32);
         // all createRateStat() moved to EstablishmentManager
@@ -1568,7 +1566,7 @@ public class PeerState {
         if (_dead) {
             dropOutbound();
             return 0;
-	}
+        }
 
         int rv = 0;
         List<OutboundMessageState> succeeded = null;
@@ -1586,6 +1584,7 @@ public class PeerState {
                     iter.remove();
                     if (_retransmitter == state)
                         _retransmitter = null;
+                    _log.debug("CachedIteratorCollection: sendFailed update" + state);
                     _context.statManager().addRateData("udp.sendFailed", state.getPushCount());
                     if (failed == null) failed = new ArrayList<OutboundMessageState>(4);
                     failed.add(state);
@@ -1593,6 +1592,7 @@ public class PeerState {
                     iter.remove();
                     if (state == _retransmitter)
                         _retransmitter = null;
+                    _log.debug("CachedIteratorCollection: sendAggressiveFailed update" + state);
                     _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount());
                     if (failed == null) failed = new ArrayList<OutboundMessageState>(4);
                     failed.add(state);
