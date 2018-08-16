@@ -137,7 +137,11 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         }
     }
 
-    protected static final int DEFAULT_READ_TIMEOUT = 5*60*1000;
+    /**
+     *  -1 (forever) as of 0.9.36,
+     *  so that large POSTs won't timeout on the read side
+     */
+    protected static final int DEFAULT_READ_TIMEOUT = -1;
     
     protected static final AtomicLong __requestId = new AtomicLong();
 

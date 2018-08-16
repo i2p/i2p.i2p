@@ -88,6 +88,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final int MAX_HEADERS = 60;
     /** Includes request, just to prevent OOM DOS @since 0.9.20 */
     private static final int MAX_TOTAL_HEADER_SIZE = 32*1024;
+    // Does not apply to header reads.
+    // We set it to forever so that it won't timeout when sending a large response.
+    // The server will presumably have its own timeout implemented for POST
+    private static final long DEFAULT_HTTP_READ_TIMEOUT = -1;
     
     private long _startedOn = 0L;
     private ConnThrottler _postThrottler;
@@ -205,6 +209,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private void setupI2PTunnelHTTPServer(String spoofHost) {
         _spoofHost = (spoofHost != null && spoofHost.trim().length() > 0) ? spoofHost.trim() : null;
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
+        readTimeout = DEFAULT_HTTP_READ_TIMEOUT;
     }
 
     @Override

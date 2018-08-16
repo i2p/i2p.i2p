@@ -62,8 +62,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected final Logging l;
     private I2PSSLSocketFactory _sslFactory;
 
-    private static final long DEFAULT_READ_TIMEOUT = 5*60*1000;
-    /** default timeout to 5 minutes - override if desired */
+    private static final long DEFAULT_READ_TIMEOUT = -1;
+    /** default timeout - override if desired */
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     /** do we use threads? default true (ignored for standard servers, always false) */
@@ -371,6 +371,17 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      * Set the read idle timeout for newly-created connections (in
      * milliseconds).  After this time expires without data being reached from
      * the I2P network, the connection itself will be closed.
+     *
+     * Less than or equal to 0 means forever.
+     * Default -1 (forever) as of 0.9.36 for standard tunnels,
+     * but extending classes may override.
+     * Prior to that, default was 5 minutes, but did not work
+     * due to streaming bugs.
+     *
+     * Applies only to future connections;
+     * calling this does not affect existing connections.
+     *
+     * @param ms in ms
      */
     public void setReadTimeout(long ms) {
         readTimeout = ms;
@@ -379,6 +390,12 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     /**
      * Get the read idle timeout for newly-created connections (in
      * milliseconds).
+     *
+     * Less than or equal to 0 means forever.
+     * Default -1 (forever) as of 0.9.36 for standard tunnels,
+     * but extending classes may override.
+     * Prior to that, default was 5 minutes, but did not work
+     * due to streaming bugs.
      *
      * @return The read timeout used for connections
      */

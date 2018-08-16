@@ -73,6 +73,8 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     private static final long HEADER_TIMEOUT = 15*1000;
     private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     private static final int MAX_LINE_LENGTH = 1024;
+    // application should ping timeout before this
+    private static final long DEFAULT_IRC_READ_TIMEOUT = 10*60*1000;
     
     private final static String ERR_UNAVAILABLE =
         ":ircserver.i2p 499 you :" +
@@ -134,6 +136,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
         
         // get the fake hostmask to use
         this.hostname = opts.getProperty(PROP_HOSTNAME, PROP_HOSTNAME_DEFAULT);
+        readTimeout = DEFAULT_IRC_READ_TIMEOUT;
     }
     
     @Override

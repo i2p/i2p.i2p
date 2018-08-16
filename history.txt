@@ -1,3 +1,16 @@
+2018-08-16 zzz
+ * i2ptunnel: Change read timeout defaults now that streaming timeout works
+
+2018-08-13 zzz
+ * Console: Format part. tunnel rate
+
+2018-08-04 zzz
+ * Data: Check sooner for unknown sig type
+ * I2NP: Remove unused Stream methods
+
+2018-08-03 zzz
+ * NTCP2: Fix termination handling and padding calculation
+
 2018-08-02 zzz
  * i2psnark: Don't disconnect seeds if comments enabled (ticket #2288)
  * NTCP2: Send termination on idle timeout
