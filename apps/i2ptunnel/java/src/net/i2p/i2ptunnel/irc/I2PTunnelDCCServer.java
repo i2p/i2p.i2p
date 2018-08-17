@@ -64,6 +64,8 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
     private static final int MAX_OUTGOING_PENDING = 20;
     private static final int MAX_OUTGOING_ACTIVE = 20;
     private static final long OUTBOUND_EXPIRE = 30*60*1000;
+    private static final long DEFAULT_DCC_READ_TIMEOUT = -1;
+
     /**
      * There's no support for unsolicited incoming I2P connections,
      * so there's no server host or port parameters.
@@ -79,6 +81,7 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
         _active = new ConcurrentHashMap<Integer, LocalAddress>(8);
         _resume = new ConcurrentHashMap<Integer, LocalAddress>(8);
         _sockList = new CopyOnWriteArrayList<I2PSocket>();
+        readTimeout = DEFAULT_DCC_READ_TIMEOUT;
     }
 
     /**

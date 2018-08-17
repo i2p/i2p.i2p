@@ -159,8 +159,8 @@ class TunnelRenderer {
                 lifetime = 1;
             if (lifetime > 10*60)
                 lifetime = 10*60;
-            int bps = 1024 * count / lifetime;
-            out.write("<td class=\"cells\" align=\"center\">" + bps + " Bps</td>");
+            long bps = 1024L * count / lifetime;
+            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2Decimal(bps) + "Bps</td>");
             if (cfg.getSendTo() == null)
                 out.write("<td class=\"cells\" align=\"center\">" + _t("Outbound Endpoint") + "</td>");
             else if (cfg.getReceiveFrom() == null)
@@ -286,7 +286,7 @@ class TunnelRenderer {
                 maxLength = length;
         }
         out.write("<table class=\"tunneldisplay tunnels_client\"><tr><th title=\"" + _t("Inbound or outbound?") + ("\">") + _t("In/Out")
-                  + "</th><th>" + _t("Expiry") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
+                  + "</th><th>" + _t("Expiration") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
         if (maxLength > 3) {
             out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
             out.write("\">" + _t("Participants") + "</th>");
