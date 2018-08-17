@@ -71,5 +71,6 @@ sloccount.sc
 /.project$
 /.settings
 # IDEA
+^.idea$
 \.iml$
 
