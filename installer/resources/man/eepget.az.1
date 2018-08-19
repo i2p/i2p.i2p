@@ -1,0 +1,94 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "26 Yanvar, 2017" "" I2P
+
+.SH AD
+Eepget \- I2P endirici
+
+.SH SYNOPSIS
+\fBeepget\fP [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH AÇIQLAMA
+.P
+Download a file non\-interactively via HTTP. Transfers through both I2P and
+the regular Internet are supported.
+.P
+Eepget is able to cope with slow or unstable network connections; if a
+download is not successful because of a network problem, it will keep
+retrying until the whole file has been retrieved (if the \-n option is set).
+If supported by the remote server, eepget will instruct the server to
+continue the download from the point of interruption.
+
+.SH OPTIONS
+\fB\-c\fP
+.TP 
+Clearnet. Do not use a proxy. Same as \fB\-p\fP :0 .
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Sets the etag value in the request headers.
+.TP 
+
+\fB\-h\fP name=value
+.TP 
+Adds an arbitrary request header with the given name and value.
+.TP 
+
+\fB\-l\fP lineLen
+.TP 
+Controls the progress display. \fB\ lineLen \fP is the length of one progress line in characters. The default is 40.
+.TP 
+
+\fB\-m\fP markSize
+.TP 
+Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. The default is 1024.
+.TP 
+
+\fB\-n\fP retries
+.TP 
+Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will not retry.
+.TP 
+
+\fB\-o\fP file
+.TP 
+Sets the output file to write to. If this option is not given, the output filename will be determined by the URL.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-c\fP or \fB\-p\fP :0 to disable the eeproxy.
+.TP 
+
+\fB\-t\fP seconds
+.TP 
+Sets the inactivity timeout. The default is 60 seconds.
+.TP 
+
+\fB\-u\fP username
+.TP 
+Sets the username for proxy authorization, if required.
+.TP 
+
+\fB\-x\fP password
+.TP 
+Sets the password for proxy authorization, if required. If a username is specified but not a password, EepGet will prompt for the password.
+
+.SH "EXIT STATUS"
+
+\fBeepget\fP exits with status zero upon successful transfer and non\-zero if
+there were problems with the download.
+
+.SH "REPORTING BUGS"
+Please enter a ticket on
+.UR https://trac.i2p2.de/
+the I2P trac page
+.UE .
+
+.SH "SEE ALSO"
+\fBi2prouter\fP(1) \fBcurl\fP(1) \fBwget\fP(1)
+
