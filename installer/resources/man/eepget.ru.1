@@ -17,11 +17,12 @@ Eepget \- загрузчик I2P
 Неинтерактивное скачивание файла через HTTP. Поддерживается передача как
 через I2P, так и через обычный Интернет.
 .P
-Eepget is able to cope with slow or unstable network connections; if a
-download is not successful because of a network problem, it will keep
-retrying until the whole file has been retrieved (if the \-n option is set).
-If supported by the remote server, eepget will instruct the server to
-continue the download from the point of interruption.
+Eepget способна работать с медленными или нестабильными сетевыми
+подключениями; в случае неудочной загрузки из\-за сетевых неполадок, будут
+предприниматься попытки переподключения до тех пор, пока файл не будет
+скачан полностью (если установлен параметр \-n). Eepget отправит команду
+серверу на продолжение загрузки из точки прерывания, если удаленный сервер
+поддерживает такую возможность.
 
 .SH ОПЦИИ
 \fB\-c\fP
@@ -31,32 +32,32 @@ Clearnet. Do not use a proxy. Same as \fB\-p\fP :0 .
 
 \fB\-e\fP etag
 .TP 
-Sets the etag value in the request headers.
+Устанавливает значение etag в заголовке запроса.
 .TP 
 
-\fB\-h\fP name=value
+\fB\-h\fPимя=значение
 .TP 
-Adds an arbitrary request header with the given name and value.
+Добавляет произвольный заголовок запроса с заданным именем и значением.
 .TP 
 
 \fB\-l\fP lineLen
 .TP 
-Controls the progress display. \fB\ lineLen \fP is the length of one progress line in characters. The default is 40.
+Контролирует отображение прогресса. \fB\ lineLen \fP \- это длина одной строчки прогресс\-бара в символах. По умолчанию равна 40.
 .TP 
 
 \fB\-m\fP markSize
 .TP 
-Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. The default is 1024.
+Контролирует отображение прогресса. \fB\ markSize \fP \- это количество байт, которое означает один символ "#". По умолчанию равно 1024.
 .TP 
 
-\fB\-n\fP retries
+\fB\-n\fP попыток
 .TP 
 Укажите сколько раз нужно повторить попытку, если загрузка не удалась. Если значение не указано, то eepget не будет повторять попытку.
 .TP 
 
-\fB\-o\fP file
+\fB\-o\fP файл
 .TP 
-Sets the output file to write to. If this option is not given, the output filename will be determined by the URL.
+Задает выходной файл для записи. Если этот параметр не указан, то имя выходного файла определяется URL\-адресом.
 .TP 
 
 \fB\-p\fP proxy_host[:port]
@@ -64,19 +65,19 @@ Sets the output file to write to. If this option is not given, the output filena
 Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-c\fP or \fB\-p\fP :0 to disable the eeproxy.
 .TP 
 
-\fB\-t\fP seconds
+\fB\-t\fP секунд
 .TP 
-Sets the inactivity timeout. The default is 60 seconds.
+Устанавливает тайм\-аут соединения. По умолчанию 60 секунд.
 .TP 
 
-\fB\-u\fP username
+\fB\-u\fP имя пользователя
 .TP 
 Задайте имя пользователя для авторизации прокси, если требуется.
 .TP 
 
-\fB\-x\fP password
+\fB\-x\fP пароль
 .TP 
-Sets the password for proxy authorization, if required. If a username is specified but not a password, EepGet will prompt for the password.
+Устанавливает пароль для авторизации на прокси, если он требуется. Если имя пользователя задано, а пароль \- нет, EepGet будет запрашивать пароль.
 
 .SH "СТАТУС ВЫХОДА"
 
@@ -84,10 +85,12 @@ Sets the password for proxy authorization, if required. If a username is specifi
 there were problems with the download.
 
 .SH "СООБЩИТЬ ОБ ОШИБКАХ"
-Please enter a ticket on
+Пожалуйста, заведите тикет на
 .UR https://trac.i2p2.de/
-the I2P trac page
+странице трекера
+I2P
 .UE .
+.
 
 .SH "СМ. ТАКЖЕ"
 \fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
