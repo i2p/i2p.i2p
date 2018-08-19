@@ -57,7 +57,7 @@ msgstr "SYNOPSIS"
 #. type: Plain text
 #: man/eepget.1:9
 msgid "B<eepget> [I<options>]I<URL>"
-msgstr "B <eepget> [<options>]I<URL>"
+msgstr "B<eepget> [I<options>]I<URL>"
 
 #. type: SH
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
