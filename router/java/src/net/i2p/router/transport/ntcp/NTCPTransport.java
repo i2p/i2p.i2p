@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -334,12 +335,18 @@ public class NTCPTransport extends TransportImpl {
                     if (addr != null) {
                         newVersion = getNTCPVersion(addr);
                         if (newVersion != 0) {
-                            con = new NTCPConnection(_context, this, ident, addr, newVersion);
-                            establishing(con);
-                            //if (_log.shouldLog(Log.DEBUG))
-                            //    _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
-                            // Note that outbound conns go in the map BEFORE establishment
-                            _conByIdent.put(ih, con);
+                            try {
+                                con = new NTCPConnection(_context, this, ident, addr, newVersion);
+                                establishing(con);
+                                //if (_log.shouldLog(Log.DEBUG))
+                                //    _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
+                                // Note that outbound conns go in the map BEFORE establishment
+                                _conByIdent.put(ih, con);
+                            } catch (DataFormatException dfe) {
+                                if (_log.shouldWarn())
+                                    _log.warn("bad address? " + target, dfe);
+                                fail = true;
+                            }
                         } else {
                             fail = true;
                         }

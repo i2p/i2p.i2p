@@ -1,3 +1,6 @@
+2018-08-19 zzz
+ * NTCP2: Catch bad IV exception
+
 2018-08-16 zzz
  * i2ptunnel: Change read timeout defaults now that streaming timeout works
 

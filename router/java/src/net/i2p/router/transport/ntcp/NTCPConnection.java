@@ -242,16 +242,22 @@ public class NTCPConnection implements Closeable {
      * Caller MUST call transport.establishing(this) after construction.
      *
      * @param version must be 1 or 2
+     * @throws DataFormatException if there's a problem with the address
      */
     public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer,
-                          RouterAddress remAddr, int version) {
+                          RouterAddress remAddr, int version) throws DataFormatException {
         this(ctx, transport, remAddr, false);
         _remotePeer = remotePeer;
         _version = version;
-        if (version == 1)
+        if (version == 1) {
             _establishState = new OutboundEstablishState(ctx, transport, this);
-        else
-            _establishState = new OutboundNTCP2State(ctx, transport, this);
+        } else {
+            try {
+                _establishState = new OutboundNTCP2State(ctx, transport, this);
+            } catch (IllegalArgumentException iae) {
+                throw new DataFormatException("bad address? " + remAddr, iae);
+            }
+        }
     }
 
     /**
