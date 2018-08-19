@@ -1,17 +1,18 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
-# a1678991 <nfgantanku@yahoo.co.jp>, 2015
+# kami <b52c55627324b29125cbcfb101258463_228943>, 2015
 # タカハシ <indexial@outlook.jp>, 2014
+# Masayuki Hatta <mhatta@mhatta.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: a1678991 <nfgantanku@yahoo.co.jp>\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2018-08-17 22:12+0000\n"
+"Last-Translator: Masayuki Hatta <mhatta@mhatta.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgstr ""
 #. Description
 #: ../i2p.templates:2001
 msgid "Should the I2P router be started at boot?"
-msgstr "I2P ルーターをブート時に起動しますか？"
+msgstr "I2P ルータをシステムブート時に起動しますか？"
 
 #. Type: boolean
 #. Description
@@ -31,13 +32,13 @@ msgstr "I2P ルーターをブート時に起動しますか？"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "I2P は、コンピューターのブート時に自動的に開始するデーモンとして起動できます。これは推奨の設定です。"
+msgstr "I2P は、コンピュータのブート時に自動的に開始するデーモンとして起動できます。これは推奨の設定です。"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
 msgid "I2P daemon user:"
-msgstr "I2P デーモンユーザー:"
+msgstr "I2P デーモンユーザ:"
 
 #. Type: string
 #. Description
@@ -55,7 +56,7 @@ msgstr "デフォルトでは、 I2P はデーモンとして起動時、アカ�
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "非常に重要: 'i2psvc' のデフォルト以外のユーザーがここで入力されるなら、選択されるユーザー名は既存のものでなければ*なりません*。"
+msgstr "非常に重要: 'i2psvc' のデフォルト以外のユーザがここで入力されるなら、選択されるユーザ名は既存のものでなければ*なりません*。"
 
 #. Type: string
 #. Description
@@ -75,13 +76,13 @@ msgstr "デフォルトでは、 I2P は最大 128MB メモリまでしか使用
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "高い帯域幅のルーター、またたくさんのアクティブな torrent / プラグインがあるルーターも、この値を増やす必要がある場合があります。"
+msgstr "帯域幅の多いルータ、あるいはたくさんのアクティブな torrent / プラグインがあるルータも、この値を増やす必要がある場合があります。"
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "AppArmorの中でI2Pデーモンを実行"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "I2P デーモンを AppArmor で制限しますか?"
 
 #. Type: boolean
 #. Description
@@ -89,4 +90,4 @@ msgstr "AppArmorの中でI2Pデーモンを実行"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr ""
+msgstr "このオプションが有効な場合、I2PはAppArmorでサンドボックスされ、I2Pからアクセスできるファイルやディレクトリが制限されます。"

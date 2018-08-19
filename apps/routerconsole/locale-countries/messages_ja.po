@@ -5,13 +5,14 @@
 # 
 # Translators:
 # タカハシ <indexial@outlook.jp>, 2013-2014
+# Masayuki Hatta <mhatta@mhatta.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2018-08-17 22:07+0000\n"
+"Last-Translator: Masayuki Hatta <mhatta@mhatta.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgid "Anonymous Proxy"
 msgstr "匿名プロキシ"
 
 msgid "Satellite Provider"
-msgstr "衛星プロバイダー"
+msgstr "衛星プロバイダ"
 
 msgid "Andorra"
 msgstr "アンドラ"
@@ -53,7 +54,7 @@ msgid "Angola"
 msgstr "アンゴラ"
 
 msgid "Asia/Pacific Region"
-msgstr ""
+msgstr "アジア太平洋地域"
 
 msgid "Antarctica"
 msgstr "南極"
@@ -107,7 +108,7 @@ msgid "Benin"
 msgstr "ベナン"
 
 msgid "Saint Barthélemy"
-msgstr ""
+msgstr "サン・バルテルミー島"
 
 msgid "Bermuda"
 msgstr "バミューダ"
@@ -119,7 +120,7 @@ msgid "Bolivia"
 msgstr "ボリビア"
 
 msgid "Bonaire"
-msgstr ""
+msgstr "ボネール島"
 
 msgid "Brazil"
 msgstr "ブラジル"
@@ -251,7 +252,7 @@ msgid "Falkland Islands (Malvinas)"
 msgstr "フォークランド諸島 (マルビナス)"
 
 msgid "Micronesia"
-msgstr ""
+msgstr "ミクロネシア連邦"
 
 msgid "Faroe Islands"
 msgstr "フェロー諸島"
@@ -353,7 +354,7 @@ msgid "Iraq"
 msgstr "イラク"
 
 msgid "Iran"
-msgstr ""
+msgstr "イラン"
 
 msgid "Iceland"
 msgstr "アイスランド"
@@ -392,7 +393,7 @@ msgid "Saint Kitts and Nevis"
 msgstr "セントクリストファー・ネイビス"
 
 msgid "North Korea"
-msgstr ""
+msgstr "北朝鮮"
 
 msgid "Republic of Korea"
 msgstr "大韓民国"
@@ -437,7 +438,7 @@ msgid "Latvia"
 msgstr "ラトビア"
 
 msgid "Libya"
-msgstr ""
+msgstr "リビア"
 
 msgid "Morocco"
 msgstr "モロッコ"
@@ -446,7 +447,7 @@ msgid "Monaco"
 msgstr "モナコ"
 
 msgid "Moldova"
-msgstr ""
+msgstr "モルドヴァ"
 
 msgid "Montenegro"
 msgstr "モンテネグロ"
@@ -461,7 +462,7 @@ msgid "Marshall Islands"
 msgstr "マーシャル諸島"
 
 msgid "Macedonia"
-msgstr ""
+msgstr "マケドニア"
 
 msgid "Mali"
 msgstr "マリ"
@@ -473,7 +474,7 @@ msgid "Mongolia"
 msgstr "モンゴル"
 
 msgid "Macau"
-msgstr ""
+msgstr "マカオ"
 
 msgid "Northern Mariana Islands"
 msgstr "北マリアナ諸島連邦"
@@ -653,7 +654,7 @@ msgid "Suriname"
 msgstr "スリナム"
 
 msgid "South Sudan"
-msgstr ""
+msgstr "南スーダン"
 
 msgid "Sao Tome and Principe"
 msgstr "サントメ・プリンシペ"
@@ -662,10 +663,10 @@ msgid "El Salvador"
 msgstr "エルサルバドル"
 
 msgid "Sint Maarten"
-msgstr ""
+msgstr "セント・マーチン島"
 
 msgid "Syria"
-msgstr ""
+msgstr "シリア"
 
 msgid "Swaziland"
 msgstr "スワジランド"
@@ -716,7 +717,7 @@ msgid "Taiwan"
 msgstr "台湾"
 
 msgid "Tanzania"
-msgstr ""
+msgstr "タンザニア"
 
 msgid "Ukraine"
 msgstr "ウクライナ"
@@ -737,7 +738,7 @@ msgid "Uzbekistan"
 msgstr "ウズベキスタン"
 
 msgid "Vatican"
-msgstr ""
+msgstr "バチカン"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "セントビンセントおよびグレナディーン諸島"
@@ -749,7 +750,7 @@ msgid "Virgin Islands"
 msgstr "バージン諸島"
 
 msgid "Vietnam"
-msgstr ""
+msgstr "ヴェトナム"
 
 msgid "Vanuatu"
 msgstr "バヌアツ"
