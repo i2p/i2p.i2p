@@ -323,7 +323,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         boolean removed = _subsessions.remove(session);
         if (removed) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Removeed subsession " + session);
+                _log.warn("Removed subsession " + session);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Subsession not found to remove " + session);
