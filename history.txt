@@ -1,5 +1,9 @@
+2018-08-20 zzz
+ * Jetty 9.2.25.v20180606
+
 2018-08-19 zzz
  * NTCP2: Catch bad IV exception
+ * Update translations
 
 2018-08-16 zzz
  * i2ptunnel: Change read timeout defaults now that streaming timeout works
