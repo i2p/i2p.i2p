@@ -74,7 +74,7 @@ class MessageInputStream extends InputStream {
         _readyDataBlocks = new ArrayList<ByteArray>(4);
         _highestReadyBlockId = -1;
         _highestBlockId = -1;
-        _readTimeout = -1;
+        _readTimeout = I2PSocketOptionsImpl.DEFAULT_READ_TIMEOUT;
         _notYetReadyBlocks = new HashMap<Long, ByteArray>(4);
         _dataLock = new Object();
         _maxMessageSize = maxMessageSize;

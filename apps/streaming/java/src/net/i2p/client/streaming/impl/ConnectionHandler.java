@@ -64,8 +64,8 @@ class ConnectionHandler {
     public synchronized void setActive(boolean active) { 
         // FIXME active=false this only kills for one thread in accept()
         // if there are more, they won't get a poison packet.
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("setActive(" + active + ") called, previously " + _active, new Exception("I did it"));
+        if (_log.shouldInfo())
+            _log.info("setActive(" + active + ") called, previously " + _active, new Exception("I did it"));
         // if starting, clear any old poison
         if (active && !_active) {
             _restartPending = false;
