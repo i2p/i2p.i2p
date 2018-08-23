@@ -76,6 +76,10 @@ Current Runtime Dependencies
   We depend on libgmp-dev for both the build and the runtime, but perhaps only the
   libgmp10 package is required for runtime? To be researched.
 
+* famfamfam-flag-png
+  Country flags (all except precise)
+  In precise and non-Debian builds we bundle the flags.
+
 
 Bundled code, NOT current dependencies
 --------------------------------------
