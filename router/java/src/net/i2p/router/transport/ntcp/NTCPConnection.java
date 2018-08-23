@@ -2131,21 +2131,12 @@ public class NTCPConnection implements Closeable {
         }
 
         public void gotOptions(byte[] options, boolean isHandshake) {
-            if (options.length < 12) {
+            NTCP2Options hisPadding = NTCP2Options.fromByteArray(options);
+            if (hisPadding == null) {
                 if (_log.shouldWarn())
                     _log.warn("Got options length " + options.length + " on: " + this);
                 return;
             }
-            float tmin = (options[0] & 0xff) / 16.0f;
-            float tmax = (options[1] & 0xff) / 16.0f;
-            float rmin = (options[2] & 0xff) / 16.0f;
-            float rmax = (options[3] & 0xff) / 16.0f;
-            int tdummy = (int) DataHelper.fromLong(options, 4, 2);
-            int rdummy = (int) DataHelper.fromLong(options, 6, 2);
-            int tdelay = (int) DataHelper.fromLong(options, 8, 2);
-            int rdelay = (int) DataHelper.fromLong(options, 10, 2);
-            NTCP2Options hisPadding = new NTCP2Options(tmin, tmax, rmin, rmax,
-                                                       tdummy, rdummy, tdelay, rdelay);
             _paddingConfig = OUR_PADDING.merge(hisPadding);
             if (_log.shouldDebug())
                 _log.debug("Got padding options:" +
