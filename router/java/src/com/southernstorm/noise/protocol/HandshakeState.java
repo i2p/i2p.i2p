@@ -39,17 +39,12 @@ public class HandshakeState implements Destroyable {
 	private final boolean isInitiator;
 	private DHState localKeyPair;
 	private DHState localEphemeral;
-	private DHState localHybrid;
 	private DHState remotePublicKey;
 	private DHState remoteEphemeral;
-	private DHState remoteHybrid;
 	private DHState fixedEphemeral;
-	private DHState fixedHybrid;
 	private int action;
 	private final int requirements;
 	private int patternIndex;
-        // not supported
-	private static final byte[] preSharedKey = null;
         // not supported
 	private static final byte[] prologue = null;
 
@@ -369,10 +364,6 @@ public class HandshakeState implements Destroyable {
 				symmetric.mixPublicKey(localKeyPair);
 			if ((requirements & FALLBACK_PREMSG) != 0) {
 				symmetric.mixPublicKey(remoteEphemeral);
-				if (remoteHybrid != null)
-					symmetric.mixPublicKey(remoteHybrid);
-				if (preSharedKey != null)
-					symmetric.mixPublicKeyIntoCK(remoteEphemeral);
 			}
 			if ((requirements & REMOTE_PREMSG) != 0)
 				symmetric.mixPublicKey(remotePublicKey);
@@ -381,10 +372,6 @@ public class HandshakeState implements Destroyable {
 				symmetric.mixPublicKey(remotePublicKey);
 			if ((requirements & FALLBACK_PREMSG) != 0) {
 				symmetric.mixPublicKey(localEphemeral);
-				if (localHybrid != null)
-					symmetric.mixPublicKey(localHybrid);
-				if (preSharedKey != null)
-					symmetric.mixPublicKeyIntoCK(localEphemeral);
 			}
 			if ((requirements & LOCAL_PREMSG) != 0)
 				symmetric.mixPublicKey(localKeyPair);
@@ -511,8 +498,6 @@ public class HandshakeState implements Destroyable {
 
 						// If the protocol is using pre-shared keys, then also mix
 						// the local ephemeral key into the chaining key.
-						if (preSharedKey != null)
-							symmetric.mixKey(message, messagePosn, len);
 						messagePosn += len;
 					}
 					break;
@@ -664,8 +649,6 @@ public class HandshakeState implements Destroyable {
 
 						// If the protocol is using pre-shared keys, then also mix
 						// the remote ephemeral key into the chaining key.
-						if (preSharedKey != null)
-							symmetric.mixKey(message, messageOffset, len);
 						messageOffset += len;
 					}
 					break;
@@ -815,20 +798,12 @@ public class HandshakeState implements Destroyable {
 			localKeyPair.destroy();
 		if (localEphemeral != null)
 			localEphemeral.destroy();
-		if (localHybrid != null)
-			localHybrid.destroy();
 		if (remotePublicKey != null)
 			remotePublicKey.destroy();
 		if (remoteEphemeral != null)
 			remoteEphemeral.destroy();
-		if (remoteHybrid != null)
-			remoteHybrid.destroy();
 		if (fixedEphemeral != null)
 			fixedEphemeral.destroy();
-		if (fixedHybrid != null)
-			fixedHybrid.destroy();
-		if (preSharedKey != null)
-			Noise.destroy(preSharedKey);
 		if (prologue != null)
 			Noise.destroy(prologue);
 	}

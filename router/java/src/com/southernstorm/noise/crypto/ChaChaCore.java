@@ -76,34 +76,6 @@ public final class ChaChaCore {
 	}
 
 	/**
-	 * Initializes a ChaCha20 block with a 128-bit key.
-	 * 
-	 * @param output The output block, which must consist of at
-	 * least 16 words.
-	 * @param key The buffer containing the key.
-	 * @param offset Offset of the key in the buffer.
-	 */
-	public static void initKey128(int[] output, byte[] key, int offset)
-	{
-		output[0] = char4('e', 'x', 'p', 'a');
-		output[1] = char4('n', 'd', ' ', '1');
-		output[2] = char4('6', '-', 'b', 'y');
-		output[3] = char4('t', 'e', ' ', 'k');
-		output[4] = fromLittleEndian(key, offset);
-		output[5] = fromLittleEndian(key, offset + 4);
-		output[6] = fromLittleEndian(key, offset + 8);
-		output[7] = fromLittleEndian(key, offset + 12);
-		output[8] = output[4];
-		output[9] = output[5];
-		output[10] = output[6];
-		output[11] = output[7];
-		output[12] = 0;
-		output[13] = 0;
-		output[14] = 0;
-		output[15] = 0;
-	}
-
-	/**
 	 * Initializes a ChaCha20 block with a 256-bit key.
 	 * 
 	 * @param output The output block, which must consist of at
