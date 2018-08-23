@@ -484,7 +484,11 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         StringBuilder buf = new StringBuilder(256);
         buf.append("[DatabaseLookupMessage: ");
         buf.append("\n\tSearch Type: ").append(_type);
-        buf.append("\n\tSearch Key: ").append(_key);
+        buf.append("\n\tSearch Key: ");
+        if (_type == Type.LS)
+            buf.append(_key.toBase32());
+        else
+            buf.append(_key);
         if (_replyKey != null)
             buf.append("\n\tReply GW: ");
         else
