@@ -79,7 +79,7 @@ public class TransportManager implements TransportEventListener {
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
 
     private static final String PROP_NTCP2_ENABLE = "i2np.ntcp2.enable";
-    private static final boolean DEFAULT_NTCP2_ENABLE = false;
+    private static final boolean DEFAULT_NTCP2_ENABLE = true;
 
     private static final String PROP_ADVANCED = "routerconsole.advanced";
     
