@@ -71,7 +71,7 @@ public final class SimpleByteCache {
     }
 
     private SimpleByteCache(int maxCachedEntries, int entrySize) {
-        _available = new TryCache(new ByteArrayFactory(entrySize), maxCachedEntries);
+        _available = new TryCache<byte[]>(new ByteArrayFactory(entrySize), maxCachedEntries);
         _entrySize = entrySize;
     }
     

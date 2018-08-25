@@ -86,7 +86,7 @@ public class VMCommSystem extends CommSystemFacade {
         } else {
             _context.jobQueue().addJob(msg.getOnSendJob());
             _context.profileManager().messageSent(msg.getTarget().getIdentity().getHash(), "vm", sendTime, msg.getMessageSize());
-            byte data[] = new byte[(int)msg.getMessageSize()];
+            byte data[] = new byte[msg.getMessageSize()];
             msg.getMessageData(data);
             _context.statManager().addRateData("transport.sendMessageSize", data.length, sendTime);
 

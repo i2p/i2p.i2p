@@ -244,7 +244,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     private static int flagMode(int flags) {
         int v = flags & FLAG_MODE;
         v >>>= 5;
-        return (int)v;
+        return v;
     }
     
     /**  unused */
