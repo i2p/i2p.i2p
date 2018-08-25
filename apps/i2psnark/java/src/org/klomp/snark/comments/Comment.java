@@ -10,7 +10,11 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 
 /**
- * Store comments
+ * Store a single comment and/or rating.
+ * Unmodifiable except for marking as hidden.
+ * Stores a one-second timestamp but designed so identical
+ * comments within a certain time frame (bucket) are equal.
+ * Don't store in a plain set - see equals().
  *
  * @since 0.9.31
  */
@@ -30,6 +34,7 @@ public class Comment implements Comparable<Comment> {
     private static final int MAX_TEXT_LEN = 512;
     private static final int BUCKET_SIZE = 10*60*1000;
     private static final long TIME_SHRINK = 1000L;
+    private static final int MAX_SKEW = (int) (BUCKET_SIZE / TIME_SHRINK);
     // 1/1/2005
     private static final long TIME_OFFSET = 1104537600000L;
 
@@ -181,26 +186,29 @@ public class Comment implements Comparable<Comment> {
         }
     }
 
-
+    /**
+     *  @return bucket number
+     */
     @Override
     public int hashCode() {
-        return time / (BUCKET_SIZE / (int) TIME_SHRINK);
+        return time / MAX_SKEW;
     }
 
     /**
-     *  Comments in the same 10-minute bucket and otherwise equal
-     *  are considered equal. This will result in duplicates
-     *  near the border.
+     *  Comments within 10 minutes (not necessarily in same bucket)
+     *  and otherwise equal are considered equal.
+     *  Violates contract, as equal objects may have different hashcodes and
+     *  be in adjacent buckets.
      */
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;
         if (!(o instanceof Comment)) return false;
         Comment c = (Comment) o;
-        return rating == c.rating &&
-               eq(text, c.text) &&
-               eq(name, c.name) &&
-               hashCode() == c.hashCode();
+        int tdiff = time - c.time;
+        if (tdiff > MAX_SKEW || tdiff < 0 - MAX_SKEW)
+            return false;
+        return equalsIgnoreTimestamp(c);
     }
 
     /**
