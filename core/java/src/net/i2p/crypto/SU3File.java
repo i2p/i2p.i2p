@@ -324,7 +324,7 @@ public class SU3File {
                 try {
                     _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
                 } catch (GeneralSecurityException gse) {
-                    IOException ioe = new IOException("keystore error");
+                    IOException ioe = new IOException("Certificate error for " + _signer + ": " + gse);
                     ioe.initCause(gse);
                     throw ioe;
                 }
@@ -338,7 +338,7 @@ public class SU3File {
                         try {
                             _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
                         } catch (GeneralSecurityException gse) {
-                            IOException ioe = new IOException("keystore error");
+                            IOException ioe = new IOException("Certificate error for " + _signer + ": " + gse);
                             ioe.initCause(gse);
                             throw ioe;
                         }
