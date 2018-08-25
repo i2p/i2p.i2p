@@ -148,7 +148,8 @@ public class ConfigClientsHelper extends HelperBase {
                 showStart = clientApp == null;
                 showStop = clientApp != null && clientApp.getState() == ClientAppState.RUNNING;
             }
-            renderForm(buf, ""+cur, ca.clientName,
+            String scur = Integer.toString(cur);
+            renderForm(buf, scur, ca.clientName,
                        // urlify, enabled
                        false, !ca.disabled,
                        // read only, preventDisable
@@ -158,7 +159,7 @@ public class ConfigClientsHelper extends HelperBase {
                        // description
                        DataHelper.escapeHTML(ca.className + ((ca.args != null) ? " " + ca.args : "")),
                        // edit
-                       allowEdit && (""+cur).equals(_edit),
+                       allowEdit && scur.equals(_edit),
                        // show edit button, show update button
                        // Don't allow edit if it's running, or else we would lose the "handle" to the ClientApp to stop it.
                        allowEdit && !showStop, false, 
@@ -169,7 +170,7 @@ public class ConfigClientsHelper extends HelperBase {
         }
         
         if (allowEdit && "new".equals(_edit))
-            renderForm(buf, "" + clients.size(), "", false, false, false, false, "", true, false, false, false, false, false);
+            renderForm(buf, Integer.toString(clients.size()), "", false, false, false, false, "", true, false, false, false, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }

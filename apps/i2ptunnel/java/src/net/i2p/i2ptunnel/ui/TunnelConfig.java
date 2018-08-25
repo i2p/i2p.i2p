@@ -604,7 +604,7 @@ public class TunnelConfig {
             if (TunnelController.TYPE_HTTP_CLIENT.equals(_type))
                 _booleanOptions.add(I2PTunnelHTTPClient.PROP_SSL_SET);
             for (String p : _booleanClientOpts)
-                config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
+                config.setProperty(OPT + p, Boolean.toString(_booleanOptions.contains(p)));
             for (String p : _otherClientOpts) {
                 if (_otherOptions.containsKey(p))
                     config.setProperty(OPT + p, _otherOptions.get(p));
@@ -616,7 +616,7 @@ public class TunnelConfig {
             // see TunnelController.setConfig()
             _booleanOptions.add(TunnelController.PROP_LIMITS_SET);
             for (String p : _booleanServerOpts)
-                config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
+                config.setProperty(OPT + p, Boolean.toString(_booleanOptions.contains(p)));
             for (String p : _otherServerOpts) {
                 if (_otherOptions.containsKey(p))
                     config.setProperty(OPT + p, _otherOptions.get(p));
@@ -634,7 +634,7 @@ public class TunnelConfig {
         if (TunnelController.TYPE_HTTP_CLIENT.equals(_type) || TunnelController.TYPE_CONNECT.equals(_type) || 
             TunnelController.TYPE_SOCKS.equals(_type) ||TunnelController.TYPE_SOCKS_IRC.equals(_type)) {
             for (String p : _booleanProxyOpts)
-                config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
+                config.setProperty(OPT + p, Boolean.toString(_booleanOptions.contains(p)));
             if (_proxyList != null)
                 config.setProperty(TunnelController.PROP_PROXIES, _proxyList);
         }
@@ -705,7 +705,7 @@ public class TunnelConfig {
         if (TunnelController.TYPE_IRC_CLIENT.equals(_type)) {
             boolean dcc = _booleanOptions.contains(I2PTunnelIRCClient.PROP_DCC);
             config.setProperty(OPT + I2PTunnelIRCClient.PROP_DCC,
-                               "" + dcc);
+                               Boolean.toString(dcc));
             // add some sane server options since they aren't in the GUI (yet)
             if (dcc) {
                 config.setProperty(OPT + PROP_MAX_CONNS_MIN, "3");

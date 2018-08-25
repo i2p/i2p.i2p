@@ -240,7 +240,7 @@ public class I2PSocketManagerFactory {
         if (i2cpHost != null)
             opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
         if (i2cpPort > 0)
-            opts.setProperty(I2PClient.PROP_TCP_PORT, "" + i2cpPort);
+            opts.setProperty(I2PClient.PROP_TCP_PORT, Integer.toString(i2cpPort));
         
         I2PSession session = client.createSession(myPrivateKeyStream, opts);
         if (connect)

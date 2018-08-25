@@ -337,16 +337,16 @@ public class TunnelPoolSettings {
      */
     public void writeToProperties(String prefix, Properties props) {
         if (props == null) return;
-        props.setProperty(prefix + PROP_ALLOW_ZERO_HOP, ""+_allowZeroHop);
-        props.setProperty(prefix + PROP_BACKUP_QUANTITY, ""+_backupQuantity);
+        props.setProperty(prefix + PROP_ALLOW_ZERO_HOP, Boolean.toString(_allowZeroHop));
+        props.setProperty(prefix + PROP_BACKUP_QUANTITY, Integer.toString(_backupQuantity));
         //props.setProperty(prefix + PROP_DURATION, ""+_duration);
-        props.setProperty(prefix + PROP_LENGTH, ""+_length);
-        props.setProperty(prefix + PROP_LENGTH_VARIANCE, ""+_lengthVariance);
+        props.setProperty(prefix + PROP_LENGTH, Integer.toString(_length));
+        props.setProperty(prefix + PROP_LENGTH_VARIANCE, Integer.toString(_lengthVariance));
         if (_destinationNickname != null)
-            props.setProperty(prefix + PROP_NICKNAME, ""+_destinationNickname);
-        props.setProperty(prefix + PROP_QUANTITY, ""+_quantity);
+            props.setProperty(prefix + PROP_NICKNAME, _destinationNickname);
+        props.setProperty(prefix + PROP_QUANTITY, Integer.toString(_quantity));
         // props.setProperty(prefix + PROP_REBUILD_PERIOD, ""+_rebuildPeriod);
-        props.setProperty(prefix + PROP_IP_RESTRICTION, ""+_IPRestriction);
+        props.setProperty(prefix + PROP_IP_RESTRICTION, Integer.toString(_IPRestriction));
         if (!_isInbound)
             props.setProperty(prefix + PROP_PRIORITY, Integer.toString(_priority));
         for (Map.Entry<Object, Object> e : _unknownOptions.entrySet()) {

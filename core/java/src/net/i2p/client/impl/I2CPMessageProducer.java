@@ -387,8 +387,9 @@ class I2CPMessageProducer {
             Properties newprops = new Properties();
             newprops.putAll(props);
             props = newprops;
-            props.setProperty("inbound.quantity", "" + tunnels);
-            props.setProperty("outbound.quantity", "" + tunnels);
+            String stunnels = Integer.toString(tunnels);
+            props.setProperty("inbound.quantity", stunnels);
+            props.setProperty("outbound.quantity", stunnels);
             props.setProperty("inbound.backupQuantity", "0");
             props.setProperty("outbound.backupQuantity", "0");
         }

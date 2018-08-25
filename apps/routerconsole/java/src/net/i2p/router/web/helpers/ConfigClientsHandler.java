@@ -361,7 +361,7 @@ public class ConfigClientsHandler extends FormHandler {
             String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
             Object val = _settings.get(app + ".enabled");
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(app))
-                props.setProperty(name, "" + (val != null));
+                props.setProperty(name, Boolean.toString(val != null));
         }
         RouterConsoleRunner.storeWebAppProperties(_context, props);
         addFormNotice(_t("WebApp configuration saved."));
@@ -375,7 +375,7 @@ public class ConfigClientsHandler extends FormHandler {
                 continue;
             String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
             Object val = _settings.get(app + ".enabled");
-            props.setProperty(name, "" + (val != null));
+            props.setProperty(name, Boolean.toString(val != null));
         }
         PluginStarter.storePluginProperties(props);
         addFormNotice(_t("Plugin configuration saved."));

@@ -30,7 +30,7 @@ public class ConfigSummaryHandler extends FormHandler {
             try {
                 int refreshInterval = Integer.parseInt(getJettyString("refreshInterval"));
                 if (refreshInterval >= CSSHelper.MIN_REFRESH) {
-                    _context.router().saveConfig(CSSHelper.PROP_REFRESH, "" + refreshInterval);
+                    _context.router().saveConfig(CSSHelper.PROP_REFRESH, Integer.toString(refreshInterval));
                     addFormNotice(_t("Refresh interval changed"));
                 } else
                     addFormError(_t("Refresh interval must be at least {0} seconds", CSSHelper.MIN_REFRESH));

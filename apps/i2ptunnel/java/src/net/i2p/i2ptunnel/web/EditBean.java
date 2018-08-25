@@ -61,7 +61,7 @@ public class EditBean extends IndexBean {
 
     public String getTargetPort(int tunnel) {
         int port = _helper.getTargetPort(tunnel);
-        return port > 0 ? "" + port : "";
+        return port > 0 ? Integer.toString(port) : "";
     }
 
     public String getPrivateKeyFile(int tunnel) {

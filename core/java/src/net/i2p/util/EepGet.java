@@ -557,7 +557,7 @@ public class EepGet {
             System.out.println("** " + new Date());
             System.out.println("** Attempt " + currentAttempt + " of " + url + " failed");
             System.out.println("** Transfered " + bytesTransferred
-                               + " with " + (bytesRemaining < 0 ? "unknown" : ""+bytesRemaining) + " remaining");
+                               + " with " + (bytesRemaining < 0 ? "unknown" : Long.toString(bytesRemaining)) + " remaining");
             System.out.println("** " + cause.getMessage());
             _previousWritten += _written;
             _written = 0;
@@ -566,7 +566,7 @@ public class EepGet {
             System.out.println("== " + new Date());
             System.out.println("== Transfer of " + url + " failed after " + currentAttempt + " attempts");
             System.out.println("== Transfer size: " + bytesTransferred + " with "
-                               + (bytesRemaining < 0 ? "unknown" : ""+bytesRemaining) + " remaining");
+                               + (bytesRemaining < 0 ? "unknown" : Long.toString(bytesRemaining)) + " remaining");
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
             double kbps = (timeToSend > 0 ? (1000.0d*(bytesTransferred)/(timeToSend*1024.0d)) : 0);

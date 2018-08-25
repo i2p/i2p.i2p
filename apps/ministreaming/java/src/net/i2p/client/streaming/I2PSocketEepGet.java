@@ -169,8 +169,8 @@ public class I2PSocketEepGet extends EepGet {
                 // This currently duplicates what SocketTimeout is doing in EepGet,
                 // but when that's ripped out of EepGet to use setsotimeout, we'll need this.
                 Properties props = new Properties();
-                props.setProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT, "" + CONNECT_TIMEOUT);
-                props.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, "" + INACTIVITY_TIMEOUT);
+                props.setProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT, Integer.toString(CONNECT_TIMEOUT));
+                props.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, Integer.toString(INACTIVITY_TIMEOUT));
                 // This is important - even if the underlying socket doesn't have a connect delay,
                 // we want to set it for this connection, so the request headers will go out
                 // in the SYN packet, saving one RTT.
