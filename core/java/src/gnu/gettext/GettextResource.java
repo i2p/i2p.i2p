@@ -148,7 +148,7 @@ public abstract class GettextResource extends ResourceBundle {
               String[] pluralforms = (String[])localValue;
               long i = 0;
               try {
-                i = ((Long) pluralEvalMethod.invoke(catalog, new Object[] { new Long(n) })).longValue();
+                i = ((Long) pluralEvalMethod.invoke(catalog, new Object[] { Long.valueOf(n) })).longValue();
                 if (!(i >= 0 && i < pluralforms.length))
                   i = 0;
               } catch (IllegalAccessException e) {

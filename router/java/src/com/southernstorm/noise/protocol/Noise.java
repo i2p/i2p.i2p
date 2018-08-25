@@ -125,11 +125,10 @@ public final class Noise {
 	static void throwBadTagException() throws BadPaddingException
 	{
 		try {
+			// java since 1.7; android since API 19
 			Class<?> c = Class.forName("javax.crypto.AEADBadTagException");
-			throw (BadPaddingException)(c.newInstance());
-		} catch (ClassNotFoundException e) {
-		} catch (InstantiationException e) {
-		} catch (IllegalAccessException e) {
+			throw (BadPaddingException)(c.getDeclaredConstructor().newInstance());
+		} catch (Exception e) {
 		}
 		throw new BadPaddingException();
 	}
