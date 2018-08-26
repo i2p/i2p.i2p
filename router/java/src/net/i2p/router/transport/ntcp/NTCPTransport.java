@@ -1528,7 +1528,13 @@ public class NTCPTransport extends TransportImpl {
             // we are still firewalled (SW firewall, bad UPnP indication, etc.)
             if (_log.shouldLog(Log.INFO))
                 _log.info("old host: " + ohost + " config: " + name + " new: null");
-            newAddr = null;
+            if (_enableNTCP2) {
+                // addNTCP2Options() called below
+                newProps.clear();
+                newAddr = new RouterAddress(STYLE2, newProps, NTCP2_OUTBOUND_COST);
+            } else {
+                newAddr = null;
+            }
             changed = true;
         }
 

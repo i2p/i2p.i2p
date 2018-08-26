@@ -949,9 +949,13 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
      */
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
         // Validate Alice static key
-        String s = null;
         // find address with matching version
         List<RouterAddress> addrs = ri.getTargetAddresses(NTCPTransport.STYLE, NTCPTransport.STYLE2);
+        if (addrs.isEmpty()) {
+            _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
+            throw new DataFormatException("no NTCP in RI: " + ri);
+        }
+        String s = null;
         for (RouterAddress addr : addrs) {
             String v = addr.getOption("v");
             if (v == null ||
@@ -964,19 +968,19 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         }
         if (s == null) {
             _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
-            throw new DataFormatException("no s in RI");
+            throw new DataFormatException("no s in RI: " + ri);
         }
         byte[] sb = Base64.decode(s);
         if (sb == null || sb.length != KEY_SIZE) {
             _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
-            throw new DataFormatException("bad s in RI");
+            throw new DataFormatException("bad s in RI: " + ri);
         }
         byte[] nb = new byte[32];
         // compare to the _handshakeState
         _handshakeState.getRemotePublicKey().getPublicKey(nb, 0);
         if (!DataHelper.eqCT(sb, 0, nb, 0, KEY_SIZE)) {
             _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
-            throw new DataFormatException("s mismatch in RI");
+            throw new DataFormatException("s mismatch in RI: " + ri);
         }
         _aliceIdent = ri.getIdentity();
         Hash h = _aliceIdent.calculateHash();
