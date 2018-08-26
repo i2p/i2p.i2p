@@ -41,7 +41,6 @@ public class HandshakeState implements Destroyable {
 	private DHState localEphemeral;
 	private DHState remotePublicKey;
 	private DHState remoteEphemeral;
-	private DHState fixedEphemeral;
 	private int action;
 	private final int requirements;
 	private int patternIndex;
@@ -486,10 +485,7 @@ public class HandshakeState implements Destroyable {
 						// then the ephemeral key may have already been provided.
 						if (localEphemeral == null)
 							throw new IllegalStateException("Pattern definition error");
-						if (fixedEphemeral == null)
-							localEphemeral.generateKeyPair();
-						else
-							localEphemeral.copyFrom(fixedEphemeral);
+						localEphemeral.generateKeyPair();
 						len = localEphemeral.getPublicKeyLength();
 						if (space < len)
 							throw new ShortBufferException();
@@ -802,8 +798,6 @@ public class HandshakeState implements Destroyable {
 			remotePublicKey.destroy();
 		if (remoteEphemeral != null)
 			remoteEphemeral.destroy();
-		if (fixedEphemeral != null)
-			fixedEphemeral.destroy();
 		if (prologue != null)
 			Noise.destroy(prologue);
 	}

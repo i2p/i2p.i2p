@@ -612,10 +612,6 @@ public class NTCPTransport extends TransportImpl {
     /** queue up afterSend call, which can take some time w/ jobs, etc */
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
 
-    private boolean isEstablished(RouterIdentity peer) {
-        return isEstablished(peer.calculateHash());
-    }
-
     @Override
     public boolean isEstablished(Hash dest) {
             NTCPConnection con = _conByIdent.get(dest);

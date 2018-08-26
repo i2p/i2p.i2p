@@ -39,7 +39,7 @@ public class PersistentKeyRing extends KeyRing {
     @Override
     public SessionKey remove(Object o) {
         SessionKey rv = super.remove(o);
-        if (rv != null && o != null && o instanceof Hash) {
+        if (rv != null && o instanceof Hash) {
             Hash h = (Hash) o;
             _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace("=", "$"), null);
         }

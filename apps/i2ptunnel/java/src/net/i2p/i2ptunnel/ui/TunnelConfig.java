@@ -811,8 +811,8 @@ public class TunnelConfig {
         "proxyUsername", "proxyPassword"
         };
 
-    public static final Set<String> _noShowSet = new HashSet<String>(128);
-    public static final Set<String> _nonProxyNoShowSet = new HashSet<String>(4);
+    static final Set<String> _noShowSet = new HashSet<String>(128);
+    static final Set<String> _nonProxyNoShowSet = new HashSet<String>(4);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
         _noShowSet.addAll(Arrays.asList(_booleanClientOpts));

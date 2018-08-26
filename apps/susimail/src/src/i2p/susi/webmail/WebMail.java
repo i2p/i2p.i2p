@@ -898,6 +898,10 @@ public class WebMail extends HttpServlet
 				// because we may already have UIDLs in the MailCache to fetch
 				synchronized(_so) {
 					mc = _so.caches.get(DIR_FOLDER);
+					if (mc == null) {
+						_so.error += "Internal error, no folder\n";
+						return;
+					}
 					while (mc.isLoading()) {
 						try {
 							_so.wait(5000);
@@ -910,9 +914,7 @@ public class WebMail extends HttpServlet
 				if (log.shouldDebug()) log.debug("Done waiting for folder load");
 				// fetch the mail outside the lock
 				// TODO, would be better to add each email as we get it
-				if (mc != null) {
-					found = mc.getMail(MailCache.FetchMode.HEADER);
-				}
+				found = mc.getMail(MailCache.FetchMode.HEADER);
 			}
 			if (log.shouldDebug()) log.debug("CW.FNM connected? " + connected + " found? " + found);
 			synchronized(_so) {
@@ -2898,7 +2900,7 @@ public class WebMail extends HttpServlet
 				} else {
 					sessionObject.error += relay.error;
 				}
-				sessionObject.info.replace(_t("Sending mail.") + '\n', "");
+				sessionObject.info = sessionObject.info.replace(_t("Sending mail.") + '\n', "");
 			}
 		}
 	}
@@ -3377,7 +3379,7 @@ public class WebMail extends HttpServlet
 				out.println(button(DELETE, _t("Delete")));
 		}
 		out.println(button(LOGOUT, _t("Logout") ));
-		if (mail.hasBody() && !mc.getFolderName().equals(DIR_DRAFTS)) {
+		if (hasHeader && mail.hasBody() && !mc.getFolderName().equals(DIR_DRAFTS)) {
 			// can't move unless has body
 			// can't move from drafts
 			out.println(button(MOVE_TO, _t("Move to Folder") + ':'));

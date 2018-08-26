@@ -829,10 +829,11 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
      * @since 0.7.12
      */
     public String verifyAndGetSigner(File signedFile) {
-        for (SigningPublicKey signingPublicKey : _trustedKeys.keySet()) {
+        for (Map.Entry<SigningPublicKey, String> e : _trustedKeys.entrySet()) {
+            SigningPublicKey signingPublicKey = e.getKey();
             boolean isValidSignature = verify(signedFile, signingPublicKey);
             if (isValidSignature)
-                return _trustedKeys.get(signingPublicKey);
+                return e.getValue();
         }
         return null;
     }

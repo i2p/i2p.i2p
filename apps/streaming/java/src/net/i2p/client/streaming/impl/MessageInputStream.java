@@ -288,12 +288,11 @@ class MessageInputStream extends InputStream {
                 
                 buf.append(" not ready blocks: [");
                 long notAvailable = 0;
-                for (Long id : _notYetReadyBlocks.keySet()) {
-                    ByteArray ba = _notYetReadyBlocks.get(id);
+                for (Map.Entry<Long, ByteArray> e : _notYetReadyBlocks.entrySet()) {
+                    Long id = e.getKey();
+                    ByteArray ba = e.getValue();
                     buf.append(id).append(" ");
-                    
-                    if (ba != null)
-                        notAvailable += ba.getValid();
+                    notAvailable += ba.getValid();
                 }
                 
                 buf.append("] not ready bytes: ").append(notAvailable);
@@ -589,11 +588,11 @@ class MessageInputStream extends InputStream {
                 buf.append(" blocks: ").append(_readyDataBlocks.size());
                 buf.append(" not ready blocks: [");
                 long notAvailable = 0;
-                for (Long id : _notYetReadyBlocks.keySet()) {
-                    ByteArray ba = _notYetReadyBlocks.get(id);
+                for (Map.Entry<Long, ByteArray> e : _notYetReadyBlocks.entrySet()) {
+                    Long id = e.getKey();
+                    ByteArray ba = e.getValue();
                     buf.append(id).append(" ");
-                    if (ba != null)
-                        notAvailable += ba.getValid();
+                    notAvailable += ba.getValid();
                 }
                 buf.append("] not ready bytes: ").append(notAvailable);
                 buf.append(" highest ready block: ").append(_highestReadyBlockId);

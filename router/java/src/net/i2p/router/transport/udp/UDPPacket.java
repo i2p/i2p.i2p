@@ -407,14 +407,14 @@ class UDPPacket implements CDQEntry {
      *  @param inbound unused
      */
     public static UDPPacket acquire(RouterContext ctx, boolean inbound) {
-        UDPPacket rv = null;
+        UDPPacket rv;
         if (CACHE) {
             PacketFactory.context = ctx;
             rv = _packetCache.acquire();
             rv.init(ctx);
-        }
-        if (rv == null)
+        } else {
             rv = new UDPPacket(ctx);
+        }
         return rv;
     }
 

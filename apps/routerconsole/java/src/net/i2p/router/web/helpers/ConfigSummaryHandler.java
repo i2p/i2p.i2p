@@ -102,10 +102,11 @@ public class ConfigSummaryHandler extends FormHandler {
                         continue;
                     }
                 }
-                for (Iterator<Integer> iter = sections.keySet().iterator(); iter.hasNext(); ) {
-                    int i = iter.next();
+                for (Iterator<Map.Entry<Integer, String>> iter = sections.entrySet().iterator(); iter.hasNext(); ) {
+                    Map.Entry<Integer, String> e = iter.next();
+                    Integer i = e.getKey();
                     if (toDelete.contains(i)) {
-                        String removedName = sections.get(i);
+                        String removedName = e.getValue();
                         iter.remove();
                         addFormNotice(_t("Removed") + ": " + removedName);
                     }
