@@ -109,8 +109,8 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   int pool;
   int pool0Count;
   int reseedCount;
-  static long refillCount = 0;
-  static long lastRefill = System.currentTimeMillis();
+  //static long refillCount = 0;
+  //static long lastRefill = System.currentTimeMillis();
 
   public static final String SEED = "gnu.crypto.prng.fortuna.seed";
 
@@ -126,10 +126,13 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     pool0Count = 0;
     allocBuffer();
   }
+
+  /** Unused, see AsyncFortunaStandalone */
   protected void allocBuffer() {
     buffer = new byte[4*1024*1024]; //256]; // larger buffer to reduce churn
   }
 
+  /** Unused, see AsyncFortunaStandalone */
   public void seed(byte val[]) {
       Map<String, byte[]> props = Collections.singletonMap(SEED, val);
       init(props);
@@ -145,9 +148,10 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     generator.init(attributes);
   }
 
+  /** Unused, see AsyncFortunaStandalone */
   public void fillBlock()
   {
-    long start = System.currentTimeMillis();
+    //long start = System.currentTimeMillis();
     if (pool0Count >= MIN_POOL_SIZE
         && System.currentTimeMillis() - lastReseed > 100)
       {
@@ -162,11 +166,11 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
         lastReseed = System.currentTimeMillis();
       }
     generator.nextBytes(buffer);
-    long now = System.currentTimeMillis();
-    long diff = now-lastRefill;
-    lastRefill = now;
-    long refillTime = now-start;
-    System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
+    //long now = System.currentTimeMillis();
+    //long diff = now-lastRefill;
+    //lastRefill = now;
+    //long refillTime = now-start;
+    //System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
   }
 
     @Override

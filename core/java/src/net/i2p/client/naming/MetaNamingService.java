@@ -213,7 +213,7 @@ public class MetaNamingService extends DummyNamingService {
      */
     public void export(Writer out, Properties options) throws IOException {
         for (NamingService ns : _services) { 
-             export(out, options);
+             ns.export(out, options);
         }
     }
 

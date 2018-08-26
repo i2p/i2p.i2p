@@ -1904,7 +1904,6 @@ public class PeerState {
                 _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount());
             _context.statManager().addRateData("udp.sendConfirmVolley", numSends);
             _transport.succeeded(state);
-            int numFragments = state.getFragmentCount();
             // this adjusts the rtt/rto/window/etc
             messageACKed(state.getMessageSize(), state.getLifetime(), numSends);
             //if (getSendWindowBytesRemaining() > 0)

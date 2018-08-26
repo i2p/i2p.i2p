@@ -2622,11 +2622,6 @@ public class WebMail extends HttpServlet
 		ArrayList<String> ccList = new ArrayList<String>();
 		ArrayList<String> bccList = new ArrayList<String>();
 		
-		String sender = null;
-		if (from != null && Mail.validateAddress(from)) {
-			sender = Mail.getAddress( from );
-		}
-		
 		// no validation
 		Mail.getRecipientsFromList( toList, to, ok );
 		Mail.getRecipientsFromList( ccList, cc, ok );
@@ -2731,7 +2726,6 @@ public class WebMail extends HttpServlet
 		String[] cc = draft.cc;
 		String[] bcc = draft.getBcc();
 		String subject = draft.subject;
-		MailPart text = draft.getPart();
 		List<Attachment> attachments = draft.getAttachments();
 
 		ArrayList<String> toList = new ArrayList<String>();
@@ -2972,7 +2966,8 @@ public class WebMail extends HttpServlet
 			// header set in processRequest()
 			I2PAppContext ctx = I2PAppContext.getGlobalContext();
 			b64UIDL = Base64.encode(ctx.random().nextLong() + "drft");
-		} else {
+		}
+
 			MailCache drafts = sessionObject.caches.get(DIR_DRAFTS);
 			if (drafts == null) {
 				sessionObject.error += "No Drafts folder?\n";
@@ -3007,7 +3002,6 @@ public class WebMail extends HttpServlet
 				// needed when processing the CANCEL button
 				out.println("<input type=\"hidden\" name=\"" + DRAFT_EXISTS + "\" value=\"1\">");
 			}
-		}
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 		

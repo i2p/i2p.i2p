@@ -981,7 +981,7 @@ public class NTCPConnection implements Closeable {
         List<Block> blocks = new ArrayList<Block>(2);
         Block block = new NTCP2Payload.RIBlock(ri, shouldFlood);
         int size = block.getTotalLength();
-        if (size > BUFFER_SIZE) {
+        if (size + NTCP2Payload.BLOCK_HEADER_SIZE > BUFFER_SIZE) {
             if (_log.shouldWarn())
                 _log.warn("RI too big: " + ri);
             return;
@@ -993,7 +993,6 @@ public class NTCPConnection implements Closeable {
             // all zeros is fine here
             //block = new NTCP2Payload.PaddingBlock(_context, padlen);
             block = new NTCP2Payload.PaddingBlock(padlen);
-            size += block.getTotalLength();
             blocks.add(block);
         }
         // use a "read buf" for the temp array
@@ -1040,7 +1039,6 @@ public class NTCPConnection implements Closeable {
             // all zeros is fine here
             //block = new NTCP2Payload.PaddingBlock(_context, padlen);
             block = new NTCP2Payload.PaddingBlock(padlen);
-            plen += block.getTotalLength();
             blocks.add(block);
         }
         // use a "read buf" for the temp array

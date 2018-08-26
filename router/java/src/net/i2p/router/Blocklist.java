@@ -422,8 +422,8 @@ public class Blocklist {
         //    buf.deleteCharAt(end1 - 1);
         //    end1--;
         //}
-        if (end1 <= 0)
-            return null;  // blank
+        //if (end1 <= 0)
+        //    return null;  // blank
         int start2 = -1;
         int mask = -1;
         String comment = null;

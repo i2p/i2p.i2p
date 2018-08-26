@@ -281,15 +281,13 @@ class PacketHandler {
                     if ( (con.getHighestAckedThrough() <= 5) && (packet.getSequenceNum() <= 5) ) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Received additional packet w/o SendStreamID after the syn on " + con + ": " + packet);
-                        receiveKnownCon(con, packet);
-                        return;
                     } else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("hrmph, received while ack of syn was in flight on " + con + ": " + packet + " acked: " + con.getAckedPackets());
                         // allow unlimited packets without a SendStreamID for now
-                        receiveKnownCon(con, packet);
-                        return;
                     }
+                    receiveKnownCon(con, packet);
+                    return;
                 }
             } else {
                 // if it has a send ID, it's almost certainly for a recently removed connection.
@@ -299,6 +297,7 @@ class PacketHandler {
                               recent + ' ' + packet);
                 }
                 // don't bother sending reset
+                // TODO send reset if recent && has data?
                 packet.releasePayload();
                 return;
             }

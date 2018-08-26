@@ -87,11 +87,6 @@ class FragmentedMessage {
         _lastReceived = _lastReceived || isLast;
         if (fragmentNum > _highFragmentNum)
             _highFragmentNum = fragmentNum;
-        if (isLast && fragmentNum <= 0) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("hmm, isLast and fragmentNum=" + fragmentNum + " for message " + _messageId);
-            return false;
-        }
         return true;
     }
     
