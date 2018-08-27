@@ -590,12 +590,7 @@ public class BlockFile implements Closeable {
 		_isClosed = true;
 		metaIndex.close();
 
-		Set<String> oi = openIndices.keySet();
-		Iterator<String> i = oi.iterator();
-		Object k;
-		while(i.hasNext()) {
-			k = i.next();
-			BSkipList bsl = openIndices.get(k);
+		for (BSkipList bsl : openIndices.values()) {
 			bsl.close();
 		}
 

@@ -495,11 +495,7 @@ class StoreJob extends JobImpl {
             StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
     
             if (_log.shouldLog(Log.DEBUG)) {
-                if (shouldEncrypt)
-                    _log.debug("sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
-                else
-                    _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
-                //_log.debug("Expiration is " + new Date(sent.getMessageExpiration()));
+                _log.debug("sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
             }
             getContext().messageRegistry().registerPending(selector, onReply, onFail);
             getContext().tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), null, to);

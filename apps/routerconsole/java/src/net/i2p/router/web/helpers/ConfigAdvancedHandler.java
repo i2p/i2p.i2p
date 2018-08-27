@@ -107,7 +107,6 @@ public class ConfigAdvancedHandler extends FormHandler {
         boolean saved = _context.router().saveConfig(ConfigAdvancedHelper.PROP_FLOODFILL_PARTICIPANT, _ff);
         if (_ff.equals("false") || _ff.equals("true")) {
             FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
-            boolean wasFF = fndf.floodfillEnabled();
             boolean isFF = _ff.equals("true");
             // this will rebuild the RI, log in the event log, etc.
             fndf.setFloodfillEnabled(isFF);

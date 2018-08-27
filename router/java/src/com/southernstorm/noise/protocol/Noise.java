@@ -22,6 +22,7 @@
 
 package com.southernstorm.noise.protocol;
 
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -125,11 +126,14 @@ public final class Noise {
 	static void throwBadTagException() throws BadPaddingException
 	{
 		try {
+			// java since 1.7; android since API 19
 			Class<?> c = Class.forName("javax.crypto.AEADBadTagException");
-			throw (BadPaddingException)(c.newInstance());
+			throw (BadPaddingException)(c.getDeclaredConstructor().newInstance());
 		} catch (ClassNotFoundException e) {
 		} catch (InstantiationException e) {
 		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		} catch (NoSuchMethodException e) {
 		}
 		throw new BadPaddingException();
 	}

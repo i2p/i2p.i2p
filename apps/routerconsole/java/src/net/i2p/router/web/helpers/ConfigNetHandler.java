@@ -282,7 +282,7 @@ public class ConfigNetHandler extends FormHandler {
                 }
                 if (valid) {
                     changes.put(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
-                    changes.put(TransportManager.PROP_ENABLE_NTCP, "" + !"disabled".equals(_ntcpAutoIP));
+                    changes.put(TransportManager.PROP_ENABLE_NTCP, Boolean.toString(!"disabled".equals(_ntcpAutoIP)));
                     restartRequired = true;
                 }
             }
@@ -304,7 +304,7 @@ public class ConfigNetHandler extends FormHandler {
                     removes.add(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
                     addFormNotice(_t("Updating inbound TCP port to auto"));
                 }
-                changes.put(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "" + _ntcpAutoPort);
+                changes.put(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, Boolean.toString(_ntcpAutoPort));
                 restartRequired = true;
             }
 
@@ -339,15 +339,15 @@ public class ConfigNetHandler extends FormHandler {
             // If hidden mode value changes, restart is required
             switchRequired = _hiddenMode != _context.router().isHidden();
             if (switchRequired) {
-                changes.put(PROP_HIDDEN, "" + _hiddenMode);
+                changes.put(PROP_HIDDEN, Boolean.toString(_hiddenMode));
                 if (_hiddenMode)
                     addFormError(_t("Gracefully restarting into Hidden Router Mode"));
                 else
                     addFormError(_t("Gracefully restarting to exit Hidden Router Mode"));
             }
 
-            changes.put(Router.PROP_REBUILD_KEYS, "" + switchRequired);
-            changes.put(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
+            changes.put(Router.PROP_REBUILD_KEYS, Boolean.toString(switchRequired));
+            changes.put(Router.PROP_DYNAMIC_KEYS, Boolean.toString(_dynamicKeys));
 
             if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UPNP) !=
                 _upnp) {
@@ -358,7 +358,7 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_t("Disabling UPnP"));
                 addFormNotice(_t("Restart required to take effect"));
             }
-            changes.put(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
+            changes.put(TransportManager.PROP_ENABLE_UPNP, Boolean.toString(_upnp));
 
             if (Boolean.parseBoolean(_context.getProperty(UDPTransport.PROP_LAPTOP_MODE)) !=
                 _laptop) {
@@ -368,7 +368,7 @@ public class ConfigNetHandler extends FormHandler {
                 else
                     addFormNotice(_t("Disabling laptop mode"));
             }
-            changes.put(UDPTransport.PROP_LAPTOP_MODE, "" + _laptop);
+            changes.put(UDPTransport.PROP_LAPTOP_MODE, Boolean.toString(_laptop));
 
             if (Boolean.parseBoolean(_context.getProperty(TransportUtil.PROP_IPV4_FIREWALLED)) !=
                 _ipv4Firewalled) {
@@ -378,7 +378,7 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_t("Enabling inbound IPv4"));
                 restartRequired = true;
             }
-            changes.put(TransportUtil.PROP_IPV4_FIREWALLED, "" + _ipv4Firewalled);
+            changes.put(TransportUtil.PROP_IPV4_FIREWALLED, Boolean.toString(_ipv4Firewalled));
 
             if (Boolean.parseBoolean(_context.getProperty(TransportUtil.PROP_IPV6_FIREWALLED)) !=
                 _ipv6Firewalled) {
@@ -388,7 +388,7 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_t("Enabling inbound IPv6"));
                 restartRequired = true;
             }
-            changes.put(TransportUtil.PROP_IPV6_FIREWALLED, "" + _ipv6Firewalled);
+            changes.put(TransportUtil.PROP_IPV6_FIREWALLED, Boolean.toString(_ipv6Firewalled));
 
             if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP) !=
                 !_udpDisabled) {
@@ -398,7 +398,7 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_t("Enabling UDP"));
                 restartRequired = true;
             }
-            changes.put(TransportManager.PROP_ENABLE_UDP, "" + (!_udpDisabled));
+            changes.put(TransportManager.PROP_ENABLE_UDP, Boolean.toString(!_udpDisabled));
 
             if (_requireIntroductions) {
                 changes.put(UDPTransport.PROP_FORCE_INTRODUCERS, "true");

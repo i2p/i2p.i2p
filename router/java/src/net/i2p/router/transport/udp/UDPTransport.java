@@ -176,8 +176,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     private static final String PROP_ADVANCED = "routerconsole.advanced";
         
-    private static final String CAP_TESTING = "" + UDPAddress.CAPACITY_TESTING;
-    private static final String CAP_TESTING_INTRO = "" + UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER;
+    private static final String CAP_TESTING = Character.toString(UDPAddress.CAPACITY_TESTING);
+    private static final String CAP_TESTING_INTRO = CAP_TESTING + UDPAddress.CAPACITY_INTRODUCER;
 
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;

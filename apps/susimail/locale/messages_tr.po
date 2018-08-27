@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-13 18:18+0000\n"
-"PO-Revision-Date: 2018-06-13 18:37+0000\n"
+"PO-Revision-Date: 2018-08-12 21:05+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -56,7 +56,7 @@ msgstr "Çöp"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:222
 msgid "Bulk Mail"
-msgstr ""
+msgstr "Toplu E-posta"
 
 #. untranslated, translate on use
 #: src/src/i2p/susi/webmail/WebMail.java:226
@@ -154,14 +154,14 @@ msgstr "Kullanıcı oturumunu kapattı."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1035
 msgid "Draft saved."
-msgstr ""
+msgstr "Taslak kaydedildi."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1045
 #: src/src/i2p/susi/webmail/WebMail.java:1286
 #: src/src/i2p/susi/webmail/WebMail.java:2692
 #: src/src/i2p/susi/webmail/WebMail.java:2874
 msgid "Unable to save mail."
-msgstr ""
+msgstr "E-posta kaydedilemedi."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1175
 #, java-format
@@ -247,7 +247,7 @@ msgstr "Oturum Aç"
 #: src/src/i2p/susi/webmail/WebMail.java:2386
 #: src/src/i2p/susi/webmail/WebMail.java:3091
 msgid "Loading emails, please wait..."
-msgstr ""
+msgstr "E-postalar yükleniyor, lütfen bekleyin..."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2268
 #, java-format
@@ -290,12 +290,12 @@ msgstr "Yeni bir ileti yok"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2388
 msgid "Checking for new emails on server"
-msgstr ""
+msgstr "Sunucu üzerindeki yeni e-postalar denetleniyor"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2390
 #: src/src/i2p/susi/webmail/WebMail.java:3093
 msgid "Refresh the page for updates"
-msgstr ""
+msgstr "Güncellemek için sayfayı yenileyin"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2595
 #: src/src/i2p/susi/webmail/WebMail.java:3193
@@ -325,7 +325,7 @@ msgstr "E-posta çok büyük en fazla {0} olabilir"
 #: src/src/i2p/susi/webmail/WebMail.java:2806
 #: src/src/i2p/susi/webmail/WebMail.java:2886
 msgid "Sending mail."
-msgstr ""
+msgstr "E-posta gönderiliyor."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2811
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:254
@@ -344,7 +344,7 @@ msgstr "Gönder"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2937
 msgid "Save as Draft"
-msgstr ""
+msgstr "Taslak Olarak Kaydet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2938
 #: src/src/i2p/susi/webmail/WebMail.java:3225
@@ -397,7 +397,7 @@ msgstr "Seçilmiş ekleri sil"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3060
 msgid "Email Login"
-msgstr ""
+msgstr "E-posta Oturumu Aç"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:3062
@@ -507,7 +507,7 @@ msgstr "Klasör"
 #. TODO css to center it
 #: src/src/i2p/susi/webmail/WebMail.java:3257
 msgid "Change to Folder"
-msgstr ""
+msgstr "Klasörü Değiştir"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3263
 msgid "First"
@@ -565,7 +565,7 @@ msgstr "Sil"
 #. can't move from drafts
 #: src/src/i2p/susi/webmail/WebMail.java:3368
 msgid "Move to Folder"
-msgstr ""
+msgstr "Klasöre Taşı"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3388
 msgid "Back to Folder"
@@ -599,11 +599,11 @@ msgstr "Sunucudan bir yanıt alınamadı"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."
-msgstr ""
+msgstr "E-posta sunucusu oturumu açılamadı, kullanıcı adı ya da parola hatalı."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr ""
+msgstr "Oturumu kapatıp yeniden doğru kullanıcı adı ve parola ile oturum açın."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240

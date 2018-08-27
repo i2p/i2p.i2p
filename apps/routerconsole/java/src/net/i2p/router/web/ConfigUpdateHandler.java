@@ -55,7 +55,7 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String DEFAULT_PROXY_HOST = "127.0.0.1";
     public static final String PROP_PROXY_PORT = "router.updateProxyPort";
     public static final int DEFAULT_PROXY_PORT_INT = 4444;
-    public static final String DEFAULT_PROXY_PORT = "" + DEFAULT_PROXY_PORT_INT;
+    public static final String DEFAULT_PROXY_PORT = Integer.toString(DEFAULT_PROXY_PORT_INT);
     /** default false */
     public static final String PROP_UPDATE_UNSIGNED = "router.updateUnsigned";
     /** default false - use for distros */
@@ -251,7 +251,7 @@ public class ConfigUpdateHandler extends FormHandler {
         long oldFreq = DEFAULT_REFRESH_FREQ;
         try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
         if (_refreshFrequency != oldFreq) {
-            changes.put(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
+            changes.put(PROP_REFRESH_FREQUENCY, Long.toString(_refreshFrequency));
             addFormNoticeNoEscape(_t("Updating refresh frequency to {0}",
                             _refreshFrequency <= 0 ? _t("Never") : DataHelper.formatDuration2(_refreshFrequency)));
         }

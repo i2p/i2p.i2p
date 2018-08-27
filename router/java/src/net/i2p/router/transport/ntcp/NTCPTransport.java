@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -272,7 +273,9 @@ public class NTCPTransport extends TransportImpl {
             }
             if (iv == null || iv.length != NTCP2_IV_LEN) {
                 iv = new byte[NTCP2_IV_LEN];
-                ctx.random().nextBytes(iv);
+                do {
+                    ctx.random().nextBytes(iv);
+                } while (DataHelper.eq(iv, 0, OutboundNTCP2State.ZEROKEY, 0, NTCP2_IV_LEN));
                 shouldSave = true;
             }
             if (shouldSave) {
@@ -334,12 +337,18 @@ public class NTCPTransport extends TransportImpl {
                     if (addr != null) {
                         newVersion = getNTCPVersion(addr);
                         if (newVersion != 0) {
-                            con = new NTCPConnection(_context, this, ident, addr, newVersion);
-                            establishing(con);
-                            //if (_log.shouldLog(Log.DEBUG))
-                            //    _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
-                            // Note that outbound conns go in the map BEFORE establishment
-                            _conByIdent.put(ih, con);
+                            try {
+                                con = new NTCPConnection(_context, this, ident, addr, newVersion);
+                                establishing(con);
+                                //if (_log.shouldLog(Log.DEBUG))
+                                //    _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
+                                // Note that outbound conns go in the map BEFORE establishment
+                                _conByIdent.put(ih, con);
+                            } catch (DataFormatException dfe) {
+                                if (_log.shouldWarn())
+                                    _log.warn("bad address? " + target, dfe);
+                                fail = true;
+                            }
                         } else {
                             fail = true;
                         }
@@ -602,10 +611,6 @@ public class NTCPTransport extends TransportImpl {
 
     /** queue up afterSend call, which can take some time w/ jobs, etc */
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
-
-    private boolean isEstablished(RouterIdentity peer) {
-        return isEstablished(peer.calculateHash());
-    }
 
     @Override
     public boolean isEstablished(Hash dest) {
@@ -1519,7 +1524,13 @@ public class NTCPTransport extends TransportImpl {
             // we are still firewalled (SW firewall, bad UPnP indication, etc.)
             if (_log.shouldLog(Log.INFO))
                 _log.info("old host: " + ohost + " config: " + name + " new: null");
-            newAddr = null;
+            if (_enableNTCP2) {
+                // addNTCP2Options() called below
+                newProps.clear();
+                newAddr = new RouterAddress(STYLE2, newProps, NTCP2_OUTBOUND_COST);
+            } else {
+                newAddr = null;
+            }
             changed = true;
         }
 

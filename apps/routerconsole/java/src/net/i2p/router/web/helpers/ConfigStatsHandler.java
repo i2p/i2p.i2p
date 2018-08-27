@@ -113,7 +113,7 @@ public class ConfigStatsHandler extends FormHandler {
         boolean graphsChanged = !_graphs.equals(_context.getProperty("stat.summaries"));
         changes.put("stat.summaries", _graphs);
         boolean fullChanged = _context.getBooleanProperty(StatManager.PROP_STAT_FULL) != _isFull;
-        changes.put(StatManager.PROP_STAT_FULL, "" + _isFull);
+        changes.put(StatManager.PROP_STAT_FULL, Boolean.toString(_isFull));
         _context.router().saveConfig(changes, null);
         if (!_stats.isEmpty())
             addFormNotice(_t("Stat filter and location updated successfully to") + ": " + stats.toString());

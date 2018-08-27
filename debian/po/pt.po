@@ -1,19 +1,20 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
 # idevk <kraidx@gmail.com>, 2016
 # wtfisthis <low_fps11@yahoo.com>, 2015
 # wtfisthis <low_fps11@yahoo.com>, 2013
+# Manuela Silva <manuela.silva@sky.com>, 2018
 # Rafael Ferrari, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: idevk <kraidx@gmail.com>\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2018-08-16 13:49+0000\n"
+"Last-Translator: Manuela Silva <manuela.silva@sky.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,7 +26,7 @@ msgstr ""
 #. Description
 #: ../i2p.templates:2001
 msgid "Should the I2P router be started at boot?"
-msgstr "Devera o i2p router ser iniciado no arranque "
+msgstr "O \"router\" de i2p deverá ser iniciado no arranque?"
 
 #. Type: boolean
 #. Description
@@ -33,13 +34,13 @@ msgstr "Devera o i2p router ser iniciado no arranque "
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "O i2p router pode correr como serviso que inicaiara quando o computudor iniciar. Esta é a configuração recomendada"
+msgstr "O \"router\" de i2p pode ser executado como um daemon que inicia automaticamente quando o seu computador arranca. É uma configuração recomendada."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
 msgid "I2P daemon user:"
-msgstr "Utilizador do serviço I2P:"
+msgstr "Utilizador do \"daemon\" do I2P:"
 
 #. Type: string
 #. Description
@@ -49,7 +50,7 @@ msgid ""
 " a daemon. To use an **existing** I2P profile you may enter a different "
 "account name here. For example, if your previous I2P installation is at "
 "/home/user/i2p, you may enter 'user' here."
-msgstr "Por padrão o I2P é configurado para executar como utilizador i2psvc no modo Serviço. Para usar um perfil I2P **existente** você pode digitar um nome de utilizador diferente aqui. Por exemplo, se a sua instalação antiga está em /home/user/i2p, você pode digitar 'user'."
+msgstr "Por predefinição o I2P é configurado para funcionar sob a conta de i2psvc quando executar como um \"daemon\". Para utilizar um perfil de I2P **existente**, pode inserir aqui um nome de conta diferente. Por exemplo, se a sua instalação do I2P anterior está em /home/user/i2p, pode inserir aqui o 'utilizador'."
 
 #. Type: string
 #. Description
@@ -57,19 +58,19 @@ msgstr "Por padrão o I2P é configurado para executar como utilizador i2psvc no
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Muito importante: Se um utilizador diferente de 'i2psvc' for introduzido aqui, este utilizador PRECISA existir."
+msgstr "Muito importante: se um utilizador diferente da predefinição de 'i2psvc' for inserido aqui, o nome de utilizador escolhido já *DEVE* existir."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr "Memoria que vai ser alocada pelo I2P:"
+msgstr "Memória que pode ser alocada para o I2P:"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Por defeito o I2P apenas vai ser autorizado a usar até 128MB de RAM."
+msgstr "Por predefinição, o I2P só será autorizado a utilizar até 128MB de RAM."
 
 #. Type: string
 #. Description
@@ -77,13 +78,13 @@ msgstr "Por defeito o I2P apenas vai ser autorizado a usar até 128MB de RAM."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Routers I2P com internet rápida, e também com muitos torrents e plugins ativos, podem precisar aumentar este valor."
+msgstr "\"Routers\" de banda larga, bem como \"routers\" com muitos \"torrents\" / \"plug-ins\" ativos, podem precisar de aumentar este valor."
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Correr daemon I2p confinado com o AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "O \"daemon\" do I2P deverá ser limitado com AppArmor?"
 
 #. Type: boolean
 #. Description
@@ -91,4 +92,4 @@ msgstr "Correr daemon I2p confinado com o AppArmor"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Com esta opção ativada  o I2P Vai correr em sandbox com AppArmor, restringindo que ficheiros  e diretórios são acessíveis pelo I2P "
+msgstr "Com esta opção ativada o I2P será colocado em \"sandbox\" com AppArmor, restringindo quais os ficheiros e diretorias que podem ser acedidos ​​pelo I2P."

@@ -58,7 +58,7 @@ public class CommentSet extends AbstractSet<Comment> {
     // Assume most comments are short or null.
     private static final int MAX_TOTAL_TEXT_LEN = MAX_SIZE * 16;
 
-    public CommentSet() {
+    private CommentSet() {
         super();
         map = new HashMap<Integer, List<Comment>>(4);
     }
@@ -80,7 +80,7 @@ public class CommentSet extends AbstractSet<Comment> {
         try {
             br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file)), "UTF-8"));
             String line = null;
-            while ( (line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 Comment c = Comment.fromPersistentString(line);
                 if (c != null)
                     add(c);
@@ -129,7 +129,18 @@ public class CommentSet extends AbstractSet<Comment> {
         // If isMine and no text and rating changed, don't bother
         if (c.isMine() && c.getText() == null && c.getRating() == myRating)
             return false;
-        Integer hc = Integer.valueOf(c.hashCode());
+        int hCode = c.hashCode();
+        // check previous and next buckets
+        Integer phc = Integer.valueOf(hCode - 1);
+        List<Comment> plist = map.get(phc);
+        if (plist != null && plist.contains(c))
+            return false;
+        Integer nhc = Integer.valueOf(hCode + 1);
+        List<Comment> nxlist = map.get(nhc);
+        if (nxlist != null && nxlist.contains(c))
+            return false;
+        // check this bucket
+        Integer hc = Integer.valueOf(hCode);
         List<Comment> list = map.get(hc);
         if (list == null) {
             list = Collections.singletonList(c);

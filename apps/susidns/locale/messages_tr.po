@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-13 18:18+0000\n"
-"PO-Revision-Date: 2018-06-13 18:36+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-08-13 05:21+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -298,7 +298,7 @@ msgstr "{0} hedefi {1} ad hizmetinden silinemedi"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:367
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:363
 msgid "Save Notes"
-msgstr ""
+msgstr "Notları Kaydet"
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
@@ -564,13 +564,13 @@ msgstr "Yayınlanmış adres defteri güncellensin"
 msgid ""
 "File containing the etags header from the fetched subscription URLs (no need"
 " to change)"
-msgstr "Alınan abonelik İnternet adresinde etags üst bilgisini içeren dosya (değiştirilmesine gerek yok)"
+msgstr "Alınan abonelik adresinde etags üst bilgisini içeren dosya (değiştirilmesine gerek yok)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:260
 msgid ""
 "File containing the modification timestamp for each fetched subscription URL"
 " (no need to change)"
-msgstr "Alınan her bir abonelik İnternet adresi için değişiklik zaman damgasını içeren dosya (değiştirilmesine gerek yok)"
+msgstr "Alınan her bir abonelik adresi için değişiklik zaman damgasını içeren dosya (değiştirilmesine gerek yok)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:262
 msgid "File to log activity to (change to /dev/null if you like)"
@@ -776,111 +776,111 @@ msgid ""
 "If SusiDNS is configured to publish your Router address book, the entries "
 "will appear in your Published address book and saved to a hosts.txt file for"
 " sharing."
-msgstr ""
+msgstr "SusiDNS Yönelticinizin adres defterini yayınlayacak şekilde yapılandırılmış ise, Kayıtlar yayınlanmış adres defterinizde görüntülenir ve paylaşılması için hosts.txt dosyasına kaydedilir."
 
 #: build/HowSVG.java:6
 msgid "Published Addressbook"
-msgstr ""
+msgstr "Yayınlanmış Adres Defteri"
 
 #: build/HowSVG.java:7
 msgid ""
 "To configure SusiDNS to push your Router address book to your Published "
 "address book, set 'should_publish=true' on the configuration page."
-msgstr ""
+msgstr "SusiDNS tarafından Yöneltici adresinizin yayınlanmış adres defterine gönderilmesini yapılandırmak için, yapılandırma bölümünden 'should_publish=true' seçeneğini ayarlayın."
 
 #: build/HowSVG.java:8
 msgid ""
 "All hosts derived from subscriptions will appear in this address book, in "
 "addition to any you manually add here or to your Master address book."
-msgstr ""
+msgstr "Aboneliklerden aktarılan tüm sunucular bu adres defterinde el ile ekledikleriniz ve Ana adres defterinden gelen kayıtlar ile birlikte görüntülenir."
 
 #: build/HowSVG.java:9
 msgid "Router Addressbook"
-msgstr ""
+msgstr "Yöneltici Adres Defteri"
 
 #: build/HowSVG.java:10
 msgid ""
 "Hosts you manually add here will never be published. You can also add "
 "aliases to hosts in other address books here."
-msgstr ""
+msgstr "Buraya eklediğiniz sunucular hiç bir zaman yayınlanmaz. Ayrıca buradan defterlerdeki sunucular için kısaltmalar da ekleyebilirsiniz."
 
 #: build/HowSVG.java:11
 msgid "Private Addressbook"
-msgstr ""
+msgstr "Özel Adres Defteri"
 
 #: build/HowSVG.java:12
 msgid "Local Records"
-msgstr ""
+msgstr "Yerel Kayıtlar"
 
 #: build/HowSVG.java:13
 msgid ""
 "I2P applications (including the HTTP proxy) use the hosts in your local "
 "address books to resolve .i2p hostnames."
-msgstr ""
+msgstr "I2P uygulamaları (HTTP vekil sunucu dahil) .i2p sunucu adlarını çözümlemek için yerel adres defterlerindeki sunucu kayıtlarını kullanır."
 
 #: build/HowSVG.java:14
 msgid ""
 "Additional subscriptions can be found in the FAQ section of the Router help "
 "page."
-msgstr ""
+msgstr "Ek abonelikler Yöneltici yardım sayfasının SSS bölümünde bulunabilir."
 
 #: build/HowSVG.java:16
 msgid ""
 "Hosts sourced from your subscriptions are added to your Router address book,"
 " and are automatically synced (by default every 12 hours)."
-msgstr ""
+msgstr "Aboneliklerinizden kaynaklanan sunucular Yöneltici adres defterine eklenir ve otomatik olarak eşitlenir (varsayılan olarak 12 saatte bir)."
 
 #: build/HowSVG.java:17
 msgid "Configure Subscriptions"
-msgstr ""
+msgstr "Abonelikleri Yapılandır"
 
 #: build/HowSVG.java:18
 msgid ""
 "If you manually add hosts here, they will be included your Published address"
 " book (if configured)."
-msgstr ""
+msgstr "Buraya el ile ekleyeceğiniz sunucular yayınlanmış adres defterinize katılır (yapılandırılmış ise)."
 
 #: build/HowSVG.java:19
 msgid "Master Addressbook"
-msgstr ""
+msgstr "Ana Adres Defteri"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
-msgstr ""
+msgstr "Şunlar arayabilir"
 
 #: build/HowSVG.java:21
 msgid "I2P applications"
-msgstr ""
+msgstr "I2P uygulamaları"
 
 #: build/HowSVG.java:22
 msgid ""
 "The Master, Router and Private address books collectively serve as the DNS "
 "authority for I2P applications."
-msgstr ""
+msgstr "Ana, Yöneltici ve Özel adres defterleri I2P uygulamaları için bir arada çalışarak DNS hizmeti sunar."
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "İsteğe bağlı,"
 
 #: build/HowSVG.java:24
 msgid "for websites"
-msgstr ""
+msgstr "web siteleri için"
 
 #: build/HowSVG.java:25
 msgid ""
 "If you configure SusiDNS to publish your Router address book, it will export"
 " a hosts.txt file containing all the hosts (by default to the root of your "
 "eepsite)."
-msgstr ""
+msgstr "Yönelticinizin adres defterini yayınlamak için SusiDNS kullanıyorsanız, tüm sunucu kayıtlarının bulunduğu bir hosts.txt dosyası dışa aktarılır (varsayılan olarak eepsitenizin kök klasörüne)."
 
 #: build/HowSVG.java:26
 msgid ""
 "Addresses manually added to your Master address book will merge with your "
 "Router address book."
-msgstr ""
+msgstr "Ana adres defterine el ile eklenmiş adresler Yöneltici adres defteriniz ile birleştirilir."
 
 #: build/HowSVG.java:27
 msgid ""
 "Hosts you receive from your subscriptions will merge with your Router "
 "address book."
-msgstr ""
+msgstr "Aboneliklerden gelen sunucular Yöneltici adres defteriniz ile birleştirilir."

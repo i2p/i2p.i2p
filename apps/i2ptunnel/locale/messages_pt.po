@@ -5,7 +5,7 @@
 # 
 # Translators:
 # kgtm <fabio.h.f.antunes@gmail.com>, 2014
-# Manuela Silva <manuela.silva@sky.com>, 2017
+# Manuela Silva <manuela.silva@sky.com>, 2017-2018
 # Manuela Silva <manuela.silva@sky.com>, 2016
 # Rafael Ferrari, 2013
 # Tulio Simoes Martins Padilha <tuliouel@gmail.com>, 2013
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-13 18:18+0000\n"
-"PO-Revision-Date: 2018-06-13 18:35+0000\n"
-"Last-Translator: Martus Translations <translations@martus.org>\n"
+"PO-Revision-Date: 2018-08-17 14:56+0000\n"
+"Last-Translator: Manuela Silva <manuela.silva@sky.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,15 +33,15 @@ msgstr "interno"
 #, java-format
 msgid "{0} inbound tunnel"
 msgid_plural "{0} inbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{0} túnel de entrada"
+msgstr[1] "{0} túneis de entrada"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:483
 #, java-format
 msgid "{0} outbound tunnel"
 msgid_plural "{0} outbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{0} túnel de saída"
+msgstr[1] "{0} túneis de saída"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:485
 #, java-format

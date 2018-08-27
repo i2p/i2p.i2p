@@ -17,6 +17,7 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
     private int _remotePort;
     
     public static final int DEFAULT_BUFFER_SIZE = 1024*64;
+    public static final int DEFAULT_READ_TIMEOUT = -1;
     public static final int DEFAULT_WRITE_TIMEOUT = -1;
     public static final int DEFAULT_CONNECT_TIMEOUT = 60*1000;
     
@@ -71,7 +72,7 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
         if (opts.getProperty(PROP_CONNECT_TIMEOUT) != null)
             _connectTimeout = getInt(opts, PROP_CONNECT_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);
         if (opts.getProperty(PROP_READ_TIMEOUT) != null)
-            _readTimeout = getInt(opts, PROP_READ_TIMEOUT, -1);
+            _readTimeout = getInt(opts, PROP_READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
         if (opts.getProperty(PROP_WRITE_TIMEOUT) != null)
             _writeTimeout = getInt(opts, PROP_WRITE_TIMEOUT, DEFAULT_WRITE_TIMEOUT);
     }

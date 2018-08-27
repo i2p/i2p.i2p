@@ -1,5 +1,7 @@
 package net.i2p.router.transport.ntcp;
 
+import net.i2p.data.DataHelper;
+
 /**
  *
  *  NTCP2 Padding/Dummy/Delay configuration for data phase.
@@ -58,6 +60,25 @@ class NTCP2Options {
 
         return new NTCP2Options(xsMin, xsMax, xrMin, xrMax,
                                 xsDummy, xrDummy, xsDelay, xrDelay);
+    }
+
+    /**
+     *  @since 0.9.37 consolidated from two places
+     *  @return null on error
+     */
+    public static NTCP2Options fromByteArray(byte[] options) {
+        if (options.length < 12)
+            return null;
+        float tmin = (options[0] & 0xff) / 16.0f;
+        float tmax = (options[1] & 0xff) / 16.0f;
+        float rmin = (options[2] & 0xff) / 16.0f;
+        float rmax = (options[3] & 0xff) / 16.0f;
+        int tdummy = (int) DataHelper.fromLong(options, 4, 2);
+        int rdummy = (int) DataHelper.fromLong(options, 6, 2);
+        int tdelay = (int) DataHelper.fromLong(options, 8, 2);
+        int rdelay = (int) DataHelper.fromLong(options, 10, 2);
+        return new NTCP2Options(tmin, tmax, rmin, rmax,
+                                tdummy, rdummy, tdelay, rdelay);
     }
 
     @Override

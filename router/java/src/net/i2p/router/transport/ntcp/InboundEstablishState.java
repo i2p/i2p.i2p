@@ -949,9 +949,13 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
      */
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
         // Validate Alice static key
-        String s = null;
         // find address with matching version
         List<RouterAddress> addrs = ri.getTargetAddresses(NTCPTransport.STYLE, NTCPTransport.STYLE2);
+        if (addrs.isEmpty()) {
+            _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
+            throw new DataFormatException("no NTCP in RI: " + ri);
+        }
+        String s = null;
         for (RouterAddress addr : addrs) {
             String v = addr.getOption("v");
             if (v == null ||
@@ -964,19 +968,19 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         }
         if (s == null) {
             _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
-            throw new DataFormatException("no s in RI");
+            throw new DataFormatException("no s in RI: " + ri);
         }
         byte[] sb = Base64.decode(s);
         if (sb == null || sb.length != KEY_SIZE) {
             _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
-            throw new DataFormatException("bad s in RI");
+            throw new DataFormatException("bad s in RI: " + ri);
         }
         byte[] nb = new byte[32];
         // compare to the _handshakeState
         _handshakeState.getRemotePublicKey().getPublicKey(nb, 0);
         if (!DataHelper.eqCT(sb, 0, nb, 0, KEY_SIZE)) {
             _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
-            throw new DataFormatException("s mismatch in RI");
+            throw new DataFormatException("s mismatch in RI: " + ri);
         }
         _aliceIdent = ri.getIdentity();
         Hash h = _aliceIdent.calculateHash();
@@ -1006,21 +1010,13 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
 
     /** @since 0.9.36 */
     public void gotOptions(byte[] options, boolean isHandshake) {
-        if (options.length < 12) {
+        NTCP2Options hisPadding = NTCP2Options.fromByteArray(options);
+        if (hisPadding == null) {
             if (_log.shouldWarn())
                 _log.warn("Got options length " + options.length + " on: " + this);
             return;
         }
-        float tmin = (options[0] & 0xff) / 16.0f;
-        float tmax = (options[1] & 0xff) / 16.0f;
-        float rmin = (options[2] & 0xff) / 16.0f;
-        float rmax = (options[3] & 0xff) / 16.0f;
-        int tdummy = (int) DataHelper.fromLong(options, 4, 2);
-        int rdummy = (int) DataHelper.fromLong(options, 6, 2);
-        int tdelay = (int) DataHelper.fromLong(options, 8, 2);
-        int rdelay = (int) DataHelper.fromLong(options, 10, 2);
-        _hisPadding = new NTCP2Options(tmin, tmax, rmin, rmax,
-                                       tdummy, rdummy, tdelay, rdelay);
+        _hisPadding = hisPadding;
     }
 
     /** @since 0.9.36 */

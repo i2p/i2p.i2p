@@ -433,7 +433,7 @@ public class AddressbookBean extends BaseBean
 	}
 
 	public String getBegin() {
-		return "" + getBeginInt();
+		return Integer.toString(getBeginInt());
 	}
 
 	/**
@@ -455,7 +455,7 @@ public class AddressbookBean extends BaseBean
 	}
 
 	public String getEnd() {
-		return "" + getEndInt();
+		return Integer.toString(getEndInt());
 	}
 
 	/**

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -396,8 +397,8 @@ class SAMStreamSession implements SAMMessageSess {
      * @return An id associated to the socket handler
      */
     protected int createSocketHandler ( I2PSocket s, int id ) {
-        SAMStreamSessionSocketReader reader = null;
-        StreamSender sender = null;
+        SAMStreamSessionSocketReader reader;
+        StreamSender sender;
         if (id == 0) {
             id = createUniqueId();
         }
@@ -468,8 +469,9 @@ class SAMStreamSession implements SAMMessageSess {
         StreamSender sender;
 
         synchronized (handlersMap) {
-            reader = handlersMap.remove(Integer.valueOf(id));
-            sender = sendersMap.remove(Integer.valueOf(id));
+            Integer iid = Integer.valueOf(id);
+            reader = handlersMap.remove(iid);
+            sender = sendersMap.remove(iid);
         }
 
         if (reader != null)
@@ -486,17 +488,10 @@ class SAMStreamSession implements SAMMessageSess {
      *
      */
     private void removeAllSocketHandlers() {
-        Integer id;
-        Set<Integer> keySet;
-        Iterator<Integer> iter;
-
         synchronized (handlersMap) {
-            keySet = handlersMap.keySet();
-            iter = keySet.iterator();
-            
-            while (iter.hasNext()) {
-                 id = iter.next();
-                 handlersMap.get(id).stopRunning();
+            for (Map.Entry<Integer, SAMStreamSessionSocketReader> e : handlersMap.entrySet()) {
+                 Integer id = e.getKey();
+                 e.getValue().stopRunning();
                  sendersMap.get(id).shutDownGracefully();
             }
             handlersMap.clear();

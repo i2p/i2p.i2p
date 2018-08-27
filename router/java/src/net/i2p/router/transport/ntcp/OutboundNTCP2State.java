@@ -94,6 +94,9 @@ class OutboundNTCP2State implements EstablishState {
         CORRUPT
     }
     
+    /**
+     * @throws IllegalArgumentException on bad address in the con
+     */
     public OutboundNTCP2State(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());

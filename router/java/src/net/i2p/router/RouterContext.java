@@ -152,7 +152,7 @@ public class RouterContext extends I2PAppContext {
             long maxMemory = SystemVersion.getMaxMemory();
             long maxBuffs = (SystemVersion.isAndroid() || SystemVersion.isARM()) ? 4 : 8;
             long buffs = Math.min(maxBuffs, Math.max(2, maxMemory / (21 * 1024 * 1024)));
-            envProps.setProperty("prng.buffers", "" + buffs);
+            envProps.setProperty("prng.buffers", Long.toString(buffs));
         }
         return envProps;
     }

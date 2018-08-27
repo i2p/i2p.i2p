@@ -25,16 +25,16 @@
 
     <h2>Руководство по анонимному веб-серверу I2P</h2>
 
-    <p>This is your own anonymous I2P webserver (traditionally referred to as an <i>eepsite</i>).
-      To serve your own content, simply edit the files in the webserver's root directory and the site will be public once you follow the instructions below.</p>
+    <p>Это ваш анонимный веб-сервер в I2P, который обычно называют <i>eepsite</i>.
+Для раздачи контента достаточно отредактировать файлы в корневой директории веб-сервера, и сайт станет доступен публично после его настройки по инструкции ниже.</p>
 
     <p id="dir">Корневая директория веб-сервера располагается в одном из следующих мест в зависимости от вашей операционной системы:</p>
 
     <ul>
 <li>
 <b>Linux</b><br>
-        Стандартная установка: <code>~/.i2p/eepsite/docroot/</code><br>
-        Установка пакета, выполняется как сервис: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Для стандартной установки: <code>~/.i2p/eepsite/docroot/</code><br>
+        Для установленного пакета, запущенного в виде сервиса: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
 <b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
@@ -43,74 +43,74 @@
 <b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
-      The Base32 address may be used as a hostname, until you assign a register a name following the instructions below.
-      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
+<p>В I2P, доступ к скрытым сервисам осуществляется по Base32-адресу, оканчивающимся на ".b32.i2p", или адресу назначения — строке, закодированной в Base64.
+Base32-адрес можно использовать в качестве имени хоста, до тех пор, пока вы не зададите доменное имя, следуя инструкции ниже.
+Адрес назначения — аналог IP-адреса в I2P, он отображается на странице <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">настройки скрытого сервиса</a>.</p>
 
     <p>Ниже описано, как назначить вашему сайту имя, например "mysite.i2p", и разрешить к нему доступ. 
        Вы можете зайти на сайт локально по адресу <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
 
     <h2>Как настроить и анонсировать ваш скрытый сервис</h2>
 
-     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
-      After you start your I2P Webserver tunnel, it will be difficult for other people to find
-      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
-      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
-      Here are detailed instructions.</p>
+     <p>Ваш веб-сервер запускается по умолчанию, но не будет доступен для других пользователей, пока вы не запустите туннель скрытого сервиса.
+Сразу после запуска туннеля пользователям будет непросто найти ваш сайт.
+На сайт можно зайти, используя длинный адрес назначения, или более короткий Base32-адрес, который представляет собой хеш адреса назначения.
+Можно просто сообщить людям адрес назначения или Base32-адрес, но, к счастью, в I2P есть адресная книга и несколько простых способов рассказать людям о своем сайте.
+Вот подробная инструкция.</p>
 
     <ul>
-<li>Pick a name for your website (<i>something</i>.i2p), using lower-case.
-        You may wish to check first in your own router's <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a> to see if your name is already taken.
-        Enter the new name for your website on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a> where it says "Website name".
-        This will replace the default "mysite.i2p".
-        Also, if you would like your I2P Webserver tunnel to be automatically started when you start I2P, check the "Auto Start" box.
-        Your website will now start every time you start your router.
-        Be sure to click "Save".</li>
-      <li>Click the start button for your webserver tunnel on the <a href="http://127.0.0.1:7657/i2ptunnel/">main Hidden Service Manager page</a>.
-         You should now see it listed under "Local Tunnels" on the left side of the <a href="http://127.0.0.1:7657/">I2P Router Console</a>.
-         Your website is now running.</li>
-      <li>Highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
-         Make sure you copy the whole thing, it is over 500 characters.</li>
-      <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>.
-         Click "Add" to save the new entry.</li>
-      <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
-          Hopefully it worked!</li>
-      <li>Before you tell the world about your new website, you should add some content.
-          Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.</li>
+<li>Выберите имя для вашего сайта (<i>чегонибудь</i>.i2p), используя латинские символы в нижнем регистре.
+Сперва следует проверить, не занято ли это имя, через <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">адресную книгу маршрутизатора</a>.
+Введите новое имя сайта на странице <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">конфигурации скрытого сервиса</a>, в поле «Имя узла веб-сайта», заменив "mysite.i2p".
+Также, если вы хотите, чтобы туннель автоматически запускался при запуске маршрутизатора, отметьте «Автоматически запустить туннель при старте маршрутизатора».
+После этого ваш веб-сайт будет автоматически запускаться при старте маршрутизатора.
+Не забудьте нажать кнопку «Сохранить».</li>
+      <li>Нажмите кнопку «запустить» у туннеля вашего веб-сервера на странице <a href="http://127.0.0.1:7657/i2ptunnel/">управления скрытыми сервисами</a>.
+Он должен отображаться в левой панели «локальные туннели» <a href="http://127.0.0.1:7657/">консоли маршрутизатора I2P</a>.
+Ваш веб-сайт теперь работает.</li>
+      <li>Выделите и скопируйте строку «Локальный адрес назначения» на странице <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">настройки скрытого сервиса</a> целиком.
+Убедитесь, что вы выделили строку полностью, ее размер более 500 символов.</li>
+      <li>Введите имя и вставьте адрес назначения в вашу <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">адресную книгу</a>.
+Нажмите кнопку «добавить» для добавления новой записи.</li>
+      <li>Введите имя веб-сайта (<i>чегонибудь</i>.i2p) в ваш браузер, он должен отобразиться.
+Надеемся, все получилось!</li>
+      <li>Прежде чем рассказывать всему миру о вашем сайте, следует добавить немного контента.
+Перейдите в корневую директорию веб-сервера, <a href="#dir">обозначенную выше</a>, и замените страницу index.html вашей собственной.</li>
     </ul>
-<p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files. 
-      You may change the appearance of the directory by supplying an edited <a href="lib/jetty-dir.css">jetty-dir.css</a> file for each directory.
-      The <a href="lib/">lib subdirectory</a> demonstrates a custom style.
-      The <a href="lib/resources">resources subdirectory</a> demonstrates the default style.
-      If you need a template for a basic site, feel free to adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">associated content</a>.</p>
+<p>В сервере включен вывод содержимого директорий, поэтому вы можете ссылаться на директорию, без создания отдельной страницы со всеми файлами.
+Вы можете изменять оформление директории, загрузив файл <a href="lib/jetty-dir.css">jetty-dir.css</a> в каждую директорию.
+Поддиректория <a href="lib/">lib</a> содержит пример такого файла.
+Поддиректория <a href="lib/resources">resources</a> демонстрирует пример стандартного стиля.
+Если вам нужен шаблон для простого сайта, вы можете адаптировать <a href="pagetemplate.html">эту страницу</a> и <a href="lib/">ассоциированное с ней содержимое</a>.</p>
 
-    <p>If you're returned to this page after editing the content, try clearing your browser's web cache:</p>
+    <p>Если вы видите эту страницу после редактирования контента, попробуйте очистить кеш вашего веб-браузера:</p>
 
     <ul>
 <li>
 <b>Firefox</b>: Настройки ➜ Дополнительные ➜ Сеть ➜ Кэшированное веб-содержимое ➜ Очистить сейчас</li>
       <li>
-<b>Chrome/Chromium:</b> Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data</li>
+<b>Chrome/Chromium:</b> Настройки → Дополнительные → раздел «Конфиденциальность и безопасность», «Очистить историю».
+</li>
       <li>
-<b>Opera:</b> Settings ➜ Privacy ➜ Clear browsing data</li>
+<b>Opera:</b> Настройки → Безопасность → Очистить историю посещений</li>
     </ul>
 <h2>Зарегистрируйте свой собственный .i2p домен</h2>
 
-    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> or <a href="http://no.i2p/" target="_blank">no.i2p</a>. 
-      You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.</p>
-<p>Some registration sites require the Destination.
-      If so, highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
-      Make sure you copy the whole thing, it is over 500 characters.</p>
-<p>Some registration sites, including <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, require the Registration Authentication string.
-      It is found on the <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication page</a> linked from the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service configuration page</a>.
-      Copy the entire authentication string and paste it on the registration page. 
-      Make sure you copy the whole thing, it is over 500 characters.
-      Describe your site briefly if the site requests this information.
-      If your site is a HTTP service, leave the checkbox selected; if not, unselect it.</p>
-<p>For all registration sites, read through the Terms of Service carefully.
-      Click the "Submit" button.
-      Verify the submission was successful.
-      Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply entering your hostname in their browser.</p>
+    <p>Теперь нужно добавить ваш веб-сайт в глобальную адресную книгу, которую предоставляют сервисы вроде <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> или <a href="http://no.i2p/" target="_blank">no.i2p</a>.
+Вы должны ввести имя веб-сайта и адрес назначения (или строку аутентификации регистрации) для одного или более сайтов.</p>
+<p>Некоторые регистрационные сайты требуют ввода адреса назначения.
+В этом случае, выделите и скопируйте адрес назначения на <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">странице настройки скрытого сервиса</a>.
+Убедитесь, что скопировали строку целиком, её длина более 500 символов.</p>
+<p>Некоторые регистрационные сайты, включая <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, требуют строку аутентификации регистрации.
+Её можно найти на странице <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">«Аутентификация регистрации»</a>, доступной через <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">настройки скрытого сервиса</a>.
+Скопируйте строку и вставьте её на страницу регистрационного сайта.
+Убедитесь, что скопировали строку целиком, ее длина более 500 символов.
+Введите краткое описание сайта, если регистрационный сайт запрашивает эту информацию.
+Если ваш веб-сайт работает по HTTP — оставьте галочку, если нет — уберите её.</p>
+<p>На всех регистрационных сайтах внимательно прочитайте условия предоставления услуг.
+Нажмите кнопку «отправить».
+Убедитесь, что данные принялись сайтом.
+Большинство I2P-маршрутизаторов запрашивают обновления адресной книги раз в несколько часов. В течение нескольких часов ваш сайт станет доступен у большинства пользователей, и они смогут вводить его адрес в адресную строку браузера.</p>
 
     <h2>Добавление подписок для адресной книги</h2>
 
@@ -162,20 +162,20 @@
 
     <h2>Дальнейшая помощь</h2>
 
-        <p>If you have any questions, the following places are available for support:</p>
+        <p>Если у вас остались вопросы, вы можете воспользоваться следующими способами связи для получения помощи:</p>
 
         <ul>
 <li>IRC-сервер поддержки:<ul>
 <li><a href="irc://irc.freenode.net/i2p">#i2p на Freenode</a></li>
-                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
+                <li>Анонимно, используя локальный <a href="irc://127.0.0.1:6668/i2p">туннель I2P IRC</a>.</li>
              </ul>
 </li>
-<li>The project forum <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
-            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
+<li>Форум проекта <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">Инструкция по настройке Eepsite в I2PWiki</a></li>
         </ul>
 <hr>
-<div class="notify">This page, the project website and the router console need translations!
-          Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.</div>
+<div class="notify">Эта страница, веб-сайт проекта и консоль маршрутизатора нуждается в переводчиках!
+Пожалуйста, помогите росту проекта <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">своим участием</a> или <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">переводами</a>.</div>
         <hr>
 </div>
 </body>

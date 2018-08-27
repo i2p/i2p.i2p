@@ -1,3 +1,19 @@
+2018-08-26 zzz
+ * NTCP2: Publish outbound address after transition to firewalled
+
+2018-08-24 zzz
+ * i2psnark: Better comment deduping, fixes rating average
+ * NTCP2: Enable by default
+
+* 2018-08-23 0.9.36 released
+
+2018-08-20 zzz
+ * Jetty 9.2.25.v20180606
+
+2018-08-19 zzz
+ * NTCP2: Catch bad IV exception
+ * Update translations
+
 2018-08-16 zzz
  * i2ptunnel: Change read timeout defaults now that streaming timeout works
 
@@ -23,7 +39,7 @@
 2018-07-27 zzz
  * Console: Split netdb output into pages
  * Router: Implement router.rejectStartupTime config (ticket #2285)
- * Transport: Defer NTCP 1/2 classifiation until receiving 64 bytes
+ * Transport: Defer NTCP 1/2 classification until receiving 64 bytes
 
 2018-07-21 zzz
  * Build: Add check for libtaglibs package in debian builds

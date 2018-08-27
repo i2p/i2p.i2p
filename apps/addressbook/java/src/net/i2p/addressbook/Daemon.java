@@ -176,7 +176,7 @@ class Daemon {
     private static void update(NamingService router, Set<String> knownNames,
                                NamingService publishedNS, AddressBook addressbook,
                                Iterator<Map.Entry<String, HostTxtEntry>> iter, Log log) {
-            long start = System.currentTimeMillis();
+            long start = DEBUG ? System.currentTimeMillis() : 0;
             int old = 0, nnew = 0, invalid = 0, conflict = 0, total = 0;
             int deleted = 0;
             while(iter.hasNext()) {
@@ -189,7 +189,7 @@ class Daemon {
                 Destination oldDest;
                 if (knownNames != null) {
                     oldDest = null;
-                    isKnown = key != null ? knownNames.contains(key) : null;
+                    isKnown = key != null ? knownNames.contains(key) : false;
                 } else {
                     oldDest = key != null ? router.lookup(key) : null;
                     isKnown = oldDest != null;
@@ -803,7 +803,7 @@ class Daemon {
      */
     public static void main(String[] args) {
         Daemon daemon = new Daemon();
-        if (args != null && args.length > 0 && args[0].equals("test"))
+        if (args.length > 0 && args[0].equals("test"))
             daemon.test(args);
         else
             daemon.run(args);
@@ -823,11 +823,14 @@ class Daemon {
         ctx.logManager().flush();
     }
     
+    /**
+     *  @param args may be null
+     */
     public void run(String[] args) {
         _running = true;
         String settingsLocation = "config.txt";
         File homeFile;
-        if (args.length > 0) {
+        if (args != null && args.length > 0) {
             homeFile = new SecureDirectory(args[0]);
             if (!homeFile.isAbsolute())
                 homeFile = new SecureDirectory(I2PAppContext.getGlobalContext().getRouterDir(), args[0]);

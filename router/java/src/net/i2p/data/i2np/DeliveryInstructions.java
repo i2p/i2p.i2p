@@ -244,7 +244,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     private static int flagMode(int flags) {
         int v = flags & FLAG_MODE;
         v >>>= 5;
-        return (int)v;
+        return v;
     }
     
     /**  unused */
@@ -312,6 +312,7 @@ public class DeliveryInstructions extends DataStructureImpl {
         return additionalSize;
     }
     
+/****
     private byte[] getAdditionalInfo() {
         int additionalSize = getAdditionalInfoSize();
         byte rv[] = new byte[additionalSize];
@@ -322,7 +323,9 @@ public class DeliveryInstructions extends DataStructureImpl {
             throw new IllegalStateException("size mismatch, additionalSize = " + additionalSize + ", offset = " + offset);
         return rv;
     }
+****/
 
+    /** */
     private int getAdditionalInfo(byte rv[], int offset) {
         int origOffset = offset;
 

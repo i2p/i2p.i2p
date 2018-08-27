@@ -176,6 +176,17 @@ public class SummaryListener implements RateSummaryListener {
                 rrdFile.delete();
         } catch (IOException ioe) {
             _log.error("Error starting RRD for stat " + baseName, ioe);
+        } catch (NoSuchMethodError nsme) {
+            // Covariant fail Java 8/9/10
+            // java.lang.NoSuchMethodError: java.nio.MappedByteBuffer.position(I)Ljava/nio/MappedByteBuffer;
+            // see e.g. https://jira.mongodb.org/browse/JAVA-2559
+            _log.error("Error starting RRD for stat " + baseName, nsme);
+            String s = "Error:" +
+                       "\nCompiler JDK mismatch with JRE version " + System.getProperty("java.version") +
+                       " and no bootclasspath specified when building." +
+                       "\nContact packager.";
+            _log.log(Log.CRIT, s);
+            System.out.println(s);
         } catch (Throwable t) {
             _log.error("Error starting RRD for stat " + baseName, t);
         }

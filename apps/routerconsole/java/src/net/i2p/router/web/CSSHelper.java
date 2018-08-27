@@ -130,7 +130,7 @@ public class CSSHelper extends HelperBase {
     public void setRefresh(String r) {
         try {
             if (Integer.parseInt(r) < MIN_REFRESH)
-                r = "" + MIN_REFRESH;
+                r = Integer.toString(MIN_REFRESH);
             _context.router().saveConfig(PROP_REFRESH, r);
         } catch (RuntimeException e) {
         }
@@ -141,9 +141,9 @@ public class CSSHelper extends HelperBase {
         String r = _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
         try {
             if (Integer.parseInt(r) < MIN_REFRESH)
-                r = "" + MIN_REFRESH;
+                r = Integer.toString(MIN_REFRESH);
         } catch (RuntimeException e) {
-            r = "" + MIN_REFRESH;
+            r = Integer.toString(MIN_REFRESH);
         }
         return r;
     }

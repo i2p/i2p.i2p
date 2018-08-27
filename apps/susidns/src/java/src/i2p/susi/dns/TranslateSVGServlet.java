@@ -31,7 +31,7 @@ public class TranslateSVGServlet extends HttpServlet {
  
     private static final long serialVersionUID = 18638760L;
     private final I2PAppContext _context;
-    private final String DIR = "/svg";
+    private static final String DIR = "/svg";
 
     public TranslateSVGServlet() {
         super();

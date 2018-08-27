@@ -5,13 +5,14 @@
 # 
 # Translators:
 # タカハシ <indexial@outlook.jp>, 2013-2014
+# Masayuki Hatta <mhatta@mhatta.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: タカハシ <indexial@outlook.jp>\n"
+"PO-Revision-Date: 2018-08-17 19:05+0000\n"
+"Last-Translator: Masayuki Hatta <mhatta@mhatta.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,14 +21,14 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "I2P のインストールに際する設定"
+msgstr "I2P のインストールおめでとうございます！"
 
 msgid "Welcome to I2P!"
 msgstr "I2P にようこそ！"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "I2P が起動し、ピアを検索するまで{0}お待ちください{1}。"
+msgstr "I2P が起動し、ピアを見つけるまで{0}お待ちください{1}。"
 
 #, java-format
 msgid ""
@@ -37,12 +38,12 @@ msgstr "お待ちの間、{2}設定ページ{3}で{0}帯域幅設定を調整{1}
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "また、 eepsite に到達するために I2P プロキシを使用するためにブラウザをセットアップしてください。"
+msgstr "また、 eepsite に到達するために I2P プロキシを使用するよう、ブラウザをセットアップしてください。"
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr "127.0.0.1 (または localhost) ポート 4444番をHTTPプロキシとして、ブラウザ設定に入力してください。"
+msgstr "127.0.0.1 (または localhost) ポート 4444をHTTPプロキシとして、ブラウザ設定に入力してください。"
 
 msgid "Do not use SOCKS for this."
 msgstr "これには SOCKS を使用しないでください。"

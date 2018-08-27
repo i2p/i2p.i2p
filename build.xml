@@ -8,7 +8,7 @@
     <property file="override.properties"/>
     <property file="build.properties"/>
     <!--  When changing, also change javadoc URL in build.properties, and checksum in apps/jetty/build.xml -->
-    <property name="jetty.ver" value="9.2.24.v20180105" />
+    <property name="jetty.ver" value="9.2.25.v20180606" />
     <property name="tomcat.ver" value="8.5.30" />
 
     <!-- You probably don't want to change anything from here down -->
@@ -877,7 +877,6 @@
                 <pathelement location="apps/jetty/jettylib/jetty-webapp.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-xml.jar" />
                 <pathelement location="apps/jetty/jettylib/tomcat-api.jar" />
-                <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
                 <!-- following are only for debian builds -->
                 <pathelement location="core/java/build/libintl.jar" />
@@ -1339,7 +1338,7 @@
 
     <target name="copyflags-unlesspkg" unless="${with-famfamfam-flag-png}" >
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
-            <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png ir.png it.png jp.png nl.png pl.png pt.png ru.png se.png us.png" />
+            <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png ir.png it.png jp.png nl.png pl.png pt.png ru.png se.png tr.png us.png" />
         </copy>
         <copy todir="pkg-temp/docs/icons/flags" >
           <!-- base flags/ dir only. flags16x11/ and flags48x48/ dirs already copied by prepConsoleDocs target -->
@@ -2060,6 +2059,8 @@
 
     <target name="findbugs" depends="build2, buildUtilityJar">
         <echo message="Starting findbugs, this will take a while..." />
+        <!-- ref: https://github.com/spotbugs/spotbugs/issues/148 -->
+        <echo message="If this doesn't work with Java 9+. try Java 8" />
         <exec executable="nice" failonerror="true">
             <arg value="findbugs"/>
             <arg value="-textui"/>
@@ -2070,7 +2071,7 @@
             <arg value="-output"/>
             <arg value="i2p.fba"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/commons-el.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
+            <arg value="build/commons-el.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:build/jrobin.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
             <!-- start of the files to be analyzed -->

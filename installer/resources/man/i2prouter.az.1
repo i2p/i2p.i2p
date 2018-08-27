@@ -1,0 +1,55 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "26 Yanvar, 2017" "" I2P
+
+.SH AD
+i2prouter \- start and stop the I2P router
+
+.SH SYNOPSIS
+\fBi2prouter\fP{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH AÇIQLAMA
+Control the I2P service.
+
+.IP \fBconsole\fP
+Runs I2P as a console application under the current user.
+
+.IP \fBstart\fP
+Starts the I2P service.
+
+.IP \fBstop\fP
+Stops the I2P service.
+
+.IP \fBrestart\fP
+Stops the I2P service and then starts it.
+
+.IP \fBcondrestart\fP
+Restart the I2P service only if it is already running.
+
+.IP \fBgraceful\fP
+Stop I2P gracefully (may take up to 11 minutes)
+
+.IP \fBinstall\fP
+Install initscript to start I2P automatically when the system boots.
+
+.IP \fBremove\fP
+Uninstall initscript that was installed with \fBinstall\fP
+
+.IP \fBstatus\fP
+Prints whether the I2P service is running.
+
+.IP \fBdump\fP
+Dumps the current threads into \fBwrapper.log\fP.
+
+.SH "REPORTING BUGS"
+Please enter a ticket on
+.UR https://trac.i2p2.de/
+the I2P trac page
+.UE .
+
+.SH "SEE ALSO"
+\fBi2prouter\-nowrapper\fP(1)

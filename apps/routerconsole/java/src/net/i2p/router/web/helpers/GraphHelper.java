@@ -477,13 +477,13 @@ public class GraphHelper extends FormHandler {
             _graphHideLegend != _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND) ||
             _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT)) {
             Map<String, String> changes = new HashMap<String, String>();
-            changes.put(PROP_X, "" + _width);
-            changes.put(PROP_Y, "" + _height);
-            changes.put(PROP_PERIODS, "" + _periodCount);
-            changes.put(PROP_REFRESH, "" + _refreshDelaySeconds);
-            changes.put(PROP_EVENTS, "" + _showEvents);
-            changes.put(PROP_LEGEND, "" + _graphHideLegend);
-            changes.put(SummaryListener.PROP_PERSISTENT, "" + _persistent);
+            changes.put(PROP_X, Integer.toString(_width));
+            changes.put(PROP_Y, Integer.toString(_height));
+            changes.put(PROP_PERIODS, Integer.toString(_periodCount));
+            changes.put(PROP_REFRESH, Integer.toString(_refreshDelaySeconds));
+            changes.put(PROP_EVENTS, Boolean.toString(_showEvents));
+            changes.put(PROP_LEGEND, Boolean.toString(_graphHideLegend));
+            changes.put(SummaryListener.PROP_PERSISTENT, Boolean.toString(_persistent));
             _context.router().saveConfig(changes, null);
             addFormNotice(_t("Graph settings saved"));
         }

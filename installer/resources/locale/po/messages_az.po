@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2018-03-21 21:01+0000\n"
+"PO-Revision-Date: 2018-07-06 21:05+0000\n"
 "Last-Translator: Nikafn <appone6@gmail.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/otf/I2P/language/az/)\n"
 "MIME-Version: 1.0\n"
@@ -86,113 +86,113 @@ msgstr "$APP_LONG_NAME dayandırıldı."
 #: ../i2prouter:1218
 #, sh-format
 msgid "Stopping $APP_LONG_NAME gracefully"
-msgstr ""
+msgstr "$APP_LONG_NAME düzgün şəkildə dayandırılır"
 
 #: ../i2prouter:1264
 #, sh-format
 msgid "$APP_LONG_NAME is not running."
-msgstr ""
+msgstr "$APP_LONG_NAME işləmir."
 
 #: ../i2prouter:1269
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid"
-msgstr ""
+msgstr "$APP_LONG_NAME işləyir: PID:$pid"
 
 #: ../i2prouter:1272
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
-msgstr ""
+msgstr "$APP_LONG_NAME işləyir:  PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
 
 #: ../i2prouter:1325 ../i2prouter:1337 ../i2prouter:1356 ../i2prouter:1373
 #: ../i2prouter:1440 ../i2prouter:1460 ../i2prouter:1474 ../i2prouter:1488
 #: ../i2prouter:1516 ../i2prouter:1554 ../i2prouter:1589
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is already installed."
-msgstr ""
+msgstr "$APP_LONG_NAME işlək proqram artıq quraşdırılıb."
 
 #: ../i2prouter:1328 ../i2prouter:1343 ../i2prouter:1445 ../i2prouter:1477
 #: ../i2prouter:1491 ../i2prouter:1505 ../i2prouter:1519 ../i2prouter:1557
 #: ../i2prouter:1592
 #, sh-format
 msgid "Installing the $APP_LONG_NAME daemon"
-msgstr ""
+msgstr "$APP_LONG_NAME işlək proqramı quraşdırılır "
 
 #: ../i2prouter:1599
 #, sh-format
 msgid "Install not currently supported for $DIST_OS"
-msgstr ""
+msgstr "$DIST_OS üçün quraşdırma hazırda dəstəklənmir "
 
 #: ../i2prouter:1615 ../i2prouter:1628 ../i2prouter:1642 ../i2prouter:1651
 #: ../i2prouter:1661 ../i2prouter:1685 ../i2prouter:1698 ../i2prouter:1710
 #: ../i2prouter:1728 ../i2prouter:1741 ../i2prouter:1755
 #, sh-format
 msgid "Removing $APP_LONG_NAME daemon"
-msgstr ""
+msgstr " $APP_LONG_NAME işlək proqramı silinir"
 
 #: ../i2prouter:1621 ../i2prouter:1636 ../i2prouter:1645 ../i2prouter:1655
 #: ../i2prouter:1666 ../i2prouter:1679 ../i2prouter:1691 ../i2prouter:1704
 #: ../i2prouter:1722 ../i2prouter:1735 ../i2prouter:1749 ../i2prouter:1760
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is not currently installed."
-msgstr ""
+msgstr " $APP_LONG_NAME işlək proqramı hazırda quraşdırılmayıb. "
 
 #: ../i2prouter:1764
 #, sh-format
 msgid "Remove not currently supported for $DIST_OS"
-msgstr ""
+msgstr "$DIST_OS üçün Sil hazırda dəstəklənmir"
 
 #: ../i2prouter:1851
 msgid "Commands:"
-msgstr ""
+msgstr "Əmrlər:"
 
 #: ../i2prouter:1852
 msgid "Launch in the current console."
-msgstr ""
+msgstr "Hazırkı konsolda işə salın."
 
 #: ../i2prouter:1853
 msgid "Start in the background as a daemon process."
-msgstr ""
+msgstr "İşlək proqram olaraq başladın."
 
 #: ../i2prouter:1854
 msgid "Stop if running as a daemon or in another console."
-msgstr ""
+msgstr "İşlək proqram olaraq və ya başqa konsolda işləyirsə, dayandırın."
 
 #: ../i2prouter:1855
 msgid "Stop gracefully, may take up to 11 minutes."
-msgstr ""
+msgstr "Düzgün şəkildə dayandırın, 11 dəqiqə çəkə bilər."
 
 #: ../i2prouter:1856
 msgid "Stop if running and then start."
-msgstr ""
+msgstr "İşləyirsə, dayandırıb daha sonra başladın. "
 
 #: ../i2prouter:1857
 msgid "Restart only if already running."
-msgstr ""
+msgstr "Yalnız işləyən zaman yenidən başladın. "
 
 #: ../i2prouter:1858
 msgid "Query the current status."
-msgstr ""
+msgstr "Hazırkı statusu sorğulayın."
 
 #: ../i2prouter:1859
 msgid "Install to start automatically when system boots."
-msgstr ""
+msgstr "Sistem işə başlayanda avtomatik yüklənəcək şəkildə quraşdırın."
 
 #: ../i2prouter:1860
 msgid "Uninstall."
-msgstr ""
+msgstr "Quraşdırmanı ləğv et."
 
 #: ../i2prouter:1861
 msgid "Request a Java thread dump if running."
-msgstr ""
+msgstr "İşləyirsə, Java idarəetmə axını dampını tələb edin."
 
 #: ../i2prouter:1874
 msgid "Please edit i2prouter and set the variable RUN_AS_USER"
-msgstr ""
+msgstr "i2prouter faylını dəyişin və dəyişkən RUN_AS_USER tənzimləyin"
 
 #: ../i2prouter:1879
 msgid "Running I2P as the root user is *not* recommended."
-msgstr ""
+msgstr "I2P-nin əsas istifadəçi kimi işlətməniz tövsiyə \"olunmur\"."
 
 #: ../i2prouter:1882
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
-msgstr ""
+msgstr "Əsas olaraq işlətmək üçün i2prouter faylını dəyişin və ALLOW_ROOT=true tənzimləyin."

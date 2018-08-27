@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr_TR">
+<head>
+<title>I2P Anonim Web Sunucusu</title>
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="lib/eepsite.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+   <div class="main">
+
+   <div class="langbar">
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+      <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+</div>
+
+    <h1>I2P Anonim Web Sunucusu</h1>
+
+    <h2>I2P Anonim Web Sunucusu Rehberi</h2>
+
+    <p>Anonim I2P web sunucunuza hoş glediniz (<i>eepsite</i> olarak da bilinir).
+      İçeriğinizi sunmak için web sunucunuzun kök klasöründeki dosyaları düzenleyin. Aşağıdaki yönergeleri uyguladığınızda siteniz herkese açık olarak yayınlanır.</p>
+
+    <p id="dir">Web sunucusunun kök klasörü işletim sisteminize göre şu konumlardan birinde bulunabilir:</p>
+
+    <ul>
+<li>
+<b>Linux</b><br>
+        Standard kurulum: <code>~/.i2p/eepsite/docroot/</code><br>
+        Paket kurulumu, hizmet olarak çalıştırmak: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+</li>
+      <li>
+<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+</li>        
+      <li>
+<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+</li>
+    </ul>
+<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
+      The Base32 address may be used as a hostname, until you assign a register a name following the instructions below.
+      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
+
+    <p>The instructions below detail how to assign a name like "mysite.i2p" to your website and enable access by others.
+       You may reach your site locally via <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
+
+    <h2>How to set up and announce your hidden service</h2>
+
+     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
+      After you start your I2P Webserver tunnel, it will be difficult for other people to find
+      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
+      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
+      Here are detailed instructions.</p>
+
+    <ul>
+<li>Pick a name for your website (<i>something</i>.i2p), using lower-case.
+        You may wish to check first in your own router's <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a> to see if your name is already taken.
+        Enter the new name for your website on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a> where it says "Website name".
+        This will replace the default "mysite.i2p".
+        Also, if you would like your I2P Webserver tunnel to be automatically started when you start I2P, check the "Auto Start" box.
+        Your website will now start every time you start your router.
+        Be sure to click "Save".</li>
+      <li>Click the start button for your webserver tunnel on the <a href="http://127.0.0.1:7657/i2ptunnel/">main Hidden Service Manager page</a>.
+         You should now see it listed under "Local Tunnels" on the left side of the <a href="http://127.0.0.1:7657/">I2P Router Console</a>.
+         Your website is now running.</li>
+      <li>Highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
+         Make sure you copy the whole thing, it is over 500 characters.</li>
+      <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>.
+         Click "Add" to save the new entry.</li>
+      <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
+          Hopefully it worked!</li>
+      <li>Before you tell the world about your new website, you should add some content.
+          Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.</li>
+    </ul>
+<p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files. 
+      You may change the appearance of the directory by supplying an edited <a href="lib/jetty-dir.css">jetty-dir.css</a> file for each directory.
+      The <a href="lib/">lib subdirectory</a> demonstrates a custom style.
+      The <a href="lib/resources">resources subdirectory</a> demonstrates the default style.
+      If you need a template for a basic site, feel free to adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">associated content</a>.</p>
+
+    <p>If you're returned to this page after editing the content, try clearing your browser's web cache:</p>
+
+    <ul>
+<li>
+<b>Firefox:</b> Preferences ➜ Advanced ➜ Network ➜ Cached Web Content ➜ Clear Now</li>
+      <li>
+<b>Chrome/Chromium:</b> Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data</li>
+      <li>
+<b>Opera:</b> Settings ➜ Privacy ➜ Clear browsing data</li>
+    </ul>
+<h2>Register your own I2P Domain</h2>
+
+    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> or <a href="http://no.i2p/" target="_blank">no.i2p</a>. 
+      You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.</p>
+<p>Some registration sites require the Destination.
+      If so, highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
+      Make sure you copy the whole thing, it is over 500 characters.</p>
+<p>Some registration sites, including <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, require the Registration Authentication string.
+      It is found on the <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication page</a> linked from the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service configuration page</a>.
+      Copy the entire authentication string and paste it on the registration page. 
+      Make sure you copy the whole thing, it is over 500 characters.
+      Describe your site briefly if the site requests this information.
+      If your site is a HTTP service, leave the checkbox selected; if not, unselect it.</p>
+<p>For all registration sites, read through the Terms of Service carefully.
+      Click the "Submit" button.
+      Verify the submission was successful.
+      Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply entering your hostname in their browser.</p>
+
+    <h2>Adding Addressbook Subscriptions</h2>
+
+    <p>Speaking of address book updates, this would be a good time to add some more addressbooks to your own subscription list.
+       Go to your <a href="http://127.0.0.1:7657/susidns/subscriptions">Subscriptions Configuration page</a> and add one or more for an automatically updated list of new hosts:</p>
+
+    <ul>
+<li>
+<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+      <li>
+<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+    </ul>
+<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
+      This will work within a few minutes of your registering your hostname on the same site.
+      Test it yourself first by entering <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
+      Once it is working, you can tell others to use it.</p>
+
+    <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
+      There are plenty of other ways to tell people. Here are a few ideas:</p>
+
+    <ul>
+<li>Post a message on the <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> telling everyone about your new I2P website!</li>
+      <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.</li>
+      <li>Put it on the <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>
+</li>
+    </ul>
+<p>Note that some sites recommend pasting in that really long destination.
+      You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
+
+    <h2>Using an alternative webserver to host your site</h2>
+
+    <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content. 
+      To maintain anonymity, be sure that your webserver is configured to only allow connections from localhost (127.0.0.1), and check the documentation to ensure your webserver isn't advertising details that may compromise your anonymity.</p>
+
+     <p>To configure your webserver for use on I2P, you may either use the existing webserver tunnel and <a href="http://127.0.0.1:7657/configclients">disable the default webserver</a> from running, or create a new HTTP Server tunnel in the <a href="http://127.0.0.1:7657/i2ptunnelmgr">Hidden Services Manager</a>.
+       Ensure that the listening port configured for the webserver (7658 by default) is also configured in the Hidden Services settings.
+       For example, if your webserver is listening by default on address 127.0.0.1 port 80, you'd need to also ensure that the Target port in the Hidden Service Manager settings page for the service is also configured to port 80.</p> 
+
+        <p>Beware that a poorly configured webserver or web appplication can leak potentially compromising information such as 
+          your real IP address or server details that may reduce your anonymity or assist a hacker.
+          We recommend using the default server unless you feel comfortable doing server administration.
+          Please ensure your web server is secure prior to placing it online.
+          There are plenty of guides online, for example if you search for "nginx security hardening guide" you will find a number of guides that have good recommendations.</p> 
+
+        <p>There is one important issue with the Apache web server.
+          The <code>mod_status</code> and <code>mod_info</code> Apache modules are enabled by default on some operating systems.
+          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
+          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
+
+    <h2>Further Assistance</h2>
+
+        <p>If you have any questions, the following places are available for support:</p>
+
+        <ul>
+<li>Our IRC support channel:<ul>
+<li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
+                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
+             </ul>
+</li>
+<li>The project forum <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
+        </ul>
+<hr>
+<div class="notify">This page, the project website and the router console need translations!
+          Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.</div>
+        <hr>
+</div>
+</body>
+</html>

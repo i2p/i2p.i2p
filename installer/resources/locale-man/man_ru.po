@@ -168,7 +168,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr "В<-n> попыток"
+msgstr "B<-n> попыток"
 
 #. type: TP
 #: man/eepget.1:55

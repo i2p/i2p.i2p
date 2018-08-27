@@ -27,7 +27,7 @@ public class ConfigHomeHandler extends FormHandler {
             boolean old = _context.getBooleanProperty(HomeHelper.PROP_OLDHOME);
             boolean nnew = getJettyString("oldHome") != null;
             if (old != nnew) {
-                _context.router().saveConfig(HomeHelper.PROP_OLDHOME, "" + nnew);
+                _context.router().saveConfig(HomeHelper.PROP_OLDHOME, Boolean.toString(nnew));
                 addFormNotice(_t("Home page changed"));
             }
         } else if (adding || deleting || restoring) {

@@ -242,16 +242,22 @@ public class NTCPConnection implements Closeable {
      * Caller MUST call transport.establishing(this) after construction.
      *
      * @param version must be 1 or 2
+     * @throws DataFormatException if there's a problem with the address
      */
     public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer,
-                          RouterAddress remAddr, int version) {
+                          RouterAddress remAddr, int version) throws DataFormatException {
         this(ctx, transport, remAddr, false);
         _remotePeer = remotePeer;
         _version = version;
-        if (version == 1)
+        if (version == 1) {
             _establishState = new OutboundEstablishState(ctx, transport, this);
-        else
-            _establishState = new OutboundNTCP2State(ctx, transport, this);
+        } else {
+            try {
+                _establishState = new OutboundNTCP2State(ctx, transport, this);
+            } catch (IllegalArgumentException iae) {
+                throw new DataFormatException("bad address? " + remAddr, iae);
+            }
+        }
     }
 
     /**
@@ -975,7 +981,7 @@ public class NTCPConnection implements Closeable {
         List<Block> blocks = new ArrayList<Block>(2);
         Block block = new NTCP2Payload.RIBlock(ri, shouldFlood);
         int size = block.getTotalLength();
-        if (size > BUFFER_SIZE) {
+        if (size + NTCP2Payload.BLOCK_HEADER_SIZE > BUFFER_SIZE) {
             if (_log.shouldWarn())
                 _log.warn("RI too big: " + ri);
             return;
@@ -987,7 +993,6 @@ public class NTCPConnection implements Closeable {
             // all zeros is fine here
             //block = new NTCP2Payload.PaddingBlock(_context, padlen);
             block = new NTCP2Payload.PaddingBlock(padlen);
-            size += block.getTotalLength();
             blocks.add(block);
         }
         // use a "read buf" for the temp array
@@ -1034,7 +1039,6 @@ public class NTCPConnection implements Closeable {
             // all zeros is fine here
             //block = new NTCP2Payload.PaddingBlock(_context, padlen);
             block = new NTCP2Payload.PaddingBlock(padlen);
-            plen += block.getTotalLength();
             blocks.add(block);
         }
         // use a "read buf" for the temp array
@@ -2125,21 +2129,12 @@ public class NTCPConnection implements Closeable {
         }
 
         public void gotOptions(byte[] options, boolean isHandshake) {
-            if (options.length < 12) {
+            NTCP2Options hisPadding = NTCP2Options.fromByteArray(options);
+            if (hisPadding == null) {
                 if (_log.shouldWarn())
                     _log.warn("Got options length " + options.length + " on: " + this);
                 return;
             }
-            float tmin = (options[0] & 0xff) / 16.0f;
-            float tmax = (options[1] & 0xff) / 16.0f;
-            float rmin = (options[2] & 0xff) / 16.0f;
-            float rmax = (options[3] & 0xff) / 16.0f;
-            int tdummy = (int) DataHelper.fromLong(options, 4, 2);
-            int rdummy = (int) DataHelper.fromLong(options, 6, 2);
-            int tdelay = (int) DataHelper.fromLong(options, 8, 2);
-            int rdelay = (int) DataHelper.fromLong(options, 10, 2);
-            NTCP2Options hisPadding = new NTCP2Options(tmin, tmax, rmin, rmax,
-                                                       tdummy, rdummy, tdelay, rdelay);
             _paddingConfig = OUR_PADDING.merge(hisPadding);
             if (_log.shouldDebug())
                 _log.debug("Got padding options:" +

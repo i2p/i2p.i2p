@@ -44,7 +44,7 @@ import net.i2p.util.SystemVersion;
  */
 public final class KeyStoreUtil {
         
-    public static boolean _blacklistLogged;
+    private static boolean _blacklistLogged;
 
     public static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String DEFAULT_KEY_ALGORITHM = "RSA";
@@ -1331,8 +1331,8 @@ public final class KeyStoreUtil {
         String alias = args[2];
         String pw = args[3];
         boolean ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, "test cname", "test ou",
-                                //DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
-                                DEFAULT_KEY_VALID_DAYS, "ElGamal", 2048, pw);
+                                DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
+                                //DEFAULT_KEY_VALID_DAYS, "ElGamal", 2048, pw);
         System.out.println("genkey ok? " + ok);
     }
 

@@ -693,8 +693,8 @@ public class WebMail extends HttpServlet
 			boolean fixedPorts = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 			if (fixedPorts) {
 				host = Config.getProperty( CONFIG_HOST, DEFAULT_HOST );
-				pop3Port = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
-				smtpPort = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
+				pop3Port = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+				smtpPort = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 			}
 			boolean doContinue = true;
 
@@ -898,6 +898,10 @@ public class WebMail extends HttpServlet
 				// because we may already have UIDLs in the MailCache to fetch
 				synchronized(_so) {
 					mc = _so.caches.get(DIR_FOLDER);
+					if (mc == null) {
+						_so.error += "Internal error, no folder\n";
+						return;
+					}
 					while (mc.isLoading()) {
 						try {
 							_so.wait(5000);
@@ -910,9 +914,7 @@ public class WebMail extends HttpServlet
 				if (log.shouldDebug()) log.debug("Done waiting for folder load");
 				// fetch the mail outside the lock
 				// TODO, would be better to add each email as we get it
-				if (mc != null) {
-					found = mc.getMail(MailCache.FetchMode.HEADER);
-				}
+				found = mc.getMail(MailCache.FetchMode.HEADER);
 			}
 			if (log.shouldDebug()) log.debug("CW.FNM connected? " + connected + " found? " + found);
 			synchronized(_so) {
@@ -2620,11 +2622,6 @@ public class WebMail extends HttpServlet
 		ArrayList<String> ccList = new ArrayList<String>();
 		ArrayList<String> bccList = new ArrayList<String>();
 		
-		String sender = null;
-		if (from != null && Mail.validateAddress(from)) {
-			sender = Mail.getAddress( from );
-		}
-		
 		// no validation
 		Mail.getRecipientsFromList( toList, to, ok );
 		Mail.getRecipientsFromList( ccList, cc, ok );
@@ -2729,7 +2726,6 @@ public class WebMail extends HttpServlet
 		String[] cc = draft.cc;
 		String[] bcc = draft.getBcc();
 		String subject = draft.subject;
-		MailPart text = draft.getPart();
 		List<Attachment> attachments = draft.getAttachments();
 
 		ArrayList<String> toList = new ArrayList<String>();
@@ -2898,7 +2894,7 @@ public class WebMail extends HttpServlet
 				} else {
 					sessionObject.error += relay.error;
 				}
-				sessionObject.info.replace(_t("Sending mail.") + '\n', "");
+				sessionObject.info = sessionObject.info.replace(_t("Sending mail.") + '\n', "");
 			}
 		}
 	}
@@ -2970,7 +2966,8 @@ public class WebMail extends HttpServlet
 			// header set in processRequest()
 			I2PAppContext ctx = I2PAppContext.getGlobalContext();
 			b64UIDL = Base64.encode(ctx.random().nextLong() + "drft");
-		} else {
+		}
+
 			MailCache drafts = sessionObject.caches.get(DIR_DRAFTS);
 			if (drafts == null) {
 				sessionObject.error += "No Drafts folder?\n";
@@ -3005,7 +3002,6 @@ public class WebMail extends HttpServlet
 				// needed when processing the CANCEL button
 				out.println("<input type=\"hidden\" name=\"" + DRAFT_EXISTS + "\" value=\"1\">");
 			}
-		}
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 		
@@ -3068,9 +3064,9 @@ public class WebMail extends HttpServlet
 	private static void showLogin( PrintWriter out )
 	{
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
-		String host = Config.getProperty( CONFIG_HOST, DEFAULT_HOST );
-		String pop3 = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
-		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
+		String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
+		String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+		String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 		
 		out.println( "<div id=\"dologin\"><h1>" + _t("Email Login") + "</h1><table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
@@ -3377,7 +3373,7 @@ public class WebMail extends HttpServlet
 				out.println(button(DELETE, _t("Delete")));
 		}
 		out.println(button(LOGOUT, _t("Logout") ));
-		if (mail.hasBody() && !mc.getFolderName().equals(DIR_DRAFTS)) {
+		if (hasHeader && mail.hasBody() && !mc.getFolderName().equals(DIR_DRAFTS)) {
 			// can't move unless has body
 			// can't move from drafts
 			out.println(button(MOVE_TO, _t("Move to Folder") + ':'));
