@@ -74,8 +74,8 @@ reprepro includedsc stable i2p_0.9.XX-1.dsc
 reprepro -v update precise
 reprepro -v update trusty
 reprepro -v update xenial
-reprepro -v update artful
 reprepro -v update bionic
+reprepro -v update cosmic
 # todo when set up
 # To add or remove distributions, edit /var/www/debian/conf/distributions
 # and /var/www/debian/conf/updates
@@ -92,10 +92,10 @@ reprepro -v copysrc wheezy precise i2p
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc jessie trusty i2p
 
-# To copy artful to stretch and sid:
+# To copy bionic to stretch and sid:
 # Note that syntax is reprepro copysrc TO FROM package!
-reprepro -v copysrc stretch artful i2p
-reprepro -v copysrc sid artful i2p
+reprepro -v copysrc stretch bionic i2p
+reprepro -v copysrc sid bionic i2p
 
 # install in the architectures not copied from ubuntu
 # 'flood' should do this but forgot how, can't make it work any more
