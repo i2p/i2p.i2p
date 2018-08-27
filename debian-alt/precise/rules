@@ -70,7 +70,7 @@ build-indep:
 		cp $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak; \
 	fi
 ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
-	sed -e "s/\(.*EXTRA\ =\ \)[^ ]*\"\(.*\)\"/\1\"\2-$$EXTRAPREFIX$$DEBIANVERSION\"/" < $(ROUTERVERSION) > $(ROUTERVERSION).tmp
+	sed -e "s/\(.*EXTRA\ =\ \)[^ ]*\"\(.*\)\"/\1\"-$$EXTRAPREFIX$$DEBIANVERSION\"/" < $(ROUTERVERSION) > $(ROUTERVERSION).tmp
 	mv -f $(ROUTERVERSION).tmp $(ROUTERVERSION)
 else
 	@echo "Already found deb in version, not doing anything"
