@@ -17,7 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.util.CachedIteratorArrayList;
+import net.i2p.router.util.CachedIteratorCollection;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.router.util.PriBlockingQueue;
 import net.i2p.util.Log;
@@ -210,7 +210,7 @@ public class PeerState {
      *  Mostly messages that have been transmitted and are awaiting acknowledgement,
      *  although there could be some that have not been sent yet.
      */
-    private final List<OutboundMessageState> _outboundMessages;
+    private final CachedIteratorCollection<OutboundMessageState> _outboundMessages;
 
     /**
      *  Priority queue of messages that have not yet been sent.
@@ -370,7 +370,7 @@ public class PeerState {
         _rtt = INIT_RTT;
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap<Long, InboundMessageState>(8);
-        _outboundMessages = new CachedIteratorArrayList<OutboundMessageState>(32);
+        _outboundMessages = new CachedIteratorCollection<OutboundMessageState>();
         //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
         _outboundQueue = new PriBlockingQueue<OutboundMessageState>(ctx, "UDP-PeerState", 32);
         // all createRateStat() moved to EstablishmentManager
