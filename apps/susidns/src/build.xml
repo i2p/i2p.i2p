@@ -30,6 +30,7 @@
 		<pathelement location="lib/standard.jar" />
 		<pathelement location="${lib}/jasper-runtime.jar" />
 		<pathelement location="${lib}/jetty-util.jar" />
+		<pathelement location="${lib}/jetty-i2p.jar" />
 		<pathelement location="${ant.home}/lib/ant.jar" />
 		<pathelement location="../../../core/java/build/i2p.jar" />
 		<pathelement location="../../addressbook/dist/addressbook.jar" />
@@ -69,7 +70,8 @@
         <delete file="WEB-INF/web-out.xml" />
     	<mkdir dir="${tmp}" />
         <echo message="Ignore any warning about /WEB-INF/web.xml not found" />
-        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp" failonerror="true">
+        <!-- See apps/routerconsole/java/build.xml for important JspC build documentation -->
+        <java classname="net.i2p.servlet.util.JspC" fork="true" classpathref="cp" failonerror="true">
             <arg value="-d" />
             <arg value="${tmp}" />
             <arg value="-v" />

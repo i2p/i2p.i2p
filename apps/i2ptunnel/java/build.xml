@@ -305,8 +305,8 @@
         <delete file="../jsp/web-out.xml" />
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
-        <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
-        <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
+        <!-- See apps/routerconsole/java/build.xml for important JspC build documentation -->
+        <java classname="net.i2p.servlet.util.JspC" fork="true" failonerror="true">
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
