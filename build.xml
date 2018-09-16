@@ -9,7 +9,7 @@
     <property file="build.properties"/>
     <!--  When changing, also change javadoc URL in build.properties, and checksum in apps/jetty/build.xml -->
     <property name="jetty.ver" value="9.2.25.v20180606" />
-    <property name="tomcat.ver" value="8.5.30" />
+    <property name="tomcat.ver" value="8.5.34" />
 
     <!-- You probably don't want to change anything from here down -->
     <target name="help" depends="all" />
