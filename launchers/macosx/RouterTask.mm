@@ -4,11 +4,15 @@
 #include <future>
 #include <stdlib.h>
 
-#include "optional.hpp"
-#include "subprocess.hpp"
-#include "PidWatcher.h"
+#ifdef __cplusplus
+#include "include/subprocess.hpp"
+#import "I2PLauncher-Swift.h"
+#include "AppDelegate.h"
+#endif
+#include "include/PidWatcher.h"
 
 #import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
 
 @implementation RTaskOptions
 @end
@@ -24,18 +28,19 @@
 
 - (instancetype) initWithOptions : (RTaskOptions*) options
 {
-    self.userRequestedRestart = NO;
-    self.isRouterRunning = NO;
-    self.input = [NSFileHandle fileHandleWithStandardInput];
-    self.routerTask = [NSTask new];
-    self.processPipe = [NSPipe new];
-    [self.routerTask setLaunchPath:options.binPath];
-    [self.routerTask setArguments:options.arguments];
-    NSDictionary *envDict = @{
-        @"I2PBASE": options.i2pBaseDir
-    };
-    [self.routerTask setEnvironment: envDict];
-    [self.routerTask setStandardOutput:self.processPipe];
+  self.userRequestedRestart = NO;
+  self.isRouterRunning = NO;
+  self.input = [NSFileHandle fileHandleWithStandardInput];
+  self.routerTask = [NSTask new];
+  self.processPipe = [NSPipe new];
+  [self.routerTask setLaunchPath:options.binPath];
+  [self.routerTask setArguments:options.arguments];
+  NSDictionary *envDict = @{
+    @"I2PBASE": options.i2pBaseDir
+  };
+  [self.routerTask setEnvironment: envDict];
+  NSLog(@"Using environment variables: %@", envDict);
+  [self.routerTask setStandardOutput:self.processPipe];
 	[self.routerTask setStandardError:self.processPipe];
 
     NSFileHandle *stdoutFileHandle = [self.processPipe fileHandleForReading];
@@ -47,12 +52,14 @@
     [stdoutFileHandle waitForDataInBackgroundAndNotify];
 
     [self.routerTask setTerminationHandler:^(NSTask* task) {
-        NSLog(@"termHandler triggered!");
-        NSBundle *launcherBundle = [NSBundle mainBundle];
-        auto iconImage = [launcherBundle pathForResource:@"ItoopieTransparent" ofType:@"png"];
-        sendUserNotification(APP_IDSTR, @"I2P Router has stopped", [NSImage imageNamed:iconImage]);
-        // Cleanup
-        self.isRouterRunning = NO;
+      NSLog(@"termHandler triggered!");
+      auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
+      [swiftRouterStatus setRouterStatus: true];
+      NSBundle *launcherBundle = [NSBundle mainBundle];
+      auto iconImage = [launcherBundle pathForResource:@"AppIcon" ofType:@"png"];
+      sendUserNotification(APP_IDSTR, @"I2P Router has stopped");
+      // Cleanup
+      self.isRouterRunning = NO;
     }];
 /*
     self.readLogHandle = [self.processPipe fileHandleForReading];
@@ -105,10 +112,8 @@
 
 @end
 
+#ifdef __cplusplus
 
-
-
-using namespace subprocess;
 
 const std::vector<NSString*> JavaRunner::defaultStartupFlags {
     @"-Xmx512M",
@@ -144,7 +149,7 @@ void JavaRunner::requestRouterShutdown()
     javaProcess->kill(1);
 }
 
-std::experimental::optional<std::future<int> > JavaRunner::execute()
+std::future<int> JavaRunner::execute()
 {
   try {
     auto executingFn = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS, ^{
@@ -160,6 +165,8 @@ std::experimental::optional<std::future<int> > JavaRunner::execute()
     return std::async(std::launch::async, []{ return 0; });
   } catch (std::exception* ex) {
     printf("ERROR: %s\n", ex->what());
-    return std::experimental::nullopt;
+    return std::async(std::launch::async, []{ return 1; });
   }
 }
+
+#endif

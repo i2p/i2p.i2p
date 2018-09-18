@@ -4,8 +4,6 @@
 #include <unistd.h>
 #include <sys/event.h>
 
-#include "neither/either.hpp"
-#include "AppDelegate.h"
 
 using callbackType = void (CFFileDescriptorRef, CFOptionFlags, void *);
 using HandleFunction = std::function<void(int)>;
@@ -16,7 +14,7 @@ static void noteProcDeath(CFFileDescriptorRef fdref, CFOptionFlags callBackTypes
     kevent(fd, NULL, 0, &kev, 1, NULL);
     // take action on death of process here
     NSLog(@"process with pid '%u' died\n", (unsigned int)kev.ident);
-    sendUserNotification(APP_IDSTR, @"The I2P router has stopped.");
+    //sendUserNotification(APP_IDSTR, @"The I2P router has stopped.");
     CFFileDescriptorInvalidate(fdref);
     CFRelease(fdref); // the CFFileDescriptorRef is no longer of any use in this example
 }

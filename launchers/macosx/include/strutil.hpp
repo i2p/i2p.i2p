@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cctype>
 #include <locale>
-#include "optional.hpp"
+#include "optional.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFArray.h>

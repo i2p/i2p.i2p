@@ -1,12 +1,7 @@
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <iostream>
-#include <algorithm>
-#include <cstring>
-#include <sstream>
-#include <list>
+#include <memory.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include <Foundation/Foundation.h>
@@ -17,16 +12,19 @@
 #include <CoreFoundation/CFArray.h>
 #include <CoreFoundation/CFString.h>
 
-#include "optional.hpp"
-#include "strutil.hpp"
-#include "subprocess.hpp"
-#include "neither/maybe.hpp"
 #include "RouterTask.h"
 
-using namespace subprocess;
-using namespace neither;
 
 #define DEF_MIN_JVM_VER "1.7+"
+
+#ifdef __cplusplus
+
+#include "include/strutil.hpp"
+
+#include <functional>
+#include <memory>
+#include <list>
+
 
 class JvmVersion
 {
@@ -53,6 +51,7 @@ public:
     );
   }
 };
+
 
 typedef std::shared_ptr<JvmVersion> JvmVersionPtr;
 typedef std::shared_ptr<std::list<JvmVersionPtr> > JvmListPtr;
@@ -113,6 +112,8 @@ static void processJvmEntry (const void* key, const void* value, void* context) 
   }
 }
 
+
+
 static void processJvmPlistEntries (const void* item, void* context) {
   CFDictionaryRef dict = CFDictionaryCreateCopy(kCFAllocatorDefault, (CFDictionaryRef)item);
 
@@ -153,15 +154,15 @@ static void listAllJavaInstallsAvailable()
   auto javaHomeRes = check_output({"/usr/libexec/java_home","-v",DEF_MIN_JVM_VER,"-X"});
   CFDataRef javaHomes = CFDataCreate(NULL, (const UInt8 *)javaHomeRes.buf.data(), strlen(javaHomeRes.buf.data()));
 
-  //CFErrorRef err;
+  CFErrorRef err;
   CFPropertyListRef propertyList = CFPropertyListCreateWithData(kCFAllocatorDefault, javaHomes, kCFPropertyListImmutable, NULL, NULL);
-  /*if (err)
+  if (err)
   {
     NSError *error = (__bridge NSError *)err;
     NSLog(@"Failed to read property list: %@", error);
     [NSApp presentError: error];
-    return nullptr;
-  }*/
+    return;
+  }
 
 
   //auto typeId = CFCopyTypeIDDescription(CFGetTypeID(propertyList));
@@ -170,8 +171,11 @@ static void listAllJavaInstallsAvailable()
 
   // Count number of entries in the property array list.
   // This is used to set max CRange for CFArrayApplyFunction.
+
   auto jCount = CFArrayGetCount((CFArrayRef)propertyList);
 
   CFArrayApplyFunction((CFArrayRef)propertyList, CFRangeMake(0, jCount), processJvmPlistEntries, NULL);
   //CFShow(propertyList);
 }
+
+#endif
