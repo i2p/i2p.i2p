@@ -3,47 +3,53 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
-	<string>I2PLauncher</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Public Domain</string>
-	<key>CFBundleGetInfoString</key>
-	<string>0.9.35-experimental</string>
+	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
-	<string>images/AppIcon.icns</string>
+	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>net.i2p.launcher</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>I2P</string>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0.1</string>
-	<key>CFBundleSignature</key>
-	<string>I2P</string>
+	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string>ItoopieTransparent</string>
+			<key>CFBundleURLName</key>
+			<string>http+i2p</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>http+i2p</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>0.0.1</string>
-    <key>NSUserNotificationAlertStyle</key>
-    <string>alert</string>
+	<string>1</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>LSUIElement</key>
+	<true/>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
-	<key>CGDisableCoalescedUpdates</key>
-	<true/>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.5</string>
-	<key>CFBundleDisplayName</key>
-	<string>I2P</string>
-	<key>LSMinimumSystemVersionByArchitecture</key>
-	<dict>
-		<key>i386</key>
-		<string>10.5.0</string>
-		<key>x86_64</key>
-		<string>10.6.0</string>
-	</dict>
-    <key>LSUIElement</key>
-    <string>1</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2018 The I2P Project. All rights reserved.</string>
+	<key>NSMainNibFile</key>
+	<string>UserInterfaces</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSServices</key>
+	<array>
+		<dict/>
+	</array>
 </dict>
 </plist>
