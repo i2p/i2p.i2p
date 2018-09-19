@@ -5,6 +5,13 @@
 #include <string.h>
 #include <memory.h>
 
+#ifdef __cplusplus
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <assert.h>
+#endif
+
 #include <Cocoa/Cocoa.h>
 
 
@@ -35,8 +42,26 @@
 @property (copy) NSString* zipFile;
 @property (copy) NSString* jarFile;
 @end
+
+
 #ifdef __cplusplus
-#include "JavaHelper.h"
+
+inline const char* RealHomeDirectory() {
+  struct passwd *pw = getpwuid(getuid());
+  assert(pw);
+  return pw->pw_dir;
+}
+
+inline std::string getDefaultBaseDir()
+{
+  // Figure out base directory
+  auto homeDir = RealHomeDirectory();
+  const char* pathFromHome = "%s/Library/I2P";
+  char buffer[strlen(homeDir)+strlen(pathFromHome)];
+  sprintf(buffer, pathFromHome, homeDir);
+  std::string i2pBaseDir(buffer);
+  return i2pBaseDir;
+}
 
 inline void sendUserNotification(NSString* title, NSString* informativeText, NSImage* contentImage = NULL, bool makeSound = false) {
   NSUserNotification *userNotification = [[NSUserNotification alloc] init];

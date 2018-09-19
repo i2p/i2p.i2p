@@ -34,31 +34,26 @@
 #include "include/fn.h"
 #include "include/portcheck.h"
 
-#define debug(format, ...) CFShow([NSString stringWithFormat:format, ## __VA_ARGS__]);
-
-@interface AppDelegate () <NSUserNotificationCenterDelegate, NSApplicationDelegate>
-@end
-
 #ifdef __cplusplus
 #import "SBridge.h"
+
+#include "include/subprocess.hpp"
+#include "include/strutil.hpp"
+
+using namespace subprocess;
+
 JvmListSharedPtr gRawJvmList = nullptr;
-#endif
 
-
-@interface AppDelegate () <NSUserNotificationCenterDelegate, NSApplicationDelegate>
-@end
-
-#ifdef __cplusplus
 maybeAnRouterRunner getGlobalRouterObject()
 {
-    std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
-    return globalRouterStatus; // Remember this might be nullptr now.
+  std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
+  return globalRouterStatus; // Remember this might be nullptr now.
 }
 
 void setGlobalRouterObject(I2PRouterTask* newRouter)
 {
-    std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
-    globalRouterStatus = newRouter;
+  std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
+  globalRouterStatus = newRouter;
 }
 
 
@@ -66,19 +61,24 @@ pthread_mutex_t mutex;
 
 bool getGlobalRouterIsRunning()
 {
-    pthread_mutex_lock(&mutex);
-    bool current = isRuterRunning;
-    pthread_mutex_unlock(&mutex);
-    return current;
+  pthread_mutex_lock(&mutex);
+  bool current = isRuterRunning;
+  pthread_mutex_unlock(&mutex);
+  return current;
 }
 void setGlobalRouterIsRunning(bool running)
 {
-    pthread_mutex_lock(&mutex);
-    isRuterRunning = running;
-    pthread_mutex_unlock(&mutex);
+  pthread_mutex_lock(&mutex);
+  isRuterRunning = running;
+  pthread_mutex_unlock(&mutex);
 }
 
 #endif
+
+#define debug(format, ...) CFShow([NSString stringWithFormat:format, ## __VA_ARGS__]);
+
+@interface AppDelegate () <NSUserNotificationCenterDelegate, NSApplicationDelegate>
+@end
 
 
 @implementation ExtractMetaInfo : NSObject
@@ -91,22 +91,6 @@ void setGlobalRouterIsRunning(bool running)
 }
 
 #ifdef __cplusplus
-
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
-#include <assert.h>
-
-#include "include/subprocess.hpp"
-#include "include/strutil.hpp"
-
-using namespace subprocess;
-
-const char* RealHomeDirectory() {
-  struct passwd *pw = getpwuid(getuid());
-  assert(pw);
-  return pw->pw_dir;
-}
 
 - (void)extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion
 {
@@ -222,17 +206,6 @@ const char* RealHomeDirectory() {
 
 
 #ifdef __cplusplus
-
-inline std::string getDefaultBaseDir()
-{
-  // Figure out base directory
-  const char* pathFromHome = "/Users/%s/Library/I2P";
-  auto username = getenv("USER");
-  char buffer[strlen(pathFromHome)+strlen(username)];
-  sprintf(buffer, pathFromHome, username);
-  std::string i2pBaseDir(buffer);
-  return i2pBaseDir;
-}
 
 - (NSString *)userSelectJavaHome:(JvmListPtr)rawJvmList
 {

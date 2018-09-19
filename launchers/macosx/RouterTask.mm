@@ -49,18 +49,16 @@
         name:NSFileHandleDataAvailableNotification
         object:stdoutFileHandle];
 
-    [stdoutFileHandle waitForDataInBackgroundAndNotify];
+  [stdoutFileHandle waitForDataInBackgroundAndNotify];
 
-    [self.routerTask setTerminationHandler:^(NSTask* task) {
-      NSLog(@"termHandler triggered!");
-      auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
-      [swiftRouterStatus setRouterStatus: true];
-      NSBundle *launcherBundle = [NSBundle mainBundle];
-      auto iconImage = [launcherBundle pathForResource:@"AppIcon" ofType:@"png"];
-      sendUserNotification(APP_IDSTR, @"I2P Router has stopped");
-      // Cleanup
-      self.isRouterRunning = NO;
-    }];
+  [self.routerTask setTerminationHandler:^(NSTask* task) {
+    NSLog(@"termHandler triggered!");
+    auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
+    [swiftRouterStatus setRouterStatus: true];
+    sendUserNotification(APP_IDSTR, @"I2P Router has stopped");
+    // Cleanup
+    //self.isRouterRunning = NO;
+  }];
 /*
     self.readLogHandle = [self.processPipe fileHandleForReading];
     NSData *inData = nil;

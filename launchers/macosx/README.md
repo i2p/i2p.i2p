@@ -1,9 +1,18 @@
 # The Mac OS X Launcher
 
+## Misc
+
 **Note** this project is WIP, cause Meeh has yet to merge in Obj-C/Swift code for GUI stuff in OSX.
 
 However, this is a thin wrapper launching both Mac OS X trayicon and the I2P router - and make them talk together.
 
 More code will be merged in, it's just a f* mess which Meeh needs to clean up and move into repo.
 
-`./fullBuild.sh` triggers Ant jobs and prepare the base.zip, as well as starting the ninja build.
+## Howto build
+
+You can both build the project from the Xcode UI or you can build it from command line.
+
+An example build command:
+`xcodebuild -target I2PLauncher -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk`
+
+

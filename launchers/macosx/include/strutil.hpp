@@ -53,7 +53,7 @@ inline std::string extractString(CFStringRef value)
   }
 }
 
-bool replace(std::string& str, const std::string& from, const std::string& to) {
+inline bool replace(std::string& str, const std::string& from, const std::string& to) {
   size_t start_pos = str.find(from);
   if(start_pos == std::string::npos)
     return false;
