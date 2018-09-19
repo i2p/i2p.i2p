@@ -53,16 +53,12 @@ inline std::string extractString(CFStringRef value)
   }
 }
 
-using std::experimental::optional;
-
-// Use CFStringRef instead of NSString*, otherwise disable ARC
-inline optional<CFStringRef> optionalString(bool val) {
-    optional<CFStringRef> myOptString;
-    if(val) {
-        // Cast to corresponding CoreFoundation object
-        myOptString = (CFStringRef)@"String";
-    }
-    return myOptString;
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+  size_t start_pos = str.find(from);
+  if(start_pos == std::string::npos)
+    return false;
+  str.replace(start_pos, from.length(), to);
+  return true;
 }
 
 
@@ -101,5 +97,23 @@ static inline std::string trim_copy(std::string s) {
     trim(s);
     return s;
 }
+
+#ifdef CPP17
+
+
+using std::experimental::optional;
+
+// Use CFStringRef instead of NSString*, otherwise disable ARC
+inline optional<CFStringRef> optionalString(bool val) {
+  optional<CFStringRef> myOptString;
+  if(val) {
+    // Cast to corresponding CoreFoundation object
+    myOptString = (CFStringRef)@"String";
+  }
+  return myOptString;
+}
+
+#endif
+
 
 #endif

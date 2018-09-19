@@ -84,17 +84,6 @@ void setGlobalRouterIsRunning(bool running)
 @implementation ExtractMetaInfo : NSObject
 @end
 
-#ifdef __cplusplus
-
-bool replace(std::string& str, const std::string& from, const std::string& to) {
-  size_t start_pos = str.find(from);
-  if(start_pos == std::string::npos)
-    return false;
-  str.replace(start_pos, from.length(), to);
-  return true;
-}
-
-#endif
 
 @implementation AppDelegate
 
@@ -109,6 +98,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 #include <assert.h>
 
 #include "include/subprocess.hpp"
+#include "include/strutil.hpp"
 
 using namespace subprocess;
 
