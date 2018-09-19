@@ -22,7 +22,7 @@ import Cocoa
   
   @objc func constructMenu() -> NSMenu {
     let menu = NSMenu()
-    let sb = SwiftMainDelegate.objCBridge
+    //let sb = SwiftMainDelegate.objCBridge
     
     menu.addItem(NSMenuItem(title: "Open I2P Console", action: #selector(self.handleOpenConsole(_:)), keyEquivalent: "O"))
     menu.addItem(NSMenuItem.separator())

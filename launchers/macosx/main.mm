@@ -10,6 +10,7 @@
 #include <vector>
 
 #import <Foundation/Foundation.h>
+#import <Foundation/NSFileManager.h>
 
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -83,6 +84,18 @@ void setGlobalRouterIsRunning(bool running)
 @implementation ExtractMetaInfo : NSObject
 @end
 
+#ifdef __cplusplus
+
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+  size_t start_pos = str.find(from);
+  if(start_pos == std::string::npos)
+    return false;
+  str.replace(start_pos, from.length(), to);
+  return true;
+}
+
+#endif
+
 @implementation AppDelegate
 
 - (void) awakeFromNib {
@@ -90,70 +103,124 @@ void setGlobalRouterIsRunning(bool running)
 
 #ifdef __cplusplus
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <assert.h>
+
+#include "include/subprocess.hpp"
+
+using namespace subprocess;
+
+const char* RealHomeDirectory() {
+  struct passwd *pw = getpwuid(getuid());
+  assert(pw);
+  return pw->pw_dir;
+}
+
 - (void)extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion
 {
-  std::string basePath([self.metaInfo.i2pBase UTF8String]);
-  NSParameterAssert(self.metaInfo.i2pBase);
+  
+  NSBundle *launcherBundle = [NSBundle mainBundle];
+  auto homeDir = RealHomeDirectory();
+  NSLog(@"Home directory is %s", homeDir);
+  
+  std::string basePath(homeDir);
+  basePath.append("/Library/I2P");
+  auto jarResPath = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
+  NSLog(@"Trying to load launcher.jar from url = %@", jarResPath);
+  self.metaInfo.jarFile = jarResPath;
+  self.metaInfo.zipFile = [launcherBundle pathForResource:@"base" ofType:@"zip"];
+  
+  NSParameterAssert(basePath.c_str());
   NSError *error = NULL;
   BOOL success = NO;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-    // Get paths
-    NSBundle *launcherBundle = [NSBundle mainBundle];
 
-    std::string basearg("-Di2p.dir.base=");
-    basearg += basePath;
-
-    std::string zippath("-Di2p.base.zip=");
-    zippath += [self.metaInfo.zipFile UTF8String];
-
-    std::string jarfile("-cp ");
-    jarfile += [self.metaInfo.jarFile UTF8String];
-
-    // Create directory
-    mkdir(basePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
-
-    auto cli = JavaRunner::defaultFlagsForExtractorJob;
-    setenv("I2PBASE", basePath.c_str(), true);
-    setenv("ZIPPATH", zippath.c_str(), true);
-    //setenv("DYLD_LIBRARY_PATH",".:/usr/lib:/lib:/usr/local/lib", true);
-
-    cli.push_back(basearg);
-    cli.push_back(zippath);
-    cli.push_back(jarfile);
-    cli.push_back("net.i2p.launchers.BaseExtractor");
-
-    auto charCli = map(cli, [](std::string str){ return str.c_str(); });
-    std::string execStr = [self.metaInfo.javaBinary UTF8String];
-    for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
-
-    NSLog(@"Trying cmd: %@", [NSString stringWithUTF8String:execStr.c_str()]);
     try {
-        sendUserNotification(APP_IDSTR, @"Please hold on while we extract I2P. You'll get a new message once done!", self.contentImage);
+      std::string basearg("-Di2p.dir.base=");
+      basearg += basePath;
+
+      std::string zippath("-Di2p.base.zip=");
+      zippath += [self.metaInfo.zipFile UTF8String];
+
+      std::string jarfile("-cp ");
+      jarfile += [self.metaInfo.jarFile UTF8String];
+
+      // Create directory
+      mkdir(basePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
+
+      auto cli = JavaRunner::defaultFlagsForExtractorJob;
+      setenv("I2PBASE", basePath.c_str(), true);
+      setenv("ZIPPATH", zippath.c_str(), true);
+      //setenv("DYLD_LIBRARY_PATH",".:/usr/lib:/lib:/usr/local/lib", true);
+
+      cli.push_back(basearg);
+      cli.push_back(zippath);
+      cli.push_back(jarfile);
+      cli.push_back("net.i2p.launchers.BaseExtractor");
+      auto rs = [[RouterProcessStatus alloc] init];
+      NSString* jh = [rs getJavaHome];
+      if (jh != nil) {
+        NSLog(@"jh er %@", jh);
+      }
+      
+      NSString* newString = [NSString stringWithFormat:@"file://%@", rs.getJavaHome];
+      NSURL *baseURL = [NSURL fileURLWithPath:newString];
+      
+      NSLog(@"MEEH URL PATH: %s", [baseURL fileSystemRepresentation]);
+
+      auto charCli = map(cli, [](std::string str){ return str.c_str(); });
+      std::string execStr = std::string([rs.getJavaHome UTF8String]);
+      // TODO: Cheap hack, make it better.
+      replace(execStr, "Internet Plug-Ins", "Internet\\ Plug-Ins");
+      replace(execStr, "\n", "");
+      NSLog(@"Java path1 = %s", execStr.c_str());
+      [rs setJavaHome: [NSString stringWithFormat:@"%s", execStr.c_str()]];
+      for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
+      
+      //execStr = replace(execStr, "\\\\ ", "\\ ");
+      //NSLog(@"Java path2 = %s", execStr.c_str());
+
+      NSLog(@"Trying cmd: %@", [NSString stringWithUTF8String:execStr.c_str()]);
+      try {
+        sendUserNotification(APP_IDSTR, @"Please hold on while we extract I2P. You'll get a new message once done!");
         int extractStatus = Popen(execStr.c_str(), environment{{
-            {"ZIPPATH", zippath.c_str()},
-            {"I2PBASE", basePath.c_str()}
+          {"ZIPPATH", zippath.c_str()},
+          {"I2PBASE", basePath.c_str()}
         }}).wait();
         NSLog(@"Extraction exit code %@",[NSString stringWithUTF8String:(std::to_string(extractStatus)).c_str()]);
         if (extractStatus == 0)
         {
-            //success = YES;
+          //success = YES;
+          NSLog(@"Time to detect I2P version in install directory");
+          [self.swiftRuntime findInstalledI2PVersion];
         }
-    } catch (subprocess::OSError &err) {
-        auto errMsg = [NSString stringWithUTF8String:err.what()];
-        //success = NO;
-        NSLog(@"Exception: %@", errMsg);
-        sendUserNotification(APP_IDSTR, [NSString stringWithFormat:@"Error: %@", errMsg], self.contentImage);
-    }
-
-    // All done. Assume success and error are already set.
-    dispatch_async(dispatch_get_main_queue(), ^{
-      //sendUserNotification(APP_IDSTR, @"Extraction complete!", self.contentImage);
-      if (completion) {
-        completion(success, error);
+      
+      } catch (subprocess::OSError &err) {
+          auto errMsg = [NSString stringWithUTF8String:err.what()];
+          //success = NO;
+          NSLog(@"Exception: %@", errMsg);
+          sendUserNotification(APP_IDSTR, [NSString stringWithFormat:@"Error: %@", errMsg]);
       }
-    });
+
+      // All done. Assume success and error are already set.
+      dispatch_async(dispatch_get_main_queue(), ^{
+        //sendUserNotification(APP_IDSTR, @"Extraction complete!", self.contentImage);
+        if (completion) {
+          completion(success, error);
+        }
+      });
+      
+      
+    } catch (OSError &err) {
+      auto errMsg = [NSString stringWithUTF8String:err.what()];
+      NSLog(@"Exception: %@", errMsg);
+    }
   });
+    
+  
 }
 
 #endif
@@ -224,14 +291,13 @@ inline std::string getDefaultBaseDir()
     @"autoStartRouter": @YES,
     @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
   }];*/
-  if (self.enableVerboseLogging) NSLog(@"Default JVM home preference set to: %@", (NSString *)cfDefaultHome);
+  if (self.enableVerboseLogging) NSLog(@"Default JVM home preference set to: %@", cfDefaultHome);
 
   auto dict = [self.userPreferences dictionaryRepresentation];
   [self.userPreferences setPersistentDomain:dict forName:NSAPPDOMAIN];
 
   CFPreferencesSetMultiple((CFDictionaryRef)dict, NULL, CFAPPDOMAIN, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost);
   CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
-  //CFPreferencesSetAppValue(@"javaHome", (CFPropertyListRef)cfDefaultHome, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost);
 
   if (self.enableVerboseLogging) NSLog(@"Default preferences stored!");
 }
@@ -240,8 +306,7 @@ inline std::string getDefaultBaseDir()
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   // Init application here
   
-  SwiftMainDelegate *swiftRuntime = [[SwiftMainDelegate alloc] init];
-  swiftRuntime.applicationDidFinishLaunching;
+  self.swiftRuntime = [[SwiftMainDelegate alloc] init];
   
   [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
   // Start with user preferences
@@ -250,13 +315,6 @@ inline std::string getDefaultBaseDir()
   self.enableLogging = [self.userPreferences boolForKey:@"enableLogging"];
   self.enableVerboseLogging = [self.userPreferences boolForKey:@"enableVerboseLogging"];
 
-
-    // Get paths
-    NSBundle *launcherBundle = [NSBundle mainBundle];
-    //auto iconImage = [launcherBundle pathForResource:@"ItoopieTransparent" ofType:@"png"];
-  
-    // This is the only GUI the user experience on a regular basis.
-    //self.menuBarCtrl = [[MenuBarCtrl alloc] init];
 
 #ifdef __cplusplus
   gRawJvmList = std::make_shared<std::list<JvmVersionPtr> >(std::list<JvmVersionPtr>());
@@ -305,7 +363,7 @@ inline std::string getDefaultBaseDir()
 
   auto getJavaBin = [&pref,&self]() -> std::string {
     // Get Java home
-    NSString* val = @"";
+    /*NSString* val = @"";
     val = [pref stringForKey:@"javaHome"];
     if (val == NULL) val = @"";
     if (self.enableVerboseLogging) NSLog(@"Javahome: %@", val);
@@ -313,11 +371,21 @@ inline std::string getDefaultBaseDir()
     //trim(javaHome); // Trim to remove endline
     auto javaBin = std::string(javaHome);
     javaBin += "/bin/java"; // Append java binary to path.
-    return javaBin;
+    return javaBin;*/
+    DetectJava *dt = [[DetectJava alloc] init];
+    [dt findIt];
+    if ([dt isJavaFound]) {
+      return [dt.javaHome UTF8String];
+    } else {
+      throw new std::runtime_error("Java home fatal error");
+    }
   };
 
 
-  //NSBundle *launcherBundle = [NSBundle mainBundle];
+  NSBundle *launcherBundle = [NSBundle mainBundle];
+  
+  auto jarResPath = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
+  NSLog(@"Trying to load launcher.jar from url = %@", jarResPath);
     
   self.metaInfo = [[ExtractMetaInfo alloc] init];
   //self.metaInfo.i2pBase = [NSString stringWithUTF8String:i2pBaseDir.c_str()];
@@ -330,6 +398,7 @@ inline std::string getDefaultBaseDir()
 
   std::string jarfile("-cp ");
   jarfile += [self.metaInfo.zipFile UTF8String];
+  
 
   struct stat sb;
   if ( !(stat(i2pBaseDir.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) )
@@ -339,6 +408,7 @@ inline std::string getDefaultBaseDir()
 
     [self extractI2PBaseDir:^(BOOL success, NSError *error) {
       sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
+      [self.swiftRuntime applicationDidFinishLaunching];
       NSLog(@"Done extracting I2P");
       if (shouldAutoStartRouter) [self startupI2PRouter];
     }];
@@ -346,7 +416,9 @@ inline std::string getDefaultBaseDir()
   } else {
     if (self.enableVerboseLogging) NSLog(@"I2P directory found!");
     if (shouldAutoStartRouter) [self startupI2PRouter];
+    [self.swiftRuntime applicationDidFinishLaunching];
   }
+  
 #endif
 }
 
@@ -376,14 +448,15 @@ inline std::string getDefaultBaseDir()
 int main(int argc, const char **argv)
 {
   NSApplication *app = [NSApplication sharedApplication];
-  NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+  //NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
-  app.delegate = [[AppDelegate alloc] initWithArgc:argc argv:argv];
+  AppDelegate *appDelegate = [[AppDelegate alloc] initWithArgc:argc argv:argv];
+  app.delegate = appDelegate;
   [NSBundle loadNibNamed:@"I2Launcher" owner:NSApp];
 
   [NSApp run];
   // Handle any errors
-  [pool drain];
+  //[pool drain];
   return 0;
 }
 

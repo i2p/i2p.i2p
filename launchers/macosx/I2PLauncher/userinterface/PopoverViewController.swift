@@ -78,8 +78,11 @@ class PopoverViewController: NSViewController {
     routerStartStopButton?.target = self
     quickControlView?.needsDisplay = true
     
-    if (RouterProcessStatus.routerVersion?.isEmpty)! {
+    if (RouterProcessStatus.routerVersion == Optional.none) {
       routerVersionLabel?.cell?.stringValue = "Router version: Still unknown"
+      // trigger a read to ensure values
+      let tmp = SwiftMainDelegate()
+      tmp.findInstalledI2PVersion()
     } else {
       routerVersionLabel?.cell?.stringValue = "Router version: " + RouterProcessStatus.routerVersion!
     }
@@ -106,7 +109,7 @@ extension PopoverViewController {
   static func freshController() -> PopoverViewController {
     let storyboard = NSStoryboard(name: "Storyboard", bundle: Bundle.main)
     //2.
-    let identifier = NSStoryboard.SceneIdentifier(string: "PopoverView")
+    let identifier = NSStoryboard.SceneIdentifier(stringLiteral: "PopoverView")
     //3.
     guard let viewcontroller = storyboard.instantiateController(withIdentifier: identifier as String) as? PopoverViewController else {
       fatalError("Why cant i find PopoverViewController? - Check PopoverViewController.storyboard")

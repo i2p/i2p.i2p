@@ -25,9 +25,10 @@ import Cocoa
       terminate("No java..")
     }
     let javaBinPath = self.javaDetector.javaHome
+    RouterProcessStatus.knownJavaBinPath = javaBinPath
     print("Found java home = ", javaBinPath)
     
-    let (portIsNotTaken, descPort) = RouterProcessStatus.checkTcpPortForListen(port: 7657)
+    let (portIsNotTaken, _) = RouterProcessStatus.checkTcpPortForListen(port: 7657)
     if (!portIsNotTaken) {
       RouterProcessStatus.isRouterRunning = true
       RouterProcessStatus.isRouterChildProcess = false
@@ -39,12 +40,12 @@ import Cocoa
     }
     
     
-  }
+  } // End of init()
   
-  func findInstalledI2PVersion(jarPath: String, javaBin: String) {
+  @objc func findInstalledI2PVersion() {
     var i2pPath = NSHomeDirectory()
     i2pPath += "/Library/I2P"
-    var jExecPath:String = javaBin
+    var jExecPath:String = RouterProcessStatus.knownJavaBinPath!
     
     // Sometimes, home will return the binary, sometimes the actual home dir. This fixes the diverge.
     // If JRE is detected, binary follows - if it's JDK, home follows.
@@ -52,16 +53,18 @@ import Cocoa
       jExecPath += "/jre/bin/java"
     }
     
+    let jarPath = i2pPath + "/lib/i2p.jar"
+    
     let subCmd = jExecPath + " -cp " + jarPath + " net.i2p.CoreVersion"
     
-    var cmdArgs:[String] = ["-c", subCmd]
+    let cmdArgs:[String] = ["-c", subCmd]
     print(cmdArgs)
     let sub:Subprocess = Subprocess.init(executablePath: "/bin/sh", arguments: cmdArgs)
     let results:ExecutionResult = sub.execute(captureOutput: true)!
     if (results.didCaptureOutput) {
       print("captured output")
       let i2pVersion = results.outputLines.first?.replace(target: "I2P Core version: ", withString: "")
-      print("I2P version detected: ",i2pVersion!)
+      NSLog("I2P version detected: %@",i2pVersion ?? "Unknown")
       RouterProcessStatus.routerVersion = i2pVersion
     } else {
       print("did NOT captured output")
@@ -74,7 +77,7 @@ import Cocoa
     var i2pPath = NSHomeDirectory()
     i2pPath += "/Library/I2P"
     
-    let javaBinPath = self.javaDetector.javaHome.replace(target: " ", withString: "\\ ")
+    //let javaBinPath = self.javaDetector.javaHome.replace(target: " ", withString: "\\ ")
     
     let fileManager = FileManager()
     var ok = ObjCBool(true)
@@ -84,9 +87,9 @@ import Cocoa
       // Deploy
     }
     
-    let i2pJarPath = i2pPath + "/lib/i2p.jar"
+    //let i2pJarPath = i2pPath + "/lib/i2p.jar"
     
-    findInstalledI2PVersion(jarPath: i2pJarPath, javaBin: javaBinPath)
+    findInstalledI2PVersion()
   }
   
   @objc static func openLink(url: String) {

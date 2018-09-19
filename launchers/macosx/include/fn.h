@@ -127,10 +127,10 @@ namespace Experimental {
             const size_t n = t.size();
             // The distance between a string and the empty string is the string's length
             if (m == 0) {
-                return n;
+                return (unsigned int)n;
             }
             if (n == 0) {
-                return m;
+                return (unsigned int)m;
             }
             // Size the matrix as necessary
             if (matrix_.size() < m + 1) {

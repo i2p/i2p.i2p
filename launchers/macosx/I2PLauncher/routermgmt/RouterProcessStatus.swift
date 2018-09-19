@@ -9,7 +9,7 @@
 import Foundation
 import AppKit
 
-class RouterProcessStatus : NSObject {
+@objc class RouterProcessStatus : NSObject {
   
   /**
    *
@@ -17,16 +17,30 @@ class RouterProcessStatus : NSObject {
    *
    **/
  
-  func setRouterStatus(_ isRunning: Bool = false) {
+  @objc func setRouterStatus(_ isRunning: Bool = false) {
     RouterProcessStatus.isRouterRunning = isRunning
   }
   
-  func setRouterRanByUs(_ ranByUs: Bool = false) {
+  @objc func setRouterRanByUs(_ ranByUs: Bool = false) {
     RouterProcessStatus.isRouterChildProcess = ranByUs
   }
   
-  func getRouterIsRunning() -> Bool? {
-    return RouterProcessStatus.isRouterRunning
+  @objc func getRouterIsRunning() -> Bool {
+    if (RouterProcessStatus.isRouterRunning == Optional.none) {
+      return false;
+    } else {
+      let running: Bool = RouterProcessStatus.isRouterRunning
+      return running
+    }
+  }
+  
+  @objc func getJavaHome() -> String {
+    return RouterProcessStatus.knownJavaBinPath!
+  }
+  
+  @objc func setJavaHome(_ home: String) {
+    NSLog("Setting known java to %s", home)
+    RouterProcessStatus.knownJavaBinPath = home
   }
 }
 
@@ -83,7 +97,7 @@ extension RouterProcessStatus {
     close(socket)
   }
   static func descriptionOfLastError() -> String {
-    return String(cString: UnsafePointer(strerror(errno))) ?? "Error: \(errno)"
+    return String(cString: UnsafePointer(strerror(errno))) 
   }
 }
 

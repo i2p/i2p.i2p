@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __cplusplus
+
 #include <memory.h>
 #include <string.h>
 #include <stdlib.h>
@@ -16,8 +18,6 @@
 
 
 #define DEF_MIN_JVM_VER "1.7+"
-
-#ifdef __cplusplus
 
 #include "include/strutil.hpp"
 
@@ -154,23 +154,9 @@ static void listAllJavaInstallsAvailable()
   auto javaHomeRes = check_output({"/usr/libexec/java_home","-v",DEF_MIN_JVM_VER,"-X"});
   CFDataRef javaHomes = CFDataCreate(NULL, (const UInt8 *)javaHomeRes.buf.data(), strlen(javaHomeRes.buf.data()));
 
-  CFErrorRef err;
   CFPropertyListRef propertyList = CFPropertyListCreateWithData(kCFAllocatorDefault, javaHomes, kCFPropertyListImmutable, NULL, NULL);
-  if (err)
-  {
-    NSError *error = (__bridge NSError *)err;
-    NSLog(@"Failed to read property list: %@", error);
-    [NSApp presentError: error];
-    return;
-  }
 
 
-  //auto typeId = CFCopyTypeIDDescription(CFGetTypeID(propertyList));
-  //auto test = CFCopyDescription(propertyList);
-  //std::cout << "test: " << [test UTF8String] << " Type: " << [typeId UTF8String] << " num: " << jCount << std::endl;
-
-  // Count number of entries in the property array list.
-  // This is used to set max CRange for CFArrayApplyFunction.
 
   auto jCount = CFArrayGetCount((CFArrayRef)propertyList);
 

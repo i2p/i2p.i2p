@@ -38,7 +38,7 @@ class RouterRunner: NSObject, I2PSubprocess {
     if (self.arguments?.isEmpty)! {
       self.arguments = Optional.some(defaultStartupFlags.joined(separator: " "))
     };
-    var newArgs:[String] = ["-c ",
+    let newArgs:[String] = ["-c ",
                             self.subprocessPath!,
       " ",
       self.arguments!,

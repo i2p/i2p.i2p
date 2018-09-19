@@ -8,14 +8,19 @@
 
 import Foundation
 
-class DetectJava : NSObject {
+@objc class DetectJava : NSObject {
   
   var hasJRE : Bool = false
   var userWantJRE : Bool = false
   var userAcceptOracleEULA : Bool = false
   
+  
+  override init() {
+    super.init()
+  }
+  
   // Java checks
-  var javaHome: String = ""{
+  @objc var javaHome: String = ""{
     
     //Called before the change
     willSet(newValue){
@@ -25,30 +30,28 @@ class DetectJava : NSObject {
     //Called after the change
     didSet{
       hasJRE = true
-      print("MDetectJava.javaHome did change from "+oldValue+" to "+self.javaHome)
+      print("DetectJava.javaHome did change from "+oldValue+" to "+self.javaHome)
     }
   };
   private var testedEnv : Bool = false
   private var testedJH : Bool = false
   private var testedDfl : Bool = false
   
-  func isJavaFound() -> Bool {
+  @objc func isJavaFound() -> Bool {
     if !(self.javaHome.isEmpty) {
       return true
     }
     return false
   }
   
-  func findIt() {
+  /**
+   *
+   * The order of the code blocks will decide the order, which will define the preffered.
+   *
+   **/
+  @objc func findIt() {
     print("Start with checking environment variable")
     self.checkJavaEnvironmentVariable()
-    if !(self.javaHome.isEmpty) {
-      RouterProcessStatus.knownJavaBinPath = Optional.some(self.javaHome)
-      hasJRE = true
-      return
-    }
-    print("Checking default JRE install path")
-    self.checkDefaultJREPath()
     if !(self.javaHome.isEmpty) {
       RouterProcessStatus.knownJavaBinPath = Optional.some(self.javaHome)
       hasJRE = true
@@ -61,9 +64,16 @@ class DetectJava : NSObject {
       hasJRE = true
       return
     }
+    print("Checking default JRE install path")
+    self.checkDefaultJREPath()
+    if !(self.javaHome.isEmpty) {
+      RouterProcessStatus.knownJavaBinPath = Optional.some(self.javaHome)
+      hasJRE = true
+      return
+    }
   }
   
-  func runJavaHomeCmd() {
+  @objc func runJavaHomeCmd() {
     let task = Process()
     task.launchPath = "/usr/libexec/java_home"
     task.arguments = []
@@ -81,7 +91,8 @@ class DetectJava : NSObject {
                                                       if (str != nil) {
                                                         let stringVal = str! as String
                                                         print("got output: "+stringVal)
-                                                        self.javaHome = stringVal
+                                                        // Adding java binary here to be alike the rest
+                                                        self.javaHome = stringVal + "/jre/bin/java"
                                                       }
                                                       // TODO: Found something, check it out
                                                       outHandle.waitForDataInBackgroundAndNotify()
@@ -104,7 +115,7 @@ class DetectJava : NSObject {
     self.testedJH = true
   }
   
-  func checkDefaultJREPath() {
+  @objc func checkDefaultJREPath() {
     let defaultJREPath = "/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java"
     if FileManager.default.fileExists(atPath: defaultJREPath) {
       // Found it!!
@@ -114,12 +125,12 @@ class DetectJava : NSObject {
     // No JRE here
   }
   
-  func getEnvironmentVar(_ name: String) -> String? {
+  @objc func getEnvironmentVar(_ name: String) -> String? {
     guard let rawValue = getenv(name) else { return nil }
     return String(utf8String: rawValue)
   }
   
-  func checkJavaEnvironmentVariable() {
+  @objc func checkJavaEnvironmentVariable() {
     let dic = ProcessInfo.processInfo.environment
     //ProcessInfo.processInfo.environment["JAVA_HOME"]
     if let javaHomeEnv = dic["JAVA_HOME"] {

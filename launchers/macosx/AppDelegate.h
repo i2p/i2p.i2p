@@ -39,7 +39,7 @@
 #include "JavaHelper.h"
 
 inline void sendUserNotification(NSString* title, NSString* informativeText, NSImage* contentImage = NULL, bool makeSound = false) {
-  NSUserNotification *userNotification = [[[NSUserNotification alloc] init] autorelease];
+  NSUserNotification *userNotification = [[NSUserNotification alloc] init];
   
   userNotification.title = title;
   userNotification.informativeText = informativeText;
@@ -83,19 +83,20 @@ void setGlobalRouterIsRunning(bool running);
 }
 @property BOOL enableLogging;
 @property BOOL enableVerboseLogging;
+@property (assign) SwiftMainDelegate *swiftRuntime;
 @property (assign) NSUserDefaults *userPreferences;
 @property (assign) ExtractMetaInfo *metaInfo;
 @property (copy) NSImage *contentImage NS_AVAILABLE(10_9, NA);
 
 - (void) extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion;
 - (void) awakeFromNib;
-- (void) startupI2PRouter;
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification;
 - (void) applicationWillTerminate:(NSNotification *)aNotification;
 - (void) setApplicationDefaultPreferences;
 - (void) userChooseJavaHome;
 - (AppDelegate *) initWithArgc:(int)argc argv:(const char **)argv;
 #ifdef __cplusplus
+- (void) startupI2PRouter;
 - (NSString *) userSelectJavaHome:(JvmListPtr)rawJvmList;
 #endif
 - (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center
