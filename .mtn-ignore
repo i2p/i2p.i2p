@@ -73,3 +73,15 @@ sloccount.sc
 # IDEA
 \.iml$
 
+
+# Meeh stuff
+target/scala-2.12
+target/streams
+project/target
+launchers/macosx/project/project/target
+launchers/macosx/I2PLauncher.xcodeproj/project.xcworkspace/xcuserdata
+launchers/macosx/I2PLauncher.xcodeproj/xcuserdata
+launchers/macosx/I2PLauncher.xcworkspace/xcuserdata
+launchers/macosx/I2PLauncher.app
+launchers/macosx/target
+
