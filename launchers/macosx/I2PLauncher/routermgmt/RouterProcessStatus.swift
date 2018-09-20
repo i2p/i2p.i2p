@@ -26,7 +26,7 @@ import AppKit
   }
   
   @objc func getRouterIsRunning() -> Bool {
-    if (RouterProcessStatus.isRouterRunning == Optional.none) {
+    if (RouterProcessStatus.isRouterRunning) {
       return false;
     } else {
       let running: Bool = RouterProcessStatus.isRouterRunning

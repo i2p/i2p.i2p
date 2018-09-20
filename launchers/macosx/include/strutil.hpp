@@ -98,10 +98,10 @@ static inline std::string trim_copy(std::string s) {
     return s;
 }
 
-#ifdef CPP17
+#if __cplusplus > 201402L
 
 
-using std::experimental::optional;
+using std::optional;
 
 // Use CFStringRef instead of NSString*, otherwise disable ARC
 inline optional<CFStringRef> optionalString(bool val) {

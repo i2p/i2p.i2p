@@ -16,7 +16,21 @@ class JavaRunner;
 typedef std::function<void(void)> fp_t;
 typedef std::function<void(JavaRunner *ptr)> fp_proc_t;
 
+const std::vector<NSString*> defaultStartupFlags {
+  @"-Xmx512M",
+  @"-Xms128m",
+  @"-Djava.awt.headless=true",
+  @"-Dwrapper.logfile=/tmp/router.log",
+  @"-Dwrapper.logfile.loglevel=DEBUG",
+  @"-Dwrapper.java.pidfile=/tmp/routerjvm.pid",
+  @"-Dwrapper.console.loglevel=DEBUG"
+};
 
+const std::vector<std::string> defaultFlagsForExtractorJob {
+  "-Xmx512M",
+  "-Xms128m",
+  "-Djava.awt.headless=true"
+};
 
 /**
  *
@@ -29,9 +43,6 @@ public:
   // copy fn
   JavaRunner(std::string& javaBin, std::string& arguments, std::string& i2pBaseDir, const fp_proc_t& executingFn, const fp_t& cb);
   ~JavaRunner() = default;
-  
-  static const std::vector<NSString*> defaultStartupFlags;
-  static const std::vector<std::string> defaultFlagsForExtractorJob;
   
   void requestRouterShutdown();
   

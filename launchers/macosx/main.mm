@@ -33,45 +33,15 @@
 #include "JavaHelper.h"
 #include "include/fn.h"
 #include "include/portcheck.h"
+#import "SBridge.h"
 
 #ifdef __cplusplus
-#import "SBridge.h"
+#include <string>
 
 #include "include/subprocess.hpp"
 #include "include/strutil.hpp"
 
 using namespace subprocess;
-
-JvmListSharedPtr gRawJvmList = nullptr;
-
-maybeAnRouterRunner getGlobalRouterObject()
-{
-  std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
-  return globalRouterStatus; // Remember this might be nullptr now.
-}
-
-void setGlobalRouterObject(I2PRouterTask* newRouter)
-{
-  std::lock_guard<std::mutex> lock(globalRouterStatusMutex);
-  globalRouterStatus = newRouter;
-}
-
-
-pthread_mutex_t mutex;
-
-bool getGlobalRouterIsRunning()
-{
-  pthread_mutex_lock(&mutex);
-  bool current = isRuterRunning;
-  pthread_mutex_unlock(&mutex);
-  return current;
-}
-void setGlobalRouterIsRunning(bool running)
-{
-  pthread_mutex_lock(&mutex);
-  isRuterRunning = running;
-  pthread_mutex_unlock(&mutex);
-}
 
 #endif
 
@@ -88,6 +58,12 @@ void setGlobalRouterIsRunning(bool running)
 @implementation AppDelegate
 
 - (void) awakeFromNib {
+}
+
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
+     shouldPresentNotification:(NSUserNotification *)notification {
+  return YES;
 }
 
 #ifdef __cplusplus
@@ -125,7 +101,7 @@ void setGlobalRouterIsRunning(bool running)
       // Create directory
       mkdir(basePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
 
-      auto cli = JavaRunner::defaultFlagsForExtractorJob;
+      auto cli = defaultFlagsForExtractorJob;
       setenv("I2PBASE", basePath.c_str(), true);
       setenv("ZIPPATH", zippath.c_str(), true);
       //setenv("DYLD_LIBRARY_PATH",".:/usr/lib:/lib:/usr/local/lib", true);
@@ -143,19 +119,8 @@ void setGlobalRouterIsRunning(bool running)
       NSString* newString = [NSString stringWithFormat:@"file://%@", rs.getJavaHome];
       NSURL *baseURL = [NSURL fileURLWithPath:newString];
       
-      NSLog(@"MEEH URL PATH: %s", [baseURL fileSystemRepresentation]);
-
-      auto charCli = map(cli, [](std::string str){ return str.c_str(); });
       std::string execStr = std::string([rs.getJavaHome UTF8String]);
-      // TODO: Cheap hack, make it better.
-      replace(execStr, "Internet Plug-Ins", "Internet\\ Plug-Ins");
-      replace(execStr, "\n", "");
-      NSLog(@"Java path1 = %s", execStr.c_str());
-      [rs setJavaHome: [NSString stringWithFormat:@"%s", execStr.c_str()]];
       for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
-      
-      //execStr = replace(execStr, "\\\\ ", "\\ ");
-      //NSLog(@"Java path2 = %s", execStr.c_str());
 
       NSLog(@"Trying cmd: %@", [NSString stringWithUTF8String:execStr.c_str()]);
       try {
@@ -197,15 +162,6 @@ void setGlobalRouterIsRunning(bool running)
   
 }
 
-#endif
-
-- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
-                               shouldPresentNotification:(NSUserNotification *)notification {
-    return YES;
-}
-
-
-#ifdef __cplusplus
 
 - (NSString *)userSelectJavaHome:(JvmListPtr)rawJvmList
 {
@@ -227,33 +183,19 @@ void setGlobalRouterIsRunning(bool running)
   return userResult;
 }
 
-
-- (void)userChooseJavaHome {
-  listAllJavaInstallsAvailable();
-  std::shared_ptr<JvmHomeContext> appContext = std::shared_ptr<JvmHomeContext>( new JvmHomeContext() );
-  for (auto item : *appContext->getJvmList()) {
-    printf("JVM %s (Version: %s, Directory: %s)\n", item->JVMName.c_str(), item->JVMPlatformVersion.c_str(), item->JVMHomePath.c_str());
-  }
-  JvmListPtr rawJvmList = appContext->getJvmList();
-  NSString * userJavaHome = [self userSelectJavaHome: rawJvmList];
-  // TODO: Add logic so user can set preferred JVM
-}
-
-#endif
-
 - (void)setApplicationDefaultPreferences {
   auto defaultJVMHome = check_output({"/usr/libexec/java_home","-v",DEF_MIN_JVM_VER});
   auto tmpStdStr = std::string(defaultJVMHome.buf.data());
   trim(tmpStdStr);
   auto cfDefaultHome  = CFStringCreateWithCString(NULL, const_cast<const char *>(tmpStdStr.c_str()), kCFStringEncodingUTF8);
-  /*[self.userPreferences registerDefaults:@{
+  [self.userPreferences registerDefaults:@{
     @"javaHome" : (NSString *)cfDefaultHome,
     @"lastI2PVersion" : (NSString *)CFSTR(DEF_I2P_VERSION),
     @"enableLogging": @YES,
     @"enableVerboseLogging": @YES,
     @"autoStartRouter": @YES,
     @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
-  }];*/
+  }];
   if (self.enableVerboseLogging) NSLog(@"Default JVM home preference set to: %@", cfDefaultHome);
 
   auto dict = [self.userPreferences dictionaryRepresentation];
@@ -263,7 +205,10 @@ void setGlobalRouterIsRunning(bool running)
   CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 
   if (self.enableVerboseLogging) NSLog(@"Default preferences stored!");
+#endif
 }
+
+
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -271,45 +216,29 @@ void setGlobalRouterIsRunning(bool running)
   
   self.swiftRuntime = [[SwiftMainDelegate alloc] init];
   
+  // This setup allows the application to send notifications
   [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
+  
+  
   // Start with user preferences
   self.userPreferences = [NSUserDefaults standardUserDefaults];
   [self setApplicationDefaultPreferences];
   self.enableLogging = [self.userPreferences boolForKey:@"enableLogging"];
   self.enableVerboseLogging = [self.userPreferences boolForKey:@"enableVerboseLogging"];
-
-
-#ifdef __cplusplus
-  gRawJvmList = std::make_shared<std::list<JvmVersionPtr> >(std::list<JvmVersionPtr>());
-#endif
   // In case we are unbundled, make us a proper UI application
   [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
   [NSApp activateIgnoringOtherApps:YES];
 
-  // TODO: Also check for new installations from time to time.
-  
+
 #ifdef __cplusplus
-  auto javaHomePref = [self.userPreferences stringForKey:@"javaHome"];
-  if (self.enableVerboseLogging)
-  {
-    NSLog(@"Java home from preferences: %@", javaHomePref);
-  }
+  //gRawJvmList = std::make_shared<std::list<JvmVersionPtr> >(std::list<JvmVersionPtr>());
 
-  if (self.enableVerboseLogging)
-  {
-    NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
-    NSLog(@"Appdomain is: %@", appDomain);
-  }
-
-  NSLog(@"We should have started the statusbar object by now...");
   RouterProcessStatus* routerStatus = [[RouterProcessStatus alloc] init];
-
   std::string i2pBaseDir(getDefaultBaseDir());
-
-  auto pref = self.userPreferences;
-  
+  NSLog(@"i2pBaseDir = %s", i2pBaseDir.c_str());
   bool shouldAutoStartRouter = false;
-
+  
+  // TODO: Make the port a setting which defaults to 7657
   if (port_check(7657) != 0)
   {
     NSLog(@"Seems i2p is already running - I will not start the router (port 7657 is in use..)");
@@ -324,44 +253,26 @@ void setGlobalRouterIsRunning(bool running)
 
   if (self.enableVerboseLogging) NSLog(@"processinfo %@", [[NSProcessInfo processInfo] arguments]);
 
-  auto getJavaBin = [&pref,&self]() -> std::string {
-    // Get Java home
-    /*NSString* val = @"";
-    val = [pref stringForKey:@"javaHome"];
-    if (val == NULL) val = @"";
-    if (self.enableVerboseLogging) NSLog(@"Javahome: %@", val);
-    auto javaHome = std::string([val UTF8String]);
-    //trim(javaHome); // Trim to remove endline
-    auto javaBin = std::string(javaHome);
-    javaBin += "/bin/java"; // Append java binary to path.
-    return javaBin;*/
-    DetectJava *dt = [[DetectJava alloc] init];
-    [dt findIt];
-    if ([dt isJavaFound]) {
-      return [dt.javaHome UTF8String];
-    } else {
-      throw new std::runtime_error("Java home fatal error");
-    }
-  };
-
 
   NSBundle *launcherBundle = [NSBundle mainBundle];
   
-  auto jarResPath = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
-  NSLog(@"Trying to load launcher.jar from url = %@", jarResPath);
-    
+  // Helper object to hold statefull path information
   self.metaInfo = [[ExtractMetaInfo alloc] init];
-  //self.metaInfo.i2pBase = [NSString stringWithUTF8String:i2pBaseDir.c_str()];
-  self.metaInfo.javaBinary = [NSString stringWithUTF8String:getJavaBin().c_str()];
+  self.metaInfo.i2pBase = [NSString stringWithUTF8String:i2pBaseDir.c_str()];
+  self.metaInfo.javaBinary = [routerStatus getJavaHome];
   self.metaInfo.jarFile = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
   self.metaInfo.zipFile = [launcherBundle pathForResource:@"base" ofType:@"zip"];
 
   std::string basearg("-Di2p.dir.base=");
-  //basearg += i2pBaseDir;
+  basearg += i2pBaseDir;
 
   std::string jarfile("-cp ");
   jarfile += [self.metaInfo.zipFile UTF8String];
   
+  auto sBridge = [[SBridge alloc] init];
+  
+  // Initialize the Swift environment (the UI components)
+  [self.swiftRuntime applicationDidFinishLaunching];
 
   struct stat sb;
   if ( !(stat(i2pBaseDir.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) )
@@ -369,17 +280,25 @@ void setGlobalRouterIsRunning(bool running)
     // I2P is not extracted.
     if (self.enableVerboseLogging) NSLog(@"I2P Directory don't exists!");
 
+    // Might be hard to read if you're not used to Objective-C
+    // But this is a "function call" that contains a "callback function"
     [self extractI2PBaseDir:^(BOOL success, NSError *error) {
       sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
-      [self.swiftRuntime applicationDidFinishLaunching];
       NSLog(@"Done extracting I2P");
-      if (shouldAutoStartRouter) [self startupI2PRouter];
+      
+      if (shouldAutoStartRouter) {
+        [sBridge startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
+        [routerStatus setRouterRanByUs: true];
+      }
     }];
 
   } else {
-    if (self.enableVerboseLogging) NSLog(@"I2P directory found!");
-    if (shouldAutoStartRouter) [self startupI2PRouter];
-    [self.swiftRuntime applicationDidFinishLaunching];
+    // I2P was already found extracted
+    
+    if (shouldAutoStartRouter) {
+      [sBridge startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
+      [routerStatus setRouterRanByUs: true];
+    }
   }
   
 #endif
@@ -411,15 +330,20 @@ void setGlobalRouterIsRunning(bool running)
 int main(int argc, const char **argv)
 {
   NSApplication *app = [NSApplication sharedApplication];
-  //NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
   AppDelegate *appDelegate = [[AppDelegate alloc] initWithArgc:argc argv:argv];
   app.delegate = appDelegate;
+  auto mainBundle = [NSBundle mainBundle];
+  NSString* stringNameBundle = [mainBundle objectForInfoDictionaryKey:(NSString *)kCFBundleNameKey];
+  if ([[NSRunningApplication runningApplicationsWithBundleIdentifier:[mainBundle bundleIdentifier]] count] > 1) {
+    [[NSAlert alertWithMessageText:[NSString stringWithFormat:@"Another copy of %@ is already running.",stringNameBundle]
+                     defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"This copy will now quit."] runModal];
+    
+    [NSApp terminate:nil];
+  }
   [NSBundle loadNibNamed:@"I2Launcher" owner:NSApp];
 
   [NSApp run];
-  // Handle any errors
-  //[pool drain];
   return 0;
 }
 

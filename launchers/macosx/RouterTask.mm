@@ -112,23 +112,6 @@
 
 #ifdef __cplusplus
 
-
-const std::vector<NSString*> JavaRunner::defaultStartupFlags {
-    @"-Xmx512M",
-    @"-Xms128m",
-    @"-Djava.awt.headless=true",
-    @"-Dwrapper.logfile=/tmp/router.log",
-    @"-Dwrapper.logfile.loglevel=DEBUG",
-    @"-Dwrapper.java.pidfile=/tmp/routerjvm.pid",
-    @"-Dwrapper.console.loglevel=DEBUG"
-};
-
-const std::vector<std::string> JavaRunner::defaultFlagsForExtractorJob {
-    "-Xmx512M",
-    "-Xms128m",
-    "-Djava.awt.headless=true"
-};
-
 JavaRunner::JavaRunner(std::string& javaBin, std::string& arguments, std::string& i2pBaseDir, const fp_proc_t& execFn, const fp_t& cb)
   : javaBinaryPath(javaBin), javaRouterArgs(arguments), _i2pBaseDir(i2pBaseDir), executingFn(execFn), exitCallbackFn(cb)
 {
