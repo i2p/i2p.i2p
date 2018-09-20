@@ -7,6 +7,51 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
+
+#ifdef __cplusplus
+#include <memory>
+#include <future>
+#include <glob.h>
+#include <string>
+#include <vector>
+#include "include/fn.h"
+std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir);
+
+
+namespace osx {
+  inline void openUrl(NSString* url)
+  {
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString: url]];
+  }
+}
+
+inline std::vector<std::string> globVector(const std::string& pattern){
+  glob_t glob_result;
+  glob(pattern.c_str(),GLOB_TILDE,NULL,&glob_result);
+  std::vector<std::string> files;
+  for(unsigned int i=0;i<glob_result.gl_pathc;++i){
+    files.push_back(std::string(glob_result.gl_pathv[i]));
+  }
+  globfree(&glob_result);
+  return files;
+}
+
+inline std::string buildClassPathForObjC(std::string basePath)
+{
+  NSBundle *launcherBundle = [NSBundle mainBundle];
+  auto jarList = globVector(basePath+std::string("/lib/*.jar"));
+  
+  std::string classpathStrHead = "-classpath";
+  std::string classpathStr = "";
+  classpathStr += [[launcherBundle pathForResource:@"launcher" ofType:@"jar"] UTF8String];
+  std::string prefix(basePath);
+  prefix += "/lib/";
+  for_each(jarList, [&classpathStr](std::string str){ classpathStr += std::string(":") + str; });
+  return classpathStr;
+}
+
+#endif
 
 @interface SBridge : NSObject
 - (NSString*) buildClassPath:(NSString*)i2pPath;

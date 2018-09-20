@@ -11,14 +11,6 @@
 
 #import <Foundation/Foundation.h>
 #import <Foundation/NSFileManager.h>
-
-
-#include <CoreFoundation/CoreFoundation.h>
-#include <CoreFoundation/CFStream.h>
-#include <CoreFoundation/CFPropertyList.h>
-#include <CoreFoundation/CFDictionary.h>
-#include <CoreFoundation/CFArray.h>
-#include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFPreferences.h>
 
 #import <objc/Object.h>
@@ -30,7 +22,6 @@
 
 #include "AppDelegate.h"
 #include "RouterTask.h"
-#include "JavaHelper.h"
 #include "include/fn.h"
 #include "include/portcheck.h"
 #import "SBridge.h"
@@ -111,13 +102,6 @@ using namespace subprocess;
       cli.push_back(jarfile);
       cli.push_back("net.i2p.launchers.BaseExtractor");
       auto rs = [[RouterProcessStatus alloc] init];
-      NSString* jh = [rs getJavaHome];
-      if (jh != nil) {
-        NSLog(@"jh er %@", jh);
-      }
-      
-      NSString* newString = [NSString stringWithFormat:@"file://%@", rs.getJavaHome];
-      NSURL *baseURL = [NSURL fileURLWithPath:newString];
       
       std::string execStr = std::string([rs.getJavaHome UTF8String]);
       for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
@@ -132,9 +116,7 @@ using namespace subprocess;
         NSLog(@"Extraction exit code %@",[NSString stringWithUTF8String:(std::to_string(extractStatus)).c_str()]);
         if (extractStatus == 0)
         {
-          //success = YES;
-          NSLog(@"Time to detect I2P version in install directory");
-          [self.swiftRuntime findInstalledI2PVersion];
+          NSLog(@"Extraction complete!");
         }
       
       } catch (subprocess::OSError &err) {
@@ -146,7 +128,6 @@ using namespace subprocess;
 
       // All done. Assume success and error are already set.
       dispatch_async(dispatch_get_main_queue(), ^{
-        //sendUserNotification(APP_IDSTR, @"Extraction complete!", self.contentImage);
         if (completion) {
           completion(success, error);
         }
@@ -158,45 +139,15 @@ using namespace subprocess;
       NSLog(@"Exception: %@", errMsg);
     }
   });
-    
-  
-}
-
-
-- (NSString *)userSelectJavaHome:(JvmListPtr)rawJvmList
-{
-  NSString *appleScriptString = @"set jvmlist to {\"Newest\"";
-  for (auto item : *rawJvmList) {
-    auto str = strprintf(",\"%s\"", item->JVMName.c_str()).c_str();
-    NSString* tmp = [NSString stringWithUTF8String:str];
-    appleScriptString = [appleScriptString stringByAppendingString:tmp];
-  }
-  appleScriptString = [appleScriptString stringByAppendingString:@"}\nchoose from list jvmlist\n"];
-  NSAppleScript *theScript = [[NSAppleScript alloc] initWithSource:appleScriptString];
-  NSDictionary *theError = nil;
-  NSString* userResult = [[theScript executeAndReturnError: &theError] stringValue];
-  NSLog(@"User choosed %@.\n", userResult);
-  if (theError != nil)
-  {
-    NSLog(@"Error: %@.\n", theError);
-  }
-  return userResult;
 }
 
 - (void)setApplicationDefaultPreferences {
-  auto defaultJVMHome = check_output({"/usr/libexec/java_home","-v",DEF_MIN_JVM_VER});
-  auto tmpStdStr = std::string(defaultJVMHome.buf.data());
-  trim(tmpStdStr);
-  auto cfDefaultHome  = CFStringCreateWithCString(NULL, const_cast<const char *>(tmpStdStr.c_str()), kCFStringEncodingUTF8);
   [self.userPreferences registerDefaults:@{
-    @"javaHome" : (NSString *)cfDefaultHome,
-    @"lastI2PVersion" : (NSString *)CFSTR(DEF_I2P_VERSION),
     @"enableLogging": @YES,
     @"enableVerboseLogging": @YES,
     @"autoStartRouter": @YES,
     @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
   }];
-  if (self.enableVerboseLogging) NSLog(@"Default JVM home preference set to: %@", cfDefaultHome);
 
   auto dict = [self.userPreferences dictionaryRepresentation];
   [self.userPreferences setPersistentDomain:dict forName:NSAPPDOMAIN];
@@ -205,10 +156,9 @@ using namespace subprocess;
   CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 
   if (self.enableVerboseLogging) NSLog(@"Default preferences stored!");
-#endif
 }
 
-
+#endif
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -231,7 +181,6 @@ using namespace subprocess;
 
 
 #ifdef __cplusplus
-  //gRawJvmList = std::make_shared<std::list<JvmVersionPtr> >(std::list<JvmVersionPtr>());
 
   RouterProcessStatus* routerStatus = [[RouterProcessStatus alloc] init];
   std::string i2pBaseDir(getDefaultBaseDir());
@@ -255,6 +204,7 @@ using namespace subprocess;
 
 
   NSBundle *launcherBundle = [NSBundle mainBundle];
+  auto sBridge = [[SBridge alloc] init];
   
   // Helper object to hold statefull path information
   self.metaInfo = [[ExtractMetaInfo alloc] init];
@@ -268,8 +218,6 @@ using namespace subprocess;
 
   std::string jarfile("-cp ");
   jarfile += [self.metaInfo.zipFile UTF8String];
-  
-  auto sBridge = [[SBridge alloc] init];
   
   // Initialize the Swift environment (the UI components)
   [self.swiftRuntime applicationDidFinishLaunching];
@@ -286,6 +234,8 @@ using namespace subprocess;
       sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
       NSLog(@"Done extracting I2P");
       
+      NSLog(@"Time to detect I2P version in install directory");
+      [self.swiftRuntime findInstalledI2PVersion];
       if (shouldAutoStartRouter) {
         [sBridge startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
         [routerStatus setRouterRanByUs: true];
@@ -294,6 +244,8 @@ using namespace subprocess;
 
   } else {
     // I2P was already found extracted
+    NSLog(@"Time to detect I2P version in install directory");
+    [self.swiftRuntime findInstalledI2PVersion];
     
     if (shouldAutoStartRouter) {
       [sBridge startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];

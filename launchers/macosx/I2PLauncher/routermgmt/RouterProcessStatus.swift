@@ -26,21 +26,11 @@ import AppKit
   }
   
   @objc func getRouterIsRunning() -> Bool {
-    if (RouterProcessStatus.isRouterRunning) {
-      return false;
-    } else {
-      let running: Bool = RouterProcessStatus.isRouterRunning
-      return running
-    }
+    return RouterProcessStatus.isRouterRunning
   }
   
   @objc func getJavaHome() -> String {
     return RouterProcessStatus.knownJavaBinPath!
-  }
-  
-  @objc func setJavaHome(_ home: String) {
-    NSLog("Setting known java to %s", home)
-    RouterProcessStatus.knownJavaBinPath = home
   }
 }
 
@@ -48,7 +38,17 @@ extension RouterProcessStatus {
   static var isRouterRunning : Bool = false
   static var isRouterChildProcess : Bool = false
   static var routerVersion : String? = Optional.none
-  static var routerUptime : String? = Optional.none
+  static var routerUptime : String? = Optional.none{
+    //Called before the change
+    willSet(newValue){
+      print("RouterProcessStatus.routerUptime will change from ", (self.routerUptime ?? "nil"), " to "+(newValue ?? "nil"))
+    }
+    
+    //Called after the change
+    didSet{
+      print("RouterProcessStatus.routerUptime did change to "+self.routerUptime!)
+    }
+  }
   static var routerStartedAt : Date? = Optional.none
   static var knownJavaBinPath : String? = Optional.none
   static var i2pDirectoryPath : String = NSHomeDirectory() + "/Library/I2P"
