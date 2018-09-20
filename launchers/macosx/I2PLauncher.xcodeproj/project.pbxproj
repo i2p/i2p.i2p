@@ -53,7 +53,6 @@
 		BF1EFA38215140E60014EB07 /* SBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBridge.h; sourceTree = SOURCE_ROOT; };
 		BF1EFA39215140E60014EB07 /* SBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBridge.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3B215141100014EB07 /* RouterTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterTask.h; sourceTree = SOURCE_ROOT; };
-		BF1EFA3C215141100014EB07 /* JavaHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JavaHelper.h; sourceTree = SOURCE_ROOT; };
 		BF1EFA3D215141100014EB07 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3E215141100014EB07 /* RouterTask.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RouterTask.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3F215141110014EB07 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -168,7 +167,6 @@
 				BF650CA62152AC7D0014EB07 /* dmgconfig.py */,
 				BF1EFA42215141220014EB07 /* include */,
 				BF1EFA3F215141110014EB07 /* AppDelegate.h */,
-				BF1EFA3C215141100014EB07 /* JavaHelper.h */,
 				BF1EFA3D215141100014EB07 /* main.mm */,
 				BF1EFA3B215141100014EB07 /* RouterTask.h */,
 				BF1EFA3E215141100014EB07 /* RouterTask.mm */,
@@ -259,7 +257,7 @@
 				TargetAttributes = {
 					BF5061672113C48E0014EB07 = {
 						CreatedOnToolsVersion = 9.4.1;
-						DevelopmentTeam = DTX4Q6WZN2;
+						DevelopmentTeam = W3C42P2LA8;
 						LastSwiftMigration = 0940;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -496,7 +494,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = DTX4Q6WZN2;
+				DEVELOPMENT_TEAM = W3C42P2LA8;
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks,
 					/System/Library/Frameworks,
@@ -532,7 +530,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = DTX4Q6WZN2;
+				DEVELOPMENT_TEAM = W3C42P2LA8;
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks,
 					/System/Library/Frameworks,

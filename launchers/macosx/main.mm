@@ -195,7 +195,7 @@ using namespace subprocess;
     
     [routerStatus setRouterStatus: true];
     [routerStatus setRouterRanByUs: false];
-    return;
+    shouldAutoStartRouter = false;
   } else {
     shouldAutoStartRouter = true;
   }
