@@ -488,6 +488,7 @@ public class NTCPConnection implements Closeable {
         }
         NTCPConnection toClose = locked_close(allowRequeue);
         if (toClose != null && toClose != this) {
+            // won't happen as of 0.9.37
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Multiple connections on remove, closing " + toClose + " (already closed " + this + ")");
             _context.statManager().addRateData("ntcp.multipleCloseOnRemove", toClose.getUptime());
@@ -507,7 +508,8 @@ public class NTCPConnection implements Closeable {
     }
 
     /**
-     * @return a second connection with the same peer...
+     * @return usually this, but could be a second connection with the same peer...
+     *         only this or null as of 0.9.37
      */
     private synchronized NTCPConnection locked_close(boolean allowRequeue) {
         if (_chan != null) try { _chan.close(); } catch (IOException ioe) { }
@@ -1834,9 +1836,9 @@ public class NTCPConnection implements Closeable {
             _paddingConfig = OUR_PADDING;
         }
         NTCPConnection toClose = _transport.inboundEstablished(this);
-        if (toClose != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Old connection closed: " + toClose + " replaced by " + this);
+        if (toClose != null && toClose != this) {
+            if (_log.shouldWarn())
+                _log.warn("Old connection closed: " + toClose + " replaced by " + this);
             _context.statManager().addRateData("ntcp.inboundEstablishedDuplicate", toClose.getUptime());
             toClose.close();
         }
@@ -2107,7 +2109,7 @@ public class NTCPConnection implements Closeable {
                     }
                 }
             } catch (IllegalArgumentException iae) {
-                throw new DataFormatException("RI store fail", iae);
+                throw new DataFormatException("RI store fail: " + ri, iae);
             }
         }
 

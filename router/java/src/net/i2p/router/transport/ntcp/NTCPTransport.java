@@ -73,7 +73,7 @@ public class NTCPTransport extends TransportImpl {
     private final SharedBid _nearCapacityCostBid;
     private final SharedBid _transientFail;
     private final Object _conLock;
-    private final Map<Hash, NTCPConnection> _conByIdent;
+    private final ConcurrentHashMap<Hash, NTCPConnection> _conByIdent;
     private final EventPumper _pumper;
     private final Reader _reader;
     private net.i2p.router.transport.ntcp.Writer _writer;
@@ -641,13 +641,17 @@ public class NTCPTransport extends TransportImpl {
 
     /**
      * @return usually the con passed in, but possibly a second connection with the same peer...
+     *         only con or null as of 0.9.37
      */
     NTCPConnection removeCon(NTCPConnection con) {
         NTCPConnection removed = null;
         RouterIdentity ident = con.getRemotePeer();
         if (ident != null) {
             synchronized (_conLock) {
-                removed = _conByIdent.remove(ident.calculateHash());
+                // only remove the con passed in
+                //removed = _conByIdent.remove(ident.calculateHash());
+                if (_conByIdent.remove(ident.calculateHash(), con))
+                    removed = con;
             }
         }
         return removed;

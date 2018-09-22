@@ -1,3 +1,8 @@
+2018-09-22 zzz
+ * NTCP:
+   - Fix handling of multiple connections
+   - Change termination code for expired RI
+
 2018-09-16 zzz
  * Build: Fix hang with Tomcat 8.5.33+ (ticket #2307)
  * Tomcat 8.5.34
