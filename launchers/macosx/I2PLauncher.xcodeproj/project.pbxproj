@@ -43,6 +43,9 @@
 		BFBDCB0021505BEE0014EB07 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFBDCAFF21505BED0014EB07 /* AppKit.framework */; };
 		BFBDCB02215060190014EB07 /* DetectJava.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCB01215060190014EB07 /* DetectJava.swift */; };
 		BFBDCB04215060970014EB07 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCB03215060970014EB07 /* StatusBarController.swift */; };
+		BFDD81DA2156B3E30014EB07 /* RouterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDD81D92156B3E30014EB07 /* RouterManager.swift */; };
+		BFE16BF82156C61E0014EB07 /* RouterStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */; };
+		BFE16BFA2156DAED0014EB07 /* EventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE16BF92156DAED0014EB07 /* EventManager.swift */; };
 		BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */; };
 		BFF4581C213C48EA0014EB07 /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF4581B213C48EA0014EB07 /* EventMonitor.swift */; };
 /* End PBXBuildFile section */
@@ -94,6 +97,10 @@
 		BFBDCAFF21505BED0014EB07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		BFBDCB01215060190014EB07 /* DetectJava.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectJava.swift; sourceTree = "<group>"; };
 		BFBDCB03215060970014EB07 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
+		BFDD81D92156B3E30014EB07 /* RouterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterManager.swift; sourceTree = "<group>"; };
+		BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterStatusView.swift; sourceTree = "<group>"; };
+		BFE16BF92156DAED0014EB07 /* EventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventManager.swift; sourceTree = "<group>"; };
+		BFE16BFB2156E94E0014EB07 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../../Sparkle/build/Release/Sparkle.framework; sourceTree = "<group>"; };
 		BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		BFF45818213C428E0014EB07 /* I2PLauncher-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "I2PLauncher-Bridging-Header.h"; sourceTree = "<group>"; };
 		BFF4581B213C48EA0014EB07 /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
@@ -134,6 +141,7 @@
 				BF07789C21506D2B0014EB07 /* PopoverViewController.swift */,
 				BFBDCB03215060970014EB07 /* StatusBarController.swift */,
 				BF531514215105B40014EB07 /* LogViewController.swift */,
+				BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */,
 			);
 			path = userinterface;
 			sourceTree = "<group>";
@@ -191,6 +199,7 @@
 		BF5061922113C6ED0014EB07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BFE16BFB2156E94E0014EB07 /* Sparkle.framework */,
 				BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */,
 				BF865416215182820014EB07 /* Foundation.framework */,
 				BF865414215180F60014EB07 /* libswiftDarwin.tbd */,
@@ -209,6 +218,7 @@
 				BF5315062150C55B0014EB07 /* RouterRunner.swift */,
 				BF5315082150C6760014EB07 /* RouterDeployer.swift */,
 				BF53150A2150C6E80014EB07 /* I2PSubprocess.swift */,
+				BFDD81D92156B3E30014EB07 /* RouterManager.swift */,
 			);
 			path = routermgmt;
 			sourceTree = "<group>";
@@ -221,6 +231,7 @@
 				BFBDCAF52150428D0014EB07 /* StringExtensions.swift */,
 				BFBDCAF7215047FE0014EB07 /* ArrayExtensions.swift */,
 				BF53150C2150CE310014EB07 /* DateTimeUtils.swift */,
+				BFE16BF92156DAED0014EB07 /* EventManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -334,8 +345,10 @@
 				BFBDCB04215060970014EB07 /* StatusBarController.swift in Sources */,
 				BFBDCAF8215047FE0014EB07 /* ArrayExtensions.swift in Sources */,
 				BF5315072150C55B0014EB07 /* RouterRunner.swift in Sources */,
+				BFE16BFA2156DAED0014EB07 /* EventManager.swift in Sources */,
 				BFBDCAF12150420C0014EB07 /* ExecutionResult.swift in Sources */,
 				BF5315092150C6760014EB07 /* RouterDeployer.swift in Sources */,
+				BFE16BF82156C61E0014EB07 /* RouterStatusView.swift in Sources */,
 				BFBDCAEF215041E30014EB07 /* Error.swift in Sources */,
 				BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */,
 				BF7506CB21509CFD0014EB07 /* RouterProcessStatus.swift in Sources */,
@@ -350,6 +363,7 @@
 				BF531515215105B40014EB07 /* LogViewController.swift in Sources */,
 				BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */,
 				BFBDCAFE2150567D0014EB07 /* SwiftMainDelegate.swift in Sources */,
+				BFDD81DA2156B3E30014EB07 /* RouterManager.swift in Sources */,
 				BF53150B2150C6E80014EB07 /* I2PSubprocess.swift in Sources */,
 				BFF4581C213C48EA0014EB07 /* EventMonitor.swift in Sources */,
 				BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */,

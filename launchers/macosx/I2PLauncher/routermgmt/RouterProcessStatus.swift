@@ -32,6 +32,10 @@ import AppKit
   @objc func getJavaHome() -> String {
     return RouterProcessStatus.knownJavaBinPath!
   }
+  
+  @objc func triggerEvent(en: String, details: String? = nil) {
+    RouterManager.shared().eventManager.trigger(eventName: en, information: details)
+  }
 }
 
 extension RouterProcessStatus {

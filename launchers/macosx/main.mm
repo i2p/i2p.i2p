@@ -204,7 +204,6 @@ using namespace subprocess;
 
 
   NSBundle *launcherBundle = [NSBundle mainBundle];
-  auto sBridge = [[SBridge alloc] init];
   
   // Helper object to hold statefull path information
   self.metaInfo = [[ExtractMetaInfo alloc] init];
@@ -237,7 +236,7 @@ using namespace subprocess;
       NSLog(@"Time to detect I2P version in install directory");
       [self.swiftRuntime findInstalledI2PVersion];
       if (shouldAutoStartRouter) {
-        [sBridge startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
+        [[SBridge sharedInstance] startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
         [routerStatus setRouterRanByUs: true];
       }
     }];
@@ -248,7 +247,7 @@ using namespace subprocess;
     [self.swiftRuntime findInstalledI2PVersion];
     
     if (shouldAutoStartRouter) {
-      [sBridge startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
+      [[SBridge sharedInstance] startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
       [routerStatus setRouterRanByUs: true];
     }
   }

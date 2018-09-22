@@ -33,9 +33,16 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     options.arguments = arguments;
     options.i2pBaseDir = i2pBaseDir;
     auto instance = [[I2PRouterTask alloc] initWithOptions: options];
+    
+    [[SBridge sharedInstance] setCurrentRouterInstance:instance];
     [instance execute];
     sendUserNotification(APP_IDSTR, @"The I2P router is starting up.");
     auto pid = [instance getPID];
+    NSLog(@"Got pid: %d", pid);
+    
+    auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
+    [swiftRouterStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
+    
     return std::async(std::launch::async, [&pid]{
       return pid;
     });
@@ -45,6 +52,13 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     auto errStr = [NSString stringWithFormat:@"Expection occurred %@",[e reason]];
     NSLog(@"%@", errStr);
     sendUserNotification(APP_IDSTR, errStr);
+    [[SBridge sharedInstance] setCurrentRouterInstance:nil];
+    
+    auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
+    [swiftRouterStatus setRouterStatus: false];
+    [swiftRouterStatus setRouterRanByUs: false];
+    [swiftRouterStatus triggerEventWithEn:@"router_exception" details:errStr];
+    
     return std::async(std::launch::async, [&]{
       return 0;
     });
@@ -55,6 +69,16 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
 
 @implementation SBridge
 
+// this makes it a singleton
++ (instancetype)sharedInstance {
+  static SBridge *sharedInstance = nil;
+  static dispatch_once_t onceToken;
+  
+  dispatch_once(&onceToken, ^{
+    sharedInstance = [[SBridge alloc] init];
+  });
+  return sharedInstance;
+}
 
 - (void) openUrl:(NSString*)url
 {
@@ -125,6 +149,7 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     sendUserNotification(APP_IDSTR, [NSString stringWithFormat:@"Error: %@", errMsg]);
     [routerStatus setRouterStatus: false];
     [routerStatus setRouterRanByUs: false];
+    [routerStatus triggerEventWithEn:@"router_exception" details:[NSString stringWithFormat:@"Error: %@", errMsg]];
   }
 }
 @end

@@ -22,7 +22,6 @@ import Cocoa
   
   @objc func constructMenu() -> NSMenu {
     let menu = NSMenu()
-    //let sb = SwiftMainDelegate.objCBridge
     
     menu.addItem(NSMenuItem(title: "Open I2P Console", action: #selector(self.handleOpenConsole(_:)), keyEquivalent: "O"))
     menu.addItem(NSMenuItem.separator())
@@ -33,17 +32,12 @@ import Cocoa
 
   
   override init() {
-    super.init()//(xib: "UserInterface", bundle: nil)
+    super.init()
     popover.contentViewController = PopoverViewController.freshController()
     
     if let button = statusItem.button {
       button.image = NSImage(named:"StatusBarButtonImage")
-      //button.title = "I2P"
       button.toolTip = "I2P Launch Manager"
-      //button.isVisible = true
-      //button.action = #selector(self.statusBarButtonClicked)
-      //button.sendAction(on: [.leftMouseUp, .rightMouseUp])
-      //button.doubleAction = #selector(self.systemBarIconDoubleClick)
       button.target = self
       button.action = #selector(self.statusBarButtonClicked(sender:))
       button.sendAction(on: [.leftMouseUp, .rightMouseUp])
@@ -97,6 +91,7 @@ import Cocoa
     if popover.isShown {
       closePopover(sender: sender)
     } else {
+      RouterManager.shared().updateState()
       showPopover(sender: sender)
     }
   }

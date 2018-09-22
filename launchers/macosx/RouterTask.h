@@ -39,11 +39,16 @@ const std::vector<std::string> defaultFlagsForExtractorJob {
 @class I2PRouterTask;
 @interface I2PRouterTask : NSObject
 @property (strong) NSTask* routerTask;
+
+// TODO: Not in use, remove?
+/*
 @property (strong) NSUserDefaults *userPreferences;
 @property (strong) NSFileHandle *readLogHandle;
 @property (strong) NSMutableData *totalLogData;
-@property (strong) NSPipe *processPipe;
 @property (strong) NSFileHandle *input;
+*/
+
+@property (strong) NSPipe *processPipe;
 @property (atomic) BOOL isRouterRunning;
 @property (atomic) BOOL userRequestedRestart;
 - (instancetype) initWithOptions : (RTaskOptions*) options;

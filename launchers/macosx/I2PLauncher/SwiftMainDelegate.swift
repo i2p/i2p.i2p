@@ -11,10 +11,9 @@ import Cocoa
 
 @objc class SwiftMainDelegate : NSObject {
   
-  //let statusItem = NSStatusBar.system().statusItem(withLength: NSSquareStatusItemLength )
   let statusBarController = StatusBarController()
+  let sharedRouterMgmr = RouterManager.shared()
   static let javaDetector = DetectJava()
-  static let objCBridge = SBridge()
   
   override init() {
     super.init()
@@ -37,10 +36,7 @@ import Cocoa
     } else {
       RouterProcessStatus.isRouterRunning = false
       print("I2P Router seems to NOT be running")
-      
     }
-    
-    
   } // End of init()
   
   @objc func findInstalledI2PVersion() {
@@ -63,13 +59,12 @@ import Cocoa
     let sub:Subprocess = Subprocess.init(executablePath: "/bin/sh", arguments: cmdArgs)
     let results:ExecutionResult = sub.execute(captureOutput: true)!
     if (results.didCaptureOutput) {
-      print("captured output")
       let i2pVersion = results.outputLines.first?.replace(target: "I2P Core version: ", withString: "")
       NSLog("I2P version detected: %@",i2pVersion ?? "Unknown")
       RouterProcessStatus.routerVersion = i2pVersion
+      RouterManager.shared().eventManager.trigger(eventName: "router_version", information: i2pVersion)
     } else {
-      print("did NOT captured output")
-      
+      print("Warning: Version Detection did NOT captured output")
     }
   }
   
@@ -78,21 +73,11 @@ import Cocoa
     var i2pPath = NSHomeDirectory()
     i2pPath += "/Library/I2P"
     
-    let fileManager = FileManager()
-    var ok = ObjCBool(true)
-    let doesI2PDirExists = fileManager.fileExists(atPath: i2pPath, isDirectory: &ok)
-    
-    if (!doesI2PDirExists) {
-      // Deploy
-    }
-    
-    //let i2pJarPath = i2pPath + "/lib/i2p.jar"
-    
     findInstalledI2PVersion()
   }
   
   @objc static func openLink(url: String) {
-    objCBridge.openUrl(url)
+    SBridge.sharedInstance().openUrl(url)
   }
   
   @objc func applicationWillTerminate() {

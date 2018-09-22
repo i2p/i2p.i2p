@@ -31,7 +31,7 @@
 {
   self.userRequestedRestart = NO;
   self.isRouterRunning = NO;
-  self.input = [NSFileHandle fileHandleWithStandardInput];
+  //self.input = [NSFileHandle fileHandleWithStandardInput];
   self.routerTask = [NSTask new];
   self.processPipe = [NSPipe new];
   [self.routerTask setLaunchPath:options.binPath];
@@ -44,13 +44,41 @@
   [self.routerTask setStandardOutput:self.processPipe];
 	[self.routerTask setStandardError:self.processPipe];
 
-    NSFileHandle *stdoutFileHandle = [self.processPipe fileHandleForReading];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-        selector:@selector(routerStdoutData:)
-        name:NSFileHandleDataAvailableNotification
-        object:stdoutFileHandle];
+  /*
+  NSFileHandle *stdoutFileHandle = [self.processPipe fileHandleForReading];
+  dup2([[self.processPipe fileHandleForWriting] fileDescriptor], fileno(stdout));
+  auto source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, [stdoutFileHandle fileDescriptor], 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
+  dispatch_source_set_event_handler(source, ^{
+    void* data = malloc(4096);
+    ssize_t readResult = 0;
+    do
+    {
+      errno = 0;
+      readResult = read([stdoutFileHandle fileDescriptor], data, 4096);
+    } while (readResult == -1 && errno == EINTR);
+    if (readResult > 0)
+    {
+      //AppKit UI should only be updated from the main thread
+      dispatch_async(dispatch_get_main_queue(),^{
+        NSString* stdOutString = [[NSString alloc] initWithBytesNoCopy:data length:readResult encoding:NSUTF8StringEncoding freeWhenDone:YES];
+        NSAttributedString* stdOutAttributedString = [[NSAttributedString alloc] initWithString:stdOutString];
+        NSLog(@"Router stdout: %@", stdOutString);
+        //auto logForwarder = new LogForwarder();
+        //[logForwarder appendLogViewWithLogLine:stdOutAttributedString];
+      });
+    }
+    else{free(data);}
+  });
+  dispatch_resume(source);
+  */
+  /*
+  [[NSNotificationCenter defaultCenter] addObserver:self
+      selector:@selector(routerStdoutData:)
+      name:NSFileHandleDataAvailableNotification
+      object:stdoutFileHandle];
 
   [stdoutFileHandle waitForDataInBackgroundAndNotify];
+  */
 
   [self.routerTask setTerminationHandler:^(NSTask* task) {
     // Cleanup
@@ -58,6 +86,8 @@
     auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
     [swiftRouterStatus setRouterStatus: false];
     [swiftRouterStatus setRouterRanByUs: false];
+    [swiftRouterStatus triggerEventWithEn:@"router_stop" details:@"normal shutdown"];
+    [[SBridge sharedInstance] setCurrentRouterInstance:nil];
     sendUserNotification(APP_IDSTR, @"I2P Router has stopped");
   }];
     return self;
@@ -82,8 +112,9 @@
 - (int) execute
 {
     @try {
+      auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
+      [swiftRouterStatus triggerEventWithEn:@"router_start" details:@"normal start"];
       [self.routerTask launch];
-      watchPid([self.routerTask processIdentifier]);
       self.isRouterRunning = YES;
       return 1;
     }
@@ -91,8 +122,11 @@
 	{
 		NSLog(@"Expection occurred %@", [e reason]);
     auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
+    self.isRouterRunning = NO;
     [swiftRouterStatus setRouterStatus: false];
     [swiftRouterStatus setRouterRanByUs: false];
+    [swiftRouterStatus triggerEventWithEn:@"router_stop" details:@"error shutdown"];
+    [[SBridge sharedInstance] setCurrentRouterInstance:nil];
     sendUserNotification(@"An error occured, can't start the I2P Router", [e reason]);
     return 0;
 	}

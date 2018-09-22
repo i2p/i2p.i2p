@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
+#import "RouterTask.h"
+
 #ifdef __cplusplus
 #include <memory>
 #include <future>
@@ -54,7 +56,9 @@ inline std::string buildClassPathForObjC(std::string basePath)
 #endif
 
 @interface SBridge : NSObject
+@property (nonatomic, assign) I2PRouterTask* currentRouterInstance;
 - (NSString*) buildClassPath:(NSString*)i2pPath;
 - (void) startupI2PRouter:(NSString*)i2pRootPath javaBinPath:(NSString*)javaBinPath;
 - (void) openUrl:(NSString*)url;
++ (instancetype)sharedInstance; // this makes it a singleton
 @end
