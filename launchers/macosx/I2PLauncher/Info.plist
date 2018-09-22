@@ -34,7 +34,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>3</string>
+	<string>4</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -53,5 +53,7 @@
 	<array>
 		<dict/>
 	</array>
+	<key>SUFeedURL</key>
+	<string>http://i2browser.i2p/updates/v1/appcast.xml</string>
 </dict>
 </plist>

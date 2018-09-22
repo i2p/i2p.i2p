@@ -2,48 +2,28 @@
 
 #include <dispatch/dispatch.h>
 #include <memory.h>
-#include <string.h>
 
 #include <Cocoa/Cocoa.h>
 #import <AppKit/AppKit.h>
 
 #ifdef __cplusplus
-#include "include/subprocess.hpp"
+#include <vector>
+#include <string>
 
-using namespace subprocess;
-class JavaRunner;
+const std::vector<NSString*> defaultStartupFlags {
+  @"-Xmx512M",
+  @"-Xms128m",
+  @"-Djava.awt.headless=true",
+  @"-Dwrapper.logfile=/tmp/router.log",
+  @"-Dwrapper.logfile.loglevel=DEBUG",
+  @"-Dwrapper.java.pidfile=/tmp/routerjvm.pid",
+  @"-Dwrapper.console.loglevel=DEBUG"
+};
 
-typedef std::function<void(void)> fp_t;
-typedef std::function<void(JavaRunner *ptr)> fp_proc_t;
-
-
-
-/**
- *
- * class JavaRunner
- *
- **/
-class JavaRunner
-{
-public:
-  // copy fn
-  JavaRunner(std::string& javaBin, std::string& arguments, std::string& i2pBaseDir, const fp_proc_t& executingFn, const fp_t& cb);
-  ~JavaRunner() = default;
-  
-  static const std::vector<NSString*> defaultStartupFlags;
-  static const std::vector<std::string> defaultFlagsForExtractorJob;
-  
-  void requestRouterShutdown();
-  
-  std::future<int> execute();
-  std::shared_ptr<subprocess::Popen> javaProcess;
-  std::string javaBinaryPath;
-  std::string javaRouterArgs;
-  std::string execLine;
-  std::string _i2pBaseDir;
-private:
-  const fp_proc_t& executingFn;
-  const fp_t& exitCallbackFn;
+const std::vector<std::string> defaultFlagsForExtractorJob {
+  "-Xmx512M",
+  "-Xms128m",
+  "-Djava.awt.headless=true"
 };
 
 #endif

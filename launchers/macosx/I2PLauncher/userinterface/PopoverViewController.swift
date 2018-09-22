@@ -60,7 +60,7 @@ class PopoverViewController: NSViewController {
   
   override func viewWillDraw() {
     super.viewWillDraw()
-    if (RouterStatusView.instance == Optional.none) {
+    if (RouterStatusView.instance != nil) {
       RouterStatusView.instance = self
     }
     self.setRouterStatusLabelText()
@@ -78,16 +78,13 @@ class PopoverViewController: NSViewController {
     routerStartStopButton?.target = self
     quickControlView?.needsDisplay = true
     
-    if (RouterProcessStatus.routerVersion == Optional.none) {
-      routerVersionLabel?.cell?.stringValue = "Router version: Still unknown"
-      // trigger a read to ensure values
-      let tmp = SwiftMainDelegate()
-      tmp.findInstalledI2PVersion()
+    if let version = RouterProcessStatus.routerVersion {
+      routerVersionLabel?.cell?.stringValue = "Router version: " + version
     } else {
-      routerVersionLabel?.cell?.stringValue = "Router version: " + RouterProcessStatus.routerVersion!
+      routerVersionLabel?.cell?.stringValue = "Router version: Still unknown"
     }
-    if (RouterProcessStatus.routerStartedAt != Optional.none) {
-      routerUptimeLabel?.cell?.stringValue = "Router has runned for " + DateTimeUtils.timeAgoSinceDate(date: NSDate(date: RouterProcessStatus.routerStartedAt!), numericDates: false)
+    if let routerStartTime = RouterProcessStatus.routerStartedAt {
+      routerUptimeLabel?.cell?.stringValue = "Router has runned for " + DateTimeUtils.timeAgoSinceDate(date: NSDate(date: routerStartTime), numericDates: false)
     }
   }
   

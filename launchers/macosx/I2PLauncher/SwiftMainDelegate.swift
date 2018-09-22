@@ -13,18 +13,19 @@ import Cocoa
   
   //let statusItem = NSStatusBar.system().statusItem(withLength: NSSquareStatusItemLength )
   let statusBarController = StatusBarController()
-  let javaDetector = DetectJava()
+  static let javaDetector = DetectJava()
   static let objCBridge = SBridge()
   
   override init() {
     super.init()
-    
-    self.javaDetector.findIt()
-    if (!javaDetector.isJavaFound()) {
-      print("Could not find java....")
-      terminate("No java..")
+    if (!SwiftMainDelegate.javaDetector.isJavaFound()) {
+    SwiftMainDelegate.javaDetector.findIt()
+      if (!SwiftMainDelegate.javaDetector.isJavaFound()) {
+        print("Could not find java....")
+        terminate("No java..")
+      }
     }
-    let javaBinPath = self.javaDetector.javaHome
+    let javaBinPath = SwiftMainDelegate.javaDetector.javaHome
     RouterProcessStatus.knownJavaBinPath = javaBinPath
     print("Found java home = ", javaBinPath)
     
@@ -76,8 +77,6 @@ import Cocoa
     print("Hello from swift!")
     var i2pPath = NSHomeDirectory()
     i2pPath += "/Library/I2P"
-    
-    //let javaBinPath = self.javaDetector.javaHome.replace(target: " ", withString: "\\ ")
     
     let fileManager = FileManager()
     var ok = ObjCBool(true)

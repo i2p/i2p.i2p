@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,7 +14,6 @@
 		BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA3E215141100014EB07 /* RouterTask.mm */; };
 		BF1EFA47215141640014EB07 /* base.zip in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA44215141630014EB07 /* base.zip */; };
 		BF1EFA48215141640014EB07 /* ItoopieTransparent.png in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA45215141640014EB07 /* ItoopieTransparent.png */; };
-		BF1EFA4A215141CD0014EB07 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5061932113C6ED0014EB07 /* NetworkExtension.framework */; };
 		BF5061702113C48E0014EB07 /* I2PLauncher.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BF50616E2113C48E0014EB07 /* I2PLauncher.xcdatamodeld */; };
 		BF5061722113C4900014EB07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF5061712113C4900014EB07 /* Assets.xcassets */; };
 		BF5061752113C4900014EB07 /* UserInterfaces.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF5061732113C4900014EB07 /* UserInterfaces.xib */; };
@@ -25,7 +24,12 @@
 		BF53150D2150CE310014EB07 /* DateTimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF53150C2150CE310014EB07 /* DateTimeUtils.swift */; };
 		BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */; };
 		BF531515215105B40014EB07 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF531514215105B40014EB07 /* LogViewController.swift */; };
+		BF650CA92152AC7D0014EB07 /* bumpInfoPlist.sh in Resources */ = {isa = PBXBuildFile; fileRef = BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */; };
+		BF650CAA2152AC7D0014EB07 /* dmgconfig.py in Resources */ = {isa = PBXBuildFile; fileRef = BF650CA62152AC7D0014EB07 /* dmgconfig.py */; };
+		BF650CAB2152AC7D0014EB07 /* Deployer.m in Sources */ = {isa = PBXBuildFile; fileRef = BF650CA72152AC7D0014EB07 /* Deployer.m */; };
 		BF7506CB21509CFD0014EB07 /* RouterProcessStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */; };
+		BF86541321515CA00014EB07 /* launcher.jar in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA46215141640014EB07 /* launcher.jar */; };
+		BF865417215182820014EB07 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF865416215182820014EB07 /* Foundation.framework */; };
 		BFBDCAE9215040670014EB07 /* Subprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAE8215040670014EB07 /* Subprocess.swift */; };
 		BFBDCAEB215041630014EB07 /* TaskPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAEA215041630014EB07 /* TaskPipeline.swift */; };
 		BFBDCAED215041C10014EB07 /* Subprocess+CompactAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAEC215041C10014EB07 /* Subprocess+CompactAPI.swift */; };
@@ -39,6 +43,7 @@
 		BFBDCB0021505BEE0014EB07 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFBDCAFF21505BED0014EB07 /* AppKit.framework */; };
 		BFBDCB02215060190014EB07 /* DetectJava.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCB01215060190014EB07 /* DetectJava.swift */; };
 		BFBDCB04215060970014EB07 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCB03215060970014EB07 /* StatusBarController.swift */; };
+		BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */; };
 		BFF4581C213C48EA0014EB07 /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF4581B213C48EA0014EB07 /* EventMonitor.swift */; };
 /* End PBXBuildFile section */
 
@@ -48,7 +53,6 @@
 		BF1EFA38215140E60014EB07 /* SBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBridge.h; sourceTree = SOURCE_ROOT; };
 		BF1EFA39215140E60014EB07 /* SBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBridge.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3B215141100014EB07 /* RouterTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterTask.h; sourceTree = SOURCE_ROOT; };
-		BF1EFA3C215141100014EB07 /* JavaHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JavaHelper.h; sourceTree = SOURCE_ROOT; };
 		BF1EFA3D215141100014EB07 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3E215141100014EB07 /* RouterTask.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RouterTask.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3F215141110014EB07 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -62,7 +66,6 @@
 		BF5061742113C4900014EB07 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/UserInterfaces.xib; sourceTree = "<group>"; };
 		BF5061762113C4900014EB07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BF5061792113C4900014EB07 /* I2PLauncher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = I2PLauncher.entitlements; sourceTree = "<group>"; };
-		BF5061932113C6ED0014EB07 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		BF5061952113C84E0014EB07 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		BF5315062150C55B0014EB07 /* RouterRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterRunner.swift; sourceTree = "<group>"; };
 		BF5315082150C6760014EB07 /* RouterDeployer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterDeployer.swift; sourceTree = "<group>"; };
@@ -70,7 +73,13 @@
 		BF53150C2150CE310014EB07 /* DateTimeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTimeUtils.swift; sourceTree = "<group>"; };
 		BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouterProcessStatus+ObjectiveC.swift"; sourceTree = "<group>"; };
 		BF531514215105B40014EB07 /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
+		BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = bumpInfoPlist.sh; sourceTree = SOURCE_ROOT; };
+		BF650CA62152AC7D0014EB07 /* dmgconfig.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = dmgconfig.py; sourceTree = SOURCE_ROOT; };
+		BF650CA72152AC7D0014EB07 /* Deployer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Deployer.m; sourceTree = SOURCE_ROOT; };
+		BF650CA82152AC7D0014EB07 /* Deployer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Deployer.h; sourceTree = SOURCE_ROOT; };
 		BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterProcessStatus.swift; sourceTree = "<group>"; };
+		BF865414215180F60014EB07 /* libswiftDarwin.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftDarwin.tbd; path = System/Library/PrivateFrameworks/Swift/libswiftDarwin.tbd; sourceTree = SDKROOT; };
+		BF865416215182820014EB07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BFBDCAE8215040670014EB07 /* Subprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subprocess.swift; sourceTree = "<group>"; };
 		BFBDCAEA215041630014EB07 /* TaskPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPipeline.swift; sourceTree = "<group>"; };
 		BFBDCAEC215041C10014EB07 /* Subprocess+CompactAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Subprocess+CompactAPI.swift"; sourceTree = "<group>"; };
@@ -85,6 +94,7 @@
 		BFBDCAFF21505BED0014EB07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		BFBDCB01215060190014EB07 /* DetectJava.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectJava.swift; sourceTree = "<group>"; };
 		BFBDCB03215060970014EB07 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
+		BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		BFF45818213C428E0014EB07 /* I2PLauncher-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "I2PLauncher-Bridging-Header.h"; sourceTree = "<group>"; };
 		BFF4581B213C48EA0014EB07 /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,7 +104,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF1EFA4A215141CD0014EB07 /* NetworkExtension.framework in Frameworks */,
+				BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */,
+				BF865417215182820014EB07 /* Foundation.framework in Frameworks */,
 				BFBDCB0021505BEE0014EB07 /* AppKit.framework in Frameworks */,
 				BF5061962113C84E0014EB07 /* Cocoa.framework in Frameworks */,
 			);
@@ -150,9 +161,12 @@
 		BF50616A2113C48E0014EB07 /* I2PLauncher */ = {
 			isa = PBXGroup;
 			children = (
+				BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */,
+				BF650CA82152AC7D0014EB07 /* Deployer.h */,
+				BF650CA72152AC7D0014EB07 /* Deployer.m */,
+				BF650CA62152AC7D0014EB07 /* dmgconfig.py */,
 				BF1EFA42215141220014EB07 /* include */,
 				BF1EFA3F215141110014EB07 /* AppDelegate.h */,
-				BF1EFA3C215141100014EB07 /* JavaHelper.h */,
 				BF1EFA3D215141100014EB07 /* main.mm */,
 				BF1EFA3B215141100014EB07 /* RouterTask.h */,
 				BF1EFA3E215141100014EB07 /* RouterTask.mm */,
@@ -177,9 +191,11 @@
 		BF5061922113C6ED0014EB07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */,
+				BF865416215182820014EB07 /* Foundation.framework */,
+				BF865414215180F60014EB07 /* libswiftDarwin.tbd */,
 				BFBDCAFF21505BED0014EB07 /* AppKit.framework */,
 				BF5061952113C84E0014EB07 /* Cocoa.framework */,
-				BF5061932113C6ED0014EB07 /* NetworkExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -236,15 +252,20 @@
 		BF5061602113C48E0014EB07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "The I2P Project";
 				TargetAttributes = {
 					BF5061672113C48E0014EB07 = {
 						CreatedOnToolsVersion = 9.4.1;
+						DevelopmentTeam = W3C42P2LA8;
 						LastSwiftMigration = 0940;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = {
+								enabled = 0;
+							};
 							com.apple.NetworkExtensions = {
-								enabled = 1;
+								enabled = 0;
 							};
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -254,7 +275,7 @@
 				};
 			};
 			buildConfigurationList = BF5061632113C48E0014EB07 /* Build configuration list for PBXProject "I2PLauncher" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -276,6 +297,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF86541321515CA00014EB07 /* launcher.jar in Resources */,
+				BF650CAA2152AC7D0014EB07 /* dmgconfig.py in Resources */,
+				BF650CA92152AC7D0014EB07 /* bumpInfoPlist.sh in Resources */,
 				BF07789721506C810014EB07 /* Storyboard.storyboard in Resources */,
 				BF5061722113C4900014EB07 /* Assets.xcassets in Resources */,
 				BF5061752113C4900014EB07 /* UserInterfaces.xib in Resources */,
@@ -298,7 +322,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run from launchers/macosx\nexport BUILDDIR=$(pwd)\ncd ../..\nant preppkg-osx\ncd pkg-temp\nrm -f ../base.zip\nzip -r7 ../base.zip *\ncp ../base.zip $BUILDDIR\ncd $BUILDDIR\n\n\n\n";
+			shellScript = "# Run from launchers/macosx\nexport BUILDDIR=$(pwd)\ncd ..\nsbt macosx:assembly\ncd ..\nant preppkg-osx\ncd pkg-temp\nrm -f ../base.zip\nzip -r -v -9 ../base.zip *\ncp ../base.zip $BUILDDIR/base.zip\ncd $BUILDDIR\ncp $BUILDDIR/target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar $BUILDDIR/launcher.jar\n\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -320,6 +344,7 @@
 				BFBDCAED215041C10014EB07 /* Subprocess+CompactAPI.swift in Sources */,
 				BFBDCB02215060190014EB07 /* DetectJava.swift in Sources */,
 				BF07789E21506D2B0014EB07 /* PopoverViewController.swift in Sources */,
+				BF650CAB2152AC7D0014EB07 /* Deployer.m in Sources */,
 				BF1EFA40215141110014EB07 /* main.mm in Sources */,
 				BFBDCAF4215042670014EB07 /* AppleStuffExceptionHandler.m in Sources */,
 				BF531515215105B40014EB07 /* LogViewController.swift in Sources */,
@@ -358,7 +383,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -400,10 +425,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.13;
 			};
 			name = Debug;
 		};
@@ -416,7 +441,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -452,80 +477,80 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.13;
+				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
 		BF50617D2113C4900014EB07 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = I2PLauncher/I2PLauncher.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = W3C42P2LA8;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Frameworks,
+					/System/Library/Frameworks,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/include",
 					"$(SRCROOT)/include/neither",
 				);
 				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = include;
 				INFOPLIST_FILE = I2PLauncher/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.launcher.I2PLauncher;
+				LD_NO_PIE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.I2PLauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "I2PLauncher/I2PLauncher-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(SRCROOT)/include/**";
-				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
 		BF50617E2113C4900014EB07 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = I2PLauncher/I2PLauncher.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = W3C42P2LA8;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Frameworks,
+					/System/Library/Frameworks,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/include",
 					"$(SRCROOT)/include/neither",
 				);
 				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = include;
 				INFOPLIST_FILE = I2PLauncher/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.launcher.I2PLauncher;
+				LD_NO_PIE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.I2PLauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "I2PLauncher/I2PLauncher-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(SRCROOT)/include/**";
-				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};

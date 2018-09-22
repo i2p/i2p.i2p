@@ -10,9 +10,9 @@ import Foundation
 
 @objc class DetectJava : NSObject {
   
-  var hasJRE : Bool = false
-  var userWantJRE : Bool = false
-  var userAcceptOracleEULA : Bool = false
+  static var hasJRE : Bool = false
+  static var userWantJRE : Bool = false
+  static var userAcceptOracleEULA : Bool = false
   
   
   override init() {
@@ -29,8 +29,9 @@ import Foundation
     
     //Called after the change
     didSet{
-      hasJRE = true
-      print("DetectJava.javaHome did change from "+oldValue+" to "+self.javaHome)
+      DetectJava.hasJRE = true
+      self.javaHome = self.javaHome.replace(target: "\n", withString: "").replace(target: "Internet Plug-Ins", withString: "Internet\\ Plug-Ins")
+      print("DetectJava.javaHome did change to "+self.javaHome)
     }
   };
   private var testedEnv : Bool = false
@@ -50,25 +51,28 @@ import Foundation
    *
    **/
   @objc func findIt() {
+    if (DetectJava.hasJRE) {
+      return
+    }
     print("Start with checking environment variable")
     self.checkJavaEnvironmentVariable()
     if !(self.javaHome.isEmpty) {
       RouterProcessStatus.knownJavaBinPath = Optional.some(self.javaHome)
-      hasJRE = true
+      DetectJava.hasJRE = true
       return
     }
     print("Checking with the java_home util")
     self.runJavaHomeCmd()
     if !(self.javaHome.isEmpty) {
       RouterProcessStatus.knownJavaBinPath = Optional.some(self.javaHome)
-      hasJRE = true
+      DetectJava.hasJRE = true
       return
     }
     print("Checking default JRE install path")
     self.checkDefaultJREPath()
     if !(self.javaHome.isEmpty) {
       RouterProcessStatus.knownJavaBinPath = Optional.some(self.javaHome)
-      hasJRE = true
+      DetectJava.hasJRE = true
       return
     }
   }
