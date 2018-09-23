@@ -28,7 +28,7 @@ import Cocoa
   
   @objc func actionBtnStartRouter(_ sender: Any?) {
     NSLog("START ROUTER")
-    if (!(RouterManager.shared().getRouterTask()?.isRunning())!) {
+    if (RouterManager.shared().getRouterTask() == nil) {
       SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath, javaBinPath: RouterProcessStatus.knownJavaBinPath!)
     }
     RouterManager.shared().updateState()
@@ -36,7 +36,7 @@ import Cocoa
   
   @objc func actionBtnStopRouter(_ sender: Any?) {
     NSLog("STOP ROUTER")
-    if ((RouterManager.shared().getRouterTask()?.isRunning())!) {
+    if (RouterManager.shared().getRouterTask() != nil) {
       NSLog("Found running router")
       RouterManager.shared().getRouterTask()?.requestShutdown()
       RouterManager.shared().updateState()
@@ -44,7 +44,7 @@ import Cocoa
   }
   
   @objc func actionBtnRestartRouter(sender: Any?) {
-    if ((RouterManager.shared().getRouterTask()?.isRunning())!) {
+    if (RouterManager.shared().getRouterTask() != nil) {
       RouterManager.shared().getRouterTask()?.requestRestart()
     } else {
       NSLog("Can't restart a non running router, start it however...")

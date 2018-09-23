@@ -154,6 +154,7 @@
                     </tabView>
                 </viewController>
                 <customObject id="d8g-wS-Zts" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <customObject id="4gn-BI-uSC" userLabel="Updater" customClass="SUUpdater"/>
             </objects>
             <point key="canvasLocation" x="-823" y="166"/>
         </scene>

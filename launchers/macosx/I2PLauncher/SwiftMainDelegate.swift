@@ -69,11 +69,17 @@ import Cocoa
   }
   
   @objc func applicationDidFinishLaunching() {
-    print("Hello from swift!")
     var i2pPath = NSHomeDirectory()
     i2pPath += "/Library/I2P"
     
-    findInstalledI2PVersion()
+  }
+  
+  @objc func listenForEvent(eventName: String, callbackActionFn: @escaping ((Any?)->()) ) {
+    RouterManager.shared().eventManager.listenTo(eventName: eventName, action: callbackActionFn )
+  }
+  
+  @objc func triggerEvent(en: String, details: String? = nil) {
+    RouterManager.shared().eventManager.trigger(eventName: en, information: details)
   }
   
   @objc static func openLink(url: String) {

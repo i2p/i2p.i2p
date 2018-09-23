@@ -26,7 +26,7 @@
 
 
 
-std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir) {
+std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir, RouterProcessStatus* routerStatus) {
   @try {
     RTaskOptions* options = [RTaskOptions alloc];
     options.binPath = javaBin;
@@ -36,12 +36,16 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     
     [[SBridge sharedInstance] setCurrentRouterInstance:instance];
     [instance execute];
+    if (routerStatus != nil) {
+      [routerStatus setRouterStatus: true];
+      [routerStatus setRouterRanByUs: true];
+      [routerStatus triggerEventWithEn:@"router_start" details:@"normal start"];
+    }
     sendUserNotification(APP_IDSTR, @"The I2P router is starting up.");
     auto pid = [instance getPID];
     NSLog(@"Got pid: %d", pid);
     
-    auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
-    [swiftRouterStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
+    if (routerStatus != nil) [routerStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
     
     return std::async(std::launch::async, [&pid]{
       return pid;
@@ -54,10 +58,11 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     sendUserNotification(APP_IDSTR, errStr);
     [[SBridge sharedInstance] setCurrentRouterInstance:nil];
     
-    auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
-    [swiftRouterStatus setRouterStatus: false];
-    [swiftRouterStatus setRouterRanByUs: false];
-    [swiftRouterStatus triggerEventWithEn:@"router_exception" details:errStr];
+    if (routerStatus != nil) {
+      [routerStatus setRouterStatus: false];
+      [routerStatus setRouterRanByUs: false];
+      [routerStatus triggerEventWithEn:@"router_exception" details:errStr];
+    }
     
     return std::async(std::launch::async, [&]{
       return 0;
@@ -100,8 +105,6 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
 {
   std::string basePath([i2pRootPath UTF8String]);
   
-  // Get paths
-  //NSBundle *launcherBundle = [NSBundle mainBundle];
   auto classPathStr = buildClassPathForObjC(basePath);
   
   RouterProcessStatus* routerStatus = [[RouterProcessStatus alloc] init];
@@ -137,12 +140,11 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     auto nsJavaBin = javaBinPath;
     auto nsBasePath = i2pRootPath;
     NSArray* arrArguments = [NSArray arrayWithObjects:&argList[0] count:argList.size()];
-    // We don't really know yet, but per now a workaround
-    [routerStatus setRouterStatus: true];
+    
     NSLog(@"Trying to run command: %@", javaBinPath);
     NSLog(@"With I2P Base dir: %@", i2pRootPath);
     NSLog(@"And Arguments: %@", arrArguments);
-    startupRouter(nsJavaBin, arrArguments, nsBasePath);
+    startupRouter(nsJavaBin, arrArguments, nsBasePath, routerStatus);
   } catch (std::exception &err) {
     auto errMsg = [NSString stringWithUTF8String:err.what()];
     NSLog(@"Exception: %@", errMsg);

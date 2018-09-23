@@ -38,6 +38,7 @@ class RouterManager : NSObject {
     let currentVersion : String = information as! String
     if (packedVersion.compare(currentVersion, options: .numeric) == .orderedDescending) {
       Swift.print("event! - router version: Packed version is newer, gonna re-deploy")
+      RouterManager.shared().eventManager.trigger(eventName: "router_must_upgrade", information: "got new version")
     } else {
       Swift.print("event! - router version: No update needed")
       RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: "all ok")

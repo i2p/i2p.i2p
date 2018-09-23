@@ -9,12 +9,13 @@
 import Foundation
 import Cocoa
 
-
 @objc class StatusBarController: NSObject, NSMenuDelegate {
   
   let popover = NSPopover()
   let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
-  //let storyboard = NSStoryboard(name: "Storyboard", bundle: nil)
+  let storyboard = NSStoryboard(name: "Storyboard", bundle: Bundle.main)
+  
+  var updateObjectRef : SUUpdater?
   
   @objc func handleOpenConsole(_ sender: Any?) {
     SwiftMainDelegate.openLink(url: "http://localhost:7657")
@@ -23,7 +24,12 @@ import Cocoa
   @objc func constructMenu() -> NSMenu {
     let menu = NSMenu()
     
+    let updateMenuItem = NSMenuItem(title: "Check for updates", action: #selector(self.updateObjectRef?.checkForUpdates(_:)), keyEquivalent: "U")
+    updateMenuItem.isEnabled = true
+    
     menu.addItem(NSMenuItem(title: "Open I2P Console", action: #selector(self.handleOpenConsole(_:)), keyEquivalent: "O"))
+    menu.addItem(NSMenuItem.separator())
+    menu.addItem(updateMenuItem)
     menu.addItem(NSMenuItem.separator())
     menu.addItem(NSMenuItem(title: "Quit I2P Launcher", action: #selector(SwiftMainDelegate.terminate(_:)), keyEquivalent: "q"))
     
@@ -34,6 +40,9 @@ import Cocoa
   override init() {
     super.init()
     popover.contentViewController = PopoverViewController.freshController()
+    updateObjectRef = SUUpdater.shared()
+    updateObjectRef?.checkForUpdatesInBackground()
+    
     
     if let button = statusItem.button {
       button.image = NSImage(named:"StatusBarButtonImage")

@@ -36,23 +36,16 @@ import AppKit
   @objc func triggerEvent(en: String, details: String? = nil) {
     RouterManager.shared().eventManager.trigger(eventName: en, information: details)
   }
+
+  @objc func listenForEvent(eventName: String, callbackActionFn: @escaping ((Any?)->()) ) {
+    RouterManager.shared().eventManager.listenTo(eventName: eventName, action: callbackActionFn )
+  }
 }
 
 extension RouterProcessStatus {
-  static var isRouterRunning : Bool = false
-  static var isRouterChildProcess : Bool = false
+  static var isRouterRunning : Bool = (RouterManager.shared().getRouterTask() != nil)
+  static var isRouterChildProcess : Bool = (RouterManager.shared().getRouterTask() != nil)
   static var routerVersion : String? = Optional.none
-  static var routerUptime : String? = Optional.none{
-    //Called before the change
-    willSet(newValue){
-      print("RouterProcessStatus.routerUptime will change from ", (self.routerUptime ?? "nil"), " to "+(newValue ?? "nil"))
-    }
-    
-    //Called after the change
-    didSet{
-      print("RouterProcessStatus.routerUptime did change to "+self.routerUptime!)
-    }
-  }
   static var routerStartedAt : Date? = Optional.none
   static var knownJavaBinPath : String? = Optional.none
   static var i2pDirectoryPath : String = NSHomeDirectory() + "/Library/I2P"

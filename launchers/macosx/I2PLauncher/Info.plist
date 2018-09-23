@@ -17,24 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLIconFile</key>
-			<string>ItoopieTransparent</string>
-			<key>CFBundleURLName</key>
-			<string>http+i2p</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>http+i2p</string>
-			</array>
-		</dict>
-	</array>
+	<string>0.1.1</string>
 	<key>CFBundleVersion</key>
-	<string>4</string>
+	<string>5</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -54,6 +39,8 @@
 		<dict/>
 	</array>
 	<key>SUFeedURL</key>
-	<string>http://i2browser.i2p/updates/v1/appcast.xml</string>
+	<string>https://download.i2p2.de/macosx/sparkle/updates/v1/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>weKSpHXfJzk+5qy3UVfqsUwTeLnT9WCFVMwd9yW0+DA=</string>
 </dict>
 </plist>

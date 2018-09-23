@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 #include "include/fn.h"
-std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir);
+//std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir, RouterProcessStatus* routerStatus = nil);
 
 
 namespace osx {

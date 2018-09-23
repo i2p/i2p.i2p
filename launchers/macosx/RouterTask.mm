@@ -44,42 +44,6 @@
   [self.routerTask setStandardOutput:self.processPipe];
 	[self.routerTask setStandardError:self.processPipe];
 
-  /*
-  NSFileHandle *stdoutFileHandle = [self.processPipe fileHandleForReading];
-  dup2([[self.processPipe fileHandleForWriting] fileDescriptor], fileno(stdout));
-  auto source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, [stdoutFileHandle fileDescriptor], 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
-  dispatch_source_set_event_handler(source, ^{
-    void* data = malloc(4096);
-    ssize_t readResult = 0;
-    do
-    {
-      errno = 0;
-      readResult = read([stdoutFileHandle fileDescriptor], data, 4096);
-    } while (readResult == -1 && errno == EINTR);
-    if (readResult > 0)
-    {
-      //AppKit UI should only be updated from the main thread
-      dispatch_async(dispatch_get_main_queue(),^{
-        NSString* stdOutString = [[NSString alloc] initWithBytesNoCopy:data length:readResult encoding:NSUTF8StringEncoding freeWhenDone:YES];
-        NSAttributedString* stdOutAttributedString = [[NSAttributedString alloc] initWithString:stdOutString];
-        NSLog(@"Router stdout: %@", stdOutString);
-        //auto logForwarder = new LogForwarder();
-        //[logForwarder appendLogViewWithLogLine:stdOutAttributedString];
-      });
-    }
-    else{free(data);}
-  });
-  dispatch_resume(source);
-  */
-  /*
-  [[NSNotificationCenter defaultCenter] addObserver:self
-      selector:@selector(routerStdoutData:)
-      name:NSFileHandleDataAvailableNotification
-      object:stdoutFileHandle];
-
-  [stdoutFileHandle waitForDataInBackgroundAndNotify];
-  */
-
   [self.routerTask setTerminationHandler:^(NSTask* task) {
     // Cleanup
     NSLog(@"termHandler triggered!");
@@ -112,8 +76,6 @@
 - (int) execute
 {
     @try {
-      auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
-      [swiftRouterStatus triggerEventWithEn:@"router_start" details:@"normal start"];
       [self.routerTask launch];
       self.isRouterRunning = YES;
       return 1;

@@ -200,9 +200,6 @@ using namespace subprocess;
     shouldAutoStartRouter = true;
   }
 
-  if (self.enableVerboseLogging) NSLog(@"processinfo %@", [[NSProcessInfo processInfo] arguments]);
-
-
   NSBundle *launcherBundle = [NSBundle mainBundle];
   
   // Helper object to hold statefull path information
@@ -218,6 +215,23 @@ using namespace subprocess;
   std::string jarfile("-cp ");
   jarfile += [self.metaInfo.zipFile UTF8String];
   
+  // Might be hard to read if you're not used to Objective-C
+  // But this is a "function call" that contains a "callback function"
+  [routerStatus listenForEventWithEventName:@"router_can_start" callbackActionFn:^(NSString* information) {
+    NSLog(@"Got signal, router can be started");
+    [[SBridge sharedInstance] startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
+  }];
+  
+  // This will trigger the router start after an upgrade.
+  [routerStatus listenForEventWithEventName:@"router_must_upgrade" callbackActionFn:^(NSString* information) {
+    NSLog(@"Got signal, router must be upgraded");
+    [self extractI2PBaseDir:^(BOOL success, NSError *error) {
+      sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
+      NSLog(@"Done extracting I2P");
+      [routerStatus triggerEventWithEn:@"router_can_start" details:@"upgrade complete"];
+    }];
+  }];
+  
   // Initialize the Swift environment (the UI components)
   [self.swiftRuntime applicationDidFinishLaunching];
 
@@ -226,36 +240,15 @@ using namespace subprocess;
   {
     // I2P is not extracted.
     if (self.enableVerboseLogging) NSLog(@"I2P Directory don't exists!");
-
-    // Might be hard to read if you're not used to Objective-C
-    // But this is a "function call" that contains a "callback function"
-    [self extractI2PBaseDir:^(BOOL success, NSError *error) {
-      sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
-      NSLog(@"Done extracting I2P");
-      
-      NSLog(@"Time to detect I2P version in install directory");
-      [self.swiftRuntime findInstalledI2PVersion];
-      if (shouldAutoStartRouter) {
-        [[SBridge sharedInstance] startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
-        [routerStatus setRouterRanByUs: true];
-      }
-    }];
-
+    [routerStatus triggerEventWithEn:@"router_must_upgrade" details:@"deploy needed"];
   } else {
     // I2P was already found extracted
     NSLog(@"Time to detect I2P version in install directory");
     [self.swiftRuntime findInstalledI2PVersion];
-    
-    if (shouldAutoStartRouter) {
-      [[SBridge sharedInstance] startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
-      [routerStatus setRouterRanByUs: true];
-    }
   }
   
 #endif
 }
-
-
 
 /**
  *
