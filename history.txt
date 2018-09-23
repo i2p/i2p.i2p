@@ -1,3 +1,6 @@
+2018-09-23 zzz
+ * Plugins: Blacklist neodatis and seedless for Java 9+ (ticket #2295)
+
 2018-09-22 zzz
  * NTCP:
    - Fix handling of multiple connections

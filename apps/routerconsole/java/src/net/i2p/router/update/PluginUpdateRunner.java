@@ -28,6 +28,7 @@ import net.i2p.util.OrderedProperties;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 
@@ -474,6 +475,15 @@ class PluginUpdateRunner extends UpdateRunner {
                     to.delete();
                     statusDone("<b>" + _t("Plugin requires Jetty version {0} or lower", "8.9999") + "</b>");
                     return;
+                }
+                if (SystemVersion.isJava9()) {
+                    blacklistVersion = PluginStarter.java9Blacklist.get(appName);
+                    if (blacklistVersion != null &&
+                        VersionComparator.comp(version, blacklistVersion) <= 0) {
+                        to.delete();
+                        statusDone("<b>" + _t("Plugin requires Java version {0} or lower", "8.9999") + "</b>");
+                        return;
+                    }
                 }
                 maxVersion = PluginStarter.stripHTML(props, "max-jetty-version");
                 if (maxVersion != null &&
