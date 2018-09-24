@@ -1,3 +1,6 @@
+2018-09-24 zzz
+ * Build: Compile jsps in-order for reproducibility (ticket #2279)
+
 2018-09-23 zzz
  * Plugins: Blacklist neodatis and seedless for Java 9+ (ticket #2295)
 

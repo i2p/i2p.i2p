@@ -307,6 +307,10 @@
         <mkdir dir="../jsp/WEB-INF/classes" />
         <!-- See apps/routerconsole/java/build.xml for important JspC build documentation -->
         <java classname="net.i2p.servlet.util.JspC" fork="true" failonerror="true">
+            <!-- these are to detect tomcat version and reproducible build setting -->
+            <jvmarg value="-Dbuild.reproducible=${build.reproducible}" />
+            <jvmarg value="-Dwith-libtomcat8-java=${with-libtomcat8-java}" />
+            <jvmarg value="-Djasper.jar=../../jetty/jettylib/jasper-runtime.jar" />
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
