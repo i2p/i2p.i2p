@@ -1068,8 +1068,8 @@ public class Router implements RouterClock.ClockShiftListener {
         rv.append(bw);
         // 512 and unlimited supported as of 0.9.18;
         // Add 256 as well for compatibility
-        if (bw == CAPABILITY_BW512 || bw == CAPABILITY_BW_UNLIMITED)
-            rv.append(CAPABILITY_BW256);
+        //if (bw == CAPABILITY_BW512 || bw == CAPABILITY_BW_UNLIMITED)
+        //    rv.append(CAPABILITY_BW256);
 
         // if prop set to true, don't tell people we are ff even if we are
         if (_context.netDb().floodfillEnabled() &&
