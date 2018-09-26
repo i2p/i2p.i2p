@@ -36,16 +36,15 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     
     [[SBridge sharedInstance] setCurrentRouterInstance:instance];
     [instance execute];
+    sendUserNotification(APP_IDSTR, @"The I2P router is starting up.");
+    auto pid = [instance getPID];
+    NSLog(@"Got pid: %d", pid);
     if (routerStatus != nil) {
       [routerStatus setRouterStatus: true];
       [routerStatus setRouterRanByUs: true];
       [routerStatus triggerEventWithEn:@"router_start" details:@"normal start"];
+      [routerStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
     }
-    sendUserNotification(APP_IDSTR, @"The I2P router is starting up.");
-    auto pid = [instance getPID];
-    NSLog(@"Got pid: %d", pid);
-    
-    if (routerStatus != nil) [routerStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
     
     return std::async(std::launch::async, [&pid]{
       return pid;
@@ -59,8 +58,6 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     [[SBridge sharedInstance] setCurrentRouterInstance:nil];
     
     if (routerStatus != nil) {
-      [routerStatus setRouterStatus: false];
-      [routerStatus setRouterRanByUs: false];
       [routerStatus triggerEventWithEn:@"router_exception" details:errStr];
     }
     

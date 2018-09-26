@@ -8,6 +8,13 @@
 
 import Foundation
 
+
+enum ErrorsInRouterMgmr: Swift.Error {
+  case NoJavaFound
+  case InvalidVersion
+  case NotFound
+}
+
 class RouterManager : NSObject {
   
   // MARK: - Properties
@@ -18,6 +25,10 @@ class RouterManager : NSObject {
   
   var logViewStorage: NSTextStorage?
   
+  private static func handleRouterException(information:Any?) {
+    NSLog("event! - handle router exception")
+    NSLog(information as! String)
+  }
   private static func handleRouterStart(information:Any?) {
     NSLog("event! - handle router start")
     RouterProcessStatus.routerStartedAt = Date()
@@ -31,17 +42,32 @@ class RouterManager : NSObject {
     RouterProcessStatus.isRouterRunning = false
   }
   private static func handleRouterPid(information:Any?) {
-    Swift.print("event! - handle router pid: %s", information ?? "")
+    Swift.print("event! - handle router pid: ", information ?? "")
   }
   private static func handleRouterVersion(information:Any?) {
-    Swift.print("event! - handle router version: %s", information ?? "")
-    let currentVersion : String = information as! String
-    if (packedVersion.compare(currentVersion, options: .numeric) == .orderedDescending) {
-      Swift.print("event! - router version: Packed version is newer, gonna re-deploy")
-      RouterManager.shared().eventManager.trigger(eventName: "router_must_upgrade", information: "got new version")
-    } else {
-      Swift.print("event! - router version: No update needed")
-      RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: "all ok")
+    do {
+      Swift.print("event! - handle router version: ", information ?? "")
+      guard let currentVersion : String = information as? String else {
+        throw ErrorsInRouterMgmr.InvalidVersion
+      }
+      if (currentVersion == "Unknown") {
+        throw ErrorsInRouterMgmr.InvalidVersion
+      }
+      if (packedVersion.compare(currentVersion, options: .numeric) == .orderedDescending) {
+        Swift.print("event! - router version: Packed version is newer, gonna re-deploy")
+        RouterManager.shared().eventManager.trigger(eventName: "router_must_upgrade", information: "got new version")
+      } else {
+        Swift.print("event! - router version: No update needed")
+        RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: "all ok")
+      }
+    } catch ErrorsInRouterMgmr.InvalidVersion {
+      // This is most likely due to an earlier extract got killed halfway or something
+      // Trigger an update
+      RouterManager.shared().eventManager.trigger(eventName: "router_must_upgrade", information: "invalid version found")
+    } catch {
+      // WTF
+      NSLog("Fatal error in RouterManager");
+      print(error)
     }
   }
   
@@ -57,6 +83,7 @@ class RouterManager : NSObject {
     routerManager.eventManager.listenTo(eventName: "router_stop", action: handleRouterStop)
     routerManager.eventManager.listenTo(eventName: "router_pid", action: handleRouterPid)
     routerManager.eventManager.listenTo(eventName: "router_version", action: handleRouterVersion)
+    routerManager.eventManager.listenTo(eventName: "router_exception", action: handleRouterException)
     return routerManager
   }()
   

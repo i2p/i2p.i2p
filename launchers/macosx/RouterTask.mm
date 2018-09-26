@@ -85,9 +85,7 @@
 		NSLog(@"Expection occurred %@", [e reason]);
     auto swiftRouterStatus = [[RouterProcessStatus alloc] init];
     self.isRouterRunning = NO;
-    [swiftRouterStatus setRouterStatus: false];
-    [swiftRouterStatus setRouterRanByUs: false];
-    [swiftRouterStatus triggerEventWithEn:@"router_stop" details:@"error shutdown"];
+    [swiftRouterStatus triggerEventWithEn:@"router_exception" details:[e reason]];
     [[SBridge sharedInstance] setCurrentRouterInstance:nil];
     sendUserNotification(@"An error occured, can't start the I2P Router", [e reason]);
     return 0;

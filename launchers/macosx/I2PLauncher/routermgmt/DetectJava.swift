@@ -32,6 +32,7 @@ import Foundation
       DetectJava.hasJRE = true
       self.javaHome = self.javaHome.replace(target: "\n", withString: "").replace(target: "Internet Plug-Ins", withString: "Internet\\ Plug-Ins")
       print("DetectJava.javaHome did change to "+self.javaHome)
+      RouterManager.shared().eventManager.trigger(eventName: "java_found", information: self.javaHome)
     }
   };
   private var testedEnv : Bool = false

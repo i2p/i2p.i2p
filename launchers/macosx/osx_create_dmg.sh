@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. .sign-secrets
+
 APP_NAME="I2PLauncher"
 VERSION="0.9.36"
 DMG_BACKGROUND_IMG="Background.png"
@@ -97,6 +99,8 @@ hdiutil detach "${DEVICE}"
 # now make the final image a compressed disk image
 echo "Creating compressed image"
 hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}"
+
+codesign --force --sign "${APPLE_CODE_SIGNER_ID}" "${DMG_FINAL}"
 
 # clean up
 rm -rf "${DMG_TMP}"

@@ -59,10 +59,18 @@ import Cocoa
     let sub:Subprocess = Subprocess.init(executablePath: "/bin/sh", arguments: cmdArgs)
     let results:ExecutionResult = sub.execute(captureOutput: true)!
     if (results.didCaptureOutput) {
-      let i2pVersion = results.outputLines.first?.replace(target: "I2P Core version: ", withString: "")
-      NSLog("I2P version detected: %@",i2pVersion ?? "Unknown")
-      RouterProcessStatus.routerVersion = i2pVersion
-      RouterManager.shared().eventManager.trigger(eventName: "router_version", information: i2pVersion)
+      if (results.status == 0) {
+        let i2pVersion = results.outputLines.first?.replace(target: "I2P Core version: ", withString: "")
+        NSLog("I2P version detected: %@",i2pVersion ?? "Unknown")
+        RouterProcessStatus.routerVersion = i2pVersion
+        RouterManager.shared().eventManager.trigger(eventName: "router_version", information: i2pVersion)
+        RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: i2pVersion)
+      } else {
+        NSLog("Non zero exit code from subprocess while trying to detect version number!")
+        for line in results.errorsLines {
+          NSLog(line)
+        }
+      }
     } else {
       print("Warning: Version Detection did NOT captured output")
     }

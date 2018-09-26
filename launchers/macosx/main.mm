@@ -107,23 +107,16 @@ using namespace subprocess;
       for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
 
       NSLog(@"Trying cmd: %@", [NSString stringWithUTF8String:execStr.c_str()]);
-      try {
-        sendUserNotification(APP_IDSTR, @"Please hold on while we extract I2P. You'll get a new message once done!");
-        int extractStatus = Popen(execStr.c_str(), environment{{
-          {"ZIPPATH", zippath.c_str()},
-          {"I2PBASE", basePath.c_str()}
-        }}).wait();
-        NSLog(@"Extraction exit code %@",[NSString stringWithUTF8String:(std::to_string(extractStatus)).c_str()]);
-        if (extractStatus == 0)
-        {
-          NSLog(@"Extraction complete!");
-        }
-      
-      } catch (subprocess::OSError &err) {
-          auto errMsg = [NSString stringWithUTF8String:err.what()];
-          //success = NO;
-          NSLog(@"Exception: %@", errMsg);
-          sendUserNotification(APP_IDSTR, [NSString stringWithFormat:@"Error: %@", errMsg]);
+      sendUserNotification(APP_IDSTR, @"Please hold on while we extract I2P. You'll get a new message once done!");
+      int extractStatus = Popen(execStr.c_str(), environment{{
+        {"ZIPPATH", zippath.c_str()},
+        {"I2PBASE", basePath.c_str()}
+      }}).wait();
+      NSLog(@"Extraction exit code %@",[NSString stringWithUTF8String:(std::to_string(extractStatus)).c_str()]);
+      if (extractStatus == 0) {
+        NSLog(@"Extraction process done");
+      } else {
+        NSLog(@"Something went wrong");
       }
 
       // All done. Assume success and error are already set.
@@ -137,6 +130,7 @@ using namespace subprocess;
     } catch (OSError &err) {
       auto errMsg = [NSString stringWithUTF8String:err.what()];
       NSLog(@"Exception: %@", errMsg);
+      sendUserNotification(APP_IDSTR, [NSString stringWithFormat:@"Error: %@", errMsg]);
     }
   });
 }
@@ -224,27 +218,52 @@ using namespace subprocess;
   
   // This will trigger the router start after an upgrade.
   [routerStatus listenForEventWithEventName:@"router_must_upgrade" callbackActionFn:^(NSString* information) {
-    NSLog(@"Got signal, router must be upgraded");
+    NSLog(@"Got signal, router must be deployed from base.zip");
     [self extractI2PBaseDir:^(BOOL success, NSError *error) {
-      sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
-      NSLog(@"Done extracting I2P");
-      [routerStatus triggerEventWithEn:@"router_can_start" details:@"upgrade complete"];
+      if (success && error != nil) {
+        sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
+        NSLog(@"Done extracting I2P");
+        [routerStatus triggerEventWithEn:@"extract_completed" details:@"upgrade complete"];
+      } else {
+        NSLog(@"Error while extracting I2P");
+        [routerStatus triggerEventWithEn:@"extract_errored" details:[NSString stringWithFormat:@"%@", error]];
+      }
     }];
   }];
   
   // Initialize the Swift environment (the UI components)
   [self.swiftRuntime applicationDidFinishLaunching];
+  
+  NSString *nsI2PBaseStr = [NSString stringWithUTF8String:i2pBaseDir.c_str()];
 
-  struct stat sb;
-  if ( !(stat(i2pBaseDir.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) )
+  
+  //struct stat sb;
+  //if ( !(stat(i2pBaseDir.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) )
+  BOOL shouldBeTrueOnReturnDir = YES;
+  if (! [NSFileManager.defaultManager fileExistsAtPath: nsI2PBaseStr isDirectory: &shouldBeTrueOnReturnDir])
   {
     // I2P is not extracted.
-    if (self.enableVerboseLogging) NSLog(@"I2P Directory don't exists!");
-    [routerStatus triggerEventWithEn:@"router_must_upgrade" details:@"deploy needed"];
+    if (shouldBeTrueOnReturnDir) {
+      if (self.enableVerboseLogging) NSLog(@"I2P Directory don't exists!");
+      [routerStatus triggerEventWithEn:@"router_must_upgrade" details:@"deploy needed"];
+    } else {
+      // TODO: handle if i2p path exists but it's not a dir.
+    }
   } else {
     // I2P was already found extracted
-    NSLog(@"Time to detect I2P version in install directory");
-    [self.swiftRuntime findInstalledI2PVersion];
+    NSString *nsI2pJar = [NSString stringWithFormat:@"%@/lib/i2p.jar", nsI2PBaseStr];
+    
+    // But does I2PBASE/lib/i2p.jar exists?
+    if ([NSFileManager.defaultManager fileExistsAtPath:nsI2pJar]) {
+      NSLog(@"Time to detect I2P version in install directory");
+      [self.swiftRuntime findInstalledI2PVersion];
+    } else {
+      // The directory exists, but not i2p.jar - most likely we're in mid-extraction state.
+      [routerStatus listenForEventWithEventName:@"extract_completed" callbackActionFn:^(NSString* information) {
+        NSLog(@"Time to detect I2P version in install directory");
+        [self.swiftRuntime findInstalledI2PVersion];
+      }];
+    }
   }
   
 #endif
