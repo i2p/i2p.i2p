@@ -87,10 +87,10 @@ class HopProcessor {
             return false;
         }
         
-        if (_log.shouldLog(Log.DEBUG)) {
+        //if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("IV received: " + Base64.encode(iv));
             //_log.debug("Before:" + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
-        }
+        //}
         //if (USE_ENCRYPTION) {
             //if (USE_DOUBLE_IV_ENCRYPTION) 
                 updateIV(orig, offset);
