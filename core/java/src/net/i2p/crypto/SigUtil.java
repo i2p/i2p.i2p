@@ -189,8 +189,10 @@ public final class SigUtil {
                 type = SigType.ECDSA_SHA384_P384;
             else if (spec.equals(SigType.ECDSA_SHA512_P521.getParams()))
                 type = SigType.ECDSA_SHA512_P521;
-            else
+            else {
+                // failing on Android (ticket #2296)
                 throw new IllegalArgumentException("Unknown EC type: " + pk.getClass() + " spec: " + spec.getClass());
+            }
             return fromJavaKey(k, type);
         }
         if (pk instanceof EdDSAPrivateKey) {

@@ -233,7 +233,7 @@ public final class SelfSignedGenerator {
         } catch (IllegalArgumentException iae) {
             throw new GeneralSecurityException("cert error", iae);
         }
-        X509CRL crl = generateCRL(cert, validDays, 1, sigoid, jpriv);
+        X509CRL crl = generateCRL(cert, validDays, 1, sigoid, priv);
 
         // some simple tests
         PublicKey cpub = cert.getPublicKey();
@@ -281,10 +281,7 @@ public final class SelfSignedGenerator {
      *  Generate a CRL for the given cert, signed with the given private key
      */
     private static X509CRL generateCRL(X509Certificate cert, int validDays, int crlNum,
-                                       byte[] sigoid, PrivateKey jpriv) throws GeneralSecurityException {
-
-        SigningPrivateKey priv = SigUtil.fromJavaKey(jpriv);
-
+                                       byte[] sigoid, SigningPrivateKey priv) throws GeneralSecurityException {
         byte[] tbs = genTBSCRL(cert, validDays, crlNum, sigoid);
         int tbslen = tbs.length;
 

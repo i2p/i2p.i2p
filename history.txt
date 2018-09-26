@@ -1,3 +1,9 @@
+2018-09-26 zzz
+ * Crypto: Avoid privkey conversion when generating CRL,
+   failing on Android for unknown reasons (ticket #2296)
+ * IRC: Make inbound whitelist static
+ * Router: Don't add 'O' cap for P/X anymore
+
 2018-09-24 zzz
  * Build: Compile jsps in-order for reproducibility (ticket #2279)
 
