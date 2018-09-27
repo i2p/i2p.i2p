@@ -155,7 +155,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             if (kspw != null) {
                 kspw = JettyXmlConfigurationParser.deobfuscate(kspw);
             } else {
-                kspw = net.i2p.crypto.KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
+                kspw = KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
             }
             if (!net.i2p.i2ptunnel.web.IndexBean.haveNonce(nonce)) {
                 msgs.append(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."))
@@ -186,7 +186,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         altNames.add("www." + name);
                     if (altb32 != null && altb32.length() > 0)
                         altNames.add(altb32);
-                    altNames.addAll(spoofs.values());
+                    for (String s : spoofs.values()) {
+                         // only add if apparently local, don't expose IP if routed externally
+                         if (s.startsWith("127.") || s.startsWith("192.168.") || s.startsWith("10."))
+                             altNames.add(s);
+                    }
                     File ks = new File(ksPath);
                     if (ks.exists()) {
                         // old ks if any must be moved or deleted, as any keys
@@ -202,8 +206,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         boolean haveEC = net.i2p.crypto.SigType.ECDSA_SHA256_P256.isAvailable();
                         String alg = haveEC ? "EC" : "RSA";
                         int sz = haveEC ? 256 : 2048;
-                        Object[] rv = net.i2p.crypto.KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
-                                                                                   3652, alg, sz, newpw);
+                        Object[] rv = KeyStoreUtil.createKeysAndCRL(ks, kspw, "eepsite", name, altNames, b32,
+                                                                    3652, alg, sz, newpw);
                         msgs.append("Created selfsigned cert\n");
                         // save cert
                         java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) rv[2];
