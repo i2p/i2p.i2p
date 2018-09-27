@@ -65,13 +65,13 @@ class SybilRenderer {
     private static final double POINTS_US32 = 25.0;
     private static final double POINTS_US24 = 25.0;
     private static final double POINTS_US16 = 10.0;
-    private static final double POINTS_FAMILY = -2.0;
+    private static final double POINTS_FAMILY = -10.0;
     private static final double POINTS_BAD_OUR_FAMILY = 100.0;
     private static final double POINTS_OUR_FAMILY = -100.0;
     private static final double MIN_CLOSE = 242.0;
     private static final double PAIR_DISTANCE_FACTOR = 2.0;
     private static final double OUR_KEY_FACTOR = 4.0;
-    private static final double MIN_DISPLAY_POINTS = 5.0;
+    private static final double MIN_DISPLAY_POINTS = 12.01;
     private static final double VERSION_FACTOR = 1.0;
     private static final double POINTS_BAD_VERSION = 50.0;
     private static final double POINTS_UNREACHABLE = 4.0;
@@ -560,7 +560,7 @@ class SybilRenderer {
             int i = ii.intValue();
             int i0 = i >> 8;
             int i1 = i & 0xff;
-            String sip = i0 + "." + i1 + ".0/16";
+            String sip = i0 + "." + i1 + ".0.0/16";
             buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
                .append(sip).append("&amp;sybil\">").append(sip)
                .append("</a></b></p>");
@@ -587,7 +587,7 @@ class SybilRenderer {
     }
 
     private void renderIPGroupsFamily(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        buf.append("<h3 id=\"samefamily\" class=\"sybils\">Floodfills in the Same Declared Family</h3><div class=\"sybil_container\">");
+        buf.append("<h3 id=\"samefamily\" class=\"sybils\">Floodfills in the same Family</h3><div class=\"sybil_container\">");
         ObjectCounter<String> oc = new ObjectCounter<String>();
         for (RouterInfo info : ris) {
             String fam = info.getOption("family");
@@ -619,13 +619,13 @@ class SybilRenderer {
                 double point = POINTS_FAMILY;
                 if (fkc != null && s.equals(ourFamily)) {
                     if (fkc.verifyOurFamily(info))
-                        addPoints(points, info.getHash(), POINTS_OUR_FAMILY, "Our family \"" + DataHelper.escapeHTML(s) + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                        addPoints(points, info.getHash(), POINTS_OUR_FAMILY, "Our family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
                     else
-                        addPoints(points, info.getHash(), POINTS_BAD_OUR_FAMILY, "Spoofed our family \"" + DataHelper.escapeHTML(s) + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                        addPoints(points, info.getHash(), POINTS_BAD_OUR_FAMILY, "Spoofed our family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
                 } else if (count > 1) {
-                    addPoints(points, info.getHash(), point, "Same declared family \"" + DataHelper.escapeHTML(s) + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                    addPoints(points, info.getHash(), point, "In family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
                 } else {
-                    addPoints(points, info.getHash(), point, "Declared family \"" + DataHelper.escapeHTML(s) + '"');
+                    addPoints(points, info.getHash(), point, "In family \"" + ss + '"');
                 }
             }
         }
