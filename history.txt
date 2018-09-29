@@ -1,3 +1,27 @@
+2018-09-26 zzz
+ * Crypto: Avoid privkey conversion when generating CRL,
+   failing on Android for unknown reasons (ticket #2296)
+ * IRC: Make inbound whitelist static
+ * Router: Don't add 'O' cap for P/X anymore
+
+2018-09-24 zzz
+ * Build: Compile jsps in-order for reproducibility (ticket #2279)
+
+2018-09-23 zzz
+ * Plugins: Blacklist neodatis and seedless for Java 9+ (ticket #2295)
+
+2018-09-22 zzz
+ * NTCP:
+   - Fix handling of multiple connections
+   - Change termination code for expired RI
+
+2018-09-16 zzz
+ * Build: Fix hang with Tomcat 8.5.33+ (ticket #2307)
+ * Tomcat 8.5.34
+
+2018-08-27 zzz
+ * Debian: Prevent dup version (ticket #2300)
+
 2018-08-26 zzz
  * NTCP2: Publish outbound address after transition to firewalled
 

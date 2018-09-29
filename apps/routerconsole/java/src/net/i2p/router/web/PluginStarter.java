@@ -36,6 +36,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
@@ -78,10 +79,26 @@ public class PluginStarter implements Runnable {
     public static final Map<String, String> jetty9Blacklist;
 
     static {
-        Map<String, String> map = new HashMap<String, String>(4);
+        Map<String, String> map = new HashMap<String, String>(2);
         map.put("i2pbote", "0.4.5");
         map.put("BwSchedule", "0.0.36");
         jetty9Blacklist = Collections.unmodifiableMap(map);
+    }
+
+    /**
+     *  Plugin name to plugin version of plugins that do not work
+     *  with Java 9+
+     *  Unmodifiable.
+     *
+     *  @since 0.9.30
+     */
+    public static final Map<String, String> java9Blacklist;
+
+    static {
+        Map<String, String> map = new HashMap<String, String>(2);
+        map.put("01_neodatis", "2.1-2.14-209-17");
+        map.put("02_seedless", "0.1.7-0.1.12");
+        java9Blacklist = Collections.unmodifiableMap(map);
     }
 
     public PluginStarter(RouterContext ctx) {
@@ -360,6 +377,18 @@ public class PluginStarter implements Runnable {
             disablePlugin(appName);
             foo = gettext("Plugin requires Jetty version {0} or lower", "8.9999", ctx);
             throw new Exception(foo);
+        }
+
+        if (SystemVersion.isJava9()) {
+            blacklistVersion = java9Blacklist.get(appName);
+            if (blacklistVersion != null &&
+                VersionComparator.comp(curVersion, blacklistVersion) <= 0) {
+                String foo = "Plugin " + appName + " requires Jetty version 8.9999 or lower";
+                log.error(foo);
+                disablePlugin(appName);
+                foo = gettext("Plugin requires Java version {0} or lower", "8.9999", ctx);
+                throw new Exception(foo);
+            }
         }
 
         String maxVersion = stripHTML(props, "max-jetty-version");

@@ -24,18 +24,8 @@ abstract class IRCFilter {
     /** does not override DCC handling */
     private static final boolean ALLOW_ALL_CTCP_OUT = false;
 
-    /*************************************************************************
-     *
-     *  Modify or filter a single inbound line.
-     *
-     *  @param helper may be null
-     *  @return the original or modified line, or null if it should be dropped.
-     */
-    public static String inboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
-        
-        String field[] = DataHelper.split(s, " ", 4);
-        String command;
-        int idx=0;
+    private static final Set<String> _allowedInbound;
+    static {
         final String[] allowedCommands =
         {
                 // "NOTICE", // can contain CTCP
@@ -57,6 +47,21 @@ abstract class IRCFilter {
                 "PROTOCTL",
                 "AWAY"
         };
+        _allowedInbound = new HashSet<String>(Arrays.asList(allowedCommands));
+    }
+
+    /*************************************************************************
+     *
+     *  Modify or filter a single inbound line.
+     *
+     *  @param helper may be null
+     *  @return the original or modified line, or null if it should be dropped.
+     */
+    public static String inboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
+        
+        String field[] = DataHelper.split(s, " ", 4);
+        String command;
+        int idx=0;
         
 
         try {
@@ -94,8 +99,7 @@ abstract class IRCFilter {
         }
         
         // Allow all allowedCommands
-        for(int i=0;i<allowedCommands.length;i++) {
-            if(allowedCommands[i].equals(command))
+        if (_allowedInbound.contains(command)) {
                 return s;
         }
         

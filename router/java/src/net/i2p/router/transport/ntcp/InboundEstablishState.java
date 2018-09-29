@@ -1002,8 +1002,9 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             }
         } catch (IllegalArgumentException iae) {
             // hash collision?
-            _msg3p2FailReason = NTCPConnection.REASON_UNSPEC;
-            throw new DataFormatException("RI store fail", iae);
+            // expired RI?
+            _msg3p2FailReason = NTCPConnection.REASON_MSG3;
+            throw new DataFormatException("RI store fail: " + ri, iae);
         }
         _con.setRemotePeer(_aliceIdent);
     }

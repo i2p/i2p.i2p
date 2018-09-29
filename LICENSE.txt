@@ -297,7 +297,7 @@ Applications:
    Systray (systray.jar):
    Public domain.
 
-   Tomcat 8.5.30 (jasper-runtime.jar):
+   Tomcat 8.5.34 (jasper-runtime.jar):
    (not included in most distribution packages)
    Copyright 1999-2018 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt

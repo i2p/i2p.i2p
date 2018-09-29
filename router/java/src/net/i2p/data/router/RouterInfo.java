@@ -336,15 +336,12 @@ public class RouterInfo extends DatabaseEntry {
         if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);
 
             _identity.writeBytes(out);
-            // avoid thrashing objects
-            //DataHelper.writeDate(out, new Date(_published));
             DataHelper.writeLong(out, 8, _published);
+            // There shouldn't be any addresses when hidden, but if there are,
+            // write them out, so as not to invalidate the signature
             int sz = _addresses.size();
-            if (sz <= 0 || isHidden()) {
-                // Do not send IP address to peers in hidden mode
-                out.write((byte) 0);
-            } else {
-                out.write((byte) sz);
+            out.write((byte) sz);
+            if (sz > 0) {
                 for (RouterAddress addr : _addresses) {
                     addr.writeBytes(out);
                 }
