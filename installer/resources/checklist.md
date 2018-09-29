@@ -20,7 +20,7 @@
 - mtn ci geoip.txt geoipv6.dat.gz
 
 - BuildTime: Don't have to do this every release, but update the
-  EARLIEST and EARLIEST_LONG values in ~/mtn/i2p/core/java/src/net/i2p/time/BuildTime.java
+  EARLIEST and EARLIEST_LONG values in core/java/src/net/i2p/time/BuildTime.java
   to the current date, more or less.
 
 - Tickets: Check if any blocker or critical tickets for this release remain open;
