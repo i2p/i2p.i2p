@@ -64,6 +64,7 @@
   /usr/share/java/standard-*.jar                          r,
   /usr/share/java/tomcat8-*.jar                           r,
   /usr/share/java/taglibs-standard-*.jar                  r,
+  /usr/share/flags/countries/16x11/*                      r,
 
   # GeoIP data
   /usr/share/GeoIP/*                                      r,
@@ -81,8 +82,14 @@
   # Scrypt used by I2P-Bote
   owner /{,lib/live/mount/overlay/}tmp/scrypt*            rwk,
   owner /{,lib/live/mount/overlay/}tmp/scrypt*/**         rw,
+
+  # temp dir (service)
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwkm,
+  # temp dir (non-service)
+  owner /{,lib/live/mount/overlay/}tmp/i2p-*.tmp/         rwm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-*.tmp/**       rwkm,
+
   # /graphs in the router console
   owner /{,lib/live/mount/overlay/}tmp/imageio[0-9]*.tmp  rwk,
 
