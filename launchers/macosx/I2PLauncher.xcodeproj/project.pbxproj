@@ -9,17 +9,21 @@
 /* Begin PBXBuildFile section */
 		BF07789721506C810014EB07 /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF07789621506C810014EB07 /* Storyboard.storyboard */; };
 		BF07789E21506D2B0014EB07 /* PopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF07789C21506D2B0014EB07 /* PopoverViewController.swift */; };
+		BF14B70F215C98DC0014EB07 /* LoggerWorker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF14B70D215C98DC0014EB07 /* LoggerWorker.cpp */; };
+		BF14B710215C98DC0014EB07 /* Logger.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF14B70E215C98DC0014EB07 /* Logger.mm */; };
+		BF14B712215D9E040014EB07 /* FolderContentMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */; };
 		BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA39215140E60014EB07 /* SBridge.mm */; };
 		BF1EFA40215141110014EB07 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA3D215141100014EB07 /* main.mm */; };
 		BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA3E215141100014EB07 /* RouterTask.mm */; };
 		BF1EFA47215141640014EB07 /* base.zip in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA44215141630014EB07 /* base.zip */; };
 		BF1EFA48215141640014EB07 /* ItoopieTransparent.png in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA45215141640014EB07 /* ItoopieTransparent.png */; };
+		BF3143FE2160C1BD0014EB07 /* DownloadJavaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF3143FD2160C1BD0014EB07 /* DownloadJavaViewController.swift */; };
+		BF4AA39F215AA58B0014EB07 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF4AA39E215AA58B0014EB07 /* NetworkExtension.framework */; };
 		BF5061702113C48E0014EB07 /* I2PLauncher.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BF50616E2113C48E0014EB07 /* I2PLauncher.xcdatamodeld */; };
 		BF5061722113C4900014EB07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF5061712113C4900014EB07 /* Assets.xcassets */; };
 		BF5061752113C4900014EB07 /* UserInterfaces.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF5061732113C4900014EB07 /* UserInterfaces.xib */; };
 		BF5061962113C84E0014EB07 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5061952113C84E0014EB07 /* Cocoa.framework */; };
 		BF5315072150C55B0014EB07 /* RouterRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5315062150C55B0014EB07 /* RouterRunner.swift */; };
-		BF5315092150C6760014EB07 /* RouterDeployer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5315082150C6760014EB07 /* RouterDeployer.swift */; };
 		BF53150B2150C6E80014EB07 /* I2PSubprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF53150A2150C6E80014EB07 /* I2PSubprocess.swift */; };
 		BF53150D2150CE310014EB07 /* DateTimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF53150C2150CE310014EB07 /* DateTimeUtils.swift */; };
 		BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */; };
@@ -46,13 +50,33 @@
 		BFDD81DA2156B3E30014EB07 /* RouterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDD81D92156B3E30014EB07 /* RouterManager.swift */; };
 		BFE16BF82156C61E0014EB07 /* RouterStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */; };
 		BFE16BFA2156DAED0014EB07 /* EventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE16BF92156DAED0014EB07 /* EventManager.swift */; };
+		BFE16BFE2156FD2A0014EB07 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFE16BFD2156FD290014EB07 /* Sparkle.framework */; };
+		BFE16C002156FD9E0014EB07 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BFE16BFD2156FD290014EB07 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */; };
-		BFF4581C213C48EA0014EB07 /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF4581B213C48EA0014EB07 /* EventMonitor.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BFE16BFF2156FD890014EB07 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BFE16C002156FD9E0014EB07 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BF07789621506C810014EB07 /* Storyboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		BF07789C21506D2B0014EB07 /* PopoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverViewController.swift; sourceTree = "<group>"; };
+		BF14B70B215C98DC0014EB07 /* LoggerWorker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LoggerWorker.hpp; sourceTree = SOURCE_ROOT; };
+		BF14B70C215C98DC0014EB07 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = SOURCE_ROOT; };
+		BF14B70D215C98DC0014EB07 /* LoggerWorker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoggerWorker.cpp; sourceTree = SOURCE_ROOT; };
+		BF14B70E215C98DC0014EB07 /* Logger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Logger.mm; sourceTree = SOURCE_ROOT; };
+		BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderContentMonitor.swift; sourceTree = "<group>"; };
+		BF14B714215DA3330014EB07 /* version.h.tpl */ = {isa = PBXFileReference; lastKnownFileType = text; path = version.h.tpl; sourceTree = "<group>"; };
 		BF1EFA38215140E60014EB07 /* SBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBridge.h; sourceTree = SOURCE_ROOT; };
 		BF1EFA39215140E60014EB07 /* SBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBridge.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3B215141100014EB07 /* RouterTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterTask.h; sourceTree = SOURCE_ROOT; };
@@ -63,6 +87,9 @@
 		BF1EFA44215141630014EB07 /* base.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = base.zip; sourceTree = "<group>"; };
 		BF1EFA45215141640014EB07 /* ItoopieTransparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ItoopieTransparent.png; sourceTree = "<group>"; };
 		BF1EFA46215141640014EB07 /* launcher.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = launcher.jar; sourceTree = "<group>"; };
+		BF3143FD2160C1BD0014EB07 /* DownloadJavaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadJavaViewController.swift; sourceTree = "<group>"; };
+		BF3143FF2160CA350014EB07 /* logger_c.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = logger_c.h; sourceTree = "<group>"; };
+		BF4AA39E215AA58B0014EB07 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/NetworkExtension.framework; sourceTree = DEVELOPER_DIR; };
 		BF5061682113C48E0014EB07 /* I2PLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = I2PLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF50616F2113C48E0014EB07 /* I2PLauncher.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = I2PLauncher.xcdatamodel; sourceTree = "<group>"; };
 		BF5061712113C4900014EB07 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -71,7 +98,6 @@
 		BF5061792113C4900014EB07 /* I2PLauncher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = I2PLauncher.entitlements; sourceTree = "<group>"; };
 		BF5061952113C84E0014EB07 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		BF5315062150C55B0014EB07 /* RouterRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterRunner.swift; sourceTree = "<group>"; };
-		BF5315082150C6760014EB07 /* RouterDeployer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterDeployer.swift; sourceTree = "<group>"; };
 		BF53150A2150C6E80014EB07 /* I2PSubprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I2PSubprocess.swift; sourceTree = "<group>"; };
 		BF53150C2150CE310014EB07 /* DateTimeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTimeUtils.swift; sourceTree = "<group>"; };
 		BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouterProcessStatus+ObjectiveC.swift"; sourceTree = "<group>"; };
@@ -100,10 +126,9 @@
 		BFDD81D92156B3E30014EB07 /* RouterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterManager.swift; sourceTree = "<group>"; };
 		BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterStatusView.swift; sourceTree = "<group>"; };
 		BFE16BF92156DAED0014EB07 /* EventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventManager.swift; sourceTree = "<group>"; };
-		BFE16BFB2156E94E0014EB07 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../../Sparkle/build/Release/Sparkle.framework; sourceTree = "<group>"; };
+		BFE16BFD2156FD290014EB07 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		BFF45818213C428E0014EB07 /* I2PLauncher-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "I2PLauncher-Bridging-Header.h"; sourceTree = "<group>"; };
-		BFF4581B213C48EA0014EB07 /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,7 +137,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */,
+				BF4AA39F215AA58B0014EB07 /* NetworkExtension.framework in Frameworks */,
 				BF865417215182820014EB07 /* Foundation.framework in Frameworks */,
+				BFE16BFE2156FD2A0014EB07 /* Sparkle.framework in Frameworks */,
 				BFBDCB0021505BEE0014EB07 /* AppKit.framework in Frameworks */,
 				BF5061962113C84E0014EB07 /* Cocoa.framework in Frameworks */,
 			);
@@ -142,6 +169,7 @@
 				BFBDCB03215060970014EB07 /* StatusBarController.swift */,
 				BF531514215105B40014EB07 /* LogViewController.swift */,
 				BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */,
+				BF3143FD2160C1BD0014EB07 /* DownloadJavaViewController.swift */,
 			);
 			path = userinterface;
 			sourceTree = "<group>";
@@ -149,6 +177,7 @@
 		BF50615F2113C48E0014EB07 = {
 			isa = PBXGroup;
 			children = (
+				BF14B714215DA3330014EB07 /* version.h.tpl */,
 				BF1EFA44215141630014EB07 /* base.zip */,
 				BF1EFA45215141640014EB07 /* ItoopieTransparent.png */,
 				BF1EFA46215141640014EB07 /* launcher.jar */,
@@ -169,12 +198,17 @@
 		BF50616A2113C48E0014EB07 /* I2PLauncher */ = {
 			isa = PBXGroup;
 			children = (
+				BF14B70E215C98DC0014EB07 /* Logger.mm */,
+				BF14B70C215C98DC0014EB07 /* Logger.h */,
+				BF14B70D215C98DC0014EB07 /* LoggerWorker.cpp */,
+				BF14B70B215C98DC0014EB07 /* LoggerWorker.hpp */,
 				BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */,
 				BF650CA82152AC7D0014EB07 /* Deployer.h */,
 				BF650CA72152AC7D0014EB07 /* Deployer.m */,
 				BF650CA62152AC7D0014EB07 /* dmgconfig.py */,
 				BF1EFA42215141220014EB07 /* include */,
 				BF1EFA3F215141110014EB07 /* AppDelegate.h */,
+				BF3143FF2160CA350014EB07 /* logger_c.h */,
 				BF1EFA3D215141100014EB07 /* main.mm */,
 				BF1EFA3B215141100014EB07 /* RouterTask.h */,
 				BF1EFA3E215141100014EB07 /* RouterTask.mm */,
@@ -199,7 +233,8 @@
 		BF5061922113C6ED0014EB07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BFE16BFB2156E94E0014EB07 /* Sparkle.framework */,
+				BF4AA39E215AA58B0014EB07 /* NetworkExtension.framework */,
+				BFE16BFD2156FD290014EB07 /* Sparkle.framework */,
 				BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */,
 				BF865416215182820014EB07 /* Foundation.framework */,
 				BF865414215180F60014EB07 /* libswiftDarwin.tbd */,
@@ -216,7 +251,6 @@
 				BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */,
 				BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */,
 				BF5315062150C55B0014EB07 /* RouterRunner.swift */,
-				BF5315082150C6760014EB07 /* RouterDeployer.swift */,
 				BF53150A2150C6E80014EB07 /* I2PSubprocess.swift */,
 				BFDD81D92156B3E30014EB07 /* RouterManager.swift */,
 			);
@@ -226,12 +260,12 @@
 		BF5315052150C4AB0014EB07 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				BFF4581B213C48EA0014EB07 /* EventMonitor.swift */,
 				BFBDCAF9215050810014EB07 /* ReflectionFunctions.swift */,
 				BFBDCAF52150428D0014EB07 /* StringExtensions.swift */,
 				BFBDCAF7215047FE0014EB07 /* ArrayExtensions.swift */,
 				BF53150C2150CE310014EB07 /* DateTimeUtils.swift */,
 				BFE16BF92156DAED0014EB07 /* EventManager.swift */,
+				BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -243,10 +277,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF50617C2113C4900014EB07 /* Build configuration list for PBXNativeTarget "I2PLauncher" */;
 			buildPhases = (
+				BF14B713215DA1460014EB07 /* ShellScript */,
 				BF5061642113C48E0014EB07 /* Sources */,
 				BF5061652113C48E0014EB07 /* Frameworks */,
 				BF1EFA4B215142030014EB07 /* ShellScript */,
 				BF5061662113C48E0014EB07 /* Resources */,
+				BFE16BFF2156FD890014EB07 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -275,8 +311,11 @@
 							com.apple.ApplicationGroups.Mac = {
 								enabled = 0;
 							};
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
 							com.apple.NetworkExtensions = {
-								enabled = 0;
+								enabled = 1;
 							};
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -322,6 +361,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		BF14B713215DA1460014EB07 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nversion=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFOPLIST_FILE}\"`\ncommit=`mtn heads --branch=i2p.i2p | awk '{ print $1 }' | head -n 1`\nbuildinfo=\"Built $(date), $commit\"\n\n# Use cat to avoid any potential alias of cp asking for overwrite of file.\ncat $SRCROOT/version.h.tpl > $SRCROOT/version.h\nsed -i '' \"s#VERSION_REPLACED_BY_XCODE_BUILD_SCRIPT#$version#\" $SRCROOT/version.h\nsed -i '' \"s#BUILD_INFO_REPLACED_BY_XCODE_BUILD_SCRIPT#$buildinfo#\" $SRCROOT/version.h\n\n$SRCROOT/check_latest_java.sh\n\n";
+		};
 		BF1EFA4B215142030014EB07 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -333,7 +389,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run from launchers/macosx\nexport BUILDDIR=$(pwd)\ncd ..\nsbt macosx:assembly\ncd ..\nant preppkg-osx\ncd pkg-temp\nrm -f ../base.zip\nzip -r -v -9 ../base.zip *\ncp ../base.zip $BUILDDIR/base.zip\ncd $BUILDDIR\ncp $BUILDDIR/target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar $BUILDDIR/launcher.jar\n\n\n\n";
+			shellScript = "# Run from launchers/macosx\nset -x\n\n# Warning to keep clean files\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" \\) -print0 | xargs -0 wc -l | awk '$1 > 200 && $2 != \"total\" { print $2 \":1: warning: file more than 200 lines\" }'\n\nexport BUILDDIR=$(pwd)\nexport MACOSX_SOURCE_DIR=$SRCROOT\nexport I2P_SOURCE_DIR=$(realpath $SRCROOT/../..)\ncd $MACOSX_SOURCE_DIR/..\n# TODO: Find out why sbt hangs when executed in cli\n#./sbt \";macosx:assembly\"\ncd ..\ncd $I2P_SOURCE_DIR\nant preppkg-osx\ncd pkg-temp\nrm -f $BUILDDIR/base.zip\nzip -r -v -9 $BUILDDIR/base.zip *\ncd $MACOSX_SOURCE_DIR\ncp $MACOSX_SOURCE_DIR/target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar $BUILDDIR/launcher.jar\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -347,7 +403,6 @@
 				BF5315072150C55B0014EB07 /* RouterRunner.swift in Sources */,
 				BFE16BFA2156DAED0014EB07 /* EventManager.swift in Sources */,
 				BFBDCAF12150420C0014EB07 /* ExecutionResult.swift in Sources */,
-				BF5315092150C6760014EB07 /* RouterDeployer.swift in Sources */,
 				BFE16BF82156C61E0014EB07 /* RouterStatusView.swift in Sources */,
 				BFBDCAEF215041E30014EB07 /* Error.swift in Sources */,
 				BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */,
@@ -360,13 +415,16 @@
 				BF650CAB2152AC7D0014EB07 /* Deployer.m in Sources */,
 				BF1EFA40215141110014EB07 /* main.mm in Sources */,
 				BFBDCAF4215042670014EB07 /* AppleStuffExceptionHandler.m in Sources */,
+				BF3143FE2160C1BD0014EB07 /* DownloadJavaViewController.swift in Sources */,
 				BF531515215105B40014EB07 /* LogViewController.swift in Sources */,
 				BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */,
+				BF14B712215D9E040014EB07 /* FolderContentMonitor.swift in Sources */,
 				BFBDCAFE2150567D0014EB07 /* SwiftMainDelegate.swift in Sources */,
 				BFDD81DA2156B3E30014EB07 /* RouterManager.swift in Sources */,
 				BF53150B2150C6E80014EB07 /* I2PSubprocess.swift in Sources */,
-				BFF4581C213C48EA0014EB07 /* EventMonitor.swift in Sources */,
 				BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */,
+				BF14B70F215C98DC0014EB07 /* LoggerWorker.cpp in Sources */,
+				BF14B710215C98DC0014EB07 /* Logger.mm in Sources */,
 				BFBDCAF62150428D0014EB07 /* StringExtensions.swift in Sources */,
 				BF5061702113C48E0014EB07 /* I2PLauncher.xcdatamodeld in Sources */,
 				BFBDCAEB215041630014EB07 /* TaskPipeline.swift in Sources */,
@@ -506,21 +564,21 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = W3C42P2LA8;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks,
 					/System/Library/Frameworks,
+					"$(PROJECT_DIR)",
 				);
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/include",
-					"$(SRCROOT)/include/neither",
-				);
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/include";
 				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = include;
 				INFOPLIST_FILE = I2PLauncher/Info.plist;
 				LD_NO_PIE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.I2PLauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -542,21 +600,21 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = W3C42P2LA8;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks,
 					/System/Library/Frameworks,
+					"$(PROJECT_DIR)",
 				);
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/include",
-					"$(SRCROOT)/include/neither",
-				);
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/include";
 				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = include;
 				INFOPLIST_FILE = I2PLauncher/Info.plist;
 				LD_NO_PIE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.I2PLauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";

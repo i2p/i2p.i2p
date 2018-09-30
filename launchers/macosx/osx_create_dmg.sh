@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 . .sign-secrets
 
 APP_NAME="I2PLauncher"
 VERSION="0.9.36"
-DMG_BACKGROUND_IMG="Background.png"
+DMG_BACKGROUND_IMG="${DIR}/Background.png"
 
 APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
 VOL_NAME="${APP_NAME} ${VERSION}"
@@ -61,7 +62,6 @@ sleep 2
 echo "Add link to /Applications"
 pushd /Volumes/"${VOL_NAME}"
 ln -s /Applications
-popd
 
 # add a background image
 mkdir /Volumes/"${VOL_NAME}"/.background
