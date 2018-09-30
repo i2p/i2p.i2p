@@ -32,11 +32,15 @@
 #include "include/subprocess.hpp"
 #include "include/strutil.hpp"
 
-using namespace subprocess;
+#include "Logger.h"
+#include "LoggerWorker.hpp"
 
+using namespace subprocess;
 #endif
 
 #define debug(format, ...) CFShow([NSString stringWithFormat:format, ## __VA_ARGS__]);
+
+
 
 @interface AppDelegate () <NSUserNotificationCenterDelegate, NSApplicationDelegate>
 @end
@@ -68,6 +72,7 @@ using namespace subprocess;
   
   std::string basePath(homeDir);
   basePath.append("/Library/I2P");
+  
   auto jarResPath = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
   NSLog(@"Trying to load launcher.jar from url = %@", jarResPath);
   self.metaInfo.jarFile = jarResPath;
@@ -196,6 +201,7 @@ using namespace subprocess;
 
   NSBundle *launcherBundle = [NSBundle mainBundle];
   
+  
   // Helper object to hold statefull path information
   self.metaInfo = [[ExtractMetaInfo alloc] init];
   self.metaInfo.i2pBase = [NSString stringWithUTF8String:i2pBaseDir.c_str()];
@@ -288,12 +294,25 @@ using namespace subprocess;
 }
 @end
 
-
+#ifdef __cplusplus
+namespace {
+  const std::string logDirectory = getDefaultLogDir();
+}
+#endif
 
 int main(int argc, const char **argv)
 {
   NSApplication *app = [NSApplication sharedApplication];
 
+#ifdef __cplusplus
+  mkdir(logDirectory.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
+  
+  SharedLogWorker logger("I2PLauncher", logDirectory);
+  MeehLog::initializeLogging(&logger);
+  
+  MLOG(INFO) << "Application is starting up";
+#endif
+  
   AppDelegate *appDelegate = [[AppDelegate alloc] initWithArgc:argc argv:argv];
   app.delegate = appDelegate;
   auto mainBundle = [NSBundle mainBundle];
@@ -304,8 +323,11 @@ int main(int argc, const char **argv)
     
     [NSApp terminate:nil];
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   [NSBundle loadNibNamed:@"I2Launcher" owner:NSApp];
-
+#pragma GCC diagnostic pop
+  
   [NSApp run];
   return 0;
 }

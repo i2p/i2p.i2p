@@ -18,6 +18,7 @@ This is some Swift code which makes the application use events to signal the dif
 | router_pid | the pid number as string | Triggered when we know the pid of the router subprocess |
 | router_version | the version string | Triggered when we have successfully extracted current I2P version |
 | extract_errored | the error message | Triggered if the process didn't exit correctly |
+| router_already_running | an error message | Triggered if any processes containing i2p.jar in name/arguments already exists upon router launch |
 
 ## Misc
 
@@ -34,4 +35,13 @@ You can both build the project from the Xcode UI or you can build it from comman
 An example build command:
 `xcodebuild -target I2PLauncher -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk`
 
+
+## Objective-C / Swift Links
+
+* https://nshipster.com/at-compiler-directives/
+* https://developer.apple.com/documentation/swift/cocoa_design_patterns/handling_cocoa_errors_in_swift
+* https://content.pivotal.io/blog/rails-to-ios-what-the-are-these-symbols-in-my-code
+* https://mackuba.eu/2008/10/05/learn-objective-c-in-30-minutes/
+* https://en.wikipedia.org/wiki/Objective-C
+* http://cocoadevcentral.com/d/learn_objectivec/
 

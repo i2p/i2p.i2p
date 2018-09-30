@@ -20,6 +20,9 @@
 
 #import <AppKit/AppKit.h>
 #import "I2PLauncher-Swift.h"
+#include "LoggerWorker.hpp"
+#include "Logger.h"
+#include "logger_c.h"
 
 #include "AppDelegate.h"
 #include "include/fn.h"
@@ -28,27 +31,39 @@
 
 std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir, RouterProcessStatus* routerStatus) {
   @try {
-    RTaskOptions* options = [RTaskOptions alloc];
-    options.binPath = javaBin;
-    options.arguments = arguments;
-    options.i2pBaseDir = i2pBaseDir;
-    auto instance = [[I2PRouterTask alloc] initWithOptions: options];
-    
-    [[SBridge sharedInstance] setCurrentRouterInstance:instance];
-    [instance execute];
-    sendUserNotification(APP_IDSTR, @"The I2P router is starting up.");
-    auto pid = [instance getPID];
-    NSLog(@"Got pid: %d", pid);
-    if (routerStatus != nil) {
-      [routerStatus setRouterStatus: true];
-      [routerStatus setRouterRanByUs: true];
-      [routerStatus triggerEventWithEn:@"router_start" details:@"normal start"];
-      [routerStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
+    IIProcessInfo* processInfoObj = [[IIProcessInfo alloc] init];
+    [processInfoObj obtainFreshProcessList];
+    auto anyRouterLookingProcs = [processInfoObj findProcessWithStringInNameOrArguments:@"i2p.jar"];
+    if (anyRouterLookingProcs) {
+      auto errMessage = @"Seems i2p is already running - I've detected another process with i2p.jar in it's arguments.";
+      NSLog(@"%@", errMessage);
+      sendUserNotification(APP_IDSTR, errMessage);
+      [routerStatus triggerEventWithEn:@"router_already_running" details:@"won't start - another router is running"];
+      return std::async(std::launch::async, []{
+        return -1;
+      });
+    } else {
+      RTaskOptions* options = [RTaskOptions alloc];
+      options.binPath = javaBin;
+      options.arguments = arguments;
+      options.i2pBaseDir = i2pBaseDir;
+      auto instance = [[I2PRouterTask alloc] initWithOptions: options];
+      
+      [[SBridge sharedInstance] setCurrentRouterInstance:instance];
+      [instance execute];
+      sendUserNotification(APP_IDSTR, @"The I2P router is starting up.");
+      auto pid = [instance getPID];
+      NSLog(@"Got pid: %d", pid);
+      if (routerStatus != nil) {
+        // TODO: Merge events router_start and router_pid ?
+        [routerStatus triggerEventWithEn:@"router_start" details:@"normal start"];
+        [routerStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
+      }
+      
+      return std::async(std::launch::async, [&pid]{
+        return pid;
+      });
     }
-    
-    return std::async(std::launch::async, [&pid]{
-      return pid;
-    });
   }
   @catch (NSException *e)
   {
@@ -92,7 +107,7 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
   const char * basePath = [i2pPath UTF8String];
   auto jarList = buildClassPathForObjC(basePath);
   const char * classpath = jarList.c_str();
-  NSLog(@"Classpath from ObjC = %s", classpath);
+  MLog(0, @"Classpath from ObjC = %s", classpath);
   return [[NSString alloc] initWithUTF8String:classpath];
 }
 
@@ -105,14 +120,17 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
   auto classPathStr = buildClassPathForObjC(basePath);
   
   RouterProcessStatus* routerStatus = [[RouterProcessStatus alloc] init];
+  
+  NSString *confDir = [NSString stringWithFormat:@"%@/Application\\ Support/i2p", NSHomeDirectory()];
+  
   try {
     std::vector<NSString*> argList = {
       @"-Xmx512M",
       @"-Xms128m",
       @"-Djava.awt.headless=true",
-      @"-Dwrapper.logfile=/tmp/router.log",
+      [NSString stringWithFormat:@"-Dwrapper.logfile=%@/router.log", [NSString stringWithUTF8String:getDefaultLogDir().c_str()]],
       @"-Dwrapper.logfile.loglevel=DEBUG",
-      @"-Dwrapper.java.pidfile=/tmp/routerjvm.pid",
+      [NSString stringWithFormat:@"-Dwrapper.java.pidfile=%@/router.pid", confDir],
       @"-Dwrapper.console.loglevel=DEBUG"
     };
     
