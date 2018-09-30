@@ -34,6 +34,8 @@ Documentation for C++ subprocessing libraray.
 #ifndef SUBPROCESS_HPP
 #define SUBPROCESS_HPP
 
+#ifdef __cplusplus
+
 #include <map>
 #include <algorithm>
 #include <iostream>
@@ -697,19 +699,19 @@ template <typename... T> struct param_pack{};
 template <typename F, typename T> struct has_type;
 
 template <typename F>
-struct has_type<F, param_pack<>> {
+struct has_type<F, param_pack<> > {
   static constexpr bool value = false;
 };
 
 template <typename F, typename... T>
-struct has_type<F, param_pack<F, T...>> {
+struct has_type<F, param_pack<F, T...> > {
   static constexpr bool value = true;
 };
 
 template <typename F, typename H, typename... T>
-struct has_type<F, param_pack<H,T...>> {
+struct has_type<F, param_pack<H,T...> > {
   static constexpr bool value =
-    std::is_same<F, typename std::decay<H>::type>::value ? true : has_type<F, param_pack<T...>>::value;
+    std::is_same<F, typename std::decay<H>::type>::value ? true : has_type<F, param_pack<T...> >::value;
 };
 
 //----
@@ -1528,7 +1530,7 @@ namespace detail
   template<typename F, typename... Args>
   OutBuffer check_output_impl(F& farg, Args&&... args)
   {
-    static_assert(!detail::has_type<output, detail::param_pack<Args...>>::value, "output not allowed in args");
+    static_assert(!detail::has_type<output, detail::param_pack<Args...> >::value, "output not allowed in args");
     auto p = Popen(std::forward<F>(farg), std::forward<Args>(args)..., output{PIPE});
     auto res = p.communicate();
     auto retcode = p.poll();
@@ -1626,5 +1628,7 @@ OutBuffer pipeline(Args&&... args)
 }
 
 };
+
+#endif // __cplusplus
 
 #endif // SUBPROCESS_HPP

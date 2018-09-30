@@ -10,6 +10,8 @@
 #include <locale>
 #include "optional.h"
 
+#import <Foundation/NSString.h>
+
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFArray.h>
 #include <CoreFoundation/CFString.h>
@@ -96,6 +98,15 @@ static inline std::string rtrim_copy(std::string s) {
 static inline std::string trim_copy(std::string s) {
     trim(s);
     return s;
+}
+
+NSString* stdStringToNSString(std::string &stdstr) {
+  return [NSString stringWithUTF8String:stdstr.c_str()];
+}
+
+std::string nsStringToStd(NSString* nsStr) {
+  const char *charlist = [nsStr UTF8String];
+  return std::string(charlist);
 }
 
 #if __cplusplus > 201402L

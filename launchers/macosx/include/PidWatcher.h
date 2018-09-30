@@ -8,7 +8,7 @@
 using callbackType = void (CFFileDescriptorRef, CFOptionFlags, void *);
 using HandleFunction = std::function<void(int)>;
 
-static void noteProcDeath(CFFileDescriptorRef fdref, CFOptionFlags callBackTypes, void *info) {
+static inline void noteProcDeath(CFFileDescriptorRef fdref, CFOptionFlags callBackTypes, void *info) {
     struct kevent kev;
     int fd = CFFileDescriptorGetNativeDescriptor(fdref);
     kevent(fd, NULL, 0, &kev, 1, NULL);
