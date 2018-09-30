@@ -36,16 +36,22 @@ class LogViewerViewController : NSTabViewItem {
 
       let output = self.outputPipe?.fileHandleForReading.availableData
       let outputString = String(data: output!, encoding: String.Encoding.utf8) ?? ""
-      
-      DispatchQueue.main.async(execute: {
+      let workTask = DispatchWorkItem {
         let previousOutput = self.textFieldView?.string ?? ""
         let nextOutput = previousOutput + "\n" + outputString
         self.textFieldView?.string = nextOutput
         
         let range = NSRange(location:nextOutput.characters.count,length:0)
         self.textFieldView?.scrollRangeToVisible(range)
-        
+      }
+      DispatchQueue.main.async(execute: workTask)
+      
+      // When router stop, stop the stream as well. If not it will go wild and create high cpu load
+      RouterManager.shared().eventManager.listenTo(eventName: "router_stop", action: {
+        NSLog("Time to cancel stream!")
+        workTask.cancel()
       })
+      
       
       self.outputPipe?.fileHandleForReading.waitForDataInBackgroundAndNotify()
     }
