@@ -43,44 +43,38 @@ void genericLogger(int loglevel, va_list params) {
 }
  */
 
-void MLog(int loglevel, NSString* format, ...)
+inline void MLog(int loglevel, NSString* format, ...)
 {
 #ifdef __cplusplus
-  static NSDateFormatter* timeStampFormat;
-  if (!timeStampFormat) {
-    timeStampFormat = [[NSDateFormatter alloc] init];
-    [timeStampFormat setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSS"];
-    [timeStampFormat setTimeZone:[NSTimeZone systemTimeZone]];
-  }
-  
-  NSString* timestamp = [timeStampFormat stringFromDate:[NSDate date]];
   
   va_list vargs;
   va_start(vargs, format);
   NSString* formattedMessage = [[NSString alloc] initWithFormat:format arguments:vargs];
   va_end(vargs);
   
-  NSString* message = [NSString stringWithFormat:@"<%@> %@", timestamp, formattedMessage];
+  NSString* message = formattedMessage;
   
   switch (loglevel) {
     case 0:
-      MLOGF(ANNOYING) << message;
+      MLOG(ANNOYING) << [message UTF8String];
       break;
     case 1:
-      MLOGF(DEBUG) << message;
+      MLOG(DEBUG) << [message UTF8String];
       break;
     case 2:
-      MLOGF(INFO) << message;
+      MLOG(INFO) << [message UTF8String];
       break;
     case 3:
-      MLOGF(WARN) << message;
+      MLOG(WARN) << [message UTF8String];
       break;
     case 4:
-      MLOGF(ERROR) << message;
+      MLOG(ERROR) << [message UTF8String];
       break;
     default:
 #if DEBUG
       assert(false);
+#else
+      return;
 #endif
   }
   
