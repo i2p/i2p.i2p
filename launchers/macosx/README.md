@@ -28,6 +28,13 @@ However, this is a thin wrapper launching both Mac OS X trayicon and the I2P rou
 
 More code will be merged in, it's just a f* mess which Meeh needs to clean up and move into repo.
 
+### Java Auto Downloader
+
+We got a quite reliable source regarding the download url,
+https://github.com/Homebrew/homebrew-cask/raw/master/Casks/java.rb
+
+Homebrew is quite well maintained on OSX and any updates at Oracle should quickly reflect to brew, which again will be noticed upon builds.
+
 ## Howto build
 
 You can both build the project from the Xcode UI or you can build it from command line.
