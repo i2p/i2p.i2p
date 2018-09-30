@@ -1,5 +1,6 @@
 #ifndef SHAREDQUEUE_H__
 #define SHAREDQUEUE_H__
+// Public domain
 
 #include <queue>
 #include <mutex>

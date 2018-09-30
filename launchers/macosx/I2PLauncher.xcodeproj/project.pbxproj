@@ -29,7 +29,6 @@
 		BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */; };
 		BF531515215105B40014EB07 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF531514215105B40014EB07 /* LogViewController.swift */; };
 		BF650CA92152AC7D0014EB07 /* bumpInfoPlist.sh in Resources */ = {isa = PBXBuildFile; fileRef = BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */; };
-		BF650CAA2152AC7D0014EB07 /* dmgconfig.py in Resources */ = {isa = PBXBuildFile; fileRef = BF650CA62152AC7D0014EB07 /* dmgconfig.py */; };
 		BF650CAB2152AC7D0014EB07 /* Deployer.m in Sources */ = {isa = PBXBuildFile; fileRef = BF650CA72152AC7D0014EB07 /* Deployer.m */; };
 		BF7506CB21509CFD0014EB07 /* RouterProcessStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */; };
 		BF86541321515CA00014EB07 /* launcher.jar in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA46215141640014EB07 /* launcher.jar */; };
@@ -103,7 +102,6 @@
 		BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouterProcessStatus+ObjectiveC.swift"; sourceTree = "<group>"; };
 		BF531514215105B40014EB07 /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = bumpInfoPlist.sh; sourceTree = SOURCE_ROOT; };
-		BF650CA62152AC7D0014EB07 /* dmgconfig.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = dmgconfig.py; sourceTree = SOURCE_ROOT; };
 		BF650CA72152AC7D0014EB07 /* Deployer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Deployer.m; sourceTree = SOURCE_ROOT; };
 		BF650CA82152AC7D0014EB07 /* Deployer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Deployer.h; sourceTree = SOURCE_ROOT; };
 		BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterProcessStatus.swift; sourceTree = "<group>"; };
@@ -205,7 +203,6 @@
 				BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */,
 				BF650CA82152AC7D0014EB07 /* Deployer.h */,
 				BF650CA72152AC7D0014EB07 /* Deployer.m */,
-				BF650CA62152AC7D0014EB07 /* dmgconfig.py */,
 				BF1EFA42215141220014EB07 /* include */,
 				BF1EFA3F215141110014EB07 /* AppDelegate.h */,
 				BF3143FF2160CA350014EB07 /* logger_c.h */,
@@ -348,7 +345,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF86541321515CA00014EB07 /* launcher.jar in Resources */,
-				BF650CAA2152AC7D0014EB07 /* dmgconfig.py in Resources */,
 				BF650CA92152AC7D0014EB07 /* bumpInfoPlist.sh in Resources */,
 				BF07789721506C810014EB07 /* Storyboard.storyboard in Resources */,
 				BF5061722113C4900014EB07 /* Assets.xcassets in Resources */,
