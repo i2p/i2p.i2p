@@ -36,7 +36,7 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     auto anyRouterLookingProcs = [processInfoObj findProcessWithStringInNameOrArguments:@"i2p.jar"];
     if (anyRouterLookingProcs) {
       auto errMessage = @"Seems i2p is already running - I've detected another process with i2p.jar in it's arguments.";
-      NSLog(@"%@", errMessage);
+      MLog(4, @"%@", errMessage);
       sendUserNotification(APP_IDSTR, errMessage);
       [routerStatus triggerEventWithEn:@"router_already_running" details:@"won't start - another router is running"];
       return std::async(std::launch::async, []{
@@ -53,11 +53,20 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
       [instance execute];
       sendUserNotification(APP_IDSTR, @"The I2P router is starting up.");
       auto pid = [instance getPID];
-      NSLog(@"Got pid: %d", pid);
+      MLog(2, @"Got pid: %d", pid);
       if (routerStatus != nil) {
         // TODO: Merge events router_start and router_pid ?
         [routerStatus triggerEventWithEn:@"router_start" details:@"normal start"];
         [routerStatus triggerEventWithEn:@"router_pid" details:[NSString stringWithFormat:@"%d", pid]];
+      }
+      NSString *applicationSupportDirectory = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) firstObject];
+      auto pidFile = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/i2p/router.pid", applicationSupportDirectory]];
+      NSError *err;
+      
+      if (![[NSString stringWithFormat:@"%d", pid] writeToURL:pidFile atomically:YES encoding:NSUTF8StringEncoding error:&err]) {
+        MLog(4, @"Error; %@", err);
+      } else {
+        MLog(3, @"Wrote pid file to %@", pidFile);
       }
       
       return std::async(std::launch::async, [&pid]{
@@ -68,7 +77,7 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
   @catch (NSException *e)
   {
     auto errStr = [NSString stringWithFormat:@"Expection occurred %@",[e reason]];
-    NSLog(@"%@", errStr);
+    MLog(4, @"%@", errStr);
     sendUserNotification(APP_IDSTR, errStr);
     [[SBridge sharedInstance] setCurrentRouterInstance:nil];
     
@@ -121,7 +130,7 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
   
   RouterProcessStatus* routerStatus = [[RouterProcessStatus alloc] init];
   
-  NSString *confDir = [NSString stringWithFormat:@"%@/Application\\ Support/i2p", NSHomeDirectory()];
+  NSString *confDir = [NSString stringWithFormat:@"%@/Library/Application\\ Support/i2p", NSHomeDirectory()];
   
   try {
     std::vector<NSString*> argList = {
@@ -156,13 +165,13 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     auto nsBasePath = i2pRootPath;
     NSArray* arrArguments = [NSArray arrayWithObjects:&argList[0] count:argList.size()];
     
-    NSLog(@"Trying to run command: %@", javaBinPath);
-    NSLog(@"With I2P Base dir: %@", i2pRootPath);
-    NSLog(@"And Arguments: %@", arrArguments);
+    MLog(0, @"Trying to run command: %@", javaBinPath);
+    MLog(0, @"With I2P Base dir: %@", i2pRootPath);
+    MLog(0, @"And Arguments: %@", arrArguments);
     startupRouter(nsJavaBin, arrArguments, nsBasePath, routerStatus);
   } catch (std::exception &err) {
     auto errMsg = [NSString stringWithUTF8String:err.what()];
-    NSLog(@"Exception: %@", errMsg);
+    MLog(4, @"Exception: %@", errMsg);
     sendUserNotification(APP_IDSTR, [NSString stringWithFormat:@"Error: %@", errMsg]);
     [routerStatus setRouterStatus: false];
     [routerStatus setRouterRanByUs: false];
