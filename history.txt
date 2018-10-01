@@ -1,3 +1,6 @@
+2018-10-01 zzz
+ * Pull translations from tx
+
 2018-09-26 zzz
  * Crypto: Avoid privkey conversion when generating CRL,
    failing on Android for unknown reasons (ticket #2296)
