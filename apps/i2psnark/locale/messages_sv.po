@@ -14,6 +14,7 @@
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2011-2012
 # Jonatan Nyberg, 2017
+# Jonatan Nyberg, 2018
 # Jonatan Nyberg, 2017-2018
 # Martin Svensson <digitalmannen@gmail.com>, 2011-2012
 # mon <mattias.ohlsson@inprose.com>, 2012
@@ -23,8 +24,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2018-08-08 18:52+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-09-15 01:57+0000\n"
+"Last-Translator: Jonatan Nyberg\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -661,7 +662,7 @@ msgstr "TX"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:616
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3202
 msgid "Upload ratio"
-msgstr "Upload ratio"
+msgstr "Sändningsförhållande"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:616
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:617

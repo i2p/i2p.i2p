@@ -1,0 +1,56 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "26 يناير 2017" "" I2P
+
+.SH اسم
+i2prouter \- بدء تشغيل وإيقاف موجه I2P
+
+.SH موجز
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH وصف
+التحكم في خدمة I2P.
+
+.IP \fBconsole\fP
+تشغيل I2P كتطبيق كونسول تحت المستخدم الحالي.
+
+.IP \fBstart\fP
+بدء تشغيل خدمة I2P.
+
+.IP \fBstop\fP
+إيقاف تشغيل خدمة I2P.
+
+.IP \fBrestart\fP
+إيقاف تشغيل خدمة I2P ثمّ إعادة تشغيلها.
+
+.IP \fBcondrestart\fP
+إعادة تشغيل خدمة I2P إذا كانت مسبقًا قيد التّشغيل.
+
+.IP \fBgraceful\fP
+إيقاف تشغيل I2P بشكل أمن (قد يستغرق ما يصل إلى 11 دقيقة)
+
+.IP \fBinstall\fP
+قم بتثبيت initscript لبدء تشغيل I2P تلقائيًا عند تشغيل النّظام.
+
+.IP \fBremove\fP
+إزالة تثبيت الـ initscript الّذي تمّ مسبقًا تثبيته مع \fBinstall\fP
+
+.IP \fBstatus\fP
+اطبع ما إذا كانت خدمة I2P قيد التشغيل.
+
+.IP \fBdump\fP
+تفريغ مؤشرات الترابط الحالية في \fBwrapper.log\fP.
+
+.SH "اﻹبلاغ عن اﻷخطاء"
+الرجاء إدخال تذكرة على
+.UR https://trac.i2p2.de/
+صفحة I2P لمتابعة المشاكل
+.UE .
+
+.SH "انظر أيضًا إلى"
+\fBi2prouter\-nowrapper\fP(1)

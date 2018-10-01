@@ -5,10 +5,11 @@
 # 
 # Translators:
 # bassmax, 2014
+# AO <ao@localizationlab.org>, 2018
 #   Box0a590, 2012
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
-# French language coordinator <french.coordinator@rbox.me>, 2017-2018
+# AO <ao@localizationlab.org>, 2017-2018
 # Boxoa590, 2012
 # Towinet, 2015-2016
 # zzzi2p, 2017
@@ -17,8 +18,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-13 18:18+0000\n"
-"PO-Revision-Date: 2018-06-15 16:52+0000\n"
-"Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
+"PO-Revision-Date: 2018-09-07 14:13+0000\n"
+"Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,7 +88,7 @@ msgstr "La partie ({0}) n’est pas affichée, à cause de {1}"
 #: src/src/i2p/susi/webmail/WebMail.java:644
 #, java-format
 msgid "Download attachment {0}"
-msgstr "Télécharger la pièce jointe {0}"
+msgstr "Télécharger le fichier joint {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:645
 msgid "File is packed into a zipfile for security reasons."
@@ -96,7 +97,7 @@ msgstr "Le fichier est compressé dans un fichier zip par sécurité."
 #: src/src/i2p/susi/webmail/WebMail.java:650
 #, java-format
 msgid "Attachment ({0})."
-msgstr "Pièce jointe ({0})."
+msgstr "Fichier joint ({0})."
 
 #: src/src/i2p/susi/webmail/WebMail.java:710
 msgid "Need username for authentication."
@@ -209,7 +210,7 @@ msgstr "Aucun encodage n’a été trouvé pour {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1575
 msgid "Attachment not found."
-msgstr "La pièce jointe est introuvable."
+msgstr "Le fichier joint est introuvable."
 
 #. error if we get here
 #: src/src/i2p/susi/webmail/WebMail.java:1604
@@ -387,19 +388,19 @@ msgstr "Objet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3028
 msgid "Add Attachment"
-msgstr "Ajouter une pièce jointe"
+msgstr "Ajouter un fichier joint"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3028
 msgid "Add another attachment"
-msgstr "Ajouter une autre pièce jointe"
+msgstr "Ajouter un autre fichier joint"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3034
 msgid "Attachments"
-msgstr "Pièces jointes"
+msgstr "Fichiers joints"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3043
 msgid "Delete selected attachments"
-msgstr "Supprimer les pièces jointes sélectionnées"
+msgstr "Supprimer les fichiers joints sélectionnés"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3060
 msgid "Email Login"
@@ -479,7 +480,7 @@ msgstr "Le message est nouveau"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3201
 msgid "Message has an attachment"
-msgstr "Le message contient une pièce jointe"
+msgstr "Le message contient un fichier joint"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3203
 msgid "Message is spam"

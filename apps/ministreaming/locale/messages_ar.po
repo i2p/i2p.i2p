@@ -1,0 +1,94 @@
+# I2P
+# Copyright (C) 2014 The I2P Project
+# This file is distributed under the same license as the streaming package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Tashigi OP, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2018-09-20 19:01+0000\n"
+"Last-Translator: Tashigi OP\n"
+"Language-Team: Arabic (http://www.transifex.com/otf/I2P/language/ar/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
+msgid "Message timeout"
+msgstr "نفذ وقت الرسالة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
+msgid "Failed delivery to local destination"
+msgstr "فشل التسليم إلى الوجهة المحلية"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
+msgid "Local router failure"
+msgstr "فشل الموجه المحلي"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:78
+msgid "Local network failure"
+msgstr "فشلت الشبكة المحلية"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
+msgid "Session closed"
+msgstr "الجلسة مغلقة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
+msgid "Invalid message"
+msgstr "رسالة غير صالحة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
+msgid "Invalid message options"
+msgstr "خيارات الرسائل غير صالحة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
+msgid "Buffer overflow"
+msgstr "تجاوز سعة المخزن المؤقت"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
+msgid "Message expired"
+msgstr "انتهت الرسالة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
+msgid "Local lease set invalid"
+msgstr "تعيين العقد المحلي غير صالح"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
+msgid "No local tunnels"
+msgstr "لا توجد أنفاق محلية"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
+msgid "Unsupported encryption options"
+msgstr "خيارات التشفير غير مدعومة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
+msgid "Invalid destination"
+msgstr "عنوان غير موجود"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
+msgid "Destination lease set expired"
+msgstr "انتهى تعيين عقد الوجهة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
+msgid "Destination lease set not found"
+msgstr "لم يتم العثور على عقد الوجهة"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
+msgid "Local destination shutdown"
+msgstr "اغلاق الوجهة المحلية"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
+msgid "Connection was reset"
+msgstr "تمت إعادة ضبط الاتصال"
+
+#. Translate this one here, can't do it later
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
+msgid "Failure code"
+msgstr "فشلت الشفرة"

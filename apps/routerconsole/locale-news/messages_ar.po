@@ -4,13 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Tashigi OP, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2018-09-19 22:20+0000\n"
+"Last-Translator: Tashigi OP\n"
 "Language-Team: Arabic (http://www.transifex.com/otf/I2P/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr ""
+msgstr "تهانينا على تثبيتِ I2P!"
 
 msgid "Welcome to I2P!"
 msgstr "!I2P مرحبا بك في شبكة"
@@ -36,20 +37,20 @@ msgstr "بسنما يتم الإتصال {0}بتغير بيانات سرعة ا�
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr ""
+msgstr " كما يمكنك أيضًا إعداد متصفحك لاستخدام وكيل  I2P للوصول إلى eepsites - مواقع ويب يتم استضافتها بشكل مجهول داخل شبكة I2P -."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
+msgstr "فقط قم بإدخال 127.0.0.1 (أو المضيف المحليّ) على منفذ 4444 كوكيل http في إعدادات متصفحك."
 
 msgid "Do not use SOCKS for this."
-msgstr ""
+msgstr "لا تستخدم SOCKS - بروتوكول يقوم بتبادل حزم الشّبكة بين العميل والخادم عن طريق خادم الوكيل - لهذا الغرض."
 
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr ""
+msgstr "يمكن العثور على المزيد من المعلومات على {0}صفحة إعداد وكيل متصفح I2P{1}."
 
 #, java-format
 msgid ""
@@ -61,4 +62,4 @@ msgstr "عندما عندما تظهر عبارة \"shared clients\" على ال
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr ""
+msgstr "أشر بعميل IRC - تطبيق للمحادثة عبر الانترنت - الخاص بك إلى {0}المضيف المحليّ:6668{1}، وألقي السّلام علينا في {2}I2P{3}."

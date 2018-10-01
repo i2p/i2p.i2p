@@ -1,4 +1,5 @@
 installer/resources/man/eepget.1
+installer/resources/man/eepget.ar.1
 installer/resources/man/eepget.az.1
 installer/resources/man/eepget.de.1
 installer/resources/man/eepget.es.1
@@ -15,6 +16,7 @@ installer/resources/man/eepget.sv.1
 installer/resources/man/eepget.tr.1
 installer/resources/man/eepget.zh.1
 installer/resources/man/i2prouter-nowrapper.1
+installer/resources/man/i2prouter-nowrapper.ar.1
 installer/resources/man/i2prouter-nowrapper.az.1
 installer/resources/man/i2prouter-nowrapper.de.1
 installer/resources/man/i2prouter-nowrapper.es.1

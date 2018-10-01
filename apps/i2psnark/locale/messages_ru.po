@@ -23,14 +23,15 @@
 # vertnis, 2015
 # Foster Snowhill, 2013
 # yume, 2014-2015
+# yume, 2018
 # zzzi2p, 2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2018-08-08 18:52+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-08-29 00:03+0000\n"
+"Last-Translator: yume\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1602,11 +1603,11 @@ msgstr "Проверить целостность содержимого ска�
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3294
 msgid "Download files in order"
-msgstr ""
+msgstr "Скачать файлы по порядку"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3295
 msgid "Download pieces in order"
-msgstr ""
+msgstr "Скачать части по порядку"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3302
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3644

@@ -43,79 +43,81 @@
 <b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
-      The Base32 address may be used as a hostname, until you assign a register a name following the instructions below.
-      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
+<p>I2P üzerinde, gizli hizmetler için ".b32.i2p" ile biten bir Base32 adresi ya da uzun bir Base64 dizgesi ile belirtilen bir Hedef kullanılır.
+      Base32 adresi, aşağıdaki yönergeleri izleyerek bir adres kayıt etmenize kadar sunucu adı olarak kullanılabilir.
+      Hedef ise bir tür IP adresi gibidir ve <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Hizmet Yapılandırma sayfasında</a> görüntülenir.</p>
 
-    <p>The instructions below detail how to assign a name like "mysite.i2p" to your website and enable access by others.
-       You may reach your site locally via <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
+    <p>Websitenize "sitem.i2p" gibi bir adın atanması ve diğerleri tarafından görülebilmesi ile ilgili yönergeleri aşağıda bulabilirsiniz.
+       Sitenize yerel olarak <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a> adresinden erişebilirsiniz.</p>
 
-    <h2>How to set up and announce your hidden service</h2>
+    <h2>Gizli hizmetinizi kurmak ve duyurmak için ne yapmalısınız</h2>
 
-     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
-      After you start your I2P Webserver tunnel, it will be difficult for other people to find
-      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
-      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
-      Here are detailed instructions.</p>
+     <p>Web sunucunuz varsayılan olarak çalışır ancak gizli hizmet tünelini başlatmadan diğerleri tarafından erişilemez.
+      I2P web sunucu tünelini başlatmanızdan sonra da diğer kişilerin erişmesi zor olur
+      Web sitesine yalnız uzun Hedef ya da Hedefin bir karması olan daha kısa Base32 adresi (.b32.i2p) kullanılarak erişilebilir.
+      Diğer kişilere Hedef ya da Base32 adresini söyeleyebilirsiniz ama neyse ki I2P üzerinde bir adres defteri ve diğer kişilere web sitenizi bildirmenin bir kaç farklı yolu var.
+      Ayrıntılı bilgiler şu şekilde.</p>
 
     <ul>
-<li>Pick a name for your website (<i>something</i>.i2p), using lower-case.
-        You may wish to check first in your own router's <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a> to see if your name is already taken.
-        Enter the new name for your website on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a> where it says "Website name".
-        This will replace the default "mysite.i2p".
-        Also, if you would like your I2P Webserver tunnel to be automatically started when you start I2P, check the "Auto Start" box.
-        Your website will now start every time you start your router.
-        Be sure to click "Save".</li>
-      <li>Click the start button for your webserver tunnel on the <a href="http://127.0.0.1:7657/i2ptunnel/">main Hidden Service Manager page</a>.
-         You should now see it listed under "Local Tunnels" on the left side of the <a href="http://127.0.0.1:7657/">I2P Router Console</a>.
-         Your website is now running.</li>
-      <li>Highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
-         Make sure you copy the whole thing, it is over 500 characters.</li>
-      <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>.
-         Click "Add" to save the new entry.</li>
-      <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
-          Hopefully it worked!</li>
-      <li>Before you tell the world about your new website, you should add some content.
-          Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.</li>
+<li>Web siteniz için küçük harflerden oluşan bir ad seçin (<i>birsey</i>.i2p).
+        Kendi yönelticinizin <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">adres defterini</a> denetleyerek kullanmak istediğiniz adın daha önce alınmış olup olmadığına bakmanız iyi olur.
+        <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Hizmet Yapılandırma bölümünde</a> "Web Sitesi Adı" alanına web sitenizin yeni adını yazın.
+        Böylece varsayılan "mysite.i2p" adı değiştirilir.
+        Ayrıca I2P başlatıldığında I2P web sunucu tünelinin de otomatik olarak başlatılmasını istiyorsanız "Otomatik Başlatılsın" seçeneğini işaretleyin.
+        Böylece yönelticinizi başlattığınızda web siteniz de başlatılmış olur.
+        "Kaydet" üzerine tıklamayı unutmayın.</li>
+      <li>
+<a href="http://127.0.0.1:7657/i2ptunnel/">Ana Gizli Hizmet Yapılandırma bölümündeki</a> başlat düğmesine tıklayın.
+         <a href="http://127.0.0.1:7657/">I2P Yöneltici Konsolunun</a> sol tarafında "Yerel Tüneller" altındaki listede görebilmeniz gerekir.
+         Web siteniz çalışmaya başladı.</li>
+      <li>
+<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Hizmet Yapılandırma bölümündeki</a> Yerel hedefin tamamını seçip kopyalayın.
+         Metnin tamamını kopyaladığınızdan emin olun, 500 karakterden uzundur.</li>
+      <li>Adı yazın ve hedefi <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">adres defterinize kaydedin</a>.
+         Yeni kaydı tamamlamak için "Ekle" üzerine tıklayın.</li>
+      <li>Web tarayıcınızda web sitenizin adını yazın (<i>birsey</i>.i2p) sitenizi görebilmelisiniz. 
+          Umuyoruz işinize yaramıştır!</li>
+      <li>Sitenizi duyurmadan önce bazı içerikler eklemeniz iyi olur.
+          Sunucunun <a href="#dir">yukarıda görüntülenen</a> kök klasörüne gidin ve index.html yönlendirme sayfasını kendi içeriğiniz ile değiştirin.</li>
     </ul>
-<p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files. 
-      You may change the appearance of the directory by supplying an edited <a href="lib/jetty-dir.css">jetty-dir.css</a> file for each directory.
-      The <a href="lib/">lib subdirectory</a> demonstrates a custom style.
-      The <a href="lib/resources">resources subdirectory</a> demonstrates the default style.
-      If you need a template for a basic site, feel free to adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">associated content</a>.</p>
+<p>Klasör listelemesi yapılabilir. Yani dosya bağlantılarının bulunduğu bir sayfa kullanmadan bir alt klasör içinden dosyalar sunabilirsiniz. 
+      Her klasörün görünümünü düzenlenmiş bir <a href="lib/jetty-dir.css">jetty-dir.css</a> biçem dosyası kullanarak isteğinize göre ayarlayabilirsiniz.
+      <a href="lib/">lib alt klasörü</a> özel bir biçemde görüntülenir.
+      <a href="lib/resources">resources alt klasörü</a> varsayılan biçemde görüntülenir.
+      Basit bir site için bir kalıba gerek duyuyorsanız <a href="pagetemplate.html">bu sayfayı</a> ve <a href="lib/">ilgili içeriği</a> uyarlayabilirsiniz.</p>
 
-    <p>If you're returned to this page after editing the content, try clearing your browser's web cache:</p>
+    <p>İçeriği düzenledikten sonra bu sayfaya döndürüldüyseniz, web tarayıcınızın ön belleğini temizlemeyi deneyin:</p>
 
     <ul>
 <li>
-<b>Firefox:</b> Preferences ➜ Advanced ➜ Network ➜ Cached Web Content ➜ Clear Now</li>
+<b>Firefox:</b> Seçenekler ➜ Gizlilik ve Güvenlik ➜ Çerezler ve site verileri ➜ Temizle ➜ Ön belleğe alınmış web içeriği ➜ Temizle</li>
       <li>
-<b>Chrome/Chromium:</b> Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data</li>
+<b>Chrome/Chromium:</b> Sağ menü ➜ Diğer Araçlar ➜ Privacy ➜ Tarayıcı verilerini temizle</li>
       <li>
-<b>Opera:</b> Settings ➜ Privacy ➜ Clear browsing data</li>
+<b>Opera:</b> Ayarlar ➜ Gizlilik ➜ Tarayıcı verilerini temizle</li>
     </ul>
-<h2>Register your own I2P Domain</h2>
+<h2>Kendi I2P etki alanınızı kaydedin</h2>
 
-    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> or <a href="http://no.i2p/" target="_blank">no.i2p</a>. 
-      You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.</p>
-<p>Some registration sites require the Destination.
-      If so, highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
-      Make sure you copy the whole thing, it is over 500 characters.</p>
-<p>Some registration sites, including <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, require the Registration Authentication string.
-      It is found on the <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication page</a> linked from the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service configuration page</a>.
-      Copy the entire authentication string and paste it on the registration page. 
-      Make sure you copy the whole thing, it is over 500 characters.
-      Describe your site briefly if the site requests this information.
-      If your site is a HTTP service, leave the checkbox selected; if not, unselect it.</p>
-<p>For all registration sites, read through the Terms of Service carefully.
-      Click the "Submit" button.
-      Verify the submission was successful.
-      Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply entering your hostname in their browser.</p>
+    <p>Şimdi web sitenizi I2P adres defterinin barındırıldığı <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> ya da <a href="http://no.i2p/" target="_blank">no.i2p</a> bir siteye ekleme zamanı.
+  Bu sitelerin biri ya da bir kaçına web sitenizin adını ve hedefi (ya da Kayıt Kimlik Doğrulama dizgesini) yazmalısınız.</p>
+<p>Bazı kayıt sitelerine Hedef bilgisinin yazılması gereklidir.
+      Bu durumda <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Hizmet Yapılandırma bölümünden</a> yerel hedefin tamamını seçip kopyalayın.
+      Metnin tamamını kopyaladığınızdan emin olun, 500 karakterden uzundur.</p>
+<p><a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a> gibi bazı kayıt siteleri için Kayıt Kimlik Doğrulama dizgesi gereklidir.
+      Bu bilgi <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Hizmet Yapılandırma bölümünden</a> erişilebilecek <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Kayıt Kimlik Doğrulama sayfasında</a> bulunabilir.
+      Kimlik doğrulama dizgesinin tamamını seçip kopyalayın ve kayıt sayfasına yapıştırın. 
+      Metnin tamamını kopyaladığınızdan emin olun, 500 karakterden uzundur.
+      Web sitenizin açıklaması isteniyorsa kısa bir açıklama yazın.
+      Siteniz bir HTTP hizmeti ise işaret kutusunu işaretlenmiş olarak bırakın; değilse, işareti kaldırın.</p>
+<p>Tüm kayıt siteleri için Hizmet Koşulları metnini dikkatlice okuyun.
+      "Gönder" düğmesine tıklayın.
+      Gönderimin sorunsuz tamamlandığından emin olun.
+      Çoğu yöneltici bu sitelerden düzenli olarak adres defteri güncellemelerini alır. Bir kaç saat içinde web tarayıcınızın adres satırına sunucu adınızı yazarak web sitenize erişebilmeniz gerekir.</p>
 
-    <h2>Adding Addressbook Subscriptions</h2>
+    <h2>Adres Defteri Abonelikleri Eklemek</h2>
 
-    <p>Speaking of address book updates, this would be a good time to add some more addressbooks to your own subscription list.
-       Go to your <a href="http://127.0.0.1:7657/susidns/subscriptions">Subscriptions Configuration page</a> and add one or more for an automatically updated list of new hosts:</p>
+    <p>Adres defteri güncellemelerinden bahsetmişken, abonelik listenize bazı adres defterleri ekleyebilirsiniz.
+       <a href="http://127.0.0.1:7657/susidns/subscriptions">Abonelik Yapılandırma Bölümünüze</a> gidin ve bir ya da bir kaç otomatik güncellenen sunucu listesi ekleyin:</p>
 
     <ul>
 <li>
@@ -123,59 +125,61 @@
       <li>
 <code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
-      This will work within a few minutes of your registering your hostname on the same site.
-      Test it yourself first by entering <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
-      Once it is working, you can tell others to use it.</p>
+<p>Aceleniz varsa ve bir kaç saat bekleyemeyecekseniz, insanlara "jump" adres yardımcısı yönlendirme hizmetini kullanmalarını söyleyebilirsiniz. 
+      Bu hizmet aynı siteye sunucu adınızı kayıt etmenizden birkaç dakika sonra çalışmaya başlar.
+      Bu hizmeti web tarayıcınıza <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>siteadresi</i>.i2p</code> yazarak deneyebilirsiniz. 
+      Çalıştığını gördükten sonra diğer kişilere de kullanmalarını söyleyebilirsiniz.</p>
 
-    <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
-      There are plenty of other ways to tell people. Here are a few ideas:</p>
+    <p>Bazı kişiler yeni eepsitelerini görmek için  <a href="http://identiguy.i2p/" target="_blank">Identiguy eepsite durum listesi</a> ya da <a href="http://no.i2p/browse/" target="_blank">no.i2p etkin sunucu listesi</a> gibi web sitesi listelerine bakar. Bu nedenle sitenize ziyaretler başlayabilir. 
+      Sitenizi diğer kişilere pek çok şekilde duyurabilirsiniz. Bir kaç öneri şu şekildedir:</p>
 
     <ul>
-<li>Post a message on the <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> telling everyone about your new I2P website!</li>
-      <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.</li>
-      <li>Put it on the <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>
-</li>
+<li>
+<a href="http://i2pforum.i2p/" target="_blank">I2P forumunda</a> yeni ISP web siteniz hakkında bir başlık açabilirsiniz!</li>
+      <li>IRC üzerinden #i2p ya da #i2p-chat kanallarına yazabilirsiniz.</li>
+      <li>
+<a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Dizinine</a> ekleyebilirsiniz</li>
     </ul>
-<p>Note that some sites recommend pasting in that really long destination.
-      You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
+<p>Bazı web sitelerinin gerçekten uzun hedefi yapıştırmanızı önereceğini unutmayın.
+      İstiyorsanız bunu yapabilirsiniz, ancak sunucu adınızı bir kayıt hizmeti üzerine kayıt ettiyseniz ve jump hizmetiyle çalıştığını gördükten sonra adres defteri güncellemesi ile diğer kişilere yayılması için 24 saat beklediyseniz buna gerek yoktur.</p>
 
-    <h2>Using an alternative webserver to host your site</h2>
+    <h2>Sitenizi barındırmak için alternatif bir web sunucusu kullanmak</h2>
 
-    <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content. 
-      To maintain anonymity, be sure that your webserver is configured to only allow connections from localhost (127.0.0.1), and check the documentation to ensure your webserver isn't advertising details that may compromise your anonymity.</p>
+    <p>Bu site (ve I2P yöneltici konsolu) Jetty web sunucusu üzerinde çalışır ancak içeriğinizi barındırmak için farklı bir web sunucusu kullanmak isteyebilirsiniz
+       Anonim kalmayı sağlamak için web sunucunuzun yalnız localhost (127.0.0.1) üzerinden gelen bağlantılara izin verecek şekilde yapılandırıldığından ve web sunucunuzun anonimliğinizi zedeleyebilecek bilgiler yayınlamaması için belgelere baktığınızdan emin olun.</p>
 
-     <p>To configure your webserver for use on I2P, you may either use the existing webserver tunnel and <a href="http://127.0.0.1:7657/configclients">disable the default webserver</a> from running, or create a new HTTP Server tunnel in the <a href="http://127.0.0.1:7657/i2ptunnelmgr">Hidden Services Manager</a>.
-       Ensure that the listening port configured for the webserver (7658 by default) is also configured in the Hidden Services settings.
-       For example, if your webserver is listening by default on address 127.0.0.1 port 80, you'd need to also ensure that the Target port in the Hidden Service Manager settings page for the service is also configured to port 80.</p> 
+     <p>Web sunucunuzu I2P üzerinde kullanılacak şekilde yapılandırmak için, var olan web sunucu tünelini kullanarak <a href="http://127.0.0.1:7657/configclients">varsayılan web sunucusunu devre dışı bırakıp</a> çalışmasını engelleyebileceğiniz gibi Gizli Hizmetler Yönetimi bölümünden yeni bir HTTP Sunucu tüneli oluşturabilirsiniz.
+       Web sunucusunun dinlediği kapı numarasının (varsayılan olarak 7658) Gizli Hizmet Ayarlarında da aynı şekilde yazıldığından emin olun.
+       Örneğin, web sunucunuz varsayılan olarak 127.0.0.1 adresinde 80 numaralı kapıyı dinliyorsa, Gizli Hizmet Yönetimi bölümünde Hedef kapı numarasının 80 olarak ayarlandığından emin olmalısınız.</p> 
 
-        <p>Beware that a poorly configured webserver or web appplication can leak potentially compromising information such as 
-          your real IP address or server details that may reduce your anonymity or assist a hacker.
-          We recommend using the default server unless you feel comfortable doing server administration.
-          Please ensure your web server is secure prior to placing it online.
-          There are plenty of guides online, for example if you search for "nginx security hardening guide" you will find a number of guides that have good recommendations.</p> 
+        <p>Hatalı yapılandırılmış bir web sunucusu ya da web uygulamasının gerçek IP adresiniz ya da sunucu bilgileriniz gibi 
+          anonimliğinizi azaltacak ya da bir saldırgana yardımcı olabilecek bilgiler yayabileceğini unutmayın.
+          Sunucu yönetimi konusunda yeterince bilgi sahibi değilseniz varsayılan sunucuyu kullanmanız önerilir.
+          Lütfen çevrimiçi yapmadan önce web sunucunuzun güvenli olduğundan emin olun.
+          Çok sayıda çevrimiçi belge bulabilirsiniz. Örneğin "nginx security hardening guide" ifadesini arayarak içinde iyi öneriler bulunan çeşitli rehberlere erişebilirsiniz.</p> 
 
-        <p>There is one important issue with the Apache web server.
-          The <code>mod_status</code> and <code>mod_info</code> Apache modules are enabled by default on some operating systems.
-          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
-          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
+        <p>Apache web sunucusu ile ilgili önemli bir sorun bulunuyor.
+          Bazı işletim sistemlerinde Apache <code>mod_status</code> ve <code>mod_info</code> modülleri varsayılan olarak etkinleştirilmiştir.
+          Bu modüller anonim bir ağ üzerinde kullanıldığında anonimliği önemli ölçüde zedeleyebilecek iç verilerin yayınlanmasına yol açabilir.
+          Bu sorunlardan kurtulmanın en kolay yolu yapılandırma dosyasından bu modüllerin yüklendiği satırları kaldırmaktır.</p>
 
-    <h2>Further Assistance</h2>
+    <h2>Daha Fazla Yardım Almak</h2>
 
-        <p>If you have any questions, the following places are available for support:</p>
+        <p>Sorularınız varsa destek almak için şuralara başvurabilirsiniz:</p>
 
         <ul>
-<li>Our IRC support channel:<ul>
-<li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
-                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
+<li>IRC destek kanalı:<ul>
+<li><a href="irc://irc.freenode.net/i2p">Freenode üzerinde #i2p</a></li>
+                <li>Yerel <a href="irc://127.0.0.1:6668/i2p">I2P IRC tünelinizi</a> anonim olarak kullanır.</li>
              </ul>
 </li>
-<li>The project forum <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
-            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
+<li>
+<a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a> proje forumu.</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite barındırma rehberi</a></li>
         </ul>
 <hr>
-<div class="notify">This page, the project website and the router console need translations!
-          Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.</div>
+<div class="notify">Bu sayfanın, proje web sitesinin ve yöneltici konsolunun çevirilmesi gerekiyor!
+          Lütfen projenin büyümesi için <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> katkıda bulunun</a> ya da <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">çevirilere destek olun</a>.</div>
         <hr>
 </div>
 </body>

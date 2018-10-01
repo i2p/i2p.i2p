@@ -17,14 +17,15 @@
 # mixxy, 2011
 # nextloop <ga25day@mytum.de>, 2013
 # pirr <pirr@tormail.org>, 2012
+# Forecast <taisto@web.de>, 2018
 # zeroflag <zeroflag@i2pmail.org>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2018-08-08 18:52+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2018-09-22 19:54+0000\n"
+"Last-Translator: Forecast <taisto@web.de>\n"
 "Language-Team: German (http://www.transifex.com/otf/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1578,11 +1579,11 @@ msgstr "Integrität der heruntergeladenen Dateien überprüfen."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3294
 msgid "Download files in order"
-msgstr ""
+msgstr "Dateien in Reihenfolge herunterladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3295
 msgid "Download pieces in order"
-msgstr ""
+msgstr "Teile in Reihenfolge herunterladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3302
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3644

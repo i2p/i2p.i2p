@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2018-08-19 20:19+0000\n"
+"PO-Revision-Date: 2018-09-04 01:11+0000\n"
 "Last-Translator: Masayuki Hatta <mhatta@mhatta.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -1889,25 +1889,25 @@ msgstr "無効なキー"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:42
 #, java-format
 msgid "Key for {0} added to keyring"
-msgstr ""
+msgstr "{0}のキーがキーリングに追加されました"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:50
 #, java-format
 msgid "Key for {0} removed from keyring"
-msgstr ""
+msgstr "{0}のキーがキーリングから削除されました"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:52
 #, java-format
 msgid "Key for {0} not found in keyring"
-msgstr ""
+msgstr "{0}のキーがキーリングに見つかりませんでした"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:32
 msgid "Local encrypted destinations"
-msgstr ""
+msgstr "ローカルの暗号化された宛先"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:34
 msgid "Remote encrypted destinations"
-msgstr ""
+msgstr "リモートの暗号化された宛先"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:44
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:440
@@ -1937,17 +1937,17 @@ msgstr "ログ設定が保存されました"
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:45
 #, java-format
 msgid "Add additional logging statements above (e.g. {0})."
-msgstr ""
+msgstr "上の追加的なロギングステートメントを追加 (例えば {0})。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:47
 #, java-format
 msgid "Alternatively, put entries in the file {0} (e.g. {1})."
-msgstr ""
+msgstr "他に、エントリをファイル{0}に追加(例えば{1})。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:51
 #, java-format
 msgid "Valid log levels are {0}."
-msgstr ""
+msgstr "有効なログレベルは{0}です。"
 
 #. Homeland Security Advisory System
 #. http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
@@ -2054,7 +2054,7 @@ msgstr "ネットワーク"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:361
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:387
 msgid "Summary Bar"
-msgstr "略式バー"
+msgstr "概要バー"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 msgid "UI"
@@ -2074,7 +2074,7 @@ msgstr "クライアント"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 msgid "Keyring"
-msgstr "キーホルダー"
+msgstr "キーリング"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 msgid "Logging"
@@ -2101,7 +2101,7 @@ msgstr "プラグイン"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
 msgid "Web Apps"
-msgstr ""
+msgstr "ウェブアプリ"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:342
@@ -2110,7 +2110,7 @@ msgstr "詳細"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 msgid "Router Family"
-msgstr ""
+msgstr "ルータファミリ"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:62
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:103
@@ -2149,7 +2149,7 @@ msgstr "着信 TCP を無効化中"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:281
 msgid "Updating inbound TCP address to auto"
-msgstr "着信 TCP アドレスをオートに更新中"
+msgstr "着信 TCP アドレスを「自動」に更新中"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:294
 #, java-format
@@ -2168,7 +2168,7 @@ msgstr "無効なポート"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:305
 msgid "Updating inbound TCP port to auto"
-msgstr "着信 TCP ポートをオートに更新中"
+msgstr "着信 TCP ポートを「自動」に更新中"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:319
 #, java-format
@@ -2177,11 +2177,11 @@ msgstr "UDP ポートを {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:344
 msgid "Gracefully restarting into Hidden Router Mode"
-msgstr "隠されたルーターモードにグレースフルに再起動"
+msgstr "隠されたルータモードに正常に再起動"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:346
 msgid "Gracefully restarting to exit Hidden Router Mode"
-msgstr "グレースフルに再起動し、隠されたルーターモードを終了"
+msgstr "正常に再起動し、隠されたルータモードを終了"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:356
 msgid "Enabling UPnP"
@@ -2209,11 +2209,11 @@ msgstr "着信 IPv4を有効化中"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:386
 msgid "Disabling inbound IPv6"
-msgstr ""
+msgstr "着信 IPv6 を無効化中"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:388
 msgid "Enabling inbound IPv6"
-msgstr ""
+msgstr "着信 IPv6 を有効化中"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:396
 msgid "Disabling UDP"
@@ -2243,7 +2243,7 @@ msgstr "共有帯域幅割合を更新中"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:514
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:529
 msgid "Invalid bandwidth"
-msgstr ""
+msgstr "無効な帯域幅"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:534
 msgid "Updated bandwidth limits"
@@ -2251,7 +2251,7 @@ msgstr "帯域幅制限を更新しました"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:249
 msgid "Add host name or IP"
-msgstr ""
+msgstr "ホスト名かIPを追加"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:283
 msgid "bits per second"
@@ -2260,7 +2260,7 @@ msgstr "毎秒ビット"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:285
 #, java-format
 msgid "{0}Bytes per month maximum"
-msgstr ""
+msgstr "月当たり最大{0}バイト"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:21
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:558
@@ -2327,24 +2327,24 @@ msgstr "非サポート"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:557
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:738
 msgid "Save changes and reseed now"
-msgstr "変更を保存し、今すぐリシード"
+msgstr "変更を保存し、今すぐ再シード"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:31
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:55
 msgid "Reseeding is already in progress"
-msgstr "リシードはすでに進行中です"
+msgstr "再シードはすでに進行中です"
 
 #. skip the nonce checking in ReseedHandler
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:35
 msgid "Starting reseed process"
-msgstr "リシードプロセスを開始"
+msgstr "再シードプロセスを開始"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:37
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:577
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:587
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:593
 msgid "Reseed from URL"
-msgstr "URLからリシード"
+msgstr "URLから再シード"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:43
 msgid "You must enter a URL"
@@ -2352,37 +2352,37 @@ msgstr "URLを入力する必要があります"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:68
 msgid "Reseed in progress, check summary bar for status"
-msgstr "リシード進行中、ステータスの概要バーをチェックしてください。"
+msgstr "再シード進行中、ステータスの概要バーをチェックしてください。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:70
 msgid "Reseed complete, check summary bar for status"
-msgstr "リシード完了、ステータスの概要バーをチェックしてください"
+msgstr "再シード完了、ステータスの概要バーをチェックしてください"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:77
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:569
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:601
 msgid "Reseed from file"
-msgstr "ファイルからリシード"
+msgstr "ファイルから再シード"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:88
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:96
 msgid "Reseed from file failed"
-msgstr "ファイルからのリシード失敗"
+msgstr "ファイルからの再シード失敗"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:91
 #, java-format
 msgid "Reseed successful, loaded {0} router info from file"
 msgid_plural "Reseed successful, loaded {0} router infos from file"
-msgstr[0] "リシード成功、ファイルから {0} 件のルータ情報を読み込みました"
+msgstr[0] "再シード成功、ファイルから {0} 件のルータ情報を読み込みました"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:105
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:647
 msgid "Reset URL list"
-msgstr ""
+msgstr "URLリストをリセット"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:131
 msgid "URL list reset successfully"
-msgstr ""
+msgstr "URLリストのリセットに成功しました"
 
 #. ctx.router().shutdown(Router.EXIT_HARD); // never returns
 #. give the UI time to respond
@@ -2429,7 +2429,7 @@ msgstr "{0} で再起動"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:119
 msgid "Stat filter and location updated successfully to"
-msgstr "統計フィルターとロケーションが正常に更新されました:"
+msgstr "統計フィルタとロケーションが正常に更新されました:"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:122
 msgid "Full statistics enabled"
@@ -2470,13 +2470,13 @@ msgstr "完全なデフォルトに戻す"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:43
 msgid "Full summary bar default restored."
-msgstr "完全な略式バーのデフォルトに戻りました"
+msgstr "完全な概要バーのデフォルトに戻りました"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:44
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:48
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:140
 msgid "Summary bar will refresh shortly."
-msgstr "略式バーはすぐに更新します。"
+msgstr "概要バーはすぐに更新されます。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:45
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:560
@@ -2485,7 +2485,7 @@ msgstr "最小のデフォルトに戻す"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:47
 msgid "Minimal summary bar default restored."
-msgstr "略式バーの最小のデフォルトに戻りました。"
+msgstr "最小の概要バーのデフォルトに戻りました。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:64
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:86
@@ -2634,7 +2634,7 @@ msgstr "ユーザー名が入力されていません"
 msgid ""
 "Warning: User names outside the ISO-8859-1 character set are not "
 "recommended. Support is not standardized and varies by browser."
-msgstr ""
+msgstr "警告: ISO-8859-1 文字セットの範囲外のユーザ名は推奨されません。サポートは標準化されておらず、ブラウザに依存します。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:109
 msgid "No password entered"
@@ -5743,7 +5743,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:572
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:485
 msgid "Applications and Configuration"
-msgstr ""
+msgstr "アプリケーションと設定"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:588
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:489

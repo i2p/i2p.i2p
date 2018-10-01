@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-13 18:18+0000\n"
-"PO-Revision-Date: 2018-06-13 18:35+0000\n"
+"PO-Revision-Date: 2018-08-20 10:47+0000\n"
 "Last-Translator: Robert Dafis <robertdafis@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -864,7 +864,7 @@ msgstr "Daftar jump URL"
 msgid ""
 "List of helper URLs providing jump links when a host is not found in your "
 "addressbook"
-msgstr ""
+msgstr "Daftar helper URL untuk menawarkan jumplinks ketika host tidak ditemukan dalam addressbook Anda"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:825
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1861
@@ -874,7 +874,7 @@ msgstr "Opsi pilihan"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:827
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1863
 msgid "Advanced tunnel, streaming, and I2CP options"
-msgstr ""
+msgstr "Advanced tunnel, streaming, dan opsi I2CP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:831
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1867
@@ -981,12 +981,12 @@ msgstr "Otentikasi Pendaftaran"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1120
 msgid "HTTPS configuration"
-msgstr ""
+msgstr "Pengaturan HTTPS"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1125
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:207
 msgid "SSL Wizard"
-msgstr ""
+msgstr "SSL Wizard "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1135
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1851
@@ -1641,7 +1641,7 @@ msgstr "Hasilkan Otentikasi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:166
 msgid "SSL Helper"
-msgstr ""
+msgstr "SSL Helper "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:632
 msgid "Experts only!"
@@ -1653,24 +1653,24 @@ msgstr "Base 32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:676
 msgid "Alt Base 32"
-msgstr ""
+msgstr "Alt Base 32 "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:685
 msgid "Incoming I2P Port Routing"
-msgstr ""
+msgstr "I2P Port Routing Masuk"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:687
 msgid "I2P Port"
-msgstr ""
+msgstr "Port I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:689
 msgid "Virtual Host"
-msgstr ""
+msgstr "Virtual Host "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:691
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:769
 msgid "SSL"
-msgstr ""
+msgstr "SSL "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:693
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:763
@@ -1683,11 +1683,11 @@ msgstr "Default "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:761
 msgid "Jetty Server"
-msgstr ""
+msgstr "Server Jetty"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:765
 msgid "Configuration Files"
-msgstr ""
+msgstr "File Konfigurasi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:767
 msgid "Enabled"
@@ -1699,31 +1699,31 @@ msgstr "I2P webserver (eepsite) "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:973
 msgid "SSL is enabled"
-msgstr ""
+msgstr "SSL diaktifkan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:975
 msgid "Disable SSL"
-msgstr ""
+msgstr "Matikan SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:981
 msgid "SSL is disabled"
-msgstr ""
+msgstr "SSL dimatikan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:983
 msgid "Enable SSL"
-msgstr ""
+msgstr "Aktifkan SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:989
 msgid "New Certificate Password"
-msgstr ""
+msgstr "Password Sertifikat Baru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:997
 msgid "Generate new SSL certificate"
-msgstr ""
+msgstr "Buat sertifikat SSL baru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1003
 msgid "Generate SSL certificate and enable"
-msgstr ""
+msgstr "Buat sertifikat SSL lalu aktifkan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:178
 msgid "I2P Tunnel Manager - Tunnel Creation Wizard"

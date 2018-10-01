@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2018-08-08 18:53+0000\n"
+"PO-Revision-Date: 2018-08-20 10:52+0000\n"
 "Last-Translator: Robert Dafis <robertdafis@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -727,7 +727,7 @@ msgstr "Men-download plugin dari {0}"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:143
 msgid "Downloading plugin"
-msgstr ""
+msgstr "Sedang mengunduh plugin"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:150
 msgid "Plugin downloaded"
@@ -2655,11 +2655,11 @@ msgstr "Paksa mobile console untuk digunakan"
 msgid ""
 "Enabling the Universal Theming option is recommended when embedding these "
 "applications"
-msgstr ""
+msgstr "Mengaktifkan opsi Universal Themeing dianjurkan ketika melakukan embedding aplikasi ini"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:71
 msgid "Embed Email and Torrent applications in the console"
-msgstr ""
+msgstr "Embed Email dan Torrent di console"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:222
 msgid "Add a user and password to enable."
@@ -3056,11 +3056,11 @@ msgstr "Laporan Bug i2p"
 #. ://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:56
 msgid "Dev Builds"
-msgstr ""
+msgstr "Dev Builds "
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:56
 msgid "Development builds of I2P"
-msgstr ""
+msgstr "Development builds dari I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:57
 msgid "Dev Forum"
@@ -3150,7 +3150,7 @@ msgstr "Plugin i2p"
 #. "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "PrivateBin"
-msgstr ""
+msgstr "PrivateBin "
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:77
 msgid "I2P home page"
@@ -3321,7 +3321,7 @@ msgstr "LeaseSets "
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:604
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:660
 msgid "Previous Page"
-msgstr ""
+msgstr "Halaman Sebelumnya"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:141
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:344
@@ -3344,7 +3344,7 @@ msgstr "Tidak ditemukan di database jaringan"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:611
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:666
 msgid "Next Page"
-msgstr ""
+msgstr "Halaman Berikutnya"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:395
 msgid "Manually Configure Floodfill Participation"
@@ -3845,7 +3845,7 @@ msgstr "Mereka menawarkan untuk memperkenalkan kami"
 #, java-format
 msgid "{0} fail"
 msgid_plural "{0} fails"
-msgstr[0] ""
+msgstr[0] "{0} gagal"
 
 #. 1
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:432
@@ -4262,40 +4262,40 @@ msgstr "I2P Internals "
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:44
 msgid "Router Information"
-msgstr ""
+msgstr "Informasi Router"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:45
 msgid "Router Information (brief)"
-msgstr ""
+msgstr "Informasi Router (singkat)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:46
 msgid "Router Information (advanced)"
-msgstr ""
+msgstr "Informasi Router (lengkap)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:47
 msgid "Memory Usage Bar"
-msgstr ""
+msgstr "Memory Usage Bar "
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:48
 msgid "Network Reachability"
-msgstr ""
+msgstr "Network Reachability "
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:49
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:609
 msgid "Update Status"
-msgstr ""
+msgstr "Status Update"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:50
 msgid "Restart Status"
-msgstr ""
+msgstr "Status Restart"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:52
 msgid "Peers (advanced)"
-msgstr ""
+msgstr "Peers (lanjutan)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:53
 msgid "Firewall &amp; Reseed Status"
-msgstr ""
+msgstr "Status Firewall &amp; Reseed "
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:55
 msgid "Bandwidth Graph"
@@ -4308,7 +4308,7 @@ msgstr "Congestion "
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:58
 msgid "Tunnel Status"
-msgstr ""
+msgstr "Status Tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:296
@@ -4323,7 +4323,7 @@ msgstr "Berita &amp; Update"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:61
 msgid "Advanced Links"
-msgstr ""
+msgstr "Advanced Links "
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:147
 msgid "I2P Router Help &amp; FAQ"
@@ -7204,7 +7204,7 @@ msgstr "I2p akan bekerja dengan baik ketika firewall diaktifkan, tidak ada alasa
 msgid ""
 "However, you will get more participating traffic and help the network if you"
 " open your firewall."
-msgstr ""
+msgstr "Namun, Anda akan mendapatkan lebih banyak lalu lintas yang berpartisipasi dan lebih membantu jaringan jika Anda dapat membuka firewall Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:475
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:474

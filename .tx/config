@@ -131,6 +131,7 @@ trans.zh_TW = apps/routerconsole/locale-news/messages_zh_TW.po
 type = PO
 source_file = apps/routerconsole/locale-countries/messages_en.po
 source_lang = en
+trans.ar = apps/routerconsole/locale-countries/messages_ar.po
 trans.az = apps/routerconsole/locale-countries/messages_az.po
 trans.ca = apps/routerconsole/locale-countries/messages_ca.po
 trans.da = apps/routerconsole/locale-countries/messages_da.po
@@ -305,6 +306,7 @@ trans.zh_TW = apps/susimail/locale/messages_zh_TW.po
 [I2P.debconf]
 source_file = debian/po/templates.pot
 source_lang = en
+trans.ar = debian/po/ar.po
 trans.az = debian/po/az.po
 trans.cs = debian/po/cs.po
 trans.de = debian/po/de.po
@@ -336,6 +338,7 @@ trans.zh_TW = debian/po/zh_TW.po
 [I2P.i2prouter-script]
 source_file = installer/resources/locale/po/messages_en.po
 source_lang = en
+trans.ar = installer/resources/locale/po/messages_ar.po
 trans.az = installer/resources/locale/po/messages_az.po
 trans.ca = installer/resources/locale/po/messages_ca.po
 trans.de = installer/resources/locale/po/messages_de.po
@@ -379,6 +382,7 @@ trans.zh_CN = installer/resources/locale/po/messages_zh.po
 source_file = core/java/src/gnu/getopt/MessagesBundle.properties
 source_lang = en
 type = PROPERTIES
+trans.ar = core/java/src/gnu/getopt/MessagesBundle_ar.properties
 trans.az = core/java/src/gnu/getopt/MessagesBundle_az.properties
 trans.cs = core/java/src/gnu/getopt/MessagesBundle_cs.properties
 trans.de = core/java/src/gnu/getopt/MessagesBundle_de.properties
@@ -411,6 +415,7 @@ trans.zh_TW = core/java/src/gnu/getopt/MessagesBundle_zh_TW.properties
 [I2P.streaming]
 source_file = apps/ministreaming/locale/messages_en.po
 source_lang = en
+trans.ar = apps/ministreaming/locale/messages_ar.po
 trans.az = apps/ministreaming/locale/messages_az.po
 trans.ca = apps/ministreaming/locale/messages_ca.po
 trans.cs = apps/ministreaming/locale/messages_cs.po
@@ -442,6 +447,7 @@ trans.zh_CN = apps/ministreaming/locale/messages_zh.po
 type = PO
 source_file = installer/resources/locale-man/man.pot
 source_lang = en
+trans.ar = installer/resources/locale-man/man_ar.po
 trans.az = installer/resources/locale-man/man_az.po
 trans.de = installer/resources/locale-man/man_de.po
 trans.es = installer/resources/locale-man/man_es.po
@@ -468,11 +474,14 @@ trans.zh_CN = installer/resources/locale-man/man_zh.po
 type = HTML
 source_file = installer/resources/eepsite/docroot/help/index.html
 source_lang = en
+trans.ar = installer/resources/eepsite/docroot/help/index_ar.html
 trans.az = installer/resources/eepsite/docroot/help/index_az.html
 trans.de = installer/resources/eepsite/docroot/help/index_de.html
 ;; not yet translated on TX, use old page
 ;;trans.es = installer/resources/eepsite/docroot/help/index_es.html
 trans.fr = installer/resources/eepsite/docroot/help/index_fr.html
+;; Java converts id to in
+trans.id = installer/resources/eepsite/docroot/help/index_in.html
 trans.it = installer/resources/eepsite/docroot/help/index_it.html
 ;; not yet translated on TX, use old page
 ;;trans.nl = installer/resources/eepsite/docroot/help/index_nl.html
@@ -492,10 +501,14 @@ trans.tr_TR = installer/resources/eepsite/docroot/help/index_tr.html
 type = HTML
 source_file = installer/resources/readme/readme.html
 source_lang = en
+trans.ar = installer/resources/readme/readme_ar.html
 trans.de = installer/resources/readme/readme_de.html
+;; Java converts id to in
+trans.id = installer/resources/readme/readme_in.html
 trans.it = installer/resources/readme/readme_it.html
 trans.ja = installer/resources/readme/readme_ja.html
 trans.pl = installer/resources/readme/readme_pl.html
+trans.pt = installer/resources/readme/readme_pt.html
 trans.tr_TR = installer/resources/readme/readme_tr.html
 
 [main]

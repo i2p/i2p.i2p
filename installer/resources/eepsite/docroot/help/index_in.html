@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<title>Server Web Anonim i2p</title>
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="lib/eepsite.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+   <div class="main">
+
+   <div class="langbar">
+<a href="index.html%20"><img src="lib/us.png%20" title="English " alt="English "></a>
+      <a href="index_zh.html%20"><img src="lib/cn.png%20" title="中文 " alt="中文 "></a>
+      <a href="index_de.html%20"><img src="lib/de.png%20" title="Deutsch " alt="Deutsch "></a>
+      <a href="index_es.html%20"><img src="lib/es.png%20" title="Español " alt="Español "></a>
+      <a href="index_fr.html%20"><img src="lib/fr.png%20" title="Français " alt="Français "></a>
+      <a href="index_nl.html%20"><img src="lib/nl.png%20" title="Nederlands " alt="Nederlands "></a>
+      <a href="index_ru.html%20"><img src="lib/ru.png%20" title="Русский " alt="Русский "></a>
+      <a href="index_sv.html%20"><img src="lib/se.png%20" title="Svenska " alt="Svenska "></a>
+</div>
+
+    <h1>Server Web Anonim i2p</h1>
+
+    <h2>Panduan Server Web Anonim i2p</h2>
+
+    <p>Ini adalah server web anonim I2P milik Anda sendiri (secara tradisional disebut <i>eepsite</i>). Untuk menampilkan konten milik Anda, cukup edit file-file di root directory situs web Anda lalu situsnya akan menjadi publik setelah Anda mengikuti semua instruksi di bawah ini.</p>
+
+    <p id="dir">Root directory server web ada di lokasi-lokasi berikut, tergantung sistem operasi yang digunakan:</p>
+
+    <ul>
+<li>
+<b>Linux</b><br>  Standard install: <code>~/.i2p/eepsite/docroot/</code><br>  Package install, dijalankan sebagai service: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+</li>
+      <li>
+<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+</li>        
+      <li>
+<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+</li>
+    </ul>
+<p>Di I2P, hidden services menggunakan alamat Base32 yang berakhir dengan ".b32.i2p", atau sebuah Destination menggunakan string Base64. Alamat Base32 dapat digunakan sebagai hostname, sampai anda mendaftarkan nama situs dengan cara di bawah ini. Destination seperti alamat IP, dan ditampilkan di <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3%20">Hidden Service Configuration page</a>.</p>
+
+    <p>Instruksi di bawah ini menjelaskan cara memberikan nama seperti "mysite.i2p" ke situs web Anda dan memberikan akses kepada orang lain. Anda dapat membuka situs Anda secara lokal dengan alamat <a href="http://127.0.0.1:7658/%20">http://127.0.0.1:7658/</a>.</p>
+
+    <h2>Cara mengatur dan mengumumkan hidden service Anda</h2>
+
+     <p>Situs web Anda sudah berjalan secara default, tapi tidak dapat diakses oleh orang lain sampai Anda mengaktifkan hidden service tunnel. Sampai Anda memulai I2P Webserver tunnel, orang lain akan sulit membukanya. Lalu, ini dapat dicapai dengan long Destination atau atau alamat Base32 yang lebih pendek (.b32.i2p), yang ini adalah berupa hash dari Destination. Anda dapat mengumumkan Destination-nya atau alamat Base32, tapi syukurnya I2P punya address book dan beberapa cara mudah untuk mengumumkan situs web Anda. Ini Instruksi Terperincinya.</p>
+
+    <ul>
+<li>Pilih nama situs web Anda(<i>namasitusanda</i>.i2p), menggunakan huruf kecil. Mungkin Anda sebaiknya memeriksai <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none%20">address book</a> di router Anda untuk melihat apakah namanya sudah digunakan situs lain. Masukkan nama baru situs Anda di <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3%20">Hidden Service Configuration page</a> di bagian "Website name". Ini akan menggantikan "mysite.i2p". Lalu, jika Anda ingin I2P Webserver tunnel dimulai otomatis ketika I2P dimulai, centang kotak "Auto Start". Situs Anda akan berjalan setiap kali Anda menjalankan situs Anda. Pastikan klik "Simpan"</li>
+      <li>Klik tombol Start pada tunnel halaman utama situs web di <a href="http://127.0.0.1:7657/i2ptunnel/%20">main Hidden Service Manager page</a>. Seharusnya sekarang Anda dapat melihat namanya di "Local Tunnels" di samping kiri<a href="http://127.0.0.1:7657/%20">I2P Router Console</a>. Situs web Anda sekarang sudah aktif.</li>
+      <li>Pilih dan salin semua Local destination di<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3%20">Hidden Service Configuration page</a>. Pastikan Anda menyalin semuanya, ada lebih dari 500 karakter.</li>
+      <li>Masukkan namanya lalu tempel destination-nya di<a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none%20">address book</a>. Klik "Add" atau "Tambah" untuk menyimpannya.</li>
+      <li>Di browser Anda, masukkan nama situs web Anda(<i>namasitusanda</i>.i2p) dan seharusnya situs web Anda dapat dibuka. Semoga ini berhasil!</li>
+      <li>Sebelum mengumumkan situs web Anda, Anda sebaiknya menambah konten. Kunjungi root directory server web<a href="#dir%20">yang ditampilkan di atas</a> lalu ganti index.html redirect page dengan konten Anda.</li>
+    </ul>
+<p>Directory listings diaktifkan, sehingga Anda dapat menghosting file di subdirectory tanpa membuat sebuah halaman berisi tautan ke file tadi. Anda dapat mengubah tampilan directory dengan membuat editan file<a href="lib/jetty-dir.css%20">jetty-dir.css</a> di setiap directory. <a href="lib/%20">Lib subdirectory</a> menampilkan custom style. <a href="lib/resources%20">Resources subdirectory</a> menampilkan default style. Jika Anda memerlukan template untuk situs sederhana, silakan gunakan<a href="pagetemplate.html%20">halaman ini</a> dan <a href="lib/%20">konten yang bersangkutan</a>.</p>
+
+    <p>Jika halaman ini yang muncul setelah kontennya diedit, kosongkan cache dari browser Anda:</p>
+
+    <ul>
+<li>
+<b>Firefox:</b> Preferences ➜ Advanced ➜ Network ➜ Cached Web Content ➜ Clear Now</li>
+      <li>
+<b>Chrome/Chromium:</b> Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data</li>
+      <li>
+<b>Opera:</b> Settings ➜ Privacy ➜ Clear browsing data</li>
+    </ul>
+<h2>Mendaftarkan DomainI2P Anda</h2>
+
+    <p>Sekarang tambahkan situs Anda ke I2P address book yang dihosting sebuah situs seperti<a href="http://stats.i2p/%20%20" target="_blank">stats.i2p</a> atau <a href="http://no.i2p/%20" target="_blank">no.i2p</a>. Masukkan nama situs dan Destination (atau Registration Authentication string) di salah satu situs berikut ini.</p>
+<p>Beberapa situs web meminta Destination. Jika begitu, pilih dan salin semua Local destination di<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3%20">Hidden Service Configuration page</a>. Pastikan Anda menyalin semuanya, ada lebih dari 500 karakter.</p>
+<p>Beberapa situs registrasi, termasuk<a href="http://stats.i2p/i2p/addkey.html%20" target="_blank">stats.i2p</a>, meminta Registration Authentication string. Ini dapat ditemukan di <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3%20">Registration Authentication page</a> yang ada link dari <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3%20">Hidden Service configuration page</a>. Salin semua authentication string dan tempel ke registration page. Pastikan Anda menyalin semuanya, ada lebih dari 500 karakter. Jelaskan dengan singkat situs Anda jika situs registrasi meminta informasi ini. Jika situs Anda HTTP service, biarkan checkbox dicentang; jika bukan, hilangkan centangnya.</p>
+<p>Di semua situs registrasi, baca Terms of Service dengan seksama. Klik tombol "Submit". Periksa apakah pendaftaran berhasil. Karena banyak router mendapat pembaruan address book secara rutin dari situs-situs ini, dalam beberapa jam orang lain akan dapat membuka situs Anda dengan hanya memasukkan nama hostnya di peramban mereka.</p>
+
+    <h2>Menambah Langganan Addressbook</h2>
+
+    <p>Tentang pembaruan address book, ini adalah waktu yang tepat untuk menambah addressbooks ke daftar langganan. Kunjungi <a href="http://127.0.0.1:7657/susidns/subscriptions%20">Subscriptions Configuration page</a> dan tambah satu atau lebih supaya mendapat pembaruan otomatis:</p>
+
+    <ul>
+<li>
+<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt%20" target="_blank">stats.i2p</a>)</li>
+      <li>
+<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt%20" target="_blank">no.i2p</a>)</li>
+    </ul>
+<p>Jika Anda terburu-buru dan tidak bisa mengunggu beberapa jam, Anda dapat bilang ke orang lain untuk menggunakan jasa "jump" address helper redirection service. Ini akan berfungsi dalam beberapa menit setelah pendaftaran di situs registrasinya. Uji sendiri terlebih dahulu dengan memasukkan <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>namasitusanda</i>.i2p</code> ke browser Anda. Jika Anda dapat membukanya, orang juga dapat membukanya.</p>
+
+    <p>Beberapa orang memeriksa daftar situs web seperti<a href="http://identiguy.i2p/%20" target="_blank">Identiguy's eepsite status list</a> atau <a href="http://no.i2p/browse/%20" target="_blank">no.i2p's active host list</a> untuk eepsites baru, jadi situs Anda mungkin akan mulai mendapat pengunjung. Ada banyak cara lain untuk mengumumkan situs Anda. Ini cara-caranya:</p>
+
+    <ul>
+<li>Posting di <a href="http://i2pforum.i2p/%20" target="_blank">I2P forum</a> umumkan tentang situs I2P baru Anda!</li>
+      <li>Umumkan situs Anda di #i2p or #i2p-chat channels di IRC.</li>
+      <li>Masukkan nama situs Anda di<a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services%20" target="_blank">I2PWiki Eepsite Index</a>
+</li>
+    </ul>
+<p>Perhatikan bahwa beberapa situs menyarankan Anda memasukkan alamat yang panjang atau base64. Anda dapat melakukan ini, tapi jika Anda telah mendaftarkan nama situs Anda di sebuah situs registrasi, uji nama situs Anda dengan jump service, lalu tunggu 24 jam supaya pembaruan address book disebarkan ke orang lain, memasukkan alamat panjang base64 tidak perlu dilakukan.</p>
+
+    <h2>Menggunakan webserver alternatif untuk hosting situs Anda</h2>
+
+    <p>Situs ini(dan I2P router console) berjalan di<a href="https://en.wikipedia.org/wiki/Jetty_(web_server)%20" target="_blank">Jetty webserver</a>, tapi Anda mungkin ingin menggunakan webserver lain untuk hosting konten. Untuk mengamankan anonimitas, pastikan webserver Anda diatur hanya menerima koneksi dari localhost (127.0.0.1), dan baca dokumentasi untuk memastikan webserver Anda tidak memberikan informasi yang dapat mengurangi anonimitas Anda.</p>
+
+     <p>Untuk mengatur webserver menggunakan I2P, Anda dapat menggunakan webserver tunnel yang ada dan<a href="http://127.0.0.1:7657/configclients%20">mematikan default webserver</a>, atau membuat HTTP Server tunnel baru di<a href="http://127.0.0.1:7657/i2ptunnelmgr%20">Hidden Services Manager</a>. Pastikan listening port diatur untuk webserver (7658 adalah default-nya) juga diatur di Hidden Services settings. Contohnya, jika webserver Anda secara default mendengarkan alamat 127.0.0.1 port 80, Anda juga perlu memastikan Target port di halaman pengaturan di Hidden Service Manager untuk service-nya juga diatur untuk port 80.</p> 
+
+        <p>Ketahui bahwa webserver atau web appplication yang salah konfigurasi akan membocorkan informasi vital seperto alamat IP asli atau server details yang mengurangi anonimitas atau membantu hacker. Kami menyarankan menggunakan server default kecuali Anda merasa lebih nyaman melakukan sendiri administrasi server Anda. Mohon pastikan webserver Anda sudah aman sebelum membuatnya online. Ada banyak panduan di Internet untuk hal ini, misalnya jika Anda mencari "nginx security hardening guide" Anda akan menemukan banyak panduang yang berisi banyak rekomendasi bagus.</p> 
+
+        <p>Ada satu hal penting di Apache web server. Apache modules <code>mod_status</code> dan <code>mod_info</code> diaktifkan secara default di beberapa sistem operasi. Modul-modul ini menyebarkan data internal yang sangat menurunkan anonimitas jika digunakan di jaringan anonim. Hapus baris-baris ini di file konfigurasi di mana module-modul ini dimuat adalah cara termudah untuk mencegah masalah ini.</p>
+
+    <h2>Bantuan Lebih Lanjut</h2>
+
+        <p>Jika ada pertanyaan, tempat-tempat berikut ini dapat membantu Anda:</p>
+
+        <ul>
+<li>IRC support channel kami:<ul>
+<li><a href="irc://irc.freenode.net/i2p%20">#i2p di Freenode</a></li>
+                <li>Secara anomin menggunakan<a href="irc://127.0.0.1:6668/i2p%20">I2P IRC tunnel</a> lokal.</li>
+             </ul>
+</li>
+<li>Forum proyek I2P di <a href="http://i2pforum.i2p/%20" target="_blank">i2pforum.i2p</a>.</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting%20" target="_blank">Panduan Hosting Eepsite I2PWiki</a></li>
+        </ul>
+<hr>
+<div class="notify">Halaman ini, situs web proyek, dan router console perlu diterjemahkan! Mohon bantu perkembangan proyek ini dengan<a href="http://i2p-projekt.i2p/getinvolved.html%20" target="_blank"> ikut terlibat</a> atau<a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators%20" target="_blank">menerjemahkan</a>.</div>
+        <hr>
+</div>
+</body>
+</html>
