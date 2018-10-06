@@ -173,7 +173,8 @@ class NetDbRenderer {
                     (version != null && version.equals(ri.getVersion())) ||
                     (country != null && country.equals(_context.commSystem().getCountry(key))) ||
                     (family != null && family.equals(ri.getOption("family"))) ||
-                    (caps != null && ri.getCapabilities().contains(caps)) ||
+                    // 'O' will catch PO and XO also
+                    (caps != null && hasCap(ri, caps)) ||
                     (tr != null && ri.getTargetAddress(tr) != null) ||
                     (type != null && type == ri.getIdentity().getSigType())) {
                     if (skipped < toSkip) {
@@ -355,6 +356,22 @@ class NetDbRenderer {
         out.flush();
         if (sybil != null)
             SybilRenderer.renderSybilHTML(out, _context, sybils, sybil);
+    }
+
+    /**
+     *  Special handling for 'O' cap
+     *  @param caps non-null
+     *  @since 0.9.38
+     */
+    private static boolean hasCap(RouterInfo ri, String caps) {
+        String ricaps = ri.getCapabilities();
+        if (caps.equals("O")) {
+            return ricaps.contains(caps) &&
+                   !ricaps.contains("P") &&
+                   !ricaps.contains("X");
+        } else {
+            return ricaps.contains(caps);
+        }
     }
 
     /**

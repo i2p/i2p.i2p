@@ -222,7 +222,7 @@ public class NetDbHelper extends HelperBase {
         if (_routerPrefix != null || _version != null || _country != null ||
             _family != null || _caps != null || _ip != null || _sybil != null ||
             _port != 0 || _type != null || _mtu != null || _ipv6 != null ||
-            _ssucaps != null || _cost != 0)
+            _ssucaps != null || _transport != null || _cost != 0)
             return 2;
         if (_full == 2)
             return 3;
@@ -276,7 +276,7 @@ public class NetDbHelper extends HelperBase {
      *  @since 0.9.28
      */
     private void renderLookupForm() throws IOException {
-        _out.write("<form action=\"/netdb\" method=\"GET\">\n" + 
+        _out.write("<form action=\"/netdb\" method=\"POST\">\n" + 
                    "<table id=\"netdblookup\"><tr><th colspan=\"3\">Network Database Search</th></tr>\n" +
                    "<tr><td colspan=\"3\" class=\"subheading\"><b>Enter one search field <i>only</i>:</b></td></tr>\n" +
                    "<tr><td>Capabilities:</td><td><input type=\"text\" name=\"caps\"></td><td>e.g. f or XOfR</td></tr>\n" +
