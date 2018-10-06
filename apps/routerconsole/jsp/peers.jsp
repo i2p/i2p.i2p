@@ -14,8 +14,13 @@
 <div class="main" id="peers">
  <jsp:useBean class="net.i2p.router.web.helpers.PeerHelper" id="peerHelper" scope="request" />
  <jsp:setProperty name="peerHelper" property="contextId" value="<%=i2pcontextId%>" />
- <% peerHelper.storeWriter(out); %>
+<%
+    peerHelper.storeWriter(out);
+    if (allowIFrame)
+        peerHelper.allowGraphical();
+%>
  <jsp:setProperty name="peerHelper" property="urlBase" value="peers.jsp" />
  <jsp:setProperty name="peerHelper" property="sort" value="<%=request.getParameter(\"sort\") != null ? request.getParameter(\"sort\") : \"\"%>" />
+ <jsp:setProperty name="peerHelper" property="transport" value="<%=request.getParameter(\"tx\")%>" />
  <jsp:getProperty name="peerHelper" property="peerSummary" />
-</div></div></body></html>
+</div></body></html>

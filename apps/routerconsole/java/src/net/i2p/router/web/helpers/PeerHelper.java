@@ -29,6 +29,22 @@ import net.i2p.util.SystemVersion;
 public class PeerHelper extends HelperBase {
     private int _sortFlags;
     private String _urlBase;
+    private String _transport;
+    private boolean _graphical;
+
+    private static final String titles[] = {
+                                            _x("Addresses"),
+                                             "NTCP",
+                                             "SSU",
+                                             _x("UPnP Status")
+                                           };
+
+    private static final String links[] = {
+                                            "",
+                                             "?tx=ntcp",
+                                             "?tx=ssu",
+                                             "?tx=upnp"
+                                           };
 
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";
@@ -47,7 +63,19 @@ public class PeerHelper extends HelperBase {
             _sortFlags = 0;
         }
     }
+
     public void setUrlBase(String base) { _urlBase = base; }
+
+    /** @since 0.9.38 */
+    public void setTransport(String t) { _transport = t; }
+
+    /**
+     *  call for non-text-mode browsers
+     *  @since 0.9.38
+     */
+    public void allowGraphical() {
+        _graphical = true;
+    }
 
     public String getPeerSummary() {
         try {
@@ -67,52 +95,109 @@ public class PeerHelper extends HelperBase {
      *  @since 0.9.31 moved from TransportManager
      */
     private void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
-        if (isAdvanced()) {
+        if (_context.commSystem().isDummy()) {
+            out.write("<p>No peers, no transports, no UPnP: i2p.vmCommSystem=true</p>");
+            return;
+        }
+        renderNavBar(out);
+        if (isAdvanced() && _transport == null) {
             out.write("<p id=\"upnpstatus\"><b>");
             out.write(_t("Status"));
             out.write(": ");
             out.write(_t(_context.commSystem().getStatus().toStatusString()));
             out.write("</b></p>");
         }
+
         SortedMap<String, Transport> transports = _context.commSystem().getTransports();
-        for (Map.Entry<String, Transport> e : transports.entrySet()) {
-            String style = e.getKey();
-            Transport t = e.getValue();
-            if (style.equals("NTCP")) {
-                NTCPTransport nt = (NTCPTransport) t;
-                render(nt, out, urlBase, sortFlags);
-            } else if (style.equals("SSU")) {
-                UDPTransport ut = (UDPTransport) t;
-                render(ut, out, urlBase, sortFlags);
-            } else {
-                // pluggable (none yet)
-                t.renderStatusHTML(out, urlBase, sortFlags);
+        if (_transport != null && !_transport.equals("upnp")) {
+            for (Map.Entry<String, Transport> e : transports.entrySet()) {
+                String style = e.getKey();
+                Transport t = e.getValue();
+                if (style.equals("NTCP") && "ntcp".equals(_transport)) {
+                    NTCPTransport nt = (NTCPTransport) t;
+                    render(nt, out, urlBase, sortFlags);
+                } else if (style.equals("SSU") && "ssu".equals(_transport)) {
+                    UDPTransport ut = (UDPTransport) t;
+                    render(ut, out, urlBase, sortFlags);
+                } else {
+                    // pluggable (none yet)
+                    t.renderStatusHTML(out, urlBase, sortFlags);
+                }
             }
-        }
-
-        if (!transports.isEmpty()) {
-            out.write(getTransportsLegend());
-        }
-
-        StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h3 id=\"transports\">").append(_t("Router Transport Addresses")).append("</h3><pre id=\"transports\">\n");
-        for (Transport t : transports.values()) {
-            if (t.hasCurrentAddress()) {
-                for (RouterAddress ra : t.getCurrentAddresses()) {
-                    buf.append(ra.toString());
-                    buf.append("\n\n");
+            if (!transports.isEmpty()) {
+                out.write(getTransportsLegend());
+            }
+        } else if (_transport == null) {
+            StringBuilder buf = new StringBuilder(4*1024);
+            buf.append("<h3 id=\"transports\">").append(_t("Router Transport Addresses")).append("</h3><pre id=\"transports\">\n");
+            if (!transports.isEmpty()) {
+                for (Transport t : transports.values()) {
+                    if (t.hasCurrentAddress()) {
+                        for (RouterAddress ra : t.getCurrentAddresses()) {
+                            buf.append(ra.toString());
+                            buf.append("\n\n");
+                        }
+                    } else {
+                        buf.append(_t("{0} is used for outbound connections only", t.getStyle()));
+                        buf.append("\n\n");
+                    }
                 }
             } else {
-                buf.append(_t("{0} is used for outbound connections only", t.getStyle()));
-                buf.append("\n\n");
+                buf.append(_t("none"));
             }
+            buf.append("</pre>\n");
+            out.write(buf.toString());
+        } else if ("upnp".equals(_transport)) {
+            // UPnP Status
+            _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
         }
-        buf.append("</pre>\n");
-        out.write(buf.toString());
-        // UPnP Status
-        _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
-        out.write("</p>\n");
         out.flush();
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    private int getTab() {
+        if ("ntcp".equals(_transport))
+            return 1;
+        if ("ssu".equals(_transport))
+            return 2;
+        if ("upnp".equals(_transport))
+            return 3;
+        return 0;
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    private void renderNavBar(Writer out) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<div class=\"confignav\" id=\"confignav\">");
+        boolean span = _graphical;
+        if (!span)
+            buf.append("<center>");
+        int tab = getTab();
+        for (int i = 0; i < titles.length; i++) {
+            if (i == tab) {
+                // we are there
+                if (span)
+                    buf.append("<span class=\"tab2\">");
+                buf.append(_t(titles[i]));
+            } else {
+                // we are not there, make a link
+                if (span)
+                    buf.append("<span class=\"tab\">");
+                buf.append("<a href=\"peers").append(links[i]).append("\">").append(_t(titles[i])).append("</a>");
+            }
+            if (span)
+                buf.append("</span>\n");
+            else if (i != titles.length - 1)
+                buf.append("&nbsp;&nbsp;\n");
+        }
+        if (!span)
+            buf.append("</center>");
+        buf.append("</div>");
+        out.write(buf.toString());
     }
 
     /**
