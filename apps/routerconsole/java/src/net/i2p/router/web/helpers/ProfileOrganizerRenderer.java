@@ -330,8 +330,6 @@ class ProfileOrganizerRenderer {
         buf.append("<tr><td>&nbsp;</td>")
            .append("<td><b>X</b></td><td>").append(_t("Over {0} shared bandwidth", Math.round(Router.MIN_BW_X * 1.024f) + " KBps")).append("</td>")
            .append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
-        buf.append("<tr><td>&nbsp;</td><td colspan=\"5\">").append(_t("Note: For P and X bandwidth tiers, O is included for the purpose of backward compatibility in the NetDB."))
-           .append("</tr>");
         buf.append("</tbody></table></td></tr>"); // profile_defs
         buf.append("<tr><td><b>")
            .append(_t("speed"))

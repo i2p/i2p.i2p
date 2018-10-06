@@ -785,6 +785,27 @@ class NetDbRenderer {
     }
 
     /**
+     *  Sort by style, then host
+     *  @since 0.9.38
+     */
+    private static class RAComparator implements Comparator<RouterAddress> {
+         private static final long serialVersionUID = 1L;
+
+         public int compare(RouterAddress l, RouterAddress r) {
+             int rv = l.getTransportStyle().compareTo(r.getTransportStyle());
+             if (rv != 0)
+                 return rv;
+             String lh = l.getHost();
+             String rh = r.getHost();
+             if (lh == null)
+                 return (rh == null) ? 0 : -1;
+             if (rh == null)
+                 return 1;
+             return lh.compareTo(rh);
+        }
+    }
+
+    /**
      *  Be careful to use stripHTML for any displayed routerInfo data
      *  to prevent vulnerabilities
      */
@@ -836,7 +857,13 @@ class NetDbRenderer {
         if (addrs.isEmpty()) {
             buf.append(_t("none"));
         } else {
-            for (RouterAddress addr : info.getAddresses()) {
+            if (addrs.size() > 1) {
+                // addrs is unmodifiable
+                List<RouterAddress> laddrs = new ArrayList<RouterAddress>(addrs);
+                Collections.sort(laddrs, new RAComparator());
+                addrs = laddrs;
+            }
+            for (RouterAddress addr : addrs) {
                 String style = addr.getTransportStyle();
                 buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b>");
                 int cost = addr.getCost();
