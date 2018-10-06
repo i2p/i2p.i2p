@@ -333,7 +333,7 @@ class TunnelRenderer {
                               _t("Tunnel identity") + "\">" + (id == null ? "" : "" + id) +
                               "</span><b class=\"tunnel_cap\" title=\"" + _t("Bandwidth tier") + "\"></b></td>");
                 } else {
-                    String cap = getCapacity(peer);
+                    char cap = getCapacity(peer);
                     out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(peer) +
                               "</span>&nbsp;<span class=\"nowrap\"><span class=\"tunnel_id\" title=\"" + _t("Tunnel identity") + "\">" +
                               (id == null ? "" : " " + id) + "</span><b class=\"tunnel_cap\" title=\"" + _t("Bandwidth tier") + "\">" +
@@ -476,17 +476,18 @@ class TunnelRenderer {
     }
 ****/
 
-    /** cap string */
-    private String getCapacity(Hash peer) {
+    /** @return cap char or ' ' */
+    private char getCapacity(Hash peer) {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
         if (info != null) {
             String caps = info.getCapabilities();
-            for (char c = Router.CAPABILITY_BW12; c <= Router.CAPABILITY_BW256; c++) {
+            for (int i = 0; i < RouterInfo.BW_CAPABILITY_CHARS.length(); i++) {
+                char c = RouterInfo.BW_CAPABILITY_CHARS.charAt(i);
                 if (caps.indexOf(c) >= 0)
-                    return " " + c;
+                    return c;
             }
         }
-        return "";
+        return ' ';
     }
 
     private String netDbLink(Hash peer) {
