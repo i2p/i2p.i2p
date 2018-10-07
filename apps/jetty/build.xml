@@ -140,7 +140,7 @@
            with-libtomcat8-java AND with-libjetty9-java: Xenial, Jessie (with backports), Stretch
            with-libjetty9-java (only): not supported
      -->
-    <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1, copyTomcatLib1, copyJettylib2, copyTomcatLib" />
+    <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1, copyTomcatLib1, copyJettylib2, copyJettylib3, copyTomcatLib" />
 
     <!-- Jetty files only -->
     <target name="copyJettylib1" depends="extractJettylib, buildPatches" unless="${with-libjetty9-java}" >
@@ -225,6 +225,12 @@
       -->
     </target>
 
+    <!-- Copy jetty-apache-jsp.jar -->
+    <!-- ONLY if with-libtomcat8-java but NOT with-libjetty9-java (wheezy/jessie configuration) -->
+    <!-- If neither with-libtomcat8-java nor with-libjetty9-java, it's merged into jasper-runtime.jar in the copyTomcatLib2 target below -->
+    <target name="copyJettylib3" depends="extractJettylib, copyTomcatLib1" if="${with-libtomcat-without-libjetty}" >
+            <copy preservelastmodified="true" file="${jetty.base}/lib/apache-jsp/org.eclipse.jetty.apache-jsp-${jetty.ver}.jar" tofile="jettylib/jetty-apache-jsp.jar" />
+    </target>
 
     <!-- Tomcat.
          The glassfish jars bundled in Jetty 6 are way too old.
@@ -250,6 +256,14 @@
                 <istrue value="${with-libtomcat7-java}" />
                 <istrue value="${with-libtomcat8-java}" />
             </or>
+        </condition>
+        <condition property="with-libtomcat-without-libjetty" >
+            <and>
+                <istrue value="${with-libtomcat-java}" />
+                <not>
+                    <istrue value="${with-libjetty9-java}" />
+                </not>
+            </and>
         </condition>
     </target>
 
