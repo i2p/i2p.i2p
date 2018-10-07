@@ -510,7 +510,7 @@ class OutboundNTCP2State implements EstablishState {
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
         buf.append("OBES2 ");
-        buf.append(System.identityHashCode(this));
+        buf.append(_con.toString());
         buf.append(' ').append(_state);
         if (_con.isEstablished()) buf.append(" established");
         buf.append(": ");
