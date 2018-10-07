@@ -805,7 +805,7 @@ class NetDbRenderer {
      *  Sort by style, then host
      *  @since 0.9.38
      */
-    private static class RAComparator implements Comparator<RouterAddress> {
+    static class RAComparator implements Comparator<RouterAddress> {
          private static final long serialVersionUID = 1L;
 
          public int compare(RouterAddress l, RouterAddress r) {

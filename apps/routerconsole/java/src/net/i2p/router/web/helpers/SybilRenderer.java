@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -912,7 +913,14 @@ class SybilRenderer {
            .append(info.getIdentity().getSigningPublicKey().getType().toString()).append("</p>\n");
         buf.append("<p class=\"sybil_filler\">&nbsp;</p>");
         buf.append("</div></td></tr><tr><td class=\"sybil_addresses\" colspan=\"3\"><table><tr><td><b>" + _t("Addresses") + ":</b></td><td>");
-        for (RouterAddress addr : info.getAddresses()) {
+        Collection<RouterAddress> addrs = info.getAddresses();
+        if (addrs.size() > 1) {
+            // addrs is unmodifiable
+            List<RouterAddress> laddrs = new ArrayList<RouterAddress>(addrs);
+            Collections.sort(laddrs, new NetDbRenderer.RAComparator());
+            addrs = laddrs;
+        }
+        for (RouterAddress addr : addrs) {
             String style = addr.getTransportStyle();
             buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b> ");
             Map<Object, Object> p = addr.getOptionsMap();
