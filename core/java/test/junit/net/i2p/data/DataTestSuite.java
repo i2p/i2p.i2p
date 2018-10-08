@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     Base64Test.class,
-    BooleanTest.class,
     CertificateTest.class,
     DataHelperTest.class,
     DataStructureImplTest.class,
