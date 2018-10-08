@@ -157,12 +157,15 @@ class BasicServlet extends HttpServlet
      */
     public File getResource(String pathInContext)
     {
-        if (_resourceBase==null)
-            return null;
         File r = null;
         if (!pathInContext.contains("..") &&
                    !pathInContext.endsWith("/")) {
-            File f = new File(_resourceBase, pathInContext);
+            File f;
+            synchronized (this) {
+                if (_resourceBase==null)
+                    return null;
+                f = new File(_resourceBase, pathInContext);
+            }
             if (f.exists())
                 r = f;
         }
@@ -178,8 +181,6 @@ class BasicServlet extends HttpServlet
      */
     public HttpContent getContent(String pathInContext)
     {
-        if (_resourceBase==null)
-            return null;
         HttpContent r = null;
         if (_warBase != null && pathInContext.startsWith(_warBase)) {
             r = new JarContent(pathInContext);
