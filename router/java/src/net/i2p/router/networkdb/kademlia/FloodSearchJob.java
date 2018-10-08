@@ -21,7 +21,7 @@ import net.i2p.util.Log;
  *
  * Note that this does NOT extend SearchJob.
  */
-public class FloodSearchJob extends JobImpl {
+abstract class FloodSearchJob extends JobImpl {
     protected final Log _log;
     protected final FloodfillNetworkDatabaseFacade _facade;
     protected final Hash _key;

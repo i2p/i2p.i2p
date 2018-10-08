@@ -52,7 +52,7 @@ import net.i2p.util.Log;
  * Kademlia based version of the network database.
  * Never instantiated directly; see FloodfillNetworkDatabaseFacade.
  */
-public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
+public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final Log _log;
     private KBucketSet<Hash> _kb; // peer hashes sorted into kbuckets, but within kbuckets, unsorted
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
@@ -187,7 +187,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return _initialized && _ds != null && _ds.isInitialized();
     }
 
-    protected PeerSelector createPeerSelector() { return new PeerSelector(_context); }
+    protected abstract PeerSelector createPeerSelector();
     public PeerSelector getPeerSelector() { return _peerSelector; }
     
     /** @since 0.9 */
@@ -1281,14 +1281,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** unused (overridden in FNDF) */
-    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore) {
-        if ( (ds == null) || (key == null) ) {
-            if (onFailure != null) 
-                _context.jobQueue().addJob(onFailure);
-            return;
-        }
-        _context.jobQueue().addJob(new StoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
-    }
+    public abstract void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore);
 
     /**
      *  Increment in the negative lookup cache

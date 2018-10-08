@@ -33,7 +33,7 @@ import net.i2p.util.Log;
  * Receive DatabaseStoreMessage data and store it in the local net db
  *
  */
-public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
+class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     private final Log _log;
     private final DatabaseStoreMessage _message;
     private final RouterIdentity _from;

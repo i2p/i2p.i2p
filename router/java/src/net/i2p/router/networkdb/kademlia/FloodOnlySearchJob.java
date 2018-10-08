@@ -37,7 +37,7 @@ import net.i2p.util.Log;
  * after it loses (or never had) floodfill references, as long as it
  * knows one peer that is up.
  */
-class FloodOnlySearchJob extends FloodSearchJob {
+abstract class FloodOnlySearchJob extends FloodSearchJob {
     private boolean _shouldProcessDSRM;
     private final HashSet<Hash> _unheardFrom;
     

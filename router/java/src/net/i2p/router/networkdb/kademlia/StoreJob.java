@@ -38,7 +38,7 @@ import net.i2p.util.VersionComparator;
  *
  *  Unused directly - see FloodfillStoreJob
  */
-class StoreJob extends JobImpl {
+abstract class StoreJob extends JobImpl {
     protected final Log _log;
     private final KademliaNetworkDatabaseFacade _facade;
     protected final StoreState _state;
