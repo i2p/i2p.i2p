@@ -15,19 +15,16 @@ class SpeedComparator implements Comparator<PeerProfile>, Serializable {
 
         double lval = left.getSpeedValue();
         double rval = right.getSpeedValue();
-
-        if (lval > rval)
-            return 1;
-        if (lval < rval)
-            return -1;
+        int rv = Double.compare(lval, rval);
+        if (rv != 0)
+            return rv;
 
         // we don't wan't to return 0 so profiles don't vanish in the TreeSet
         lval = left.getCapacityValue();
         rval = right.getCapacityValue();
-        if (lval > rval)
-            return 1;
-        if (lval < rval)
-            return -1;
+        rv = Double.compare(lval, rval);
+        if (rv != 0)
+            return rv;
         return DataHelper.compareTo(right.getPeer().getData(), left.getPeer().getData());
     }
 }

@@ -23,11 +23,13 @@ class InverseCapacityComparator implements Comparator<PeerProfile>, Serializable
 
         double rval = right.getCapacityValue();
         double lval = left.getCapacityValue();
+        int rv = Double.compare(rval, lval);
 
-        if (lval == rval) {
+        if (rv == 0) {
             rval = right.getSpeedValue();
             lval = left.getSpeedValue();
-            if (lval == rval) {
+            rv = Double.compare(rval, lval);
+            if (rv == 0) {
                 // note the following call inverts right and left (see: classname)
                 return DataHelper.compareTo(right.getPeer().getData(), left.getPeer().getData());
             } else {
@@ -35,18 +37,6 @@ class InverseCapacityComparator implements Comparator<PeerProfile>, Serializable
             }
         }
 
-        boolean rightBigger = rval > lval;
-
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("The capacity of " + right.getPeer().toBase64() 
-        //               + " and " + left.getPeer().toBase64() + " marks " + (rightBigger ? "right" : "left")
-        //               + " as larger: r=" + right.getCapacityValue() 
-        //               + " l="
-        //               + left.getCapacityValue());
-
-        if (rightBigger)
-            return 1;
-        else
-            return -1;
+        return rv;
     }
 }

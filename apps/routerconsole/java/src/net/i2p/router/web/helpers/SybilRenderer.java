@@ -115,11 +115,7 @@ class SybilRenderer {
              reasons.add(reason);
          }
          public int compareTo(Points r) {
-             if (points > r.points)
-                 return 1;
-             if (points < r.points)
-                 return -1;
-             return 0;
+             return Double.compare(points, r.points);
         }
     }
 
