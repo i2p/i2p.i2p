@@ -6,14 +6,19 @@
  *
  * Do not tag this file for translation.
  */
-
+net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
+net.i2p.router.web.StatSummarizer ss = net.i2p.router.web.StatSummarizer.instance(ctx);
+if (ss == null) {
+    response.sendError(403, "Stats disabled");
+    return;
+}
 boolean rendered = false;
 /****  unused
 String templateFile = request.getParameter("template");
 if (templateFile != null) {
   java.io.OutputStream cout = response.getOutputStream();
   response.setContentType("image/png");
-  rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(cout, templateFile);
+  rendered = ss.renderPng(cout, templateFile);
 }
 ****/
 net.i2p.stat.Rate rate = null;
@@ -22,7 +27,7 @@ String period = request.getParameter("period");
 boolean fakeBw = (stat != null && ("bw.combined".equals(stat)));
 net.i2p.stat.RateStat rs = null;
 if (stat != null)
-    rs = net.i2p.I2PAppContext.getGlobalContext().statManager().getRate(stat);
+    rs = ctx.statManager().getRate(stat);
 if ( !rendered && ((rs != null) || fakeBw) ) {
   long per = -1;
   try {
@@ -39,12 +44,12 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
       if ("xml".equals(format)) {
         if (!fakeBw) {
           response.setContentType("text/xml");
-          rendered = net.i2p.router.web.StatSummarizer.instance().getXML(rate, cout);
+          rendered = ss.getXML(rate, cout);
         }
       } else {
         response.setContentType("image/png");
         // very brief 45 sec expire
-        response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + (45*1000));
+        response.setDateHeader("Expires", ctx.clock().now() + (45*1000));
         response.setHeader("Accept-Ranges", "none");
         // http://jira.codehaus.org/browse/JETTY-1346
         // This doesn't actually appear in the response, but it fixes the problem,
@@ -70,9 +75,9 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
         if (request.getParameter("showCredit") != null)
           showCredit = Boolean.parseBoolean(request.getParameter("showCredit"));
         if (fakeBw)
-            rendered = net.i2p.router.web.StatSummarizer.instance().renderRatePng(cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, end, showCredit);
+            rendered = ss.renderRatePng(cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, end, showCredit);
         else
-            rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(rate, cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, end, showCredit);
+            rendered = ss.renderPng(rate, cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, end, showCredit);
       }
       if (rendered)
         cout.close();

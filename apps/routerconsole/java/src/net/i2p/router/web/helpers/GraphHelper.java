@@ -147,10 +147,11 @@ public class GraphHelper extends FormHandler {
     }
 
     public String getImages() { 
-        if (StatSummarizer.isDisabled())
+        StatSummarizer ss = StatSummarizer.instance(_context);
+        if (ss == null)
             return "";
         try {
-            List<SummaryListener> listeners = StatSummarizer.instance().getListeners();
+            List<SummaryListener> listeners = ss.getListeners();
             TreeSet<SummaryListener> ordered = new TreeSet<SummaryListener>(new AlphaComparator());
             ordered.addAll(listeners);
 
@@ -235,9 +236,10 @@ public class GraphHelper extends FormHandler {
      *  @since 0.9
      */
     public String getSingleStat() {
+        StatSummarizer ss = StatSummarizer.instance(_context);
+        if (ss == null)
+            return "";
         try {
-            if (StatSummarizer.isDisabled())
-                return "";
             if (_stat == null) {
                 _out.write("No stat specified");
                 return "";
@@ -249,7 +251,7 @@ public class GraphHelper extends FormHandler {
                 name = _stat;
                 displayName = _t("Bandwidth usage");
             } else {
-                Set<Rate> rates = StatSummarizer.instance().parseSpecs(_stat);
+                Set<Rate> rates = ss.parseSpecs(_stat);
                 if (rates.size() != 1) {
                     _out.write("Graphs not enabled for " + _stat);
                     return "";
@@ -376,7 +378,8 @@ public class GraphHelper extends FormHandler {
     private static final int[] times = { 15, 30, 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
 
     public String getForm() { 
-        if (StatSummarizer.isDisabled())
+        StatSummarizer ss = StatSummarizer.instance(_context);
+        if (ss == null)
             return "";
         // too hard to use the standard formhandler.jsi / FormHandler.java session nonces
         // since graphs.jsp needs the refresh value in its <head>.
@@ -440,7 +443,7 @@ public class GraphHelper extends FormHandler {
      */
     @Override
     public String getAllMessages() {
-        if (StatSummarizer.isDisabled()) {
+        if (StatSummarizer.isDisabled(_context)) {
             addFormError("Graphing not supported with this JVM: " +
                          System.getProperty("java.vendor") + ' ' +
                          System.getProperty("java.version") + " (" +

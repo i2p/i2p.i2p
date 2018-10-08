@@ -11,6 +11,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
+import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppState;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.web.GraphConstants.*;
@@ -32,29 +35,40 @@ import net.i2p.util.SystemVersion;
  *
  *  @since 0.6.1.13
  */
-public class StatSummarizer implements Runnable {
+public class StatSummarizer implements Runnable, ClientApp {
     private final RouterContext _context;
     private final Log _log;
     /** list of SummaryListener instances */
     private final List<SummaryListener> _listeners;
-    // TODO remove static instance
-    private static StatSummarizer _instance;
     private static final int MAX_CONCURRENT_PNG = SystemVersion.isARM() ? 2 : 3;
     private final Semaphore _sem;
-    private volatile boolean _isRunning = true;
-    private boolean _isDisabled;
-    private Thread _thread;
+    private volatile boolean _isRunning;
+    private volatile Thread _thread;
+    private static final String NAME = "StatSummarizer";
     
-    public StatSummarizer() {
-        _context = RouterContext.listContexts().get(0); // only summarize one per jvm
+    public StatSummarizer(RouterContext ctx) {
+        _context = ctx;
         _log = _context.logManager().getLog(getClass());
         _listeners = new CopyOnWriteArrayList<SummaryListener>();
-        _instance = this;
         _sem = new Semaphore(MAX_CONCURRENT_PNG, true);
         _context.addShutdownTask(new Shutdown());
     }
     
-    public static StatSummarizer instance() { return _instance; }
+    /**
+     * @return null if disabled
+     */
+    public static StatSummarizer instance() {
+        return instance(I2PAppContext.getGlobalContext());
+    }
+
+    /**
+     * @return null if disabled
+     * @since 0.0.38
+     */
+    public static StatSummarizer instance(I2PAppContext ctx) {
+        ClientApp app = ctx.clientAppManager().getRegisteredApp(NAME);
+        return (app != null) ? (StatSummarizer) app : null;
+    }
     
     public void run() {
         // JRobin 1.5.9 crashes these JVMs
@@ -65,24 +79,29 @@ public class StatSummarizer implements Runnable {
                                      System.getProperty("java.version") + " (" +
                                      System.getProperty("java.runtime.name") + ' ' +
                                      System.getProperty("java.runtime.version") + ')');
-            _isDisabled = true;
-            _isRunning = false;
             return;
         }
+        _isRunning = true;
         boolean isPersistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
         if (!isPersistent)
             deleteOldRRDs();
         _thread = Thread.currentThread();
+        _context.clientAppManager().register(this);
         String specs = "";
-        while (_isRunning && _context.router().isAlive()) {
-            specs = adjustDatabases(specs);
-            try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
+        try {
+            while (_isRunning && _context.router().isAlive()) {
+                specs = adjustDatabases(specs);
+                try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
+            }
+        } finally {
+            _isRunning = false;
+            _context.clientAppManager().unregister(this);
         }
     }
     
-    /** @since 0.8.7, public since 0.9.33, was package private */
-    public static boolean isDisabled() {
-        return _instance == null || _instance._isDisabled;
+    /** @since 0.0.38 */
+    public static boolean isDisabled(I2PAppContext ctx) {
+        return ctx.clientAppManager().getRegisteredApp(NAME) == null;
     }
     
     /**
@@ -90,12 +109,56 @@ public class StatSummarizer implements Runnable {
      * See SummaryRenderer.render()
      * @since 0.9.6
      */
-    static void setDisabled() {
-        if (_instance != null) {
-            _instance._isDisabled = true;
-            _instance._isRunning = false;
+    static void setDisabled(I2PAppContext ctx) {
+        StatSummarizer ss = instance(ctx);
+        if (ss != null)
+            ss.setDisabled();
+    }
+
+    /**
+     * Disable graph generation until restart
+     * See SummaryRenderer.render()
+     * @since 0.9.38
+     */
+    synchronized void setDisabled() {
+        if (_isRunning) {
+            _isRunning = false;
+            Thread t = _thread;
+            if (t != null)
+                t.interrupt();
         }
     }
+
+    /////// ClientApp methods
+
+    /**
+     * Does nothing, we aren't tracked
+     * @since 0.9.38
+     */
+    public void startup() {}
+
+    /**
+     * Does nothing, we aren't tracked
+     * @since 0.9.38
+     */
+    public void shutdown(String[] args) {}
+
+    /** @since 0.9.38 */
+    public ClientAppState getState() {
+        return ClientAppState.RUNNING;
+    }
+
+    /** @since 0.9.38 */
+    public String getName() {
+        return NAME;
+    }
+
+    /** @since 0.9.38 */
+    public String getDisplayName() {
+        return "Console stats summarizer";
+    }
+
+    /////// End ClientApp methods
 
     /**
      *  List of SummaryListener instances
@@ -206,8 +269,7 @@ public class StatSummarizer implements Runnable {
                 //  at java.lang.Class.forName0(Native Method)
                 //  at java.lang.Class.forName(Class.java:270)
                 //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
-                _isDisabled = true;
-                _isRunning = false;
+                setDisabled();
                 String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
                 _log.logAlways(Log.WARN, s);
                 IOException ioe = new IOException(s);
@@ -296,8 +358,7 @@ public class StatSummarizer implements Runnable {
                 //  at java.lang.Class.forName0(Native Method)
                 //  at java.lang.Class.forName(Class.java:270)
                 //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
-                _isDisabled = true;
-                _isRunning = false;
+                setDisabled();
                 String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
                 _log.logAlways(Log.WARN, s);
                 IOException ioe = new IOException(s);
@@ -316,7 +377,7 @@ public class StatSummarizer implements Runnable {
         // go to some trouble to see if we have the data for the combined bw graph
         SummaryListener txLsnr = null;
         SummaryListener rxLsnr = null;
-        for (SummaryListener lsnr : StatSummarizer.instance().getListeners()) {
+        for (SummaryListener lsnr : getListeners()) {
             String title = lsnr.getRate().getRateStat().getName();
             if (title.equals("bw.sendRate"))
                 txLsnr = lsnr;
@@ -396,9 +457,7 @@ public class StatSummarizer implements Runnable {
      */
     private class Shutdown implements Runnable {
         public void run() {
-            _isRunning = false;
-            if (_thread != null)
-                _thread.interrupt();
+            setDisabled();
             for (SummaryListener lsnr : _listeners) {
                 // FIXME could cause exceptions if rendering?
                 lsnr.stopListening();

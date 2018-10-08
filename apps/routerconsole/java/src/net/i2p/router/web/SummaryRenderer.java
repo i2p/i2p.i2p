@@ -289,7 +289,7 @@ class SummaryRenderer {
                 graph = new RrdGraph(def);
             } catch (NullPointerException npe) {
                 _log.error("Error rendering", npe);
-                StatSummarizer.setDisabled();
+                StatSummarizer.setDisabled(_context);
                 throw new IOException("Error rendering - disabling graph generation. Missing font? See http://trac.i2p2.i2p/ticket/915");
             }
             int totalWidth = graph.getRrdGraphInfo().getWidth();

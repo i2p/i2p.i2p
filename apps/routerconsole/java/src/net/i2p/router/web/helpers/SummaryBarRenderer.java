@@ -277,7 +277,7 @@ class SummaryBarRenderer {
            .append("</a>\n");
         }
 
-        if (!StatSummarizer.isDisabled()) {
+        if (!StatSummarizer.isDisabled(_context)) {
             buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
                .append(_t("Graph router performance"))
                .append("\">")
@@ -822,13 +822,14 @@ class SummaryBarRenderer {
     public String renderBandwidthGraphHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
-        if (!StatSummarizer.isDisabled())
+        if (!StatSummarizer.isDisabled(_context)) {
             buf.append("<div id=\"sb_graphcontainer\"><a href=\"/graphs\"><table id=\"sb_bandwidthgraph\">" +
                        "<tr title=\"")
                .append(_t("Our inbound &amp; outbound traffic for the last 20 minutes"))
                .append("\"><td><span id=\"sb_graphstats\">")
                .append(_helper.getSecondKBps())
                .append("Bps</span></td></tr></table></a></div>\n");
+        }
         buf.append("<script src=\"/js/refreshGraph.js\" type=\"text/javascript\" id=\"refreshGraph\" async></script>");
         return buf.toString();
     }
