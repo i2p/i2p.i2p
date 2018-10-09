@@ -143,9 +143,8 @@ class SybilRenderer {
                  return 0;
              double ld, rd;
              try {
-                 // skip "<b>"
-                 ld = Double.parseDouble(l.substring(3, lc));
-                 rd = Double.parseDouble(r.substring(3, rc));
+                 ld = Double.parseDouble(l.substring(0, lc));
+                 rd = Double.parseDouble(r.substring(0, rc));
              } catch (NumberFormatException nfe) {
                  return 0;
              }
@@ -175,7 +174,7 @@ class SybilRenderer {
     }
 
     private void addPoints(Map<Hash, Points> points, Hash h, double d, String reason) {
-        String rsn = "<b>" + fmt.format(d) + ":</b> " + reason;
+        String rsn = fmt.format(d) + ": " + reason;
         Points dd = points.get(h);
         if (dd != null) {
             dd.points += d;
@@ -331,7 +330,10 @@ class SybilRenderer {
                 if (pp.reasons.size() > 1)
                     Collections.sort(pp.reasons, new ReasonComparator());
                 for (String s : pp.reasons) {
-                    buf.append("<li>").append(s).append("</li>");
+                    int c = s.indexOf(':');
+                    if (c <= 0)
+                        continue;
+                    buf.append("<li><b>").append(s.substring(0, c+1)).append("</b>").append(s.substring(c+1)).append("</li>");
                 }
                 buf.append("</ul>");
                 renderRouterInfo(buf, ri, null, false, false);
