@@ -105,7 +105,7 @@ class SybilRenderer {
     /**
      *  A total score and a List of reason Strings
      */
-    private static class Points implements Comparable<Points> {
+    public static class Points implements Comparable<Points> {
          private double points;
          private final List<String> reasons;
 
@@ -156,6 +156,24 @@ class SybilRenderer {
         }
     }
 
+    /**
+     *  Merge points1 into points2.
+     *  points1 is unmodified.
+     */
+    private void mergePoints(Map<Hash, Points> points1, Map<Hash, Points> points2) {
+        for (Map.Entry<Hash, Points> e : points1.entrySet()) {
+             Hash h = e.getKey();
+             Points p1 = e.getValue();
+             Points p2 = points2.get(h);
+             if (p2 != null) {
+                 p2.points += p1.points;
+                 p2.reasons.addAll(p1.reasons);
+             } else {
+                 points2.put(h, p1);
+             }
+        }
+    }
+
     private void addPoints(Map<Hash, Points> points, Hash h, double d, String reason) {
         String rsn = "<b>" + fmt.format(d) + ":</b> " + reason;
         Points dd = points.get(h);
@@ -168,15 +186,12 @@ class SybilRenderer {
     }
 
     /**
-     *  The whole thing
-     *
-     *  @param routerPrefix ignored
+     *  All the floodfills, not including us
+     *  @since 0.9.38 split out from renderRouterInfoHTML
      */
-    private void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
+    private List<RouterInfo> getFloodfills(Hash us) {
         Set<Hash> ffs = _context.peerManager().getPeersByCapability('f');
         List<RouterInfo> ris = new ArrayList<RouterInfo>(ffs.size());
-        Hash us = _context.routerHash();
-        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
         for (Hash ff : ffs) {
              if (ff.equals(us))
                  continue;
@@ -184,6 +199,32 @@ class SybilRenderer {
              if (ri != null)
                  ris.add(ri);
         }
+        return ris;
+    }
+
+    private double getAvgMinDist(List<RouterInfo> ris) {
+        double tot = 0;
+        int count = 200;
+        byte[] b = new byte[32];
+        for (int i = 0; i < count; i++) {
+            _context.random().nextBytes(b);
+            Hash h = new Hash(b);
+            double d = closestDistance(h, ris);
+            tot += d;
+        }
+        double avgMinDist = tot / count;
+        return avgMinDist;
+    }
+
+    /**
+     *  The whole thing
+     *
+     *  @param routerPrefix ignored
+     */
+    private void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
+        Hash us = _context.routerHash();
+        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
+        List<RouterInfo> ris = getFloodfills(us);
         if (ris.isEmpty()) {
             out.write("<h3 class=\"sybils\">No known floodfills</h3>");
             return;
@@ -210,16 +251,7 @@ class SybilRenderer {
         renderRouterInfo(buf, _context.router().getRouterInfo(), null, true, false);
         buf.append("<h3 id=\"known\" class=\"sybils\">Known Floodfills: ").append(ris.size()).append("</h3>");
 
-        double tot = 0;
-        int count = 200;
-        byte[] b = new byte[32];
-        for (int i = 0; i < count; i++) {
-            _context.random().nextBytes(b);
-            Hash h = new Hash(b);
-            double d = closestDistance(h, ris);
-            tot += d;
-        }
-        double avgMinDist = tot / count;
+        double avgMinDist = getAvgMinDist(ris);
         buf.append("<div id=\"sybils_summary\">\n" +
                    "<b>Average closest floodfill distance:</b> ").append(fmt.format(avgMinDist)).append("<br>\n" +
                    "<b>Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
@@ -243,15 +275,15 @@ class SybilRenderer {
         // Distance to our router analysis
         buf.append("<h3 id=\"ritoday\" class=\"sybils\">Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
         buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
-        renderRouterInfoHTML(out, buf, ourRKey, avgMinDist, ris, points);
+        renderRouterInfoHTML(out, buf, ourRKey, "our rkey", avgMinDist, ris, points);
         RouterKeyGenerator rkgen = _context.routerKeyGenerator();
         Hash nkey = rkgen.getNextRoutingKey(us);
         buf.append("<h3 id=\"ritmrw\" class=\"sybils\">Closest Floodfills to Tomorrow's Routing Key (Where we will Store our RI)</h3>");
         buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
-        renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
+        renderRouterInfoHTML(out, buf, nkey, "our rkey (tomorrow)", avgMinDist, ris, points);
 
         buf.append("<h3 id=\"dht\" class=\"sybils\">Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
-        renderRouterInfoHTML(out, buf, us, avgMinDist, ris, points);
+        renderRouterInfoHTML(out, buf, us, "our router", avgMinDist, ris, points);
 
         // Distance to our published destinations analysis
         buf.append("<h3 id=\"dest\" class=\"sybils\">Floodfills Close to Our Destinations</h3>");
@@ -269,14 +301,14 @@ class SybilRenderer {
                 continue;
             Hash rkey = ls.getRoutingKey();
             TunnelPool in = clientInboundPools.get(client);
-            String name = (in != null) ? in.getSettings().getDestinationNickname() : client.toBase64().substring(0,4);
-            buf.append("<h3 class=\"sybils\">Closest floodfills to the Routing Key for " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
+            String name = (in != null) ? DataHelper.escapeHTML(in.getSettings().getDestinationNickname()) : client.toBase64().substring(0,4);
+            buf.append("<h3 class=\"sybils\">Closest floodfills to the Routing Key for " + name + " (where we store our LS)</h3>");
             buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
-            renderRouterInfoHTML(out, buf, rkey, avgMinDist, ris, points);
+            renderRouterInfoHTML(out, buf, rkey, name, avgMinDist, ris, points);
             nkey = rkgen.getNextRoutingKey(ls.getHash());
-            buf.append("<h3 class=\"sybils\">Closest floodfills to Tomorrow's Routing Key for " + DataHelper.escapeHTML(name) + " (where we will store our LS)</h3>");
+            buf.append("<h3 class=\"sybils\">Closest floodfills to Tomorrow's Routing Key for " + name + " (where we will store our LS)</h3>");
             buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
-            renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
+            renderRouterInfoHTML(out, buf, nkey, name + " (tomorrow)", avgMinDist, ris, points);
         }
 
         // Profile analysis
@@ -309,6 +341,67 @@ class SybilRenderer {
         out.write(buf.toString());
         out.flush();
         buf.setLength(0);
+    }
+
+    /**
+     *  Analyze threats. No output.
+     *  Return separate maps for each cause instead?
+     *  @since 0.9.38
+     */
+    public Map<Hash, Points> backgroundAnalysis() throws IOException {
+        Hash us = _context.routerHash();
+        List<RouterInfo> ris = getFloodfills(us);
+
+        double avgMinDist = getAvgMinDist(ris);
+        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
+
+        // IP analysis
+        renderIPGroupsFamily(null, null, ris, points);
+        renderIPGroupsUs(null, null, ris, points);
+        renderIPGroups32(null, null, ris, points);
+        renderIPGroups24(null, null, ris, points);
+        renderIPGroups16(null, null, ris, points);
+
+        // Pairwise distance analysis
+        renderPairDistance(null, null, ris, points);
+
+        // Distance to our router analysis
+        // closest to our routing key today
+        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
+        renderRouterInfoHTML(null, null, ourRKey, "our rkey", avgMinDist, ris, points);
+        // closest to our routing key tomorrow
+        RouterKeyGenerator rkgen = _context.routerKeyGenerator();
+        Hash nkey = rkgen.getNextRoutingKey(us);
+        renderRouterInfoHTML(null, null, nkey, "our rkey (tomorrow)", avgMinDist, ris, points);
+        // closest to us
+        renderRouterInfoHTML(null, null, us, "our router", avgMinDist, ris, points);
+
+        // Distance to our published destinations analysis
+        Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
+        List<Hash> destinations = new ArrayList<Hash>(clientInboundPools.keySet());
+        for (Hash client : destinations) {
+            boolean isLocal = _context.clientManager().isLocal(client);
+            if (!isLocal)
+                continue;
+            if (! _context.clientManager().shouldPublishLeaseSet(client))
+                continue;
+            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client);
+            if (ls == null)
+                continue;
+            Hash rkey = ls.getRoutingKey();
+            TunnelPool in = clientInboundPools.get(client);
+            String name = (in != null) ? DataHelper.escapeHTML(in.getSettings().getDestinationNickname()) : client.toBase64().substring(0,4);
+            // closest to routing key today
+            renderRouterInfoHTML(null, null, rkey, name, avgMinDist, ris, points);
+            // closest to routing key tomorrow
+            nkey = rkgen.getNextRoutingKey(ls.getHash());
+            renderRouterInfoHTML(null, null, nkey, name + " (tomorrow)", avgMinDist, ris, points);
+        }
+
+        // Profile analysis
+        addProfilePoints(ris, points);
+        addVersionPoints(ris, points);
+        return points;
     }
 
     private static class Pair implements Comparable<Pair> {
@@ -380,7 +473,7 @@ class SybilRenderer {
         }
     }
 
-    private double closestDistance(Hash h, List<RouterInfo> ris) throws IOException {
+    private double closestDistance(Hash h, List<RouterInfo> ris) {
         BigInteger min = (new BigInteger("2")).pow(256);
         for (RouterInfo info : ris) {
             BigInteger dist = HashDistance.getDistance(h, info.getHash());
@@ -799,8 +892,9 @@ class SybilRenderer {
     /**
      *  @param out null for background analysis
      *  @param buf null for background analysis
+     *  @param usName HTML escaped
      */
-    private void renderRouterInfoHTML(Writer out, StringBuilder buf, Hash us, double avgMinDist,
+    private void renderRouterInfoHTML(Writer out, StringBuilder buf, Hash us, String usName, double avgMinDist,
                                       List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         Collections.sort(ris, new RouterInfoRoutingKeyComparator(us));
         double min = 256;
@@ -843,7 +937,7 @@ class SybilRenderer {
             double point = MIN_CLOSE - dist;
             if (point > 0) {
                 point *= OUR_KEY_FACTOR;
-                addPoints(points, ri.getHash(), point, "Very close (" + fmt.format(dist) + ") to our key " + us.toBase64());
+                addPoints(points, ri.getHash(), point, "Very close (" + fmt.format(dist) + ") to our key " + usName + ": " + us.toBase64());
             }
             if (i >= MAX - 1)
                 break;
