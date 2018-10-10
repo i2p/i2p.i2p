@@ -443,11 +443,13 @@
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
 
-    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber, setBuildTimestamp" >
+    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
         <!-- default if not set above -->
         <property name="workspace.version" value="unknown" />
         <!-- default if not set by setBuildTimestamp -->
         <property name="build.timestamp" value="reproducible" />
+        <!-- default if not set by disableManifestClasspath -->
+        <property name="manifest.classpath.name" value="Class-Path" />
         <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
         <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
     </target>
@@ -456,6 +458,11 @@
         <tstamp>
             <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
         </tstamp>
+    </target>
+
+    <!-- Disable Class-Path in jar manifests by renaming it (Fedora) -->
+    <target name="disableManifestClasspath" if="${without-manifest-classpath}" >
+        <property name="manifest.classpath.name" value="Disabled-Class-Path" />
     </target>
 
     <target name="buildWEB" depends="buildRouterConsole" >

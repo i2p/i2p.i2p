@@ -20,6 +20,7 @@
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
     <property name="javac.version" value="1.7" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- fixups if we're using libintl.jar for GettextResource.java -->
     <condition property="source.exclude1" value="gnu/gettext/GettextResource.java" else="NOTHING" >
@@ -96,7 +97,7 @@
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
             <manifest>
-                <attribute name="Class-Path" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
+                <attribute name="${manifest.classpath.name}" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
                 <attribute name="Specification-Title" value="I2P Core API" />
                 <attribute name="Specification-Version" value="${release.number}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />

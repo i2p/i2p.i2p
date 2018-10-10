@@ -25,6 +25,7 @@
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.7" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- everything we need is in the deployer package, except for tomcat-api.jar in the full package,
          so we just use the full package instead.
@@ -410,7 +411,7 @@
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <!-- needed by JettyStart for pre-0.7.5 wrapper.config -->
-                <attribute name="Class-Path" value="jetty-deploy.jar jetty-xml.jar" />
+                <attribute name="${manifest.classpath.name}" value="jetty-deploy.jar jetty-xml.jar" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />

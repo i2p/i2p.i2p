@@ -30,6 +30,7 @@
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.7" />
     <property name="require.gettext" value="true" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- Compile includes ui/ classes but not web/ classes here -->
     <target name="compile" depends="depend">
@@ -83,7 +84,7 @@
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" excludes="**/ui/*.class **/web/*.class" >
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
-                <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2p.jar mstreaming.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
@@ -324,6 +325,7 @@
 
                 <pathelement location="../../jetty/jettylib/jasper-el.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-xml.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
@@ -358,6 +360,7 @@
                 <pathelement location="../../jetty/jettylib/tomcat-util-scan.jar" />
 
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-xml.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />

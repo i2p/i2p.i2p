@@ -25,9 +25,11 @@
         </depend>
     </target>
 
+    <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.7" />
     <property name="require.gettext" value="true" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <condition property="no.bundle">
         <isfalse value="${require.gettext}" />
@@ -79,7 +81,7 @@
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/web/* **/messages_*.class, **/standalone/*">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.CommandLine" />
-                <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2p.jar mstreaming.jar streaming.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />

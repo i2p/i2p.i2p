@@ -22,8 +22,10 @@
         </depend>
     </target>
 
+    <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs7" value="" />
     <property name="javac.version" value="1.7" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- compile everything including client classes -->
     <target name="compile" depends="depend">
@@ -71,7 +73,7 @@
         <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*.class" excludes="net/i2p/sam/client/*">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.sam.SAMBridge" />
-                <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2p.jar mstreaming.jar streaming.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
