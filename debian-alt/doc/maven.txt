@@ -1,0 +1,13 @@
+Whoever wants privileges needs to follow the process documented by Sonatype (which was annoying for me the first time around).
+It involves creating a ticket in their JIRA instance, which I assume we can use as a means to add additional access
+(probably by me confirming on said ticket, again once the process has been started).
+
+As for the actual process:
+Run "ant distclean mavenCentral". It tells you what to do -
+namely, specify a GPG signing key if you haven't already,
+and then upload the resulting mavencentral-*.jar files to Maven Central,
+which happens via the Sonatype repository and is well-documented there.
+
+If someone eventually gets the Gradle build scripts to be byte-for-byte compatible with Ant for those libraries,
+then the process will be even simpler: just configure your Sonatype password,
+and then run a single command which will do everything.

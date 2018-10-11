@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
@@ -100,7 +101,7 @@ public class RouterConsoleRunner implements RouterApp {
     private final RouterContext _context;
     private final ClientAppManager _mgr;
     private volatile ClientAppState _state = UNINITIALIZED;
-    private static Server _server;
+    private Server _server;
     private static ScheduledExecutorScheduler _jettyTimer;
     private String _listenPort;
     private String _listenHost;
@@ -116,6 +117,7 @@ public class RouterConsoleRunner implements RouterApp {
         // default changed from 0 (forever) in Jetty 6 to 60*1000 ms in Jetty 7
         authenticator.setMaxNonceAge(7*24*60*60*1000L);
     }
+    private static final String NAME = "console";
     public static final String JETTY_REALM = "i2prouter";
     private static final String JETTY_ROLE = "routerAdmin";
     public static final String PROP_CONSOLE_PW = "routerconsole.auth." + JETTY_REALM;
@@ -264,7 +266,7 @@ public class RouterConsoleRunner implements RouterApp {
 
     /** @since 0.9.4 */
     public String getName() {
-        return "console";
+        return NAME;
     }
 
     /** @since 0.9.4 */
@@ -281,13 +283,24 @@ public class RouterConsoleRunner implements RouterApp {
     }
 
     /**
-     *  SInce _server is now static
+     *  To get to Jetty
      *  @return may be null or stopped perhaps
      *  @since Jetty 6 since it doesn't have Server.getServers()
      */
-    static Server getConsoleServer() {
+    synchronized Server getConsoleServer() {
         return _server;
     }
+
+    /**
+     *  To get to Jetty
+     *  @return may be null or stopped perhaps
+     *  @since 0.9.38
+     */
+    static Server getConsoleServer(I2PAppContext ctx) {
+        ClientApp app = ctx.clientAppManager().getRegisteredApp(NAME);
+        return (app != null) ? ((RouterConsoleRunner)app).getConsoleServer() : null;
+    }
+
 
     /** @since 0.8.13, moved from LogsHelper in 0.9.33 */
     public static String jettyVersion() {
@@ -1113,7 +1126,7 @@ public class RouterConsoleRunner implements RouterApp {
                 String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
                 if (ROUTERCONSOLE.equals(app))
                     continue;
-                if (WebAppStarter.isWebAppRunning(app)) {
+                if (WebAppStarter.isWebAppRunning(_context, app)) {
                     try {
                         WebAppStarter.stopWebApp(_context, app);
                     } catch (Throwable t) { t.printStackTrace(); }
