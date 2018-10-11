@@ -16,7 +16,7 @@
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Router Status &amp; Control" identifier="" id="Fle-u6-lgB">
-                                <view key="view" canDrawConcurrently="YES" id="xXg-Bt-RWR" customClass="RouterStatusView" customModule="I2PLauncher" customModuleProvider="target">
+                                <view key="view" identifier="routerStatusTabView" canDrawConcurrently="YES" id="xXg-Bt-RWR" customClass="RouterStatusView" customModule="I2PLauncher" customModuleProvider="target">
                                     <rect key="frame" x="10" y="33" width="430" height="254"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -63,6 +63,15 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <textField identifier="RouterPIDLabel" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bmP-Ui-gyo" userLabel="RouterPIDLabel">
+                                                        <rect key="frame" x="6" y="114" width="245" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Router PID: Unknown" id="uFb-he-Wf3">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -74,7 +83,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button identifier="startstopRouterButton" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1eu-Qw-TD9" userLabel="start-stop-button">
-                                                        <rect key="frame" x="0.0" y="176" width="147" height="32"/>
+                                                        <rect key="frame" x="1" y="176" width="147" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Start/Stop Router" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OYN-sS-eQH">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -101,8 +110,11 @@
                                             </view>
                                         </box>
                                     </subviews>
+                                    <accessibility identifier="routerStatusTabView"/>
                                     <connections>
+                                        <outlet property="openConsoleButton" destination="XZi-oz-5gy" id="6xH-8v-63j"/>
                                         <outlet property="quickControlView" destination="D8V-d8-0wT" id="4to-rN-2eL"/>
+                                        <outlet property="routerPIDLabel" destination="bmP-Ui-gyo" id="x5L-c1-yja"/>
                                         <outlet property="routerStartStopButton" destination="1eu-Qw-TD9" id="FLt-MK-y5u"/>
                                         <outlet property="routerStartedByLabel" destination="tgG-IT-Ojg" id="dA0-3w-cuF"/>
                                         <outlet property="routerStatusLabel" destination="0Eo-re-5WK" id="7dm-Et-eSn"/>
@@ -121,7 +133,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <clipView key="contentView" ambiguous="YES" drawsBackground="NO" id="E5l-WA-qOn">
                                                 <rect key="frame" x="1" y="1" width="407" height="226"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textView identifier="LoggerTextView" ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="bgQ-8i-Xgb" userLabel="LoggerTextView">
                                                         <rect key="frame" x="0.0" y="0.0" width="407" height="226"/>
@@ -152,9 +164,11 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
+                    <connections>
+                        <outlet property="routerStatusViewOutlet" destination="xXg-Bt-RWR" id="L98-nF-i0n"/>
+                    </connections>
                 </viewController>
                 <customObject id="d8g-wS-Zts" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="4gn-BI-uSC" userLabel="Updater" customClass="SUUpdater"/>
             </objects>
             <point key="canvasLocation" x="-823" y="166"/>
         </scene>
