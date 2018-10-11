@@ -15,7 +15,11 @@ import Cocoa
   let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
   let storyboard = NSStoryboard(name: "Storyboard", bundle: Bundle.main)
   
-  var updateObjectRef : SUUpdater?
+  var ctrl : PopoverViewController?
+
+  @IBOutlet var routerStatusTabView: RouterStatusView?
+  
+  //var updateObjectRef : SUUpdater?
   
   @objc func handleOpenConsole(_ sender: Any?) {
     SwiftMainDelegate.openLink(url: "http://localhost:7657")
@@ -24,24 +28,34 @@ import Cocoa
   @objc func constructMenu() -> NSMenu {
     let menu = NSMenu()
     
-    let updateMenuItem = NSMenuItem(title: "Check for updates", action: #selector(self.updateObjectRef?.checkForUpdates(_:)), keyEquivalent: "U")
+    /*let updateMenuItem = NSMenuItem(title: "Check for updates", action: #selector(self.updateObjectRef?.checkForUpdates(_:)), keyEquivalent: "U")
     updateMenuItem.isEnabled = true
-    
+    */
     menu.addItem(NSMenuItem(title: "Open I2P Console", action: #selector(self.handleOpenConsole(_:)), keyEquivalent: "O"))
     menu.addItem(NSMenuItem.separator())
-    menu.addItem(updateMenuItem)
+    //menu.addItem(updateMenuItem)
     menu.addItem(NSMenuItem.separator())
     menu.addItem(NSMenuItem(title: "Quit I2P Launcher", action: #selector(SwiftMainDelegate.terminate(_:)), keyEquivalent: "q"))
     
     return menu
   }
+  
+  func pidReaction(information:Any?){
+    let pidStr = information as! String
+    NSLog("PID! %@", pidStr)
+    showPopover(sender: nil)
+    //self.ctrl?.getRouterStatusView()?.handlerRouterStart(information: pidStr)
+    self.ctrl?.getRouterStatusView()?.needsDisplay = true
+  }
 
   
   override init() {
     super.init()
-    popover.contentViewController = PopoverViewController.freshController()
-    updateObjectRef = SUUpdater.shared()
-    updateObjectRef?.checkForUpdatesInBackground()
+    self.ctrl = PopoverViewController.freshController()
+    popover.contentViewController = self.ctrl
+    //updateObjectRef = SUUpdater.shared()
+    //updateObjectRef?.checkForUpdatesInBackground()
+   RouterManager.shared().eventManager.listenTo(eventName: "router_pid", action: pidReaction)
     
     
     if let button = statusItem.button {
@@ -100,7 +114,6 @@ import Cocoa
     if popover.isShown {
       closePopover(sender: sender)
     } else {
-      RouterManager.shared().updateState()
       showPopover(sender: sender)
     }
   }

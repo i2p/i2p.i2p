@@ -22,60 +22,132 @@ import Cocoa
   @IBOutlet var routerVersionLabel: NSTextField?
   @IBOutlet var routerStartedByLabel: NSTextField?
   @IBOutlet var routerUptimeLabel: NSTextField?
+  @IBOutlet var routerPIDLabel: NSTextField?
   
   @IBOutlet var quickControlView: NSView?
   @IBOutlet var routerStartStopButton: NSButton?
+  @IBOutlet var openConsoleButton: NSButton?
   
   @objc func actionBtnStartRouter(_ sender: Any?) {
     NSLog("START ROUTER")
-    if (RouterManager.shared().getRouterTask() == nil) {
-      SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath, javaBinPath: RouterProcessStatus.knownJavaBinPath!)
+    /*if (RouterManager.shared().getRouterTask() == nil) {
+      SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath)
+    }*/
+    (sender as! NSButton).isTransparent = true
+    let routerStatus = RouterRunner.launchAgent?.status()
+    switch routerStatus {
+    case .loaded?:
+      RouterManager.shared().routerRunner.StartAgent(information: RouterRunner.launchAgent)
+    case .unloaded?:
+      do {
+        try LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+        RouterManager.shared().routerRunner.StartAgent(information: RouterRunner.launchAgent)
+      } catch {
+        RouterManager.shared().eventManager.trigger(eventName: "router_exception", information: error)
+      }
+      break
+    default:
+      break
     }
-    RouterManager.shared().updateState()
+    self.reEnableButton()
   }
   
   @objc func actionBtnStopRouter(_ sender: Any?) {
     NSLog("STOP ROUTER")
-    if (RouterManager.shared().getRouterTask() != nil) {
+    let routerStatus = RouterRunner.launchAgent?.status()
+    switch routerStatus {
+    case .running?:
       NSLog("Found running router")
-      RouterManager.shared().getRouterTask()?.requestShutdown()
-      RouterManager.shared().updateState()
+      RouterManager.shared().routerRunner.StopAgent()
+      break
+    default:
+      break
     }
+    self.reEnableButton()
   }
   
   @objc func actionBtnRestartRouter(sender: Any?) {
     if (RouterManager.shared().getRouterTask() != nil) {
-      RouterManager.shared().getRouterTask()?.requestRestart()
+      //RouterManager.shared().getRouterTask()?.requestRestart()
     } else {
       NSLog("Can't restart a non running router, start it however...")
-      SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath, javaBinPath: RouterProcessStatus.knownJavaBinPath!)
+      //SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath)
     }
-    RouterManager.shared().updateState()
   }
   
+  func handlerRouterStart(information:Any?) {
+    print("Triggered handlerRouterStart")
+    NSLog("PID2! %@", information as! String)
+    routerPIDLabel?.cell?.stringValue = "Router PID: "+(information as! String)
+    routerPIDLabel?.needsDisplay = true
+    routerStatusLabel?.cell?.stringValue = "Router status: Running"
+    self.toggleSetButtonStop()
+    self.reEnableButton()
+  }
   
+  func reEnableButton() {
+    let currentStatus : AgentStatus = RouterRunner.launchAgent?.status() ?? AgentStatus.unloaded
+    if currentStatus != AgentStatus.loaded && currentStatus != AgentStatus.unloaded  {
+      self.toggleSetButtonStop()
+    } else {
+      self.toggleSetButtonStart()
+    }
+    routerStartStopButton?.isTransparent = false
+    routerStartStopButton?.needsDisplay = true
+    self.setRouterStatusLabelText()
+  }
+  
+  func setupObservers() {
+    RouterManager.shared().eventManager.listenTo(eventName: "router_start", action: handlerRouterStart)
+    RouterManager.shared().eventManager.listenTo(eventName: "router_stop", action: handleRouterStop)
+    RouterManager.shared().eventManager.listenTo(eventName: "router_pid", action: handlerRouterStart)
+    RouterManager.shared().eventManager.listenTo(eventName: "launch_agent_running", action: reEnableButton)
+    RouterManager.shared().eventManager.listenTo(eventName: "launch_agent_unloaded", action: reEnableButton)
+    RouterManager.shared().eventManager.listenTo(eventName: "launch_agent_loaded", action: reEnableButton)
+  }
   
   override func viewWillDraw() {
     super.viewWillDraw()
     if (RouterStatusView.instance != nil) {
       RouterStatusView.instance = self
     }
-    self.setRouterStatusLabelText()
+    self.reEnableButton()
+  }
+  
+  func handleRouterStop() {
+    routerPIDLabel?.cell?.stringValue = "Router PID: Not running"
+    self.toggleSetButtonStart()
+    reEnableButton()
+  }
+  
+  private func toggleSetButtonStart() {
+    routerStatusLabel?.cell?.stringValue = "Router status: Not running"
+    routerStartStopButton?.title = "Start Router"
+    routerStartStopButton?.action = #selector(self.actionBtnStartRouter(_:))
+  }
+  
+  private func toggleSetButtonStop() {
+    routerStatusLabel?.cell?.stringValue = "Router status: Running"
+    routerStartStopButton?.title = "Stop Router"
+    routerStartStopButton?.action = #selector(self.actionBtnStopRouter(_:))
   }
   
   func setRouterStatusLabelText() {
-    if (RouterProcessStatus.isRouterRunning) {
-      routerStatusLabel?.cell?.stringValue = "Router status: Running"
-      routerStartStopButton?.title = "Stop Router"
-      routerStartStopButton?.action = #selector(self.actionBtnStopRouter(_:))
-    } else {
-      routerStatusLabel?.cell?.stringValue = "Router status: Not running"
-      routerStartStopButton?.title = "Start Router"
-      routerStartStopButton?.action = #selector(self.actionBtnStartRouter(_:))
-    }
     routerStartStopButton?.needsDisplay = true
     routerStartStopButton?.target = self
     quickControlView?.needsDisplay = true
+    
+    do {
+      let currentStatus : AgentStatus = RouterRunner.launchAgent!.status()
+      if currentStatus == AgentStatus.loaded || currentStatus == AgentStatus.unloaded  {
+        routerStatusLabel?.cell?.stringValue = "Router status: Not running"
+      } else {
+        routerStatusLabel?.cell?.stringValue = "Router status: Running"
+      }
+    } catch {
+      // Ensure it's set even AgentStatus is nil (uninitialized yet..)
+      routerStatusLabel?.cell?.stringValue = "Router status: Not running"
+    }
     
     let staticStartedByLabelText = "Router started by launcher?"
     if RouterProcessStatus.isRouterChildProcess {
@@ -102,12 +174,16 @@ import Cocoa
   init() {
     let c = NSCoder()
     super.init(coder: c)!
-    self.setRouterStatusLabelText()
+    self.setupObservers()
+    self.toggleSetButtonStart()
+    self.reEnableButton()
   }
   
   required init?(coder decoder: NSCoder) {
     super.init(coder: decoder)
-    self.setRouterStatusLabelText()
+    self.setupObservers()
+    self.toggleSetButtonStart()
+    self.reEnableButton()
   }
   
 }

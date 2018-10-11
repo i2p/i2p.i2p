@@ -10,6 +10,12 @@ import Cocoa
 
 class PopoverViewController: NSViewController {
   
+  @IBOutlet var routerStatusViewOutlet: RouterStatusView?
+  
+  func getRouterStatusView() -> RouterStatusView? {
+    return self.routerStatusViewOutlet
+  }
+  
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
