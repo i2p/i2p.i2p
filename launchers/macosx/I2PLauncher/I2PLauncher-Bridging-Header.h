@@ -5,5 +5,4 @@
 #import "AppleStuffExceptionHandler.h"
 #import "AppDelegate.h"
 #import "RouterTask.h"
-#import "Sparkle/SUUpdater.h"
-
+#import "logger_c.h"

@@ -55,10 +55,12 @@ inline std::string buildClassPathForObjC(std::string basePath)
 
 #endif
 
+
 @interface SBridge : NSObject
 @property (nonatomic, assign) I2PRouterTask* currentRouterInstance;
 - (NSString*) buildClassPath:(NSString*)i2pPath;
-- (void) startupI2PRouter:(NSString*)i2pRootPath javaBinPath:(NSString*)javaBinPath;
+- (void) startupI2PRouter:(NSString*)i2pRootPath;
 - (void) openUrl:(NSString*)url;
++ (void) logProxy:(int)level formattedMsg:(NSString*)formattedMsg;
 + (instancetype)sharedInstance; // this makes it a singleton
 @end

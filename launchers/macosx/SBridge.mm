@@ -31,10 +31,20 @@
 
 std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir, RouterProcessStatus* routerStatus) {
   @try {
+    
+    /**
+     *
+     * The following code will do a test, where it lists all known processes in the OS (visibility depending on user rights)
+     * and scan for any command/arguments matching the substring "i2p.jar" - and in which case it won't start I2P itself.
+     *
+     **/
     IIProcessInfo* processInfoObj = [[IIProcessInfo alloc] init];
     [processInfoObj obtainFreshProcessList];
     auto anyRouterLookingProcs = [processInfoObj findProcessWithStringInNameOrArguments:@"i2p.jar"];
     if (anyRouterLookingProcs) {
+      /**
+       * The router was found running
+       */
       auto errMessage = @"Seems i2p is already running - I've detected another process with i2p.jar in it's arguments.";
       MLog(4, @"%@", errMessage);
       sendUserNotification(APP_IDSTR, errMessage);
@@ -43,6 +53,9 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
         return -1;
       });
     } else {
+      /**
+       * No router was detected running
+       **/
       RTaskOptions* options = [RTaskOptions alloc];
       options.binPath = javaBin;
       options.arguments = arguments;
@@ -120,9 +133,13 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
   return [[NSString alloc] initWithUTF8String:classpath];
 }
 
++ (void) logProxy:(int)level formattedMsg:(NSString*)formattedMsg
+{
+  MLog(level, formattedMsg);
+}
 
 
-- (void)startupI2PRouter:(NSString*)i2pRootPath javaBinPath:(NSString*)javaBinPath
+- (void)startupI2PRouter:(NSString*)i2pRootPath
 {
   std::string basePath([i2pRootPath UTF8String]);
   
@@ -134,6 +151,10 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
   
   try {
     std::vector<NSString*> argList = {
+      @"-v",
+      @"1.7+",
+      @"--exec",
+      @"java",
       @"-Xmx512M",
       @"-Xms128m",
       @"-Djava.awt.headless=true",
@@ -157,15 +178,15 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
     argList.push_back([NSString stringWithUTF8String:cpString.c_str()]);
     argList.push_back([NSString stringWithUTF8String:classPathStr.c_str()]);
     argList.push_back(@"net.i2p.router.Router");
-    auto javaBin = std::string([javaBinPath UTF8String]);
+    auto javaBin = std::string("/usr/libexec/java_home");
     
     
     sendUserNotification(APP_IDSTR, @"I2P Router is starting up!");
-    auto nsJavaBin = javaBinPath;
+    auto nsJavaBin = [NSString stringWithUTF8String:javaBin.c_str()];
     auto nsBasePath = i2pRootPath;
     NSArray* arrArguments = [NSArray arrayWithObjects:&argList[0] count:argList.size()];
     
-    MLog(0, @"Trying to run command: %@", javaBinPath);
+    MLog(0, @"Trying to run command: %@", nsJavaBin);
     MLog(0, @"With I2P Base dir: %@", i2pRootPath);
     MLog(0, @"And Arguments: %@", arrArguments);
     startupRouter(nsJavaBin, arrArguments, nsBasePath, routerStatus);
