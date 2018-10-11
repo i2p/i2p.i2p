@@ -40,8 +40,9 @@ Homebrew is quite well maintained on OSX and any updates at Oracle should quickl
 You can both build the project from the Xcode UI or you can build it from command line.
 
 An example build command:
-`xcodebuild -target I2PLauncher -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk`
+`REPACK_I2P=1 xcodebuild -target I2PLauncher -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk`
 
+**Note** you don't need REPACK_I2P except for the first build, and each time you wish to repack the zip file containing i2p.
 
 ## Objective-C / Swift Links
 
