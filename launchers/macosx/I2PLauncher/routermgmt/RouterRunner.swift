@@ -8,62 +8,212 @@
 
 import Foundation
 
-class RouterRunner: NSObject, I2PSubprocess {
+class RouterRunner: NSObject {
   
-  var subprocessPath: String?
+  
+  var daemonPath: String?
   var arguments: String?
-  var timeWhenStarted: Date?
+  
+  static var launchAgent: LaunchAgent?
+  let routerStatus: RouterProcessStatus = RouterProcessStatus()
   
   var currentRunningProcess: Subprocess?
   var currentProcessResults: ExecutionResult?
   
-  func findJava() {
-    self.subprocessPath = RouterProcessStatus.knownJavaBinPath
-  }
+  let domainLabel = "net.i2p.macosx.I2PRouter"
   
-  let defaultStartupFlags:[String] = [
-    "-Xmx512M",
-    "-Xms128m",
-    "-Djava.awt.headless=true",
-    "-Dwrapper.logfile=/tmp/router.log",
-    "-Dwrapper.logfile.loglevel=DEBUG",
-    "-Dwrapper.java.pidfile=/tmp/routerjvm.pid",
-    "-Dwrapper.console.loglevel=DEBUG"
+  let plistName = "net.i2p.macosx.I2PRouterAgent.plist"
+  
+  let defaultStartupCommand:String = "/usr/libexec/java_home"
+  
+  let defaultJavaHomeArgs:[String] = [
+    "-v",
+    "1.7+",
+    "--exec",
+    "java",
   ]
   
-  private func subInit(cmdPath: String?, cmdArgs: String?) {
-    // Use this as common init
-    self.subprocessPath = cmdPath
-    self.arguments = cmdArgs
-    if (self.arguments?.isEmpty)! {
-      self.arguments = Optional.some(defaultStartupFlags.joined(separator: " "))
-    };
-    let newArgs:[String] = ["-c ",
-                            self.subprocessPath!,
-      " ",
-      self.arguments!,
-    ]
-    self.currentRunningProcess = Optional.some(Subprocess.init(executablePath: "/bin/sh", arguments: newArgs))
+  let appSupportPath = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
+  
+  func SetupAgent() {
+    let agent = SetupAndReturnAgent()
+    RouterRunner.launchAgent = agent
   }
   
-  init(cmdPath: String?, _ cmdArgs: String? = Optional.none) {
-    super.init()
-    self.subInit(cmdPath: cmdPath, cmdArgs: cmdArgs)
+  typealias Async = (_ success: () -> Void, _ failure: (NSError) -> Void) -> Void
+  
+  func retry(numberOfTimes: Int, _ sleepForS: UInt32, task: () -> Async, success: () -> Void, failure: (NSError) -> Void) {
+    task()(success, { error in
+      if numberOfTimes > 1 {
+        sleep(sleepForS)
+        retry(numberOfTimes: numberOfTimes - 1, sleepForS, task: task, success: success, failure: failure)
+      } else {
+        failure(error)
+      }
+    })
   }
   
-  init(coder: NSCoder) {
-    super.init()
-    self.subInit(cmdPath: Optional.none, cmdArgs: Optional.none)
-  }
-  
-  func execute() {
-    if (self.currentRunningProcess != Optional.none!) {
-      print("Already executing! Process ", self.toString())
-    }
-    self.timeWhenStarted = Date()
-    RouterProcessStatus.routerStartedAt = self.timeWhenStarted
+  func SetupAndReturnAgent() -> LaunchAgent {
     
-    self.currentProcessResults = self.currentRunningProcess?.execute(captureOutput: true)
+    let defaultStartupFlags:[String] = [
+      "-Xmx512M",
+      "-Xms128m",
+      "-Djava.awt.headless=true",
+      "".appendingFormat("-Di2p.base.dir=%@", NSHomeDirectory()+"/Library/I2P"),
+      "".appendingFormat("-Dwrapper.logfile=%@/Library/I2P/router.log", NSHomeDirectory()),
+      "-Dwrapper.logfile.loglevel=DEBUG",
+      "".appendingFormat("-Dwrapper.java.pidfile=%@/i2p/router.pid", appSupportPath.description),
+      "-Dwrapper.console.loglevel=DEBUG",
+      "net.i2p.router.Router"
+    ]
+    
+    self.daemonPath = self.defaultStartupCommand
+    self.arguments = defaultStartupFlags.joined(separator: " ")
+    
+    let basePath = NSHomeDirectory()+"/Library/I2P"
+    
+    let jars = try! FileManager.default.contentsOfDirectory(atPath: basePath+"/lib")
+    var classpath:String = "."
+    for jar in jars {
+      classpath += ":"+basePath+"/lib/"+jar
+    }
+    
+    var cliArgs:[String] = [
+      self.daemonPath!,
+      ]
+    cliArgs.append(contentsOf: self.defaultJavaHomeArgs)
+    cliArgs.append(contentsOf: [
+      "-cp",
+      classpath,
+      ])
+    cliArgs.append(contentsOf: defaultStartupFlags)
+    let agent = LaunchAgent(label: self.domainLabel,program: cliArgs)
+    agent.launchOnlyOnce = false
+    agent.keepAlive = false
+    agent.workingDirectory = basePath
+    agent.userName = NSUserName()
+    agent.standardErrorPath = NSHomeDirectory()+"/Library/Logs/I2P/router.stderr.log"
+    agent.standardOutPath = NSHomeDirectory()+"/Library/Logs/I2P/router.stdout.log"
+    agent.environmentVariables = [
+      "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+      "I2PBASE": basePath,
+    ]
+    agent.disabled = false
+    agent.processType = ProcessType.adaptive
+    RouterRunner.launchAgent = agent
+    
+    let userPreferences = UserDefaults.standard
+    let shouldStartupAtLogin = userPreferences.bool(forKey: "startRouterAtLogin")
+    agent.runAtLoad = shouldStartupAtLogin
+    agent.keepAlive = true
+    
+    do {
+      
+      try LaunchAgentManager.shared.write(agent, called: self.plistName)
+      sleep(1)
+      try LaunchAgentManager.shared.load(agent)
+      sleep(1)
+      
+      let agentStatus = LaunchAgentManager.shared.status(agent)
+      switch agentStatus {
+      case .running:
+        break
+      case .loaded:
+        break
+      case .unloaded:
+        sleep(2)
+        break
+      }
+      
+      
+      RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: agent)
+    } catch {
+      RouterManager.shared().eventManager.trigger(eventName: "router_setup_error", information: "\(error)")
+    }
+    return agent
+  }
+  
+  func StartAgent(information:Any?) {
+    let agent = RouterRunner.launchAgent!
+    LaunchAgentManager.shared.start(agent)
+    sleep(1)
+    let agentStatus = agent.status()
+    switch agentStatus {
+    case .running(let pid):
+      RouterManager.shared().eventManager.trigger(eventName: "router_start", information: String(pid))
+      routerStatus.setRouterStatus(true)
+      routerStatus.setRouterRanByUs(true)
+      DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        // Delayed message to ensure UI has been initialized.
+        RouterManager.shared().eventManager.trigger(eventName: "router_pid", information: String(pid))
+      }
+      break
+      
+    default: break
+    }
+  }
+  
+  func StopAgent() {
+    var agentStatus = LaunchAgentManager.shared.status(RouterRunner.launchAgent!)
+    switch agentStatus {
+    case .running:
+      LaunchAgentManager.shared.stop(RouterRunner.launchAgent!)
+      break
+    case .loaded, .unloaded:
+      try! LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+      routerStatus.setRouterStatus(false)
+      routerStatus.setRouterRanByUs(false)
+      RouterManager.shared().eventManager.trigger(eventName: "router_stop", information: "ok")
+      return;
+      break
+    default: break
+    }
+    sleep(1)
+    agentStatus = LaunchAgentManager.shared.status(RouterRunner.launchAgent!)
+    switch agentStatus {
+    case .loaded, .unloaded:
+      try! LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+      routerStatus.setRouterStatus(false)
+      routerStatus.setRouterRanByUs(false)
+      RouterManager.shared().eventManager.trigger(eventName: "router_stop", information: "ok")
+      break
+    default: break
+    }
+  }
+  
+  func SetupLaunchd() {
+    do {
+      try LaunchAgentManager.shared.write(RouterRunner.launchAgent!, called: self.plistName)
+      try LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+    } catch {
+      RouterManager.shared().eventManager.trigger(eventName: "router_exception", information: error)
+    }
+  }
+  
+  func TeardownLaunchd() {
+    /*let status = LaunchAgentManager.shared.status(RouterRunner.launchAgent!)
+    switch status {
+    case .running:*/
+      do {
+        // Unload no matter previous state!
+        try LaunchAgentManager.shared.unload(RouterRunner.launchAgent!)
+        
+        let plistPath = NSHomeDirectory()+"/Library/LaunchAgents/"+self.plistName
+        
+        sleep(1)
+        if FileManager.default.fileExists(atPath: plistPath) {
+          try FileManager.default.removeItem(atPath: plistPath)
+        }
+      } catch LaunchAgentManagerError.urlNotSet(label: self.domainLabel) {
+        Logger.MLog(level:3, "URL not set in launch agent")
+      } catch {
+        Logger.MLog(level:3, "".appendingFormat("Error in launch agent: %s", error as CVarArg))
+        RouterManager.shared().eventManager.trigger(eventName: "router_exception", information: error)
+      }
+   /*   break
+    default: break
+    }
+    */
   }
   
 }

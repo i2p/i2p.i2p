@@ -10,10 +10,10 @@ import Foundation
 
 extension RouterProcessStatus {
   
-  static func createNewRouterProcess(i2pPath: String, javaBinPath: String) {
+  static func createNewRouterProcess(i2pPath: String) {
     let timeWhenStarted = Date()
     RouterProcessStatus.routerStartedAt = timeWhenStarted
-    SBridge.sharedInstance().startupI2PRouter(i2pPath, javaBinPath: javaBinPath)
+    SBridge.sharedInstance().startupI2PRouter(i2pPath)
     RouterManager.shared().updateState()
   }
   static func shutdownRouterChildProcess() {

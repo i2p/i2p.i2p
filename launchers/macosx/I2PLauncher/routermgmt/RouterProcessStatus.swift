@@ -30,7 +30,11 @@ import AppKit
   }
   
   @objc func getJavaHome() -> String {
-    return RouterProcessStatus.knownJavaBinPath!
+    return DetectJava.shared().javaHome
+  }
+  
+  @objc func getJavaViaLibexec() -> Array<String> {
+    return DetectJava.shared().getJavaViaLibexecBin()
   }
   
   @objc func triggerEvent(en: String, details: String? = nil) {
@@ -47,10 +51,8 @@ extension RouterProcessStatus {
   static var isRouterChildProcess : Bool = (RouterManager.shared().getRouterTask() != nil)
   static var routerVersion : String? = Optional.none
   static var routerStartedAt : Date? = Optional.none
-  static var knownJavaBinPath : String? = Optional.none
   static var i2pDirectoryPath : String = NSHomeDirectory() + "/Library/I2P"
   
-  static var knownRouterSubTaskRef : I2PSubprocess? = Optional.none
   
 }
 
