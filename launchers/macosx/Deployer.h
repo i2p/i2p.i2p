@@ -7,9 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Foundation/NSError.h>
+#import "AppDelegate.h"
+
+@class ExtractMetaInfo;
 
 
-@interface NSObject ()
-
+@interface I2PDeployer : NSObject
+@property (assign) ExtractMetaInfo *metaInfo;
+- (I2PDeployer *) initWithMetaInfo:(ExtractMetaInfo*)mi;
+- (void) extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion;
 @end
 

@@ -18,12 +18,7 @@
 
 #include "RouterTask.h"
 
-
-#define DEF_I2P_VERSION "0.9.36"
-#define APPDOMAIN "net.i2p.launcher"
-#define NSAPPDOMAIN @APPDOMAIN
-#define CFAPPDOMAIN CFSTR(APPDOMAIN)
-#define APP_IDSTR @"I2P Launcher"
+#include "version.h"
 
 @class SwiftMainDelegate;
 
@@ -55,6 +50,17 @@ inline std::string getDefaultBaseDir()
   // Figure out base directory
   auto homeDir = RealHomeDirectory();
   const char* pathFromHome = "%s/Library/I2P";
+  char buffer[strlen(homeDir)+strlen(pathFromHome)];
+  sprintf(buffer, pathFromHome, homeDir);
+  std::string i2pBaseDir(buffer);
+  return i2pBaseDir;
+}
+
+inline std::string getDefaultLogDir()
+{
+  // Figure out log directory
+  auto homeDir = RealHomeDirectory();
+  const char* pathFromHome = "%s/Library/Logs/I2P";
   char buffer[strlen(homeDir)+strlen(pathFromHome)];
   sprintf(buffer, pathFromHome, homeDir);
   std::string i2pBaseDir(buffer);
