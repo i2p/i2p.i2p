@@ -8,7 +8,7 @@ improve our official packages and support other packagers.
 Our packages are available at https://deb.i2p2.de/ and
 instructions are at https://geti2p.net/debian
 
-This document is current as of release 0.9.33, scheduled 2018-01
+This document is current as of release 0.9.37, 2018-10-04.
 
 
 Build-only Dependencies
@@ -17,13 +17,22 @@ Build-only Dependencies
 * ant
   This is the standard java build system.
 
+* Java JDK
+  We require openjdk-7-java or higher to build. For 8, set bootclasspath to
+  java 7 jars if available.
+  For 9 or higher, require the same or higher runtime, since bootclasspath
+  isn't possible.
+
+* libgmp-dev
+
 
 Current Runtime Dependencies
 ----------------------------
 
-* Java JDK/JRE
-  We require openjdk-7-java to build, and any Java 7, 8, or 9 runtime to run.
-  Java 9 may still have some issues; see https://trac.i2p2.de/ticket/1870 for status
+* Java JRE
+  We require Java 7 or higher runtime, if built with Java 7 or bootclasspath was set
+  in the build. If built with 8 or higher and bootclasspath was not set,
+  then require the same JRE or higher.
 
 * geoip-database
   In non-Debian builds we bundle our own geoip data;
@@ -40,12 +49,16 @@ Current Runtime Dependencies
 * libjetty9-java
   For /usr/share/java/jetty9-*.jar.
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
+  This is for Jetty 9.2.x, which is what's in Debian.
+  We are not compatible with Jetty 9.4.x, which is what's in RedHat.
 
 * libtomcat8-java
   For /usr/share/java/tomcat8-*.jar.
   In non-Debian builds we bundle the jars as packaged in the Jetty 9.2 binary release,
   which are different than the way they are packaged for Debian.
   They are removed in the Debian source package.
+  This is for Tomcat 8.5.x, which is what's in recent Debian/Ubuntu.
+  Tomcat 8.0.x in older Debian/Ubuntu may or may not work.
 
 * libtaglibs-standard-*-java (stretch and later, artful and later only)
   Provides JSTL 1.2, solves the glassfish-javaee problem described below.
@@ -70,11 +83,9 @@ Current Runtime Dependencies
   For some Debian and Ubuntu releases, these seem to be much older than what we're bundling,
   but there's no particular version that we need.
 
-* libgmp-dev
+* libgmp10
   In non-Debian builds we bundle compiled C code; in the Debian packages we have a small
   C shim that links to the libgmp .so file.
-  We depend on libgmp-dev for both the build and the runtime, but perhaps only the
-  libgmp10 package is required for runtime? To be researched.
 
 * famfamfam-flag-png
   Country flags (all except precise)
@@ -185,3 +196,6 @@ Other Issues and TODO
   We don't have a strategy for building, installing, or finding packages for
   3rd-party plugins using our plugin system. If we do that, then we can
   have packages for popular plugins such as i2p-bote.
+
+* AppArmor
+  Needs work. In complain-only mode now.
