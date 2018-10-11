@@ -440,7 +440,7 @@ public class PluginStarter implements Runnable {
         }
 
         // start console webapps in console/webapps
-        ContextHandlerCollection server = WebAppStarter.getConsoleServer();
+        ContextHandlerCollection server = WebAppStarter.getConsoleServer(ctx);
         if (server != null) {
             File consoleDir = new File(pluginDir, "console");
             Properties wprops = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -951,7 +951,7 @@ public class PluginStarter implements Runnable {
             Iterator <String> it = pluginWars.get(pluginName).iterator();
             while(it.hasNext() && !isWarRunning) {
                 String warName = it.next();
-                if(WebAppStarter.isWebAppRunning(warName)) {
+                if(WebAppStarter.isWebAppRunning(ctx, warName)) {
                     isWarRunning = true;
                 }
             }

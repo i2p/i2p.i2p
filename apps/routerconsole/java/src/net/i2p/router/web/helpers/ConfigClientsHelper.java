@@ -215,7 +215,7 @@ public class ConfigClientsHelper extends HelperBase {
             if (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)) {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
-                boolean isRunning = WebAppStarter.isWebAppRunning(app);
+                boolean isRunning = WebAppStarter.isWebAppRunning(_context, app);
                 String desc;
                 // use descriptions already tagged elsewhere
                 if (app.equals("routerconsole"))

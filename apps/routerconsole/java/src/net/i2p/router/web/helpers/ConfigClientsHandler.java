@@ -387,7 +387,7 @@ public class ConfigClientsHandler extends FormHandler {
      * requested and add the .war to that one
      */
     private void startWebApp(String app) {
-        ContextHandlerCollection s = WebAppStarter.getConsoleServer();
+        ContextHandlerCollection s = WebAppStarter.getConsoleServer(_context);
         if (s != null) {
                     try {
                         File path = new File(_context.getBaseDir(), "webapps");
