@@ -9,50 +9,56 @@
 import Foundation
 import Cocoa
 
+class Logger {
+  static func MLog<T>(level:Int32, _ object: T?,file:String = #file, function:String = #function, line:Int = #line) {
+    SBridge.logProxy(level, formattedMsg: "\(makeTag(function: function, file: file, line: line)) : \(object)")
+  }
+  
+  private static func makeTag(function: String, file: String, line: Int) -> String{
+    let url = NSURL(fileURLWithPath: file)
+    let className:String! = url.lastPathComponent == nil ? file: url.lastPathComponent!
+    return "\(className) \(function)[\(line)]"
+  }
+  
+}
+
+
 @objc class SwiftMainDelegate : NSObject {
   
   let statusBarController = StatusBarController()
   let sharedRouterMgmr = RouterManager.shared()
-  static let javaDetector = DetectJava()
   
   override init() {
     super.init()
-    if (!SwiftMainDelegate.javaDetector.isJavaFound()) {
-    SwiftMainDelegate.javaDetector.findIt()
-      if (!SwiftMainDelegate.javaDetector.isJavaFound()) {
-        print("Could not find java....")
+    if (!DetectJava.shared().isJavaFound()) {
+    DetectJava.shared().findIt()
+      if (!DetectJava.shared().isJavaFound()) {
+        Logger.MLog(level:3, "Could not find java....")
         terminate("No java..")
       }
     }
-    let javaBinPath = SwiftMainDelegate.javaDetector.javaHome
-    RouterProcessStatus.knownJavaBinPath = javaBinPath
-    print("Found java home = ", javaBinPath)
+    let javaBinPath = DetectJava.shared().javaBinary
+    Logger.MLog(level:1, "".appendingFormat("Found java home = %@", javaBinPath!))
     
     let (portIsNotTaken, _) = RouterProcessStatus.checkTcpPortForListen(port: 7657)
     if (!portIsNotTaken) {
       RouterProcessStatus.isRouterRunning = true
       RouterProcessStatus.isRouterChildProcess = false
-      print("I2P Router seems to be running")
+      Logger.MLog(level:2, "I2P Router seems to be running")
     } else {
       RouterProcessStatus.isRouterRunning = false
-      print("I2P Router seems to NOT be running")
+      Logger.MLog(level:2, "I2P Router seems to NOT be running")
     }
   } // End of init()
   
   @objc func findInstalledI2PVersion() {
     var i2pPath = NSHomeDirectory()
     i2pPath += "/Library/I2P"
-    var jExecPath:String = RouterProcessStatus.knownJavaBinPath!
-    
-    // Sometimes, home will return the binary, sometimes the actual home dir. This fixes the diverge.
-    // If JRE is detected, binary follows - if it's JDK, home follows.
-    if (jExecPath.hasSuffix("Home")) {
-      jExecPath += "/jre/bin/java"
-    }
+    let jExecPath:String = "/usr/libexec/java_home -v 1.7+ --exec java "
     
     let jarPath = i2pPath + "/lib/i2p.jar"
     
-    let subCmd = jExecPath + " -cp " + jarPath + " net.i2p.CoreVersion"
+    let subCmd = jExecPath + "-cp " + jarPath + " net.i2p.CoreVersion"
     
     let cmdArgs:[String] = ["-c", subCmd]
     print(cmdArgs)
@@ -61,25 +67,21 @@ import Cocoa
     if (results.didCaptureOutput) {
       if (results.status == 0) {
         let i2pVersion = results.outputLines.first?.replace(target: "I2P Core version: ", withString: "")
-        NSLog("I2P version detected: %@",i2pVersion ?? "Unknown")
+        Logger.MLog(level: 1, "".appendingFormat("I2P version detected: %@",i2pVersion ?? "Unknown"))
         RouterProcessStatus.routerVersion = i2pVersion
         RouterManager.shared().eventManager.trigger(eventName: "router_version", information: i2pVersion)
-        RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: i2pVersion)
       } else {
-        NSLog("Non zero exit code from subprocess while trying to detect version number!")
+        Logger.MLog(level: 2, "Non zero exit code from subprocess while trying to detect version number!")
         for line in results.errorsLines {
-          NSLog(line)
+          Logger.MLog(level: 2, line)
         }
       }
     } else {
-      print("Warning: Version Detection did NOT captured output")
+      Logger.MLog(level: 1, "Warning: Version Detection did NOT captured output")
     }
   }
   
   @objc func applicationDidFinishLaunching() {
-    var i2pPath = NSHomeDirectory()
-    i2pPath += "/Library/I2P"
-    
   }
   
   @objc func listenForEvent(eventName: String, callbackActionFn: @escaping ((Any?)->()) ) {
@@ -96,10 +98,21 @@ import Cocoa
   
   @objc func applicationWillTerminate() {
     // Shutdown stuff
+    let userPreferences = UserDefaults.standard
+    if (!userPreferences.bool(forKey: "letRouterLiveEvenLauncherDied")) {
+      RouterManager.shared().routerRunner.TeardownLaunchd()
+      sleep(2)
+      let status: AgentStatus? = RouterRunner.launchAgent?.status()
+      if status != .unloaded {
+        Logger.MLog(level:2, "Router service not yet stopped")
+        RouterManager.shared().routerRunner.TeardownLaunchd()
+        sleep(5)
+      }
+    }
   }
   
   @objc func terminate(_ why: Any?) {
-    print("Stopping cause of ", why!)
+    Logger.MLog(level:2, "".appendingFormat("Stopping cause of ", why! as! CVarArg))
   }
 }
 
