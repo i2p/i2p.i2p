@@ -8,6 +8,8 @@
 
 import Foundation
 
+// TODO: Log all events?
+
 class EventManager {
   var listeners = Dictionary<String, NSMutableArray>();
   
@@ -51,6 +53,7 @@ class EventManager {
   // @param eventName: Matching listener eventNames will fire when this is called
   // @param information: pass values to your listeners
   func trigger(eventName:String, information:Any? = nil) {
+    print("Event: ", eventName, " will trigger ", self.listeners[eventName]?.count ?? 0, " listeners")
     if let actionObjects = self.listeners[eventName] {
       for actionObject in actionObjects {
         if let actionToPerform = actionObject as? EventListenerAction {
