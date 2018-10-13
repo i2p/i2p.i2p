@@ -90,16 +90,8 @@
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                     </button>
-                                                    <button identifier="restartRouterButton" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C1m-1t-Xiq" userLabel="restart-button">
-                                                        <rect key="frame" x="10" y="150" width="128" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Restart Router" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="sih-uF-V06">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                    </button>
                                                     <button identifier="openConsoleButton" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XZi-oz-5gy" userLabel="open-console-button">
-                                                        <rect key="frame" x="11" y="123" width="126" height="32"/>
+                                                        <rect key="frame" x="10" y="150" width="126" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Open Console" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yh8-lj-JFi">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -114,7 +106,6 @@
                                     <connections>
                                         <outlet property="openConsoleButton" destination="XZi-oz-5gy" id="6xH-8v-63j"/>
                                         <outlet property="quickControlView" destination="D8V-d8-0wT" id="4to-rN-2eL"/>
-                                        <outlet property="restartRouterButton" destination="C1m-1t-Xiq" id="foI-Gq-cHI"/>
                                         <outlet property="routerPIDLabel" destination="bmP-Ui-gyo" id="x5L-c1-yja"/>
                                         <outlet property="routerStartStopButton" destination="1eu-Qw-TD9" id="FLt-MK-y5u"/>
                                         <outlet property="routerStartedByLabel" destination="tgG-IT-Ojg" id="dA0-3w-cuF"/>
