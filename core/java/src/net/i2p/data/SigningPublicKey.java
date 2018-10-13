@@ -202,11 +202,14 @@ public class SigningPublicKey extends SimpleDataStructure {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
-        buf.append('[').append(getClass().getSimpleName()).append(' ').append(_type).append(": ");
+        buf.append("[SigningPublicKey ").append((_type != null) ? _type.toString() : "unknown type").append(' ');
+        int length = length();
         if (_data == null) {
             buf.append("null");
+        } else if (length <= 32) {
+            buf.append(toBase64());
         } else {
-            buf.append("size: ").append(Integer.toString(length()));
+            buf.append("size: ").append(length);
         }
         buf.append(']');
         return buf.toString();
