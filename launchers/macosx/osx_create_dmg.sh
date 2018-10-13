@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. .sign-secrets
+source $DIR/.sign-secrets
 
 APP_NAME="I2PLauncher"
-VERSION="0.9.36"
-DMG_BACKGROUND_IMG="${DIR}/Background.png"
+VERSION="0.9.37"
+DMG_BACKGROUND_IMG=${BACKGROUND_IMG:-"Background.png"}
 
 APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
-VOL_NAME="${APP_NAME} ${VERSION}"
+VOL_NAME="${APP_NAME}-${VERSION}"
 DMG_TMP="${VOL_NAME}-temp.dmg"
 DMG_FINAL="${VOL_NAME}.dmg"
 STAGING_DIR="/tmp/mkdmg$$"
@@ -23,13 +23,11 @@ if [ $(echo " $_BACKGROUND_IMAGE_DPI_H != 72.0 " | bc) -eq 1 -o $(echo " $_BACKG
 
    _DMG_BACKGROUND_TMP="${DMG_BACKGROUND_IMG%.*}"_dpifix."${DMG_BACKGROUND_IMG##*.}"
 
-   sips -s dpiWidth 72 -s dpiHeight 72 ${DMG_BACKGROUND_IMG} --out ${_DMG_BACKGROUND_TMP}
+   sips -s dpiWidth 72 -s dpiHeight 72 $DIR/${DMG_BACKGROUND_IMG} --out $DIR/${_DMG_BACKGROUND_TMP}
 
-   DMG_BACKGROUND_IMG="${_DMG_BACKGROUND_TMP}"
+
+  DMG_BACKGROUND_IMG="${_DMG_BACKGROUND_TMP}"
 fi
-
-# clear out any old data
-rm -rf "${STAGING_DIR}" "${DMG_TMP}" "${DMG_FINAL}"
 
 # copy over the stuff we want in the final disk image to our staging dir
 mkdir -p "${STAGING_DIR}"
@@ -39,7 +37,7 @@ cp -rpf "${APP_NAME}.app" "${STAGING_DIR}"
 # figure out how big our DMG needs to be
 #  assumes our contents are at least 1M!
 SIZE=`du -sh "${STAGING_DIR}" | sed 's/\([0-9\.]*\)M\(.*\)/\1/'`
-SIZE=`echo "${SIZE} + 1.0" | bc | awk '{print int($1+0.5)}'`
+SIZE=`echo "${SIZE} + 23.0" | bc | awk '{print int($1+0.5)}'`
 
 if [ $? -ne 0 ]; then
    echo "Error: Cannot compute size of staging dir"
@@ -48,24 +46,28 @@ fi
 
 # create the temp DMG file
 hdiutil create -srcfolder "${STAGING_DIR}" -volname "${VOL_NAME}" -fs HFS+ \
-      -fsargs "-c c=64,a=16,e=16" -format UDRW -size ${SIZE}M "${DMG_TMP}"
+      -fsargs "-c c=64,a=16,e=16" -format UDRW -size ${SIZE}M "$RELEASE_DIR/${DMG_TMP}"
 
 echo "Created DMG: ${DMG_TMP}"
 
 # mount it and save the device
-DEVICE=$(hdiutil attach -readwrite -noverify "${DMG_TMP}" | \
+DEVICE=$(hdiutil attach -readwrite -noverify "$RELEASE_DIR/${DMG_TMP}" | \
          egrep '^/dev/' | sed 1q | awk '{print $1}')
 
 sleep 2
 
+
+
 # add a link to the Applications dir
 echo "Add link to /Applications"
-pushd /Volumes/"${VOL_NAME}"
-ln -s /Applications
+cd /Volumes/"${VOL_NAME}"
+ln -sf /Applications Applications
 
 # add a background image
-mkdir /Volumes/"${VOL_NAME}"/.background
-cp "${DMG_BACKGROUND_IMG}" /Volumes/"${VOL_NAME}"/.background/
+mkdir -p /Volumes/"${VOL_NAME}"/.background
+cp "$DIR/`basename ${DMG_BACKGROUND_IMG}`" /Volumes/"${VOL_NAME}"/.background/`basename ${DMG_BACKGROUND_IMG}`
+
+cd $RELEASE_DIR
 
 # tell the Finder to resize the window, set the background,
 #  change the icon size, place the icons in the right position, etc.
@@ -98,13 +100,14 @@ hdiutil detach "${DEVICE}"
 
 # now make the final image a compressed disk image
 echo "Creating compressed image"
-hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}"
+hdiutil convert "$RELEASE_DIR/${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "$RELEASE_DIR/${DMG_FINAL}"
 
-codesign --force --sign "${APPLE_CODE_SIGNER_ID}" "${DMG_FINAL}"
+codesign --force --deep --sign "${APPLE_CODE_SIGNER_ID}" "$RELEASE_DIR/${DMG_FINAL}"
 
 # clean up
-rm -rf "${DMG_TMP}"
+rm -rf "$RELEASE_DIR/${DMG_TMP}"
 rm -rf "${STAGING_DIR}"
+
 
 echo 'Done.'
 
