@@ -27,7 +27,6 @@ import Cocoa
   
   @IBOutlet var quickControlView: NSView?
   @IBOutlet var routerStartStopButton: NSButton?
-  @IBOutlet var restartRouterButton: NSButton?
   @IBOutlet var openConsoleButton: NSButton?
   
   
@@ -85,25 +84,6 @@ import Cocoa
     })
   }
   
-  @objc func actionBtnRestartRouter(_ sender: Any?) {
-    RouterManager.shared().eventManager.trigger(eventName: "toggle_popover")
-    let currentStatus : AgentStatus = RouterRunner.launchAgent?.status() ?? AgentStatus.unloaded
-    if currentStatus != AgentStatus.loaded && currentStatus != AgentStatus.unloaded {
-      NSLog("Found a running router, will unload it from launchd")
-      // OK, router seems to be running
-      DispatchQueue(label: "background_restart").async {
-        self.restartFn()
-        // Report done to main thread
-        DispatchQueue.main.async {
-          self.reEnableButton()
-        }
-      }
-    } else {
-      NSLog("Can't restart a non running router, start it however...")
-      RouterManager.shared().routerRunner.StartAgent()
-    }
-  }
-  
   func handlerRouterStart(information:Any?) {
     NSLog("Triggered handlerRouterStart")
     NSLog("PID2! %@", information as! String)
@@ -144,8 +124,6 @@ import Cocoa
     self.reEnableButton()
     openConsoleButton!.cell!.action = #selector(self.actionBtnOpenConsole(_:))
     openConsoleButton!.cell!.target = self
-    restartRouterButton!.cell!.action = #selector(self.actionBtnRestartRouter(_:))
-    restartRouterButton!.cell!.target = self
     
   }
   
