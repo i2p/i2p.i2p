@@ -23,11 +23,9 @@ import net.i2p.util.Clock;
  * @author jrandom
  */
 public class Lease extends DataStructureImpl {
-    private Hash _gateway;
-    private TunnelId _tunnelId;
-    private Date _end;
-    //private int _numSuccess;
-    //private int _numFailure;
+    protected Hash _gateway;
+    protected TunnelId _tunnelId;
+    protected Date _end;
 
     public Lease() {
     }

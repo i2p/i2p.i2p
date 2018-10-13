@@ -60,21 +60,21 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class LeaseSet extends DatabaseEntry {
-    private Destination _destination;
-    private PublicKey _encryptionKey;
-    private SigningPublicKey _signingKey;
+    protected Destination _destination;
+    protected PublicKey _encryptionKey;
+    protected SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
-    private final List<Lease> _leases;
-    private boolean _receivedAsPublished;
+    protected final List<Lease> _leases;
+    protected boolean _receivedAsPublished;
     private boolean _receivedAsReply;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
-    private long _lastExpiration;
+    protected long _lastExpiration;
     private List<Lease> _decryptedLeases;
     private boolean _decrypted;
-    private boolean _checked;
+    protected boolean _checked;
     // cached byte version
-    private volatile byte _byteified[];
+    protected volatile byte _byteified[];
 
     /**
      *  Unlimited before 0.6.3;
@@ -288,23 +288,21 @@ public class LeaseSet extends DatabaseEntry {
         return _lastExpiration > now - fudge;
     }
 
+    /** without sig! */
     protected byte[] getBytes() {
         if (_byteified != null) return _byteified;
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null))
             return null;
-        int len = _destination.size()
-                + PublicKey.KEYSIZE_BYTES // encryptionKey
-                + _signingKey.length() // signingKey
-                + 1
-                + _leases.size() * 44; // leases
+        int len = size();
         ByteArrayOutputStream out = new ByteArrayOutputStream(len);
         try {
             _destination.writeBytes(out);
             _encryptionKey.writeBytes(out);
             _signingKey.writeBytes(out);
             out.write((byte) _leases.size());
-            for (Lease lease : _leases)
+            for (Lease lease : _leases) {
                 lease.writeBytes(out);
+            }
         } catch (IOException ioe) {
             return null;
         } catch (DataFormatException dfe) {
@@ -361,8 +359,9 @@ public class LeaseSet extends DatabaseEntry {
         _encryptionKey.writeBytes(out);
         _signingKey.writeBytes(out);
         out.write((byte) _leases.size());
-        for (Lease lease : _leases)
+        for (Lease lease : _leases) {
             lease.writeBytes(out);
+        }
         _signature.writeBytes(out);
     }
     
@@ -374,7 +373,7 @@ public class LeaseSet extends DatabaseEntry {
              + PublicKey.KEYSIZE_BYTES // encryptionKey
              + _signingKey.length() // signingKey
              + 1 // number of leases
-             + _leases.size() * (Hash.HASH_LENGTH + 4 + 8);
+             + _leases.size() * 44;
     }
     
     @Override
@@ -388,7 +387,6 @@ public class LeaseSet extends DatabaseEntry {
                && DataHelper.eq(getEncryptionKey(), ls.getEncryptionKey())
                && DataHelper.eq(_signingKey, ls.getSigningKey())
                && DataHelper.eq(_destination, ls.getDestination());
-
     }
     
     /** the destination has enough randomness in it to use it by itself for speed */
