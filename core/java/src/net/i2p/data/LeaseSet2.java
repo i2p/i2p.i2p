@@ -20,19 +20,19 @@ import net.i2p.util.OrderedProperties;
  * @since 0.9.38
  */
 public class LeaseSet2 extends LeaseSet {
-    private int _flags;
+    protected int _flags;
     // stored as absolute ms
-    private long _published;
+    protected long _published;
     // stored as absolute ms
-    private long _expires;
+    protected long _expires;
     // stored as absolute ms
-    private long _transientExpires;
+    protected long _transientExpires;
     // if non-null, type of this is type of _signature in super
-    private SigningPublicKey _transientSigningPublicKey;
+    protected SigningPublicKey _transientSigningPublicKey;
     // if non-null, type of this is type of SPK in the dest
-    private Signature _offlineSignature;
+    protected Signature _offlineSignature;
     // may be null
-    private Properties _options;
+    protected Properties _options;
     // only used for unknown types; else use _encryptionKey.getType()
     private int _encType;
 
@@ -186,22 +186,7 @@ public class LeaseSet2 extends LeaseSet {
         if (_destination != null)
             throw new IllegalStateException();
         // LS2 header
-        _destination = Destination.create(in);
-        _published = DataHelper.readLong(in, 4) * 1000;
-        _expires = _published + (DataHelper.readLong(in, 2) * 1000);
-        _flags = (int) DataHelper.readLong(in, 2);
-        if (isOffline()) {
-            _transientExpires = DataHelper.readLong(in, 4) * 1000;
-            int itype = (int) DataHelper.readLong(in, 2);
-            SigType type = SigType.getByCode(itype);
-            if (type == null)
-                throw new DataFormatException("Unknown sig type " + itype);
-            _transientSigningPublicKey = new SigningPublicKey(type);
-            _transientSigningPublicKey.readBytes(in);
-            SigType stype = _destination.getSigningPublicKey().getType();
-            _offlineSignature = new Signature(stype);
-            _offlineSignature.readBytes(in);
-        }
+        readHeader(in);
         // LS2 part
         _options = DataHelper.readProperties(in);
         _encType = (int) DataHelper.readLong(in, 2);
@@ -231,7 +216,7 @@ public class LeaseSet2 extends LeaseSet {
         _signature = new Signature(type);
         _signature.readBytes(in);
     }
-    
+
     /**
      *  Including sig. This does NOT validate the signature
      */
@@ -246,24 +231,11 @@ public class LeaseSet2 extends LeaseSet {
     /**
      *  Without sig. This does NOT validate the signature
      */
-    private void writeBytesWithoutSig(OutputStream out) throws DataFormatException, IOException {
+    protected void writeBytesWithoutSig(OutputStream out) throws DataFormatException, IOException {
         if (_destination == null || _encryptionKey == null)
             throw new DataFormatException("Not enough data to write out a LeaseSet");
         // LS2 header
-        _destination.writeBytes(out);
-        if (_published <= 0)
-            _published = Clock.getInstance().now();
-        DataHelper.writeLong(out, 4, _published / 1000);
-        DataHelper.writeLong(out, 2, (_expires - _published) / 1000);
-        DataHelper.writeLong(out, 2, _flags);
-        if (isOffline()) {
-            if (_transientSigningPublicKey == null || _offlineSignature == null)
-                throw new DataFormatException("No offline key/sig");
-            DataHelper.writeLong(out, 4, _transientExpires / 1000);
-            DataHelper.writeLong(out, 2, _transientSigningPublicKey.getType().getCode());
-            _transientSigningPublicKey.writeBytes(out);
-            _offlineSignature.writeBytes(out);
-        }
+        writeHeader(out);
         // LS2 part
         if (_options != null && !_options.isEmpty()) {
             DataHelper.writeProperties(out, _options);
@@ -284,6 +256,48 @@ public class LeaseSet2 extends LeaseSet {
         }
     }
     
+    protected void readHeader(InputStream in) throws DataFormatException, IOException {
+        _destination = Destination.create(in);
+        _published = DataHelper.readLong(in, 4) * 1000;
+        _expires = _published + (DataHelper.readLong(in, 2) * 1000);
+        _flags = (int) DataHelper.readLong(in, 2);
+        if (isOffline())
+            readOfflineBytes(in);
+    }
+
+    protected void writeHeader(OutputStream out) throws DataFormatException, IOException {
+        _destination.writeBytes(out);
+        if (_published <= 0)
+            _published = Clock.getInstance().now();
+        DataHelper.writeLong(out, 4, _published / 1000);
+        DataHelper.writeLong(out, 2, (_expires - _published) / 1000);
+        DataHelper.writeLong(out, 2, _flags);
+        if (isOffline())
+            writeOfflineBytes(out);
+    }
+
+    private void readOfflineBytes(InputStream in) throws DataFormatException, IOException {
+        _transientExpires = DataHelper.readLong(in, 4) * 1000;
+        int itype = (int) DataHelper.readLong(in, 2);
+        SigType type = SigType.getByCode(itype);
+        if (type == null)
+            throw new DataFormatException("Unknown sig type " + itype);
+        _transientSigningPublicKey = new SigningPublicKey(type);
+        _transientSigningPublicKey.readBytes(in);
+        SigType stype = _destination.getSigningPublicKey().getType();
+        _offlineSignature = new Signature(stype);
+        _offlineSignature.readBytes(in);
+    }
+
+    private void writeOfflineBytes(OutputStream out) throws DataFormatException, IOException {
+        if (_transientSigningPublicKey == null || _offlineSignature == null)
+            throw new DataFormatException("No offline key/sig");
+        DataHelper.writeLong(out, 4, _transientExpires / 1000);
+        DataHelper.writeLong(out, 2, _transientSigningPublicKey.getType().getCode());
+        _transientSigningPublicKey.writeBytes(out);
+        _offlineSignature.writeBytes(out);
+    }
+    
     /**
      *  Number of bytes, NOT including signature
      */
@@ -295,10 +309,15 @@ public class LeaseSet2 extends LeaseSet {
              + (_leases.size() * 40);
         if (isOffline())
             rv += 2 + _transientSigningPublicKey.length() + _offlineSignature.length();
-        if (_options != null && !_options.isEmpty())
-            rv += 99; // TODO FIXME
-        else
+        if (_options != null && !_options.isEmpty()) {
+            try {
+                rv += DataHelper.toProperties(_options).length;
+            } catch (DataFormatException dfe) {
+                throw new IllegalStateException("bad options", dfe);
+            }
+        } else {
             rv += 2;
+        }
         return rv;
     }
 
@@ -371,10 +390,13 @@ public class LeaseSet2 extends LeaseSet {
         buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
         if (isOffline()) {
             buf.append("\n\tTransient Key: ").append(_transientSigningPublicKey);
-            buf.append("\n\tExpires: ").append(new java.util.Date(_transientExpires));
+            buf.append("\n\tTransient Expires: ").append(new java.util.Date(_transientExpires));
             buf.append("\n\tOffline Signature: ").append(_offlineSignature);
         }
+        buf.append("\n\tOptions: ").append((_options != null) ? _options.size() : 0);
         buf.append("\n\tSignature: ").append(_signature);
+        buf.append("\n\tPublished: ").append(new java.util.Date(_published));
+        buf.append("\n\tExpires: ").append(new java.util.Date(_expires));
         buf.append("\n\tLeases: #").append(getLeaseCount());
         for (int i = 0; i < getLeaseCount(); i++)
             buf.append("\n\t\t").append(getLease(i));
@@ -397,12 +419,14 @@ public class LeaseSet2 extends LeaseSet {
         PrivateKeyFile pkf = new PrivateKeyFile(f);
         pkf.createIfAbsent(SigType.EdDSA_SHA512_Ed25519);
         System.out.println("Online test");
-        test(pkf, false);
+        java.io.File f2 = new java.io.File("online-leaseset.dat");
+        test(pkf, f2, false);
         System.out.println("Offline test");
-        test(pkf, true);
+        f2 = new java.io.File("offline-leaseset.dat");
+        test(pkf, f2, true);
     }
 
-    private static void test(PrivateKeyFile pkf, boolean offline) throws Exception {
+    private static void test(PrivateKeyFile pkf, java.io.File outfile, boolean offline) throws Exception {
         net.i2p.util.RandomSource rand = net.i2p.util.RandomSource.getInstance();
         long now = System.currentTimeMillis() + 5*60*1000;
         LeaseSet2 ls2 = new LeaseSet2();
@@ -417,6 +441,10 @@ public class LeaseSet2 extends LeaseSet {
             l2.setTunnelId(id);
             ls2.addLease(l2);
         }
+        Properties opts = new Properties();
+        opts.setProperty("foo", "bar");
+        opts.setProperty("test", "bazzle");
+        ls2.setOptions(opts);
         ls2.setDestination(pkf.getDestination());
         SimpleDataStructure encKeys[] = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys();
         PublicKey pubKey = (PublicKey) encKeys[0];
@@ -438,6 +466,9 @@ public class LeaseSet2 extends LeaseSet {
             System.out.println("Verify FAILED");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ls2.writeBytes(out);
+        java.io.OutputStream out2 = new java.io.FileOutputStream(outfile);
+        ls2.writeBytes(out2);
+        out2.close();
         java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(out.toByteArray());
         LeaseSet2 ls3 = new LeaseSet2();
         ls3.readBytes(in);
