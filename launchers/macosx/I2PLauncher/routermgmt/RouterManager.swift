@@ -25,6 +25,7 @@ class RouterManager : NSObject {
   let routerRunner = RouterRunner()
   
   var logViewStorage: NSTextStorage?
+  var lastRouterPid : String? = nil
   
   private static func handleRouterException(information:Any?) {
     Logger.MLog(level:1,"event! - handle router exception")
@@ -94,6 +95,27 @@ class RouterManager : NSObject {
     routerManager.eventManager.listenTo(eventName: "router_already_running", action: handleRouterAlreadyStarted)
     routerManager.eventManager.listenTo(eventName: "router_can_start", action: routerManager.routerRunner.StartAgent)
     routerManager.eventManager.listenTo(eventName: "router_can_setup", action: routerManager.routerRunner.SetupAgent)
+    
+    //routerManager.eventManager.listenTo(eventName: "launch_agent_running", action: routerManager.routerRunner.onLoadedAgent)
+    
+    routerManager.eventManager.listenTo(eventName: "launch_agent_running", action: {
+      let agent = RouterRunner.launchAgent!
+      let agentStatus = agent.status()
+      switch agentStatus {
+      case .running(let pid):
+        DispatchQueue.main.async {
+          routerManager.eventManager.trigger(eventName: "router_start", information: String(pid))
+          routerManager.routerRunner.routerStatus.setRouterStatus(true)
+          routerManager.routerRunner.routerStatus.setRouterRanByUs(true)
+          routerManager.eventManager.trigger(eventName: "router_pid", information: String(pid))
+        }
+        break
+        
+      default:
+        NSLog("wtf, agent status = \(agentStatus)")
+        break
+      }
+    })
     return routerManager
   }()
   
