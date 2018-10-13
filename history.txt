@@ -1,5 +1,29 @@
+2018-10-13 zzz
+ * Build: Add javac.classpath to junit.compileTest targets (ticket #2333)
+
+2018-10-11 zzz
+ * Console: Remove static Server reference
+
+2018-10-10 zzz
+ * Build: Provide option to prevent Class-Path in manifests (ticket #2317)
+
+2018-10-09 zzz
+ * Console: Sybil tool refactoring
+
+2018-10-08 zzz
+ * Console: Refactor StatSummarizer
+
+2018-10-07 zzz
+ * Build: Fix config with-libtomcat8-java but not
+   with-libjetty9-java (ticket #1934)
+ * Debian: Don't override dh_builddeb (ticket #2329)
+
 2018-10-06 zzz
- * Console: Sort addresses in RIs
+ * Console:
+   - Fix P/X caps on /tunnels
+   - Netdb search fixes (ticket #2326)
+   - Sort addresses in RIs
+   - Split /peers page into tabs (ticket #1934)
 
 * 2018-10-04 0.9.37 released
 

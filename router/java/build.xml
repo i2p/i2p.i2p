@@ -163,6 +163,7 @@
             includeAntRuntime="true"
             destdir="./build/obj">
             <classpath>
+                <pathelement location="${javac.classpath}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
