@@ -114,6 +114,7 @@
                                     <connections>
                                         <outlet property="openConsoleButton" destination="XZi-oz-5gy" id="6xH-8v-63j"/>
                                         <outlet property="quickControlView" destination="D8V-d8-0wT" id="4to-rN-2eL"/>
+                                        <outlet property="restartRouterButton" destination="C1m-1t-Xiq" id="foI-Gq-cHI"/>
                                         <outlet property="routerPIDLabel" destination="bmP-Ui-gyo" id="x5L-c1-yja"/>
                                         <outlet property="routerStartStopButton" destination="1eu-Qw-TD9" id="FLt-MK-y5u"/>
                                         <outlet property="routerStartedByLabel" destination="tgG-IT-Ojg" id="dA0-3w-cuF"/>
