@@ -47,6 +47,16 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     /** these are the same as in i2np's DatabaseStoreMessage */
     public final static int KEY_TYPE_ROUTERINFO = 0;
     public final static int KEY_TYPE_LEASESET = 1;
+    /** @since 0.9.38 */
+    public final static int KEY_TYPE_LS2 = 3;
+    /** @since 0.9.38 */
+    public final static int KEY_TYPE_ENCRYPTED_LS2 = 5;
+    /** @since 0.9.38 */
+    public final static int KEY_TYPE_META_LS2 = 7;
+    /** @since 0.9.38 */
+    public final static int KEY_TYPE_SERVICE_RECORD = 9;
+    /** @since 0.9.38 */
+    public final static int KEY_TYPE_SERVICE_LIST = 11;
 
     protected volatile Signature _signature;
     protected volatile Hash _currentRoutingKey;
