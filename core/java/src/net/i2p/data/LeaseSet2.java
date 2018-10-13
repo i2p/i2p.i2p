@@ -124,6 +124,10 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     public boolean verifyOfflineSignature() {
+        return verifyOfflineSignature(_destination.getSigningPublicKey());
+    }
+
+    protected boolean verifyOfflineSignature(SigningPublicKey spk) {
         if (!isOffline())
             return false;
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
@@ -276,7 +280,7 @@ public class LeaseSet2 extends LeaseSet {
             writeOfflineBytes(out);
     }
 
-    private void readOfflineBytes(InputStream in) throws DataFormatException, IOException {
+    protected void readOfflineBytes(InputStream in) throws DataFormatException, IOException {
         _transientExpires = DataHelper.readLong(in, 4) * 1000;
         int itype = (int) DataHelper.readLong(in, 2);
         SigType type = SigType.getByCode(itype);
@@ -289,7 +293,7 @@ public class LeaseSet2 extends LeaseSet {
         _offlineSignature.readBytes(in);
     }
 
-    private void writeOfflineBytes(OutputStream out) throws DataFormatException, IOException {
+    protected void writeOfflineBytes(OutputStream out) throws DataFormatException, IOException {
         if (_transientSigningPublicKey == null || _offlineSignature == null)
             throw new DataFormatException("No offline key/sig");
         DataHelper.writeLong(out, 4, _transientExpires / 1000);
