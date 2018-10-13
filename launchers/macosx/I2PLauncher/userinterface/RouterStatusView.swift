@@ -24,63 +24,93 @@ import Cocoa
   @IBOutlet var routerUptimeLabel: NSTextField?
   @IBOutlet var routerPIDLabel: NSTextField?
   
+  
   @IBOutlet var quickControlView: NSView?
   @IBOutlet var routerStartStopButton: NSButton?
+  @IBOutlet var restartRouterButton: NSButton?
   @IBOutlet var openConsoleButton: NSButton?
   
+  
+  @objc func actionBtnOpenConsole(_ sender: Any?) {
+    SwiftMainDelegate.openLink(url: "http://localhost:7657")
+  }
+  
   @objc func actionBtnStartRouter(_ sender: Any?) {
-    NSLog("START ROUTER")
+    NSLog("Router start clicked")
     /*if (RouterManager.shared().getRouterTask() == nil) {
       SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath)
     }*/
     (sender as! NSButton).isTransparent = true
     let routerStatus = RouterRunner.launchAgent?.status()
-    switch routerStatus {
-    case .loaded?:
-      RouterManager.shared().routerRunner.StartAgent(information: RouterRunner.launchAgent)
-    case .unloaded?:
-      do {
-        try LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
-        RouterManager.shared().routerRunner.StartAgent(information: RouterRunner.launchAgent)
-      } catch {
-        RouterManager.shared().eventManager.trigger(eventName: "router_exception", information: error)
+    DispatchQueue(label: "background_start").async {
+      switch routerStatus {
+      case .loaded?:
+        RouterManager.shared().routerRunner.StartAgent(RouterRunner.launchAgent)
+      case .unloaded?:
+        do {
+          try LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+          RouterManager.shared().routerRunner.StartAgent(RouterRunner.launchAgent)
+        } catch {
+          RouterManager.shared().eventManager.trigger(eventName: "router_exception", information: error)
+        }
+        break
+      default:
+        break
       }
-      break
-    default:
-      break
+      DispatchQueue.main.async {
+        self.reEnableButton()
+      }
     }
-    self.reEnableButton()
   }
   
   @objc func actionBtnStopRouter(_ sender: Any?) {
-    NSLog("STOP ROUTER")
-    let routerStatus = RouterRunner.launchAgent?.status()
-    switch routerStatus {
-    case .running?:
-      NSLog("Found running router")
-      RouterManager.shared().routerRunner.StopAgent()
-      break
-    default:
-      break
+    NSLog("Router stop clicked")
+    DispatchQueue(label: "background_shutdown").async {
+      RouterManager.shared().routerRunner.StopAgent({
+        RouterProcessStatus.isRouterRunning = false
+        RouterProcessStatus.isRouterChildProcess = false
+        NSLog("Router should be stopped by now.")
+      })
+      // Wait for it to die.
+      
     }
+    RouterManager.shared().eventManager.trigger(eventName: "toggle_popover")
     self.reEnableButton()
   }
   
-  @objc func actionBtnRestartRouter(sender: Any?) {
-    if (RouterManager.shared().getRouterTask() != nil) {
-      //RouterManager.shared().getRouterTask()?.requestRestart()
+  func restartFn() {
+    RouterManager.shared().routerRunner.StopAgent({
+      sleep(30)
+      RouterManager.shared().routerRunner.StartAgent()
+    })
+  }
+  
+  @objc func actionBtnRestartRouter(_ sender: Any?) {
+    RouterManager.shared().eventManager.trigger(eventName: "toggle_popover")
+    let currentStatus : AgentStatus = RouterRunner.launchAgent?.status() ?? AgentStatus.unloaded
+    if currentStatus != AgentStatus.loaded && currentStatus != AgentStatus.unloaded {
+      NSLog("Found a running router, will unload it from launchd")
+      // OK, router seems to be running
+      DispatchQueue(label: "background_restart").async {
+        self.restartFn()
+        // Report done to main thread
+        DispatchQueue.main.async {
+          self.reEnableButton()
+        }
+      }
     } else {
       NSLog("Can't restart a non running router, start it however...")
-      //SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath)
+      RouterManager.shared().routerRunner.StartAgent()
     }
   }
   
   func handlerRouterStart(information:Any?) {
-    print("Triggered handlerRouterStart")
+    NSLog("Triggered handlerRouterStart")
     NSLog("PID2! %@", information as! String)
     routerPIDLabel?.cell?.stringValue = "Router PID: "+(information as! String)
     routerPIDLabel?.needsDisplay = true
     routerStatusLabel?.cell?.stringValue = "Router status: Running"
+    RouterManager.shared().lastRouterPid = (information as? String)
     self.toggleSetButtonStop()
     self.reEnableButton()
   }
@@ -112,10 +142,16 @@ import Cocoa
       RouterStatusView.instance = self
     }
     self.reEnableButton()
+    openConsoleButton!.cell!.action = #selector(self.actionBtnOpenConsole(_:))
+    openConsoleButton!.cell!.target = self
+    restartRouterButton!.cell!.action = #selector(self.actionBtnRestartRouter(_:))
+    restartRouterButton!.cell!.target = self
+    
   }
   
   func handleRouterStop() {
     routerPIDLabel?.cell?.stringValue = "Router PID: Not running"
+    RouterManager.shared().lastRouterPid = nil
     self.toggleSetButtonStart()
     reEnableButton()
   }
@@ -133,41 +169,49 @@ import Cocoa
   }
   
   func setRouterStatusLabelText() {
-    routerStartStopButton?.needsDisplay = true
     routerStartStopButton?.target = self
-    quickControlView?.needsDisplay = true
+    let staticStartedByLabelText = "Router started by launcher? "
+    let staticIsRunningLabelText = "Router status: "
+    let staticRouterVersionLabelText = "Router version: "
+    let staticRouterPidLabelText = "Router PID: "
     
-    do {
-      let currentStatus : AgentStatus = RouterRunner.launchAgent!.status()
-      if currentStatus == AgentStatus.loaded || currentStatus == AgentStatus.unloaded  {
-        routerStatusLabel?.cell?.stringValue = "Router status: Not running"
-      } else {
-        routerStatusLabel?.cell?.stringValue = "Router status: Running"
-      }
-    } catch {
-      // Ensure it's set even AgentStatus is nil (uninitialized yet..)
-      routerStatusLabel?.cell?.stringValue = "Router status: Not running"
-    }
-    
-    let staticStartedByLabelText = "Router started by launcher?"
-    if RouterProcessStatus.isRouterChildProcess {
-      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+" Yes"
+    // Use default here to avoid any potential crashes with force unwrapping
+    let currentStatus : AgentStatus = RouterRunner.launchAgent?.status() ?? AgentStatus.unloaded
+    if currentStatus == AgentStatus.loaded || currentStatus == AgentStatus.unloaded  {
+      routerStatusLabel?.cell?.stringValue = staticIsRunningLabelText+"Not running"
     } else {
-      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+" No"
+      routerStatusLabel?.cell?.stringValue = staticIsRunningLabelText+"Running"
     }
-    routerStartedByLabel?.needsDisplay = true
+    
+    if RouterProcessStatus.isRouterChildProcess {
+      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+"Yes"
+    } else {
+      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+"No"
+    }
+    
+    // Try to display PID - if not, the string behind ?? is used as "default"
+    let tmpPidText = RouterManager.shared().lastRouterPid ?? "Not running"
+    routerPIDLabel?.cell?.stringValue = staticRouterPidLabelText+tmpPidText
     
     if let version = RouterProcessStatus.routerVersion {
-      routerVersionLabel?.cell?.stringValue = "Router version: " + version
+      routerVersionLabel?.cell?.stringValue = staticRouterVersionLabelText + version
     } else {
-      routerVersionLabel?.cell?.stringValue = "Router version: Still unknown"
+      routerVersionLabel?.cell?.stringValue = staticRouterVersionLabelText + "Still unknown"
     }
+    
     if let routerStartTime = RouterProcessStatus.routerStartedAt {
       routerUptimeLabel?.cell?.stringValue = "Uptime: Router started " + DateTimeUtils.timeAgoSinceDate(date: NSDate(date: routerStartTime), numericDates: false)
     } else {
       routerUptimeLabel?.cell?.stringValue = "Uptime: Router isn't running"
     }
+    
+    // Needs display function alerts the rendrerer that the UI parts need to be re-drawed.
+    routerStartStopButton?.needsDisplay = true
+    quickControlView?.needsDisplay = true
     routerUptimeLabel?.needsDisplay = true
+    routerVersionLabel?.needsDisplay = true
+    routerStartedByLabel?.needsDisplay = true
+    routerPIDLabel?.needsDisplay = true
   }
   
   
