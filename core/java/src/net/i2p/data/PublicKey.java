@@ -12,18 +12,26 @@ package net.i2p.data;
 import java.io.InputStream;
 import java.io.IOException;
 
+import net.i2p.crypto.EncType;
+
 /**
  * Defines the PublicKey as defined by the I2P data structure spec.
  * A public key is 256byte Integer. The public key represents only the 
  * exponent, not the primes, which are constant and defined in the crypto spec.
  *
+ * As of release 0.9.38, keys of arbitrary length and type are supported.
+ * See EncType.
+ *
  * @author jrandom
  */
 public class PublicKey extends SimpleDataStructure {
-    public final static int KEYSIZE_BYTES = 256;
+    private static final EncType DEF_TYPE = EncType.ELGAMAL_2048;
+    public final static int KEYSIZE_BYTES = DEF_TYPE.getPubkeyLen();
     private static final int CACHE_SIZE = 1024;
 
     private static final SDSCache<PublicKey> _cache = new SDSCache<PublicKey>(PublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
+
+    private final EncType _type;
 
     /**
      * Pull from cache or return new.
@@ -45,12 +53,31 @@ public class PublicKey extends SimpleDataStructure {
     }
 
     public PublicKey() {
+        this(DEF_TYPE);
+    }
+
+    /**
+     *  @param type if null, type is unknown
+     *  @since 0.9.38
+     */
+    public PublicKey(EncType type) {
         super();
+        _type = type;
     }
 
     /** @param data must be non-null */
     public PublicKey(byte data[]) {
+        this(DEF_TYPE, data);
+    }
+
+    /**
+     *  @param type if null, type is unknown
+     *  @param data must be non-null
+     *  @since 0.9.38
+     */
+    public PublicKey(EncType type, byte data[]) {
         super();
+        _type = type;
         if (data == null)
             throw new IllegalArgumentException("Data must be specified");
         _data = data;
@@ -61,12 +88,24 @@ public class PublicKey extends SimpleDataStructure {
      * on a prior instance of PublicKey
      */
     public PublicKey(String base64Data)  throws DataFormatException {
-        super();
+        this(DEF_TYPE);
         fromBase64(base64Data);
     }
     
     public int length() {
+        if (_type != null)
+            return _type.getPubkeyLen();
+        if (_data != null)
+            return _data.length;
         return KEYSIZE_BYTES;
+    }
+
+    /**
+     *  @return null if unknown
+     *  @since 0.9.38
+     */
+    public EncType getType() {
+        return _type;
     }
 
     /**
@@ -74,5 +113,21 @@ public class PublicKey extends SimpleDataStructure {
      */
     public static void clearCache() {
         _cache.clear();
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("[PublicKey ").append((_type != null) ? _type.toString() : "unknown type").append(' ');
+        if (_data == null) {
+            buf.append("null");
+        } else {
+            buf.append("size: ").append(length());
+        }
+        buf.append(']');
+        return buf.toString();
     }
 }
