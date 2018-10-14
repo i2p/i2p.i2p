@@ -34,15 +34,15 @@ extension LaunchAgent {
   /// Run `launchctl start` on the agent
   ///
   /// Check the status of the job with `.status()`
-  public func start() {
-    LaunchAgentManager.shared.start(self)
+  public func start(_ callback: ((Process) -> Void)? = nil ) {
+    LaunchAgentManager.shared.start(self, callback)
   }
   
   /// Run `launchctl stop` on the agent
   ///
   /// Check the status of the job with `.status()`
-  public func stop() {
-    LaunchAgentManager.shared.stop(self)
+  public func stop(_ callback: ((Process) -> Void)? = nil ) {
+    LaunchAgentManager.shared.stop(self, callback)
   }
   
   /// Run `launchctl load` on the agent

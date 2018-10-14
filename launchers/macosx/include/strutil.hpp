@@ -100,11 +100,11 @@ static inline std::string trim_copy(std::string s) {
     return s;
 }
 
-NSString* stdStringToNSString(std::string &stdstr) {
+inline NSString* stdStringToNSString(std::string &stdstr) {
   return [NSString stringWithUTF8String:stdstr.c_str()];
 }
 
-std::string nsStringToStd(NSString* nsStr) {
+inline std::string nsStringToStd(NSString* nsStr) {
   const char *charlist = [nsStr UTF8String];
   return std::string(charlist);
 }

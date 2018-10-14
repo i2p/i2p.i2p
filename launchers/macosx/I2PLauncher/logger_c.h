@@ -82,4 +82,7 @@ inline void MLog(int loglevel, NSString* format, ...)
 }
 
 
+
+#define MMLog(format_string,...) ((MLog(1, [NSString stringWithFormat:format_string,##__VA_ARGS__])))
+
 #endif /* logger_c_h */

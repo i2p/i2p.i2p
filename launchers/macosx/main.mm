@@ -65,8 +65,8 @@ using namespace subprocess;
 
 - (void)extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion
 {
-  auto deployer = [[I2PDeployer alloc] initWithMetaInfo:self.metaInfo];
-  [deployer extractI2PBaseDir:completion];
+  self.deployer = [[I2PDeployer alloc] initWithMetaInfo:self.metaInfo];
+  [self.deployer extractI2PBaseDir:completion];
 }
 
 - (void)setApplicationDefaultPreferences {
@@ -77,6 +77,7 @@ using namespace subprocess;
     @"startRouterAtLogin": @NO,
     @"startRouterAtStartup": @NO,
     @"letRouterLiveEvenLauncherDied": @NO,
+    @"consolePortCheckNum": @7657,
     @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
   }];
 
@@ -119,10 +120,10 @@ using namespace subprocess;
   // Initialize the Swift environment (the UI components)
   [self.swiftRuntime applicationDidFinishLaunching];
   
-  // TODO: Make the port a setting which defaults to 7657
-  if (port_check(7657) != 0)
+  NSInteger portNum = [self.userPreferences integerForKey:@"consolePortCheckNum"];
+  if (port_check((int)portNum) != 0)
   {
-    NSLog(@"Seems i2p is already running - I will not start the router (port 7657 is in use..)");
+    NSLog(@"Seems i2p is already running - I will not start the router (port %d is in use..)", (int)portNum);
     sendUserNotification(@"Found already running router", @"TCP port 7657 seem to be used by another i2p instance.");
     
     [routerStatus setRouterStatus: true];
@@ -130,6 +131,13 @@ using namespace subprocess;
     shouldAutoStartRouter = false;
   } else {
     shouldAutoStartRouter = true;
+  }
+  if (![self.userPreferences boolForKey:@"startRouterAtLogin"] && ![self.userPreferences boolForKey:@"startRouterAtStartup"])
+  {
+    // In this case we don't want to find a running service
+    std::string launchdFile(RealHomeDirectory());
+    launchdFile += "/Library/LaunchAgents/net.i2p.macosx.I2PRouter.plist";
+    
   }
 
   NSBundle *launcherBundle = [NSBundle mainBundle];
@@ -147,13 +155,6 @@ using namespace subprocess;
 
   std::string jarfile("-cp ");
   jarfile += [self.metaInfo.zipFile UTF8String];
-  
-  // Might be hard to read if you're not used to Objective-C
-  // But this is a "function call" that contains a "callback function"
-  /*[routerStatus listenForEventWithEventName:@"router_can_start" callbackActionFn:^(NSString* information) {
-    NSLog(@"Got signal, router can be started");
-    [[SBridge sharedInstance] startupI2PRouter:self.metaInfo.i2pBase];
-  }];*/
   
   // This will trigger the router start after an upgrade.
   [routerStatus listenForEventWithEventName:@"router_must_upgrade" callbackActionFn:^(NSString* information) {

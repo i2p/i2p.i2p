@@ -93,7 +93,8 @@ class Logger {
   }
   
   @objc static func openLink(url: String) {
-    SBridge.sharedInstance().openUrl(url)
+    NSLog("Trying to open \(url)")
+    NSWorkspace.shared().open(NSURL(string: url)! as URL)
   }
   
   @objc func applicationWillTerminate() {

@@ -22,7 +22,7 @@ class RouterRunner: NSObject {
   
   let domainLabel = "net.i2p.macosx.I2PRouter"
   
-  let plistName = "net.i2p.macosx.I2PRouterAgent.plist"
+  let plistName = "net.i2p.macosx.I2PRouter.plist"
   
   let defaultStartupCommand:String = "/usr/libexec/java_home"
   
@@ -34,6 +34,10 @@ class RouterRunner: NSObject {
   ]
   
   let appSupportPath = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
+  
+  override init() {
+    super.init()
+  }
   
   func SetupAgent() {
     let agent = SetupAndReturnAgent()
@@ -106,78 +110,70 @@ class RouterRunner: NSObject {
     let shouldStartupAtLogin = userPreferences.bool(forKey: "startRouterAtLogin")
     agent.runAtLoad = shouldStartupAtLogin
     agent.keepAlive = true
-    
-    do {
-      
-      try LaunchAgentManager.shared.write(agent, called: self.plistName)
-      sleep(1)
-      try LaunchAgentManager.shared.load(agent)
-      sleep(1)
-      
-      let agentStatus = LaunchAgentManager.shared.status(agent)
-      switch agentStatus {
-      case .running:
-        break
-      case .loaded:
-        break
-      case .unloaded:
-        sleep(2)
-        break
+    DispatchQueue(label: "background_starter").async {
+      do {
+        try LaunchAgentManager.shared.write(agent, called: self.plistName)
+        sleep(1)
+        try LaunchAgentManager.shared.load(agent)
+        sleep(1)
+        
+        let agentStatus = LaunchAgentManager.shared.status(agent)
+        switch agentStatus {
+        case .running:
+          break
+        case .loaded:
+          DispatchQueue.main.async {
+            RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: agent)
+          }
+          break
+        case .unloaded:
+          break
+        }
+      } catch {
+        DispatchQueue.main.async {
+          RouterManager.shared().eventManager.trigger(eventName: "router_setup_error", information: "\(error)")
+        }
       }
-      
-      
-      RouterManager.shared().eventManager.trigger(eventName: "router_can_start", information: agent)
-    } catch {
-      RouterManager.shared().eventManager.trigger(eventName: "router_setup_error", information: "\(error)")
     }
     return agent
   }
   
-  func StartAgent(information:Any?) {
-    let agent = RouterRunner.launchAgent!
-    LaunchAgentManager.shared.start(agent)
-    sleep(1)
-    let agentStatus = agent.status()
-    switch agentStatus {
-    case .running(let pid):
-      RouterManager.shared().eventManager.trigger(eventName: "router_start", information: String(pid))
-      routerStatus.setRouterStatus(true)
-      routerStatus.setRouterRanByUs(true)
-      DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-        // Delayed message to ensure UI has been initialized.
-        RouterManager.shared().eventManager.trigger(eventName: "router_pid", information: String(pid))
-      }
-      break
-      
-    default: break
+  
+  func StartAgent(_ information:Any? = nil) {
+    let agent = RouterRunner.launchAgent ?? information as! LaunchAgent
+    DispatchQueue(label: "background_block").async {
+      LaunchAgentManager.shared.start(agent, { (proc) in
+        NSLog("Will call onLaunchdStarted")
+      })
     }
   }
   
-  func StopAgent() {
-    var agentStatus = LaunchAgentManager.shared.status(RouterRunner.launchAgent!)
-    switch agentStatus {
-    case .running:
-      LaunchAgentManager.shared.stop(RouterRunner.launchAgent!)
-      break
-    case .loaded, .unloaded:
-      try! LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
-      routerStatus.setRouterStatus(false)
-      routerStatus.setRouterRanByUs(false)
-      RouterManager.shared().eventManager.trigger(eventName: "router_stop", information: "ok")
-      return;
-      break
-    default: break
-    }
-    sleep(1)
-    agentStatus = LaunchAgentManager.shared.status(RouterRunner.launchAgent!)
-    switch agentStatus {
-    case .loaded, .unloaded:
-      try! LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
-      routerStatus.setRouterStatus(false)
-      routerStatus.setRouterRanByUs(false)
-      RouterManager.shared().eventManager.trigger(eventName: "router_stop", information: "ok")
-      break
-    default: break
+  func StopAgent(_ callback: @escaping () -> () = {}) {
+    let agentStatus = LaunchAgentManager.shared.status(RouterRunner.launchAgent!)
+    DispatchQueue(label: "background_block").async {
+      do {
+        switch agentStatus {
+        case .running:
+          // For now we need to use unload to stop it.
+          try LaunchAgentManager.shared.unload(RouterRunner.launchAgent!, { (proc) in
+            // Called when stop is actually executed
+            proc.waitUntilExit()
+            DispatchQueue.main.async {
+              RouterManager.shared().eventManager.trigger(eventName: "router_stop", information: "ok")
+              callback()
+            }
+          })
+          try LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+          break
+        case .unloaded:
+          // Seems it sometimes get unloaded on stop, we load it again.
+          try! LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+          return
+        default: break
+        }
+      } catch {
+        NSLog("Error \(error)")
+      }
     }
   }
   

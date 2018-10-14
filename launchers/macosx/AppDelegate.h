@@ -21,6 +21,7 @@
 #include "version.h"
 
 @class SwiftMainDelegate;
+@class I2PDeployer;
 
 @protocol SwiftMainDelegateProto
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification;
@@ -92,6 +93,7 @@ inline void sendUserNotification(NSString* title, NSString* informativeText, boo
 @property (assign) SwiftMainDelegate *swiftRuntime;
 @property (assign) NSUserDefaults *userPreferences;
 @property (assign) ExtractMetaInfo *metaInfo;
+@property (assign) I2PDeployer *deployer;
 @property (copy) NSImage *contentImage NS_AVAILABLE(10_9, NA);
 
 - (void) extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion;

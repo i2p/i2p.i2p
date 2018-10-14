@@ -88,41 +88,53 @@ extension LaunchAgentManager {
   /// Run `launchctl start` on the agent
   ///
   /// Check the status of the job with `.status(_: LaunchAgent)`
-  public func start(_ agent: LaunchAgent) {
+  public func start(_ agent: LaunchAgent, _ termHandler: ((Process) -> Void)? = nil ) {
     let arguments = ["start", agent.label]
-    Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    let proc = Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    if ((termHandler) != nil) {
+      proc.terminationHandler = termHandler
+    }
   }
   
   /// Run `launchctl stop` on the agent
   ///
   /// Check the status of the job with `.status(_: LaunchAgent)`
-  public func stop(_ agent: LaunchAgent) {
+  public func stop(_ agent: LaunchAgent, _ termHandler: ((Process) -> Void)? = nil ) {
     let arguments = ["stop", agent.label]
-    Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    let proc = Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    if ((termHandler) != nil) {
+      proc.terminationHandler = termHandler
+    }
   }
   
   /// Run `launchctl load` on the agent
   ///
   /// Check the status of the job with `.status(_: LaunchAgent)`
-  public func load(_ agent: LaunchAgent) throws {
+  public func load(_ agent: LaunchAgent, _ termHandler: ((Process) -> Void)? = nil ) throws {
     guard let agentURL = agent.url else {
       throw LaunchAgentManagerError.urlNotSet(label: agent.label)
     }
     
     let arguments = ["load", agentURL.path]
-    Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    let proc = Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    if ((termHandler) != nil) {
+      proc.terminationHandler = termHandler
+    }
   }
   
   /// Run `launchctl unload` on the agent
   ///
   /// Check the status of the job with `.status(_: LaunchAgent)`
-  public func unload(_ agent: LaunchAgent) throws {
+  public func unload(_ agent: LaunchAgent, _ termHandler: ((Process) -> Void)? = nil ) throws {
     guard let agentURL = agent.url else {
       throw LaunchAgentManagerError.urlNotSet(label: agent.label)
     }
     
     let arguments = ["unload", agentURL.path]
-    Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    let proc = Process.launchedProcess(launchPath: LaunchAgentManager.launchctl, arguments: arguments)
+    if ((termHandler) != nil) {
+      proc.terminationHandler = termHandler
+    }
   }
   
   /// Retreives the status of the LaunchAgent from `launchctl`

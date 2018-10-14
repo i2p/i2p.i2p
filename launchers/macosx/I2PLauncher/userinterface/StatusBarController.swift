@@ -44,8 +44,12 @@ import Cocoa
     let pidStr = information as! String
     NSLog("PID! %@", pidStr)
     showPopover(sender: nil)
-    //self.ctrl?.getRouterStatusView()?.handlerRouterStart(information: pidStr)
+    RouterManager.shared().lastRouterPid = pidStr
     self.ctrl?.getRouterStatusView()?.needsDisplay = true
+  }
+  
+  func event_toggle(information:Any?) {
+    self.togglePopover(sender: self)
   }
 
   
@@ -53,10 +57,9 @@ import Cocoa
     super.init()
     self.ctrl = PopoverViewController.freshController()
     popover.contentViewController = self.ctrl
-    //updateObjectRef = SUUpdater.shared()
-    //updateObjectRef?.checkForUpdatesInBackground()
-   RouterManager.shared().eventManager.listenTo(eventName: "router_pid", action: pidReaction)
+    RouterManager.shared().eventManager.listenTo(eventName: "router_pid", action: pidReaction)
     
+    RouterManager.shared().eventManager.listenTo(eventName: "toggle_popover", action: event_toggle)
     
     if let button = statusItem.button {
       button.image = NSImage(named:"StatusBarButtonImage")
