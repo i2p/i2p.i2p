@@ -187,6 +187,12 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Reachability")))
            .append("</a>\n" +
 
+                   "<a href=\"/welcome\" target=\"_top\" title=\"")
+           .append(_t("New Install Wizard"))
+           .append("\">")
+           .append(nbsp(_t("Setup")))
+           .append("</a>\n" +
+
                    "<a href=\"/help#sidebarhelp\" target=\"_top\" title=\"")
            .append(_t("An introduction to the router sidebar"))
            .append("\">")

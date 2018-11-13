@@ -21,11 +21,31 @@
     buf.append(req);
     if (!req.endsWith("/"))
         buf.append('/');
-    boolean oldHome = net.i2p.I2PAppContext.getGlobalContext().getBooleanProperty("routerconsole.oldHomePage");
-    if (oldHome)
-        buf.append("console");
-    else
-        buf.append("home");
+    net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
+    boolean oldHome = ctx.getBooleanProperty("routerconsole.oldHomePage");
+    boolean wizRun = ctx.getBooleanProperty("routerconsole.welcomeWizardComplete");
+    String firstVersion = ctx.getProperty("router.firstVersion");
+    String tgt;
+    final boolean ENABLE_WIZARD_ON_FIRST_RUN = false;
+    if (oldHome) {
+        tgt = "console";
+    } else if (ENABLE_WIZARD_ON_FIRST_RUN && (wizRun || firstVersion == null)) {
+        // wizard already run
+        tgt = "home";
+    } else {
+        String version = net.i2p.CoreVersion.VERSION;
+        if (version.equals("0.9.37")) {
+            // dev builds, force everyone to run it once for testing
+            tgt = "welcome";
+        } else if (version.equals(firstVersion)) {
+            // first install 38 or later, still on same version
+            tgt = "welcome";
+        } else {
+            // they already upgraded
+            tgt = "home";
+        }
+    }
+    buf.append(tgt);
     String query = request.getQueryString();
     if (query != null)
         buf.append('?').append(query);

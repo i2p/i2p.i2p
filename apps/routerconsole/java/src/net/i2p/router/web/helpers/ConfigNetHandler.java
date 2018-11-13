@@ -477,8 +477,8 @@ public class ConfigNetHandler extends FormHandler {
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
     
-    private static final int DEF_BURST_PCT = 10;
-    private static final int DEF_BURST_TIME = 20;
+    static final int DEF_BURST_PCT = 10;
+    static final int DEF_BURST_TIME = 20;
 
     /**
      *  @return changed
