@@ -274,6 +274,10 @@ Applications:
    Some images licensed under a Creative Commons 2.0 license.
        Silk icons: See licenses/LICENSE-SilkIcons.txt
 
+   Router Console M-Lab subsystem:
+   Copyright 2010 Vuze, Inc.  All rights reserved.
+   See licenses/LICENSE-GPLv2.txt
+
    Router Console NDT subsystem:
    Copyright (c) 2003 University of Chicago.  All rights reserved.
    See licenses/LICENSE-NDT.txt
