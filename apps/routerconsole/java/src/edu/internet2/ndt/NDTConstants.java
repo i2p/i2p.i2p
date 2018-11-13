@@ -3,7 +3,7 @@ package edu.internet2.ndt;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.swing.JOptionPane;
+import com.vuze.plugins.mlab.tools.ndt.swingemu.JOptionPane;
 
 /**
  * 

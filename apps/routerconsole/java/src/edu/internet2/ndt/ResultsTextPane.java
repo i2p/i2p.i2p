@@ -1,8 +1,6 @@
 package edu.internet2.ndt;
 
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import java.awt.*;
+import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
 
 /*
  * Class that extends TextPane. This Text-pane is used as the chief
@@ -27,6 +25,7 @@ public class ResultsTextPane extends JTextPane {
 	 *            String to be inserted into the document
 	 **/
 	public void append(String paramTextStr) {
+/****
 		try {
 			getStyledDocument().insertString(getStyledDocument().getLength(),
 					paramTextStr, null);
@@ -35,6 +34,7 @@ public class ResultsTextPane extends JTextPane {
 					.println("WARNING: failed to append text to the text pane! ["
 							+ paramTextStr + "]");
 		}
+****/
 	}
 
 	/**
@@ -46,9 +46,11 @@ public class ResultsTextPane extends JTextPane {
 	 *            the component to insert
 	 * */
 	public void insertComponent(Component paramCompObj) {
+/****
 		setSelectionStart(this.getStyledDocument().getLength());
 		setSelectionEnd(this.getStyledDocument().getLength());
 		super.insertComponent(paramCompObj);
+****/
 	}
 
 }

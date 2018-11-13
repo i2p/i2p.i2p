@@ -1,7 +1,7 @@
 package edu.internet2.ndt;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class JSONUtils {
 	/**
 	 * Function that return value from json object represented by jsontext containing a single message
 	 * which is assigned to "msg" key.
-	 * @param {String} JSON object
+	 * @param jsonTxt {String} JSON object
 	 * @return {int} obtained value from JSON object
 	 */
 	public static String getSingleMessage(String jsonTxt) {
@@ -22,8 +22,8 @@ public class JSONUtils {
 
 	/**
 	 * Function that return value for given key from json object represented by jsontext
-	 * @param {String} JSON object
-	 * @param {int} key by which value should be obtained from JSON map
+	 * @param jsonTxt {String} JSON object
+	 * @param key {int} key by which value should be obtained from JSON map
 	 * @return {int} obtained value from JSON map
 	 */
 	public static String getValueFromJsonObj(String jsonTxt, String key) {
@@ -41,9 +41,9 @@ public class JSONUtils {
 
 	/**
 	 * Function that add new value to JSON map
-	 * @param {String} JSON object
-	 * @param {String} key by which value should be assigned to JSON map
-	 * @param {String} value for given key
+	 * @param jsonTxt {String} JSON object
+	 * @param key {String} key by which value should be assigned to JSON map
+	 * @param value {String} value for given key
 	 * @return {String} json object with added value.
 	 */
 	public static String addValueToJsonObj(String jsonTxt, String key, String value) {
@@ -57,7 +57,7 @@ public class JSONUtils {
 	/**
 	 * Function that return json object represented by jsontext and included
 	 * single message assigned to "msg" key
-	 * @param {byte[]} message which should be assigned to json object
+	 * @param msg {byte[]} message which should be assigned to json object
 	 * @return {byte[]} json object represented by jsontext and encodes into a sequence of bytes
 	 */
 	public static byte[] createJsonObj(byte[] msg) {

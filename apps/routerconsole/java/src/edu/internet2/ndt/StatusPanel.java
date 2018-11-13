@@ -1,12 +1,6 @@
 package edu.internet2.ndt;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
+import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
 
 /**
  * Class that displays status of tests being run. It also provides methods to
@@ -26,9 +20,11 @@ public class StatusPanel extends JPanel {
 	private int _iTestsNum; // total test count
 	private boolean _bStop = false;
 
+/****
 	private JLabel _labelTestNum = new JLabel();
 	private JButton _buttonStop;
 	private JProgressBar _progressBarObj = new JProgressBar();
+****/
 
 	/*
 	 * Constructor
@@ -39,6 +35,7 @@ public class StatusPanel extends JPanel {
 	 * have been scheduled
 	 */
 	public StatusPanel(int iParamTestsNum, String sParamEnableMultiple) {
+/****
 		this._iTestsCompleted = 1;
 		this._iTestsNum = iParamTestsNum;
 
@@ -79,16 +76,19 @@ public class StatusPanel extends JPanel {
 		if (sParamEnableMultiple != null) {
 			add(_buttonStop);
 		}
+****/
 	}
 
 	/**
 	 * Set Test number being run
 	 * */
 	private void setTestNoLabelText() {
+/****
 		_labelTestNum.setText(NDTConstants.getMessageString("test") + " "
 				+ _iTestsCompleted + " " + NDTConstants.getMessageString("of")
 				+ " " + _iTestsNum);
 
+****/
 	}
 
 	/**
@@ -104,9 +104,11 @@ public class StatusPanel extends JPanel {
 	 * End the currently running test
 	 * */
 	public void endTest() {
+/****
 		_progressBarObj.setValue(_iTestsCompleted);
 		_iTestsCompleted++;
 		setTestNoLabelText();
+****/
 	}
 
 	/**
@@ -116,8 +118,10 @@ public class StatusPanel extends JPanel {
 	 *            String status of test-run
 	 * */
 	public void setText(String sParamText) {
+/****
 		if (!_progressBarObj.isIndeterminate()) {
 			_progressBarObj.setString(sParamText);
 		}
+****/
 	}
 } // end class StatusPanel

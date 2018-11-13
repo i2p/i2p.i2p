@@ -62,6 +62,7 @@ package edu.internet2.ndt;
  as Operator of Argonne National Laboratory (http://miranda.ctd.anl.gov:7123/).
  */
 
+/*
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -75,6 +76,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+*/
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -94,7 +97,9 @@ import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+/*
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JApplet;
@@ -109,6 +114,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
+*/
+import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
+
+// Workaround for remote JavaScript start method
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+import net.i2p.util.Addresses;
+import net.i2p.util.Log;
 
 /*
  * Naming convention used: Hungarian, with the following details
@@ -215,7 +229,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	// end naming convention-not-followed variables
 
 	boolean _bIsApplication = false;
-	boolean _bTestInProgress = false;
+	private final AtomicBoolean _bTestInProgress = new AtomicBoolean();
 	String sHostName = null;
 	InetAddress hostAddress = null;
 	String _sTestResults, _sMidBoxTestResult;
@@ -282,11 +296,20 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	private boolean jsonSupport = true;
 	private boolean retry = false;
 
+	// I2P
+	private final Log _log = new Log(Tcpbw100.class);
+
 	/**
 	 * public static void main for invoking as an Application
 	 * @param args String array of command line arguments
 	 * */
 	public static void main(String[] args) {
+		Tcpbw100 test = mainSupport( args );
+		test.runIt();
+	}
+
+	/** bigly */
+	public static Tcpbw100 mainSupport(String[] args) {
 		JFrame frame = new JFrame("ANL/Internet2 NDT (applet)");
 		if (args.length < 1 || args.length > 2) {
 			System.out.println("Usage: java -jar Tcpbw100.jar <hostname> [client-id]");
@@ -309,7 +332,12 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		applet.setsHostName(args[0]);
 		applet.start();
 		frame.setVisible(true);
+		return applet;
 	}
+
+
+
+
 
 	//
 	// Accessor methods for public variables
@@ -557,6 +585,11 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	// End of accessor methods
 	//
 
+	/** I2P */
+	public boolean isTestInProgress() {
+		return _bTestInProgress.get();
+	}
+
 	/**
 	 * Class to start tests in a thread. Starts by disabling all buttons, and
 	 * invokes the dottcp() method. This thread is stopped when the number of
@@ -565,12 +598,21 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * buttons are enabled so that results can be viewed in detail.
 	 * */
 	class TestWorker implements Runnable {
+		// I2P
 		public void run() {
-			if (!_bTestInProgress) {
+			if (_bTestInProgress.compareAndSet(false, true)) {
+				try {
+					run2();
+				} finally {
+					_bTestInProgress.set(false);
+				}
+			}
+		}
+
+		private void run2() {
 				int testNo = 1;
 				int testsNum = ((Integer) _spinnerTestCount.getValue())
 						.intValue();
-				_bTestInProgress = true;
 				_buttonStartTest.setEnabled(false);
 				_buttonDetails.setEnabled(false);
 				_buttonStatistics.setEnabled(false);
@@ -701,7 +743,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 							}
 						} catch (InterruptedException e) {
 							// do nothing.
-							System.err.println("INFO: Thread interrupted while sleeping before starting the next test.");
+							_log.warn("INFO: Thread interrupted while sleeping before starting the next test.");
 						}
 					}
 				} catch (Exception e) {
@@ -736,11 +778,9 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				_resultsTxtPane.append("\n"
 						+ _resBundDisplayMsgs.getString("clickStart2") + "\n");
 				_buttonStartTest.setEnabled(true);
-				_bTestInProgress = false;
 				getContentPane().remove(sPanel);
 				getContentPane().validate();
 				getContentPane().repaint();
-			}
 		}
 	} // end inner class
 
@@ -800,7 +840,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				}
 			});
 		} catch (Exception e) {
-			System.err.println("createGUI didn't successfully complete");
+			_log.warn("createGUI didn't successfully complete", e);
 		}
 
 		// Autorun functionality
@@ -897,7 +937,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		// 1. Is IPv6 preferred?
 		_chkboxPreferIPv6 = new JCheckBox(
 				_resBundDisplayMsgs.getString("preferIPv6"));
-		_chkboxPreferIPv6.setSelected(true);
+		// I2P
+		_chkboxPreferIPv6.setSelected(Addresses.isConnectedIPv6());
 		_chkboxPreferIPv6.addActionListener(this);
 		// 2. Conduct default tests?
 		_chkboxDefaultTest = new JCheckBox(
@@ -1240,7 +1281,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// this Exception is only when the client cannot copy
 			// some data, and is acted on by disabling the
 			// copy button.
-			System.err.println(" You may not have some security Permissions. Please confirm");
+			_log.warn(" You may not have some security Permissions. Please confirm", e);
 		}
 	}
 
@@ -1322,13 +1363,13 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			try {
 				midSrvrSockObj = new Socket(hostAddress, midport);
 			} catch (UnknownHostException e) {
-				System.err.println("Don't know about host: " + sHostName);
+				_log.warn("Don't know about host: " + sHostName, e);
 				_sErrMsg = _resBundDisplayMsgs.getString("unknownServer")
 						+ "\n";
 				return true;
 			} catch (IOException e) {
-				System.err.println("Couldn't perform middlebox testing to: "
-						+ sHostName);
+				_log.warn("Couldn't perform middlebox testing to: "
+						+ sHostName, e);
 				_sErrMsg = _resBundDisplayMsgs.getString("middleboxFail")
 						+ "\n";
 				return true;
@@ -1361,9 +1402,9 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					}
 				}
 			} catch (IOException e) {
-				System.err.println("Couldn't complete middlebox testing to: "
+				_log.warn("Couldn't complete middlebox testing to: "
 						+ sHostName
-						+ " since the socket read was not succesful");
+						+ " since the socket read was not succesful", e);
 				_sErrMsg = _resBundDisplayMsgs.getString("middleboxFail")
 						+ "\n";
 			}
@@ -1372,7 +1413,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_dTime = System.currentTimeMillis() - _dTime;
 			double tempSpeedInBits = (NDTConstants.EIGHT * bytes) / _dTime;
 			double tempTimeInSecs = _dTime / NDTConstants.KILO;
-			System.out.println(bytes + " bytes " + tempSpeedInBits + " kb/s "
+			_log.warn(bytes + " bytes " + tempSpeedInBits + " kb/s "
 					+ tempTimeInSecs + " secs");
 			// Calculate throughput in Kbps
 			_dS2cspd = tempSpeedInBits / NDTConstants.KILO;
@@ -1409,7 +1450,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			String tmpstr4 = Double.toString(_dS2cspd * NDTConstants.KILO); // was
 																			// Double.toString(_dS2cspd*
 																			// 1000);
-			System.out.println("Sending '" + tmpstr4 + "' back to server");
+			_log.warn("Sending '" + tmpstr4 + "' back to server");
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG, tmpstr4.getBytes());
 
 			// Append server address as seen by the client
@@ -1434,7 +1475,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 
 				// Append local address to the Test results obtained from server
-				System.err.println("calling in2Socket.getLocalAddress()");
+				_log.warn("calling in2Socket.getLocalAddress()");
 				String sClientSideClientIp;
 				try {
 					sClientSideClientIp = midSrvrSockObj.getLocalAddress() + ";";
@@ -1463,7 +1504,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 
 				// Append local address to the Test results obtained from server
-				System.err.println("calling in2Socket.getLocalAddress()");
+				_log.warn("calling in2Socket.getLocalAddress()");
 				try {
 					_sMidBoxTestResult += midSrvrSockObj.getLocalAddress() + ";";
 				} catch (SecurityException e) {
@@ -1592,8 +1633,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				}
 			}
 
-			System.out.println("SFW: port=" + iSrvPort);
-			System.out.println("SFW: testTime=" + iTestTime);
+			_log.warn("SFW: port=" + iSrvPort);
+			_log.warn("SFW: testTime=" + iTestTime);
 
 			// Client creates a server socket to send TEST_MSG
 			ServerSocket srvSocket;
@@ -1614,7 +1655,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				return true;
 			}
 
-			System.out.println("SFW: oport=" + srvSocket.getLocalPort());
+			_log.warn("SFW: oport=" + srvSocket.getLocalPort());
 			// Send TEST_MSG
 			protocolObj.send_json_msg(MessageType.TEST_MSG,
 					Integer.toString(srvSocket.getLocalPort()).getBytes());
@@ -1788,13 +1829,13 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			try {
 				outSocket = new Socket(hostAddress, iC2sport);
 			} catch (UnknownHostException e) {
-				System.err.println("Don't know about host: " + sHostName);
+				_log.warn("Don't know about host: " + sHostName, e);
 				_sErrMsg = _resBundDisplayMsgs.getString("unknownServer")
 						+ "\n";
 				return true;
 			} catch (IOException e) {
-				System.err.println("Couldn't get 2nd connection to: "
-						+ sHostName);
+				_log.warn("Couldn't get 2nd connection to: "
+						+ sHostName, e);
 				_sErrMsg = _resBundDisplayMsgs.getString("serverBusy15s")
 						+ "\n";
 				return true;
@@ -1838,7 +1879,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				}
 				_yabuff2Write[i] = c++;
 			}
-			System.err.println("******Send buffer size =" + i);
+			if (_log.shouldWarn())
+			    _log.warn("******Send buffer size =" + i);
 
 			_iPkts = 0;
 			_dTime = System.currentTimeMillis();
@@ -1851,7 +1893,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					try {
 						Thread.sleep(10000);
 					} catch (InterruptedException e) {
-						System.err.println("Thread interrupted : " + e);
+						_log.warn("Thread interrupted", e);
 						// Thread was interrupted while timing 10 seconds
 						// of the C->S test. So, streaming 10 seconds of data may not be complete.
 						// But, the throughput is correctly calculated based on the number of packets
@@ -1862,7 +1904,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						outStream.close();
 						outSocket.close();
 					} catch (IOException e) {
-						System.err.println("Caught IOException while closing stream after thread interrupted : " + e);
+						_log.warn("Caught IOException while closing stream after thread interrupted", e);
 					}
 				}
 			}.start();
@@ -1878,17 +1920,17 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 			// While the 10 s timer ticks, write buffer data into server socket
 			while (true) {
-				// System.err.println("Send pkt = " + pkts + "; at " +
+				// _log.error("Send pkt = " + pkts + "; at " +
 				// System.currentTimeMillis());
 				try {
 					outStream.write(_yabuff2Write, 0, _yabuff2Write.length);
 				} catch (SocketException e) {
-					System.out.println("SocketException while writing to server" + e);
+					_log.warn("SocketException while writing to server", e);
 					break;
 				}
 				// catch (InterruptedIOException iioe) {
 				catch (IOException ioe) {
-					System.out.println("Client socket timed out");
+					_log.warn("Client socket timed out");
 					break;
 				}
 				// In both cases above, thread was interrupted while timing 10 seconds
@@ -1903,14 +1945,14 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 			c2sspdUpdateTimer.cancel();
 			_dTime = System.currentTimeMillis() - _dTime;
-			System.err.println(_dTime + " millisec test completed" + ","
+			_log.warn(_dTime + " millisec test completed" + ","
 					+ _yabuff2Write.length + ","+ _iPkts);
 			if (_dTime == 0) {
 				_dTime = 1;
 			}
 
 			// Calculate C2S throughput in kbps
-			System.out.println((NDTConstants.EIGHT * _iPkts * _yabuff2Write.length) / _dTime
+			_log.warn((NDTConstants.EIGHT * _iPkts * _yabuff2Write.length) / _dTime
 					+ " kb/s outbound"); //*8 for calculating bits
 
 			_dC2sspd = ((NDTConstants.EIGHT * _iPkts * _yabuff2Write.length) / NDTConstants.KILO)
@@ -2052,12 +2094,12 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			try {
 				inSocket = new Socket(hostAddress, iS2cport);
 			} catch (UnknownHostException e) {
-				System.err.println("Don't know about host: " + sHostName);
+				_log.warn("Don't know about host: " + sHostName, e);
 				_sErrMsg = "unknown server\n";
 				return true;
 			} catch (IOException e) {
-				System.err.println("Couldn't get 3rd connection to: "
-						+ sHostName);
+				_log.warn("Couldn't get 3rd connection to: "
+						+ sHostName, e);
 				_sErrMsg = "Server Failed while receiving data\n";
 				return true;
 			}
@@ -2114,8 +2156,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				}
 			} catch (IOException ioExcep) {
 				// new addition to handle Exception
-				System.err.println("Couldn't perform s2c testing to: "
-						+ sHostName + ":" + ioExcep);
+				_log.warn("Couldn't perform s2c testing to: "
+						+ sHostName, ioExcep);
 				_sErrMsg = "Server Failed while reading socket data\n";
 				return true;
 			} finally {
@@ -2124,7 +2166,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 			// get time duration during which bytes were received
 			_dTime = System.currentTimeMillis() - _dTime;
-			System.out.println(iBitCount + " bytes "
+			_log.warn(iBitCount + " bytes "
 					+ (NDTConstants.EIGHT * iBitCount) / _dTime + " kb/s "
 					+ _dTime / NDTConstants.KILO + " secs");
 
@@ -2219,7 +2261,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// message
 			buff = Double.toString(_dS2cspd * NDTConstants.KILO).getBytes();
 			String tmpstr4 = new String(buff, 0, buff.length);
-			System.out.println("Sending '" + tmpstr4 + "' back to server");
+			_log.warn("Sending '" + tmpstr4 + "' back to server");
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG, buff);
 
 			// get web100 variables from server
@@ -2273,8 +2315,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				// new addition to handle Exception
 				_sErrMsg = _resBundDisplayMsgs.getString("s2cThroughputFailed")
 						+ "\n";
-				System.err.println("Couldn't perform s2c testing to: "
-						+ sHostName + ":" + ioExcep);
+				_log.warn("Couldn't perform s2c testing to: "
+						+ sHostName, ioExcep);
 				_sErrMsg += "Server Failed while reading socket data\n";
 				return true;
 			}
@@ -2365,7 +2407,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// name-value pairs.
 			// Note that there are length constraints to keys- values: 64/256
 			// characters respectively
-			System.err.println("USERAGENT " + getUserAgent());
+			_log.warn("USERAGENT " + getUserAgent());
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG,
 					(NDTConstants.META_CLIENT_OS + ":" + System
 							.getProperty("os.name")).getBytes());
@@ -2489,13 +2531,13 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// create socket to host specified by user and the default port
 			ctlSocket = new Socket(hostAddress, ctlport);
 		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host: " + sHostName);
+			_log.warn("Don't know about host: " + sHostName, e);
 			_sErrMsg = _resBundDisplayMsgs.getString("unknownServer") + "\n";
 			_bFailed = true;
 			return;
 		} catch (IOException e) {
-			System.err.println("Couldn't get the connection to: " + sHostName
-					+ " " + ctlport);
+			_log.warn("Couldn't get the connection to: " + sHostName
+					+ " " + ctlport, e);
 			_sErrMsg = _resBundDisplayMsgs.getString("serverNotRunning") + " ("
 					+ sHostName + ":" + ctlport + ")\n";
 			_bFailed = true;
@@ -2565,13 +2607,13 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						// create socket to host specified by user and the default port
 						ctlSocket = new Socket(hostAddress, ctlport);
 					} catch (UnknownHostException e) {
-						System.err.println("Don't know about host: " + sHostName);
+						_log.warn("Don't know about host: " + sHostName, e);
 						_sErrMsg = _resBundDisplayMsgs.getString("unknownServer") + "\n";
 						_bFailed = true;
 						return;
 					} catch (IOException e) {
-						System.err.println("Couldn't get the connection to: " + sHostName
-								+ " " + ctlport);
+						_log.warn("Couldn't get the connection to: " + sHostName
+								+ " " + ctlport, e);
 						_sErrMsg = _resBundDisplayMsgs.getString("serverNotRunning") + " ("
 								+ sHostName + ":" + ctlport + ")\n";
 						_bFailed = true;
@@ -2614,7 +2656,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// Get wait flag value
 			String tmpstr3 = new String(msg.getBody());
 			wait = parseMsgBodyToInt(tmpstr3);
-			System.out.println("wait flag received = " + wait);
+			_log.warn("wait flag received = " + wait);
 
 			if (wait == NDTConstants.SRV_QUEUE_TEST_STARTS_NOW) { // SRV_QUEUE message received indicating
 								// "ready to start tests" status,
@@ -2716,19 +2758,19 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_bFailed = true;
 			return;
 		}
-		System.out.println("Server version: " + vVersion.substring(1));
+		_log.warn("Server version: " + vVersion.substring(1));
 
 		if (vVersion.endsWith("Web10G") || vVersion.endsWith("Web100")) {
 			if (!vVersion.substring(1, vVersion.lastIndexOf('-')).equals(NDTConstants.VERSION)) {
 				_resultsTxtPane.append(_resBundDisplayMsgs
 						.getString("diffrentVersion") + " (" + vVersion.substring(1, vVersion.lastIndexOf('-')) + ")\n");
-				System.out.println("WARNING: NDT server has different version number (" + vVersion.substring(1) + ")");
+				_log.warn("WARNING: NDT server has different version number (" + vVersion.substring(1) + ")");
 			}
 		}
 		else if (!vVersion.substring(1).equals(NDTConstants.VERSION)) {
 			_resultsTxtPane.append(_resBundDisplayMsgs
 					.getString("diffrentVersion") + " (" + vVersion.substring(1) + ")\n");
-			System.out.println("WARNING: NDT server has different version number (" + vVersion.substring(1) + ")");
+			_log.warn("WARNING: NDT server has different version number (" + vVersion.substring(1) + ")");
 		}
 
 		// If we have connected to a Web10G server rebrand ourselves as such
@@ -2899,7 +2941,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_resultsTxtPane.append(_resBundDisplayMsgs
 					.getString("resultsTimeout") + "\n");
 		}
-		System.err.println("Calling InetAddress.getLocalHost() twice");
+		_log.warn("Calling InetAddress.getLocalHost() twice");
 		try {
 			_txtDiagnosis.append(_resBundDisplayMsgs.getString("client") + ": "
 					+ InetAddress.getLocalHost() + "\n");
@@ -2985,7 +3027,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						try{
 							lSysval3 = Long.parseLong(sStrval);
 						} catch (Exception e) {
-							System.out.println("Exception occured reading a web100 var " + sSysvar + " - " + e);
+							_log.warn("Exception occured reading a web100 var " + sSysvar, e);
 							lSysval3 = -1;
 						}
 						// save value into a key value expected by us
@@ -2997,7 +3039,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 							iSysval = Integer.parseInt(sStrval);
 							// If it fails as an int it's probably to big since the values are often unsigned
 						} catch (Exception e) {
-							System.out.println("Exception occured reading a web100 var " + sSysvar + " - " + e);
+							_log.warn("Exception occured reading a web100 var " + sSysvar, e);
 							iSysval = -1;
 						}
 						// save value into a key value expected by us
@@ -3157,7 +3199,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					pub_AccessTech = "10 Gigabit Ethernet/OC-192";
 					break;
 				default: // default block indicating no match
-					System.err.println("No _iC2sData option match");
+					_log.warn("No _iC2sData option match");
 					break;
 				}
 			}
@@ -4337,7 +4379,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	/**
 	 * Function that returns a variable corresponding to the parameter passed to
 	 * it as a request.
-	 * @param {String} The parameter which the caller is seeking.
+	 * @param varName {String} The parameter which the caller is seeking.
 	 * @return {String} The value of the desired parameter.
 	 */
 	public String getNDTvar(String varName) {
@@ -4412,6 +4454,88 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		} else {
 			return Integer.parseInt(msg, radix);
 		}
+	}
+
+	/** bigly */
+	private ThreadGroup thread_group;
+	
+	/** bigly */
+	public void
+	killIt()
+	{
+		while( !thread_group.isDestroyed()){
+			Thread[] threads = new Thread[thread_group.activeCount()];
+			thread_group.enumerate( threads );
+			int	done = 0;
+			for ( int i=0;i<threads.length;i++){
+				if ( threads[i] != null ){
+					done++;
+					//SESecurityManager.stopThread( threads[i] );
+				}
+			}
+			
+			if ( done == 0 ){
+				try{
+					thread_group.destroy();
+					break;
+				}catch( Throwable e ){
+					e.printStackTrace();
+				}
+			}
+			
+			try{
+				Thread.sleep(250);
+			}catch( Throwable e ){	
+			}
+		}
+	}
+	
+	/** bigly */
+	public void
+	runIt()
+	{
+		//final AESemaphore sem = new AESemaphore( "waiter" );
+		
+		thread_group = new 
+			ThreadGroup( "NDT" )
+			{
+				@Override
+				public void
+				uncaughtException(
+					Thread t, 
+					Throwable e) 
+				{
+					_log.debug("?", e);
+				}
+			};
+		
+		thread_group.setDaemon( true );
+		
+		Thread t = 
+			new Thread( 
+				thread_group,
+				new Runnable()
+				{
+					@Override
+					public void
+					run()
+					{
+						try{
+							new TestWorker().run();
+						}catch( Throwable e ){
+						
+							if ( !( e instanceof ThreadDeath )){
+								_log.debug("?", e);
+							}
+						}finally{
+							//sem.release();
+						}
+					}
+				});
+		
+		t.setDaemon( true );
+		t.start();
+		//sem.reserve();
 	}
 
 } // class: Tcpbw100

@@ -1,9 +1,6 @@
 package edu.internet2.ndt;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
 
 /**
  * Utility class that creates a new "Frame" with a window closing functionality.
@@ -15,22 +12,10 @@ import java.awt.event.WindowEvent;
  * 
  */
 public class NewFrame extends JFrame {
-	/**
-	 * Auto-generated compiler constant that does not contribute to classes'
-	 * functionality
-	 */
-	private static final long serialVersionUID = 8990839319520684317L;
 
     /**
      * Constructor
      **/
-    public NewFrame(final JApplet parent) throws HeadlessException {
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent event) {
-                parent.requestFocus();
-				dispose();
-			}
-		});
+    public NewFrame(final JApplet parent) {
 	}
-
 } // class: NewFrame
