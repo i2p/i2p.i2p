@@ -89,6 +89,7 @@ public abstract class FormHandler {
      * Curses Jetty for returning arrays.
      *
      * @since 0.9.4 consolidated from numerous FormHandlers
+     * @return trimmed string or null
      */
     protected String getJettyString(String key) {
         if (_settings == null)
