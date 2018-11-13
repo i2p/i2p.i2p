@@ -125,6 +125,15 @@
     <target name="jar1" depends="compile, bundle-news, bundle-countries, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
+        <!-- copy the NDT translations, strip the countries -->
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_en_US.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs.properties" />
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_ca_ES.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_ca.properties" />
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_el_GR.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_el.properties" />
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_fr_FR.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_fr.properties" />
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_nb_NO.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_nb.properties" />
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_nl_NL.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_nl.properties" />
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_pt_BR.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_pt.properties" />
+        <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_ru_RU.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_ru.properties" />
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*">
             <manifest>
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
