@@ -93,7 +93,7 @@ public class OsfwWorker implements Runnable {
 				// accept it
 				socketObj = _srvSocket.accept();
 			} catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 
 				// The "accept" call has failed, and indicates a firewall
 				// possibility

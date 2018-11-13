@@ -189,11 +189,11 @@ public class NDTConstants {
 		try {
 			_rscBundleMessages = ResourceBundle.getBundle(TCPBW100_MSGS,
 					paramLocale);
-			System.out.println("Obtained messages ");
+			//System.out.println("Obtained messages ");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null,
 					"Error while loading language files:\n" + e.getMessage());
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 
 	} // end method
@@ -214,7 +214,7 @@ public class NDTConstants {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null,
 					"Error while loading language files:\n" + e.getMessage());
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}// end method initconstants
 

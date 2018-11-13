@@ -117,10 +117,6 @@ import javax.swing.SpinnerNumberModel;
 */
 import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
 
-// Workaround for remote JavaScript start method
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -747,7 +743,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						}
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					_log.warn("?", e);
 
 					String sMessage = NDTUtils.isEmpty(e.getMessage())
 							? _resBundDisplayMsgs.getString("withoutMessage")
@@ -788,18 +784,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * "Remote Control" function - invoke NDT' runtest() method from the API
 	 */
 	public void run_test() {
-		// The Java security model considers calling a method that opens a
-		// socket
-		// from JavaScript to be a privileged action. By using
-		// java.security.privilegedAction here, we can grant JavaScript the
-		// same expanded privileges as the signed applet to open a socket.
-		AccessController.doPrivileged(new PrivilegedAction() {
-			public Object run() {
 				pub_errmsg = "Test in progress.";
 				runtest();
-				return null;
-			}
-		});
 	}
 
 	/**
@@ -829,7 +815,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null,
 					"Error while loading language files:\n" + e.getMessage());
-			e.printStackTrace();
+			_log.warn("?", e);
 		}
 
 		// create main window
@@ -1249,7 +1235,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 				getAppletContext().showDocument(_targetURL);
 			} catch (Exception e) {
-				e.printStackTrace();
+				_log.warn("?", e);
 
 				String sMessage = NDTUtils.isEmpty(e.getMessage())
 						? _resBundDisplayMsgs.getString("withoutMessage")
@@ -1641,15 +1627,14 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			try {
 				SecurityManager security = System.getSecurityManager();
 				if (security != null) {
-					System.out
-							.println("Asking security manager for listen permissions...");
+					_log.warn("Asking security manager for listen permissions...");
 					security.checkListen(0);
 				}
 				// SOCKET_FREE_PORT_INDICATOR = 0 to use any free port
 				srvSocket = new ServerSocket(
 						NDTConstants.SOCKET_FREE_PORT_INDICATOR);
 			} catch (Exception e) {
-				e.printStackTrace();
+				_log.warn("?", e);
 				_sErrMsg = _resBundDisplayMsgs.getString("sfwSocketFail")
 						+ "\n";
 				return true;
@@ -1701,7 +1686,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				sfwCtl.send_json_msg(MessageType.TEST_MSG, new String(
 						NDTConstants.SFW_PREDEFINED_TEST_MESSAGE).getBytes());
 			} catch (Exception e) {
-				e.printStackTrace();
+				_log.warn("?", e);
 				//Indication that there might be a firewall from C->S side.
 			}
 
@@ -2210,7 +2195,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					_iSsndqueue = Integer.parseInt(JSONUtils.getValueFromJsonObj(tmpstr3, "UnsentDataAmount"));
 					_dSbytes = Double.parseDouble(JSONUtils.getValueFromJsonObj(tmpstr3, "TotalSentByte"));
 				} catch (Exception e) {
-					e.printStackTrace();
+					_log.warn("?", e);
 					_sErrMsg = _resBundDisplayMsgs.getString("inboundWrongMessage")
 							+ "\n";
 					return true;
@@ -2228,7 +2213,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					_dSbytes = Double.parseDouble(tmpstr3.substring(k1 + 1)
 							.substring(k2 + 1));
 				} catch (Exception e) {
-					e.printStackTrace();
+					_log.warn("?", e);
 					_sErrMsg = _resBundDisplayMsgs.getString("inboundWrongMessage")
 							+ "\n";
 					return true;
@@ -4479,7 +4464,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					thread_group.destroy();
 					break;
 				}catch( Throwable e ){
-					e.printStackTrace();
+					_log.warn("?", e);
 				}
 			}
 			

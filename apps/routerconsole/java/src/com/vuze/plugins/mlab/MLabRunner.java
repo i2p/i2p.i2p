@@ -58,8 +58,17 @@ public class MLabRunner {
     // null for testing
     private final RouterContext _rcontext;
     private final Log _log;
+    private static MLabRunner _instance;
     
-    public MLabRunner(I2PAppContext ctx) {
+    public static MLabRunner getInstance(I2PAppContext ctx) {
+        synchronized(MLabRunner.class) {
+            if (_instance == null)
+                _instance = new MLabRunner(ctx);
+            return _instance;
+        }
+    }
+
+    private MLabRunner(I2PAppContext ctx) {
         _context = ctx;
         _rcontext = ctx.isRouterContext() ? (RouterContext) ctx : null;
         _log = ctx.logManager().getLog(MLabRunner.class);
@@ -338,9 +347,8 @@ public class MLabRunner {
     /** standalone test */
     public static void main(String[] args) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        MLabRunner mlab = new MLabRunner(ctx);
+        MLabRunner mlab = MLabRunner.getInstance(ctx);
         ToolListener lsnr = new TestListener();
         mlab.runNDT(lsnr);
-        try { Thread.sleep(120*1000); } catch(InterruptedException ie) {}
     }
 }

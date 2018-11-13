@@ -183,7 +183,7 @@ public class Protocol {
 			_ctlInStream.close();
 			_ctlOutStream.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
