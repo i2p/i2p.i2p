@@ -1,0 +1,49 @@
+Copyright (c) 2003 University of Chicago.  All rights reserved.
+The Web100 Network Diagnostic Tool (NDT) is distributed subject to the
+following license conditions:
+SOFTWARE LICENSE AGREEMENT
+Software: Web100 Network Diagnostic Tool (NDT)
+1. The "Software", below, refers to the Web100 Network Diagnostic Tool
+   (NDT) (in either source code, or binary form and accompanying documentation).
+   Each licensee is addressed as "you" or "Licensee."
+2. The copyright holder shown above hereby grants Licensee a royalty-free
+   nonexclusive license, subject to the limitations stated herein and U.S.
+   Government license rights.
+3. You may modify and make a copy or copies of the Software for use within
+   your organization, if you meet the following conditions: 
+    a. Copies in source code must include the copyright notice and this Software
+       License Agreement.
+    b. Copies in binary form must include the copyright notice and this Software
+       License Agreement in the documentation and/or other materials provided with the copy.
+4. You may make a copy, or modify a copy or copies of the Software or any
+   portion of it, thus forming a work based on the Software, and distribute
+   copies outside your organization, if you meet all of the following conditions: 
+    a. Copies in source code must include the copyright notice and this Software
+       License Agreement;
+    b. Copies in binary form must include the copyright notice and this Software
+       License Agreement in the documentation and/or other materials provided with the copy;
+    c. Modified copies and works based on the Software must carry prominent
+       notices stating that you changed specified portions of the Software.
+5. Portions of the Software resulted from work developed under a U.S.
+   Government contract and are subject to the following license: the Government
+   is granted for itself and others acting on its behalf a paid-up, nonexclusive,
+   irrevocable worldwide license in this computer software to reproduce, prepare
+   derivative works, and perform publicly and display publicly.
+6. WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED "AS IS" WITHOUT WARRANTY OF
+   ANY KIND. THE COPYRIGHT HOLDER, THE UNITED STATES, THE UNITED STATES DEPARTMENT
+   OF ENERGY, AND THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT, (2) DO NOT ASSUME
+   ANY LEGAL LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR
+   USEFULNESS OF THE SOFTWARE, (3) DO NOT REPRESENT THAT USE OF THE SOFTWARE WOULD
+   NOT INFRINGE PRIVATELY OWNED RIGHTS, (4) DO NOT WARRANT THAT THE SOFTWARE
+   WILL FUNCTION UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL BE CORRECTED.
+7. LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT HOLDER, THE UNITED
+   STATES, THE UNITED STATES DEPARTMENT OF ENERGY, OR THEIR EMPLOYEES: BE LIABLE
+   FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF ANY
+   KIND OR NATURE, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS OR LOSS OF DATA,
+   FOR ANY REASON WHATSOEVER, WHETHER SUCH LIABILITY IS ASSERTED ON THE BASIS OF
+   CONTRACT, TORT (INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR OTHERWISE, EVEN
+   IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGES.
+The Software was developed at least in part by the University of Chicago, as
+Operator of Argonne National Laboratory (http://miranda.ctd.anl.gov:7123/). 

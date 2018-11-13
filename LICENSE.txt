@@ -274,9 +274,10 @@ Applications:
    Some images licensed under a Creative Commons 2.0 license.
        Silk icons: See licenses/LICENSE-SilkIcons.txt
 
-   I2PSnark light theme:
-   "Creative Commons Cat" licensed under a Creative Commons Attribution 3.0 Unported License.
-   Original photo by Boaz Arad. http://www.luxphile.com/2011/01/creative-commons-cat.html
+   Router Console NDT subsystem:
+   Copyright (c) 2003 University of Chicago.  All rights reserved.
+   See licenses/LICENSE-NDT.txt
+   Notice: I2P has changed specified portions of the Software, including the package edu.internet2.ndt.
 
    SAM (sam.jar):
    Public domain.
