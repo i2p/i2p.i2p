@@ -48,4 +48,11 @@ JCheckBox
 	{
 		return( selected );
 	}
+	
+	public void
+	addActionListener(
+		ActionListener	l )
+	{
+		
+	}
 }
