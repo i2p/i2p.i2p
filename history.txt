@@ -1,5 +1,12 @@
+2018-11-13 zzz
+ * Console:
+   - New M-Lab NDT subsystem
+   - Setup wizard (WIP)
+ * Router: LS2 handling for proposal 123
+
 2018-10-13 zzz
  * Build: Add javac.classpath to junit.compileTest targets (ticket #2333)
+ * Data: Add LS2 classes for proposal 123
 
 2018-10-11 zzz
  * Console: Remove static Server reference

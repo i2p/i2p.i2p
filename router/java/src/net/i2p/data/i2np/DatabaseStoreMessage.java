@@ -18,6 +18,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 
@@ -113,7 +114,8 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         
         // as of 0.9.18, ignore other 7 bits of the type byte, in preparation for future options
-        int dbType = data[curIndex] & 0x01;
+        // as of 0.9.38, ignore other 4 bits of the type byte, in preparation for future options
+        int dbType = data[curIndex] & 0x0f;
         curIndex++;
         
         _replyToken = DataHelper.fromLong(data, curIndex, 4);
@@ -141,7 +143,16 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Error reading the leaseSet", ioe);
             }
-        } else {   // dbType == DatabaseEntry.KEY_TYPE_ROUTERINFO
+        } else if (dbType == DatabaseEntry.KEY_TYPE_LS2) {
+            _dbEntry = new LeaseSet2();
+            try {
+                _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
+            } catch (DataFormatException dfe) {
+                throw new I2NPMessageException("Error reading the leaseSet", dfe);
+            } catch (IOException ioe) {
+                throw new I2NPMessageException("Error reading the leaseSet", ioe);
+            }
+        } else if ((dbType & 0x01) == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
@@ -160,8 +171,12 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the routerInfo", dfe);
             } catch (IOException ioe) {
+                //net.i2p.util.Log log = new net.i2p.util.Log(DatabaseStoreMessage.class);
+                //log.error("Corrupt compressed routerInfo size = " + compressedSize + " key " + _key, ioe);
                 throw new I2NPMessageException("Corrupt compressed routerInfo size = " + compressedSize, ioe);
             }
+        } else {
+            throw new I2NPMessageException("Unknown type " + dbType);
         }
         //if (!key.equals(_dbEntry.getHash()))
         //    throw new I2NPMessageException("Hash mismatch in DSM");
@@ -269,7 +284,11 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             buf.append("\n\tReply tunnel: ").append(_replyTunnel);
             buf.append("\n\tReply gateway: ").append(_replyGateway);
         }
-        buf.append("\n\tKey: ").append(getKey());
+        buf.append("\n\tKey: ");
+        if (_dbEntry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+            buf.append(getKey());
+        else
+            buf.append(getKey().toBase32());
         buf.append("\n\tEntry: ").append(_dbEntry);
         buf.append(']');
         return buf.toString();

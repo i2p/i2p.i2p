@@ -94,7 +94,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         DatabaseLookupMessage.Type lookupType = _message.getSearchType();
         // only lookup once, then cast to correct type
         DatabaseEntry dbe = getContext().netDb().lookupLocally(_message.getSearchKey());
-        if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
+        int type = dbe != null ? dbe.getType() : -1;
+        if ((type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) &&
             (lookupType == DatabaseLookupMessage.Type.ANY || lookupType == DatabaseLookupMessage.Type.LS)) {
             LeaseSet ls = (LeaseSet) dbe;
             // We have to be very careful here to decide whether or not to send out the leaseSet,
@@ -158,7 +159,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 Set<Hash> routerHashSet = getNearestRouters(lookupType);
                 sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
             }
-        } else if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
+        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
                    lookupType != DatabaseLookupMessage.Type.LS) {
             RouterInfo info = (RouterInfo) dbe;
             if (info.isCurrent(EXPIRE_DELAY)) {
@@ -259,7 +260,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             _log.debug("Sending data matching key " + key + " to peer " + toPeer
                        + " tunnel " + replyTunnel);
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        int type = data.getType();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
             getContext().statManager().addRateData("netDb.lookupsMatchedLeaseSet", 1);
         }
         msg.setEntry(data);

@@ -38,7 +38,6 @@ public class Lease2 extends Lease {
         return DataHelper.eq(_end, lse.getEndDate())
                && DataHelper.eq(_tunnelId, lse.getTunnelId())
                && DataHelper.eq(_gateway, lse.getGateway());
-
     }
     
     @Override

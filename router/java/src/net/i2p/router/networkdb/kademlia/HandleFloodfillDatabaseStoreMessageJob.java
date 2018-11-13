@@ -69,7 +69,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         RouterInfo prevNetDb = null;
         Hash key = _message.getKey();
         DatabaseEntry entry = _message.getEntry();
-        if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        int type = entry.getType();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
+            type == DatabaseEntry.KEY_TYPE_LS2) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of leaseset " + _message);
@@ -135,7 +137,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
             }
-        } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             RouterInfo ri = (RouterInfo) entry;
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1);
             if (_log.shouldLog(Log.INFO))
@@ -181,7 +183,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             }
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid DatabaseStoreMessage data type - " + entry.getType() 
+                _log.error("Invalid DatabaseStoreMessage data type - " + type
                            + ": " + _message);
             // don't ack or flood
             return;

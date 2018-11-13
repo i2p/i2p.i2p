@@ -52,15 +52,22 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
             // We do it here first to make sure it is in the DB before
             // runJob() and search.success() is called???
             // Should we just pass the DataStructure directly back to somebody?
-            if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+            DatabaseEntry entry = dsm.getEntry();
+            int type = entry.getType();
+            if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
+                type == DatabaseEntry.KEY_TYPE_LS2) {
                 // Since HFDSMJ wants to setReceivedAsPublished(), we have to
                 // set a flag saying this was really the result of a query,
                 // so don't do that.
                 LeaseSet ls = (LeaseSet) dsm.getEntry();
                 ls.setReceivedAsReply();
                 getContext().netDb().store(dsm.getKey(), ls);
-            } else {
+            } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 getContext().netDb().store(dsm.getKey(), (RouterInfo) dsm.getEntry());
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn(_search.getJobId() + ": got a DSM of unknown type " + type
+                              + " for " + dsm.getKey().toBase64());
             }
         } catch (UnsupportedCryptoException uce) {
             _search.failed();

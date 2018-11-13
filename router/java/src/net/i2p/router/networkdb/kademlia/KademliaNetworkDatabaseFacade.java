@@ -438,7 +438,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         //return _ds.countLeaseSets();
         int rv = 0;
         for (DatabaseEntry ds : _ds.getEntries()) {
-            if (ds.getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
+            int type = ds.getType();
+            if ((type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) &&
                 ((LeaseSet)ds).getReceivedAsPublished())
                 rv++;
         }
@@ -466,13 +467,14 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         DatabaseEntry rv = _ds.get(key);
         if (rv == null)
             return null;
-        if (rv.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        int type = rv.getType();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
             LeaseSet ls = (LeaseSet)rv;
             if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR))
                 return rv;
             else
                 fail(key);
-        } else if (rv.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             try {
                 if (validate((RouterInfo)rv) == null)
                     return rv;
@@ -551,7 +553,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return null;
         DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
-            if (ds.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+            int type = ds.getType();
+            if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
                 LeaseSet ls = (LeaseSet)ds;
                 if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                     return ls;
@@ -604,7 +607,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return null;
         DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
-            if (ds.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+            int type = ds.getType();
+            if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
                 LeaseSet ls = (LeaseSet)ds;
                 return ls.getDestination();
             }
@@ -1077,7 +1081,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     private void processStoreFailure(Hash h, DatabaseEntry entry) throws UnsupportedCryptoException {
         if (entry.getHash().equals(h)) {
-            if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+            int etype = entry.getType();
+            if (etype == DatabaseEntry.KEY_TYPE_LEASESET || etype == DatabaseEntry.KEY_TYPE_LS2) {
                 LeaseSet ls = (LeaseSet) entry;
                 Destination d = ls.getDestination();
                 Certificate c = d.getCertificate();
@@ -1094,7 +1099,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                         }
                     } catch (DataFormatException dfe) {}
                 }
-            } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            } else if (etype == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 RouterInfo ri = (RouterInfo) entry;
                 RouterIdentity id = ri.getIdentity();
                 Certificate c = id.getCertificate();
@@ -1237,7 +1242,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return null;
         Set<LeaseSet> leases = new HashSet<LeaseSet>();
         for (DatabaseEntry o : getDataStore().getEntries()) {
-            if (o.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
+            int type = o.getType();
+            if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2)
                 leases.add((LeaseSet)o);
         }
         return leases;

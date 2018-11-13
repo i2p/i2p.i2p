@@ -294,9 +294,7 @@ public class PersistentDataStore extends TransientDataStore {
         try {
             String filename = null;
 
-            if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
-                filename = getLeaseSetName(key);
-            else if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+            if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
                 filename = getRouterInfoName(key);
             else
                 throw new IOException("We don't know how to write objects of type " + data.getClass().getName());
@@ -624,18 +622,12 @@ public class PersistentDataStore extends TransientDataStore {
         }
     }
     
-    private final static String LEASESET_PREFIX = "leaseSet-";
-    private final static String LEASESET_SUFFIX = ".dat";
     private final static String ROUTERINFO_PREFIX = "routerInfo-";
     private final static String ROUTERINFO_SUFFIX = ".dat";
 
     /** @since 0.9.34 */
     public static final FileFilter RI_FILTER = new FileSuffixFilter(ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     
-    private static String getLeaseSetName(Hash hash) {
-        return LEASESET_PREFIX + hash.toBase64() + LEASESET_SUFFIX;
-    }
-
     private String getRouterInfoName(Hash hash) {
         String b64 = hash.toBase64();
         if (_flat)

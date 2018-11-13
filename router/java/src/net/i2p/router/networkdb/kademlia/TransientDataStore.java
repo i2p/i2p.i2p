@@ -99,7 +99,9 @@ class TransientDataStore implements DataStore {
     public int countLeaseSets() {
         int count = 0;
         for (DatabaseEntry d : _data.values()) {
-            if (d.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
+            int type = d.getType();
+            if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
+                type == DatabaseEntry.KEY_TYPE_LS2)
                 count++;
         }
         return count;
@@ -122,7 +124,8 @@ class TransientDataStore implements DataStore {
             _log.debug("Storing key " + key);
         DatabaseEntry old = _data.putIfAbsent(key, data);
         boolean rv = false;
-        if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        int type = data.getType();
+        if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             // Don't do this here so we don't reset it at router startup;
             // the StoreMessageJob calls this
             //_context.profileManager().heardAbout(key);
@@ -148,7 +151,8 @@ class TransientDataStore implements DataStore {
                     _log.info("New router for " + key + ": published on " + new Date(ri.getPublished()));
                 rv = true;
             }
-        } else if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        } else if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
+                   type == DatabaseEntry.KEY_TYPE_LS2) {
             LeaseSet ls = (LeaseSet)data;
             if (old != null) {
                 LeaseSet ols = (LeaseSet)old;
