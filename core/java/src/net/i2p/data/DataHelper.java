@@ -400,14 +400,14 @@ public class DataHelper {
     /**
      * Pretty print the mapping, unsorted
      * (unless the options param is an OrderedProperties)
-     * @since 0.9.4
+     * @since 0.9.4, as of 0.9.38 supports non-String values
      */
     public static String toString(Map<?, ?> options) {
         StringBuilder buf = new StringBuilder();
         if (options != null) {
             for (Map.Entry<?, ?> entry : options.entrySet()) {
                 String key = (String) entry.getKey();
-                String val = (String) entry.getValue();
+                String val = entry.getValue().toString();
                 buf.append("[").append(key).append("] = [").append(val).append("]");
             }
         } else {
