@@ -9,7 +9,9 @@ import net.i2p.router.web.HelperBase;
  */
 public class WizardHelper extends HelperBase {
 
+    public static final String PROP_COMPLETE = "routerconsole.welcomeWizardComplete";
+
     public void complete() {
-        _context.router().saveConfig("routerconsole.welcomeWizardComplete", "true");
+        _context.router().saveConfig(PROP_COMPLETE, "true");
     }
 }

@@ -12,6 +12,7 @@
     //  while preserving any query parameters
     //
     response.setStatus(307);
+    response.setHeader("Cache-Control","no-cache");
     String req = request.getRequestURL().toString();
     StringBuilder buf = new StringBuilder(128);
     if (req.endsWith("index"))
@@ -23,13 +24,13 @@
         buf.append('/');
     net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
     boolean oldHome = ctx.getBooleanProperty("routerconsole.oldHomePage");
-    boolean wizRun = ctx.getBooleanProperty("routerconsole.welcomeWizardComplete");
+    boolean wizRun = ctx.getBooleanProperty(net.i2p.router.web.helpers.WizardHelper.PROP_COMPLETE);
     String firstVersion = ctx.getProperty("router.firstVersion");
     String tgt;
     final boolean ENABLE_WIZARD_ON_FIRST_RUN = false;
     if (oldHome) {
         tgt = "console";
-    } else if (ENABLE_WIZARD_ON_FIRST_RUN && (wizRun || firstVersion == null)) {
+    } else if (!ENABLE_WIZARD_ON_FIRST_RUN || wizRun || firstVersion == null) {
         // wizard already run
         tgt = "home";
     } else {

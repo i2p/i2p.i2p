@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.vuze.plugins.mlab.tools.ndt.swingemu.Tcpbw100UIWrapper;
 import com.vuze.plugins.mlab.tools.ndt.swingemu.Tcpbw100UIWrapperListener;
@@ -40,7 +41,6 @@ import net.minidev.json.parser.ParseException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -51,13 +51,14 @@ import net.i2p.util.Log;
  * @since 0.9.38
  */
 public class MLabRunner {
+    // ns.measurementlab.net does not support https
+    // use ndt_ssl for test over ssl? but Tcpbw100 doesn't support it
     private static final String NS_URL = "http://ns.measurementlab.net/ndt?format=json";
     private static final long NS_TIMEOUT = 20*1000;
     private boolean test_active;
     private final I2PAppContext _context;
-    // null for testing
-    private final RouterContext _rcontext;
     private final Log _log;
+    private final AtomicBoolean _running = new AtomicBoolean();
     private static MLabRunner _instance;
     
     public static MLabRunner getInstance(I2PAppContext ctx) {
@@ -70,13 +71,26 @@ public class MLabRunner {
 
     private MLabRunner(I2PAppContext ctx) {
         _context = ctx;
-        _rcontext = ctx.isRouterContext() ? (RouterContext) ctx : null;
         _log = ctx.logManager().getLog(MLabRunner.class);
     }
+
+    public boolean isRunning() {
+       return _running.get();
+    }
     
+    /**
+     * Non-blocking, spawns a thread and returns immediately.
+     *
+     * @param listener use to detect completion and get results
+     * @return a ToolRun object which may be used to cancel the test,
+     *         or null if there was already a test in progress.
+     */
     public ToolRun runNDT(final ToolListener listener) {
+        if (!_running.compareAndSet(false, true)) {
+            _log.warn("Test already running");
+            return null;
+        }
         final ToolRun run = new ToolRunImpl();
-        //final AESemaphore    sem = new AESemaphore( "waiter" );
         
         runTool(
             new Runnable()
@@ -85,7 +99,6 @@ public class MLabRunner {
                     boolean completed = false;
                     try{
                         _log.warn("Starting NDT Test");
-                        _log.warn("-----------------");
                         
                         new Tcpbw100UIWrapper(
                             new Tcpbw100UIWrapperListener()
@@ -141,7 +154,6 @@ public class MLabRunner {
                             // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
                             //               int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream,
                             //               String url, boolean allowCaching, String etag, String postData) {
-                            // TODO why no HTTPS?
                             EepGet eepget = new EepGet(_context, false, null, 0,
                                                        0, 2, 1024, null, baos,
                                                        NS_URL, false, null, null);
@@ -160,6 +172,7 @@ public class MLabRunner {
                             if (_log.shouldWarn())
                                 _log.warn("Got response: " + DataHelper.getUTF8(b));
                             // TODO use IP instead to avoid another lookup?
+                            // or use "fqdn" in response instead of "url"
                             URL url = new URL((String)map.get( "url" ));
                             if (url == null) {
                                 throw new IOException("no url");
@@ -174,7 +187,7 @@ public class MLabRunner {
                         }
                         
                         if (server_host == null) {
-                                // fallback to old, discouraged approach
+                            // fallback to old, discouraged approach
                             server_host = "ndt.iupui.donar.measurement-lab.org";
                             if (_log.shouldWarn())
                                 _log.warn("Failed to select server, falling back to donar method");
@@ -191,8 +204,6 @@ public class MLabRunner {
                                 }
                             });
                         
-                        //sem.release();
-                        
                         test.runIt();
                         
                         try { Thread.sleep(2000); } catch (InterruptedException ie) { return; }
@@ -202,11 +213,13 @@ public class MLabRunner {
                             try { Thread.sleep(1000); } catch (InterruptedException ie) { break; }
                         }
 
+                        // in integer bytes per second
                         long up_bps = 0;
                         try {
                             up_bps = (long)(Double.parseDouble(test.get_c2sspd())*1000000)/8;
                         } catch(Throwable e) {}
                         
+                        // in integer bytes per second
                         long down_bps = 0;
                         try {
                             down_bps = (long)(Double.parseDouble(test.get_s2cspd())*1000000)/8;
@@ -236,54 +249,44 @@ public class MLabRunner {
                             _log.warn("Test complete in " + DataHelper.formatDuration(end - start));
                         }
                     } finally {
-                        //sem.release();
                         if (!completed && listener != null) {
                             listener.complete( new HashMap<String, Object>());
                         }
+                        _running.set(false);
                     }
                 }
             });
         
-        //sem.reserve();
         return run;
     }
     
-    protected void runTool(final Runnable target) {
-        // need something like this
-        //ap.setEnabled( false );
-        new I2PAppThread("toolRunner")
+    /**
+     * Non-blocking, spawns a thread and returns immediately.
+     */
+    private void runTool(final Runnable target) {
+        new I2PAppThread("MLabRunner")
         {
             @Override
             public void run() {
                 try{
                     target.run();
                 }finally{
-                    //ap.setEnabled( true );
                 }
             }
         }.start();
     }
     
-    public void runTest(
-        final Map<String,Object> args,
-        //final IPCInterface        callback,
-        final boolean autoApply)
-    
-        throws Exception
-    {
-        synchronized( this ){
-            if (test_active) {
-                throw new Exception("Test already active");
-            }
-            test_active = true;
-        }
-    }
-    
+    /**
+     * Returned from runNDT
+     */
     public interface ToolRun {
         public void cancel();
         public void addListener(ToolRunListener    l);
     }
     
+    /**
+     * Returned from runNDT
+     */
     private class ToolRunImpl implements ToolRun {
         private List<ToolRunListener> listeners = new ArrayList<ToolRunListener>();
         private boolean cancelled;
@@ -319,10 +322,12 @@ public class MLabRunner {
         }
     }
     
+    /** The listener for ToolRun */
     public interface ToolRunListener {
         public void cancelled();
     }
     
+    /** The parameter for runNDT() */
     public interface ToolListener {
         public void reportSummary(String str);
         public void reportDetail(String str);
@@ -331,6 +336,8 @@ public class MLabRunner {
 
     /** standalone test */
     private static class TestListener implements ToolListener {
+        private final AtomicBoolean _complete = new AtomicBoolean();
+
         public void reportSummary(String str) {
             System.out.println(str);
         }
@@ -341,6 +348,11 @@ public class MLabRunner {
 
         public void complete(Map<String, Object> results) {
             System.out.println("**************** Results: " + DataHelper.toString(results) + "***********************");
+            _complete.set(true);
+        }
+
+        public boolean isComplete() {
+            return _complete.get();
         }
     }
 
@@ -348,7 +360,13 @@ public class MLabRunner {
     public static void main(String[] args) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         MLabRunner mlab = MLabRunner.getInstance(ctx);
-        ToolListener lsnr = new TestListener();
+        TestListener lsnr = new TestListener();
         mlab.runNDT(lsnr);
+        try { Thread.sleep(2000); } catch (InterruptedException ie) { return; }
+        for (int i = 0; i < 180; i++) {
+            if (lsnr.isComplete())
+                break;
+            try { Thread.sleep(1000); } catch (InterruptedException ie) { break; }
+        }
     }
 }

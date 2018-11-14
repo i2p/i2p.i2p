@@ -42,6 +42,7 @@
 
         // redirect to /home
         response.setStatus(307);
+        response.setHeader("Cache-Control","no-cache");
         String req = request.getRequestURL().toString();
         int slash = req.indexOf("/welcome");
         if (slash >= 0)
@@ -63,8 +64,8 @@
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script type="text/javascript">
   var failMessage = "<hr><b><%=intl._t("Router is down")%><\/b>";
-  function requestAjax1() { ajax("/welcomexhr.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", "1000"); }
-  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
+  function requestAjax1() { ajax("/welcomexhr.jsp", "xhr", "1000"); }
+  function initAjax() { setTimeout(requestAjax1, "1000");  }
 </script>
 <%
     }
@@ -83,7 +84,12 @@
 %>
 <h2><%=intl._t("New Install Wizard")%> <%=ipg%>/<%=LAST_PAGE%></h2>
 <div id="wizard">
-<jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="request" />
+<%--
+    // note that for the handler we use a session scope, not a page scope,
+    // so that we can access the NDT test results.
+    // The MLabHelper singleton will prevent multiple simultaneous tests, even across sessions.
+--%>
+<jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="session" />
 <%@include file="formhandler.jsi" %>
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>">
