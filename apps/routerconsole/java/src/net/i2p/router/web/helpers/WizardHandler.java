@@ -28,10 +28,6 @@ public class WizardHandler extends FormHandler {
 
     @Override
     protected void processForm() {
-{
-String page = getJettyString("page");
-System.out.println("Action: " + _action + " page: " + page);
-}
         if (_action == null)
             return;
         if (getJettyString("cancelbw") != null) {
@@ -55,7 +51,9 @@ System.out.println("Action: " + _action + " page: " + page);
                 boolean updated = updateRates(changes);
                 if (updated) {
                     boolean saved = _context.router().saveConfig(changes, null);
-                    if (saved)   // needed?
+                    // this has to be after the save
+                    _context.bandwidthLimiter().reinitialize();
+                    if (saved)
                         addFormNotice(_t("Configuration saved successfully"));
                     else
                         addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
