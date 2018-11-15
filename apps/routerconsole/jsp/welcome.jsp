@@ -157,6 +157,7 @@
 <table class="configtable">
 <tr><td><%=intl._t("Test running?")%></td><td><%=wizhelper.isNDTRunning()%></td></tr>
 <tr><td><%=intl._t("Test complete?")%></td><td><%=wizhelper.isNDTComplete()%></td></tr>
+<tr><td><%=intl._t("Test server location")%></td><td><%=wizhelper.getServerLocation()%></td></tr>
 <tr><td><%=intl._t("Completion status")%></td><td><%=wizhelper.getCompletionStatus()%></td></tr>
 <tr><td><%=intl._t("Details")%></td><td><%=wizhelper.getDetailStatus()%></td></tr>
 <tr><td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>

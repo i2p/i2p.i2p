@@ -148,6 +148,8 @@ public class MLabRunner {
                         // The other option, discouraged, is to continue using donar which should still be resolving. It just uses ns.measurementlab.net on the backend now. However, this is currently down according to my tests, so we'll work on getting this back as soon as possible.
                         
                         String server_host = null;
+                        String server_city = null;
+                        String server_country = null;
                         
                         try {
                             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
@@ -178,6 +180,8 @@ public class MLabRunner {
                                 throw new IOException("no url");
                             }
                             server_host = url.getHost();
+                            server_city = (String) map.get("city");
+                            server_country = (String) map.get("country");
                             // ignore the returned port in the URL (7123) which is the applet, not the control port
                             if (_log.shouldWarn())
                                 _log.warn("Selected server: " + server_host);
@@ -230,8 +234,8 @@ public class MLabRunner {
                             result_str = "No results were received. Either the test server is unavailable or network problems are preventing the test from running correctly. Please try again.";
                         } else {
                             result_str =     
-                                "Completed: up=" + DataHelper.formatSize(up_bps) +
-                                ", down=" + DataHelper.formatSize(down_bps);
+                                "Completed: up=" + DataHelper.formatSize2Decimal(up_bps, false) +
+                                ", down=" + DataHelper.formatSize2Decimal(down_bps, false);
                         }
                         
                         _log.warn(result_str);
@@ -242,6 +246,11 @@ public class MLabRunner {
                             Map<String,Object> results = new HashMap<String, Object>();
                             results.put("up", up_bps);
                             results.put("down", down_bps);
+                            results.put("server_host", server_host);
+                            if (server_city != null)
+                                results.put("server_city", server_city);
+                            if (server_country != null)
+                                results.put("server_country", server_country);
                             listener.complete( results );
                         }
                         if (_log.shouldWarn()) {

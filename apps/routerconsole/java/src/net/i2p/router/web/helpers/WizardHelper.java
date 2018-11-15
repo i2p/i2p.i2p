@@ -58,7 +58,7 @@ public class WizardHelper extends HelperBase {
         if (_listener != null) {
             String s = _listener.getSummary();
             if (s != null)
-                s = DataHelper.escapeHTML(s);
+                rv = DataHelper.escapeHTML(s);
         }
         return rv;
     }
@@ -71,7 +71,7 @@ public class WizardHelper extends HelperBase {
         if (_listener != null) {
             String s = _listener.getDetail();
             if (s != null)
-                s = DataHelper.escapeHTML(s);
+                rv = DataHelper.escapeHTML(s);
         }
         return rv;
     }
@@ -90,7 +90,24 @@ public class WizardHelper extends HelperBase {
         return getLongResult("down");
     }
 
-    public synchronized long getLongResult(String key) {
+    /**
+     * @return HTML-escaped location or ""
+     */
+    public String getServerLocation() {
+        StringBuilder buf = new StringBuilder(64);
+        String s = getStringResult("server_city");
+        if (s != null)
+            buf.append(s).append(' ');
+        s = getStringResult("server_country");
+        if (s != null)
+            buf.append(s).append(' ');
+        s = getStringResult("server_host");
+        if (s != null)
+            buf.append(s);
+        return DataHelper.escapeHTML(buf.toString());
+    }
+
+    private synchronized long getLongResult(String key) {
         if (_listener != null) {
             Map<String, Object> results = _listener.getResults();
             if (results != null) {
@@ -100,6 +117,16 @@ public class WizardHelper extends HelperBase {
             }
         }
         return 0;
+    }
+
+    private synchronized String getStringResult(String key) {
+        if (_listener != null) {
+            Map<String, Object> results = _listener.getResults();
+            if (results != null) {
+                return (String) results.get(key);
+            }
+        }
+        return null;
     }
 
     /**
