@@ -50,7 +50,7 @@ StyledDocument
 			
 		}else{
 		
-			System.out.println( "doc: " + s );
+			//System.out.println( "doc: " + s );
 		}
 		
 		str += s;

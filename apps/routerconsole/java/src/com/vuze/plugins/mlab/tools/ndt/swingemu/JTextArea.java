@@ -50,7 +50,7 @@ JTextArea
 			
 		}else{
 			
-			System.out.println( "text: " + str );
+			//System.out.println( "text: " + str );
 		}
 		
 		text += str;

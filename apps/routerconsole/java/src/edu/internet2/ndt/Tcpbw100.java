@@ -1279,9 +1279,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * @param msg String value of status
 	 * */
 	public void showStatus(String msg) {
-		if (!_bIsApplication) {
-			super.showStatus(msg);
-		}
+		_log.warn(msg);
 	}
 
 	/**
@@ -1449,9 +1447,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					// Get Client reported server IP
 					sClientSideServerIp = midSrvrSockObj.getInetAddress() + "";
 				} catch (SecurityException e) {
-					System.err
-							.println("Unable to obtain Servers IP addresses: using "
-									+ sHostName);
+					_log.warn("Unable to obtain Servers IP addresses: using "
+									+ sHostName, e);
 					_sErrMsg = "getInetAddress() called failed\n";
 					sClientSideServerIp = sHostName;
 					_resultsTxtPane.append(_resBundDisplayMsgs
@@ -1468,8 +1465,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				try {
 					sClientSideClientIp = midSrvrSockObj.getLocalAddress() + ";";
 				} catch (SecurityException e) {
-					System.err
-							.println("Unable to obtain local IP address: using 127.0.0.1");
+					_log.warn("Unable to obtain local IP address: using 127.0.0.1", e);
 					_sErrMsg = "getLocalAddress() call failed\n";
 					sClientSideClientIp = NDTConstants.LOOPBACK_ADDRS_STRING + ";";
 				}
@@ -1481,9 +1477,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				try {
 					_sMidBoxTestResult += midSrvrSockObj.getInetAddress() + ";";
 				} catch (SecurityException e) {
-					System.err
-							.println("Unable to obtain Servers IP addresses: using "
-									+ sHostName);
+					_log.warn("Unable to obtain Servers IP addresses: using "
+									+ sHostName, e);
 					_sErrMsg = "getInetAddress() called failed\n";
 					_sMidBoxTestResult += sHostName + ";";
 					_resultsTxtPane.append(_resBundDisplayMsgs
@@ -1496,8 +1491,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				try {
 					_sMidBoxTestResult += midSrvrSockObj.getLocalAddress() + ";";
 				} catch (SecurityException e) {
-					System.err
-							.println("Unable to obtain local IP address: using 127.0.0.1");
+					_log.warn("Unable to obtain local IP address: using 127.0.0.1", e);
 					_sErrMsg = "getLocalAddress() call failed\n";
 					_sMidBoxTestResult += NDTConstants.LOOPBACK_ADDRS_STRING + ";";
 				}
@@ -2913,9 +2907,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				i++;
 			}
 		} catch (IOException e) {
-			System.err
-					.println("Couldn't complete tests while waiting for MSG_LOGOUT/MSG_RESULTS for "
-							+ sHostName);
+			_log.warn("Couldn't complete tests while waiting for MSG_LOGOUT/MSG_RESULTS for "
+							+ sHostName, e);
 			_sErrMsg = "Couldn't complete tests while waiting for MSG_LOGOUT/MSG_RESULTS for "
 					+ sHostName + ")\n";
 			_bFailed = true;
@@ -2937,8 +2930,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					+ ": 127.0.0.1\n");
 			_resultsTxtPane.append(_resBundDisplayMsgs
 					.getString("unableToObtainIP") + "\n");
-			System.err
-					.println("Unable to obtain local IP address: using 127.0.0.1");
+			_log.warn("Unable to obtain local IP address: using 127.0.0.1", e);
 		}
 
 		try {

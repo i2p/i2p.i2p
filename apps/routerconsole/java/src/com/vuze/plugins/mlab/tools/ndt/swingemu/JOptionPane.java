@@ -33,7 +33,7 @@ JOptionPane
 		Object	wha,
 		String	str )
 	{
-		System.out.println( "dialog: " + str );
+		//System.out.println( "dialog: " + str );
 	}
 	
 	public static void
@@ -43,7 +43,7 @@ JOptionPane
 		String	str2,
 		int		a )
 	{
-		System.out.println( "dialog: " + str1 + "/" + str2 );
+		//System.out.println( "dialog: " + str1 + "/" + str2 );
 	}
 	
 }

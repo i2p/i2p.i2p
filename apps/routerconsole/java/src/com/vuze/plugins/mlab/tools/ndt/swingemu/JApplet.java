@@ -50,7 +50,7 @@ public class JApplet extends JFrame{
 	showStatus(
 		String		str )
 	{
-		System.out.println( "status: " + str );
+		//System.out.println( "status: " + str );
 	}
 	
 	public void
