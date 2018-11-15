@@ -602,6 +602,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				} finally {
 					_bTestInProgress.set(false);
 				}
+			} else {
+				_log.warn("Test in progress, not running another one");
 			}
 		}
 
