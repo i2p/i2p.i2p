@@ -19,6 +19,11 @@ import net.i2p.router.web.HelperBase;
 public class WizardHelper extends HelperBase {
 
     public static final String PROP_COMPLETE = "routerconsole.welcomeWizardComplete";
+    // scale bw test results by this for limiter settings
+    public static final float BW_SCALE = 0.75f;
+    // KBps
+    private static final float MIN_DOWN_BW = 32.0f;
+    private static final float MIN_UP_BW = 12.0f;
 
     // session scope, but it's an underlying singleton
     private MLabRunner _mlab;
@@ -130,6 +135,100 @@ public class WizardHelper extends HelperBase {
     }
 
     /**
+     * To populate form with.
+     * Uses the test result if available, else the current setting
+     * Adapted from ConfigNetHelper.
+     * @return decimal KBytes/sec
+     */
+    public String getInboundBurstRate() {
+        float bw;
+        long result = getDownBandwidth();
+        if (result > 0) {
+            bw = Math.max(MIN_DOWN_BW, BW_SCALE * result / 1000f);
+        } else {
+            bw = _context.bandwidthLimiter().getInboundBurstKBytesPerSecond() * 1.024f;
+        }
+        return Integer.toString(Math.round(bw));
+    }
+
+    /**
+     * To populate form with.
+     * Uses the test result if available, else the current setting
+     * Adapted from ConfigNetHelper.
+     * @return decimal KBytes/sec
+     */
+    public String getOutboundBurstRate() {
+        float bw;
+        long result = getUpBandwidth();
+        if (result > 0) {
+            bw = Math.max(MIN_UP_BW, BW_SCALE * result / 1000f);
+        } else {
+            bw = _context.bandwidthLimiter().getOutboundBurstKBytesPerSecond() * 1.024f;
+        }
+        return Integer.toString(Math.round(bw));
+    }
+
+    /**
+     * Copied from ConfigNetHelper.
+     * @return decimal
+     */
+    public String getInboundBurstRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getInboundBurstKBytesPerSecond());
+    }
+
+    /**
+     * Copied from ConfigNetHelper.
+     * @return decimal
+     */
+    public String getOutboundBurstRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getOutboundBurstKBytesPerSecond());
+    }
+
+    /**
+     * Copied from ConfigNetHelper.
+     * @return decimal
+     */
+    public String getShareRateBits() {
+        return kbytesToBits(getShareBandwidth());
+    }
+
+    /**
+     * Copied from ConfigNetHelper.
+     * @param kbytes binary K
+     * @return decimal
+     */
+    private String kbytesToBits(float kbytes) {
+        return DataHelper.formatSize2Decimal((long) (kbytes * (8 * 1024))) + _t("bits per second") +
+               "; " +
+               _t("{0}Bytes per month maximum", DataHelper.formatSize2Decimal((long) (kbytes * (1024L * 60 * 60 * 24 * 31))));
+    }
+
+    /**
+     *  Adapted from ConfigNetHelper.
+     *  @return in binary KBytes per second
+     */
+    public int getShareBandwidth() {
+        float irateKBps;
+        float orateKBps;
+        long result = getDownBandwidth();
+        if (result > 0) {
+            irateKBps = Math.max(MIN_DOWN_BW, BW_SCALE * result / 1024f);
+        } else {
+            irateKBps = _context.bandwidthLimiter().getInboundKBytesPerSecond();
+        }
+        result = getUpBandwidth();
+        if (result > 0) {
+            orateKBps = Math.max(MIN_UP_BW, BW_SCALE * result / 1024f);
+        } else {
+            orateKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        }
+        if (irateKBps < 0 || orateKBps < 0)
+            return ConfigNetHelper.DEFAULT_SHARE_KBPS;
+        double pct = _context.router().getSharePercentage();
+        return (int) (pct * Math.min(irateKBps, orateKBps));
+    }
+
+    /**
      *  Start the test. Called from the Handler.
      *  @return success
      */
@@ -137,15 +236,16 @@ public class WizardHelper extends HelperBase {
         if (_mlab.isRunning() || _listener != null && !_listener.isComplete()) {
             return false;
         }
-        _listener = new TestListener();
-        _runner = _mlab.runNDT(_listener);
-        if (_runner != null) {
-            return true;
-        } else {
+        TestListener lsnr = new TestListener();
+        _runner = _mlab.runNDT(lsnr);
+        boolean rv = _runner != null;
+        if (!rv) {
             Map<String, Object> map = new HashMap<String, Object>(2);
-            _listener.complete(map);
-            return false;
+            lsnr.complete(map);
         }
+        // replace the old listener
+        _listener = lsnr;
+        return rv;
     }
 
     /**
@@ -156,13 +256,12 @@ public class WizardHelper extends HelperBase {
         if (!_mlab.isRunning()) {
             return false;
         }
-        if (_runner != null) {
+        boolean rv = _runner != null;
+        if (rv) {
             _runner.cancel();
             _runner = null;
-            return true;
-        } else {
-            return false;
         }
+        return rv;
     }
 
     /** test results */

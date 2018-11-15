@@ -87,6 +87,8 @@ public class MLabRunner {
      */
     public ToolRun runNDT(final ToolListener listener) {
         if (!_running.compareAndSet(false, true)) {
+            listener.reportSummary("Test already running");
+            listener.reportDetail("Test already running");
             _log.warn("Test already running");
             return null;
         }
@@ -107,10 +109,10 @@ public class MLabRunner {
                                 
                                 public void reportSummary(String str) {
                                     str = str.trim();
-                                    log( str );
-                                    if ( listener != null ){
-                                        if ( !str.startsWith( "Click" )){
-                                            listener.reportSummary( str );
+                                    log(str);
+                                    if (listener != null){
+                                        if (!str.startsWith("Click")) {
+                                            listener.reportSummary(str);
                                         }
                                     }
                                 }
@@ -235,7 +237,7 @@ public class MLabRunner {
                         } else {
                             result_str =     
                                 "Completed: up=" + DataHelper.formatSize2Decimal(up_bps, false) +
-                                ", down=" + DataHelper.formatSize2Decimal(down_bps, false);
+                                "Bps, down=" + DataHelper.formatSize2Decimal(down_bps, false) + "Bps";
                         }
                         
                         _log.warn(result_str);

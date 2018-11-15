@@ -160,28 +160,29 @@
 <tr><td><%=intl._t("Test server location")%></td><td><%=wizhelper.getServerLocation()%></td></tr>
 <tr><td><%=intl._t("Completion status")%></td><td><%=wizhelper.getCompletionStatus()%></td></tr>
 <tr><td><%=intl._t("Details")%></td><td><%=wizhelper.getDetailStatus()%></td></tr>
-<tr><td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>
 <tr><td><%=intl._t("Downstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getDownBandwidth())%>Bps</td></tr>
+<tr><td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>
+<tr><td><%=intl._t("Share of Bandwidth for I2P")%></td><td><%=Math.round(net.i2p.router.web.helpers.WizardHelper.BW_SCALE * 100)%>%</td></tr>
 </table>
 <h3><%=intl._t("Bandwidth Configuration")%></h3>
 <table id="bandwidthconfig" class="configtable">
 <tr><td class="infohelp" colspan="2">
 <%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%>
 </td></tr>
-<tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" >
+<tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="wizhelper" property="inboundBurstRate" />" >
 <%=intl._t("KBps In")%>
-</td><td>(<jsp:getProperty name="nethelper" property="inboundBurstRateBits" />)</td>
+</td><td>(<jsp:getProperty name="wizhelper" property="inboundBurstRateBits" />)</td>
 </tr><tr>
 <%-- display burst, set standard, handler will fix up --%>
-<td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" >
+<td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="wizhelper" property="outboundBurstRate" />" >
 <%=intl._t("KBps Out")%>
-</td><td>(<jsp:getProperty name="nethelper" property="outboundBurstRateBits" />)</td>
+</td><td>(<jsp:getProperty name="wizhelper" property="outboundBurstRateBits" />)</td>
 </tr><tr>
 <td><jsp:getProperty name="nethelper" property="sharePercentageBox" /> <%=intl._t("Share")%></td>
-<td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
+<td>(<jsp:getProperty name="wizhelper" property="shareRateBits" />)
 </td></tr>
 <tr><td class="infohelp" colspan="2">
-<% int share = Math.round(nethelper.getShareBandwidth() * 1.024f);
+<% int share = Math.round(wizhelper.getShareBandwidth() * 1.024f);
     if (share < 12) {
         out.print("<b>");
         out.print(intl._t("NOTE"));
