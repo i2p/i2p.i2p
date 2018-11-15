@@ -1,4 +1,8 @@
-<%@page contentType="text/html"%><%@page pageEncoding="UTF-8"%><jsp:useBean class="net.i2p.router.web.helpers.WizardHelper" id="wizhelper" scope="request" /><%
+<%@page contentType="text/html"%><%@page pageEncoding="UTF-8"%><jsp:useBean class="net.i2p.router.web.helpers.WizardHelper" id="wizhelper" scope="session" /><%
+    // note that for the helper we use a session scope, not a request scope,
+    // so that we can access the NDT test results.
+    // The MLabHelper singleton will prevent multiple simultaneous tests, even across sessions.
+
     // page ID
     final int LAST_PAGE = 7;
     String pg = request.getParameter("page");
@@ -59,6 +63,7 @@
 <%@include file="css.jsi" %>
 <%=intl.title("New Install Wizard")%>
 <%
+    wizhelper.setContextId(i2pcontextId);
     if (ipg == 4) {
 %>
 <script src="/js/ajax.js" type="text/javascript"></script>
@@ -84,19 +89,17 @@
 %>
 <h2><%=intl._t("New Install Wizard")%> <%=ipg%>/<%=LAST_PAGE%></h2>
 <div id="wizard">
-<%--
-    // note that for the handler we use a session scope, not a page scope,
-    // so that we can access the NDT test results.
-    // The MLabHelper singleton will prevent multiple simultaneous tests, even across sessions.
---%>
-<jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="session" />
+<jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="request" />
+<%
+    // Bind the session-scope Helper to the request-scope Handler
+    formhandler.setWizardHelper(wizhelper);
+%>
 <%@include file="formhandler.jsi" %>
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>">
 <input type="hidden" name="action" value="blah" >
 <input type="hidden" name="page" value="<%=(ipg + 1)%>" >
 <%
-
     if (ipg == 1) {
         // language selection
 %>
@@ -141,7 +144,7 @@
         // Bandwidth test in progress (w/ AJAX)
 %>
 <h3><%=intl._t("Bandwidth Test in Progress")%></h3>
-<p>TODO</p>
+<p>Ajax TODO - wait 60 seconds then click next</p>
 <%
 
     } else if (ipg == 5) {
@@ -152,9 +155,12 @@
 <jsp:setProperty name="nethelper" property="contextId" value="<%=i2pcontextId%>" />
 <h3><%=intl._t("Bandwidth Test Results")%></h3>
 <table class="configtable">
-<tr><td>
-Test results go here
-</td></tr>
+<tr><td><%=intl._t("Test running?")%></td><td><%=wizhelper.isNDTRunning()%></td></tr>
+<tr><td><%=intl._t("Test complete?")%></td><td><%=wizhelper.isNDTComplete()%></td></tr>
+<tr><td><%=intl._t("Completion status")%></td><td><%=wizhelper.getCompletionStatus()%></td></tr>
+<tr><td><%=intl._t("Details")%></td><td><%=wizhelper.getDetailStatus()%></td></tr>
+<tr><td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>
+<tr><td><%=intl._t("Downstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getDownBandwidth())%>Bps</td></tr>
 </table>
 <h3><%=intl._t("Bandwidth Configuration")%></h3>
 <table id="bandwidthconfig" class="configtable">
@@ -245,6 +251,6 @@ Test results go here
 <%
     }
 %>
-</td></tr></table>
+</td></tr></table></div>
 </form>
 </div></body></html>

@@ -50,13 +50,9 @@
         // Put all the params in the map, some handlers use this instead of individual setters
         // We also call all of the setters below.
         formhandler.setSettings(request.getParameterMap());
-%>
-<jsp:setProperty name="formhandler" property="*" />
-<%
+%><jsp:setProperty name="formhandler" property="*" /><%
     }
-%>
-<jsp:getProperty name="formhandler" property="allMessages" />
-<%
+%><jsp:getProperty name="formhandler" property="allMessages" /><%
 
     // Only call this once per page, do not getProperty("newNonce") elsewhere,
     // use the variable instead.

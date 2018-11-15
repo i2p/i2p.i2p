@@ -18,6 +18,8 @@ import net.i2p.util.Log;
  * The form is "processed" after the properties are set and the first output
  * property is retrieved - either getAll(), getNotices() or getErrors().
  *
+ * This Handler will only process a single POST. The jsp bean must be declared scope=request.
+ *
  */
 public abstract class FormHandler {
     protected RouterContext _context;
