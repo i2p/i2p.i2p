@@ -69,7 +69,7 @@
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script type="text/javascript">
   var failMessage = "<hr><b><%=intl._t("Router is down")%><\/b>";
-  function requestAjax1() { ajax("/welcomexhr.jsp", "xhr", "1000"); }
+  function requestAjax1() { ajax("/welcomexhr1.jsp", "xhr", "1000"); }
   function initAjax() { setTimeout(requestAjax1, "1000");  }
 </script>
 <%
@@ -144,7 +144,10 @@
         // Bandwidth test in progress (w/ AJAX)
 %>
 <h3><%=intl._t("Bandwidth Test in Progress")%></h3>
-<p>Ajax TODO - wait 60 seconds then click next</p>
+<div id="xhr">
+<!-- for non-script -->
+<%=intl._t("Javascript is disabled - wait 60 seconds for the bandwidth test to complete and then click Next")%>
+</div>
 <%
 
     } else if (ipg == 5) {
