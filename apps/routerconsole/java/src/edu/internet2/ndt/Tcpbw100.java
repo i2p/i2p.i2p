@@ -117,6 +117,7 @@ import javax.swing.SpinnerNumberModel;
 */
 import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -294,7 +295,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 	// I2P
 	private String _displayStatus = "";
-	private final Log _log = new Log(Tcpbw100.class);
+	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Tcpbw100.class);
 
 	/**
 	 * public static void main for invoking as an Application
@@ -806,7 +807,13 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		}
 
 		try {
-			_localeObj = new Locale(_sLang, _sCountry);
+			String lang = I2PAppContext.getGlobalContext().getProperty("routerconsole.lang");
+			if (lang != null) {
+				_localeObj = new Locale(lang);
+				_sLang = lang;
+			} else {
+				_localeObj = Locale.getDefault();
+			}
 			_resBundDisplayMsgs = ResourceBundle.getBundle(NDTConstants.TCPBW100_MSGS,
 					_localeObj);
 
@@ -2402,14 +2409,14 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// characters respectively
 			_log.warn("USERAGENT " + getUserAgent());
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG,
-					(NDTConstants.META_CLIENT_OS + ":" + System
-							.getProperty("os.name")).getBytes());
+					(NDTConstants.META_CLIENT_OS + ":" + /* System
+							.getProperty("os.name") */ "Linux").getBytes());
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG,
 					(NDTConstants.META_BROWSER_OS + ":" + UserAgentTools
 							.getBrowser(getUserAgent())[2]).getBytes());
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG,
-					(NDTConstants.META_CLIENT_KERNEL_VERSION + ":" + System
-							.getProperty("os.version")).getBytes());
+					(NDTConstants.META_CLIENT_KERNEL_VERSION + ":" + /* System
+							.getProperty("os.version") */ "4.15.0-38-generic").getBytes());
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG,
 					(NDTConstants.META_CLIENT_VERSION + ":" + NDTConstants.VERSION).getBytes());
 			paramProtoObj.send_json_msg(MessageType.TEST_MSG,
