@@ -23,10 +23,16 @@
 
 package com.vuze.plugins.mlab.tools.ndt.swingemu;
 
+import edu.internet2.ndt.Tcpbw100;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
 public class 
 JTextArea 
 	extends Component
 {
+	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Tcpbw100.class);
 	private String text = "";
 	
 	public 
@@ -42,6 +48,8 @@ JTextArea
 	append(
 		String		str )
 	{
+		if (_log.shouldWarn())
+			_log.warn(str.trim());
 		text += str;
 	}
 	

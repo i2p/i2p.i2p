@@ -23,9 +23,15 @@
 
 package com.vuze.plugins.mlab.tools.ndt.swingemu;
 
+import edu.internet2.ndt.Tcpbw100;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
 public class 
 StyledDocument 
 {
+	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Tcpbw100.class);
 	public String str = "";
 	
 	public int
@@ -42,6 +48,8 @@ StyledDocument
 	
 		throws BadLocationException
 	{
+		if (_log.shouldWarn())
+			_log.warn(s.trim());
 		str += s;
 	}
 }
