@@ -58,6 +58,19 @@ public class WizardHelper extends HelperBase {
     /**
      * @return HTML-escaped status string or ""
      */
+    public synchronized String getTestStatus() {
+        String rv = "";
+        if (_runner != null) {
+            String s = _runner.getStatus();
+            if (s != null)
+                rv = DataHelper.escapeHTML(s);
+        }
+        return rv;
+    }
+
+    /**
+     * @return HTML-escaped status string or ""
+     */
     public synchronized String getCompletionStatus() {
         String rv = "";
         if (_listener != null) {

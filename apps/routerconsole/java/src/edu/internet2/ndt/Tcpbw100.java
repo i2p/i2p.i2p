@@ -293,6 +293,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	private boolean retry = false;
 
 	// I2P
+	private String _displayStatus = "";
 	private final Log _log = new Log(Tcpbw100.class);
 
 	/**
@@ -1279,7 +1280,18 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * @param msg String value of status
 	 * */
 	public void showStatus(String msg) {
-		_log.warn(msg);
+		synchronized(this) {
+			_displayStatus = msg;
+		}
+		_log.warn("NDT STATUS: " + msg);
+	}
+
+	/**
+         *  I2P
+	 *  Translated status, not HTML escaped.
+	 */
+	public synchronized String getStatus() {
+		return _displayStatus;
 	}
 
 	/**

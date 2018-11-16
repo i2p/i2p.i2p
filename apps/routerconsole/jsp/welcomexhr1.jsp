@@ -8,9 +8,10 @@
             }
         } catch (IllegalStateException ise) {}
         wizhelper.setContextId(i2pcontextId);
+        // output 1 for complete, 0 + status string for in progress
         if (wizhelper.isNDTComplete()) {
-%><%=wizhelper._t("Bandwidth test is complete, click Next")%><%
+%>1<%
         } else {
-%><%=wizhelper._t("Bandwidth test in progress...")%><%
+%>0<%=wizhelper.getTestStatus()%><%
         }
 %>

@@ -136,7 +136,7 @@ public class WizardHandler extends FormHandler {
         if (_helper == null) {
             addFormError("Bad state for test");
         } else if (_helper.cancelNDT()) {
-            addFormNotice(_t("Candelled bandwidth test"));
+            addFormNotice(_t("Cancelled bandwidth test"));
         } else {
             addFormError(_t("Bandwidth test was not running"));
         }

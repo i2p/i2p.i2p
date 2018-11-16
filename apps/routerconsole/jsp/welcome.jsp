@@ -66,11 +66,16 @@
     wizhelper.setContextId(i2pcontextId);
     if (ipg == 4) {
 %>
-<script src="/js/ajax.js" type="text/javascript"></script>
+<script src="/js/welcomeajax.js" type="text/javascript"></script>
 <script type="text/javascript">
-  var failMessage = "<hr><b><%=intl._t("Router is down")%><\/b>";
+  var failMessage = "<b><%=intl._t("Router is down")%><\/b>";
+  var progressMessage = "<b><%=intl._t("Bandwidth test in progress...")%><\/b>";
+  var doneMessage = "<b><%=intl._t("Bandwidth test is complete, click Next")%><\/b>";
   function requestAjax1() { ajax("/welcomexhr1.jsp", "xhr", "1000"); }
-  function initAjax() { setTimeout(requestAjax1, "1000");  }
+  function initAjax() {
+     document.getElementById("xhr").innerHTML = progressMessage;
+     setTimeout(requestAjax1, "1000");
+  }
 </script>
 <%
     }
@@ -147,6 +152,8 @@
 <div id="xhr">
 <!-- for non-script -->
 <%=intl._t("Javascript is disabled - wait 60 seconds for the bandwidth test to complete and then click Next")%>
+</div>
+<div id="xhr2">
 </div>
 <%
 

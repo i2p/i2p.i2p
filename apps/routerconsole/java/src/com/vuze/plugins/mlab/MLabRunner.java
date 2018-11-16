@@ -25,13 +25,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.vuze.plugins.mlab.tools.ndt.swingemu.Tcpbw100UIWrapper;
-import com.vuze.plugins.mlab.tools.ndt.swingemu.Tcpbw100UIWrapperListener;
 
 import edu.internet2.ndt.Tcpbw100;
 
@@ -101,41 +97,6 @@ public class MLabRunner {
                     boolean completed = false;
                     try{
                         _log.warn("Starting NDT Test");
-                        
-                        new Tcpbw100UIWrapper(
-                            new Tcpbw100UIWrapperListener()
-                            {
-                                private LinkedList<String> history = new LinkedList<String>();
-                                
-                                public void reportSummary(String str) {
-                                    str = str.trim();
-                                    log(str);
-                                    if (listener != null){
-                                        if (!str.startsWith("Click")) {
-                                            listener.reportSummary(str);
-                                        }
-                                    }
-                                }
-                                
-                                public void reportDetail(String str) {
-                                    str = str.trim();
-                                    log(str);
-                                    if (listener != null) {
-                                        listener.reportDetail(str);
-                                    }
-                                }
-                                
-                                private void log(String str) {
-                                    synchronized( history ){
-                                        if (history.size() > 0 && history.getLast().equals(str)) {
-                                            return;
-                                        }
-                                        history.add(str);
-                                    }
-                                    _log.warn(str);
-                                }
-                        
-                            });
                         
                         // String host = "ndt.iupui.donar.measurement-lab.org";
                         // String host = "jlab4.jlab.org";
@@ -208,6 +169,10 @@ public class MLabRunner {
                                 public void cancelled() {
                                     test.killIt();
                                 }
+
+                                public String getStatus() {
+                                    return test.getStatus();
+                                }
                             });
                         
                         test.runIt();
@@ -253,7 +218,7 @@ public class MLabRunner {
                                 results.put("server_city", server_city);
                             if (server_country != null)
                                 results.put("server_country", server_country);
-                            listener.complete( results );
+                            listener.complete(results);
                         }
                         if (_log.shouldWarn()) {
                             long end = System.currentTimeMillis();
@@ -293,6 +258,7 @@ public class MLabRunner {
     public interface ToolRun {
         public void cancel();
         public void addListener(ToolRunListener    l);
+        public String getStatus();
     }
     
     /**
@@ -331,11 +297,18 @@ public class MLabRunner {
                 }
             }
         }
+
+        public String getStatus() {
+            synchronized(this) {
+                return listeners.isEmpty() ? "" : listeners.get(0).getStatus();
+            }
+        }
     }
     
     /** The listener for ToolRun */
     public interface ToolRunListener {
         public void cancelled();
+        public String getStatus();
     }
     
     /** The parameter for runNDT() */

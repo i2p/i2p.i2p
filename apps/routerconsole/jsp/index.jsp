@@ -27,7 +27,7 @@
     boolean wizRun = ctx.getBooleanProperty(net.i2p.router.web.helpers.WizardHelper.PROP_COMPLETE);
     String firstVersion = ctx.getProperty("router.firstVersion");
     String tgt;
-    final boolean ENABLE_WIZARD_ON_FIRST_RUN = false;
+    final boolean ENABLE_WIZARD_ON_FIRST_RUN = true;
     if (oldHome) {
         tgt = "console";
     } else if (!ENABLE_WIZARD_ON_FIRST_RUN || wizRun || firstVersion == null) {

@@ -42,17 +42,6 @@ JTextArea
 	append(
 		String		str )
 	{
-		Tcpbw100UIWrapperListener listener = Tcpbw100UIWrapper.current_adapter;
-		
-		if ( listener != null ){
-			
-			listener.reportDetail( str );
-			
-		}else{
-			
-			//System.out.println( "text: " + str );
-		}
-		
 		text += str;
 	}
 	
