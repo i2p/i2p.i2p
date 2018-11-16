@@ -32,12 +32,12 @@ public class
 StyledDocument 
 {
 	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Tcpbw100.class);
-	public String str = "";
+	private final StringBuilder text = new StringBuilder();
 	
 	public int
 	getLength()
 	{
-		return( str.length());
+		return text.length();
 	}
 	
 	public void
@@ -50,6 +50,6 @@ StyledDocument
 	{
 		if (_log.shouldWarn())
 			_log.warn(s.trim());
-		str += s;
+		text.append(s);
 	}
 }

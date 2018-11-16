@@ -33,7 +33,7 @@ JTextArea
 	extends Component
 {
 	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Tcpbw100.class);
-	private String text = "";
+	private final StringBuilder text = new StringBuilder();
 	
 	public 
 	JTextArea(
@@ -41,7 +41,7 @@ JTextArea
 		int			a,
 		int			b )
 	{
-		text	= str;
+		text.append(str);
 	}
 	
 	public void
@@ -50,13 +50,13 @@ JTextArea
 	{
 		if (_log.shouldWarn())
 			_log.warn(str.trim());
-		text += str;
+		text.append(str);
 	}
 	
 	public String
 	getText()
 	{
-		return( text );
+		return text.toString();
 	}
 	
 	public void

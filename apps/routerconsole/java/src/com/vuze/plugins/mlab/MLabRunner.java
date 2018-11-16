@@ -38,6 +38,7 @@ import net.minidev.json.parser.ParseException;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.EepGet;
+import net.i2p.util.SSLEepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -49,9 +50,9 @@ import net.i2p.util.Log;
 public class MLabRunner {
     // ns.measurementlab.net does not support https
     // use ndt_ssl for test over ssl? but Tcpbw100 doesn't support it
-    private static final String NS_URL = "http://ns.measurementlab.net/ndt?format=json";
+    //private static final String NS_URL = "http://ns.measurementlab.net/ndt?format=json";
+    private static final String NS_URL_SSL = "https://mlab-ns.appspot.com/ndt?format=json";
     private static final long NS_TIMEOUT = 20*1000;
-    private boolean test_active;
     private final I2PAppContext _context;
     private final Log _log;
     private final AtomicBoolean _running = new AtomicBoolean();
@@ -119,9 +120,10 @@ public class MLabRunner {
                             // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
                             //               int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream,
                             //               String url, boolean allowCaching, String etag, String postData) {
-                            EepGet eepget = new EepGet(_context, false, null, 0,
-                                                       0, 2, 1024, null, baos,
-                                                       NS_URL, false, null, null);
+                            //EepGet eepget = new EepGet(_context, false, null, 0,
+                            //                           0, 2, 1024, null, baos,
+                            //                           NS_URL, false, null, null);
+                            EepGet eepget = new SSLEepGet(_context, baos, NS_URL_SSL);
                             boolean ok = eepget.fetch(NS_TIMEOUT, NS_TIMEOUT, NS_TIMEOUT);
                             if (!ok)
                                 throw new IOException("ns fetch failed");
