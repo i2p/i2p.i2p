@@ -829,17 +829,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_log.warn("?", e);
 		}
 
-		// create main window
-		try {
-			javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
-				public void run() {
-					createMainWindow();
-				}
-			});
-		} catch (Exception e) {
-			_log.warn("createGUI didn't successfully complete", e);
-		}
-
 		// Autorun functionality
 		_sIsAutoRun = getParameter("autoRun");
 		if ((_sIsAutoRun != null) && _sIsAutoRun.equals("true")) {
