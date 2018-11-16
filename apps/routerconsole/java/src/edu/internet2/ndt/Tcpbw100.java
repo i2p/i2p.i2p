@@ -119,6 +119,7 @@ import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Addresses;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /*
@@ -1132,7 +1133,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 */
 	synchronized public void runtest() {
 		pub_status = "notStarted";
-		new Thread(new TestWorker()).start();
+		new I2PAppThread(new TestWorker(), "TestWorker").start();
 	}
 
 	/**
@@ -1684,7 +1685,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// Listen for server sending out a test for the S->C direction , and
 			// update test results
 			OsfwWorker osfwTest = new OsfwWorker(srvSocket, iTestTime, this);
-			new Thread(osfwTest).start();
+			new I2PAppThread(osfwTest, "OsfwWorker").start();
 
 			// Now, run Test from client for the C->S direction SFW test
 			// trying to connect to ephemeral port number sent by server
@@ -1887,7 +1888,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			pub_time = _dTime;
 
 			// sleep for 10 s
-			new Thread() {
+			new I2PAppThread("NDT Sleeper") {
 
 				public void run() {
 					try {
@@ -4510,7 +4511,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		thread_group.setDaemon( true );
 		
 		Thread t = 
-			new Thread( 
+			new I2PAppThread( 
 				thread_group,
 				new Runnable()
 				{
@@ -4529,7 +4530,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 							//sem.release();
 						}
 					}
-				});
+				},
+				"TestWorker");
 		
 		t.setDaemon( true );
 		t.start();
