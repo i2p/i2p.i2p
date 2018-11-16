@@ -829,6 +829,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_log.warn("?", e);
 		}
 
+		createMainWindow();
+
 		// Autorun functionality
 		_sIsAutoRun = getParameter("autoRun");
 		if ((_sIsAutoRun != null) && _sIsAutoRun.equals("true")) {
