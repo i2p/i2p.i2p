@@ -1,3 +1,6 @@
+2018-11-17 zzz
+ * Console: Wizard fixes and improvements
+
 2018-11-15 zzz
  * Console: Connect NDT to setup wizard, various fixes
 
