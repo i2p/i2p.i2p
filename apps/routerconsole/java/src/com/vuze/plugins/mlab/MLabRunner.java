@@ -22,7 +22,6 @@ package com.vuze.plugins.mlab;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,9 +48,12 @@ import net.i2p.util.Log;
  */
 public class MLabRunner {
     // ns.measurementlab.net does not support https
-    // use ndt_ssl for test over ssl? but Tcpbw100 doesn't support it
     //private static final String NS_URL = "http://ns.measurementlab.net/ndt?format=json";
     private static final String NS_URL_SSL = "https://mlab-ns.appspot.com/ndt?format=json";
+    // use ndt_ssl for test over ssl
+    private static final String NS_URL_SSL_SSL = "https://mlab-ns.appspot.com/ndt_ssl?format=json";
+    private static final String PROP_SSL = "routerconsole.bwtest.useSSL";
+    private static final boolean DEFAULT_USE_SSL = true;
     private static final long NS_TIMEOUT = 20*1000;
     private final I2PAppContext _context;
     private final Log _log;
@@ -114,16 +116,20 @@ public class MLabRunner {
                         String server_host = null;
                         String server_city = null;
                         String server_country = null;
+                        boolean useSSL = _context.getProperty(PROP_SSL, DEFAULT_USE_SSL);
                         
                         try {
                             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+                            // http to name server
                             // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
                             //               int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream,
                             //               String url, boolean allowCaching, String etag, String postData) {
                             //EepGet eepget = new EepGet(_context, false, null, 0,
                             //                           0, 2, 1024, null, baos,
                             //                           NS_URL, false, null, null);
-                            EepGet eepget = new SSLEepGet(_context, baos, NS_URL_SSL);
+                            // https to name server
+                            String nsURL = useSSL ? NS_URL_SSL_SSL : NS_URL_SSL;
+                            EepGet eepget = new SSLEepGet(_context, baos, nsURL);
                             boolean ok = eepget.fetch(NS_TIMEOUT, NS_TIMEOUT, NS_TIMEOUT);
                             if (!ok)
                                 throw new IOException("ns fetch failed");
@@ -138,13 +144,12 @@ public class MLabRunner {
                             }
                             if (_log.shouldWarn())
                                 _log.warn("Got response: " + DataHelper.getUTF8(b));
-                            // TODO use IP instead to avoid another lookup?
-                            // or use "fqdn" in response instead of "url"
-                            URL url = new URL((String)map.get( "url" ));
-                            if (url == null) {
-                                throw new IOException("no url");
+                            // TODO use IP instead to avoid another lookup? - no, won't work with ssl
+                            // use "fqdn" in response instead of "url" since ndt_ssl does not have url
+                            server_host = (String)map.get("fqdn");
+                            if (server_host == null) {
+                                throw new IOException("no fqdn");
                             }
-                            server_host = url.getHost();
                             server_city = (String) map.get("city");
                             server_country = (String) map.get("country");
                             // ignore the returned port in the URL (7123) which is the applet, not the control port
@@ -158,12 +163,14 @@ public class MLabRunner {
                         if (server_host == null) {
                             // fallback to old, discouraged approach
                             server_host = "ndt.iupui.donar.measurement-lab.org";
+                            useSSL = false;
                             if (_log.shouldWarn())
                                 _log.warn("Failed to select server, falling back to donar method");
                         }
                         
+                        String[] args = useSSL ? new String[] { "-s", server_host } : new String[] { server_host };
                         long start = System.currentTimeMillis();
-                        final Tcpbw100 test = Tcpbw100.mainSupport( new String[]{ server_host });
+                        final Tcpbw100 test = Tcpbw100.mainSupport(args);
                         
                         run.addListener(
                             new ToolRunListener()
@@ -344,6 +351,8 @@ public class MLabRunner {
 
     /** standalone test */
     public static void main(String[] args) {
+        boolean useSSL = args.length > 0 && args[0].equals("-s");
+        System.setProperty(PROP_SSL, Boolean.toString(useSSL));
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         MLabRunner mlab = MLabRunner.getInstance(ctx);
         TestListener lsnr = new TestListener();

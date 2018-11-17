@@ -89,8 +89,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -120,6 +120,7 @@ import com.vuze.plugins.mlab.tools.ndt.swingemu.*;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Addresses;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 
 /*
@@ -296,7 +297,22 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 	// I2P
 	private String _displayStatus = "";
-	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Tcpbw100.class);
+	private final I2PAppContext _context = I2PAppContext.getGlobalContext();
+	private final Log _log = _context.logManager().getLog(Tcpbw100.class);
+	private final boolean _useSSL;
+	private final I2PSSLSocketFactory _sslFactory;
+
+	public Tcpbw100(boolean useSSL) {
+		super();
+		I2PSSLSocketFactory sslFactory = null;
+		if (useSSL) {
+			try {
+		        	sslFactory = new I2PSSLSocketFactory(_context, true, "certificates/ndt");
+			} catch (GeneralSecurityException gse) { throw new IllegalStateException("init", gse); }
+		}
+		_sslFactory = sslFactory;
+		_useSSL = useSSL;
+	}
 
 	/**
 	 * public static void main for invoking as an Application
@@ -310,11 +326,14 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	/** bigly */
 	public static Tcpbw100 mainSupport(String[] args) {
 		JFrame frame = new JFrame("ANL/Internet2 NDT (applet)");
+		boolean useSSL = args.length > 0 && args[0].equals("-s");
+		if (useSSL)
+			args = Arrays.copyOfRange(args, 1, args.length);
 		if (args.length < 1 || args.length > 2) {
-			System.out.println("Usage: java -jar Tcpbw100.jar <hostname> [client-id]");
+			System.out.println("Usage: java -jar Tcpbw100.jar [-s] <hostname> [client-id]");
 			System.exit(0);
 		}
-		final Tcpbw100 applet = new Tcpbw100();
+		final Tcpbw100 applet = new Tcpbw100(useSSL);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				applet.destroy();
@@ -748,8 +767,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						}
 					}
 				} catch (Exception e) {
-					_log.warn("?", e);
-
 					String sMessage = NDTUtils.isEmpty(e.getMessage())
 							? _resBundDisplayMsgs.getString("withoutMessage")
 							: e.getMessage();
@@ -758,6 +775,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					_sErrMsg = _resBundDisplayMsgs.getString("unexpectedException")
 							+ " (" + e.getClass().getName() + "): "
 							+ sMessage + "\n";
+					_log.warn(_sErrMsg, e);
 				}
 
 				// If test failed due to any reason, mark failure reason too
@@ -808,7 +826,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		}
 
 		try {
-			String lang = I2PAppContext.getGlobalContext().getProperty("routerconsole.lang");
+			String lang = _context.getProperty("routerconsole.lang");
 			if (lang != null) {
 				_localeObj = new Locale(lang);
 				_sLang = lang;
@@ -826,7 +844,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null,
 					"Error while loading language files:\n" + e.getMessage());
-			_log.warn("?", e);
+			_log.warn("bundle", e);
 		}
 
 		createMainWindow();
@@ -1237,8 +1255,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 				getAppletContext().showDocument(_targetURL);
 			} catch (Exception e) {
-				_log.warn("?", e);
-
 				String sMessage = NDTUtils.isEmpty(e.getMessage())
 						? _resBundDisplayMsgs.getString("withoutMessage")
 						: e.getMessage();
@@ -1247,6 +1263,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						+ " (" + e.getClass().getName() + "): "
 						+ sMessage + "\n";
 
+				_log.warn(_sErrMsg, e);
 				_resultsTxtPane.append(_sErrMsg);
 			}
 		} // end mail-to functionality
@@ -1282,7 +1299,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		synchronized(this) {
 			_displayStatus = msg;
 		}
-		_log.warn("NDT STATUS: " + msg);
+		if (_log.shouldWarn())
+		    _log.warn("NDT STATUS: " + msg);
 	}
 
 	/**
@@ -1358,6 +1376,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// connect to server using port obtained above
 			Socket midSrvrSockObj = null;
 			try {
+				// this one is NOT SSL
 				midSrvrSockObj = new Socket(hostAddress, midport);
 			} catch (UnknownHostException e) {
 				_log.warn("Don't know about host: " + sHostName, e);
@@ -1641,9 +1660,9 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				srvSocket = new ServerSocket(
 						NDTConstants.SOCKET_FREE_PORT_INDICATOR);
 			} catch (Exception e) {
-				_log.warn("?", e);
 				_sErrMsg = _resBundDisplayMsgs.getString("sfwSocketFail")
 						+ "\n";
+				_log.warn(_sErrMsg, e);
 				return true;
 			}
 
@@ -1680,6 +1699,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 
 			// Now, run Test from client for the C->S direction SFW test
 			// trying to connect to ephemeral port number sent by server
+			// this one is NOT SSL
 			Socket sfwSocket = new Socket();
 			try {
 				// create socket to ephemeral port. testTime now specified in mS
@@ -1693,7 +1713,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				sfwCtl.send_json_msg(MessageType.TEST_MSG, new String(
 						NDTConstants.SFW_PREDEFINED_TEST_MESSAGE).getBytes());
 			} catch (Exception e) {
-				_log.warn("?", e);
+				_log.warn("sfwSocket", e);
 				//Indication that there might be a firewall from C->S side.
 			}
 
@@ -1819,7 +1839,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// client connects to this port
 			final Socket outSocket;
 			try {
-				outSocket = new Socket(hostAddress, iC2sport);
+				outSocket = newSocket(hostAddress, iC2sport);
 			} catch (UnknownHostException e) {
 				_log.warn("Don't know about host: " + sHostName, e);
 				_sErrMsg = _resBundDisplayMsgs.getString("unknownServer")
@@ -1917,7 +1937,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				try {
 					outStream.write(_yabuff2Write, 0, _yabuff2Write.length);
 				} catch (SocketException e) {
-					_log.warn("SocketException while writing to server", e);
+					// normal after 10 seconds
+					_log.debug("SocketException while writing to server (normal)", e);
 					break;
 				}
 				// catch (InterruptedIOException iioe) {
@@ -2084,7 +2105,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// Create socket and bind to port as instructed by server
 			Socket inSocket;
 			try {
-				inSocket = new Socket(hostAddress, iS2cport);
+				inSocket = newSocket(hostAddress, iS2cport);
 			} catch (UnknownHostException e) {
 				_log.warn("Don't know about host: " + sHostName, e);
 				_sErrMsg = "unknown server\n";
@@ -2202,9 +2223,9 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					_iSsndqueue = Integer.parseInt(JSONUtils.getValueFromJsonObj(tmpstr3, "UnsentDataAmount"));
 					_dSbytes = Double.parseDouble(JSONUtils.getValueFromJsonObj(tmpstr3, "TotalSentByte"));
 				} catch (Exception e) {
-					_log.warn("?", e);
 					_sErrMsg = _resBundDisplayMsgs.getString("inboundWrongMessage")
 							+ "\n";
+					_log.warn(_sErrMsg, e);
 					return true;
 				}
 			}
@@ -2220,9 +2241,9 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					_dSbytes = Double.parseDouble(tmpstr3.substring(k1 + 1)
 							.substring(k2 + 1));
 				} catch (Exception e) {
-					_log.warn("?", e);
 					_sErrMsg = _resBundDisplayMsgs.getString("inboundWrongMessage")
 							+ "\n";
+					_log.warn(_sErrMsg, e);
 					return true;
 				}
 			}
@@ -2497,7 +2518,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		// The default control port used for the NDT tests session. NDT server
 		// listens
 		// to this port
-		int ctlport = NDTConstants.CONTROL_PORT_DEFAULT;
+		int ctlport = _useSSL ? NDTConstants.CONTROL_PORT_SSL : NDTConstants.CONTROL_PORT_DEFAULT;
 
 		// Commenting these 2 variables - seem unused
 		// double wait2;
@@ -2521,7 +2542,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					+ "] "
 					+ _resBundDisplayMsgs.getString("toRunTest") + "\n");
 			// create socket to host specified by user and the default port
-			ctlSocket = new Socket(hostAddress, ctlport);
+			ctlSocket = newSocket(hostAddress, ctlport);
 		} catch (UnknownHostException e) {
 			_log.warn("Don't know about host: " + sHostName, e);
 			_sErrMsg = _resBundDisplayMsgs.getString("unknownServer") + "\n";
@@ -2565,6 +2586,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_sErrMsg = _resBundDisplayMsgs.getString("unsupportedClient")
 					+ "\n";
 			_bFailed = true;
+			try { ctlSocket.close(); } catch (IOException ioe) {}
 			return;
 		}
 
@@ -2597,7 +2619,11 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 								.getString("unsupportedMsgExtendedLogin")
 								+ "\n");
 						// create socket to host specified by user and the default port
-						ctlSocket = new Socket(hostAddress, ctlport);
+						// we seem to always get here, why bother trying extended above?
+						if (ctlSocket != null) {
+							try { ctlSocket.close(); } catch (IOException ioe) {}
+						}
+						ctlSocket = newSocket(hostAddress, ctlport);
 					} catch (UnknownHostException e) {
 						_log.warn("Don't know about host: " + sHostName, e);
 						_sErrMsg = _resBundDisplayMsgs.getString("unknownServer") + "\n";
@@ -2808,6 +2834,9 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		// cannot be successfully run,
 		// indicate reason
 		while (tokenizer.hasMoreTokens()) {
+		    // None of test_xxx catch NumberFormatException,
+		    // do it here so we don't kill the whole thing
+		    try {
 			if (sPanel.wantToStop()) { // user has indicated decision to stop
 										// tests from GUI
 				protocolObj.send_json_msg(MessageType.MSG_ERROR,
@@ -2871,6 +2900,11 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				_bFailed = true;
 				return;
 			}
+		    } catch (NumberFormatException nfe) {
+			// None of test_xxx catch NumberFormatException,
+			// do it here so we don't kill the whole thing
+			_log.warn("nfe", nfe);
+		    }
 		}
 
 		if (sPanel.wantToStop()) { // user has indicated decision to stop tests
@@ -2971,6 +3005,25 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		pub_isReady = "yes";
 		pub_errmsg = "All tests completed OK.";
 		pub_status = "done";
+	}
+
+	/**
+	 *  Return a SSL or standard socket depending on config
+	 */
+	private Socket newSocket(InetAddress hostAddress, int ctlPort) throws IOException {
+		if (_log.shouldInfo())
+			_log.info("Connecting to " + hostAddress + ':' + ctlPort, new Exception("I did it"));
+		Socket rv;
+		if (_useSSL) {
+			rv = _sslFactory.createSocket(hostAddress, ctlPort);
+			if (_log.shouldWarn())
+				_log.warn("New SSL socket to " + hostAddress + ':' + ctlPort);
+		} else {
+			rv = new Socket(hostAddress, ctlPort);
+			if (_log.shouldWarn())
+				_log.warn("New non-SSL socket to " + hostAddress + ':' + ctlPort);
+		}
+		return rv;
 	}
 
 	/**
@@ -4439,10 +4492,15 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * @return {int} The parsed value.
 	 */
 	private int parseMsgBodyToInt(String msg, int radix) {
-		if (jsonSupport) {
-			return Integer.parseInt(JSONUtils.getSingleMessage(msg), radix);
-		} else {
-			return Integer.parseInt(msg, radix);
+		try {
+			if (jsonSupport) {
+				return Integer.parseInt(JSONUtils.getSingleMessage(msg), radix);
+			} else {
+				return Integer.parseInt(msg, radix);
+			}
+		} catch (NumberFormatException nfe) {
+			_log.warn("parse", nfe);
+			return 0;
 		}
 	}
 
@@ -4469,7 +4527,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					thread_group.destroy();
 					break;
 				}catch( Throwable e ){
-					_log.warn("?", e);
+					_log.warn("TG", e);
 				}
 			}
 			
@@ -4495,7 +4553,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					Thread t, 
 					Throwable e) 
 				{
-					_log.debug("?", e);
+					_log.warn("TG", e);
 				}
 			};
 		
@@ -4515,7 +4573,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						}catch( Throwable e ){
 						
 							if ( !( e instanceof ThreadDeath )){
-								_log.debug("?", e);
+								_log.warn("TG", e);
 							}
 						}finally{
 							//sem.release();

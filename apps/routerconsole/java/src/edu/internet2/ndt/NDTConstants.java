@@ -70,6 +70,7 @@ public class NDTConstants {
 
 	// NDT pre-fixed port ID
 	public static final int CONTROL_PORT_DEFAULT = 3001;
+	public static final int CONTROL_PORT_SSL = 3010;
 
 	// Section: SRV-QUEUE message status constants
 	public static final int SRV_QUEUE_TEST_STARTS_NOW = 0;

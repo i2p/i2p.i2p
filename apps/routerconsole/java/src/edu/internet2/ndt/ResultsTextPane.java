@@ -25,16 +25,11 @@ public class ResultsTextPane extends JTextPane {
 	 *            String to be inserted into the document
 	 **/
 	public void append(String paramTextStr) {
-/****
 		try {
 			getStyledDocument().insertString(getStyledDocument().getLength(),
 					paramTextStr, null);
 		} catch (BadLocationException e) {
-			System.out
-					.println("WARNING: failed to append text to the text pane! ["
-							+ paramTextStr + "]");
 		}
-****/
 	}
 
 	/**
