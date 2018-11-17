@@ -44,8 +44,6 @@ public class HandshakeState implements Destroyable {
 	private int action;
 	private final int requirements;
 	private int patternIndex;
-        // not supported
-	private static final byte[] prologue = null;
 
 	/**
 	 * Enumerated value that indicates that the handshake object
@@ -352,10 +350,7 @@ public class HandshakeState implements Destroyable {
 		}
 		
 		// Hash the prologue value.
-		if (prologue != null)
-			symmetric.mixHash(prologue, 0, prologue.length);
-		else
-			symmetric.mixHash(emptyPrologue, 0, 0);
+		symmetric.mixHash(emptyPrologue, 0, 0);
 		
 		// Mix the pre-supplied public keys into the handshake hash.
 		if (isInitiator) {
@@ -798,8 +793,6 @@ public class HandshakeState implements Destroyable {
 			remotePublicKey.destroy();
 		if (remoteEphemeral != null)
 			remoteEphemeral.destroy();
-		if (prologue != null)
-			Noise.destroy(prologue);
 	}
 	
 	/**
