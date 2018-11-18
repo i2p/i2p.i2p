@@ -171,12 +171,16 @@ public class MLabRunner {
                         String[] args = useSSL ? new String[] { "-s", server_host } : new String[] { server_host };
                         long start = System.currentTimeMillis();
                         final Tcpbw100 test = Tcpbw100.mainSupport(args);
+                        final AtomicBoolean cancelled = new AtomicBoolean();
                         
                         run.addListener(
                             new ToolRunListener()
                             {
                                 public void cancelled() {
+                                    cancelled.set(true);
+                                    _log.warn("TRL cancelling test");
                                     test.killIt();
+                                    _log.warn("TRL cancelled test");
                                 }
 
                                 public String getStatus() {
@@ -188,7 +192,7 @@ public class MLabRunner {
                         
                         try { Thread.sleep(2000); } catch (InterruptedException ie) { return; }
                         for (int i = 0; i < 180; i++) {
-                            if (!test.isTestInProgress())
+                            if (cancelled.get() || !test.isTestInProgress())
                                 break;
                             try { Thread.sleep(1000); } catch (InterruptedException ie) { break; }
                         }
@@ -206,7 +210,9 @@ public class MLabRunner {
                         } catch(Throwable e) {}
                         
                         String result_str;
-                        if (up_bps == 0 || down_bps == 0) {
+                        if (cancelled.get()) {
+                            result_str = "Test cancelled";
+                        } else if (up_bps == 0 || down_bps == 0) {
                             result_str = "No results were received. Either the test server is unavailable or network problems are preventing the test from running correctly. Please try again.";
                         } else {
                             result_str =     

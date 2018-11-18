@@ -96,19 +96,16 @@ public class StatusPanel extends JPanel {
 	 * 
 	 * @return boolean indicating intention to stop or not
 	 * */
-	public boolean wantToStop() {
+	public synchronized boolean wantToStop() {
 		return _bStop;
 	}
 
 	/**
 	 * End the currently running test
+	 * Cannot be restarted.
 	 * */
-	public void endTest() {
-/****
-		_progressBarObj.setValue(_iTestsCompleted);
-		_iTestsCompleted++;
-		setTestNoLabelText();
-****/
+	public synchronized void endTest() {
+		_bStop = true;
 	}
 
 	/**

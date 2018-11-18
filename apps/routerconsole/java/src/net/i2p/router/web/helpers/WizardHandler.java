@@ -32,6 +32,9 @@ public class WizardHandler extends FormHandler {
             return;
         if (getJettyString("cancelbw") != null) {
             cancelNDT();
+            for (int i = 0; i < 20 && !_helper.isNDTComplete(); i++) {
+                try { Thread.sleep(100); } catch (InterruptedException ie) {}
+            }
             return;
         }
         if (getJettyString("next") == null)
@@ -138,7 +141,7 @@ public class WizardHandler extends FormHandler {
         if (_helper == null) {
             addFormError("Bad state for test");
         } else if (_helper.startNDT()) {
-            addFormNotice(_t("Started bandwidth test"));
+            addFormNotice(_t("Bandwidth test started"));
         } else {
             addFormError(_t("Bandwidth test is already running"));
         }
@@ -149,7 +152,7 @@ public class WizardHandler extends FormHandler {
         if (_helper == null) {
             addFormError("Bad state for test");
         } else if (_helper.cancelNDT()) {
-            addFormNotice(_t("Cancelled bandwidth test"));
+            addFormError(_t("Bandwidth test cancelled"));
         } else {
             addFormError(_t("Bandwidth test was not running"));
         }

@@ -301,6 +301,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	private final Log _log = _context.logManager().getLog(Tcpbw100.class);
 	private final boolean _useSSL;
 	private final I2PSSLSocketFactory _sslFactory;
+	private StatusPanel _sPanel;
 
 	public Tcpbw100(boolean useSSL) {
 		super();
@@ -652,6 +653,9 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				// number of tests
 
 				StatusPanel sPanel = new StatusPanel(testsNum, sTempEnable);
+				synchronized (Tcpbw100.this) {
+					_sPanel = sPanel;
+				}
 				getContentPane().add(BorderLayout.NORTH, sPanel);
 				getContentPane().validate();
 				getContentPane().repaint();
@@ -659,6 +663,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				try {
 					while (true) {
 						if (sPanel.wantToStop()) {
+							_log.warn("cancelled");
 							break;
 						}
 						if (testsNum == 0) {
@@ -681,6 +686,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						}
 						// If user stops the test, quit
 						if (sPanel.wantToStop()) {
+							_log.warn("cancelled");
 							break;
 						}
 						sPanel.setText("");
@@ -2846,6 +2852,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				_sErrMsg = "\n" + _resBundDisplayMsgs.getString("stopped")
 						+ "\n";
 				_bFailed = true;
+				_log.warn(_sErrMsg);
 				return;
 			}
 			int testId = Integer.parseInt(tokenizer.nextToken());
@@ -2915,6 +2922,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			ctlSocket.close();
 			_sErrMsg = _resBundDisplayMsgs.getString("stopped") + "\n";
 			_bFailed = true;
+			_log.warn(_sErrMsg);
 			return;
 		}
 
@@ -4505,24 +4513,60 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	}
 
 	/** bigly */
-	private ThreadGroup thread_group;
+	private ThreadGroup _thread_group;
 	
-	/** bigly */
+	/**
+	 * bigly -- must have been started with main() or runIt()
+	 */
+	@SuppressWarnings("deprecation")
 	public void
 	killIt()
 	{
-		while( !thread_group.isDestroyed()){
+		final ThreadGroup thread_group;
+		synchronized(this) {
+			thread_group = _thread_group;
+			if (thread_group == null) {
+				_log.warn("No thread group to kill");
+				return;
+			}
+			// so wantToStop() returns true
+			if (_sPanel != null)
+				_sPanel.endTest();
+		}
+		_log.warn("killIt()");
+		boolean destroyed = false;
+		for (int j = 0; j < 10 && !thread_group.isDestroyed(); j++) {
 			Thread[] threads = new Thread[thread_group.activeCount()];
 			thread_group.enumerate( threads );
 			int	done = 0;
 			for ( int i=0;i<threads.length;i++){
-				if ( threads[i] != null ){
+				Thread t = threads[i];
+				if (t != null) {
+					if (_log.shouldWarn())
+						_log.warn("Interrupting TG thread " + t);
 					done++;
-					//SESecurityManager.stopThread( threads[i] );
+					try {
+						t.interrupt();
+					} catch (RuntimeException re) {
+						_log.warn("TG", re);
+					}
+					try {
+						Thread.sleep(20);
+					} catch (InterruptedException ie) {}
+					if (t.isAlive()) {
+						if (_log.shouldWarn())
+							_log.warn("Killing TG thread " + t);
+						try {
+							t.stop();
+						} catch (RuntimeException re) {
+							_log.warn("TG", re);
+						}
+					}
 				}
 			}
 			
 			if ( done == 0 ){
+				_log.warn("TG destroy");
 				try{
 					thread_group.destroy();
 					break;
@@ -4532,19 +4576,18 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			}
 			
 			try{
-				Thread.sleep(250);
-			}catch( Throwable e ){	
-			}
+				Thread.sleep(50);
+			} catch (InterruptedException ie) {}
 		}
 	}
 	
 	/** bigly */
-	public void
+	public synchronized void
 	runIt()
 	{
 		//final AESemaphore sem = new AESemaphore( "waiter" );
 		
-		thread_group = new 
+		_thread_group = new 
 			ThreadGroup( "NDT" )
 			{
 				@Override
@@ -4557,11 +4600,11 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				}
 			};
 		
-		thread_group.setDaemon( true );
+		_thread_group.setDaemon( true );
 		
 		Thread t = 
 			new I2PAppThread( 
-				thread_group,
+				_thread_group,
 				new Runnable()
 				{
 					@Override
