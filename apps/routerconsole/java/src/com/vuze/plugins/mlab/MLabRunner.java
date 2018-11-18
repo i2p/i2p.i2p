@@ -224,7 +224,7 @@ public class MLabRunner {
                             results.put("down", down_bps);
                             results.put("server_host", server_host);
                             if (server_city != null)
-                                results.put("server_city", server_city);
+                                results.put("server_city", server_city.replace("_", ", "));
                             if (server_country != null)
                                 results.put("server_country", server_country);
                             listener.complete(results);

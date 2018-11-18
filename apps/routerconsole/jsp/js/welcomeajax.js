@@ -6,6 +6,8 @@ function ajax(url, target, refresh) {
     req = new XMLHttpRequest();
     req.onreadystatechange = function() {ajaxDone(url, target, refresh);};
     req.open("GET", url, true);
+    // IE https://www.jamesmaurer.com/ajax-refresh-problem-w-ie-not-refreshing.asp
+    req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
     req.send(null);
     // IE/Windows ActiveX version
   } else if (window.ActiveXObject) {
@@ -13,6 +15,8 @@ function ajax(url, target, refresh) {
     if (req) {
       req.onreadystatechange = function() {ajaxDone(target);};
       req.open("GET", url, true);
+      // IE https://www.jamesmaurer.com/ajax-refresh-problem-w-ie-not-refreshing.asp
+      req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
       req.send(null);
     }
   }
@@ -29,7 +33,8 @@ function ajaxDone(url, target, refresh) {
       // output 1 for complete, 0 + status string for in progress
       fails = 0;
       var status;
-      if (req.responseText.startsWith("1")) {
+      // IE doesn't support startsWith()
+      if (req.responseText.indexOf("1") == 0) {
           results = doneMessage;
           running = false;
           done = true;

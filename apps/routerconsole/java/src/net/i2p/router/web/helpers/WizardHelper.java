@@ -55,6 +55,10 @@ public class WizardHelper extends HelperBase {
         return _listener != null && !_listener.isComplete();
     }
 
+    public synchronized boolean isNDTSuccessful() {
+        return isNDTComplete() && getUpBandwidth() > 0 && getDownBandwidth() > 0;
+    }
+
     /**
      * @return HTML-escaped status string or ""
      */

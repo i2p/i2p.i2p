@@ -46,6 +46,19 @@ public class WizardHandler extends FormHandler {
             }
             if ("4".equals(page)) {
                 startNDT();
+            } else if ("5".equals(page)) {
+                synchronized (_helper) {
+                    if (_helper.isNDTSuccessful()) {
+                        addFormNotice(_t("Bandwidth test completed successfully"));
+                    } else if (_helper.isNDTComplete()) {
+                        addFormError(_t("Bandwidth test failed"));
+                    } else if (_helper.isNDTRunning()) {
+                        addFormError(_t("Bandwidth test did not complete"));
+                    } else {
+                        // didn't run at all?
+                        addFormError(_t("Bandwidth test did not complete"));
+                    }
+                }
             } else if ("6".equals(page)) {
                 Map<String, String> changes = new HashMap<String, String>();
                 boolean updated = updateRates(changes);

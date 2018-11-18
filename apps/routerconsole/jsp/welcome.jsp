@@ -163,6 +163,10 @@
 %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigNetHelper" id="nethelper" scope="request" />
 <jsp:setProperty name="nethelper" property="contextId" value="<%=i2pcontextId%>" />
+<%
+        if (request.getParameter("skipbw") == null) {
+            // don't display this if we skipped the test
+%>
 <h3><%=intl._t("Bandwidth Test Results")%></h3>
 <table class="configtable">
 <tr><td><%=intl._t("Test running?")%></td><td><%=wizhelper.isNDTRunning()%></td></tr>
@@ -174,6 +178,9 @@
 <tr><td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>
 <tr><td><%=intl._t("Share of Bandwidth for I2P")%></td><td><%=Math.round(net.i2p.router.web.helpers.WizardHelper.BW_SCALE * 100)%>%</td></tr>
 </table>
+<%
+        } // skipbw
+%>
 <h3><%=intl._t("Bandwidth Configuration")%></h3>
 <table id="bandwidthconfig" class="configtable">
 <tr><td class="infohelp" colspan="2">
