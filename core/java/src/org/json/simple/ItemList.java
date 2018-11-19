@@ -107,7 +107,7 @@ public class ItemList {
 	
 	/**
 	 * @param i 0-based
-	 * @return
+	 * @return the value
 	 */
 	public String get(int i){
 		return (String)items.get(i);
