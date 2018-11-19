@@ -12,9 +12,9 @@ import java.util.Map;
 
 import gnu.getopt.Getopt;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -98,7 +98,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         _log = ctx.logManager().getLog(DNSOverHTTPS.class);
         state = sslState;
         baos = new ByteArrayOutputStream(512);
-        parser = new JSONParser(JSONParser.MODE_PERMISSIVE);
+        parser = new JSONParser();
     }
 
     public enum Type { V4_ONLY, V6_ONLY, V4_PREFERRED, V6_PREFERRED }
@@ -255,12 +255,13 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
             log("Got response in " + (end - fetchStart) + "ms");
             byte[] b = baos.toByteArray();
             try {
-                JSONObject map = (JSONObject) parser.parse(b);
+                String s = new String(b, "ISO-8859-1");
+                JSONObject map = (JSONObject) parser.parse(s);
                 if (map == null) {
                     log("No map");
                     return null;
                 }
-                Integer status = (Integer) map.get("Status");
+                Number status = (Number) map.get("Status");
                 if (status == null || status.intValue() != 0) {
                     log("Bad status: " + status);
                     return null;
@@ -280,7 +281,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                             log("no data");
                             continue;
                         }
-                        Integer typ = (Integer) a.get("type");
+                        Number typ = (Number) a.get("type");
                         if (typ == null)
                             continue;
                         String name = (String) a.get("name");
@@ -314,7 +315,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                             log("name mismatch: " + name);
                             continue;
                         }
-                        Integer ttl = (Integer) a.get("TTL");
+                        Number ttl = (Number) a.get("TTL");
                         int ittl = (ttl != null) ? Math.min(ttl.intValue(), MAX_TTL) : 3600;
                         long expires = end + (ittl * 1000L);
                         Map<String, Result> cache = isv6 ? v6Cache : v4Cache;

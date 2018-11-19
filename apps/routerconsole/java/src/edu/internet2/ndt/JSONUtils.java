@@ -1,7 +1,7 @@
 package edu.internet2.ndt;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import java.util.Iterator;
 import java.util.Map;
 
