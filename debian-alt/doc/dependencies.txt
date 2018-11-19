@@ -8,7 +8,7 @@ improve our official packages and support other packagers.
 Our packages are available at https://deb.i2p2.de/ and
 instructions are at https://geti2p.net/debian
 
-This document is current as of release 0.9.37, 2018-10-04.
+This document is current as of release 0.9.38, 2018-01-xx.
 
 
 Build-only Dependencies
@@ -45,6 +45,11 @@ Current Runtime Dependencies
 * libgetopt-java
   For /usr/share/java/gnu-getopt.jar.
   In non-Debian builds we bundle the source code; it's removed in the Debian source package.
+
+* libjson-simple-java (jessie and later, trusty and later only)
+  For /usr/share/java/json-simple.jar.
+  In non-Debian builds we bundle the 1.1.1 source code; it's removed in the Debian source package.
+  Compatible with 1.x and 2.x only; not compatible with 3.x.
 
 * libjetty9-java
   For /usr/share/java/jetty9-*.jar.

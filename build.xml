@@ -825,7 +825,7 @@
             additionalparam="-notimestamp"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:net.minidev.json:net.minidev.json.*" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:org.json.simple.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.geoip:com.southernstorm.noise.*" />
             <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
@@ -888,6 +888,7 @@
                 <!-- following are only for debian builds -->
                 <pathelement location="core/java/build/libintl.jar" />
                 <pathelement location="core/java/build/gnu-getopt.jar" />
+                <pathelement location="core/java/build/json-simple.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
                   End-users can override by creating the file override.properties -->
@@ -2457,6 +2458,8 @@
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <!-- libgetopt-java -->
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <!-- libjson-simple-java -->
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
             <!-- libhttpclient-java and libhttpcore-java -->
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
@@ -2622,6 +2625,7 @@
             <file name="../i2p-${Extended.Version}/settings.gradle" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->
@@ -2695,6 +2699,7 @@
             <file name="../i2p-${Extended.Version}/settings.gradle" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->

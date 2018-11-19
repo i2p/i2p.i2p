@@ -18,6 +18,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,bash-completion
  ,gettext
  ,libgetopt-java
+ ,libjson-simple-java (< 3)
  ,libgmp-dev (>= 2:5.0.2)
  ,libservice-wrapper-java
  ,hardening-wrapper
@@ -80,6 +81,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  geoip-database,
  gettext-base,
  libgetopt-java,
+ libjson-simple-java (< 3),
  glassfish-javaee,
  famfamfam-flag-png
 Replaces: i2p ( << 0.8.6-5)

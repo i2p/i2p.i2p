@@ -81,6 +81,7 @@
 
                 <!-- following jars only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
+                <pathelement location="../../../core/java/build/json-simple.jar" />
             </classpath>
         </javac>
     </target>
