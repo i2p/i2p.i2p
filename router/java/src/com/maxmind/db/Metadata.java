@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public final class Metadata {
     private final int binaryFormatMajorVersion;
     private final int binaryFormatMinorVersion;
@@ -18,11 +14,11 @@ public final class Metadata {
 
     private final String databaseType;
 
-    private final JsonNode description;
+    private final Map description;
 
     private final int ipVersion;
 
-    private final JsonNode languages;
+    private final List languages;
 
     private final int nodeByteSize;
 
@@ -32,20 +28,41 @@ public final class Metadata {
 
     private final int searchTreeSize;
 
-    Metadata(JsonNode metadata) {
-        this.binaryFormatMajorVersion = metadata.get(
-                "binary_format_major_version").asInt();
-        this.binaryFormatMinorVersion = metadata.get(
-                "binary_format_minor_version").asInt();
-        this.buildEpoch = metadata.get("build_epoch").asLong();
-        this.databaseType = metadata.get("database_type").asText();
-        this.languages = metadata.get("languages");
-        this.description = metadata.get("description");
-        this.ipVersion = metadata.get("ip_version").asInt();
-        this.nodeCount = metadata.get("node_count").asInt();
-        this.recordSize = metadata.get("record_size").asInt();
+    Metadata(Map metadata) {
+        this.binaryFormatMajorVersion = getInt(metadata,
+                "binary_format_major_version");
+        this.binaryFormatMinorVersion = getInt(metadata,
+                "binary_format_minor_version");
+        this.buildEpoch = getLong(metadata, "build_epoch");
+        this.databaseType = getString(metadata, "database_type");
+        this.languages = (List) metadata.get("languages");
+        this.description = (Map) metadata.get("description");
+        this.ipVersion = getInt(metadata, "ip_version");
+        this.nodeCount = getInt(metadata, "node_count");
+        this.recordSize = getInt(metadata, "record_size");
         this.nodeByteSize = this.recordSize / 4;
         this.searchTreeSize = this.nodeCount * this.nodeByteSize;
+    }
+
+    private static int getInt(Object m, String key) {
+        Map map = (Map) m;
+        Number i = (Number) map.get(key);
+        if (i != null)
+            return i.intValue();
+        return 0;
+    }
+
+    private static long getLong(Object m, String key) {
+        Map map = (Map) m;
+        Number i = (Number) map.get(key);
+        if (i != null)
+            return i.longValue();
+        return 0;
+    }
+
+    private static String getString(Object m, String key) {
+        Map map = (Map) m;
+        return (String) map.get(key);
     }
 
     /**
@@ -82,9 +99,7 @@ public final class Metadata {
      * @return map from language code to description in that language.
      */
     public Map<String, String> getDescription() {
-        return new ObjectMapper().convertValue(this.description,
-                new TypeReference<HashMap<String, String>>() {
-                });
+        return this.description;
     }
 
     /**
@@ -99,9 +114,7 @@ public final class Metadata {
      * @return list of languages supported by the database.
      */
     public List<String> getLanguages() {
-        return new ObjectMapper().convertValue(this.languages,
-                new TypeReference<ArrayList<String>>() {
-                });
+        return this.languages;
     }
 
     /**
