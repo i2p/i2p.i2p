@@ -103,6 +103,12 @@ Public domain except as listed below:
    GeoIP API 1.3.1:
    See licenses/LICENSE-LGPLv2.1.txt
 
+   GeoIP2-java 2.12.0:
+   See licenses/LICENSE-Apache2.0.txt
+
+   Maxmind-DB-Reader-java 1.2.2:
+   See licenses/LICENSE-Apache2.0.txt
+
    Noise library:
    Copyright (C) 2016 Southern Storm Software, Pty Ltd.
    See licenses/LICENSE-Noise.txt
