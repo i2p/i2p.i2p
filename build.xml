@@ -76,7 +76,7 @@
             <echo message="The following command will install the build dependencies for you:" />
             <echo message=" " />
             <echo message="sudo apt-get install debhelper ant debconf default-jdk gettext libgmp-dev po-debconf fakeroot \" />
-            <echo message="  build-essential quilt dh-apparmor dh-systemd libservice-wrapper-java \"  />
+            <echo message="  build-essential quilt dh-apparmor dh-systemd libservice-wrapper-java libjson-simple-java \"  />
             <echo message="  devscripts libjetty9-java libtomcat8-java libtaglibs-standard-jstlel-java libgetopt-java"  />
             <echo message=" " />
             <echo message="The following command will install the additional runtime dependencies:" />
@@ -1686,8 +1686,6 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- decapitalized the file in 0.7.8 -->
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <!-- small enough to include for now -->
-        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
         <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
@@ -1716,8 +1714,12 @@
     <!-- GeoIP files, set withGeoIPDatabase=true in override.properties to prevent -->
     <!-- As of 0.9.26, the files are not included in Debian/Ubuntu builds. -->
     <target name="prepgeoupdate-unlesspkg" unless="${with-geoip-database}" >
+        <mkdir dir="pkg-temp/geoip" />
+      <!--
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
+       -->
+        <gunzip src="installer/resources/GeoLite2-Country.mmdb.gz" dest="pkg-temp/geoip/GeoLite2-Country.mmdb" />
     </target>
 
     <!-- All jetty jars required for update.
@@ -2113,9 +2115,9 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
--->
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
+-->
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
@@ -2467,6 +2469,7 @@
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <!-- libjetty9-java -->
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
             <!-- libtomcat8-java -->
@@ -2548,6 +2551,7 @@
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <!-- libjetty9-java -->
           <!--
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
@@ -2631,6 +2635,7 @@
            -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
           <!--
@@ -2705,6 +2710,7 @@
            -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />

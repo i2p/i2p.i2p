@@ -1,3 +1,10 @@
+2018-11-20 zzz
+ * GeoIP: Add support for Maxmind GeoLite2 format (ticket #2268)
+
+2018-11-19 zzz
+ * Debian: Add libjson-simple-java dependency
+ * Util: Change json lib from net.minidev.json to com.json.simple
+
 2018-11-17 zzz
  * Console: Wizard fixes and improvements
 
@@ -6,8 +13,8 @@
 
 2018-11-13 zzz
  * Console:
-   - New M-Lab NDT subsystem
-   - Setup wizard (WIP)
+   - New M-Lab NDT subsystem (ticket #2321)
+   - Setup wizard (WIP) (ticket #1473)
  * Router: LS2 handling for proposal 123
 
 2018-10-13 zzz

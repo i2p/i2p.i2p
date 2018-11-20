@@ -10,14 +10,9 @@
 - Push to Transifex: `tx push -s`
 - Make announcement on Transifex with checkin deadline
 
-- GeoIP: Maxmind update is usually first week of the month, time accordingly
-- wget http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip
-- unzip GeoIPCountryCSV.zip
-- cut -d, -f3-5 < GeoIPCountryWhois.csv|sed 's/"//g' > geoip.txt
-- replace header
-- fix date in header (get date from HEAD)
-- ./makegeoipv6.sh
-- mtn ci geoip.txt geoipv6.dat.gz
+- GeoIP: Maxmind update is usually first Tuesday of the month, time accordingly
+- installer/resources/makegeoip.sh
+- mtn ci installer/resources/GeoLite2-Country.mmdb
 
 - BuildTime: Don't have to do this every release, but update the
   EARLIEST and EARLIEST_LONG values in core/java/src/net/i2p/time/BuildTime.java
