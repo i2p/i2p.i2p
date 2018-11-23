@@ -1,4 +1,4 @@
-package net.i2p.crypto;
+package net.i2p.router.crypto;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.AESEngine;
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -31,6 +33,8 @@ import net.i2p.util.SimpleByteCache;
  * supplied keys and data.
  *
  * No, this does not extend AESEngine or CryptixAESEngine.
+ *
+ * @since 0.9.38 moved from net.i2p.crypto
  */
 public final class ElGamalAESEngine {
     private final Log _log;
@@ -649,7 +653,7 @@ public final class ElGamalAESEngine {
                  + Hash.HASH_LENGTH
                  + (newKey == null ? 1 : 1 + SessionKey.KEYSIZE_BYTES)
                  + data.length;
-        int totalSize = size + getPaddingSize(size, paddedSize);
+        int totalSize = size + AESEngine.getPaddingSize(size, paddedSize);
 
         byte aesData[] = new byte[totalSize + prefixBytes];
 
@@ -683,7 +687,7 @@ public final class ElGamalAESEngine {
         cur += data.length;
 
         //_log.debug("raw data written: " + len);
-        byte padding[] = getPadding(_context, size, paddedSize);
+        byte padding[] = AESEngine.getPadding(_context, size, paddedSize);
         //_log.debug("padding length: " + padding.length);
         System.arraycopy(padding, 0, aesData, cur, padding.length);
         cur += padding.length;
@@ -696,28 +700,6 @@ public final class ElGamalAESEngine {
         return aesData;
     }
 
-    /**
-     * Return random bytes for padding the data to a mod 16 size so that it is
-     * at least minPaddedSize
-     *
-     */
-    final static byte[] getPadding(I2PAppContext context, int curSize, long minPaddedSize) {
-        int size = getPaddingSize(curSize, minPaddedSize);
-        byte rv[] = new byte[size];
-        context.random().nextBytes(rv);
-        return rv;
-    }
-
-    final static int getPaddingSize(int curSize, long minPaddedSize) {
-        int diff = 0;
-        if (curSize < minPaddedSize) {
-            diff = (int) minPaddedSize - curSize;
-        }
-
-        int numPadding = diff;
-        if (((curSize + diff) % 16) != 0) numPadding += (16 - ((curSize + diff) % 16));
-        return numPadding;
-    }
 
 /****
     public static void main(String args[]) {

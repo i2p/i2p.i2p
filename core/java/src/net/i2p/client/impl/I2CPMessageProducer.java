@@ -164,7 +164,7 @@ class I2CPMessageProducer {
         }
         msg.setSessionId(sid);
         msg.setNonce(nonce);
-        Payload data = createPayload(dest, payload, null, null, null, null);
+        Payload data = createPayload(payload);
         msg.setPayload(data);
         session.sendMessage(msg);
     }
@@ -191,7 +191,7 @@ class I2CPMessageProducer {
         }
         msg.setSessionId(sid);
         msg.setNonce(nonce);
-        Payload data = createPayload(dest, payload, null, null, null, null);
+        Payload data = createPayload(payload);
         msg.setPayload(data);
         session.sendMessage(msg);
     }
@@ -299,41 +299,14 @@ class I2CPMessageProducer {
         }
     }
     
-    /** 
-     * Should we include the I2CP end to end crypto (which is in addition to any
-     * garlic crypto added by the router)
-     *
-     */
-    static final boolean END_TO_END_CRYPTO = false;
-    
     /**
-     * Create a new signed payload and send it off to the destination
-     *
-     * @param tag unused - no end-to-end crypto
-     * @param tags unused - no end-to-end crypto
-     * @param key unused - no end-to-end crypto
-     * @param newKey unused - no end-to-end crypto
+     * Create a new payload.
+     * No more end-to-end encryption, just set the "encrypted" data to the payload.
      */
-    private Payload createPayload(Destination dest, byte[] payload, SessionTag tag, SessionKey key, Set<SessionTag> tags,
-                                  SessionKey newKey) throws I2PSessionException {
-        if (dest == null) throw new I2PSessionException("No destination specified");
+    private static Payload createPayload(byte[] payload) throws I2PSessionException {
         if (payload == null) throw new I2PSessionException("No payload specified");
-
         Payload data = new Payload();
-        if (!END_TO_END_CRYPTO) {
-            data.setEncryptedData(payload);
-            return data;
-        }
-        // no padding at this level
-        // the garlic may pad, and the tunnels may pad, and the transports may pad
-        int size = payload.length;
-        byte encr[] = _context.elGamalAESEngine().encrypt(payload, dest.getPublicKey(), key, tags, tag, newKey, size);
-        // yes, in an intelligent component, newTags would be queued for confirmation along with key, and
-        // generateNewTags would only generate tags if necessary
-
-        data.setEncryptedData(encr);
-        //_log.debug("Encrypting the payload to public key " + dest.getPublicKey().toBase64() + "\nPayload: "
-        //           + data.calculateHash());
+        data.setEncryptedData(payload);
         return data;
     }
 

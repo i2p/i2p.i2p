@@ -13,7 +13,6 @@ import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
-import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMAC256Generator;
 import net.i2p.crypto.HMACGenerator;
@@ -74,7 +73,6 @@ public class I2PAppContext {
     protected SessionKeyManager _sessionKeyManager;
     private NamingService _namingService;
     private ElGamalEngine _elGamalEngine;
-    private ElGamalAESEngine _elGamalAESEngine;
     private AESEngine _AESEngine;
     private LogManager _logManager;
     private HMACGenerator _hmac;
@@ -94,7 +92,6 @@ public class I2PAppContext {
     protected volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
     private volatile boolean _elGamalEngineInitialized;
-    private volatile boolean _elGamalAESEngineInitialized;
     private volatile boolean _AESEngineInitialized;
     private volatile boolean _logManagerInitialized;
     private volatile boolean _hmacInitialized;
@@ -120,7 +117,7 @@ public class I2PAppContext {
     private final ClientAppManager _appManager;
     // split up big lock on this to avoid deadlocks
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
-                         _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
+                         _lock5 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
                          _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
                          _lock13 = new Object(), _lock14 = new Object(), _lock16 = new Object(),
                          _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object();
@@ -681,28 +678,7 @@ public class I2PAppContext {
             _elGamalEngineInitialized = true;
         }
     }
-    
-    /**
-     * Access the ElGamal/AES+SessionTag engine for this context.  The algorithm
-     * makes use of the context's sessionKeyManager to coordinate transparent
-     * access to the sessionKeys and sessionTags, as well as the context's elGamal
-     * engine (which in turn keeps stats, etc).
-     *
-     */
-    public ElGamalAESEngine elGamalAESEngine() {
-        if (!_elGamalAESEngineInitialized)
-            initializeElGamalAESEngine();
-        return _elGamalAESEngine;
-    }
 
-    private void initializeElGamalAESEngine() {
-        synchronized (_lock6) {
-            if (_elGamalAESEngine == null)
-                _elGamalAESEngine = new ElGamalAESEngine(this);
-            _elGamalAESEngineInitialized = true;
-        }
-    }
-    
     /**
      * Ok, I'll admit it.  there is no good reason for having a context specific
      * AES engine.  We dont really keep stats on it, since its just too fast to

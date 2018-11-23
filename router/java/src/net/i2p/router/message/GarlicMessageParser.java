@@ -10,7 +10,6 @@ package net.i2p.router.message;
 
 import java.util.Date;
 
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
@@ -18,6 +17,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
@@ -27,7 +27,7 @@ import net.i2p.util.Log;
  */
 public class GarlicMessageParser {
     private final Log _log;
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     
     /**
      *  Huge limit just to reduce chance of trouble. Typ. usage is 3.
@@ -35,7 +35,7 @@ public class GarlicMessageParser {
      */
     private static final int MAX_CLOVES = 32;
 
-    public GarlicMessageParser(I2PAppContext context) { 
+    public GarlicMessageParser(RouterContext context) { 
         _context = context;
         _log = _context.logManager().getLog(GarlicMessageParser.class);
     }

@@ -15,6 +15,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
+import net.i2p.router.crypto.ElGamalAESEngine;
 import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
 import net.i2p.router.message.GarlicMessageParser;
@@ -68,6 +69,7 @@ public class RouterContext extends I2PAppContext {
     private RouterAppManager _appManager;
     private RouterKeyGenerator _routingKeyGenerator;
     private GarlicMessageParser _garlicMessageParser;
+    private ElGamalAESEngine _elGamalAESEngine;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
     private volatile boolean _initialized;
@@ -211,6 +213,7 @@ public class RouterContext extends I2PAppContext {
             _clientManagerFacade = new DummyClientManagerFacade(this);
             // internal client manager is null
         }
+        _elGamalAESEngine = new ElGamalAESEngine(this);
         _garlicMessageParser = new GarlicMessageParser(this);
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
@@ -666,5 +669,17 @@ public class RouterContext extends I2PAppContext {
      */
     public GarlicMessageParser garlicMessageParser() {
         return _garlicMessageParser;
+    }
+
+    /**
+     * Access the ElGamal/AES+SessionTag engine for this context.  The algorithm
+     * makes use of the context's sessionKeyManager to coordinate transparent
+     * access to the sessionKeys and sessionTags, as well as the context's elGamal
+     * engine (which in turn keeps stats, etc).
+     *
+     * @since 0.9.38 moved from superclass (app context)
+     */
+    public ElGamalAESEngine elGamalAESEngine() {
+        return _elGamalAESEngine;
     }
 }
