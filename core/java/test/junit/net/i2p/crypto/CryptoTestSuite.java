@@ -24,7 +24,6 @@ public class CryptoTestSuite {
         suite.addTestSuite(CryptixAESEngineTest.class);
         suite.addTestSuite(CryptixRijndael_AlgorithmTest.class);
         suite.addTestSuite(DSATest.class);
-        suite.addTestSuite(ElGamalTest.class);
         suite.addTestSuite(HMACSHA256Test.class);
         suite.addTestSuite(KeyGeneratorTest.class);
         suite.addTestSuite(SHA1HashTest.class);

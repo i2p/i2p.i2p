@@ -21,6 +21,7 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.router.crypto.ElGamalAESEngine;
 
 /**
  *
@@ -48,8 +49,9 @@ public class SessionEncryptionTest extends TestCase{
         
         byte[] msg = DataHelper.getASCII("msg 1");
         
-        byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, null, null, 64);
-        byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
+        byte emsg[] = e.encrypt(msg, pubKey, curKey, null, null, 64);
+        byte dmsg[] = e.decrypt(emsg, privKey, skm);
         assertTrue(DataHelper.eq(dmsg, msg));
     }
     
@@ -62,8 +64,9 @@ public class SessionEncryptionTest extends TestCase{
         
         byte[] msg = DataHelper.getASCII("msg 2");
         
-        byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, null, null, 64);
-        byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
+        byte emsg[] = e.encrypt(msg, pubKey, curKey, null, null, 64);
+        byte dmsg[] = e.decrypt(emsg, privKey, skm);
         assertTrue(DataHelper.eq(dmsg, msg));
     }
     
@@ -101,9 +104,10 @@ public class SessionEncryptionTest extends TestCase{
         byte[] msg4 = DataHelper.getASCII("msg 4");
         byte[] msg5 = DataHelper.getASCII("msg 5");
         
-        byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, null, 64);
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
+        byte emsg1[] = e.encrypt(msg1, pubKey, curKey, firstTags, null, 64);
         
-        byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey, skm);
+        byte dmsg1[] = e.decrypt(emsg1, privKey, skm);
         assertTrue(DataHelper.eq(dmsg1, msg1));
         
         
@@ -116,9 +120,9 @@ public class SessionEncryptionTest extends TestCase{
         
         assertNotNull(curTag);
         
-        byte emsg2[] = _context.elGamalAESEngine().encrypt(msg2, pubKey, curKey, null, curTag, 64);
+        byte emsg2[] = e.encrypt(msg2, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg2[] = _context.elGamalAESEngine().decrypt(emsg2, privKey, skm);
+        byte dmsg2[] = e.decrypt(emsg2, privKey, skm);
         assertTrue(DataHelper.eq(dmsg2, msg2));
         
         
@@ -130,9 +134,9 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg3[] = _context.elGamalAESEngine().encrypt(msg3, pubKey, curKey, secondTags, curTag, 64);
+        byte emsg3[] = e.encrypt(msg3, pubKey, curKey, secondTags, curTag, 64);
         
-        byte dmsg3[] = _context.elGamalAESEngine().decrypt(emsg3, privKey, skm);
+        byte dmsg3[] = e.decrypt(emsg3, privKey, skm);
         assertTrue(DataHelper.eq(dmsg3, msg3));
         
         
@@ -146,9 +150,9 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg4[] = _context.elGamalAESEngine().encrypt(msg4, pubKey, curKey, null, curTag, 64);
+        byte emsg4[] = e.encrypt(msg4, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg4[] = _context.elGamalAESEngine().decrypt(emsg4, privKey, skm);
+        byte dmsg4[] = e.decrypt(emsg4, privKey, skm);
         assertTrue(DataHelper.eq(dmsg4, msg4));
         
         
@@ -158,9 +162,9 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg5[] = _context.elGamalAESEngine().encrypt(msg5, pubKey, curKey, null, curTag, 64);
+        byte emsg5[] = e.encrypt(msg5, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg5[] = _context.elGamalAESEngine().decrypt(emsg5, privKey, skm);
+        byte dmsg5[] = e.decrypt(emsg5, privKey, skm);
         assertTrue(DataHelper.eq(dmsg5, msg5));
         
         
@@ -201,9 +205,10 @@ public class SessionEncryptionTest extends TestCase{
         byte[] msg4 = DataHelper.getASCII("msg 4");
         byte[] msg5 = DataHelper.getASCII("msg 5");
         
-        byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, null, 64);
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
+        byte emsg1[] = e.encrypt(msg1, pubKey, curKey, firstTags, null, 64);
         
-        byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey, skm);
+        byte dmsg1[] = e.decrypt(emsg1, privKey, skm);
         assertTrue(DataHelper.eq(dmsg1, msg1));
         
         
@@ -216,9 +221,9 @@ public class SessionEncryptionTest extends TestCase{
         
         assertNotNull(curTag);
         
-        byte emsg2[] = _context.elGamalAESEngine().encrypt(msg2, pubKey, curKey, null, curTag, 64);
+        byte emsg2[] = e.encrypt(msg2, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg2[] = _context.elGamalAESEngine().decrypt(emsg2, privKey, skm);
+        byte dmsg2[] = e.decrypt(emsg2, privKey, skm);
         assertTrue(DataHelper.eq(dmsg2, msg2));
         
         
@@ -229,9 +234,9 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg3[] = _context.elGamalAESEngine().encrypt(msg3, pubKey, curKey, secondTags, curTag, nextKey, 64);
+        byte emsg3[] = e.encrypt(msg3, pubKey, curKey, secondTags, curTag, nextKey, 64);
         
-        byte dmsg3[] = _context.elGamalAESEngine().decrypt(emsg3, privKey, skm);
+        byte dmsg3[] = e.decrypt(emsg3, privKey, skm);
         assertTrue(DataHelper.eq(dmsg3, msg3));
         
         
@@ -245,9 +250,9 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg4[] = _context.elGamalAESEngine().encrypt(msg4, pubKey, curKey, null, curTag, 64);
+        byte emsg4[] = e.encrypt(msg4, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg4[] = _context.elGamalAESEngine().decrypt(emsg4, privKey, skm);
+        byte dmsg4[] = e.decrypt(emsg4, privKey, skm);
         assertTrue(DataHelper.eq(dmsg4, msg4));
         
         
@@ -258,9 +263,9 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg5[] = _context.elGamalAESEngine().encrypt(msg5, pubKey, curKey, null, curTag, 64);
+        byte emsg5[] = e.encrypt(msg5, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg5[] = _context.elGamalAESEngine().decrypt(emsg5, privKey, skm);
+        byte dmsg5[] = e.decrypt(emsg5, privKey, skm);
         assertTrue(DataHelper.eq(dmsg5, msg5));
         
         
@@ -278,6 +283,7 @@ public class SessionEncryptionTest extends TestCase{
         SessionKeyManager skm = new TransientSessionKeyManager(_context);
         SessionKey curKey = skm.createSession(pubKey);
         
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
         for (int i = 0; i < 1000; i++) {
             Set<SessionTag> tags = null;
             SessionKey nextKey = null;
@@ -293,9 +299,9 @@ public class SessionEncryptionTest extends TestCase{
             
             byte[] msg = DataHelper.getASCII("msg " + i);
             
-            byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, tags, curTag, nextKey, 64);
+            byte emsg[] = e.encrypt(msg, pubKey, curKey, tags, curTag, nextKey, 64);
             
-            byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
+            byte dmsg[] = e.decrypt(emsg, privKey, skm);
             assertTrue(DataHelper.eq(dmsg, msg));
             
             if ( (tags != null) && (tags.size() > 0) ) {

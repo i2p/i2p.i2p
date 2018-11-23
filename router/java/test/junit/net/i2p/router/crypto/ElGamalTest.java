@@ -1,4 +1,4 @@
-package net.i2p.crypto;
+package net.i2p.router.crypto;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -16,6 +16,8 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -24,6 +26,7 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.router.crypto.ElGamalAESEngine;
 import net.i2p.util.RandomSource;
 
 public class ElGamalTest extends TestCase{
@@ -126,7 +129,7 @@ public class ElGamalTest extends TestCase{
     
     protected void setUp() {
         _context = I2PAppContext.getGlobalContext();
-        Object o = YKGenerator.class;
+        //Object o = YKGenerator.class;
     }
     
     public void testBasicAES(){
@@ -155,12 +158,13 @@ public class ElGamalTest extends TestCase{
         
         String msg = "Hello world";
         
-        byte encrypted[] = _context.elGamalAESEngine().encryptAESBlock(DataHelper.getASCII(msg), sessionKey, iv, null, null, 64);
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
+        byte encrypted[] = e.encryptAESBlock(DataHelper.getASCII(msg), sessionKey, iv, null, null, 64);
         Set<SessionTag> foundTags = new HashSet<SessionTag>();
         SessionKey foundKey = new SessionKey();
         byte decrypted[] = null;
         try{
-            decrypted = _context.elGamalAESEngine().decryptAESBlock(encrypted, 0, encrypted.length, sessionKey, iv, null, foundTags, foundKey);
+            decrypted = e.decryptAESBlock(encrypted, 0, encrypted.length, sessionKey, iv, null, foundTags, foundKey);
         }catch(DataFormatException dfe){
             dfe.printStackTrace();
             fail();
@@ -180,10 +184,11 @@ public class ElGamalTest extends TestCase{
         SessionKey key = _context.sessionKeyManager().getCurrentKey(pubKey);
         if (key == null)
             key = _context.sessionKeyManager().createSession(pubKey);
-        byte[] encrypted = _context.elGamalAESEngine().encrypt(DataHelper.getASCII(msg), pubKey, key, null, null, 64);
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
+        byte[] encrypted = e.encrypt(DataHelper.getASCII(msg), pubKey, key, null, null, 64);
         byte[] decrypted = null;
         try{
-            decrypted = _context.elGamalAESEngine().decrypt(encrypted, privKey, _context.sessionKeyManager());
+            decrypted = e.decrypt(encrypted, privKey, _context.sessionKeyManager());
         }catch(DataFormatException dfe){
             dfe.printStackTrace();
             fail();
@@ -256,6 +261,7 @@ public class ElGamalTest extends TestCase{
     }
     
     public void testLoop(){
+        ElGamalAESEngine e = new ElGamalAESEngine(_context);
         for(int i = 0; i < 5; i++){
             Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
             PublicKey pubKey = (PublicKey)keys[0];
@@ -267,10 +273,10 @@ public class ElGamalTest extends TestCase{
             if (key == null)
                 key = _context.sessionKeyManager().createSession(pubKey);
             
-            byte[] encrypted = _context.elGamalAESEngine().encrypt(msg, pubKey, key, null, null, 1024);
+            byte[] encrypted = e.encrypt(msg, pubKey, key, null, null, 1024);
             byte[] decrypted = null;
             try{
-                decrypted = _context.elGamalAESEngine().decrypt(encrypted, privKey, _context.sessionKeyManager());
+                decrypted = e.decrypt(encrypted, privKey, _context.sessionKeyManager());
             }catch(DataFormatException dfe){
                 dfe.printStackTrace();
                 fail();
@@ -370,6 +376,8 @@ public class ElGamalTest extends TestCase{
         }
     }
     
+/****
+Package private, move back to net.i2p.crypto if we want to test it
     public void testYKGen(){
         RandomSource.getInstance().nextBoolean();
         I2PAppContext context = I2PAppContext.getGlobalContext();
@@ -378,4 +386,5 @@ public class ElGamalTest extends TestCase{
             ykgen.getNextYK();
         }
     }
+****/
 }
