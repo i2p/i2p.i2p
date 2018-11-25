@@ -286,7 +286,7 @@
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
 
-    <target name="builddep" depends="builddepSmall, buildBOB, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark" />
+    <target name="builddep" depends="builddepSmall, buildBOB, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark, buildI2PControl" />
 
     <target name="builddepSmall" depends="buildrouter, buildSystray, buildDesktopGui, buildRouterConsole, buildStreaming, buildI2PTunnel, buildAddressbook" />
 
@@ -354,6 +354,11 @@
     <target name="buildImagegen" depends="buildCore, buildJetty" >
         <ant dir="apps/imagegen" target="build" />
         <copy file="apps/imagegen/imagegen/build/imagegen.war" todir="build/" />
+    </target>
+
+    <target name="buildI2PControl" depends="buildRouter, buildJetty" >
+        <ant dir="apps/i2pcontrol" target="war" />
+        <copy file="apps/i2pcontrol/build/jsonrpc.war" todir="build/" />
     </target>
 
     <target name="buildI2PSnark" depends="buildStreaming, buildJetty, buildSystray" >
@@ -834,6 +839,7 @@
             <group title="BOB Bridge" packages="net.i2p.BOB" />
             <group title="BOB Demos" packages="net.i2p.BOB.Demos.echo.echoclient:net.i2p.BOB.Demos.echo.echoserver" />
             <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
+            <group title="I2PControl Application" packages="net.i2p.i2pcontrol:net.i2p.i2pcontrol.*:org.mindrot.jbcrypt:com.thetransactioncompany.jsonrpc2:com.thetransactioncompany.jsonrpc2.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="Imagegen Application" packages="com.docuverse.identicon:com.google.zxing:com.google.zxing.*:net.i2p.imagegen" />
@@ -869,6 +875,7 @@
                 <pathelement location="apps/imagegen/zxing/javase/src/main/java" />
                 <pathelement location="apps/jrobin/java/src" />
                 <pathelement location="installer/java/src" />
+                <pathelement location="apps/i2pcontrol/java" />
             </sourcepath>
             <classpath>
                 <!-- warning, some entries are needed for Debian builds only -->
@@ -1320,6 +1327,7 @@
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
+        <copy file="build/jsonrpc.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
@@ -1648,6 +1656,7 @@
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
+        <copy file="build/jsonrpc.war" todir="pkg-temp/webapps/" />
         <!-- as of 0.7.12; last changed in 0.9; removed from update in 0.9.26 -->
       <!--
         <copy file="apps/susidns/src/lib/jstl.jar" todir="pkg-temp/lib/" />
@@ -2094,6 +2103,7 @@
             <arg value="build/i2ptunnel.war"/>
             <arg value="build/imagegen.war"/>
             <arg value="build/jetty-i2p.jar"/>
+            <arg value="build/jsonrpc.war"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
             <arg value="build/desktopgui.jar"/>

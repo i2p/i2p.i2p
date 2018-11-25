@@ -207,6 +207,14 @@ Applications:
    See https://glassfish.dev.java.net/public/CDDL+GPL.html
    See licenses/LICENSE-GPLv2.txt
 
+   I2PControl
+   See licenses/LICENSE-Apache2.0.txt
+   Includes jBCrypt:
+   Copyright (c) 2006 Damien Miller <djm@mindrot.org>
+   See licenses/LICENSE-jBCrypt.txt
+   Includes jsonrpc2 1.38.1 (base) 1.11 (server)
+   See licenses/LICENSE-Apache2.0.txt
+
    I2PSnark (i2psnark.jar, i2psnark.war):
    Copyright (C) 2003 Mark J. Wielaard
    GPLv2 (or any later version)

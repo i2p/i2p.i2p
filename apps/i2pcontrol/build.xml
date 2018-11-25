@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="source">
+    <property name="i2pbase" value="../.."/>
+    <property name="i2plib" value="${i2pbase}/build"/>
+    <property name="wrapperlib" value="${i2pbase}/installer/lib/wrapper/all"/>
+
+    <path id="cp">
+        <pathelement location="${i2plib}/i2p.jar" />
+        <pathelement location="${i2plib}/router.jar" />
+        <pathelement location="${i2plib}/org.mortbay.jetty.jar" />
+        <pathelement location="${i2plib}/javax.servlet.jar" />
+        <pathelement location="${i2plib}/jetty-servlet.jar" />
+        <pathelement location="${wrapperlib}/wrapper.jar" />
+    </path>
+
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="jar" />
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="builddep" if="depend.available">
+        <depend
+            cache="${i2pbase}/build"
+            srcdir="./java" 
+            classpath="${cp}"
+            destdir="./build/obj" >
+        </depend>
+    </target>
+
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.7" />
+
+    <target name="compile" depends="builddep" >
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac 
+            srcdir="./java" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            includeAntRuntime="false"
+            destdir="./build/obj" 
+            classpath="${cp}">
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath refid="cp"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="build/I2PControl.jar" basedir="./build/obj" includes="**/*.class" >
+        </jar>
+    </target>    
+
+    <target name="war" depends="compile" >
+        <war destfile="build/jsonrpc.war" webxml="web.xml" >
+            <classes dir="./build/obj" excludes="net/i2p/i2pcontrol/I2PControlController.class net/i2p/i2pcontrol/HostCheckHandler.class" />
+            <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+        </war>
+    </target>
+
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+
+    <target name="cleandep" depends="clean">
+    </target>
+
+    <target name="distclean" depends="clean">
+    </target>
+</project>
