@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.ProviderException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -142,7 +143,12 @@ public final class SelfSignedGenerator {
         SigningPrivateKey priv = (SigningPrivateKey) keys[1];
         PublicKey jpub = SigUtil.toJavaKey(pub);
         PrivateKey jpriv = SigUtil.toJavaKey(priv);
-        return generate(jpub, jpriv, priv, type, cname, altNames, ou, o, l, st, c, validDays);
+        try {
+            return generate(jpub, jpriv, priv, type, cname, altNames, ou, o, l, st, c, validDays);
+        } catch (ProviderException pe) {
+            // PE is unchecked
+            throw new GeneralSecurityException(pe);
+        }
     }
 
     /**
@@ -184,6 +190,7 @@ public final class SelfSignedGenerator {
         }
         byte[] sigoid = getEncodedOIDSeq(oid);
 
+        // ProviderException thrown here
         byte[] tbs = genTBS(cname, altNames, ou, o, l, st, c, validDays, sigoid, jpub);
         int tbslen = tbs.length;
 
@@ -379,6 +386,7 @@ public final class SelfSignedGenerator {
         byte[] validity = getValidity(validDays);
         byte[] subject = issuer;
 
+        // ProviderException thrown here
         byte[] pubbytes = jpub.getEncoded();
         byte[] extbytes = getExtensions(pubbytes, cname, altNames);
 
