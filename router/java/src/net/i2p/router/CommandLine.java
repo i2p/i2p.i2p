@@ -14,6 +14,7 @@ import java.util.List;
 public class CommandLine extends net.i2p.util.CommandLine {
 
     protected static final List<String> RCLASSES = Arrays.asList(new String[] {
+        "com.maxmind.geoip2.DatabaseReader",
         "net.i2p.data.router.RouterInfo",
         "net.i2p.data.router.RouterKeyGenerator",
         "net.i2p.router.MultiRouter",

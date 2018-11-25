@@ -7,7 +7,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,6 +254,7 @@ final class Decoder {
         }
     }
 
+    /** @return modifiable, don't modify it */
     private List<Object> decodeArray(int size) throws IOException {
 
         List<Object> array = new ArrayList<Object>(size);
@@ -263,9 +263,10 @@ final class Decoder {
             array.add(r);
         }
 
-        return Collections.unmodifiableList(array);
+        return array;
     }
 
+    /** @return modifiable, don't modify it */
     private Map<String, Object> decodeMap(int size) throws IOException {
         int capacity = (int) (size / 0.75F + 1.0F);
         Map<String, Object> map = new HashMap<String, Object>(capacity);
@@ -276,7 +277,7 @@ final class Decoder {
             map.put(key, value);
         }
 
-        return Collections.unmodifiableMap(map);
+        return map;
     }
 
     private byte[] getByteArray(int length) {
