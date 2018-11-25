@@ -58,6 +58,9 @@ public final class ElGamalEngine {
     private final YKGenerator _ykgen;
 
     private static final BigInteger ELGPM1 = CryptoConstants.elgp.subtract(BigInteger.ONE);
+    private static final int ELG_CLEARTEXT_LENGTH = 222;
+    private static final int ELG_ENCRYPTED_LENGTH = 514;
+    private static final int ELG_HALF_LENGTH = ELG_ENCRYPTED_LENGTH / 2;
 
     
     /** 
@@ -113,8 +116,8 @@ public final class ElGamalEngine {
      *         the cleartext to 222 bytes with random data.
      */
     public byte[] encrypt(byte data[], PublicKey publicKey) {
-        if ((data == null) || (data.length >= 223))
-            throw new IllegalArgumentException("Data to encrypt must be < 223 bytes at the moment");
+        if ((data == null) || (data.length > ELG_CLEARTEXT_LENGTH))
+            throw new IllegalArgumentException("Data to encrypt must be <= 222 bytes");
         if (publicKey == null) throw new IllegalArgumentException("Null public key specified");
 
         long start = _context.clock().now();
@@ -149,11 +152,11 @@ public final class ElGamalEngine {
 
         byte[] ybytes = y.toByteArray();
         byte[] dbytes = d.toByteArray();
-        byte[] out = new byte[514];
-        System.arraycopy(ybytes, 0, out, (ybytes.length < 257 ? 257 - ybytes.length : 0),
-                         (ybytes.length > 257 ? 257 : ybytes.length));
-        System.arraycopy(dbytes, 0, out, (dbytes.length < 257 ? 514 - dbytes.length : 257),
-                         (dbytes.length > 257 ? 257 : dbytes.length));
+        byte[] out = new byte[ELG_ENCRYPTED_LENGTH];
+        System.arraycopy(ybytes, 0, out, (ybytes.length < ELG_HALF_LENGTH ? ELG_HALF_LENGTH - ybytes.length : 0),
+                         (ybytes.length > ELG_HALF_LENGTH ? ELG_HALF_LENGTH : ybytes.length));
+        System.arraycopy(dbytes, 0, out, (dbytes.length < ELG_HALF_LENGTH ? ELG_ENCRYPTED_LENGTH - dbytes.length : ELG_HALF_LENGTH),
+                         (dbytes.length > ELG_HALF_LENGTH ? ELG_HALF_LENGTH : dbytes.length));
         /*
         StringBuilder buf = new StringBuilder(1024);
         buf.append("Timing\n");
@@ -190,18 +193,18 @@ public final class ElGamalEngine {
      * @return unencrypted data or null on failure
      */
     public byte[] decrypt(byte encrypted[], PrivateKey privateKey) {
-        if ((encrypted == null) || (encrypted.length != 514))
-            throw new IllegalArgumentException("Data to decrypt must be exactly 514 bytes");
+        if ((encrypted == null) || (encrypted.length != ELG_ENCRYPTED_LENGTH))
+            throw new IllegalArgumentException("Data to decrypt must be exactly ELG_ENCRYPTED_LENGTH bytes");
         long start = _context.clock().now();
 
         BigInteger a = new NativeBigInteger(1, privateKey.getData());
         BigInteger y1p = ELGPM1.subtract(a);
         // we use this buf first for Y, then for D, then for the hash
-        byte[] buf = SimpleByteCache.acquire(257);
-        System.arraycopy(encrypted, 0, buf, 0, 257);
+        byte[] buf = SimpleByteCache.acquire(ELG_HALF_LENGTH);
+        System.arraycopy(encrypted, 0, buf, 0, ELG_HALF_LENGTH);
         NativeBigInteger y = new NativeBigInteger(1, buf);
         BigInteger ya = y.modPowCT(y1p, CryptoConstants.elgp);
-        System.arraycopy(encrypted, 257, buf, 0, 257);
+        System.arraycopy(encrypted, ELG_HALF_LENGTH, buf, 0, ELG_HALF_LENGTH);
         BigInteger d = new NativeBigInteger(1, buf);
         BigInteger m = ya.multiply(d);
         m = m.mod(CryptoConstants.elgp);
