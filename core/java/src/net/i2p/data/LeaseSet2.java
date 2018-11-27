@@ -338,32 +338,74 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     /**
+     * Sign the structure using the supplied signing key.
+     * Overridden because LS2 sigs cover the type byte.
+     *
+     * @throws IllegalStateException if already signed
+     */
+    @Override
+    public void sign(SigningPrivateKey key) throws DataFormatException {
+        if (_signature != null)
+            throw new IllegalStateException();
+        if (key == null)
+            throw new DataFormatException("No signing key");
+        int len = size();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        try {
+            // unlike LS1, sig covers type
+            out.write(getType());
+            writeBytesWithoutSig(out);
+        } catch (IOException ioe) {
+            throw new DataFormatException("Signature failed", ioe);
+        }
+        byte data[] = out.toByteArray();
+        // now sign with the key 
+        _signature = DSAEngine.getInstance().sign(data, key);
+        if (_signature == null)
+            throw new DataFormatException("Signature failed with " + key.getType() + " key");
+    }
+
+    /**
      * Verify with the SPK in the dest for online sigs.
      * Verify with the SPK in the offline sig section for offline sigs.
      * @return valid
      */
     @Override
     public boolean verifySignature() {
-        if (!isOffline())
-            return super.verifySignature();
         if (_signature == null)
             return false;
         // Disallow RSA as it's so slow it could be used as a DoS
         SigType type = _signature.getType();
         if (type == null || type.getBaseAlgorithm() == SigAlgo.RSA)
             return false;
-        // verify offline block
-        if (!verifyOfflineSignature())
+        SigningPublicKey spk;
+        if (isOffline()) {
+            // verify LS2 using offline block's SPK
+            // Disallow RSA as it's so slow it could be used as a DoS
+            type = _transientSigningPublicKey.getType();
+            if (type == null || type.getBaseAlgorithm() == SigAlgo.RSA)
+                return false;
+            if (!verifyOfflineSignature())
+                return false;
+            spk = _transientSigningPublicKey;
+        } else {
+            spk = getSigningPublicKey();
+        }
+        int len = size();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        try {
+            // unlike LS1, sig covers type
+            out.write(getType());
+            writeBytesWithoutSig(out);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
             return false;
-        // verify LS2 using offline block's SPK
-        // Disallow RSA as it's so slow it could be used as a DoS
-        type = _transientSigningPublicKey.getType();
-        if (type == null || type.getBaseAlgorithm() == SigAlgo.RSA)
+        } catch (DataFormatException dfe) {
+            dfe.printStackTrace();
             return false;
-        byte data[] = getBytes();
-        if (data == null)
-            return false;
-        return DSAEngine.getInstance().verifySignature(_signature, data, _transientSigningPublicKey);
+        }
+        byte data[] = out.toByteArray();
+        return DSAEngine.getInstance().verifySignature(_signature, data, spk);
     }
     
     @Override
