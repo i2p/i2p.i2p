@@ -2,7 +2,7 @@ package net.i2p.router.transport.crypto;
 
 import java.security.PrivateKey;
 
-import com.southernstorm.noise.crypto.Curve25519;
+import com.southernstorm.noise.crypto.x25519.Curve25519;
 
 /**
  *  A PrivateKey we can stick in a KeyPair.

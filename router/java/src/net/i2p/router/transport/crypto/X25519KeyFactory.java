@@ -3,7 +3,7 @@ package net.i2p.router.transport.crypto;
 import java.security.KeyPair;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.southernstorm.noise.crypto.Curve25519;
+import com.southernstorm.noise.crypto.x25519.Curve25519;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PThread;

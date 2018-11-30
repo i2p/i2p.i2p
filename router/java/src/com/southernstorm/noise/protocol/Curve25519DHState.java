@@ -25,7 +25,7 @@ package com.southernstorm.noise.protocol;
 import java.security.KeyPair;
 import java.util.Arrays;
 
-import com.southernstorm.noise.crypto.Curve25519;
+import com.southernstorm.noise.crypto.x25519.Curve25519;
 
 import net.i2p.router.transport.crypto.X25519KeyFactory;
 
