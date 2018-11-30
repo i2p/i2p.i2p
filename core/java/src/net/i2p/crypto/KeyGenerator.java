@@ -13,7 +13,6 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.ProviderException;
@@ -176,6 +175,40 @@ public final class KeyGenerator {
     }
 
     /**
+     *  Supports EncTypes
+     *  @since 0.9.38
+     */
+    public KeyPair generatePKIKeys(EncType type) {
+        PublicKey pub;
+        PrivateKey priv;
+        switch (type) {
+          case ELGAMAL_2048:
+            SimpleDataStructure[] keys = generatePKIKeys();
+            pub = (PublicKey) keys[0];
+            priv = (PrivateKey) keys[1];
+            break;
+
+          case ECIES_X25519:
+            byte[] bpriv = new byte[32];
+            do {
+                _context.random().nextBytes(bpriv);
+                // little endian, loop if too small
+                // worth doing?
+            } while (bpriv[31] == 0);
+            byte[] bpub = new byte[32];
+            Curve25519.eval(bpub, 0, bpriv, null);
+            pub = new PublicKey(type, bpub);
+            priv = new PrivateKey(type, bpriv);
+            break;
+
+          default:
+            throw new IllegalArgumentException("Unsupported algorithm");
+
+        }
+        return new KeyPair(pub, priv);
+    }
+
+    /**
      * Convert a PrivateKey to its corresponding PublicKey.
      * As of 0.9.38, supports EncTypes
      *
@@ -254,7 +287,7 @@ public final class KeyGenerator {
     public SimpleDataStructure[] generateSigningKeys(SigType type) throws GeneralSecurityException {
         if (type == SigType.DSA_SHA1)
             return generateSigningKeys();
-        KeyPair kp;
+        java.security.KeyPair kp;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
             net.i2p.crypto.eddsa.KeyPairGenerator kpg = new net.i2p.crypto.eddsa.KeyPairGenerator();
             kpg.initialize(type.getParams(), _context.random());
