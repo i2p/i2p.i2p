@@ -13,9 +13,15 @@ public class KeyPair {
     private final PublicKey pub;
     private final PrivateKey priv;
 
+    /**
+     * @param publicKey non-null, same EncType as privateKey
+     * @param privateKey non-null, same EncType as publicKey
+     */
     public KeyPair(PublicKey publicKey, PrivateKey privateKey) {
         pub = publicKey;
         priv = privateKey;
+        if (pub.getType() != priv.getType())
+            throw new IllegalArgumentException();
     }
 
     public PublicKey getPublic() {

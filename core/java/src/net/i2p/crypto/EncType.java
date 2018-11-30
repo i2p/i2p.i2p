@@ -113,6 +113,9 @@ public enum EncType {
     private boolean x_isAvailable() {
         if (ELGAMAL_2048 == this)
             return true;
+        // EC types are placeholders for now
+        if (base == EncAlgo.EC)
+            return false;
         try {
             getParams();
         } catch (InvalidParameterSpecException e) {
