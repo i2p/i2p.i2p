@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.southernstorm.noise.crypto.x25519.Curve25519;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
@@ -173,20 +175,38 @@ public final class KeyGenerator {
         return keys;
     }
 
-    /** Convert a PrivateKey to its corresponding PublicKey
+    /**
+     * Convert a PrivateKey to its corresponding PublicKey.
+     * As of 0.9.38, supports EncTypes
+     *
      * @param priv PrivateKey object
      * @return the corresponding PublicKey object
      * @throws IllegalArgumentException on bad key
      */
     public static PublicKey getPublicKey(PrivateKey priv) {
-        BigInteger a = new NativeBigInteger(1, priv.toByteArray());
-        BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
-        PublicKey pub = new PublicKey();
-        try {
-            pub.setData(SigUtil.rectify(aalpha, PublicKey.KEYSIZE_BYTES));
-        } catch (InvalidKeyException ike) {
-            throw new IllegalArgumentException(ike);
+        EncType type = priv.getType();
+        byte[] data;
+        switch (type) {
+          case ELGAMAL_2048:
+            BigInteger a = new NativeBigInteger(1, priv.toByteArray());
+            BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
+            try {
+                data = SigUtil.rectify(aalpha, PublicKey.KEYSIZE_BYTES);
+            } catch (InvalidKeyException ike) {
+                throw new IllegalArgumentException(ike);
+            }
+            break;
+
+          case ECIES_X25519:
+            data = new byte[32];
+            Curve25519.eval(data, 0, priv.getData(), null);
+            break;
+
+          default:
+            throw new IllegalArgumentException("Unsupported algorithm");
+
         }
+        PublicKey pub = new PublicKey(type, data);
         return pub;
     }
 

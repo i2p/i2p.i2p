@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static net.i2p.crypto.x25519.spec.X25519Spec.X25519_SPEC;
 import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
 
@@ -36,7 +37,13 @@ public enum EncType {
     EC_P384(2, 96, 48, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P384_SPEC, "0.9.20"),
 
     /**  Pubkey 132 bytes; privkey 66 bytes; */
-    EC_P521(3, 132, 66, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P521_SPEC, "0.9.20");
+    EC_P521(3, 132, 66, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P521_SPEC, "0.9.20"),
+
+    /**
+     *  Pubkey 32 bytes; privkey 32 bytes
+     *  @since 0.9.38
+     */
+    ECIES_X25519(4, 32, 32, EncAlgo.ECIES, "EC/None/NoPadding", X25519_SPEC, "0.9.38");
 
 
 

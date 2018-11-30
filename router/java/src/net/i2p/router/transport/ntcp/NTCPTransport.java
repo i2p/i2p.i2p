@@ -8,7 +8,6 @@ import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.security.KeyPair;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -27,11 +26,15 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.EncType;
+import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.PublicKey;
+import net.i2p.data.PrivateKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
@@ -48,8 +51,6 @@ import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.crypto.X25519KeyFactory;
-import net.i2p.router.transport.crypto.X25519PublicKey;
-import net.i2p.router.transport.crypto.X25519PrivateKey;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.EventLog;
@@ -257,12 +258,12 @@ public class NTCPTransport extends TransportImpl {
             }
             if (priv == null || priv.length != NTCP2_KEY_LEN) {
                 KeyPair keys = xdh.getKeys();
-                _ntcp2StaticPrivkey = keys.getPrivate().getEncoded();
-                _ntcp2StaticPubkey = keys.getPublic().getEncoded();
+                _ntcp2StaticPrivkey = keys.getPrivate().getData();
+                _ntcp2StaticPubkey = keys.getPublic().getData();
                 shouldSave = true;
             } else {
                 _ntcp2StaticPrivkey = priv;
-                _ntcp2StaticPubkey = (new X25519PrivateKey(priv)).toPublic().getEncoded();
+                _ntcp2StaticPubkey = (new PrivateKey(EncType.ECIES_X25519, priv)).toPublic().getData();
             }
             if (!shouldSave) {
                 s = ctx.getProperty(PROP_NTCP2_IV);

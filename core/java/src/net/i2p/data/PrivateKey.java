@@ -53,8 +53,11 @@ public class PrivateKey extends SimpleDataStructure {
      *  @since 0.9.38
      */
     public PrivateKey(EncType type, byte data[]) {
-        super(data);
+        super();
         _type = type;
+        if (data == null)
+            throw new IllegalArgumentException("Data must be specified");
+        _data = data;
     }
 
     /** constructs from base64
