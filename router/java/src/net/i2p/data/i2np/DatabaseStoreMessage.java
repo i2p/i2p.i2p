@@ -16,9 +16,11 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
+import net.i2p.data.MetaLeaseSet;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 
@@ -134,17 +136,15 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             _replyGateway = null;
         }
         
-        if (dbType == DatabaseEntry.KEY_TYPE_LEASESET) {
-            _dbEntry = new LeaseSet();
-            try {
-                _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
-            } catch (DataFormatException dfe) {
-                throw new I2NPMessageException("Error reading the leaseSet", dfe);
-            } catch (IOException ioe) {
-                throw new I2NPMessageException("Error reading the leaseSet", ioe);
-            }
-        } else if (dbType == DatabaseEntry.KEY_TYPE_LS2) {
-            _dbEntry = new LeaseSet2();
+        if (DatabaseEntry.isLeaseSet(dbType)) {
+            if (dbType == DatabaseEntry.KEY_TYPE_LEASESET)
+                _dbEntry = new LeaseSet();
+            else if (dbType == DatabaseEntry.KEY_TYPE_LS2)
+                _dbEntry = new LeaseSet2();
+            else if (dbType == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2)
+                _dbEntry = new EncryptedLeaseSet();
+            else
+                _dbEntry = new MetaLeaseSet();
             try {
                 _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
             } catch (DataFormatException dfe) {
@@ -196,7 +196,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         if (_replyToken > 0) 
             len += 4 + Hash.HASH_LENGTH; // replyTunnel+replyGateway
         int type = _dbEntry.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+        if (_dbEntry.isLeaseSet()) {
             if (_byteCache == null) {
                 _byteCache = _dbEntry.toByteArray();
             }
@@ -218,7 +218,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if (_dbEntry == null) throw new I2NPMessageException("Missing entry");
         int type = _dbEntry.getType();
-        if (type != DatabaseEntry.KEY_TYPE_LEASESET && type != DatabaseEntry.KEY_TYPE_ROUTERINFO)
+        if (type != DatabaseEntry.KEY_TYPE_ROUTERINFO && !_dbEntry.isLeaseSet())
             throw new I2NPMessageException("Invalid key type " + type);
         
         // Use the hash of the DatabaseEntry

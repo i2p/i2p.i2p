@@ -70,8 +70,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         Hash key = _message.getKey();
         DatabaseEntry entry = _message.getEntry();
         int type = entry.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
-            type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (DatabaseEntry.isLeaseSet(type)) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of leaseset " + _message);

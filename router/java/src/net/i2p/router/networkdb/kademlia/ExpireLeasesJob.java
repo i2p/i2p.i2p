@@ -61,9 +61,7 @@ class ExpireLeasesJob extends JobImpl {
         Set<Hash> toExpire = new HashSet<Hash>(128);
         for (Map.Entry<Hash, DatabaseEntry> entry : _facade.getDataStore().getMapEntries()) {
             DatabaseEntry obj = entry.getValue();
-            int type = obj.getType();
-            if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
-                type == DatabaseEntry.KEY_TYPE_LS2) {
+            if (obj.isLeaseSet()) {
                 LeaseSet ls = (LeaseSet)obj;
                 if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR))
                     toExpire.add(entry.getKey());

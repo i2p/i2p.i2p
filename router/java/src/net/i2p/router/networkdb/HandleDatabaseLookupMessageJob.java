@@ -95,7 +95,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         // only lookup once, then cast to correct type
         DatabaseEntry dbe = getContext().netDb().lookupLocally(_message.getSearchKey());
         int type = dbe != null ? dbe.getType() : -1;
-        if ((type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) &&
+        if (DatabaseEntry.isLeaseSet(type) &&
             (lookupType == DatabaseLookupMessage.Type.ANY || lookupType == DatabaseLookupMessage.Type.LS)) {
             LeaseSet ls = (LeaseSet) dbe;
             // We have to be very careful here to decide whether or not to send out the leaseSet,
@@ -260,8 +260,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             _log.debug("Sending data matching key " + key + " to peer " + toPeer
                        + " tunnel " + replyTunnel);
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        int type = data.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (data.isLeaseSet()) {
             getContext().statManager().addRateData("netDb.lookupsMatchedLeaseSet", 1);
         }
         msg.setEntry(data);

@@ -78,8 +78,7 @@ abstract class StoreJob extends JobImpl {
         _timeoutMs = timeoutMs;
         _expiration = context.clock().now() + timeoutMs;
         _peerSelector = facade.getPeerSelector();
-        int type = data.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (data.isLeaseSet()) {
             _connectChecker = null;
             _connectMask = 0;
         } else {
@@ -313,8 +312,7 @@ abstract class StoreJob extends JobImpl {
         if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             if (responseTime > MAX_DIRECT_EXPIRATION)
                 responseTime = MAX_DIRECT_EXPIRATION;
-        } else if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
-        } else {
+        } else if (!DatabaseEntry.isLeaseSet(type)) {
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
         }
         msg.setEntry(_state.getData());
@@ -340,8 +338,7 @@ abstract class StoreJob extends JobImpl {
      *
      */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        int type = msg.getEntry().getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (msg.getEntry().isLeaseSet()) {
             getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1);
             // if it is an encrypted leaseset...
             if (getContext().keyRing().get(msg.getKey()) != null)
