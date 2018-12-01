@@ -38,6 +38,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private long _sendTime;
     private final long _published;
     private final boolean _isRouterInfo;
+    private final boolean _isLS2;
     private MessageWrapper.WrappedMessage _wrappedMessage;
     private final Set<Hash> _ignore;
     private final MaskedIPSet _ipSet;
@@ -52,12 +53,14 @@ class FloodfillVerifyStoreJob extends JobImpl {
      *  Delay a few seconds, then start the verify
      *  @param sentTo who to give the credit or blame to, can be null
      */
-    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, boolean isRouterInfo, Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
+    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, boolean isRouterInfo,
+                                   boolean isLS2, Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         facade.verifyStarted(key);
         _key = key;
         _published = published;
         _isRouterInfo = isRouterInfo;
+        _isLS2 = isLS2;
         _log = ctx.logManager().getLog(getClass());
         _sentTo = sentTo;
         _facade = facade;
@@ -195,7 +198,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
                 Hash peer = peers.get(0);
                 RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
                 //if (ri != null && StoreJob.supportsCert(ri, keyCert)) {
-                if (ri != null && StoreJob.shouldStoreTo(ri)) {
+                if (ri != null && StoreJob.shouldStoreTo(ri) &&
+                    (!_isLS2 || StoreJob.shouldStoreLS2To(ri))) {
                     Set<String> peerIPs = new MaskedIPSet(getContext(), ri, IP_CLOSE_BYTES);
                     if (!_ipSet.containsAny(peerIPs)) {
                         _ipSet.addAll(peerIPs);

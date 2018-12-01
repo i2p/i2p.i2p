@@ -79,6 +79,7 @@ class FloodfillStoreJob extends StoreJob {
             }
 
             long published = data.getDate();
+            boolean isls2 = data.isLeaseSet() && data.getType() != DatabaseEntry.KEY_TYPE_LEASESET;
 
             // we should always have exactly one successful entry
             Hash sentTo = null;
@@ -86,7 +87,8 @@ class FloodfillStoreJob extends StoreJob {
                 sentTo = _state.getSuccessful().iterator().next();
             } catch (NoSuchElementException nsee) {}
             getContext().jobQueue().addJob(new FloodfillVerifyStoreJob(getContext(), _state.getTarget(),
-                                                                       published, isRouterInfo, sentTo, _facade));
+                                                                       published, isRouterInfo, isls2,
+                                                                       sentTo, _facade));
     }
     
     @Override
