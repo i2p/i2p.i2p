@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.crypto.SigType;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -517,6 +518,7 @@ class NetDbRenderer {
                         median = dist;
                 }
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(fmt.format(biLog2(dist)));
+                buf.append("&nbsp;&nbsp;<b>Type: </b>").append(ls.getType());
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
                 buf.append("<b>Signature type:</b> ").append(dest.getSigningPublicKey().getType());
@@ -527,14 +529,18 @@ class NetDbRenderer {
 
             }
             buf.append("<tr><td colspan=\"2\"><ul class=\"netdb_leases\">");
+            boolean isMeta = ls.getType() == DatabaseEntry.KEY_TYPE_META_LS2;
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 Lease lease = ls.getLease(i);
                 buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"netdb_gateway\" title=\"")
                    .append(_t("Gateway")).append("\"><img src=\"themes/console/images/info/gateway.png\" alt=\"")
                    .append(_t("Gateway")).append("\"></span> <span class=\"tunnel_peer\">");
                 buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
-                buf.append("</span> <span class=\"netdb_tunnel\">").append(_t("Tunnel")).append(" <span class=\"tunnel_id\">")
-                   .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
+                buf.append("</span> ");
+                if (!isMeta) {
+                    buf.append("<span class=\"netdb_tunnel\">").append(_t("Tunnel")).append(" <span class=\"tunnel_id\">")
+                       .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
+                }
                 if (debug) {
                     long exl = lease.getEndDate().getTime() - now;
                     if (exl > 0)
