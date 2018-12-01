@@ -112,6 +112,8 @@ public class I2CPMessageHandler {
             return new HostLookupMessage();
         case HostReplyMessage.MESSAGE_TYPE:
             return new HostReplyMessage();
+        case CreateLeaseSet2Message.MESSAGE_TYPE:
+            return new CreateLeaseSet2Message();
         default:
             throw new I2CPMessageException("The type " + type + " is an unknown I2CP message");
         }

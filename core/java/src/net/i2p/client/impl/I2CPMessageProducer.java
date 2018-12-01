@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.SendMessageOptions;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
@@ -28,6 +29,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2cp.AbuseReason;
 import net.i2p.data.i2cp.AbuseSeverity;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
+import net.i2p.data.i2cp.CreateLeaseSet2Message;
 import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.MessageId;
@@ -328,13 +330,20 @@ class I2CPMessageProducer {
     }
 
     /**
-     * Create a new signed leaseSet in response to a request to do so and send it
-     * to the router
-     * 
+     * In response to a RequestLeaseSet Message from the router, send a
+     * CreateLeaseset Message back to the router.
+     * This method is misnamed, it does not create the LeaseSet,
+     * the caller does that.
+     *
      */
     public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv,
                                PrivateKey priv) throws I2PSessionException {
-        CreateLeaseSetMessage msg = new CreateLeaseSetMessage();
+        CreateLeaseSetMessage msg;
+        int type = leaseSet.getType();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET)
+            msg = new CreateLeaseSetMessage();
+        else
+            msg = new CreateLeaseSet2Message();
         msg.setLeaseSet(leaseSet);
         msg.setPrivateKey(priv);
         msg.setSigningPrivateKey(signingPriv);

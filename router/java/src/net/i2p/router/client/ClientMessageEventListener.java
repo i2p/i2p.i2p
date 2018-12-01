@@ -20,6 +20,7 @@ import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
+import net.i2p.data.i2cp.CreateLeaseSet2Message;
 import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
@@ -126,6 +127,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 handleReceiveEnd((ReceiveMessageEndMessage)message);
                 break;
             case CreateLeaseSetMessage.MESSAGE_TYPE:
+            case CreateLeaseSet2Message.MESSAGE_TYPE:
                 handleCreateLeaseSet((CreateLeaseSetMessage)message);
                 break;
             case DestroySessionMessage.MESSAGE_TYPE:

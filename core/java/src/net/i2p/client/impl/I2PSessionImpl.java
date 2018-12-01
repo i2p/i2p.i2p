@@ -171,6 +171,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private final boolean _fastReceive;
     private volatile boolean _routerSupportsFastReceive;
     private volatile boolean _routerSupportsHostLookup;
+    private volatile boolean _routerSupportsLS2;
 
     protected static final int CACHE_MAX_SIZE = SystemVersion.isAndroid() ? 32 : 128;
     /**
@@ -197,19 +198,25 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private static final long MAX_SEND_WAIT = 10*1000;
 
     private static final String MIN_FAST_VERSION = "0.9.4";
+////// TESTING, change to 38 before release
+    private static final String MIN_LS2_VERSION = "0.9.37";
 
     /** @param routerVersion as rcvd in the SetDateMessage, may be null for very old routers */
     void dateUpdated(String routerVersion) {
-        _routerSupportsFastReceive = _context.isRouterContext() ||
+        boolean isrc = _context.isRouterContext();
+        _routerSupportsFastReceive = isrc ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_FAST_VERSION) >= 0);
-        _routerSupportsHostLookup = _context.isRouterContext() ||
+        _routerSupportsHostLookup = isrc ||
                                     TEST_LOOKUP ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_HOST_LOOKUP_VERSION) >= 0);
-        _routerSupportsSubsessions = _context.isRouterContext() ||
+        _routerSupportsSubsessions = isrc ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_SUBSESSION_VERSION) >= 0);
+        _routerSupportsLS2 = isrc ||
+                                     (routerVersion != null && routerVersion.length() > 0 &&
+                                      VersionComparator.comp(routerVersion, MIN_LS2_VERSION) >= 0);
         synchronized (_stateLock) {
             if (_state == State.OPENING) {
                 changeState(State.GOTDATE);
@@ -281,9 +288,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             _privateKey = null;
             _signingPrivateKey = null;
         }
-        _routerSupportsFastReceive = _context.isRouterContext();
-        _routerSupportsHostLookup = _context.isRouterContext();
-        _routerSupportsSubsessions = _context.isRouterContext();
+        boolean isrc = _context.isRouterContext();
+        _routerSupportsFastReceive = isrc;
+        _routerSupportsHostLookup = isrc;
+        _routerSupportsSubsessions = isrc;
+        _routerSupportsLS2 = isrc;
     }
 
     /**
@@ -507,6 +516,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     public boolean getFastReceive() {
         return _fastReceive && _routerSupportsFastReceive;
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    public boolean supportsLS2() {
+        return _routerSupportsLS2;
     }
 
     void setLeaseSet(LeaseSet ls) {

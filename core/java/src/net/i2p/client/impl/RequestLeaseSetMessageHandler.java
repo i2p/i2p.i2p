@@ -17,14 +17,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSessionException;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
+import net.i2p.data.Lease2;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -58,13 +63,38 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         _existingLeaseSets = new ConcurrentHashMap<Destination, LeaseInfo>(4);
     }
     
+    /**
+     *  Do we send a LeaseSet or a LeaseSet2?
+     *  @since 0.9.38
+     */
+    protected static boolean requiresLS2(I2PSessionImpl session) {
+        if (!session.supportsLS2())
+            return false;
+        String s = session.getOptions().getProperty("crypto.encType");
+        if (s != null) {
+            EncType type = EncType.parseEncType(s);
+            if (type != null && type != EncType.ELGAMAL_2048 && type.isAvailable())
+                return true;
+        }
+        s = session.getOptions().getProperty("i2cp.leaseSetType");
+        if (s != null) {
+            try {
+                int type = Integer.parseInt(s);
+                if (type != DatabaseEntry.KEY_TYPE_LEASESET)
+                    return true;
+            } catch (NumberFormatException nfe) {}
+        }
+        return false;
+    }
+
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
         RequestLeaseSetMessage msg = (RequestLeaseSetMessage) message;
-        LeaseSet leaseSet = new LeaseSet();
+        boolean isLS2 = requiresLS2(session);
+        LeaseSet leaseSet = isLS2 ? new LeaseSet2() : new LeaseSet();
         for (int i = 0; i < msg.getEndpoints(); i++) {
-            Lease lease = new Lease();
+            Lease lease = isLS2 ? new Lease2() : new Lease();
             lease.setGateway(msg.getRouter(i));
             lease.setTunnelId(msg.getTunnelId(i));
             lease.setEndDate(msg.getEndDate());
@@ -147,7 +177,26 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                     li = new LeaseInfo(privKey, dest);
                 }
             } else {
-                li = new LeaseInfo(dest);
+                EncType type = EncType.ELGAMAL_2048;
+                String senc = session.getOptions().getProperty("crypto.encType");
+                if (senc != null) {
+                    EncType newtype = EncType.parseEncType(senc);
+                    if (newtype != null) {
+                        if (newtype.isAvailable()) {
+                            type = newtype;
+                            if (_log.shouldDebug())
+                                _log.debug("Using crypto type: " + type);
+                        } else {
+                            _log.error("Unsupported crypto.encType: " + newtype);
+                        }
+                    } else {
+                        _log.error("Bad crypto.encType: " + senc);
+                    }
+                } else {
+                    if (_log.shouldDebug())
+                        _log.debug("Using default crypto type");
+                }
+                li = new LeaseInfo(dest, type);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Creating new leaseInfo keys for " + dest + " without configured private keys");
             }
@@ -187,14 +236,18 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             // Workaround for unparsable serialized signing private key for revocation
             // Send him a dummy DSA_SHA1 private key since it's unused anyway
             // See CreateLeaseSetMessage.doReadMessage()
+            // For LS1 only
             SigningPrivateKey spk = li.getSigningPrivateKey();
-            if (!_context.isRouterContext() && spk.getType() != SigType.DSA_SHA1) {
+            if (!_context.isRouterContext() && spk.getType() != SigType.DSA_SHA1 &&
+                !(leaseSet instanceof LeaseSet2)) {
                 byte[] dummy = new byte[SigningPrivateKey.KEYSIZE_BYTES];
                 _context.random().nextBytes(dummy);
                 spk = new SigningPrivateKey(dummy);
             }
             session.getProducer().createLeaseSet(session, leaseSet, spk, li.getPrivateKey());
             session.setLeaseSet(leaseSet);
+            if (_log.shouldDebug())
+                _log.debug("Created and signed LeaseSet: " + leaseSet);
         } catch (DataFormatException dfe) {
             session.propogateError("Error signing the leaseSet", dfe);
         } catch (I2PSessionException ise) {
@@ -220,8 +273,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         /**
          *  New keys
          */
-        public LeaseInfo(Destination dest) {
-            SimpleDataStructure encKeys[] = KeyGenerator.getInstance().generatePKIKeys();
+        public LeaseInfo(Destination dest, EncType type) {
+            KeyPair encKeys = KeyGenerator.getInstance().generatePKIKeys(type);
             // must be same type as the Destination's signing key
             SimpleDataStructure signKeys[];
             try {
@@ -229,8 +282,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             } catch (GeneralSecurityException gse) {
                 throw new IllegalStateException(gse);
             }
-            _pubKey = (PublicKey) encKeys[0];
-            _privKey = (PrivateKey) encKeys[1];
+            _pubKey = encKeys.getPublic();
+            _privKey = encKeys.getPrivate();
             _signingPubKey = (SigningPublicKey) signKeys[0];
             _signingPrivKey = (SigningPrivateKey) signKeys[1];
         }
