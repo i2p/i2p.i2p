@@ -234,6 +234,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                 _log.info("Flooding the entry for " + key + " to " + i + " more, just before midnight");
         }
         int flooded = 0;
+        boolean isls2 = ds.isLeaseSet() && ds.getType() != DatabaseEntry.KEY_TYPE_LEASESET;
         for (int i = 0; i < peers.size(); i++) {
             Hash peer = peers.get(i);
             RouterInfo target = lookupRouterInfoLocally(peer);
@@ -245,6 +246,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && peer.equals(key))
                 continue;
             if (peer.equals(_context.routerHash()))
+                continue;
+            // min version checks
+            if (isls2 && !StoreJob.shouldStoreLS2To(target))
+                continue;
+            if (!StoreJob.shouldStoreTo(target))
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
             msg.setEntry(ds);
