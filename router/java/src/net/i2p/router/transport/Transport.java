@@ -196,4 +196,11 @@ public interface Transport {
      * @since 0.9.24
      */
     public void mayDisconnect(Hash peer);
+
+    /**
+     * Tell the transport to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    public void forceDisconnect(Hash peer);
 }

@@ -641,6 +641,18 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     * Tell the transport to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    public void forceDisconnect(Hash peer) {
+        NTCPConnection con = _conByIdent.remove(peer);
+        if (con != null) {
+            con.close();
+        }
+    }
+
+    /**
      * @return usually the con passed in, but possibly a second connection with the same peer...
      *         only con or null as of 0.9.37
      */

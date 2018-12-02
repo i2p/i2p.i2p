@@ -102,6 +102,13 @@ public abstract class CommSystemFacade implements Service {
      * @since 0.9.24
      */
     public void mayDisconnect(Hash peer) {}
+    
+    /**
+     * Tell the comm system to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    public void forceDisconnect(Hash peer) {}
 
     /** @since 0.8.11 */
     public String getOurCountry() { return null; }
