@@ -1,3 +1,14 @@
+2018-12-01 zzz
+ * I2CP: Add preliminary support for LS2 (proposal #123)
+ * Router: More support for LS2 types (proposal #123)
+
+2018-11-30 zzz
+ * Crypto: Move X25519 primitives from router to core (proposal #144)
+ * Data: Update LS2 sign/verify to match spec changes (proposal #123)
+
+2018-11-25 zzz
+ * Utils: Catch ProviderException in SelfSignedGenerator (ticket #2344)
+
 2018-11-20 zzz
  * GeoIP: Add support for Maxmind GeoLite2 format (ticket #2268)
 

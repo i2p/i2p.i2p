@@ -148,10 +148,12 @@ public class DataHelper {
      */
     public static Properties readProperties(InputStream rawStream, Properties props) 
         throws DataFormatException, IOException {
-        long size = readLong(rawStream, 2);
-        byte data[] = new byte[(int) size];
-        int read = read(rawStream, data);
-        if (read != size) throw new DataFormatException("Not enough data to read the properties, expected " + size + " but got " + read);
+        int size = (int) readLong(rawStream, 2);
+        if (size == 0)
+            return props;
+        byte data[] = new byte[size];
+        // full read guaranteed
+        read(rawStream, data);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         while (in.available() > 0) {
             String key = readString(in);
@@ -213,7 +215,7 @@ public class DataHelper {
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
             throws DataFormatException, IOException {
-        writeProperties(rawStream, props, utf8, props != null && !(props instanceof OrderedProperties));
+        writeProperties(rawStream, props, utf8, props != null && props.size() > 1 && !(props instanceof OrderedProperties));
     }
 
     /**
@@ -242,7 +244,7 @@ public class DataHelper {
             throws DataFormatException, IOException {
         if (props != null && !props.isEmpty()) {
             Properties p;
-            if (sort) {
+            if (sort && props.size() > 1) {
                 p = new OrderedProperties();
                 p.putAll(props);
             } else {
@@ -866,9 +868,8 @@ public class DataHelper {
             return "";   // reduce object proliferation
         size &= 0xff;
         byte raw[] = new byte[size];
-        int read = read(in, raw);
-        // was DataFormatException
-        if (read != size) throw new EOFException("EOF reading string");
+        // full read guaranteed
+        read(in, raw);
         // the following constructor throws an UnsupportedEncodingException which is an IOException,
         // but that's only if UTF-8 is not supported. Other encoding errors are not thrown.
         return new String(raw, "UTF-8");
