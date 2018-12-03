@@ -64,6 +64,12 @@ public interface I2PClient {
      */
     public final static String PROP_FAST_RECEIVE = "i2cp.fastReceive";
 
+    /**
+     *  7654
+     *  @since 0.9.38
+     */
+    public static final int DEFAULT_LISTEN_PORT = 7654;
+
     /** protocol flag that must be sent when opening the i2cp connection to the router */
     public final static int PROTOCOL_BYTE = 0x2A;
 

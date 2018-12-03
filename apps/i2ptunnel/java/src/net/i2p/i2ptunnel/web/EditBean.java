@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.I2PException;
-import net.i2p.client.I2PSession;
+import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -447,7 +447,7 @@ public class EditBean extends IndexBean {
         if (tun != null)
             return tun.getI2CPPort();
         else
-            return Integer.toString(I2PSession.DEFAULT_LISTEN_PORT);
+            return Integer.toString(I2PClient.DEFAULT_LISTEN_PORT);
     }
 
     public String getCustomOptions(int tunnel) {
