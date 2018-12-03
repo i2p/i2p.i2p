@@ -37,6 +37,7 @@ import java.util.jar.Manifest;
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
@@ -242,7 +243,7 @@ public class BOB implements Runnable, ClientApp {
 			save = true;
 		}
 		if (!props.containsKey(I2PClient.PROP_TCP_PORT)) {
-			props.setProperty(I2PClient.PROP_TCP_PORT, "7654");
+			props.setProperty(I2PClient.PROP_TCP_PORT, Integer.toString(I2PSession.DEFAULT_LISTEN_PORT));
 			save = true;
 		}
 		if (!props.containsKey(PROP_BOB_PORT)) {

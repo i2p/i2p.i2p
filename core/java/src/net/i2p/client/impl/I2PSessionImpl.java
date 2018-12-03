@@ -224,7 +224,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
     }
 
-    public static final int LISTEN_PORT = 7654;
+    public static final int LISTEN_PORT = DEFAULT_LISTEN_PORT;
 
     private static final int BUF_SIZE = 32*1024;
 

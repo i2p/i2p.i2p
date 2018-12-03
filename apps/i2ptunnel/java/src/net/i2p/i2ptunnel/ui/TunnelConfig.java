@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -836,7 +837,7 @@ public class TunnelConfig {
             if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
                 config.setProperty(TunnelController.PROP_I2CP_PORT, _i2cpPort);
             } else {
-                config.setProperty(TunnelController.PROP_I2CP_PORT, "7654");
+                config.setProperty(TunnelController.PROP_I2CP_PORT, Integer.toString(I2PSession.DEFAULT_LISTEN_PORT));
             }
         }
         if (_privKeyFile != null)

@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
@@ -96,12 +97,14 @@ public class MUXlisten implements Runnable {
 			}
 
 			String i2cpHost = Q.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
-			int i2cpPort = 7654;
-			String i2cpPortStr = Q.getProperty(I2PClient.PROP_TCP_PORT, "7654");
-			try {
-				i2cpPort = Integer.parseInt(i2cpPortStr);
-			} catch (NumberFormatException nfe) {
-				throw new IllegalArgumentException("Invalid I2CP port specified [" + i2cpPortStr + "]");
+			int i2cpPort = I2PSession.DEFAULT_LISTEN_PORT;
+			String i2cpPortStr = Q.getProperty(I2PClient.PROP_TCP_PORT);
+			if (i2cpPortStr != null) {
+				try {
+					i2cpPort = Integer.parseInt(i2cpPortStr);
+				} catch (NumberFormatException nfe) {
+					throw new IllegalArgumentException("Invalid I2CP port specified [" + i2cpPortStr + "]");
+				}
 			}
 
 			if (this.come_in) {

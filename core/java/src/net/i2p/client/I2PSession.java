@@ -444,4 +444,10 @@ public interface I2PSession {
      *  @since 0.9.2
      */
     public static final int PROTO_DATAGRAM_RAW = 18;
+
+    /**
+     *  7654
+     *  @since 0.9.38
+     */
+    public static final int DEFAULT_LISTEN_PORT = 7654;
 }
