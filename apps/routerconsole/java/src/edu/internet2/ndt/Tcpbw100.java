@@ -563,38 +563,38 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	}
 
 	/**
-	 * Get Client->Server fire-wall test results.
+	 * Get Client-&gt;Server fire-wall test results.
 	 *
-	 * @return integer indicating C->S test results
+	 * @return integer indicating C-&gt;S test results
 	 * */
 	public int getC2sSFWTestResults() {
 		return this._iC2sSFWResult;
 	}
 
 	/**
-	 * Set Client->Server fire-wall test results.
+	 * Set Client-&gt;Server fire-wall test results.
 	 *
 	 * @param iParamC2SRes
-	 *    	    integer indicating C->S test results
+	 *    	    integer indicating C-&gt;S test results
 	 * */
 	public void setC2sSFWTestResults(int iParamC2SRes) {
 		this._iC2sSFWResult = iParamC2SRes;
 	}
 
 	/**
-	 * Get Server->Client fire-wall test results.
+	 * Get Server-&gt;Client fire-wall test results.
 	 *
-	 * @return integer indicating C->S test results
+	 * @return integer indicating C-&gt;S test results
 	 * */
 	public int getS2cSFWTestResults() {
 		return this._iS2cSFWResult;
 	}
 
 	/**
-	 * Set server->Client fire-wall test results.
+	 * Set server-&gt;Client fire-wall test results.
 	 *
 	 * @param iParamS2CRes
-	 *            integer indicating C->S test results
+	 *            integer indicating C-&gt;S test results
 	 * */
 	public void setS2cSFWTestResults(int iParamS2CRes) {
 		this._iS2cSFWResult = iParamS2CRes;
@@ -4548,7 +4548,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					try {
 						t.interrupt();
 					} catch (RuntimeException re) {
-						_log.warn("TG", re);
+						_log.debug("TG", re);
 					}
 					try {
 						Thread.sleep(20);
@@ -4559,7 +4559,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						try {
 							t.stop();
 						} catch (RuntimeException re) {
-							_log.warn("TG", re);
+							_log.debug("TG", re);
 						}
 					}
 				}
@@ -4571,7 +4571,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					thread_group.destroy();
 					break;
 				}catch( Throwable e ){
-					_log.warn("TG", e);
+					_log.debug("TG", e);
 				}
 			}
 			

@@ -7,7 +7,7 @@ import java.net.Socket;
 /**
  * OsfwWorker creates a thread that listens for a message from the server. It
  * functions to check if the server has sent a message that is valid and
- * sufficient to determine if the server->client direction has a fire-wall.
+ * sufficient to determine if the server-&gt;client direction has a fire-wall.
  * 
  * <p>
  * As part of the simple firewall test, the Server must try to connect to the
@@ -49,7 +49,7 @@ public class OsfwWorker implements Runnable {
 	 * @param iParamTestTime
 	 *            Test time duration to wait for message from server
 	 * @param _localParam
-	 *            Applet object used to set the result of the S->C firewall test
+	 *            Applet object used to set the result of the S-&gt;C firewall test
 	 */
 	OsfwWorker(ServerSocket srvSocketParam, int iParamTestTime,
 			Tcpbw100 _localParam) {
@@ -76,7 +76,7 @@ public class OsfwWorker implements Runnable {
 	/**
 	 * run() method of this SFW Worker thread. This thread listens on the socket
 	 * from the server for a given time period, and checks to see if the server
-	 * has sent a message that is valid and sufficient to determine if the S->C
+	 * has sent a message that is valid and sufficient to determine if the S-&gt;C
 	 * direction has a fire-wall.
 	 * */
 	public void run() {

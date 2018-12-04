@@ -18,7 +18,7 @@ import org.json.simple.JSONObject;
 /**
  * Parser for JSON text. Please note that JSONParser is NOT thread-safe.
  * 
- * @author FangYidong<fangyidong@yahoo.com.cn>
+ * @author FangYidong fangyidong@yahoo.com.cn
  */
 public class JSONParser {
 	public static final int S_INIT=0;
@@ -56,8 +56,6 @@ public class JSONParser {
      * Reset the parser to the initial state with a new character reader.
      * 
      * @param in - The new character reader.
-     * @throws IOException
-     * @throws ParseException
      */
 	public void reset(Reader in){
 		lexer.yyreset(in);

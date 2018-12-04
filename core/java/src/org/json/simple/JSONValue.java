@@ -16,7 +16,7 @@ import org.json.simple.parser.ParseException;
 
 
 /**
- * @author FangYidong<fangyidong@yahoo.com.cn>
+ * @author FangYidong fangyidong@yahoo.com.cn
  */
 public class JSONValue {
 	/**
