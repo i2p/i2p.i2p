@@ -1,3 +1,16 @@
+2018-12-04 zzz
+ * Data: Add preliminary PrivateKeyFile support for LS2 offline keys (proposal #123)
+ * I2CP: Add preliminary support for LS2 offline keys (proposal #123)
+
+2018-12-03 zzz
+ * I2CP: Consolidate all the port 7654 definitions
+ * NetDb: Don't send our RI in response to DSM when shutting down
+ * Wizard: Update text
+
+2018-12-02 zzz
+ * Router: Allow LS2 DSM down a tunnel
+ * Transport: Add methods to force-disconnect a peer
+
 2018-12-01 zzz
  * I2CP: Add preliminary support for LS2 (proposal #123)
  * Router: More support for LS2 types (proposal #123)

@@ -36,13 +36,17 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionListener;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
+import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
@@ -91,6 +95,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private SessionId _sessionId;
     /** currently granted lease set, or null */
     protected volatile LeaseSet _leaseSet;
+    private long _offlineExpiration;
+    private Signature _offlineSignature;
+    protected SigningPublicKey _transientSigningPublicKey; 
 
     // subsession stuff
     // registered subsessions
@@ -300,6 +307,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * from the destKeyStream, and using the specified options to connect to the router
      *
      * As of 0.9.19, defaults in options are honored.
+     *
+     * This does NOT validate consistency of the destKeyStream,
+     * e.g. pubkey/privkey match or valid offline sig. The router does that.
      *
      * @param destKeyStream stream containing the private key data,
      *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
@@ -548,7 +558,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
 
     /**
-     * Load up the destKeyFile for our Destination, PrivateKey, and SigningPrivateKey
+     * Load up the destKeyFile for our Destination, PrivateKey, and SigningPrivateKey.
+     * As of 0.9.38, loads the offline data also. See PrivateKeyFile.
+     *
+     * This does NOT validate consistency of the destKeyStream,
+     * e.g. pubkey/privkey match or valid offline sig. The router does that.
      *
      * @throws DataFormatException if the file is in the wrong format or keys are invalid
      * @throws IOException if there is a problem reading the file
@@ -556,8 +570,68 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private void readDestination(InputStream destKeyStream) throws DataFormatException, IOException {
         _myDestination.readBytes(destKeyStream);
         _privateKey.readBytes(destKeyStream);
-        _signingPrivateKey = new SigningPrivateKey(_myDestination.getSigningPublicKey().getType());
+        SigType dtype = _myDestination.getSigningPublicKey().getType();
+        _signingPrivateKey = new SigningPrivateKey(dtype);
         _signingPrivateKey.readBytes(destKeyStream);
+        if (isOffline(_signingPrivateKey)) {
+            _offlineExpiration = DataHelper.readLong(destKeyStream, 4) * 1000;;
+            int itype = (int) DataHelper.readLong(destKeyStream, 2);
+            SigType type = SigType.getByCode(itype);
+            if (type == null)
+                throw new DataFormatException("Unsupported transient sig type: " + itype);
+            _transientSigningPublicKey = new SigningPublicKey(type);
+            _transientSigningPublicKey.readBytes(destKeyStream);
+            _offlineSignature = new Signature(dtype);
+            _offlineSignature.readBytes(destKeyStream);
+            // replace SPK
+            _signingPrivateKey = new SigningPrivateKey(type);
+            _signingPrivateKey.readBytes(destKeyStream);
+        }
+    }
+
+    /**
+     *  Constant time
+     *  @since 0.9.38
+     */
+    private static boolean isOffline(SigningPrivateKey spk) {
+        byte b = 0;
+        byte[] data = spk.getData();
+        for (int i = 0; i < data.length; i++) {
+            b |= data[i];
+        }
+        return b == 0;
+    }
+
+    /**
+     *  Does this session have offline and transient keys?
+     *  @since 0.9.38
+     */
+    public boolean isOffline() {
+        return _offlineSignature != null;
+    }
+
+    /**
+     *  @return Java time (ms) or 0 if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public long getOfflineExpiration() {
+        return _offlineExpiration;
+    }
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public Signature getOfflineSignature() {
+        return _offlineSignature;
+    }
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public SigningPublicKey getTransientSigningPublicKey() {
+        return _transientSigningPublicKey;
     }
 
     /**
@@ -1044,7 +1118,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     public PrivateKey getDecryptionKey() { return _privateKey; }
 
     /**
-     * Retrieve the signing SigningPrivateKey
+     * Retrieve the signing SigningPrivateKey.
+     * As of 0.9.38, this will be the transient key if offline signed.
      */
     public SigningPrivateKey getPrivateKey() { return _signingPrivateKey; }
 
