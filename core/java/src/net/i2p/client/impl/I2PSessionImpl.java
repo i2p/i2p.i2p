@@ -148,6 +148,10 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /** monitor for waiting until a lease set has been granted */
     protected final Object _leaseSetWait = new Object();
 
+    /** set in propogateError(), sync with _stateLock */
+    private String _errorMessage;
+    private Throwable _errorCause;
+
     /**
      *  @since 0.9.8
      */
@@ -694,6 +698,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         try {
             // protect w/ closeSocket()
             synchronized(_stateLock) {
+                _errorMessage = null;
+                _errorCause = null;
                 // If we are in the router JVM, connect using the internal queue
                 if (_context.isRouterContext()) {
                     // _socket and _writer remain null
@@ -780,8 +786,17 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                     _leaseSetWait.wait(1000);
                 }
                 // if we got a disconnect message while waiting
-                if (isClosed())
-                    throw new IOException("Disconnected from router while waiting for tunnels");
+                synchronized (_stateLock) {
+                    if (isClosed()) {
+                        String msg = "Disconnected from router while waiting for tunnels";
+                        if (_errorMessage != null)
+                            msg += ": " + _errorMessage;
+                        IOException ioe =  new IOException(msg);
+                        if (_errorCause != null)
+                            ioe.initCause(_errorCause);
+                        throw ioe;
+                    }
+                }
             }
             if (_log.shouldLog(Log.INFO)) {
                 long connected = _context.clock().now();
@@ -1258,6 +1273,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         if (_log.shouldLog(level)) 
             _log.log(level, getPrefix() + msgpfx + msg, error);
         if (_sessionListener != null) _sessionListener.errorOccurred(this, msg, error);
+        // Save for throwing out of connect()
+        _errorMessage = msg;
+        _errorCause = error;
     }
 
     /**

@@ -49,6 +49,15 @@ import net.i2p.util.Log;
 class RequestLeaseSetMessageHandler extends HandlerImpl {
     private final Map<Destination, LeaseInfo> _existingLeaseSets;
 
+    // LS 1
+    private static final String PROP_LS_ENCRYPT = "i2cp.encryptLeaseSet";
+    private static final String PROP_LS_KEY = "i2cp.leaseSetKey";
+    private static final String PROP_LS_PK = "i2cp.leaseSetPrivateKey";
+    private static final String PROP_LS_SPK = "i2cp.leaseSetSigningPrivateKey";
+    // LS 2
+    private static final String PROP_LS_TYPE = "i2cp.leaseSetType";
+    private static final String PROP_LS_ENCTYPE = "i2cp.leaseSetEncType";
+
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
         this(context, RequestLeaseSetMessage.MESSAGE_TYPE);
     }
@@ -70,13 +79,15 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     protected static boolean requiresLS2(I2PSessionImpl session) {
         if (!session.supportsLS2())
             return false;
-        String s = session.getOptions().getProperty("crypto.encType");
+        if (session.isOffline())
+            return true;
+        String s = session.getOptions().getProperty(PROP_LS_ENCTYPE);
         if (s != null) {
             EncType type = EncType.parseEncType(s);
             if (type != null && type != EncType.ELGAMAL_2048 && type.isAvailable())
                 return true;
         }
-        s = session.getOptions().getProperty("i2cp.leaseSetType");
+        s = session.getOptions().getProperty(PROP_LS_TYPE);
         if (s != null) {
             try {
                 int type = Integer.parseInt(s);
@@ -117,9 +128,9 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         LeaseInfo li = _existingLeaseSets.get(dest);
         if (li == null) {
             // [enctype:]b64 of private key
-            String spk = session.getOptions().getProperty("i2cp.leaseSetPrivateKey");
+            String spk = session.getOptions().getProperty(PROP_LS_PK);
             // [sigtype:]b64 of private key
-            String sspk = session.getOptions().getProperty("i2cp.leaseSetSigningPrivateKey");
+            String sspk = session.getOptions().getProperty(PROP_LS_SPK);
             PrivateKey privKey = null;
             SigningPrivateKey signingPrivKey = null;
             if (spk != null && sspk != null) {
@@ -178,7 +189,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                 }
             } else {
                 EncType type = EncType.ELGAMAL_2048;
-                String senc = session.getOptions().getProperty("crypto.encType");
+                String senc = session.getOptions().getProperty(PROP_LS_ENCTYPE);
                 if (senc != null) {
                     EncType newtype = EncType.parseEncType(senc);
                     if (newtype != null) {
@@ -215,8 +226,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             opts = ((SubSession) session).getPrimaryOptions();
         else
             opts = session.getOptions();
-        boolean encrypt = Boolean.parseBoolean(opts.getProperty("i2cp.encryptLeaseSet"));
-        String sk = opts.getProperty("i2cp.leaseSetKey");
+        boolean encrypt = Boolean.parseBoolean(opts.getProperty(PROP_LS_ENCRYPT));
+        String sk = opts.getProperty(PROP_LS_KEY);
         Hash h = dest.calculateHash();
         if (encrypt && sk != null) {
             SessionKey key = new SessionKey();
@@ -230,6 +241,16 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             }
         } else {
             _context.keyRing().remove(h);
+        }
+        // offline keys
+        if (session.isOffline()) {
+            LeaseSet2 ls2 = (LeaseSet2) leaseSet;
+            boolean ok = ls2.setOfflineSignature(session.getOfflineExpiration(), session.getTransientSigningPublicKey(),
+                                                 session.getOfflineSignature());
+            if (!ok) {
+                session.propogateError("Bad offline signature", new Exception());
+                // TODO just let the router handle it for now
+            }
         }
         try {
             leaseSet.sign(session.getPrivateKey());
