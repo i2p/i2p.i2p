@@ -95,17 +95,18 @@ class I2CPMessageProducer {
         CreateSessionMessage msg = new CreateSessionMessage();
         SessionConfig cfg = new SessionConfig(session.getMyDestination());
         cfg.setOptions(session.getOptions());
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config created");
+        if (session.isOffline()) {
+            cfg.setOfflineSignature(session.getOfflineExpiration(),
+                                    session.getTransientSigningPublicKey(),
+                                    session.getOfflineSignature());
+        }
         try {
             cfg.signSessionConfig(session.getPrivateKey());
         } catch (DataFormatException dfe) {
             throw new I2PSessionException("Unable to sign the session config", dfe);
         }
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config signed");
         msg.setSessionConfig(cfg);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config loaded into message");
         session.sendMessage_unchecked(msg);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config message sent");
     }
 
     /**

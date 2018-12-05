@@ -19,12 +19,14 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -39,6 +41,24 @@ public class SessionConfig extends DataStructureImpl {
     private Signature _signature;
     private Date _creationDate;
     private Properties _options;
+
+    /**
+     *  Seconds since epoch, NOT ms
+     *  @since 0.9.38
+     */
+    public static final String PROP_OFFLINE_EXPIRATION = "i2cp.leaseSetOfflineExpiration";
+
+    /**
+     *  Base 64, optionally preceded by sig type and ':', default DSA-SHA1
+     *  @since 0.9.38
+     */
+    public static final String PROP_TRANSIENT_KEY = "i2cp.leaseSetTransientPublicKey";
+
+    /**
+     *  Base 64, optionally preceded by sig type and ':', default DSA-SHA1
+     *  @since 0.9.38
+     */
+    public static final String PROP_OFFLINE_SIGNATURE = "i2cp.leaseSetOfflineSignature";
 
     /** 
      * If the client authorized this session more than the specified period ago, 
@@ -98,6 +118,8 @@ public class SessionConfig extends DataStructureImpl {
      * Defaults are not serialized out-of-JVM, and the router does not recognize defaults in-JVM.
      * Client side must promote defaults to the primary map.
      *
+     * Does NOT make a copy.
+     *
      * @param options Properties for this session
      */
     public void setOptions(Properties options) {
@@ -113,9 +135,95 @@ public class SessionConfig extends DataStructureImpl {
     }
 
     /**
+     *  Set the offline signing data.
+     *  Does NOT validate the signature.
+     *  Must be called AFTER setOptions(). Will throw ISE otherwise.
+     *  Side effect - modifies options.
+     *
+     *  @throws IllegalStateException
+     *  @since 0.9.38
+     */
+    public void setOfflineSignature(long expires, SigningPublicKey transientSPK, Signature offlineSig) {
+        if (_options == null)
+            throw new IllegalStateException();
+        _options.setProperty(PROP_OFFLINE_EXPIRATION, Long.toString(expires / 1000));
+        _options.setProperty(PROP_TRANSIENT_KEY,
+                             transientSPK.getType().getCode() + ":" + transientSPK.toBase64());
+        _options.setProperty(PROP_OFFLINE_SIGNATURE, offlineSig.toBase64());
+    }
+
+    /**
+     *  Get the offline expiration
+     *  @return Java time (ms) or 0 if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public long getOfflineExpiration() {
+        if (_options == null)
+            return 0;
+        String s = _options.getProperty(PROP_OFFLINE_EXPIRATION);
+        if (s == null)
+            return 0;
+        try {
+            return Long.parseLong(s) * 1000;
+        } catch (NumberFormatException nfe) {
+            return 0;
+        }
+    }
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public SigningPublicKey getTransientSigningPublicKey() {
+        if (_options == null || _destination == null)
+            return null;
+        String s = _options.getProperty(PROP_TRANSIENT_KEY);
+        if (s == null)
+            return null;
+        int colon = s.indexOf(':');
+        SigType type;
+        if (colon > 0) {
+            String stype = s.substring(0, colon);
+            type = SigType.parseSigType(stype);
+            if (type == null)
+                return null;
+            s = s.substring(colon + 1);
+        } else {
+            type = SigType.DSA_SHA1;
+        }
+        SigningPublicKey rv = new SigningPublicKey(type);
+        try {
+            rv.fromBase64(s);
+            return rv;
+        } catch (DataFormatException dfe) {
+            return null;
+        }
+    }
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public Signature getOfflineSignature() {
+        if (_options == null || _destination == null)
+            return null;
+        String s = _options.getProperty(PROP_OFFLINE_SIGNATURE);
+        if (s == null)
+            return null;
+        Signature rv = new Signature(_destination.getSigningPublicKey().getType());
+        try {
+            rv.fromBase64(s);
+            return rv;
+        } catch (DataFormatException dfe) {
+            return null;
+        }
+    }
+
+    /**
      * Sign the structure using the supplied private key 
      *
-     * @param signingKey SigningPrivateKey to sign with
+     * @param signingKey SigningPrivateKey to sign with.
+     *                   If offline data is set, must be with the transient key.
      * @throws DataFormatException
      */
     public void signSessionConfig(SigningPrivateKey signingKey) throws DataFormatException {
@@ -133,6 +241,8 @@ public class SessionConfig extends DataStructureImpl {
      *
      * Note that this also returns false if the creation date is too far in the
      * past or future. See tooOld() and getCreationDate().
+     *
+     * As of 0.9.38, validates the offline signature if included.
      *
      * @return true only if the signature matches
      */
@@ -159,8 +269,35 @@ public class SessionConfig extends DataStructureImpl {
             return false;
         }
 
-        boolean ok = DSAEngine.getInstance().verifySignature(getSignature(), data,
-                                                             getDestination().getSigningPublicKey());
+        SigningPublicKey spk = getTransientSigningPublicKey();
+        if (spk != null) {
+            // validate offline sig
+            long expires = getOfflineExpiration();
+            if (expires < _creationDate.getTime())
+                return false;
+            Signature sig = getOfflineSignature();
+            if (sig == null)
+                return false;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(128);
+            try {
+                DataHelper.writeLong(baos, 4, expires / 1000);
+                DataHelper.writeLong(baos, 2, spk.getType().getCode());
+                spk.writeBytes(baos);
+            } catch (IOException ioe) {
+                return false;
+            } catch (DataFormatException dfe) {
+                return false;
+            }
+            byte[] odata = baos.toByteArray();
+            boolean ok = DSAEngine.getInstance().verifySignature(sig, odata, 0, odata.length,
+                                                                 _destination.getSigningPublicKey());
+            if (!ok)
+                return false;
+        } else {
+            spk = getDestination().getSigningPublicKey();
+        }
+
+        boolean ok = DSAEngine.getInstance().verifySignature(getSignature(), data, spk);
         if (!ok) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(SessionConfig.class);
             if (log.shouldLog(Log.WARN)) log.warn("DSA signature failed!");
