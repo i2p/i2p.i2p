@@ -2312,7 +2312,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
                 replaceCurrentExternalAddress(local, isIPv6);
             }
-            if (hasCurrentAddress()) {
+            if (getCurrentAddress(false) != null) {
                 // We must remove current address, otherwise the user will see
                 // "firewalled with inbound NTCP enabled" warning in console.
                 // Remove the IPv4 address only
