@@ -136,6 +136,12 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 45*60*1000l;
     
+    /**
+     * Don't let leaseSets go too far into the future 
+     */
+    private static final long MAX_LEASE_FUTURE = 15*60*1000;
+    private static final long MAX_META_LEASE_FUTURE = 65535*1000;
+    
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
 
     /** this needs to be long enough to give us time to start up,
@@ -772,11 +778,6 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
 ***/
     
     /**
-     * Don't let leaseSets go 20 minutes into the future 
-     */
-    static final long MAX_LEASE_FUTURE = 20*60*1000;
-    
-    /**
      * Determine whether this leaseSet will be accepted as valid and current
      * given what we know now.
      *
@@ -818,7 +819,9 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             return "Expired leaseSet for " + leaseSet.getDestination().toBase32()
                    + " expired " + DataHelper.formatDuration(age) + " ago";
         }
-        if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE)) {
+        if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE) &&
+            (leaseSet.getType() != DatabaseEntry.KEY_TYPE_META_LS2 ||
+             latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_META_LEASE_FUTURE))) {
             long age = latest - now;
             // let's not make this an error, it happens when peers have bad clocks
             if (_log.shouldLog(Log.WARN))
