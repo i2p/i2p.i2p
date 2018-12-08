@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -24,11 +24,11 @@
                                             <rect key="frame" x="6" y="16" width="279" height="231"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="zBB-wE-VXr">
-                                                <rect key="frame" x="2" y="2" width="275" height="214"/>
+                                                <rect key="frame" x="3" y="3" width="273" height="213"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField identifier="RouterStatusLabel" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Eo-re-5WK" userLabel="RouterStatusLabel">
-                                                        <rect key="frame" x="6" y="190" width="245" height="17"/>
+                                                        <rect key="frame" x="6" y="189" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Router status: Unknown" id="m7V-Se-tnf">
                                                             <font key="font" metaFont="system"/>
@@ -37,7 +37,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField identifier="RouterVersionLabel" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sGy-NV-gmH" userLabel="RouterVersionLabel">
-                                                        <rect key="frame" x="6" y="171" width="245" height="17"/>
+                                                        <rect key="frame" x="6" y="170" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Router version: Unknown" id="Mda-Os-8O9">
                                                             <font key="font" metaFont="system"/>
@@ -46,7 +46,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField identifier="RouterStartedByLabel" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tgG-IT-Ojg" userLabel="RouterStartedByLabel">
-                                                        <rect key="frame" x="6" y="152" width="245" height="17"/>
+                                                        <rect key="frame" x="6" y="151" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Router started by launcher? No" id="WBg-nH-kwu">
                                                             <font key="font" metaFont="system"/>
@@ -55,7 +55,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField identifier="RouterUptimeLabel" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f2W-Kc-cxB" userLabel="RouterUptimeLabel">
-                                                        <rect key="frame" x="6" y="133" width="245" height="17"/>
+                                                        <rect key="frame" x="6" y="132" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Router uptime: Unknown" id="uQ0-cW-tYL">
                                                             <font key="font" metaFont="system"/>
@@ -64,7 +64,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField identifier="RouterPIDLabel" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bmP-Ui-gyo" userLabel="RouterPIDLabel">
-                                                        <rect key="frame" x="6" y="114" width="245" height="17"/>
+                                                        <rect key="frame" x="6" y="113" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Router PID: Unknown" id="uFb-he-Wf3">
                                                             <font key="font" metaFont="system"/>
@@ -79,11 +79,11 @@
                                             <rect key="frame" x="287" y="16" width="150" height="231"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" identifier="QuickControlView" id="D8V-d8-0wT">
-                                                <rect key="frame" x="2" y="2" width="146" height="214"/>
+                                                <rect key="frame" x="3" y="3" width="144" height="213"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button identifier="startstopRouterButton" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1eu-Qw-TD9" userLabel="start-stop-button">
-                                                        <rect key="frame" x="1" y="176" width="147" height="32"/>
+                                                        <rect key="frame" x="1" y="175" width="147" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Start/Stop Router" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OYN-sS-eQH">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -91,12 +91,23 @@
                                                         </buttonCell>
                                                     </button>
                                                     <button identifier="openConsoleButton" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XZi-oz-5gy" userLabel="open-console-button">
-                                                        <rect key="frame" x="10" y="150" width="126" height="32"/>
+                                                        <rect key="frame" x="10" y="149" width="126" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Open Console" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yh8-lj-JFi">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="93P-Qg-IND">
+                                                        <rect key="frame" x="10" y="122" width="126" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Preferences" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vab-yq-aBK">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="onPreferencesClick:" target="Ii7-Rb-Ls8" id="xzS-61-nx7"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -138,11 +149,11 @@
                                                     </textView>
                                                 </subviews>
                                             </clipView>
-                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="MRF-Wt-zdZ">
+                                            <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="MRF-Wt-zdZ">
                                                 <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Xq6-ur-WuT">
+                                            <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Xq6-ur-WuT">
                                                 <rect key="frame" x="392" y="1" width="16" height="226"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
