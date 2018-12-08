@@ -635,7 +635,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         public void timeReached() {
-             boolean good = Addresses.isConnected();
+             boolean good = Addresses.isConnected() || Addresses.isConnectedIPv6();
              if (_netMonitorStatus != good) {
                  if (good)
                      _log.logAlways(Log.INFO, "Network reconnected");
