@@ -6,3 +6,4 @@
 #import "AppDelegate.h"
 #import "RouterTask.h"
 #import "logger_c.h"
+#import <Webkit/Webkit.h>
