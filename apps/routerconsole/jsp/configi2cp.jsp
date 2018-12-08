@@ -43,9 +43,17 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%=intl._t("Enabled without SSL")%></label><br>
 <label><input type="radio" class="optbox" name="mode" value="2" <%=clientshelper.i2cpModeChecked(2) %> >
 <%=intl._t("Enabled with SSL required")%></label><br>
-<label><input type="radio" class="optbox" name="mode" value="0" <%=clientshelper.i2cpModeChecked(0) %> >
+<%
+    // returns nonempty string if disabled
+    String disableChecked = clientshelper.i2cpModeChecked(0);
+    boolean isDisabled = disableChecked.length() > 0;
+%>
+<label><input type="radio" class="optbox" name="mode" value="0" <%=disableChecked%> >
 <%=intl._t("Disabled - Clients outside this Java process may not connect")%></label><br>
 </td></tr>
+<%
+    if (!isDisabled) {
+%>
 <tr><td>
 <b><%=intl._t("I2CP Interface")%>:</b>
 <select name="interface">
@@ -77,6 +85,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <b><%=intl._t("Password")%>:</b>
 <input name="nofilter_pw" type="password" value="" />
 </td></tr>
+<%
+    } // !isDisabled
+%>
 <tr><td class="optionsave" align="right">
 <input type="submit" class="default" name="action" value="<%=intl._t("Save Interface Configuration")%>" />
 <input type="submit" class="cancel" name="foo" value="<%=intl._t("Cancel")%>" />
