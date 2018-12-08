@@ -19,7 +19,7 @@
 		BF1D6D9921BB7DC10014EB07 /* FirefoxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9821BB7DC10014EB07 /* FirefoxManager.swift */; };
 		BF1D6D9B21BB86520014EB07 /* ConsoleWebView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF1D6D9A21BB86520014EB07 /* ConsoleWebView.storyboard */; };
 		BF1D6D9D21BB87000014EB07 /* EmbeddedConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9C21BB87000014EB07 /* EmbeddedConsoleView.swift */; };
-		BF1D6D9F21BBA1460014EB07 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1D6D9E21BBA1460014EB07 /* WebKit.framework */; };
+		BF1D6D9F21BBA1460014EB07 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1D6D9E21BBA1460014EB07 /* WebKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		BF1D6DA321BBB8120014EB07 /* AdvancedTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6DA221BBB8120014EB07 /* AdvancedTableView.swift */; };
 		BF1D6DA521BBB84E0014EB07 /* PreferencesViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6DA421BBB84E0014EB07 /* PreferencesViewController+TableView.swift */; };
 		BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA39215140E60014EB07 /* SBridge.mm */; };

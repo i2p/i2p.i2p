@@ -27,20 +27,14 @@ class PreferenceRow {
 class Preferences  : NSObject {
   private var prefObject: Dictionary<String,Any> = Dictionary<String,Any>()
   private var prefDict = Dictionary<String,PreferenceRow>()
-  private var prefDefaultDict: Dictionary<String,Any>?
+  private var prefDefaultDict: Dictionary<String,Any> = Dictionary<String,Any>()
   
-  // This makes an read-only property computed from another property
-  // It's usage is mainly in UI Table view, so we want the prefDict size
-  var count: Int {
-    get {
-      return prefDict.count
-    }
-  }
+  var count: Int = 0
   
   // Interface with a string setting in background
   var showAsIconMode: PreferencesViewController.ShowAsMode {
     get {
-      var mode = self.prefObject["I2Pref_showAsIconMode"]
+      var mode = self["I2Pref_showAsIconMode"]
       if (mode == nil) {
         mode = "bothIcon"
       }
@@ -66,8 +60,8 @@ class Preferences  : NSObject {
       case .dockIcon:
         newMode = "dockIcon"
       }
-      self.prefObject["I2Pref_showAsIconMode"] = newMode
-      UserDefaults.standard.setPersistentDomain(self.prefObject, forName: APPDOMAIN)
+      self["I2Pref_showAsIconMode"] = newMode
+      self.syncPref()
     }
   }
 
@@ -78,9 +72,14 @@ class Preferences  : NSObject {
     }
     set(newValue) {
       prefObject[prefName] = newValue
-      prefDict[prefName] = PreferenceRow(prefName, newValue)
-      UserDefaults.standard.setPersistentDomain(self.prefObject, forName: APPDOMAIN)
+      prefDict[prefName] = PreferenceRow(prefName, newValue, prefDefaultDict[prefName])
+      self.syncPref()
     }
+  }
+  
+  func syncPref() {
+    UserDefaults.standard.setPersistentDomain(self.prefObject, forName: APPDOMAIN)
+    UserDefaults.standard.synchronize()
   }
   
   // Lookup by index
@@ -89,10 +88,9 @@ class Preferences  : NSObject {
       return prefDict[Array(prefDict.keys)[index]]
     }
     set(newValue) {
-      let pKey = Array(prefDict.keys)[index]
+      let pKey = Array(prefDefaultDict.keys)[index]
       prefDict[pKey] = newValue!
       prefObject[pKey] = newValue!.asRawValue()
-      UserDefaults.standard.setPersistentDomain(self.prefObject, forName: APPDOMAIN)
     }
   }
   
@@ -123,10 +121,19 @@ class Preferences  : NSObject {
     defaults["I2Pref_featureToggleExperimental"] = false
     preferences.prefDefaultDict = defaults
     
-    if (preferences.prefDict.isEmpty) {
+    /*if (preferences.prefDict.isEmpty) {
       print("Stored new user defaults")
       preferences.addDictToPrefTable(defaults)
+    }*/
+    for name in Array(preferences.prefDefaultDict.keys) {
+      let potentialValue = UserDefaults.standard.object(forKey: name)
+      //preferences.prefDict[name] = PreferenceRow(name, potentialValue, preferences.prefDefaultDict[name])
+      preferences[name] = potentialValue
     }
+    preferences.count = preferences.prefDict.keys.count
+    UserDefaults.standard.register(defaults: defaults)
+    UserDefaults.standard.setPersistentDomain(preferences.prefObject, forName: APPDOMAIN)
+    UserDefaults.standard.synchronize()
     
     print("User Preferences loaded - Got \(preferences.count) items.")
     
@@ -142,7 +149,7 @@ class Preferences  : NSObject {
     for (pKey, pVal) in dict {
       if (pKey.starts(with: "I2P")) {
         print("Preference -> \(pKey)")
-        prefDict[pKey] = PreferenceRow(pKey, pVal, self.prefDefaultDict![pKey])
+        self[pKey] = pVal
       } else {
         print("Skipping preference -> \(pKey)")
       }
@@ -153,10 +160,17 @@ class Preferences  : NSObject {
   
   private override init() {
     super.init()
-    self.prefObject = UserDefaults.standard.persistentDomain(forName: APPDOMAIN) ?? Dictionary<String,Any>()
+    let fromDisk = UserDefaults.standard.persistentDomain(forName: APPDOMAIN) ?? Dictionary<String,Any>()
+    for (pKey, pVal) in fromDisk {
+      if (pKey.starts(with: "I2P")) {
+        print("Preference -> \(pKey)")
+        self[pKey] = pVal
+      } else {
+        print("Skipping preference -> \(pKey)")
+      }
+    }
     print("Preferences size from disk is: \(prefObject.count).")
-    self.addDictToPrefTable(self.prefObject)
-    UserDefaults.standard.setPersistentDomain(self.prefObject, forName: APPDOMAIN)
+    self.syncPref()
   }
   
   // TODO: Make menubar icon optional
@@ -171,7 +185,7 @@ class Preferences  : NSObject {
   }
   
   func redrawPrefTableItems() {
-    self.addDictToPrefTable(self.prefObject, true)
+    self.addDictToPrefTable(self.prefObject, false)
   }
   
   
@@ -179,104 +193,104 @@ class Preferences  : NSObject {
   
   var startRouterOnLauncherStart: Bool {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_startRouterAtStartup"] as! Bool
-      return (self.prefObject["I2Pref_startRouterAtStartup"] as? Bool ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_startRouterAtStartup"] as! Bool
+      return (self["I2Pref_startRouterAtStartup"] as? Bool ?? dfl)
     }
     set(newValue) {
-      self.prefObject["I2Pref_startRouterAtStartup"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_startRouterAtStartup"] = newValue
+      self.syncPref()
     }
   }
   
   var stopRouterOnLauncherShutdown: Bool {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_stopRouterAtShutdown"] as! Bool
-      return (self.prefObject["I2Pref_stopRouterAtShutdown"] as? Bool ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_stopRouterAtShutdown"] as! Bool
+      return (self["I2Pref_stopRouterAtShutdown"] as? Bool ?? dfl)
     }
     set(newValue) {
-      self.prefObject["I2Pref_stopRouterAtShutdown"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_stopRouterAtShutdown"] = newValue
+      self.syncPref()
     }
   }
   
   var allowAdvancedPreferenceEdit: Bool {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_allowAdvancedPreferences"] as! Bool
-      return (self.prefObject["I2Pref_allowAdvancedPreferences"] as? Bool ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_allowAdvancedPreferences"] as! Bool
+      return (self["I2Pref_allowAdvancedPreferences"] as? Bool ?? dfl)
     }
     set(newValue) {
-      self.prefObject["I2Pref_allowAdvancedPreferences"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_allowAdvancedPreferences"] = newValue
+      self.syncPref()
     }
   }
   
   var alsoStartFirefoxOnLaunch: Bool {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_alsoStartFirefoxOnLaunch"] as! Bool
-      return (self.prefObject["I2Pref_alsoStartFirefoxOnLaunch"] as? Bool ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_alsoStartFirefoxOnLaunch"] as! Bool
+      return (self["I2Pref_alsoStartFirefoxOnLaunch"] as? Bool ?? dfl)
     }
     set(newValue) {
-      self.prefObject["I2Pref_alsoStartFirefoxOnLaunch"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_alsoStartFirefoxOnLaunch"] = newValue
+      self.syncPref()
     }
   }
   
   var featureToggleExperimental: Bool {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_featureToggleExperimental"] as! Bool
-      return (self.prefObject["I2Pref_featureToggleExperimental"] as? Bool ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_featureToggleExperimental"] as! Bool
+      return (self["I2Pref_featureToggleExperimental"] as? Bool ?? dfl)
     }
     set(newValue) {
-      self.prefObject["I2Pref_featureToggleExperimental"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_featureToggleExperimental"] = newValue
+      self.syncPref()
     }
   }
   
   var i2pBaseDirectory: String {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_i2pBaseDirectory"] as! String
-      return (self.prefObject["I2Pref_i2pBaseDirectory"] as? String ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_i2pBaseDirectory"] as! String
+      return (self["I2Pref_i2pBaseDirectory"] as? String ?? dfl)
     }
     set(newValue) {
       // TODO: Check if string is a valid directory path, and that it exists.
-      self.prefObject["I2Pref_i2pBaseDirectory"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_i2pBaseDirectory"] = newValue
+      self.syncPref()
     }
   }
   
   var i2pLogDirectory: String {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_i2pLogDirectory"] as! String
-      return (self.prefObject["I2Pref_i2pLogDirectory"] as? String ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_i2pLogDirectory"] as! String
+      return (self["I2Pref_i2pLogDirectory"] as? String ?? dfl)
     }
     set(newValue) {
       // TODO: Check if string is a valid java command path, check if it executes with -version.
-      self.prefObject["I2Pref_i2pLogDirectory"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_i2pLogDirectory"] = newValue
+      self.syncPref()
     }
   }
   
   var javaCommandPath: String {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_javaCommandPath"] as! String
-      return (self.prefObject["I2Pref_javaCommandPath"] as? String ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_javaCommandPath"] as! String
+      return (self["I2Pref_javaCommandPath"] as? String ?? dfl)
     }
     set(newValue) {
       // TODO: Check if string is a valid java command path, check if it executes with -version.
-      self.prefObject["I2Pref_javaCommandPath"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_javaCommandPath"] = newValue
+      self.syncPref()
     }
   }
   
   var javaCommandOptions: String {
     get {
-      let dfl = self.prefDefaultDict?["I2Pref_javaCommandOptions"] as! String
-      return (self.prefObject["I2Pref_javaCommandOptions"] as? String ?? dfl)
+      let dfl = self.prefDefaultDict["I2Pref_javaCommandOptions"] as! String
+      return (self["I2Pref_javaCommandOptions"] as? String ?? dfl)
     }
     set(newValue) {
       // TODO: Check if string is a valid set of java options
-      self.prefObject["I2Pref_javaCommandOptions"] = newValue
-      UserDefaults.standard.synchronize()
+      self["I2Pref_javaCommandOptions"] = newValue
+      self.syncPref()
     }
   }
   
