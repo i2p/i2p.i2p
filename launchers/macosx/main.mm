@@ -73,9 +73,10 @@ using namespace subprocess;
   [self.userPreferences registerDefaults:@{
     @"enableLogging": @YES,
     @"enableVerboseLogging": @YES,
-    @"autoStartRouter": @YES,
-    @"startRouterAtLogin": @NO,
-    @"startRouterAtStartup": @NO,
+    @"autoStartRouterAtBoot": @NO,
+    @"startLauncherAtLogin": @NO,
+    @"startRouterAtStartup": @YES,
+    @"stopRouterAtShutdown": @YES,
     @"letRouterLiveEvenLauncherDied": @NO,
     @"consolePortCheckNum": @7657,
     @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
@@ -87,7 +88,7 @@ using namespace subprocess;
   CFPreferencesSetMultiple((CFDictionaryRef)dict, NULL, CFAPPDOMAIN, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost);
   CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 
-  if (self.enableVerboseLogging) NSLog(@"Default preferences stored!");
+  NSLog(@"Default preferences stored!");
 }
 
 

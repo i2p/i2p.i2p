@@ -119,6 +119,11 @@ std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments,
   return sharedInstance;
 }
 
++ (void) sendUserNotification:(NSString*)title formattedMsg:(NSString*)formattedMsg
+{
+  sendUserNotification(title, formattedMsg);
+}
+
 - (void) openUrl:(NSString*)url
 {
   osx::openUrl(url);
