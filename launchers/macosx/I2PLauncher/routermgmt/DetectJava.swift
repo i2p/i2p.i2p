@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 @objc class DetectJava : NSObject {
   
   static var hasJRE : Bool = false
