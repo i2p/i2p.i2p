@@ -648,6 +648,8 @@ public class NTCPTransport extends TransportImpl {
     public void forceDisconnect(Hash peer) {
         NTCPConnection con = _conByIdent.remove(peer);
         if (con != null) {
+            if (_log.shouldWarn())
+                _log.warn("Force disconnect of " + peer, new Exception("I did it"));
             con.close();
         }
     }

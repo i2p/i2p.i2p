@@ -450,12 +450,9 @@ public abstract class TransportImpl implements Transport {
      * @param remoteIdentHash may be null, calculated from remoteIdent if null
      */
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
-        //if (true)
-        //    _log.error("(not error) I2NP message received: " + inMsg.getUniqueId() + " after " + msToReceive);
-
         int level = Log.INFO;
-        if (msToReceive > 5000)
-            level = Log.WARN;
+        //if (msToReceive > 5000)
+        //    level = Log.WARN;
         if (_log.shouldLog(level)) {
             StringBuilder buf = new StringBuilder(128);
             buf.append("Message received: ").append(inMsg.getClass().getSimpleName());
@@ -470,10 +467,6 @@ public abstract class TransportImpl implements Transport {
             } else {
                 buf.append("[unknown]");
             }
-            buf.append(" and forwarding to listener: ");
-            if (_listener != null)
-                buf.append(_listener);
-
             _log.log(level, buf.toString());
         }
 
@@ -519,6 +512,9 @@ public abstract class TransportImpl implements Transport {
     /**
      *  What address are we currently listening to?
      *  Replaces getCurrentAddress()
+     *
+     *  Note: An address without a host is considered IPv4.
+     *
      *  @param ipv6 true for IPv6 only; false for IPv4 only
      *  @return first matching address or null
      *  @since IPv6
