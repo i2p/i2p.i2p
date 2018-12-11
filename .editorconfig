@@ -26,6 +26,12 @@ indent_style = tab
 [apps/BOB/**/*.java]
 indent_style = tab
 
+[apps/routerconsole/java/src/com/vuze/plugins/mlab/tools/ndt/swingemu/*.java]
+indent_style = tab
+
+[apps/routerconsole/java/src/edu/internet2/ndt/*.java]
+indent_style = tab
+
 [apps/routerconsole/jsp/{createreseed.jsp,exportfamily.jsp,flags.jsp,index.jsp,viewhistory.jsp,viewrouterlog.jsp,viewstat.jsp,viewtheme.jsp,viewwrapperlog.jsp}]
 insert_final_newline = false
 
@@ -44,7 +50,11 @@ indent_size = 2
 [core/java/src/gnu/getopt/*.properties]
 charset = iso-8859-1
 
-[core/java/src/net/minidev/**/*.java]
+[core/java/src/org/json/simple/**/*.java]
+end_of_line = crlf
+indent_style = tab
+
+[core/java/src/com/southernstorm/**/*.java]
 indent_style = tab
 
 [router/java/src/org/cybergarage/**/*.java]
