@@ -436,34 +436,28 @@ class OutboundNTCP2State implements EstablishState {
     static byte[][] generateSipHashKeys(RouterContext ctx, HandshakeState state) {
         // TODO use noise HMAC or HKDF method instead?
         // ask_master = HKDF(ck, zerolen, info="ask")
-        SessionKey tk = new SessionKey(state.getChainingKey());
-        byte[] temp_key = doHMAC(ctx, tk, ZEROLEN);
-        tk = new SessionKey(temp_key);
-        byte[] ask_master = doHMAC(ctx, tk, ASK);
+        byte[] temp_key = doHMAC(ctx, state.getChainingKey(), ZEROLEN);
+        byte[] ask_master = doHMAC(ctx, temp_key, ASK);
         byte[] tmp = new byte[32 + SIPHASH.length];
         byte[] hash = state.getHandshakeHash();
         System.arraycopy(hash, 0, tmp, 0, 32);
         System.arraycopy(SIPHASH, 0, tmp, 32, SIPHASH.length); 
-        tk = new SessionKey(ask_master);
-        temp_key = doHMAC(ctx, tk, tmp);
-        tk = new SessionKey(temp_key);
-        byte[] sip_master = doHMAC(ctx, tk, ONE);
-        tk = new SessionKey(sip_master);
-        temp_key = doHMAC(ctx, tk, ZEROLEN);
-        tk = new SessionKey(temp_key);
+        temp_key = doHMAC(ctx, ask_master, tmp);
+        byte[] sip_master = doHMAC(ctx, temp_key, ONE);
+        temp_key = doHMAC(ctx, sip_master, ZEROLEN);
         // Output 1
-        byte[] sip_ab = doHMAC(ctx, tk, ONE);
+        byte[] sip_ab = doHMAC(ctx, temp_key, ONE);
         // Output 2
         tmp = new byte[KEY_SIZE + 1];
         System.arraycopy(sip_ab, 0, tmp, 0, 32);
         tmp[32] = 2;
-        byte[] sip_ba = doHMAC(ctx, tk, tmp);
+        byte[] sip_ba = doHMAC(ctx, temp_key, tmp);
         Arrays.fill(temp_key, (byte) 0);
         Arrays.fill(tmp, (byte) 0);
         return new byte[][] { sip_ab, sip_ba };
     }
 
-    private static byte[] doHMAC(RouterContext ctx, SessionKey key, byte data[]) {
+    private static byte[] doHMAC(RouterContext ctx, byte[] key, byte[] data) {
         byte[] rv = new byte[32];
         ctx.hmac256().calculate(key, data, 0, data.length, rv, 0);
         return rv;

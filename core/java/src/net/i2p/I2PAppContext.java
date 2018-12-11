@@ -746,8 +746,9 @@ public class I2PAppContext {
         }
     }
 
-    /** @deprecated used only by syndie */
-    @Deprecated
+    /**
+     * Un-deprecated in 0.9.38
+     */
     public HMAC256Generator hmac256() {
         if (!_hmac256Initialized)
             initializeHMAC256();

@@ -4,6 +4,7 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import net.i2p.I2PAppContext;
@@ -19,7 +20,7 @@ import org.bouncycastle.oldcrypto.macs.I2PHMac;
  *
  * As of 0.9.12, uses javax.crypto.Mac.
  *
- * Deprecated, used only by Syndie.
+ * Warning - used by Syndie, don't break it.
  */
 public final class HMAC256Generator extends HMACGenerator {
 
@@ -33,6 +34,7 @@ public final class HMAC256Generator extends HMACGenerator {
      *  @throws UnsupportedOperationException since 0.9.12
      */
     @Override
+    @Deprecated
     protected I2PHMac acquire() {
         throw new UnsupportedOperationException();
     }
@@ -46,6 +48,7 @@ public final class HMAC256Generator extends HMACGenerator {
      *  @since 0.9.12 overrides HMACGenerator
      */
     @Override
+    @Deprecated
     public Hash calculate(SessionKey key, byte data[]) {
         throw new UnsupportedOperationException();
     }
@@ -60,9 +63,22 @@ public final class HMAC256Generator extends HMACGenerator {
      */
     @Override
     public void calculate(SessionKey key, byte data[], int offset, int length, byte target[], int targetOffset) {
+        calculate(key.getData(), data, offset, length, target, targetOffset);
+    }
+    
+    /**
+     *  Calculate the HMAC of the data with the given key.
+     *  Outputs 32 bytes to target starting at targetOffset.
+     *
+     *  @param key 32 bytes
+     *  @throws UnsupportedOperationException if the JVM does not support it
+     *  @throws IllegalArgumentException for bad key or target too small
+     *  @since 0.9.38
+     */
+    public void calculate(byte[] key, byte data[], int offset, int length, byte target[], int targetOffset) {
         try {
-            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
-            Key keyObj = new SecretKeySpec(key.getData(), "HmacSHA256");
+            Mac mac = Mac.getInstance("HmacSHA256");
+            Key keyObj = new SecretKeySpec(key, "HmacSHA256");
             mac.init(keyObj);
             mac.update(data, offset, length);
             mac.doFinal(target, targetOffset);
