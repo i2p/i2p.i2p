@@ -282,9 +282,28 @@ public class ShellCommand {
      * @return              <code>true</code> if the spawned shell process
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
+     * @deprecated Use the String[] method
      */
+    @Deprecated
     public boolean executeSilentAndWait(String shellCommand) {
         return execute(shellCommand, CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
+    }
+
+    /**
+     * Passes a command to the shell for execution. This method blocks until
+     * all of the command's resulting shell processes have completed. Any output
+     * produced by the executed command will not be displayed.
+     * 
+     * @param  commandArray The command for the shell to execute,
+     *                      as a String[].
+     *                      See Runtime.exec(String[]) for more info.
+     * @return              <code>true</code> if the spawned shell process
+     *                      returns an exit status of 0 (indicating success),
+     *                      else <code>false</code>.
+     * @since 0.9.38
+     */
+    public boolean executeSilentAndWait(String[] commandArray) {
+        return execute(commandArray, CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
     }
 
     /**
