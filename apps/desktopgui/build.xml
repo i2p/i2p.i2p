@@ -34,6 +34,7 @@
                     <pathelement location="../../core/java/build/i2p.jar" />
                     <pathelement location="../../installer/lib/wrapper/all/wrapper.jar" />
                     <pathelement location="../../router/java/build/router.jar" />
+                    <pathelement location="../systray/java/build/systray.jar" />
                 </classpath>
             </javac>
         </target>

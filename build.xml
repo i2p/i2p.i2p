@@ -388,10 +388,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
     </target>
 
-    <target name="buildDesktopGui" depends="buildCore, buildrouter" >
-<!--
-        <ant dir="apps/desktopgui" target="clean" />
--->
+    <target name="buildDesktopGui" depends="buildCore, buildrouter, buildSystray" >
         <ant dir="apps/desktopgui" target="jar" />
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
     </target>

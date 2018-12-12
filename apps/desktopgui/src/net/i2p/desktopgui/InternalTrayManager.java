@@ -6,16 +6,15 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.io.IOException;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 
+import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.data.DataHelper;
 import net.i2p.desktopgui.router.RouterManager;
-import net.i2p.desktopgui.util.BrowseException;
-import net.i2p.desktopgui.util.I2PDesktop;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
@@ -433,15 +432,16 @@ class InternalTrayManager extends TrayManager {
      * and launch the browser at it.
      *
      * Modified from I2PTunnelHTTPClientBase.
-     * TODO perhaps move this to a new PortMapper method.
      *
      * @since 0.9.26
      */
     private void launchBrowser() {
+        // null args ok
+        UrlLauncher launcher = new UrlLauncher(_context, null, null);
         String url = _context.portMapper().getConsoleURL();
         try {
-            I2PDesktop.browse(url);
-        } catch (BrowseException e1) {
+            launcher.openUrl(url);
+        } catch (IOException e1) {
             log.log(Log.WARN, "Failed to open browser!", e1);
         }    
     }
