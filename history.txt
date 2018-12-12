@@ -1,3 +1,29 @@
+2018-12-12 zzz
+ * DTG: Use UrlLauncher to launch browser
+ * Installer: Drop unused systray.config
+ * UrlLauncher: Improvements and cleanups
+ * Util: Add another ShellCommand String[] method
+
+2018-12-11 zzz
+ * Crypto: HMAC-SHA256 cleanup
+ * Debian: Add conffiles list
+ * Utils: Enable TLSv1.3 for SSL sockets
+
+2018-12-08 zzz
+ * Console: Hide I2CP config if disabled
+ * NetDb: Allow longer expiration for Meta LS2
+ * Transport:
+   - Don't repeatedly publish RI if IPv6-only but
+     not configured IPv6-only
+   - Don't set status to disconnected if IPv6-only but
+     not configured IPv6-only
+
+2018-12-05 zzz
+ * I2CP:
+   - Propagate error from disconnect message to session listener
+   - Set offline keys in generated LS2
+   - Set and validate offline sig in SessionConfig
+
 2018-12-04 zzz
  * Data: Add preliminary PrivateKeyFile support for LS2 offline keys (proposal #123)
  * I2CP: Add preliminary support for LS2 offline keys (proposal #123)
