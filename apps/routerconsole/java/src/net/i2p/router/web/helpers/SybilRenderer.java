@@ -30,6 +30,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.sybil.Points;
 import net.i2p.router.tunnel.pool.TunnelPool;
 import net.i2p.router.util.HashDistance;
 import net.i2p.router.web.Messages;
@@ -50,7 +51,7 @@ import net.i2p.util.VersionComparator;
  *  @since 0.9.24
  *
  */
-class SybilRenderer {
+public class SybilRenderer {
 
     private final RouterContext _context;
     private final DecimalFormat fmt = new DecimalFormat("#0.00");
@@ -102,23 +103,6 @@ class SybilRenderer {
         }
     }
 
-    /**
-     *  A total score and a List of reason Strings
-     */
-    public static class Points implements Comparable<Points> {
-         private double points;
-         private final List<String> reasons;
-
-         public Points(double points, String reason) {
-             this.points = points;
-             reasons = new ArrayList<String>(4);
-             reasons.add(reason);
-         }
-         public int compareTo(Points r) {
-             return Double.compare(points, r.points);
-        }
-    }
-
     private static class PointsComparator implements Comparator<Hash>, Serializable {
          private final Map<Hash, Points> _points;
 
@@ -159,6 +143,7 @@ class SybilRenderer {
      *  Merge points1 into points2.
      *  points1 is unmodified.
      */
+/****
     private void mergePoints(Map<Hash, Points> points1, Map<Hash, Points> points2) {
         for (Map.Entry<Hash, Points> e : points1.entrySet()) {
              Hash h = e.getKey();
@@ -172,15 +157,15 @@ class SybilRenderer {
              }
         }
     }
+****/
 
+    /** */
     private void addPoints(Map<Hash, Points> points, Hash h, double d, String reason) {
-        String rsn = fmt.format(d) + ": " + reason;
         Points dd = points.get(h);
         if (dd != null) {
-            dd.points += d;
-            dd.reasons.add(rsn);
+            dd.addPoints(d, reason);
         } else {
-            points.put(h, new Points(d, rsn));
+            points.put(h, new Points(d, reason));
         }
     }
 
@@ -323,13 +308,14 @@ class SybilRenderer {
                 if (ri == null)
                     continue;
                 Points pp = points.get(h);
-                double p = pp.points;
+                double p = pp.getPoints();
                 if (p < MIN_DISPLAY_POINTS)
                     break;  // sorted
                 buf.append("<p class=\"threatpoints\"><b>Threat Points: " + fmt.format(p) + "</b></p><ul>");
-                if (pp.reasons.size() > 1)
-                    Collections.sort(pp.reasons, new ReasonComparator());
-                for (String s : pp.reasons) {
+                List<String> reasons = pp.getReasons();
+                if (reasons.size() > 1)
+                    Collections.sort(reasons, new ReasonComparator());
+                for (String s : reasons) {
                     int c = s.indexOf(':');
                     if (c <= 0)
                         continue;
