@@ -38,6 +38,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import static net.i2p.router.sybil.Util.biLog2;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.Log;
@@ -576,23 +577,6 @@ class NetDbRenderer {
         }  // !empty
         out.write(buf.toString());
         out.flush();
-    }
-
-    /**
-     * For debugging
-     * http://forums.sun.com/thread.jspa?threadID=597652
-     * @since 0.7.14
-     */
-    public static double biLog2(BigInteger a) {
-        int b = a.bitLength() - 1;
-        double c = 0;
-        double d = 0.5;
-        for (int i = b; i >= 0; --i) {
-             if (a.testBit(i))
-                 c += d;
-             d /= 2;
-        }
-        return b + c;
     }
 
     /**
