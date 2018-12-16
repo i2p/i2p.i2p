@@ -125,7 +125,7 @@ public class SybilRenderer {
      */
     private void renderRouterInfoHTML(Writer out, int mode, long date) throws IOException {
         Hash us = _context.routerHash();
-        Analysis analysis = new Analysis(_context);
+        Analysis analysis = Analysis.getInstance(_context);
         List<RouterInfo> ris = analysis.getFloodfills(us);
         if (ris.isEmpty()) {
             out.write("<h3 class=\"sybils\">No known floodfills</h3>");
@@ -180,7 +180,7 @@ public class SybilRenderer {
         } else if (mode == 11) {
             renderDestSummary(out, buf, analysis, avgMinDist, ris, points);
         } else if (mode == 12) {
-            PersistSybil ps = new PersistSybil(_context);
+            PersistSybil ps = analysis.getPersister();
             try {
                 points = ps.load(date);
             } catch (IOException ioe) {
@@ -196,7 +196,7 @@ public class SybilRenderer {
             long now = _context.clock().now();
             points = analysis.backgroundAnalysis();
             if (!points.isEmpty()) {
-                PersistSybil ps = new PersistSybil(_context);
+                PersistSybil ps = analysis.getPersister();
                 try {
                     ps.store(now, points);
                 } catch (IOException ioe) {
@@ -214,7 +214,7 @@ public class SybilRenderer {
      *  @since 0.9.38
      */
     private void renderOverview(Writer out, StringBuilder buf, Analysis analysis) throws IOException {
-        PersistSybil ps = new PersistSybil(_context);
+        PersistSybil ps = analysis.getPersister();
         List<Long> dates = ps.load();
         if (dates.isEmpty()) {
             out.write("No stored analysis");

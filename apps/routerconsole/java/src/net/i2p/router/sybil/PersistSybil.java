@@ -44,7 +44,8 @@ public class PersistSybil {
     private static final String PFX = "sybil-";
     private static final String SFX = ".txt.gz";
 
-    public PersistSybil(I2PAppContext ctx) {
+    /** access via Analysis.getPersister() */
+    PersistSybil(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(PersistSybil.class);
     }

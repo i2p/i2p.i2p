@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
+import static net.i2p.app.ClientAppState.*;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -20,6 +23,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.app.RouterApp;
 import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
@@ -36,10 +40,20 @@ import net.i2p.util.ObjectCounter;
  *  @since 0.9.38 split out from SybilRenderer
  *
  */
-public class Analysis {
+public class Analysis implements RouterApp {
 
     private final RouterContext _context;
+    private final ClientAppManager _cmgr;
+    private final PersistSybil _persister;
+    private volatile ClientAppState _state = UNINITIALIZED;
     private final DecimalFormat fmt = new DecimalFormat("#0.00");
+    /**
+     *  The name we register with the ClientAppManager
+     */
+    public static final String APP_NAME = "sybil";
+    public static final String PROP_FREQUENCY = "router.sybilFrequency";
+    private static final long MIN_FREQUENCY = 60*60*1000L;
+    private static final long MIN_UPTIME = 75*60*1000L;
 
     public static final int PAIRMAX = 20;
     public static final int MAX = 10;
@@ -64,8 +78,88 @@ public class Analysis {
     private static final double POINTS_NEW = 4.0;
     private static final double POINTS_BANLIST = 25.0;
 
-    public Analysis(RouterContext ctx) {
+    /** Get via getInstance() */
+    private Analysis(RouterContext ctx, ClientAppManager mgr, String[] args) {
         _context = ctx;
+        _cmgr = mgr;
+        _persister = new PersistSybil(ctx);
+    }
+
+    /**
+     *  @return non-null, creates new if not already registered
+     */
+    public synchronized static Analysis getInstance(RouterContext ctx) {
+        ClientAppManager cmgr = ctx.clientAppManager();
+        if (cmgr == null)
+            return null;
+        Analysis rv = (Analysis) cmgr.getRegisteredApp(APP_NAME);
+        if (rv == null) {
+            rv = new Analysis(ctx, cmgr, null);
+            rv.startup();
+        }
+        return rv;
+    }
+
+    public PersistSybil getPersister() { return _persister; }
+
+    /**
+     *  ClientApp interface
+     */
+    public synchronized void startup() {
+        changeState(STARTING);
+        changeState(RUNNING);
+        _cmgr.register(this);
+        schedule();
+    }
+
+    /**
+     *  ClientApp interface
+     *  @param args ignored
+     */
+    public synchronized void shutdown(String[] args) {
+        if (_state == STOPPED)
+            return;
+        changeState(STOPPING);
+        changeState(STOPPED);
+    }
+
+    public ClientAppState getState() {
+        return _state;
+    }
+
+    public String getName() {
+        return APP_NAME;
+    }
+
+    public String getDisplayName() {
+        return "Sybil Analyzer";
+    }
+
+    /////// end ClientApp methods
+
+    private synchronized void changeState(ClientAppState state) {
+        _state = state;
+        if (_cmgr != null)
+            _cmgr.notify(this, state, null, null);
+    }
+
+    public void schedule() {
+        long freq = _context.getProperty(PROP_FREQUENCY, 0L);
+        if (freq > 0) {
+            List<Long> previous = _persister.load();
+            long now = _context.clock().now();
+            long when;
+            if (!previous.isEmpty()) {
+                if (freq < MIN_FREQUENCY)
+                    freq = MIN_FREQUENCY;
+                when = Math.max(previous.get(0).longValue() + freq, now);
+            } else {
+                when = now;
+            }
+            long up = _context.router().getUptime();
+            when = Math.max(when, now + MIN_UPTIME - up);
+            // TODO schedule for when
+        }
     }
 
     private static class RouterInfoRoutingKeyComparator implements Comparator<RouterInfo>, Serializable {
