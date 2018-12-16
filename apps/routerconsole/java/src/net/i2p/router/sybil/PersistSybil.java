@@ -95,7 +95,7 @@ public class PersistSybil {
                 rv.add(Long.valueOf(d));
             } catch (NumberFormatException nfe) {}
         }
-        Collections.sort(rv);
+        Collections.sort(rv, Collections.reverseOrder());
         return rv;
     }
 

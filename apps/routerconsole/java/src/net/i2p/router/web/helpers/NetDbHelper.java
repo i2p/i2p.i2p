@@ -13,7 +13,8 @@ public class NetDbHelper extends HelperBase {
     private String _version;
     private String _country;
     private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6, _transport;
-    private int _full, _port, _cost, _page;
+    private int _full, _port, _cost, _page, _mode;
+    private long _date;
     private int _limit = DEFAULT_LIMIT;
     private boolean _lease;
     private boolean _debug;
@@ -141,6 +142,20 @@ public class NetDbHelper extends HelperBase {
         } catch (NumberFormatException nfe) {}
     }
 
+    /** @since 0.9.38 */
+    public void setMode(String f) {
+        try {
+            _mode = Integer.parseInt(f);
+        } catch (NumberFormatException nfe) {}
+    }
+
+    /** @since 0.9.38 */
+    public void setDate(String f) {
+        try {
+            _date = Long.parseLong(f);
+        } catch (NumberFormatException nfe) {}
+    }
+
     public void setFull(String f) {
         try {
             _full = Integer.parseInt(f);
@@ -198,7 +213,7 @@ public class NetDbHelper extends HelperBase {
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
             else if (_full == 3)
-                (new SybilRenderer(_context)).getNetDbSummary(_out);
+                (new SybilRenderer(_context)).getNetDbSummary(_out, _mode, _date);
             else if (_full == 4)
                 renderLookupForm();
             else

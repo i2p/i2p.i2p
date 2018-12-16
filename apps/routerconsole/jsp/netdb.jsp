@@ -38,5 +38,7 @@
  <jsp:setProperty name="netdbHelper" property="transport" value="<%=request.getParameter(\"tr\")%>" />
  <jsp:setProperty name="netdbHelper" property="limit" value="<%=request.getParameter(\"ps\")%>" />
  <jsp:setProperty name="netdbHelper" property="page" value="<%=request.getParameter(\"pg\")%>" />
+ <jsp:setProperty name="netdbHelper" property="mode" value="<%=request.getParameter(\"m\")%>" />
+ <jsp:setProperty name="netdbHelper" property="date" value="<%=request.getParameter(\"date\")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div></body></html>

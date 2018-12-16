@@ -249,8 +249,10 @@ public class Analysis {
         return avg;
     }
 
-    private double closestDistance(Hash h, List<RouterInfo> ris) {
-        BigInteger min = (new BigInteger("2")).pow(256);
+    private static final BigInteger BI_MAX = (new BigInteger("2")).pow(256);
+
+    private static double closestDistance(Hash h, List<RouterInfo> ris) {
+        BigInteger min = BI_MAX;
         for (RouterInfo info : ris) {
             BigInteger dist = HashDistance.getDistance(h, info.getHash());
             if (dist.compareTo(min) < 0)

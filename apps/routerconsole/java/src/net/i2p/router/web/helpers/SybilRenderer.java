@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,6 +33,7 @@ import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.sybil.Analysis;
 import net.i2p.router.sybil.Pair;
+import net.i2p.router.sybil.PersistSybil;
 import net.i2p.router.sybil.Points;
 import static net.i2p.router.sybil.Util.biLog2;
 import net.i2p.router.tunnel.pool.TunnelPool;
@@ -70,9 +72,12 @@ public class SybilRenderer {
 
     /**
      *   Entry point
+     *
+     *  @param mode what tab to show
+     *  @param date only for mode = 12
      */
-    public String getNetDbSummary(Writer out) throws IOException {
-        renderRouterInfoHTML(out, (String)null);
+    public String getNetDbSummary(Writer out, int mode, long date) throws IOException {
+        renderRouterInfoHTML(out, mode, date);
         return "";
     }
 
@@ -115,11 +120,11 @@ public class SybilRenderer {
     /**
      *  The whole thing
      *
-     *  @param routerPrefix ignored
+     *  @param mode what tab to show
+     *  @param date only for mode = 12
      */
-    private void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
+    private void renderRouterInfoHTML(Writer out, int mode, long date) throws IOException {
         Hash us = _context.routerHash();
-        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
         Analysis analysis = new Analysis(_context);
         List<RouterInfo> ris = analysis.getFloodfills(us);
         if (ris.isEmpty()) {
@@ -131,24 +136,117 @@ public class SybilRenderer {
         buf.append("<p id=\"sybilinfo\"><b>This is an experimental network database tool for debugging and analysis. Do not panic even if you see warnings below. " +
                    "Possible \"threats\" are summarized at the bottom, however these are unlikely to be real threats. " +
                    "If you see anything you would like to discuss with the devs, contact us on IRC #i2p-dev.</b></p>" +
-                   "<div id=\"sybilnav\"><ul><li><a href=\"#known\">FF Summary</a>" +
-                   "</li><li><a href=\"#family\">Same Family</a>" +
-                   "</li><li><a href=\"#ourIP\">IP close to us</a>" +
-                   "</li><li><a href=\"#sameIP\">Same IP</a>" +
-                   "</li><li><a href=\"#same24\">Same /24</a>" +
-                   "</li><li><a href=\"#same16\">Same /16</a>" +
-                   "</li><li><a href=\"#pairs\">Pair distance</a>" +
-                   "</li><li><a href=\"#ritoday\">Close to us</a>" +
-                   "</li><li><a href=\"#ritmrw\">Close to us tomorrow</a>" +
-                   "</li><li><a href=\"#dht\">DHT neighbors</a>" +
-                   "</li><li><a href=\"#dest\">Close to our destinations</a>" +
-                   "</li><li><a href=\"#threats\">Highest threats</a>" +
+                   "<div id=\"sybilnav\"><ul><li><a href=\"netdb?f=3\">Review stored analysis</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=13\">Run new analysis</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=1\">Floodfill Summary</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=2\">Same Family</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=3\">IP close to us</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=4\">Same IP</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=5\">Same /24</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=6\">Same /16</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=7\">Pair distance</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=8\">Close to us</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=9\">Close to us tomorrow</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=10\">DHT neighbors</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=11\">Close to our destinations</a>" +
                    "</li></ul></div>");
-
-        renderRouterInfo(buf, _context.router().getRouterInfo(), null, true, false);
-        buf.append("<h3 id=\"known\" class=\"sybils\">Known Floodfills: ").append(ris.size()).append("</h3>");
+        writeBuf(out, buf);
 
         double avgMinDist = analysis.getAvgMinDist(ris);
+        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
+
+        if (mode == 0) {
+            renderOverview(out, buf, analysis);
+        } else if (mode == 1) {
+            renderFFSummary(out, buf, ris, avgMinDist);
+        } else if (mode == 2) {
+            renderFamilySummary(out, buf, analysis, ris, points);
+        } else if (mode == 3) {
+            renderIPUsSummary(out, buf, analysis, ris, points);
+        } else if (mode == 4) {
+            renderIP32Summary(out, buf, analysis, ris, points);
+        } else if (mode == 5) {
+            renderIP24Summary(out, buf, analysis, ris, points);
+        } else if (mode == 6) {
+            renderIP16Summary(out, buf, analysis, ris, points);
+        } else if (mode == 7) {
+            renderPairSummary(out, buf, analysis, ris, points);
+        } else if (mode == 8) {
+            renderCloseSummary(out, buf, analysis, avgMinDist, ris, points);
+        } else if (mode == 9) {
+            renderCloseTmrwSummary(out, buf, analysis, us, avgMinDist, ris, points);
+        } else if (mode == 10) {
+            renderDHTSummary(out, buf, analysis, us, avgMinDist, ris, points);
+        } else if (mode == 11) {
+            renderDestSummary(out, buf, analysis, avgMinDist, ris, points);
+        } else if (mode == 12) {
+            PersistSybil ps = new PersistSybil(_context);
+            try {
+                points = ps.load(date);
+            } catch (IOException ioe) {
+                out.write("<b>No analysis found for " + new Date(date) + "</b>");
+                return;
+            }
+            if (points.isEmpty()) {
+                out.write("<b>No analysis found for " + new Date(date) + "</b>");
+            } else {
+                renderThreatsHTML(out, buf, date, points);
+            }
+        } else if (mode == 13) {
+            long now = _context.clock().now();
+            points = analysis.backgroundAnalysis();
+            if (!points.isEmpty()) {
+                PersistSybil ps = new PersistSybil(_context);
+                try {
+                    ps.store(now, points);
+                } catch (IOException ioe) {
+                    out.write("<b>Failed to store analysis " + ioe + "</b>");
+                }
+            }
+            renderThreatsHTML(out, buf, now, points);
+        } else {
+            out.write("Unknown mode " + mode);
+        }
+        writeBuf(out, buf);
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    private void renderOverview(Writer out, StringBuilder buf, Analysis analysis) throws IOException {
+        PersistSybil ps = new PersistSybil(_context);
+        List<Long> dates = ps.load();
+        if (dates.isEmpty()) {
+            out.write("No stored analysis");
+        } else {
+            buf.append("<form action=\"netdb\" method=\"GET\">\n" +
+                       "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
+                       "<input type=\"hidden\" name=\"m\" value=\"12\">\n" +
+                       "Select stored analysis: " +
+                       "<select name=\"date\">\n");
+            boolean first = true;
+            for (Long date : dates) {
+                buf.append("<option value=\"").append(date).append('\"');
+                if (first) {
+                    buf.append(" selected=\"selected\"");
+                    first = false;
+                }
+                buf.append('>').append(new Date(date.longValue())).append("</option>\n");
+            }        
+            buf.append("</select>\n" +
+                       "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Review analysis\" />" +
+                       "</form>\n");
+        }        
+        buf.append("<br><a href=\"netdb?f=3&amp;m=13\">Run new analysis</a>");
+        writeBuf(out, buf);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderFFSummary(Writer out, StringBuilder buf, List<RouterInfo> ris, double avgMinDist) throws IOException {
+        renderRouterInfo(buf, _context.router().getRouterInfo(), null, true, false);
+        buf.append("<h3 id=\"known\" class=\"sybils\">Known Floodfills: ").append(ris.size()).append("</h3>");
         buf.append("<div id=\"sybils_summary\">\n" +
                    "<b>Average closest floodfill distance:</b> ").append(fmt.format(avgMinDist)).append("<br>\n" +
                    "<b>Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
@@ -156,56 +254,119 @@ public class SybilRenderer {
                    "<b>Next Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData()))
            .append("\" <b>Rotates in:</b> ").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight())).append("\n" +
                    "</div>\n");
+        writeBuf(out, buf);
+    }
 
-        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
-
-        // IP analysis
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderFamilySummary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         Map<String, List<RouterInfo>> fmap = analysis.calculateIPGroupsFamily(ris, points);
         renderIPGroupsFamily(out, buf, fmap);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIPUsSummary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         List<RouterInfo> ri32 = new ArrayList<RouterInfo>(4);
         List<RouterInfo> ri24 = new ArrayList<RouterInfo>(4);
         List<RouterInfo> ri16 = new ArrayList<RouterInfo>(4);
         analysis.calculateIPGroupsUs(ris, points, ri32, ri24, ri16);
         renderIPGroupsUs(out, buf, ri32, ri24, ri16);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIP32Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         Map<Integer, List<RouterInfo>> map = analysis.calculateIPGroups32(ris, points);
         renderIPGroups32(out, buf, map);
-        map = analysis.calculateIPGroups24(ris, points);
-        renderIPGroups24(out, buf, map);
-        map = analysis.calculateIPGroups16(ris, points);
-        //renderIPGroups16(out, buf, map);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIP24Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<Integer, List<RouterInfo>> map = analysis.calculateIPGroups24(ris, points);
+        renderIPGroups24(out, buf, map);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIP16Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<Integer, List<RouterInfo>> map = analysis.calculateIPGroups16(ris, points);
+        renderIPGroups16(out, buf, map);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderPairSummary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         // Pairwise distance analysis
         List<Pair> pairs = new ArrayList<Pair>(PAIRMAX);
         double avg = analysis.calculatePairDistance(ris, points, pairs);
         renderPairDistance(out, buf, pairs, avg);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderCloseSummary(Writer out, StringBuilder buf, Analysis analysis, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         // Distance to our router analysis
         buf.append("<h3 id=\"ritoday\" class=\"sybils\">Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
         buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
+        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
         analysis.calculateRouterInfo(ourRKey, "our rkey", ris, points);
         renderRouterInfoHTML(out, buf, ourRKey, avgMinDist, ris);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderCloseTmrwSummary(Writer out, StringBuilder buf, Analysis analysis, Hash us, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        // Distance to our router analysis
         RouterKeyGenerator rkgen = _context.routerKeyGenerator();
         Hash nkey = rkgen.getNextRoutingKey(us);
         buf.append("<h3 id=\"ritmrw\" class=\"sybils\">Closest Floodfills to Tomorrow's Routing Key (Where we will Store our RI)</h3>");
         buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
         analysis.calculateRouterInfo(nkey, "our rkey (tomorrow)", ris, points);
         renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderDHTSummary(Writer out, StringBuilder buf, Analysis analysis, Hash us, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3 id=\"dht\" class=\"sybils\">Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
         analysis.calculateRouterInfo(us, "our router", ris, points);
         renderRouterInfoHTML(out, buf, us, avgMinDist, ris);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderDestSummary(Writer out, StringBuilder buf, Analysis analysis, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         // Distance to our published destinations analysis
+        RouterKeyGenerator rkgen = _context.routerKeyGenerator();
         buf.append("<h3 id=\"dest\" class=\"sybils\">Floodfills Close to Our Destinations</h3>");
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         List<Hash> destinations = new ArrayList<Hash>(clientInboundPools.keySet());
-        //boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
+        for (Iterator<Hash> iter = destinations.iterator(); iter.hasNext(); ) {
+            Hash client = iter.next();
+            if (!_context.clientManager().isLocal(client) ||
+                !_context.clientManager().shouldPublishLeaseSet(client) ||
+                _context.netDb().lookupLeaseSetLocally(client) == null) {
+                iter.remove();
+            }
+        }
+        if (destinations.isEmpty()) {
+            buf.append("<p class=\"notfound\">None</p>");
+            writeBuf(out, buf);
+            return;
+        }
         for (Hash client : destinations) {
-            boolean isLocal = _context.clientManager().isLocal(client);
-            if (!isLocal)
-                continue;
-            if (! _context.clientManager().shouldPublishLeaseSet(client))
-                continue;
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client);
             if (ls == null)
                 continue;
@@ -216,21 +377,22 @@ public class SybilRenderer {
             buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
             analysis.calculateRouterInfo(rkey, name, ris, points);
             renderRouterInfoHTML(out, buf, rkey, avgMinDist, ris);
-            nkey = rkgen.getNextRoutingKey(ls.getHash());
+            Hash nkey = rkgen.getNextRoutingKey(ls.getHash());
             buf.append("<h3 class=\"sybils\">Closest floodfills to Tomorrow's Routing Key for " + name + " (where we will store our LS)</h3>");
             buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
             analysis.calculateRouterInfo(nkey, name + " (tomorrow)", ris, points);
             renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris);
         }
+    }
 
-        // Profile analysis
-        analysis.addProfilePoints(ris, points);
-        analysis.addVersionPoints(ris, points);
-
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderThreatsHTML(Writer out, StringBuilder buf, long date, Map<Hash, Points> points) throws IOException {
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
             Collections.sort(warns, new PointsComparator(points));
-            buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points</h3>");
+            buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points as of " + new Date(date) + "</h3>");
             for (Hash h : warns) {
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
                 if (ri == null)
@@ -253,10 +415,7 @@ public class SybilRenderer {
                 renderRouterInfo(buf, ri, null, false, false);
             }
         }
-
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     /**
@@ -277,10 +436,7 @@ public class SybilRenderer {
             renderRouterInfo(buf, p.r1, null, false, false);
             renderRouterInfo(buf, p.r2, null, false, false);
         }
-
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     private static class FooComparator implements Comparator<Integer>, Serializable {
@@ -340,9 +496,7 @@ public class SybilRenderer {
         }
         if (!found)
             buf.append("<p class=\"notfound\">None</p>");
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     /**
@@ -372,9 +526,7 @@ public class SybilRenderer {
         }
         if (!found)
             buf.append("<p class=\"notfound\">None</p>");
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     /**
@@ -403,9 +555,7 @@ public class SybilRenderer {
         }
         if (!found)
             buf.append("<p class=\"notfound\">None</p>");
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     /**
@@ -435,9 +585,7 @@ public class SybilRenderer {
         }
         if (!found)
             buf.append("<p class=\"notfound\">None</p>");
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     /**
@@ -467,9 +615,7 @@ public class SybilRenderer {
         if (!found)
             buf.append("<p class=\"notfound\">None</p>");
         buf.append("</div>");
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     /**
@@ -520,6 +666,10 @@ public class SybilRenderer {
                    "&nbsp; <span class=\"netdb_name\">MEDIAN:</span> " + fmt.format(median) +
                    "&nbsp; <span class=\"netdb_name\">MAX:</span> " + fmt.format(max) +
                    "</p>\n");
+        writeBuf(out, buf);
+    }
+
+    private static void writeBuf(Writer out, StringBuilder buf) throws IOException {
         out.write(buf.toString());
         out.flush();
         buf.setLength(0);
