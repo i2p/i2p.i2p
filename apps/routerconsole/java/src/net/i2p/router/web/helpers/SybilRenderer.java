@@ -200,7 +200,7 @@ public class SybilRenderer {
                 try {
                     ps.store(now, points);
                 } catch (IOException ioe) {
-                    out.write("<b>Failed to store analysis " + ioe + "</b>");
+                    out.write("<b>Failed to store analysis: " + ioe + "</b>");
                 }
             }
             renderThreatsHTML(out, buf, now, points);
@@ -392,6 +392,7 @@ public class SybilRenderer {
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
             Collections.sort(warns, new PointsComparator(points));
+            ReasonComparator rcomp = new ReasonComparator();
             buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points as of " + new Date(date) + "</h3>");
             for (Hash h : warns) {
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
@@ -404,12 +405,12 @@ public class SybilRenderer {
                 buf.append("<p class=\"threatpoints\"><b>Threat Points: " + fmt.format(p) + "</b></p><ul>");
                 List<String> reasons = pp.getReasons();
                 if (reasons.size() > 1)
-                    Collections.sort(reasons, new ReasonComparator());
+                    Collections.sort(reasons, rcomp);
                 for (String s : reasons) {
                     int c = s.indexOf(':');
                     if (c <= 0)
                         continue;
-                    buf.append("<li><b>").append(s.substring(0, c+1)).append("</b>").append(s.substring(c+1)).append("</li>");
+                    buf.append("<li><b>").append(s, 0, c+1).append("</b>").append(s, c+1, s.length()).append("</li>");
                 }
                 buf.append("</ul>");
                 renderRouterInfo(buf, ri, null, false, false);
@@ -695,7 +696,7 @@ public class SybilRenderer {
      */
     private double renderRouterInfo(StringBuilder buf, RouterInfo info, Hash us, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\"></a><table class=\"sybil_routerinfo\"><tr>");
+        buf.append("<a name=\"").append(hash, 0, 6).append("\"></a><table class=\"sybil_routerinfo\"><tr>");
         double distance = 0;
         if (isUs) {
             buf.append("<th colspan=\"2\"><a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b> <code>").append(hash)
@@ -713,7 +714,7 @@ public class SybilRenderer {
             }
             if (!full) {
                 buf.append("<a title=\"View extended router info\" class=\"viewfullentry\" href=\"netdb?r=")
-                   .append(hash.substring(0, 6)).append("\" >[").append(_t("Full entry")).append("]</a></th><th>");
+                   .append(hash, 0, 6).append("\" >[").append(_t("Full entry")).append("]</a></th><th>");
             }
             if (_context.portMapper().isRegistered("imagegen"))
                 buf.append("<img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");

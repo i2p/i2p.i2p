@@ -1,5 +1,6 @@
 package net.i2p.router.sybil;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -21,6 +22,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
+import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.app.RouterApp;
@@ -33,6 +35,8 @@ import net.i2p.router.web.Messages;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
+import net.i2p.util.Addresses;
+import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 
 /**
@@ -40,13 +44,16 @@ import net.i2p.util.ObjectCounter;
  *  @since 0.9.38 split out from SybilRenderer
  *
  */
-public class Analysis implements RouterApp {
+public class Analysis extends JobImpl implements RouterApp {
 
     private final RouterContext _context;
+    private final Log _log;
     private final ClientAppManager _cmgr;
     private final PersistSybil _persister;
     private volatile ClientAppState _state = UNINITIALIZED;
     private final DecimalFormat fmt = new DecimalFormat("#0.00");
+    private boolean _wasRun;
+
     /**
      *  The name we register with the ClientAppManager
      */
@@ -80,7 +87,9 @@ public class Analysis implements RouterApp {
 
     /** Get via getInstance() */
     private Analysis(RouterContext ctx, ClientAppManager mgr, String[] args) {
+        super(ctx);
         _context = ctx;
+        _log = ctx.logManager().getLog(Analysis.class);
         _cmgr = mgr;
         _persister = new PersistSybil(ctx);
     }
@@ -101,6 +110,27 @@ public class Analysis implements RouterApp {
     }
 
     public PersistSybil getPersister() { return _persister; }
+
+    /////// begin Job methods
+
+    public void runJob() {
+        long now = _context.clock().now();
+        _log.info("Running analysis");
+        Map<Hash, Points> points = backgroundAnalysis();
+        if (!points.isEmpty()) {
+            try {
+                _log.info("Storing analysis");
+                _persister.store(now, points);
+                _log.info("Store complete");
+            } catch (IOException ioe) {
+                _log.error("Failed to store analysis", ioe);
+            }
+        }
+        schedule();
+    }
+
+    /////// end Job methods
+    /////// begin ClientApp methods
 
     /**
      *  ClientApp interface
@@ -143,22 +173,25 @@ public class Analysis implements RouterApp {
             _cmgr.notify(this, state, null, null);
     }
 
-    public void schedule() {
+    public synchronized void schedule() {
         long freq = _context.getProperty(PROP_FREQUENCY, 0L);
         if (freq > 0) {
             List<Long> previous = _persister.load();
-            long now = _context.clock().now();
+            long now = _context.clock().now() + 15*1000;
+            if (freq < MIN_FREQUENCY)
+                freq = MIN_FREQUENCY;
             long when;
-            if (!previous.isEmpty()) {
-                if (freq < MIN_FREQUENCY)
-                    freq = MIN_FREQUENCY;
+            if (_wasRun) {
+                when = now + freq;
+            } else if (!previous.isEmpty()) {
                 when = Math.max(previous.get(0).longValue() + freq, now);
             } else {
                 when = now;
             }
             long up = _context.router().getUptime();
             when = Math.max(when, now + MIN_UPTIME - up);
-            // TODO schedule for when
+            getTiming().setStartAfter(when);
+            _context.jobQueue().addJob(this);
         }
     }
 
@@ -239,12 +272,17 @@ public class Analysis implements RouterApp {
      *  Return separate maps for each cause instead?
      *  @since 0.9.38
      */
-    public Map<Hash, Points> backgroundAnalysis() {
+    public synchronized Map<Hash, Points> backgroundAnalysis() {
+        _wasRun = true;
+        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
         Hash us = _context.routerHash();
+        if (us == null)
+            return points;
         List<RouterInfo> ris = getFloodfills(us);
+        if (ris.isEmpty())
+            return points;
 
         double avgMinDist = getAvgMinDist(ris);
-        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
 
         // IP analysis
         calculateIPGroupsFamily(ris, points);
@@ -375,8 +413,14 @@ public class Analysis implements RouterApp {
                                     List<RouterInfo> ri32, List<RouterInfo> ri24, List<RouterInfo> ri16) {
         RouterInfo us = _context.router().getRouterInfo();
         byte[] ourIP = getIP(us);
-        if (ourIP == null)
-            return;
+        if (ourIP == null) {
+            String last = _context.getProperty("i2np.lastIP");
+            if (last == null)
+                return;
+            ourIP = Addresses.getIP(last);
+            if (ourIP == null)
+                return;
+        }
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
             if (ip == null)
@@ -385,11 +429,14 @@ public class Analysis implements RouterApp {
                 if (ip[2] == ourIP[2]) {
                     if (ip[3] == ourIP[3]) {
                         addPoints(points, info.getHash(), POINTS_US32, "Same IP as us");
+                        ri32.add(info);
                     } else {
                         addPoints(points, info.getHash(), POINTS_US24, "Same /24 as us");
+                        ri24.add(info);
                     }
                 } else {
                     addPoints(points, info.getHash(), POINTS_US16, "Same /16 as us");
+                    ri16.add(info);
                 }
             }
         }
@@ -416,11 +463,13 @@ public class Analysis implements RouterApp {
         for (Map.Entry<Integer, List<RouterInfo>> e : rv.entrySet()) {
             Integer ii = e.getKey();
             int count = oc.count(ii);
+            double point = POINTS32 * (count - 1);
             int i = ii.intValue();
             int i0 = (i >> 24) & 0xff;
             int i1 = (i >> 16) & 0xff;
             int i2 = (i >> 8) & 0xff;
             int i3 = i & 0xff;
+            String reason = "Same IP with " + (count - 1) + " other" + (( count > 2) ? "s" : "");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
@@ -434,8 +483,7 @@ public class Analysis implements RouterApp {
                 if ((ip[3] & 0xff) != i3)
                     continue;
                 e.getValue().add(info);
-                double point = POINTS32 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                addPoints(points, info.getHash(), point, reason);
             }
         }
         return rv;
@@ -462,10 +510,12 @@ public class Analysis implements RouterApp {
         for (Map.Entry<Integer, List<RouterInfo>> e : rv.entrySet()) {
             Integer ii = e.getKey();
             int count = oc.count(ii);
+            double point = POINTS24 * (count - 1);
             int i = ii.intValue();
             int i0 = i >> 16;
             int i1 = (i >> 8) & 0xff;
             int i2 = i & 0xff;
+            String reason = "Same /24 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : "");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
@@ -477,8 +527,7 @@ public class Analysis implements RouterApp {
                 if ((ip[2] & 0xff) != i2)
                     continue;
                 e.getValue().add(info);
-                double point = POINTS24 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same /24 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                addPoints(points, info.getHash(), point, reason);
             }
         }
         return rv;
@@ -505,9 +554,11 @@ public class Analysis implements RouterApp {
         for (Map.Entry<Integer, List<RouterInfo>> e : rv.entrySet()) {
             Integer ii = e.getKey();
             int count = oc.count(ii);
+            double point = POINTS16 * (count - 1);
             int i = ii.intValue();
             int i0 = i >> 8;
             int i1 = i & 0xff;
+            String reason = "Same /16 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : "");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
@@ -517,8 +568,7 @@ public class Analysis implements RouterApp {
                 if ((ip[1] & 0xff) != i1)
                     continue;
                 e.getValue().add(info);
-                double point = POINTS16 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same /16 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                addPoints(points, info.getHash(), point, reason);
             }
         }
         return rv;

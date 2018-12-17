@@ -92,10 +92,11 @@ public class Points implements Comparable<Points> {
         } catch (NumberFormatException nfe) {
             return null;
         }
-        Points rv = new Points(d, ss[1]);
-        for (int i = 2; i < ss.length; i++) {
+        Points rv = new Points();
+        for (int i = 1; i < ss.length; i++) {
             rv.reasons.add(ss[i]);
         }
+        rv.points = d;
         return rv;
     }
 }
