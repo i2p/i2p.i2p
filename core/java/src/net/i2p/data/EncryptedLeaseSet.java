@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
 import net.i2p.util.Clock;
 
@@ -18,6 +19,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
 
     // includes IV and MAC
     private byte[] _encryptedData;
+    private LeaseSet2 _decryptedLS2;
+    private Hash __calculatedHash;
 
     private static final int MIN_ENCRYPTED_SIZE = 8 + 16;
     private static final int MAX_ENCRYPTED_SIZE = 4096;
@@ -31,6 +34,24 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     @Override
     public int getType() {
         return KEY_TYPE_ENCRYPTED_LS2;
+    }
+
+    /**
+     *  @return 0-16, or 0 if not decrypted.
+     */
+    @Override
+    public int getLeaseCount() {
+        // TODO attempt decryption
+        return _decryptedLS2 != null ? _decryptedLS2.getLeaseCount() : 0;
+    }
+
+    /**
+     *  @return null if not decrypted.
+     */
+    @Override
+    public Lease getLease(int index) {
+        // TODO attempt decryption
+        return _decryptedLS2 != null ? _decryptedLS2.getLease(index) : null;
     }
 
     /**
@@ -154,6 +175,27 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         if (isOffline())
             rv += 2 + _transientSigningPublicKey.length() + _offlineSignature.length();
         return rv;
+    }
+
+    /**
+     *  Overridden because we have a blinded key, not a dest.
+     *  This is the hash of the signing public key type and the signing public key.
+     *  Throws IllegalStateException if not initialized.
+     *
+     *  @throws IllegalStateException
+     */
+    @Override
+    public Hash getHash() {
+        if (__calculatedHash == null) {
+            if (_signingKey == null)
+                throw new IllegalStateException();
+            int len = _signingKey.length();
+            byte[] b = new byte[2 + len];
+            DataHelper.toLong(b, 0, 2, _signingKey.getType().getCode());
+            System.arraycopy(_signingKey.getData(), 0, b, 2, len);
+            __calculatedHash = SHA256Generator.getInstance().calculateHash(b);
+        }
+        return __calculatedHash;
     }
 
     // encrypt / decrypt TODO
