@@ -174,7 +174,10 @@ public class GeoIP {
                                 // returns upper case or "--"
                                 String uc = ls.getCountry(ip).getCode();
                                 if (!uc.equals(UNKNOWN_COUNTRY_CODE)) {
-                                    String cached = _codeCache.get(uc.toLowerCase(Locale.US));
+                                    String lc = uc.toLowerCase(Locale.US);
+                                    String cached = _codeCache.get(lc);
+                                    if (cached == null)
+                                        cached = lc;
                                     _IPToCountry.put(ipl, cached);
                                 } else {
                                     _notFound.add(ipl);
@@ -197,7 +200,10 @@ public class GeoIP {
                                 // returns upper case or null
                                 String uc = dbr.country(ipv4);
                                 if (uc != null) {
-                                    String cached = _codeCache.get(uc.toLowerCase(Locale.US));
+                                    String lc = uc.toLowerCase(Locale.US);
+                                    String cached = _codeCache.get(lc);
+                                    if (cached == null)
+                                        cached = lc;
                                     _IPToCountry.put(ipl, cached);
                                 } else {
                                     _notFound.add(ipl);
@@ -262,7 +268,10 @@ public class GeoIP {
                                 // returns upper case or null
                                 String uc = dbr.country(ipv6);
                                 if (uc != null) {
-                                    String cached = _codeCache.get(uc.toLowerCase(Locale.US));
+                                    String lc = uc.toLowerCase(Locale.US);
+                                    String cached = _codeCache.get(lc);
+                                    if (cached == null)
+                                        cached = lc;
                                     _IPToCountry.put(ipl, cached);
                                 } else {
                                     _notFound.add(ipl);
