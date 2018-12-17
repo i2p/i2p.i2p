@@ -67,11 +67,11 @@ public class Analysis extends JobImpl implements RouterApp {
     // multiplied by size - 1, will also get POINTS24 added
     private static final double POINTS32 = 5.0;
     // multiplied by size - 1, will also get POINTS16 added
-    private static final double POINTS24 = 5.0;
+    private static final double POINTS24 = 4.0;
     // multiplied by size - 1
     private static final double POINTS16 = 0.25;
     private static final double POINTS_US32 = 25.0;
-    private static final double POINTS_US24 = 25.0;
+    private static final double POINTS_US24 = 20.0;
     private static final double POINTS_US16 = 10.0;
     private static final double POINTS_FAMILY = -10.0;
     private static final double POINTS_BAD_OUR_FAMILY = 100.0;
@@ -421,6 +421,12 @@ public class Analysis extends JobImpl implements RouterApp {
             if (ourIP == null)
                 return;
         }
+        String reason32 = "Same IP as <a href=\"/netdb?ip=" +
+                          ourIP[0] + '.' + ourIP[1] + '.' + ourIP[2] + '.' + ourIP[3] + "&amp;sybil\">us</a>";
+        String reason24 = "Same /24 IP as <a href=\"/netdb?ip=" +
+                          ourIP[0] + '.' + ourIP[1] + '.' + ourIP[2] + ".0/24&amp;sybil\">us</a>";
+        String reason16 = "Same /16 IP as <a href=\"/netdb?ip=" +
+                          ourIP[0] + '.' + ourIP[1] + ".0.0/16&amp;sybil\">us</a>";
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
             if (ip == null)
@@ -428,14 +434,14 @@ public class Analysis extends JobImpl implements RouterApp {
             if (ip[0] == ourIP[0] && ip[1] == ourIP[1]) {
                 if (ip[2] == ourIP[2]) {
                     if (ip[3] == ourIP[3]) {
-                        addPoints(points, info.getHash(), POINTS_US32, "Same IP as us");
+                        addPoints(points, info.getHash(), POINTS_US32, reason32);
                         ri32.add(info);
                     } else {
-                        addPoints(points, info.getHash(), POINTS_US24, "Same /24 as us");
+                        addPoints(points, info.getHash(), POINTS_US24, reason24);
                         ri24.add(info);
                     }
                 } else {
-                    addPoints(points, info.getHash(), POINTS_US16, "Same /16 as us");
+                    addPoints(points, info.getHash(), POINTS_US16, reason16);
                     ri16.add(info);
                 }
             }
@@ -469,7 +475,9 @@ public class Analysis extends JobImpl implements RouterApp {
             int i1 = (i >> 16) & 0xff;
             int i2 = (i >> 8) & 0xff;
             int i3 = i & 0xff;
-            String reason = "Same IP with " + (count - 1) + " other" + (( count > 2) ? "s" : "");
+            String reason = "Same IP with <a href=\"/netdb?ip=" +
+                            i0 + '.' + i1 + '.' + i2 + '.' + i3 + "&amp;sybil\">" +
+                            (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
@@ -515,7 +523,9 @@ public class Analysis extends JobImpl implements RouterApp {
             int i0 = i >> 16;
             int i1 = (i >> 8) & 0xff;
             int i2 = i & 0xff;
-            String reason = "Same /24 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : "");
+            String reason = "Same /24 IP with <a href=\"/netdb?ip=" +
+                            i0 + '.' + i1 + '.' + i2 + ".0/24&amp;sybil\">" +
+                            (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
@@ -558,7 +568,9 @@ public class Analysis extends JobImpl implements RouterApp {
             int i = ii.intValue();
             int i0 = i >> 8;
             int i1 = i & 0xff;
-            String reason = "Same /16 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : "");
+            String reason = "Same /16 IP with <a href=\"/netdb?ip=" +
+                            i0 + '.' + i1 + ".0.0/16&amp;sybil\">" +
+                            (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
