@@ -415,9 +415,13 @@ public class NTCPConnection implements Closeable {
     
     /** @return milliseconds */
     public long getTimeSinceSend() { return _context.clock().now()-_lastSendTime; }
+    
+    public long getTimeSinceSend(long now) { return now - _lastSendTime; }
 
     /** @return milliseconds */
     public long getTimeSinceReceive() { return _context.clock().now()-_lastReceiveTime; }
+    
+    public long getTimeSinceReceive(long now) { return now - _lastReceiveTime; }
 
     /** @return milliseconds */
     public long getTimeSinceCreated() { return _context.clock().now()-_created; }

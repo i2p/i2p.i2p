@@ -707,12 +707,13 @@ public class NTCPTransport extends TransportImpl {
      * As of 0.9.20, actually returns active peer count, not total.
      */
     public int countActivePeers() {
+    	final long now = _context.clock().now();
         int active = 0;
         for (NTCPConnection con : _conByIdent.values()) {
             // con initializes times at construction,
             // so check message count also
-            if ((con.getMessagesSent() > 0 && con.getTimeSinceSend() <= 5*60*1000) ||
-                (con.getMessagesReceived() > 0 && con.getTimeSinceReceive() <= 5*60*1000)) {
+            if ((con.getMessagesSent() > 0 && con.getTimeSinceSend(now) <= 5*60*1000) ||
+                (con.getMessagesReceived() > 0 && con.getTimeSinceReceive(now) <= 5*60*1000)) {
                 active++;
             }
         }
