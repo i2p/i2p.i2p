@@ -288,6 +288,7 @@ public class PeerHelper extends HelperBase {
                    " </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
+        long now = _context.clock().now();
         for (NTCPConnection con : peers) {
             buf.append("<tr><td class=\"cells\" align=\"left\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(con.getRemotePeer().calculateHash()));
@@ -306,10 +307,10 @@ public class PeerHelper extends HelperBase {
                 buf.append("");
             buf.append("</td><td class=\"cells peeripv6\" align=\"center\">").append(con.getVersion());
             buf.append("</td><td class=\"cells\" align=\"center\"><span class=\"right\">");
-            buf.append(DataHelper.formatDuration2(con.getTimeSinceReceive()));
-            buf.append("</span>").append(THINSP).append("<span class=\"left\">").append(DataHelper.formatDuration2(con.getTimeSinceSend()));
+            buf.append(DataHelper.formatDuration2(con.getTimeSinceReceive(now)));
+            buf.append("</span>").append(THINSP).append("<span class=\"left\">").append(DataHelper.formatDuration2(con.getTimeSinceSend(now)));
             buf.append("</span></td><td class=\"cells\" align=\"center\"><span class=\"right\">");
-            if (con.getTimeSinceReceive() < 2*60*1000) {
+            if (con.getTimeSinceReceive(now) < 2*60*1000) {
                 float r = con.getRecvRate();
                 buf.append(formatRate(r / 1000));
                 bpsRecv += r;
@@ -317,7 +318,7 @@ public class PeerHelper extends HelperBase {
                 buf.append(formatRate(0));
             }
             buf.append("</span>").append(THINSP).append("<span class=\"left\">");
-            if (con.getTimeSinceSend() < 2*60*1000) {
+            if (con.getTimeSinceSend(now) < 2*60*1000) {
                 float r = con.getSendRate();
                 buf.append(formatRate(r / 1000));
                 bpsSend += r;

@@ -707,7 +707,7 @@ public class NTCPTransport extends TransportImpl {
      * As of 0.9.20, actually returns active peer count, not total.
      */
     public int countActivePeers() {
-    	final long now = _context.clock().now();
+        final long now = _context.clock().now();
         int active = 0;
         for (NTCPConnection con : _conByIdent.values()) {
             // con initializes times at construction,
@@ -724,11 +724,12 @@ public class NTCPTransport extends TransportImpl {
      * How many peers are we actively sending messages to (this minute)
      */
     public int countActiveSendPeers() {
+        final long now = _context.clock().now();
         int active = 0;
         for (NTCPConnection con : _conByIdent.values()) {
             // con initializes times at construction,
             // so check message count also
-            if (con.getMessagesSent() > 0 && con.getTimeSinceSend() <= 60*1000) {
+            if (con.getMessagesSent() > 0 && con.getTimeSinceSend(now) <= 60*1000) {
                 active++;
             }
         }
@@ -1104,12 +1105,13 @@ public class NTCPTransport extends TransportImpl {
      */
     void expireTimedOut() {
         int expired = 0;
+        final long now = _context.clock().now();
 
             for (Iterator<NTCPConnection> iter = _establishing.iterator(); iter.hasNext(); ) {
                 NTCPConnection con = iter.next();
                 if (con.isClosed() || con.isEstablished()) {
                     iter.remove();
-                } else if (con.getTimeSinceCreated() > ESTABLISH_TIMEOUT) {
+                } else if (con.getTimeSinceCreated(now) > ESTABLISH_TIMEOUT) {
                     iter.remove();
                     con.close();
                     expired++;
