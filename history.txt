@@ -1,3 +1,21 @@
+2018-12-21 zzz
+ * Transports: Improve banning of routers from wrong network
+
+2018-12-19 zzz
+ * NTCP: Efficiency improvements (ticket #2355)
+
+2018-12-17 zzz
+ * Console: Sybil tool background analysis
+ * Data: Set encrypted LS2 hash (proposal 123)
+ * GeoIP: Fix NPE (thx parg)
+ * NTCP: Use new HKDF class
+
+2018-12-15 zzz
+ * Console: Sybil tool refactoring
+
+2018-12-13 zzz
+ * Crypto: Add HKDF class for LS2 and NTCP2 (proposal 123)
+
 2018-12-12 zzz
  * DTG: Use UrlLauncher to launch browser
  * Installer: Drop unused systray.config

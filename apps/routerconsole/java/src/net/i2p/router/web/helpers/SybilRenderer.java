@@ -722,7 +722,11 @@ public class SybilRenderer {
             }
             if (!full) {
                 buf.append("<a title=\"View extended router info\" class=\"viewfullentry\" href=\"netdb?r=")
-                   .append(hash, 0, 6).append("\" >[").append(_t("Full entry")).append("]</a></th><th>");
+                   .append(hash, 0, 6).append("\" >[").append(_t("Full entry")).append("]</a>");
+                buf.append("<a title=\"View profile data\" class=\"viewfullentry\" href=\"viewprofile?peer=")
+                   .append(hash).append("\" >[").append(_t("profile")).append("]</a>");
+                buf.append("<a title=\"").append(_t("Configure peer")).append("\" class=\"viewfullentry\" href=\"configpeer?peer=")
+                   .append(hash).append("\" >+-</a></th><th>");
             }
             if (_context.portMapper().isRegistered("imagegen"))
                 buf.append("<img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
