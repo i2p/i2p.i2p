@@ -339,7 +339,7 @@ public class Analysis extends JobImpl implements RouterApp {
 
     /**
      *  @param pairs out parameter, sorted
-     *  @param return average distance
+     *  @return average distance
      *  @since 0.9.38 split out from renderPairDistance()
      */
     public double calculatePairDistance(List<RouterInfo> ris, Map<Hash, Points> points,
