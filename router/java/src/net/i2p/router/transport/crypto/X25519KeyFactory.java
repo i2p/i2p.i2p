@@ -40,7 +40,7 @@ public class X25519KeyFactory extends I2PThread {
     private final static int DEFAULT_DH_PRECALC_DELAY = 25;
 
     public X25519KeyFactory(I2PAppContext ctx) {
-        super("DH Precalc");
+        super("XDH Precalc");
         _context = ctx;
         _log = ctx.logManager().getLog(X25519KeyFactory.class);
         ctx.statManager().createRateStat("crypto.XDHGenerateTime", "How long it takes to create x and X", "Encryption", new long[] { 60*60*1000 });
