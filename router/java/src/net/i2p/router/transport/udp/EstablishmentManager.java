@@ -252,7 +252,7 @@ class EstablishmentManager {
         RouterIdentity toIdentity = toRouterInfo.getIdentity();
         Hash toHash = toIdentity.calculateHash();
         if (toRouterInfo.getNetworkId() != _networkID) {
-            _context.banlist().banlistRouter(toHash);
+            _context.banlist().banlistRouterForever(toHash, "Not in our network: " + toRouterInfo.getNetworkId());
             _transport.markUnreachable(toHash);
             _transport.failed(msg, "Remote peer is on the wrong network, cannot establish");
             return;

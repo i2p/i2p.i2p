@@ -920,7 +920,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             return "Invalid routerInfo signature";
         }
         if (routerInfo.getNetworkId() != _networkID){
-            _context.banlist().banlistRouter(key, "Not in our network");
+            _context.banlist().banlistRouterForever(key, "Not in our network: " + routerInfo.getNetworkId());
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad network: " + routerInfo);
             return "Not in our network";

@@ -81,6 +81,7 @@ public class NTCPTransport extends TransportImpl {
     private int _ssuPort;
     /** synch on this */
     private final Set<InetSocketAddress> _endpoints;
+    private final int _networkID;
 
     /**
      * list of NTCPConnection of connections not yet established that we
@@ -229,6 +230,7 @@ public class NTCPTransport extends TransportImpl {
         _reader = new Reader(ctx);
         _writer = new net.i2p.router.transport.ntcp.Writer(ctx);
 
+        _networkID = ctx.router().getNetworkID();
         _fastBid = new SharedBid(25); // best
         _slowBid = new SharedBid(70); // better than ssu unestablished, but not better than ssu established
         _slowCostBid = new SharedBid(85);
@@ -503,6 +505,11 @@ public class NTCPTransport extends TransportImpl {
                 }
             }
             return _fastBid;
+        }
+        if (toAddress.getNetworkId() != _networkID) {
+            _context.banlist().banlistRouterForever(peer, "Not in our network: " + toAddress.getNetworkId());
+            markUnreachable(peer);
+            return null;    
         }
         if (dataSize > NTCPConnection.NTCP1_MAX_MSG_SIZE) {
             // Not established, too big for NTCP 1, let SSU deal with it
