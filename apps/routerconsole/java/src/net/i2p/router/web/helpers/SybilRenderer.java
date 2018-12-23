@@ -796,8 +796,8 @@ public class SybilRenderer {
                 buf.append("<p><b>Hash Distance:</b> ").append(fmt.format(distance)).append("</p>\n");
             }
         }
-        buf.append("<p><b>Version:</b> ").append(DataHelper.stripHTML(info.getVersion())).append("</p>\n" +
-                   "<p><b>Caps:</b> ").append(DataHelper.stripHTML(info.getCapabilities())).append("</p>\n");
+        buf.append("<p><b>").append(_t("Version")).append(":</b> ").append(DataHelper.stripHTML(info.getVersion())).append("</p>\n" +
+                   "<p><b>").append(_t("Caps")).append(":</b> ").append(DataHelper.stripHTML(info.getCapabilities())).append("</p>\n");
         String kr = info.getOption("netdb.knownRouters");
 ;
         if (kr != null) {
@@ -807,13 +807,13 @@ public class SybilRenderer {
         }
         String kls = info.getOption("netdb.knownLeaseSets");
         if (kls != null) {
-            buf.append("<p class=\"sybilinfo_leasesets\"><b>Lease Sets:</b> ").append(DataHelper.stripHTML(kls)).append("</p>\n");
+            buf.append("<p class=\"sybilinfo_leasesets\"><b>").append(_t("LeaseSets")).append(":</b> ").append(DataHelper.stripHTML(kls)).append("</p>\n");
         } else {
-            buf.append("<p class=\"sybilinfo_leasesets filler\"><b>Lease Sets:</b> ").append(_t("n/a")).append("</p>");
+            buf.append("<p class=\"sybilinfo_leasesets filler\"><b>").append(_t("LeaseSets")).append(":</b> ").append(_t("n/a")).append("</p>");
         }
         String fam = info.getOption("family");
         if (fam != null) {
-            buf.append("<p><b>Family:</b> <span class=\"sybilinfo_familyname\">").append(DataHelper.escapeHTML(fam)).append("</span></p>\n");
+            buf.append("<p><b>").append(_t("Family")).append(":</b> <span class=\"sybilinfo_familyname\">").append(DataHelper.escapeHTML(fam)).append("</span></p>\n");
         }
         long now = _context.clock().now();
         if (!isUs) {
@@ -829,46 +829,46 @@ public class SybilRenderer {
                 heard = prof.getLastHeardAbout();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    buf.append("<p><b>Last heard about:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                    buf.append("<p><b>").append(_t("Last Heard About")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                 } else {
-                    buf.append("<p class=\"sybil_filler\"><b>Last heard about:</b> ").append(_t("n/a")).append("</p>");
+                    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Heard About")).append(":</b> ").append(_t("n/a")).append("</p>");
                 }
                 heard = prof.getLastHeardFrom();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    buf.append("<p><b>Last heard from:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>\n");
+                    buf.append("<p><b>").append(_t("Last Heard From")).append("</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>\n");
                 } else {
-                    buf.append("<p class=\"sybil_filler\"><b>Last heard from:</b> ").append(_t("n/a")).append("</p>");
+                    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Heard From")).append(":</b> ").append(_t("n/a")).append("</p>");
                 }
                 DBHistory dbh = prof.getDBHistory();
                 if (dbh != null) {
                     heard = dbh.getLastLookupSuccessful();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last lookup successful:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Good Lookup")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last lookup successful:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastLookupFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last lookup failed:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Bad Lookup")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last lookup failed:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastStoreSuccessful();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last store successful:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Good Store")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last store successful:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Store")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastStoreFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last store failed:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Bad Store")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last store failed:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Store")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                 }
                 // any other profile stuff?
