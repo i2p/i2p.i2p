@@ -395,10 +395,10 @@ public class GraphHelper extends FormHandler {
             for (int i = 0; i < times.length; i++) {
                 _out.write("<option value=\"");
                 _out.write(Integer.toString(times[i]));
-                _out.write("\"");
+                _out.write('"');
                 if (times[i] == _refreshDelaySeconds)
                     _out.write(" selected=\"selected\"");
-                _out.write(">");
+                _out.write('>');
                 if (times[i] > 0)
                     _out.write(DataHelper.formatDuration2(times[i] * 1000));
                 else

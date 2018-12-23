@@ -157,8 +157,6 @@ public class ConfigUpdateHandler extends FormHandler {
 
     @Override
     protected void processForm() {
-        if (_action == null)
-            return;
         if (_action.equals(_t("Check for updates"))) {
             ConsoleUpdateManager mgr = UpdateHandler.updateManager(_context);
             if (mgr == null) {

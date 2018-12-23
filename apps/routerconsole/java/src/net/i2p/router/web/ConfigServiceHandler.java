@@ -228,8 +228,6 @@ public class ConfigServiceHandler extends FormHandler {
 
     @Override
     protected void processForm() {
-        if (_action == null) return;
-        
         if (_t("Shutdown gracefully").equals(_action)) {
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_GRACEFUL, false);

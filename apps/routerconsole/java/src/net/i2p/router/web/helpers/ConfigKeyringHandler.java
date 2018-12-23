@@ -15,7 +15,6 @@ public class ConfigKeyringHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if (_action == null) return;
         boolean adding = _action.equals(_t("Add key"));
         if (adding || _action.equals(_t("Delete key"))) {
             if (_peer == null)

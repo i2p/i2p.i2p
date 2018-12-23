@@ -130,6 +130,7 @@ public abstract class FormHandler {
      * Implement this to perform the final processing (in turn, adding formNotice
      * and formError messages, etc)
      *
+     * Will only be called if _action is non-null and the nonce is valid.
      */
     protected abstract void processForm();
     
