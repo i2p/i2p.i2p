@@ -67,6 +67,7 @@ public class SybilRenderer {
     private static final int MAX = Analysis.MAX;
     private static final double MIN_CLOSE = Analysis.MIN_CLOSE;
     private static final double MIN_DISPLAY_POINTS = 12.01;
+    private static final int[] HOURS = { 1, 6, 24, 7*24, 30*24, 0 };
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
@@ -143,6 +144,7 @@ public class SybilRenderer {
                    "If you see anything you would like to discuss with the devs, contact us on IRC #i2p-dev.</b></p>" +
                    "<div id=\"sybilnav\"><ul><li><a href=\"netdb?f=3\">Review stored analysis</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=14\">Run new analysis</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=15\">Configure periodic analysis</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=1\">Floodfill Summary</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=2\">Same Family</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=3\">IP close to us</a>" +
@@ -215,8 +217,11 @@ public class SybilRenderer {
             }
             renderThreatsHTML(out, buf, now, points);
         } else if (mode == 14) {
-            // show form
+            // show run form
             renderRunForm(out, buf, nonce);
+        } else if (mode == 15) {
+            // show background form
+            renderBackgroundForm(out, buf, nonce);
         } else {
             out.write("Unknown mode " + mode);
         }
@@ -235,7 +240,7 @@ public class SybilRenderer {
             buf.append("<form action=\"netdb\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
                        "<input type=\"hidden\" name=\"m\" value=\"12\">\n" +
-                       "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n" +
+                       "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
                        "Select stored analysis: " +
                        "<select name=\"date\">\n");
             boolean first = true;
@@ -256,16 +261,45 @@ public class SybilRenderer {
         writeBuf(out, buf);
     }
 
+    /**
+     *  @since 0.9.38
+     */
+    private static void renderRunForm(Writer out, StringBuilder buf, String nonce) throws IOException {
+        buf.append("<form action=\"netdb\" method=\"POST\">\n" +
+                   "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
+                   "<input type=\"hidden\" name=\"m\" value=\"13\">\n" +
+                   "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
+                   "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Run new analysis\" />" +
+                   "</form>\n");
+        writeBuf(out, buf);
+    }
 
     /**
      *  @since 0.9.38
      */
-    private void renderRunForm(Writer out, StringBuilder buf, String nonce) throws IOException {
+    private void renderBackgroundForm(Writer out, StringBuilder buf, String nonce) throws IOException {
+        long freq = _context.getProperty(Analysis.PROP_FREQUENCY, 0L);
         buf.append("<form action=\"netdb\" method=\"POST\">\n" +
                    "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
-                   "<input type=\"hidden\" name=\"m\" value=\"13\">\n" +
-                   "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n" +
-                   "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Run new analysis\" />" +
+                   "<input type=\"hidden\" name=\"m\" value=\"15\">\n" +
+                   "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
+                   "Background analysis run frequency: <select name=\"runFrequency\">");
+        for (int i = 0; i < HOURS.length; i++) {
+            buf.append("<option value=\"");
+            buf.append(Integer.toString(HOURS[i]));
+            buf.append('"');
+            long time = HOURS[i] * 60*60*1000L;
+            if (time == freq)
+                buf.append(" selected=\"selected\"");
+            buf.append('>');
+            if (HOURS[i] > 0)
+                buf.append(DataHelper.formatDuration2(time));
+            else
+                buf.append(_t("Never"));
+            buf.append("</option>\n");
+        }
+        buf.append("</select> " +
+                   "<input type=\"submit\" name=\"action\" class=\"accept\" value=\"Save\" />" +
                    "</form>\n");
         writeBuf(out, buf);
     }

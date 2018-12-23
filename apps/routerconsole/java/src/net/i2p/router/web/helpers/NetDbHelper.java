@@ -6,6 +6,7 @@ import java.util.Locale;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.util.SystemVersion;
+import net.i2p.router.sybil.Analysis;
 import net.i2p.router.web.FormHandler;
 
 /**
@@ -219,6 +220,21 @@ public class NetDbHelper extends FormHandler {
     protected void processForm() {
         _postOK = "Run new analysis".equals(_action) ||
                   "Review analysis".equals(_action);
+        if ("Save".equals(_action)) {
+            String newTime = getJettyString("runFrequency");
+            if (newTime != null) {
+                try {
+                    long ntime = Long.parseLong(newTime) * 60*60*1000;
+                    if (_context.router().saveConfig(Analysis.PROP_FREQUENCY, Long.toString(ntime)))
+                        addFormNotice(_t("Configuration saved successfully."));
+                    else
+                        addFormError("Error saving the configuration (applied but not saved) - please see the error logs");
+                    Analysis.getInstance(_context).schedule();
+                } catch (NumberFormatException nfe) {
+                        addFormError("bad value");
+                }
+            }
+        }
     }
 
     /**

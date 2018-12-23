@@ -192,6 +192,8 @@ public class Analysis extends JobImpl implements RouterApp {
             when = Math.max(when, now + MIN_UPTIME - up);
             getTiming().setStartAfter(when);
             _context.jobQueue().addJob(this);
+        } else {
+            _context.jobQueue().removeJob(this);
         }
     }
 
