@@ -266,7 +266,7 @@ public class PeerHelper extends HelperBase {
         buf.append("<h3 id=\"ntcpcon\">").append(_t("NTCP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_t("Limit")).append(": ").append(nt.getMaxConnections());
         //buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
-        if (_context.getBooleanProperty(PROP_ADVANCED)) {
+        if (isAdvanced()) {
             buf.append(". ").append(_t("Status")).append(": ").append(_t(nt.getReachabilityStatus().toStatusString()));
         }
         buf.append(".</h3>\n" +

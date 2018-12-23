@@ -263,7 +263,7 @@ public class NetDbHelper extends HelperBase {
         for (int i = 0; i < titles.length; i++) {
             if (i == 2 && tab != 2)
                 continue;   // can't nav to lookup
-            if ((i == 5 || i == 7 || i == 8) && !_context.getBooleanProperty(PROP_ADVANCED))
+            if ((i == 5 || i == 7 || i == 8) && !isAdvanced())
                 continue;
             if (i == tab) {
                 // we are there
