@@ -78,8 +78,8 @@ public class SybilRenderer {
      *  @param mode what tab to show
      *  @param date only for mode = 12
      */
-    public String getNetDbSummary(Writer out, int mode, long date) throws IOException {
-        renderRouterInfoHTML(out, mode, date);
+    public String getNetDbSummary(Writer out, String nonce, int mode, long date) throws IOException {
+        renderRouterInfoHTML(out, nonce, mode, date);
         return "";
     }
 
@@ -125,21 +125,24 @@ public class SybilRenderer {
      *  @param mode what tab to show
      *  @param date only for mode = 12
      */
-    private void renderRouterInfoHTML(Writer out, int mode, long date) throws IOException {
+    private void renderRouterInfoHTML(Writer out, String nonce, int mode, long date) throws IOException {
         Hash us = _context.routerHash();
         Analysis analysis = Analysis.getInstance(_context);
-        List<RouterInfo> ris = analysis.getFloodfills(us);
-        if (ris.isEmpty()) {
-            out.write("<h3 class=\"sybils\">No known floodfills</h3>");
-            return;
+        List<RouterInfo> ris = null;
+        if (mode != 0 && mode != 12 && mode != 13 && mode != 14) {
+            ris = analysis.getFloodfills(us);
+            if (ris.isEmpty()) {
+                out.write("<h3 class=\"sybils\">No known floodfills</h3>");
+                return;
+            }
         }
 
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<p id=\"sybilinfo\"><b>This is an experimental network database tool for debugging and analysis. Do not panic even if you see warnings below. " +
-                   "Possible \"threats\" are summarized at the bottom, however these are unlikely to be real threats. " +
+                   "Possible \"threats\" are summarized, however these are unlikely to be real threats. " +
                    "If you see anything you would like to discuss with the devs, contact us on IRC #i2p-dev.</b></p>" +
                    "<div id=\"sybilnav\"><ul><li><a href=\"netdb?f=3\">Review stored analysis</a>" +
-                   "</li><li><a href=\"netdb?f=3&amp;m=13\">Run new analysis</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=14\">Run new analysis</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=1\">Floodfill Summary</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=2\">Same Family</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=3\">IP close to us</a>" +
@@ -154,11 +157,14 @@ public class SybilRenderer {
                    "</li></ul></div>");
         writeBuf(out, buf);
 
-        double avgMinDist = analysis.getAvgMinDist(ris);
+        double avgMinDist = 0;
+        if (mode == 1 || mode == 8 || mode == 9 || mode == 10 || mode == 11) {
+            avgMinDist = analysis.getAvgMinDist(ris);
+        }
         Map<Hash, Points> points = new HashMap<Hash, Points>(64);
 
         if (mode == 0) {
-            renderOverview(out, buf, analysis);
+            renderOverview(out, buf, nonce, analysis);
         } else if (mode == 1) {
             renderFFSummary(out, buf, ris, avgMinDist);
         } else if (mode == 2) {
@@ -182,6 +188,7 @@ public class SybilRenderer {
         } else if (mode == 11) {
             renderDestSummary(out, buf, analysis, avgMinDist, ris, points);
         } else if (mode == 12) {
+            // load stored analysis
             PersistSybil ps = analysis.getPersister();
             try {
                 points = ps.load(date);
@@ -195,6 +202,7 @@ public class SybilRenderer {
                 renderThreatsHTML(out, buf, date, points);
             }
         } else if (mode == 13) {
+            // run analysis and store it
             long now = _context.clock().now();
             points = analysis.backgroundAnalysis();
             if (!points.isEmpty()) {
@@ -206,6 +214,9 @@ public class SybilRenderer {
                 }
             }
             renderThreatsHTML(out, buf, now, points);
+        } else if (mode == 14) {
+            // show form
+            renderRunForm(out, buf, nonce);
         } else {
             out.write("Unknown mode " + mode);
         }
@@ -215,15 +226,16 @@ public class SybilRenderer {
     /**
      *  @since 0.9.38
      */
-    private void renderOverview(Writer out, StringBuilder buf, Analysis analysis) throws IOException {
+    private void renderOverview(Writer out, StringBuilder buf, String nonce, Analysis analysis) throws IOException {
         PersistSybil ps = analysis.getPersister();
         List<Long> dates = ps.load();
         if (dates.isEmpty()) {
             out.write("No stored analysis");
         } else {
-            buf.append("<form action=\"netdb\" method=\"GET\">\n" +
+            buf.append("<form action=\"netdb\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
                        "<input type=\"hidden\" name=\"m\" value=\"12\">\n" +
+                       "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n" +
                        "Select stored analysis: " +
                        "<select name=\"date\">\n");
             boolean first = true;
@@ -241,7 +253,20 @@ public class SybilRenderer {
                        "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Review analysis\" />" +
                        "</form>\n");
         }        
-        buf.append("<br><a href=\"netdb?f=3&amp;m=13\">Run new analysis</a>");
+        writeBuf(out, buf);
+    }
+
+
+    /**
+     *  @since 0.9.38
+     */
+    private void renderRunForm(Writer out, StringBuilder buf, String nonce) throws IOException {
+        buf.append("<form action=\"netdb\" method=\"POST\">\n" +
+                   "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
+                   "<input type=\"hidden\" name=\"m\" value=\"13\">\n" +
+                   "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n" +
+                   "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Run new analysis\" />" +
+                   "</form>\n");
         writeBuf(out, buf);
     }
 
