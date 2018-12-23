@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ public abstract class FormHandler {
     private final List<String> _notices;
     private boolean _processed;
     private boolean _valid;
+    protected Writer _out;
     
     public FormHandler() {
         _errors = new ArrayList<String>();
@@ -111,6 +113,11 @@ public abstract class FormHandler {
     public void storeMethod(String val) { _method = val; }
 
     /**
+     * @since 0.9.38
+     */
+    public void storeWriter(Writer out) { _out = out; }
+
+    /**
      * The old nonces from the session
      * @since 0.9.4
      */
@@ -120,11 +127,11 @@ public abstract class FormHandler {
     }
     
     /**
-     * Override this to perform the final processing (in turn, adding formNotice
+     * Implement this to perform the final processing (in turn, adding formNotice
      * and formError messages, etc)
      *
      */
-    protected void processForm() {}
+    protected abstract void processForm();
     
     /**
      * Add an error message to display

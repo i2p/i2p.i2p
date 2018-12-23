@@ -2,7 +2,6 @@ package net.i2p.router.web.helpers;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,7 +24,6 @@ import net.i2p.stat.Rate;
  *  /graphs.jsp, including form, and /graph.jsp
  */
 public class GraphHelper extends FormHandler {
-    protected Writer _out;
     private int _periodCount;
     private boolean _showEvents;
     private int _width;
@@ -73,12 +71,6 @@ public class GraphHelper extends FormHandler {
         // shorten the refresh by 3 seconds so we beat the iframe
         return "<meta http-equiv=\"refresh\" content=\"" + (_refreshDelaySeconds - 3) + "\">";
     }
-
-    /**
-     *  This was a HelperBase but now it's a FormHandler
-     *  @since 0.8.2
-     */
-    public void storeWriter(Writer out) { _out = out; }
 
     public void setPeriodCount(String str) { 
         setC(str);

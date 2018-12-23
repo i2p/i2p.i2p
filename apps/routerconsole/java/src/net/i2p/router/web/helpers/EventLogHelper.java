@@ -1,7 +1,6 @@
 package net.i2p.router.web.helpers;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,7 +23,6 @@ import net.i2p.util.SystemVersion;
  *  /events.jsp
  */
 public class EventLogHelper extends FormHandler {
-    protected Writer _out;
     private long _from, _age;
     //private long _to = Long.MAX_VALUE;
     private String _event = ALL;
@@ -63,6 +61,8 @@ public class EventLogHelper extends FormHandler {
         _xevents = new HashMap<String, String>(1 + (_events.length / 2));
     }
 
+    protected void processForm() {}
+
     /** set the defaults after we have a context */
     @Override
     public void setContextId(String contextId) {
@@ -72,8 +72,6 @@ public class EventLogHelper extends FormHandler {
         }
     }
     
-    public void storeWriter(Writer out) { _out = out; }
-
     public void setFrom(String s) { 
         try {
             _age = Long.parseLong(s);
