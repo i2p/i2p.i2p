@@ -22,6 +22,9 @@ public class Points implements Comparable<Points> {
         reasons = new ArrayList<String>(4);
     }
 
+    /**
+     *  @param reason may not contain '%'
+     */
     public Points(double d, String reason) {
         this();
         addPoints(d, reason);
@@ -42,6 +45,7 @@ public class Points implements Comparable<Points> {
     }
 
     /**
+     *  @param reason may not contain '%'
      *  @since 0.9.38
      */
     public void addPoints(double d, String reason) {
@@ -67,13 +71,17 @@ public class Points implements Comparable<Points> {
 
     /**
      *  For persistence.
-     *  Total points and reasons, comma separated, no newline
+     *  Total points and reasons, '%' separated, no newline.
+     *  The separation character is chosen to not conflict with
+     *  decimal point in various locales, or chars in reasons, including HTML links,
+     *  or special chars in Pattern.
+     *
      *  @since 0.9.38
      */
     public void toString(StringBuilder buf) {
         buf.append(points);
         for (String r : reasons) {
-            buf.append(',').append(r);
+            buf.append('%').append(r);
         }
     }
 
@@ -83,7 +91,7 @@ public class Points implements Comparable<Points> {
      *  @since 0.9.38
      */
     public static Points fromString(String s) {
-        String[] ss = DataHelper.split(s, ",");
+        String[] ss = DataHelper.split(s, "%");
         if (ss.length < 2)
             return null;
         double d;
