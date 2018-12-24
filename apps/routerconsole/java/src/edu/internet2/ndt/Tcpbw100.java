@@ -958,8 +958,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		_chkboxDefaultTest.setSelected(true);
 		// 3. configure number of tests
 		SpinnerNumberModel model = new SpinnerNumberModel();
-		model.setMinimum(new Integer(0));
-		model.setValue(new Integer(1));
+		model.setMinimum(Integer.valueOf(0));
+		model.setValue(Integer.valueOf(1));
 		_spinnerTestCount.setModel(model);
 		_spinnerTestCount.setPreferredSize(new Dimension(60, 20));
 		_cmboboxDelay = new JComboBox();
