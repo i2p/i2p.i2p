@@ -1,3 +1,9 @@
+2018-12-24 zzz
+ * Console: Update ARM warning (ticket #2368)
+
+2018-12-23 zzz
+ * Console: Sybil tool background analysis setup form
+
 2018-12-21 zzz
  * Transports: Improve banning of routers from wrong network
 

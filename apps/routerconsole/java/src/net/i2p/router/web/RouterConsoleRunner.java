@@ -343,8 +343,8 @@ public class RouterConsoleRunner implements RouterApp {
         boolean noJava7 = !SystemVersion.isJava7();
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
-        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
-        boolean isJava11 = SystemVersion.isJava11();
+        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
+        boolean isJava11 = false; // SystemVersion.isJava11();
         if (noJava7 || noPack200 || openARM || isJava11) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
@@ -364,15 +364,15 @@ public class RouterConsoleRunner implements RouterApp {
                 System.out.println("Warning: " + s);
             }
             if (openARM) {
-                s = "OpenJDK is not recommended for ARM. Use Oracle Java 8";
+                s = "OpenJDK 7/8 are not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
-            if (isJava11) {
-                s = "Java 11+ support is beta, and not recommended for general use";
-                log.logAlways(net.i2p.util.Log.WARN, s);
-                System.out.println("Warning: " + s);
-            }
+            //if (isJava11) {
+            //    s = "Java 11+ support is beta, and not recommended for general use";
+            //    log.logAlways(net.i2p.util.Log.WARN, s);
+            //    System.out.println("Warning: " + s);
+            //}
         }
     }
 
