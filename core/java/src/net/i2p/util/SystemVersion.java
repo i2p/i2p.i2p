@@ -27,7 +27,8 @@ public abstract class SystemVersion {
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
-    private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
+    private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm") ||
+                                          System.getProperty("os.arch").startsWith("aarch");
     private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
                                           System.getProperty("os.arch").equals("amd64");
     private static final boolean _isGentoo = System.getProperty("os.version").contains("gentoo") ||
