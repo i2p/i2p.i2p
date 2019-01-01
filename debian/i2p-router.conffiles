@@ -1,4 +1,3 @@
-/etc/i2p/wrapper.config
 /usr/share/i2p/blocklist.txt
 /usr/share/i2p/clients.config
 /usr/share/i2p/eepsite/contexts/base-context.xml
