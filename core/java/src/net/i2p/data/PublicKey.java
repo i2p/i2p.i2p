@@ -32,6 +32,7 @@ public class PublicKey extends SimpleDataStructure {
     private static final SDSCache<PublicKey> _cache = new SDSCache<PublicKey>(PublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
 
     private final EncType _type;
+    private final int _unknownTypeCode;
 
     /**
      * Pull from cache or return new.
@@ -63,6 +64,7 @@ public class PublicKey extends SimpleDataStructure {
     public PublicKey(EncType type) {
         super();
         _type = type;
+        _unknownTypeCode = (type != null) ? type.getCode() : -1;
     }
 
     /** @param data must be non-null */
@@ -82,7 +84,24 @@ public class PublicKey extends SimpleDataStructure {
         setData(data);
     }
 
-    /** constructs from base64
+    /**
+     *  Unknown type only.
+     *  @param typeCode must not match a known type. 1-255
+     *  @param data must be non-null
+     *  @since 0.9.38
+     */
+    public PublicKey(int typeCode, byte data[]) {
+        _type = null;
+        if (data == null)
+            throw new IllegalArgumentException("Data must be specified");
+        _data = data;
+        if (typeCode <= 0 || typeCode > 255)
+            throw new IllegalArgumentException();
+        _unknownTypeCode = typeCode;
+    }
+
+    /**
+     * Constructs from base64. ElGamal only.
      * @param base64Data a string of base64 data (the output of .toBase64() called
      * on a prior instance of PublicKey
      */
@@ -108,6 +127,14 @@ public class PublicKey extends SimpleDataStructure {
     }
 
     /**
+     *  Only valid if getType() returns null
+     *  @since 0.9.38
+     */
+    public int getUnknownTypeCode() {
+        return _unknownTypeCode;
+    }
+
+    /**
      *  @since 0.9.17
      */
     public static void clearCache() {
@@ -120,7 +147,7 @@ public class PublicKey extends SimpleDataStructure {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("[PublicKey ").append((_type != null) ? _type.toString() : "unknown type").append(' ');
+        buf.append("[PublicKey ").append((_type != null) ? _type.toString() : "unknown type: " + _unknownTypeCode).append(' ');
         if (_data == null) {
             buf.append("null");
         } else {

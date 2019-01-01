@@ -37,8 +37,6 @@ public class LeaseSet2 extends LeaseSet {
     protected Signature _offlineSignature;
     // may be null
     protected Properties _options;
-    // only used for unknown types; else use _encryptionKey.getType()
-    private int _encType;
     // only used if more than one key, otherwise null
     private List<PublicKey> _encryptionKeys;
 
@@ -236,18 +234,21 @@ public class LeaseSet2 extends LeaseSet {
         if (numKeys > 1)
             _encryptionKeys = new ArrayList<PublicKey>(numKeys);
         for (int i = 0; i < numKeys; i++) {
-            _encType = (int) DataHelper.readLong(in, 2);
+            int encType = (int) DataHelper.readLong(in, 2);
             int encLen = (int) DataHelper.readLong(in, 2);
             // TODO
-            if (_encType == 0) {
+            if (encType == 0) {
                 _encryptionKey = PublicKey.create(in);
             } else {
-                EncType type = EncType.getByCode(_encType);
+                EncType type = EncType.getByCode(encType);
                 // type will be null if unknown
                 byte[] encKey = new byte[encLen];
                 DataHelper.read(in, encKey);
                 // this will throw IAE if type is non-null and length is wrong
-                _encryptionKey = new PublicKey(type, encKey);
+                if (type != null)
+                    _encryptionKey = new PublicKey(type, encKey);
+                else
+                    _encryptionKey = new PublicKey(encType, encKey);
             }
             if (numKeys > 1)
                 _encryptionKeys.add(_encryptionKey);
@@ -299,7 +300,7 @@ public class LeaseSet2 extends LeaseSet {
             if (type != null) {
                 DataHelper.writeLong(out, 2, type.getCode());
             } else {
-                DataHelper.writeLong(out, 2, _encType);
+                DataHelper.writeLong(out, 2, key.getUnknownTypeCode());
             }
             DataHelper.writeLong(out, 2, key.length());
             key.writeBytes(out);
@@ -559,6 +560,14 @@ public class LeaseSet2 extends LeaseSet {
         ls2.addEncryptionKey(pubKey);
         net.i2p.crypto.KeyPair encKeys2 = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys(net.i2p.crypto.EncType.ECIES_X25519);
         pubKey = encKeys2.getPublic();
+        ls2.addEncryptionKey(pubKey);
+        byte[] b = new byte[99];
+        rand.nextBytes(b);
+        pubKey = new PublicKey(77, b);
+        ls2.addEncryptionKey(pubKey);
+        b = new byte[55];
+        rand.nextBytes(b);
+        pubKey = new PublicKey(177, b);
         ls2.addEncryptionKey(pubKey);
         SigningPrivateKey spk = pkf.getSigningPrivKey();
         if (offline) {
