@@ -187,7 +187,8 @@ public class LeaseSet extends DatabaseEntry {
     public void addLease(Lease lease) {
         if (lease == null) throw new IllegalArgumentException("erm, null lease");
         if (lease.getGateway() == null) throw new IllegalArgumentException("erm, lease has no gateway");
-        if (lease.getTunnelId() == null) throw new IllegalArgumentException("erm, lease has no tunnel");
+        if (getType() != KEY_TYPE_META_LS2 && lease.getTunnelId() == null)
+            throw new IllegalArgumentException("erm, lease has no tunnel");
         if (_signature != null)
             throw new IllegalStateException();
         if (_leases.size() >= MAX_LEASES)

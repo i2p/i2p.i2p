@@ -79,4 +79,15 @@ public class MetaLease extends Lease {
         return (int) _end.getTime() ^ DataHelper.hashCode(_gateway)
                ^ _cost;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(128);
+        buf.append("[Meta Lease: ");
+        buf.append("\n\tEnd Date: ").append(_end);
+        buf.append("\n\tTarget: ").append(_gateway);
+        buf.append("\n\tCost: ").append(_cost);
+        buf.append("]");
+        return buf.toString();
+    }
 }

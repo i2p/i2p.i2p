@@ -324,8 +324,10 @@ public class LeaseSet2 extends LeaseSet {
         _destination.writeBytes(out);
         if (_published <= 0)
             _published = Clock.getInstance().now();
-        DataHelper.writeLong(out, 4, _published / 1000);
-        DataHelper.writeLong(out, 2, (_expires - _published) / 1000);
+        long pub1k = _published / 1000;
+        DataHelper.writeLong(out, 4, pub1k);
+        // Divide separately to prevent rounding errors
+        DataHelper.writeLong(out, 2, ((_expires / 1000) - pub1k));
         DataHelper.writeLong(out, 2, _flags);
         if (isOffline())
             writeOfflineBytes(out);
@@ -359,11 +361,14 @@ public class LeaseSet2 extends LeaseSet {
     @Override
     public int size() {
         int rv = _destination.size()
-             + _encryptionKey.length()
-             + 11
+             + 10
              + (_leases.size() * 40);
+        for (PublicKey key : getEncryptionKeys()) {
+            rv += 4;
+            rv += key.length();
+        }
         if (isOffline())
-            rv += 2 + _transientSigningPublicKey.length() + _offlineSignature.length();
+            rv += 6 + _transientSigningPublicKey.length() + _offlineSignature.length();
         if (_options != null && !_options.isEmpty()) {
             try {
                 rv += DataHelper.toProperties(_options).length;
@@ -382,7 +387,7 @@ public class LeaseSet2 extends LeaseSet {
      */
     @Override
     public void addLease(Lease lease) {
-        if (!(lease instanceof Lease2))
+        if (getType() == KEY_TYPE_LS2 && !(lease instanceof Lease2))
             throw new IllegalArgumentException();
         super.addLease(lease);
         _expires = _lastExpiration;
@@ -590,6 +595,8 @@ public class LeaseSet2 extends LeaseSet {
         ls2.writeBytes(out2);
         out2.close();
         java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(out.toByteArray());
+        System.out.println("Size calculated: " + (ls2.size() + ls2.getSignature().length()));
+        System.out.println("Size to read in: " + in.available());
         LeaseSet2 ls3 = new LeaseSet2();
         ls3.readBytes(in);
         System.out.println("Read back: " + ls3);
