@@ -1,3 +1,6 @@
+2019-01-01 zzz
+ * Console: New light background (ticket #738)
+
 2018-12-24 zzz
  * Console: Update ARM warning (ticket #2368)
 

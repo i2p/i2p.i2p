@@ -4,7 +4,8 @@
 body {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      font-size: 9pt;
-     background: #a4a4cb url(/themes/console/light/images/tile2.png) center center;
+     background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+     background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
      color: #33333f;
      margin: 0 5px;
 }

@@ -6,22 +6,14 @@ body {
      color: #33333f;
      font-family: "Droid Sans", "NotoSans", Ubuntu, "Bitstream Vera Sans", "Segoe UI", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-size: 9pt;
-     background: #a4a4cb url(/themes/console/light/images/tile2.png);
+     background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+     background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
 }
 
 /* preload button mouseovers */
 body {
-     background: url(/themes/console/light/images/tile2.png),
-     url(/themes/susimail/images/compose_hover.png) no-repeat,
-     url(/themes/susimail/images/login_hover.png) no-repeat,
-     url(/themes/susimail/images/logout_hover.png) no-repeat,
-     url(/themes/susimail/images/offline_hover.png) no-repeat,
-     url(/themes/susimail/images/save_hover.png) no-repeat,
-     url(/themes/susimail/images/send_hover.png) no-repeat,
-     url(/themes/console/images/buttons/configure_hover.png),
-     url(/themes/console/images/buttons/delete_hover.png),
-     url(/themes/console/images/buttons/update_hover.png), #a4a4cb !important;
-     background-size: 32px 32px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
+  background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+  background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
 }
 
 body.iframed {
