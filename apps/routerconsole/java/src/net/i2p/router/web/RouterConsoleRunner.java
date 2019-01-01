@@ -344,8 +344,9 @@ public class RouterConsoleRunner implements RouterApp {
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
+        boolean isZero = SystemVersion.isZeroVM();
         boolean isJava11 = false; // SystemVersion.isJava11();
-        if (noJava7 || noPack200 || openARM || isJava11) {
+        if (noJava7 || noPack200 || openARM || isZero || isJava11) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -365,6 +366,11 @@ public class RouterConsoleRunner implements RouterApp {
             }
             if (openARM) {
                 s = "OpenJDK 7/8 are not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
+                log.logAlways(net.i2p.util.Log.WARN, s);
+                System.out.println("Warning: " + s);
+            }
+            if (isZero) {
+                s = "OpenJDK Zero is a very slow interpreter-only JVM. Not recommended for use with I2P. Please use a faster JVM if possible.";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }

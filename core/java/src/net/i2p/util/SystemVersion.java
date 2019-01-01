@@ -33,6 +33,8 @@ public abstract class SystemVersion {
                                           System.getProperty("os.arch").equals("amd64");
     private static final boolean _isGentoo = System.getProperty("os.version").contains("gentoo") ||
                                              System.getProperty("os.version").contains("hardened");  // Funtoo
+    // Could also check for java.vm.info = "interpreted mode"
+    private static final boolean _isZero = System.getProperty("java.vm.name").contains("Zero");
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
@@ -73,7 +75,7 @@ public abstract class SystemVersion {
         _isLinuxService = !_isWin && !_isMac && !_isAndroid &&
                           (DAEMON_USER.equals(System.getProperty("user.name")) ||
                            (_isGentoo && GENTOO_USER.equals(System.getProperty("user.name"))));
-        _isSlow = _isAndroid || _isApache || _isArm || _isGNU || getMaxMemory() < 48*1024*1024L;
+        _isSlow = _isAndroid || _isApache || _isArm || _isGNU || _isZero || getMaxMemory() < 48*1024*1024L;
 
         int sdk = 0;
         if (_isAndroid) {
@@ -161,6 +163,14 @@ public abstract class SystemVersion {
      */
     public static boolean isX86() {
         return _isX86;
+    }
+
+    /**
+     *  Is this a very slow interpreted mode VM?
+     *  @since 0.9.38
+     */
+    public static boolean isZeroVM() {
+        return _isZero;
     }
 
     /**
@@ -347,6 +357,6 @@ public abstract class SystemVersion {
         System.out.println("Windows  : " + isWindows());
         System.out.println("Wrapper  : " + hasWrapper());
         System.out.println("x86      : " + isX86());
-
+        System.out.println("Zero JVM : " + isZeroVM());
     }
 }
