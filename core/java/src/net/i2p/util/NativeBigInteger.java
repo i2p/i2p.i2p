@@ -186,6 +186,7 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_ARM_ARMV5           = "armv5";
     private final static String JBIGI_OPTIMIZATION_ARM_ARMV6           = "armv6";
     private final static String JBIGI_OPTIMIZATION_ARM_ARMV7           = "armv7";
+    private final static String JBIGI_OPTIMIZATION_ARM_ARMV8           = "armv8";
     private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A5       = "armcortexa5";
     private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A7       = "armcortexa7";
     private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A8       = "armcortexa8";
@@ -216,6 +217,7 @@ public class NativeBigInteger extends BigInteger {
     private final static String[] JBIGI_COMPAT_LIST_ARM           = {JBIGI_OPTIMIZATION_ARM_CORTEX_A15, JBIGI_OPTIMIZATION_ARM_CORTEX_A9, JBIGI_OPTIMIZATION_ARM_CORTEX_A8,
                                                                      JBIGI_OPTIMIZATION_ARM_CORTEX_A7, JBIGI_OPTIMIZATION_ARM_CORTEX_A5, JBIGI_OPTIMIZATION_ARM_ARMV7,
                                                                      JBIGI_OPTIMIZATION_ARM_ARMV6, JBIGI_OPTIMIZATION_ARM_ARMV5};
+    private final static String[] JBIGI_COMPAT_LIST_ARM_ARMV8     = {JBIGI_OPTIMIZATION_ARM_ARMV8};
     private final static String[] JBIGI_COMPAT_LIST_VIA           = {JBIGI_OPTIMIZATION_NANO, JBIGI_OPTIMIZATION_VIAC32, JBIGI_OPTIMIZATION_VIAC3,
                                                                      JBIGI_OPTIMIZATION_PENTIUM, JBIGI_OPTIMIZATION_X86};
     private final static String[] JBIGI_COMPAT_LIST_AMD_ATHLON    = {JBIGI_OPTIMIZATION_K10, JBIGI_OPTIMIZATION_ATHLON64, JBIGI_OPTIMIZATION_ATHLON,
@@ -247,6 +249,7 @@ public class NativeBigInteger extends BigInteger {
         put(JBIGI_OPTIMIZATION_ARM_ARMV5,      JBIGI_COMPAT_LIST_ARM);
         put(JBIGI_OPTIMIZATION_ARM_ARMV6,      JBIGI_COMPAT_LIST_ARM);
         put(JBIGI_OPTIMIZATION_ARM_ARMV7,      JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_ARMV8,      JBIGI_COMPAT_LIST_ARM_ARMV8);
         put(JBIGI_OPTIMIZATION_ARM_CORTEX_A5,  JBIGI_COMPAT_LIST_ARM);
         put(JBIGI_OPTIMIZATION_ARM_CORTEX_A7,  JBIGI_COMPAT_LIST_ARM);
         put(JBIGI_OPTIMIZATION_ARM_CORTEX_A8,  JBIGI_COMPAT_LIST_ARM);
@@ -454,6 +457,8 @@ public class NativeBigInteger extends BigInteger {
             if (arch != null) {
                 //CPU architecture: 5TEJ
                 //CPU architecture: 7
+                if (arch.startsWith("8"))
+                    return JBIGI_OPTIMIZATION_ARM_ARMV8;
                 if (arch.startsWith("7")) {
                     // Raspberry Pi workaround
                     // Processor       : ARMv6-compatible processor rev 7 (v6l)
@@ -471,6 +476,8 @@ public class NativeBigInteger extends BigInteger {
             // We couldn't identify the architecture
             // Let's try by looking at model name
             if (model != null) {
+                if (model.contains("ARMv8"))
+                    return JBIGI_OPTIMIZATION_ARM_ARMV8;
                 if (model.contains("ARMv7"))
                     return JBIGI_OPTIMIZATION_ARM_ARMV7;
                 if (model.contains("ARMv6"))
@@ -478,6 +485,9 @@ public class NativeBigInteger extends BigInteger {
                 if (model.contains("ARMv5"))
                     return JBIGI_OPTIMIZATION_ARM_ARMV5;
             }
+                
+            if (_is64)
+                return JBIGI_OPTIMIZATION_ARM_ARMV8;
                 
             // If we didn't find a match, return null
             return null;
