@@ -123,28 +123,29 @@
         // license info?
 %>
 <h3><%=intl._t("Why I2P?")%></h3>
-<p>
+<table class="configtable"><tr><td>
 <%=intl._t("I2P is a communication tool for people who value privacy and wish to remain anonymous online.")%>
 <%=intl._t("I2P is a peer to peer network where you can browse and create hidden services.")%>
-</p>
+</td></tr></table>
 <%
 
     } else if (ipg == 3) {
         // Overview of bandwidth test
 %>
 <h3><%=intl._t("Bandwidth Test")%></h3>
+<table class="configtable"><tr><td>
 <p>
 <%=intl._t("I2P will now test your internet connection to identify the optimal speed settings.")%>
 <%=intl._t("Bandwidth participation improves the anonymity level of all users on the network and maximizes your download speed.")%>
 <%=intl._t("This is done using the third-party M-Lab service.")%>
+</p><p>
 <%=intl._t("Please review the M-Lab privacy policies linked below.")%>
 <%=intl._t("If you do not wish to run the M-Lab bandwidth test, you may skip it by clicking the button below.")%>
 </p><p>
 <a href="https://www.measurementlab.net/privacy/" target="_blank"><%=intl._t("M-Lab Privacy Policy")%></a>
 <br><a href="https://github.com/m-lab/mlab-ns/blob/master/MLAB-NS_PRIVACY_POLICY.md" target="_blank"><%=intl._t("M-Lab Name Server Privacy Policy")%></a>
 </p>
-
-
+</td></tr></table>
 <%
 
     } else if (ipg == 4) {
@@ -233,36 +234,40 @@
         // Browser setup
 %>
 <h3><%=intl._t("Browser Setup")%></h3>
-<p>
+<table class="configtable"><tr><td><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
-<a href="TODO" target="_blank"><%=intl._t("If you want to do this yourself, here are instructions.")%></a> (browser-config link)
+<a href="https://geti2p.net/htproxyports#firefox" target="_blank"><%=intl._t("If you want to do this yourself, here are instructions.")%></a> (browser-config link)
 <%
         if (net.i2p.util.SystemVersion.isWindows()) {
 %>
+</p><p>
 <%=intl._t("Otherwise, the recommended way to browse I2P websites is with a separate profile in the Firefox browser.")%>
-<ol><li><a href="TODO" target="_blank"><%=intl._t("Install Firefox")%></a>
-</li><li><a href="TODO" target="_blank"><%=intl._t("Install the I2P Firefox profile")%></a>
+<ol><li><a href="https://www.mozilla.org/firefox/" target="_blank"><%=intl._t("Install Firefox")%></a>
+</li><li><a href="https://geti2p.net/download#windows" target="_blank"><%=intl._t("Install the I2P Firefox profile")%></a>
 </li></ol>
 <%
         } //isWindows()
 %>
-</p>
+</p></td></tr></table>
 <%
 
     } else if (ipg == LAST_PAGE) {
         // Done
 %>
 <h3><%=intl._t("Welcome to I2P!")%></h3>
+<table class="configtable"><tr><td>
 <p>
 <%=intl._t("When you start I2P, it may take a few minutes to bootstrap (integrate) your router into the network and find additional peers, so please be patient.")%>
+</p><p>
 <%=intl._t("When I2P starts up, and during normal operation, I2P's tunnel build readiness indicator in the side panel may indicate that I2P is \"Rejecting Tunnels\"; this is normal behavior.")%>
 <%=intl._t("Once green stars are indicated next to your Local Tunnels, there is a wide variety of things you can do with I2P.")%>
 </p>
+</td></tr></table>
 <%
 
     } else {
 %>
-<p>unknown wizard page</p>
+<table class="configtable"><tr><td>unknown wizard page</td></tr></table>
 <%
     }
 %>
@@ -271,7 +276,7 @@
 <%
     if (ipg != 1) {
 %>
-<input type="submit" class="go" name="prev" value="<%=intl._t("Previous")%>" >
+<input type="submit" class="back" name="prev" value="<%=intl._t("Previous")%>" >
 <%
     }
     if (ipg != LAST_PAGE) {
@@ -292,7 +297,7 @@
 <%
     } else {
 %>
-<input type="submit" class="go" name="done" value="<%=intl._t("Finished")%>" >
+<input type="submit" class="accept" name="done" value="<%=intl._t("Finished")%>" >
 <%
     }
 %>

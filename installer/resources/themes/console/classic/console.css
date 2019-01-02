@@ -1797,6 +1797,18 @@ input.go[value^="Create"]:focus, button.go[value^="Create"]:focus {
      background: url(/themes/console/images/buttons/create-file.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
+input.back {
+     background: #eee url(/themes/console/images/buttons/back.png) no-repeat 7px center;
+     background: url(/themes/console/images/buttons/back.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
+}
+
+input.back:hover,
+input.back:focus {
+     background: #fff url(/themes/console/images/buttons/back.png) no-repeat 7px center;
+     background: url(/themes/console/images/buttons/back.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
+}
+
 input.reload, button.reload {
      background: #eee url(/themes/console/images/buttons/restore.png) no-repeat 7px center;
      background: url(/themes/console/images/buttons/restore.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);

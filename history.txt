@@ -1,5 +1,16 @@
+2019-01-02 zzz
+ * Console: Wizard styling
+ * Data: Encrypted LS2 progress (proposal 123)
+
 2019-01-01 zzz
- * Console: New light background (ticket #738)
+ * Console:
+   - New light background (ticket #738)
+   - Add warning for OpenJDK Zero VM
+ * Data:
+   - Add support for LS2 multiple encryption keys (proposal 123)
+   - Fix Meta LS2 bugs (proposal 123)
+ * Debian: Remove obsolete systray.config
+ * NBI: Add lookup tables for ARMv8
 
 2018-12-24 zzz
  * Console: Update ARM warning (ticket #2368)
