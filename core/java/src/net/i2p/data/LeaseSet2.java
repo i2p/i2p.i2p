@@ -179,7 +179,7 @@ public class LeaseSet2 extends LeaseSet {
             return false;
         }
         byte[] data = baos.toByteArray();
-        return ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, _destination.getSigningPublicKey());
+        return ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, getSigningPublicKey());
     }
 
 
@@ -288,6 +288,13 @@ public class LeaseSet2 extends LeaseSet {
         // LS2 header
         writeHeader(out);
         // LS2 part
+        writeBody(out);
+    }
+
+    /**
+     *  Without sig. This does NOT validate the signature
+     */
+    protected void writeBody(OutputStream out) throws DataFormatException, IOException {
         if (_options != null && !_options.isEmpty()) {
             DataHelper.writeProperties(out, _options);
         } else {

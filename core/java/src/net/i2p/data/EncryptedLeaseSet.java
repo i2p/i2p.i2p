@@ -1,5 +1,6 @@
 package net.i2p.data;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,6 +56,38 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     }
 
     /**
+     * Overridden to set the blinded key
+     *
+     * @param dest non-null, must be EdDSA_SHA512_Ed25519
+     * @throws IllegalStateException if already signed
+     * @throws IllegalArgumentException if not EdDSA
+     */
+    @Override
+    public void setDestination(Destination dest) {
+        super.setDestination(dest);
+        SigningPublicKey spk = dest.getSigningPublicKey();
+        if (spk.getType() != SigType.EdDSA_SHA512_Ed25519)
+            throw new IllegalArgumentException();
+        // TODO generate blinded key
+        _signingKey = blind(spk, null);
+    }
+
+    private static SigningPublicKey blind(SigningPublicKey spk, SigningPrivateKey priv) {
+        // TODO generate blinded key
+        return spk;
+    }
+
+    /**
+     * Overridden to return the blinded key so super.verifySignature() will work.
+     *
+     * @return SPK or null
+     */
+    @Override
+    protected SigningPublicKey getSigningPublicKey() {
+        return _signingKey;
+    }
+
+    /**
      *  This does NOT validate the signature
      *
      *  @throws IllegalStateException if called more than once or Destination already set
@@ -88,6 +121,10 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         // LS2 header
         writeHeader(out);
         // Encrypted LS2 part
+        if (_encryptedData == null) {
+            // TODO
+            encrypt(null);
+        }
         DataHelper.writeLong(out, 2, _encryptedData.length);
         out.write(_encryptedData);
     }
@@ -170,10 +207,13 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     @Override
     public int size() {
         int rv = _signingKey.length()
-             + 12
-             + _encryptedData.length;
+             + 12;
+        if (_encryptedData != null)
+            rv += _encryptedData.length;
+        else
+            rv += 99; // TODO
         if (isOffline())
-            rv += 2 + _transientSigningPublicKey.length() + _offlineSignature.length();
+            rv += 6 + _transientSigningPublicKey.length() + _offlineSignature.length();
         return rv;
     }
 
@@ -198,7 +238,37 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         return __calculatedHash;
     }
 
-    // encrypt / decrypt TODO
+    /**
+     *  Throws IllegalStateException if not initialized.
+     *
+     *  @param key ignored, to be fixed
+     *  @throws IllegalStateException
+     */
+    @Override
+    public void encrypt(SessionKey key) {
+        if (_encryptedData != null)
+            throw new IllegalStateException();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            // Middle layer - flag
+            baos.write(0);
+            // Inner layer - type - data covered by sig
+            baos.write(KEY_TYPE_LS2);
+            super.writeHeader(baos);
+            writeBody(baos);
+        } catch (DataFormatException dfe) {
+            throw new IllegalStateException("Error encrypting LS2", dfe);
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Error encrypting LS2", ioe);
+        }
+
+        // TODO sign and add signature
+        // TODO encrypt - TESTING ONLY
+        _encryptedData = baos.toByteArray();
+        for (int i = 0; i < _encryptedData.length; i++) {
+             _encryptedData[i] ^= 0x5a;
+        }
+    }
 
     @Override
     public boolean equals(Object object) {
@@ -234,4 +304,77 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         buf.append("]");
         return buf.toString();
     }
+
+/****
+    public static void main(String args[]) throws Exception {
+        if (args.length != 1) {
+            System.out.println("Usage: LeaseSet2 privatekeyfile.dat");
+            System.exit(1);
+        }
+        java.io.File f = new java.io.File(args[0]);
+        PrivateKeyFile pkf = new PrivateKeyFile(f);
+        pkf.createIfAbsent(SigType.EdDSA_SHA512_Ed25519);
+        System.out.println("Online test");
+        java.io.File f2 = new java.io.File("online-encls2.dat");
+        test(pkf, f2, false);
+        System.out.println("Offline test");
+        f2 = new java.io.File("offline-encls2.dat");
+        test(pkf, f2, true);
+    }
+
+    private static void test(PrivateKeyFile pkf, java.io.File outfile, boolean offline) throws Exception {
+        net.i2p.util.RandomSource rand = net.i2p.util.RandomSource.getInstance();
+        long now = System.currentTimeMillis() + 5*60*1000;
+        EncryptedLeaseSet ls2 = new EncryptedLeaseSet();
+        for (int i = 0; i < 3; i++) {
+            Lease2 l2 = new Lease2();
+            now += 10000;
+            l2.setEndDate(new java.util.Date(now));
+            byte[] gw = new byte[32];
+            rand.nextBytes(gw);
+            l2.setGateway(new Hash(gw));
+            TunnelId id = new TunnelId(1 + rand.nextLong(TunnelId.MAX_ID_VALUE));
+            l2.setTunnelId(id);
+            ls2.addLease(l2);
+        }
+        java.util.Properties opts = new java.util.Properties();
+        opts.setProperty("foof", "bar");
+        ls2.setOptions(opts);
+        ls2.setDestination(pkf.getDestination());
+        SimpleDataStructure encKeys[] = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys();
+        PublicKey pubKey = (PublicKey) encKeys[0];
+        ls2.addEncryptionKey(pubKey);
+        net.i2p.crypto.KeyPair encKeys2 = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys(net.i2p.crypto.EncType.ECIES_X25519);
+        pubKey = encKeys2.getPublic();
+        ls2.addEncryptionKey(pubKey);
+        SigningPrivateKey spk = pkf.getSigningPrivKey();
+        if (offline) {
+            now += 365*24*60*60*1000L;
+            SimpleDataStructure transKeys[] = net.i2p.crypto.KeyGenerator.getInstance().generateSigningKeys(SigType.EdDSA_SHA512_Ed25519);
+            SigningPublicKey transientPub = (SigningPublicKey) transKeys[0];
+            SigningPrivateKey transientPriv = (SigningPrivateKey) transKeys[1];
+            Signature sig = offlineSign(now, transientPub, spk);
+            ls2.setOfflineSignature(now, transientPub, sig);
+            ls2.sign(transientPriv);
+        } else {
+            ls2.sign(spk);
+        }
+        System.out.println("Created: " + ls2);
+        if (!ls2.verifySignature())
+            System.out.println("Verify FAILED");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ls2.writeBytes(out);
+        java.io.OutputStream out2 = new java.io.FileOutputStream(outfile);
+        ls2.writeBytes(out2);
+        out2.close();
+        java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(out.toByteArray());
+        System.out.println("Size calculated: " + (ls2.size() + ls2.getSignature().length()));
+        System.out.println("Size to read in: " + in.available());
+        EncryptedLeaseSet ls3 = new EncryptedLeaseSet();
+        ls3.readBytes(in);
+        System.out.println("Read back: " + ls3);
+        if (!ls3.verifySignature())
+            System.out.println("Verify FAILED");
+    }
+****/
 }
