@@ -227,7 +227,8 @@ public class LeaseSet2 extends LeaseSet {
         // LS2 header
         readHeader(in);
         // LS2 part
-        _options = DataHelper.readProperties(in);
+        // null arg to get an EmptyProperties back
+        _options = DataHelper.readProperties(in, null);
         int numKeys = in.read();
         if (numKeys <= 0 || numKeys > MAX_KEYS)
             throw new DataFormatException("Bad key count: " + numKeys);
@@ -369,7 +370,7 @@ public class LeaseSet2 extends LeaseSet {
     public int size() {
         int rv = _destination.size()
              + 10
-             + (_leases.size() * 40);
+             + (_leases.size() * Lease2.LENGTH);
         for (PublicKey key : getEncryptionKeys()) {
             rv += 4;
             rv += key.length();

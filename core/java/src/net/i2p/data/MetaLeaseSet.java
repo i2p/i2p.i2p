@@ -53,7 +53,8 @@ public class MetaLeaseSet extends LeaseSet2 {
         // LS2 header
         readHeader(in);
         // Meta LS2 part
-        _options = DataHelper.readProperties(in);
+        // null arg to get an EmptyProperties back
+        _options = DataHelper.readProperties(in, null);
         int numLeases = in.read();
         //if (numLeases > MAX_META_LEASES)
         //    throw new DataFormatException("Too many leases - max is " + MAX_META_LEASES);
@@ -106,7 +107,7 @@ public class MetaLeaseSet extends LeaseSet2 {
     public int size() {
         int rv = _destination.size()
              + 10
-             + (_leases.size() * 40);
+             + (_leases.size() * MetaLease.LENGTH);
         if (isOffline())
             rv += 6 + _transientSigningPublicKey.length() + _offlineSignature.length();
         if (_options != null && !_options.isEmpty()) {
@@ -209,11 +210,12 @@ public class MetaLeaseSet extends LeaseSet2 {
             rand.nextBytes(gw);
             l2.setGateway(new Hash(gw));
             l2.setCost(i * 5);
+            l2.setType(((i & 0x01) == 0) ? KEY_TYPE_LS2 : KEY_TYPE_META_LS2);
             ls2.addLease(l2);
         }
         java.util.Properties opts = new java.util.Properties();
-        opts.setProperty("foo", "bar");
-        opts.setProperty("test", "bazzle");
+        //opts.setProperty("foo", "bar");
+        //opts.setProperty("test", "bazzle");
         ls2.setOptions(opts);
         ls2.setDestination(pkf.getDestination());
         SigningPrivateKey spk = pkf.getSigningPrivKey();

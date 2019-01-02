@@ -139,18 +139,23 @@ public class DataHelper {
      *
      *  As of 0.9.18, throws DataFormatException on duplicate key
      *
-     *  @param props the Properties to load into
+     *  @param props The Properties to load into.
+     *               As of 0.9.38, if null, a new OrderedProperties will be created.
      *  @param rawStream stream to read the mapping from
      *  @throws DataFormatException if the format is invalid
      *  @throws IOException if there is a problem reading the data
-     *  @return the parameter props
+     *  @return the parameter props, or (as of 0.9.38) a new OrderedProperties if props is null,
+     *                               and an immutable EmptyProperties if empty.
      *  @since 0.8.13
      */
     public static Properties readProperties(InputStream rawStream, Properties props) 
         throws DataFormatException, IOException {
         int size = (int) readLong(rawStream, 2);
-        if (size == 0)
-            return props;
+        if (size == 0) {
+            return (props != null) ? props : EmptyProperties.INSTANCE;
+        }
+        if (props == null)
+            props = new OrderedProperties();
         byte data[] = new byte[size];
         // full read guaranteed
         read(rawStream, data);
@@ -454,7 +459,7 @@ public class DataHelper {
     public static void loadProps(Properties props, InputStream inStr, boolean forceLowerCase) throws IOException {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 16*1024);
+            in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 4*1024);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 if (line.trim().length() <= 0) continue;

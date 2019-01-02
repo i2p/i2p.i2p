@@ -142,9 +142,8 @@ public class LeaseSet extends DatabaseEntry {
 
     /**
      *  The revocation key.
-     *  @deprecated unused
+     *  Undeprecated as of 0.9.38, used for the blinded key in EncryptedLeaseSet.
      */
-    @Deprecated
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
