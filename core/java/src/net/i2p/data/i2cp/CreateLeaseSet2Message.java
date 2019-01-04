@@ -4,6 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
@@ -14,6 +17,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
 import net.i2p.data.MetaLeaseSet;
 import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
 
 /**
@@ -22,20 +26,55 @@ import net.i2p.data.SigningPrivateKey;
  *
  * For LS2:
  * Same as CreateLeaseSetMessage, but has a netdb type before
- * the LeaseSet. SigningPrivateKey and PrivateKey are
+ * the LeaseSet. SigningPrivateKey and PrivateKey(s) are
  * serialized after the LeaseSet, not before, so we can
  * infer the types from the LeaseSet.
  *
  * For Meta LS:
  * SigningPrivateKey and PrivateKey are not present.
  *
+ * For Encrypted LS:
+ * TODO
+ *
  * @since 0.9.38
  */
 public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
     public final static int MESSAGE_TYPE = 40;
 
+    // only used if more than one key, otherwise null
+    private List<PrivateKey> _privateKeys;
+
     public CreateLeaseSet2Message() {
         super();
+    }
+
+    /**
+     *  This returns all the keys. getPrivateKey() returns the first one.
+     *  @return not a copy, do not modify, null if none
+     */
+    public List<PrivateKey> getPrivateKeys() {
+        if (_privateKeys != null)
+            return _privateKeys;
+        PrivateKey pk = getPrivateKey();
+        if (pk != null)
+            return Collections.singletonList(pk);
+        return null;
+    }
+
+    /**
+     *  Add a private key.
+     */
+    public void addPrivateKey(PrivateKey key) {
+        PrivateKey pk = getPrivateKey();
+        if (pk == null) {
+            setPrivateKey(key);
+        } else {
+            if (_privateKeys == null) {
+                _privateKeys = new ArrayList<PrivateKey>(4);
+                _privateKeys.add(pk);
+            }
+            _privateKeys.add(key);
+        }
     }
 
     @Override
@@ -68,11 +107,25 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
                     throw new I2CPMessageException("Unsupported sig type");
                 _signingPrivateKey = new SigningPrivateKey(stype);
                 _signingPrivateKey.readBytes(in);
-                EncType etype = _leaseSet.getEncryptionKey().getType();
-                if (etype == null)
-                    throw new I2CPMessageException("Unsupported encryption type");
-                _privateKey = new PrivateKey(etype);
-                _privateKey.readBytes(in);
+                if (type == DatabaseEntry.KEY_TYPE_LS2) {
+                    LeaseSet2 ls2 = (LeaseSet2) _leaseSet;
+                    // get one PrivateKey for each PublicKey
+                    List<PublicKey> pks = ls2.getEncryptionKeys();
+                    for (PublicKey pk : pks) {
+                        EncType etype = pk.getType();
+                        if (etype == null)
+                            throw new I2CPMessageException("Unsupported encryption type");
+                        PrivateKey priv = new PrivateKey(etype);
+                        priv.readBytes(in);
+                        addPrivateKey(priv);
+                    }
+                } else {
+                    EncType etype = _leaseSet.getEncryptionKey().getType();
+                    if (etype == null)
+                        throw new I2CPMessageException("Unsupported encryption type");
+                    _privateKey = new PrivateKey(etype);
+                    _privateKey.readBytes(in);
+                }
             }
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Error reading the CreateLeaseSetMessage", dfe);
