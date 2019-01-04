@@ -1,5 +1,11 @@
+2019-01-04 zzz
+ * Build: Check cert validity
+ * Data: Add type byte to MetaLease (proposal 123)
+ * NetDb: Prevent ISJ deadlock (ticket #2366)
+ * Router: Reseed updates
+
 2019-01-02 zzz
- * Console: Wizard styling
+ * Console: Wizard styling (ticket #1473)
  * Data: Encrypted LS2 progress (proposal 123)
 
 2019-01-01 zzz

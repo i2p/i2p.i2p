@@ -492,9 +492,9 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     /**
      *  Not for use without validation
      *  @return RouterInfo, LeaseSet, or null, NOT validated
-     *  @since 0.9.9
+     *  @since 0.9.9, public since 0.9.38
      */
-    DatabaseEntry lookupLocallyWithoutValidation(Hash key) {
+    public DatabaseEntry lookupLocallyWithoutValidation(Hash key) {
         if (!_initialized)
             return null;
         return _ds.get(key);
@@ -638,6 +638,12 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
     }
     
+    /**
+     * This will return immediately with the result or null.
+     * However, this may still fire off a lookup if the RI is present but expired (and will return null).
+     * This may result in deadlocks.
+     * For true local only, use lookupLocallyWithoutValidation()
+     */
     public RouterInfo lookupRouterInfoLocally(Hash key) {
         if (!_initialized) return null;
         DatabaseEntry ds = _ds.get(key);
