@@ -1438,10 +1438,17 @@
     </target>
 
     <!-- SSL Certs -->
-    <target name="prepCertificates">
+    <target name="prepCertificates" depends="buildCore">
         <copy todir="pkg-temp/certificates/" >
           <fileset dir="installer/resources/certificates/" />
         </copy>
+        <java classname="net.i2p.crypto.CertUtil" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="checkall" />
+            <arg value="pkg-temp/certificates" />
+        </java>
     </target>
 
     <condition property="no.bundle.routerInfos">
