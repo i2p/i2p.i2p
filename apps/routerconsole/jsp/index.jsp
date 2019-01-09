@@ -35,10 +35,7 @@
         tgt = "home";
     } else {
         String version = net.i2p.CoreVersion.VERSION;
-        if (version.equals("0.9.37")) {
-            // dev builds, force everyone to run it once for testing
-            tgt = "welcome";
-        } else if (version.equals(firstVersion)) {
+        if (version.equals(firstVersion)) {
             // first install 38 or later, still on same version
             tgt = "welcome";
         } else {
