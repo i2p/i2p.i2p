@@ -1,3 +1,11 @@
+2019-01-09 zzz
+ * Console: Fix broken image link on /configui
+ * I2CP: Stub out client-side creation of meta and enc. LS2
+ * Wrapper: Increase default heap to 256 MB
+
+2019-01-05 zzz
+ * Crypto: Stub out EdDSA blinding (proposal 123)
+
 2019-01-04 zzz
  * Build: Check cert validity
  * Data: Add type byte to MetaLease (proposal 123)

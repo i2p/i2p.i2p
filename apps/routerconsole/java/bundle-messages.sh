@@ -54,7 +54,8 @@ ROUTERFILES="\
 "
 
 # add ../java/ so the refs will work in the po file
-JPATHS="../java/src ../jsp/WEB-INF ../java/strings $ROUTERFILES"
+# do not scan 3rd-party code in java/src/com or java/src/edu
+JPATHS="../java/src/net ../jsp/WEB-INF ../java/strings $ROUTERFILES"
 for i in ../locale/messages_*.po
 do
 	# get language
