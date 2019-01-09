@@ -25,11 +25,14 @@ import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.Lease2;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
+import net.i2p.data.MetaLease;
+import net.i2p.data.MetaLeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -48,6 +51,7 @@ import net.i2p.util.Log;
  */
 class RequestLeaseSetMessageHandler extends HandlerImpl {
     private final Map<Destination, LeaseInfo> _existingLeaseSets;
+    protected int _ls2Type = DatabaseEntry.KEY_TYPE_LS2;
 
     // LS 1
     private static final String PROP_LS_ENCRYPT = "i2cp.encryptLeaseSet";
@@ -74,9 +78,12 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     
     /**
      *  Do we send a LeaseSet or a LeaseSet2?
+     *
+     *  Side effect: sets _ls2Type
+     *
      *  @since 0.9.38
      */
-    protected static boolean requiresLS2(I2PSessionImpl session) {
+    protected boolean requiresLS2(I2PSessionImpl session) {
         if (!session.supportsLS2())
             return false;
         if (session.isOffline())
@@ -91,9 +98,13 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         if (s != null) {
             try {
                 int type = Integer.parseInt(s);
+                _ls2Type = type;
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET)
                     return true;
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+              session.propogateError("Bad LS2 type", nfe);
+              return true;
+            }
         }
         return false;
     }
@@ -103,11 +114,34 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             _log.debug("Handle message " + message);
         RequestLeaseSetMessage msg = (RequestLeaseSetMessage) message;
         boolean isLS2 = requiresLS2(session);
-        LeaseSet leaseSet = isLS2 ? new LeaseSet2() : new LeaseSet();
+        LeaseSet leaseSet;
+        if (isLS2) {
+            if (_ls2Type == DatabaseEntry.KEY_TYPE_LS2) {
+                leaseSet = new LeaseSet2();
+            } else if (_ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                leaseSet = new EncryptedLeaseSet();
+            } else if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {
+                leaseSet = new MetaLeaseSet();
+            } else {
+              session.propogateError("Unsupported LS2 type", new Exception());
+              return;
+            }
+        } else {
+            leaseSet = new LeaseSet();
+        }
+        // Full Meta and Encrypted support TODO
         for (int i = 0; i < msg.getEndpoints(); i++) {
-            Lease lease = isLS2 ? new Lease2() : new Lease();
+            Lease lease;
+            if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {
+                lease = new MetaLease();
+            } else if (isLS2) {
+                lease = new Lease2();
+                lease.setTunnelId(msg.getTunnelId(i));
+            } else {
+                lease = new Lease();
+                lease.setTunnelId(msg.getTunnelId(i));
+            }
             lease.setGateway(msg.getRouter(i));
-            lease.setTunnelId(msg.getTunnelId(i));
             lease.setEndDate(msg.getEndDate());
             //lease.setStartDate(msg.getStartDate());
             leaseSet.addLease(lease);
@@ -218,7 +252,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                            + dest);
         }
 
-        leaseSet.setEncryptionKey(li.getPublicKey());
+        if (_ls2Type != DatabaseEntry.KEY_TYPE_META_LS2)
+            leaseSet.setEncryptionKey(li.getPublicKey());
         leaseSet.setSigningKey(li.getSigningPublicKey());
         // SubSession options aren't updated via the gui, so use the primary options
         Properties opts;
