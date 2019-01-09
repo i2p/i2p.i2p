@@ -236,7 +236,7 @@
 <h3><%=intl._t("Browser Setup")%></h3>
 <table class="configtable"><tr><td><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
-<a href="https://geti2p.net/htproxyports#firefox" target="_blank"><%=intl._t("If you want to do this yourself, here are instructions.")%></a>
+<a href="https://geti2p.net/htproxyports" target="_blank"><%=intl._t("If you want to do this yourself, here are instructions.")%></a>
 <%
         if (net.i2p.util.SystemVersion.isWindows()) {
 %>
