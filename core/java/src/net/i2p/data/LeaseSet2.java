@@ -39,6 +39,8 @@ public class LeaseSet2 extends LeaseSet {
     protected Properties _options;
     // only used if more than one key, otherwise null
     private List<PublicKey> _encryptionKeys;
+    // If this leaseset was formerly blinded, the blinded hash, so we can find it again
+    private Hash _blindedHash;
 
     private static final int FLAG_OFFLINE_KEYS = 1;
     private static final int FLAG_UNPUBLISHED = 2;
@@ -180,6 +182,21 @@ public class LeaseSet2 extends LeaseSet {
         }
         byte[] data = baos.toByteArray();
         return ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, getSigningPublicKey());
+    }
+
+    /**
+     * Set this on creation if known
+     */
+    public void setBlindedHash(Hash bh) {
+        _blindedHash = bh;
+    }
+
+    /**
+     * The orignal blinded hash, where this came from.
+     * @return null if unknown or not previously blinded
+     */
+    public Hash getBlindedHash() {
+        return _blindedHash;
     }
 
 

@@ -50,6 +50,7 @@ class RequestVariableLeaseSetMessageHandler extends RequestLeaseSetMessageHandle
                 leaseSet = new MetaLeaseSet();
             } else {
               session.propogateError("Unsupported LS2 type", new Exception());
+              session.destroySession();
               return;
             }
         } else {

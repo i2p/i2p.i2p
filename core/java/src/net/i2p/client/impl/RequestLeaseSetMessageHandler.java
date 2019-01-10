@@ -103,6 +103,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                     return true;
             } catch (NumberFormatException nfe) {
               session.propogateError("Bad LS2 type", nfe);
+              session.destroySession();
               return true;
             }
         }
@@ -124,6 +125,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                 leaseSet = new MetaLeaseSet();
             } else {
               session.propogateError("Unsupported LS2 type", new Exception());
+              session.destroySession();
               return;
             }
         } else {
@@ -284,7 +286,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                                                  session.getOfflineSignature());
             if (!ok) {
                 session.propogateError("Bad offline signature", new Exception());
-                // TODO just let the router handle it for now
+                session.destroySession();
             }
         }
         try {
@@ -306,6 +308,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                 _log.debug("Created and signed LeaseSet: " + leaseSet);
         } catch (DataFormatException dfe) {
             session.propogateError("Error signing the leaseSet", dfe);
+            session.destroySession();
         } catch (I2PSessionException ise) {
             if (session.isClosed()) {
                 // race, closed while signing leaseset
