@@ -107,10 +107,14 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
                     throw new I2CPMessageException("Unsupported sig type");
                 _signingPrivateKey = new SigningPrivateKey(stype);
                 _signingPrivateKey.readBytes(in);
-                if (type == DatabaseEntry.KEY_TYPE_LS2) {
+                if (type == DatabaseEntry.KEY_TYPE_LS2 ||
+                    type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                     LeaseSet2 ls2 = (LeaseSet2) _leaseSet;
                     // get one PrivateKey for each PublicKey
+                    // TODO decrypt an encrypted LS so we can get the keys
                     List<PublicKey> pks = ls2.getEncryptionKeys();
+                    if (pks == null)
+                        throw new I2CPMessageException("TODO decrypt");
                     for (PublicKey pk : pks) {
                         EncType etype = pk.getType();
                         if (etype == null)
