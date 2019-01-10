@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.Inet6Address;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.Buffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ClosedSelectorException;
@@ -650,7 +651,8 @@ class EventPumper implements Runnable {
                 // go around again if we filled the buffer (so we can read more)
                 boolean keepReading = !buf.hasRemaining();
                 // ZERO COPY. The buffer will be returned in Reader.processRead()
-                buf.flip();
+                // not ByteBuffer to avoid Java 8/9 issues with flip()
+                ((Buffer)buf).flip();
                 FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(read, "NTCP read"); //con, buf);
                 if (req.getPendingRequested() > 0) {
                     // rare since we generally don't throttle inbound
