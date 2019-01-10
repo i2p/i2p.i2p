@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -817,7 +818,9 @@ class ClientConnectionRunner {
         LeaseRequestState state;
         synchronized (this) {
             current = sp.currentLeaseSet;
-            if (current != null && current.getLeaseCount() == leases) {
+            // Skip this check for meta, for now, TODO
+            if (current != null && current.getLeaseCount() == leases &&
+                current.getType() != DatabaseEntry.KEY_TYPE_META_LS2) {
                 for (int i = 0; i < leases; i++) {
                     if (! current.getLease(i).getTunnelId().equals(set.getLease(i).getTunnelId()))
                         break;
