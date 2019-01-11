@@ -209,8 +209,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private static final long MAX_SEND_WAIT = 10*1000;
 
     private static final String MIN_FAST_VERSION = "0.9.4";
-////// TESTING, change to 38 before release
-    private static final String MIN_LS2_VERSION = "0.9.37";
+    private static final String MIN_LS2_VERSION = "0.9.38";
 
     /** @param routerVersion as rcvd in the SetDateMessage, may be null for very old routers */
     void dateUpdated(String routerVersion) {

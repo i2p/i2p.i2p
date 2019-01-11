@@ -32,6 +32,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
@@ -519,11 +520,21 @@ class NetDbRenderer {
                         median = dist;
                 }
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(fmt.format(biLog2(dist)));
-                buf.append("&nbsp;&nbsp;<b>Type: </b>").append(ls.getType());
+                int type = ls.getType();
+                buf.append("&nbsp;&nbsp;<b>Type: </b>").append(type);
+                if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
+                    LeaseSet2 ls2 = (LeaseSet2) ls;
+                    buf.append("&nbsp;&nbsp;<b>Unpublished? </b>").append(ls2.isUnpublished());
+                    boolean isOff = ls2.isOffline();
+                    buf.append("&nbsp;&nbsp;<b>Offline signed? </b>").append(isOff);
+                    if (isOff)
+                        buf.append("&nbsp;&nbsp;<b>Type: </b>").append(ls2.getTransientSigningKey().getType());
+                }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
                 buf.append("<b>Signature type:</b> ").append(dest.getSigningPublicKey().getType());
-                buf.append("&nbsp;&nbsp;<b>Encryption Key:</b> ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("&hellip;");
+                if (type != DatabaseEntry.KEY_TYPE_META_LS2)
+                    buf.append("&nbsp;&nbsp;<b>Encryption Key:</b> ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("&hellip;");
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 buf.append("<b>Routing Key:</b> ").append(ls.getRoutingKey().toBase64());
                 buf.append("</td></tr>");

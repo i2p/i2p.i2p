@@ -121,6 +121,13 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     /**
+     *  @return transient public key or null if not offline signed
+     */
+    public SigningPublicKey getTransientSigningKey() {
+        return _transientSigningPublicKey;
+    }
+
+    /**
      *  Destination must be previously set.
      *
      *  @param expires absolute ms
