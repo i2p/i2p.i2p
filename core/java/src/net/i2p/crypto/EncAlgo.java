@@ -10,7 +10,10 @@ package net.i2p.crypto;
 public enum EncAlgo {
 
     ELGAMAL("ElGamal"),
-    EC("EC");
+    EC("EC"),
+
+    /** @since 0.9.38 */
+    ECIES("ECIES");
 
     private final String name;
 

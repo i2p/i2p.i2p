@@ -13,13 +13,16 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
+import net.i2p.data.i2cp.CreateLeaseSet2Message;
 import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
@@ -126,6 +129,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 handleReceiveEnd((ReceiveMessageEndMessage)message);
                 break;
             case CreateLeaseSetMessage.MESSAGE_TYPE:
+            case CreateLeaseSet2Message.MESSAGE_TYPE:
                 handleCreateLeaseSet((CreateLeaseSetMessage)message);
                 break;
             case DestroySessionMessage.MESSAGE_TYPE:
@@ -264,6 +268,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             }
         }
         props.putAll(inProps);
+        if ("7".equals(props.getProperty("i2cp.leaseSetType"))) {
+            // Prevent tunnel builds for Meta LS
+            // more TODO
+            props.setProperty("inbound.length", "0");
+            props.setProperty("outbound.length", "0");
+            props.setProperty("inbound.lengthVariance", "0");
+            props.setProperty("outbound.lengthVariance", "0");
+        }
         cfg.setOptions(props);
         // this sets the session id
         int status = _runner.sessionEstablished(cfg);
@@ -467,10 +479,19 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     
     /** override for testing */
     protected void handleCreateLeaseSet(CreateLeaseSetMessage message) {
-        if ( (message.getLeaseSet() == null) || (message.getPrivateKey() == null) || (message.getSigningPrivateKey() == null) ) {
+        LeaseSet ls = message.getLeaseSet();
+        if (ls == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null lease set granted: " + message);
-            _runner.disconnectClient("Invalid CreateLeaseSetMessage");
+            _runner.disconnectClient("Invalid CreateLeaseSetMessage - null LS");
+            return;
+        }
+        int type = ls.getType();
+        if (type != DatabaseEntry.KEY_TYPE_META_LS2 &&
+            (message.getPrivateKey() == null || message.getSigningPrivateKey() == null)) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Null private keys: " + message);
+            _runner.disconnectClient("Invalid CreateLeaseSetMessage - null private keys");
             return;
         }
         SessionId id = message.getSessionId();
@@ -484,42 +505,44 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         Destination dest = cfg.getDestination();
-        Destination ndest = message.getLeaseSet().getDestination();
+        Destination ndest = ls.getDestination();
         if (!dest.equals(ndest)) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Different destination in LS");
             _runner.disconnectClient("Different destination in LS");
             return;
         }
-        LeaseSetKeys keys = _context.keyManager().getKeys(dest);
-        if (keys == null ||
-            !message.getPrivateKey().equals(keys.getDecryptionKey())) {
-            // Verify and register crypto keys if new or if changed
-            // Private crypto key should never change, and if it does,
-            // one of the checks below will fail
-            PublicKey pk;
-            try {
-                pk = message.getPrivateKey().toPublic();
-            } catch (IllegalArgumentException iae) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Bad private key in LS");
-                _runner.disconnectClient("Bad private key in LS");
-                return;
+        if (type != DatabaseEntry.KEY_TYPE_META_LS2) {
+            LeaseSetKeys keys = _context.keyManager().getKeys(dest);
+            if (keys == null ||
+                !message.getPrivateKey().equals(keys.getDecryptionKey())) {
+                // Verify and register crypto keys if new or if changed
+                // Private crypto key should never change, and if it does,
+                // one of the checks below will fail
+                PublicKey pk;
+                try {
+                    pk = message.getPrivateKey().toPublic();
+                } catch (IllegalArgumentException iae) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Bad private key in LS");
+                    _runner.disconnectClient("Bad private key in LS");
+                    return;
+                }
+                if (!pk.equals(ls.getEncryptionKey())) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Private/public crypto key mismatch in LS");
+                    _runner.disconnectClient("Private/public crypto key mismatch in LS");
+                    return;
+                }
+                // just register new SPK, don't verify, unused
+                _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
+            } else if (!message.getSigningPrivateKey().equals(keys.getRevocationKey())) {
+                // just register new SPK, don't verify, unused
+                _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
             }
-            if (!pk.equals(message.getLeaseSet().getEncryptionKey())) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Private/public crypto key mismatch in LS");
-                _runner.disconnectClient("Private/public crypto key mismatch in LS");
-                return;
-            }
-            // just register new SPK, don't verify, unused
-            _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
-        } else if (!message.getSigningPrivateKey().equals(keys.getRevocationKey())) {
-            // just register new SPK, don't verify, unused
-            _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
         }
         try {
-            _context.netDb().publish(message.getLeaseSet());
+            _context.netDb().publish(ls);
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid leaseset from client", iae);
@@ -530,7 +553,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _log.info("New lease set granted for destination " + dest);
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
-        _runner.leaseSetCreated(message.getLeaseSet());
+        _runner.leaseSetCreated(ls);
     }
 
     /** override for testing */

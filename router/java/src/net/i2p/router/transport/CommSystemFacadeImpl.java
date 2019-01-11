@@ -195,6 +195,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _manager.mayDisconnect(peer); 
     }
     
+    /**
+     * Tell the comm system to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    @Override
+    public void forceDisconnect(Hash peer) {
+        _manager.forceDisconnect(peer); 
+    }
+    
     @Override
     public List<String> getMostRecentErrorMessages() { 
         return _manager.getMostRecentErrorMessages(); 
@@ -625,7 +635,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         public void timeReached() {
-             boolean good = Addresses.isConnected();
+             boolean good = Addresses.isConnected() || Addresses.isConnectedIPv6();
              if (_netMonitorStatus != good) {
                  if (good)
                      _log.logAlways(Log.INFO, "Network reconnected");

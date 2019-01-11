@@ -19,7 +19,9 @@ import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 
 /**
  * <p>Define the standard means of sending and receiving messages on the 
@@ -300,9 +302,35 @@ public interface I2PSession {
     public PrivateKey getDecryptionKey();
 
     /**
-     * Retrieve the signing SigningPrivateKey associated with the Destination
+     * Retrieve the signing SigningPrivateKey associated with the Destination.
+     * As of 0.9.38, this will be the transient key if offline signed.
      */
     public SigningPrivateKey getPrivateKey();
+
+    /**
+     *  Does this session have offline and transient keys?
+     *  @since 0.9.38
+     */
+    public boolean isOffline();
+
+    /**
+     *  Get the offline expiration
+     *  @return Java time (ms) or 0 if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public long getOfflineExpiration();
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public Signature getOfflineSignature();
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public SigningPublicKey getTransientSigningPublicKey();
 
     /**
      * Lookup a Destination by Hash.

@@ -132,13 +132,19 @@ public class I2PSSLSocketFactory {
     /**
      *  Java 7 does not enable 1.1 or 1.2 by default on the client side.
      *  Java 8 does enable 1.1 and 1.2 by default on the client side.
+     *  1.3 in Java 11, but it requires:
+     *    ChaCha20/Poly1305 in Java 12 (we could add a provider)
+     *    X25519 in Java 13 but may be pulled in to 12 (can't use our unsigned provider)
+     *    Ed25519 in Java 13 (but we can use our provider)
+     *    ref: https://openjdk.java.net/jeps/332
+     *
      *  ref: http://docs.oracle.com/javase/7/docs/technotes/guides/security/SunProviders.html
      *  Unmodifiable.
      *  Public for RouterConsoleRunner.
      *  @since 0.9.16
      */
     public static final List<String> INCLUDE_PROTOCOLS = Collections.unmodifiableList(Arrays.asList(new String[] {
-        "TLSv1", "TLSv1.1", "TLSv1.2"
+        "TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"
     }));
 
     /**

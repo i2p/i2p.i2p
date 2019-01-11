@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.Inet6Address;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.Buffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ClosedSelectorException;
@@ -262,7 +263,7 @@ class EventPumper implements Runnable {
                                  */
                                 if ((!key.isValid()) &&
                                     (!((SocketChannel)key.channel()).isConnectionPending()) &&
-                                    con.getTimeSinceCreated() > 2 * NTCPTransport.ESTABLISH_TIMEOUT) {
+                                    con.getTimeSinceCreated(now) > 2 * NTCPTransport.ESTABLISH_TIMEOUT) {
                                     if (_log.shouldLog(Log.INFO))
                                         _log.info("Removing invalid key for " + con);
                                     // this will cancel the key, and it will then be removed from the keyset
@@ -293,8 +294,8 @@ class EventPumper implements Runnable {
                                     expire = _expireIdleWriteTime;
                                 }
 
-                                if ( con.getTimeSinceSend() > expire &&
-                                     con.getTimeSinceReceive() > expire) {
+                                if ( con.getTimeSinceSend(now) > expire &&
+                                     con.getTimeSinceReceive(now) > expire) {
                                     // we haven't sent or received anything in a really long time, so lets just close 'er up
                                     con.sendTerminationAndClose();
                                     if (_log.shouldInfo())
@@ -650,7 +651,8 @@ class EventPumper implements Runnable {
                 // go around again if we filled the buffer (so we can read more)
                 boolean keepReading = !buf.hasRemaining();
                 // ZERO COPY. The buffer will be returned in Reader.processRead()
-                buf.flip();
+                // not ByteBuffer to avoid Java 8/9 issues with flip()
+                ((Buffer)buf).flip();
                 FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(read, "NTCP read"); //con, buf);
                 if (req.getPendingRequested() > 0) {
                     // rare since we generally don't throttle inbound

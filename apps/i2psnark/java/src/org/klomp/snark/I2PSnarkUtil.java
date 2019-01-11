@@ -99,7 +99,7 @@ public class I2PSnarkUtil {
         _baseName = baseName;
         _opts = new HashMap<String, String>();
         //setProxy("127.0.0.1", 4444);
-        setI2CPConfig("127.0.0.1", 7654, null);
+        setI2CPConfig("127.0.0.1", I2PClient.DEFAULT_LISTEN_PORT, null);
         _banlist = new ConcurrentHashSet<Hash>();
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
         _maxUpBW = SnarkManager.DEFAULT_MAX_UP_BW;

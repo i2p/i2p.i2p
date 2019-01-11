@@ -5,21 +5,16 @@
 body {
      color: #31334f;
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
-     background: #a4a4cb url(/themes/console/light/images/tile2.png) center top scroll;
-     background-size: 32px 32px;
+     background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+     background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+
      margin: 3px 4px;
 }
 
 /* preload top navigation mouseovers */
 body {
-     background: url(images/tile2.png) scroll,
-     url(images/button_snark_hover.png) no-repeat,
-     url(images/button_snark_active.png) no-repeat,
-     url(images/button_tracker_hover.png) no-repeat,
-     url(images/button_tracker_active.png) no-repeat,
-     url(images/button_forum_hover.png) no-repeat,
-     url(images/button_forum_active.png) no-repeat, #a4a4cb;
-     background-size: 32px 32px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+  background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+  background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
 }
 
 @supports (text-justify: auto) { /* only Firefox 55 or newer */
@@ -2730,4 +2725,3 @@ a, a:link, th, td, button, input, select, textarea {
      background: #f60 url(images/button_tracker_active.png) left 3px center no-repeat !important;
      background-size: 14px auto !important;
 }
-

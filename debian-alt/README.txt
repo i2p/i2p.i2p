@@ -12,6 +12,7 @@ xenial may be copied to yakkety, zesty.
 Not maintained:
 wheezy files are not maintained. Use the precise files instead.
 jessie files may not be maintained. Use the trusty files instead.
+buster and sid files are not maintained, see the latest in Debian.
 
 Note on systemd:
 

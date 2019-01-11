@@ -733,10 +733,10 @@ public class TunnelController implements Logging {
                 int portNum = Integer.parseInt(port);
                 _tunnel.port = String.valueOf(portNum);
             } catch (NumberFormatException nfe) {
-                _tunnel.port = "7654";
+                _tunnel.port = Integer.toString(I2PClient.DEFAULT_LISTEN_PORT);
             }
         } else {
-            _tunnel.port = "7654";
+            _tunnel.port = Integer.toString(I2PClient.DEFAULT_LISTEN_PORT);
         }
     }
 

@@ -42,6 +42,8 @@ public final class ElGamalAESEngine {
     private final I2PAppContext _context;
     /** enforced since release 0.6 */
     public static final int MAX_TAGS_RECEIVED = 200;
+    private static final int ELG_CLEARTEXT_LENGTH = 222;
+    private static final int ELG_ENCRYPTED_LENGTH = 514;
 
     public ElGamalAESEngine(I2PAppContext ctx) {
         _context = ctx;
@@ -178,15 +180,15 @@ public final class ElGamalAESEngine {
         if (data == null) {
             //if (_log.shouldLog(Log.WARN)) _log.warn("Data is null, unable to decrypt new session");
             return null;
-        } else if (data.length < 514) {
+        } else if (data.length < ELG_ENCRYPTED_LENGTH) {
             //if (_log.shouldLog(Log.WARN)) _log.warn("Data length is too small (" + data.length + ")");
             return null;
         }
-        byte elgEncr[] = new byte[514];
-        if (data.length > 514) {
-            System.arraycopy(data, 0, elgEncr, 0, 514);
+        byte elgEncr[] = new byte[ELG_ENCRYPTED_LENGTH];
+        if (data.length > ELG_ENCRYPTED_LENGTH) {
+            System.arraycopy(data, 0, elgEncr, 0, ELG_ENCRYPTED_LENGTH);
         } else {
-            System.arraycopy(data, 0, elgEncr, 514 - data.length, data.length);
+            System.arraycopy(data, 0, elgEncr, ELG_ENCRYPTED_LENGTH - data.length, data.length);
         }
         byte elgDecr[] = _context.elGamalEngine().decrypt(elgEncr, targetPrivateKey);
         if (elgDecr == null) {
@@ -217,7 +219,8 @@ public final class ElGamalAESEngine {
         // feed the extra bytes into the PRNG
         _context.random().harvester().feedEntropy("ElG/AES", elgDecr, offset, elgDecr.length - offset); 
 
-        byte aesDecr[] = decryptAESBlock(data, 514, data.length-514, usedKey, iv, null, foundTags, foundKey);
+        byte aesDecr[] = decryptAESBlock(data, ELG_ENCRYPTED_LENGTH, data.length - ELG_ENCRYPTED_LENGTH,
+                                         usedKey, iv, null, foundTags, foundKey);
         SimpleByteCache.release(iv);
 
         //if (_log.shouldLog(Log.DEBUG))
@@ -508,10 +511,10 @@ public final class ElGamalAESEngine {
     private byte[] encryptNewSession(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
                                     SessionKey newKey, long paddedSize) {
         //_log.debug("Encrypting to a NEW session");
-        byte elgSrcData[] = new byte[SessionKey.KEYSIZE_BYTES+32+158];
+        byte elgSrcData[] = new byte[ELG_CLEARTEXT_LENGTH];
         System.arraycopy(key.getData(), 0, elgSrcData, 0, SessionKey.KEYSIZE_BYTES);
         // get both the preIV and the padding at once, then copy to the preIV array
-        _context.random().nextBytes(elgSrcData, SessionKey.KEYSIZE_BYTES, 32 + 158);
+        _context.random().nextBytes(elgSrcData, SessionKey.KEYSIZE_BYTES, ELG_CLEARTEXT_LENGTH - SessionKey.KEYSIZE_BYTES);
         byte preIV[] = SimpleByteCache.acquire(32);
         System.arraycopy(elgSrcData, SessionKey.KEYSIZE_BYTES, preIV, 0, 32);
 
@@ -523,9 +526,9 @@ public final class ElGamalAESEngine {
             long after = _context.clock().now();
             _log.info("elgEngine.encrypt of the session key took " + (after - before) + "ms");
         }
-        if (elgEncr.length < 514) {
+        if (elgEncr.length < ELG_ENCRYPTED_LENGTH) {
             // ??? ElGamalEngine.encrypt() always returns 514 bytes
-            byte elg[] = new byte[514];
+            byte elg[] = new byte[ELG_ENCRYPTED_LENGTH];
             int diff = elg.length - elgEncr.length;
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Difference in size: " + diff);
             System.arraycopy(elgEncr, 0, elg, diff, elgEncr.length);

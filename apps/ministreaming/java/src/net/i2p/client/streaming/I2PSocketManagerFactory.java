@@ -275,7 +275,7 @@ public class I2PSocketManagerFactory {
     }
 
     private static int getPort() {
-        int i2cpPort = 7654;
+        int i2cpPort = I2PClient.DEFAULT_LISTEN_PORT;
         String i2cpPortStr = System.getProperty(I2PClient.PROP_TCP_PORT);
         if (i2cpPortStr != null) {
             try {

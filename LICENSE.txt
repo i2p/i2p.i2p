@@ -90,6 +90,10 @@ Public domain except as listed below:
    (not included in most distribution packages)
    See licenses/LICENSE-Apache2.0.txt
 
+   Noise library:
+   Copyright (C) 2016 Southern Storm Software, Pty Ltd.
+   See licenses/LICENSE-Noise.txt
+
 
 Router (router.jar):
 Public domain except as listed below:

@@ -1,0 +1,13 @@
+/usr/share/i2p/blocklist.txt
+/usr/share/i2p/clients.config
+/usr/share/i2p/eepsite/contexts/base-context.xml
+/usr/share/i2p/eepsite/contexts/cgi-context.xml
+/usr/share/i2p/eepsite/etc/webdefault.xml
+/usr/share/i2p/eepsite/jetty-jmx.xml
+/usr/share/i2p/eepsite/jetty-rewrite.xml
+/usr/share/i2p/eepsite/jetty-ssl.xml
+/usr/share/i2p/eepsite/jetty.xml
+/usr/share/i2p/hosts.txt
+/usr/share/i2p/i2psnark.config
+/usr/share/i2p/i2ptunnel.config
+/usr/share/i2p/router.config

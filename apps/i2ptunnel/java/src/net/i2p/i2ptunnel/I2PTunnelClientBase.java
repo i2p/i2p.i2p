@@ -409,7 +409,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         Log _log = tunnel.getContext().logManager().getLog(I2PTunnelClientBase.class);
         Properties props = new Properties();
         props.putAll(tunnel.getClientOptions());
-        int portNum = 7654;
+        int portNum = I2PClient.DEFAULT_LISTEN_PORT;
         if (tunnel.port != null) {
             try {
                 portNum = Integer.parseInt(tunnel.port);
@@ -471,7 +471,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 // try to make this error sensible as it will happen...
                 String portNum = getTunnel().port;
                 if (portNum == null)
-                    portNum = "7654";
+                    portNum = Integer.toString(I2PClient.DEFAULT_LISTEN_PORT);
                 String msg;
                 if (getTunnel().getContext().isRouterContext())
                     msg = "Unable to build tunnels for the client";

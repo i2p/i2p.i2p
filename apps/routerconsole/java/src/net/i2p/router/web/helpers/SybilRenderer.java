@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.text.Collator;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +32,11 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.sybil.Analysis;
+import net.i2p.router.sybil.Pair;
+import net.i2p.router.sybil.PersistSybil;
+import net.i2p.router.sybil.Points;
+import static net.i2p.router.sybil.Util.biLog2;
 import net.i2p.router.tunnel.pool.TunnelPool;
 import net.i2p.router.util.HashDistance;
 import net.i2p.router.web.Messages;
@@ -39,6 +46,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
@@ -50,34 +58,16 @@ import net.i2p.util.VersionComparator;
  *  @since 0.9.24
  *
  */
-class SybilRenderer {
+public class SybilRenderer {
 
     private final RouterContext _context;
     private final DecimalFormat fmt = new DecimalFormat("#0.00");
 
-    private static final int PAIRMAX = 20;
-    private static final int MAX = 10;
-    // multiplied by size - 1, will also get POINTS24 added
-    private static final double POINTS32 = 5.0;
-    // multiplied by size - 1, will also get POINTS16 added
-    private static final double POINTS24 = 5.0;
-    // multiplied by size - 1
-    private static final double POINTS16 = 0.25;
-    private static final double POINTS_US32 = 25.0;
-    private static final double POINTS_US24 = 25.0;
-    private static final double POINTS_US16 = 10.0;
-    private static final double POINTS_FAMILY = -10.0;
-    private static final double POINTS_BAD_OUR_FAMILY = 100.0;
-    private static final double POINTS_OUR_FAMILY = -100.0;
-    private static final double MIN_CLOSE = 242.0;
-    private static final double PAIR_DISTANCE_FACTOR = 2.0;
-    private static final double OUR_KEY_FACTOR = 4.0;
+    private static final int PAIRMAX = Analysis.PAIRMAX;
+    private static final int MAX = Analysis.MAX;
+    private static final double MIN_CLOSE = Analysis.MIN_CLOSE;
     private static final double MIN_DISPLAY_POINTS = 12.01;
-    private static final double VERSION_FACTOR = 1.0;
-    private static final double POINTS_BAD_VERSION = 50.0;
-    private static final double POINTS_UNREACHABLE = 4.0;
-    private static final double POINTS_NEW = 4.0;
-    private static final double POINTS_BANLIST = 25.0;
+    private static final int[] HOURS = { 1, 6, 24, 7*24, 30*24, 0 };
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
@@ -85,38 +75,13 @@ class SybilRenderer {
 
     /**
      *   Entry point
+     *
+     *  @param mode what tab to show
+     *  @param date only for mode = 12
      */
-    public String getNetDbSummary(Writer out) throws IOException {
-        renderRouterInfoHTML(out, (String)null);
+    public String getNetDbSummary(Writer out, String nonce, int mode, long date) throws IOException {
+        renderRouterInfoHTML(out, nonce, mode, date);
         return "";
-    }
-
-    private static class RouterInfoRoutingKeyComparator implements Comparator<RouterInfo>, Serializable {
-         private final Hash _us;
-         /** @param us ROUTING KEY */
-         public RouterInfoRoutingKeyComparator(Hash us) {
-             _us = us;
-         }
-         public int compare(RouterInfo l, RouterInfo r) {
-             return HashDistance.getDistance(_us, l.getHash()).compareTo(HashDistance.getDistance(_us, r.getHash()));
-        }
-    }
-
-    /**
-     *  A total score and a List of reason Strings
-     */
-    public static class Points implements Comparable<Points> {
-         private double points;
-         private final List<String> reasons;
-
-         public Points(double points, String reason) {
-             this.points = points;
-             reasons = new ArrayList<String>(4);
-             reasons.add(reason);
-         }
-         public int compareTo(Points r) {
-             return Double.compare(points, r.points);
-        }
     }
 
     private static class PointsComparator implements Comparator<Hash>, Serializable {
@@ -156,145 +121,317 @@ class SybilRenderer {
     }
 
     /**
-     *  Merge points1 into points2.
-     *  points1 is unmodified.
-     */
-    private void mergePoints(Map<Hash, Points> points1, Map<Hash, Points> points2) {
-        for (Map.Entry<Hash, Points> e : points1.entrySet()) {
-             Hash h = e.getKey();
-             Points p1 = e.getValue();
-             Points p2 = points2.get(h);
-             if (p2 != null) {
-                 p2.points += p1.points;
-                 p2.reasons.addAll(p1.reasons);
-             } else {
-                 points2.put(h, p1);
-             }
-        }
-    }
-
-    private void addPoints(Map<Hash, Points> points, Hash h, double d, String reason) {
-        String rsn = fmt.format(d) + ": " + reason;
-        Points dd = points.get(h);
-        if (dd != null) {
-            dd.points += d;
-            dd.reasons.add(rsn);
-        } else {
-            points.put(h, new Points(d, rsn));
-        }
-    }
-
-    /**
-     *  All the floodfills, not including us
-     *  @since 0.9.38 split out from renderRouterInfoHTML
-     */
-    private List<RouterInfo> getFloodfills(Hash us) {
-        Set<Hash> ffs = _context.peerManager().getPeersByCapability('f');
-        List<RouterInfo> ris = new ArrayList<RouterInfo>(ffs.size());
-        for (Hash ff : ffs) {
-             if (ff.equals(us))
-                 continue;
-             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(ff);
-             if (ri != null)
-                 ris.add(ri);
-        }
-        return ris;
-    }
-
-    private double getAvgMinDist(List<RouterInfo> ris) {
-        double tot = 0;
-        int count = 200;
-        byte[] b = new byte[32];
-        for (int i = 0; i < count; i++) {
-            _context.random().nextBytes(b);
-            Hash h = new Hash(b);
-            double d = closestDistance(h, ris);
-            tot += d;
-        }
-        double avgMinDist = tot / count;
-        return avgMinDist;
-    }
-
-    /**
      *  The whole thing
      *
-     *  @param routerPrefix ignored
+     *  @param mode what tab to show
+     *  @param date only for mode = 12
      */
-    private void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
+    private void renderRouterInfoHTML(Writer out, String nonce, int mode, long date) throws IOException {
         Hash us = _context.routerHash();
-        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
-        List<RouterInfo> ris = getFloodfills(us);
-        if (ris.isEmpty()) {
-            out.write("<h3 class=\"sybils\">No known floodfills</h3>");
-            return;
+        Analysis analysis = Analysis.getInstance(_context);
+        List<RouterInfo> ris = null;
+        if (mode != 0 && mode != 12 && mode != 13 && mode != 14) {
+            ris = analysis.getFloodfills(us);
+            if (ris.isEmpty()) {
+                out.write("<h3 class=\"sybils\">No known floodfills</h3>");
+                return;
+            }
         }
 
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<p id=\"sybilinfo\"><b>This is an experimental network database tool for debugging and analysis. Do not panic even if you see warnings below. " +
-                   "Possible \"threats\" are summarized at the bottom, however these are unlikely to be real threats. " +
+                   "Possible \"threats\" are summarized, however these are unlikely to be real threats. " +
                    "If you see anything you would like to discuss with the devs, contact us on IRC #i2p-dev.</b></p>" +
-                   "<div id=\"sybilnav\"><ul><li><a href=\"#known\">FF Summary</a>" +
-                   "</li><li><a href=\"#family\">Same Family</a>" +
-                   "</li><li><a href=\"#ourIP\">IP close to us</a>" +
-                   "</li><li><a href=\"#sameIP\">Same IP</a>" +
-                   "</li><li><a href=\"#same24\">Same /24</a>" +
-                   "</li><li><a href=\"#same16\">Same /16</a>" +
-                   "</li><li><a href=\"#pairs\">Pair distance</a>" +
-                   "</li><li><a href=\"#ritoday\">Close to us</a>" +
-                   "</li><li><a href=\"#ritmrw\">Close to us tomorrow</a>" +
-                   "</li><li><a href=\"#dht\">DHT neighbors</a>" +
-                   "</li><li><a href=\"#dest\">Close to our destinations</a>" +
-                   "</li><li><a href=\"#threats\">Highest threats</a>" +
+                   "<div id=\"sybilnav\"><ul><li><a href=\"netdb?f=3\">Review stored analysis</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=14\">Run new analysis</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=15\">Configure periodic analysis</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=1\">Floodfill Summary</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=2\">Same Family</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=3\">IP close to us</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=4\">Same IP</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=5\">Same /24</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=6\">Same /16</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=7\">Pair distance</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=8\">Close to us</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=9\">Close to us tomorrow</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=10\">DHT neighbors</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=11\">Close to our destinations</a>" +
                    "</li></ul></div>");
+        writeBuf(out, buf);
 
+        double avgMinDist = 0;
+        if (mode == 1 || mode == 8 || mode == 9 || mode == 10 || mode == 11) {
+            avgMinDist = analysis.getAvgMinDist(ris);
+        }
+        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
+
+        if (mode == 0) {
+            renderOverview(out, buf, nonce, analysis);
+        } else if (mode == 1) {
+            renderFFSummary(out, buf, ris, avgMinDist);
+        } else if (mode == 2) {
+            renderFamilySummary(out, buf, analysis, ris, points);
+        } else if (mode == 3) {
+            renderIPUsSummary(out, buf, analysis, ris, points);
+        } else if (mode == 4) {
+            renderIP32Summary(out, buf, analysis, ris, points);
+        } else if (mode == 5) {
+            renderIP24Summary(out, buf, analysis, ris, points);
+        } else if (mode == 6) {
+            renderIP16Summary(out, buf, analysis, ris, points);
+        } else if (mode == 7) {
+            renderPairSummary(out, buf, analysis, ris, points);
+        } else if (mode == 8) {
+            renderCloseSummary(out, buf, analysis, avgMinDist, ris, points);
+        } else if (mode == 9) {
+            renderCloseTmrwSummary(out, buf, analysis, us, avgMinDist, ris, points);
+        } else if (mode == 10) {
+            renderDHTSummary(out, buf, analysis, us, avgMinDist, ris, points);
+        } else if (mode == 11) {
+            renderDestSummary(out, buf, analysis, avgMinDist, ris, points);
+        } else if (mode == 12) {
+            // load stored analysis
+            PersistSybil ps = analysis.getPersister();
+            try {
+                points = ps.load(date);
+            } catch (IOException ioe) {
+                out.write("<b>No analysis found for " + new Date(date) + "</b>");
+                return;
+            }
+            if (points.isEmpty()) {
+                out.write("<b>No analysis found for " + new Date(date) + "</b>");
+            } else {
+                renderThreatsHTML(out, buf, date, points);
+            }
+        } else if (mode == 13) {
+            // run analysis and store it
+            long now = _context.clock().now();
+            points = analysis.backgroundAnalysis();
+            if (!points.isEmpty()) {
+                PersistSybil ps = analysis.getPersister();
+                try {
+                    ps.store(now, points);
+                } catch (IOException ioe) {
+                    out.write("<b>Failed to store analysis: " + ioe + "</b>");
+                }
+            }
+            renderThreatsHTML(out, buf, now, points);
+        } else if (mode == 14) {
+            // show run form
+            renderRunForm(out, buf, nonce);
+        } else if (mode == 15) {
+            // show background form
+            renderBackgroundForm(out, buf, nonce);
+        } else {
+            out.write("Unknown mode " + mode);
+        }
+        writeBuf(out, buf);
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    private void renderOverview(Writer out, StringBuilder buf, String nonce, Analysis analysis) throws IOException {
+        PersistSybil ps = analysis.getPersister();
+        List<Long> dates = ps.load();
+        if (dates.isEmpty()) {
+            out.write("No stored analysis");
+        } else {
+            buf.append("<form action=\"netdb\" method=\"POST\">\n" +
+                       "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
+                       "<input type=\"hidden\" name=\"m\" value=\"12\">\n" +
+                       "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
+                       "Select stored analysis: " +
+                       "<select name=\"date\">\n");
+            boolean first = true;
+            DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+            dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+            for (Long date : dates) {
+                buf.append("<option value=\"").append(date).append('\"');
+                if (first) {
+                    buf.append(" selected=\"selected\"");
+                    first = false;
+                }
+                buf.append('>').append(dfmt.format(new Date(date.longValue()))).append("</option>\n");
+            }        
+            buf.append("</select>\n" +
+                       "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Review analysis\" />" +
+                       "</form>\n");
+        }        
+        writeBuf(out, buf);
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    private static void renderRunForm(Writer out, StringBuilder buf, String nonce) throws IOException {
+        buf.append("<form action=\"netdb\" method=\"POST\">\n" +
+                   "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
+                   "<input type=\"hidden\" name=\"m\" value=\"13\">\n" +
+                   "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
+                   "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Run new analysis\" />" +
+                   "</form>\n");
+        writeBuf(out, buf);
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    private void renderBackgroundForm(Writer out, StringBuilder buf, String nonce) throws IOException {
+        long freq = _context.getProperty(Analysis.PROP_FREQUENCY, 0L);
+        buf.append("<form action=\"netdb\" method=\"POST\">\n" +
+                   "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
+                   "<input type=\"hidden\" name=\"m\" value=\"15\">\n" +
+                   "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
+                   "Background analysis run frequency: <select name=\"runFrequency\">");
+        for (int i = 0; i < HOURS.length; i++) {
+            buf.append("<option value=\"");
+            buf.append(Integer.toString(HOURS[i]));
+            buf.append('"');
+            long time = HOURS[i] * 60*60*1000L;
+            if (time == freq)
+                buf.append(" selected=\"selected\"");
+            buf.append('>');
+            if (HOURS[i] > 0)
+                buf.append(DataHelper.formatDuration2(time));
+            else
+                buf.append(_t("Never"));
+            buf.append("</option>\n");
+        }
+        buf.append("</select> " +
+                   "<input type=\"submit\" name=\"action\" class=\"accept\" value=\"Save\" />" +
+                   "</form>\n");
+        writeBuf(out, buf);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderFFSummary(Writer out, StringBuilder buf, List<RouterInfo> ris, double avgMinDist) throws IOException {
         renderRouterInfo(buf, _context.router().getRouterInfo(), null, true, false);
         buf.append("<h3 id=\"known\" class=\"sybils\">Known Floodfills: ").append(ris.size()).append("</h3>");
-
-        double avgMinDist = getAvgMinDist(ris);
+        DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
         buf.append("<div id=\"sybils_summary\">\n" +
                    "<b>Average closest floodfill distance:</b> ").append(fmt.format(avgMinDist)).append("<br>\n" +
                    "<b>Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
-           .append("\" <b>Last Changed:</b> ").append(new Date(_context.routerKeyGenerator().getLastChanged())).append("<br>\n" +
+           .append("\" <b>Last Changed:</b> ").append(dfmt.format(new Date(_context.routerKeyGenerator().getLastChanged()))).append("<br>\n" +
                    "<b>Next Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData()))
            .append("\" <b>Rotates in:</b> ").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight())).append("\n" +
                    "</div>\n");
+        writeBuf(out, buf);
+    }
 
-        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderFamilySummary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<String, List<RouterInfo>> fmap = analysis.calculateIPGroupsFamily(ris, points);
+        renderIPGroupsFamily(out, buf, fmap);
+    }
 
-        // IP analysis
-        renderIPGroupsFamily(out, buf, ris, points);
-        renderIPGroupsUs(out, buf, ris, points);
-        renderIPGroups32(out, buf, ris, points);
-        renderIPGroups24(out, buf, ris, points);
-        renderIPGroups16(out, buf, ris, points);
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIPUsSummary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        List<RouterInfo> ri32 = new ArrayList<RouterInfo>(4);
+        List<RouterInfo> ri24 = new ArrayList<RouterInfo>(4);
+        List<RouterInfo> ri16 = new ArrayList<RouterInfo>(4);
+        analysis.calculateIPGroupsUs(ris, points, ri32, ri24, ri16);
+        renderIPGroupsUs(out, buf, ri32, ri24, ri16);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIP32Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<Integer, List<RouterInfo>> map = analysis.calculateIPGroups32(ris, points);
+        renderIPGroups32(out, buf, map);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIP24Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<Integer, List<RouterInfo>> map = analysis.calculateIPGroups24(ris, points);
+        renderIPGroups24(out, buf, map);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderIP16Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<Integer, List<RouterInfo>> map = analysis.calculateIPGroups16(ris, points);
+        renderIPGroups16(out, buf, map);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderPairSummary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         // Pairwise distance analysis
-        renderPairDistance(out, buf, ris, points);
+        List<Pair> pairs = new ArrayList<Pair>(PAIRMAX);
+        double avg = analysis.calculatePairDistance(ris, points, pairs);
+        renderPairDistance(out, buf, pairs, avg);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderCloseSummary(Writer out, StringBuilder buf, Analysis analysis, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         // Distance to our router analysis
         buf.append("<h3 id=\"ritoday\" class=\"sybils\">Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
         buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
-        renderRouterInfoHTML(out, buf, ourRKey, "our rkey", avgMinDist, ris, points);
+        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
+        analysis.calculateRouterInfo(ourRKey, "our rkey", ris, points);
+        renderRouterInfoHTML(out, buf, ourRKey, avgMinDist, ris);
+    }
+
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderCloseTmrwSummary(Writer out, StringBuilder buf, Analysis analysis, Hash us, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        // Distance to our router analysis
         RouterKeyGenerator rkgen = _context.routerKeyGenerator();
         Hash nkey = rkgen.getNextRoutingKey(us);
         buf.append("<h3 id=\"ritmrw\" class=\"sybils\">Closest Floodfills to Tomorrow's Routing Key (Where we will Store our RI)</h3>");
         buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
-        renderRouterInfoHTML(out, buf, nkey, "our rkey (tomorrow)", avgMinDist, ris, points);
+        analysis.calculateRouterInfo(nkey, "our rkey (tomorrow)", ris, points);
+        renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderDHTSummary(Writer out, StringBuilder buf, Analysis analysis, Hash us, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3 id=\"dht\" class=\"sybils\">Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
-        renderRouterInfoHTML(out, buf, us, "our router", avgMinDist, ris, points);
+        analysis.calculateRouterInfo(us, "our router", ris, points);
+        renderRouterInfoHTML(out, buf, us, avgMinDist, ris);
+    }
 
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderDestSummary(Writer out, StringBuilder buf, Analysis analysis, double avgMinDist, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         // Distance to our published destinations analysis
+        RouterKeyGenerator rkgen = _context.routerKeyGenerator();
         buf.append("<h3 id=\"dest\" class=\"sybils\">Floodfills Close to Our Destinations</h3>");
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         List<Hash> destinations = new ArrayList<Hash>(clientInboundPools.keySet());
-        //boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
+        for (Iterator<Hash> iter = destinations.iterator(); iter.hasNext(); ) {
+            Hash client = iter.next();
+            if (!_context.clientManager().isLocal(client) ||
+                !_context.clientManager().shouldPublishLeaseSet(client) ||
+                _context.netDb().lookupLeaseSetLocally(client) == null) {
+                iter.remove();
+            }
+        }
+        if (destinations.isEmpty()) {
+            buf.append("<p class=\"notfound\">None</p>");
+            writeBuf(out, buf);
+            return;
+        }
         for (Hash client : destinations) {
-            boolean isLocal = _context.clientManager().isLocal(client);
-            if (!isLocal)
-                continue;
-            if (! _context.clientManager().shouldPublishLeaseSet(client))
-                continue;
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client);
             if (ls == null)
                 continue;
@@ -303,204 +440,79 @@ class SybilRenderer {
             String name = (in != null) ? DataHelper.escapeHTML(in.getSettings().getDestinationNickname()) : client.toBase64().substring(0,4);
             buf.append("<h3 class=\"sybils\">Closest floodfills to the Routing Key for " + name + " (where we store our LS)</h3>");
             buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
-            renderRouterInfoHTML(out, buf, rkey, name, avgMinDist, ris, points);
-            nkey = rkgen.getNextRoutingKey(ls.getHash());
+            analysis.calculateRouterInfo(rkey, name, ris, points);
+            renderRouterInfoHTML(out, buf, rkey, avgMinDist, ris);
+            Hash nkey = rkgen.getNextRoutingKey(ls.getHash());
             buf.append("<h3 class=\"sybils\">Closest floodfills to Tomorrow's Routing Key for " + name + " (where we will store our LS)</h3>");
             buf.append("<p class=\"sybil_info\"><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
-            renderRouterInfoHTML(out, buf, nkey, name + " (tomorrow)", avgMinDist, ris, points);
+            analysis.calculateRouterInfo(nkey, name + " (tomorrow)", ris, points);
+            renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris);
         }
+    }
 
-        // Profile analysis
-        addProfilePoints(ris, points);
-        addVersionPoints(ris, points);
-
+    /**
+     *  @since 0.9.38 split out from renderRouterInfoHTML()
+     */
+    private void renderThreatsHTML(Writer out, StringBuilder buf, long date, Map<Hash, Points> points) throws IOException {
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
             Collections.sort(warns, new PointsComparator(points));
-            buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points</h3>");
+            ReasonComparator rcomp = new ReasonComparator();
+            DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+            dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+            buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points as of " + dfmt.format(new Date(date)) + "</h3>");
             for (Hash h : warns) {
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
                 if (ri == null)
                     continue;
                 Points pp = points.get(h);
-                double p = pp.points;
+                double p = pp.getPoints();
                 if (p < MIN_DISPLAY_POINTS)
                     break;  // sorted
                 buf.append("<p class=\"threatpoints\"><b>Threat Points: " + fmt.format(p) + "</b></p><ul>");
-                if (pp.reasons.size() > 1)
-                    Collections.sort(pp.reasons, new ReasonComparator());
-                for (String s : pp.reasons) {
+                List<String> reasons = pp.getReasons();
+                if (reasons.size() > 1)
+                    Collections.sort(reasons, rcomp);
+                for (String s : reasons) {
                     int c = s.indexOf(':');
                     if (c <= 0)
                         continue;
-                    buf.append("<li><b>").append(s.substring(0, c+1)).append("</b>").append(s.substring(c+1)).append("</li>");
+                    buf.append("<li><b>").append(s, 0, c+1).append("</b>").append(s, c+1, s.length()).append("</li>");
                 }
                 buf.append("</ul>");
                 renderRouterInfo(buf, ri, null, false, false);
             }
         }
-
-        out.write(buf.toString());
-        out.flush();
-        buf.setLength(0);
+        writeBuf(out, buf);
     }
 
     /**
-     *  Analyze threats. No output.
-     *  Return separate maps for each cause instead?
-     *  @since 0.9.38
+     *  @param pairs sorted
      */
-    public Map<Hash, Points> backgroundAnalysis() throws IOException {
-        Hash us = _context.routerHash();
-        List<RouterInfo> ris = getFloodfills(us);
+    private void renderPairDistance(Writer out, StringBuilder buf, List<Pair> pairs, double avg) throws IOException {
+        buf.append("<h3 class=\"sybils\">Average Floodfill Distance is ").append(fmt.format(avg)).append("</h3>" +
+                   "<h3 id=\"pairs\" class=\"sybils\">Closest Floodfill Pairs by Hash</h3>");
 
-        double avgMinDist = getAvgMinDist(ris);
-        Map<Hash, Points> points = new HashMap<Hash, Points>(64);
-
-        // IP analysis
-        renderIPGroupsFamily(null, null, ris, points);
-        renderIPGroupsUs(null, null, ris, points);
-        renderIPGroups32(null, null, ris, points);
-        renderIPGroups24(null, null, ris, points);
-        renderIPGroups16(null, null, ris, points);
-
-        // Pairwise distance analysis
-        renderPairDistance(null, null, ris, points);
-
-        // Distance to our router analysis
-        // closest to our routing key today
-        Hash ourRKey = _context.router().getRouterInfo().getRoutingKey();
-        renderRouterInfoHTML(null, null, ourRKey, "our rkey", avgMinDist, ris, points);
-        // closest to our routing key tomorrow
-        RouterKeyGenerator rkgen = _context.routerKeyGenerator();
-        Hash nkey = rkgen.getNextRoutingKey(us);
-        renderRouterInfoHTML(null, null, nkey, "our rkey (tomorrow)", avgMinDist, ris, points);
-        // closest to us
-        renderRouterInfoHTML(null, null, us, "our router", avgMinDist, ris, points);
-
-        // Distance to our published destinations analysis
-        Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
-        List<Hash> destinations = new ArrayList<Hash>(clientInboundPools.keySet());
-        for (Hash client : destinations) {
-            boolean isLocal = _context.clientManager().isLocal(client);
-            if (!isLocal)
-                continue;
-            if (! _context.clientManager().shouldPublishLeaseSet(client))
-                continue;
-            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client);
-            if (ls == null)
-                continue;
-            Hash rkey = ls.getRoutingKey();
-            TunnelPool in = clientInboundPools.get(client);
-            String name = (in != null) ? DataHelper.escapeHTML(in.getSettings().getDestinationNickname()) : client.toBase64().substring(0,4);
-            // closest to routing key today
-            renderRouterInfoHTML(null, null, rkey, name, avgMinDist, ris, points);
-            // closest to routing key tomorrow
-            nkey = rkgen.getNextRoutingKey(ls.getHash());
-            renderRouterInfoHTML(null, null, nkey, name + " (tomorrow)", avgMinDist, ris, points);
-        }
-
-        // Profile analysis
-        addProfilePoints(ris, points);
-        addVersionPoints(ris, points);
-        return points;
-    }
-
-    private static class Pair implements Comparable<Pair> {
-        public final RouterInfo r1, r2;
-        public final BigInteger dist;
-        public Pair(RouterInfo ri1, RouterInfo ri2, BigInteger distance) {
-            r1 = ri1; r2 = ri2; dist = distance;
-        }
-        public int compareTo(Pair p) {
-            return this.dist.compareTo(p.dist);
-        }
-    }
-
-    /**
-     *  @param out null for background analysis
-     *  @param buf null for background analysis
-     */
-    private void renderPairDistance(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        int sz = ris.size();
-        List<Pair> pairs = new ArrayList<Pair>(PAIRMAX);
-        double total = 0;
-        for (int i = 0; i < sz; i++) {
-            RouterInfo info1 = ris.get(i);
-            for (int j = i + 1; j < sz; j++) {
-                RouterInfo info2 = ris.get(j);
-                BigInteger dist = HashDistance.getDistance(info1.getHash(), info2.getHash());
-                if (pairs.isEmpty()) {
-                    pairs.add(new Pair(info1, info2, dist));
-                } else if (pairs.size() < PAIRMAX) {
-                    pairs.add(new Pair(info1, info2, dist));
-                    Collections.sort(pairs);
-                } else if (dist.compareTo(pairs.get(PAIRMAX - 1).dist) < 0) {
-                    pairs.set(PAIRMAX - 1, new Pair(info1, info2, dist));
-                    Collections.sort(pairs);
-                }
-                total += biLog2(dist);
-            }
-        }
-
-        double avg = total / (sz * sz / 2d);
-        if (buf != null) {
-            buf.append("<h3 class=\"sybils\">Average Floodfill Distance is ").append(fmt.format(avg)).append("</h3>" +
-                       "<h3 id=\"pairs\" class=\"sybils\">Closest Floodfill Pairs by Hash</h3>");
-        }
         for (Pair p : pairs) {
             double distance = biLog2(p.dist);
             double point = MIN_CLOSE - distance;
-            if (point < 0)
+            // limit display
+            if (point < 2)
                 break;  // sorted;
-            if (buf != null && point >= 2) {
-                // limit display
-                buf.append("<p class=\"hashdist\"><b>Hash Distance: ").append(fmt.format(distance)).append(": </b>" +
-                           "</p>");
-                renderRouterInfo(buf, p.r1, null, false, false);
-                renderRouterInfo(buf, p.r2, null, false, false);
-            }
-            point *= PAIR_DISTANCE_FACTOR;
-            String b2 = p.r2.getHash().toBase64();
-            addPoints(points, p.r1.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill <a href=\"netdb?r=" + b2 + "\">" + b2 + "</a>");
-            String b1 = p.r1.getHash().toBase64();
-            addPoints(points, p.r2.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill <a href=\"netdb?r=" + b1 + "\">" + b1 + "</a>");
+            buf.append("<p class=\"hashdist\"><b>Hash Distance: ").append(fmt.format(distance)).append("</b>" +
+                       "</p>");
+            renderRouterInfo(buf, p.r1, null, false, false);
+            renderRouterInfo(buf, p.r2, null, false, false);
         }
-        if (buf != null) {
-            out.write(buf.toString());
-            out.flush();
-            buf.setLength(0);
-        }
-    }
-
-    private double closestDistance(Hash h, List<RouterInfo> ris) {
-        BigInteger min = (new BigInteger("2")).pow(256);
-        for (RouterInfo info : ris) {
-            BigInteger dist = HashDistance.getDistance(h, info.getHash());
-            if (dist.compareTo(min) < 0)
-                min = dist;
-        }
-        return biLog2(min);
-    }
-
-    /** v4 only */
-    private static byte[] getIP(RouterInfo ri) {
-        for (RouterAddress ra : ri.getAddresses()) {
-            byte[] rv = ra.getIP();
-            if (rv != null && rv.length == 4)
-                return rv;
-        }
-        return null;
+        writeBuf(out, buf);
     }
 
     private static class FooComparator implements Comparator<Integer>, Serializable {
-         private final ObjectCounter<Integer> _o;
-         public FooComparator(ObjectCounter<Integer> o) { _o = o;}
+         private final Map<Integer, List<RouterInfo>> _o;
+         public FooComparator(Map<Integer, List<RouterInfo>> o) { _o = o;}
          public int compare(Integer l, Integer r) {
              // reverse by count
-             int rv = _o.count(r) - _o.count(l);
+             int rv = _o.get(r).size() - _o.get(l).size();
              if (rv != 0)
                  return rv;
              // foward by IP
@@ -509,12 +521,12 @@ class SybilRenderer {
     }
 
     private static class FoofComparator implements Comparator<String>, Serializable {
-         private final ObjectCounter<String> _o;
+         private final Map<String, List<RouterInfo>> _o;
          private final Collator _comp = Collator.getInstance();
-         public FoofComparator(ObjectCounter<String> o) { _o = o;}
+         public FoofComparator(Map<String, List<RouterInfo>> o) { _o = o;}
          public int compare(String l, String r) {
              // reverse by count
-             int rv = _o.count(r) - _o.count(l);
+             int rv = _o.get(r).size() - _o.get(l).size();
              if (rv != 0)
                  return rv;
              // foward by name
@@ -523,205 +535,108 @@ class SybilRenderer {
     }
 
     /**
-     *  @param out null for background analysis
-     *  @param buf null for background analysis
+     *
      */
-    private void renderIPGroupsUs(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        RouterInfo us = _context.router().getRouterInfo();
-        byte[] ourIP = getIP(us);
-        if (ourIP == null)
-            return;
-        if (buf != null)
-            buf.append("<h3 id=\"ourIP\" class=\"sybils\">Floodfills close to Our IP</h3>");
+    private void renderIPGroupsUs(Writer out, StringBuilder buf, List<RouterInfo> ri32,
+                                  List<RouterInfo> ri24, List<RouterInfo> ri16) throws IOException {
+        buf.append("<h3 id=\"ourIP\" class=\"sybils\">Floodfills close to Our IP</h3>");
         boolean found = false;
-        for (RouterInfo info : ris) {
-            byte[] ip = getIP(info);
-            if (ip == null)
-                continue;
-            if (ip[0] == ourIP[0] && ip[1] == ourIP[1]) {
-                if (buf != null)
-                    buf.append("<p id=\"sybil_info\"><b>");
-                if (ip[2] == ourIP[2]) {
-                    if (ip[3] == ourIP[3]) {
-                        if (buf != null)
-                            buf.append("Same IP as us");
-                        addPoints(points, info.getHash(), POINTS_US32, "Same IP as us");
-                    } else {
-                        if (buf != null)
-                            buf.append("Same /24 as us");
-                        addPoints(points, info.getHash(), POINTS_US24, "Same /24 as us");
-                    }
-                } else {
-                    if (buf != null)
-                        buf.append("Same /16 as us");
-                    addPoints(points, info.getHash(), POINTS_US16, "Same /16 as us");
-                }
-                if (buf != null) {
-                    buf.append(":</b></p>");
-                    renderRouterInfo(buf, info, null, false, false);
-                }
-                found = true;
-            }
+        for (RouterInfo info : ri32) {
+             buf.append("<p id=\"sybil_info\"><b>");
+             buf.append("Same IP as us");
+             buf.append(":</b></p>");
+             renderRouterInfo(buf, info, null, false, false);
+             found = true;
         }
-        if (buf != null) {
-            if (!found)
-                buf.append("<p class=\"notfound\">None</p>");
-            out.write(buf.toString());
-            out.flush();
-            buf.setLength(0);
+        for (RouterInfo info : ri24) {
+             buf.append("<p id=\"sybil_info\"><b>");
+             buf.append("Same /24 as us");
+             buf.append(":</b></p>");
+             renderRouterInfo(buf, info, null, false, false);
+             found = true;
         }
+        for (RouterInfo info : ri16) {
+             buf.append("<p id=\"sybil_info\"><b>");
+             buf.append("Same /16 as us");
+             buf.append(":</b></p>");
+             renderRouterInfo(buf, info, null, false, false);
+             found = true;
+        }
+        if (!found)
+            buf.append("<p class=\"notfound\">None</p>");
+        writeBuf(out, buf);
     }
 
     /**
-     *  @param out null for background analysis
-     *  @param buf null for background analysis
+     *
      */
-    private void renderIPGroups32(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        if (buf != null)
-            buf.append("<h3 id=\"sameIP\" class=\"sybils\">Floodfills with the Same IP</h3>");
-        ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
-        for (RouterInfo info : ris) {
-            byte[] ip = getIP(info);
-            if (ip == null)
-                continue;
-            Integer x = Integer.valueOf((int) DataHelper.fromLong(ip, 0, 4));
-            oc.increment(x);
-        }
-        List<Integer> foo = new ArrayList<Integer>();
-        for (Integer ii : oc.objects()) {
-            int count = oc.count(ii);
-            if (count >= 2)
-                foo.add(ii);
-        }
-        Collections.sort(foo, new FooComparator(oc));
+    private void renderIPGroups32(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
+        buf.append("<h3 id=\"sameIP\" class=\"sybils\">Floodfills with the Same IP</h3>");
+        List<Integer> foo = new ArrayList<Integer>(map.keySet());
+        Collections.sort(foo, new FooComparator(map));
         boolean found = false;
         for (Integer ii : foo) {
-            int count = oc.count(ii);
+            List<RouterInfo> ris = map.get(ii);
+            int count = ris.size();
             int i = ii.intValue();
             int i0 = (i >> 24) & 0xff;
             int i1 = (i >> 16) & 0xff;
             int i2 = (i >> 8) & 0xff;
             int i3 = i & 0xff;
             String sip = i0 + "." + i1 + '.' + i2 + '.' + i3;
-            if (buf != null) {
-                buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
-                   .append(sip).append("&amp;sybil\">").append(sip)
-                   .append("</a>:</b></p>");
-            }
+            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
+               .append(sip).append("&amp;sybil\">").append(sip)
+               .append("</a>:</b></p>");
             for (RouterInfo info : ris) {
-                byte[] ip = getIP(info);
-                if (ip == null)
-                    continue;
-                if ((ip[0] & 0xff) != i0)
-                    continue;
-                if ((ip[1] & 0xff) != i1)
-                    continue;
-                if ((ip[2] & 0xff) != i2)
-                    continue;
-                if ((ip[3] & 0xff) != i3)
-                    continue;
                 found = true;
-                if (buf != null)
-                    renderRouterInfo(buf, info, null, false, false);
-                double point = POINTS32 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                renderRouterInfo(buf, info, null, false, false);
             }
         }
-        if (buf != null) {
-            if (!found)
-                buf.append("<p class=\"notfound\">None</p>");
-            out.write(buf.toString());
-            out.flush();
-            buf.setLength(0);
-        }
+        if (!found)
+            buf.append("<p class=\"notfound\">None</p>");
+        writeBuf(out, buf);
     }
 
     /**
-     *  @param out null for background analysis
-     *  @param buf null for background analysis
+     *
      */
-    private void renderIPGroups24(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        if (buf != null)
-            buf.append("<h3 id=\"same24\" class=\"sybils\">Floodfills in the Same /24 (2 minimum)</h3>");
-        ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
-        for (RouterInfo info : ris) {
-            byte[] ip = getIP(info);
-            if (ip == null)
-                continue;
-            Integer x = Integer.valueOf((int) DataHelper.fromLong(ip, 0, 3));
-            oc.increment(x);
-        }
-        List<Integer> foo = new ArrayList<Integer>();
-        for (Integer ii : oc.objects()) {
-            int count = oc.count(ii);
-            if (count >= 2)
-                foo.add(ii);
-        }
-        Collections.sort(foo, new FooComparator(oc));
+    private void renderIPGroups24(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
+        buf.append("<h3 id=\"same24\" class=\"sybils\">Floodfills in the Same /24 (2 minimum)</h3>");
+        List<Integer> foo = new ArrayList<Integer>(map.keySet());
+        Collections.sort(foo, new FooComparator(map));
         boolean found = false;
         for (Integer ii : foo) {
-            int count = oc.count(ii);
+            List<RouterInfo> ris = map.get(ii);
+            int count = ris.size();
             int i = ii.intValue();
             int i0 = i >> 16;
             int i1 = (i >> 8) & 0xff;
             int i2 = i & 0xff;
             String sip = i0 + "." + i1 + '.' + i2 + ".0/24";
-            if (buf != null) {
-                buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
-                   .append(sip).append("&amp;sybil\">").append(sip)
-                   .append("</a>:</b></p>");
-            }
+            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
+               .append(sip).append("&amp;sybil\">").append(sip)
+               .append("</a>:</b></p>");
             for (RouterInfo info : ris) {
-                byte[] ip = getIP(info);
-                if (ip == null)
-                    continue;
-                if ((ip[0] & 0xff) != i0)
-                    continue;
-                if ((ip[1] & 0xff) != i1)
-                    continue;
-                if ((ip[2] & 0xff) != i2)
-                    continue;
                 found = true;
-                if (buf != null)
-                    renderRouterInfo(buf, info, null, false, false);
-                double point = POINTS24 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same /24 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                renderRouterInfo(buf, info, null, false, false);
             }
         }
-        if (buf != null) {
-            if (!found)
-                buf.append("<p class=\"notfound\">None</p>");
-            out.write(buf.toString());
-            out.flush();
-            buf.setLength(0);
-        }
+        if (!found)
+            buf.append("<p class=\"notfound\">None</p>");
+        writeBuf(out, buf);
     }
 
     /**
-     *  @param out null for background analysis
-     *  @param buf null for background analysis
+     *
      */
-    private void renderIPGroups16(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        if (buf != null)
-            buf.append("<h3 id=\"same16\" class=\"sybils\">Floodfills in the Same /16 (4 minimum)</h3>");
-        ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
-        for (RouterInfo info : ris) {
-            byte[] ip = getIP(info);
-            if (ip == null)
-                continue;
-            Integer x = Integer.valueOf((int) DataHelper.fromLong(ip, 0, 2));
-            oc.increment(x);
-        }
-        List<Integer> foo = new ArrayList<Integer>();
-        for (Integer ii : oc.objects()) {
-            int count = oc.count(ii);
-            if (count >= 4)
-                foo.add(ii);
-        }
-        Collections.sort(foo, new FooComparator(oc));
+    private void renderIPGroups16(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
+        buf.append("<h3 id=\"same16\" class=\"sybils\">Floodfills in the Same /16 (4 minimum)</h3>");
+        List<Integer> foo = new ArrayList<Integer>(map.keySet());
+        Collections.sort(foo, new FooComparator(map));
         boolean found = false;
         for (Integer ii : foo) {
-            int count = oc.count(ii);
+            List<RouterInfo> ris = map.get(ii);
+            int count = ris.size();
             int i = ii.intValue();
             int i0 = i >> 8;
             int i1 = i & 0xff;
@@ -732,173 +647,52 @@ class SybilRenderer {
                    .append("</a></b></p>");
             }
             for (RouterInfo info : ris) {
-                byte[] ip = getIP(info);
-                if (ip == null)
-                    continue;
-                if ((ip[0] & 0xff) != i0)
-                    continue;
-                if ((ip[1] & 0xff) != i1)
-                    continue;
                 found = true;
-                // limit display
-                //renderRouterInfo(buf, info, null, false, false);
-                double point = POINTS16 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same /16 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                renderRouterInfo(buf, info, null, false, false);
             }
         }
-        if (buf != null) {
-            if (!found)
-                buf.append("<p class=\"notfound\">None</p>");
-            out.write(buf.toString());
-            out.flush();
-            buf.setLength(0);
-        }
+        if (!found)
+            buf.append("<p class=\"notfound\">None</p>");
+        writeBuf(out, buf);
     }
 
     /**
-     *  @param out null for background analysis
-     *  @param buf null for background analysis
+     *
      */
-    private void renderIPGroupsFamily(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        if (buf != null)
-            buf.append("<h3 id=\"samefamily\" class=\"sybils\">Floodfills in the same Family</h3><div class=\"sybil_container\">");
-        ObjectCounter<String> oc = new ObjectCounter<String>();
-        for (RouterInfo info : ris) {
-            String fam = info.getOption("family");
-            if (fam == null)
-                continue;
-            oc.increment(fam);
-        }
-        List<String> foo = new ArrayList<String>(oc.objects());
-        Collections.sort(foo, new FoofComparator(oc));
+    private void renderIPGroupsFamily(Writer out, StringBuilder buf, Map<String, List<RouterInfo>> map) throws IOException {
+        buf.append("<h3 id=\"samefamily\" class=\"sybils\">Floodfills in the same Family</h3><div class=\"sybil_container\">");
+        List<String> foo = new ArrayList<String>(map.keySet());
+        Collections.sort(foo, new FoofComparator(map));
         FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
         String ourFamily = fkc != null ? fkc.getOurFamilyName() : null;
         boolean found = false;
         for (String s : foo) {
-            int count = oc.count(s);
+            List<RouterInfo> list = map.get(s);
+            int count = list.size();
             String ss = DataHelper.escapeHTML(s);
-            if (buf != null && count > 1) {
+            if (count > 1) {
                 buf.append("<p class=\"family\"><b>").append(count).append(" floodfills in family: &nbsp;<a href=\"/netdb?fam=")
                    .append(ss).append("&amp;sybil\">").append(ss).append("</a></b></p>");
-            }
-            for (RouterInfo info : ris) {
-                String fam = info.getOption("family");
-                if (fam == null)
-                    continue;
-                if (!fam.equals(s))
-                    continue;
                 found = true;
+            }
+            //for (RouterInfo info : ris) {
                 // limit display
                 //renderRouterInfo(buf, info, null, false, false);
-                double point = POINTS_FAMILY;
-                if (fkc != null && s.equals(ourFamily)) {
-                    if (fkc.verifyOurFamily(info))
-                        addPoints(points, info.getHash(), POINTS_OUR_FAMILY, "Our family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
-                    else
-                        addPoints(points, info.getHash(), POINTS_BAD_OUR_FAMILY, "Spoofed our family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
-                } else if (count > 1) {
-                    addPoints(points, info.getHash(), point, "In family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
-                } else {
-                    addPoints(points, info.getHash(), point, "In family \"" + ss + '"');
-                }
-            }
+            //}
         }
-        if (buf != null) {
-            if (!found)
-                buf.append("<p class=\"notfound\">None</p>");
-            buf.append("</div>");
-            out.write(buf.toString());
-            out.flush();
-            buf.setLength(0);
-        }
-    }
-
-    private static final long DAY = 24*60*60*1000L;
-
-    private void addProfilePoints(List<RouterInfo> ris, Map<Hash, Points> points) {
-        long now = _context.clock().now();
-        RateAverages ra = RateAverages.getTemp();
-        for (RouterInfo info : ris) {
-            Hash h = info.getHash();
-            if (_context.banlist().isBanlisted(h))
-                addPoints(points, h, POINTS_BANLIST, "Banlisted");
-            PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(h);
-            if (prof != null) {
-                long heard = prof.getFirstHeardAbout();
-                if (heard > 0) {
-                    long age = Math.max(now - heard, 1);
-                    if (age < 2 * DAY) {
-                        // (POINTS_NEW / 48) for every hour under 48, max POINTS_NEW
-                        double point = Math.min(POINTS_NEW, (2 * DAY - age) / (2 * DAY / POINTS_NEW));
-                        addPoints(points, h, point,
-                                  "First heard about: " + _t("{0} ago", DataHelper.formatDuration2(age)));
-                    }
-                }
-                DBHistory dbh = prof.getDBHistory();
-                if (dbh != null) {
-                    RateStat rs = dbh.getFailedLookupRate();
-                    if (rs != null) {
-                        Rate r = rs.getRate(24*60*60*1000);
-                        if (r != null) {
-                            r.computeAverages(ra, false);
-                            if (ra.getTotalEventCount() > 0) {
-                                double avg = 100 * ra.getAverage();
-                                if (avg > 40)
-                                    addPoints(points, h, (avg - 40) / 6.0, "Lookup fail rate " + ((int) avg) + '%');
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void addVersionPoints(List<RouterInfo> ris, Map<Hash, Points> points) {
-        RouterInfo us = _context.router().getRouterInfo();
-        if (us == null) return;
-        String ourVer = us.getVersion();
-        if (!ourVer.startsWith("0.9.")) return;
-        ourVer = ourVer.substring(4);
-        int dot = ourVer.indexOf('.');
-        if (dot > 0)
-            ourVer = ourVer.substring(0, dot);
-        int minor;
-        try {
-            minor = Integer.parseInt(ourVer);
-        } catch (NumberFormatException nfe) { return; }
-        for (RouterInfo info : ris) {
-            Hash h = info.getHash();
-            String caps = info.getCapabilities();
-            if (!caps.contains("R"))
-                addPoints(points, h, POINTS_UNREACHABLE, "Unreachable: " + DataHelper.escapeHTML(caps));
-            String hisFullVer = info.getVersion();
-            if (!hisFullVer.startsWith("0.9.")) {
-                addPoints(points, h, POINTS_BAD_VERSION, "Strange version " + DataHelper.escapeHTML(hisFullVer));
-                continue;
-            }
-            String hisVer = hisFullVer.substring(4);
-            dot = hisVer.indexOf('.');
-            if (dot > 0)
-                hisVer = hisVer.substring(0, dot);
-            int hisMinor;
-            try {
-                hisMinor = Integer.parseInt(hisVer);
-            } catch (NumberFormatException nfe) { continue; }
-            int howOld = minor - hisMinor;
-            if (howOld < 3)
-                continue;
-            addPoints(points, h, howOld * VERSION_FACTOR, howOld + " versions behind: " + DataHelper.escapeHTML(hisFullVer));
-        }
+        if (!found)
+            buf.append("<p class=\"notfound\">None</p>");
+        buf.append("</div>");
+        writeBuf(out, buf);
     }
 
     /**
-     *  @param out null for background analysis
-     *  @param buf null for background analysis
+     *  Render routers closer than MIN_CLOSE up to MAX routers
+     *  @param ris sorted, closest first
      *  @param usName HTML escaped
      */
-    private void renderRouterInfoHTML(Writer out, StringBuilder buf, Hash us, String usName, double avgMinDist,
-                                      List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        Collections.sort(ris, new RouterInfoRoutingKeyComparator(us));
+    private void renderRouterInfoHTML(Writer out, StringBuilder buf, Hash us, double avgMinDist,
+                                      List<RouterInfo> ris) throws IOException {
         double min = 256;
         double max = 0;
         double tot = 0;
@@ -908,14 +702,10 @@ class SybilRenderer {
         int medIdx = isEven ? (count / 2) - 1 : (count / 2);
         for (int i = 0; i < count; i++) {
             RouterInfo ri = ris.get(i);
-            double dist;
-            if (buf != null) {
-                dist = renderRouterInfo(buf, ri, us, false, false);
-            } else {
-                BigInteger bidist = HashDistance.getDistance(us, ri.getHash());
-                dist = biLog2(bidist);
-            }
-            if (buf != null && dist < avgMinDist) {
+            double dist = renderRouterInfo(buf, ri, us, false, false);
+            if (dist < MIN_CLOSE)
+                break;
+            if (dist < avgMinDist) {
                 if (i == 0) {
                     //buf.append("<p><b>Not to worry, but above router is closer than average minimum distance " + fmt.format(avgMinDist) + "</b></p>");
                 } else if (i == 1) {
@@ -936,31 +726,21 @@ class SybilRenderer {
                 median = dist;
             else if (i == medIdx + 1 && isEven)
                 median = (median + dist) / 2;
-            double point = MIN_CLOSE - dist;
-            if (point > 0) {
-                point *= OUR_KEY_FACTOR;
-                addPoints(points, ri.getHash(), point, "Very close (" + fmt.format(dist) + ") to our key " + usName + ": " + us.toBase64());
-            }
-            if (i >= MAX - 1)
-                break;
         }
-        if (buf != null) {
-            double avg = tot / count;
-            buf.append("<p id=\"sybil_totals\"><b>Totals for " + count + " floodfills: &nbsp;</b><span class=\"netdb_name\">MIN:</span > " + fmt.format(min) + "&nbsp; <span class=\"netdb_name\">AVG:</span> " +
-                fmt.format(avg) + "&nbsp; <span class=\"netdb_name\">MEDIAN:</span> " + fmt.format(median) + "&nbsp; <span class=\"netdb_name\">MAX:</span> " + fmt.format(max) + "</p>\n");
-            out.write(buf.toString());
-            out.flush();
-            buf.setLength(0);
-        }
+        double avg = tot / count;
+        buf.append("<p id=\"sybil_totals\"><b>Totals for " + count +
+                   " floodfills: &nbsp;</b><span class=\"netdb_name\">MIN:</span > " + fmt.format(min) +
+                   "&nbsp; <span class=\"netdb_name\">AVG:</span> " + fmt.format(avg) +
+                   "&nbsp; <span class=\"netdb_name\">MEDIAN:</span> " + fmt.format(median) +
+                   "&nbsp; <span class=\"netdb_name\">MAX:</span> " + fmt.format(max) +
+                   "</p>\n");
+        writeBuf(out, buf);
     }
 
-    /**
-     * For debugging
-     * http://forums.sun.com/thread.jspa?threadID=597652
-     * @since 0.7.14
-     */
-    private static double biLog2(BigInteger a) {
-        return NetDbRenderer.biLog2(a);
+    private static void writeBuf(Writer out, StringBuilder buf) throws IOException {
+        out.write(buf.toString());
+        out.flush();
+        buf.setLength(0);
     }
 
     /**
@@ -983,7 +763,7 @@ class SybilRenderer {
      */
     private double renderRouterInfo(StringBuilder buf, RouterInfo info, Hash us, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\"></a><table class=\"sybil_routerinfo\"><tr>");
+        buf.append("<a name=\"").append(hash, 0, 6).append("\"></a><table class=\"sybil_routerinfo\"><tr>");
         double distance = 0;
         if (isUs) {
             buf.append("<th colspan=\"2\"><a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b> <code>").append(hash)
@@ -1001,7 +781,11 @@ class SybilRenderer {
             }
             if (!full) {
                 buf.append("<a title=\"View extended router info\" class=\"viewfullentry\" href=\"netdb?r=")
-                   .append(hash.substring(0, 6)).append("\" >[").append(_t("Full entry")).append("]</a></th><th>");
+                   .append(hash, 0, 6).append("\" >[").append(_t("Full entry")).append("]</a>");
+                buf.append("<a title=\"View profile data\" class=\"viewfullentry\" href=\"viewprofile?peer=")
+                   .append(hash).append("\" >[").append(_t("profile")).append("]</a>");
+                buf.append("<a title=\"").append(_t("Configure peer")).append("\" class=\"viewfullentry\" href=\"configpeer?peer=")
+                   .append(hash).append("\" >+-</a></th><th>");
             }
             if (_context.portMapper().isRegistered("imagegen"))
                 buf.append("<img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
@@ -1012,8 +796,8 @@ class SybilRenderer {
                 buf.append("<p><b>Hash Distance:</b> ").append(fmt.format(distance)).append("</p>\n");
             }
         }
-        buf.append("<p><b>Version:</b> ").append(DataHelper.stripHTML(info.getVersion())).append("</p>\n" +
-                   "<p><b>Caps:</b> ").append(DataHelper.stripHTML(info.getCapabilities())).append("</p>\n");
+        buf.append("<p><b>").append(_t("Version")).append(":</b> ").append(DataHelper.stripHTML(info.getVersion())).append("</p>\n" +
+                   "<p><b>").append(_t("Caps")).append(":</b> ").append(DataHelper.stripHTML(info.getCapabilities())).append("</p>\n");
         String kr = info.getOption("netdb.knownRouters");
 ;
         if (kr != null) {
@@ -1023,13 +807,13 @@ class SybilRenderer {
         }
         String kls = info.getOption("netdb.knownLeaseSets");
         if (kls != null) {
-            buf.append("<p class=\"sybilinfo_leasesets\"><b>Lease Sets:</b> ").append(DataHelper.stripHTML(kls)).append("</p>\n");
+            buf.append("<p class=\"sybilinfo_leasesets\"><b>").append(_t("LeaseSets")).append(":</b> ").append(DataHelper.stripHTML(kls)).append("</p>\n");
         } else {
-            buf.append("<p class=\"sybilinfo_leasesets filler\"><b>Lease Sets:</b> ").append(_t("n/a")).append("</p>");
+            buf.append("<p class=\"sybilinfo_leasesets filler\"><b>").append(_t("LeaseSets")).append(":</b> ").append(_t("n/a")).append("</p>");
         }
         String fam = info.getOption("family");
         if (fam != null) {
-            buf.append("<p><b>Family:</b> <span class=\"sybilinfo_familyname\">").append(DataHelper.escapeHTML(fam)).append("</span></p>\n");
+            buf.append("<p><b>").append(_t("Family")).append(":</b> <span class=\"sybilinfo_familyname\">").append(DataHelper.escapeHTML(fam)).append("</span></p>\n");
         }
         long now = _context.clock().now();
         if (!isUs) {
@@ -1045,46 +829,46 @@ class SybilRenderer {
                 heard = prof.getLastHeardAbout();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    buf.append("<p><b>Last heard about:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                    buf.append("<p><b>").append(_t("Last Heard About")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                 } else {
-                    buf.append("<p class=\"sybil_filler\"><b>Last heard about:</b> ").append(_t("n/a")).append("</p>");
+                    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Heard About")).append(":</b> ").append(_t("n/a")).append("</p>");
                 }
                 heard = prof.getLastHeardFrom();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    buf.append("<p><b>Last heard from:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>\n");
+                    buf.append("<p><b>").append(_t("Last Heard From")).append("</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>\n");
                 } else {
-                    buf.append("<p class=\"sybil_filler\"><b>Last heard from:</b> ").append(_t("n/a")).append("</p>");
+                    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Heard From")).append(":</b> ").append(_t("n/a")).append("</p>");
                 }
                 DBHistory dbh = prof.getDBHistory();
                 if (dbh != null) {
                     heard = dbh.getLastLookupSuccessful();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last lookup successful:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Good Lookup")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last lookup successful:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastLookupFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last lookup failed:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Bad Lookup")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last lookup failed:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastStoreSuccessful();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last store successful:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Good Store")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last store successful:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Store")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastStoreFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<p><b>Last store failed:</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
+                        buf.append("<p><b>").append(_t("Last Bad Store")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
                     } else {
-                        buf.append("<p class=\"sybil_filler\"><b>Last store failed:</b> ").append(_t("n/a")).append("</p>");
+                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Store")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                 }
                 // any other profile stuff?
@@ -1168,8 +952,9 @@ class SybilRenderer {
         out.write("<h3>Distance to " + from.toBase64() + "</h3>");
         prev = null;
         final int limit = Math.min(10, sybils.size());
+        DateFormat dfmt = DateFormat.getDateInstance(DateFormat.MEDIUM);
         for (int i = start; i <= days; i++) {
-            out.write("<h3 class=\"tabletitle\">Distance for " + new Date(now) +
+            out.write("<h3 class=\"tabletitle\">Distance for " + dfmt.format(new Date(now)) +
                       "</h3><table class=\"sybil_distance\"><tr><th>Hash<th>Distance<th>Distance from previous</tr>\n");
             Hash rkey = rkgen.getRoutingKey(from, now);
             xor = new XORComparator<Hash>(rkey);

@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
+import net.i2p.I2PAppContext;
+
 /**
  * Passes a command to the OS shell for execution and manages the input and
  * output.
@@ -28,7 +30,6 @@ import java.util.Arrays;
  */
 public class ShellCommand {
 
-    private static final boolean DEBUG = false;
     private static final boolean CONSUME_OUTPUT    = true;
     private static final boolean NO_CONSUME_OUTPUT = false;
 
@@ -282,9 +283,28 @@ public class ShellCommand {
      * @return              <code>true</code> if the spawned shell process
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
+     * @deprecated Use the String[] method
      */
+    @Deprecated
     public boolean executeSilentAndWait(String shellCommand) {
         return execute(shellCommand, CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
+    }
+
+    /**
+     * Passes a command to the shell for execution. This method blocks until
+     * all of the command's resulting shell processes have completed. Any output
+     * produced by the executed command will not be displayed.
+     * 
+     * @param  commandArray The command for the shell to execute,
+     *                      as a String[].
+     *                      See Runtime.exec(String[]) for more info.
+     * @return              <code>true</code> if the spawned shell process
+     *                      returns an exit status of 0 (indicating success),
+     *                      else <code>false</code>.
+     * @since 0.9.38
+     */
+    public boolean executeSilentAndWait(String[] commandArray) {
+        return execute(commandArray, CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
     }
 
     /**
@@ -339,7 +359,8 @@ public class ShellCommand {
     private boolean executeSAWT(Object shellCommand, int seconds) {
         String name = null;
         long begin = 0;
-        if (DEBUG) {
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(ShellCommand.class);
+        if (log.shouldDebug()) {
             if (shellCommand instanceof String) {
                 name = (String) shellCommand;
             } else if (shellCommand instanceof String[]) {
@@ -355,16 +376,16 @@ public class ShellCommand {
             if (seconds > 0) {
                 commandThread.join(seconds * 1000);
                 if (commandThread.isAlive()) {
-                    if (DEBUG)
-                        System.out.println("ShellCommand gave up waiting for \"" + name + "\" after " + seconds + " seconds");
+                    if (log.shouldDebug())
+                        log.debug("ShellCommand gave up waiting for \"" + name + "\" after " + seconds + " seconds");
                     return true;
                 }
             }
         } catch (InterruptedException e) {
             // Wake up, time to die.
         }
-        if (DEBUG)
-            System.out.println("ShellCommand returning " + result.commandSuccessful + " for \"" + name + "\" after " + (System.currentTimeMillis() - begin) + " ms");
+        if (log.shouldDebug())
+            log.debug("ShellCommand returning " + result.commandSuccessful + " for \"" + name + "\" after " + (System.currentTimeMillis() - begin) + " ms");
         return result.commandSuccessful;
     }
 
@@ -407,18 +428,19 @@ public class ShellCommand {
     private boolean execute(Object shellCommand, boolean consumeOutput, boolean waitForExitStatus) {
         Process process;
         String name = null;  // for debugging only
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(ShellCommand.class);
         try {
             // easy way so we don't have to copy this whole method
             if (shellCommand instanceof String) {
                 name = (String) shellCommand;
-                if (DEBUG)
-                    System.out.println("ShellCommand exec \"" + name + "\" consume? " + consumeOutput + " wait? " + waitForExitStatus);
+                if (log.shouldDebug())
+                    log.debug("ShellCommand exec \"" + name + "\" consume? " + consumeOutput + " wait? " + waitForExitStatus);
                 process = Runtime.getRuntime().exec(name);
             } else if (shellCommand instanceof String[]) {
                 String[] arr = (String[]) shellCommand;
-                if (DEBUG) {
+                if (log.shouldDebug()) {
                     name = Arrays.toString(arr);
-                    System.out.println("ShellCommand exec \"" + name + "\" consume? " + consumeOutput + " wait? " + waitForExitStatus);
+                    log.debug("ShellCommand exec \"" + name + "\" consume? " + consumeOutput + " wait? " + waitForExitStatus);
                 }
                 process = Runtime.getRuntime().exec(arr);
             } else {
@@ -442,14 +464,13 @@ public class ShellCommand {
                 processStdoutReader.start();
             }
             if (waitForExitStatus) {
-                if (DEBUG)
-                    System.out.println("ShellCommand waiting for \"" + name + '\"');
+                if (log.shouldDebug())
+                    log.debug("ShellCommand waiting for \"" + name + '\"');
                 try {
                     process.waitFor();
                 } catch (InterruptedException e) {
-                    if (DEBUG) {
-                        System.out.println("ShellCommand exception waiting for \"" + name + '\"');
-                        e.printStackTrace();
+                    if (log.shouldWarn()) {
+                        log.warn("ShellCommand exception waiting for \"" + name + '"', e);
                     }
                     if (!consumeOutput)
                         killStreams();
@@ -459,16 +480,15 @@ public class ShellCommand {
                 if (!consumeOutput)
                     killStreams();
 
-                if (DEBUG)
-                    System.out.println("ShellCommand exit value is " + process.exitValue() + " for \"" + name + '\"');
+                if (log.shouldDebug())
+                    log.debug("ShellCommand exit value is " + process.exitValue() + " for \"" + name + '\"');
                 if (process.exitValue() > 0)
                     return false;
             }
         } catch (IOException e) {
             // probably IOException, file not found from exec()
-            if (DEBUG) {
-                System.out.println("ShellCommand execute exception for \"" + name + '\"');
-                e.printStackTrace();
+            if (log.shouldWarn()) {
+                log.warn("ShellCommand execute exception for \"" + name + '"', e);
             }
             return false;
         }

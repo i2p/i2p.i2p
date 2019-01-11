@@ -139,19 +139,26 @@ public class DataHelper {
      *
      *  As of 0.9.18, throws DataFormatException on duplicate key
      *
-     *  @param props the Properties to load into
+     *  @param props The Properties to load into.
+     *               As of 0.9.38, if null, a new OrderedProperties will be created.
      *  @param rawStream stream to read the mapping from
      *  @throws DataFormatException if the format is invalid
      *  @throws IOException if there is a problem reading the data
-     *  @return the parameter props
+     *  @return the parameter props, or (as of 0.9.38) a new OrderedProperties if props is null,
+     *                               and an immutable EmptyProperties if empty.
      *  @since 0.8.13
      */
     public static Properties readProperties(InputStream rawStream, Properties props) 
         throws DataFormatException, IOException {
-        long size = readLong(rawStream, 2);
-        byte data[] = new byte[(int) size];
-        int read = read(rawStream, data);
-        if (read != size) throw new DataFormatException("Not enough data to read the properties, expected " + size + " but got " + read);
+        int size = (int) readLong(rawStream, 2);
+        if (size == 0) {
+            return (props != null) ? props : EmptyProperties.INSTANCE;
+        }
+        if (props == null)
+            props = new OrderedProperties();
+        byte data[] = new byte[size];
+        // full read guaranteed
+        read(rawStream, data);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         while (in.available() > 0) {
             String key = readString(in);
@@ -213,7 +220,7 @@ public class DataHelper {
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
             throws DataFormatException, IOException {
-        writeProperties(rawStream, props, utf8, props != null && !(props instanceof OrderedProperties));
+        writeProperties(rawStream, props, utf8, props != null && props.size() > 1 && !(props instanceof OrderedProperties));
     }
 
     /**
@@ -242,7 +249,7 @@ public class DataHelper {
             throws DataFormatException, IOException {
         if (props != null && !props.isEmpty()) {
             Properties p;
-            if (sort) {
+            if (sort && props.size() > 1) {
                 p = new OrderedProperties();
                 p.putAll(props);
             } else {
@@ -452,7 +459,7 @@ public class DataHelper {
     public static void loadProps(Properties props, InputStream inStr, boolean forceLowerCase) throws IOException {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 16*1024);
+            in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 4*1024);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 if (line.trim().length() <= 0) continue;
@@ -866,9 +873,8 @@ public class DataHelper {
             return "";   // reduce object proliferation
         size &= 0xff;
         byte raw[] = new byte[size];
-        int read = read(in, raw);
-        // was DataFormatException
-        if (read != size) throw new EOFException("EOF reading string");
+        // full read guaranteed
+        read(in, raw);
         // the following constructor throws an UnsupportedEncodingException which is an IOException,
         // but that's only if UTF-8 is not supported. Other encoding errors are not thrown.
         return new String(raw, "UTF-8");

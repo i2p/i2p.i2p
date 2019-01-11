@@ -54,8 +54,7 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
             // Should we just pass the DataStructure directly back to somebody?
             DatabaseEntry entry = dsm.getEntry();
             int type = entry.getType();
-            if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
-                type == DatabaseEntry.KEY_TYPE_LS2) {
+            if (DatabaseEntry.isLeaseSet(type)) {
                 // Since HFDSMJ wants to setReceivedAsPublished(), we have to
                 // set a flag saying this was really the result of a query,
                 // so don't do that.

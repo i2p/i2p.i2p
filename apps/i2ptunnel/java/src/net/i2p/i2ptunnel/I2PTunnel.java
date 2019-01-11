@@ -97,7 +97,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     public boolean ownDest = false;
 
     /** the I2CP port, non-null */
-    public String port = System.getProperty(I2PClient.PROP_TCP_PORT, "7654");
+    public String port = System.getProperty(I2PClient.PROP_TCP_PORT, Integer.toString(I2PClient.DEFAULT_LISTEN_PORT));
     /** the I2CP host, non-null */
     public String host = System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
     /** the listen-on host. Sadly the listen-on port does not have a field. */

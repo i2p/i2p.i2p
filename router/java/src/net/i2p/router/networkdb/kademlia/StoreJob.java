@@ -78,8 +78,7 @@ abstract class StoreJob extends JobImpl {
         _timeoutMs = timeoutMs;
         _expiration = context.clock().now() + timeoutMs;
         _peerSelector = facade.getPeerSelector();
-        int type = data.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (data.isLeaseSet()) {
             _connectChecker = null;
             _connectMask = 0;
         } else {
@@ -181,6 +180,8 @@ abstract class StoreJob extends JobImpl {
             //_state.addPending(closestHashes);
             int queued = 0;
             int skipped = 0;
+            int type = _state.getData().getType();
+            boolean isls2 = DatabaseEntry.isLeaseSet(type) && type != DatabaseEntry.KEY_TYPE_LEASESET;
             for (Hash peer : closestHashes) {
                 DatabaseEntry ds = _facade.getDataStore().get(peer);
                 if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
@@ -193,24 +194,12 @@ abstract class StoreJob extends JobImpl {
                         _log.info(getJobId() + ": Skipping old router " + peer);
                     _state.addSkipped(peer);
                     skipped++;
-/****
-   above shouldStoreTo() check is newer than these two checks, so we're covered
-
-                } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
-                           !supportsCert((RouterInfo)ds,
-                                         ((LeaseSet)_state.getData()).getDestination().getCertificate())) {
+                } else if (isls2 &&
+                           !shouldStoreLS2To((RouterInfo)ds)) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info(getJobId() + ": Skipping router that doesn't support key certs " + peer);
+                        _log.info(getJobId() + ": Skipping router that doesn't support LS2 " + peer);
                     _state.addSkipped(peer);
                     skipped++;
-                } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
-                           ((LeaseSet)_state.getData()).getLeaseCount() > 6 &&
-                           !supportsBigLeaseSets((RouterInfo)ds)) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info(getJobId() + ": Skipping router that doesn't support big leasesets " + peer);
-                    _state.addSkipped(peer);
-                    skipped++;
-****/
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
 
@@ -313,8 +302,7 @@ abstract class StoreJob extends JobImpl {
         if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             if (responseTime > MAX_DIRECT_EXPIRATION)
                 responseTime = MAX_DIRECT_EXPIRATION;
-        } else if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
-        } else {
+        } else if (!DatabaseEntry.isLeaseSet(type)) {
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
         }
         msg.setEntry(_state.getData());
@@ -340,8 +328,7 @@ abstract class StoreJob extends JobImpl {
      *
      */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        int type = msg.getEntry().getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (msg.getEntry().isLeaseSet()) {
             getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1);
             // if it is an encrypted leaseset...
             if (getContext().keyRing().get(msg.getKey()) != null)
@@ -472,8 +459,7 @@ abstract class StoreJob extends JobImpl {
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel(client, to);
         if (outTunnel != null) {
             I2NPMessage sent;
-            boolean shouldEncrypt = supportsEncryption(peer);
-            if (shouldEncrypt) {
+
                 // garlic encrypt
                 MessageWrapper.WrappedMessage wm = MessageWrapper.wrap(getContext(), msg, client, peer);
                 if (wm == null) {
@@ -484,14 +470,6 @@ abstract class StoreJob extends JobImpl {
                 }
                 sent = wm.getMessage();
                 _state.addPending(to, wm);
-            } else {
-                _state.addPending(to);
-                // now that almost all floodfills are at 0.7.10,
-                // just refuse to store unencrypted to older ones.
-                _state.replyTimeout(to);
-                getContext().jobQueue().addJob(new WaitJob(getContext()));
-                return;
-            }
 
             SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, sent.getMessageSize());
             FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
@@ -530,56 +508,7 @@ abstract class StoreJob extends JobImpl {
         public String getName() { return "Kademlia Store Send Delay"; }
     }
 
-    private static final String MIN_ENCRYPTION_VERSION = "0.7.10";
-
-    /**
-     * *sigh*
-     * sadly due to a bug in HandleFloodfillDatabaseStoreMessageJob, where
-     * a floodfill would not flood anything that arrived garlic-wrapped
-     * @since 0.7.10
-     */
-    private static boolean supportsEncryption(RouterInfo ri) {
-        String v = ri.getVersion();
-        return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
-    }
-
-    /**
-     * Does this router understand this cert?
-     * @return true if not a key cert
-     * @since 0.9.12
-     */
-/****
-    public static boolean supportsCert(RouterInfo ri, Certificate cert) {
-        if (cert.getCertificateType() != Certificate.CERTIFICATE_TYPE_KEY)
-            return true;
-        SigType type;
-        try {
-            type = cert.toKeyCertificate().getSigType();
-        } catch (DataFormatException dfe) {
-            return false;
-        }
-        if (type == null)
-            return false;
-        String v = ri.getVersion();
-        String since = type.getSupportedSince();
-        return VersionComparator.comp(v, since) >= 0;
-    }
-
-    private static final String MIN_BIGLEASESET_VERSION = "0.9";
-****/
-
-    /**
-     * Does he support more than 6 leasesets?
-     * @since 0.9.12
-     */
-/****
-    private static boolean supportsBigLeaseSets(RouterInfo ri) {
-        String v = ri.getVersion();
-        return VersionComparator.comp(v, MIN_BIGLEASESET_VERSION) >= 0;
-    }
-****/
-
-    /** */
+    /** @since 0.9.28 */
     public static final String MIN_STORE_VERSION = "0.9.28";
 
     /**
@@ -589,6 +518,18 @@ abstract class StoreJob extends JobImpl {
     static boolean shouldStoreTo(RouterInfo ri) {
         String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_STORE_VERSION) >= 0;
+    }
+
+    /** @since 0.9.38 */
+    public static final String MIN_STORE_LS2_VERSION = "0.9.38";
+
+    /**
+     * Is it too old?
+     * @since 0.9.38
+     */
+    static boolean shouldStoreLS2To(RouterInfo ri) {
+        String v = ri.getVersion();
+        return VersionComparator.comp(v, MIN_STORE_LS2_VERSION) >= 0;
     }
 
     /**

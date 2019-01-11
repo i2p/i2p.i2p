@@ -6,12 +6,16 @@ import java.io.OutputStream;
 import java.util.Date;
 
 /**
- * Like Lease but with 4-byte timestamps
+ * Like Lease but with 4-byte timestamps.
+ * Length is 40.
+ *
  * PRELIMINARY - Subject to change - see proposal 123
  *
  * @since 0.9.38
  */
 public class Lease2 extends Lease {
+
+    public static final int LENGTH = 40;
     
     @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {

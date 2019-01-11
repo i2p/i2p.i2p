@@ -99,9 +99,7 @@ class TransientDataStore implements DataStore {
     public int countLeaseSets() {
         int count = 0;
         for (DatabaseEntry d : _data.values()) {
-            int type = d.getType();
-            if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
-                type == DatabaseEntry.KEY_TYPE_LS2)
+            if (d.isLeaseSet())
                 count++;
         }
         return count;
@@ -151,8 +149,7 @@ class TransientDataStore implements DataStore {
                     _log.info("New router for " + key + ": published on " + new Date(ri.getPublished()));
                 rv = true;
             }
-        } else if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
-                   type == DatabaseEntry.KEY_TYPE_LS2) {
+        } else if (DatabaseEntry.isLeaseSet(type)) {
             LeaseSet ls = (LeaseSet)data;
             if (old != null) {
                 LeaseSet ols = (LeaseSet)old;

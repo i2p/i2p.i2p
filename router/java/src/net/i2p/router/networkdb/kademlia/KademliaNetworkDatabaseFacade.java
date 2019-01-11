@@ -136,6 +136,12 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 45*60*1000l;
     
+    /**
+     * Don't let leaseSets go too far into the future 
+     */
+    private static final long MAX_LEASE_FUTURE = 15*60*1000;
+    private static final long MAX_META_LEASE_FUTURE = 65535*1000;
+    
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
 
     /** this needs to be long enough to give us time to start up,
@@ -438,8 +444,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         //return _ds.countLeaseSets();
         int rv = 0;
         for (DatabaseEntry ds : _ds.getEntries()) {
-            int type = ds.getType();
-            if ((type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) &&
+            if (ds.isLeaseSet() &&
                 ((LeaseSet)ds).getReceivedAsPublished())
                 rv++;
         }
@@ -468,7 +473,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (rv == null)
             return null;
         int type = rv.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (DatabaseEntry.isLeaseSet(type)) {
             LeaseSet ls = (LeaseSet)rv;
             if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR))
                 return rv;
@@ -487,9 +492,9 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     /**
      *  Not for use without validation
      *  @return RouterInfo, LeaseSet, or null, NOT validated
-     *  @since 0.9.9
+     *  @since 0.9.9, public since 0.9.38
      */
-    DatabaseEntry lookupLocallyWithoutValidation(Hash key) {
+    public DatabaseEntry lookupLocallyWithoutValidation(Hash key) {
         if (!_initialized)
             return null;
         return _ds.get(key);
@@ -553,8 +558,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return null;
         DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
-            int type = ds.getType();
-            if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+            if (ds.isLeaseSet()) {
                 LeaseSet ls = (LeaseSet)ds;
                 if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                     return ls;
@@ -607,8 +611,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return null;
         DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
-            int type = ds.getType();
-            if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+            if (ds.isLeaseSet()) {
                 LeaseSet ls = (LeaseSet)ds;
                 return ls.getDestination();
             }
@@ -635,6 +638,12 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
     }
     
+    /**
+     * This will return immediately with the result or null.
+     * However, this may still fire off a lookup if the RI is present but expired (and will return null).
+     * This may result in deadlocks.
+     * For true local only, use lookupLocallyWithoutValidation()
+     */
     public RouterInfo lookupRouterInfoLocally(Hash key) {
         if (!_initialized) return null;
         DatabaseEntry ds = _ds.get(key);
@@ -775,11 +784,6 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
 ***/
     
     /**
-     * Don't let leaseSets go 20 minutes into the future 
-     */
-    static final long MAX_LEASE_FUTURE = 20*60*1000;
-    
-    /**
      * Determine whether this leaseSet will be accepted as valid and current
      * given what we know now.
      *
@@ -821,7 +825,9 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             return "Expired leaseSet for " + leaseSet.getDestination().toBase32()
                    + " expired " + DataHelper.formatDuration(age) + " ago";
         }
-        if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE)) {
+        if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE) &&
+            (leaseSet.getType() != DatabaseEntry.KEY_TYPE_META_LS2 ||
+             latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_META_LEASE_FUTURE))) {
             long age = latest - now;
             // let's not make this an error, it happens when peers have bad clocks
             if (_log.shouldLog(Log.WARN))
@@ -920,7 +926,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             return "Invalid routerInfo signature";
         }
         if (routerInfo.getNetworkId() != _networkID){
-            _context.banlist().banlistRouter(key, "Not in our network");
+            _context.banlist().banlistRouterForever(key, "Not in our network: " + routerInfo.getNetworkId());
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad network: " + routerInfo);
             return "Not in our network";
@@ -1082,7 +1088,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private void processStoreFailure(Hash h, DatabaseEntry entry) throws UnsupportedCryptoException {
         if (entry.getHash().equals(h)) {
             int etype = entry.getType();
-            if (etype == DatabaseEntry.KEY_TYPE_LEASESET || etype == DatabaseEntry.KEY_TYPE_LS2) {
+            if (DatabaseEntry.isLeaseSet(etype)) {
                 LeaseSet ls = (LeaseSet) entry;
                 Destination d = ls.getDestination();
                 Certificate c = d.getCertificate();
@@ -1242,8 +1248,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return null;
         Set<LeaseSet> leases = new HashSet<LeaseSet>();
         for (DatabaseEntry o : getDataStore().getEntries()) {
-            int type = o.getType();
-            if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2)
+            if (o.isLeaseSet())
                 leases.add((LeaseSet)o);
         }
         return leases;

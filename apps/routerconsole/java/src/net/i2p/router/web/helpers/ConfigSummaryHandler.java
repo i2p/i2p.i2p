@@ -20,7 +20,6 @@ public class ConfigSummaryHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if (_action == null) return;
         String group = getJettyString("group");
         boolean deleting = _action.equals(_t("Delete selected"));
         boolean adding = _action.equals(_t("Add item"));

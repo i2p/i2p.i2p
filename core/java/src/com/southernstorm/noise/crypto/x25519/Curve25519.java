@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package com.southernstorm.noise.crypto;
+package com.southernstorm.noise.crypto.x25519;
 
 import java.util.Arrays;
 
@@ -34,6 +34,8 @@ import java.util.Arrays;
  * representation instead of the 8/16/32-bit limbs in the original.
  * 
  * References: http://cr.yp.to/ecdh.html, RFC 7748
+ * 
+ * @since 0.9.36 moved from router to core in 0.9.38
  */
 public final class Curve25519 {
 

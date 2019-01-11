@@ -62,5 +62,6 @@ inline std::string buildClassPathForObjC(std::string basePath)
 - (void) startupI2PRouter:(NSString*)i2pRootPath;
 - (void) openUrl:(NSString*)url;
 + (void) logProxy:(int)level formattedMsg:(NSString*)formattedMsg;
++ (void) sendUserNotification:(NSString*)title formattedMsg:(NSString*)formattedMsg;
 + (instancetype)sharedInstance; // this makes it a singleton
 @end

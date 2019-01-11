@@ -210,7 +210,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     private I2PSocketManager createManager(InputStream privData) {
         Properties props = new Properties();
         props.putAll(getTunnel().getClientOptions());
-        int portNum = 7654;
+        int portNum = I2PClient.DEFAULT_LISTEN_PORT;
         if (getTunnel().port != null) {
             try {
                 portNum = Integer.parseInt(getTunnel().port);
@@ -305,7 +305,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 // try to make this error sensible as it will happen...
                 String portNum = getTunnel().port;
                 if (portNum == null)
-                    portNum = "7654";
+                    portNum = Integer.toString(I2PClient.DEFAULT_LISTEN_PORT);
                 String msg;
                 if (getTunnel().getContext().isRouterContext())
                     msg = "Unable to build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;

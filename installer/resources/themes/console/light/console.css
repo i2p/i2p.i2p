@@ -12,23 +12,15 @@ body {
      color: #33333f;
      font-size: 9pt;
      line-height: 130%;
-     background: #a4a4cb url(images/tile2.png) fixed;
-     background-size: 32px 32px;
+     background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+     background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
 }
 
 /* preload button mouseovers */
 
 body {
-     background: url(images/tile2.png),
-     url(/themes/console/images/buttons/clean_hover.png) no-repeat,
-     url(/themes/console/images/buttons/configure_hover.png) no-repeat,
-     url(/themes/console/images/buttons/delete_hover.png) no-repeat,
-     url(/themes/console/images/buttons/restart_hover.png) no-repeat,
-     url(/themes/console/images/buttons/restore_hover.png) no-repeat,
-     url(/themes/console/images/buttons/search_hover.png) no-repeat,
-     url(/themes/console/images/buttons/shutdown_hover.png) no-repeat,
-     url(/themes/console/images/buttons/update_hover.png) no-repeat, #a4a4cb;
-     background-size: 32px 32px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+    background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+    background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
 }
 
 @supports (text-justify: auto) { /* Firefox 55+ */
@@ -3975,6 +3967,16 @@ input.go[value^="Create"], button.go[value^="Create"] {
 input.go[value^="Create"]:hover, button.go[value^="Create"]:hover,
 input.go[value^="Create"]:focus, button.go[value^="Create"]:focus {
      background: url(/themes/console/images/buttons/create-file.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
+}
+
+input.back {
+     background: url(/themes/console/images/buttons/back.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
+     padding: 5px 7px 5px 22px;
+}
+
+input.back:hover,
+input.back:focus {
+     background: url(/themes/console/images/buttons/back.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.reload, button.reload {
@@ -8132,4 +8134,3 @@ th.options .optbox {
 }
 
 /* end chrome overrides */
-

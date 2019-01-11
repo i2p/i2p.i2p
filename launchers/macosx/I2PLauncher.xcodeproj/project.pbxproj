@@ -12,6 +12,16 @@
 		BF14B70F215C98DC0014EB07 /* LoggerWorker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF14B70D215C98DC0014EB07 /* LoggerWorker.cpp */; };
 		BF14B710215C98DC0014EB07 /* Logger.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF14B70E215C98DC0014EB07 /* Logger.mm */; };
 		BF14B712215D9E040014EB07 /* FolderContentMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */; };
+		BF1D6D8F21BB32460014EB07 /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF1D6D8E21BB32460014EB07 /* Preferences.storyboard */; };
+		BF1D6D9121BB344D0014EB07 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9021BB344D0014EB07 /* Preferences.swift */; };
+		BF1D6D9321BB36880014EB07 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9221BB36880014EB07 /* PreferencesViewController.swift */; };
+		BF1D6D9521BB379A0014EB07 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9421BB379A0014EB07 /* PreferencesWindowController.swift */; };
+		BF1D6D9921BB7DC10014EB07 /* FirefoxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9821BB7DC10014EB07 /* FirefoxManager.swift */; };
+		BF1D6D9B21BB86520014EB07 /* ConsoleWebView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF1D6D9A21BB86520014EB07 /* ConsoleWebView.storyboard */; };
+		BF1D6D9D21BB87000014EB07 /* EmbeddedConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9C21BB87000014EB07 /* EmbeddedConsoleView.swift */; };
+		BF1D6D9F21BBA1460014EB07 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1D6D9E21BBA1460014EB07 /* WebKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		BF1D6DA321BBB8120014EB07 /* AdvancedTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6DA221BBB8120014EB07 /* AdvancedTableView.swift */; };
+		BF1D6DA521BBB84E0014EB07 /* PreferencesViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6DA421BBB84E0014EB07 /* PreferencesViewController+TableView.swift */; };
 		BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA39215140E60014EB07 /* SBridge.mm */; };
 		BF1EFA40215141110014EB07 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA3D215141100014EB07 /* main.mm */; };
 		BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA3E215141100014EB07 /* RouterTask.mm */; };
@@ -62,6 +72,16 @@
 		BF14B70E215C98DC0014EB07 /* Logger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Logger.mm; sourceTree = SOURCE_ROOT; };
 		BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderContentMonitor.swift; sourceTree = "<group>"; };
 		BF14B714215DA3330014EB07 /* version.h.tpl */ = {isa = PBXFileReference; lastKnownFileType = text; path = version.h.tpl; sourceTree = "<group>"; };
+		BF1D6D8E21BB32460014EB07 /* Preferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Preferences.storyboard; sourceTree = "<group>"; };
+		BF1D6D9021BB344D0014EB07 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		BF1D6D9221BB36880014EB07 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
+		BF1D6D9421BB379A0014EB07 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
+		BF1D6D9821BB7DC10014EB07 /* FirefoxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxManager.swift; sourceTree = "<group>"; };
+		BF1D6D9A21BB86520014EB07 /* ConsoleWebView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ConsoleWebView.storyboard; sourceTree = "<group>"; };
+		BF1D6D9C21BB87000014EB07 /* EmbeddedConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedConsoleView.swift; sourceTree = "<group>"; };
+		BF1D6D9E21BBA1460014EB07 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		BF1D6DA221BBB8120014EB07 /* AdvancedTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedTableView.swift; sourceTree = "<group>"; };
+		BF1D6DA421BBB84E0014EB07 /* PreferencesViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreferencesViewController+TableView.swift"; sourceTree = "<group>"; };
 		BF1EFA38215140E60014EB07 /* SBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBridge.h; sourceTree = SOURCE_ROOT; };
 		BF1EFA39215140E60014EB07 /* SBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBridge.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3B215141100014EB07 /* RouterTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterTask.h; sourceTree = SOURCE_ROOT; };
@@ -121,6 +141,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF1D6D9F21BBA1460014EB07 /* WebKit.framework in Frameworks */,
 				BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */,
 				BF865417215182820014EB07 /* Foundation.framework in Frameworks */,
 				BFBDCB0021505BEE0014EB07 /* AppKit.framework in Frameworks */,
@@ -148,6 +169,7 @@
 		BF0778A12150897A0014EB07 /* userinterface */ = {
 			isa = PBXGroup;
 			children = (
+				BF1D6DA121BBAA420014EB07 /* preferences */,
 				BF07789C21506D2B0014EB07 /* PopoverViewController.swift */,
 				BFBDCB03215060970014EB07 /* StatusBarController.swift */,
 				BF531514215105B40014EB07 /* LogViewController.swift */,
@@ -155,6 +177,37 @@
 				BF3143FD2160C1BD0014EB07 /* DownloadJavaViewController.swift */,
 			);
 			path = userinterface;
+			sourceTree = "<group>";
+		};
+		BF1D6DA021BBA9910014EB07 /* browser */ = {
+			isa = PBXGroup;
+			children = (
+				BF1D6D9C21BB87000014EB07 /* EmbeddedConsoleView.swift */,
+				BF1D6D9A21BB86520014EB07 /* ConsoleWebView.storyboard */,
+				BF1D6D9821BB7DC10014EB07 /* FirefoxManager.swift */,
+			);
+			path = browser;
+			sourceTree = "<group>";
+		};
+		BF1D6DA121BBAA420014EB07 /* preferences */ = {
+			isa = PBXGroup;
+			children = (
+				BF1D6D9221BB36880014EB07 /* PreferencesViewController.swift */,
+				BF1D6DA421BBB84E0014EB07 /* PreferencesViewController+TableView.swift */,
+				BF1D6D9421BB379A0014EB07 /* PreferencesWindowController.swift */,
+				BF1D6DA221BBB8120014EB07 /* AdvancedTableView.swift */,
+			);
+			path = preferences;
+			sourceTree = "<group>";
+		};
+		BF1D6DA621BBB9F50014EB07 /* launchd */ = {
+			isa = PBXGroup;
+			children = (
+				BFD899422169EE9F0014EB07 /* LaunchAgent.swift */,
+				BFD899442169EFE90014EB07 /* LaunchAgent+Status.swift */,
+				BFD899462169F01B0014EB07 /* LaunchAgentManager.swift */,
+			);
+			path = launchd;
 			sourceTree = "<group>";
 		};
 		BF50615F2113C48E0014EB07 = {
@@ -207,6 +260,7 @@
 				BF50616E2113C48E0014EB07 /* I2PLauncher.xcdatamodeld */,
 				BFF45818213C428E0014EB07 /* I2PLauncher-Bridging-Header.h */,
 				BF07789621506C810014EB07 /* Storyboard.storyboard */,
+				BF1D6D8E21BB32460014EB07 /* Preferences.storyboard */,
 				BFBDCAFD2150567D0014EB07 /* SwiftMainDelegate.swift */,
 			);
 			path = I2PLauncher;
@@ -215,6 +269,7 @@
 		BF5061922113C6ED0014EB07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BF1D6D9E21BBA1460014EB07 /* WebKit.framework */,
 				BFE16BFD2156FD290014EB07 /* Sparkle.framework */,
 				BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */,
 				BF865416215182820014EB07 /* Foundation.framework */,
@@ -228,6 +283,7 @@
 		BF5315042150C4860014EB07 /* routermgmt */ = {
 			isa = PBXGroup;
 			children = (
+				BF1D6DA621BBB9F50014EB07 /* launchd */,
 				BFBDCB01215060190014EB07 /* DetectJava.swift */,
 				BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */,
 				BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */,
@@ -240,15 +296,14 @@
 		BF5315052150C4AB0014EB07 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				BF1D6DA021BBA9910014EB07 /* browser */,
 				BFBDCAF9215050810014EB07 /* ReflectionFunctions.swift */,
 				BFBDCAF52150428D0014EB07 /* StringExtensions.swift */,
 				BFBDCAF7215047FE0014EB07 /* ArrayExtensions.swift */,
 				BF53150C2150CE310014EB07 /* DateTimeUtils.swift */,
 				BFE16BF92156DAED0014EB07 /* EventManager.swift */,
 				BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */,
-				BFD899422169EE9F0014EB07 /* LaunchAgent.swift */,
-				BFD899442169EFE90014EB07 /* LaunchAgent+Status.swift */,
-				BFD899462169F01B0014EB07 /* LaunchAgentManager.swift */,
+				BF1D6D9021BB344D0014EB07 /* Preferences.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -336,6 +391,8 @@
 				BF5061752113C4900014EB07 /* UserInterfaces.xib in Resources */,
 				BF1EFA48215141640014EB07 /* ItoopieTransparent.png in Resources */,
 				BF1EFA47215141640014EB07 /* base.zip in Resources */,
+				BF1D6D8F21BB32460014EB07 /* Preferences.storyboard in Resources */,
+				BF1D6D9B21BB86520014EB07 /* ConsoleWebView.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -357,7 +414,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nversion=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFOPLIST_FILE}\"`\ncommit=`mtn heads --branch=i2p.i2p | awk '{ print $1 }' | head -n 1`\nbuildinfo=\"Built $(date), $commit\"\n\n# Use cat to avoid any potential alias of cp asking for overwrite of file.\ncat $SRCROOT/version.h.tpl > $SRCROOT/version.h\nsed -i '' \"s#VERSION_REPLACED_BY_XCODE_BUILD_SCRIPT#$version#\" $SRCROOT/version.h\nsed -i '' \"s#BUILD_INFO_REPLACED_BY_XCODE_BUILD_SCRIPT#$buildinfo#\" $SRCROOT/version.h\n\n$SRCROOT/check_latest_java.sh\n\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nversion=`/usr/libexec/PlistBuddy -c \"Print I2PRoutereVersion\" \"${INFOPLIST_FILE}\"`\ncommit=`mtn heads --branch=i2p.i2p | awk '{ print $1 }' | head -n 1`\nbuildinfo=\"Built $(date), $commit\"\n\n# Use cat to avoid any potential alias of cp asking for overwrite of file.\ncat $SRCROOT/version.h.tpl > $SRCROOT/version.h\nsed -i '' \"s#VERSION_REPLACED_BY_XCODE_BUILD_SCRIPT#$version#g\" $SRCROOT/version.h\nsed -i '' \"s#BUILD_INFO_REPLACED_BY_XCODE_BUILD_SCRIPT#$buildinfo#\" $SRCROOT/version.h\n\n$SRCROOT/check_latest_java.sh\n\n";
 		};
 		BF1EFA4B215142030014EB07 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -389,17 +446,23 @@
 				BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */,
 				BF7506CB21509CFD0014EB07 /* RouterProcessStatus.swift in Sources */,
 				BFBDCAE9215040670014EB07 /* Subprocess.swift in Sources */,
+				BF1D6D9321BB36880014EB07 /* PreferencesViewController.swift in Sources */,
+				BF1D6D9921BB7DC10014EB07 /* FirefoxManager.swift in Sources */,
 				BFBDCAFA215050810014EB07 /* ReflectionFunctions.swift in Sources */,
 				BFBDCAED215041C10014EB07 /* Subprocess+CompactAPI.swift in Sources */,
 				BFBDCB02215060190014EB07 /* DetectJava.swift in Sources */,
 				BF07789E21506D2B0014EB07 /* PopoverViewController.swift in Sources */,
+				BF1D6DA321BBB8120014EB07 /* AdvancedTableView.swift in Sources */,
 				BFD899472169F01B0014EB07 /* LaunchAgentManager.swift in Sources */,
 				BF650CAB2152AC7D0014EB07 /* Deployer.mm in Sources */,
+				BF1D6DA521BBB84E0014EB07 /* PreferencesViewController+TableView.swift in Sources */,
 				BF1EFA40215141110014EB07 /* main.mm in Sources */,
 				BFBDCAF4215042670014EB07 /* AppleStuffExceptionHandler.m in Sources */,
 				BF3143FE2160C1BD0014EB07 /* DownloadJavaViewController.swift in Sources */,
+				BF1D6D9521BB379A0014EB07 /* PreferencesWindowController.swift in Sources */,
 				BF531515215105B40014EB07 /* LogViewController.swift in Sources */,
 				BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */,
+				BF1D6D9121BB344D0014EB07 /* Preferences.swift in Sources */,
 				BFD899452169EFE90014EB07 /* LaunchAgent+Status.swift in Sources */,
 				BF14B712215D9E040014EB07 /* FolderContentMonitor.swift in Sources */,
 				BFBDCAFE2150567D0014EB07 /* SwiftMainDelegate.swift in Sources */,
@@ -407,6 +470,7 @@
 				BFDD81DA2156B3E30014EB07 /* RouterManager.swift in Sources */,
 				BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */,
 				BF14B70F215C98DC0014EB07 /* LoggerWorker.cpp in Sources */,
+				BF1D6D9D21BB87000014EB07 /* EmbeddedConsoleView.swift in Sources */,
 				BF14B710215C98DC0014EB07 /* Logger.mm in Sources */,
 				BFBDCAF62150428D0014EB07 /* StringExtensions.swift in Sources */,
 				BF5061702113C48E0014EB07 /* I2PLauncher.xcdatamodeld in Sources */,
@@ -478,12 +542,13 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.13;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -530,11 +595,12 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx10.13;
+				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -558,6 +624,9 @@
 					/System/Library/Frameworks,
 					"$(PROJECT_DIR)",
 				);
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/include",
 					"$(SRCROOT)/../../../Sparkle/Sparkle",
@@ -597,6 +666,9 @@
 					/System/Library/Frameworks,
 					"$(PROJECT_DIR)",
 				);
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/include",
 					"$(SRCROOT)/../../../Sparkle/Sparkle",

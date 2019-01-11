@@ -22,11 +22,11 @@
 
 package com.southernstorm.noise.protocol;
 
-import java.security.KeyPair;
 import java.util.Arrays;
 
-import com.southernstorm.noise.crypto.Curve25519;
+import com.southernstorm.noise.crypto.x25519.Curve25519;
 
+import net.i2p.crypto.KeyPair;
 import net.i2p.router.transport.crypto.X25519KeyFactory;
 
 /**
@@ -78,8 +78,8 @@ class Curve25519DHState implements DHState {
 	@Override
 	public void generateKeyPair() {
 		KeyPair kp = _xdh.getKeys();
-		System.arraycopy(kp.getPrivate().getEncoded(), 0, privateKey, 0, 32);
-		System.arraycopy(kp.getPublic().getEncoded(), 0, publicKey, 0, 32);
+		System.arraycopy(kp.getPrivate().getData(), 0, privateKey, 0, 32);
+		System.arraycopy(kp.getPublic().getData(), 0, publicKey, 0, 32);
 		mode = 0x03;
 	}
 

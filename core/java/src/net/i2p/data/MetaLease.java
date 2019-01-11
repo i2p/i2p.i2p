@@ -18,7 +18,10 @@ import java.util.Date;
  */
 public class MetaLease extends Lease {
 
+    public static final int LENGTH = 40;
+
     private int _cost;
+    private int _type;
 
     public int getCost() {
         return _cost;
@@ -26,6 +29,14 @@ public class MetaLease extends Lease {
 
     public void setCost(int cost) {
         _cost = cost;
+    }
+
+    public int getType() {
+        return _type;
+    }
+
+    public void setType(int type) {
+        _type = type;
     }
 
     /**
@@ -48,7 +59,8 @@ public class MetaLease extends Lease {
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _gateway = Hash.create(in);
         // flags
-        DataHelper.skip(in, 3);
+        DataHelper.skip(in, 2);
+        _type = in.read();
         _cost = in.read();
         _end = new Date(DataHelper.readLong(in, 4) * 1000);
     }
@@ -59,7 +71,8 @@ public class MetaLease extends Lease {
             throw new DataFormatException("Not enough data to write out a Lease");
         _gateway.writeBytes(out);
         // flags
-        DataHelper.writeLong(out, 3, 0);
+        DataHelper.writeLong(out, 2, 0);
+        out.write(_type);
         out.write(_cost);
         DataHelper.writeLong(out, 4, _end.getTime() / 1000);
     }
@@ -70,6 +83,7 @@ public class MetaLease extends Lease {
         if ((object == null) || !(object instanceof MetaLease)) return false;
         MetaLease lse = (MetaLease) object;
         return DataHelper.eq(_end, lse.getEndDate())
+               && _type == lse._type
                && _cost == lse._cost
                && DataHelper.eq(_gateway, lse.getGateway());
     }
@@ -78,5 +92,17 @@ public class MetaLease extends Lease {
     public int hashCode() {
         return (int) _end.getTime() ^ DataHelper.hashCode(_gateway)
                ^ _cost;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(128);
+        buf.append("[Meta Lease: ");
+        buf.append("\n\tEnd Date: ").append(_end);
+        buf.append("\n\tTarget: ").append(_gateway);
+        buf.append("\n\tCost: ").append(_cost);
+        buf.append("\n\tType: ").append(_type);
+        buf.append("]");
+        return buf.toString();
     }
 }

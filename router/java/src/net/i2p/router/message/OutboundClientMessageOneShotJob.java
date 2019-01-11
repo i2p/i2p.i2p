@@ -11,6 +11,7 @@ import net.i2p.client.SendMessageOptions;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Certificate;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -271,6 +272,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED);
             return;
         }
+        if (_leaseSet != null && _leaseSet.getType() == DatabaseEntry.KEY_TYPE_META_LS2) {
+            // can't send to a meta LS
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET);
+            return;
+        }
+
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(getJobId() + ": Send outbound client message job beginning" +
         //               ": preparing to search for the leaseSet for " + _toString);
@@ -352,14 +359,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 getContext().statManager().addRateData("client.leaseSetFoundRemoteTime", lookupTime);
             }
             _wantACK = false;
-            boolean ok = getNextLease();
-            if (ok) {
+            int rc = getNextLease();
+            if (rc == 0) {
                 send();
             } else {
                 // shouldn't happen
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to send on a random lease, as getNext returned null (to=" + _toString + ")");
-                dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET);
+                dieFatal(rc);
             }
         }
     }
@@ -367,9 +374,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     /**
      *  Choose a lease from his leaseset to send the message to. Sets _lease.
      *  Sets _wantACK if it's new or changed.
-     *  @return success
+     *  @return 0 on success, or a MessageStatusMessage failure code
      */
-    private boolean getNextLease() {
+    private int getNextLease() {
         // set in runJob if found locally
         if (_leaseSet == null) {
             _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
@@ -377,9 +384,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 // shouldn't happen
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet for " + _toString);
-                return false;
+                return MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
             } 
         } 
+        if (_leaseSet.getType() == DatabaseEntry.KEY_TYPE_META_LS2) {
+            // can't send to a meta LS
+            return MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
+        }
 
         // Use the same lease if it's still good
         // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
@@ -398,7 +409,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                             _lease.getGateway().equals(lease.getGateway())) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info(getJobId() + ": Found in cache - lease for " + _toString); 
-                            return true;
+                            return 0;
                         }
                     }
                 }
@@ -431,7 +442,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (leases.isEmpty()) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": No leases found from: " + _leaseSet);
-            return false;
+            return MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
         }
         
         // randomize the ordering (so leases with equal # of failures per next 
@@ -484,7 +495,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Added to cache - lease for " + _toString); 
         _wantACK = true;
-        return true;
+        return 0;
     }
 
     
@@ -590,6 +601,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (wantACK) {
             _cache.lastReplyRequestCache.put(_hashPair, Long.valueOf(now));
             token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+            // 0.9.38 change to DESTINATION reply delivery
+            // NOPE! Rejected in InboundMessageDistributor
             _inTunnel = selectInboundTunnel();
         } else {
             token = -1;

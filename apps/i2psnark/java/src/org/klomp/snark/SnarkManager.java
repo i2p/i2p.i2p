@@ -28,6 +28,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
+import net.i2p.client.I2PClient;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -785,7 +786,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         if (!_config.containsKey(PROP_I2CP_HOST))
             _config.setProperty(PROP_I2CP_HOST, "127.0.0.1");
         if (!_config.containsKey(PROP_I2CP_PORT))
-            _config.setProperty(PROP_I2CP_PORT, "7654");
+            _config.setProperty(PROP_I2CP_PORT, Integer.toString(I2PClient.DEFAULT_LISTEN_PORT));
         if (!_config.containsKey(PROP_I2CP_OPTS))
             _config.setProperty(PROP_I2CP_OPTS, "inbound.length=3 outbound.length=3" +
                                                 " inbound.quantity=" + DEFAULT_TUNNEL_QUANTITY +
@@ -911,7 +912,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
 
     private void updateConfig() {
         String i2cpHost = _config.getProperty(PROP_I2CP_HOST);
-        int i2cpPort = getInt(PROP_I2CP_PORT, 7654);
+        int i2cpPort = getInt(PROP_I2CP_PORT, I2PClient.DEFAULT_LISTEN_PORT);
         String opts = _config.getProperty(PROP_I2CP_OPTS);
         Map<String, String> i2cpOpts = new HashMap<String, String>();
         if (opts != null) {

@@ -8,7 +8,6 @@ import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.security.KeyPair;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -27,11 +26,15 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.EncType;
+import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.PublicKey;
+import net.i2p.data.PrivateKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
@@ -48,8 +51,6 @@ import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.crypto.X25519KeyFactory;
-import net.i2p.router.transport.crypto.X25519PublicKey;
-import net.i2p.router.transport.crypto.X25519PrivateKey;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.EventLog;
@@ -80,6 +81,7 @@ public class NTCPTransport extends TransportImpl {
     private int _ssuPort;
     /** synch on this */
     private final Set<InetSocketAddress> _endpoints;
+    private final int _networkID;
 
     /**
      * list of NTCPConnection of connections not yet established that we
@@ -228,6 +230,7 @@ public class NTCPTransport extends TransportImpl {
         _reader = new Reader(ctx);
         _writer = new net.i2p.router.transport.ntcp.Writer(ctx);
 
+        _networkID = ctx.router().getNetworkID();
         _fastBid = new SharedBid(25); // best
         _slowBid = new SharedBid(70); // better than ssu unestablished, but not better than ssu established
         _slowCostBid = new SharedBid(85);
@@ -257,12 +260,12 @@ public class NTCPTransport extends TransportImpl {
             }
             if (priv == null || priv.length != NTCP2_KEY_LEN) {
                 KeyPair keys = xdh.getKeys();
-                _ntcp2StaticPrivkey = keys.getPrivate().getEncoded();
-                _ntcp2StaticPubkey = keys.getPublic().getEncoded();
+                _ntcp2StaticPrivkey = keys.getPrivate().getData();
+                _ntcp2StaticPubkey = keys.getPublic().getData();
                 shouldSave = true;
             } else {
                 _ntcp2StaticPrivkey = priv;
-                _ntcp2StaticPubkey = (new X25519PrivateKey(priv)).toPublic().getEncoded();
+                _ntcp2StaticPubkey = (new PrivateKey(EncType.ECIES_X25519, priv)).toPublic().getData();
             }
             if (!shouldSave) {
                 s = ctx.getProperty(PROP_NTCP2_IV);
@@ -503,6 +506,11 @@ public class NTCPTransport extends TransportImpl {
             }
             return _fastBid;
         }
+        if (toAddress.getNetworkId() != _networkID) {
+            _context.banlist().banlistRouterForever(peer, "Not in our network: " + toAddress.getNetworkId());
+            markUnreachable(peer);
+            return null;    
+        }
         if (dataSize > NTCPConnection.NTCP1_MAX_MSG_SIZE) {
             // Not established, too big for NTCP 1, let SSU deal with it
             // TODO look at his addresses to see if NTCP2 supported?
@@ -640,6 +648,20 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     * Tell the transport to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    public void forceDisconnect(Hash peer) {
+        NTCPConnection con = _conByIdent.remove(peer);
+        if (con != null) {
+            if (_log.shouldWarn())
+                _log.warn("Force disconnect of " + peer, new Exception("I did it"));
+            con.close();
+        }
+    }
+
+    /**
      * @return usually the con passed in, but possibly a second connection with the same peer...
      *         only con or null as of 0.9.37
      */
@@ -692,12 +714,13 @@ public class NTCPTransport extends TransportImpl {
      * As of 0.9.20, actually returns active peer count, not total.
      */
     public int countActivePeers() {
+        final long now = _context.clock().now();
         int active = 0;
         for (NTCPConnection con : _conByIdent.values()) {
             // con initializes times at construction,
             // so check message count also
-            if ((con.getMessagesSent() > 0 && con.getTimeSinceSend() <= 5*60*1000) ||
-                (con.getMessagesReceived() > 0 && con.getTimeSinceReceive() <= 5*60*1000)) {
+            if ((con.getMessagesSent() > 0 && con.getTimeSinceSend(now) <= 5*60*1000) ||
+                (con.getMessagesReceived() > 0 && con.getTimeSinceReceive(now) <= 5*60*1000)) {
                 active++;
             }
         }
@@ -708,11 +731,12 @@ public class NTCPTransport extends TransportImpl {
      * How many peers are we actively sending messages to (this minute)
      */
     public int countActiveSendPeers() {
+        final long now = _context.clock().now();
         int active = 0;
         for (NTCPConnection con : _conByIdent.values()) {
             // con initializes times at construction,
             // so check message count also
-            if (con.getMessagesSent() > 0 && con.getTimeSinceSend() <= 60*1000) {
+            if (con.getMessagesSent() > 0 && con.getTimeSinceSend(now) <= 60*1000) {
                 active++;
             }
         }
@@ -1088,12 +1112,13 @@ public class NTCPTransport extends TransportImpl {
      */
     void expireTimedOut() {
         int expired = 0;
+        final long now = _context.clock().now();
 
             for (Iterator<NTCPConnection> iter = _establishing.iterator(); iter.hasNext(); ) {
                 NTCPConnection con = iter.next();
                 if (con.isClosed() || con.isEstablished()) {
                     iter.remove();
-                } else if (con.getTimeSinceCreated() > ESTABLISH_TIMEOUT) {
+                } else if (con.getTimeSinceCreated(now) > ESTABLISH_TIMEOUT) {
                     iter.remove();
                     con.close();
                     expired++;

@@ -103,10 +103,33 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      * Get the type of the data structure.
      * This should be faster than instanceof.
      *
-     * @return KEY_TYPE_ROUTERINFO or KEY_TYPE_LEASESET
+     * @return KEY_TYPE_ROUTERINFO or KEY_TYPE_LEASESET or LS2 types
      * @since 0.8.2
      */
     public abstract int getType();
+
+    /**
+     * Convenience method, is the type any variant of leaseset?
+     *
+     * @return true for any type of LeaseSet, false for RouterInfo, false for others
+     * @since 0.9.38
+     */
+    public boolean isLeaseSet() {
+        return isLeaseSet(getType());
+    }
+
+    /**
+     * Convenience method, is the type any variant of leaseset?
+     *
+     * @return true for any type of LeaseSet, false for RouterInfo, false for others
+     * @since 0.9.38
+     */
+    public static boolean isLeaseSet(int type) {
+        return type == KEY_TYPE_LEASESET ||
+               type == KEY_TYPE_LS2 ||
+               type == KEY_TYPE_ENCRYPTED_LS2 ||
+               type == KEY_TYPE_META_LS2;
+    }
 
     /**
      * Returns the raw payload data, excluding the signature, to be signed by sign().

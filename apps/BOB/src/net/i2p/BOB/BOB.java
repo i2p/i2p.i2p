@@ -242,7 +242,7 @@ public class BOB implements Runnable, ClientApp {
 			save = true;
 		}
 		if (!props.containsKey(I2PClient.PROP_TCP_PORT)) {
-			props.setProperty(I2PClient.PROP_TCP_PORT, "7654");
+			props.setProperty(I2PClient.PROP_TCP_PORT, Integer.toString(I2PClient.DEFAULT_LISTEN_PORT));
 			save = true;
 		}
 		if (!props.containsKey(PROP_BOB_PORT)) {

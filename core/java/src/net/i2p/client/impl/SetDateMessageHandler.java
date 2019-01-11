@@ -34,7 +34,13 @@ class SetDateMessageHandler extends HandlerImpl {
         // we did was get the time from ourselves.
         if (!_context.isRouterContext())
             Clock.getInstance().setNow(msg.getDate().getTime());
-        // TODO - save router's version string for future reference
+        // This saves the various support capabilities based on
+        // the router's version string for future reference
         session.dateUpdated(msg.getVersion());
+        if (session.isOffline() && !session.supportsLS2()) {
+            // TODO check other options also? see RLSMH.requiresLS2()
+            session.propogateError("Router does not support offline keys", new Exception());
+            session.destroySession(false);
+        }
     }
 }

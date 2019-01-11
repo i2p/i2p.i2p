@@ -1416,7 +1416,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _context.simpleTimer2().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
-                _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getVersion());
+                _context.banlist().banlistRouterForever(peerHash, "Not in our network: " + ((RouterInfo) entry).getNetworkId());
                 //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
                 if (peer != null)
                     sendDestroy(peer);
@@ -1754,6 +1754,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 return _cachedBid[FAST_BID];
         } else {
+            if (toAddress.getNetworkId() != _networkID) {
+                _context.banlist().banlistRouterForever(to, "Not in our network: " + toAddress.getNetworkId());
+                markUnreachable(to);
+                return null;    
+            }
+
             // If we don't have a port, all is lost
             if ( _reachabilityStatus == Status.HOSED) {
                 markUnreachable(to);
@@ -1880,15 +1886,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     @Override
     public void send(OutNetMessage msg) { 
         if (msg == null) return;
-        if (msg.getTarget() == null) return;
-        if (msg.getTarget().getIdentity() == null) return;
+        RouterInfo tori = msg.getTarget();
+        if (tori == null) return;
+        if (tori.getIdentity() == null) return;
         if (_establisher == null) {
             failed(msg, "UDP not up yet");
             return;    
         }
 
         msg.timestamp("sending on UDP transport");
-        Hash to = msg.getTarget().getIdentity().calculateHash();
+        Hash to = tori.getIdentity().calculateHash();
         PeerState peer = getPeerState(to);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending to " + (to != null ? to.toString() : ""));
@@ -2312,7 +2319,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
                 replaceCurrentExternalAddress(local, isIPv6);
             }
-            if (hasCurrentAddress()) {
+            if (getCurrentAddress(false) != null) {
                 // We must remove current address, otherwise the user will see
                 // "firewalled with inbound NTCP enabled" warning in console.
                 // Remove the IPv4 address only
@@ -2676,6 +2683,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             (ps.getTheyRelayToUsAs() <= 0 || ps.getIntroducerTime() < _context.clock().now() - 2*60*60*1000) &&
             ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 2) {
             ps.setMayDisconnect();
+        }
+    }
+
+    /**
+     * Tell the transport to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    public void forceDisconnect(Hash peer) {
+        PeerState ps =  _peersByIdent.get(peer);
+        if (ps != null) {
+            if (_log.shouldWarn())
+                _log.warn("Force disconnect of " + peer, new Exception("I did it"));
+            dropPeer(ps, true, "router");
         }
     }
 

@@ -836,7 +836,7 @@ public class TunnelConfig {
             if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
                 config.setProperty(TunnelController.PROP_I2CP_PORT, _i2cpPort);
             } else {
-                config.setProperty(TunnelController.PROP_I2CP_PORT, "7654");
+                config.setProperty(TunnelController.PROP_I2CP_PORT, Integer.toString(I2PClient.DEFAULT_LISTEN_PORT));
             }
         }
         if (_privKeyFile != null)

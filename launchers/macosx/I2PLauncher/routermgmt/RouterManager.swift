@@ -19,13 +19,14 @@ class RouterManager : NSObject {
   
   // MARK: - Properties
   
-  static let packedVersion : String = "0.9.37"
+  static let packedVersion : String = NSDEF_I2P_VERSION
   
   let eventManager = EventManager()
   let routerRunner = RouterRunner()
   
   var logViewStorage: NSTextStorage?
   var lastRouterPid : String? = nil
+  private var canRouterStart : Bool = false
   
   private static func handleRouterException(information:Any?) {
     Logger.MLog(level:1,"event! - handle router exception")
@@ -93,7 +94,7 @@ class RouterManager : NSObject {
     routerManager.eventManager.listenTo(eventName: "router_version", action: handleRouterVersion)
     routerManager.eventManager.listenTo(eventName: "router_exception", action: handleRouterException)
     routerManager.eventManager.listenTo(eventName: "router_already_running", action: handleRouterAlreadyStarted)
-    routerManager.eventManager.listenTo(eventName: "router_can_start", action: routerManager.routerRunner.StartAgent)
+    routerManager.eventManager.listenTo(eventName: "router_can_start", action: routerManager.setLauncherReadyToStartRouter)
     routerManager.eventManager.listenTo(eventName: "router_can_setup", action: routerManager.routerRunner.SetupAgent)
     
     //routerManager.eventManager.listenTo(eventName: "launch_agent_running", action: routerManager.routerRunner.onLoadedAgent)
@@ -149,6 +150,22 @@ class RouterManager : NSObject {
   
   class func shared() -> RouterManager {
     return sharedRouterManager
+  }
+  
+  func setLauncherReadyToStartRouter(_ information: Any?) {
+    self.canRouterStart = true
+    if (Preferences.shared().startRouterOnLauncherStart) {
+      // Trigger the actual start at launch time
+      print("Start router on launch preference is enabled - Starting")
+      self.routerRunner.StartAgent(information)
+    } else {
+      print("Start router on launch preference is disabled - Router ready when user are!")
+      SBridge.sendUserNotification("I2P Router Ready", formattedMsg: "The I2P Router is ready to be launched, however the autostart is disabled and require user input to start.")
+    }
+  }
+  
+  func checkIfRouterCanStart() -> Bool {
+    return self.canRouterStart
   }
   
   func setRouterTask(router: I2PRouterTask) {

@@ -15,8 +15,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.SendMessageOptions;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
@@ -28,6 +30,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2cp.AbuseReason;
 import net.i2p.data.i2cp.AbuseSeverity;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
+import net.i2p.data.i2cp.CreateLeaseSet2Message;
 import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.MessageId;
@@ -55,6 +58,16 @@ class I2CPMessageProducer {
     /** see ConnectionOptions in streaming  - MTU + streaming overhead + gzip overhead */
     private static final int TYP_SIZE = 1730 + 28 + 23;
     private static final int MIN_RATE = 2 * TYP_SIZE;
+
+    // http://i2p-projekt.i2p/en/docs/protocol/i2cp
+    // Note that some are listed for both client and server side, don't include those below.
+    private static final String[] CLIENT_SIDE_OPTIONS = new String[] {
+        "i2cp.closeIdleTime", "i2cp.closeOnIdle", "i2cp.encryptLeaseSet",
+        "i2cp.gzip", "i2cp.leaseSetKey", "i2cp.leaseSetPrivateKey",
+        "i2cp.leaseSetSigningPrivateKey", "i2cp.reduceIdleTime", "i2cp.reduceOnIdle",
+        I2PSessionImpl.PROP_ENABLE_SSL, I2PClient.PROP_TCP_HOST, I2PClient.PROP_TCP_PORT
+    };
+
 
     public I2CPMessageProducer(I2PAppContext context) {
         _context = context;
@@ -85,6 +98,20 @@ class I2CPMessageProducer {
     }
 
     /** 
+     * Strip out the client-side options from the session options.
+     * @return a new copy, may be modified
+     * @since 0.9.38 
+     */
+    private static Properties getRouterOptions(I2PSessionImpl session) {
+        Properties props = new Properties();
+        props.putAll(session.getOptions());
+        for (int i = 0; i < CLIENT_SIDE_OPTIONS.length; i++) {
+            props.remove(CLIENT_SIDE_OPTIONS[i]);
+        }
+        return props;
+    }
+
+    /** 
      * Send all the messages that a client needs to send to a router to establish
      * a new session.  
      */
@@ -92,18 +119,19 @@ class I2CPMessageProducer {
         updateBandwidth(session);
         CreateSessionMessage msg = new CreateSessionMessage();
         SessionConfig cfg = new SessionConfig(session.getMyDestination());
-        cfg.setOptions(session.getOptions());
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config created");
+        cfg.setOptions(getRouterOptions(session));
+        if (session.isOffline()) {
+            cfg.setOfflineSignature(session.getOfflineExpiration(),
+                                    session.getTransientSigningPublicKey(),
+                                    session.getOfflineSignature());
+        }
         try {
             cfg.signSessionConfig(session.getPrivateKey());
         } catch (DataFormatException dfe) {
             throw new I2PSessionException("Unable to sign the session config", dfe);
         }
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config signed");
         msg.setSessionConfig(cfg);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config loaded into message");
         session.sendMessage_unchecked(msg);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("config message sent");
     }
 
     /**
@@ -328,13 +356,20 @@ class I2CPMessageProducer {
     }
 
     /**
-     * Create a new signed leaseSet in response to a request to do so and send it
-     * to the router
-     * 
+     * In response to a RequestLeaseSet Message from the router, send a
+     * CreateLeaseset Message back to the router.
+     * This method is misnamed, it does not create the LeaseSet,
+     * the caller does that.
+     *
      */
     public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv,
                                PrivateKey priv) throws I2PSessionException {
-        CreateLeaseSetMessage msg = new CreateLeaseSetMessage();
+        CreateLeaseSetMessage msg;
+        int type = leaseSet.getType();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET)
+            msg = new CreateLeaseSetMessage();
+        else
+            msg = new CreateLeaseSet2Message();
         msg.setLeaseSet(leaseSet);
         msg.setPrivateKey(priv);
         msg.setSigningPrivateKey(signingPriv);
@@ -355,11 +390,8 @@ class I2CPMessageProducer {
     public void updateTunnels(I2PSessionImpl session, int tunnels) throws I2PSessionException {
         ReconfigureSessionMessage msg = new ReconfigureSessionMessage();
         SessionConfig cfg = new SessionConfig(session.getMyDestination());
-        Properties props = session.getOptions();
+        Properties props = getRouterOptions(session);
         if (tunnels > 0) {
-            Properties newprops = new Properties();
-            newprops.putAll(props);
-            props = newprops;
             String stunnels = Integer.toString(tunnels);
             props.setProperty("inbound.quantity", stunnels);
             props.setProperty("outbound.quantity", stunnels);

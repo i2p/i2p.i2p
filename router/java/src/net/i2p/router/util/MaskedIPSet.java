@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -32,11 +33,30 @@ public class MaskedIPSet extends HashSet<String> {
       *
       * As of 0.9.24, returned set will include netdb family as well.
       *
+      * This gets the peer from the netdb without validation,
+      * for efficiency and to avoid deadlocks.
+      * Peers are presumed to be validated elsewhere.
+      *
       * @param peer non-null
       * @param mask is 1-4 (number of bytes to match)
       */
     public MaskedIPSet(RouterContext ctx, Hash peer, int mask) {
-        this(ctx, peer, ctx.netDb().lookupRouterInfoLocally(peer), mask);
+        this(ctx, peer, lookupRILocally(ctx, peer), mask);
+    }
+
+    /**
+      * This gets the peer from the netdb without validation,
+      * for efficiency and to avoid deadlocks.
+      *
+      * @since 0.9.38
+      */
+    private static RouterInfo lookupRILocally(RouterContext ctx, Hash peer) {
+        DatabaseEntry ds = ctx.netDb().lookupLocallyWithoutValidation(peer);
+        if (ds != null) {
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+                return (RouterInfo) ds;
+        }
+        return null;
     }
 
     /**

@@ -4,6 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -33,11 +37,14 @@ public class LeaseSet2 extends LeaseSet {
     protected Signature _offlineSignature;
     // may be null
     protected Properties _options;
-    // only used for unknown types; else use _encryptionKey.getType()
-    private int _encType;
+    // only used if more than one key, otherwise null
+    private List<PublicKey> _encryptionKeys;
+    // If this leaseset was formerly blinded, the blinded hash, so we can find it again
+    private Hash _blindedHash;
 
     private static final int FLAG_OFFLINE_KEYS = 1;
     private static final int FLAG_UNPUBLISHED = 2;
+    private static final int MAX_KEYS = 8;
 
     public LeaseSet2() {
         super();
@@ -57,6 +64,36 @@ public class LeaseSet2 extends LeaseSet {
         if (_options == null)
             return null;
         return _options.getProperty(opt);
+    }
+
+    /**
+     *  Add an encryption key.
+     */
+    public void addEncryptionKey(PublicKey key) {
+        if (_encryptionKey == null) {
+            setEncryptionKey(key);
+        } else {
+            if (_encryptionKeys == null) {
+                _encryptionKeys = new ArrayList<PublicKey>(4);
+                _encryptionKeys.add(_encryptionKey);
+            } else {
+                if (_encryptionKeys.size() >= MAX_KEYS)
+                    throw new IllegalStateException();
+            }
+            _encryptionKeys.add(key);
+        }
+    }
+
+    /**
+     *  This returns all the keys. getEncryptionKey() returns the first one.
+     *  @return not a copy, do not modify, null if none
+     */
+    public List<PublicKey> getEncryptionKeys() {
+        if (_encryptionKeys != null)
+            return _encryptionKeys;
+        if (_encryptionKey != null)
+            return Collections.singletonList(_encryptionKey);
+        return null;
     }
 
     /**
@@ -144,7 +181,22 @@ public class LeaseSet2 extends LeaseSet {
             return false;
         }
         byte[] data = baos.toByteArray();
-        return ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, _destination.getSigningPublicKey());
+        return ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, getSigningPublicKey());
+    }
+
+    /**
+     * Set this on creation if known
+     */
+    public void setBlindedHash(Hash bh) {
+        _blindedHash = bh;
+    }
+
+    /**
+     * The orignal blinded hash, where this came from.
+     * @return null if unknown or not previously blinded
+     */
+    public Hash getBlindedHash() {
+        return _blindedHash;
     }
 
 
@@ -192,19 +244,32 @@ public class LeaseSet2 extends LeaseSet {
         // LS2 header
         readHeader(in);
         // LS2 part
-        _options = DataHelper.readProperties(in);
-        _encType = (int) DataHelper.readLong(in, 2);
-        int encLen = (int) DataHelper.readLong(in, 2);
-        // TODO
-        if (_encType == 0) {
-            _encryptionKey = PublicKey.create(in);
-        } else {
-            EncType type = EncType.getByCode(_encType);
-            // type will be null if unknown
-            byte[] encKey = new byte[encLen];
-            DataHelper.read(in, encKey);
-            // this will throw IAE if type is non-null and length is wrong
-            _encryptionKey = new PublicKey(type, encKey);
+        // null arg to get an EmptyProperties back
+        _options = DataHelper.readProperties(in, null);
+        int numKeys = in.read();
+        if (numKeys <= 0 || numKeys > MAX_KEYS)
+            throw new DataFormatException("Bad key count: " + numKeys);
+        if (numKeys > 1)
+            _encryptionKeys = new ArrayList<PublicKey>(numKeys);
+        for (int i = 0; i < numKeys; i++) {
+            int encType = (int) DataHelper.readLong(in, 2);
+            int encLen = (int) DataHelper.readLong(in, 2);
+            // TODO
+            if (encType == 0) {
+                _encryptionKey = PublicKey.create(in);
+            } else {
+                EncType type = EncType.getByCode(encType);
+                // type will be null if unknown
+                byte[] encKey = new byte[encLen];
+                DataHelper.read(in, encKey);
+                // this will throw IAE if type is non-null and length is wrong
+                if (type != null)
+                    _encryptionKey = new PublicKey(type, encKey);
+                else
+                    _encryptionKey = new PublicKey(encType, encKey);
+            }
+            if (numKeys > 1)
+                _encryptionKeys.add(_encryptionKey);
         }
         int numLeases = in.read();
         if (numLeases > MAX_LEASES)
@@ -241,19 +306,30 @@ public class LeaseSet2 extends LeaseSet {
         // LS2 header
         writeHeader(out);
         // LS2 part
+        writeBody(out);
+    }
+
+    /**
+     *  Without sig. This does NOT validate the signature
+     */
+    protected void writeBody(OutputStream out) throws DataFormatException, IOException {
         if (_options != null && !_options.isEmpty()) {
             DataHelper.writeProperties(out, _options);
         } else {
             DataHelper.writeLong(out, 2, 0);
         }
-        EncType type = _encryptionKey.getType();
-        if (type != null) {
-            DataHelper.writeLong(out, 2, type.getCode());
-        } else {
-            DataHelper.writeLong(out, 2, _encType);
+        List<PublicKey> keys = getEncryptionKeys();
+        out.write((byte) keys.size());
+        for (PublicKey key : keys) {
+            EncType type = key.getType();
+            if (type != null) {
+                DataHelper.writeLong(out, 2, type.getCode());
+            } else {
+                DataHelper.writeLong(out, 2, key.getUnknownTypeCode());
+            }
+            DataHelper.writeLong(out, 2, key.length());
+            key.writeBytes(out);
         }
-        DataHelper.writeLong(out, 2, _encryptionKey.length());
-        _encryptionKey.writeBytes(out);
         out.write((byte) _leases.size());
         for (Lease lease : _leases) {
             lease.writeBytes(out);
@@ -273,8 +349,10 @@ public class LeaseSet2 extends LeaseSet {
         _destination.writeBytes(out);
         if (_published <= 0)
             _published = Clock.getInstance().now();
-        DataHelper.writeLong(out, 4, _published / 1000);
-        DataHelper.writeLong(out, 2, (_expires - _published) / 1000);
+        long pub1k = _published / 1000;
+        DataHelper.writeLong(out, 4, pub1k);
+        // Divide separately to prevent rounding errors
+        DataHelper.writeLong(out, 2, ((_expires / 1000) - pub1k));
         DataHelper.writeLong(out, 2, _flags);
         if (isOffline())
             writeOfflineBytes(out);
@@ -308,11 +386,14 @@ public class LeaseSet2 extends LeaseSet {
     @Override
     public int size() {
         int rv = _destination.size()
-             + _encryptionKey.length()
-             + 11
-             + (_leases.size() * 40);
+             + 10
+             + (_leases.size() * Lease2.LENGTH);
+        for (PublicKey key : getEncryptionKeys()) {
+            rv += 4;
+            rv += key.length();
+        }
         if (isOffline())
-            rv += 2 + _transientSigningPublicKey.length() + _offlineSignature.length();
+            rv += 6 + _transientSigningPublicKey.length() + _offlineSignature.length();
         if (_options != null && !_options.isEmpty()) {
             try {
                 rv += DataHelper.toProperties(_options).length;
@@ -331,10 +412,38 @@ public class LeaseSet2 extends LeaseSet {
      */
     @Override
     public void addLease(Lease lease) {
-        if (!(lease instanceof Lease2))
+        if (getType() == KEY_TYPE_LS2 && !(lease instanceof Lease2))
             throw new IllegalArgumentException();
         super.addLease(lease);
         _expires = _lastExpiration;
+    }
+
+    /**
+     * Sign the structure using the supplied signing key.
+     * Overridden because LS2 sigs cover the type byte.
+     *
+     * @throws IllegalStateException if already signed
+     */
+    @Override
+    public void sign(SigningPrivateKey key) throws DataFormatException {
+        if (_signature != null)
+            throw new IllegalStateException();
+        if (key == null)
+            throw new DataFormatException("No signing key");
+        int len = size();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        try {
+            // unlike LS1, sig covers type
+            out.write(getType());
+            writeBytesWithoutSig(out);
+        } catch (IOException ioe) {
+            throw new DataFormatException("Signature failed", ioe);
+        }
+        byte data[] = out.toByteArray();
+        // now sign with the key 
+        _signature = DSAEngine.getInstance().sign(data, key);
+        if (_signature == null)
+            throw new DataFormatException("Signature failed with " + key.getType() + " key");
     }
 
     /**
@@ -344,26 +453,40 @@ public class LeaseSet2 extends LeaseSet {
      */
     @Override
     public boolean verifySignature() {
-        if (!isOffline())
-            return super.verifySignature();
         if (_signature == null)
             return false;
         // Disallow RSA as it's so slow it could be used as a DoS
         SigType type = _signature.getType();
         if (type == null || type.getBaseAlgorithm() == SigAlgo.RSA)
             return false;
-        // verify offline block
-        if (!verifyOfflineSignature())
+        SigningPublicKey spk;
+        if (isOffline()) {
+            // verify LS2 using offline block's SPK
+            // Disallow RSA as it's so slow it could be used as a DoS
+            type = _transientSigningPublicKey.getType();
+            if (type == null || type.getBaseAlgorithm() == SigAlgo.RSA)
+                return false;
+            if (!verifyOfflineSignature())
+                return false;
+            spk = _transientSigningPublicKey;
+        } else {
+            spk = getSigningPublicKey();
+        }
+        int len = size();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        try {
+            // unlike LS1, sig covers type
+            out.write(getType());
+            writeBytesWithoutSig(out);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
             return false;
-        // verify LS2 using offline block's SPK
-        // Disallow RSA as it's so slow it could be used as a DoS
-        type = _transientSigningPublicKey.getType();
-        if (type == null || type.getBaseAlgorithm() == SigAlgo.RSA)
+        } catch (DataFormatException dfe) {
+            dfe.printStackTrace();
             return false;
-        byte data[] = getBytes();
-        if (data == null)
-            return false;
-        return DSAEngine.getInstance().verifySignature(_signature, data, _transientSigningPublicKey);
+        }
+        byte data[] = out.toByteArray();
+        return DSAEngine.getInstance().verifySignature(_signature, data, spk);
     }
     
     @Override
@@ -391,13 +514,25 @@ public class LeaseSet2 extends LeaseSet {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet2: ");
         buf.append("\n\tDestination: ").append(_destination);
-        buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
+        List<PublicKey> keys = getEncryptionKeys();
+        int sz = keys.size();
+        buf.append("\n\tEncryption Keys: ").append(sz);
+        for (int i = 0; i < sz; i++) {
+            buf.append("\n\tEncryptionKey ").append(i).append(": ").append(keys.get(i));
+        }
         if (isOffline()) {
             buf.append("\n\tTransient Key: ").append(_transientSigningPublicKey);
             buf.append("\n\tTransient Expires: ").append(new java.util.Date(_transientExpires));
             buf.append("\n\tOffline Signature: ").append(_offlineSignature);
         }
         buf.append("\n\tOptions: ").append((_options != null) ? _options.size() : 0);
+        if (_options != null && !_options.isEmpty()) {
+            for (Map.Entry<Object, Object> e : _options.entrySet()) {
+                String key = (String) e.getKey();
+                String val = (String) e.getValue();
+                buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
+            }
+        }
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));
@@ -423,10 +558,10 @@ public class LeaseSet2 extends LeaseSet {
         PrivateKeyFile pkf = new PrivateKeyFile(f);
         pkf.createIfAbsent(SigType.EdDSA_SHA512_Ed25519);
         System.out.println("Online test");
-        java.io.File f2 = new java.io.File("online-leaseset.dat");
+        java.io.File f2 = new java.io.File("online-ls2.dat");
         test(pkf, f2, false);
         System.out.println("Offline test");
-        f2 = new java.io.File("offline-leaseset.dat");
+        f2 = new java.io.File("offline-ls2.dat");
         test(pkf, f2, true);
     }
 
@@ -452,10 +587,21 @@ public class LeaseSet2 extends LeaseSet {
         ls2.setDestination(pkf.getDestination());
         SimpleDataStructure encKeys[] = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys();
         PublicKey pubKey = (PublicKey) encKeys[0];
-        ls2.setEncryptionKey(pubKey);
+        ls2.addEncryptionKey(pubKey);
+        net.i2p.crypto.KeyPair encKeys2 = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys(net.i2p.crypto.EncType.ECIES_X25519);
+        pubKey = encKeys2.getPublic();
+        ls2.addEncryptionKey(pubKey);
+        byte[] b = new byte[99];
+        rand.nextBytes(b);
+        pubKey = new PublicKey(77, b);
+        ls2.addEncryptionKey(pubKey);
+        b = new byte[55];
+        rand.nextBytes(b);
+        pubKey = new PublicKey(177, b);
+        ls2.addEncryptionKey(pubKey);
         SigningPrivateKey spk = pkf.getSigningPrivKey();
         if (offline) {
-            now += 100000;
+            now += 365*24*60*60*1000L;
             SimpleDataStructure transKeys[] = net.i2p.crypto.KeyGenerator.getInstance().generateSigningKeys(SigType.EdDSA_SHA512_Ed25519);
             SigningPublicKey transientPub = (SigningPublicKey) transKeys[0];
             SigningPrivateKey transientPriv = (SigningPrivateKey) transKeys[1];
@@ -474,6 +620,8 @@ public class LeaseSet2 extends LeaseSet {
         ls2.writeBytes(out2);
         out2.close();
         java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(out.toByteArray());
+        System.out.println("Size calculated: " + (ls2.size() + ls2.getSignature().length()));
+        System.out.println("Size to read in: " + in.available());
         LeaseSet2 ls3 = new LeaseSet2();
         ls3.readBytes(in);
         System.out.println("Read back: " + ls3);

@@ -393,10 +393,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
     </target>
 
-    <target name="buildDesktopGui" depends="buildCore, buildrouter" >
-<!--
-        <ant dir="apps/desktopgui" target="clean" />
--->
+    <target name="buildDesktopGui" depends="buildCore, buildrouter, buildSystray" >
         <ant dir="apps/desktopgui" target="jar" />
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
     </target>
@@ -830,10 +827,10 @@
             additionalparam="-notimestamp"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:org.json.simple.*" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:org.json.simple.*:com.southernstorm.noise.crypto.x25519" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.*:com.southernstorm.noise.*" />
-            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
+            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:net.i2p.router.sybil:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook:net.i2p.router.naming:net.metanotion:net.metanotion.*" />
             <group title="BOB Bridge" packages="net.i2p.BOB" />
@@ -1333,7 +1330,6 @@
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
-        <copy file="installer/resources/systray.config" todir="pkg-temp/" />
         <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
         <copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
@@ -1450,10 +1446,17 @@
     </target>
 
     <!-- SSL Certs -->
-    <target name="prepCertificates">
+    <target name="prepCertificates" depends="buildCore">
         <copy todir="pkg-temp/certificates/" >
           <fileset dir="installer/resources/certificates/" />
         </copy>
+        <java classname="net.i2p.crypto.CertUtil" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="checkall" />
+            <arg value="pkg-temp/certificates" />
+        </java>
     </target>
 
     <condition property="no.bundle.routerInfos">

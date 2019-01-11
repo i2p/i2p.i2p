@@ -146,12 +146,14 @@ class SAMStreamSession implements SAMMessageSess {
         allprops.putAll(props);
 
         String i2cpHost = allprops.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
-        int i2cpPort = 7654;
-        String port = allprops.getProperty(I2PClient.PROP_TCP_PORT, "7654");
-        try {
-            i2cpPort = Integer.parseInt(port);
-        } catch (NumberFormatException nfe) {
-            throw new SAMException("Invalid I2CP port specified [" + port + "]");
+        int i2cpPort = I2PClient.DEFAULT_LISTEN_PORT;
+        String sport = allprops.getProperty(I2PClient.PROP_TCP_PORT);
+        if (sport != null) {
+            try {
+                i2cpPort = Integer.parseInt(sport);
+            } catch (NumberFormatException nfe) {
+                throw new SAMException("Invalid I2CP port specified [" + sport + "]");
+            }
         }
         if (!canReceive)
             allprops.setProperty("i2cp.dontPublishLeaseSet", "true");

@@ -28,8 +28,6 @@ public class WizardHandler extends FormHandler {
 
     @Override
     protected void processForm() {
-        if (_action == null)
-            return;
         if (getJettyString("cancelbw") != null) {
             cancelNDT();
             for (int i = 0; i < 20 && !_helper.isNDTComplete(); i++) {

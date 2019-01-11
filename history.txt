@@ -1,3 +1,105 @@
+2019-01-09 zzz
+ * Console: Fix broken image link on /configui
+ * I2CP: Stub out client-side creation of meta and enc. LS2
+ * Wrapper: Increase default heap to 256 MB
+
+2019-01-05 zzz
+ * Crypto: Stub out EdDSA blinding (proposal 123)
+
+2019-01-04 zzz
+ * Build: Check cert validity
+ * Data: Add type byte to MetaLease (proposal 123)
+ * NetDb: Prevent ISJ deadlock (ticket #2366)
+ * Router: Reseed updates
+
+2019-01-02 zzz
+ * Console: Wizard styling (ticket #1473)
+ * Data: Encrypted LS2 progress (proposal 123)
+
+2019-01-01 zzz
+ * Console:
+   - New light background (ticket #738)
+   - Add warning for OpenJDK Zero VM
+ * Data:
+   - Add support for LS2 multiple encryption keys (proposal 123)
+   - Fix Meta LS2 bugs (proposal 123)
+ * Debian: Remove obsolete systray.config
+ * NBI: Add lookup tables for ARMv8
+
+2018-12-24 zzz
+ * Console: Update ARM warning (ticket #2368)
+
+2018-12-23 zzz
+ * Console: Sybil tool background analysis setup form
+
+2018-12-21 zzz
+ * Transports: Improve banning of routers from wrong network
+
+2018-12-19 zzz
+ * NTCP: Efficiency improvements (ticket #2355)
+
+2018-12-17 zzz
+ * Console: Sybil tool background analysis
+ * Data: Set encrypted LS2 hash (proposal 123)
+ * GeoIP: Fix NPE (thx parg)
+ * NTCP: Use new HKDF class
+
+2018-12-15 zzz
+ * Console: Sybil tool refactoring
+
+2018-12-13 zzz
+ * Crypto: Add HKDF class for LS2 and NTCP2 (proposal 123)
+
+2018-12-12 zzz
+ * DTG: Use UrlLauncher to launch browser
+ * Installer: Drop unused systray.config
+ * UrlLauncher: Improvements and cleanups
+ * Util: Add another ShellCommand String[] method
+
+2018-12-11 zzz
+ * Crypto: HMAC-SHA256 cleanup
+ * Debian: Add conffiles list
+ * Utils: Enable TLSv1.3 for SSL sockets
+
+2018-12-08 zzz
+ * Console: Hide I2CP config if disabled
+ * NetDb: Allow longer expiration for Meta LS2
+ * Transport:
+   - Don't repeatedly publish RI if IPv6-only but
+     not configured IPv6-only
+   - Don't set status to disconnected if IPv6-only but
+     not configured IPv6-only
+
+2018-12-05 zzz
+ * I2CP:
+   - Propagate error from disconnect message to session listener
+   - Set offline keys in generated LS2
+   - Set and validate offline sig in SessionConfig
+
+2018-12-04 zzz
+ * Data: Add preliminary PrivateKeyFile support for LS2 offline keys (proposal #123)
+ * I2CP: Add preliminary support for LS2 offline keys (proposal #123)
+
+2018-12-03 zzz
+ * I2CP: Consolidate all the port 7654 definitions
+ * NetDb: Don't send our RI in response to DSM when shutting down
+ * Wizard: Update text
+
+2018-12-02 zzz
+ * Router: Allow LS2 DSM down a tunnel
+ * Transport: Add methods to force-disconnect a peer
+
+2018-12-01 zzz
+ * I2CP: Add preliminary support for LS2 (proposal #123)
+ * Router: More support for LS2 types (proposal #123)
+
+2018-11-30 zzz
+ * Crypto: Move X25519 primitives from router to core (proposal #144)
+ * Data: Update LS2 sign/verify to match spec changes (proposal #123)
+
+2018-11-25 zzz
+ * Utils: Catch ProviderException in SelfSignedGenerator (ticket #2344)
+
 2018-11-20 zzz
  * GeoIP: Add support for Maxmind GeoLite2 format (ticket #2268)
 

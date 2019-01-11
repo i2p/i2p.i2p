@@ -70,8 +70,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         Hash key = _message.getKey();
         DatabaseEntry entry = _message.getEntry();
         int type = entry.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET ||
-            type == DatabaseEntry.KEY_TYPE_LS2) {
+        if (DatabaseEntry.isLeaseSet(type)) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of leaseset " + _message);
@@ -253,7 +252,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         TunnelId replyTunnel = _message.getReplyTunnel();
         // A store of our own RI, only if we are not FF
         DatabaseStoreMessage msg2;
-        if ((getContext().netDb().floodfillEnabled() && !getContext().router().gracefulShutdownInProgress()) ||
+        if (getContext().netDb().floodfillEnabled() ||
             storedKey.equals(getContext().routerHash())) {
             // don't send our RI if the store was our RI (from PeerTestJob)
             msg2 = null;

@@ -26,10 +26,10 @@ import net.i2p.data.SigningPrivateKey;
  */
 public class CreateLeaseSetMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 4;
-    private SessionId _sessionId;
-    private LeaseSet _leaseSet;
-    private SigningPrivateKey _signingPrivateKey;
-    private PrivateKey _privateKey;
+    protected SessionId _sessionId;
+    protected LeaseSet _leaseSet;
+    protected SigningPrivateKey _signingPrivateKey;
+    protected PrivateKey _privateKey;
 
     public CreateLeaseSetMessage() {
     }

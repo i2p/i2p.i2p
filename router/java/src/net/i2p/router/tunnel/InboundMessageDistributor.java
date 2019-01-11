@@ -154,7 +154,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         _log.error("Dropping DSM w/ reply token down a expl. tunnel: " + msg);
                         return;
                     }
-                    if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET)
+                    if (dsm.getEntry().isLeaseSet())
                         ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
                     break;
 
@@ -249,7 +249,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         dsm.setReplyTunnel(null);
                         dsm.setReplyGateway(null);
 
-                            if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+                            if (dsm.getEntry().isLeaseSet()) {
                                     // Case 1:
                                     // store of our own LS.
                                     // This is almost certainly a response to a FloodfillVerifyStoreJob search.

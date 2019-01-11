@@ -20,20 +20,11 @@ class RouterRunner: NSObject {
   var currentRunningProcess: Subprocess?
   var currentProcessResults: ExecutionResult?
   
-  let domainLabel = "net.i2p.macosx.I2PRouter"
+  let domainLabel = String(NSString(format: "%@.I2PRouter", APPDOMAIN))
   
-  let plistName = "net.i2p.macosx.I2PRouter.plist"
+  let plistName = String(NSString(format: "%@.I2PRouter.plist", APPDOMAIN))
   
-  let defaultStartupCommand:String = "/usr/libexec/java_home"
-  
-  let defaultJavaHomeArgs:[String] = [
-    "-v",
-    "1.7+",
-    "--exec",
-    "java",
-  ]
-  
-  let appSupportPath = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
+  //let appSupportPath = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
   
   override init() {
     super.init()
@@ -59,22 +50,24 @@ class RouterRunner: NSObject {
   
   func SetupAndReturnAgent() -> LaunchAgent {
     
+    let applicationsSupportPath: URL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+    
     let defaultStartupFlags:[String] = [
-      "-Xmx512M",
-      "-Xms128m",
       "-Djava.awt.headless=true",
-      "".appendingFormat("-Di2p.base.dir=%@", NSHomeDirectory()+"/Library/I2P"),
-      "".appendingFormat("-Dwrapper.logfile=%@/Library/I2P/router.log", NSHomeDirectory()),
-      "-Dwrapper.logfile.loglevel=DEBUG",
-      "".appendingFormat("-Dwrapper.java.pidfile=%@/i2p/router.pid", appSupportPath.description),
+      "".appendingFormat("-Di2p.base.dir=%@", Preferences.shared().i2pBaseDirectory),
+      "".appendingFormat("-Dwrapper.logfile=%@/i2p/router.log", applicationsSupportPath.absoluteString),
+      "".appendingFormat("-Dwrapper.java.pidfile=%@/i2p/router.pid", applicationsSupportPath.absoluteString),
+      "-Dwrapper.logfile.loglevel=DEBUG", // TODO: Allow loglevel to be set from Preferences?
       "-Dwrapper.console.loglevel=DEBUG",
       "net.i2p.router.Router"
     ]
     
-    self.daemonPath = self.defaultStartupCommand
+    let javaCliArgs = Preferences.shared().javaCommandPath.splitByWhitespace()
+    
+    self.daemonPath = javaCliArgs[0]
     self.arguments = defaultStartupFlags.joined(separator: " ")
     
-    let basePath = NSHomeDirectory()+"/Library/I2P"
+    let basePath = Preferences.shared().i2pBaseDirectory
     
     let jars = try! FileManager.default.contentsOfDirectory(atPath: basePath+"/lib")
     var classpath:String = "."
@@ -85,19 +78,21 @@ class RouterRunner: NSObject {
     var cliArgs:[String] = [
       self.daemonPath!,
       ]
-    cliArgs.append(contentsOf: self.defaultJavaHomeArgs)
+    cliArgs.append(contentsOf: javaCliArgs.dropFirst())
     cliArgs.append(contentsOf: [
       "-cp",
       classpath,
       ])
+    // This allow java arguments to be passed from the settings
+    cliArgs.append(contentsOf: Preferences.shared().javaCommandOptions.splitByWhitespace())
     cliArgs.append(contentsOf: defaultStartupFlags)
     let agent = LaunchAgent(label: self.domainLabel,program: cliArgs)
     agent.launchOnlyOnce = false
     agent.keepAlive = false
     agent.workingDirectory = basePath
     agent.userName = NSUserName()
-    agent.standardErrorPath = NSHomeDirectory()+"/Library/Logs/I2P/router.stderr.log"
-    agent.standardOutPath = NSHomeDirectory()+"/Library/Logs/I2P/router.stdout.log"
+    agent.standardErrorPath = NSString(format: "%@/router.stderr.log", Preferences.shared().i2pLogDirectory) as String
+    agent.standardOutPath = NSString(format: "%@/router.stdout.log", Preferences.shared().i2pLogDirectory) as String
     agent.environmentVariables = [
       "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
       "I2PBASE": basePath,
@@ -106,12 +101,12 @@ class RouterRunner: NSObject {
     agent.processType = ProcessType.adaptive
     RouterRunner.launchAgent = agent
     
-    let userPreferences = UserDefaults.standard
-    let shouldStartupAtLogin = userPreferences.bool(forKey: "startRouterAtLogin")
-    agent.runAtLoad = shouldStartupAtLogin
+    // NOTE: I suspect this is better to solve in the application
+    agent.runAtLoad = false //Preferences.shared().startRouterOnLauncherStart
     agent.keepAlive = true
     DispatchQueue(label: "background_starter").async {
       do {
+        // TODO: Find a better way than sleep
         try LaunchAgentManager.shared.write(agent, called: self.plistName)
         sleep(1)
         try LaunchAgentManager.shared.load(agent)
@@ -140,11 +135,15 @@ class RouterRunner: NSObject {
   
   
   func StartAgent(_ information:Any? = nil) {
-    let agent = RouterRunner.launchAgent ?? information as! LaunchAgent
-    DispatchQueue(label: "background_block").async {
-      LaunchAgentManager.shared.start(agent, { (proc) in
-        NSLog("Will call onLaunchdStarted")
-      })
+    if (RouterManager.shared().checkIfRouterCanStart()) {
+      let agent = RouterRunner.launchAgent ?? information as! LaunchAgent
+      DispatchQueue(label: "background_block").async {
+        LaunchAgentManager.shared.start(agent, { (proc) in
+          NSLog("Will call onLaunchdStarted")
+        })
+      }
+    } else {
+      SBridge.sendUserNotification("Whops! Please wait", formattedMsg: "I'm sorry but it's still something unresolved before we can start the I2P router. Please wait.")
     }
   }
   

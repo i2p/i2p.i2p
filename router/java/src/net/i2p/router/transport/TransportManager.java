@@ -556,6 +556,17 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
+     * Tell the transports to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    void forceDisconnect(Hash peer) {
+        for (Transport t : _transports.values()) {
+             t.forceDisconnect(peer);
+        }
+    }
+    
+    /**
      * Was the peer UNreachable (outbound only) on any transport,
      * based on the last time we tried it for each transport?
      * This is NOT reset if the peer contacts us.

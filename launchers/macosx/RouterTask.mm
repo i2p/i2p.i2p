@@ -63,8 +63,8 @@
 }
 
 - (void) requestRestart
-{
-    self.userRequestedRestart = YES;
+
+{    self.userRequestedRestart = YES;
     kill([self.routerTask processIdentifier], SIGHUP);
 }
 
@@ -84,7 +84,9 @@
 	{
 		NSLog(@"Expection occurred %@", [e reason]);
     self.isRouterRunning = NO;
+    
     [[[RouterProcessStatus alloc] init] triggerEventWithEn:@"router_exception" details:[e reason]];
+    
     [[SBridge sharedInstance] setCurrentRouterInstance:nil];
     sendUserNotification(@"An error occured, can't start the I2P Router", [e reason]);
     return 0;

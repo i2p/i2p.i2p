@@ -9,8 +9,8 @@ body {
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #33333f;
      font-size: 9pt;
-     background: #a4a4cb url(images/tile2.png) fixed;
-     background-size: 32px 32px;
+     background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
+     background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
 }
 
 body.iframed {

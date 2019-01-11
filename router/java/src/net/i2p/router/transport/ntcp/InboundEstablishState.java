@@ -573,6 +573,38 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     }
 
     /**
+     *  Validate network ID, NTCP 2 only.
+     *  Call after receiving Alice's RouterInfo,
+     *  but before storing it in the netdb.
+     *
+     *  Side effects: When returning false, sets _msg3p2FailReason,
+     *  banlists permanently and blocklists
+     *
+     *  @return success
+     *  @since 0.9.38
+     */
+    private boolean verifyInboundNetworkID(RouterInfo alice) {
+        int aliceID = alice.getNetworkId();
+        boolean rv = aliceID == _context.router().getNetworkID();
+        if (!rv) {
+            Hash aliceHash = alice.getHash();
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping inbound connection from wrong network: " + aliceID + ' ' + aliceHash);
+            // So next time we will not accept the con from this IP,
+            // rather than doing the whole handshake
+            InetAddress addr = _con.getChannel().socket().getInetAddress();
+            if (addr != null) {
+                byte[] ip = addr.getAddress();
+                _context.blocklist().add(ip);
+            }
+            _context.banlist().banlistRouterForever(aliceHash, "Not in our network: " + aliceID);
+            _transport.markUnreachable(aliceHash);
+            _msg3p2FailReason = NTCPConnection.REASON_BANNED;
+        }
+        return rv;
+    }
+
+    /**
      *  We are Bob. Send message #4 to Alice.
      *
      *  State must be VERIFIED.
@@ -988,6 +1020,9 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         boolean ok = verifyInbound(h);
         if (!ok)
             throw new DataFormatException("NTCP2 verifyInbound() fail");
+        ok = verifyInboundNetworkID(ri);
+        if (!ok)
+            throw new DataFormatException("NTCP2 network ID mismatch");
         try {
             RouterInfo old = _context.netDb().store(h, ri);
             if (flood && !ri.equals(old)) {

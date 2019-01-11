@@ -20,6 +20,9 @@ class PopoverViewController: NSViewController {
     super.init(coder: coder)
   }
   
+  @IBAction func onPreferencesClick(_ sender: Any) {
+    StatusBarController.launchPreferences(sender)
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()

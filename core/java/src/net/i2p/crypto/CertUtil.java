@@ -558,7 +558,7 @@ public final class CertUtil {
 
     public static final void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Usage: [loadcert | loadcrl | loadcrldir | loadcrldirs | isrevoked | loadprivatekey] file");
+            System.out.println("Usage: [loadcert | loadcrl | loadcrldir | loadcrldirs | isrevoked | loadprivatekey | checkall] file");
             System.exit(1);
         }
         try {
@@ -580,13 +580,87 @@ public final class CertUtil {
                 Certificate cert = loadCert(f);
                 boolean rv = isRevoked(I2PAppContext.getGlobalContext(), cert);
                 System.out.println("Revoked? " + rv);
+            } else if (args[0].equals("checkall")) {
+                int rv = checkAll(f);
+                //System.exit(rv);
             } else {
-                System.out.println("Usage: [loadcert | loadcrl | loadprivatekey] file");
+                System.out.println("Usage: [loadcert | loadcrl | loadcrldir | loadcrldirs | isrevoked | loadprivatekey | checkall] file");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    // threshold for warning
+    private static final long CHECK = 120*24*60*60*1000L;
+
+    /**
+     *  For use in the build process.
+     *
+     *  @return 0 for success, nonzero for failure
+     *  @since 0.9.38
+     */
+    private static int checkAll(File dir) {
+        int good = 0;
+        int soon = 0;
+        int bad = 0;
+        Set<X509CRL> crls = new HashSet<X509CRL>(8);
+        File rdir = new File(dir, REVOCATION_DIR);
+        loadCRLs(crls, rdir);
+        //System.out.println("Loaded " + crls.size() + " CRLs");
+        CollectionCertStoreParameters ccsp = new CollectionCertStoreParameters(crls);
+        CertStore store;
+        try {
+            store = CertStore.getInstance("Collection", ccsp);
+        } catch (GeneralSecurityException gse) {
+            // shouldn't happen
+            error("CertStore", gse);
+            throw new UnsupportedOperationException(gse);
+        }
+        long now = System.currentTimeMillis();
+        File[] dirs = dir.listFiles();
+        if (dirs != null) {
+            for (int i = 0; i < dirs.length; i++) {
+                File d = dirs[i];
+                if (!d.isDirectory())
+                    continue;
+                if (d.getName().equals(REVOCATION_DIR))
+                    continue;
+                File[] files = d.listFiles(new FileSuffixFilter(".crt"));
+                if (files != null) {
+                    for (int j = 0; j < files.length; j++) {
+                        File f = files[j];
+                        try {
+                            X509Certificate cert = loadCert(f);
+                            if (isRevoked(store, cert)) {
+                                System.out.println("ERROR: Revoked cert " + f);
+                                bad++;
+                                continue;
+                            }
+                            long exp = cert.getNotAfter().getTime() - now;
+                            if (exp < CHECK) {                            
+                                System.out.println("**** WARNING: Cert " + f + " expires in " + DataHelper.formatDuration(exp));
+                                soon++;
+                            } else {
+                                good++;
+                            }
+                        } catch (IOException ioe) {
+                            System.out.println("**** ERROR: Cannot load cert from " + f + ": " + ioe);
+                            bad++;
+                        } catch (java.security.cert.CertificateExpiredException cee) {
+                            System.out.println("**** WARNING: Cert expired " + f + ": " + cee);
+                            bad++;
+                        } catch (GeneralSecurityException gse) {
+                            System.out.println("**** ERROR: Cannot load cert from " + f + ": " + gse);
+                            bad++;
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("Found " + good + " valid certs, " + bad + " bad certs, " + soon + " about to expire certs");
+        return (bad > 0) ? 1 : 0;
     }
 }

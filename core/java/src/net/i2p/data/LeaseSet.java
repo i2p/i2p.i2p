@@ -142,9 +142,8 @@ public class LeaseSet extends DatabaseEntry {
 
     /**
      *  The revocation key.
-     *  @deprecated unused
+     *  Undeprecated as of 0.9.38, used for the blinded key in EncryptedLeaseSet.
      */
-    @Deprecated
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
@@ -187,7 +186,8 @@ public class LeaseSet extends DatabaseEntry {
     public void addLease(Lease lease) {
         if (lease == null) throw new IllegalArgumentException("erm, null lease");
         if (lease.getGateway() == null) throw new IllegalArgumentException("erm, lease has no gateway");
-        if (lease.getTunnelId() == null) throw new IllegalArgumentException("erm, lease has no tunnel");
+        if (getType() != KEY_TYPE_META_LS2 && lease.getTunnelId() == null)
+            throw new IllegalArgumentException("erm, lease has no tunnel");
         if (_signature != null)
             throw new IllegalStateException();
         if (_leases.size() >= MAX_LEASES)

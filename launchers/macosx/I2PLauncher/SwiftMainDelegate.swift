@@ -52,9 +52,8 @@ class Logger {
   } // End of init()
   
   @objc func findInstalledI2PVersion() {
-    var i2pPath = NSHomeDirectory()
-    i2pPath += "/Library/I2P"
-    let jExecPath:String = "/usr/libexec/java_home -v 1.7+ --exec java "
+    var i2pPath = Preferences.shared().i2pBaseDirectory
+    let jExecPath:String = Preferences.shared().javaCommandPath
     
     let jarPath = i2pPath + "/lib/i2p.jar"
     
@@ -81,7 +80,35 @@ class Logger {
     }
   }
   
+  func triggerDockIconShowHide(showIcon state: Bool) -> Bool {
+    var result: Bool
+    if state {
+      result = NSApp.setActivationPolicy(NSApplicationActivationPolicy.regular)
+    } else {
+      result = NSApp.setActivationPolicy(NSApplicationActivationPolicy.accessory)
+    }
+    return result
+  }
+  
+  func getDockIconStateIsShowing() -> Bool {
+    if NSApp.activationPolicy() == NSApplicationActivationPolicy.regular {
+      return true
+    } else {
+      return false
+    }
+  }
+  
   @objc func applicationDidFinishLaunching() {
+    switch Preferences.shared().showAsIconMode {
+    case .bothIcon, .dockIcon:
+      if (!getDockIconStateIsShowing()) {
+        triggerDockIconShowHide(showIcon: true)
+      }
+    default:
+      if (getDockIconStateIsShowing()) {
+        triggerDockIconShowHide(showIcon: false)
+      }
+    }
   }
   
   @objc func listenForEvent(eventName: String, callbackActionFn: @escaping ((Any?)->()) ) {
@@ -99,8 +126,7 @@ class Logger {
   
   @objc func applicationWillTerminate() {
     // Shutdown stuff
-    let userPreferences = UserDefaults.standard
-    if (!userPreferences.bool(forKey: "letRouterLiveEvenLauncherDied")) {
+    if (Preferences.shared().stopRouterOnLauncherShutdown) {
       RouterManager.shared().routerRunner.TeardownLaunchd()
       sleep(2)
       let status: AgentStatus? = RouterRunner.launchAgent?.status()

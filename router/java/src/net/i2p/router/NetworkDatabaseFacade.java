@@ -40,6 +40,14 @@ public abstract class NetworkDatabaseFacade implements Service {
      *  @since 0.8.3
      */
     public abstract DatabaseEntry lookupLocally(Hash key);
+    
+    /**
+     *  Not for use without validation
+     *  @return RouterInfo, LeaseSet, or null, NOT validated
+     *  @since 0.9.38
+     */
+    public abstract DatabaseEntry lookupLocallyWithoutValidation(Hash key);
+
     public abstract void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs);
     
     /**

@@ -34,6 +34,7 @@ import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
 import net.i2p.router.news.NewsManager;
+import net.i2p.router.sybil.Analysis;
 import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileSuffixFilter;
@@ -342,9 +343,10 @@ public class RouterConsoleRunner implements RouterApp {
         boolean noJava7 = !SystemVersion.isJava7();
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
-        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
-        boolean isJava11 = SystemVersion.isJava11();
-        if (noJava7 || noPack200 || openARM || isJava11) {
+        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
+        boolean isZero = SystemVersion.isZeroVM();
+        boolean isJava11 = false; // SystemVersion.isJava11();
+        if (noJava7 || noPack200 || openARM || isZero || isJava11) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -363,15 +365,20 @@ public class RouterConsoleRunner implements RouterApp {
                 System.out.println("Warning: " + s);
             }
             if (openARM) {
-                s = "OpenJDK is not recommended for ARM. Use Oracle Java 8";
+                s = "OpenJDK 7/8 are not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
-            if (isJava11) {
-                s = "Java 11+ support is beta, and not recommended for general use";
+            if (isZero) {
+                s = "OpenJDK Zero is a very slow interpreter-only JVM. Not recommended for use with I2P. Please use a faster JVM if possible.";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
+            //if (isJava11) {
+            //    s = "Java 11+ support is beta, and not recommended for general use";
+            //    log.logAlways(net.i2p.util.Log.WARN, s);
+            //    System.out.println("Warning: " + s);
+            //}
         }
     }
 
@@ -865,6 +872,13 @@ public class RouterConsoleRunner implements RouterApp {
             if (_mgr == null)
                 _context.addShutdownTask(new ServerShutdown());
             ConfigServiceHandler.registerSignalHandler(_context);
+
+            if (_mgr != null &&
+                _context.getBooleanProperty(HelperBase.PROP_ADVANCED) &&
+                _context.getProperty(Analysis.PROP_FREQUENCY, 0L) > 0) {
+                // registers and starts itself
+                Analysis.getInstance(_context);
+            }
     }
     
     /**

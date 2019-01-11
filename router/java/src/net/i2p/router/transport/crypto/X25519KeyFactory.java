@@ -1,11 +1,14 @@
 package net.i2p.router.transport.crypto;
 
-import java.security.KeyPair;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.southernstorm.noise.crypto.Curve25519;
+import com.southernstorm.noise.crypto.x25519.Curve25519;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
+import net.i2p.crypto.KeyPair;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -37,7 +40,7 @@ public class X25519KeyFactory extends I2PThread {
     private final static int DEFAULT_DH_PRECALC_DELAY = 25;
 
     public X25519KeyFactory(I2PAppContext ctx) {
-        super("DH Precalc");
+        super("XDH Precalc");
         _context = ctx;
         _log = ctx.logManager().getLog(X25519KeyFactory.class);
         ctx.statManager().createRateStat("crypto.XDHGenerateTime", "How long it takes to create x and X", "Encryption", new long[] { 60*60*1000 });
@@ -133,7 +136,7 @@ public class X25519KeyFactory extends I2PThread {
         } while (priv[31] == 0);
         byte[] pub = new byte[32];
         Curve25519.eval(pub, 0, priv, null);
-        KeyPair rv = new KeyPair(new X25519PublicKey(pub), new X25519PrivateKey(priv));
+        KeyPair rv = new KeyPair(new PublicKey(EncType.ECIES_X25519, pub), new PrivateKey(EncType.ECIES_X25519, priv));
         long end = System.currentTimeMillis();
         long diff = end - start;
         _context.statManager().addRateData("crypto.XDHGenerateTime", diff);

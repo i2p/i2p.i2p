@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException; 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -45,6 +46,14 @@ import net.i2p.util.SecureFileOutputStream;
  *     - Certificate if length != 0
  *  - Private key (256 bytes)
  *  - Signing Private key (20 bytes, or length specified by key certificate)
+ *  - As of 0.9.38, if the Signing Private Key is all zeros,
+ *    the offline signature section (see proposal 123):
+ *     - Expires timestamp (4 bytes, seconds since epoch, rolls over in 2106)
+ *     - Sig type of transient public key (2 bytes)
+ *     - Transient Signing Public key (length as specified by transient sig type)
+ *     - Signature of Signed Public key by offline key (length as specified by destination sig type)
+ *     - Transient Signing Private key (length as specified by transient sig type)
+ *
  * Total: 663 or more bytes
  *</pre>
  *
@@ -60,6 +69,10 @@ public class PrivateKeyFile {
     protected Destination dest;
     protected PrivateKey privKey;
     protected SigningPrivateKey signingPrivKey; 
+    private long _offlineExpiration;
+    private Signature _offlineSignature;
+    private SigningPrivateKey _transientSigningPrivKey; 
+    private SigningPublicKey _transientSigningPubKey; 
 
     /**
      *  Create a new PrivateKeyFile, or modify an existing one, with various
@@ -75,10 +88,13 @@ public class PrivateKeyFile {
     public static void main(String args[]) {
         int hashEffort = HASH_EFFORT;
         String stype = null;
+        String ttype = null;
         String hostname = null;
+        String offline = null;
+        int days = 365;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:");
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -109,8 +125,24 @@ public class PrivateKeyFile {
                     error = true;
                 break;
 
+            case 'o':
+                offline = g.getOptarg();
+                if (mode == 0)
+                    mode = c;
+                else
+                    error = true;
+                break;
+
             case 'e':
                 hashEffort = Integer.parseInt(g.getOptarg());
+                break;
+
+            case 'd':
+                days = Integer.parseInt(g.getOptarg());
+                break;
+
+            case 'r':
+                ttype = g.getOptarg();
                 break;
 
             case '?':
@@ -132,7 +164,8 @@ public class PrivateKeyFile {
         I2PClient client = I2PClientFactory.createClient();
 
         try {
-            File f = new File(filearg);
+            String orig = offline != null ? offline : filearg;
+            File f = new File(orig);
             boolean exists = f.exists();
             PrivateKeyFile pkf = new PrivateKeyFile(f, client);
             Destination d;
@@ -179,13 +212,16 @@ public class PrivateKeyFile {
                 break;
 
               case 's':
+              {
                 // Sign dest1 with dest2's Signing Private Key
                 PrivateKeyFile pkf2 = new PrivateKeyFile(args[g.getOptind() + 1]);
                 pkf.setSignedCert(pkf2);
                 System.out.println("New destination with signed cert is:");
                 break;
+              }
 
               case 't':
+              {
                 // KeyCert
                 SigType type = SigType.parseSigType(stype);
                 if (type == null)
@@ -193,8 +229,10 @@ public class PrivateKeyFile {
                 pkf.setKeyCert(type);
                 System.out.println("New destination with key cert is:");
                 break;
+              }
 
               case 'a':
+              {
                 // addressbook auth
                 OrderedProperties props = new OrderedProperties();
                 HostTxtEntry he = new HostTxtEntry(hostname, d.toBase64(), props);
@@ -205,6 +243,50 @@ public class PrivateKeyFile {
                 out.flush();
                 System.out.println("");
                 return;
+              }
+
+              case 'o':
+              {
+                // Sign dest1 with dest2's Signing Private Key
+                File f3 = new File(filearg);
+                // set dummy SPK
+                SigType type = pkf.getSigningPrivKey().getType();
+                byte[] dbytes = new byte[type.getPrivkeyLen()];
+                SigningPrivateKey dummy = new SigningPrivateKey(type, dbytes);
+                PrivateKeyFile pkf2 = new PrivateKeyFile(f3, pkf.getDestination(), pkf.getPrivKey(), dummy);
+                // keygen transient
+                SigType tstype = SigType.EdDSA_SHA512_Ed25519;
+                if (ttype != null) {
+                    tstype = SigType.parseSigType(ttype);
+                    if (tstype == null)
+                        throw new I2PException("Bad or unsupported -r option: " + ttype);
+                }
+                SimpleDataStructure signingKeys[];
+                try {
+                    signingKeys = KeyGenerator.getInstance().generateSigningKeys(tstype);
+                } catch (GeneralSecurityException gse) {
+                    throw new RuntimeException("keygen fail", gse);
+                }
+                SigningPublicKey tSigningPubKey = (SigningPublicKey) signingKeys[0];
+                SigningPrivateKey tSigningPrivKey = (SigningPrivateKey) signingKeys[1];
+                // set expires
+                long expires = System.currentTimeMillis() + (days * 24*60*60*1000L);
+                // sign
+                byte[] data = new byte[4 + 2 + tSigningPubKey.length()];
+                DataHelper.toLong(data, 0, 4, expires / 1000);
+                DataHelper.toLong(data, 4, 2, tstype.getCode());
+                System.arraycopy(tSigningPubKey.getData(), 0, data, 6, tSigningPubKey.length());
+                Signature sign = DSAEngine.getInstance().sign(data, pkf.getSigningPrivKey());
+                if (sign == null)
+                    throw new I2PException("Sig fail");
+                // set the offline block
+                pkf2.setOfflineData(expires, tSigningPubKey, sign, tSigningPrivKey);
+                // write it
+                System.out.println("New destination with offline signature is:");
+                System.out.println(pkf2);
+                pkf2.write();
+                return;
+              }
 
               default:
                 // shouldn't happen
@@ -226,15 +308,22 @@ public class PrivateKeyFile {
     }
 
     private static void usage() {
-        System.err.println("Usage: PrivateKeyFile [-c sigtype] filename (generates if nonexistent, then prints)\n" +
-                           "       PrivateKeyFile -a example.i2p filename (generate addressbook authentication string)\n" +
-                           "       PrivateKeyFile -h filename (generates if nonexistent, adds hashcash cert)\n" +
-                           "       PrivateKeyFile -h -e effort filename (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
-                           "       PrivateKeyFile -n filename (changes to null cert)\n" +
-                           "       PrivateKeyFile -s filename signwithdestfile (generates if nonexistent, adds cert signed by 2nd dest)\n" +
-                           "       PrivateKeyFile -t sigtype filename (changes to KeyCertificate of the given sig type)\n" +
-                           "       PrivateKeyFile -u filename (changes to unknown cert)\n" +
-                           "       PrivateKeyFile -x filename (changes to hidden cert)\n");
+        System.err.println("Usage: PrivateKeyFile filename (generates if nonexistent, then prints)\n" +
+                           "   \ncertificate options:\n" +
+                           "      -h                   (generates if nonexistent, adds hashcash cert)\n" +
+                           "      -n                   (changes to null cert)\n" +
+                           "      -s signwithdestfile  (generates if nonexistent, adds cert signed by 2nd dest)\n" +
+                           "      -u                   (changes to unknown cert)\n" +
+                           "      -x                   (changes to hidden cert)\n" +
+                           "   \nother options:\n" +
+                           "      -a example.i2p       (generate addressbook authentication string)\n" +
+                           "      -d days              (specify expiration in days of offline sig, default 365)\n" +
+                           "      -c sigtype           (specify sig type of destination)\n" +
+                           "      -e effort            (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
+                           "      -o offlinedestfile   (generate the online key file using the offline key file specified)\n" +
+                           "      -r sigtype           (specify sig type of transient key, default Ed25519)\n" +
+                           "      -t sigtype           (changes to KeyCertificate of the given sig type)\n" +
+                           "");
     }
     
     public PrivateKeyFile(String file) {
@@ -358,6 +447,16 @@ public class PrivateKeyFile {
                 this.dest = new VerifiedDestination(s.getMyDestination());
                 this.privKey = s.getDecryptionKey();
                 this.signingPrivKey = s.getPrivateKey();
+                if (s.isOffline()) {
+                    _offlineExpiration = s.getOfflineExpiration();
+                    _transientSigningPubKey = s.getTransientSigningPublicKey();
+                    _offlineSignature = s.getOfflineSignature();
+                    _transientSigningPrivKey = signingPrivKey;
+                    // set dummy SPK
+                    SigType type = dest.getSigningPublicKey().getType();
+                    byte[] dbytes = new byte[type.getPrivkeyLen()];
+                    signingPrivKey = new SigningPrivateKey(type, dbytes);
+                }
             }
         }
         return this.dest;
@@ -480,7 +579,7 @@ public class PrivateKeyFile {
         System.arraycopy(this.dest.getPublicKey().getData(), 0, data, 0, PublicKey.KEYSIZE_BYTES);
         System.arraycopy(this.dest.getSigningPublicKey().getData(), 0, data, PublicKey.KEYSIZE_BYTES, SigningPublicKey.KEYSIZE_BYTES);
         byte[] payload = new byte[Hash.HASH_LENGTH + Signature.SIGNATURE_BYTES];
-        Signature sign = DSAEngine.getInstance().sign(new ByteArrayInputStream(data), spk2);
+        Signature sign = DSAEngine.getInstance().sign(data, spk2);
         if (sign == null)
             return null;
         byte[] sig = sign.getData();
@@ -519,6 +618,91 @@ public class PrivateKeyFile {
         return this.signingPrivKey;
     }
     
+    //// offline methods
+
+    /**
+     *  Constant time
+     *  @since 0.9.38
+     */
+    private static boolean isOffline(SigningPrivateKey spk) {
+        byte b = 0;
+        byte[] data = spk.getData();
+        for (int i = 0; i < data.length; i++) {
+            b |= data[i];
+        }
+        return b == 0;
+    }
+
+    /**
+     *  Does this session have offline and transient keys?
+     *  @since 0.9.38
+     */
+    public boolean isOffline() {
+        return _offlineSignature != null;
+    }
+
+    /**
+     *  Side effect - zeroes out the current signing private key
+     *  @since 0.9.38
+     */
+    public void setOfflineData(long expires, SigningPublicKey transientPub, Signature sig, SigningPrivateKey transientPriv) {
+        if (!isOffline(signingPrivKey)) {
+            SigType type = getSigningPrivKey().getType();
+            byte[] dbytes = new byte[type.getPrivkeyLen()];
+            signingPrivKey = new SigningPrivateKey(type, dbytes);
+        }
+        _offlineExpiration = expires;
+        _transientSigningPubKey = transientPub;
+        _offlineSignature = sig;
+        _transientSigningPrivKey = transientPriv;
+    }
+
+    /**
+     *  @return Java time (ms) or 0 if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public long getOfflineExpiration() {
+        return _offlineExpiration;
+    }
+
+    /**
+     *  @since 0.9.38
+     */
+    public Signature getOfflineSignature() {
+        return _offlineSignature;
+    }
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public SigningPublicKey getTransientSigningPubKey() {
+        try {
+            // call this to force initialization
+            getDestination();
+        } catch (Exception e) {
+            return null;
+        }
+        return _transientSigningPubKey;
+    }
+
+    /**
+     *  @return null on error or if not initialized or does not have offline keys
+     *  @since 0.9.38
+     */
+    public SigningPrivateKey getTransientSigningPrivKey() {
+        try {
+            // call this to force initialization
+            getDestination();
+        } catch (Exception e) {
+            return null;
+        }
+        return _transientSigningPrivKey;
+    }
+
+    //// end offline methods
+
+
     public I2PSession open() throws I2PSessionException, IOException {
         return this.open(new Properties());
     }
@@ -546,6 +730,13 @@ public class PrivateKeyFile {
             this.dest.writeBytes(out);
             this.privKey.writeBytes(out);
             this.signingPrivKey.writeBytes(out);
+            if (isOffline()) {
+                DataHelper.writeLong(out, 4, _offlineExpiration / 1000);
+                DataHelper.writeLong(out, 2, _transientSigningPubKey.getType().getCode());
+                _transientSigningPubKey.writeBytes(out);
+                _offlineSignature.writeBytes(out);
+                _transientSigningPrivKey.writeBytes(out);
+            }
         } finally {
             if (out != null) {
                 try { out.close(); } catch (IOException ioe) {}
@@ -582,8 +773,19 @@ public class PrivateKeyFile {
         s.append("\nPrivate Key: ");
         s.append(this.privKey);
         s.append("\nSigining Private Key: ");
-        s.append(this.signingPrivKey);
-        s.append("\n");
+        if (isOffline()) {
+            s.append("offline\nOffline Signature Expires: ");
+            s.append(new Date(getOfflineExpiration()));
+            s.append("\nTransient Signing Public Key: ");
+            s.append(_transientSigningPubKey);
+            s.append("\nOffline Signature: ");
+            s.append(_offlineSignature);
+            s.append("\nTransient Signing Private Key: ");
+            s.append(_transientSigningPrivKey);
+        } else {
+            s.append(this.signingPrivKey);
+            s.append("\n");
+        }
         return s.toString();
     }
     

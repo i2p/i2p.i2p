@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
@@ -40,7 +41,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     private final RouterContext _context;
     /** note that this is different than the property the client side uses, i2cp.tcp.port */
     public final static String PROP_CLIENT_PORT = "i2cp.port";
-    public final static int DEFAULT_PORT = 7654;
+    public final static int DEFAULT_PORT = I2PClient.DEFAULT_LISTEN_PORT;
     /** note that this is different than the property the client side uses, i2cp.tcp.host */
     public final static String PROP_CLIENT_HOST = "i2cp.hostname";
     public final static String DEFAULT_HOST = "127.0.0.1";

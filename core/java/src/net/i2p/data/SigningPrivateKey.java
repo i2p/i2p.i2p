@@ -11,6 +11,7 @@ package net.i2p.data;
 
 import java.util.Arrays;
 
+import net.i2p.crypto.Blinding;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 
@@ -86,6 +87,17 @@ public class SigningPrivateKey extends SimpleDataStructure {
      */
     public SigningPublicKey toPublic() {
         return KeyGenerator.getSigningPublicKey(this);
+    }
+
+    /**
+     *  Only for SigType EdDSA_SHA512_Ed25519
+     *
+     *  @param h hash of secret data, same length as this key
+     *  @throws UnsupportedOperationException unless supported
+     *  @since 0.9.38
+     */
+    public SigningPrivateKey blind(SimpleDataStructure h) {
+        return Blinding.blind(this, h);
     }
 
     /**

@@ -51,7 +51,7 @@ extension RouterProcessStatus {
   static var isRouterChildProcess : Bool = (RouterManager.shared().getRouterTask() != nil)
   static var routerVersion : String? = Optional.none
   static var routerStartedAt : Date? = Optional.none
-  static var i2pDirectoryPath : String = NSHomeDirectory() + "/Library/I2P"
+  static var i2pDirectoryPath : String = Preferences.shared().i2pBaseDirectory
   
   
 }
