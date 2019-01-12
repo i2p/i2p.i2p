@@ -286,9 +286,10 @@ class OutboundMessageFragments {
                     // if there is nothing left to send.
                     // Otherwise, return the volley to be sent.
                     // Otherwise, wait()
+                    long now = _context.clock().now();
                     while (_iterator.hasNext()) {
                         peer = _iterator.next();
-                        int remaining = peer.finishMessages();
+                        int remaining = peer.finishMessages(now);
                         if (remaining <= 0) {
                             // race with add()
                             _iterator.remove();
