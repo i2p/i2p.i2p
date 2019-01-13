@@ -298,6 +298,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             buf.append("\n\tTransient Expires: ").append(new java.util.Date(_transientExpires));
             buf.append("\n\tOffline Signature: ").append(_offlineSignature);
         }
+        buf.append("\n\tUnpublished? ").append(isUnpublished());
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));
