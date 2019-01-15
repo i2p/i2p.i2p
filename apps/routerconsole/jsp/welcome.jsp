@@ -243,7 +243,7 @@
 </p><p>
 <%=intl._t("Otherwise, the recommended way to browse I2P websites is with a separate profile in the Firefox browser.")%>
 <ol><li><a href="https://www.mozilla.org/firefox/" target="_blank"><%=intl._t("Install Firefox")%></a>
-</li><li><a href="https://geti2p.net/download#windows" target="_blank"><%=intl._t("Install the I2P Firefox profile")%></a>
+</li><li><a href="https://geti2p.net/firefox" target="_blank"><%=intl._t("Install the I2P Firefox profile")%></a>
 </li></ol>
 <%
         } //isWindows()
