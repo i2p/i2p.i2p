@@ -1,3 +1,11 @@
+2019-01-15 zzz
+ * SusiMail:
+   - Fix sending mail with attachments (ticket #2373)
+   - Fix deleting attachments from drafts
+   - Fix dup attachments after clicking add attachment without browsing first
+   - Fix update of draft folder after saving as draft
+   - Change text of add attachment button for clarity
+
 2019-01-13 zzz
  * I2CP: Set LS2 unpublished bit, show in debug output
 

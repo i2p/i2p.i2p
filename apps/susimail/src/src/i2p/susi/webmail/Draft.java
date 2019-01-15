@@ -71,7 +71,7 @@ class Draft extends Mail {
 				String name = DataHelper.getUTF8(b);
 				String type = flds[1];
 				String enc = flds[2];
-				b = Base64.decode(flds[0]);
+				b = Base64.decode(flds[3]);
 				if (b == null)
 					continue;
 				String path = DataHelper.getUTF8(b);
