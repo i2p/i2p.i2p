@@ -10,6 +10,7 @@
 //
 
 import Cocoa
+import ServiceManagement
 
 
 class PreferencesViewController: NSViewController {
@@ -64,6 +65,18 @@ class PreferencesViewController: NSViewController {
     // Update radio buttons to reflect runtime/stored preferences
     self.updateRadioButtonEffect(mode: Preferences.shared().showAsIconMode, withSideEffect: false)
     
+    if (Preferences.shared().stopRouterOnLauncherShutdown) {
+      self.checkboxStopWithLauncher?.state = NSOnState;
+    } else {
+      self.checkboxStopWithLauncher?.state = NSOffState;
+    }
+    if (Preferences.shared().startRouterOnLauncherStart) {
+      self.checkboxStartWithLauncher?.state = NSOnState;
+    } else {
+      self.checkboxStartWithLauncher?.state = NSOffState;
+    }
+    
+    
   }
   
   override func viewDidAppear() {
@@ -110,11 +123,18 @@ class PreferencesViewController: NSViewController {
   // MARK: - Launcher settings functions
   
   @IBAction func checkboxStartLauncherOnOSXStartupClicked(_ sender: NSButton) {
+    let launcherAppId = "net.i2p.bootstrap.macosx.StartupItemApp"
     switch sender.state {
     case NSOnState:
       print("on")
+      Preferences.shared()["I2Pref_startLauncherAtLogin"] = true
+      let success = SMLoginItemSetEnabled(launcherAppId as CFString, true)
+      print("SMLoginItemSetEnabled returned \(success)....")
     case NSOffState:
       print("off")
+      Preferences.shared()["I2Pref_startLauncherAtLogin"] = false
+      let success = SMLoginItemSetEnabled(launcherAppId as CFString, false)
+      print("SMLoginItemSetEnabled returned \(success)....")
     case NSMixedState:
       print("mixed")
     default: break

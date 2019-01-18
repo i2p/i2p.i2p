@@ -18,6 +18,8 @@ import Cocoa
     return Optional.none
   }
   
+  var isFirefoxEnabled = false
+  
   @IBOutlet var routerStatusLabel: NSTextField?
   @IBOutlet var routerVersionLabel: NSTextField?
   @IBOutlet var routerStartedByLabel: NSTextField?
@@ -28,6 +30,7 @@ import Cocoa
   @IBOutlet var quickControlView: NSView?
   @IBOutlet var routerStartStopButton: NSButton?
   @IBOutlet var openConsoleButton: NSButton?
+  @IBOutlet var launchFirefoxButton: NSButton?
   
   
   @objc func actionBtnOpenConsole(_ sender: Any?) {
@@ -77,6 +80,13 @@ import Cocoa
     self.reEnableButton()
   }
   
+  @objc func actionBtnLaunchFirefox(_ sender: Any?) {
+    DispatchQueue.global(qos: .background).async {
+      Swift.print("Starting firefox")
+      FirefoxManager.shared().executeFirefox()
+    }
+  }
+  
   func restartFn() {
     RouterManager.shared().routerRunner.StopAgent({
       sleep(30)
@@ -116,14 +126,30 @@ import Cocoa
     RouterManager.shared().eventManager.listenTo(eventName: "launch_agent_loaded", action: reEnableButton)
   }
   
+  func setupFirefoxBtn() {
+    DispatchQueue.global(qos: .background).async {
+      if (FirefoxManager.shared().IsFirefoxFound() && !self.isFirefoxEnabled) {
+        Swift.print("Enabling Firefox Launch Button")
+        DispatchQueue.main.async {
+          self.isFirefoxEnabled = true
+          self.launchFirefoxButton?.isEnabled = true
+          self.launchFirefoxButton?.isTransparent = false
+          self.launchFirefoxButton?.needsDisplay = true
+          self.launchFirefoxButton?.action = #selector(self.actionBtnLaunchFirefox(_:))
+          self.launchFirefoxButton?.target = self
+        }
+      }
+    }
+  }
+  
   override func viewWillDraw() {
     super.viewWillDraw()
     if (RouterStatusView.instance != nil) {
       RouterStatusView.instance = self
     }
     self.reEnableButton()
-    openConsoleButton!.cell!.action = #selector(self.actionBtnOpenConsole(_:))
-    openConsoleButton!.cell!.target = self
+    openConsoleButton?.cell?.action = #selector(self.actionBtnOpenConsole(_:))
+    openConsoleButton?.cell?.target = self
     
   }
   
@@ -197,6 +223,7 @@ import Cocoa
     let c = NSCoder()
     super.init(coder: c)!
     self.setupObservers()
+    self.setupFirefoxBtn()
     self.toggleSetButtonStart()
     self.reEnableButton()
   }
@@ -204,6 +231,7 @@ import Cocoa
   required init?(coder decoder: NSCoder) {
     super.init(coder: decoder)
     self.setupObservers()
+    self.setupFirefoxBtn()
     self.toggleSetButtonStart()
     self.reEnableButton()
   }

@@ -108,6 +108,14 @@ import Cocoa
     
     RouterManager.shared().eventManager.listenTo(eventName: "toggle_popover", action: event_toggle)
     
+    FirefoxManager.shared().tryAutoDetect()
+    
+    print("Is Firefox found? \(FirefoxManager.shared().IsFirefoxFound())")
+    print("Is Firefox profile extracted at \(Preferences.shared()["I2Pref_firefoxProfilePath"] as! String)? \(FirefoxManager.shared().IsProfileExtracted())")
+    if (!FirefoxManager.shared().IsProfileExtracted()) {
+      FirefoxManager.shared().unzipProfile()
+    }
+    
     if let button = statusItem.button {
       button.image = NSImage(named:"StatusBarButtonImage")
       button.toolTip = "I2P Launch Manager"
