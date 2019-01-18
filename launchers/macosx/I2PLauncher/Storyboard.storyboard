@@ -83,7 +83,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button identifier="startstopRouterButton" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1eu-Qw-TD9" userLabel="start-stop-button">
-                                                        <rect key="frame" x="1" y="175" width="147" height="32"/>
+                                                        <rect key="frame" x="10" y="175" width="126" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Start/Stop Router" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OYN-sS-eQH">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -109,12 +109,21 @@
                                                             <action selector="onPreferencesClick:" target="Ii7-Rb-Ls8" id="xzS-61-nx7"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SQB-9F-cGZ">
+                                                        <rect key="frame" x="10" y="95" width="126" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Launch Firefox" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MDt-Na-H9e">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
                                     </subviews>
                                     <accessibility identifier="routerStatusTabView"/>
                                     <connections>
+                                        <outlet property="launchFirefoxButton" destination="SQB-9F-cGZ" id="Rp9-UH-O8q"/>
                                         <outlet property="openConsoleButton" destination="XZi-oz-5gy" id="6xH-8v-63j"/>
                                         <outlet property="quickControlView" destination="D8V-d8-0wT" id="4to-rN-2eL"/>
                                         <outlet property="routerPIDLabel" destination="bmP-Ui-gyo" id="x5L-c1-yja"/>
