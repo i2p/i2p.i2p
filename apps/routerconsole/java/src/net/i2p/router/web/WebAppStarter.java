@@ -139,8 +139,11 @@ public class WebAppStarter {
         if (classNames.length == 0)
             classNames = wac.getDefaultConfigurationClasses();
         String[] newClassNames = new String[classNames.length + 1];
-        for (int j = 0; j < classNames.length; j++)
+        for (int j = 0; j < classNames.length; j++) {
              newClassNames[j] = classNames[j];
+             // fix for Jetty 9.4 ticket #2385
+             wac.prependServerClass("-" + classNames[j]);
+        }
         newClassNames[classNames.length] = WebAppConfiguration.class.getName();
         wac.setConfigurationClasses(newClassNames);
     }

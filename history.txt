@@ -1,4 +1,8 @@
+2019-01-18 zzz
+ * Plugins: Fix loading of webapp configuration classes (ticket #2385)
+
 2019-01-15 zzz
+ * Debian: AppArmor updates (ticket #2319)
  * SusiMail:
    - Fix sending mail with attachments (ticket #2373)
    - Fix deleting attachments from drafts
