@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2016
+# Besnik <besnik@programeshqip.org>, 2016,2019
 # Shpetim <shpetim@privacysolutions.no>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2019-01-10 14:28+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/otf/I2P/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -92,4 +92,4 @@ msgstr "Rrjet"
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:63
 msgid "I2P: Right-click for menu"
-msgstr "I2P: Djathtas-klikoni për menu"
+msgstr "I2P: Djathtasklikoni për menu"
