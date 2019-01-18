@@ -9,6 +9,10 @@
 import Foundation
 import Cocoa
 
+extension Notification.Name {
+  static let killLauncher = Notification.Name("killStartupLauncher")
+}
+
 class Logger {
   static func MLog<T>(level:Int32, _ object: T?,file:String = #file, function:String = #function, line:Int = #line) {
     SBridge.logProxy(level, formattedMsg: "\(makeTag(function: function, file: file, line: line)) : \(object)")
@@ -108,6 +112,14 @@ class Logger {
       if (getDockIconStateIsShowing()) {
         triggerDockIconShowHide(showIcon: false)
       }
+    }
+    let launcherAppId = "net.i2p.bootstrap.macosx.StartupItemApp"
+    let runningApps = NSWorkspace.shared().runningApplications
+    let isRunning = !runningApps.filter { $0.bundleIdentifier == launcherAppId }.isEmpty
+    // SMLoginItemSetEnabled(launcherAppId as CFString, true)
+    
+    if isRunning {
+      DistributedNotificationCenter.default().post(name: .killLauncher, object: Bundle.main.bundleIdentifier!)
     }
   }
   

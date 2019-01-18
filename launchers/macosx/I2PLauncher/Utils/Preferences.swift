@@ -68,11 +68,16 @@ class Preferences  : NSObject {
   // Lookup by name
   subscript(prefName:String) -> Any? {
     get  {
-      return prefObject[prefName]
+      let ret = prefObject[prefName]
+      if (ret != nil) {
+        return ret
+      }
+      return prefDefaultDict[prefName]
     }
     set(newValue) {
       prefObject[prefName] = newValue
       prefDict[prefName] = PreferenceRow(prefName, newValue, prefDefaultDict[prefName])
+      UserDefaults.standard.set(newValue, forKey: prefName)
       self.syncPref()
     }
   }
@@ -112,6 +117,7 @@ class Preferences  : NSObject {
     defaults["I2Pref_allowAdvancedPreferences"] = false
     defaults["I2Pref_alsoStartFirefoxOnLaunch"] = true
     defaults["I2Pref_firefoxBundlePath"] = "/Applications/Firefox.app"
+    defaults["I2Pref_firefoxProfilePath"] = NSString(format: "%@/Library/Application Support/i2p/profile", home)
     defaults["I2Pref_consolePortCheckNum"] = 7657
     defaults["I2Pref_i2pBaseDirectory"] = NSString(format: "%@/Library/I2P", home)
     defaults["I2Pref_i2pLogDirectory"] = NSString(format: "%@/Library/Logs/I2P", home)
