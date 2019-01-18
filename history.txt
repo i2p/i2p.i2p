@@ -1,4 +1,7 @@
 2019-01-18 zzz
+ * Build:
+   - Update translations
+   - Add files for Disco
  * NTCP: Stop X25519KeyFactory on shutdown (ticket #2388)
  * Plugins: Fix loading of webapp configuration classes (ticket #2385)
 
