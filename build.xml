@@ -814,6 +814,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc access="package"
+            source="${javac.version}"
             destdir="./build/javadoc"
             packagenames="*"
             use="true"
