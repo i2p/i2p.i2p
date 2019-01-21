@@ -63,7 +63,7 @@ public class StatSummarizer implements Runnable, ClientApp {
 
     /**
      * @return null if disabled
-     * @since 0.0.38
+     * @since 0.9.38
      */
     public static StatSummarizer instance(I2PAppContext ctx) {
         ClientApp app = ctx.clientAppManager().getRegisteredApp(NAME);
@@ -99,7 +99,7 @@ public class StatSummarizer implements Runnable, ClientApp {
         }
     }
     
-    /** @since 0.0.38 */
+    /** @since 0.9.38 */
     public static boolean isDisabled(I2PAppContext ctx) {
         return ctx.clientAppManager().getRegisteredApp(NAME) == null;
     }
