@@ -500,7 +500,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nversion=`/usr/libexec/PlistBuddy -c \"Print I2PRoutereVersion\" \"${INFOPLIST_FILE}\"`\ncommit=`mtn heads --branch=i2p.i2p | awk '{ print $1 }' | head -n 1`\nbuildinfo=\"Built $(date), $commit\"\n\n# Use cat to avoid any potential alias of cp asking for overwrite of file.\ncat $SRCROOT/version.h.tpl > $SRCROOT/version.h\nsed -i '' \"s#VERSION_REPLACED_BY_XCODE_BUILD_SCRIPT#$version#g\" $SRCROOT/version.h\nsed -i '' \"s#BUILD_INFO_REPLACED_BY_XCODE_BUILD_SCRIPT#$buildinfo#\" $SRCROOT/version.h\n\n$SRCROOT/check_latest_java.sh\n\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nversion=`/usr/libexec/PlistBuddy -c \"Print I2PRouterVersion\" \"${INFOPLIST_FILE}\"`\ncommit=`mtn heads --branch=i2p.i2p | awk '{ print $1 }' | head -n 1`\nbuildinfo=\"Built $(date), $commit\"\n\n# Use cat to avoid any potential alias of cp asking for overwrite of file.\ncat $SRCROOT/version.h.tpl > $SRCROOT/version.h\nsed -i '' \"s#VERSION_REPLACED_BY_XCODE_BUILD_SCRIPT#$version#g\" $SRCROOT/version.h\nsed -i '' \"s#BUILD_INFO_REPLACED_BY_XCODE_BUILD_SCRIPT#$buildinfo#\" $SRCROOT/version.h\n\n$SRCROOT/check_latest_java.sh\n\n";
 		};
 		BF1EFA4B215142030014EB07 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

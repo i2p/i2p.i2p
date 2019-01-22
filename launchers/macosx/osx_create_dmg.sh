@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $DIR/.sign-secrets
 
 APP_NAME="I2PLauncher"
-VERSION="0.9.37"
+VERSION="`/usr/libexec/PlistBuddy -c 'Print I2PRouterVersion' Info.plist`"
 DMG_BACKGROUND_IMG=${BACKGROUND_IMG:-"Background.png"}
 
 APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
