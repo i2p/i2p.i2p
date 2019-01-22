@@ -1,3 +1,11 @@
+* 2019-01-22 0.9.38 released
+
+2019-01-21 zzz
+ * Debian:
+   - Add source param to javadoc target (ticket #2394)
+   - Replace ttf-dejavu with fonts-dejavu (ticket #2395)
+ * Reseed: Update SSL cert
+
 2019-01-18 zzz
  * Build:
    - Update translations
