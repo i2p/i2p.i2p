@@ -16,7 +16,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,dh-apparmor
  ,gettext
  ,libgetopt-java
- ,libjson-simple-java (< 3)
+ ,libjson-simple-java (<< 3)
  ,libgmp-dev (>= 2:5.0.2)
  ,libservice-wrapper-java
  ,hardening-wrapper
@@ -79,7 +79,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  libtomcat8-java,
  geoip-database,
  gettext-base,
- libjson-simple-java (< 3),
+ libjson-simple-java (<< 3),
  libgetopt-java,
  famfamfam-flag-png
 Replaces: i2p ( << 0.8.6-5)
