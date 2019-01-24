@@ -1367,6 +1367,7 @@
                 <istrue value="${with-libtomcat6-java}" />
                 <istrue value="${with-libtomcat7-java}" />
                 <istrue value="${with-libtomcat8-java}" />
+                <istrue value="${with-libtomcat9-java}" />
             </or>
         </condition>
     </target>

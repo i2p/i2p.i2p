@@ -43,7 +43,8 @@ public class JspC {
     // if true, try to make web.xml reproducible
     private static final boolean REPRODUCIBLE = Boolean.valueOf(System.getProperty("build.reproducible"));
     // if true, we must get the Tomcat version out of the jasper jar's manifest
-    private static final boolean SYSTEM_TOMCAT = Boolean.valueOf(System.getProperty("with-libtomcat8-java"));
+    private static final boolean SYSTEM_TOMCAT = Boolean.valueOf(System.getProperty("with-libtomcat8-java")) ||
+                                                 Boolean.valueOf(System.getProperty("with-libtomcat9-java"));
     // path to the jasper jar
     private static final String JASPER_JAR = System.getProperty("jasper.jar");
 
