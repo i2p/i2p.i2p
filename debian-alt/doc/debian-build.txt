@@ -76,6 +76,7 @@ reprepro -v update trusty
 reprepro -v update xenial
 reprepro -v update bionic
 reprepro -v update cosmic
+reprepro -v update disco
 # todo when set up
 # To add or remove distributions, edit /var/www/debian/conf/distributions
 # and /var/www/debian/conf/updates
@@ -92,25 +93,28 @@ reprepro -v copysrc wheezy precise i2p
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc jessie trusty i2p
 
-# To copy bionic to stretch and sid:
+# To copy bionic to stretch:
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc stretch bionic i2p
-reprepro -v copysrc sid bionic i2p
+
+# To copy disco to sid:
+# Note that syntax is reprepro copysrc TO FROM package!
+reprepro -v copysrc sid disco i2p
 
 # install in the architectures not copied from ubuntu
 # 'flood' should do this but forgot how, can't make it work any more
 reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p_0.9.xxp-1~precise+1_all.deb
 reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-doc_0.9.xxp-1~precise+1_all.deb
 reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-router_0.9.xxp-1~precise+1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p_0.9.xxp-2~trusty+1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-doc_0.9.xxp-2~trusty+1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-router_0.9.xxp-2~trusty+1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p_0.9.xxp-1~trusty+1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-doc_0.9.xxp-1~trusty+1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-router_0.9.xxp-1~trusty+1_all.deb
 reprepro -v -A 'armel|armhf' includedeb stretch i2p_0.9.xx-1ubuntu1_all.deb
 reprepro -v -A 'armel|armhf' includedeb stretch i2p-doc_0.9.xx-1ubuntu1_all.deb
 reprepro -v -A 'armel|armhf' includedeb stretch i2p-router_0.9.xx-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf' includedeb sid i2p_0.9.xx-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf' includedeb sid i2p-doc_0.9.xx-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf' includedeb sid i2p-router_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf' includedeb sid i2p_0.9.xx-1~disco+1_all.deb
+reprepro -v -A 'armel|armhf' includedeb sid i2p-doc_0.9.xx-1~disco+1_all.deb
+reprepro -v -A 'armel|armhf' includedeb sid i2p-router_0.9.xx-1~disco+1_all.deb
 
 
 
