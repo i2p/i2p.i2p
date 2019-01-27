@@ -67,6 +67,24 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     /**
+     *  If more than one key, return the first supported one.
+     *  If none supported, return the first one.
+     *
+     *  @since 0.9.39 overridden
+     */
+    @Override
+    public PublicKey getEncryptionKey() {
+        if (_encryptionKeys != null) {
+            for (PublicKey pk : _encryptionKeys) {
+                EncType type = pk.getType();
+                if (type != null && type.isAvailable())
+                    return pk;
+            }
+        }
+        return _encryptionKey;
+    }
+
+    /**
      *  Add an encryption key.
      */
     public void addEncryptionKey(PublicKey key) {

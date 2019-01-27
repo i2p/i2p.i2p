@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.client.SendMessageOptions;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Certificate;
@@ -311,7 +312,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             getContext().netDb().lookupLeaseSet(key, success, failed, LS_LOOKUP_TIMEOUT, _from.calculateHash());
         }
     }
-    
+
     /**
      *  @param force to force including a reply lease set
      *  @return lease set or null if we should not send the lease set
@@ -374,6 +375,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     /**
      *  Choose a lease from his leaseset to send the message to. Sets _lease.
      *  Sets _wantACK if it's new or changed.
+     *  Does several checks to see if we can actually send to this leaseset,
+     *  and returns nonzero failure code if unable to.
+     *
      *  @return 0 on success, or a MessageStatusMessage failure code
      */
     private int getNextLease() {
@@ -387,10 +391,20 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 return MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
             } 
         } 
-        if (_leaseSet.getType() == DatabaseEntry.KEY_TYPE_META_LS2) {
-            // can't send to a meta LS
+
+        int lsType = _leaseSet.getType();
+        // Can't send to a meta LS.
+        // TODO Encrypted LS2 must have been previously decrypted.
+        if (lsType != DatabaseEntry.KEY_TYPE_LEASESET &&
+            lsType != DatabaseEntry.KEY_TYPE_LS2) {
             return MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
         }
+        PublicKey pk = _leaseSet.getEncryptionKey();
+        if (pk == null)
+            return MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
+        EncType encType = pk.getType();
+        if (encType == null || !encType.isAvailable())
+            return MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION;
 
         // Use the same lease if it's still good
         // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
