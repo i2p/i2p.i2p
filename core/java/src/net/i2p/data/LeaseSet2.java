@@ -59,6 +59,18 @@ public class LeaseSet2 extends LeaseSet {
     public void setUnpublished() {
         _flags |= FLAG_UNPUBLISHED;
     }
+    
+    /**
+     * If true, we received this LeaseSet by a remote peer publishing it to
+     * us, AND the unpublished flag is not set.
+     * Default false.
+     *
+     *  @since 0.9.39 overridden
+     */
+    @Override
+    public boolean getReceivedAsPublished() {
+        return super.getReceivedAsPublished() && !isUnpublished();
+    }
 
     public String getOption(String opt) {
         if (_options == null)
