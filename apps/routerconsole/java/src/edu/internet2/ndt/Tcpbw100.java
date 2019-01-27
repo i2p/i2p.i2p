@@ -318,13 +318,17 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	/**
 	 * public static void main for invoking as an Application
 	 * @param args String array of command line arguments
-	 * */
+	 * @throws IllegalArgumentException on bad hostname
+	 **/
 	public static void main(String[] args) {
 		Tcpbw100 test = mainSupport( args );
 		test.runIt();
 	}
 
-	/** bigly */
+	/**
+	 *  bigly
+	 * @throws IllegalArgumentException on bad hostname
+	 **/
 	public static Tcpbw100 mainSupport(String[] args) {
 		JFrame frame = new JFrame("ANL/Internet2 NDT (applet)");
 		boolean useSSL = args.length > 0 && args[0].equals("-s");

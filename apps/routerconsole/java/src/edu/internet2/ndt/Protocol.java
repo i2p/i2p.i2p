@@ -12,8 +12,8 @@ import java.net.Socket;
  * */
 
 public class Protocol {
-	private InputStream _ctlInStream;
-	private OutputStream _ctlOutStream;
+	private final InputStream _ctlInStream;
+	private final OutputStream _ctlOutStream;
 	private boolean jsonSupport = true;
 
 	/**

@@ -1,3 +1,14 @@
+2019-01-27 zzz
+ * NDT:
+   - Catch exception on DNS lookup failure (ticket #2399)
+   - Add support for specifying server in CLI (ticket #2413)
+
+2019-01-24 zzz
+ * Debian:
+   - Fix Debian control files (ticket #2401)
+   - Add build option for libtomcat9 (ticket #2364)
+   - Fix PPA builds for precise and trusty (ticket #2408)
+
 * 2019-01-22 0.9.38 released
 
 2019-01-21 zzz
