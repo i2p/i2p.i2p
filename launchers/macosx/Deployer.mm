@@ -83,7 +83,7 @@ using namespace subprocess;
       chdir(basePath.c_str());
       
       // Everything behind --exec java - would be passed as arguments to the java executable.
-      std::string execStr = "/usr/bin/unzip "; //std::string([rs.getJavaHome UTF8String]);
+      std::string execStr = "/usr/bin/unzip -uo "; //std::string([rs.getJavaHome UTF8String]);
       execStr += [self.metaInfo.zipFile UTF8String];
       //for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
       

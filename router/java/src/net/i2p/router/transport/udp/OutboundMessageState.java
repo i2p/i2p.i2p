@@ -116,6 +116,13 @@ class OutboundMessageState implements CDPQEntry {
         return _expiration < _context.clock().now(); 
     }
 
+    /**
+     * @since 0.9.38
+     */
+    public boolean isExpired(long now) {
+        return _expiration < now; 
+    }
+
     public synchronized boolean isComplete() {
         return _fragmentAcks == 0;
     }

@@ -38,7 +38,6 @@ SCRIPTFILES="\
 	./installer/resources/install_i2p_service_osx.command \
 	./installer/resources/install_i2p_service_unix \
 	./installer/resources/locale/bundle-messages.sh \
-	./installer/resources/makegeoipv6.sh \
 	./installer/resources/postinstall.sh \
 	./installer/resources/runplain.sh \
 	./installer/resources/uninstall_i2p_service_osx.command

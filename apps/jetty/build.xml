@@ -139,6 +139,8 @@
            no system jars: Precise, Trusty
            with-libtomcat8-java: Jessie (without backports), Wheezy
            with-libtomcat8-java AND with-libjetty9-java: Xenial, Jessie (with backports), Stretch
+           with-libtomcat9-java: Buster
+           with-libtomcat9-java AND with-libjetty9-java: Buster
            with-libjetty9-java (only): not supported
      -->
     <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1, copyTomcatLib1, copyJettylib2, copyJettylib3, copyTomcatLib" />
@@ -195,9 +197,12 @@
         </jar>
     </target>
 
-    <!-- Make javax.servlet.jar -->
-    <!-- If with-libtomcat8-java but not with-libjetty9-java, we don't do this -->
-    <target name="copyJettylib2" depends="extractJettylib" unless="${with-libtomcat8-java}" >
+    <!--
+         Make javax.servlet.jar.
+         If with-libtomcat8-java or with-libtomcat9-java but not with-libjetty9-java, we don't do this.
+         copyTomcatLib1 dependency to set the with-libtomcat-java variable.
+     -->
+    <target name="copyJettylib2" depends="extractJettylib, copyTomcatLib1" unless="${with-libtomcat-java}" >
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
             <!-- all versions - Servlet API -->
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/servlet-api-3.1.jar" />
@@ -256,6 +261,7 @@
                 <istrue value="${with-libtomcat6-java}" />
                 <istrue value="${with-libtomcat7-java}" />
                 <istrue value="${with-libtomcat8-java}" />
+                <istrue value="${with-libtomcat9-java}" />
             </or>
         </condition>
         <condition property="with-libtomcat-without-libjetty" >

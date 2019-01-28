@@ -80,7 +80,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  glassfish-javaee
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
-Recommends: libjbigi-jni, ttf-dejavu
+Recommends: libjbigi-jni, fonts-dejavu
 Suggests: apparmor
  ,privoxy
  ,syndie
@@ -90,5 +90,5 @@ Description: Router for I2P
  layers of encryption, and the network is both distributed and dynamic, with no
  trusted parties.
  .
- TrueType fonts (such as those provided in the package ttf-dejavu) are required
+ TrueType fonts (such as those provided in the package fonts-dejavu) are required
  in order to generate graphs.

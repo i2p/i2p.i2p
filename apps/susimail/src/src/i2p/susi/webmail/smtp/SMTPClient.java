@@ -346,6 +346,8 @@ public class SMTPClient {
 					error += _t("Error sending mail") + " (" + result +  ")\n";
 			}
 		} catch (IOException e) {
+			if (_log.shouldWarn())
+				_log.warn("Error sending mail", e);
 			error += _t("Error sending mail") + ": " + e.getMessage() + '\n';
 		}
 		if( !mailSent && lastResponse.length() > 0 ) {

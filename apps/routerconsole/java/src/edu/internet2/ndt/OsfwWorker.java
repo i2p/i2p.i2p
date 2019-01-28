@@ -21,11 +21,11 @@ import java.net.Socket;
 
 public class OsfwWorker implements Runnable {
 
-	private ServerSocket _srvSocket;
-	private int _iTestTime;
+	private final ServerSocket _srvSocket;
+	private final int _iTestTime;
 	private boolean _iFinalized = false;
 	// local Tcpbw100 Applet reference
-	Tcpbw100 _localTcpAppObj;
+	private final Tcpbw100 _localTcpAppObj;
 
 	/**
 	 * Constructor
@@ -39,6 +39,7 @@ public class OsfwWorker implements Runnable {
 	OsfwWorker(ServerSocket srvSocketParam, int iParamTestTime) {
 		this._srvSocket = srvSocketParam;
 		this._iTestTime = iParamTestTime;
+		this._localTcpAppObj = null;
 	}
 
 	/**

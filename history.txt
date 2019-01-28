@@ -1,3 +1,51 @@
+2019-01-27 zzz
+ * NDT:
+   - Catch exception on DNS lookup failure (ticket #2399)
+   - Add support for specifying server in CLI (ticket #2413)
+
+2019-01-24 zzz
+ * Debian:
+   - Fix Debian control files (ticket #2401)
+   - Add build option for libtomcat9 (ticket #2364)
+   - Fix PPA builds for precise and trusty (ticket #2408)
+
+* 2019-01-22 0.9.38 released
+
+2019-01-21 zzz
+ * Debian:
+   - Add source param to javadoc target (ticket #2394)
+   - Replace ttf-dejavu with fonts-dejavu (ticket #2395)
+ * Reseed: Update SSL cert
+
+2019-01-18 zzz
+ * Build:
+   - Update translations
+   - Add files for Disco
+ * NTCP: Stop X25519KeyFactory on shutdown (ticket #2388)
+ * Plugins: Fix loading of webapp configuration classes (ticket #2385)
+
+2019-01-15 zzz
+ * Debian: AppArmor updates (ticket #2319)
+ * SusiMail:
+   - Fix sending mail with attachments (ticket #2373)
+   - Fix deleting attachments from drafts
+   - Fix dup attachments after clicking add attachment without browsing first
+   - Fix update of draft folder after saving as draft
+   - Change text of add attachment button for clarity
+
+2019-01-13 zzz
+ * I2CP: Set LS2 unpublished bit, show in debug output
+
+2019-01-12 zzz
+ * NetDB: Use isSlow() in floodfill criteria
+ * SSU: More consolidation of clock().now() calls
+
+2019-01-10 zzz
+ * I2CP:
+   - Router-side handling of meta LS2
+   - Remove client-side-only options from those sent to router
+   - Router-side stub for encrypted LS2
+
 2019-01-09 zzz
  * Console: Fix broken image link on /configui
  * I2CP: Stub out client-side creation of meta and enc. LS2

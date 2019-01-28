@@ -85,6 +85,21 @@ public class MLabRunner {
      *         or null if there was already a test in progress.
      */
     public ToolRun runNDT(final ToolListener listener) {
+        boolean useSSL = _context.getProperty(PROP_SSL, DEFAULT_USE_SSL);
+        return runNDT(listener, useSSL, null);
+    }
+    
+    /**
+     * Non-blocking, spawns a thread and returns immediately.
+     *
+     * @param listener use to detect completion and get results
+     * @param use_SSL whether to use SSL to talk to the servers
+     * @param serverHost if non-null, bypass the name server and run test with this host
+     * @return a ToolRun object which may be used to cancel the test,
+     *         or null if there was already a test in progress.
+     * @since 0.9.39
+     */
+    public ToolRun runNDT(final ToolListener listener, final boolean use_SSL, final String serverHost) {
         if (!_running.compareAndSet(false, true)) {
             listener.reportSummary("Test already running");
             listener.reportDetail("Test already running");
@@ -113,52 +128,54 @@ public class MLabRunner {
                         // The first is to switch to our new name server, ns.measurementlab.net. For example: http://ns.measurementlab.net/ndt will return a JSON string with the closest NDT server. Example integration can be found on www.measurementlab.net/p/ndt.html
                         // The other option, discouraged, is to continue using donar which should still be resolving. It just uses ns.measurementlab.net on the backend now. However, this is currently down according to my tests, so we'll work on getting this back as soon as possible.
                         
-                        String server_host = null;
+                        String server_host = serverHost;
                         String server_city = null;
                         String server_country = null;
-                        boolean useSSL = _context.getProperty(PROP_SSL, DEFAULT_USE_SSL);
+                        boolean useSSL = use_SSL;
                         
-                        try {
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-                            // http to name server
-                            // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
-                            //               int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream,
-                            //               String url, boolean allowCaching, String etag, String postData) {
-                            //EepGet eepget = new EepGet(_context, false, null, 0,
-                            //                           0, 2, 1024, null, baos,
-                            //                           NS_URL, false, null, null);
-                            // https to name server
-                            String nsURL = useSSL ? NS_URL_SSL_SSL : NS_URL_SSL;
-                            EepGet eepget = new SSLEepGet(_context, baos, nsURL);
-                            boolean ok = eepget.fetch(NS_TIMEOUT, NS_TIMEOUT, NS_TIMEOUT);
-                            if (!ok)
-                                throw new IOException("ns fetch failed");
-                            int code = eepget.getStatusCode();
-                            if (code != 200)
-                                throw new IOException("ns fetch failed: " + code);
-                            JSONParser parser = new JSONParser();
-                            byte[] b = baos.toByteArray();
-                            String s = new String(b, "ISO-8859-1");
-                            JSONObject map = (JSONObject) parser.parse(s);
-                            if (map == null) {
-                                throw new IOException("no map");
+                        if (server_host == null) {
+                            try {
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+                                // http to name server
+                                // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
+                                //               int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream,
+                                //               String url, boolean allowCaching, String etag, String postData) {
+                                //EepGet eepget = new EepGet(_context, false, null, 0,
+                                //                           0, 2, 1024, null, baos,
+                                //                           NS_URL, false, null, null);
+                                // https to name server
+                                String nsURL = useSSL ? NS_URL_SSL_SSL : NS_URL_SSL;
+                                EepGet eepget = new SSLEepGet(_context, baos, nsURL);
+                                boolean ok = eepget.fetch(NS_TIMEOUT, NS_TIMEOUT, NS_TIMEOUT);
+                                if (!ok)
+                                    throw new IOException("ns fetch failed");
+                                int code = eepget.getStatusCode();
+                                if (code != 200)
+                                    throw new IOException("ns fetch failed: " + code);
+                                JSONParser parser = new JSONParser();
+                                byte[] b = baos.toByteArray();
+                                String s = new String(b, "ISO-8859-1");
+                                JSONObject map = (JSONObject) parser.parse(s);
+                                if (map == null) {
+                                    throw new IOException("no map");
+                                }
+                                if (_log.shouldWarn())
+                                    _log.warn("Got response: " + DataHelper.getUTF8(b));
+                                // TODO use IP instead to avoid another lookup? - no, won't work with ssl
+                                // use "fqdn" in response instead of "url" since ndt_ssl does not have url
+                                server_host = (String)map.get("fqdn");
+                                if (server_host == null) {
+                                    throw new IOException("no fqdn");
+                                }
+                                server_city = (String) map.get("city");
+                                server_country = (String) map.get("country");
+                                // ignore the returned port in the URL (7123) which is the applet, not the control port
+                                if (_log.shouldWarn())
+                                    _log.warn("Selected server: " + server_host);
+                            } catch (Exception e) {
+                                if (_log.shouldWarn())
+                                    _log.warn("Failed to get server", e);
                             }
-                            if (_log.shouldWarn())
-                                _log.warn("Got response: " + DataHelper.getUTF8(b));
-                            // TODO use IP instead to avoid another lookup? - no, won't work with ssl
-                            // use "fqdn" in response instead of "url" since ndt_ssl does not have url
-                            server_host = (String)map.get("fqdn");
-                            if (server_host == null) {
-                                throw new IOException("no fqdn");
-                            }
-                            server_city = (String) map.get("city");
-                            server_country = (String) map.get("country");
-                            // ignore the returned port in the URL (7123) which is the applet, not the control port
-                            if (_log.shouldWarn())
-                                _log.warn("Selected server: " + server_host);
-                        } catch (Exception e) {
-                            if (_log.shouldWarn())
-                                _log.warn("Failed to get server", e);
                         }
                         
                         if (server_host == null) {
@@ -171,7 +188,18 @@ public class MLabRunner {
                         
                         String[] args = useSSL ? new String[] { "-s", server_host } : new String[] { server_host };
                         long start = System.currentTimeMillis();
-                        final Tcpbw100 test = Tcpbw100.mainSupport(args);
+                        final Tcpbw100 test;
+                        try {
+                            test = Tcpbw100.mainSupport(args);
+                        } catch (IllegalArgumentException iae) {
+                            String err = "Failed to connect to bandwidth test server " + server_host;
+                            _log.error(err, iae);
+                            if (listener != null) {
+                                listener.reportSummary(err);
+                                listener.reportDetail(err);
+                            }
+                            return;
+                        }
                         final AtomicBoolean cancelled = new AtomicBoolean();
                         
                         run.addListener(
@@ -359,11 +387,17 @@ public class MLabRunner {
     /** standalone test */
     public static void main(String[] args) {
         boolean useSSL = args.length > 0 && args[0].equals("-s");
-        System.setProperty(PROP_SSL, Boolean.toString(useSSL));
+        String host;
+        if (useSSL && args.length > 1)
+            host = args[1];
+        else if (!useSSL && args.length > 0)
+            host = args[0];
+        else
+            host = null;
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         MLabRunner mlab = MLabRunner.getInstance(ctx);
         TestListener lsnr = new TestListener();
-        mlab.runNDT(lsnr);
+        mlab.runNDT(lsnr, useSSL, host);
         try { Thread.sleep(2000); } catch (InterruptedException ie) { return; }
         for (int i = 0; i < 180; i++) {
             if (lsnr.isComplete())

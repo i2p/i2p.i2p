@@ -1405,15 +1405,15 @@ public class WebMail extends HttpServlet
 		State state = null;
 		String filename = request.getFilename( NEW_FILENAME );
 		// We handle an attachment whether sending or uploading
-		if (filename != null &&
-		    (buttonPressed(request, NEW_UPLOAD) || buttonPressed(request, SEND))) {
+		if (filename != null && filename.length() > 0 &&
+		    (buttonPressed(request, NEW_UPLOAD) || buttonPressed(request, SEND) || buttonPressed(request, SAVE_AS_DRAFT))) {
 			int i = filename.lastIndexOf('/');
 			if( i != - 1 )
 				filename = filename.substring( i + 1 );
 			i = filename.lastIndexOf('\\');
 			if( i != -1 )
 				filename = filename.substring( i + 1 );
-			if( filename != null && filename.length() > 0 ) {
+			if (filename.length() > 0) {
 				InputStream in = null;
 				OutputStream out = null;
 				I2PAppContext ctx = I2PAppContext.getGlobalContext();
@@ -1452,6 +1452,12 @@ public class WebMail extends HttpServlet
 						sessionObject.attachments.add(
 							new Attachment(filename, contentType, encodeTo, f)
 						);
+						// Save the draft
+						String uidl = Base64.decodeToString(request.getParameter(NEW_UIDL));
+						if (uidl != null) {
+							StringBuilder draft = composeDraft(sessionObject, request);
+							saveDraft(sessionObject, uidl, draft);
+						}
 					} else {
 						sessionObject.error += _t("No Encoding found for {0}", encodeTo) + '\n';
 					}
@@ -1466,6 +1472,7 @@ public class WebMail extends HttpServlet
 			state = State.NEW;
 		}
 		else if( sessionObject.attachments != null && buttonPressed( request, DELETE_ATTACHMENT ) ) {
+			boolean deleted = false;
 			for (String item : getCheckedItems(request)) {
 				try {
 					int n = Integer.parseInt(item);
@@ -1473,11 +1480,21 @@ public class WebMail extends HttpServlet
 						Attachment attachment = sessionObject.attachments.get(i);
 						if( attachment.hashCode() == n ) {
 							sessionObject.attachments.remove( i );
+							attachment.deleteData();
+							deleted = true;
 							break;
 						}
 					}
 				} catch (NumberFormatException nfe) {}
 			}			
+			// Save the draft or else the attachment comes back
+			if (deleted) {
+				String uidl = Base64.decodeToString(request.getParameter(NEW_UIDL));
+				if (uidl != null) {
+					StringBuilder draft = composeDraft(sessionObject, request);
+					saveDraft(sessionObject, uidl, draft);
+				}
+			}
 			state = State.NEW;
 		}
 		return state;
@@ -2893,6 +2910,7 @@ public class WebMail extends HttpServlet
 					}
 				} else {
 					sessionObject.error += relay.error;
+					if (log.shouldWarn()) log.warn("Error sending mail: " + relay.error);
 				}
 				sessionObject.info = sessionObject.info.replace(_t("Sending mail.") + '\n', "");
 			}
@@ -2997,7 +3015,11 @@ public class WebMail extends HttpServlet
 				if (!a.isEmpty()) {
 					if (sessionObject.attachments == null)
 						sessionObject.attachments = new ArrayList<Attachment>(a.size());
+					else
+						sessionObject.attachments.clear();
 					sessionObject.attachments.addAll(a);
+				} else if (sessionObject.attachments != null) {
+					sessionObject.attachments.clear();
 				}
 				// needed when processing the CANCEL button
 				out.println("<input type=\"hidden\" name=\"" + DRAFT_EXISTS + "\" value=\"1\">");
@@ -3036,7 +3058,7 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _t("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + quoteHTML(subject) + "\"></td></tr>\n" +
 				"<tr><td></td><td align=\"left\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea></td></tr>" +
 				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr class=\"bottombuttons\"><td align=\"right\">" + _t("Add Attachment") + ":</td><td id=\"addattach\" align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\">&nbsp;" + button(NEW_UPLOAD, _t("Add another attachment")) + "</td></tr>");
+				"<tr class=\"bottombuttons\"><td align=\"right\">" + _t("Add Attachment") + ":</td><td id=\"addattach\" align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\">&nbsp;" + button(NEW_UPLOAD, _t("Add Attachment")) + "</td></tr>");
 		
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;

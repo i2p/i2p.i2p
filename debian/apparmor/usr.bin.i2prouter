@@ -20,7 +20,7 @@
   /bin/cat                              rix,
   /bin/grep                             rix,
   /bin/mkdir                            rix,
-  /bin/ps                               rix,
+  /bin/ps                               rUx,
   /bin/rm                               rix,
   /bin/sed                              rix,
   /bin/sleep                            rix,
@@ -34,7 +34,8 @@
   /usr/bin/dirname                      rix,
   /usr/bin/expr                         rix,
   /usr/bin/id                           rix,
-  /usr/bin/ldd                          rix,
+  # should replace this in i2prouter with something safer
+  /usr/bin/ldd                          rUx,
   /usr/bin/tail                         rix,
   /usr/bin/tr                           rix,
 

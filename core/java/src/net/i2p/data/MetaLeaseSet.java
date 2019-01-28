@@ -171,6 +171,7 @@ public class MetaLeaseSet extends LeaseSet2 {
                 buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
             }
         }
+        buf.append("\n\tUnpublished? ").append(isUnpublished());
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));

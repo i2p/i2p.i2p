@@ -59,11 +59,41 @@ public class LeaseSet2 extends LeaseSet {
     public void setUnpublished() {
         _flags |= FLAG_UNPUBLISHED;
     }
+    
+    /**
+     * If true, we received this LeaseSet by a remote peer publishing it to
+     * us, AND the unpublished flag is not set.
+     * Default false.
+     *
+     *  @since 0.9.39 overridden
+     */
+    @Override
+    public boolean getReceivedAsPublished() {
+        return super.getReceivedAsPublished() && !isUnpublished();
+    }
 
     public String getOption(String opt) {
         if (_options == null)
             return null;
         return _options.getProperty(opt);
+    }
+
+    /**
+     *  If more than one key, return the first supported one.
+     *  If none supported, return the first one.
+     *
+     *  @since 0.9.39 overridden
+     */
+    @Override
+    public PublicKey getEncryptionKey() {
+        if (_encryptionKeys != null) {
+            for (PublicKey pk : _encryptionKeys) {
+                EncType type = pk.getType();
+                if (type != null && type.isAvailable())
+                    return pk;
+            }
+        }
+        return _encryptionKey;
     }
 
     /**
@@ -118,6 +148,13 @@ public class LeaseSet2 extends LeaseSet {
 
     public boolean isOffline() {
         return (_flags & FLAG_OFFLINE_KEYS) != 0;
+    }
+
+    /**
+     *  @return transient public key or null if not offline signed
+     */
+    public SigningPublicKey getTransientSigningKey() {
+        return _transientSigningPublicKey;
     }
 
     /**
@@ -533,6 +570,7 @@ public class LeaseSet2 extends LeaseSet {
                 buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
             }
         }
+        buf.append("\n\tUnpublished? ").append(isUnpublished());
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));

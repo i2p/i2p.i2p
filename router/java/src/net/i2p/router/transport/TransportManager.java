@@ -378,6 +378,8 @@ public class TransportManager implements TransportEventListener {
     synchronized void shutdown() {
         stopListening();
         _dhThread.shutdown();
+        if (_xdhThread != null)
+            _xdhThread.shutdown();
         Addresses.clearCaches();
         TransportImpl.clearCaches();
     }

@@ -12,12 +12,12 @@ Build-Depends: debhelper (>= 9.20160709)
  ,openjdk-9-jdk
  ,libjetty9-java (>= 9.2.22)
  ,libtaglibs-standard-jstlel-java
- ,libtomcat8-java
+ ,libtomcat9-java
  ,dh-apparmor
  ,bash-completion
  ,gettext
  ,libgetopt-java
- ,libjson-simple-java (< 3)
+ ,libjson-simple-java (<< 3)
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
  ,po-debconf
@@ -79,14 +79,14 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  geoip-database,
  gettext-base,
  libgetopt-java,
- libjson-simple-java (< 3),
+ libjson-simple-java (<< 3),
  libjetty9-java,
  libtaglibs-standard-jstlel-java,
- libtomcat8-java,
+ libtomcat9-java,
  famfamfam-flag-png
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
-Recommends: libjbigi-jni, ttf-dejavu
+Recommends: libjbigi-jni, fonts-dejavu
 Suggests: apparmor
  ,privoxy
  ,syndie
@@ -96,5 +96,5 @@ Description: Invisible Internet Project (I2P) - Router
  layers of encryption, and the network is both distributed and dynamic, with no
  trusted parties.
  .
- TrueType fonts (such as those provided in the package ttf-dejavu) are required
+ TrueType fonts (such as those provided in the package fonts-dejavu) are required
  in order to generate graphs.

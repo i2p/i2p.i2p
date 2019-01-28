@@ -1560,7 +1560,7 @@ public class PeerState {
      *
      * @return number of active outbound messages remaining
      */
-    public int finishMessages() {
+    public int finishMessages(long now) {
         // short circuit, unsynchronized
         if (_outboundMessages.isEmpty())
             return _outboundQueue.size();
@@ -1582,7 +1582,7 @@ public class PeerState {
                         _retransmitter = null;
                     if (succeeded == null) succeeded = new ArrayList<OutboundMessageState>(4);
                     succeeded.add(state);
-                } else if (state.isExpired()) {
+                } else if (state.isExpired(now)) {
                     iter.remove();
                     if (_retransmitter == state)
                         _retransmitter = null;
@@ -1789,7 +1789,7 @@ public class PeerState {
         long now = _context.clock().now();
         if (state.getNextSendTime() <= now) {
             OutboundMessageState retrans = _retransmitter;
-            if ( (retrans != null) && ( (retrans.isExpired() || retrans.isComplete()) ) ) {
+            if ( (retrans != null) && ( (retrans.isExpired(now) || retrans.isComplete()) ) ) {
                 _retransmitter = null;
                 retrans = null;
 	    }

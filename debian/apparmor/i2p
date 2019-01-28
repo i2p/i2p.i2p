@@ -6,6 +6,11 @@
   #include <abstractions/nameservice>
   #include <abstractions/ssl_certs>
 
+  # for launching browswers
+  #include <abstractions/ubuntu-helpers>
+  #include <abstractions/ubuntu-browsers>
+  #include <abstractions/ubuntu-console-browsers>
+
   network inet stream,
   network inet dgram,
   network inet6 stream,
@@ -14,11 +19,14 @@
   # Needed by Java
   @{PROC}                                                 r,
   owner @{PROC}/[0-9]*/                                   r,
+  owner @{PROC}/[0-9]*/cgroup                             r,
+  owner @{PROC}/[0-9]*/mountinfo                          r,
   owner @{PROC}/[0-9]*/status                             r,
   @{PROC}/[0-9]*/net/ipv6_route                           r,
   @{PROC}/[0-9]*/net/if_inet6                             r,
   /sys/devices/system/cpu/                                r,
   /sys/devices/system/cpu/**                              r,
+  /sys/fs/cgroup/**                                       r,
 
   /etc/ssl/certs/java/**                                  r,
   /etc/timezone                                           r,
@@ -58,11 +66,14 @@
   /usr/share/java/gnu-getopt.jar                          r,
   /usr/share/java/gnu-getopt-*.jar                        r,
   /usr/share/java/jetty9-*.jar                            r,
+  /usr/share/java/json-simple.jar                         r,
+  /usr/share/java/json-simple-*.jar                       r,
   /usr/share/java/jsp-api-*.jar                           r,
   /usr/share/java/servlet-api-*.jar                       r,
   /usr/share/java/standard.jar                            r,
   /usr/share/java/standard-*.jar                          r,
   /usr/share/java/tomcat8-*.jar                           r,
+  /usr/share/java/tomcat9-*.jar                           r,
   /usr/share/java/taglibs-standard-*.jar                  r,
   /usr/share/flags/countries/16x11/*                      r,
 
@@ -75,8 +86,8 @@
 
   # 'm' is needed by the I2P-Bote plugin
   /{,lib/live/mount/overlay/}tmp/                         rwm,
-  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/ rwk,
-  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/** rw,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_*/      rwk,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_*/**    rw,
   owner /{,lib/live/mount/overlay/}tmp/wrapper*           rwk,
   owner /{,lib/live/mount/overlay/}tmp/wrapper*/**        rw,
   # Scrypt used by I2P-Bote
@@ -89,6 +100,9 @@
   # temp dir (non-service)
   owner /{,lib/live/mount/overlay/}tmp/i2p-*.tmp/         rwm,
   owner /{,lib/live/mount/overlay/}tmp/i2p-*.tmp/**       rwkm,
+  # temp dir (Jetty default)
+  owner /{,lib/live/mount/overlay/}tmp/jetty-*/           rwm,
+  owner /{,lib/live/mount/overlay/}tmp/jetty-*/**         rwkm,
 
   # /graphs in the router console
   owner /{,lib/live/mount/overlay/}tmp/imageio[0-9]*.tmp  rwk,

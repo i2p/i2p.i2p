@@ -17,7 +17,8 @@ Min version	Max version	Uses src pkg	Copied to Debian
 precise		saucy   	precise		wheezy
 trusty		wily		precise		jessie
 xenial		yakkety		xenial		--
-bionic		cosmic		bionic		stretch, buster, sid
+bionic		cosmic		bionic		stretch
+disco		disco		bionic		buster, sid
 
 
 Prep (first time only)

@@ -63,7 +63,7 @@ public class StatSummarizer implements Runnable, ClientApp {
 
     /**
      * @return null if disabled
-     * @since 0.0.38
+     * @since 0.9.38
      */
     public static StatSummarizer instance(I2PAppContext ctx) {
         ClientApp app = ctx.clientAppManager().getRegisteredApp(NAME);
@@ -99,7 +99,7 @@ public class StatSummarizer implements Runnable, ClientApp {
         }
     }
     
-    /** @since 0.0.38 */
+    /** @since 0.9.38 */
     public static boolean isDisabled(I2PAppContext ctx) {
         return ctx.clientAppManager().getRegisteredApp(NAME) == null;
     }
@@ -270,7 +270,7 @@ public class StatSummarizer implements Runnable, ClientApp {
                 //  at java.lang.Class.forName(Class.java:270)
                 //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
                 setDisabled();
-                String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
+                String s = "Error rendering - disabling graph generation. Install fonts-dejavu font package?";
                 _log.logAlways(Log.WARN, s);
                 IOException ioe = new IOException(s);
                 ioe.initCause(ncdfe);
@@ -359,7 +359,7 @@ public class StatSummarizer implements Runnable, ClientApp {
                 //  at java.lang.Class.forName(Class.java:270)
                 //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
                 setDisabled();
-                String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
+                String s = "Error rendering - disabling graph generation. Install fonts-dejavu font package?";
                 _log.logAlways(Log.WARN, s);
                 IOException ioe = new IOException(s);
                 ioe.initCause(ncdfe);
