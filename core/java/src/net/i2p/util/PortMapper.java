@@ -78,6 +78,12 @@ public class PortMapper {
      *  @since 0.9.34
      */
     public static final String SVC_SUSIMAIL = "susimail";
+    /**
+     *  To indicate presence, alternative to WebAppStarter.isWebappRunning().
+     *  For actual base URL, use getConsoleURL()
+     *  @since 0.9.39
+     */
+    public static final String SVC_JSONRPC = "jsonrpc";
 
     /** @since 0.9.34 */
     public static final int DEFAULT_CONSOLE_PORT = 7657;

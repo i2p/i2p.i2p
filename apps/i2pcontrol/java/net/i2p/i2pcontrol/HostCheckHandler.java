@@ -24,6 +24,8 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
  * all the webapps (not just routerconsole).
  * Therefore, this protects all the webapps.
  *
+ * This class is NOT used for the webapp or the bare ServerSocket implementation.
+ *
  * @since 0.12 copied from routerconsole
  */
 public class HostCheckHandler extends HandlerWrapper

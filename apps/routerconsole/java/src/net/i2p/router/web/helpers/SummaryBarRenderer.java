@@ -228,6 +228,14 @@ class SummaryBarRenderer {
            .append("</a>\n");
         }
 
+        if (pm.isRegistered(PortMapper.SVC_JSONRPC)) {
+           buf.append("<a href=\"/jsonrpc/\" target=\"_top\" title=\"")
+           .append(_t("RPC Service"))
+           .append("\">")
+           .append(nbsp(_t("I2PControl")))
+           .append("</a>\n");
+        }
+
         if (pm.isRegistered(PortMapper.SVC_I2PSNARK)) {
            buf.append("<a href=\"/torrents\" target=\"_top\" title=\"")
            .append(_t("Built-in anonymous BitTorrent Client"))

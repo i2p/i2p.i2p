@@ -802,6 +802,10 @@ public class RouterConsoleRunner implements RouterApp {
                             props.remove(PREFIX + "addressbook" + ENABLED);
                             rewrite = true;
                         }
+                    } else if (appName.equals("jsonrpc") && enabled == null) {
+                        // jsonrpc (i2pcontrol) webapp default is false
+                        props.setProperty(PREFIX + "jsonrpc" + ENABLED, "false");
+                        rewrite = true;
                     } else if (! "false".equals(enabled)) {
                         try {
                             String path = files[i].getCanonicalPath();

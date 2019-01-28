@@ -51,7 +51,7 @@
 
     <target name="war" depends="compile" >
         <war destfile="build/jsonrpc.war" webxml="web.xml" >
-            <classes dir="./build/obj" excludes="net/i2p/i2pcontrol/I2PControlController.class net/i2p/i2pcontrol/HostCheckHandler.class" />
+            <classes dir="./build/obj" excludes="net/i2p/i2pcontrol/I2PControlController.class net/i2p/i2pcontrol/HostCheckHandler.class net/i2p/i2pcontrol/SocketController*.class" />
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />

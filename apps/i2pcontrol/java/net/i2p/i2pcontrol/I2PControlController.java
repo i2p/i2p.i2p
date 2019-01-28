@@ -59,6 +59,8 @@ import java.util.StringTokenizer;
  *
  * Usage: I2PControlController -d $PLUGIN [start|stop]
  *
+ * This class is NOT used for the webapp or the bare ServerSocket implementation.
+ *
  * @author hottuna
  */
 public class I2PControlController implements RouterApp {
@@ -78,6 +80,7 @@ public class I2PControlController implements RouterApp {
     private static I2PControlController _instance;
     static final String PROP_ALLOWED_HOSTS = "i2pcontrol.allowedhosts";
     private static final String SVC_HTTPS_I2PCONTROL = "https_i2pcontrol";
+    private static final int DEFAULT_PORT = 7650;
 
     /**
      *  RouterApp (new way)
@@ -207,7 +210,7 @@ public class I2PControlController implements RouterApp {
         _server.start();
         _context.portMapper().register(SVC_HTTPS_I2PCONTROL,
                                        _conf.getConf("i2pcontrol.listen.address", "127.0.0.1"),
-                                       _conf.getConf("i2pcontrol.listen.port", 7650));
+                                       _conf.getConf("i2pcontrol.listen.port", DEFAULT_PORT));
     }
 
 
@@ -218,7 +221,7 @@ public class I2PControlController implements RouterApp {
      */
     private Connector buildDefaultListener(Server server) {
         Connector ssl = buildSslListener(server, _conf.getConf("i2pcontrol.listen.address", "127.0.0.1"),
-                                 _conf.getConf("i2pcontrol.listen.port", 7650));
+                                 _conf.getConf("i2pcontrol.listen.port", DEFAULT_PORT));
         return ssl;
     }
 
