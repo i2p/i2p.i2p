@@ -1,11 +1,13 @@
 package net.i2p.crypto.eddsa.math;
 
+import java.io.Serializable;
+
 /**
  *
  * @since 0.9.15
  *
  */
-public interface ScalarOps {
+public interface ScalarOps extends Serializable {
     /**
      * Reduce the given scalar mod l.
      * <p>
