@@ -14,11 +14,11 @@ public final class Metadata {
 
     private final String databaseType;
 
-    private final Map description;
+    private final Map<String, String> description;
 
     private final int ipVersion;
 
-    private final List languages;
+    private final List<String> languages;
 
     private final int nodeByteSize;
 
@@ -28,6 +28,7 @@ public final class Metadata {
 
     private final int searchTreeSize;
 
+    @SuppressWarnings("unchecked")
     Metadata(Map metadata) {
         this.binaryFormatMajorVersion = getInt(metadata,
                 "binary_format_major_version");
@@ -35,8 +36,8 @@ public final class Metadata {
                 "binary_format_minor_version");
         this.buildEpoch = getLong(metadata, "build_epoch");
         this.databaseType = getString(metadata, "database_type");
-        this.languages = (List) metadata.get("languages");
-        this.description = (Map) metadata.get("description");
+        this.languages = (List<String>) metadata.get("languages");
+        this.description = (Map<String, String>) metadata.get("description");
         this.ipVersion = getInt(metadata, "ip_version");
         this.nodeCount = getInt(metadata, "node_count");
         this.recordSize = getInt(metadata, "record_size");
