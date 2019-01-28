@@ -2,14 +2,32 @@
 <project basedir="." default="all" name="source">
     <property name="i2pbase" value="../.."/>
     <property name="i2plib" value="${i2pbase}/build"/>
+    <property name="jettylib" value="${i2pbase}/apps/jetty/jettylib"/>
     <property name="wrapperlib" value="${i2pbase}/installer/lib/wrapper/all"/>
+
+    <!--
+         Supports four build options:
+         1) war (jsonrpc.war) for running under the console
+         2) jar (i2pcontrol.jar) for starting and running on its own Jetty instance,
+            no console dependency
+         3) socketJar (i2pcontrol.jar) for running on a ServerSocket (JSON splitting),
+            no Jetty dependency (Work in progress)
+         4) TODO xxxjar with bundled, small non-Jetty server, similar to I2PTunnelHTTPClient?
+     -->
 
     <path id="cp">
         <pathelement location="${i2plib}/i2p.jar" />
         <pathelement location="${i2plib}/router.jar" />
-        <pathelement location="${i2plib}/org.mortbay.jetty.jar" />
-        <pathelement location="${i2plib}/javax.servlet.jar" />
-        <pathelement location="${i2plib}/jetty-servlet.jar" />
+        <pathelement location="${jettylib}/org.mortbay.jetty.jar" />
+        <pathelement location="${jettylib}/javax.servlet.jar" />
+        <pathelement location="${jettylib}/jetty-servlet.jar" />
+        <pathelement location="${wrapperlib}/wrapper.jar" />
+    </path>
+
+    <path id="cpSocket">
+        <pathelement location="${i2plib}/i2p.jar" />
+        <pathelement location="${i2plib}/router.jar" />
+        <!-- TODO get rid of wraper dependency also -->
         <pathelement location="${wrapperlib}/wrapper.jar" />
     </path>
 
@@ -44,8 +62,52 @@
         </javac>
     </target>
 
+    <!--
+      More TODO here. jsonrpc2 lib uses MessageContext which depends on servlet
+     -->
+    <target name="compileSocketJar" depends="builddep" >
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac 
+            sourcepath=""
+            srcdir="./java" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            includeAntRuntime="false"
+            destdir="./build/obj" 
+            classpath="${cpSocket}">
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath refid="cpSocket" />
+            <exclude name="**/I2PControlController.java" />
+            <exclude name="**/HostCheckHandler.java" />
+            <exclude name="**/JSONRPC2Servlet.java" />
+        </javac>
+    </target>
+
     <target name="jar" depends="compile">
-        <jar destfile="build/I2PControl.jar" basedir="./build/obj" includes="**/*.class" >
+        <jar destfile="build/i2pcontrol.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+        </jar>
+    </target>    
+
+    <target name="socketJar" depends="compileSocketJar">
+        <jar destfile="build/i2pcontrol.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
         </jar>
     </target>    
 
