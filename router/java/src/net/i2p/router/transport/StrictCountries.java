@@ -6,10 +6,11 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- *  Maintain a list of bad places.
+ *  Maintain a list of countries that may have
+ *  tight restrictions on applications like ours.
  *  @since 0.8.13
  */
-public abstract class BadCountries {
+public abstract class StrictCountries {
 
     private static final Set<String> _countries;
 

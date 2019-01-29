@@ -29,7 +29,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
-import net.i2p.router.transport.BadCountries;
+import net.i2p.router.transport.StrictCountries;
 import net.i2p.router.transport.GeoIP;
 import net.i2p.util.FileUtil;
 
@@ -227,7 +227,7 @@ public class BundleRouterInfos {
             for (Map.Entry<String, String> e : ipMap.entrySet()) {
                 String co = geoIP.get(e.getKey());
                 if (co != null) {
-                    if (BadCountries.contains(co)) {
+                    if (StrictCountries.contains(co)) {
                         String name = e.getValue();
                         File toFile = new File(toDir, name);
                         if (toFile.delete()) {
