@@ -26,7 +26,8 @@ public class EdDSAPrivateKeySpec implements KeySpec {
      *  @throws IllegalArgumentException if seed length is wrong or hash algorithm is unsupported
      */
     public EdDSAPrivateKeySpec(byte[] seed, EdDSAParameterSpec spec) {
-        if (seed.length != spec.getCurve().getField().getb()/8)
+        int bd8 = spec.getCurve().getField().getb() / 8;
+        if (seed.length != bd8)
             throw new IllegalArgumentException("seed length is wrong");
 
         this.spec = spec;
@@ -34,7 +35,6 @@ public class EdDSAPrivateKeySpec implements KeySpec {
 
         try {
             MessageDigest hash = MessageDigest.getInstance(spec.getHashAlgorithm());
-            int b = spec.getCurve().getField().getb();
 
             // H(k)
             h = hash.digest(seed);
@@ -46,9 +46,9 @@ public class EdDSAPrivateKeySpec implements KeySpec {
             // Saves ~0.4ms per key when running signing tests.
             // TODO: are these bitflips the same for any hash function?
             h[0] &= 248;
-            h[(b/8)-1] &= 63;
-            h[(b/8)-1] |= 64;
-            a = Arrays.copyOfRange(h, 0, b/8);
+            h[bd8 - 1] &= 63;
+            h[bd8 - 1] |= 64;
+            a = Arrays.copyOfRange(h, 0, bd8);
 
             A = spec.getB().scalarMultiply(a);
         } catch (NoSuchAlgorithmException e) {
@@ -66,18 +66,19 @@ public class EdDSAPrivateKeySpec implements KeySpec {
      *  @since 0.9.27 (GitHub issue #17)
      */
     public EdDSAPrivateKeySpec(EdDSAParameterSpec spec, byte[] h) {
-        if (h.length != spec.getCurve().getField().getb()/4)
+        int bd4 = spec.getCurve().getField().getb() / 4;
+        if (h.length != bd4)
             throw new IllegalArgumentException("hash length is wrong");
+        int bd8 = bd4 / 2;
 
 	this.seed = null;
 	this.h = h;
 	this.spec = spec;
-	int b = spec.getCurve().getField().getb();
 
         h[0] &= 248;
-        h[(b/8)-1] &= 63;
-        h[(b/8)-1] |= 64;
-        a = Arrays.copyOfRange(h, 0, b/8);
+        h[bd8 - 1] &= 63;
+        h[bd8 - 1] |= 64;
+        a = Arrays.copyOfRange(h, 0, bd8);
 
         A = spec.getB().scalarMultiply(a);
     }
