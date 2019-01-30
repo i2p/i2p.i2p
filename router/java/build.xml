@@ -142,7 +142,7 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${javac.classpath}" />
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
@@ -163,7 +163,7 @@
             includeAntRuntime="true"
             destdir="./build/obj">
             <classpath>
-                <pathelement location="${javac.classpath}" />
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />

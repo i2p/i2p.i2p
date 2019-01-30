@@ -1,5 +1,10 @@
+2019-01-30 zzz
+ * Build: Fix javac.classpath in junit.compileTest targets (ticket #2333)
+ * I2CP: Fixes for CreateLeaseset2 message with multiple keys
+
 2019-01-28 zzz
  * Bundle i2pcontrol
+ * EdDSA: Make more classes serializable (Github PR #68)
 
 2019-01-27 zzz
  * NDT:

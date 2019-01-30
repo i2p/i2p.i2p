@@ -195,7 +195,7 @@
             includeAntRuntime="false"
             destdir="./build/obj" >
             <classpath>
-                <pathelement location="${javac.classpath}" />
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest.jar" />
