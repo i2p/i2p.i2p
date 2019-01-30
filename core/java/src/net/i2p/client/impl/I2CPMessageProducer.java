@@ -9,6 +9,7 @@ package net.i2p.client.impl;
  *
  */
 
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -363,15 +364,20 @@ class I2CPMessageProducer {
      *
      */
     public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv,
-                               PrivateKey priv) throws I2PSessionException {
+                               List<PrivateKey> privs) throws I2PSessionException {
         CreateLeaseSetMessage msg;
         int type = leaseSet.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET)
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
             msg = new CreateLeaseSetMessage();
-        else
-            msg = new CreateLeaseSet2Message();
+            msg.setPrivateKey(privs.get(0));
+        } else {
+            CreateLeaseSet2Message msg2 = new CreateLeaseSet2Message();
+            for (PrivateKey priv : privs) {
+                msg2.addPrivateKey(priv);
+            }
+            msg = msg2;
+        }
         msg.setLeaseSet(leaseSet);
-        msg.setPrivateKey(priv);
         msg.setSigningPrivateKey(signingPriv);
         SessionId sid = session.getSessionId();
         if (sid == null) {

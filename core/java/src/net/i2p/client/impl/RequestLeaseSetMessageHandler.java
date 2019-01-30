@@ -315,7 +315,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                 _context.random().nextBytes(dummy);
                 spk = new SigningPrivateKey(dummy);
             }
-            session.getProducer().createLeaseSet(session, leaseSet, spk, li.getPrivateKey());
+            session.getProducer().createLeaseSet(session, leaseSet, spk, li.getPrivateKeys());
             session.setLeaseSet(leaseSet);
             if (_log.shouldDebug())
                 _log.debug("Created and signed LeaseSet: " + leaseSet);
