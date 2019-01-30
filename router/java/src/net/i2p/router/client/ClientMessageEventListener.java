@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -268,6 +269,26 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             }
         }
         props.putAll(inProps);
+        String senc = props.getProperty("i2cp.leaseSetEncType");
+        if (senc != null) {
+            String[] senca = DataHelper.split(senc, ",");
+            for (String sencaa : senca) {
+                EncType type = EncType.parseEncType(sencaa);
+                if (type != null) {
+                    if (!type.isAvailable()) {
+                        String msg = "Unsupported crypto type: " + type;
+                        _log.error(msg);
+                        _runner.disconnectClient(msg);
+                        return;
+                    }
+                } else {
+                    String msg = "Unsupported crypto type: " + sencaa;
+                    _log.error(msg);
+                    _runner.disconnectClient(msg);
+                    return;
+                }
+            }
+        }
         if ("7".equals(props.getProperty("i2cp.leaseSetType"))) {
             // Prevent tunnel builds for Meta LS
             // more TODO

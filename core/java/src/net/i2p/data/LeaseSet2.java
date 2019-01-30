@@ -555,7 +555,7 @@ public class LeaseSet2 extends LeaseSet {
         int sz = keys.size();
         buf.append("\n\tEncryption Keys: ").append(sz);
         for (int i = 0; i < sz; i++) {
-            buf.append("\n\tEncryptionKey ").append(i).append(": ").append(keys.get(i));
+            buf.append("\n\tEncryption Key ").append(i).append(": ").append(keys.get(i));
         }
         if (isOffline()) {
             buf.append("\n\tTransient Key: ").append(_transientSigningPublicKey);

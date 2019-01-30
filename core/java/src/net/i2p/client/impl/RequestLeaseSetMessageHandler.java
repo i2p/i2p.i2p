@@ -11,6 +11,10 @@ package net.i2p.client.impl;
 
 import java.io.EOFException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,8 +94,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             return true;
         String s = session.getOptions().getProperty(PROP_LS_ENCTYPE);
         if (s != null) {
-            EncType type = EncType.parseEncType(s);
-            if (type != null && type != EncType.ELGAMAL_2048 && type.isAvailable())
+            if (!s.equals("0") && !s.equals("ELGAMAL_2048"))
                 return true;
         }
         s = session.getOptions().getProperty(PROP_LS_TYPE);
@@ -150,14 +153,14 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             //lease.setStartDate(msg.getStartDate());
             leaseSet.addLease(lease);
         }
-        signLeaseSet(leaseSet, session);
+        signLeaseSet(leaseSet, isLS2, session);
     }
 
     /**
      *  Finish creating and signing the new LeaseSet
      *  @since 0.9.7
      */
-    protected synchronized void signLeaseSet(LeaseSet leaseSet, I2PSessionImpl session) {
+    protected synchronized void signLeaseSet(LeaseSet leaseSet, boolean isLS2, I2PSessionImpl session) {
         Destination dest = session.getMyDestination();
         // also, if this session is connected to multiple routers, include other leases here
         leaseSet.setDestination(dest);
@@ -165,11 +168,11 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         // reuse the old keys for the client
         LeaseInfo li = _existingLeaseSets.get(dest);
         if (li == null) {
-            // [enctype:]b64 of private key
+            // [enctype:]b64,... of private keys
             String spk = session.getOptions().getProperty(PROP_LS_PK);
             // [sigtype:]b64 of private key
             String sspk = session.getOptions().getProperty(PROP_LS_SPK);
-            PrivateKey privKey = null;
+            List<PrivateKey> privKeys = new ArrayList<PrivateKey>(2);
             SigningPrivateKey signingPrivKey = null;
             if (spk != null && sspk != null) {
                 boolean useOldKeys = true;
@@ -183,69 +186,69 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                     else
                         useOldKeys = false;
                 }
-                colon = spk.indexOf(':');
-                // just ignore for now, no other types supported
-                if (colon >= 0)
-                    spk = spk.substring(colon + 1);
                 if (useOldKeys) {
                     try {
                         signingPrivKey = new SigningPrivateKey(type);
                         signingPrivKey.fromBase64(sspk);
-                    } catch (DataFormatException iae) {
+                    } catch (DataFormatException dfe) {
                         useOldKeys = false;
                         signingPrivKey = null;
                     }
                 }
                 if (useOldKeys) {
-                    try {
-                        privKey = new PrivateKey();
-                        privKey.fromBase64(spk);
-                    } catch (DataFormatException iae) {
-                        privKey = null;
-                    }
+                    parsePrivateKeys(spk, privKeys);
                 }
             }
-            if (privKey == null && !_existingLeaseSets.isEmpty()) {
-                // look for keypair from another dest using same pubkey
+            if (privKeys.isEmpty() && !_existingLeaseSets.isEmpty()) {
+                // look for private keys from another dest using same pubkey
                 PublicKey pk = dest.getPublicKey();
                 for (Map.Entry<Destination, LeaseInfo> e : _existingLeaseSets.entrySet()) {
                     if (pk.equals(e.getKey().getPublicKey())) {
-                        privKey = e.getValue().getPrivateKey();
+                        privKeys.addAll(e.getValue().getPrivateKeys());
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Creating new leaseInfo keys for " + dest + " with private key from " + e.getKey());
                         break;
                     }
                 }
             }
-            if (privKey != null) {
+            if (!privKeys.isEmpty()) {
                 if (signingPrivKey != null) {
-                    li = new LeaseInfo(privKey, signingPrivKey);
+                    li = new LeaseInfo(privKeys, signingPrivKey);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Creating new leaseInfo keys for " + dest + " WITH configured private keys");
                 } else {
-                    li = new LeaseInfo(privKey, dest);
+                    li = new LeaseInfo(privKeys, dest);
                 }
             } else {
-                EncType type = EncType.ELGAMAL_2048;
+                List<EncType> types = new ArrayList<EncType>(2);
                 String senc = session.getOptions().getProperty(PROP_LS_ENCTYPE);
                 if (senc != null) {
-                    EncType newtype = EncType.parseEncType(senc);
-                    if (newtype != null) {
-                        if (newtype.isAvailable()) {
-                            type = newtype;
-                            if (_log.shouldDebug())
-                                _log.debug("Using crypto type: " + type);
+                    String[] senca = DataHelper.split(senc, ",");
+                    for (String sencaa : senca) {
+                        EncType newtype = EncType.parseEncType(sencaa);
+                        if (newtype != null) {
+                            if (types.contains(newtype)) {
+                                _log.error("Duplicate crypto type: " + newtype);
+                                continue;
+                            }
+                            if (newtype.isAvailable()) {
+                                types.add(newtype);
+                                if (_log.shouldDebug())
+                                    _log.debug("Using crypto type: " + newtype);
+                            } else {
+                                _log.error("Unsupported crypto type: " + newtype);
+                            }
                         } else {
-                            _log.error("Unsupported crypto.encType: " + newtype);
+                            _log.error("Unsupported crypto type: " + sencaa);
                         }
-                    } else {
-                        _log.error("Bad crypto.encType: " + senc);
                     }
-                } else {
+                }
+                if (types.isEmpty()) {
                     if (_log.shouldDebug())
                         _log.debug("Using default crypto type");
+                    types.add(EncType.ELGAMAL_2048);
                 }
-                li = new LeaseInfo(dest, type);
+                li = new LeaseInfo(dest, types);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Creating new leaseInfo keys for " + dest + " without configured private keys");
             }
@@ -256,8 +259,16 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                            + dest);
         }
 
-        if (_ls2Type != DatabaseEntry.KEY_TYPE_META_LS2)
+        if (isLS2) {
+            LeaseSet2 ls2 = (LeaseSet2) leaseSet;
+            if (_ls2Type != DatabaseEntry.KEY_TYPE_META_LS2) {
+                for (PublicKey key : li.getPublicKeys()) {
+                    ls2.addEncryptionKey(key);
+                }
+            }
+        } else {
             leaseSet.setEncryptionKey(li.getPublicKey());
+        }
         leaseSet.setSigningKey(li.getSigningPublicKey());
         // SubSession options aren't updated via the gui, so use the primary options
         Properties opts;
@@ -325,17 +336,72 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         }
     }
 
+    /**
+     *  @param spk non-null [type:]b64[,[type:]b64]...
+     *  @param privKeys out parameter
+     *  @since 0.9.39
+     */
+    private void parsePrivateKeys(String spkl, List<PrivateKey> privKeys) {
+        String[] spks = DataHelper.split(spkl, ",");
+        for (String spk : spks) {
+            int colon = spk.indexOf(':');
+            if (colon > 0) {
+                EncType type = EncType.parseEncType(spk.substring(0, colon));
+                if (type != null) {
+                    if (type.isAvailable()) {
+                        try {
+                            PrivateKey privKey = new PrivateKey(type);
+                            privKey.fromBase64(spk.substring(colon + 1));
+                            privKeys.add(privKey);
+                            if (_log.shouldDebug())
+                                _log.debug("Using crypto type: " + type);
+                        } catch (DataFormatException dfe) {
+                            _log.error("Bad private key: " + spk, dfe);
+                        }
+                    } else {
+                        _log.error("Unsupported crypto type: " + type);
+                    }
+                } else {
+                    _log.error("Unsupported crypto type: " + spk);
+                }
+            } else if (colon < 0) {
+                try {
+                    PrivateKey privKey = new PrivateKey();
+                    privKey.fromBase64(spk);
+                    privKeys.add(privKey);
+                } catch (DataFormatException dfe) {
+                    _log.error("Bad private key: " + spk, dfe);
+                }
+            } else {
+                _log.error("Empty crypto type");
+            }
+        }
+    }
+
+    /**
+     *  Multiple encryption keys supported, as of 0.9.39, for LS2
+     */
     private static class LeaseInfo {
-        private final PublicKey _pubKey;
-        private final PrivateKey _privKey;
+        private final List<PublicKey> _pubKeys;
+        private final List<PrivateKey> _privKeys;
         private final SigningPublicKey _signingPubKey;
         private final SigningPrivateKey _signingPrivKey;
 
         /**
          *  New keys
+         *  @param types must be available
          */
-        public LeaseInfo(Destination dest, EncType type) {
-            KeyPair encKeys = KeyGenerator.getInstance().generatePKIKeys(type);
+        public LeaseInfo(Destination dest, List<EncType> types) {
+            if (types.size() > 1) {
+                Collections.sort(types, Collections.reverseOrder());
+            }
+            _privKeys = new ArrayList<PrivateKey>(types.size());
+            _pubKeys = new ArrayList<PublicKey>(types.size());
+            for (EncType type : types) {
+                KeyPair encKeys = KeyGenerator.getInstance().generatePKIKeys(type);
+                _pubKeys.add(encKeys.getPublic());
+                _privKeys.add(encKeys.getPrivate());
+            }
             // must be same type as the Destination's signing key
             SimpleDataStructure signKeys[];
             try {
@@ -343,46 +409,67 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             } catch (GeneralSecurityException gse) {
                 throw new IllegalStateException(gse);
             }
-            _pubKey = encKeys.getPublic();
-            _privKey = encKeys.getPrivate();
             _signingPubKey = (SigningPublicKey) signKeys[0];
             _signingPrivKey = (SigningPrivateKey) signKeys[1];
         }
 
         /**
          *  Existing keys
+         *  @param privKeys all EncTypes must be available
          *  @since 0.9.18
          */
-        public LeaseInfo(PrivateKey privKey, SigningPrivateKey signingPrivKey) {
-            _pubKey = KeyGenerator.getPublicKey(privKey);
-            _privKey = privKey;
+        public LeaseInfo(List<PrivateKey> privKeys, SigningPrivateKey signingPrivKey) {
+            if (privKeys.size() > 1) {
+                Collections.sort(privKeys, new PrivKeyComparator());
+            }
+            _privKeys = privKeys;
+            _pubKeys = new ArrayList<PublicKey>(privKeys.size());
+            for (PrivateKey privKey : privKeys) {
+                _pubKeys.add(KeyGenerator.getPublicKey(privKey));
+            }
             _signingPubKey = KeyGenerator.getSigningPublicKey(signingPrivKey);
             _signingPrivKey = signingPrivKey;
         }
 
         /**
-         *  Existing crypto key, new signing key
+         *  Existing crypto keys, new signing key
+         *  @param privKeys all EncTypes must be available
          *  @since 0.9.21
          */
-        public LeaseInfo(PrivateKey privKey, Destination dest) {
+        public LeaseInfo(List<PrivateKey> privKeys, Destination dest) {
             SimpleDataStructure signKeys[];
             try {
                 signKeys = KeyGenerator.getInstance().generateSigningKeys(dest.getSigningPublicKey().getType());
             } catch (GeneralSecurityException gse) {
                 throw new IllegalStateException(gse);
             }
-            _pubKey = KeyGenerator.getPublicKey(privKey);
-            _privKey = privKey;
+            _privKeys = privKeys;
+            _pubKeys = new ArrayList<PublicKey>(privKeys.size());
+            for (PrivateKey privKey : privKeys) {
+                _pubKeys.add(KeyGenerator.getPublicKey(privKey));
+            }
             _signingPubKey = (SigningPublicKey) signKeys[0];
             _signingPrivKey = (SigningPrivateKey) signKeys[1];
         }
 
+        /** @return the first one if more than one */
         public PublicKey getPublicKey() {
-            return _pubKey;
+            return _pubKeys.get(0);
         }
 
+        /** @return the first one if more than one */
         public PrivateKey getPrivateKey() {
-            return _privKey;
+            return _privKeys.get(0);
+        }
+
+        /** @since 0.9.39 */
+        public List<PublicKey> getPublicKeys() {
+            return _pubKeys;
+        }
+
+        /** @since 0.9.39 */
+        public List<PrivateKey> getPrivateKeys() {
+            return _privKeys;
         }
 
         public SigningPublicKey getSigningPublicKey() {
@@ -392,20 +479,15 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         public SigningPrivateKey getSigningPrivateKey() {
             return _signingPrivKey;
         }
-        
-        @Override
-        public int hashCode() {
-            return DataHelper.hashCode(_pubKey) + 7 * DataHelper.hashCode(_privKey) + 7 * 7
-                   * DataHelper.hashCode(_signingPubKey) + 7 * 7 * 7 * DataHelper.hashCode(_signingPrivKey);
-        }
-        
-        @Override
-        public boolean equals(Object obj) {
-            if ((obj == null) || !(obj instanceof LeaseInfo)) return false;
-            LeaseInfo li = (LeaseInfo) obj;
-            return DataHelper.eq(_pubKey, li.getPublicKey()) && DataHelper.eq(_privKey, li.getPrivateKey())
-                   && DataHelper.eq(_signingPubKey, li.getSigningPublicKey())
-                   && DataHelper.eq(_signingPrivKey, li.getSigningPrivateKey());
+
+        /**
+         *  Reverse order by enc type
+         *  @since 0.9.39
+         */
+        private static class PrivKeyComparator implements Comparator<PrivateKey> {
+            public int compare(PrivateKey l, PrivateKey r) {
+                return r.getType().compareTo(l.getType());
+            }
         }
     }
 }

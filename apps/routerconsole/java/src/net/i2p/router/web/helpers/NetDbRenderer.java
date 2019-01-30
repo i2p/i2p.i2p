@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -33,6 +34,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
+import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
@@ -533,8 +535,24 @@ class NetDbRenderer {
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
                 buf.append("<b>Signature type:</b> ").append(dest.getSigningPublicKey().getType());
-                if (type != DatabaseEntry.KEY_TYPE_META_LS2)
-                    buf.append("&nbsp;&nbsp;<b>Encryption Key:</b> ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("&hellip;");
+                if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+                    buf.append("</td></tr>\n<tr><td colspan=\"2\"><b>Encryption Key:</b> ELGAMAL_2048 ")
+                       .append(ls.getEncryptionKey().toBase64().substring(0, 20))
+                       .append("&hellip;");
+                } else if (type == DatabaseEntry.KEY_TYPE_LS2) {
+                    LeaseSet2 ls2 = (LeaseSet2) ls;
+                    for (PublicKey pk : ls2.getEncryptionKeys()) {
+                        buf.append("</td></tr>\n<tr><td colspan=\"2\"><b>Encryption Key:</b> ");
+                        EncType etype = pk.getType();
+                        if (etype != null)
+                            buf.append(etype);
+                        else
+                            buf.append("Unsupported type ").append(pk.getUnknownTypeCode());
+                        buf.append(' ')
+                           .append(pk.toBase64().substring(0, 20))
+                           .append("&hellip;");
+                    }
+                }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 buf.append("<b>Routing Key:</b> ").append(ls.getRoutingKey().toBase64());
                 buf.append("</td></tr>");

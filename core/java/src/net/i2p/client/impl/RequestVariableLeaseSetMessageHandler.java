@@ -77,6 +77,6 @@ class RequestVariableLeaseSetMessageHandler extends RequestLeaseSetMessageHandle
             }
             leaseSet.addLease(lease);
         }
-        signLeaseSet(leaseSet, session);
+        signLeaseSet(leaseSet, isLS2, session);
     }
 }
