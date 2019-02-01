@@ -367,8 +367,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public static final String PROP_VIA = "i2ptunnel.httpclient.sendVia";
     public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
     public static final String PROP_DISABLE_HELPER = "i2ptunnel.httpclient.disableAddressHelper";
-    /** @since 0.9.11 */
-    public static final String PROP_SSL_OUTPROXIES = "i2ptunnel.httpclient.SSLOutproxies";
     /** @since 0.9.14 */
     public static final String PROP_ACCEPT = "i2ptunnel.httpclient.sendAccept";
     /** @since 0.9.14, overridden to true as of 0.9.35 unlesss PROP_SSL_SET is set */
@@ -406,6 +404,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             out = s.getOutputStream();
             InputReader reader = new InputReader(s.getInputStream());
             String line, method = null, protocol = null, host = null, destination = null;
+            String hostLowerCase = null;
             StringBuilder newRequest = new StringBuilder();
             boolean ahelperPresent = false;
             boolean ahelperNew = false;
@@ -581,7 +580,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     // in our addressbook (all naming is local),
                     // and it is removed from the request line.
 
-                    String hostLowerCase = host.toLowerCase(Locale.US);
+                    hostLowerCase = host.toLowerCase(Locale.US);
                     if(hostLowerCase.equals(LOCAL_SERVER)) {
                         // so we don't do any naming service lookups
                         destination = host;
@@ -869,9 +868,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             }
                             if ("https".equals(protocol) ||
                                 method.toUpperCase(Locale.US).equals("CONNECT"))
-                                currentProxy = selectSSLProxy();
+                                currentProxy = selectSSLProxy(hostLowerCase);
                             else
-                                currentProxy = selectProxy();
+                                currentProxy = selectProxy(hostLowerCase);
                             if(_log.shouldLog(Log.DEBUG)) {
                                 _log.debug("After selecting outproxy for " + host + ": " + currentProxy);
                             }
@@ -945,8 +944,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // Note that we only pass the original Host: line through to the outproxy
                         // But we don't create a Host: line if it wasn't sent to us
                         line = "Host: " + host;
-                        if(_log.shouldLog(Log.INFO)) {
-                            _log.info(getPrefix(requestId) + "Setting host = " + host);
+                        if (_log.shouldDebug()) {
+                            _log.debug(getPrefix(requestId) + "Setting host = " + host);
                         }
                     } else if(lowercaseLine.startsWith("user-agent: ")) {
                         // save for deciding whether to offer address book form
@@ -1306,9 +1305,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if (remotePort > 0)
                 sktOpts.setPort(remotePort);
             i2ps = createI2PSocket(clientDest, sktOpts);
-            OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
-            Thread t;
-            if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+            boolean isConnect = method.toUpperCase(Locale.US).equals("CONNECT");
+            OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy,
+                                                currentProxy, requestId, hostLowerCase, isConnect);
+            I2PTunnelRunner t;
+            if (isConnect) {
                 byte[] data;
                 byte[] response;
                 if (usingWWWProxy) {
@@ -1322,6 +1323,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             } else {
                 byte[] data = newRequest.toString().getBytes("ISO-8859-1");
                 t = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+            }
+            if (usingWWWProxy) {
+                t.setSuccessCallback(new OnProxySuccess(currentProxy, hostLowerCase, isConnect));
             }
             // we are called from an unlimited thread pool, so run inline
             //t.start();
@@ -1345,26 +1349,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             closeSocket(s);
             if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
         }
-    }
-
-    /**
-     *  Unlike selectProxy(), we parse the option on the fly so it
-     *  can be changed. selectProxy() requires restart...
-     *  @return null if none
-     *  @since 0.9.11
-     */
-    private String selectSSLProxy() {
-        String s = getTunnel().getClientOptions().getProperty(PROP_SSL_OUTPROXIES);
-        if (s == null)
-            return null;
-        String[] p = DataHelper.split(s, "[,; \r\n\t]");
-        if (p.length == 0)
-            return null;
-        // todo doesn't check for ""
-        if (p.length == 1)
-            return p[0];
-        int i = _context.random().nextInt(p.length);
-        return p[i];
     }
 
     /** @since 0.8.7 */

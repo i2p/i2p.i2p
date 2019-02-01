@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
@@ -42,6 +43,7 @@ import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.util.EepGet;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.InternalSocket;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.PasswordManager;
 import net.i2p.util.PortMapper;
@@ -64,6 +66,9 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private static final int MAX_NONCE_COUNT = 1024;
     /** @since 0.9.11, moved to Base in 0.9.29 */
     public static final String PROP_USE_OUTPROXY_PLUGIN = "i2ptunnel.useLocalOutproxy";
+    /** @since 0.9.11, moved to Base in 0.9.39 */
+    public static final String PROP_SSL_OUTPROXIES = "i2ptunnel.httpclient.SSLOutproxies";
+
     /**
      *  This is a standard soTimeout, not a total timeout.
      *  We have no slowloris protection on the client side.
@@ -122,19 +127,142 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private final byte[] _proxyNonce;
     private final ConcurrentHashMap<String, NonceInfo> _nonces;
     private final AtomicInteger _nonceCleanCounter = new AtomicInteger();
+    // clearnet host to proxy
+    private final Map<String, String> _proxyCache = new LHMCache<String, String>(32);
+    // very simple, remember last-failed only
+    private String _lastFailedProxy;
+    // clearnet host to proxy
+    private final Map<String, String> _proxySSLCache = new LHMCache<String, String>(32);
+    // very simple, remember last-failed only
+    private String _lastFailedSSLProxy;
 
     protected String getPrefix(long requestId) {
         return "HTTPClient[" + _clientId + '/' + requestId + "]: ";
     }
+
+    // TODO standard proxy config changes require tunnel restart;
+    // SSL proxy config is parsed on the fly;
+    // allow both to be changed and store the SSL proxy list.
+    // TODO should track more than one failed proxy
     
-    protected String selectProxy() {
+    /**
+     *  Simple random selection, with caching by hostname,
+     *  and avoidance of the last one to fail.
+     *
+     *  @param host the clearnet hostname we're targeting
+     *  @return null if none configured
+     */
+    protected String selectProxy(String host) {
+        String rv;
         synchronized (_proxyList) {
             int size = _proxyList.size();
             if (size <= 0)
                 return null;
-            int index = _context.random().nextInt(size);
-            return _proxyList.get(index);
+            if (size == 1)
+                return _proxyList.get(0);
+            rv = _proxyCache.get(host);
+            if (rv == null) {
+                List<String> tmpList;
+                if (_lastFailedProxy != null) {
+                    // don't use last failed one
+                    tmpList = new ArrayList<String>(_proxyList);
+                    tmpList.remove(_lastFailedProxy);
+                    size = tmpList.size();
+                } else {
+                    tmpList = _proxyList;
+                }
+                int index = _context.random().nextInt(size);
+                rv = tmpList.get(index);
+                _proxyCache.put(host, rv);
+            }
         }
+        if (_log.shouldInfo())
+            _log.info("Selected proxy for " + host + ": " + rv);
+        return rv;
+    }
+
+    /**
+     *  Only for SSL via HTTPClient. ConnectClient should use selectProxy()
+     *
+     *  Unlike selectProxy(), we parse the option on the fly so it
+     *  can be changed. selectProxy() requires restart...
+     *
+     *  @return null if none configured
+     *  @since 0.9.11, moved from I2PTunnelHTTPClient in 0.9.39
+     */
+    protected String selectSSLProxy(String host) {
+        String s = getTunnel().getClientOptions().getProperty(PROP_SSL_OUTPROXIES);
+        if (s == null)
+            return null;
+        String[] p = DataHelper.split(s, "[,; \r\n\t]");
+        int size = p.length;
+        if (size == 0)
+            return null;
+        // todo doesn't check for ""
+        if (size == 1)
+            return p[0];
+        String rv;
+        synchronized (_proxySSLCache) {
+            rv = _proxySSLCache.get(host);
+            if (rv == null) {
+                List<String> tmpList;
+                if (_lastFailedSSLProxy != null) {
+                    // don't use last failed one
+                    tmpList = new ArrayList<String>(Arrays.asList(p));
+                    tmpList.remove(_lastFailedSSLProxy);
+                    size = tmpList.size();
+                } else {
+                    tmpList = Arrays.asList(p);
+                }
+                int index = _context.random().nextInt(size);
+                rv = tmpList.get(index);
+                _proxySSLCache.put(host, rv);
+            }
+        }
+        if (_log.shouldInfo())
+            _log.info("Selected SSL proxy for " + host + ": " + rv);
+        return rv;
+    }
+    
+    /**
+     *  Update the cache and note if failed.
+     *
+     *  @param proxy which
+     *  @param host clearnet hostname targeted
+     *  @param isSSL set to FALSE for ConnectClient
+     *  @param ok success or failure
+     *  @since 0.9.39
+     */
+    protected void noteProxyResult(String proxy, String host, boolean isSSL, boolean ok) {
+        if (isSSL) {
+            synchronized (_proxySSLCache) {
+                if (ok) {
+                    if (proxy.equals(_lastFailedSSLProxy))
+                        _lastFailedSSLProxy = null;
+                    _proxySSLCache.put(host, proxy);
+                } else {
+                    _lastFailedSSLProxy = proxy;
+                    if (proxy.equals(_proxySSLCache.get(host)))
+                        _proxySSLCache.remove(host);
+                }
+            }
+        } else {
+            synchronized (_proxyList) {
+                if (_proxyList.size() > 1) {
+                    if (ok) {
+                        if (proxy.equals(_lastFailedProxy))
+                            _lastFailedProxy = null;
+                        _proxyCache.put(host, proxy);
+                    } else {
+                        _lastFailedProxy = proxy;
+                        if (proxy.equals(_proxyCache.get(host)))
+                            _proxyCache.remove(host);
+                    }
+                }
+            }
+        }
+        if (_log.shouldInfo())
+            _log.info("Proxy result: to " + host + " through " + proxy + " SSL? " + isSSL + " success? " + ok);
     }
 
     /**
@@ -610,7 +738,12 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         private final boolean _usingProxy;
         private final String _wwwProxy;
         private final long _requestId;
+        private final String _targetHost;
+        private final boolean _isSSL;
 
+        /**
+         *  @param target the URI for an HTTP request, or the host name for CONNECT
+         */
         public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy, String wwwProxy, long id) {
             _socket = s;
             _out = out;
@@ -618,12 +751,35 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             _usingProxy = usingProxy;
             _wwwProxy = wwwProxy;
             _requestId = id;
+            _targetHost = null;
+            _isSSL = false;
+        }
+
+        /**
+         *  @param target the URI for an HTTP request, or the host name for CONNECT
+         *  @param targetHost if non-null, call noteProxyResult() with this as host
+         *  @param isSSL to pass to noteProxyResult(). FALSE for ConnectClient.
+         *  @since 0.9.39
+         */
+        public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy,
+                         String wwwProxy, long id, String targetHost, boolean isSSL) {
+            _socket = s;
+            _out = out;
+            _target = target;
+            _usingProxy = usingProxy;
+            _wwwProxy = wwwProxy;
+            _requestId = id;
+            _targetHost = targetHost;
+            _isSSL = isSSL;
         }
 
         /**
          *  @param ex may be null
          */
         public void onFail(Exception ex) {
+            if (_usingProxy && _targetHost != null) {
+                noteProxyResult(_wwwProxy, _targetHost, _isSSL, false);
+            }
             Throwable cause = ex != null ? ex.getCause() : null;
             if (cause != null && cause instanceof I2PSocketException) {
                 I2PSocketException ise = (I2PSocketException) cause;
@@ -632,6 +788,23 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 handleClientException(ex, _out, _target, _usingProxy, _wwwProxy, _requestId);
             }
             closeSocket(_socket);
+        }
+    }
+
+    /**
+     *  @since 0.9.39
+     */
+    protected class OnProxySuccess implements I2PTunnelRunner.SuccessCallback {
+        private final String _proxy, _host;
+        private final boolean _isSSL;
+
+        /** @param isSSL FALSE for ConnectClient */
+        public OnProxySuccess(String proxy, String host, boolean isSSL) {
+            _proxy = proxy; _host = host; _isSSL = isSSL;
+        }
+
+        public void onSuccess() {
+            noteProxyResult(_proxy, _host, _isSSL, true);
         }
     }
 
