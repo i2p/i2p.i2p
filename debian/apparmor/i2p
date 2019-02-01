@@ -33,17 +33,13 @@
   /usr/share/javazi/**                                    r,
 
   /etc/java-*-openjdk/**                                  r,
-  /usr/lib/jvm/default-java/jre/bin/java                  rix,
-  /usr/lib/jvm/java-*-openjdk-*/jre/bin/java              rix,
-  /usr/lib/jvm/java-*-openjdk-*/jre/bin/keytool           rix,
-
-  # Oracle Java is needed on the Raspberry Pi and is included in Raspbian's repositories
-  /usr/lib/jvm/jdk-*-oracle-*/jre/bin/java                rix,
-  /usr/lib/jvm/jdk-*-oracle-*/jre/bin/keytool             rix,
+  # Allow any JRE or JDK
+  /usr/lib/jvm/*/jre/bin/java                             rix,
+  /usr/lib/jvm/*/jre/bin/keytool                          rix,
 
   # */client/classes.jsa is only found (and needed) in 32-bit JVMs.
-  /usr/lib/jvm/java-*-openjdk-*/jre/lib/i386/client/classes.jsa m,
-  /usr/lib/jvm/java-*-oracle-*/jre/lib/i386/client/classes.jsa m,
+  /usr/lib/jvm/*/jre/lib/i386/client/classes.jsa          m,
+  /usr/lib/jvm/*/jre/lib/i386/client/classes.jsa          m,
 
   # needed for I2P's graphs
   /usr/share/java/java-atk-wrapper.jar                    r,
