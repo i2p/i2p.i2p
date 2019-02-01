@@ -369,7 +369,8 @@ class SOCKS5Server extends SOCKSServer {
         I2PSocket destSock;
 
         try {
-            if (connHostName.toLowerCase(Locale.US).endsWith(".i2p")) {
+            String hostLowerCase = connHostName.toLowerCase(Locale.US);
+            if (hostLowerCase.endsWith(".i2p")) {
                 // Let's not do a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
@@ -386,7 +387,9 @@ class SOCKS5Server extends SOCKSServer {
                 I2PSocketOptions sktOpts = t.buildOptions(overrides);
                 sktOpts.setPort(connPort);
                 destSock = t.createI2PSocket(dest, sktOpts);
-            } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
+            } else if (hostLowerCase.equals("localhost") || connHostName.equals("127.0.0.1") ||
+                       hostLowerCase.endsWith(".localhost") ||
+                       connHostName.startsWith("192.168.") || connHostName.equals("[::1]")) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);
                 try {

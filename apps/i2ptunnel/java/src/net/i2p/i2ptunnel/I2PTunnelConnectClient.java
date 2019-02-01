@@ -203,7 +203,8 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         restofline = request.substring(pos); // ":80 HTTP/1.1" or " HTTP/1.1"
                     }
 
-                    if (host.toLowerCase(Locale.US).endsWith(".i2p")) {
+                    String hostLowerCase = host.toLowerCase(Locale.US);
+                    if (hostLowerCase.endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
                     } else if (host.contains(".") || host.startsWith("[")) {
@@ -235,7 +236,9 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                             usingWWWProxy = true;
                             newRequest.append("CONNECT ").append(host).append(restofline).append("\r\n"); // HTTP spec
                          }
-                    } else if (host.toLowerCase(Locale.US).equals("localhost")) {
+                    } else if (hostLowerCase.equals("localhost") || host.equals("127.0.0.1") ||
+                               hostLowerCase.endsWith(".localhost") ||
+                               host.startsWith("192.168.") || host.equals("[::1]")) {
                         writeErrorMessage(ERR_LOCALHOST, out);
                         return;
                     } else {  // full b64 address (hopefully)

@@ -210,7 +210,8 @@ class SOCKS4aServer extends SOCKSServer {
         I2PSocket destSock;
 
         try {
-            if (connHostName.toLowerCase(Locale.US).endsWith(".i2p")) {
+            String hostLowerCase = connHostName.toLowerCase(Locale.US);
+            if (hostLowerCase.endsWith(".i2p")) {
                 Destination dest = _context.namingService().lookup(connHostName);
                 if (dest == null) {
                     try {
@@ -224,7 +225,9 @@ class SOCKS4aServer extends SOCKSServer {
                 I2PSocketOptions sktOpts = t.buildOptions(overrides);
                 sktOpts.setPort(connPort);
                 destSock = t.createI2PSocket(dest, sktOpts);
-            } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
+            } else if ("localhost".equals(hostLowerCase) || "127.0.0.1".equals(connHostName) ||
+                       hostLowerCase.endsWith(".localhost") ||
+                       connHostName.startsWith("192.168.") || connHostName.equals("[::1]")) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);
                 try {
