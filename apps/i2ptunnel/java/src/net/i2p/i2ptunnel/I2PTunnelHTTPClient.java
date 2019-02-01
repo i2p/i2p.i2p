@@ -1279,7 +1279,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // and not pass the parameter to the eepsite.
             // This also prevents the not-found error page from looking bad
             // Syndie can't handle a redirect of a POST
-            if(ahelperPresent && !"POST".equals(method)) {
+            if (ahelperPresent && !"POST".equals(method) && !"PUT".equals(method)) {
                 String uri = targetRequest;
                 if(_log.shouldLog(Log.DEBUG)) {
                     _log.debug("Auto redirecting to " + uri);

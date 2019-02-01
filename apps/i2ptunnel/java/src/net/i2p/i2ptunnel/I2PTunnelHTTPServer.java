@@ -230,7 +230,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 long pb = 1000L * getIntOption(OPT_POST_BAN_TIME, DEFAULT_POST_BAN_TIME);
                 long px = 1000L * getIntOption(OPT_POST_TOTAL_BAN_TIME, DEFAULT_POST_TOTAL_BAN_TIME);
                 if (_postThrottler == null)
-                    _postThrottler = new ConnThrottler(pp, pt, pw, pb, px, "POST", _log);
+                    _postThrottler = new ConnThrottler(pp, pt, pw, pb, px, "POST/PUT", _log);
                 else
                     _postThrottler.updateLimits(pp, pt, pw, pb, px);
             }
@@ -481,10 +481,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             if (_postThrottler != null &&
                 command.length() >= 5 &&
-                command.substring(0, 5).toUpperCase(Locale.US).equals("POST ")) {
+                (command.substring(0, 5).toUpperCase(Locale.US).equals("POST ") ||
+                 command.substring(0, 4).toUpperCase(Locale.US).equals("PUT "))) {
                 if (_postThrottler.shouldThrottle(peerHash)) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Refusing POST since peer is throttled: " + peerB32);
+                        _log.warn("Refusing POST/PUT since peer is throttled: " + peerB32);
                     try {
                         // Send a 429, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
@@ -641,7 +642,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.info("request headers: " + _headers);
                 serverout.write(DataHelper.getUTF8(_headers));
                 browserin = _browser.getInputStream();
-                // Don't spin off a thread for this except for POSTs
+                // Don't spin off a thread for this except for POSTs and PUTs
+                // TODO Upgrade:
                 // beware interference with Shoutcast, etc.?
                 if ((!(_headers.startsWith("GET ") || _headers.startsWith("HEAD "))) ||
                     browserin.available() > 0) {  // just in case

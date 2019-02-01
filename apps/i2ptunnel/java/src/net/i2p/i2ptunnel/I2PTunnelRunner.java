@@ -254,6 +254,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     protected OutputStream getSocketOut() throws IOException { return s.getOutputStream(); }
     
     private static final byte[] POST = { 'P', 'O', 'S', 'T', ' ' };
+    private static final byte[] PUT = { 'P', 'U', 'T', ' ' };
 
     @Override
     public void run() {
@@ -289,7 +290,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     if (initialI2PData.length <= 1730) {  // ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE
                         // Don't flush if POST, so we can get POST data into the initial packet
                         if (initialI2PData.length < 5 ||
-                            !DataHelper.eq(POST, 0, initialI2PData, 0, 5))
+                            !(DataHelper.eq(POST, 0, initialI2PData, 0, 5) ||
+                              DataHelper.eq(PUT, 0, initialI2PData, 0, 4)))
                             i2pout.flush();
                     }
                 //}

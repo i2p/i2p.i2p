@@ -1,3 +1,14 @@
+2019-02-01 zzz
+ * Debian: AppArmor fix for Oracle JVM (ticket #2319)
+ * i2ptunnel:
+   - Caching of outproxy selection, avoid last-failed outproxy
+   - More localhost checks
+   - Handle PUT like POST
+
+2019-01-31 zzz
+ * Debian: Fix version detection of Tomcat 9 required
+   for reproducible builds (ticket #2279)
+
 2019-01-30 zzz
  * Build: Fix javac.classpath in junit.compileTest targets (ticket #2333)
  * I2CP: Fixes for CreateLeaseset2 message with multiple keys
