@@ -89,7 +89,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                          "\r\n";
     // ESR version of Firefox, same as Tor Browser
     private static final String UA_CLEARNET = "User-Agent: " +
-                                              "Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0" +
+                                              "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0" +
                                               "\r\n";
 
     /**
