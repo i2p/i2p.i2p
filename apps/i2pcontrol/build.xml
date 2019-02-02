@@ -22,6 +22,8 @@
         <pathelement location="${jettylib}/javax.servlet.jar" />
         <pathelement location="${jettylib}/jetty-servlet.jar" />
         <pathelement location="${wrapperlib}/wrapper.jar" />
+        <!-- following jar only present for debian builds -->
+        <pathelement location="../../core/java/build/json-simple.jar" />
     </path>
 
     <path id="cpSocket">
@@ -29,6 +31,8 @@
         <pathelement location="${i2plib}/router.jar" />
         <!-- TODO get rid of wraper dependency also -->
         <pathelement location="${wrapperlib}/wrapper.jar" />
+        <!-- following jar only present for debian builds -->
+        <pathelement location="../../core/java/build/json-simple.jar" />
     </path>
 
     <target name="all" depends="clean, build" />
