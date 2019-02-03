@@ -174,7 +174,13 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             
                             String lcKey = key.toLowerCase(Locale.US);
                             if ("connection".equals(lcKey)) {
-                                out.write(DataHelper.getASCII("Connection: close\r\n"));
+                                if (val.toLowerCase(Locale.US).contains("upgrade")) {
+                                    // pass through for websocket
+                                    out.write(DataHelper.getASCII("Connection: " + val + "\r\n"));
+                                    proxyConnectionSent = true;
+                                } else {
+                                    out.write(DataHelper.getASCII("Connection: close\r\n"));
+                                }
                                 connectionSent = true;
                             } else if ("proxy-connection".equals(lcKey)) {
                                 out.write(DataHelper.getASCII("Proxy-Connection: close\r\n"));

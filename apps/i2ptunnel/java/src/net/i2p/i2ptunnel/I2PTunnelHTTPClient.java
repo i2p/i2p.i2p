@@ -414,6 +414,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             int remotePort = 0;
             String referer = null;
             URI origRequestURI = null;
+            boolean preserveConnectionHeader = false;
             while((line = reader.readLine(method)) != null) {
                 line = line.trim();
                 if(_log.shouldLog(Log.DEBUG)) {
@@ -421,11 +422,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
 
                 String lowercaseLine = line.toLowerCase(Locale.US);
-                if(lowercaseLine.startsWith("connection: ") ||
-                        lowercaseLine.startsWith("keep-alive: ") ||
-                        lowercaseLine.startsWith("proxy-connection: ")) {
-                    continue;
-                }
 
                 if(method == null) { // first line (GET /base64/realaddr)
                     if(_log.shouldLog(Log.DEBUG)) {
@@ -940,7 +936,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 // end first line processing
 
                 } else {
-                    if(lowercaseLine.startsWith("host: ") && !usingWWWProxy && !usingInternalOutproxy) {
+                    if (lowercaseLine.startsWith("connection: ")) {
+                        if (lowercaseLine.contains("upgrade")) {
+                            // pass through for websocket
+                            preserveConnectionHeader = true;
+                        } else {
+                            continue;
+                        }
+                    } else if (lowercaseLine.startsWith("keep-alive: ") ||
+                               lowercaseLine.startsWith("proxy-connection: ")) {
+                        continue;
+                    } else if (lowercaseLine.startsWith("host: ") && !usingWWWProxy && !usingInternalOutproxy) {
                         // Note that we only pass the original Host: line through to the outproxy
                         // But we don't create a Host: line if it wasn't sent to us
                         line = "Host: " + host;
@@ -1081,7 +1087,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     .append("\r\n");
                         }
                     }
-                    newRequest.append("Connection: close\r\n\r\n");
+                    if (preserveConnectionHeader)
+                        newRequest.append("\r\n");
+                    else
+                        newRequest.append("Connection: close\r\n\r\n");
                     s.setSoTimeout(0);
                     break;
                 } else {
