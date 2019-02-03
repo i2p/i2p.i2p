@@ -563,7 +563,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 }
                 // just register new SPK, don't verify, unused
                 _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
-            } else if (!message.getSigningPrivateKey().equals(keys.getRevocationKey())) {
+            } else if (message.getSigningPrivateKey() != null &&
+                       !message.getSigningPrivateKey().equals(keys.getRevocationKey())) {
                 // just register new SPK, don't verify, unused
                 _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
             }
