@@ -77,6 +77,10 @@ class MessageHandler implements I2PSessionMuxedListener {
             packet.setRemotePort(fromPort);
             packet.setLocalPort(toPort);
             _manager.getPacketHandler().receivePacket(packet);
+        } catch (IndexOutOfBoundsException ioobe) {
+            _context.statManager().addRateData("stream.packetReceiveFailure", 1);
+            if (_log.shouldWarn())
+                _log.warn("Received an invalid packet", ioobe);
         } catch (IllegalArgumentException iae) {
             _context.statManager().addRateData("stream.packetReceiveFailure", 1);
             if (_log.shouldLog(Log.WARN))

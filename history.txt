@@ -1,3 +1,18 @@
+2019-02-03 zzz
+ * I2CP:
+   - Remove revocation private key from CreateLeaseset2 message
+   - Use correct key to sign SessionConfig with offline keys
+ * Streaming:
+   - Support offline signatures (proposal 123)
+   - Don't send FROM in RESET, not required since 0.9.20
+   - Send RESET when SYN signature verification fails
+   - Use cached buffers for signature verification
+   - Always verify packets with signatures, even if not required
+ * Test: Disable NTP in LocalClientManager
+
+2019-02-02 zzz
+ * Debian: Fix build of i2pcontrol
+
 2019-02-01 zzz
  * Debian: AppArmor fix for Oracle JVM (ticket #2319)
  * i2ptunnel:

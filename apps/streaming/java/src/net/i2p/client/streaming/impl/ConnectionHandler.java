@@ -7,7 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.RouterRestartException;
+import net.i2p.data.ByteArray;
 import net.i2p.data.Destination;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
@@ -23,6 +25,7 @@ import net.i2p.util.SimpleTimer2;
 class ConnectionHandler {
     private final I2PAppContext _context;
     private final Log _log;
+    private final ByteCache _cache = ByteCache.getInstance(32, 4*1024);
     private final ConnectionManager _manager;
     private final LinkedBlockingQueue<Packet> _synQueue;
     private final SimpleTimer2 _timer;
@@ -259,21 +262,29 @@ class ConnectionHandler {
         }
     }
 
+    /**
+     *  Send a reset in response to this packet, but only if it
+     *  contains a FROM field and Signature that can be verified.
+     *
+     *  @param packet the incoming packet we're responding to
+     */
     private void sendReset(Packet packet) {
-        boolean ok = packet.verifySignature(_context, packet.getOptionalFrom(), null);
+        ByteArray ba = _cache.acquire();
+        boolean ok = packet.verifySignature(_context, ba.getData());
+        _cache.release(ba);
         if (!ok) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Received a spoofed SYN packet: they said they were " + packet.getOptionalFrom());
+            if (_log.shouldWarn())
+                _log.warn("Can't send reset in response to packet: " + packet);
             return;
         }
         PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom(), packet.getSession());
-        reply.setFlag(Packet.FLAG_RESET);
-        reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
+        reply.setFlag(Packet.FLAG_RESET | Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setAckThrough(packet.getSequenceNum());
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(0);
-        // TODO remove this someday, as of 0.9.20 we do not require it
-        reply.setOptionalFrom();
+        // As of 0.9.20 we do not require FROM
+        // Removed in 0.9.39
+        //reply.setOptionalFrom();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending RST: " + reply + " because of " + packet);
         // this just sends the packet - no retries or whatnot

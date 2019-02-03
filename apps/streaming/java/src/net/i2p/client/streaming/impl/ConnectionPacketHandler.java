@@ -4,8 +4,11 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.SigningPublicKey;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -23,6 +26,7 @@ import net.i2p.util.SimpleTimer;
 class ConnectionPacketHandler {
     private final I2PAppContext _context;
     private final Log _log;
+    private final ByteCache _cache = ByteCache.getInstance(32, 4*1024);
 
     public static final int MAX_SLOW_START_WINDOW = 24;
     
@@ -514,6 +518,7 @@ class ConnectionPacketHandler {
             
             if (con.getSendStreamId() <= 0) {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                    // this is an incoming connection.
                     con.setSendStreamId(packet.getReceiveStreamId());
                     Destination dest = packet.getOptionalFrom();
                     if (dest == null) {
@@ -522,6 +527,9 @@ class ConnectionPacketHandler {
                         return false;
                     }
                     con.setRemotePeer(dest);
+                    SigningPublicKey spk = packet.getTransientSPK();
+                    if (spk != null)
+                        con.setRemoteTransientSPK(spk);
                     return true;
                 } else {
                     // neither RST nor SYN and we dont have the stream id yet?
@@ -535,6 +543,7 @@ class ConnectionPacketHandler {
                     }
                 }
             } else {
+                // getting a lot of these - why? mostly/all for acks...
                 if (con.getSendStreamId() != packet.getReceiveStreamId()) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Packet received with the wrong reply stream id: " 
@@ -553,20 +562,22 @@ class ConnectionPacketHandler {
      * Prior to 0.9.20, the reset packet must contain a FROM field,
      * and we used that for verification.
      * As of 0.9.20, we correctly use the connection's remote peer.
+     *
+     * @param con non-null
      */
     private void verifyReset(Packet packet, Connection con) {
         if (con.getReceiveStreamId() == packet.getSendStreamId()) {
-            Destination from = con.getRemotePeer();
-            if (from == null)
-                from = packet.getOptionalFrom();
-            boolean ok = packet.verifySignature(_context, from, null);
+            SigningPublicKey spk = con.getRemoteSPK();
+            ByteArray ba = _cache.acquire();
+            boolean ok = packet.verifySignature(_context, spk, ba.getData());
+            _cache.release(ba);
             if (!ok) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Received unsigned / forged RST on " + con);
                 return;
             } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Reset received");
+                if (_log.shouldWarn())
+                    _log.warn("Reset received on " + con);;
                 // ok, valid RST
                 con.resetReceived();
                 con.eventOccurred();
@@ -587,17 +598,18 @@ class ConnectionPacketHandler {
     /**
      * Verify the signature if necessary.  
      *
+     * @param con non-null
      * @throws I2PException if the signature was necessary and it was invalid
      */
     private void verifySignature(Packet packet, Connection con) throws I2PException {
         // verify the signature if necessary
         if (con.getOptions().getRequireFullySigned() || 
-            packet.isFlagSet(Packet.FLAG_SYNCHRONIZE | Packet.FLAG_CLOSE)) {
+            packet.isFlagSet(Packet.FLAG_SYNCHRONIZE | Packet.FLAG_CLOSE | Packet.FLAG_SIGNATURE_INCLUDED)) {
             // we need a valid signature
-            Destination from = con.getRemotePeer();
-            if (from == null)
-                from = packet.getOptionalFrom();
-            boolean sigOk = packet.verifySignature(_context, from, null);
+            SigningPublicKey spk = con.getRemoteSPK();
+            ByteArray ba = _cache.acquire();
+            boolean sigOk = packet.verifySignature(_context, spk, null);
+            _cache.release(ba);
             if (!sigOk) {
                 throw new I2PException("Received unsigned / forged packet: " + packet);
             }

@@ -1,8 +1,10 @@
 package net.i2p.client.streaming.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
@@ -82,6 +84,11 @@ class Packet {
     protected Destination _optionFrom;
     private int _optionDelay;
     private int _optionMaxSize;
+    // following 3 for ofline sigs
+    protected long _transientExpires;
+    protected Signature _offlineSignature;
+    protected SigningPublicKey _transientSigningPublicKey; 
+    // ports
     private int _localPort;
     private int _remotePort;
     
@@ -161,6 +168,12 @@ class Packet {
      * If set, this packet doesn't really want to ack anything
      */
     public static final int FLAG_NO_ACK = (1 << 10);
+    
+    /** 
+     * If set, an offline signing block is in the options.
+     * @since 0.9.39
+     */
+    public static final int FLAG_SIGNATURE_OFFLINE = (1 << 11);
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     protected static final int MAX_DELAY_REQUEST = 65535;
@@ -348,15 +361,12 @@ class Packet {
      */
     public Destination getOptionalFrom() { return _optionFrom; }
 
-    /** 
-     * This sets the from field in the packet to the Destination for the session
-     * provided in the constructor.
-     * This also sets flag FLAG_FROM_INCLUDED
+    /**
+     *  Only if an offline signing block was included, else null
+     *
+     *  @since 0.9.39
      */
-    public void setOptionalFrom() { 
-        setFlag(FLAG_FROM_INCLUDED, true);
-        _optionFrom = _session.getMyDestination();
-    }
+    public SigningPublicKey getTransientSPK() { return _transientSigningPublicKey; }
     
     /** 
      * How many milliseconds the sender of this packet wants the recipient
@@ -478,6 +488,11 @@ class Packet {
             optionSize += _optionFrom.size();
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
             optionSize += 2;
+        if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
+            optionSize += 6;
+            optionSize += _transientSigningPublicKey.length();
+            optionSize += _offlineSignature.length();
+        }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
             if (fakeSigLen > 0)
                 optionSize += fakeSigLen;
@@ -501,6 +516,18 @@ class Packet {
             DataHelper.toLong(buffer, cur, 2, _optionMaxSize > 0 ? _optionMaxSize : DEFAULT_MAX_SIZE);
             cur += 2;
         }
+        if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
+                DataHelper.toLong(buffer, cur, 4, _transientExpires / 1000);
+                cur += 4;
+                DataHelper.toLong(buffer, cur, 2, _transientSigningPublicKey.getType().getCode());
+                cur += 2;
+                int len = _transientSigningPublicKey.length();
+                System.arraycopy(_transientSigningPublicKey.getData(), 0, buffer, cur, len);
+                cur += len;
+                len = _offlineSignature.length();
+                System.arraycopy(_offlineSignature.getData(), 0, buffer, cur, len);
+                cur += len;
+            }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
             if (fakeSigLen == 0) {
                 // we're signing (or validating)
@@ -535,9 +562,8 @@ class Packet {
     
     /**
      * how large would this packet be if we wrote it
-     * @return How large the current packet would be
      *
-     * @throws IllegalStateException 
+     * @return How large the current packet would be
      */
     private int writtenSize() {
         //int size = 0;
@@ -564,6 +590,11 @@ class Packet {
             size += 2;
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED))
             size += _optionSignature.length();
+        if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
+            size += 6;
+            size += _transientSigningPublicKey.length();
+            size += _offlineSignature.length();
+        }
         
         if (_payload != null) {
             size += _payload.getValid();
@@ -583,6 +614,7 @@ class Packet {
      *               part of the packet?
      *
      * @throws IllegalArgumentException if the data is b0rked
+     * @throws IndexOutOfBoundsException if the data is b0rked
      */
     public void readPacket(byte buffer[], int offset, int length) throws IllegalArgumentException {
         if (buffer.length - offset < length) 
@@ -657,11 +689,39 @@ class Packet {
             setOptionalMaxSize((int)DataHelper.fromLong(buffer, cur, 2));
             cur += 2;
         }
+        if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
+            _transientExpires = DataHelper.fromLong(buffer, cur, 4) * 1000;
+            cur += 4;
+            int itype = (int) DataHelper.fromLong(buffer, cur, 2);
+            cur += 2;
+            SigType type = SigType.getByCode(itype);
+            if (type == null || !type.isAvailable())
+                throw new IllegalArgumentException("Unsupported transient sig type: " + itype);
+            _transientSigningPublicKey = new SigningPublicKey(type);
+            byte[] buf = new byte[_transientSigningPublicKey.length()];
+            System.arraycopy(buffer, cur, buf, 0, buf.length);
+            _transientSigningPublicKey.setData(buf);
+            cur += buf.length;
+            if (_optionFrom != null) {
+                type = _optionFrom.getSigningPublicKey().getType();
+            } else {
+                throw new IllegalArgumentException("TODO offline w/o FROM");
+            }
+            _offlineSignature = new Signature(type);
+            buf = new byte[_offlineSignature.length()];
+            System.arraycopy(buffer, cur, buf, 0, buf.length);
+            _offlineSignature.setData(buf);
+            cur += buf.length;
+        }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
             Signature optionSignature;
-            Destination from = getOptionalFrom();
-            if (from != null) {
-                optionSignature = new Signature(from.getSigningPublicKey().getType());
+            if (_optionFrom != null) {
+                SigType type;
+                if (isFlagSet(FLAG_SIGNATURE_OFFLINE))
+                    type = _transientSigningPublicKey.getType();
+                else
+                    type = _optionFrom.getSigningPublicKey().getType();
+                optionSignature = new Signature(type);
             } else {
                 // super cheat for now, look for correct type,
                 // assume no more options. If we add to the options
@@ -694,32 +754,77 @@ class Packet {
             cur += buf.length;
         }
     }
-    
+
+    /**
+     * Determine whether the signature on the data is valid.  
+     * Packet MUST have a FROM option or will return false.
+     *
+     * @param ctx Application context
+     * @param buffer data to validate with signature, or null to use our own buffer.
+     * @return true if the signature exists and validates against the data,
+     *         false otherwise.
+     * @since 0.9.39
+     */
+    public boolean verifySignature(I2PAppContext ctx, byte buffer[]) {
+        return verifySignature(ctx, null, buffer);    
+    }
+
     /**
      * Determine whether the signature on the data is valid.  
      *
      * @param ctx Application context
-     * @param from the Destination the data came from
-     * @param buffer data to validate with signature
+     * @param spk Signing key to verify with, ONLY if there is no FROM field in this packet.
+     *        May be the SPK from a FROM field or offline sig field from a previous packet on this connection.
+     *        Ignored if this packet contains a FROM option block.
+     *        Null ok if none available.
+     * @param buffer data to validate with signature, or null to use our own buffer.
      * @return true if the signature exists and validates against the data,
      *         false otherwise.
      */
-    public boolean verifySignature(I2PAppContext ctx, Destination from, byte buffer[]) {
+    public boolean verifySignature(I2PAppContext ctx, SigningPublicKey altSPK, byte buffer[]) {
         if (!isFlagSet(FLAG_SIGNATURE_INCLUDED)) return false;
         if (_optionSignature == null) return false;
+        SigningPublicKey spk = _optionFrom != null ? _optionFrom.getSigningPublicKey() : altSPK;
         // prevent receiveNewSyn() ... !active ... sendReset() ... verifySignature ... NPE
-        if (from == null) return false;
+        if (spk == null) return false;
         
         int size = writtenSize();
         
         if (buffer == null)
             buffer = new byte[size];
-        SigningPublicKey spk = from.getSigningPublicKey();
+        if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
+            if (_transientExpires < ctx.clock().now()) {
+                Log l = ctx.logManager().getLog(Packet.class);
+                if (l.shouldLog(Log.WARN))
+                    l.warn("Offline signature expired " + toString());
+                return false;
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(6 + _transientSigningPublicKey.length());
+            try {
+                DataHelper.writeLong(baos, 4, _transientExpires / 1000);
+                DataHelper.writeLong(baos, 2, _transientSigningPublicKey.getType().getCode());
+                _transientSigningPublicKey.writeBytes(baos);
+            } catch (IOException ioe) {
+                return false;
+            } catch (DataFormatException dfe) {
+                return false;
+            }
+            byte[] data = baos.toByteArray();
+            boolean ok = ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, spk);
+            if (!ok) {
+                Log l = ctx.logManager().getLog(Packet.class);
+                if (l.shouldLog(Log.WARN))
+                    l.warn("Offline signature failed on " + toString());
+                return false;
+            }
+            // use transient key to verify
+            spk = _transientSigningPublicKey;
+        }
         SigType type = spk.getType();
-        if (type == null) {
+        if (type == null || !type.isAvailable()) {
             Log l = ctx.logManager().getLog(Packet.class);
             if (l.shouldLog(Log.WARN))
-                l.warn("Unknown sig type in " + from + " cannot verify " + toString());
+                l.warn("Unknown sig type in " + spk + " cannot verify " + toString());
             return false;
         }
         int written = writePacket(buffer, 0, type.getSigLen());
@@ -731,18 +836,27 @@ class Packet {
         // Fixup of signature if we guessed wrong on the type in readPacket(), which could happen
         // on a close or reset packet where we have a signature without a FROM
         if (type != _optionSignature.getType() &&
-            type.getSigLen() == _optionSignature.length())
+            type.getSigLen() == _optionSignature.length()) {
+            //Log l = ctx.logManager().getLog(Packet.class);
+            //if (l.shouldDebug())
+            //    l.debug("Fixing up sig type from " + _optionSignature.getType() + " to " + type);
             _optionSignature = new Signature(type, _optionSignature.getData());
+        }
 
-        boolean ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, spk);
+        boolean ok;
+        try {
+            ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, spk);
+        } catch (IllegalArgumentException iae) {
+            // sigtype mismatch
+            Log l = ctx.logManager().getLog(Packet.class);
+            if (l.shouldLog(Log.WARN))
+                l.warn("Signature failed on " + toString(), iae);
+            ok = false;
+        }
         if (!ok) {
             Log l = ctx.logManager().getLog(Packet.class);
             if (l.shouldLog(Log.WARN))
-                l.warn("Signature failed on " + toString(), new Exception("moo"));
-            //if (false) {
-            //    l.error(Base64.encode(buffer, 0, size));
-            //    l.error("Signature: " + Base64.encode(_optionSignature.getData()));
-            //}
+                l.warn("Signature failed on " + toString() + " using SPK " + spk);
         }
         return ok;
     }
@@ -776,6 +890,11 @@ class Packet {
     }
     
     private final void toFlagString(StringBuilder buf) {
+        if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
+        if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
+        if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
+        if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
+        if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM ").append(_optionFrom.size());
         if (isFlagSet(FLAG_NO_ACK))
             buf.append(" NO_ACK");
         else
@@ -786,21 +905,30 @@ class Packet {
                 buf.append(' ').append(_nacks[i]);
             }
         }
-        if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
-        if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
-        if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM ").append(_optionFrom.size());
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
-        if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
+        if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
+        if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
+            if (_transientExpires != 0)
+                buf.append(" TRANSEXP ").append(new Date(_transientExpires));
+            else
+                buf.append(" (no expiration)");
+            if (_transientSigningPublicKey != null)
+                buf.append(" TRANSKEY ").append(_transientSigningPublicKey.getType());
+            else
+                buf.append(" (no key data)");
+            if (_offlineSignature != null)
+                buf.append(" OFFSIG ").append(_offlineSignature.getType());
+            else
+                buf.append(" (no offline sig data)");
+        }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
             if (_optionSignature != null)
-                buf.append(" SIG ").append(_optionSignature.length());
+                buf.append(" SIG ").append(_optionSignature.getType());
             else
                 buf.append(" (to be signed)");
         }
-        if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
-        if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
     }
 
     /** Generate a pcap/tcpdump-compatible format,

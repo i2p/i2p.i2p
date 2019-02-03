@@ -61,6 +61,25 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         _lastSend = -1;
         _cancelledOn = -1;
     }
+
+    /** 
+     * This sets the from field in the packet to the Destination for the session
+     * provided in the constructor.
+     * This also sets flag FLAG_FROM_INCLUDED.
+     * Also, as of 0.9.39, sets the offline signing data if supported by the session.
+     *
+     * @since 0.9.39 moved from super
+     */
+    public void setOptionalFrom() { 
+        setFlag(FLAG_FROM_INCLUDED, true);
+        _optionFrom = _session.getMyDestination();
+        if (_session.isOffline()) {
+            setFlag(FLAG_SIGNATURE_OFFLINE, true);
+            _transientExpires = _session.getOfflineExpiration();
+            _transientSigningPublicKey = _session.getTransientSigningPublicKey();
+            _offlineSignature = _session.getOfflineSignature();
+        }
+    }
     
     public Destination getTo() { return _to; }
     
@@ -227,11 +246,21 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
                               //+ 1 // resendDelay
                               //+ 2 // flags
                               //+ 2 // optionSize
-                              + 21
-                              + (_nacks != null ? 4*_nacks.length + 1 : 1)
-                              + (isFlagSet(FLAG_DELAY_REQUESTED) ? 2 : 0)
-                              + (isFlagSet(FLAG_FROM_INCLUDED) ? _optionFrom.size() : 0)
-                              + (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED) ? 2 : 0);
+                              //+ 1 // nacksSize
+                              + 22;
+        if (_nacks != null)
+            signatureOffset += 4 *_nacks.length;
+        if (isFlagSet(FLAG_DELAY_REQUESTED))
+            signatureOffset += 2;
+        if (isFlagSet(FLAG_FROM_INCLUDED))
+            signatureOffset += _optionFrom.size();
+        if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
+            signatureOffset += 2;
+        if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
+            signatureOffset += 6;
+            signatureOffset += _transientSigningPublicKey.length();
+            signatureOffset += _offlineSignature.length();
+        }
         System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, _optionSignature.length());
         return size;
     }

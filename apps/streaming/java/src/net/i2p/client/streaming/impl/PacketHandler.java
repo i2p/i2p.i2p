@@ -5,7 +5,10 @@ import java.util.Date;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.data.ByteArray;
 import net.i2p.data.Destination;
+import net.i2p.data.SigningPublicKey;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
@@ -18,6 +21,7 @@ class PacketHandler {
     private final ConnectionManager _manager;
     private final I2PAppContext _context;
     private final Log _log;
+    private final ByteCache _cache = ByteCache.getInstance(32, 4*1024);
     //private int _lastDelay;
     //private int _dropped;
     
@@ -179,8 +183,11 @@ class PacketHandler {
                     long oldId = con.getSendStreamId();
                     if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                         if (oldId <= 0) {
-                            // con fully established, w00t
+                            // outgoing con now fully established
                             con.setSendStreamId(packet.getReceiveStreamId());
+                            SigningPublicKey spk = packet.getTransientSPK();
+                            if (spk != null)
+                                con.setRemoteTransientSPK(spk);
                         } else if (oldId == packet.getReceiveStreamId()) {
                             // ok, as expected...
                         } else {
@@ -195,9 +202,14 @@ class PacketHandler {
                     try {
                         con.getPacketHandler().receivePacket(packet, con);
                     } catch (I2PException ie) {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Received forged packet for " + con + "/" + oldId + ": " + packet, ie);
+                        if (_log.shouldWarn())
+                            _log.warn("Sig verify fail for " + con + "/" + oldId + ": " + packet, ie);
                         con.setSendStreamId(oldId);
+                        if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                            // send a reset, it's a known con, so it's unlikely to be spoofed
+                            // don't bother to send reset if it's just a CLOSE
+                            sendResetUnverified(packet);
+                        }
                     }
                 } else if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                     if (_log.shouldLog(Log.WARN))
@@ -238,19 +250,34 @@ class PacketHandler {
         Destination from = packet.getOptionalFrom();
         if (from == null)
             return;
-        boolean ok = packet.verifySignature(_context, from, null);
+        ByteArray ba = _cache.acquire();
+        boolean ok = packet.verifySignature(_context, ba.getData());
+        _cache.release(ba);
         if (!ok) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Can't send reset after recv spoofed packet: " + packet);
+                _log.warn("Can't send reset in response to packet: " + packet);
             return;
         }
-        PacketLocal reply = new PacketLocal(_context, from, packet.getSession());
+        sendResetUnverified(packet);
+    }
+    
+    /**
+     *  This sends a reset back to the place this packet came from.
+     *  Packet MUST have a FROM option.
+     *  This is not associated with a connection, so no con stats are updated.
+     *
+     *  @param packet incoming packet to be replied to, MUST have a FROM option
+     *  @since 0.9.39
+     */
+    private void sendResetUnverified(Packet packet) {
+        PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom(), packet.getSession());
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(packet.getSendStreamId());
-        // TODO remove this someday, as of 0.9.20 we do not require it
-        reply.setOptionalFrom();
+        // As of 0.9.20 we do not require FROM
+        // Removed in 0.9.39
+        //reply.setOptionalFrom();
         reply.setLocalPort(packet.getLocalPort());
         reply.setRemotePort(packet.getRemotePort());
         // this just sends the packet - no retries or whatnot
@@ -348,17 +375,13 @@ class PacketHandler {
      *  @param con null if unknown
      */
     private void receivePing(Connection con, Packet packet) {
-        boolean ok = packet.verifySignature(_context, packet.getOptionalFrom(), null);
+        SigningPublicKey spk = con != null ? con.getRemoteSPK() : null;
+        ByteArray ba = _cache.acquire();
+        boolean ok = packet.verifySignature(_context, spk, ba.getData());
+        _cache.release(ba);
         if (!ok) {
-            if (_log.shouldLog(Log.WARN)) {
-                if (packet.getOptionalFrom() == null)
-                    _log.warn("Ping with no from (flagged? " + packet.isFlagSet(Packet.FLAG_FROM_INCLUDED) + ")");
-                else if (packet.getOptionalSignature() == null)
-                    _log.warn("Ping with no signature (flagged? " + packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED) + ")");
-                else
-                    _log.warn("Forged ping, discard (from=" + packet.getOptionalFrom().calculateHash().toBase64() 
-                              + " sig=" + packet.getOptionalSignature().toBase64() + ")");
-            }
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Bad ping, dropping: " + packet);
         } else {
             _manager.receivePing(con, packet);
         }
