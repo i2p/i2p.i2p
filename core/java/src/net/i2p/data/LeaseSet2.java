@@ -207,7 +207,7 @@ public class LeaseSet2 extends LeaseSet {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         if (_transientExpires < ctx.clock().now())
             return false;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(128);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(6 + _transientSigningPublicKey.length());
         try {
             DataHelper.writeLong(baos, 4, _transientExpires / 1000);
             DataHelper.writeLong(baos, 2, _transientSigningPublicKey.getType().getCode());
