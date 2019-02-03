@@ -18,20 +18,21 @@ import net.i2p.data.LeaseSet2;
 import net.i2p.data.MetaLeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
-import net.i2p.data.SigningPrivateKey;
 
 /**
  * Like CreateLeaseSetMessage, but supports both old
  * and new LeaseSet types, including LS2, Meta, and Encrypted.
+ * Revocation keys are not present.
+ * Multiple public/private encryption keys are possible.
  *
  * For LS2:
  * Same as CreateLeaseSetMessage, but has a netdb type before
- * the LeaseSet. SigningPrivateKey and PrivateKey(s) are
+ * the LeaseSet. PrivateKeys are
  * serialized after the LeaseSet, not before, so we can
  * infer the types from the LeaseSet.
  *
  * For Meta LS:
- * SigningPrivateKey and PrivateKey are not present.
+ * PrivateKeys are not present.
  *
  * For Encrypted LS:
  * TODO
@@ -105,8 +106,6 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
                 SigType stype = _leaseSet.getSignature().getType();
                 if (stype == null)
                     throw new I2CPMessageException("Unsupported sig type");
-                _signingPrivateKey = new SigningPrivateKey(stype);
-                _signingPrivateKey.readBytes(in);
                 if (type == DatabaseEntry.KEY_TYPE_LS2 ||
                     type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                     LeaseSet2 ls2 = (LeaseSet2) _leaseSet;
@@ -140,20 +139,22 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         int type = _leaseSet.getType();
         if (_sessionId == null || _leaseSet == null ||
-            (type != DatabaseEntry.KEY_TYPE_META_LS2 && (_signingPrivateKey == null || _privateKey == null)))
+            (type != DatabaseEntry.KEY_TYPE_META_LS2 && _privateKey == null))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         int size = 4 // sessionId
                  + 1 // type
-                 + _leaseSet.size()
-                 + _signingPrivateKey.length()
-                 + _privateKey.length();
+                 + _leaseSet.size();
+        if (type != DatabaseEntry.KEY_TYPE_META_LS2) {
+            for (PrivateKey pk : getPrivateKeys()) {
+                size += pk.length();
+            }
+        }
         ByteArrayOutputStream os = new ByteArrayOutputStream(size);
         try {
             _sessionId.writeBytes(os);
             os.write(_leaseSet.getType());
             _leaseSet.writeBytes(os);
             if (type != DatabaseEntry.KEY_TYPE_META_LS2) {
-                _signingPrivateKey.writeBytes(os);
                 for (PrivateKey pk : getPrivateKeys()) {
                     pk.writeBytes(os);
                 }
@@ -173,9 +174,12 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[CreateLeaseSet2Message: ");
-        buf.append("\n\tLeaseSet: ").append(getLeaseSet());
-        buf.append("\n\tSigningPrivateKey: ").append(getSigningPrivateKey());
-        buf.append("\n\tPrivateKey: ").append(getPrivateKey());
+        buf.append("\n\tLeaseSet: ").append(_leaseSet);
+        if (_leaseSet.getType() != DatabaseEntry.KEY_TYPE_META_LS2) {
+            for (PrivateKey pk : getPrivateKeys()) {
+                buf.append("\n\tPrivateKey: ").append(pk);
+            }
+        }
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("]");
         return buf.toString();

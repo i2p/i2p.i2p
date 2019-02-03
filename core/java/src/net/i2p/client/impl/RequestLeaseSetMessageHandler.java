@@ -304,16 +304,20 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         }
         try {
             leaseSet.sign(session.getPrivateKey());
-            // Workaround for unparsable serialized signing private key for revocation
-            // Send him a dummy DSA_SHA1 private key since it's unused anyway
-            // See CreateLeaseSetMessage.doReadMessage()
-            // For LS1 only
             SigningPrivateKey spk = li.getSigningPrivateKey();
-            if (!_context.isRouterContext() && spk.getType() != SigType.DSA_SHA1 &&
-                !(leaseSet instanceof LeaseSet2)) {
+            if (isLS2) {
+                // no revocation key in LS2
+                spk = null;
+            } else if (!_context.isRouterContext() && spk.getType() != SigType.DSA_SHA1) {
+                // Workaround for unparsable serialized signing private key for revocation
+                // Send him a dummy DSA_SHA1 private key since it's unused anyway
+                // See CreateLeaseSetMessage.doReadMessage()
+                // For LS1 only
                 byte[] dummy = new byte[SigningPrivateKey.KEYSIZE_BYTES];
                 _context.random().nextBytes(dummy);
                 spk = new SigningPrivateKey(dummy);
+                if (_log.shouldDebug())
+                    _log.debug("Generated random dummy SPK " + spk);
             }
             session.getProducer().createLeaseSet(session, leaseSet, spk, li.getPrivateKeys());
             session.setLeaseSet(leaseSet);

@@ -109,7 +109,10 @@ public class KeyManager {
      */
     public synchronized SigningPublicKey getSigningPublicKey() { return _signingPublicKey; }
     
-    /** client */
+    /**
+     *  client
+     *  @param leaseRevocationPrivateKey unused, may be null
+     */
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Registering keys for destination " + dest.calculateHash().toBase64());

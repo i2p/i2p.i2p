@@ -362,6 +362,7 @@ class I2CPMessageProducer {
      * This method is misnamed, it does not create the LeaseSet,
      * the caller does that.
      *
+     * @param signingPriv ignored for LS2
      */
     public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv,
                                List<PrivateKey> privs) throws I2PSessionException {
@@ -370,6 +371,7 @@ class I2CPMessageProducer {
         if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
             msg = new CreateLeaseSetMessage();
             msg.setPrivateKey(privs.get(0));
+            msg.setSigningPrivateKey(signingPriv);
         } else {
             CreateLeaseSet2Message msg2 = new CreateLeaseSet2Message();
             for (PrivateKey priv : privs) {
@@ -378,7 +380,6 @@ class I2CPMessageProducer {
             msg = msg2;
         }
         msg.setLeaseSet(leaseSet);
-        msg.setSigningPrivateKey(signingPriv);
         SessionId sid = session.getSessionId();
         if (sid == null) {
             _log.error(session.toString() + " create LS w/o session", new Exception());

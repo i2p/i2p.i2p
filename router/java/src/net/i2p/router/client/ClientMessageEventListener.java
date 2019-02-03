@@ -508,8 +508,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         int type = ls.getType();
-        if (type != DatabaseEntry.KEY_TYPE_META_LS2 &&
-            (message.getPrivateKey() == null || message.getSigningPrivateKey() == null)) {
+        if (type != DatabaseEntry.KEY_TYPE_META_LS2 && message.getPrivateKey() == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Null private keys: " + message);
+            _runner.disconnectClient("Invalid CreateLeaseSetMessage - null private keys");
+            return;
+        }
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET && message.getSigningPrivateKey() == null) {
+            // revocation keys only in LS1
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null private keys: " + message);
             _runner.disconnectClient("Invalid CreateLeaseSetMessage - null private keys");

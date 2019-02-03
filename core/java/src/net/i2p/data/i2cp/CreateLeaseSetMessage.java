@@ -28,7 +28,7 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 4;
     protected SessionId _sessionId;
     protected LeaseSet _leaseSet;
-    protected SigningPrivateKey _signingPrivateKey;
+    private SigningPrivateKey _signingPrivateKey;
     protected PrivateKey _privateKey;
 
     public CreateLeaseSetMessage() {

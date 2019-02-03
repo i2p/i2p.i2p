@@ -8,20 +8,13 @@ package net.i2p.router;
  *
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataHelper;
-import net.i2p.data.DataStructureImpl;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SigningPrivateKey;
 
 /**
  * Wrap up the keys given to the router when a destination connects to it.
- * Used only by KeyManager.
+ * Used by KeyManager, ClientMessageEventListener, GarlicMessageReceiver.
  */
 public class LeaseSetKeys {
     private final SigningPrivateKey _revocationKey;
@@ -29,7 +22,7 @@ public class LeaseSetKeys {
 
     /**
      *  @param dest unused
-     *  @param revocationKey unused
+     *  @param revocationKey unused, may be null
      *  @param decryptionKey non-null
      */
     public LeaseSetKeys(Destination dest, SigningPrivateKey revocationKey, PrivateKey decryptionKey) {
