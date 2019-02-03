@@ -8,6 +8,8 @@ package net.i2p.router.client;
  *
  */
 
+import java.util.Properties;
+
 import gnu.getopt.Getopt;
 
 import net.i2p.data.Destination;
@@ -158,7 +160,10 @@ class LocalClientManager extends ClientManager {
             System.exit(1);
         }
 
-        RouterContext ctx = new RouterContext(null);
+        Properties props = new Properties();
+        // prevent NTP queries
+        props.setProperty("time.disabled", "true");
+        RouterContext ctx = new RouterContext(null, props);
         int port = ClientManagerFacadeImpl.DEFAULT_PORT;
         LocalClientManager mgr = new LocalClientManager(ctx, port);
         mgr.dropX1000 = dropX1000;
