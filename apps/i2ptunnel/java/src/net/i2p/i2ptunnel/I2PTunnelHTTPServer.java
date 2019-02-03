@@ -516,7 +516,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
             if (spoofHost != null)
                 setEntry(headers, "Host", spoofHost);
-            setEntry(headers, "Connection", "close");
+
+            // Force Connection: close, unless websocket
+            String conn = getEntryOrNull(headers, "Connection");
+            if (conn == null || !conn.toLowerCase(Locale.US).contains("upgrade"))
+                setEntry(headers, "Connection", "close");
+
             // we keep the enc sent by the browser before clobbering it, since it may have 
             // been x-i2p-gzip
             String enc = getEntryOrNull(headers, "Accept-Encoding");
@@ -1044,6 +1049,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     name = "User-Agent";
                 else if ("referer".equals(lcName))
                     name = "Referer";
+                else if ("connection".equals(lcName))
+                    name = "Connection";
 
                 // For incoming, we remove certain headers to prevent spoofing.
                 // For outgoing, we remove certain headers to improve anonymity.

@@ -2,6 +2,8 @@
  * I2CP:
    - Remove revocation private key from CreateLeaseset2 message
    - Use correct key to sign SessionConfig with offline keys
+ * i2ptunnel: Fix HTTP websockets by passing through
+   Connection headers containing "upgrade" (ticket #2422)
  * Streaming:
    - Support offline signatures (proposal 123)
    - Don't send FROM in RESET, not required since 0.9.20
