@@ -12,6 +12,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
@@ -40,7 +41,11 @@ import net.i2p.data.PublicKey;
  * @since 0.9.38
  */
 public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
-    public final static int MESSAGE_TYPE = 40;
+    /**
+     *  NOTE: Preliminary format was type 40 in 0.9.38.
+     *  Format changed as of 0.9.39, changed type to 41.
+     */
+    public final static int MESSAGE_TYPE = 41;
 
     // only used if more than one key, otherwise null
     private List<PrivateKey> _privateKeys;
@@ -118,6 +123,10 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
                         EncType etype = pk.getType();
                         if (etype == null)
                             throw new I2CPMessageException("Unsupported encryption type");
+                        int encType = (int) DataHelper.readLong(in, 2);
+                        int encLen = (int) DataHelper.readLong(in, 2);
+                        if (encType != etype.getCode() || encLen != etype.getPrivkeyLen())
+                            throw new I2CPMessageException("Enc type mismatch");
                         PrivateKey priv = new PrivateKey(etype);
                         priv.readBytes(in);
                         addPrivateKey(priv);
@@ -156,6 +165,9 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
             _leaseSet.writeBytes(os);
             if (type != DatabaseEntry.KEY_TYPE_META_LS2) {
                 for (PrivateKey pk : getPrivateKeys()) {
+                    EncType etype = pk.getType();
+                    DataHelper.writeLong(os, 2, etype.getCode());
+                    DataHelper.writeLong(os, 2, pk.length());
                     pk.writeBytes(os);
                 }
             }
