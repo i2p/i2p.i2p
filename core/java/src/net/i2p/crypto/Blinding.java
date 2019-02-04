@@ -8,7 +8,6 @@ import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.data.Hash;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.data.SimpleDataStructure;
 
 
 /**
@@ -27,17 +26,16 @@ public final class Blinding {
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
      *  @param key must be SigType EdDSA_SHA512_Ed25519
-     *  @param h hash of secret data, same length as this key
+     *  @param alpha the secret data
      *  @throws UnsupportedOperationException unless supported
      */
-    public static SigningPublicKey blind(SigningPublicKey key, SimpleDataStructure h) {
-        if (key.getType() != TYPE)
+    public static SigningPublicKey blind(SigningPublicKey key, SigningPrivateKey alpha) {
+        if (key.getType() != TYPE && alpha.getType() != TYPE)
             throw new UnsupportedOperationException();
-        if (h.length() != key.length())
-            throw new IllegalArgumentException();
         try {
             EdDSAPublicKey jk = SigUtil.toJavaEdDSAKey(key);
-            EdDSAPublicKey bjk = EdDSABlinding.blind(jk, h.getData());
+            EdDSAPrivateKey ajk = SigUtil.toJavaEdDSAKey(alpha);
+            EdDSAPublicKey bjk = EdDSABlinding.blind(jk, ajk);
             return SigUtil.fromJavaKey(bjk, TYPE);
         } catch (GeneralSecurityException gse) {
             throw new IllegalArgumentException(gse);
@@ -48,17 +46,16 @@ public final class Blinding {
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
      *  @param key must be SigType EdDSA_SHA512_Ed25519
-     *  @param h hash of secret data, same length as this key
+     *  @param alpha the secret data
      *  @throws UnsupportedOperationException unless supported
      */
-    public static SigningPrivateKey blind(SigningPrivateKey key, SimpleDataStructure h) {
-        if (key.getType() != TYPE)
+    public static SigningPrivateKey blind(SigningPrivateKey key, SigningPrivateKey alpha) {
+        if (key.getType() != TYPE && alpha.getType() != TYPE)
             throw new UnsupportedOperationException();
-        if (h.length() != key.length())
-            throw new IllegalArgumentException();
         try {
             EdDSAPrivateKey jk = SigUtil.toJavaEdDSAKey(key);
-            EdDSAPrivateKey bjk = EdDSABlinding.blind(jk, h.getData());
+            EdDSAPrivateKey ajk = SigUtil.toJavaEdDSAKey(alpha);
+            EdDSAPrivateKey bjk = EdDSABlinding.blind(jk, ajk);
             return SigUtil.fromJavaKey(bjk, TYPE);
         } catch (GeneralSecurityException gse) {
             throw new IllegalArgumentException(gse);
@@ -69,17 +66,16 @@ public final class Blinding {
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
      *  @param key must be SigType EdDSA_SHA512_Ed25519
-     *  @param h hash of secret data, same length as this key
+     *  @param alpha the secret data
      *  @throws UnsupportedOperationException unless supported
      */
-    public static SigningPrivateKey unblind(SigningPrivateKey key, SimpleDataStructure h) {
-        if (key.getType() != TYPE)
+    public static SigningPrivateKey unblind(SigningPrivateKey key, SigningPrivateKey alpha) {
+        if (key.getType() != TYPE && alpha.getType() != TYPE)
             throw new UnsupportedOperationException();
-        if (h.length() != key.length())
-            throw new IllegalArgumentException();
         try {
             EdDSAPrivateKey bjk = SigUtil.toJavaEdDSAKey(key);
-            EdDSAPrivateKey jk = EdDSABlinding.unblind(bjk, h.getData());
+            EdDSAPrivateKey ajk = SigUtil.toJavaEdDSAKey(alpha);
+            EdDSAPrivateKey jk = EdDSABlinding.unblind(bjk, ajk);
             return SigUtil.fromJavaKey(jk, TYPE);
         } catch (GeneralSecurityException gse) {
             throw new IllegalArgumentException(gse);

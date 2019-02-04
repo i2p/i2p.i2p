@@ -92,12 +92,12 @@ public class SigningPrivateKey extends SimpleDataStructure {
     /**
      *  Only for SigType EdDSA_SHA512_Ed25519
      *
-     *  @param h hash of secret data, same length as this key
+     *  @param alpha the secret data
      *  @throws UnsupportedOperationException unless supported
      *  @since 0.9.38
      */
-    public SigningPrivateKey blind(SimpleDataStructure h) {
-        return Blinding.blind(this, h);
+    public SigningPrivateKey blind(SigningPrivateKey alpha) {
+        return Blinding.blind(this, alpha);
     }
 
     /**

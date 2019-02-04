@@ -14,10 +14,10 @@ public final class EdDSABlinding {
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
      *  @param key must be SigType EdDSA_SHA512_Ed25519
-     *  @param h hash of secret data, same length as this key
+     *  @param alpha generated from hash of secret data
      *  @throws UnsupportedOperationException unless supported
      */
-    public static EdDSAPublicKey blind(EdDSAPublicKey key, byte[] h) {
+    public static EdDSAPublicKey blind(EdDSAPublicKey key, EdDSAPrivateKey alpha) {
         // TODO, test only
         return key;
     }
@@ -26,10 +26,10 @@ public final class EdDSABlinding {
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
      *  @param key must be SigType EdDSA_SHA512_Ed25519
-     *  @param h hash of secret data, same length as this key
+     *  @param alpha generated from hash of secret data
      *  @throws UnsupportedOperationException unless supported
      */
-    public static EdDSAPrivateKey blind(EdDSAPrivateKey key, byte[] h) {
+    public static EdDSAPrivateKey blind(EdDSAPrivateKey key, EdDSAPrivateKey alpha) {
         // TODO, test only
         return key;
     }
@@ -38,10 +38,10 @@ public final class EdDSABlinding {
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
      *  @param key must be SigType EdDSA_SHA512_Ed25519
-     *  @param h hash of secret data, same length as this key
+     *  @param alpha generated from hash of secret data
      *  @throws UnsupportedOperationException unless supported
      */
-    public static EdDSAPrivateKey unblind(EdDSAPrivateKey key, byte[] h) {
+    public static EdDSAPrivateKey unblind(EdDSAPrivateKey key, EdDSAPrivateKey alpha) {
         // TODO, test only
         return key;
     }
