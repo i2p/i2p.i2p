@@ -846,10 +846,10 @@ public abstract class TransportImpl implements Transport {
     public void mayDisconnect(Hash peer) {}
 
     public boolean isUnreachable(Hash peer) {
-        long now = _context.clock().now();
         synchronized (_unreachableEntries) {
             Long when = _unreachableEntries.get(peer);
             if (when == null) return false;
+            long now = _context.clock().now();
             if (when.longValue() + UNREACHABLE_PERIOD < now) {
                 _unreachableEntries.remove(peer);
                 return false;
@@ -910,10 +910,10 @@ public abstract class TransportImpl implements Transport {
      * This is NOT reset if the peer contacts us.
      */
     public boolean wasUnreachable(Hash peer) {
-        long now = _context.clock().now();
         synchronized (_wasUnreachableEntries) {
             Long when = _wasUnreachableEntries.get(peer);
             if (when != null) {
+                long now = _context.clock().now();
                 if (when.longValue() + WAS_UNREACHABLE_PERIOD < now) {
                     _unreachableEntries.remove(peer);
                     return false;
