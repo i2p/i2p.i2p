@@ -614,7 +614,7 @@ public class NTCPTransport extends TransportImpl {
     }
 
     public boolean allowConnection() {
-        return countActivePeers() < getMaxConnections();
+        return _conByIdent.size() < getMaxConnections();
     }
 
     /** queue up afterSend call, which can take some time w/ jobs, etc */
