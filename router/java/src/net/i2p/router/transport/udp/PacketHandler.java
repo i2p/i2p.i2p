@@ -77,8 +77,8 @@ class PacketHandler {
             _handlers[i] = new Handler();
         }
 
-        _context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSkew", "How long ago after the packet was sent did we receive it", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.droppedInvalidUnkown", "How old the packet we dropped due to invalidity (unkown type) was", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.droppedInvalidReestablish", "How old the packet we dropped due to invalidity (doesn't use existing key, not an establishment) was", "udp", UDPTransport.RATES);
@@ -206,11 +206,11 @@ class PacketHandler {
                 if (packet == null) break; // keepReading is probably false, or bind failed...
 
                 packet.received();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Received: " + packet);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Received: " + packet);
                 _state = 4;
-                long queueTime = packet.getLifetime();
-                long handleStart = _context.clock().now();
+                //long queueTime = packet.getLifetime();
+                //long handleStart = _context.clock().now();
                 try {
                     _state = 5;
                     handlePacket(_reader, packet);
@@ -220,10 +220,10 @@ class PacketHandler {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Crazy error handling a packet: " + packet, e);
                 }
-                long handleTime = _context.clock().now() - handleStart;
+                //long handleTime = _context.clock().now() - handleStart;
                 //packet.afterHandling();
-                _context.statManager().addRateData("udp.handleTime", handleTime, packet.getLifetime());
-                _context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
+                //_context.statManager().addRateData("udp.handleTime", handleTime, packet.getLifetime());
+                //_context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
                 _state = 8;
 
                 //if (_log.shouldLog(Log.DEBUG))
@@ -417,11 +417,12 @@ class PacketHandler {
                         int newPort = remoteHost.getPort();
                         for (PeerState ps : peers) {
                             boolean valid = false;
-                            long now = _context.clock().now();
-                            if (_log.shouldLog(Log.WARN))
+                            if (_log.shouldLog(Log.WARN)) {
+                                long now = _context.clock().now();
                                 buf.append(ps.getRemoteHostId().toString())
                                    .append(" last sent: ").append(now - ps.getLastSendTime())
                                    .append(" last rcvd: ").append(now - ps.getLastReceiveTime());
+                            }
                             if (ps.getRemotePort() == newPort) {
                                 foundSamePort = true;
                             } else if (packet.validate(ps.getCurrentMACKey())) {
