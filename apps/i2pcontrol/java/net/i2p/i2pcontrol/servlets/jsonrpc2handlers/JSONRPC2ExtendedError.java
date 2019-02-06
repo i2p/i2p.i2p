@@ -57,12 +57,12 @@ import org.json.simple.JSONObject;
  * <p id="map">The mapping between JSON and Java entities (as defined by the
  * underlying JSON.simple library):
  * <pre>
- *     true|false  <--->  java.lang.Boolean
- *     number      <--->  java.lang.Number
- *     string      <--->  java.lang.String
- *     array       <--->  java.util.List
- *     object      <--->  java.util.Map
- *     null        <--->  null
+ *     true|false  &lt;---&gt;  java.lang.Boolean
+ *     number      &lt;---&gt;  java.lang.Number
+ *     string      &lt;---&gt;  java.lang.String
+ *     array       &lt;---&gt;  java.util.List
+ *     object      &lt;---&gt;  java.util.Map
+ *     null        &lt;---&gt;  null
  * </pre>
  *
  * <p>The JSON-RPC 2.0 specification and user group forum can be found
