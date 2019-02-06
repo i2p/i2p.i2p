@@ -45,7 +45,10 @@ public final class I2PDatagramMaker {
      * Construct a new I2PDatagramMaker that will be able to create I2P
      * repliable datagrams going to be sent through the specified I2PSession.
      *
+     * Does NOT support LS2 offline keys!
+     *
      * @param session I2PSession used to send I2PDatagrams through
+     * @throws IllegalArgumentException if session has offline keys
      */
     public I2PDatagramMaker(I2PSession session) {
         this.setI2PDatagramMaker(session);
@@ -59,7 +62,15 @@ public final class I2PDatagramMaker {
         // nop
     }
 
+    /**
+     * Does NOT support LS2 offline keys!
+     *
+     * @param session I2PSession used to send I2PDatagrams through
+     * @throws IllegalArgumentException if session has offline keys
+     */
     public void setI2PDatagramMaker(I2PSession session) {
+        if (session.isOffline())
+            throw new IllegalArgumentException("Offline keys unsupported");
         sxPrivKey = session.getPrivateKey();
         sxDestBytes = session.getMyDestination().toByteArray();
     }
