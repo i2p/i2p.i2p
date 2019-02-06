@@ -127,7 +127,6 @@ public class OutNetMessage implements CDPQEntry {
      * Only useful if log level is INFO or DEBUG
      *
      * @param eventName what occurred 
-     * @return how long this message has been 'in flight'
      */
     public void timestamp(String eventName) {
         if (_shouldTimestamp) {

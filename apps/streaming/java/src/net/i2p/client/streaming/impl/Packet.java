@@ -773,7 +773,7 @@ class Packet {
      * Determine whether the signature on the data is valid.  
      *
      * @param ctx Application context
-     * @param spk Signing key to verify with, ONLY if there is no FROM field in this packet.
+     * @param altSPK Signing key to verify with, ONLY if there is no FROM field in this packet.
      *        May be the SPK from a FROM field or offline sig field from a previous packet on this connection.
      *        Ignored if this packet contains a FROM option block.
      *        Null ok if none available.

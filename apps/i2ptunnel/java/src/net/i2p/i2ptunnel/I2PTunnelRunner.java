@@ -61,7 +61,9 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     private final Runnable onTimeout;
     private final FailCallback _onFail;
     private SuccessCallback _onSuccess;
+    // does not include initialI2PData
     private long totalSent;
+    // does not include initialSocketData
     private long totalReceived;
 
     /**
@@ -79,9 +81,6 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *  @since 0.9.39
      */
     public interface SuccessCallback {
-        /**
-         *  @param e may be null
-         */
         public void onSuccess();
     }
 
