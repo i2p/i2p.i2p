@@ -2378,6 +2378,40 @@
     </target>
 
     <target name="debian" depends="debian-clean, debchange, debian-binary" />
+    <target name="precise" depends="copy-precise, debian" />
+    <target name="wheezy" depends="precise" />
+    <target name="trusty" depends="copy-trusty, debian" />
+    <target name="jessie" depends="trusty" />
+    <target name="xenial" depends="copy-xenial, debian" />
+    <target name="bionic" depends="copy-bionic, debian" />
+    <target name="disco" depends="copy-disco, debian" />
+    <target name="buster" depends="disco" />
+
+    <target name="copy-precise">
+        <copy todir="debian" overwrite="true">
+            <fileset dir="debian-alt/precise/" />
+        </copy>
+    </target>
+    <target name="copy-trusty">
+        <copy todir="debian" overwrite="true">
+            <fileset dir="debian-alt/trusty/" />
+        </copy>
+    </target>
+    <target name="copy-xenial">
+        <copy todir="debian" overwrite="true">
+            <fileset dir="debian-alt/xenial/" />
+        </copy>
+    </target>
+    <target name="copy-bionic">
+        <copy todir="debian" overwrite="true">
+            <fileset dir="debian-alt/bionic/" />
+        </copy>
+    </target>
+    <target name="copy-disco">
+        <copy todir="debian" overwrite="true">
+            <fileset dir="debian-alt/disco/" />
+        </copy>
+    </target>
 
     <target name="getExtendedVersion" depends="buildProperties, trimMtnRev">
         <property name="MtnShortHash" value="unknown" />
