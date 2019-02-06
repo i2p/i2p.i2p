@@ -483,11 +483,11 @@ public class GroupElement implements Serializable {
      * @return A new group element in the given representation.
      */
     private GroupElement toRep(final Representation repr) {
+        if (this.repr == repr)
+            return this;
         switch (this.repr) {
             case P2:
                 switch (repr) {
-                    case P2:
-                        return p2(this.curve, this.X, this.Y, this.Z);
                     default:
                         throw new IllegalArgumentException();
                 }
@@ -495,8 +495,6 @@ public class GroupElement implements Serializable {
                 switch (repr) {
                     case P2:
                         return p2(this.curve, this.X, this.Y, this.Z);
-                    case P3:
-                        return p3(this.curve, this.X, this.Y, this.Z, this.T);
                     case CACHED:
                         return cached(this.curve, this.Y.add(this.X), this.Y.subtract(this.X), this.Z, this.T.multiply(this.curve.get2D()));
                     default:
@@ -510,22 +508,16 @@ public class GroupElement implements Serializable {
                         return p3(this.curve, this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y), false);
                     case P3PrecomputedDouble:
                         return p3(this.curve, this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y), true);
-                    case P1P1:
-                        return p1p1(this.curve, this.X, this.Y, this.Z, this.T);
                     default:
                         throw new IllegalArgumentException();
                 }
             case PRECOMP:
                 switch (repr) {
-                    case PRECOMP:
-                        return precomp(this.curve, this.X, this.Y, this.Z);
                     default:
                         throw new IllegalArgumentException();
                 }
             case CACHED:
                 switch (repr) {
-                    case CACHED:
-                        return cached(this.curve, this.X, this.Y, this.Z, this.T);
                     default:
                         throw new IllegalArgumentException();
                 }
