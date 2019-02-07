@@ -572,8 +572,8 @@ class ConnectionPacketHandler {
             boolean ok = packet.verifySignature(_context, spk, ba.getData());
             _cache.release(ba);
             if (!ok) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Received unsigned / forged RST on " + con);
+                if (_log.shouldWarn())
+                    _log.warn("Received unsigned / forged RST on " + con);
                 return;
             } else {
                 if (_log.shouldWarn())

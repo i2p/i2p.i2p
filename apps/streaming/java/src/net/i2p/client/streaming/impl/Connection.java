@@ -913,11 +913,11 @@ class Connection {
 
     /**
      *  @param id 0 to 0xffffffff
-     *  @throws RuntimeException if already set to nonzero
+     *  @throws IllegalStateException if already set to nonzero
      */
     public void setSendStreamId(long id) { 
         if (!_sendStreamId.compareAndSet(0, id))
-            throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
+            throw new IllegalStateException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
     }
     
     /**
@@ -928,11 +928,11 @@ class Connection {
 
     /**
      *  @param id 0 to 0xffffffff
-     *  @throws RuntimeException if already set to nonzero
+     *  @throws IllegalStateException if already set to nonzero
      */
     public void setReceiveStreamId(long id) { 
         if (!_receiveStreamId.compareAndSet(0, id))
-            throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
+            throw new IllegalStateException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     

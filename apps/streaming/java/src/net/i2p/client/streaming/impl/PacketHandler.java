@@ -204,7 +204,8 @@ class PacketHandler {
                     } catch (I2PException ie) {
                         if (_log.shouldWarn())
                             _log.warn("Sig verify fail for " + con + "/" + oldId + ": " + packet, ie);
-                        con.setSendStreamId(oldId);
+                        // TODO we can't set the stream ID back to 0, throws ISE
+                        //con.setSendStreamId(oldId);
                         if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                             // send a reset, it's a known con, so it's unlikely to be spoofed
                             // don't bother to send reset if it's just a CLOSE

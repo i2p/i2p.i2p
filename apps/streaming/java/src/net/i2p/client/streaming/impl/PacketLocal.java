@@ -71,10 +71,10 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
      * @since 0.9.39 moved from super
      */
     public void setOptionalFrom() { 
-        setFlag(FLAG_FROM_INCLUDED, true);
+        setFlag(FLAG_FROM_INCLUDED);
         _optionFrom = _session.getMyDestination();
         if (_session.isOffline()) {
-            setFlag(FLAG_SIGNATURE_OFFLINE, true);
+            setFlag(FLAG_SIGNATURE_OFFLINE);
             _transientExpires = _session.getOfflineExpiration();
             _transientSigningPublicKey = _session.getTransientSigningPublicKey();
             _offlineSignature = _session.getOfflineSignature();
