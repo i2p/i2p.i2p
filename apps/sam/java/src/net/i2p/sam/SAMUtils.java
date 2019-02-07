@@ -23,9 +23,12 @@ import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
+import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 
 /**
  * Miscellaneous utility methods used by SAM protocol handlers.
@@ -95,7 +98,10 @@ class SAMUtils {
 ****/
 
     /**
-     * Check whether a base64-encoded {dest,privkey,signingprivkey} is valid
+     * Check whether a base64-encoded {dest,privkey,signingprivkey[,offlinesig]} is valid
+     *
+     * This only checks that the length is correct. It does not validate
+     * for pubkey/privkey match, or check the signatures.
      *
      * @param dest The base64-encoded destination and keys to be checked (same format as PrivateKeyFile)
      * @return true if valid
@@ -106,16 +112,44 @@ class SAMUtils {
             return false;
     	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(b);
     	try {
-    		Destination d = Destination.create(destKeyStream);
-    		new PrivateKey().readBytes(destKeyStream);
-    		SigningPrivateKey spk = new SigningPrivateKey(d.getSigningPublicKey().getType());
-    		spk.readBytes(destKeyStream);
-    	} catch (DataFormatException e) {
+            Destination d = Destination.create(destKeyStream);
+            new PrivateKey().readBytes(destKeyStream);
+            SigType dtype = d.getSigningPublicKey().getType();
+            SigningPrivateKey spk = new SigningPrivateKey(dtype);
+            spk.readBytes(destKeyStream);
+            if (isOffline(spk)) {
+                // offlineExpiration
+                DataHelper.readLong(destKeyStream, 4);
+                int itype = (int) DataHelper.readLong(destKeyStream, 2);
+                SigType type = SigType.getByCode(itype);
+                if (type == null)
+                    return false;
+                SigningPublicKey transientSigningPublicKey = new SigningPublicKey(type);
+                transientSigningPublicKey.readBytes(destKeyStream);
+                Signature offlineSignature = new Signature(dtype);
+                offlineSignature.readBytes(destKeyStream);
+                // replace spk
+                spk = new SigningPrivateKey(type);
+                spk.readBytes(destKeyStream);
+            }
+        } catch (DataFormatException e) {
                 return false;
-    	} catch (IOException e) {
+        } catch (IOException e) {
                 return false;
-    	}
+        }
         return destKeyStream.available() == 0;
+    }
+
+    /**
+     *  @since 0.9.39
+     */
+    private static boolean isOffline(SigningPrivateKey spk) {
+        byte[] data = spk.getData();
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] != 0)
+                return false;
+        }
+        return true;
     }
 
 

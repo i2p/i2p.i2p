@@ -45,7 +45,8 @@ abstract class SAMMessageSession implements SAMMessageSess {
     /**
      * Initialize a new SAM message-based session.
      *
-     * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
+     * @param dest Base64-encoded destination and private keys,
+     *             and optional offline signature section (same format as PrivateKeyFile)
      * @param props Properties to setup the I2P session
      * @throws IOException
      * @throws DataFormatException
@@ -58,7 +59,8 @@ abstract class SAMMessageSession implements SAMMessageSess {
     /**
      * Initialize a new SAM message-based session.
      *
-     * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
+     * @param destStream Input stream containing the binary destination and private keys,
+     *                   and optional offline signature section (same format as PrivateKeyFile)
      * @param props Properties to setup the I2P session
      * @throws IOException
      * @throws DataFormatException

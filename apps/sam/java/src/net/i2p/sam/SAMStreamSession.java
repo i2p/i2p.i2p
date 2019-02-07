@@ -85,7 +85,8 @@ class SAMStreamSession implements SAMMessageSess {
      *
      * Caller MUST call start().
      *
-     * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
+     * @param dest Base64-encoded destination and private keys,
+     *             and optional offline signature section (same format as PrivateKeyFile)
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
@@ -101,7 +102,10 @@ class SAMStreamSession implements SAMMessageSess {
     /**
      * Create a new SAM STREAM session.
      *
-     * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
+     * Caller MUST call start().
+     *
+     * @param destStream Input stream containing the binary destination and private keys,
+     *                   and optional offline signature section (same format as PrivateKeyFile)
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
