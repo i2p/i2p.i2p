@@ -137,6 +137,7 @@ public class NTCPTransport extends TransportImpl {
     private static final int NTCP2_IV_LEN = OutboundNTCP2State.IV_SIZE;
     private static final int NTCP2_KEY_LEN = OutboundNTCP2State.KEY_SIZE;
     private static final long MIN_DOWNTIME_TO_REKEY = 30*24*60*60*1000L;
+    private final boolean _enableNTCP1;
     private final boolean _enableNTCP2;
     private final byte[] _ntcp2StaticPubkey;
     private final byte[] _ntcp2StaticPrivkey;
@@ -145,6 +146,7 @@ public class NTCPTransport extends TransportImpl {
     private final String _b64Ntcp2StaticIV;
 
     /**
+     *  @param dh null to disable NTCP1
      *  @param xdh null to disable NTCP2
      */
     public NTCPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh, X25519KeyFactory xdh) {
@@ -238,7 +240,10 @@ public class NTCPTransport extends TransportImpl {
         _nearCapacityCostBid = new SharedBid(105);
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
 
+        _enableNTCP1 = dh != null;
         _enableNTCP2 = xdh != null;
+        if (!_enableNTCP1 && !_enableNTCP2)
+            throw new IllegalArgumentException();
         if (_enableNTCP2) {
             boolean shouldSave = false;
             byte[] priv = null;
@@ -577,6 +582,10 @@ public class NTCPTransport extends TransportImpl {
         List<RouterAddress> addrs = getTargetAddresses(target);
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
+            // use this to skip outbound-only NTCP2,
+            // and NTCP1 if disabled
+            if (getNTCPVersion(addr) == 0)
+                continue;
             byte[] ip = addr.getIP();
             if (!TransportUtil.isValidPort(addr.getPort()) || ip == null) {
                 //_context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
@@ -840,7 +849,7 @@ public class NTCPTransport extends TransportImpl {
                     props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
                     addNTCP2Options(props);
                     int cost = getDefaultCost(ia instanceof Inet6Address);
-                    myAddress = new RouterAddress(STYLE, props, cost);
+                    myAddress = new RouterAddress(getPublishStyle(), props, cost);
                     replaceAddress(myAddress);
                 }
             } else if (_enableNTCP2) {
@@ -969,7 +978,7 @@ public class NTCPTransport extends TransportImpl {
                     props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
                     addNTCP2Options(props);
                     int cost = getDefaultCost(false);
-                    myAddress = new RouterAddress(STYLE, props, cost);
+                    myAddress = new RouterAddress(getPublishStyle(), props, cost);
                 }
                 if (!_endpoints.isEmpty()) {
                     // If we are already bound to the new address, OR
@@ -1052,6 +1061,9 @@ public class NTCPTransport extends TransportImpl {
      */
     net.i2p.router.transport.ntcp.Writer getWriter() { return _writer; }
 
+    /**
+     * @return always "NTCP" even if NTCP1 is disabled
+     */
     public String getStyle() { return STYLE; }
 
     /**
@@ -1065,15 +1077,24 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     * @return "NTCP" if NTCP1 is enabled, else "NTCP2"
+     * @since 0.9.39
+     */
+    private String getPublishStyle() {
+        return _enableNTCP1 ? STYLE : STYLE2;
+    }
+
+    /**
      *  Hook for NTCPConnection
      */
     EventPumper getPumper() { return _pumper; }
 
     /**
+     *  @return null if not configured for NTCP1
      *  @since 0.9
      */
     DHSessionKeyBuilder getDHBuilder() {
-        return _dhFactory.getBuilder();
+        return _dhFactory != null ? _dhFactory.getBuilder() : null;
     }
 
     /**
@@ -1092,7 +1113,8 @@ public class NTCPTransport extends TransportImpl {
      * @since 0.9.16
      */
     void returnUnused(DHSessionKeyBuilder builder) {
-        _dhFactory.returnUnused(builder);
+        if (_dhFactory != null)
+            _dhFactory.returnUnused(builder);
     }
 
     /**
@@ -1185,7 +1207,7 @@ public class NTCPTransport extends TransportImpl {
         props.setProperty(RouterAddress.PROP_PORT, Integer.toString(p));
         addNTCP2Options(props);
         int cost = getDefaultCost(false);
-        RouterAddress addr = new RouterAddress(STYLE, props, cost);
+        RouterAddress addr = new RouterAddress(getPublishStyle(), props, cost);
         return addr;
     }
 
@@ -1204,6 +1226,13 @@ public class NTCPTransport extends TransportImpl {
         props.setProperty("s", _b64Ntcp2StaticPubkey);
         props.setProperty("v", NTCP2_VERSION);
     }
+
+    /**
+     * Is NTCP1 enabled?
+     *
+     * @since 0.9.39
+     */
+    boolean isNTCP1Enabled() { return _enableNTCP1; }
 
     /**
      * Is NTCP2 enabled?
@@ -1267,9 +1296,11 @@ public class NTCPTransport extends TransportImpl {
             addr.getOption("i") == null ||
             addr.getOption("s") == null ||
             (!v.equals(NTCP2_VERSION) && !v.startsWith(NTCP2_VERSION_ALT))) {
-            return (rv == 1) ? 1 : 0;
+            // his address is NTCP1 or is outbound NTCP2 only
+            return (rv == 1 && _enableNTCP1) ? 1 : 0;
         }
-        // todo validate s/i b64, or just catch it later?
+        // his address is NTCP2
+        // do not validate the s/i b64, we will just catch it later
         return NTCP2_INT_VERSION;
     }
 
@@ -1461,7 +1492,7 @@ public class NTCPTransport extends TransportImpl {
             cost = oldAddr.getCost();
             newProps.putAll(oldAddr.getOptionsMap());
         }
-        RouterAddress newAddr = new RouterAddress(STYLE, newProps, cost);
+        RouterAddress newAddr = new RouterAddress(getPublishStyle(), newProps, cost);
 
         boolean changed = false;
 
@@ -1532,6 +1563,8 @@ public class NTCPTransport extends TransportImpl {
                 return;
             if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
                 newProps.setProperty(RouterAddress.PROP_HOST, nhost);
+                if (cost == NTCP2_OUTBOUND_COST)
+                    newAddr.setCost(DEFAULT_COST);
                 changed = true;
             }
         } else if (enabled.equals("false") &&
@@ -1543,6 +1576,8 @@ public class NTCPTransport extends TransportImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info("old host: " + ohost + " config: " + name + " new: " + name);
             newProps.setProperty(RouterAddress.PROP_HOST, name);
+            if (cost == NTCP2_OUTBOUND_COST)
+                newAddr.setCost(DEFAULT_COST);
             changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
             return;

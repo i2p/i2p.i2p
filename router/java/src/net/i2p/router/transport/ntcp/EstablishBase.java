@@ -191,12 +191,17 @@ abstract class EstablishBase implements EstablishState {
         _log = ctx.logManager().getLog(getClass());
         _transport = transport;
         _con = con;
+        // null if NTCP1 disabled
         _dh = _transport.getDHBuilder();
         _hX_xor_bobIdentHash = SimpleByteCache.acquire(HXY_SIZE);
         if (_con.isInbound()) {
             _X = SimpleByteCache.acquire(XY_SIZE);
-            _Y = _dh.getMyPublicValueBytes();
+            _Y = (_dh != null) ?_dh.getMyPublicValueBytes() : null;
         } else {
+            // OutboundNTCP2State does not extend this,
+            // can't get here with NTCP1 disabled
+            if (_dh == null)
+                throw new IllegalStateException();
             _X = _dh.getMyPublicValueBytes();
             _Y = SimpleByteCache.acquire(XY_SIZE);
         }
@@ -304,7 +309,7 @@ abstract class EstablishBase implements EstablishState {
             SimpleByteCache.release(_prevEncrypted);
         SimpleByteCache.release(_curDecrypted);
         SimpleByteCache.release(_hX_xor_bobIdentHash);
-        if (_dh.getPeerPublicValue() == null)
+        if (_dh != null && _dh.getPeerPublicValue() == null)
             _transport.returnUnused(_dh);
     }
 

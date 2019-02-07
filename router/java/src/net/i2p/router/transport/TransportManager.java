@@ -70,6 +70,8 @@ public class TransportManager implements TransportEventListener {
     private final UPnPManager _upnpManager;
     private final DHSessionKeyBuilder.PrecalcRunner _dhThread;
     private final X25519KeyFactory _xdhThread;
+    private final boolean _enableUDP;
+    private final boolean _enableNTCP1;
 
     /** default true */
     public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
@@ -78,6 +80,9 @@ public class TransportManager implements TransportEventListener {
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
 
+    /** default true */
+    private static final String PROP_NTCP1_ENABLE = "i2np.ntcp1.enable";
+    private static final boolean DEFAULT_NTCP1_ENABLE = true;
     private static final String PROP_NTCP2_ENABLE = "i2np.ntcp2.enable";
     private static final boolean DEFAULT_NTCP2_ENABLE = true;
 
@@ -102,9 +107,12 @@ public class TransportManager implements TransportEventListener {
             _upnpManager = new UPnPManager(context, this);
         else
             _upnpManager = null;
-        _dhThread = new DHSessionKeyBuilder.PrecalcRunner(context);
+        _enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
+        _enableNTCP1 = isNTCPEnabled(context) &&
+                       context.getProperty(PROP_NTCP1_ENABLE, DEFAULT_NTCP1_ENABLE);
         boolean enableNTCP2 = isNTCPEnabled(context) &&
                               context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
+        _dhThread = (_enableUDP || enableNTCP2) ? new DHSessionKeyBuilder.PrecalcRunner(context) : null;
         _xdhThread = enableNTCP2 ? new X25519KeyFactory(context) : null;
     }
 
@@ -149,6 +157,7 @@ public class TransportManager implements TransportEventListener {
     /**
      *  Hook for pluggable transport creation.
      *
+     *  @return null if both NTCP1 and SSU are disabled
      *  @since 0.9.16
      */
     DHSessionKeyBuilder.Factory getDHFactory() {
@@ -172,15 +181,15 @@ public class TransportManager implements TransportEventListener {
     }
 
     private void configTransports() {
-        boolean enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
         Transport udp = null;
-        if (enableUDP) {
+        if (_enableUDP) {
             udp = new UDPTransport(_context, _dhThread);
             addTransport(udp);
             initializeAddress(udp);
         }
         if (isNTCPEnabled(_context)) {
-            Transport ntcp = new NTCPTransport(_context, _dhThread, _xdhThread);
+            DHSessionKeyBuilder.PrecalcRunner dh = _enableNTCP1 ? _dhThread : null;
+            Transport ntcp = new NTCPTransport(_context, dh, _xdhThread);
             addTransport(ntcp);
             initializeAddress(ntcp);
             if (udp != null) {
@@ -315,7 +324,7 @@ public class TransportManager implements TransportEventListener {
     }
 
     synchronized void startListening() {
-        if (_dhThread.getState() == Thread.State.NEW)
+        if (_dhThread != null && _dhThread.getState() == Thread.State.NEW)
             _dhThread.start();
         if (_xdhThread != null && _xdhThread.getState() == Thread.State.NEW)
             _xdhThread.start();
@@ -377,7 +386,8 @@ public class TransportManager implements TransportEventListener {
      */
     synchronized void shutdown() {
         stopListening();
-        _dhThread.shutdown();
+        if (_dhThread != null)
+            _dhThread.shutdown();
         if (_xdhThread != null)
             _xdhThread.shutdown();
         Addresses.clearCaches();

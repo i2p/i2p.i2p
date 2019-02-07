@@ -1,3 +1,24 @@
+2019-02-07 zzz
+ * NTCP:
+   - Add option to disable NTCP1 (ticket #2328)
+   - Don't bid for outbound-only NTCP2 addresses
+   - Fix NTCP2 cost when transitioning to inbound
+
+2019-02-06 zzz
+ * Build: Add targets for alternate debian distros (ticket #2410)
+ * Crypto: Shortcut GroupElement representation conversion
+ * I2CP: Prevent use of repliable datagrams with offline keys
+
+2019-02-05 zzz
+ * Transport:
+   - Clean up unreachable() methods (ticket #2382)
+   - Speed up NTCP allowConnection() (ticket #2381)
+   - OutNetMessage cleanup (ticket #2386)
+   - SSU PacketHandler cleanup (ticket #2383)
+
+2019-02-04 zzz
+ * I2CP: Change format and message type of CreateLeaseSet2 message
+
 2019-02-03 zzz
  * I2CP:
    - Remove revocation private key from CreateLeaseset2 message

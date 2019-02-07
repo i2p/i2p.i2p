@@ -123,6 +123,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     public int getVersion() {
         if (!_transport.isNTCP2Enabled())
             return 1;
+        if (!_transport.isNTCP1Enabled())
+            return 2;
         synchronized (_stateLock) {
             if (_state == State.IB_INIT)
                 return 0;
@@ -160,7 +162,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                         _log.warn("Short buffer got " + remaining + " total now " + _received + " on " + this);
                     return;
                 }
-                if (remaining + _received < NTCP1_MSG1_SIZE) {
+                if (remaining + _received < NTCP1_MSG1_SIZE ||
+                    !_transport.isNTCP1Enabled()) {
                     // Less than 288 total received, assume NTCP2
                     // TODO can't change our mind later if we get more than 287
                     _con.setVersion(2);
@@ -743,6 +746,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 fail("Clock Skew: " + _peerSkew, null, true);
                 return;
             }
+            // TODO if NTCP1 disabled, we should allow longer padding
             if (_padlen1 > PADDING1_MAX) {
                 fail("bad msg 1 padlen: " + _padlen1);
                 return;
