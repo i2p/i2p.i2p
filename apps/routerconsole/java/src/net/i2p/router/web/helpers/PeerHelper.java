@@ -16,6 +16,7 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.router.transport.Transport;
+import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.ntcp.NTCPConnection;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.PeerState;
@@ -184,6 +185,13 @@ public class PeerHelper extends HelperBase {
                     buf.append("<span class=\"tab2\">");
                 buf.append(_t(titles[i]));
             } else {
+                if (i == 1) {
+                    if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_NTCP))
+                        continue;
+                } else if (i == 2) {
+                    if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
+                        continue;
+                }
                 // we are not there, make a link
                 if (span)
                     buf.append("<span class=\"tab\">");
