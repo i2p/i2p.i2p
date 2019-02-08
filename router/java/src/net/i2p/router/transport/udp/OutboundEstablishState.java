@@ -653,6 +653,12 @@ class OutboundEstablishState {
     /** how long have we been trying to establish this session? */
     public long getLifetime() { return _context.clock().now() - _establishBegin; }
     public long getEstablishBeginTime() { return _establishBegin; }
+
+    /**
+     *  @return 0 at initialization (to force sending session request),
+     *          rcv time after receiving a packet,
+     *          send time + delay after sending a packet (including session request)
+     */
     public synchronized long getNextSendTime() { return _nextSend; }
 
     /**
@@ -678,10 +684,13 @@ class OutboundEstablishState {
         _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
     }
     
+    /**
+     *  Call from synchronized method only
+     */
     private void packetReceived() {
         _nextSend = _context.clock().now();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Got a packet, nextSend == now");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Got a packet, nextSend == now");
     }
 
     /** @since 0.8.9 */

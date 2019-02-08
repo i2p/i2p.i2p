@@ -97,7 +97,7 @@ class InboundEstablishState {
      *                   SessionCreated message will be bad if the external port != the internal port.
      */
     public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort,
-                                 DHSessionKeyBuilder dh) {
+                                 DHSessionKeyBuilder dh, UDPPacketReader.SessionRequestReader req) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundEstablishState.class);
         _aliceIP = remoteIP;
@@ -108,6 +108,7 @@ class InboundEstablishState {
         _establishBegin = ctx.clock().now();
         _keyBuilder = dh;
         _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
+        receiveSessionRequest(req);
     }
     
     public synchronized InboundState getState() { return _currentState; }
@@ -288,6 +289,11 @@ class InboundEstablishState {
     /** how long have we been trying to establish this session? */
     public long getLifetime() { return _context.clock().now() - _establishBegin; }
     public long getEstablishBeginTime() { return _establishBegin; }
+
+    /**
+     *  @return rcv time after receiving a packet (including after constructor),
+     *          send time + delay after sending a packet
+     */
     public synchronized long getNextSendTime() { return _nextSend; }
 
     /** RemoteHostId, uniquely identifies an attempt */
@@ -478,6 +484,9 @@ class InboundEstablishState {
             }
     }
     
+    /**
+     *  Call from synchronized method only
+     */
     private void packetReceived() {
         _nextSend = _context.clock().now();
     }
