@@ -1,5 +1,7 @@
-apply plugin: 'java-library'
-apply plugin: 'scala'
+plugins {
+    id 'java-library'
+    id 'scala'
+}
 
 archivesBaseName = 'i2p'
 
