@@ -24,7 +24,7 @@ dependencies {
     testCompile 'org.scalatest:scalatest_2.12:3.0.4'
 }
 
-if (JavaVersion.current() != JavaVersion.VERSION_1_7) {
+if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVersion.VERSION_1_7) {
     sourceSets {
         test {
             scala {
