@@ -47,6 +47,10 @@ dependencies {
     implementation 'gnu.getopt:java-getopt:1.0.13'
     implementation 'org.gnu.gettext:libintl:0.18.3'
 
+    if (project.hasProperty("with.jbigi")) {
+        runtimeOnly project(path: ':installer', configuration: 'jbigi')
+    }
+
     testCompile "org.scala-lang:scala-library:2.12.4"
     testCompile 'org.scalatest:scalatest_2.12:3.0.4'
 }
