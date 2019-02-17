@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'scala'
+    id 'me.champeau.gradle.jmh' version '0.4.8'
 }
 
 archivesBaseName = 'i2p'
@@ -33,6 +34,11 @@ sourceSets {
             include 'net/i2p/crypto/eddsa/test.data'
             include 'net/i2p/crypto/eddsa/math/baseDblPrecmp'
             include 'net/i2p/crypto/eddsa/math/basePrecmp'
+        }
+    }
+    jmh {
+        java {
+            srcDir 'java/bench'
         }
     }
 }
