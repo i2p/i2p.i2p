@@ -101,10 +101,12 @@ configure(javaProjects) {
         if (JavaVersion.current().java8Compatible && !JavaVersion.current().java9Compatible) {
             throw new GradleException("Set java7BootClasspath property or JAVA7_HOME environment variable to enable cross-compilation, or run Gradle with JDK 9+")
         }
-        tasks.withType(JavaCompile) {
-            def version = compat(sourceCompatibility)
-            logger.info("Configuring $name to use --release $version")
-            options.compilerArgs.addAll(['--release', version])
+        project.afterEvaluate {
+            tasks.withType(JavaCompile) {
+                def version = compat(sourceCompatibility)
+                logger.info("Configuring $name to use --release $version")
+                options.compilerArgs.addAll(['--release', version])
+            }
         }
     }
 
