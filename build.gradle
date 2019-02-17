@@ -40,6 +40,15 @@ String compat(String src) {
     }
 }
 
+String javaExecutable(String targetJavaHome, String execName) {
+    def javaExecutablesPath = new File(targetJavaHome, "bin")
+    def executable = new File(javaExecutablesPath, execName)
+    if (!executable.exists()) {
+        throw new IllegalArgumentException("There is no ${execName} executable in ${javaExecutablesPath}")
+    }
+    executable.toString()
+}
+
 def releaseVersion = getReleaseVersion()
 def buildVersion = getBuildVersion()
 def buildExtra = getBuildExtra()
@@ -96,6 +105,36 @@ configure(javaProjects) {
             def version = compat(sourceCompatibility)
             logger.info("Configuring $name to use --release $version")
             options.compilerArgs.addAll(['--release', version])
+        }
+    }
+
+    // Set up Java override if configured (used to test with Java 7).
+    def targetJavaHome = System.getenv("TARGET_JAVA_HOME")
+    if (targetJavaHome) {
+        if (JavaVersion.current().java9Compatible) {
+            throw new GradleException("Only set TARGET_JAVA_HOME with JDK 8")
+        }
+
+        project.afterEvaluate {
+            logger.info("Target Java home set to ${targetJavaHome}")
+            logger.info("Configuring Gradle to use forked compilation and testing")
+
+            tasks.withType(JavaCompile) {
+                options.fork = true
+                options.forkOptions.javaHome = file(targetJavaHome)
+            }
+
+            tasks.withType(Javadoc) {
+                executable = javaExecutable(targetJavaHome, "javadoc")
+            }
+
+            tasks.withType(Test) {
+                executable = javaExecutable(targetJavaHome, "java")
+            }
+
+            tasks.withType(JavaExec) {
+                executable = javaExecutable(targetJavaHome, "java")
+            }
         }
     }
 }

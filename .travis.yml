@@ -2,7 +2,6 @@ language: java
 
 jdk:
   - oraclejdk9
-  - openjdk8
 
 matrix:
   include:
@@ -10,18 +9,23 @@ matrix:
       addons:
         sonarcloud:
           organization: "i2p"
+      before_install:
+        - export JAVA7_HOME=$(jdk_switcher home openjdk7)
+        - sed -i "1iplugins {\n    id 'org.sonarqube' version '2.6.1'\n}\n" build.gradle
+    - jdk: openjdk8
+      before_install:
+        - export JAVA7_HOME=$(jdk_switcher home openjdk7)
     - jdk: openjdk7
       sudo: required
       before_install: # Work around missing crypto in openjdk7
+        - export JAVA7_HOME=$(jdk_switcher home openjdk7)
         - sudo wget "https://bouncycastle.org/download/bcprov-ext-jdk15on-158.jar" -O "${JAVA_HOME}/jre/lib/ext/bcprov-ext-jdk15on-158.jar"
         - sudo perl -pi.bak -e 's/^(security\.provider\.)([0-9]+)/$1.($2+1)/ge' /etc/java-7-openjdk/security/java.security
         - echo "security.provider.1=org.bouncycastle.jce.provider.BouncyCastleProvider" | sudo tee -a /etc/java-7-openjdk/security/java.security
-
-before_install:
- - |
-    if [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]; then
-      sed -i "1iplugins {\n    id 'org.sonarqube' version '2.6.1'\n}\n" build.gradle
-    fi
+      install:
+        - export TARGET_JAVA_HOME=$JAVA_HOME
+        - jdk_switcher use oraclejdk8
+        - ./gradlew assemble
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
