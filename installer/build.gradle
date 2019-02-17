@@ -1,7 +1,19 @@
+configurations {
+    jbigi
+}
+
 sourceSets {
     main {
         java {
             srcDir 'java/src'
+        }
+    }
+    jbigi {
+        resources {
+            srcDir 'lib/jbigi'
+            include '*.so'
+            include '*.dll'
+            include '*.jnilib'
         }
     }
 }
@@ -19,4 +31,13 @@ jar {
     manifest {
         attributes 'Main-Class': 'net.i2p.installer.Main'
     }
+}
+
+task jbigiJar(type: Jar) {
+    baseName = 'jbigi'
+    from sourceSets.jbigi.output
+}
+
+artifacts {
+    jbigi jbigiJar
 }
