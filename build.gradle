@@ -32,6 +32,14 @@ String getBuildExtra() {
     buildExtra
 }
 
+String compat(String src) {
+    if (src.contains('.')) {
+        src.substring(src.lastIndexOf('.') + 1)
+    } else {
+        src
+    }
+}
+
 def releaseVersion = getReleaseVersion()
 def buildVersion = getBuildVersion()
 def buildExtra = getBuildExtra()
@@ -63,11 +71,32 @@ configure(javaProjects) {
     }
 
     sourceCompatibility = 1.7
-    // Set i2pBootClasspath=/path/to/rt.jar:/path/to/jce.jar in ~/.gradle/gradle.properties if needed
+    targetCompatibility = 1.7
+
+    def i2pBootClasspath
+    // Set java7BootClasspath=/path/to/rt.jar:/path/to/jce.jar in ~/.gradle/gradle.properties if needed
+    if (java7BootClasspath) {
+        i2pBootClasspath = java7BootClasspath
+    } else {
+        def java7Home = System.getenv("JAVA7_HOME")
+        if (java7Home) {
+            i2pBootClasspath = "${java7Home}/jre/lib/jce.jar:${java7Home}/jre/lib/rt.jar"
+        }
+    }
+
     if (i2pBootClasspath) {
         tasks.withType(AbstractCompile, { AbstractCompile ac ->
             ac.options.bootstrapClasspath = files(i2pBootClasspath)
         })
+    } else {
+        if (JavaVersion.current().java8Compatible && !JavaVersion.current().java9Compatible) {
+            throw new GradleException("Set java7BootClasspath property or JAVA7_HOME environment variable to enable cross-compilation, or run Gradle with JDK 9+")
+        }
+        tasks.withType(JavaCompile) {
+            def version = compat(sourceCompatibility)
+            logger.info("Configuring $name to use --release $version")
+            options.compilerArgs.addAll(['--release', version])
+        }
     }
 }
 
