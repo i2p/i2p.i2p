@@ -2,6 +2,41 @@ plugins {
     id 'idea'
 }
 
+String getReleaseVersion() {
+    def releaseVersion
+    file("core/java/src/net/i2p/CoreVersion.java").readLines().findAll({ line ->
+        line.contains("public final static String VERSION")
+    }).first().eachMatch('.*"([^"]+)";', {
+        releaseVersion = it[1]
+    })
+    releaseVersion
+}
+
+String getBuildVersion() {
+    def buildVersion
+    file("router/java/src/net/i2p/router/RouterVersion.java").readLines().findAll({ line ->
+        line.contains("public final static long BUILD")
+    }).first().eachMatch('.*=\\s+([0-9]+);', {
+        buildVersion = it[1]
+    })
+    buildVersion
+}
+
+String getBuildExtra() {
+    def buildExtra
+    file("router/java/src/net/i2p/router/RouterVersion.java").readLines().findAll({ line ->
+        line.contains("public final static String EXTRA")
+    }).first().eachMatch('.*"(.*)";', {
+        buildExtra = it[1]
+    })
+    buildExtra
+}
+
+def releaseVersion = getReleaseVersion()
+def buildVersion = getBuildVersion()
+def buildExtra = getBuildExtra()
+def fullVersion = "$releaseVersion-$buildVersion$buildExtra"
+
 // Exclude apps/ dir itself, but include its subdirs
 def javaProjects = subprojects - project(':apps')
 
@@ -23,7 +58,7 @@ configure(javaProjects) {
 
     jar {
         manifest {
-            attributes 'Implementation-Version': '0.9.31-7'
+            attributes 'Implementation-Version': "$fullVersion"
         }
     }
 
