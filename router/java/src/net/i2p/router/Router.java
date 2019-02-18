@@ -1179,6 +1179,7 @@ public class Router implements RouterClock.ClockShiftListener {
         synchronized(_configFileLock) {
             removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
             removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+            removeConfigSetting(NTCPTransport.PROP_I2NP_NTCP_PORT);
             removeConfigSetting(NTCPTransport.PROP_NTCP2_SP);
             removeConfigSetting(NTCPTransport.PROP_NTCP2_IV);
             removeConfigSetting(PROP_IB_RANDOM_KEY);

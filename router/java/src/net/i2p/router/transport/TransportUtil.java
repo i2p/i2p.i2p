@@ -11,10 +11,12 @@ package net.i2p.router.transport;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
 
 /**
@@ -27,6 +29,15 @@ public abstract class TransportUtil {
     public static final String PROP_IPV4_FIREWALLED = "i2np.ipv4.firewalled";
     /** @since 0.9.28 */
     public static final String PROP_IPV6_FIREWALLED = "i2np.ipv6.firewalled";
+    private static final String PROP_PORT_PFX = "i2np.";
+    private static final String PROP_MIN_PORT_SFX = ".minPort";
+    private static final String PROP_MAX_PORT_SFX = ".maxPort";
+    /**
+     * 8998 is monotone, and 31000 is the wrapper outbound, so let's stay between those
+     * Was 9111, increase to skip Tor browser at 9050
+     */
+    private static final int MIN_RANDOM_PORT = 9151;
+    private static final int MAX_RANDOM_PORT = 30777;
 
     public enum IPv6Config {
         /** IPv6 disabled */
@@ -249,5 +260,30 @@ public abstract class TransportUtil {
                // do not block anything in 9111 - 30777, this is the standard random selection range
                port != 31000 && // Wrapper
                port != 32000;   // Wrapper
+    }
+
+    /**
+     *  log an error
+     *  @since 0.9.39 pulled out of UDPEndpoint
+     */
+    public static void logInvalidPort(Log log, String transportStyle, int port) {
+        log.error("Specified " + transportStyle + " port " + port + " is not valid, selecting a new port");
+        log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
+    }
+
+    /**
+     *  Pick a random port between the configured boundaries
+     *  @since IPv6, moved from UDPEndpoint in 0.9.39 to support NTCP also
+     */
+    public static int selectRandomPort(RouterContext ctx, String transportStyle) {
+        if (transportStyle.equals("SSU"))
+            transportStyle = "udp";
+        else
+            transportStyle = transportStyle.toLowerCase(Locale.US);
+        String minprop = PROP_PORT_PFX + transportStyle + PROP_MIN_PORT_SFX;
+        String maxprop = PROP_PORT_PFX + transportStyle + PROP_MAX_PORT_SFX;
+        int minPort = Math.min(65535, Math.max(1, ctx.getProperty(minprop, MIN_RANDOM_PORT)));
+        int maxPort = Math.min(65535, Math.max(minPort, ctx.getProperty(maxprop, MAX_RANDOM_PORT)));
+        return minPort + ctx.random().nextInt(1 + maxPort - minPort);
     }
 }

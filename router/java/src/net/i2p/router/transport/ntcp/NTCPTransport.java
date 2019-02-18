@@ -47,6 +47,7 @@ import net.i2p.router.transport.Transport;
 import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
@@ -240,6 +241,7 @@ public class NTCPTransport extends TransportImpl {
         _nearCapacityCostBid = new SharedBid(105);
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
 
+        setupPort();
         _enableNTCP1 = dh != null;
         _enableNTCP2 = xdh != null;
         if (!_enableNTCP1 && !_enableNTCP2)
@@ -303,6 +305,28 @@ public class NTCPTransport extends TransportImpl {
             _ntcp2StaticIV = null;
             _b64Ntcp2StaticPubkey = null;
             _b64Ntcp2StaticIV = null;
+        }
+    }
+    
+    /**
+     *  Pick a port if not previously configured.
+     *  Only if UDP is disabled.
+     *
+     *  @since 0.9.39
+     */
+    private void setupPort() {
+        if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
+            return;
+        int port = getRequestedPort();
+        if (port > 0 && !TransportUtil.isValidPort(port)) {
+            TransportUtil.logInvalidPort(_log, STYLE, port);
+        }
+        if (port <= 0) {
+            port = TransportUtil.selectRandomPort(_context, STYLE);
+            Map<String, String> changes = new HashMap<String, String>(2);
+            changes.put(PROP_I2NP_NTCP_PORT, Integer.toString(port));
+            _context.router().saveConfig(changes, null);
+            _log.logAlways(Log.INFO, "NTCP selected random port " + port);
         }
     }
 
@@ -999,6 +1023,7 @@ public class NTCPTransport extends TransportImpl {
                     _log.error("Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
                 ServerSocketChannel chan = ServerSocketChannel.open();
                 chan.configureBlocking(false);
+                // TODO retry
                 chan.socket().bind(addr);
                 _endpoints.add(addr);
                 if (_log.shouldLog(Log.INFO))
@@ -1437,8 +1462,9 @@ public class NTCPTransport extends TransportImpl {
             }
             return;
         }
-        // ignore UPnP for now, get everything from SSU
-        if (source != SOURCE_SSU)
+        // ignore UPnP for now, get everything from SSU if it's enabled
+        if (source != SOURCE_SSU &&
+            _context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
             return;
         boolean isIPv6 = ip != null && ip.length == 16;
         externalAddressReceived(ip, isIPv6, port);
@@ -1464,8 +1490,9 @@ public class NTCPTransport extends TransportImpl {
     public void externalAddressRemoved(AddressSource source, boolean ipv6) {
         if (_log.shouldWarn())
             _log.warn("Removing address, ipv6? " + ipv6 + " from: " + source, new Exception());
-        // ignore UPnP for now, get everything from SSU
-        if (source != SOURCE_SSU)
+        // ignore UPnP for now, get everything from SSU if it's enabled
+        if (source != SOURCE_SSU &&
+            _context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
             return;
         externalAddressReceived(null, ipv6, 0);
     }    
@@ -1658,6 +1685,14 @@ public class NTCPTransport extends TransportImpl {
                 _log.warn("UPnP has opened the NTCP port: " + port + " via " + Addresses.toString(ip, externalPort));
             else
                 _log.warn("UPnP has failed to open the NTCP port: " + port + " reason: " + reason);
+        }
+        // ignore UPnP for now, get everything from SSU if it's enabled
+        if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP)) {
+            // TODO
+            //if (success && ip != null && getExternalIP() != null) {
+            //    if (!isIPv4Firewalled())
+            //        setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+            //}
         }
     }
 

@@ -308,8 +308,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private void setupPort() {
         int port = getRequestedPort();
-        if (port < 0) {
-            port = UDPEndpoint.selectRandomPort(_context);
+        if (port <= 0) {
+            port = TransportUtil.selectRandomPort(_context, STYLE);
             Map<String, String> changes = new HashMap<String, String>(2);
             changes.put(PROP_INTERNAL_PORT, Integer.toString(port));
             changes.put(PROP_EXTERNAL_PORT, Integer.toString(port));

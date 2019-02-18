@@ -42,6 +42,8 @@ import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
@@ -72,6 +74,7 @@ public class TransportManager implements TransportEventListener {
     private final X25519KeyFactory _xdhThread;
     private final boolean _enableUDP;
     private final boolean _enableNTCP1;
+    private boolean _upnpUpdateQueued;
 
     /** default true */
     public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
@@ -196,6 +199,11 @@ public class TransportManager implements TransportEventListener {
                 // pass along the port SSU is probably going to use
                 // so that NTCP may bind early
                 int port = udp.getRequestedPort();
+                if (port > 0)
+                    ntcp.externalAddressReceived(SOURCE_CONFIG, (byte[]) null, port);
+            } else {
+                // SSU disabled
+                int port = ntcp.getRequestedPort();
                 if (port > 0)
                     ntcp.externalAddressReceived(SOURCE_CONFIG, (byte[]) null, port);
             }
@@ -661,7 +669,7 @@ public class TransportManager implements TransportEventListener {
                 _context.getBooleanProperty(NTCPTransport.PROP_I2NP_NTCP_AUTO_PORT)) {
                 Transport udp = getTransport(UDPTransport.STYLE);
                 if (udp != null)
-                    port = t.getRequestedPort();
+                    port = udp.getRequestedPort();
             }
             if (port > 0)
                 rv.add(new Port(t.getStyle(), port));
@@ -806,9 +814,32 @@ public class TransportManager implements TransportEventListener {
      */
     public void transportAddressChanged() {
         if (_upnpManager != null) {
-            _upnpManager.rescan();
-            // should really delay the following by 5 seconds?
-            _upnpManager.update(getPorts());
+            synchronized (_upnpManager) {
+                if (!_upnpUpdateQueued) {
+                    boolean shouldWait = _upnpManager.rescan();
+                    if (shouldWait) {
+                        // Delay until the rescan finishes, MX time + 250
+                        _upnpUpdateQueued = true;
+                        _context.simpleTimer2().addEvent(new UpdatePorts(), 3250);
+                    } else {
+                        _upnpManager.update(getPorts());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Delayed update of UPnP ports
+     *
+     * @since 0.9.39
+     */
+    private class UpdatePorts implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            synchronized (_upnpManager) {
+                _upnpUpdateQueued = false;
+                _upnpManager.update(getPorts());
+            }
         }
     }
 

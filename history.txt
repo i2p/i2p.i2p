@@ -1,8 +1,19 @@
+2019-02-18 zzz
+ * Transport:
+   - Fixes for NTCP when SSU disabled (ticket #1417)
+   - Delay port forwarding until after UPnP rescan complete
+
+2019-02-08 zzz
+ * Console: Hide disabled transports on /peers
+ * SSU: EstablishmentManager fixes (ticket #2397)
+
 2019-02-07 zzz
  * NTCP:
    - Add option to disable NTCP1 (ticket #2328)
    - Don't bid for outbound-only NTCP2 addresses
    - Fix NTCP2 cost when transitioning to inbound
+ * SAM: Support offline keys
+ * Streaming: Fix exception after sig verify fail
 
 2019-02-06 zzz
  * Build: Add targets for alternate debian distros (ticket #2410)
