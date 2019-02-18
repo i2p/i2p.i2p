@@ -32,7 +32,7 @@ public class BaseBean
     private static final String BASE_THEME_PATH = "/themes/susidns/";
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
-    private static final boolean DEFAULT_DISABLE_OLD = false;
+    private static final boolean DEFAULT_DISABLE_OLD = true;
     public static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
     private static final String ADDRESSBOOK_DIR = "addressbook";
     private static final String CONFIG_FILE = "config.txt";

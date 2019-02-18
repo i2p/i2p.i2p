@@ -255,7 +255,7 @@ public class WebMail extends HttpServlet
 	private static final String DEFAULT_THEME = "light";
 	/** From CSSHelper */
 	private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
-	private static final boolean DEFAULT_DISABLE_OLD = false;
+	private static final boolean DEFAULT_DISABLE_OLD = true;
 
 	private static final String spacer = ""; /* this is best done with css */
 	private static final String thSpacer = "<th>&nbsp;</th>\n";

@@ -33,7 +33,7 @@ public class CSSHelper extends HelperBase {
     public static final String PROP_EMBED_APPS = "routerconsole.embedApps";
     /** @since 0.9.36 */
     public static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
-    public static final boolean DEFAULT_DISABLE_OLD = false;
+    public static final boolean DEFAULT_DISABLE_OLD = true;
 
     private static final String _consoleNonce = Long.toString(RandomSource.getInstance().nextLong());
 

@@ -135,7 +135,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String DEFAULT_THEME = "ubergine";
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
-    private static final boolean DEFAULT_DISABLE_OLD = false;
+    private static final boolean DEFAULT_DISABLE_OLD = true;
     /** @since 0.9.32 */
     public static final String PROP_COLLAPSE_PANELS = "i2psnark.collapsePanels";
     private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
