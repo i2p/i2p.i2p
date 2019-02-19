@@ -169,4 +169,45 @@ public final class ChaChaCore {
 		v[c] += v[d];
 		v[b] = leftRotate7(v[b] ^ v[c]);
 	}
+
+	/**
+	 * XOR's the output of ChaCha20 with a byte buffer.
+	 * 
+	 * @param input The input byte buffer.
+	 * @param inputOffset The offset of the first input byte.
+	 * @param output The output byte buffer (can be the same as the input).
+	 * @param outputOffset The offset of the first output byte.
+	 * @param length The number of bytes to XOR between 1 and 64.
+	 * @param block The ChaCha20 output block.
+	 *
+	 * @since 0.9.39 moved from ChaChaPolyCipherState
+	 */
+	public static void xorBlock(byte[] input, int inputOffset, byte[] output, int outputOffset, int length, int[] block)
+	{
+		int posn = 0;
+		int value;
+		while (length >= 4) {
+			value = block[posn++];
+			output[outputOffset] = (byte)(input[inputOffset] ^ value);
+			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
+			output[outputOffset + 2] = (byte)(input[inputOffset + 2] ^ (value >> 16));
+			output[outputOffset + 3] = (byte)(input[inputOffset + 3] ^ (value >> 24));
+			inputOffset += 4;
+			outputOffset += 4;
+			length -= 4;
+		}
+		if (length == 3) {
+			value = block[posn];
+			output[outputOffset] = (byte)(input[inputOffset] ^ value);
+			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
+			output[outputOffset + 2] = (byte)(input[inputOffset + 2] ^ (value >> 16));
+		} else if (length == 2) {
+			value = block[posn];
+			output[outputOffset] = (byte)(input[inputOffset] ^ value);
+			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
+		} else if (length == 1) {
+			value = block[posn];
+			output[outputOffset] = (byte)(input[inputOffset] ^ value);
+		}
+	}
 }

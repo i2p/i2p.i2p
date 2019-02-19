@@ -89,45 +89,6 @@ public class ChaChaPolyCipherState implements CipherState {
 	public boolean hasKey() {
 		return haskey;
 	}
-
-	/**
-	 * XOR's the output of ChaCha20 with a byte buffer.
-	 * 
-	 * @param input The input byte buffer.
-	 * @param inputOffset The offset of the first input byte.
-	 * @param output The output byte buffer (can be the same as the input).
-	 * @param outputOffset The offset of the first output byte.
-	 * @param length The number of bytes to XOR between 1 and 64.
-	 * @param block The ChaCha20 output block.
-	 */
-	private static void xorBlock(byte[] input, int inputOffset, byte[] output, int outputOffset, int length, int[] block)
-	{
-		int posn = 0;
-		int value;
-		while (length >= 4) {
-			value = block[posn++];
-			output[outputOffset] = (byte)(input[inputOffset] ^ value);
-			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
-			output[outputOffset + 2] = (byte)(input[inputOffset + 2] ^ (value >> 16));
-			output[outputOffset + 3] = (byte)(input[inputOffset + 3] ^ (value >> 24));
-			inputOffset += 4;
-			outputOffset += 4;
-			length -= 4;
-		}
-		if (length == 3) {
-			value = block[posn];
-			output[outputOffset] = (byte)(input[inputOffset] ^ value);
-			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
-			output[outputOffset + 2] = (byte)(input[inputOffset + 2] ^ (value >> 16));
-		} else if (length == 2) {
-			value = block[posn];
-			output[outputOffset] = (byte)(input[inputOffset] ^ value);
-			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
-		} else if (length == 1) {
-			value = block[posn];
-			output[outputOffset] = (byte)(input[inputOffset] ^ value);
-		}
-	}
 	
 	/**
 	 * Set up to encrypt or decrypt the next packet.
@@ -141,7 +102,7 @@ public class ChaChaPolyCipherState implements CipherState {
 		ChaChaCore.initIV(input, n++);
 		ChaChaCore.hash(output, input);
 		Arrays.fill(polyKey, (byte)0);
-		xorBlock(polyKey, 0, polyKey, 0, 32, output);
+		ChaChaCore.xorBlock(polyKey, 0, polyKey, 0, 32, output);
 		poly.reset(polyKey, 0);
 		if (ad != null) {
 			poly.update(ad, 0, ad.length);
@@ -201,7 +162,7 @@ public class ChaChaPolyCipherState implements CipherState {
 			if (tempLen > length)
 				tempLen = length;
 			ChaChaCore.hash(output, input);
-			xorBlock(plaintext, plaintextOffset, ciphertext, ciphertextOffset, tempLen, output);
+			ChaChaCore.xorBlock(plaintext, plaintextOffset, ciphertext, ciphertextOffset, tempLen, output);
 			if (++(input[12]) == 0)
 				++(input[13]);
 			plaintextOffset += tempLen;
