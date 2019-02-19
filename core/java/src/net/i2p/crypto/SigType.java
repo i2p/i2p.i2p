@@ -65,6 +65,17 @@ public enum SigType {
     EdDSA_SHA512_Ed25519ph(8, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "NonewithEdDSA",
                            EdDSANamedCurveTable.getByName("ed25519-sha-512"), "1.3.101.101", "0.9.25"),
 
+    // 9 and 10 reserved for GOST - see proposal 134
+
+    /**
+     *  Blinded version of EdDSA, use for encrypted LS2
+     *  Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes
+     *
+     *  @since 0.9.39
+     */
+    RedDSA_SHA512_Ed25519(11, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA",
+                          EdDSANamedCurveTable.getByName("ed25519-sha-512"), "1.3.101.101", "0.9.39"),
+
     ;
 
     // TESTING....................
@@ -295,6 +306,8 @@ public enum SigType {
                 return EdDSA_SHA512_Ed25519;
             if (uc.equals("EDDSA_SHA512_ED25519PH"))
                 return EdDSA_SHA512_Ed25519ph;
+            if (uc.equals("REDDSA_SHA512_ED25519"))
+                return RedDSA_SHA512_Ed25519;
             return valueOf(uc);
         } catch (IllegalArgumentException iae) {
             try {

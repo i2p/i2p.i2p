@@ -369,8 +369,16 @@ public final class SigUtil {
     private static EdDSAPrivateKey cvtToJavaEdDSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         try {
-            return new EdDSAPrivateKey(new EdDSAPrivateKeySpec(
-                pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
+            EdDSAParameterSpec paramspec = (EdDSAParameterSpec) pk.getType().getParams();
+            EdDSAPrivateKeySpec pkspec;
+            SigType type = pk.getType();
+            if (type == SigType.EdDSA_SHA512_Ed25519)
+                pkspec = new EdDSAPrivateKeySpec(pk.getData(), paramspec);
+            else if (type == SigType.RedDSA_SHA512_Ed25519)
+                pkspec = new EdDSAPrivateKeySpec(pk.getData(), null, paramspec);
+            else
+                throw new InvalidKeyException();
+            return new EdDSAPrivateKey(pkspec);
         } catch (IllegalArgumentException iae) {
             throw new InvalidKeyException(iae);
         }
@@ -389,7 +397,14 @@ public final class SigUtil {
      */
     public static SigningPrivateKey fromJavaKey(EdDSAPrivateKey pk, SigType type)
             throws GeneralSecurityException {
-        return new SigningPrivateKey(type, pk.getSeed());
+        byte[] data;
+        if (type == SigType.EdDSA_SHA512_Ed25519)
+            data = pk.getSeed();
+        else if (type == SigType.RedDSA_SHA512_Ed25519)
+            data = pk.geta();
+        else
+            throw new IllegalArgumentException();
+        return new SigningPrivateKey(type, data);
     }
 
     public static DSAPublicKey toJavaDSAKey(SigningPublicKey pk)
