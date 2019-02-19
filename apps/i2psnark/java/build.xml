@@ -252,12 +252,6 @@
 
         <replace dir="build/standalone-resources/.resources/themes/snark"
             summary="true"
-            token="url(/themes/console/classic/images/"
-            value="url(/i2psnark/.resources/themes/snark/classic/images/" >
-            <include name="**/*.css" />
-        </replace>
-        <replace dir="build/standalone-resources/.resources/themes/snark"
-            summary="true"
             token="url(/themes/console/dark/images/"
             value="url(/i2psnark/.resources/themes/snark/dark/images/" >
             <include name="**/*.css" />
@@ -298,8 +292,6 @@
               todir="build/standalone-resources/.resources/themes/snark/dark/images" />
         <copy file="../../../installer/resources/themes/console/images/info/errortriangle.png"
               todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
-        <copy file="../../../installer/resources/themes/console/classic/images/bg0.png"
-              todir="build/standalone-resources/.resources/themes/snark/classic/images" />
 
         <mkdir dir="build/standalone-resources/.resources/js" />
         <copy file="../../routerconsole/jsp/js/ajax.js" todir="build/standalone-resources/.resources/js" />
