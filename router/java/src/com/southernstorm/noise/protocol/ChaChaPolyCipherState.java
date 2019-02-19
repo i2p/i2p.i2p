@@ -27,7 +27,7 @@ import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.ShortBufferException;
 
-import com.southernstorm.noise.crypto.ChaChaCore;
+import com.southernstorm.noise.crypto.chacha20.ChaChaCore;
 import com.southernstorm.noise.crypto.Poly1305;
 
 /**

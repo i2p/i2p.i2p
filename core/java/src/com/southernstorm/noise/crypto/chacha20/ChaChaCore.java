@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package com.southernstorm.noise.crypto;
+package com.southernstorm.noise.crypto.chacha20;
 
 /**
  * Implementation of the ChaCha20 core hash transformation.
