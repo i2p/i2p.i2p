@@ -55,10 +55,10 @@ import net.i2p.crypto.eddsa.math.ScalarOps;
  * @author str4d
  *
  */
-public final class EdDSAEngine extends Signature {
+public class EdDSAEngine extends Signature {
     public static final String SIGNATURE_ALGORITHM = "NONEwithEdDSA";
 
-    private MessageDigest digest;
+    protected MessageDigest digest;
     private ByteArrayOutputStream baos;
     private EdDSAKey key;
     private boolean oneShotMode;
@@ -129,7 +129,7 @@ public final class EdDSAEngine extends Signature {
         }
     }
 
-    private void digestInitSign(EdDSAPrivateKey privKey) {
+    protected void digestInitSign(EdDSAPrivateKey privKey) {
         // Preparing for hash
         // r = H(h_b,...,h_2b-1,M)
         int b = privKey.getParams().getCurve().getField().getb();

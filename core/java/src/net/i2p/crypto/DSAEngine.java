@@ -44,6 +44,7 @@ import java.security.interfaces.RSAKey;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAKey;
+import net.i2p.crypto.eddsa.RedDSAEngine;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
@@ -520,7 +521,8 @@ public final class DSAEngine {
         boolean rv;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
             // take advantage of one-shot mode
-            EdDSAEngine jsig = new EdDSAEngine(type.getDigestInstance());
+            MessageDigest md = type.getDigestInstance();
+            EdDSAEngine jsig = (type == SigType.RedDSA_SHA512_Ed25519) ? new RedDSAEngine(md) : new EdDSAEngine(md);
             jsig.initVerify(pubKey);
             rv = jsig.verifyOneShot(data, offset, len, sigbytes);
         } else {
@@ -573,7 +575,7 @@ public final class DSAEngine {
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
             // take advantage of one-shot mode
             // Ignore algo, EdDSAKey includes a hash specification.
-            EdDSAEngine jsig = new EdDSAEngine();
+            EdDSAEngine jsig = (type == SigType.RedDSA_SHA512_Ed25519) ? new RedDSAEngine() : new EdDSAEngine();
             jsig.initVerify(pubKey);
             rv = jsig.verifyOneShot(hash.getData(), sigbytes);
         } else {
@@ -621,7 +623,8 @@ public final class DSAEngine {
         byte[] sigbytes;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
             // take advantage of one-shot mode
-            EdDSAEngine jsig = new EdDSAEngine(type.getDigestInstance());
+            MessageDigest md = type.getDigestInstance();
+            EdDSAEngine jsig = (type == SigType.RedDSA_SHA512_Ed25519) ? new RedDSAEngine(md) : new EdDSAEngine(md);
             jsig.initSign(privKey);
             sigbytes = jsig.signOneShot(data, offset, len);
         } else {
@@ -669,7 +672,7 @@ public final class DSAEngine {
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
             // take advantage of one-shot mode
             // Ignore algo, EdDSAKey includes a hash specification.
-            EdDSAEngine jsig = new EdDSAEngine();
+            EdDSAEngine jsig = (type == SigType.RedDSA_SHA512_Ed25519) ? new RedDSAEngine() : new EdDSAEngine();
             jsig.initSign(privKey);
             sigbytes = jsig.signOneShot(hash.getData());
         } else {
