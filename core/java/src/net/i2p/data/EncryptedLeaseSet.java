@@ -1,13 +1,20 @@
 package net.i2p.data;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.I2PAppContext;
+import net.i2p.crypto.Blinding;
+import net.i2p.crypto.ChaCha20;
+import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.HKDF;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Use getSigningKey() / setSigningKey() (revocation key in super) for the blinded key.
@@ -18,23 +25,40 @@ import net.i2p.util.Clock;
  */
 public class EncryptedLeaseSet extends LeaseSet2 {
 
-    // includes IV and MAC
+    // includes salt
     private byte[] _encryptedData;
     private LeaseSet2 _decryptedLS2;
     private Hash __calculatedHash;
+    private SigningPrivateKey _alpha;
 
     private static final int MIN_ENCRYPTED_SIZE = 8 + 16;
     private static final int MAX_ENCRYPTED_SIZE = 4096;
 
+    private static final int SALT_LEN = 32;
+    private static final byte[] CREDENTIAL = DataHelper.getASCII("credential");
+    private static final byte[] SUBCREDENTIAL = DataHelper.getASCII("subcredential");
+    private static final String ELS2L1K = "ELS2_L1K";
+    private static final String ELS2L2K = "ELS2_L2K";
+
     public EncryptedLeaseSet() {
         super();
+    }
+
+    /**
+     *  @return leaseset or null if not decrypted.
+     *          Also returns null if we created and encrypted it.
+     *  @since 0.9.39
+     */
+    public LeaseSet2 getDecryptedLeaseSet() {
+        return _decryptedLS2;
     }
 
     ///// overrides below here
 
     @Override
     public int getType() {
-        return KEY_TYPE_ENCRYPTED_LS2;
+        // return type 3 before signing so inner signing works
+        return (_signature != null) ? KEY_TYPE_ENCRYPTED_LS2 : KEY_TYPE_LS2;
     }
 
     /**
@@ -68,13 +92,27 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         SigningPublicKey spk = dest.getSigningPublicKey();
         if (spk.getType() != SigType.EdDSA_SHA512_Ed25519)
             throw new IllegalArgumentException();
-        // TODO generate blinded key
-        _signingKey = blind(spk, null);
+        SigningPublicKey bpk = blind();
+        if (_signingKey == null)
+            _signingKey = bpk;
+        else if (!_signingKey.equals(bpk))
+            throw new IllegalArgumentException("blinded pubkey mismatch");
     }
 
-    private static SigningPublicKey blind(SigningPublicKey spk, SigningPrivateKey priv) {
-        // TODO generate blinded key
-        return spk;
+    /**
+     * Generate blinded pubkey from the unblinded pubkey in the destination,
+     * which must have been previously set.
+     *
+     * @since 0.9.39
+     */
+    private SigningPublicKey blind() {
+        SigningPublicKey spk = _destination.getSigningPublicKey();
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        if (_published <= 0)
+            _alpha = Blinding.generateAlpha(ctx, _destination, null);
+        else
+            _alpha = Blinding.generateAlpha(ctx, _destination, null, _published);
+        return Blinding.blind(spk, _alpha);
     }
 
     /**
@@ -112,21 +150,25 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     }
 
     /**
+     *  Before encrypt() is called, the inner leaseset.
+     *  After encrypt() is called, the encrypted data.
      *  Without sig. This does NOT validate the signature
      */
     @Override
     protected void writeBytesWithoutSig(OutputStream out) throws DataFormatException, IOException {
         if (_signingKey == null)
             throw new DataFormatException("Not enough data to write out a LeaseSet");
-        // LS2 header
-        writeHeader(out);
-        // Encrypted LS2 part
         if (_encryptedData == null) {
-            // TODO
-            encrypt(null);
+            super.writeHeader(out);
+            writeBody(out);
+        } else {
+            // for signing the inner part
+            writeHeader(out);
+            // After signing
+            // Encrypted LS2 part
+            DataHelper.writeLong(out, 2, _encryptedData.length);
+            out.write(_encryptedData);
         }
-        DataHelper.writeLong(out, 2, _encryptedData.length);
-        out.write(_encryptedData);
     }
     
     /**
@@ -241,34 +283,248 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     /**
      *  Throws IllegalStateException if not initialized.
      *
-     *  @param key ignored, to be fixed
+     *  @param skey ignored
      *  @throws IllegalStateException
      */
     @Override
-    public void encrypt(SessionKey key) {
+    public void encrypt(SessionKey skey) {
         if (_encryptedData != null)
-            throw new IllegalStateException();
+            throw new IllegalStateException("already encrypted");
+        if (_signature == null)
+            throw new IllegalStateException("not signed");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            // Middle layer - flag
-            baos.write(0);
             // Inner layer - type - data covered by sig
             baos.write(KEY_TYPE_LS2);
             super.writeHeader(baos);
             writeBody(baos);
+            _signature.writeBytes(baos);
         } catch (DataFormatException dfe) {
             throw new IllegalStateException("Error encrypting LS2", dfe);
         } catch (IOException ioe) {
             throw new IllegalStateException("Error encrypting LS2", ioe);
         }
 
-        // TODO sign and add signature
-        // TODO encrypt - TESTING ONLY
-        _encryptedData = baos.toByteArray();
-        for (int i = 0; i < _encryptedData.length; i++) {
-             _encryptedData[i] ^= 0x5a;
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        byte[] input = getHKDFInput(ctx);
+
+        // layer 2 (inner) encryption
+        byte[] salt = new byte[SALT_LEN];
+        ctx.random().nextBytes(salt);
+        HKDF hkdf = new HKDF(ctx);
+        byte[] key = new byte[32];
+        // use first 12 bytes only
+        byte[] iv = new byte[32];
+        hkdf.calculate(salt, input, ELS2L2K, key, iv, 0);
+        byte[] plaintext = baos.toByteArray();
+        byte[] ciphertext = new byte[1 + SALT_LEN + plaintext.length];
+        // Middle layer - flag
+        ciphertext[0] = 0;
+        System.arraycopy(salt, 0, ciphertext, 1, SALT_LEN);
+        ChaCha20.encrypt(key, iv, plaintext, 0, ciphertext, 1 + SALT_LEN, plaintext.length);
+        System.out.println("Encrypt: inner plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
+        System.out.println("Encrypt: inner ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
+
+        // layer 1 (outer) encryption
+        // reuse input (because there's no authcookie), generate new salt/key/iv
+        ctx.random().nextBytes(salt);
+        hkdf.calculate(salt, input, ELS2L1K, key, iv, 0);
+        plaintext = ciphertext;
+        ciphertext = new byte[SALT_LEN + plaintext.length];
+        System.arraycopy(salt, 0, ciphertext, 0, SALT_LEN);
+        ChaCha20.encrypt(key, iv, plaintext, 0, ciphertext, SALT_LEN, plaintext.length);
+        System.out.println("Encrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
+        _encryptedData = ciphertext;
+    }
+
+    /**
+     *  Throws IllegalStateException if not initialized.
+     *
+     *  @param skey ignored
+     *  @throws IllegalStateException
+     */
+    private void decrypt() throws DataFormatException, IOException {
+        if (_encryptedData == null)
+            throw new IllegalStateException("not encrypted");
+        if (_decryptedLS2 != null)
+            return;
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        byte[] input = getHKDFInput(ctx);
+
+        // layer 1 (outer) decryption
+        HKDF hkdf = new HKDF(ctx);
+        byte[] key = new byte[32];
+        // use first 12 bytes only
+        byte[] iv = new byte[32];
+        byte[] ciphertext = _encryptedData;
+        byte[] plaintext = new byte[ciphertext.length - SALT_LEN];
+        // first 32 bytes of ciphertext are the salt
+        hkdf.calculate(ciphertext, input, ELS2L1K, key, iv, 0);
+        ChaCha20.decrypt(key, iv, ciphertext, SALT_LEN, plaintext, 0, plaintext.length);
+        System.out.println("Decrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
+        System.out.println("Decrypt: outer plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
+
+        boolean perClient = (plaintext[0] & 0x01) != 0;
+        if (perClient) {
+            int authScheme = (plaintext[0] & 0x0e) >> 1;
+            // TODO
+            throw new DataFormatException("Per client auth unsupported, scheme: " + authScheme);
+        }
+
+        // layer 2 (inner) decryption
+        // reuse input (because there's no authcookie), get new salt/key/iv
+        ciphertext = plaintext;
+        plaintext = new byte[ciphertext.length  - (1 + SALT_LEN)];
+        byte[] salt = new byte[SALT_LEN];
+        System.arraycopy(ciphertext, 1, salt, 0, SALT_LEN);
+        hkdf.calculate(salt, input, ELS2L2K, key, iv, 0);
+        ChaCha20.decrypt(key, iv, ciphertext, 1 + SALT_LEN, plaintext, 0, plaintext.length);
+        System.out.println("Decrypt: inner plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
+        ByteArrayInputStream bais = new ByteArrayInputStream(plaintext);
+        int type = bais.read();
+        LeaseSet2 innerLS2;
+        if (type == KEY_TYPE_LS2)
+            innerLS2 = new LeaseSet2();
+        else if (type == KEY_TYPE_META_LS2)
+            innerLS2 = new MetaLeaseSet();
+        else
+            throw new DataFormatException("Unsupported LS type: " + type);
+        innerLS2.readBytes(bais);
+        _decryptedLS2 = innerLS2;
+    }
+
+    /**
+     *  The HKDF input
+     *
+     *  @return 36 bytes
+     *  @since 0.9.39
+     */
+    private byte[] getHKDFInput(I2PAppContext ctx) {
+        byte[] subcredential = getSubcredential(ctx);
+        byte[] rv = new byte[subcredential.length + 4];
+        System.arraycopy(subcredential, 0, rv, 0, subcredential.length);
+        DataHelper.toLong(rv, subcredential.length, 4, _published / 1000);
+        return rv;
+    }
+
+    /**
+     *  The subcredential
+     *
+     *  @return 32 bytes
+     *  @throws IllegalStateException if we don't have it
+     *  @since 0.9.39
+     */
+    private byte[] getSubcredential(I2PAppContext ctx) {
+        if (_destination == null)
+            throw new IllegalStateException("no known destination to decrypt with");
+        byte[] credential = hash(ctx, CREDENTIAL, _destination.toByteArray());
+        byte[] spk = _signingKey.getData();
+        byte[] tmp = new byte[credential.length + spk.length];
+        System.arraycopy(credential, 0, tmp, 0, credential.length);
+        System.arraycopy(spk, 0, tmp, credential.length, spk.length);
+        return hash(ctx, SUBCREDENTIAL, tmp);
+    }
+
+    /**
+     *  Hash with a personalization string
+     *
+     *  @return 32 bytes
+     *  @since 0.9.39
+     */
+    private static byte[] hash(I2PAppContext ctx, byte[] p, byte[] d) {
+        byte[] data = new byte[p.length + d.length];
+        System.arraycopy(p, 0, data, 0, p.length);
+        System.arraycopy(d, 0, data, p.length, d.length);
+        byte[] rv = new byte[32];
+        ctx.sha().calculateHash(data, 0, data.length, rv, 0);
+        return rv;
+    }
+
+    /**
+     * Sign the structure using the supplied signing key.
+     * Overridden because we sign the inner, then blind and encrypt
+     * and sign the outer.
+     *
+     * @throws IllegalStateException if already signed
+     */
+    @Override
+    public void sign(SigningPrivateKey key) throws DataFormatException {
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(EncryptedLeaseSet.class);
+        // now sign inner with the unblinded key 
+        super.sign(key);
+        if (log.shouldDebug()) {
+            log.debug("Sign inner with key: " + key.getType() + ' ' + key.toBase64());
+            log.debug("Corresponding pubkey: " + key.toPublic().toBase64());
+            log.debug("Sign inner: " + _signature.getType() + ' ' + _signature.toBase64());
+        }
+        encrypt(null);
+        SigningPrivateKey bkey = Blinding.blind(key, _alpha);
+        int len = size();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        try {
+            // unlike LS1, sig covers type
+            out.write(getType());
+            writeBytesWithoutSig(out);
+        } catch (IOException ioe) {
+            throw new DataFormatException("Signature failed", ioe);
+        }
+        byte data[] = out.toByteArray();
+        // now sign outer with the blinded key 
+        _signature = DSAEngine.getInstance().sign(data, bkey);
+        if (_signature == null)
+            throw new DataFormatException("Signature failed with " + key.getType() + " key");
+        if (log.shouldDebug()) {
+            log.debug("Sign outer with key: " + bkey.getType() + ' ' + bkey.toBase64());
+            log.debug("Corresponding pubkey: " + bkey.toPublic().toBase64());
+            log.debug("Sign outer: " + _signature.getType() + ' ' + _signature.toBase64());
         }
     }
+
+    /**
+     * Overridden to decrypt if possible, and verify inner sig also.
+     *
+     * Must call setDestination() prior to this if attempting decryption.
+     *
+     * @return valid
+     */
+    @Override
+    public boolean verifySignature() {
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(EncryptedLeaseSet.class);
+        if (log.shouldDebug()) {
+            log.debug("Sig verify outer with key: " + _signingKey.getType() + ' ' + _signingKey.toBase64());
+            log.debug("Sig verify outer: " + _signature.getType() + ' ' + _signature.toBase64());
+        }
+        if (!super.verifySignature()) {
+            log.error("ELS2 outer sig verify fail");
+            return false;
+        }
+        log.error("ELS2 outer sig verify success");
+        if (_destination == null) {
+            log.warn("ELS2 no dest to decrypt with");
+            return true;
+        }
+        try {
+            decrypt();
+        } catch (DataFormatException dfe) {
+            log.error("ELS2 decrypt fail", dfe);
+            return false;
+        } catch (IOException ioe) {
+            log.error("ELS2 decrypt fail", ioe);
+            return false;
+        }
+        if (log.shouldDebug()) {
+            log.debug("Decrypted inner LS2:\n" + _decryptedLS2);
+            log.debug("Sig verify inner with key: " + _decryptedLS2.getDestination().getSigningPublicKey().getType() + ' ' + _decryptedLS2.getDestination().getSigningPublicKey().toBase64());
+            log.debug("Sig verify inner: " + _decryptedLS2.getSignature().getType() + ' ' + _decryptedLS2.getSignature().toBase64());
+        }
+        boolean rv = _decryptedLS2.verifySignature();
+        if (!rv)
+            log.error("ELS2 inner sig verify fail");
+        else
+            log.debug("ELS2 inner sig verify success");
+        return rv;
+    }
+
 
     @Override
     public boolean equals(Object object) {
@@ -299,9 +555,21 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             buf.append("\n\tOffline Signature: ").append(_offlineSignature);
         }
         buf.append("\n\tUnpublished? ").append(isUnpublished());
+        buf.append("\n\tLength: ").append(_encryptedData.length);
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));
+        if (_decryptedLS2 != null) {
+            buf.append("\n\tDecrypted LS:\n").append(_decryptedLS2);
+        } else if (_destination != null) {
+            buf.append("\n\tDestination: ").append(_destination);
+            buf.append("\n\tLeases: #").append(getLeaseCount());
+            for (int i = 0; i < getLeaseCount(); i++) {
+                buf.append("\n\t\t").append(getLease(i));
+            }
+        } else {
+            buf.append("\n\tNot decrypted");
+        }
         buf.append("]");
         return buf.toString();
     }
@@ -309,7 +577,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
 /****
     public static void main(String args[]) throws Exception {
         if (args.length != 1) {
-            System.out.println("Usage: LeaseSet2 privatekeyfile.dat");
+            System.out.println("Usage: EncryptedLeaseSet privatekeyfile.dat");
             System.exit(1);
         }
         java.io.File f = new java.io.File(args[0]);
@@ -318,9 +586,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         System.out.println("Online test");
         java.io.File f2 = new java.io.File("online-encls2.dat");
         test(pkf, f2, false);
-        System.out.println("Offline test");
-        f2 = new java.io.File("offline-encls2.dat");
-        test(pkf, f2, true);
+        //System.out.println("Offline test");
+        //f2 = new java.io.File("offline-encls2.dat");
+        //test(pkf, f2, true);
     }
 
     private static void test(PrivateKeyFile pkf, java.io.File outfile, boolean offline) throws Exception {
@@ -361,8 +629,10 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             ls2.sign(spk);
         }
         System.out.println("Created: " + ls2);
-        if (!ls2.verifySignature())
+        if (!ls2.verifySignature()) {
             System.out.println("Verify FAILED");
+            return;
+        }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ls2.writeBytes(out);
         java.io.OutputStream out2 = new java.io.FileOutputStream(outfile);
@@ -374,6 +644,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         EncryptedLeaseSet ls3 = new EncryptedLeaseSet();
         ls3.readBytes(in);
         System.out.println("Read back: " + ls3);
+        // required to decrypt
+        ls3.setDestination(pkf.getDestination());
         if (!ls3.verifySignature())
             System.out.println("Verify FAILED");
     }

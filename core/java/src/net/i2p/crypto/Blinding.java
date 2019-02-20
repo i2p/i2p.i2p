@@ -105,6 +105,7 @@ public final class Blinding {
     }
 
     /**
+     *  Generate alpha for current time.
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
      *  @param dest spk must be SigType EdDSA_SHA512_Ed25519
@@ -116,6 +117,23 @@ public final class Blinding {
      */
     public static SigningPrivateKey generateAlpha(I2PAppContext ctx, Destination dest, String secret) {
         long now = ctx.clock().now();
+        return generateAlpha(ctx, dest, secret, now);
+    }
+
+    /**
+     *  Generate alpha for the given time.
+     *  Only for SigType EdDSA_SHA512_Ed25519.
+     *
+     *  @param dest spk must be SigType EdDSA_SHA512_Ed25519
+     *  @param secret may be null or zero-length
+     *  @param now for what time?
+     *  @return SigType RedDSA_SHA512_Ed25519
+     *  @throws UnsupportedOperationException unless supported SigTypes
+     *  @throws IllegalArgumentException on bad inputs
+     *  @since 0.9.39
+     */
+    public static SigningPrivateKey generateAlpha(I2PAppContext ctx, Destination dest,
+                                                  String secret, long now) {
         String modVal;
         synchronized(_fmt) {
             modVal = _fmt.format(now);
