@@ -82,7 +82,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     /**
      * Overridden to set the blinded key
      *
-     * @param dest non-null, must be EdDSA_SHA512_Ed25519
+     * @param dest non-null, must be EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      * @throws IllegalStateException if already signed
      * @throws IllegalArgumentException if not EdDSA
      */
@@ -90,7 +90,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     public void setDestination(Destination dest) {
         super.setDestination(dest);
         SigningPublicKey spk = dest.getSigningPublicKey();
-        if (spk.getType() != SigType.EdDSA_SHA512_Ed25519)
+        SigType type = spk.getType();
+        if (type != SigType.EdDSA_SHA512_Ed25519 &&
+            type != SigType.RedDSA_SHA512_Ed25519)
             throw new IllegalArgumentException();
         SigningPublicKey bpk = blind();
         if (_signingKey == null)

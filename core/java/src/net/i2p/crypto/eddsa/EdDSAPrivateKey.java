@@ -71,7 +71,7 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
     }
 
     /**
-     * Returns the public key in its canonical encoding.
+     * Returns the private key in its canonical encoding.
      *<p>
      * This implements the following specs:
      *<ul><li>

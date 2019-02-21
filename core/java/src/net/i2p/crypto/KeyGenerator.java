@@ -35,6 +35,7 @@ import com.southernstorm.noise.crypto.x25519.Curve25519;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.RedKeyPairGenerator;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Hash;
@@ -289,7 +290,11 @@ public final class KeyGenerator {
             return generateSigningKeys();
         java.security.KeyPair kp;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
-            net.i2p.crypto.eddsa.KeyPairGenerator kpg = new net.i2p.crypto.eddsa.KeyPairGenerator();
+            net.i2p.crypto.eddsa.KeyPairGenerator kpg;
+            if (type == SigType.RedDSA_SHA512_Ed25519)
+                kpg = new RedKeyPairGenerator();
+            else
+                kpg = new net.i2p.crypto.eddsa.KeyPairGenerator();
             kpg.initialize(type.getParams(), _context.random());
             kp = kpg.generateKeyPair();
         } else {

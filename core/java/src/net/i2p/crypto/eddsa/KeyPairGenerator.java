@@ -21,11 +21,11 @@ import net.i2p.util.RandomSource;
  *
  *  @since 0.9.15
  */
-public final class KeyPairGenerator extends KeyPairGeneratorSpi {
-    private static final int DEFAULT_KEYSIZE = 256;
-    private EdDSAParameterSpec edParams;
-    private SecureRandom random;
-    private boolean initialized;
+public class KeyPairGenerator extends KeyPairGeneratorSpi {
+    protected static final int DEFAULT_KEYSIZE = 256;
+    protected EdDSAParameterSpec edParams;
+    protected SecureRandom random;
+    protected boolean initialized;
 
     private static final Hashtable<Integer, AlgorithmParameterSpec> edParameters;
 

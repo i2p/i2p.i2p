@@ -39,16 +39,18 @@ public final class Blinding {
     private Blinding() {}
 
     /**
-     *  Only for SigType EdDSA_SHA512_Ed25519.
+     *  Only for SigTypes EdDSA_SHA512_Ed25519 and RedDSA_SHA512_Ed25519.
      *
-     *  @param key must be SigType EdDSA_SHA512_Ed25519
+     *  @param key must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      *  @param alpha must be SigType RedDSA_SHA512_Ed25519
      *  @return SigType RedDSA_SHA512_Ed25519
      *  @throws UnsupportedOperationException unless supported SigTypes
      *  @throws IllegalArgumentException on bad inputs
      */
     public static SigningPublicKey blind(SigningPublicKey key, SigningPrivateKey alpha) {
-        if (key.getType() != TYPE || alpha.getType() != TYPER)
+        SigType type = key.getType();
+        if ((type != TYPE && type != TYPER) ||
+            alpha.getType() != TYPER)
             throw new UnsupportedOperationException();
         try {
             EdDSAPublicKey jk = SigUtil.toJavaEdDSAKey(key);
@@ -61,16 +63,18 @@ public final class Blinding {
     }
 
     /**
-     *  Only for SigType EdDSA_SHA512_Ed25519.
+     *  Only for SigTypes EdDSA_SHA512_Ed25519 and RedDSA_SHA512_Ed25519.
      *
-     *  @param key must be SigType EdDSA_SHA512_Ed25519
+     *  @param key must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      *  @param alpha must be SigType RedDSA_SHA512_Ed25519
      *  @return SigType RedDSA_SHA512_Ed25519
      *  @throws UnsupportedOperationException unless supported SigTypes
      *  @throws IllegalArgumentException on bad inputs
      */
     public static SigningPrivateKey blind(SigningPrivateKey key, SigningPrivateKey alpha) {
-        if (key.getType() != TYPE || alpha.getType() != TYPER)
+        SigType type = key.getType();
+        if ((type != TYPE && type != TYPER) ||
+            alpha.getType() != TYPER)
             throw new UnsupportedOperationException();
         try {
             EdDSAPrivateKey jk = SigUtil.toJavaEdDSAKey(key);
@@ -122,9 +126,9 @@ public final class Blinding {
 
     /**
      *  Generate alpha for the given time.
-     *  Only for SigType EdDSA_SHA512_Ed25519.
+     *  Only for SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519.
      *
-     *  @param dest spk must be SigType EdDSA_SHA512_Ed25519
+     *  @param dest spk must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      *  @param secret may be null or zero-length
      *  @param now for what time?
      *  @return SigType RedDSA_SHA512_Ed25519
