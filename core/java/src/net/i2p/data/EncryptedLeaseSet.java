@@ -88,7 +88,12 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     @Override
     public void setDestination(Destination dest) {
-        super.setDestination(dest);
+        if (_signature != null && _destination != null) {
+            if (!dest.equals(_destination))
+                throw new IllegalStateException();
+        } else {
+            _destination = dest;
+        }
         SigningPublicKey spk = dest.getSigningPublicKey();
         SigType type = spk.getType();
         if (type != SigType.EdDSA_SHA512_Ed25519 &&
@@ -295,6 +300,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         if (_signature == null)
             throw new IllegalStateException("not signed");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // inner LS is always unpublished
+        int saveFlags = _flags;
+        setUnpublished();
         try {
             // Inner layer - type - data covered by sig
             baos.write(KEY_TYPE_LS2);
@@ -305,6 +313,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             throw new IllegalStateException("Error encrypting LS2", dfe);
         } catch (IOException ioe) {
             throw new IllegalStateException("Error encrypting LS2", ioe);
+        } finally {
+            _flags = saveFlags;
         }
 
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
@@ -453,7 +463,11 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     public void sign(SigningPrivateKey key) throws DataFormatException {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(EncryptedLeaseSet.class);
         // now sign inner with the unblinded key 
+        // inner LS is always unpublished
+        int saveFlags = _flags;
+        setUnpublished();
         super.sign(key);
+        _flags = saveFlags;
         if (log.shouldDebug()) {
             log.debug("Sign inner with key: " + key.getType() + ' ' + key.toBase64());
             log.debug("Corresponding pubkey: " + key.toPublic().toBase64());
