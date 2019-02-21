@@ -289,13 +289,17 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 }
             }
         }
-        if ("7".equals(props.getProperty("i2cp.leaseSetType"))) {
+        String lsType = props.getProperty("i2cp.leaseSetType");
+        if ("7".equals(lsType)) {
             // Prevent tunnel builds for Meta LS
             // more TODO
             props.setProperty("inbound.length", "0");
             props.setProperty("outbound.length", "0");
             props.setProperty("inbound.lengthVariance", "0");
             props.setProperty("outbound.lengthVariance", "0");
+        } else if (lsType == null && props.getProperty(SessionConfig.PROP_OFFLINE_SIGNATURE) != null) {
+            // force type 3
+            props.setProperty("i2cp.leaseSetType", "3");
         }
         cfg.setOptions(props);
         // this sets the session id

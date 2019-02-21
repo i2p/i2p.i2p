@@ -120,8 +120,14 @@ class I2CPMessageProducer {
         updateBandwidth(session);
         CreateSessionMessage msg = new CreateSessionMessage();
         SessionConfig cfg = new SessionConfig(session.getMyDestination());
-        cfg.setOptions(getRouterOptions(session));
-        if (session.isOffline()) {
+        Properties p = getRouterOptions(session);
+        boolean isOffline = session.isOffline();
+        if (isOffline) {
+            if (!p.containsKey(RequestLeaseSetMessageHandler.PROP_LS_TYPE))
+                p.setProperty(RequestLeaseSetMessageHandler.PROP_LS_TYPE, "3");
+        }
+        cfg.setOptions(p);
+        if (isOffline) {
             cfg.setOfflineSignature(session.getOfflineExpiration(),
                                     session.getTransientSigningPublicKey(),
                                     session.getOfflineSignature());

@@ -63,7 +63,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     private static final String PROP_LS_PK = "i2cp.leaseSetPrivateKey";
     private static final String PROP_LS_SPK = "i2cp.leaseSetSigningPrivateKey";
     // LS 2
-    private static final String PROP_LS_TYPE = "i2cp.leaseSetType";
+    public static final String PROP_LS_TYPE = "i2cp.leaseSetType";
     private static final String PROP_LS_ENCTYPE = "i2cp.leaseSetEncType";
 
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
