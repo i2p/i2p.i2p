@@ -187,22 +187,22 @@ public class Log {
 
     /** @since 0.9.20 */
     public boolean shouldDebug() {
-        return shouldLog(DEBUG);
+        return DEBUG >= _minPriority;
     }
 
     /** @since 0.9.20 */
     public boolean shouldInfo() {
-        return shouldLog(INFO);
+        return INFO >= _minPriority;
     }
 
     /** @since 0.9.20 */
     public boolean shouldWarn() {
-        return shouldLog(WARN);
+        return WARN >= _minPriority;
     }
 
     /** @since 0.9.20 */
     public boolean shouldError() {
-        return shouldLog(ERROR);
+        return ERROR >= _minPriority;
     }
     
     /**
