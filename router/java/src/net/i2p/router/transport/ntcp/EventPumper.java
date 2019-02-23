@@ -753,7 +753,7 @@ class EventPumper implements Runnable {
                     } else if (buf.remaining() > 0) {
                         // stay interested
                         //key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                        break;
+                        continue;
                     } else {
                         con.removeWriteBuf(buf);
                         //if (buffer time is too much, add OP_WRITe to the interest ops and break?)
