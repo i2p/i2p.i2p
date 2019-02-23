@@ -114,28 +114,28 @@ public class LogsHelper extends HelperBase {
         return "Undefined";
     }
     
-    /*****  unused
-    public String getConnectionLogs() {
-        return formatMessages(_context.commSystem().getMostRecentErrorMessages());
-    }
-    ******/
-
     private final static String NL = System.getProperty("line.separator");
 
-    /** formats in reverse order */
+    /** formats in forward order */
     private String formatMessages(List<String> msgs) {
         if (msgs.isEmpty())
             return "</td></tr><tr><td><p><i>" + _t("No log messages") + "</i></p>";
         boolean colorize = _context.getBooleanPropertyDefaultTrue("routerconsole.logs.color");
         StringBuilder buf = new StringBuilder(16*1024); 
         buf.append("</td></tr><tr><td><ul>");
-        for (int i = msgs.size() - 1; i >= 0; i--) { 
+        // newest first
+        // for (int i = msgs.size() - 1; i >= 0; i--) { 
+        // oldest first
+        for (int i = 0; i < msgs.size(); i++) { 
             String msg = msgs.get(i);
             // don't display the dup message if it is last
-            if (i == 0 && msg.contains("&darr;"))
+            //if (i == 0 && msg.contains("&darr;"))
+            // don't display the dup message if it is first
+            if (i == 0 && msg.contains("&uarr;"))
                 break;
             msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            msg = msg.replace("&amp;darr;", "&darr;");  // hack - undo the damage (LogWriter)
+            //msg = msg.replace("&amp;darr;", "&darr;");  // hack - undo the damage (LogWriter)
+            msg = msg.replace("&amp;uarr;", "&uarr;");  // hack - undo the damage (LogWriter)
             // remove  last \n that LogRecordFormatter added
             if (msg.endsWith(NL))
                 msg = msg.substring(0, msg.length() - NL.length());
