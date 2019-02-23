@@ -208,11 +208,20 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         RouterKeyGenerator gen = _context.routerKeyGenerator();
         Hash rkey = gen.getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
-        List<Hash> peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
+        final int type = ds.getType();
+        final boolean isls2 = ds.isLeaseSet() && type != DatabaseEntry.KEY_TYPE_LEASESET;
+        int max = MAX_TO_FLOOD;
+        // increase candidates because we will be skipping some
+        if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2)
+            max *= 4;
+        else if (isls2)
+            max *= 2;
+        List<Hash> peers = sel.selectFloodfillParticipants(rkey, max, getKBuckets());
+
         // todo key cert skip?
         long until = gen.getTimeTillMidnight();
         if (until < NEXT_RKEY_LS_ADVANCE_TIME ||
-            (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && until < NEXT_RKEY_RI_ADVANCE_TIME)) {
+            (type == DatabaseEntry.KEY_TYPE_ROUTERINFO && until < NEXT_RKEY_RI_ADVANCE_TIME)) {
             // to avoid lookup faulures after midnight, also flood to some closest to the
             // next routing key for a period of time before midnight.
             Hash nkey = gen.getNextRoutingKey(key);
@@ -229,28 +238,20 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                     peers.add(h);
                     i++;
                 }
+                if (i >= MAX_TO_FLOOD)
+                    break;
             }
-            if (i > 0 && _log.shouldLog(Log.INFO))
-                _log.info("Flooding the entry for " + key + " to " + i + " more, just before midnight");
+            if (i > 0) {
+                max += i;
+                if (_log.shouldInfo())
+                    _log.info("Flooding the entry for " + key + " to " + i + " more, just before midnight");
+            }
         }
         int flooded = 0;
-        boolean isls2 = ds.isLeaseSet() && ds.getType() != DatabaseEntry.KEY_TYPE_LEASESET;
         for (int i = 0; i < peers.size(); i++) {
             Hash peer = peers.get(i);
             RouterInfo target = lookupRouterInfoLocally(peer);
-            if ( (target == null) || (_context.banlist().isBanlisted(peer)) )
-                continue;
-            // Don't flood an RI back to itself
-            // Not necessary, a ff will do its own flooding (reply token == 0)
-            // But other implementations may not...
-            if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && peer.equals(key))
-                continue;
-            if (peer.equals(_context.routerHash()))
-                continue;
-            // min version checks
-            if (isls2 && !StoreJob.shouldStoreLS2To(target))
-                continue;
-            if (!StoreJob.shouldStoreTo(target))
+            if (!shouldFloodTo(key, type, peer, target))
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
             msg.setEntry(ds);
@@ -265,10 +266,35 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             flooded++;
             if (_log.shouldLog(Log.INFO))
                 _log.info("Flooding the entry for " + key.toBase64() + " to " + peer.toBase64());
+            if (flooded >= MAX_TO_FLOOD)
+                break;
         }
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Flooded the data to " + flooded + " of " + peers.size() + " peers");
+    }
+
+    /** @since 0.9.39 */
+    private boolean shouldFloodTo(Hash key, int type, Hash peer, RouterInfo target) {
+       if ( (target == null) || (_context.banlist().isBanlisted(peer)) )
+           return false;
+       // Don't flood an RI back to itself
+       // Not necessary, a ff will do its own flooding (reply token == 0)
+       // But other implementations may not...
+       if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO && peer.equals(key))
+           return false;
+       if (peer.equals(_context.routerHash()))
+           return false;
+       // min version checks
+       if (type != DatabaseEntry.KEY_TYPE_ROUTERINFO && type != DatabaseEntry.KEY_TYPE_LS2 &&
+           !StoreJob.shouldStoreLS2To(target))
+           return false;
+       if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 &&
+           !StoreJob.shouldStoreEncLS2To(target))
+           return false;
+       if (!StoreJob.shouldStoreTo(target))
+           return false;
+        return true;
     }
 
     /** note in the profile that the store failed */

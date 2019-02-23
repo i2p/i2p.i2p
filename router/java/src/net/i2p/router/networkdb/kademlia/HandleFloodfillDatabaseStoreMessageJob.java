@@ -14,6 +14,7 @@ import java.util.Date;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.TunnelId;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
@@ -113,10 +114,19 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 } else if (match.getEarliestLeaseDate() < ls.getEarliestLeaseDate()) {
                     wasNew = true;
                     // If it is in our keyspace and we are talking to it
-
-
                     if (match.getReceivedAsPublished())
                         ls.setReceivedAsPublished(true);
+                } else if (type != DatabaseEntry.KEY_TYPE_LEASESET &&
+                           match.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+                    LeaseSet2 ls2 = (LeaseSet2) ls;
+                    LeaseSet2 match2 = (LeaseSet2) match;
+                    if (match2.getPublished() < ls2.getPublished()) {
+                        wasNew = true;
+                        if (match.getReceivedAsPublished())
+                            ls.setReceivedAsPublished(true);
+                    } else {
+                        wasNew = false;
+                    }
                 } else {
                     wasNew = false;
                     // The FloodOnlyLookupSelector goes away after the first good reply
@@ -228,7 +238,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     return;
                 }
                 long floodBegin = System.currentTimeMillis();
-                _facade.flood(_message.getEntry());
+                _facade.flood(entry);
                 // ERR: see comment in HandleDatabaseLookupMessageJob regarding hidden mode
                 //else if (!_message.getRouterInfo().isHidden())
                 long floodEnd = System.currentTimeMillis();

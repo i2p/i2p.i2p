@@ -87,6 +87,9 @@ class RepublishLeaseSetJob extends JobImpl {
         requeue(RETRY_DELAY + getContext().random().nextInt(RETRY_DELAY));
     }
 
+    /**
+     * @return last attempted publish time, or 0 if never
+     */
     public long lastPublished() {
         return _lastPublished;
     }

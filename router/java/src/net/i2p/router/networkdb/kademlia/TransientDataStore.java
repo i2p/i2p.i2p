@@ -18,6 +18,7 @@ import java.util.Set;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -153,17 +154,29 @@ class TransientDataStore implements DataStore {
             LeaseSet ls = (LeaseSet)data;
             if (old != null) {
                 LeaseSet ols = (LeaseSet)old;
-                if (ls.getEarliestLeaseDate() < ols.getEarliestLeaseDate()) {
+                long oldDate, newDate;
+                if (type != DatabaseEntry.KEY_TYPE_LEASESET &&
+                    ols.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+                    LeaseSet2 ls2 = (LeaseSet2) ls;
+                    LeaseSet2 ols2 = (LeaseSet2) ols;
+                    oldDate = ols2.getPublished();
+                    newDate = ls2.getPublished();
+                } else {
+                    oldDate = ols.getEarliestLeaseDate();
+                    newDate = ls.getEarliestLeaseDate();
+                }
+
+                if (newDate < oldDate) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Almost clobbered an old leaseSet! " + key + ": [old expires " + new Date(ols.getEarliestLeaseDate()) +
-                                  " new on " + new Date(ls.getEarliestLeaseDate()) + ']');
-                } else if (ls.getEarliestLeaseDate() == ols.getEarliestLeaseDate()) {
+                        _log.info("Almost clobbered an old leaseSet! " + key + ": [old " + new Date(oldDate) +
+                                  " new " + new Date(newDate) + ']');
+                } else if (newDate == oldDate) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Duplicate " + key);
                 } else {
                     if (_log.shouldLog(Log.INFO)) {
-                        _log.info("Updated old leaseSet " + key + ": [old expires " + new Date(ols.getEarliestLeaseDate()) +
-                                  " new on " + new Date(ls.getEarliestLeaseDate()) + ']');
+                        _log.info("Updated old leaseSet " + key + ": [old " + new Date(oldDate) +
+                                  " new " + new Date(newDate) + ']');
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
                     }

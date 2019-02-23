@@ -25,17 +25,22 @@ class LeaseRequestState {
     private final Job _onGranted;
     private final Job _onFailed;
     private final long _expiration;
+    private final long _currentEarliestLeastDate;
     private boolean _successful;
 
     /**
+     *  @param currentEarliestLeastDate absolute time, the earliest expiration in
+     *         the current LS (NOT the requested one), or 0 if none
      *  @param expiration absolute time, when the request expires (not when the LS expires)
      *  @param requested LeaseSet with requested leases - this object must be updated to contain the 
      *             signed version (as well as any changed/added/removed Leases)
      *             The LeaseSet contains Leases and destination only, it is unsigned.
      */
-    public LeaseRequestState(Job onGranted, Job onFailed, long expiration, LeaseSet requested) {
+    public LeaseRequestState(Job onGranted, Job onFailed, long currentEarliestLeastDate,
+                             long expiration, LeaseSet requested) {
         _onGranted = onGranted;
         _onFailed = onFailed;
+        _currentEarliestLeastDate = currentEarliestLeastDate;
         _expiration = expiration;
         _requestedLeaseSet = requested;
     }
@@ -68,6 +73,14 @@ class LeaseRequestState {
 
     /** when the request for the lease set expires */
     public long getExpiration() { return _expiration; }
+
+    /**
+     * The earliest lease expiration time in the current LS (NOT the requested one),
+     * or 0 if none.
+     *
+     * @since 0.9.39
+     */
+    public long getCurrentEarliestLeaseDate() { return _currentEarliestLeastDate; }
 
     /** whether the request was successful in the time allotted */
     public boolean getIsSuccessful() { return _successful; }

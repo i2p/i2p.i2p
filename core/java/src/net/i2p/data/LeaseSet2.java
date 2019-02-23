@@ -52,6 +52,17 @@ public class LeaseSet2 extends LeaseSet {
         _checked = true;
     }
 
+    /**
+     * Published timestamp, as received.
+     * Different than getDate(), which is the earliest lease expiration.
+     *
+     * @return in ms, with 1 second resolution
+     * @since 0.9.39
+     */
+    public long getPublished() {
+        return _published;
+    }
+
     public boolean isUnpublished() {
         return (_flags & FLAG_UNPUBLISHED) != 0;
     }
@@ -384,8 +395,10 @@ public class LeaseSet2 extends LeaseSet {
 
     protected void writeHeader(OutputStream out) throws DataFormatException, IOException {
         _destination.writeBytes(out);
-        if (_published <= 0)
-            _published = Clock.getInstance().now();
+        if (_published <= 0) {
+            // we round it here, so comparisons during verifies aren't wrong
+            _published = ((Clock.getInstance().now() + 500) / 1000) * 1000;
+        }
         long pub1k = _published / 1000;
         DataHelper.writeLong(out, 4, pub1k);
         // Divide separately to prevent rounding errors
@@ -575,8 +588,9 @@ public class LeaseSet2 extends LeaseSet {
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));
         buf.append("\n\tLeases: #").append(getLeaseCount());
-        for (int i = 0; i < getLeaseCount(); i++)
+        for (int i = 0; i < getLeaseCount(); i++) {
             buf.append("\n\t\t").append(getLease(i));
+        }
         buf.append("]");
         return buf.toString();
     }

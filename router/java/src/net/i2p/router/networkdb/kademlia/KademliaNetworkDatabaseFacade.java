@@ -935,8 +935,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (fkc != null) {
             boolean validFamily = fkc.verify(routerInfo);
             if (!validFamily) {
-                if (_log.shouldWarn())
-                    _log.warn("Bad family sig: " + routerInfo.getHash());
+                if (_log.shouldInfo())
+                    _log.info("Bad family sig: " + routerInfo.getHash());
             }
             // todo store in RI
         }

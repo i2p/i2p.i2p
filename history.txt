@@ -1,4 +1,26 @@
+2019-02-23 zzz
+ * NetDB:
+   - Use published date, not earliest lease expiration, for LS2 comparisons
+   - Fix earliest LS expiration adjustment when publishing for LS2
+   - Increase flood candidates for LS2
+   - Don't start new store after verify fail if we've already done so
+   - Version checks for encrypted LS2
+
+2019-02-21 zzz
+ * Crypto: Keygen for RedDSA, allow RedDSA for unblinded keys (Enc LS2)
+ * Data: Always set unpublished flag for inner LS (Enc LS2)
+ * I2CP: Force i2cp.leaseSetType option for offline keys
+
+2019-02-20 zzz
+ * Crypto: ChaCha20 and RedDSA for Encrypted LS2 (proposal #123)
+ * Data: Encrypt/decrypt/sign/verify for Encrypted LS2 (proposal #123)
+
+2019-02-19 zzz
+ * Crypto: Implement blinding, add sig type 11 (proposal 123)
+
 2019-02-18 zzz
+ * Console: Drop midnight and classic themes (ticket #2272)
+ * Tomcat 8.5.38
  * Transport:
    - Fixes for NTCP when SSU disabled (ticket #1417)
    - Delay port forwarding until after UPnP rescan complete

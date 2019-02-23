@@ -53,7 +53,7 @@ abstract class StoreJob extends JobImpl {
     private final static int PARALLELIZATION = 4; // how many sent at a time
     private final static int REDUNDANCY = 4; // we want the data sent to 6 peers
     private final static int STORE_PRIORITY = OutNetMessage.PRIORITY_MY_NETDB_STORE;
-    
+
     /**
      * Send a data structure to the floodfills
      * 
@@ -89,9 +89,12 @@ abstract class StoreJob extends JobImpl {
             else
                 _connectMask = ConnectChecker.ANY_V4;
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": New store job for " + data, new Exception("I did it"));
     }
 
     public String getName() { return "Kademlia NetDb Store";}
+
     public void runJob() {
         sendNext();
     }
@@ -192,6 +195,12 @@ abstract class StoreJob extends JobImpl {
                 } else if (!shouldStoreTo((RouterInfo)ds)) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": Skipping old router " + peer);
+                    _state.addSkipped(peer);
+                    skipped++;
+                } else if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 &&
+                           !shouldStoreEncLS2To((RouterInfo)ds)) {
+                    if (_log.shouldInfo())
+                        _log.info(getJobId() + ": Skipping router that doesn't support LS2 " + peer);
                     _state.addSkipped(peer);
                     skipped++;
                 } else if (isls2 &&
@@ -410,7 +419,7 @@ abstract class StoreJob extends JobImpl {
             StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
     
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
+                _log.debug(getJobId() + ": sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
             getContext().messageRegistry().registerPending(selector, onReply, onFail);
             getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, to);
         } else {
@@ -476,7 +485,7 @@ abstract class StoreJob extends JobImpl {
             StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
     
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
+                _log.debug(getJobId() + ": sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
             }
             getContext().messageRegistry().registerPending(selector, onReply, onFail);
             getContext().tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), null, to);
@@ -512,7 +521,7 @@ abstract class StoreJob extends JobImpl {
     public static final String MIN_STORE_VERSION = "0.9.28";
 
     /**
-     * Is it too old?
+     * Is it new enough?
      * @since 0.9.33
      */
     static boolean shouldStoreTo(RouterInfo ri) {
@@ -524,12 +533,27 @@ abstract class StoreJob extends JobImpl {
     public static final String MIN_STORE_LS2_VERSION = "0.9.38";
 
     /**
-     * Is it too old?
+     * Is it new enough?
      * @since 0.9.38
      */
     static boolean shouldStoreLS2To(RouterInfo ri) {
         String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_STORE_LS2_VERSION) >= 0;
+    }
+
+    /**
+     * Was supported in 38, but they're now sigtype 11 which wasn't added until 39
+     * @since 0.9.39
+     */
+    public static final String MIN_STORE_ENCLS2_VERSION = "0.9.39";
+
+    /**
+     * Is it new enough?
+     * @since 0.9.38
+     */
+    static boolean shouldStoreEncLS2To(RouterInfo ri) {
+        String v = ri.getVersion();
+        return VersionComparator.comp(v, MIN_STORE_ENCLS2_VERSION) >= 0;
     }
 
     /**
@@ -575,7 +599,7 @@ abstract class StoreJob extends JobImpl {
 
             if ( (_sendThrough != null) && (_msgSize > 0) ) {
                 if (_log.shouldDebug())
-                    _log.debug("sent a " + _msgSize + " byte netDb message through tunnel " + _sendThrough + " after " + howLong);
+                    _log.debug(StoreJob.this.getJobId() + ": sent a " + _msgSize + " byte netDb message through tunnel " + _sendThrough + " after " + howLong);
                 for (int i = 0; i < _sendThrough.getLength(); i++)
                     getContext().profileManager().tunnelDataPushed(_sendThrough.getPeer(i), howLong, _msgSize);
                 _sendThrough.incrementVerifiedBytesTransferred(_msgSize);
@@ -634,10 +658,11 @@ abstract class StoreJob extends JobImpl {
      * Send was totally successful
      */
     protected void succeed() {
-        if (_log.shouldLog(Log.INFO))
+        if (_log.shouldInfo()) {
             _log.info(getJobId() + ": Succeeded sending key " + _state.getTarget());
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": State of successful send: " + _state);
+            if (_log.shouldDebug())
+                _log.debug(getJobId() + ": State of successful send: " + _state);
+        }
         if (_onSuccess != null)
             getContext().jobQueue().addJob(_onSuccess);
         _state.complete(true);
@@ -648,10 +673,11 @@ abstract class StoreJob extends JobImpl {
      * Send totally failed
      */
     protected void fail() {
-        if (_log.shouldLog(Log.INFO))
+        if (_log.shouldInfo()) {
             _log.info(getJobId() + ": Failed sending key " + _state.getTarget());
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": State of failed send: " + _state, new Exception("Who failed me?"));
+            if (_log.shouldDebug())
+                _log.debug(getJobId() + ": State of failed send: " + _state, new Exception("Who failed me?"));
+        }
         if (_onFailure != null)
             getContext().jobQueue().addJob(_onFailure);
         _state.complete(true);

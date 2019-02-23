@@ -9,6 +9,7 @@ import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -16,6 +17,7 @@ import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
+import net.i2p.router.ProfileManager;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -37,6 +39,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private long _expiration;
     private long _sendTime;
     private final long _published;
+    private final int _type;
     private final boolean _isRouterInfo;
     private final boolean _isLS2;
     private MessageWrapper.WrappedMessage _wrappedMessage;
@@ -51,16 +54,18 @@ class FloodfillVerifyStoreJob extends JobImpl {
     
     /**
      *  Delay a few seconds, then start the verify
+     *  @param published getDate() for RI or LS1, getPublished() for LS2
      *  @param sentTo who to give the credit or blame to, can be null
      */
-    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, boolean isRouterInfo,
-                                   boolean isLS2, Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
+    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, int type,
+                                   Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         facade.verifyStarted(key);
         _key = key;
         _published = published;
-        _isRouterInfo = isRouterInfo;
-        _isLS2 = isLS2;
+        _isRouterInfo = type == DatabaseEntry.KEY_TYPE_ROUTERINFO;
+        _isLS2 = !_isRouterInfo && type != DatabaseEntry.KEY_TYPE_LEASESET;
+        _type = type;
         _log = ctx.logManager().getLog(getClass());
         _sentTo = sentTo;
         _facade = facade;
@@ -148,7 +153,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
                 }
             }
             if (_log.shouldLog(Log.INFO))
-                _log.info("Requesting encrypted reply from " + _target + ' ' + sess.key + ' ' + sess.tag);
+                _log.info(getJobId() + ": Requesting encrypted reply from " + _target + ' ' + sess.key + ' ' + sess.tag);
             lookup.setReplySession(sess.key, sess.tag);
         }
         Hash fromKey;
@@ -166,7 +171,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         I2NPMessage sent = _wrappedMessage.getMessage();
 
         if (_log.shouldLog(Log.INFO))
-            _log.info("Starting verify (stored " + _key + " to " + _sentTo + "), asking " + _target);
+            _log.info(getJobId() + ": Starting verify (stored " + _key + " to " + _sentTo + "), asking " + _target);
         _sendTime = getContext().clock().now();
         _expiration = _sendTime + VERIFY_TIMEOUT;
         getContext().messageRegistry().registerPending(new VerifyReplySelector(),
@@ -199,7 +204,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
                 RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
                 //if (ri != null && StoreJob.supportsCert(ri, keyCert)) {
                 if (ri != null && StoreJob.shouldStoreTo(ri) &&
-                    (!_isLS2 || StoreJob.shouldStoreLS2To(ri))) {
+                    (!_isLS2 || (StoreJob.shouldStoreLS2To(ri) &&
+                                 (_type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || StoreJob.shouldStoreEncLS2To(ri))))) {
                     Set<String> peerIPs = new MaskedIPSet(getContext(), ri, IP_CLOSE_BYTES);
                     if (!_ipSet.containsAny(peerIPs)) {
                         _ipSet.addAll(peerIPs);
@@ -221,7 +227,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         }
         
         if (_log.shouldLog(Log.WARN))
-            _log.warn("No other peers to verify floodfill with, using the one we sent to");
+            _log.warn(getJobId() + ": No other peers to verify floodfill with, using the one we sent to");
         return _sentTo;
     }
     
@@ -259,60 +265,78 @@ class FloodfillVerifyStoreJob extends JobImpl {
     
     private class VerifyReplyJob extends JobImpl implements ReplyJob {
         private I2NPMessage _message;
+
         public VerifyReplyJob(RouterContext ctx) {
             super(ctx);
         }
+
         public String getName() { return "Handle floodfill verification reply"; }
+
         public void runJob() {
-            long delay = getContext().clock().now() - _sendTime;
+            final RouterContext ctx = getContext();
+            long delay = ctx.clock().now() - _sendTime;
             if (_wrappedMessage != null)
                 _wrappedMessage.acked();
             _facade.verifyFinished(_key);
-            if (_message instanceof DatabaseStoreMessage) {
+            final ProfileManager pm = ctx.profileManager();
+            final int type = _message.getType();
+            if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
                 // Verify it's as recent as the one we sent
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage)_message;
-                boolean success = dsm.getEntry().getDate() >= _published;
+                DatabaseEntry entry = dsm.getEntry();
+                long newDate;
+                boolean success;
+                if (_isLS2 &&
+                    entry.getType() != DatabaseEntry.KEY_TYPE_ROUTERINFO &&
+                    entry.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+                    LeaseSet2 ls2 = (LeaseSet2) entry;
+                    success = ls2.getPublished() >= _published;
+                } else {
+                    success = entry.getDate() >= _published;
+                }
                 if (success) {
                     // store ok, w00t!
-                    getContext().profileManager().dbLookupSuccessful(_target, delay);
+                    pm.dbLookupSuccessful(_target, delay);
                     if (_sentTo != null)
-                        getContext().profileManager().dbStoreSuccessful(_sentTo);
-                    getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay);
+                        pm.dbStoreSuccessful(_sentTo);
+                    ctx.statManager().addRateData("netDb.floodfillVerifyOK", delay);
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Verify success for " + _key);
+                        _log.info(getJobId() + ": Verify success for " + _key);
                     if (_isRouterInfo)
                         _facade.routerInfoPublishSuccessful();
                     return;
                 }
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Verify failed (older) for " + _key);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Rcvd older data: " + dsm.getEntry());
-            } else if (_message instanceof DatabaseSearchReplyMessage) {
+                if (_log.shouldWarn()) {
+                    _log.warn(getJobId() + ": Verify failed (older) for " + _key);
+                    if (_log.shouldInfo())
+                        _log.info(getJobId() + ": Rcvd older data: " + dsm.getEntry());
+                }
+            } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
                 DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage) _message;
                 // assume 0 old, all new, 0 invalid, 0 dup
-                getContext().profileManager().dbLookupReply(_target,  0,
+                pm.dbLookupReply(_target,  0,
                                 dsrm.getNumReplies(), 0, 0, delay);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Verify failed (DSRM) for " + _key);
+                    _log.warn(getJobId() + ": Verify failed (DSRM) for " + _key);
                 // only for RI... LS too dangerous?
                 if (_isRouterInfo)
-                    getContext().jobQueue().addJob(new SingleLookupJob(getContext(), dsrm));
+                    ctx.jobQueue().addJob(new SingleLookupJob(ctx, dsrm));
             }
             // store failed, boo, hiss!
             // blame the sent-to peer, but not the verify peer
             if (_sentTo != null)
-                getContext().profileManager().dbStoreFailed(_sentTo);
+                pm.dbStoreFailed(_sentTo);
             // Blame the verify peer also.
             // We must use dbLookupFailed() or dbStoreFailed(), neither of which is exactly correct,
             // but we have to use one of them to affect the FloodfillPeerSelector ordering.
             // If we don't do this we get stuck using the same verify peer every time even
             // though it is the real problem.
             if (_target != null && !_target.equals(_sentTo))
-                getContext().profileManager().dbLookupFailed(_target);
-            getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay);
+                pm.dbLookupFailed(_target);
+            ctx.statManager().addRateData("netDb.floodfillVerifyFail", delay);
             resend();
         }        
+
         public void setMessage(I2NPMessage message) { _message = message; }
     }
     
@@ -327,11 +351,30 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private void resend() {
         DatabaseEntry ds = _facade.lookupLocally(_key);
         if (ds != null) {
+            // By the time we get here, a minute or more after the store started, 
+            // we may have already started a new store
+            // (probably, for LS, and we don't verify by default for RI)
+            long newDate;
+            if (_isLS2 &&
+                ds.getType() != DatabaseEntry.KEY_TYPE_ROUTERINFO &&
+                ds.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+                LeaseSet2 ls2 = (LeaseSet2) ds;
+                newDate = ls2.getPublished();
+            } else {
+                newDate = ds.getDate();
+            }
+            if (newDate > _published) {
+                if (_log.shouldInfo())
+                    _log.info(getJobId() + ": Verify failed, but new store already happened for: " + _key);
+                return;
+            }
             Set<Hash> toSkip = new HashSet<Hash>(2);
             if (_sentTo != null)
                 toSkip.add(_sentTo);
             if (_target != null)
                 toSkip.add(_target);
+            if (_log.shouldWarn())
+                _log.warn(getJobId() + ": Verify failed, starting new store for: " + _key);
             _facade.sendStore(_key, ds, null, null, FloodfillNetworkDatabaseFacade.PUBLISH_TIMEOUT, toSkip);
         }
     }
@@ -350,7 +393,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             //    getContext().profileManager().dbStoreFailed(_sentTo);
             getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime);
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Verify timed out for: " + _key);
+                _log.warn(getJobId() + ": Verify timed out for: " + _key);
             if (_ignore.size() < MAX_PEERS_TO_TRY) {
                 // Don't resend, simply rerun FVSJ.this inline and
                 // chose somebody besides _target for verification

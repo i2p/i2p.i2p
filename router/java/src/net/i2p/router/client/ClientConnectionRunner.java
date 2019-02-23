@@ -607,7 +607,7 @@ class ClientConnectionRunner {
             } else {
                 state.setIsSuccessful(true);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("LeaseSet created fully: " + state + " / " + ls);
+                    _log.debug("LeaseSet created fully: " + state + '\n' + ls);
                 sp.leaseRequest = null;
                 _consecutiveLeaseRequestFails = 0;
             }
@@ -813,7 +813,7 @@ class ClientConnectionRunner {
         //  so the comparison will always work.
         int leases = set.getLeaseCount();
         // synch so _currentLeaseSet isn't changed out from under us
-        LeaseSet current = null;
+        LeaseSet current;
         Destination dest = sp.dest;
         LeaseRequestState state;
         synchronized (this) {
@@ -875,7 +875,8 @@ class ClientConnectionRunner {
                 } else {
                     // so the timer won't fire off with an older LS request
                     sp.rerequestTimer = null;
-                    sp.leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob,
+                    long earliest = (current != null) ? current.getEarliestLeaseDate() : 0;
+                    sp.leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob, earliest,
                                                                 _context.clock().now() + expirationTime, set);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("New request: " + state);
