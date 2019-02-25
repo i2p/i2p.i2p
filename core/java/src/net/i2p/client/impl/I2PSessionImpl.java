@@ -487,6 +487,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 key.equals("loggerFilenameOverride") ||
                 key.equals("router.version") ||
                 key.equals("i2p.dir.base") ||
+                key.equals("i2p.reseedURL") ||  // long
                 key.startsWith("networkaddress.cache.") ||
                 key.startsWith("http.") ||
                 key.startsWith("jetty.") ||
