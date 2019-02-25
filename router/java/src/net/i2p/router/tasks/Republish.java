@@ -8,6 +8,7 @@ package net.i2p.router.tasks;
  *
  */
 
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.SimpleTimer;
@@ -27,7 +28,9 @@ public class Republish implements SimpleTimer.TimedEvent {
 
     public void timeReached() {
         try {
-            _context.netDb().publish(_context.router().getRouterInfo());
+            RouterInfo ri = _context.router().getRouterInfo();
+            if (ri != null)
+                _context.netDb().publish(ri);
         } catch (IllegalArgumentException iae) {
             Log log = _context.logManager().getLog(Router.class);
             log.log(Log.CRIT, "Local router info is invalid?  rebuilding a new identity", iae);

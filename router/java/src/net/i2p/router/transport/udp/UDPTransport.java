@@ -991,20 +991,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean fireTest = false;
 
         boolean isIPv6 = ourIP.length == 16;
-        RouterAddress current = getCurrentExternalAddress(isIPv6);
-        byte[] externalListenHost = current != null ? current.getIP() : null;
-        int externalListenPort = current != null ? current.getPort() : getRequestedPort(isIPv6);
 
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Change address? status = " + _reachabilityStatus +
+        synchronized (_rebuildLock) {
+            RouterAddress current = getCurrentExternalAddress(isIPv6);
+            byte[] externalListenHost = current != null ? current.getIP() : null;
+            int externalListenPort = current != null ? current.getPort() : getRequestedPort(isIPv6);
+
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Change address? status = " + _reachabilityStatus +
                       " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
                       " old = " + Addresses.toString(externalListenHost, externalListenPort) +
                       " new = " + Addresses.toString(ourIP, ourPort));
 
-        if ((fixedPort && externalListenPort > 0) || ourPort <= 0)
-            ourPort = externalListenPort;
+            if ((fixedPort && externalListenPort > 0) || ourPort <= 0)
+                ourPort = externalListenPort;
 
-            synchronized (this) {
                 if (ourPort > 0 &&
                     !eq(externalListenHost, externalListenPort, ourIP, ourPort)) {
                     // This prevents us from changing our IP when we are not firewalled
@@ -1029,7 +1030,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Same address as the current one");
                 }
-            }
+        }
 
         if (fireTest) {
             // always false, commented out above
@@ -1087,7 +1088,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _context.router().saveConfig(changes, null);
             }
             // deadlock thru here ticket #1699
-            _context.router().rebuildRouterInfo();
+            // this causes duplicate publish, REA() call above calls rebuildRouterInfo
+            //_context.router().rebuildRouterInfo();
             _testEvent.forceRunImmediately(isIPv6);
         }
         return updated;

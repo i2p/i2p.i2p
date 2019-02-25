@@ -1,10 +1,15 @@
+2019-02-25 zzz
+ * NetDB: Fix dup publish of RI at startup
+
 2019-02-23 zzz
+ * Console: Flip order of router logs
  * NetDB:
    - Use published date, not earliest lease expiration, for LS2 comparisons
    - Fix earliest LS expiration adjustment when publishing for LS2
    - Increase flood candidates for LS2
    - Don't start new store after verify fail if we've already done so
    - Version checks for encrypted LS2
+ * NTCP: Loop in pumper if more to write (ticket #2440)
 
 2019-02-21 zzz
  * Crypto: Keygen for RedDSA, allow RedDSA for unblinded keys (Enc LS2)

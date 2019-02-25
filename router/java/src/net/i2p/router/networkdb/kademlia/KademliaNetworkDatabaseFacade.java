@@ -678,7 +678,11 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * @throws IllegalArgumentException if the leaseSet is not valid
      */
     public void publish(LeaseSet localLeaseSet) throws IllegalArgumentException {
-        if (!_initialized) return;
+        if (!_initialized) {
+            if (_log.shouldWarn())
+                _log.warn("publish() before initialized: " + localLeaseSet, new Exception("I did it"));
+            return;
+        }
         Hash h = localLeaseSet.getDestination().calculateHash();
         try {
             store(h, localLeaseSet);

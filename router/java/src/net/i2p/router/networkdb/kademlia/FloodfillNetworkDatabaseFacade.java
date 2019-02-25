@@ -137,8 +137,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         if (_context.router().isHidden()) return; // DE-nied!
         super.publish(localRouterInfo);
         // wait until we've read in the RI's so we can find the closest floodfill
-        if (!isInitialized())
+        if (!isInitialized()) {
+            if (_log.shouldWarn())
+                _log.warn("publish() before initialized: " + localRouterInfo, new Exception("I did it"));
             return;
+        }
         // no use sending if we have no addresses
         // (unless maybe we used to have addresses? not worth it
         if (localRouterInfo.getAddresses().isEmpty())

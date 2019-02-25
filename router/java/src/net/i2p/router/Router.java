@@ -837,11 +837,24 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.9.18
      */
     public void setNetDbReady() {
+        boolean changed = false;
         synchronized(_stateLock) {
-            if (_state == State.STARTING_3)
+            if (_state == State.STARTING_3) {
                 changeState(State.NETDB_READY);
-            else if (_state == State.EXPL_TUNNELS_READY)
+                changed = true;
+            } else if (_state == State.EXPL_TUNNELS_READY) {
                 changeState(State.RUNNING);
+                changed = true;
+            }
+        }
+        if (changed) {
+            // any previous calls to netdb().publish() did not
+            // actually publish, because netdb init was not complete
+            Republish r = new Republish(_context);
+            // this is called from PersistentDataStore.ReadJob,
+            // so we probably don't need to throw it to the timer queue,
+            // but just to be safe
+            _context.simpleTimer2().addEvent(r, 0);
         }
     }
 
@@ -905,7 +918,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Rebuilding new routerInfo");
+            _log.info("Rebuilding new routerInfo, publish inline? " + blockingRebuild, new Exception("I did it"));
         _routerInfoLock.writeLock().lock();
         try {
             locked_rebuildRouterInfo(blockingRebuild);

@@ -49,10 +49,13 @@ public class PublishLocalRouterInfoJob extends JobImpl {
     private static final long PUBLISH_DELAY = 52*60*1000;
 
     /** this needs to be long enough to give us time to start up,
-        but less than 20m (when we start accepting tunnels and could be a IBGW)
-        Actually no, we need this soon if we are a new router or
-        other routers have forgotten about us, else
-        we can't build IB exploratory tunnels.
+     *  but less than 20m (when we start accepting tunnels and could be a IBGW)
+     *  Actually no, we need this soon if we are a new router or
+     *  other routers have forgotten about us, else
+     *  we can't build IB exploratory tunnels.
+     *
+     *  First publish after netdb ready is now done via state machine
+     *  in Router.setNetDbReady(), so we probably don't need this anymore
      */
     private static final long FIRST_TIME_DELAY = 90*1000;
     private volatile boolean _notFirstTime;
@@ -142,6 +145,9 @@ public class PublishLocalRouterInfoJob extends JobImpl {
         if (_notFirstTime) {
             requeue(getDelay());
         } else {
+            // First publish after netdb ready is now done via state machine
+            // in Router.setNetDbReady(), so we probably don't need this anymore
+            // but leave it in for now, a router may have trouble publishing right away
             requeue(FIRST_TIME_DELAY);
             _notFirstTime = true;
         }
