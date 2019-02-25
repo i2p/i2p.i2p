@@ -68,7 +68,7 @@ class NTCPSendFinisher {
     private static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
         public CustomThreadPoolExecutor(int num) {
              // use unbounded queue, so maximumPoolSize and keepAliveTime have no effect
-             super(MIN_THREADS, num, 10*1000, TimeUnit.MILLISECONDS,
+             super(num, num, 10*1000, TimeUnit.MILLISECONDS,
                    new LinkedBlockingQueue<Runnable>(), new CustomThreadFactory());
         }
     }
