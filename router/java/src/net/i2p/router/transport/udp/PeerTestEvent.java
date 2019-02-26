@@ -45,9 +45,9 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
             long sinceRunV6 = now - _lastTestedV6.get();
             boolean configV4fw = _transport.isIPv4Firewalled();
             boolean configV6fw = _transport.isIPv6Firewalled();
-            if (!configV4fw && _forceRun == FORCE_IPV4 && sinceRunV4 >= MIN_TEST_FREQUENCY) {
+            if (!configV4fw && (_forceRun == FORCE_IPV4 || sinceRunV4 >= MIN_TEST_FREQUENCY)) {
                 locked_runTest(false);
-            } else if (!configV6fw && _transport.hasIPv6Address() &&_forceRun == FORCE_IPV6 && sinceRunV6 >= MIN_TEST_FREQUENCY) {
+            } else if (!configV6fw && _transport.hasIPv6Address() && (_forceRun == FORCE_IPV6 || sinceRunV6 >= MIN_TEST_FREQUENCY)) {
                 locked_runTest(true);
             } else if (!configV4fw && sinceRunV4 >= TEST_FREQUENCY && _transport.getIPv6Config() != IPV6_ONLY) {
                 locked_runTest(false);
@@ -87,12 +87,20 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
      *  @since 0.9.13
      */
     public synchronized void forceRunSoon(boolean isIPv6) {
+        forceRunSoon(isIPv6, MIN_TEST_FREQUENCY);
+    }
+        
+    /**
+     *  Run within the specified time at the latest
+     *  @since 0.9.39
+     */
+    public synchronized void forceRunSoon(boolean isIPv6, long delay) {
         if (!isIPv6 && _transport.isIPv4Firewalled())
             return;
         if (isIPv6 && _transport.isIPv6Firewalled())
             return;
         _forceRun = isIPv6 ? FORCE_IPV6 : FORCE_IPV4;
-        reschedule(MIN_TEST_FREQUENCY);
+        reschedule(delay);
     }
         
     /**
@@ -101,16 +109,7 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
      *  @since 0.9.13
      */
     public synchronized void forceRunImmediately(boolean isIPv6) {
-        if (!isIPv6 && _transport.isIPv4Firewalled())
-            return;
-        if (isIPv6 && _transport.isIPv6Firewalled())
-            return;
-        if (isIPv6)
-            _lastTestedV6.set(0);
-        else
-            _lastTested.set(0);
-        _forceRun = isIPv6 ? FORCE_IPV6 : FORCE_IPV4;
-        reschedule(5*1000);
+        forceRunSoon(isIPv6, 5*1000);
     }
         
     public synchronized void setIsAlive(boolean isAlive) {

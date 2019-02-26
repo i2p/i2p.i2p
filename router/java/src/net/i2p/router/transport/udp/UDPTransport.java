@@ -532,7 +532,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _expireEvent.setIsAlive(true);
         _reachabilityStatus = Status.UNKNOWN;
         _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
-        _testEvent.reschedule(10*1000); // lets requeue it for Real Soon
+        boolean v6only = getIPv6Config() == IPV6_ONLY;
+        _testEvent.forceRunSoon(v6only, 10*1000); // lets requeue it for Real Soon
 
         // set up external addresses
         // REA param is false;
