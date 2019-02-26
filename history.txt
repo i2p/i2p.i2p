@@ -1,5 +1,11 @@
+2019-02-26 zzz
+ * SSU:
+   - Fix scheduling of peer test at startup (ticket #2441)
+   - Fix RTT/RTO calculations (ticket #2443)
+
 2019-02-25 zzz
  * NetDB: Fix dup publish of RI at startup
+ * NTCP: Fix number of SendFinisher threads (ticket #2438)
 
 2019-02-23 zzz
  * Console: Flip order of router logs

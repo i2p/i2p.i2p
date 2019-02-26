@@ -1237,14 +1237,11 @@ public class PeerState {
         if (_rtt <= 0) {
             // first measurement
             _rtt = (int) lifetime;
-            _rttDeviation = (int)(lifetime / 2);
+            _rttDeviation = _rtt /  2;
         } else {
             // the rttDev calculation matches that recommended in RFC 2988 (beta = 1/4)
-            _rttDeviation = (int)( 0.75*_rttDeviation + 0.25*Math.abs(lifetime-_rtt) );
-        
-            float scale = RTT_DAMPENING;
-        
-            _rtt = (int)(_rtt*(1.0f-scale) + (scale)*lifetime);
+            _rttDeviation = (int)((0.75 * _rttDeviation) + (0.25 * Math.abs(lifetime - _rtt)));
+            _rtt = (int)((_rtt * (1.0f - RTT_DAMPENING)) + (RTT_DAMPENING * lifetime));
         }
         // K = 4
         _rto = Math.min(MAX_RTO, Math.max(minRTO(), _rtt + (_rttDeviation<<2)));

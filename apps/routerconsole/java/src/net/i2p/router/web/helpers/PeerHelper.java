@@ -431,6 +431,7 @@ public class PeerHelper extends HelperBase {
         long resentTotal = 0;
         long dupRecvTotal = 0;
         int numPeers = 0;
+        int numRTTPeers = 0;
 
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3 id=\"udpcon\">").append(_t("UDP connections")).append(": ").append(peers.size());
@@ -593,7 +594,10 @@ public class PeerHelper extends HelperBase {
             int rto = peer.getRTO();
 
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(DataHelper.formatDuration2(rtt));
+            if (rtt > 0)
+                buf.append(DataHelper.formatDuration2(rtt));
+            else
+                buf.append("n/a");
             buf.append("</td>");
 
             //buf.append("<td class=\"cells\" align=\"right\">");
@@ -651,7 +655,10 @@ public class PeerHelper extends HelperBase {
 
             uptimeMsTotal += uptime;
             cwinTotal += sendWindow;
-            rttTotal += rtt;
+            if (rtt > 0) {
+                rttTotal += rtt;
+                numRTTPeers++;
+            }
             rtoTotal += rto;
 
             sendTotal += sent;
@@ -679,7 +686,10 @@ public class PeerHelper extends HelperBase {
         buf.append(cwinTotal/(numPeers*1024) + "K");
         buf.append("</b></td><td>&nbsp;</td>\n" +
                    "<td align=\"right\"><b>");
-        buf.append(DataHelper.formatDuration2(rttTotal/numPeers));
+        if (numRTTPeers > 0)
+            buf.append(DataHelper.formatDuration2(rttTotal/numRTTPeers));
+        else
+            buf.append("n/a");
         //buf.append("</b></td><td>&nbsp;</td><td align=\"center\"><b>");
         buf.append("</b></td><td align=\"right\"><b>");
         buf.append(DataHelper.formatDuration2(rtoTotal/numPeers));
