@@ -64,6 +64,8 @@ class InboundEstablishState {
     private int _createdSentCount;
     // default true
     private boolean _introductionRequested = true;
+
+    private int _rtt;
     
     public enum InboundState {
         /** nothin known yet */
@@ -296,6 +298,8 @@ class InboundEstablishState {
      */
     public synchronized long getNextSendTime() { return _nextSend; }
 
+    synchronized int getRTT() { return _rtt; }
+
     /** RemoteHostId, uniquely identifies an attempt */
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
@@ -356,6 +360,10 @@ class InboundEstablishState {
                 _currentState = InboundState.IB_STATE_CONFIRMED_PARTIALLY;
         }
         
+        if (_createdSentCount == 1) {
+            _rtt = (int) ( _context.clock().now() - _lastSend );
+        }	
+
         packetReceived();
     }
     

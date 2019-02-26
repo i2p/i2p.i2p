@@ -694,7 +694,7 @@ class EstablishmentManager {
         
         RouterIdentity remote = state.getConfirmedIdentity();
         PeerState peer = new PeerState(_context, _transport,
-                                       state.getSentIP(), state.getSentPort(), remote.calculateHash(), true);
+                                       state.getSentIP(), state.getSentPort(), remote.calculateHash(), true, state.getRTT());
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
         peer.setWeRelayToThemAs(state.getSentRelayTag());
@@ -813,7 +813,7 @@ class EstablishmentManager {
             _outboundByClaimedAddress.remove(claimed, state);
         _outboundByHash.remove(remote.calculateHash(), state);
         PeerState peer = new PeerState(_context, _transport,
-                                       state.getSentIP(), state.getSentPort(), remote.calculateHash(), false);
+                                       state.getSentIP(), state.getSentPort(), remote.calculateHash(), false, state.getRTT());
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
         peer.setTheyRelayToUsAs(state.getReceivedRelayTag());

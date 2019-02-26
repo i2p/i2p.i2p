@@ -314,10 +314,10 @@ public class PeerState {
      */
     public static final int MAX_MTU = Math.max(LARGE_MTU, MAX_IPV6_MTU);
     
-    private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
-    private static final int INIT_RTO = 3*1000;
-    public static final int INIT_RTT = INIT_RTO / 2;
-    private static final int MAX_RTO = 15*1000;
+    private static final int MIN_RTO = 1000;
+    private static final int INIT_RTO = 1000;
+    private static final int INIT_RTT = 0;
+    private static final int MAX_RTO = 60*1000;
     private static final int CLOCK_SKEW_FUDGE = (ACKSender.ACK_FREQUENCY * 2) / 3;
     
     /**
@@ -336,8 +336,11 @@ public class PeerState {
     private static final long RESEND_ACK_TIMEOUT = 5*60*1000;
 
     
+    /**
+     *  @param rtt from the EstablishState, or 0 if not available
+     */
     public PeerState(RouterContext ctx, UDPTransport transport,
-                     byte[] remoteIP, int remotePort, Hash remotePeer, boolean isInbound) {
+                     byte[] remoteIP, int remotePort, Hash remotePeer, boolean isInbound, int rtt) {
         _context = ctx;
         _log = ctx.logManager().getLog(PeerState.class);
         _transport = transport;
@@ -366,9 +369,14 @@ public class PeerState {
         }
         //_mtuLastChecked = -1;
         _lastACKSend = -1;
+
         _rto = INIT_RTO;
         _rtt = INIT_RTT;
-        _rttDeviation = _rtt;
+        if (rtt > 0)  
+            recalculateTimeouts(rtt);
+        else
+            _rttDeviation = _rtt;
+            
         _inboundMessages = new HashMap<Long, InboundMessageState>(8);
         _outboundMessages = new CachedIteratorCollection<OutboundMessageState>();
         //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
@@ -1226,16 +1234,18 @@ public class PeerState {
      *  Caller should synch on this
      */
     private void recalculateTimeouts(long lifetime) {
-        // the rttDev calculation matches that recommended in RFC 2988 (beta = 1/4)
-        _rttDeviation = _rttDeviation + (int)(0.25d*(Math.abs(lifetime-_rtt)-_rttDeviation));
+        if (_rtt <= 0) {
+            // first measurement
+            _rtt = (int) lifetime;
+            _rttDeviation = (int)(lifetime / 2);
+        } else {
+            // the rttDev calculation matches that recommended in RFC 2988 (beta = 1/4)
+            _rttDeviation = (int)( 0.75*_rttDeviation + 0.25*Math.abs(lifetime-_rtt) );
         
-        float scale = RTT_DAMPENING;
-        // the faster we are going, the slower we want to reduce the rtt
-        //if (_sendBps > 0)
-        //    scale = lifetime / ((float)lifetime + (float)_sendBps);
-        //if (scale < 0.001f) scale = 0.001f;
+            float scale = RTT_DAMPENING;
         
-        _rtt = (int)(_rtt*(1.0f-scale) + (scale)*lifetime);
+            _rtt = (int)(_rtt*(1.0f-scale) + (scale)*lifetime);
+        }
         // K = 4
         _rto = Math.min(MAX_RTO, Math.max(minRTO(), _rtt + (_rttDeviation<<2)));
         //if (_log.shouldLog(Log.DEBUG))
@@ -1821,13 +1831,15 @@ public class PeerState {
                               + " remaining"
                               + " for message " + state.getMessageId() + ": " + state);
 
-                if (state.getPushCount() > 0)
+                int rto = getRTO();
+                if (state.getPushCount() > 0) {
                     _retransmitter = state;
+                    rto = Math.min(MAX_RTO, rto << state.getPushCount()); // Section 5.5 RFC 6298
+                }
 
                 if (state.push())
                     _messagesSent++;
             
-                int rto = getRTO();
                 state.setNextSendTime(now + rto);
 
                 //if (peer.getSendWindowBytesRemaining() > 0)

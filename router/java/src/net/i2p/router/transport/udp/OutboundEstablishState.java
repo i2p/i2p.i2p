@@ -74,6 +74,7 @@ class OutboundEstablishState {
     private long _confirmedSentTime;
     private long _requestSentTime;
     private long _introSentTime;
+    private int _rtt;
     
     public enum OutboundState {
         /** nothin sent yet */
@@ -179,6 +180,8 @@ class OutboundEstablishState {
      *  @since 0.9.24
      */
     public boolean needIntroduction() { return _needIntroduction; }
+
+    synchronized int getRTT() { return _rtt; }
     
     /**
      *  Queue a message to be sent after the session is established.
@@ -304,6 +307,10 @@ class OutboundEstablishState {
             _currentState == OutboundState.OB_STATE_INTRODUCED ||
             _currentState == OutboundState.OB_STATE_PENDING_INTRO)
             _currentState = OutboundState.OB_STATE_CREATED_RECEIVED;
+
+        if (_requestSentCount == 1) {
+            _rtt = (int) (_context.clock().now() - _requestSentTime);
+        }
         packetReceived();
     }
     

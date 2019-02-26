@@ -2723,7 +2723,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         for (PeerState peer : _peersByIdent.values()) {
             if ((!includeEverybody) && now - peer.getLastReceiveTime() > 5*60*1000)
                 continue; // skip old peers
-            if (peer.getRTT() > PeerState.INIT_RTT - 250)
+            if (peer.getRTT() > 1250)
                 continue; // Big RTT makes for a poor calculation
             skews.addElement(Long.valueOf(peer.getClockSkew() / 1000));
         }
