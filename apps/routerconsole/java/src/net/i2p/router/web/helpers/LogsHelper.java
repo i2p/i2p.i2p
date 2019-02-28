@@ -126,13 +126,15 @@ public class LogsHelper extends HelperBase {
         // newest first
         // for (int i = msgs.size() - 1; i >= 0; i--) { 
         // oldest first
+        boolean displayed = false;
         for (int i = 0; i < msgs.size(); i++) { 
             String msg = msgs.get(i);
             // don't display the dup message if it is last
             //if (i == 0 && msg.contains("&darr;"))
             // don't display the dup message if it is first
-            if (i == 0 && msg.contains("&uarr;"))
-                break;
+            if (!displayed && msg.contains("&uarr;"))
+                continue;
+            displayed = true;
             msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             //msg = msg.replace("&amp;darr;", "&darr;");  // hack - undo the damage (LogWriter)
             msg = msg.replace("&amp;uarr;", "&uarr;");  // hack - undo the damage (LogWriter)
