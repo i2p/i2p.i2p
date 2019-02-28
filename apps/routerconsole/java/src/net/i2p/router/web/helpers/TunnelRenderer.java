@@ -67,13 +67,19 @@ class TunnelRenderer {
             String name = (in != null) ? in.getSettings().getDestinationNickname() : null;
             if ( (name == null) && (outPool != null) )
                 name = outPool.getSettings().getDestinationNickname();
-            if (name == null)
-                name = client.toBase64().substring(0,4);
-            out.write("<h3 class=\"tabletitle\" id=\"" + client.toBase64().substring(0,4)
-                      + "\" >" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(name)));
+            String b64 = client.toBase64().substring(0, 4);
+            String dname;
+            if (name == null) {
+                name = b64;
+                dname = client.toBase32();
+            } else {
+                dname = DataHelper.escapeHTML(_t(name));
+            }
+            out.write("<h3 class=\"tabletitle\" id=\"" + b64
+                      + "\" >" + _t("Client tunnels for") + ' ' + dname);
             if (isLocal) {
                 // links are set to float:right in CSS so they will be displayed in reverse order
-                out.write(" <a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a>");
+                out.write(" <a href=\"/configtunnels#" + b64 + "\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a>");
                 writeGraphLinks(out, in, outPool);
                 out.write("</h3>\n");
             } else {
@@ -87,12 +93,13 @@ class TunnelRenderer {
                         TunnelPool ain = clientInboundPools.get(a);
                         if (ain != null) {
                             String aname = ain.getSettings().getDestinationNickname();
+                            String ab64 = a.toBase64().substring(0, 4);
                             if (aname == null)
-                                aname = a.toBase64().substring(0,4);
-                            out.write("<h3 class=\"tabletitle\" id=\"" + a.toBase64().substring(0,4)
+                                aname = ab64;
+                            out.write("<h3 class=\"tabletitle\" id=\"" + ab64
                                       + "\" >" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(aname)));
                             if (isLocal)
-                                out.write(" <a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
+                                out.write(" <a href=\"/configtunnels#" + b64 + "\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
                             else
                                 out.write(" (" + _t("dead") + ")</h3>\n");
                         }

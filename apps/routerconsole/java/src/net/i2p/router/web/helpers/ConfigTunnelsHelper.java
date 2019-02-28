@@ -46,10 +46,11 @@ public class ConfigTunnelsHelper extends HelperBase {
             }
             
             String name = in.getDestinationNickname();
-            if (name == null)
+            if (name == null) {
                 name = out.getDestinationNickname();
-            if (name == null)
-                name = dest.calculateHash().toBase64().substring(0,6);
+                if (name == null)
+                    name = dest.calculateHash().toBase32();
+            }
         
             String prefix = dest.calculateHash().toBase64().substring(0,4);
             renderForm(buf, cur, prefix, _t("Client tunnels for {0}", DataHelper.escapeHTML(_t(name))), in, out);

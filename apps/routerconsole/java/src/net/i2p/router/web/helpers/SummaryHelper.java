@@ -642,7 +642,7 @@ public class SummaryHelper extends HelperBase {
             TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(d.calculateHash());
             name = (out != null ? out.getDestinationNickname() : null);
             if (name == null)
-                name = d.calculateHash().toBase64().substring(0,6);
+                name = d.toBase32();
             else
                 name = _t(name);
         } else {
