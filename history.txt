@@ -1,3 +1,11 @@
+2019-03-01 zzz
+  * Streaming: Fix sending messages with expired times (ticket #2451)
+
+2019-02-28 zzz
+  * Console:
+    - Fix router logs not shown if first msg is a dup
+    - Change fallback client names to use b32
+
 2019-02-26 zzz
  * SSU:
    - Fix scheduling of peer test at startup (ticket #2441)
