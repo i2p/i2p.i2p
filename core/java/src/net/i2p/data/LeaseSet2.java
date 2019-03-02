@@ -16,6 +16,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 
 /**
@@ -254,6 +255,19 @@ public class LeaseSet2 extends LeaseSet {
     @Override
     public int getType() {
         return KEY_TYPE_LS2;
+    }
+
+    /**
+     *  The revocation key. Overridden to do nothing,
+     *  as we're using the _signingKey field for the blinded key in Enc LS2.
+     *
+     * @since 0.9.39
+     */
+    @Override
+    public void setSigningKey(SigningPublicKey key) {
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet2.class);
+        if (log.shouldWarn())
+            log.warn("Don't set revocation key in ls2", new Exception("I did it"));
     }
 
     /** without sig! */

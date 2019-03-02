@@ -115,18 +115,32 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
                     type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                     LeaseSet2 ls2 = (LeaseSet2) _leaseSet;
                     // get one PrivateKey for each PublicKey
-                    // TODO decrypt an encrypted LS so we can get the keys
                     List<PublicKey> pks = ls2.getEncryptionKeys();
-                    if (pks == null)
-                        throw new I2CPMessageException("TODO decrypt");
-                    for (PublicKey pk : pks) {
-                        EncType etype = pk.getType();
-                        if (etype == null)
-                            throw new I2CPMessageException("Unsupported encryption type");
+                    int numkeys = in.read();
+                    // pks is null for encrypted LS2
+                    if (pks != null && numkeys != pks.size())
+                        throw new I2CPMessageException("Wrong number of privkeys");
+                    for (int i = 0; i < numkeys; i++) {
                         int encType = (int) DataHelper.readLong(in, 2);
                         int encLen = (int) DataHelper.readLong(in, 2);
-                        if (encType != etype.getCode() || encLen != etype.getPrivkeyLen())
-                            throw new I2CPMessageException("Enc type mismatch");
+                        EncType etype;
+                        if (pks != null) {
+                            // standard LS2
+                            etype = pks.get(i).getType();
+                            if (etype == null)
+                                throw new I2CPMessageException("Unsupported encryption type: " + encType);
+                            if (encType != etype.getCode())
+                                throw new I2CPMessageException("Enc type mismatch");
+                            if (encLen != etype.getPrivkeyLen())
+                                throw new I2CPMessageException("Enc type bad length");
+                        } else {
+                            // encrypted LS2
+                            etype = EncType.getByCode(encType);
+                            if (etype == null)
+                                throw new I2CPMessageException("Unsupported encryption type: " + encType);
+                            if (encLen != etype.getPrivkeyLen())
+                                throw new I2CPMessageException("Enc type bad length");
+                        }
                         PrivateKey priv = new PrivateKey(etype);
                         priv.readBytes(in);
                         addPrivateKey(priv);
@@ -164,7 +178,9 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
             os.write(_leaseSet.getType());
             _leaseSet.writeBytes(os);
             if (type != DatabaseEntry.KEY_TYPE_META_LS2) {
-                for (PrivateKey pk : getPrivateKeys()) {
+                List<PrivateKey> pks = getPrivateKeys();
+                os.write(pks.size());
+                for (PrivateKey pk : pks) {
                     EncType etype = pk.getType();
                     DataHelper.writeLong(os, 2, etype.getCode());
                     DataHelper.writeLong(os, 2, pk.length());
@@ -187,7 +203,9 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
         StringBuilder buf = new StringBuilder();
         buf.append("[CreateLeaseSet2Message: ");
         buf.append("\n\tLeaseSet: ").append(_leaseSet);
-        if (_leaseSet.getType() != DatabaseEntry.KEY_TYPE_META_LS2) {
+        int type = _leaseSet.getType();
+        if (type != DatabaseEntry.KEY_TYPE_META_LS2 &&
+            type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
             for (PrivateKey pk : getPrivateKeys()) {
                 buf.append("\n\tPrivateKey: ").append(pk);
             }

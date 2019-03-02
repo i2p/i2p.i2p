@@ -19,7 +19,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.Payload;
+import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
@@ -290,7 +292,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             }
         }
         String lsType = props.getProperty("i2cp.leaseSetType");
-        if ("7".equals(lsType)) {
+        if ("5".equals(lsType)) {
+            SigType stype = dest.getSigningPublicKey().getType();
+            if (stype != SigType.EdDSA_SHA512_Ed25519 &&
+                stype != SigType.RedDSA_SHA512_Ed25519) {
+                _runner.disconnectClient("Invalid sig type for encrypted LS");
+                return;
+            }
+        } else if ("7".equals(lsType)) {
             // Prevent tunnel builds for Meta LS
             // more TODO
             props.setProperty("inbound.length", "0");
@@ -512,7 +521,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         int type = ls.getType();
-        if (type != DatabaseEntry.KEY_TYPE_META_LS2 && message.getPrivateKey() == null) {
+        if (type != DatabaseEntry.KEY_TYPE_META_LS2 &&
+            type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 &&
+            message.getPrivateKey() == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null private keys: " + message);
             _runner.disconnectClient("Invalid CreateLeaseSetMessage - null private keys");
@@ -536,12 +547,31 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         Destination dest = cfg.getDestination();
-        Destination ndest = ls.getDestination();
-        if (!dest.equals(ndest)) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Different destination in LS");
-            _runner.disconnectClient("Different destination in LS");
-            return;
+        if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+            // so we can decrypt it
+            try {
+                ls.setDestination(dest);
+            } catch (RuntimeException re) {
+                if (_log.shouldError())
+                    _log.error("Error decrypting leaseset from client", re);
+                _runner.disconnectClient(re.toString());
+                return;
+            }
+            // we have to do this before checking encryption keys below
+            if (!ls.verifySignature()) {
+                if (_log.shouldError())
+                    _log.error("Error decrypting leaseset from client");
+                _runner.disconnectClient("Error decrypting leaseset from client");
+                return;
+            }
+        } else {
+            Destination ndest = ls.getDestination();
+            if (!dest.equals(ndest)) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Different destination in LS");
+                _runner.disconnectClient("Different destination in LS");
+                return;
+            }
         }
         if (type != DatabaseEntry.KEY_TYPE_META_LS2) {
             LeaseSetKeys keys = _context.keyManager().getKeys(dest);
@@ -550,20 +580,47 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 // Verify and register crypto keys if new or if changed
                 // Private crypto key should never change, and if it does,
                 // one of the checks below will fail
-                PublicKey pk;
-                try {
-                    pk = message.getPrivateKey().toPublic();
-                } catch (IllegalArgumentException iae) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Bad private key in LS");
-                    _runner.disconnectClient("Bad private key in LS");
-                    return;
-                }
-                if (!pk.equals(ls.getEncryptionKey())) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Private/public crypto key mismatch in LS");
-                    _runner.disconnectClient("Private/public crypto key mismatch in LS");
-                    return;
+                if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+                    // LS1
+                    PublicKey pk;
+                    try {
+                        pk = message.getPrivateKey().toPublic();
+                    } catch (IllegalArgumentException iae) {
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Bad private key in LS");
+                        _runner.disconnectClient("Bad private key in LS");
+                        return;
+                    }
+                    if (!pk.equals(ls.getEncryptionKey())) {
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Private/public crypto key mismatch in LS");
+                        _runner.disconnectClient("Private/public crypto key mismatch in LS");
+                        return;
+                    }
+                } else {
+                    // LS2
+                    LeaseSet2 ls2 = (LeaseSet2) ls;
+                    CreateLeaseSet2Message msg2 = (CreateLeaseSet2Message) message;
+                    List<PublicKey> eks = ls2.getEncryptionKeys();
+                    List<PrivateKey> pks = msg2.getPrivateKeys();
+                    for (int i = 0; i < eks.size(); i++) {
+                        PublicKey ek = eks.get(i);
+                        PublicKey pk;
+                        try {
+                            pk = pks.get(i).toPublic();
+                        } catch (IllegalArgumentException iae) {
+                            if (_log.shouldLog(Log.ERROR))
+                                _log.error("Bad private key in LS: " + i);
+                            _runner.disconnectClient("Bad private key in LS: " + i);
+                            return;
+                        }
+                        if (!pk.equals(ek)) {
+                            if (_log.shouldLog(Log.ERROR))
+                                _log.error("Private/public crypto key mismatch in LS for key: " + i);
+                            _runner.disconnectClient("Private/public crypto key mismatch in LS for key: " + i);
+                            return;
+                        }
+                    }
                 }
                 // just register new SPK, don't verify, unused
                 _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());

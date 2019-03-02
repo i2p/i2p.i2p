@@ -268,8 +268,9 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             }
         } else {
             leaseSet.setEncryptionKey(li.getPublicKey());
+            // revocation key
+            leaseSet.setSigningKey(li.getSigningPublicKey());
         }
-        leaseSet.setSigningKey(li.getSigningPublicKey());
         // SubSession options aren't updated via the gui, so use the primary options
         Properties opts;
         if (session instanceof SubSession)

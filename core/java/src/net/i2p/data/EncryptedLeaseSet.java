@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.Blinding;
@@ -68,7 +69,6 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     @Override
     public int getLeaseCount() {
-        // TODO attempt decryption
         return _decryptedLS2 != null ? _decryptedLS2.getLeaseCount() : 0;
     }
 
@@ -77,8 +77,17 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     @Override
     public Lease getLease(int index) {
-        // TODO attempt decryption
         return _decryptedLS2 != null ? _decryptedLS2.getLease(index) : null;
+    }
+
+    /**
+     *  @return null if not decrypted.
+     *  @since 0.9.39
+     */
+    public List<PublicKey> getEncryptionKeys() {
+        if (_decryptedLS2 != null)
+            return _decryptedLS2.getEncryptionKeys();
+        return super.getEncryptionKeys();
     }
 
     /**
@@ -105,7 +114,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         if (_signingKey == null)
             _signingKey = bpk;
         else if (!_signingKey.equals(bpk))
-            throw new IllegalArgumentException("blinded pubkey mismatch");
+            throw new IllegalArgumentException("blinded pubkey mismatch:" +
+                                               "\nas received:   " + _signingKey +
+                                               "\nas calculated: " + bpk);
     }
 
     /**
@@ -121,7 +132,13 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             _alpha = Blinding.generateAlpha(ctx, _destination, null);
         else
             _alpha = Blinding.generateAlpha(ctx, _destination, null, _published);
-        return Blinding.blind(spk, _alpha);
+        SigningPublicKey rv = Blinding.blind(spk, _alpha);
+        if (_log.shouldDebug())
+            _log.debug("Blind:" +
+                       "\norig:    " + spk +
+                       "\nalpha:   " + _alpha +
+                       "\nblinded: " + rv);
+        return rv;
     }
 
     /**
@@ -348,6 +365,10 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         plaintext = ciphertext;
         ciphertext = new byte[SALT_LEN + plaintext.length];
         System.arraycopy(salt, 0, ciphertext, 0, SALT_LEN);
+        if (_log.shouldDebug()) {
+            _log.debug("Encrypt: chacha20 key:\n" + net.i2p.util.HexDump.dump(key));
+            _log.debug("Encrypt: chacha20 IV:\n" + net.i2p.util.HexDump.dump(iv));
+        }
         ChaCha20.encrypt(key, iv, plaintext, 0, ciphertext, SALT_LEN, plaintext.length);
         if (_log.shouldDebug())
             _log.debug("Encrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
@@ -377,6 +398,10 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         byte[] plaintext = new byte[ciphertext.length - SALT_LEN];
         // first 32 bytes of ciphertext are the salt
         hkdf.calculate(ciphertext, input, ELS2L1K, key, iv, 0);
+        if (_log.shouldDebug()) {
+            _log.debug("Decrypt: chacha20 key:\n" + net.i2p.util.HexDump.dump(key));
+            _log.debug("Decrypt: chacha20 IV:\n" + net.i2p.util.HexDump.dump(iv));
+        }
         ChaCha20.decrypt(key, iv, ciphertext, SALT_LEN, plaintext, 0, plaintext.length);
         if (_log.shouldDebug()) {
             _log.debug("Decrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
@@ -477,8 +502,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         _flags = saveFlags;
         if (_log.shouldDebug()) {
             _log.debug("Sign inner with key: " + key.getType() + ' ' + key.toBase64());
-            _log.debug("Corresponding pubkey: " + key.toPublic().toBase64());
-            _log.debug("Sign inner: " + _signature.getType() + ' ' + _signature.toBase64());
+            _log.debug("Corresponding pubkey: " + key.toPublic());
+            _log.debug("Inner sig: " + _signature.getType() + ' ' + _signature.toBase64());
         }
         encrypt(null);
         SigningPrivateKey bkey = Blinding.blind(key, _alpha);
@@ -498,8 +523,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             throw new DataFormatException("Signature failed with " + key.getType() + " key");
         if (_log.shouldDebug()) {
             _log.debug("Sign outer with key: " + bkey.getType() + ' ' + bkey.toBase64());
-            _log.debug("Corresponding pubkey: " + bkey.toPublic().toBase64());
-            _log.debug("Sign outer: " + _signature.getType() + ' ' + _signature.toBase64());
+            _log.debug("Corresponding pubkey: " + bkey.toPublic());
+            _log.debug("Outer sig: " + _signature.getType() + ' ' + _signature.toBase64());
         }
     }
 
@@ -514,7 +539,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     public boolean verifySignature() {
         if (_log.shouldDebug()) {
             _log.debug("Sig verify outer with key: " + _signingKey.getType() + ' ' + _signingKey.toBase64());
-            _log.debug("Sig verify outer: " + _signature.getType() + ' ' + _signature.toBase64());
+            _log.debug("Outer sig: " + _signature.getType() + ' ' + _signature.toBase64());
         }
         if (!super.verifySignature()) {
             _log.warn("ELS2 outer sig verify fail");
@@ -537,7 +562,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         if (_log.shouldDebug()) {
             _log.debug("Decrypted inner LS2:\n" + _decryptedLS2);
             _log.debug("Sig verify inner with key: " + _decryptedLS2.getDestination().getSigningPublicKey().getType() + ' ' + _decryptedLS2.getDestination().getSigningPublicKey().toBase64());
-            _log.debug("Sig verify inner: " + _decryptedLS2.getSignature().getType() + ' ' + _decryptedLS2.getSignature().toBase64());
+            _log.debug("Inner sig: " + _decryptedLS2.getSignature().getType() + ' ' + _decryptedLS2.getSignature().toBase64());
         }
         boolean rv = _decryptedLS2.verifySignature();
         if (!rv)
