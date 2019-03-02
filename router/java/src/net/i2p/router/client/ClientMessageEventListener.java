@@ -17,6 +17,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
@@ -631,7 +632,16 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             }
         }
         try {
+            if (_log.shouldDebug())
+                _log.debug("Publishing: " + ls);
             _context.netDb().publish(ls);
+            if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                // store the decrypted ls also
+                EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                if (_log.shouldDebug())
+                    _log.debug("Storing decrypted: " + encls.getDecryptedLeaseSet());
+                _context.netDb().store(dest.getHash(), encls.getDecryptedLeaseSet());
+            }
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid leaseset from client", iae);
@@ -642,7 +652,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _log.info("New lease set granted for destination " + dest);
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
-        _runner.leaseSetCreated(ls);
+        if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+            EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+            _runner.leaseSetCreated(encls.getDecryptedLeaseSet());
+        } else {
+            _runner.leaseSetCreated(ls);
+        }
     }
 
     /** override for testing */

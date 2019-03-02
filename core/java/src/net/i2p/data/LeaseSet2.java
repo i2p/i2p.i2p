@@ -55,13 +55,24 @@ public class LeaseSet2 extends LeaseSet {
 
     /**
      * Published timestamp, as received.
-     * Different than getDate(), which is the earliest lease expiration.
+     * Different than getDate() or getEarliestLeaseDate(), which are the earliest lease expiration.
      *
      * @return in ms, with 1 second resolution
      * @since 0.9.39
      */
     public long getPublished() {
         return _published;
+    }
+
+    /**
+     * Published expiration, as received.
+     * May be different than getLatestLeaseDate(), which is the latest lease expiration.
+     *
+     * @return in ms, with 1 second resolution
+     * @since 0.9.39
+     */
+    public long getExpires() {
+        return _expires;
     }
 
     public boolean isUnpublished() {
@@ -578,6 +589,7 @@ public class LeaseSet2 extends LeaseSet {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet2: ");
         buf.append("\n\tDestination: ").append(_destination);
+        buf.append("\n\tB32: ").append(_destination.toBase32());
         List<PublicKey> keys = getEncryptionKeys();
         int sz = keys.size();
         buf.append("\n\tEncryption Keys: ").append(sz);

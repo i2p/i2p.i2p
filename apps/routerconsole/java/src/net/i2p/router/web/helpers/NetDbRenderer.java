@@ -448,11 +448,12 @@ class NetDbRenderer {
           buf.append("<div class=\"leasesets_container\">");
           for (LeaseSet ls : leases) {
             Destination dest = ls.getDestination();
-            Hash key = dest.calculateHash();
+            Hash key = ls.getHash();
             buf.append("<table class=\"leaseset\">\n")
                .append("<tr><th><b>").append(_t("LeaseSet")).append(":</b>&nbsp;<code>").append(key.toBase64()).append("</code>");
-            if (_context.keyRing().get(key) != null)
-                buf.append(" (").append(_t("Encrypted")).append(')');
+            int type = ls.getType();
+            if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || _context.keyRing().get(key) != null)
+                buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
             buf.append("</th>");
             if (_context.clientManager().isLocal(dest)) {
                 buf.append("<th><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
@@ -477,7 +478,7 @@ class NetDbRenderer {
                     buf.append(" colspan=\"2\"");
                 }
                 buf.append(">");
-                String b32 = dest.toBase32();
+                String b32 = key.toBase32();
                 buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
                 if (linkSusi && !unpublished) {
                     if (host == null) {
@@ -505,13 +506,23 @@ class NetDbRenderer {
                     }
                 }
             }
-            buf.append("</tr>\n<tr><td colspan=\"2\">\n");
-            long exp = ls.getLatestLeaseDate()-now;
+            long exp;
+            if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+                exp = ls.getLatestLeaseDate() - now;
+            } else {
+                LeaseSet2 ls2 = (LeaseSet2) ls;
+                long pub = now - ls2.getPublished();
+                buf.append("</tr>\n<tr><td colspan=\"2\">\n<b>")
+                   .append(_t("Published {0} ago", DataHelper.formatDuration2(pub)))
+                   .append("</b>");
+                exp = ((LeaseSet2)ls).getExpires()-now;
+            }
+            buf.append("</tr>\n<tr><td colspan=\"2\">\n<b>");
             if (exp > 0)
-                buf.append("<b>").append(_t("Expires in {0}", DataHelper.formatDuration2(exp))).append("</b>");
+                buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
             else
-                buf.append("<b>").append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp))).append("</b>");
-            buf.append("</td></tr>\n");
+                buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
+            buf.append("</b></td></tr>\n");
             if (debug) {
                 buf.append("<tr><td colspan=\"2\">");
                 buf.append("<b>RAP?</b> ").append(ls.getReceivedAsPublished());
@@ -522,7 +533,6 @@ class NetDbRenderer {
                         median = dist;
                 }
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(fmt.format(biLog2(dist)));
-                int type = ls.getType();
                 buf.append("&nbsp;&nbsp;<b>Type: </b>").append(type);
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;

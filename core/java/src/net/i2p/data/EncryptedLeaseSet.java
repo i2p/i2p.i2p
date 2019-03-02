@@ -286,6 +286,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     }
 
     /**
+     *  This must be used instead of getDestination().getHash().
+     *
      *  Overridden because we have a blinded key, not a dest.
      *  This is the hash of the signing public key type and the signing public key.
      *  Throws IllegalStateException if not initialized.
@@ -537,6 +539,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     @Override
     public boolean verifySignature() {
+        // TODO use fields in super
+        if (_decryptedLS2 != null)
+            return _decryptedLS2.verifySignature();
         if (_log.shouldDebug()) {
             _log.debug("Sig verify outer with key: " + _signingKey.getType() + ' ' + _signingKey.toBase64());
             _log.debug("Outer sig: " + _signature.getType() + ' ' + _signature.toBase64());
@@ -596,6 +601,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[EncryptedLeaseSet: ");
         buf.append("\n\tBlinded Key: ").append(_signingKey);
+        buf.append("\n\tHash: ").append(getHash());
+        buf.append("\n\tB32: ").append(getHash().toBase32());
         if (isOffline()) {
             buf.append("\n\tTransient Key: ").append(_transientSigningPublicKey);
             buf.append("\n\tTransient Expires: ").append(new java.util.Date(_transientExpires));

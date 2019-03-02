@@ -402,9 +402,9 @@ public class LeaseSet extends DatabaseEntry {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet: ");
         buf.append("\n\tDestination: ").append(_destination);
+        buf.append("\n\tB32: ").append(_destination.toBase32());
         buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
         buf.append("\n\tSigningKey: ").append(_signingKey);
-        //buf.append("\n\tVersion: ").append(getVersion());
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tLeases: #").append(getLeaseCount());
         for (int i = 0; i < getLeaseCount(); i++)

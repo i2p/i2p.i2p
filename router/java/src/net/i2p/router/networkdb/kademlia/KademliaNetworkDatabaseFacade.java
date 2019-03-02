@@ -29,6 +29,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.KeyCertificate;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.router.RouterAddress;
@@ -683,7 +684,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 _log.warn("publish() before initialized: " + localLeaseSet, new Exception("I did it"));
             return;
         }
-        Hash h = localLeaseSet.getDestination().calculateHash();
+        Hash h = localLeaseSet.getHash();
         try {
             store(h, localLeaseSet);
         } catch (IllegalArgumentException iae) {
@@ -798,10 +799,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * @return reason why the entry is not valid, or null if it is valid
      */
     private String validate(Hash key, LeaseSet leaseSet) throws UnsupportedCryptoException {
-        if (!key.equals(leaseSet.getDestination().calculateHash())) {
+        if (!key.equals(leaseSet.getHash())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid store attempt! key does not match leaseSet.destination!  key = "
-                          + key + ", leaseSet = " + leaseSet);
+                          + key.toBase32() + ", leaseSet = " + leaseSet);
             return "Key does not match leaseSet.destination - " + key.toBase64();
         }
         // todo experimental sig types
@@ -812,8 +813,23 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 _log.warn("Invalid leaseSet signature! " + leaseSet);
             return "Invalid leaseSet signature on " + key;
         }
-        long earliest = leaseSet.getEarliestLeaseDate();
-        long latest = leaseSet.getLatestLeaseDate();
+        long earliest;
+        long latest;
+        int type = leaseSet.getType();
+        if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+            LeaseSet2 ls2 = (LeaseSet2) leaseSet;
+            // we'll assume it's not an encrypted meta, for now
+            earliest = ls2.getPublished();
+            latest = ls2.getExpires();
+        } else if (type == DatabaseEntry.KEY_TYPE_META_LS2) {
+            LeaseSet2 ls2 = (LeaseSet2) leaseSet;
+            // TODO this isn't right, and must adjust limits below also
+            earliest = Math.min(ls2.getEarliestLeaseDate(), ls2.getPublished());
+            latest = Math.min(ls2.getLatestLeaseDate(), ls2.getExpires());
+        } else {
+            earliest = leaseSet.getEarliestLeaseDate();
+            latest = leaseSet.getLatestLeaseDate();
+        }
         long now = _context.clock().now();
         if (earliest <= now - 10*60*1000L ||
             // same as the isCurrent(Router.CLOCK_FUDGE_FACTOR) test in
