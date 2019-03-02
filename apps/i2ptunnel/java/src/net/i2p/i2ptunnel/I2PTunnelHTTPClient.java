@@ -1346,12 +1346,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
         } catch(I2PException ex) {
             if(_log.shouldLog(Log.INFO)) {
-                _log.info("getPrefix(requestId) + Error trying to connect", ex);
+                _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             }
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
         } catch(OutOfMemoryError oom) {
             IOException ex = new IOException("OOM");
-            _log.error("getPrefix(requestId) + Error trying to connect", oom);
+            _log.error(getPrefix(requestId) + "Error trying to connect", oom);
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
         } finally {
             // only because we are running it inline
