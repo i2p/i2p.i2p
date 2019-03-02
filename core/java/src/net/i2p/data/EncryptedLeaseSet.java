@@ -30,6 +30,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     private LeaseSet2 _decryptedLS2;
     private Hash __calculatedHash;
     private SigningPrivateKey _alpha;
+    private final Log _log;
 
     private static final int MIN_ENCRYPTED_SIZE = 8 + 16;
     private static final int MAX_ENCRYPTED_SIZE = 4096;
@@ -42,6 +43,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
 
     public EncryptedLeaseSet() {
         super();
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(EncryptedLeaseSet.class);
     }
 
     /**
@@ -334,8 +336,10 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         ciphertext[0] = 0;
         System.arraycopy(salt, 0, ciphertext, 1, SALT_LEN);
         ChaCha20.encrypt(key, iv, plaintext, 0, ciphertext, 1 + SALT_LEN, plaintext.length);
-        System.out.println("Encrypt: inner plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
-        System.out.println("Encrypt: inner ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
+        if (_log.shouldDebug()) {
+            _log.debug("Encrypt: inner plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
+            _log.debug("Encrypt: inner ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
+        }
 
         // layer 1 (outer) encryption
         // reuse input (because there's no authcookie), generate new salt/key/iv
@@ -345,7 +349,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         ciphertext = new byte[SALT_LEN + plaintext.length];
         System.arraycopy(salt, 0, ciphertext, 0, SALT_LEN);
         ChaCha20.encrypt(key, iv, plaintext, 0, ciphertext, SALT_LEN, plaintext.length);
-        System.out.println("Encrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
+        if (_log.shouldDebug())
+            _log.debug("Encrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
         _encryptedData = ciphertext;
     }
 
@@ -373,8 +378,10 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         // first 32 bytes of ciphertext are the salt
         hkdf.calculate(ciphertext, input, ELS2L1K, key, iv, 0);
         ChaCha20.decrypt(key, iv, ciphertext, SALT_LEN, plaintext, 0, plaintext.length);
-        System.out.println("Decrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
-        System.out.println("Decrypt: outer plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
+        if (_log.shouldDebug()) {
+            _log.debug("Decrypt: outer ciphertext:\n" + net.i2p.util.HexDump.dump(ciphertext));
+            _log.debug("Decrypt: outer plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
+        }
 
         boolean perClient = (plaintext[0] & 0x01) != 0;
         if (perClient) {
@@ -391,7 +398,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         System.arraycopy(ciphertext, 1, salt, 0, SALT_LEN);
         hkdf.calculate(salt, input, ELS2L2K, key, iv, 0);
         ChaCha20.decrypt(key, iv, ciphertext, 1 + SALT_LEN, plaintext, 0, plaintext.length);
-        System.out.println("Decrypt: inner plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
+        if (_log.shouldDebug())
+            _log.debug("Decrypt: inner plaintext:\n" + net.i2p.util.HexDump.dump(plaintext));
         ByteArrayInputStream bais = new ByteArrayInputStream(plaintext);
         int type = bais.read();
         LeaseSet2 innerLS2;
@@ -461,17 +469,16 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     @Override
     public void sign(SigningPrivateKey key) throws DataFormatException {
-        Log log = I2PAppContext.getGlobalContext().logManager().getLog(EncryptedLeaseSet.class);
         // now sign inner with the unblinded key 
         // inner LS is always unpublished
         int saveFlags = _flags;
         setUnpublished();
         super.sign(key);
         _flags = saveFlags;
-        if (log.shouldDebug()) {
-            log.debug("Sign inner with key: " + key.getType() + ' ' + key.toBase64());
-            log.debug("Corresponding pubkey: " + key.toPublic().toBase64());
-            log.debug("Sign inner: " + _signature.getType() + ' ' + _signature.toBase64());
+        if (_log.shouldDebug()) {
+            _log.debug("Sign inner with key: " + key.getType() + ' ' + key.toBase64());
+            _log.debug("Corresponding pubkey: " + key.toPublic().toBase64());
+            _log.debug("Sign inner: " + _signature.getType() + ' ' + _signature.toBase64());
         }
         encrypt(null);
         SigningPrivateKey bkey = Blinding.blind(key, _alpha);
@@ -489,10 +496,10 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         _signature = DSAEngine.getInstance().sign(data, bkey);
         if (_signature == null)
             throw new DataFormatException("Signature failed with " + key.getType() + " key");
-        if (log.shouldDebug()) {
-            log.debug("Sign outer with key: " + bkey.getType() + ' ' + bkey.toBase64());
-            log.debug("Corresponding pubkey: " + bkey.toPublic().toBase64());
-            log.debug("Sign outer: " + _signature.getType() + ' ' + _signature.toBase64());
+        if (_log.shouldDebug()) {
+            _log.debug("Sign outer with key: " + bkey.getType() + ' ' + bkey.toBase64());
+            _log.debug("Corresponding pubkey: " + bkey.toPublic().toBase64());
+            _log.debug("Sign outer: " + _signature.getType() + ' ' + _signature.toBase64());
         }
     }
 
@@ -505,39 +512,38 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     @Override
     public boolean verifySignature() {
-        Log log = I2PAppContext.getGlobalContext().logManager().getLog(EncryptedLeaseSet.class);
-        if (log.shouldDebug()) {
-            log.debug("Sig verify outer with key: " + _signingKey.getType() + ' ' + _signingKey.toBase64());
-            log.debug("Sig verify outer: " + _signature.getType() + ' ' + _signature.toBase64());
+        if (_log.shouldDebug()) {
+            _log.debug("Sig verify outer with key: " + _signingKey.getType() + ' ' + _signingKey.toBase64());
+            _log.debug("Sig verify outer: " + _signature.getType() + ' ' + _signature.toBase64());
         }
         if (!super.verifySignature()) {
-            log.error("ELS2 outer sig verify fail");
+            _log.warn("ELS2 outer sig verify fail");
             return false;
         }
-        log.error("ELS2 outer sig verify success");
+        _log.info("ELS2 outer sig verify success");
         if (_destination == null) {
-            log.warn("ELS2 no dest to decrypt with");
+            _log.warn("ELS2 no dest to decrypt with");
             return true;
         }
         try {
             decrypt();
         } catch (DataFormatException dfe) {
-            log.error("ELS2 decrypt fail", dfe);
+            _log.warn("ELS2 decrypt fail", dfe);
             return false;
         } catch (IOException ioe) {
-            log.error("ELS2 decrypt fail", ioe);
+            _log.warn("ELS2 decrypt fail", ioe);
             return false;
         }
-        if (log.shouldDebug()) {
-            log.debug("Decrypted inner LS2:\n" + _decryptedLS2);
-            log.debug("Sig verify inner with key: " + _decryptedLS2.getDestination().getSigningPublicKey().getType() + ' ' + _decryptedLS2.getDestination().getSigningPublicKey().toBase64());
-            log.debug("Sig verify inner: " + _decryptedLS2.getSignature().getType() + ' ' + _decryptedLS2.getSignature().toBase64());
+        if (_log.shouldDebug()) {
+            _log.debug("Decrypted inner LS2:\n" + _decryptedLS2);
+            _log.debug("Sig verify inner with key: " + _decryptedLS2.getDestination().getSigningPublicKey().getType() + ' ' + _decryptedLS2.getDestination().getSigningPublicKey().toBase64());
+            _log.debug("Sig verify inner: " + _decryptedLS2.getSignature().getType() + ' ' + _decryptedLS2.getSignature().toBase64());
         }
         boolean rv = _decryptedLS2.verifySignature();
         if (!rv)
-            log.error("ELS2 inner sig verify fail");
+            _log.warn("ELS2 inner sig verify fail");
         else
-            log.debug("ELS2 inner sig verify success");
+            _log.info("ELS2 inner sig verify success");
         return rv;
     }
 
