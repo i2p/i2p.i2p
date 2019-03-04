@@ -603,8 +603,10 @@ public class LeaseSet2 extends LeaseSet {
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet2: ");
-        buf.append("\n\tDestination: ").append(_destination);
-        buf.append("\n\tB32: ").append(_destination.toBase32());
+        if (_destination != null) {
+            buf.append("\n\tDestination: ").append(_destination);
+            buf.append("\n\tB32: ").append(_destination.toBase32());
+        }
         List<PublicKey> keys = getEncryptionKeys();
         int sz = keys.size();
         buf.append("\n\tEncryption Keys: ").append(sz);

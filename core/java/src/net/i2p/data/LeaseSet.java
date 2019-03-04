@@ -401,8 +401,10 @@ public class LeaseSet extends DatabaseEntry {
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet: ");
-        buf.append("\n\tDestination: ").append(_destination);
-        buf.append("\n\tB32: ").append(_destination.toBase32());
+        if (_destination != null) {
+            buf.append("\n\tDestination: ").append(_destination);
+            buf.append("\n\tB32: ").append(_destination.toBase32());
+        }
         buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
         buf.append("\n\tSigningKey: ").append(_signingKey);
         buf.append("\n\tSignature: ").append(_signature);

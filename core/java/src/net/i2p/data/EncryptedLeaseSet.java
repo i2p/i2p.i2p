@@ -600,9 +600,12 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[EncryptedLeaseSet: ");
-        buf.append("\n\tBlinded Key: ").append(_signingKey);
-        buf.append("\n\tHash: ").append(getHash());
-        buf.append("\n\tB32: ").append(getHash().toBase32());
+        if (_signingKey != null) {
+            buf.append("\n\tBlinded Key: ").append(_signingKey);
+            Hash h = getHash();
+            buf.append("\n\tHash: ").append(h);
+            buf.append("\n\tB32: ").append(h.toBase32());
+        }
         if (isOffline()) {
             buf.append("\n\tTransient Key: ").append(_transientSigningPublicKey);
             buf.append("\n\tTransient Expires: ").append(new java.util.Date(_transientExpires));
