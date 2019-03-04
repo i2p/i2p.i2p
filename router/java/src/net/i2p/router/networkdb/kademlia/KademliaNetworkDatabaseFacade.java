@@ -597,6 +597,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         } else if (isNegativeCached(key)) {
             if (_log.shouldInfo())
                 _log.info("Negative cached, not searching dest: " + key);
+            _context.jobQueue().addJob(onFinishedJob);
         } else {
             search(key, onFinishedJob, onFinishedJob, timeoutMs, true, fromLocalDest);
         }
@@ -634,6 +635,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         } else if (isNegativeCached(key)) {
             if (_log.shouldInfo())
                 _log.info("Negative cached, not searching RI: " + key);
+            if (onFailedLookupJob != null)
+                _context.jobQueue().addJob(onFailedLookupJob);
         } else {
             search(key, onFindJob, onFailedLookupJob, timeoutMs, false);
         }
