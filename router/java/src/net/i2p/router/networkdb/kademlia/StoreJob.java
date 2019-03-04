@@ -90,7 +90,7 @@ abstract class StoreJob extends JobImpl {
                 _connectMask = ConnectChecker.ANY_V4;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": New store job for " + data, new Exception("I did it"));
+            _log.debug(getJobId() + ": New store job for\n" + data, new Exception("I did it"));
     }
 
     public String getName() { return "Kademlia NetDb Store";}
@@ -200,7 +200,7 @@ abstract class StoreJob extends JobImpl {
                 } else if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 &&
                            !shouldStoreEncLS2To((RouterInfo)ds)) {
                     if (_log.shouldInfo())
-                        _log.info(getJobId() + ": Skipping router that doesn't support LS2 " + peer);
+                        _log.info(getJobId() + ": Skipping router that doesn't support Enc LS2 " + peer);
                     _state.addSkipped(peer);
                     skipped++;
                 } else if (isls2 &&
@@ -447,7 +447,13 @@ abstract class StoreJob extends JobImpl {
      */
     private void sendStoreThroughClient(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         long token = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
-        Hash client = msg.getKey();
+        Hash client;
+        if (msg.getEntry().getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+            // get the real client hash
+            client = ((LeaseSet)msg.getEntry()).getDestination().calculateHash();
+        } else {
+            client = msg.getKey();
+        }
 
         Hash to = peer.getIdentity().getHash();
         TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel(client, to);
@@ -549,7 +555,7 @@ abstract class StoreJob extends JobImpl {
 
     /**
      * Is it new enough?
-     * @since 0.9.38
+     * @since 0.9.39
      */
     static boolean shouldStoreEncLS2To(RouterInfo ri) {
         String v = ri.getVersion();
