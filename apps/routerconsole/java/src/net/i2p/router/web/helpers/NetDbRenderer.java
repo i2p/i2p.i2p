@@ -61,13 +61,13 @@ class NetDbRenderer {
      */
     private class LeaseSetComparator implements Comparator<LeaseSet> {
          public int compare(LeaseSet l, LeaseSet r) {
-             Destination dl = l.getDestination();
-             Destination dr = r.getDestination();
+             Hash dl = l.getHash();
+             Hash dr = r.getHash();
              boolean locall = _context.clientManager().isLocal(dl);
              boolean localr = _context.clientManager().isLocal(dr);
              if (locall && !localr) return -1;
              if (localr && !locall) return 1;
-             return dl.calculateHash().toBase64().compareTo(dr.calculateHash().toBase64());
+             return dl.toBase32().compareTo(dr.toBase32());
         }
     }
 
@@ -447,6 +447,7 @@ class NetDbRenderer {
           long now = _context.clock().now();
           buf.append("<div class=\"leasesets_container\">");
           for (LeaseSet ls : leases) {
+            // warning - will be null for non-local encrypted
             Destination dest = ls.getDestination();
             Hash key = ls.getHash();
             buf.append("<table class=\"leaseset\">\n")
@@ -455,7 +456,7 @@ class NetDbRenderer {
             if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || _context.keyRing().get(key) != null)
                 buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
             buf.append("</th>");
-            if (_context.clientManager().isLocal(dest)) {
+            if (_context.clientManager().isLocal(key)) {
                 buf.append("<th><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
                 boolean unpublished = ! _context.clientManager().shouldPublishLeaseSet(key);
                 if (unpublished)
@@ -489,17 +490,22 @@ class NetDbRenderer {
                 } // else probably a client
             } else {
                 buf.append("<th><b>").append(_t("Destination")).append(":</b> ");
-                String host = _context.namingService().reverseLookup(dest);
+                String host = (dest != null) ? _context.namingService().reverseLookup(dest) : null;
                 if (host != null) {
                     buf.append("<a href=\"http://").append(host).append("/\">").append(host).append("</a></th>");
                 } else {
-                    String b32 = dest.toBase32();
-                    buf.append("<code>").append(dest.toBase64().substring(0, 6)).append("</code></th>")
-                       .append("</tr>\n<tr><td");
+                    String b32 = key.toBase32();
+                    buf.append("<code>");
+                    if (dest != null)
+                        buf.append(dest.toBase64().substring(0, 6));
+                    else
+                        buf.append("n/a");
+                    buf.append("</code></th>" +
+                               "</tr>\n<tr><td");
                     if (!linkSusi)
                         buf.append(" colspan=\"2\"");
                     buf.append("><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n");
-                    if (linkSusi) {
+                    if (linkSusi && dest != null) {
                        buf.append("<td class=\"addtobook\"><a title=\"").append(_t("Add to addressbook"))
                        .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
                        .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
@@ -544,7 +550,13 @@ class NetDbRenderer {
                 }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
-                buf.append("<b>Signature type:</b> ").append(dest.getSigningPublicKey().getType());
+                buf.append("<b>Signature type:</b> ");
+                if (dest != null && type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                    buf.append(dest.getSigningPublicKey().getType());
+                } else {
+                    // encrypted, show blinded key type
+                    buf.append(ls.getSigningKey().getType());
+                }
                 if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
                     buf.append("</td></tr>\n<tr><td colspan=\"2\"><b>Encryption Key:</b> ELGAMAL_2048 ")
                        .append(ls.getEncryptionKey().toBase64().substring(0, 20))
