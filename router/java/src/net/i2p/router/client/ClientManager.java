@@ -272,7 +272,7 @@ class ClientManager {
             }
         }
     }
-    
+
     /**
      *  Remove only the following session. Does not remove the runner if it has more.
      *
@@ -287,7 +287,21 @@ class ClientManager {
             _runnersByHash.remove(dest.calculateHash());
         }
     }
-    
+
+    /**
+     *  Remove the hash for the encrypted LS.
+     *  Call before unregisterConnection, or when the hash changes.
+     *
+     *  @since 0.9.39
+     */
+    public void unregisterEncryptedDestination(ClientConnectionRunner runner, Hash hash) {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Unregistering encrypted LS "  + hash.toBase32());
+        synchronized (_runners) {
+            _runnersByHash.remove(hash);
+        }
+    }
+
     /**
      *  Add to the clients list. Check for a dup destination.
      *  Side effect: Sets the session ID of the runner.
@@ -327,7 +341,32 @@ class ClientManager {
         }
         return rv;
     }
-    
+
+    /**
+     *  Call after destinationEstablished(),
+     *  when an encrypted leaseset is created, so we know it's local.
+     *  Add to the clients list. Check for a dup hash.
+     *  Caller must call runner.disconnectClient() on failure.
+     *
+     *  @param hash the location of the encrypted LS, will change every day
+     *  @return success, false on dup
+     *  @since 0.9.39
+     */
+    public boolean registerEncryptedDestination(ClientConnectionRunner runner, Hash hash) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("New encrypted LS " + hash.toBase32());
+
+        boolean rv;
+        synchronized (_runners) {
+            rv = !_runnersByHash.containsKey(hash);
+            if (rv)
+                _runnersByHash.put(hash, runner);
+        }
+        if (!rv)
+            _log.error("Encrypted dest collision " + hash.toBase32());
+        return rv;
+    }
+
     /**
      *  Generate a new random, unused sessionId. Caller must synch on _runners.
      *  @return null on failure

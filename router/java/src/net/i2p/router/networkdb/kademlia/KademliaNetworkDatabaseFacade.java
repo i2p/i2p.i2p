@@ -1200,7 +1200,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     
     public void unpublish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
-        Hash h = localLeaseSet.getDestination().calculateHash();
+        Hash h = localLeaseSet.getHash();
         DatabaseEntry data = _ds.remove(h);
         
         if (data == null) {

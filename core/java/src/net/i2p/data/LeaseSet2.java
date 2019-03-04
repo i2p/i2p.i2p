@@ -281,6 +281,21 @@ public class LeaseSet2 extends LeaseSet {
             log.warn("Don't set revocation key in ls2", new Exception("I did it"));
     }
 
+    /**
+     * Determine whether the leaseset is currently valid, at least within a given
+     * fudge factor.
+     * Overridden to use the expiration time instead of the last expiration.
+     *
+     * @param fudge milliseconds fudge factor to allow between the current time
+     * @return true if there are current leases, false otherwise
+     * @since 0.9.39
+     */
+    @Override
+    public boolean isCurrent(long fudge) {
+        long now = Clock.getInstance().now();
+        return _expires > now - fudge;
+    }
+
     /** without sig! */
     @Override
     protected byte[] getBytes() {

@@ -28,6 +28,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
+import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
@@ -99,6 +100,7 @@ class ClientConnectionRunner {
     /** For inbound traffic. true if i2cp.fastReceive = "true"; @since 0.9.4 */
     private boolean _dontSendMSMOnReceive;
     private final AtomicInteger _messageId; // messageId counter
+    private Hash _encryptedLSHash;
     
     // Was 32767 since the beginning (04-2004).
     // But it's 4 bytes in the I2CP spec and stored as a long in MessageID....
@@ -125,7 +127,10 @@ class ClientConnectionRunner {
         SessionConfig config;
         LeaseRequestState leaseRequest;
         Rerequest rerequestTimer;
+        /** possibly decrypted */
         LeaseSet currentLeaseSet;
+        /** only if encrypted */
+        LeaseSet currentEncryptedLeaseSet;
 
         SessionParams(Destination d, boolean isPrimary) {
             dest = d;
@@ -199,11 +204,17 @@ class ClientConnectionRunner {
         _acceptedPending.clear();
         if (_sessionKeyManager != null)
             _sessionKeyManager.shutdown();
+        if (_encryptedLSHash != null)
+            _manager.unregisterEncryptedDestination(this, _encryptedLSHash);
         _manager.unregisterConnection(this);
         // netdb may be null in unit tests
         if (_context.netDb() != null) {
             for (SessionParams sp : _sessions.values()) {
                 LeaseSet ls = sp.currentLeaseSet;
+                if (ls != null)
+                    _context.netDb().unpublish(ls);
+                // unpublish encrypted LS also
+                ls = sp.currentEncryptedLeaseSet;
                 if (ls != null)
                     _context.netDb().unpublish(ls);
                 if (!sp.isPrimary)
@@ -433,6 +444,10 @@ class ClientConnectionRunner {
                 LeaseSet ls = sp.currentLeaseSet;
                 if (ls != null)
                     _context.netDb().unpublish(ls);
+                // unpublish encrypted LS also
+                ls = sp.currentEncryptedLeaseSet;
+                if (ls != null)
+                    _context.netDb().unpublish(ls);
                 isPrimary = sp.isPrimary;
                 if (!isPrimary)
                     _context.tunnelManager().removeAlias(sp.dest);
@@ -446,6 +461,10 @@ class ClientConnectionRunner {
                     _log.info("Destroying remaining client subsession " + sp.sessionId);
                 _manager.unregisterSession(sp.sessionId, sp.dest);
                 LeaseSet ls = sp.currentLeaseSet;
+                if (ls != null)
+                    _context.netDb().unpublish(ls);
+                // unpublish encrypted LS also
+                ls = sp.currentEncryptedLeaseSet;
                 if (ls != null)
                     _context.netDb().unpublish(ls);
                 _context.tunnelManager().removeAlias(sp.dest);
@@ -588,6 +607,8 @@ class ClientConnectionRunner {
     /** 
      * called after a new leaseSet is granted by the client, the NetworkDb has been
      * updated.  This takes care of all the LeaseRequestState stuff (including firing any jobs)
+     *
+     * @param ls, if encrypted, the encrypted LS, not the decrypted one
      */
     void leaseSetCreated(LeaseSet ls) {
         Hash h = ls.getDestination().calculateHash();
@@ -596,6 +617,11 @@ class ClientConnectionRunner {
             return;
         LeaseRequestState state;
         synchronized (this) {
+            if (ls.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                sp.currentEncryptedLeaseSet = encls;
+                ls = encls.getDecryptedLeaseSet();
+            }
             sp.currentLeaseSet = ls;
             state = sp.leaseRequest;
             if (state == null) {
@@ -614,6 +640,30 @@ class ClientConnectionRunner {
         }
         if ( (state != null) && (state.getOnGranted() != null) )
             _context.jobQueue().addJob(state.getOnGranted());
+    }
+
+    /**
+     *  Call after destinationEstablished(),
+     *  when an encrypted leaseset is created, so we know it's local.
+     *  Add to the clients list. Check for a dup hash.
+     *  Caller must call runner.disconnectClient() on failure.
+     *
+     *  @param hash the location of the encrypted LS, will change every day
+     *  @return success, false on dup
+     *  @since 0.9.39
+     */
+    public boolean registerEncryptedLS(Hash hash) {
+        boolean rv = true;
+        synchronized(this) {
+            if (!hash.equals(_encryptedLSHash)) {
+                if (_encryptedLSHash != null)
+                    _manager.unregisterEncryptedDestination(this, _encryptedLSHash);
+                rv = _manager.registerEncryptedDestination(this, hash);
+                if (rv)
+                    _encryptedLSHash = hash;
+            }
+        }
+        return rv;
     }
     
     /**

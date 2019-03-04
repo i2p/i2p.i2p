@@ -632,6 +632,17 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             }
         }
         try {
+            if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                // so the client manager knows it's a local hash
+                // we could put this in runner.leaseSetCreated(), but
+                // need to set it before calling publish()
+                Hash newHash = ls.getHash();
+                boolean ok = _runner.registerEncryptedLS(newHash);
+                if (!ok) {
+                    _runner.disconnectClient("Duplicate hash of encrypted LS2");
+                    return;
+                }
+            }
             if (_log.shouldDebug())
                 _log.debug("Publishing: " + ls);
             _context.netDb().publish(ls);
@@ -652,12 +663,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _log.info("New lease set granted for destination " + dest);
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
-        if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
-            EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
-            _runner.leaseSetCreated(encls.getDecryptedLeaseSet());
-        } else {
-            _runner.leaseSetCreated(ls);
-        }
+        _runner.leaseSetCreated(ls);
     }
 
     /** override for testing */
