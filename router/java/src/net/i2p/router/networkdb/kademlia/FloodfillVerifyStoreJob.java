@@ -32,7 +32,7 @@ import net.i2p.util.Log;
  */
 class FloodfillVerifyStoreJob extends JobImpl {
     private final Log _log;
-    private final Hash _key;
+    private final Hash _key, _client;
     private Hash _target;
     private final Hash _sentTo;
     private final FloodfillNetworkDatabaseFacade _facade;
@@ -54,14 +54,16 @@ class FloodfillVerifyStoreJob extends JobImpl {
     
     /**
      *  Delay a few seconds, then start the verify
+     *  @param client generally the same as key, unless encrypted LS2
      *  @param published getDate() for RI or LS1, getPublished() for LS2
      *  @param sentTo who to give the credit or blame to, can be null
      */
-    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, int type,
+    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, Hash client, long published, int type,
                                    Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         facade.verifyStarted(key);
         _key = key;
+        _client = client;
         _published = published;
         _isRouterInfo = type == DatabaseEntry.KEY_TYPE_ROUTERINFO;
         _isLS2 = !_isRouterInfo && type != DatabaseEntry.KEY_TYPE_LEASESET;
@@ -105,12 +107,13 @@ class FloodfillVerifyStoreJob extends JobImpl {
             replyTunnelInfo = getContext().tunnelManager().selectInboundExploratoryTunnel(_target);
             isInboundExploratory = true;
         } else {
-            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel(_key, _target);
+            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel(_client, _target);
             isInboundExploratory = false;
         }
         if (replyTunnelInfo == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No inbound tunnels to get a reply from!");
+            _facade.verifyFinished(_key);
             return;
         }
         DatabaseLookupMessage lookup = buildLookup(replyTunnelInfo);
@@ -122,7 +125,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         if (_isRouterInfo || getContext().keyRing().get(_key) != null)
             outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(_target);
         else
-            outTunnel = getContext().tunnelManager().selectOutboundTunnel(_key, _target);
+            outTunnel = getContext().tunnelManager().selectOutboundTunnel(_client, _target);
         if (outTunnel == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No outbound tunnels to verify a store");
@@ -144,7 +147,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             if (isInboundExploratory) {
                 sess = MessageWrapper.generateSession(getContext());
             } else {
-                sess = MessageWrapper.generateSession(getContext(), _key);
+                sess = MessageWrapper.generateSession(getContext(), _client);
                 if (sess == null) {
                      if (_log.shouldLog(Log.WARN))
                          _log.warn("No SKM to reply to");
@@ -160,7 +163,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         if (_isRouterInfo)
             fromKey = null;
         else
-            fromKey = _key;
+            fromKey = _client;
         _wrappedMessage = MessageWrapper.wrap(getContext(), lookup, fromKey, peer);
         if (_wrappedMessage == null) {
              if (_log.shouldLog(Log.WARN))

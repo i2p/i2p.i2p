@@ -102,7 +102,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             // to avoid anonymity vulnerabilities.
             // As this is complex, lots of comments follow...
 
-            boolean isLocal = getContext().clientManager().isLocal(ls.getDestination());
+            boolean isLocal = getContext().clientManager().isLocal(ls.getHash());
             boolean shouldPublishLocal = isLocal && getContext().clientManager().shouldPublishLeaseSet(_message.getSearchKey());
         
             // Only answer a request for a LeaseSet if it has been published

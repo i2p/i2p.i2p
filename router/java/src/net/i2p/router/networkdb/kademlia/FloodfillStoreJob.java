@@ -13,6 +13,7 @@ import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
@@ -41,7 +42,8 @@ class FloodfillStoreJob extends StoreJob {
      * @param toSkip set of peer hashes of people we dont want to send the data to (e.g. we
      *               already know they have it).  This can be null.
      */
-    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DatabaseEntry data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
+    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DatabaseEntry data,
+                             Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
         super(context, facade, key, data, onSuccess, onFailure, timeoutMs, toSkip);
         _facade = facade;
     }
@@ -60,15 +62,16 @@ class FloodfillStoreJob extends StoreJob {
         super.succeed();
 
         final boolean shouldLog = _log.shouldInfo();
+        final Hash key = _state.getTarget();
 
-            if (_facade.isVerifyInProgress(_state.getTarget())) {
+            if (_facade.isVerifyInProgress(key)) {
                 if (shouldLog)
-                    _log.info("Skipping verify, one already in progress for: " + _state.getTarget());
+                    _log.info("Skipping verify, one already in progress for: " + key);
                 return;
             }
             if (getContext().router().gracefulShutdownInProgress()) {
                 if (shouldLog)
-                    _log.info("Skipping verify, shutdown in progress for: " + _state.getTarget());
+                    _log.info("Skipping verify, shutdown in progress for: " + key);
                 return;
             }
             // Get the time stamp from the data we sent, so the Verify job can meke sure that
@@ -95,11 +98,18 @@ class FloodfillStoreJob extends StoreJob {
             try {
                 sentTo = _state.getSuccessful().iterator().next();
             } catch (NoSuchElementException nsee) {}
-            Job fvsj = new FloodfillVerifyStoreJob(getContext(), _state.getTarget(),
+            Hash client;
+            if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                // get the real client hash
+                client = ((LeaseSet)data).getDestination().calculateHash();
+            } else {
+                client = key;
+            }
+            Job fvsj = new FloodfillVerifyStoreJob(getContext(), key, client,
                                                    published, type,
                                                    sentTo, _facade);
             if (shouldLog)
-                _log.info(getJobId() + ": Succeeded sending key " + _state.getTarget() +
+                _log.info(getJobId() + ": Succeeded sending key " + key +
                           ", queueing verify job " + fvsj.getJobId());
             getContext().jobQueue().addJob(fvsj);
     }
