@@ -129,9 +129,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         SigningPublicKey spk = _destination.getSigningPublicKey();
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         if (_published <= 0)
-            _alpha = Blinding.generateAlpha(ctx, _destination, null);
+            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), null);
         else
-            _alpha = Blinding.generateAlpha(ctx, _destination, null, _published);
+            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), null, _published);
         SigningPublicKey rv = Blinding.blind(spk, _alpha);
         if (_log.shouldDebug())
             _log.debug("Blind:" +
@@ -464,7 +464,14 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     private byte[] getSubcredential(I2PAppContext ctx) {
         if (_destination == null)
             throw new IllegalStateException("no known destination to decrypt with");
-        byte[] credential = hash(ctx, CREDENTIAL, _destination.toByteArray());
+        SigningPublicKey destspk = _destination.getSigningPublicKey();
+        int spklen = destspk.length();
+        byte[] in = new byte[spklen + 4];
+        // SHA256("credential" || spk || sigtypein || sigtypeout)
+        System.arraycopy(destspk.getData(), 0, in, 0, spklen);
+        DataHelper.toLong(in, spklen, 2, destspk.getType().getCode());
+        DataHelper.toLong(in, spklen + 2, 2, SigType.RedDSA_SHA512_Ed25519.getCode());
+        byte[] credential = hash(ctx, CREDENTIAL, in);
         byte[] spk = _signingKey.getData();
         byte[] tmp = new byte[credential.length + spk.length];
         System.arraycopy(credential, 0, tmp, 0, credential.length);

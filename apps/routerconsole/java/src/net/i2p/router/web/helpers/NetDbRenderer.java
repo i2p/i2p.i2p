@@ -467,27 +467,29 @@ class NetDbRenderer {
                     buf.append(in.getDestinationNickname());
                 else
                     buf.append(dest.toBase64().substring(0, 6));
-                buf.append("</th></tr>\n<tr><td");
-                // If the dest is published but not in the addressbook, an extra
-                // <td> is appended with an "Add to addressbook" link, so this
-                // <td> should not span 2 columns.
-                String host = null;
-                if (!unpublished) {
-                    host = _context.namingService().reverseLookup(dest);
-                }
-                if (unpublished || host != null || !linkSusi) {
-                    buf.append(" colspan=\"2\"");
-                }
-                buf.append(">");
-                String b32 = key.toBase32();
-                buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
-                if (linkSusi && !unpublished) {
-                    if (host == null) {
+                buf.append("</th></tr>\n");
+                // we don't show a b32 or addressbook links if encrypted
+                if (type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                    buf.append("<tr><td");
+                    // If the dest is published but not in the addressbook, an extra
+                    // <td> is appended with an "Add to addressbook" link, so this
+                    // <td> should not span 2 columns.
+                    String host = null;
+                    if (!unpublished) {
+                        host = _context.namingService().reverseLookup(dest);
+                    }
+                    if (unpublished || host != null || !linkSusi) {
+                        buf.append(" colspan=\"2\"");
+                    }
+                    buf.append(">");
+                    String b32 = key.toBase32();
+                    buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
+                    if (linkSusi && !unpublished && host == null) {
                         buf.append("<td class=\"addtobook\" colspan=\"2\">").append("<a title=\"").append(_t("Add to addressbook"))
                            .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
                            .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
-                    }
-                } // else probably a client
+                    } // else probably a client
+                }
             } else {
                 buf.append("<th><b>").append(_t("Destination")).append(":</b> ");
                 String host = (dest != null) ? _context.namingService().reverseLookup(dest) : null;

@@ -27,6 +27,7 @@ public final class Blinding {
     private static final SigType TYPE = SigType.EdDSA_SHA512_Ed25519;
     private static final SigType TYPER = SigType.RedDSA_SHA512_Ed25519;
     private static final String INFO = "i2pblinding1";
+    private static final byte[] INFO_ALPHA = DataHelper.getASCII("I2PGenerateAlpha");
 
     // following copied from RouterKeyGenerator
     private static final String FORMAT = "yyyyMMdd";
@@ -112,16 +113,16 @@ public final class Blinding {
      *  Generate alpha for current time.
      *  Only for SigType EdDSA_SHA512_Ed25519.
      *
-     *  @param dest spk must be SigType EdDSA_SHA512_Ed25519
+     *  @param destspk must be SigType EdDSA_SHA512_Ed25519
      *  @param secret may be null or zero-length
      *  @return SigType RedDSA_SHA512_Ed25519
      *  @throws UnsupportedOperationException unless supported SigTypes
      *  @throws IllegalArgumentException on bad inputs
      *  @since 0.9.39
      */
-    public static SigningPrivateKey generateAlpha(I2PAppContext ctx, Destination dest, String secret) {
+    public static SigningPrivateKey generateAlpha(I2PAppContext ctx, SigningPublicKey destspk, String secret) {
         long now = ctx.clock().now();
-        return generateAlpha(ctx, dest, secret, now);
+        return generateAlpha(ctx, destspk, secret, now);
     }
 
     /**
@@ -136,7 +137,7 @@ public final class Blinding {
      *  @throws IllegalArgumentException on bad inputs
      *  @since 0.9.39
      */
-    public static SigningPrivateKey generateAlpha(I2PAppContext ctx, Destination dest,
+    public static SigningPrivateKey generateAlpha(I2PAppContext ctx, SigningPublicKey destspk,
                                                   String secret, long now) {
         String modVal;
         synchronized(_fmt) {
@@ -155,7 +156,15 @@ public final class Blinding {
         }
         HKDF hkdf = new HKDF(ctx);
         byte[] out = new byte[64];
-        hkdf.calculate(dest.getHash().getData(), data, INFO, out, out, 32);
+        int stoff = INFO_ALPHA.length + destspk.length();
+        byte[] in = new byte[stoff + 4];
+        // SHA256("I2PGenerateAlpha" || spk || sigtypein || sigtypeout)
+        System.arraycopy(INFO_ALPHA, 0, in, 0, INFO_ALPHA.length);
+        System.arraycopy(destspk.getData(), 0, in, INFO_ALPHA.length, destspk.length());
+        DataHelper.toLong(in, stoff, 2, destspk.getType().getCode());
+        DataHelper.toLong(in, stoff + 2, 2, TYPER.getCode());
+        Hash salt = ctx.sha().calculateHash(in);
+        hkdf.calculate(salt.getData(), data, INFO, out, out, 32);
         byte[] b = EdDSABlinding.reduce(out);
         return new SigningPrivateKey(TYPER, b);
     }

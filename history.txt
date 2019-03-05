@@ -1,10 +1,22 @@
+2019-03-05 zzz
+ * Data: Update Encrypted LS2 blinding and encryption
+
+2019-03-04 zzz
+ * Console: Fix NPEs displaying encrypted LS2
+ * Data: Fix NPE in debug logging
+ * I2CP, NetDB: More fixes for encrypted LS2 (proposal 123)
+ * NetDB: Call fail callback when lookup is negative cached (thx zab)
+
+2019-03-02 zzz
+ * I2CP, NetDB: Fixes for encrypted LS2 (proposal 123)
+
 2019-03-01 zzz
-  * Streaming: Fix sending messages with expired times (ticket #2451)
+ * Streaming: Fix sending messages with expired times (ticket #2451)
 
 2019-02-28 zzz
-  * Console:
-    - Fix router logs not shown if first msg is a dup
-    - Change fallback client names to use b32
+ * Console:
+   - Fix router logs not shown if first msg is a dup
+   - Change fallback client names to use b32
 
 2019-02-26 zzz
  * SSU:
