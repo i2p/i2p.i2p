@@ -184,7 +184,11 @@ abstract class StoreJob extends JobImpl {
             int queued = 0;
             int skipped = 0;
             int type = _state.getData().getType();
-            boolean isls2 = DatabaseEntry.isLeaseSet(type) && type != DatabaseEntry.KEY_TYPE_LEASESET;
+            final boolean isls = DatabaseEntry.isLeaseSet(type);
+            final boolean isls2 = isls && type != DatabaseEntry.KEY_TYPE_LEASESET;
+            final SigType lsSigType = (isls && type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) ?
+                                      _state.getData().getKeysAndCert().getSigningPublicKey().getType() :
+                                      null;
             for (Hash peer : closestHashes) {
                 DatabaseEntry ds = _facade.getDataStore().get(peer);
                 if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
@@ -197,10 +201,11 @@ abstract class StoreJob extends JobImpl {
                         _log.info(getJobId() + ": Skipping old router " + peer);
                     _state.addSkipped(peer);
                     skipped++;
-                } else if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 &&
+                } else if ((type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 ||
+                            lsSigType == SigType.RedDSA_SHA512_Ed25519) &&
                            !shouldStoreEncLS2To((RouterInfo)ds)) {
                     if (_log.shouldInfo())
-                        _log.info(getJobId() + ": Skipping router that doesn't support Enc LS2 " + peer);
+                        _log.info(getJobId() + ": Skipping router that doesn't support EncLS2/RedDSA " + peer);
                     _state.addSkipped(peer);
                     skipped++;
                 } else if (isls2 &&

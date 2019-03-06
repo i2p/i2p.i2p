@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -212,7 +213,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         Hash rkey = gen.getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         final int type = ds.getType();
-        final boolean isls2 = ds.isLeaseSet() && type != DatabaseEntry.KEY_TYPE_LEASESET;
+        final boolean isls = ds.isLeaseSet();
+        final boolean isls2 = isls && type != DatabaseEntry.KEY_TYPE_LEASESET;
+        final SigType lsSigType = (isls && type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) ?
+                                  ds.getKeysAndCert().getSigningPublicKey().getType() :
+                                  null;
         int max = MAX_TO_FLOOD;
         // increase candidates because we will be skipping some
         if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2)
@@ -254,8 +259,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         for (int i = 0; i < peers.size(); i++) {
             Hash peer = peers.get(i);
             RouterInfo target = lookupRouterInfoLocally(peer);
-            if (!shouldFloodTo(key, type, peer, target))
+            if (!shouldFloodTo(key, type, lsSigType, peer, target)) {
+                if (_log.shouldDebug())
+                    _log.debug("Too old, not flooding " + key.toBase64() + " to " + peer.toBase64());
                 continue;
+            }
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
             msg.setEntry(ds);
             OutNetMessage m = new OutNetMessage(_context, msg, _context.clock().now()+FLOOD_TIMEOUT, FLOOD_PRIORITY, target);
@@ -277,8 +285,12 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             _log.info("Flooded the data to " + flooded + " of " + peers.size() + " peers");
     }
 
-    /** @since 0.9.39 */
-    private boolean shouldFloodTo(Hash key, int type, Hash peer, RouterInfo target) {
+    /**
+     *  @param type database store type
+     *  @param lsSigType may be null
+     *  @since 0.9.39
+     */
+    private boolean shouldFloodTo(Hash key, int type, SigType lsSigType, Hash peer, RouterInfo target) {
        if ( (target == null) || (_context.banlist().isBanlisted(peer)) )
            return false;
        // Don't flood an RI back to itself
@@ -289,10 +301,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
        if (peer.equals(_context.routerHash()))
            return false;
        // min version checks
-       if (type != DatabaseEntry.KEY_TYPE_ROUTERINFO && type != DatabaseEntry.KEY_TYPE_LS2 &&
+       if (type != DatabaseEntry.KEY_TYPE_ROUTERINFO && type != DatabaseEntry.KEY_TYPE_LEASESET &&
            !StoreJob.shouldStoreLS2To(target))
            return false;
-       if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 &&
+       if ((type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 ||
+            lsSigType == SigType.RedDSA_SHA512_Ed25519) &&
            !StoreJob.shouldStoreEncLS2To(target))
            return false;
        if (!StoreJob.shouldStoreTo(target))
