@@ -207,7 +207,7 @@ public class PeerTestJob extends JobImpl {
         public boolean continueMatching() { return false; }
         public long getExpiration() { return _expiration; }
         public boolean isMatch(I2NPMessage message) {
-            if (message instanceof DeliveryStatusMessage) {
+            if (message.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
                 DeliveryStatusMessage msg = (DeliveryStatusMessage)message;
                 if (_nonce == msg.getMessageId()) {
                     long timeLeft = _expiration - getContext().clock().now();

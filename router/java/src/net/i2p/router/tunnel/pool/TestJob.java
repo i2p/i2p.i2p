@@ -267,7 +267,7 @@ class TestJob extends JobImpl {
         public long getExpiration() { return _expiration; }
 
         public boolean isMatch(I2NPMessage message) {
-            if (message instanceof DeliveryStatusMessage) {
+            if (message.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
                 return ((DeliveryStatusMessage)message).getMessageId() == _id;
             }
             return false;
