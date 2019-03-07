@@ -255,10 +255,11 @@ class FloodfillVerifyStoreJob extends JobImpl {
         
         public long getExpiration() { return _expiration; }
         public boolean isMatch(I2NPMessage message) {
-            if (message instanceof DatabaseStoreMessage) {
+            int type = message.getType();
+            if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage)message;
                 return _key.equals(dsm.getKey());
-            } else if (message instanceof DatabaseSearchReplyMessage) {
+            } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
                 DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage)message;
                 return _key.equals(dsrm.getSearchKey());
             }

@@ -79,7 +79,8 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
             _outTunnel.incrementVerifiedBytesTransferred(msgSize);
         }
         
-        if (message instanceof DatabaseStoreMessage) {
+        int type = message.getType();
+        if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
             long timeToReply = _state.dataFound(_peer);
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
             DatabaseEntry entry = msg.getEntry();
@@ -97,7 +98,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
                 // blame the peer
                 getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
             }
-        } else if (message instanceof DatabaseSearchReplyMessage) {
+        } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
             _job.replyFound((DatabaseSearchReplyMessage)message, _peer);
         } else {
             if (_log.shouldLog(Log.ERROR))

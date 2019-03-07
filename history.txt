@@ -1,3 +1,6 @@
+2019-03-06 zzz
+ * NetDB: Fix flood version check, add version check for RedDSA
+
 2019-03-05 zzz
  * Data: Update Encrypted LS2 blinding and encryption
 

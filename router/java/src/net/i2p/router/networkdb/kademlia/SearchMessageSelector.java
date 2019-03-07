@@ -69,7 +69,8 @@ class SearchMessageSelector implements MessageSelector {
             _log.debug("[" + _id + "] isMatch("+message.getClass().getName() 
                        + ") [want dbStore or dbSearchReply from " + _peer 
                        + " for " + _state.getTarget() + "]");
-        if (message instanceof DatabaseStoreMessage) {
+        int type = message.getType();
+        if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
             if (msg.getKey().equals(_state.getTarget())) {
                 if (_log.shouldLog(Log.DEBUG))
@@ -83,7 +84,7 @@ class SearchMessageSelector implements MessageSelector {
                     _log.debug("[" + _id + "] DBStore of a key we're not looking for");
                 return false;
             }
-        } else if (message instanceof DatabaseSearchReplyMessage) {
+        } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
             DatabaseSearchReplyMessage msg = (DatabaseSearchReplyMessage)message;
             if (_peer.equals(msg.getFromHash())) {
                 if (msg.getSearchKey().equals(_state.getTarget())) {

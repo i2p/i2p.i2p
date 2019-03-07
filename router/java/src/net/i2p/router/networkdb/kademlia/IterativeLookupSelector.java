@@ -38,14 +38,15 @@ class IterativeLookupSelector implements MessageSelector {
      */
     public boolean isMatch(I2NPMessage message) {
         if (message == null) return false;
-        if (message instanceof DatabaseStoreMessage) {
+        int type = message.getType();
+        if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
             DatabaseStoreMessage dsm = (DatabaseStoreMessage)message;
             // is it worth making sure the reply came in on the right tunnel?
             if (_search.getKey().equals(dsm.getKey())) {
                 _matchFound = true;
                 return true;
             }
-        } else if (message instanceof DatabaseSearchReplyMessage) {
+        } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
             DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage)message;
             if (_search.getKey().equals(dsrm.getSearchKey())) {
                 // Got a netDb reply pointing us at other floodfills...

@@ -569,8 +569,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             (getKBucketSetSize() < MIN_REMAINING_ROUTERS ||
              _context.router().getUptime() < DONT_FAIL_PERIOD ||
              _context.commSystem().countActivePeers() <= MIN_ACTIVE_PEERS)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Not failing " + peer.toBase64() + " as we are just starting up or have problems");
+            if (_log.shouldInfo())
+                _log.info("Not failing " + peer.toBase64() + " as we are just starting up or have problems");
             return;
         }
 

@@ -36,7 +36,7 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
     public String getName() { return "NetDb flood search match"; }
 
     public void setMessage(I2NPMessage message) {
-        if (message instanceof DatabaseSearchReplyMessage) {
+        if (message.getType() == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
             // DSRM processing now in FloodOnlyLookupSelector instead of here,
             // a dsrm is only passed in when there are no more lookups remaining
             // so that all DSRM's are processed, not just the last one.
