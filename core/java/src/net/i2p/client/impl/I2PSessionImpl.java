@@ -577,7 +577,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SigType dtype = _myDestination.getSigningPublicKey().getType();
         _signingPrivateKey = new SigningPrivateKey(dtype);
         _signingPrivateKey.readBytes(destKeyStream);
-        if (isOffline(_signingPrivateKey)) {
+        if (_signingPrivateKey.isOffline()) {
             _offlineExpiration = DataHelper.readLong(destKeyStream, 4) * 1000;;
             int itype = (int) DataHelper.readLong(destKeyStream, 2);
             SigType type = SigType.getByCode(itype);
@@ -591,19 +591,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             _signingPrivateKey = new SigningPrivateKey(type);
             _signingPrivateKey.readBytes(destKeyStream);
         }
-    }
-
-    /**
-     *  Constant time
-     *  @since 0.9.38
-     */
-    private static boolean isOffline(SigningPrivateKey spk) {
-        byte b = 0;
-        byte[] data = spk.getData();
-        for (int i = 0; i < data.length; i++) {
-            b |= data[i];
-        }
-        return b == 0;
     }
 
     /**

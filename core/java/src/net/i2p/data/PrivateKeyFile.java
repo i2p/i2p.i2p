@@ -621,19 +621,6 @@ public class PrivateKeyFile {
     //// offline methods
 
     /**
-     *  Constant time
-     *  @since 0.9.38
-     */
-    private static boolean isOffline(SigningPrivateKey spk) {
-        byte b = 0;
-        byte[] data = spk.getData();
-        for (int i = 0; i < data.length; i++) {
-            b |= data[i];
-        }
-        return b == 0;
-    }
-
-    /**
      *  Does this session have offline and transient keys?
      *  @since 0.9.38
      */
@@ -646,7 +633,7 @@ public class PrivateKeyFile {
      *  @since 0.9.38
      */
     public void setOfflineData(long expires, SigningPublicKey transientPub, Signature sig, SigningPrivateKey transientPriv) {
-        if (!isOffline(signingPrivKey)) {
+        if (!signingPrivKey.isOffline()) {
             SigType type = getSigningPrivKey().getType();
             byte[] dbytes = new byte[type.getPrivkeyLen()];
             signingPrivKey = new SigningPrivateKey(type, dbytes);

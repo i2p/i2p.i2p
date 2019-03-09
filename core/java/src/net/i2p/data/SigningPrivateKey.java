@@ -101,6 +101,21 @@ public class SigningPrivateKey extends SimpleDataStructure {
     }
 
     /**
+     *  Constant time
+     *  @return true if all zeros
+     *  @since 0.9.39 moved from PrivateKeyFile
+     */
+    public boolean isOffline() {
+        if (_data == null)
+            return true;
+        byte b = 0;
+        for (int i = 0; i < _data.length; i++) {
+            b |= _data[i];
+        }
+        return b == 0;
+    }
+
+    /**
      *  @since 0.9.8
      */
     @Override

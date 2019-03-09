@@ -127,6 +127,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
            SigningPrivateKey spk = editBean.getSigningPrivateKey(curTunnel);
            if (spk == null) {
                %><tr><td class="infohelp"><%=intl._t("Destination signing key is not available. Start the tunnel.")%></td></tr><%
+           } else if (spk.isOffline()) {
+               %><tr><td class="infohelp"><%=intl._t("Destination signing key is offline. Use CLI tools on the offline machine.")%></td></tr><%
            } else {
                valid = true;
                OrderedProperties props = new OrderedProperties();

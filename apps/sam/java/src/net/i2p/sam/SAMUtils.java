@@ -117,7 +117,7 @@ class SAMUtils {
             SigType dtype = d.getSigningPublicKey().getType();
             SigningPrivateKey spk = new SigningPrivateKey(dtype);
             spk.readBytes(destKeyStream);
-            if (isOffline(spk)) {
+            if (spk.isOffline()) {
                 // offlineExpiration
                 DataHelper.readLong(destKeyStream, 4);
                 int itype = (int) DataHelper.readLong(destKeyStream, 2);
@@ -139,19 +139,6 @@ class SAMUtils {
         }
         return destKeyStream.available() == 0;
     }
-
-    /**
-     *  @since 0.9.39
-     */
-    private static boolean isOffline(SigningPrivateKey spk) {
-        byte[] data = spk.getData();
-        for (int i = 0; i < data.length; i++) {
-            if (data[i] != 0)
-                return false;
-        }
-        return true;
-    }
-
 
     /**
      * Resolved the specified hostname.
