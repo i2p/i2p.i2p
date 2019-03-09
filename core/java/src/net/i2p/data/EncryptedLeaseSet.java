@@ -22,6 +22,8 @@ import net.i2p.util.Log;
  *
  * PRELIMINARY - Subject to change - see proposal 123
  *
+ * Per-client auth TODO
+ *
  * @since 0.9.38
  */
 public class EncryptedLeaseSet extends LeaseSet2 {
@@ -31,6 +33,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     private LeaseSet2 _decryptedLS2;
     private Hash __calculatedHash;
     private SigningPrivateKey _alpha;
+    private String _secret;
     private final Log _log;
 
     private static final int MIN_ENCRYPTED_SIZE = 8 + 16;
@@ -54,6 +57,16 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     public LeaseSet2 getDecryptedLeaseSet() {
         return _decryptedLS2;
+    }
+
+    /**
+     *  Must be set before sign or verify.
+     *
+     *  @param secret null or "" for none (default)
+     *  @since 0.9.39
+     */
+    public void setSecret(String secret) {
+        _secret = secret;
     }
 
     ///// overrides below here
@@ -84,6 +97,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      *  @return null if not decrypted.
      *  @since 0.9.39
      */
+    @Override
     public List<PublicKey> getEncryptionKeys() {
         if (_decryptedLS2 != null)
             return _decryptedLS2.getEncryptionKeys();
@@ -129,9 +143,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         SigningPublicKey spk = _destination.getSigningPublicKey();
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         if (_published <= 0)
-            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), null);
+            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), _secret);
         else
-            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), null, _published);
+            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), _secret, _published);
         SigningPublicKey rv = Blinding.blind(spk, _alpha);
         if (_log.shouldDebug())
             _log.debug("Blind:" +
@@ -680,6 +694,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         net.i2p.crypto.KeyPair encKeys2 = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys(net.i2p.crypto.EncType.ECIES_X25519);
         pubKey = encKeys2.getPublic();
         ls2.addEncryptionKey(pubKey);
+        ls2.setSecret("foobar");
         SigningPrivateKey spk = pkf.getSigningPrivKey();
         if (offline) {
             now += 365*24*60*60*1000L;
@@ -692,7 +707,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         } else {
             ls2.sign(spk);
         }
-        System.out.println("Created: " + ls2);
+        System.out.println("\nCreated: " + ls2);
         if (!ls2.verifySignature()) {
             System.out.println("Verify FAILED");
             return;
@@ -703,11 +718,11 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         ls2.writeBytes(out2);
         out2.close();
         java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(out.toByteArray());
-        System.out.println("Size calculated: " + (ls2.size() + ls2.getSignature().length()));
-        System.out.println("Size to read in: " + in.available());
+        System.out.println("\nSize calculated: " + (ls2.size() + ls2.getSignature().length()));
+        System.out.println("\nSize to read in: " + in.available());
         EncryptedLeaseSet ls3 = new EncryptedLeaseSet();
         ls3.readBytes(in);
-        System.out.println("Read back: " + ls3);
+        System.out.println("\nRead back: " + ls3);
         // required to decrypt
         ls3.setDestination(pkf.getDestination());
         if (!ls3.verifySignature())

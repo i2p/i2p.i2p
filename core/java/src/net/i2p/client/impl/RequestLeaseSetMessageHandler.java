@@ -65,6 +65,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     // LS 2
     public static final String PROP_LS_TYPE = "i2cp.leaseSetType";
     private static final String PROP_LS_ENCTYPE = "i2cp.leaseSetEncType";
+    private static final String PROP_SECRET = "i2cp.leaseSetSecret";
 
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
         this(context, RequestLeaseSetMessage.MESSAGE_TYPE);
@@ -123,7 +124,11 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             if (_ls2Type == DatabaseEntry.KEY_TYPE_LS2) {
                 leaseSet = new LeaseSet2();
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
-                leaseSet = new EncryptedLeaseSet();
+                EncryptedLeaseSet encls2 = new EncryptedLeaseSet();
+                String secret = session.getOptions().getProperty(PROP_SECRET);
+                if (secret != null)
+                    encls2.setSecret(secret);
+                leaseSet = encls2;
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {
                 leaseSet = new MetaLeaseSet();
             } else {
@@ -136,7 +141,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         } else {
             leaseSet = new LeaseSet();
         }
-        // Full Meta and Encrypted support TODO
+        // Full Meta support TODO
         for (int i = 0; i < msg.getEndpoints(); i++) {
             Lease lease;
             if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {

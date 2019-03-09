@@ -642,6 +642,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                     _runner.disconnectClient("Duplicate hash of encrypted LS2");
                     return;
                 }
+                String secret = cfg.getOptions().getProperty("i2cp.leaseSetSecret");
+                if (secret != null) {
+                    EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                    encls.setSecret(secret);
+                }
             }
             if (_log.shouldDebug())
                 _log.debug("Publishing: " + ls);
