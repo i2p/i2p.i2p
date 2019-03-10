@@ -326,7 +326,7 @@ public class Action
 	
 	public boolean performActionListener(ActionRequest actionReq)
 	{
-		ActionListener listener = (ActionListener)getActionListener();
+		ActionListener listener = getActionListener();
 		if (listener == null)
 			return false;
 		ActionResponse actionRes = new ActionResponse();

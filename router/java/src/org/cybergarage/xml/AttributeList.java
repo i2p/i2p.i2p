@@ -25,7 +25,7 @@ public class AttributeList extends Vector<Attribute>
 	
 	public Attribute getAttribute(int n)
 	{
-		return (Attribute)get(n);
+		return get(n);
 	}
 	
 	public Attribute getAttribute(String name) 

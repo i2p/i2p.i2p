@@ -39,7 +39,7 @@ public class IconList extends Vector<Icon>
 	
 	public Icon getIcon(int n)
 	{
-		return (Icon)get(n);
+		return get(n);
 	}
 }
 

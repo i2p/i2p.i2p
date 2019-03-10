@@ -67,7 +67,7 @@ public class SSDPSearchSocketList extends Vector<SSDPSearchSocket>
 	
 	public SSDPSearchSocket getSSDPSearchSocket(int n)
 	{
-		return (SSDPSearchSocket)get(n);
+		return get(n);
 	}
 	
 	public void addSearchListener(SearchListener listener)

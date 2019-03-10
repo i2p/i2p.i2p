@@ -39,7 +39,7 @@ public class ActionList extends Vector<Action>
 	
 	public Action getAction(int n)
 	{
-		return (Action)get(n);
+		return get(n);
 	}
 }
 

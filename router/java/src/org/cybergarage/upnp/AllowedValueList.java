@@ -51,7 +51,7 @@ public class AllowedValueList extends Vector<AllowedValue>
 	
 	public AllowedValue getAllowedValue(int n)
 	{
-		return (AllowedValue)get(n);
+		return get(n);
 	}
 
 	public boolean isAllowed(String v){

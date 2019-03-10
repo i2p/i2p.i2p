@@ -387,7 +387,7 @@ public class HTTPPacket
 
 	public HTTPHeader getHeader(int n)
 	{
-		return (HTTPHeader)httpHeaderList.get(n);
+		return httpHeaderList.get(n);
 	}
 	
 	public HTTPHeader getHeader(String name)

@@ -1280,7 +1280,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 			ActionList actionList = service.getActionList();
 			int actionCnt = actionList.size();
 			for (int i = 0; i < actionCnt; i++) {
-				Action action = (Action) actionList.getAction(i);
+				Action action = actionList.getAction(i);
 				String actionName = action.getName();
 				if (actionName == null)
 					continue;

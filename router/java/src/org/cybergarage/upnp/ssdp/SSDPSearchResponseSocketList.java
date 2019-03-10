@@ -66,7 +66,7 @@ public class SSDPSearchResponseSocketList extends Vector<SSDPSearchResponseSocke
 	
 	public SSDPSearchResponseSocket getSSDPSearchResponseSocket(int n)
 	{
-		return (SSDPSearchResponseSocket)get(n);
+		return get(n);
 	}
 	
 	////////////////////////////////////////////////

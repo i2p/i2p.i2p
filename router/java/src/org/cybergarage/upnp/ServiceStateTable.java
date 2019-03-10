@@ -39,7 +39,7 @@ public class ServiceStateTable extends Vector<StateVariable>
 	
 	public StateVariable getStateVariable(int n)
 	{
-		return (StateVariable)get(n);
+		return get(n);
 	}
 }
 

@@ -39,7 +39,7 @@ public class ArgumentList extends Vector<Argument>
 	
 	public Argument getArgument(int n)
 	{
-		return (Argument)get(n);
+		return get(n);
 	}
 
 	public Argument getArgument(String name)

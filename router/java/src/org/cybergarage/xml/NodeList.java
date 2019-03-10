@@ -25,7 +25,7 @@ public class NodeList extends Vector<Node>
 	
 	public Node getNode(int n)
 	{
-		return (Node)get(n);
+		return get(n);
 	}
 
 	public Node getNode(String name) 

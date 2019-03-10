@@ -25,12 +25,12 @@ public class ParameterList extends Vector<Parameter>
 	
 	public Parameter at(int n)
 	{
-		return (Parameter)get(n);
+		return get(n);
 	}
 
 	public Parameter getParameter(int n)
 	{
-		return (Parameter)get(n);
+		return get(n);
 	}
 	
 	public Parameter getParameter(String name) 

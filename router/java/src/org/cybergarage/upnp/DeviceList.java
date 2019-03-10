@@ -39,7 +39,7 @@ public class DeviceList extends Vector<Device>
 	
 	public Device getDevice(int n)
 	{
-		return (Device)get(n);
+		return get(n);
 	}
 }
 

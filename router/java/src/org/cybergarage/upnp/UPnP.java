@@ -172,7 +172,7 @@ public class UPnP
 
 	private static final String toUUID(int seed)
 	{
-		String id = Integer.toString((int)(seed & 0xFFFF), 16);
+		String id = Integer.toString(seed & 0xFFFF, 16);
 		int idLen = id.length();
 		String uuid = "";
 		for (int n=0; n<(4-idLen); n++)

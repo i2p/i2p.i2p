@@ -48,7 +48,7 @@ public class SSDPNotifySocketList extends Vector<SSDPNotifySocket>
 	
 	public SSDPNotifySocket getSSDPNotifySocket(int n)
 	{
-		return (SSDPNotifySocket)get(n);
+		return get(n);
 	}
 
 	////////////////////////////////////////////////

@@ -39,7 +39,7 @@ public class PropertyList extends Vector<Property>
 	
 	public Property getProperty(int n)
 	{
-		return (Property)get(n);
+		return get(n);
 	}
 }
 

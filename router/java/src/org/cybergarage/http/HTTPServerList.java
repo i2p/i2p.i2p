@@ -55,7 +55,7 @@ public class HTTPServerList extends Vector<HTTPServer>
 	
 	public HTTPServer getHTTPServer(int n)
 	{
-		return (HTTPServer)get(n);
+		return get(n);
 	}
 
 	////////////////////////////////////////////////
