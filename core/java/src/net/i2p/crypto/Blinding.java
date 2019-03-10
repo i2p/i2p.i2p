@@ -148,9 +148,10 @@ public final class Blinding {
         byte[] mod = DataHelper.getASCII(modVal);
         byte[] data;
         if (secret != null && secret.length() > 0) {
-            data = new byte[LENGTH + secret.length()];
+            byte[] sb = DataHelper.getUTF8(secret);
+            data = new byte[LENGTH + sb.length];
             System.arraycopy(mod, 0, data, 0, LENGTH);
-            System.arraycopy(DataHelper.getASCII(secret), 0, data, LENGTH, secret.length());
+            System.arraycopy(sb, 0, data, LENGTH, sb.length);
         } else {
             data = mod;
         }
@@ -166,6 +167,12 @@ public final class Blinding {
         Hash salt = ctx.sha().calculateHash(in);
         hkdf.calculate(salt.getData(), data, INFO, out, out, 32);
         byte[] b = EdDSABlinding.reduce(out);
+        //net.i2p.util.Log log = ctx.logManager().getLog(Blinding.class);
+        //log.debug("Input to salt sha256:\n" + net.i2p.util.HexDump.dump(in));
+        //log.debug("salt:\n" + net.i2p.util.HexDump.dump(salt.getData()));
+        //log.debug("data:\n" + net.i2p.util.HexDump.dump(data));
+        //log.debug("hkdf output (seed):\n" + net.i2p.util.HexDump.dump(out));
+        //log.debug("alpha (seed mod l):\n" + net.i2p.util.HexDump.dump(b));
         return new SigningPrivateKey(TYPER, b);
     }
 

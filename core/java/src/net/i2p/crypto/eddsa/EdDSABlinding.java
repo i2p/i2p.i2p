@@ -94,7 +94,7 @@ public final class EdDSABlinding {
      */
     public static byte[] reduce(byte[] b) {
         if (b.length != 64)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Must be 64 bytes");
         ScalarOps sc = new BigIntegerScalarOps(FIELD, ORDER);
         return sc.reduce(b);
     }
