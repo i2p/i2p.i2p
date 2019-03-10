@@ -32,8 +32,10 @@ class Logger {
   let statusBarController = StatusBarController()
   let sharedRouterMgmr = RouterManager.shared()
   
+  // Constructor, think of it like an early entrypoint.
   override init() {
     super.init()
+    
     if (!DetectJava.shared().isJavaFound()) {
     DetectJava.shared().findIt()
       if (!DetectJava.shared().isJavaFound()) {
@@ -55,6 +57,7 @@ class Logger {
     }
   } // End of init()
   
+  // A function which detects the current installed I2P router version
   @objc func findInstalledI2PVersion() {
     var i2pPath = Preferences.shared().i2pBaseDirectory
     let jExecPath:String = Preferences.shared().javaCommandPath
@@ -84,6 +87,8 @@ class Logger {
     }
   }
   
+  
+  // Helper functions for the optional dock icon
   func triggerDockIconShowHide(showIcon state: Bool) -> Bool {
     var result: Bool
     if state {
@@ -94,6 +99,7 @@ class Logger {
     return result
   }
   
+  // Helper functions for the optional dock icon
   func getDockIconStateIsShowing() -> Bool {
     if NSApp.activationPolicy() == NSApplicationActivationPolicy.regular {
       return true
@@ -102,6 +108,11 @@ class Logger {
     }
   }
   
+  /**
+   *
+   * This is the swift "entrypoint". In C it would been "main(argc,argv)"
+   *
+   */
   @objc func applicationDidFinishLaunching() {
     switch Preferences.shared().showAsIconMode {
     case .bothIcon, .dockIcon:
@@ -121,6 +132,15 @@ class Logger {
     if isRunning {
       DistributedNotificationCenter.default().post(name: .killLauncher, object: Bundle.main.bundleIdentifier!)
     }
+    
+    if (Preferences.shared().alsoStartFirefoxOnLaunch)
+    {
+      // TODO: For some reason it does not seem to obay the two minutes delay.
+      // If set, execute i2p browser / firefox after two minutes.
+      DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        FirefoxManager.shared().executeFirefox()
+      }
+    }
   }
   
   @objc func listenForEvent(eventName: String, callbackActionFn: @escaping ((Any?)->()) ) {
@@ -136,6 +156,12 @@ class Logger {
     NSWorkspace.shared().open(NSURL(string: url)! as URL)
   }
   
+  /**
+   *
+   * This function will execute when the launcher shuts down for some reason.
+   * Could be either OS or user triggered.
+   *
+   */
   @objc func applicationWillTerminate() {
     // Shutdown stuff
     if (Preferences.shared().stopRouterOnLauncherShutdown) {

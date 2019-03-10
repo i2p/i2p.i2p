@@ -21,6 +21,9 @@ import Cocoa
 
   @IBOutlet var routerStatusTabView: RouterStatusView?
   
+  @IBAction func handleNativePreferencesClicked(_ sender: Any) {
+    StatusBarController.launchPreferences(sender)
+  }
   //var updateObjectRef : SUUpdater?
   
   @objc func handleOpenConsole(_ sender: Any?) {

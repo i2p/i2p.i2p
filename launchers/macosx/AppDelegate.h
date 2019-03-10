@@ -100,7 +100,6 @@ inline void sendUserNotification(NSString* title, NSString* informativeText, boo
 - (void) awakeFromNib;
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification;
 - (void) applicationWillTerminate:(NSNotification *)aNotification;
-- (void) setApplicationDefaultPreferences;
 - (AppDelegate *) initWithArgc:(int)argc argv:(const char **)argv;
 - (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center
                                shouldPresentNotification:(NSUserNotification *)notification;

@@ -25,13 +25,15 @@ extension PreferencesViewController: NSTableViewDelegate {
   }
   
   func tableViewDoubleClick(_ sender:AnyObject) {
-    
+    print("Double click")
     // 1
-    /*guard tableView.selectedRow >= 0,
-     let item = Preferences.shared()[tableView.selectedRow] else {
-     return
-     }
-     
+    print(self.advPrefTableView.selectedRow)
+    guard self.advPrefTableView.selectedRow >= 0,
+      let item = Preferences.shared()[self.advPrefTableView.selectedRow] else {
+        return
+    }
+    print(item.name)
+     /*
      if item.isFolder {
      // 2
      self.representedObject = item.url as Any
@@ -45,7 +47,7 @@ extension PreferencesViewController: NSTableViewDelegate {
   
   func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
     // 1
-    guard let sortDescriptor = tableView.sortDescriptors.first else {
+    guard let sortDescriptor = self.advPrefTableView.sortDescriptors.first else {
       return
     }
     /*if let order = Directory.FileOrder(rawValue: sortDescriptor.key!) {
@@ -74,7 +76,7 @@ extension PreferencesViewController: NSTableViewDelegate {
       text = item.name!
       cellIdentifier = CellIdentifiers.NameCell
     } else if tableColumn == tableView.tableColumns[1] {
-      text = "\(item.defaultValue!)"
+      text = "\(item.defaultValue ?? "")"
       cellIdentifier = CellIdentifiers.DefaultCell
     } else if tableColumn == tableView.tableColumns[2] {
       let thing = (item.selectedValue ?? "none")

@@ -69,29 +69,6 @@ using namespace subprocess;
   [self.deployer extractI2PBaseDir:completion];
 }
 
-- (void)setApplicationDefaultPreferences {
-  [self.userPreferences registerDefaults:@{
-    @"enableLogging": @YES,
-    @"enableVerboseLogging": @YES,
-    @"autoStartRouterAtBoot": @NO,
-    @"startLauncherAtLogin": @NO,
-    @"startRouterAtStartup": @YES,
-    @"stopRouterAtShutdown": @YES,
-    @"letRouterLiveEvenLauncherDied": @NO,
-    @"consolePortCheckNum": @7657,
-    @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
-  }];
-
-  auto dict = [self.userPreferences dictionaryRepresentation];
-  [self.userPreferences setPersistentDomain:dict forName:NSAPPDOMAIN];
-
-  CFPreferencesSetMultiple((CFDictionaryRef)dict, NULL, CFAPPDOMAIN, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost);
-  CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
-
-  NSLog(@"Default preferences stored!");
-}
-
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   // Init application here
   
@@ -103,9 +80,6 @@ using namespace subprocess;
   
   // Start with user preferences
   self.userPreferences = [NSUserDefaults standardUserDefaults];
-  [self setApplicationDefaultPreferences];
-  self.enableLogging = [self.userPreferences boolForKey:@"enableLogging"];
-  self.enableVerboseLogging = [self.userPreferences boolForKey:@"enableVerboseLogging"];
   // In case we are unbundled, make us a proper UI application
   [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
   [NSApp activateIgnoringOtherApps:YES];

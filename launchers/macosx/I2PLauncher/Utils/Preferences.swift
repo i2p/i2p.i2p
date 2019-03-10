@@ -116,7 +116,7 @@ class Preferences  : NSObject {
     defaults["I2Pref_letRouterLiveEvenLauncherDied"] = false
     defaults["I2Pref_allowAdvancedPreferences"] = false
     defaults["I2Pref_alsoStartFirefoxOnLaunch"] = true
-    defaults["I2Pref_firefoxBundlePath"] = "/Applications/Firefox.app"
+    defaults["I2Pref_useServiceManagementAsStartupTool"] = false
     defaults["I2Pref_firefoxProfilePath"] = NSString(format: "%@/Library/Application Support/i2p/profile", home)
     defaults["I2Pref_consolePortCheckNum"] = 7657
     defaults["I2Pref_i2pBaseDirectory"] = NSString(format: "%@/Library/I2P", home)

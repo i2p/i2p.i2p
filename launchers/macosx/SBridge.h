@@ -18,8 +18,6 @@
 #include <string>
 #include <vector>
 #include "include/fn.h"
-//std::future<int> startupRouter(NSString* javaBin, NSArray<NSString*>* arguments, NSString* i2pBaseDir, RouterProcessStatus* routerStatus = nil);
-
 
 namespace osx {
   inline void openUrl(NSString* url)
@@ -58,8 +56,6 @@ inline std::string buildClassPathForObjC(std::string basePath)
 
 @interface SBridge : NSObject
 @property (nonatomic, assign) I2PRouterTask* currentRouterInstance;
-- (NSString*) buildClassPath:(NSString*)i2pPath;
-- (void) startupI2PRouter:(NSString*)i2pRootPath;
 - (void) openUrl:(NSString*)url;
 + (void) logProxy:(int)level formattedMsg:(NSString*)formattedMsg;
 + (void) sendUserNotification:(NSString*)title formattedMsg:(NSString*)formattedMsg;

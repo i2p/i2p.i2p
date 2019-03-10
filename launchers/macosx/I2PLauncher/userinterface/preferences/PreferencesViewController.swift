@@ -38,6 +38,15 @@ class PreferencesViewController: NSViewController {
   @IBOutlet var checkboxStopWithLauncher: NSButton?
   @IBOutlet var buttonResetRouterConfig: NSButton?
   
+  @IBAction func onEnterInTextField(_ sender: NSTextField) {
+    let selectedRowNumber = advPrefTableView.selectedRow
+    print("Trying to store preferences")
+    let currentItem = Preferences.shared()[selectedRowNumber]
+    currentItem?.selectedValue = sender.stringValue
+    Preferences.shared()[selectedRowNumber] = currentItem
+    UserDefaults.standard.set(sender.stringValue, forKey: (currentItem?.name)!)
+    Preferences.shared().syncPref()
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -60,6 +69,8 @@ class PreferencesViewController: NSViewController {
       advPrefTableView.tableColumns[0].sortDescriptorPrototype = NSSortDescriptor(key: "name", ascending: true)
       advPrefTableView.tableColumns[1].sortDescriptorPrototype = NSSortDescriptor(key: "defaultValue", ascending: true)
       advPrefTableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: "selectedValue", ascending: true)
+      
+      self.advPrefTableView.isEnabled = Preferences.shared().allowAdvancedPreferenceEdit
     }
     
     // Update radio buttons to reflect runtime/stored preferences
@@ -124,17 +135,30 @@ class PreferencesViewController: NSViewController {
   
   @IBAction func checkboxStartLauncherOnOSXStartupClicked(_ sender: NSButton) {
     let launcherAppId = "net.i2p.bootstrap.macosx.StartupItemApp"
+    let startupMgr = Startup()
     switch sender.state {
     case NSOnState:
       print("on")
       Preferences.shared()["I2Pref_startLauncherAtLogin"] = true
-      let success = SMLoginItemSetEnabled(launcherAppId as CFString, true)
-      print("SMLoginItemSetEnabled returned \(success)....")
+      if (Preferences.shared()["I2Pref_useServiceManagementAsStartupTool"] as! Bool)
+      {
+        let success = SMLoginItemSetEnabled(launcherAppId as CFString, true)
+        print("SMLoginItemSetEnabled returned \(success)....")
+      } else {
+        startupMgr.addLoginItem(Startup.appPath())
+        print("Shared file for auto-startup added. (viewable via OSX Preferences -> Users -> Login Items)")
+      }
     case NSOffState:
       print("off")
       Preferences.shared()["I2Pref_startLauncherAtLogin"] = false
-      let success = SMLoginItemSetEnabled(launcherAppId as CFString, false)
-      print("SMLoginItemSetEnabled returned \(success)....")
+      if (Preferences.shared()["I2Pref_useServiceManagementAsStartupTool"] as! Bool)
+      {
+        let success = SMLoginItemSetEnabled(launcherAppId as CFString, false)
+        print("SMLoginItemSetEnabled returned \(success)....")
+      } else {
+        startupMgr.removeLoginItem(Startup.appPath())
+        print("Shared file for auto-startup removed (if any). (viewable via OSX Preferences -> Users -> Login Items)")
+      }
     case NSMixedState:
       print("mixed")
     default: break
@@ -143,9 +167,11 @@ class PreferencesViewController: NSViewController {
   @IBAction func checkboxStartFirefoxAlsoAtLaunchClicked(_ sender: NSButton) {
     switch sender.state {
     case NSOnState:
-      print("on")
+      print("launch firefox: on")
+      Preferences.shared().alsoStartFirefoxOnLaunch = true
     case NSOffState:
-      print("off")
+      print("launch firefox: off")
+      Preferences.shared().alsoStartFirefoxOnLaunch = false
     case NSMixedState:
       print("mixed")
     default: break
@@ -261,9 +287,11 @@ class PreferencesViewController: NSViewController {
     case NSOnState:
       print("on")
       Preferences.shared().allowAdvancedPreferenceEdit = true
+      self.advPrefTableView.isEnabled = true
     case NSOffState:
       print("off")
       Preferences.shared().allowAdvancedPreferenceEdit = false
+      self.advPrefTableView.isEnabled = false
     case NSMixedState:
       print("mixed")
     default: break

@@ -29,6 +29,7 @@ class FirefoxManager {
     return self.isFirefoxProfileExtracted
   }
   
+  // Since we execute in the "unix/POSIX way", we need the full path of the binary.
   func bundleExecutableSuffixPath() -> String {
     return "/Contents/MacOS/firefox"
   }
@@ -42,15 +43,37 @@ class FirefoxManager {
     return true
   }
 
+  /**
+   *
+   * First, try find I2P Browser, if  it fails, then try Firefox or Firefox Developer.
+   *
+   * Instead of using hardcoded paths, or file search we use OS X's internal "registry" API
+   * and detects I2P Browser or Firefox by bundle name. (or id, but name is more readable)
+   *
+   */
   func tryAutoDetect() -> Bool {
-    let expectedPath = Preferences.shared()["I2Pref_firefoxBundlePath"] as! String
+    var browserPath = NSWorkspace.shared().fullPath(forApplication: "I2P Browser")
+    if (browserPath == nil)
+    {
+      browserPath = NSWorkspace.shared().fullPath(forApplication: "Firefox")
+      if (browserPath == nil)
+      {
+        browserPath = NSWorkspace.shared().fullPath(forApplication: "Firefox Developer")
+      }
+    }
    
     self.isFirefoxProfileExtracted = directoryExistsAtPath(Preferences.shared()["I2Pref_firefoxProfilePath"] as! String)
     
-    let result = directoryExistsAtPath(expectedPath)
+    // If browserPath is still nil, then nothing above was found and we can return early.
+    if (browserPath == nil)
+    {
+      return false
+    }
+    
+    let result = directoryExistsAtPath(browserPath!)
     self.isFirefoxFound = result
     if (result) {
-      self.firefoxAppPath = expectedPath
+      self.firefoxAppPath = browserPath!
       return true
     }
     return false

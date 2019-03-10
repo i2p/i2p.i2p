@@ -39,9 +39,6 @@ import Cocoa
   
   @objc func actionBtnStartRouter(_ sender: Any?) {
     NSLog("Router start clicked")
-    /*if (RouterManager.shared().getRouterTask() == nil) {
-      SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath)
-    }*/
     (sender as! NSButton).isTransparent = true
     let routerStatus = RouterRunner.launchAgent?.status()
     DispatchQueue(label: "background_start").async {

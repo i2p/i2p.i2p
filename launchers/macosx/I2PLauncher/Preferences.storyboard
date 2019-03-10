@@ -67,7 +67,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aAH-4e-tuf">
                                 <rect key="frame" x="18" y="198" width="325" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Start the I2P Launcher at User login (Mac startup)" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="EOY-1C-aqa">
+                                <buttonCell key="cell" type="check" title="Start the I2P Launcher at User login (Mac startup)" bezelStyle="regularSquare" imagePosition="left" inset="2" id="EOY-1C-aqa">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -132,7 +132,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XPH-xk-vMg">
                                 <rect key="frame" x="18" y="173" width="313" height="23"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Start Firefox with a I2P enabled profile at launch" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="i7v-mQ-d1Y">
+                                <buttonCell key="cell" type="check" title="Start Firefox with a I2P enabled profile at launch" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="i7v-mQ-d1Y">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -218,7 +218,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SSS-Fz-fYY">
                                 <rect key="frame" x="18" y="345" width="257" height="28"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Yes, I want to edit advanced settings" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="UzU-4G-MLw">
+                                <buttonCell key="cell" type="check" title="Yes, I want to edit advanced settings" bezelStyle="regularSquare" imagePosition="left" inset="2" id="UzU-4G-MLw">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -243,14 +243,14 @@
                                     <rect key="frame" x="1" y="0.0" width="559" height="310"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView identifier="AdvancedView" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="M6Y-Yi-YWr" viewBased="YES" id="lzO-OC-oiQ" customClass="AdvancedTableView" customModule="I2PLauncher" customModuleProvider="target">
+                                        <tableView identifier="AdvancedView" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="M6Y-Yi-YWr" viewBased="YES" id="lzO-OC-oiQ" customClass="AdvancedTableView" customModule="I2PLauncher" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="645" height="285"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn identifier="KeyColumnID" width="116" minWidth="40" maxWidth="1000" id="3Hj-6J-5ww">
+                                                <tableColumn identifier="KeyColumnID" editable="NO" width="116" minWidth="40" maxWidth="1000" id="3Hj-6J-5ww">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Key">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -283,7 +283,7 @@
                                                         </tableCellView>
                                                     </prototypeCellViews>
                                                 </tableColumn>
-                                                <tableColumn identifier="DefaultColumnID" width="120" minWidth="40" maxWidth="1000" id="xna-T0-L5h">
+                                                <tableColumn identifier="DefaultColumnID" editable="NO" width="120" minWidth="40" maxWidth="1000" id="xna-T0-L5h">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Default Value">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -336,11 +336,14 @@
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2ro-Gm-4DU">
                                                                     <rect key="frame" x="0.0" y="0.0" width="400" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="Sj7-Se-KMC">
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Table View Cell" usesSingleLineMode="YES" id="Sj7-Se-KMC">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
+                                                                    <connections>
+                                                                        <action selector="onEnterInTextField:" target="mVJ-sm-WjL" id="4y0-HJ-teb"/>
+                                                                    </connections>
                                                                 </textField>
                                                             </subviews>
                                                             <connections>

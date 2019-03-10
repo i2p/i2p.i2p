@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -37,5 +37,53 @@
             </items>
             <point key="canvasLocation" x="17" y="167"/>
         </menu>
+        <menuItem title="Application" allowsKeyEquivalentWhenHidden="YES" id="84R-pF-Wt1">
+            <modifierMask key="keyEquivalentModifierMask"/>
+            <menu key="submenu" title="Application" id="Trv-j7-WYu">
+                <items>
+                    <menuItem title="About Application" id="XDp-94-iig">
+                        <modifierMask key="keyEquivalentModifierMask"/>
+                        <connections>
+                            <action selector="orderFrontStandardAboutPanel:" target="-1" id="gJe-90-jzd"/>
+                        </connections>
+                    </menuItem>
+                    <menuItem isSeparatorItem="YES" id="xT4-H9-l6g"/>
+                    <menuItem title="Preferences…" keyEquivalent="," id="2Kn-gO-qBP">
+                        <connections>
+                            <action selector="handleNativePreferencesClicked:" target="-1" id="wIn-2L-u1k"/>
+                        </connections>
+                    </menuItem>
+                    <menuItem isSeparatorItem="YES" id="45f-s8-MiT"/>
+                    <menuItem title="Services" id="x2v-WG-Nuy">
+                        <modifierMask key="keyEquivalentModifierMask"/>
+                        <menu key="submenu" title="Services" systemMenu="services" id="DkL-DH-gJf"/>
+                    </menuItem>
+                    <menuItem isSeparatorItem="YES" id="T1H-h7-Sat"/>
+                    <menuItem title="Hide Application" keyEquivalent="h" id="uAA-NV-src">
+                        <connections>
+                            <action selector="hide:" target="-1" id="wFN-Nz-FpI"/>
+                        </connections>
+                    </menuItem>
+                    <menuItem title="Hide Others" keyEquivalent="h" id="ext-76-4lm">
+                        <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                        <connections>
+                            <action selector="hideOtherApplications:" target="-1" id="KyT-0x-vod"/>
+                        </connections>
+                    </menuItem>
+                    <menuItem title="Show All" id="HmI-6K-eUt">
+                        <modifierMask key="keyEquivalentModifierMask"/>
+                        <connections>
+                            <action selector="unhideAllApplications:" target="-1" id="mXg-9c-azx"/>
+                        </connections>
+                    </menuItem>
+                    <menuItem isSeparatorItem="YES" id="xOX-eV-fcA"/>
+                    <menuItem title="Quit Application" keyEquivalent="q" id="Fap-30-HH0">
+                        <connections>
+                            <action selector="terminate:" target="-1" id="IM7-XC-JlF"/>
+                        </connections>
+                    </menuItem>
+                </items>
+            </menu>
+        </menuItem>
     </objects>
 </document>
