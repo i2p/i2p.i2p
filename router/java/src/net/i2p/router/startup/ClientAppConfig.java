@@ -67,7 +67,7 @@ public class ClientAppConfig {
     /** wait 2 minutes before starting up client apps */
     private final static long DEFAULT_STARTUP_DELAY = 2*60*1000;
     /** speed up i2ptunnel without rewriting clients.config */
-    private final static long I2PTUNNEL_STARTUP_DELAY = 35*1000;
+    private final static long I2PTUNNEL_STARTUP_DELAY = -1000;
     
     private static final String PROP_CLIENT_CONFIG_FILENAME = "router.clientConfigFile";
     private static final String DEFAULT_CLIENT_CONFIG_FILENAME = "clients.config";
@@ -185,13 +185,17 @@ public class ClientAppConfig {
             if (onBoot != null)
                 onStartup = "true".equals(onBoot) || "yes".equals(onBoot);
 
-            // speed up the start of i2ptunnel for everybody without rewriting clients.config
-            long delay = onStartup ? 0 :
-                                   (className.equals("net.i2p.i2ptunnel.TunnelControllerGroup") ?
-                                    I2PTUNNEL_STARTUP_DELAY : DEFAULT_STARTUP_DELAY);
-            if (delayStr != null && !onStartup)
-                try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
-
+            long delay;
+            if (onStartup) {
+                delay = 0;
+            } else if (className.equals("net.i2p.i2ptunnel.TunnelControllerGroup")) {
+                // speed up the start of i2ptunnel for everybody without rewriting clients.config
+                delay = I2PTUNNEL_STARTUP_DELAY;
+            } else {
+                delay = DEFAULT_STARTUP_DELAY;
+                if (delayStr != null)
+                    try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
+            }
             rv.add(new ClientAppConfig(className, clientName, args, delay, dis,
                    classpath, stopargs, uninstallargs));
         }
