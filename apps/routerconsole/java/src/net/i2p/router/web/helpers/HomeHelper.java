@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.CoreVersion;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.App;
@@ -227,7 +228,9 @@ public class HomeHelper extends HelperBase {
                        "<div class=\"appimg\">" +
                        // usability: add tabindex -1 so we avoid 2 tabs per app
                        "<a href=\"").append(url).append("\" tabindex=\"-1\">" +
-                       "<img alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon).append("\"></a>" +
+                       "<img alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon)
+               // version the icons because they may change
+               .append('?').append(CoreVersion.VERSION).append("\"></a>" +
                        "</div>\n" +
                        "<table><tr><td>" +
                        "<div class=\"applabel\">" +

@@ -1,3 +1,14 @@
+2019-03-11 zzz
+ * Console: New home page icons
+
+2019-03-09 zzz
+ * Data: Consolidate offline key check
+ * I2CP: Add support for blinding secret
+ * i2ptunnel: Prevent registration auth if key offline
+
+2019-03-07 zzz
+ * NetDB: Minor performance improvement in selectors
+
 2019-03-06 zzz
  * NetDB: Fix flood version check, add version check for RedDSA
 

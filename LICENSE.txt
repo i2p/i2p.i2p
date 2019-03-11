@@ -285,6 +285,7 @@ Applications:
          - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
        FatCow icons: See licenses/LICENSE-FatCowIcons.txt
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
+       Feather icons: Copyright (c) 2013-2017 Cole Bemis; see licenses/LICENSE-Feather.txt
 
    Router Console and I2PSnark themes:
    Some images licensed under a Creative Commons 2.0 license.
