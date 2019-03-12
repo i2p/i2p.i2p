@@ -21,7 +21,7 @@ public final class EdDSABlinding {
 
     private static final byte[] ONE = Utils.hexToBytes("0100000000000000000000000000000000000000000000000000000000000000");
     private static final Field FIELD = EdDSANamedCurveTable.getByName("Ed25519").getCurve().getField();
-    private static final BigInteger ORDER = new BigInteger("2").pow(252).add(new BigInteger("27742317777372353535851937790883648493"));
+    public static final BigInteger ORDER = new BigInteger("2").pow(252).add(new BigInteger("27742317777372353535851937790883648493"));
 
     private EdDSABlinding() {}
 
