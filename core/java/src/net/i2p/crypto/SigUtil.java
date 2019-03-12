@@ -372,7 +372,8 @@ public final class SigUtil {
             EdDSAParameterSpec paramspec = (EdDSAParameterSpec) pk.getType().getParams();
             EdDSAPrivateKeySpec pkspec;
             SigType type = pk.getType();
-            if (type == SigType.EdDSA_SHA512_Ed25519)
+            if (type == SigType.EdDSA_SHA512_Ed25519 ||
+                type == SigType.EdDSA_SHA512_Ed25519ph)
                 pkspec = new EdDSAPrivateKeySpec(pk.getData(), paramspec);
             else if (type == SigType.RedDSA_SHA512_Ed25519)
                 pkspec = new EdDSAPrivateKeySpec(pk.getData(), null, paramspec);
@@ -398,7 +399,8 @@ public final class SigUtil {
     public static SigningPrivateKey fromJavaKey(EdDSAPrivateKey pk, SigType type)
             throws GeneralSecurityException {
         byte[] data;
-        if (type == SigType.EdDSA_SHA512_Ed25519)
+        if (type == SigType.EdDSA_SHA512_Ed25519 ||
+            type == SigType.EdDSA_SHA512_Ed25519ph)
             data = pk.getSeed();
         else if (type == SigType.RedDSA_SHA512_Ed25519)
             data = pk.geta();
