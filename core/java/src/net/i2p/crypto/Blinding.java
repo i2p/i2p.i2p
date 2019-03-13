@@ -129,7 +129,7 @@ public final class Blinding {
      *  Generate alpha for the given time.
      *  Only for SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519.
      *
-     *  @param dest spk must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
+     *  @param destspk must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      *  @param secret may be null or zero-length
      *  @param now for what time?
      *  @return SigType RedDSA_SHA512_Ed25519
