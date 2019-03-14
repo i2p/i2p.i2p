@@ -694,10 +694,7 @@ public class I2PAppContext {
     private void initializeAESEngine() {
         synchronized (_lock7) {
             if (_AESEngine == null) {
-                if ("off".equals(getProperty("i2p.encryption", "on")))
-                    _AESEngine = new AESEngine(this);
-                else
-                    _AESEngine = new CryptixAESEngine(this);
+                _AESEngine = new CryptixAESEngine(this);
             }
             _AESEngineInitialized = true;
         }

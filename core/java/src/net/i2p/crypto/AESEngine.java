@@ -18,15 +18,14 @@ import net.i2p.util.SimpleByteCache;
 
 /** 
  * Dummy wrapper for AES cipher operation.
- * Warning - 
- * most methods UNUSED unless i2p.encryption = off
+ * Warning - most methods UNUSED.
  * See CryptixAESEngine overrides for the real thing.
  */
 public class AESEngine {
     protected final Log _log;
     protected final I2PAppContext _context;
 
-    public AESEngine(I2PAppContext ctx) {
+    protected AESEngine(I2PAppContext ctx) {
         _context = ctx;
         _log = _context.logManager().getLog(getClass());
         if (getClass().equals(AESEngine.class))
