@@ -12,7 +12,7 @@
 
 - GeoIP: Maxmind update is usually first Tuesday of the month, time accordingly
 - installer/resources/makegeoip.sh
-- mtn ci installer/resources/GeoLite2-Country.mmdb
+- mtn ci installer/resources/GeoLite2-Country.mmdb.gz
 
 - BuildTime: Don't have to do this every release, but update the
   EARLIEST and EARLIEST_LONG values in core/java/src/net/i2p/time/BuildTime.java

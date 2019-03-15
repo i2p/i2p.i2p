@@ -7,7 +7,8 @@ To use them, copy them over the files in ../debian/  .
 Built file compatibility:
 trusty may be copied to vivid.
 trusty may be used for jessie without libjetty9-java from backports.
-xenial may be copied to yakkety, zesty.
+xenial may be copied to yakkety, zesty
+bionic may be copied to cosmic
 
 Not maintained:
 wheezy files are not maintained. Use the precise files instead.
