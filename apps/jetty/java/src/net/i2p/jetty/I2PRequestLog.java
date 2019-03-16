@@ -17,7 +17,7 @@ package net.i2p.jetty;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
+//import java.io.Writer; // As of Jetty 9.4.15, RequestLog interface has a Writer subinterface
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -81,7 +81,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private transient OutputStream _fileOut;
     private transient DateCache _logDateCache;
     private transient PathMap<String> _ignorePathMap;
-    private transient Writer _writer;
+    private transient java.io.Writer _writer;
     private transient ArrayList<Utf8StringBuilder> _buffers;
     private transient char[] _copy;
 
@@ -439,7 +439,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     /* ------------------------------------------------------------ */
     protected void logExtended(Request request, 
                                Response response, 
-                               Writer writer) throws IOException 
+                               java.io.Writer writer) throws IOException 
     {
         String referer = request.getHeader("Referer");
         if (referer == null) 
