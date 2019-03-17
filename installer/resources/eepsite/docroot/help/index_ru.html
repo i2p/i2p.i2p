@@ -114,8 +114,8 @@ Base32-адрес можно использовать в качестве име
 
     <h2>Добавление подписок для адресной книги</h2>
 
-    <p>Speaking of address book updates, this would be a good time to add some more addressbooks to your own subscription list.
-       Go to your <a href="http://127.0.0.1:7657/susidns/subscriptions">Subscriptions Configuration page</a> and add one or more for an automatically updated list of new hosts:</p>
+    <p>Говоря о обновлениях адресной книги, сейчас хороший момент для добавления дополнительных адрес книг в ваш список подписок.
+       Перейдите на <a href="http://127.0.0.1:7657/susidns/subscriptions">страницу Настройки Подписок</a> и добавте один или более автоматически обновляемый список новых хостов:</p>
 
     <ul>
 <li>
@@ -123,13 +123,13 @@ Base32-адрес можно использовать в качестве име
       <li>
 <code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
-      This will work within a few minutes of your registering your hostname on the same site.
-      Test it yourself first by entering <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
-      Once it is working, you can tell others to use it.</p>
+<p>Если вы спешите и не можете ждать несколько часов, вы можете попросить людей воспользоваться "jump" сервисом.
+      Это будет будет работать уже через немколько минут после регистрации вашего имени хоста на том же сайте.
+       Сначала проверьте самостоятельно перейдя на <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> в вашем браузере.
+      Как только он заработает, вы можете попросить остальных воспользоваться им.</p>
 
-    <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
-      There are plenty of other ways to tell people. Here are a few ideas:</p>
+    <p>Некоторые люди проверяют списки сайтов,  такие как <a href="http://identiguy.i2p/" target="_blank">список eepsite статусов Identiguy</a> или <a href="http://no.i2p/browse/" target="_blank"> скписок активных хостов no.i2p</a> для поиска новых eepsites, так что ваш сайт может начать получать некоторый траффик. 
+      Есть много других способов рассказать людям о сайте. Вот несколько из них:</p>
 
     <ul>
 <li>Разместите сообщение на <a href="http://i2pforum.i2p/" target="_blank">форуме I2P</a> и расскажите всем о вашем новом I2P веб-сайте!</li>
@@ -137,28 +137,28 @@ Base32-адрес можно использовать в качестве име
       <li>Разместите ссылку в <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">списке eepsite'ов I2PWiki</a>
 </li>
     </ul>
-<p>Note that some sites recommend pasting in that really long destination.
-      You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
+<p>Обратите внимание что некоторые сайты рекомендуют вставлять этот, действительно длинный, адрес назрачения.
+      Вы можете делать так, если хотите, но если вы успешно зарегистрировали свое имя хоста в службе регистрации, проверили его через службу прыжков, и, подождали 24 часа, пока обновление адресной книги не распространится среди пользователей, то в этом не должно быть необходимости.</p>
 
     <h2>Использование другого веб-севера для размещения вашего сайта</h2>
 
-    <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content. 
-      To maintain anonymity, be sure that your webserver is configured to only allow connections from localhost (127.0.0.1), and check the documentation to ensure your webserver isn't advertising details that may compromise your anonymity.</p>
+    <p>Этот сайт (и консоль маршрутизатора I2P) работает на <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">веб-сервере Jetty</a>, но вы можете использовать другой веб-сервер для размещения вашего контента.
+      Чтобы сохранить анонимность, убедитесь, что ваш веб-сервер настроен на разрешение подключений только с localhost (127.0.0.1), и проверьте документацию, чтобы убедиться, что ваш веб-сервер не публикует сведения, которые могут поставить под угрозу вашу анонимность.</p>
 
-     <p>To configure your webserver for use on I2P, you may either use the existing webserver tunnel and <a href="http://127.0.0.1:7657/configclients">disable the default webserver</a> from running, or create a new HTTP Server tunnel in the <a href="http://127.0.0.1:7657/i2ptunnelmgr">Hidden Services Manager</a>.
-       Ensure that the listening port configured for the webserver (7658 by default) is also configured in the Hidden Services settings.
-       For example, if your webserver is listening by default on address 127.0.0.1 port 80, you'd need to also ensure that the Target port in the Hidden Service Manager settings page for the service is also configured to port 80.</p> 
+     <p>Чтобы настроить ваш веб-сервер для использования в I2P, вы можете использовать существующий туннель веб-сервера и <a href="http://127.0.0.1:7657/configclients">отключить стандартный веб-сервер</a>, или создать новый туннель HTTP-сервера в <a href="http://127.0.0.1:7657/i2ptunnelmgr">Менеджере Скрытых Служб</a>.
+       Убедитесь что порт, настроенный  для прослушивания веб-сервером (7658 по умолчанию) также настроен в настройках Скрытых Служб.
+       Например, если ваш веб-сервер слушает по умолчанию адрес 127.0.0.1 и порт 80, вам так же необходимо убедиться что целевой порт на странице настроек Менеждера Скрытых Служб так же настроен на порт 80 для службы.</p> 
 
-        <p>Beware that a poorly configured webserver or web appplication can leak potentially compromising information such as 
-          your real IP address or server details that may reduce your anonymity or assist a hacker.
-          We recommend using the default server unless you feel comfortable doing server administration.
-          Please ensure your web server is secure prior to placing it online.
-          There are plenty of guides online, for example if you search for "nginx security hardening guide" you will find a number of guides that have good recommendations.</p> 
+        <p>Помните, что плохо натсроенный веб-сервер или веб-приложение может привести к утечке потенциально опасной информациии, такой как
+          ваш реальный IP адрес или данные сервера, которые могут снизить ваше анонимнось или помочь хакеру.
+          Мы рекомендуем использовать сервер по умолчанию, если у вас недостаточно опыта в администрировании сервера.
+          Пожалуйста, убедитесь, что ваш веб-сервер защищен, перед тем как размещать его в сети.
+          В сети существует множество руководств, например, если вы ищете «Руководство по усилению безопасности nginx», вы найдете несколько руководств, в которых есть хорошие рекомендации.</p> 
 
-        <p>There is one important issue with the Apache web server.
-          The <code>mod_status</code> and <code>mod_info</code> Apache modules are enabled by default on some operating systems.
-          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
-          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
+        <p>Есть одна важная проблема с веб-сервером Apache.
+          Модули Apache <code>mod_status</code> и <code>mod_info</code> включены по умолчанию в некоторых операционных системах.
+          Эти модули предоставляют внутренние данные, которые могут привести к серьезному нарушению анонимности при использовании в анонимной сети.
+          Удаление строк в файле конфигурации, где загружаются эти модули, является самым простым способом предотвращения этих проблем.</p>
 
     <h2>Дальнейшая помощь</h2>
 

@@ -11,12 +11,14 @@
 # Filipp Chertiev <f@fzfx.ru>, 2017
 # 1 2 <sulyukin@gmail.com>, 2017
 # Boris Shminke, 2017
+# R4SAS, 2019
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
-"PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: Boris Shminke, 2017\n"
+"PO-Revision-Date: 2017-01-26 15:31+0000\n"
+"Last-Translator: R4SAS, 2019\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,7 +64,7 @@ msgstr "СИНОПСИС"
 #. type: Plain text
 #: man/eepget.1:9
 msgid "B<eepget> [I<options>]I<URL>"
-msgstr ""
+msgstr "B<eepget> [I<options>]I<URL>"
 
 #. type: SH
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
@@ -110,12 +112,12 @@ msgstr "B<-c>"
 #: man/eepget.1:25
 #, no-wrap
 msgid "Clearnet. Do not use a proxy. Same as B<-p> :0 ."
-msgstr ""
+msgstr "Клирнет. Не использовать прокси. Аналогично как B<-p> :0 ."
 
 #. type: Plain text
 #: man/eepget.1:31
 msgid "B<-e> etag"
-msgstr ""
+msgstr "B<-e> etag"
 
 #. type: TP
 #: man/eepget.1:31
@@ -138,7 +140,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:43
 msgid "B<-l> lineLen"
-msgstr ""
+msgstr "B<-l> lineLen"
 
 #. type: TP
 #: man/eepget.1:43
@@ -153,7 +155,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:49
 msgid "B<-m> markSize"
-msgstr ""
+msgstr "B<-m> markSize"
 
 #. type: TP
 #: man/eepget.1:49
@@ -168,7 +170,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr "B<-n> попыток"
+msgstr "В<-n> попыток"
 
 #. type: TP
 #: man/eepget.1:55
@@ -198,7 +200,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:67
 msgid "B<-p> proxy_host[:port]"
-msgstr ""
+msgstr "B<-p> прокси_хост[:порт]"
 
 #. type: TP
 #: man/eepget.1:67
@@ -208,6 +210,10 @@ msgid ""
 "eepget will use 4444. If this option is not specified, eepget will use "
 "127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
 msgstr ""
+"Укажите I2P прокси-сервер (eeproxy) для использования. Если порт не указан, "
+"eepget будет использовать 4444. Если эта опция не указана, eepget будет "
+"использовать 127.0.0.1:4444. Укажите B<-c> или B<-p> :0 для отключения "
+"eeproxy."
 
 #. type: Plain text
 #: man/eepget.1:73
@@ -258,6 +264,8 @@ msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
 msgstr ""
+"B<eepget> завершается с нулевым статусом при успешной передаче и ненулевым, "
+"если были проблемы с загрузкой."
 
 #. type: SH
 #: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
@@ -283,7 +291,7 @@ msgstr "СМ. ТАКЖЕ"
 #. type: Plain text
 #: man/eepget.1:104
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 
 #. type: TH
 #: man/i2prouter.1:1
@@ -302,6 +310,8 @@ msgid ""
 "B<i2prouter> "
 "{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 msgstr ""
+"B<i2prouter> "
+"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 
 #. type: Plain text
 #: man/i2prouter.1:13
@@ -312,7 +322,7 @@ msgstr "Контроль службы I2P"
 #: man/i2prouter.1:15
 #, no-wrap
 msgid "B<console>"
-msgstr ""
+msgstr "B<console>"
 
 #. type: Plain text
 #: man/i2prouter.1:17
@@ -323,7 +333,7 @@ msgstr "Запускает I2P как консольное приложение 
 #: man/i2prouter.1:19
 #, no-wrap
 msgid "B<start>"
-msgstr ""
+msgstr "B<start>"
 
 #. type: Plain text
 #: man/i2prouter.1:21
@@ -334,7 +344,7 @@ msgstr "Запускает сервис I2P"
 #: man/i2prouter.1:23
 #, no-wrap
 msgid "B<stop>"
-msgstr ""
+msgstr "B<stop>"
 
 #. type: Plain text
 #: man/i2prouter.1:25
@@ -345,7 +355,7 @@ msgstr "Останавливает сервис I2P"
 #: man/i2prouter.1:27
 #, no-wrap
 msgid "B<restart>"
-msgstr ""
+msgstr "B<restart>"
 
 #. type: Plain text
 #: man/i2prouter.1:29
@@ -356,7 +366,7 @@ msgstr "Останавливает сервис I2P и затем запуске
 #: man/i2prouter.1:31
 #, no-wrap
 msgid "B<condrestart>"
-msgstr ""
+msgstr "B<condrestart>"
 
 #. type: Plain text
 #: man/i2prouter.1:33
@@ -367,7 +377,7 @@ msgstr "Перезапускает сервис I2P, только если он 
 #: man/i2prouter.1:35
 #, no-wrap
 msgid "B<graceful>"
-msgstr ""
+msgstr "B<graceful>"
 
 #. type: Plain text
 #: man/i2prouter.1:37
@@ -378,7 +388,7 @@ msgstr "Постепенно остановить сервис I2P (может �
 #: man/i2prouter.1:39
 #, no-wrap
 msgid "B<install>"
-msgstr ""
+msgstr "B<install>"
 
 #. type: Plain text
 #: man/i2prouter.1:41
@@ -391,18 +401,19 @@ msgstr ""
 #: man/i2prouter.1:43
 #, no-wrap
 msgid "B<remove>"
-msgstr ""
+msgstr "B<remove>"
 
 #. type: Plain text
 #: man/i2prouter.1:45
 msgid "Uninstall initscript that was installed with B<install>"
 msgstr ""
+"Удалить скрипт инициализации, который был установлен с помощью B<install>"
 
 #. type: IP
 #: man/i2prouter.1:47
 #, no-wrap
 msgid "B<status>"
-msgstr ""
+msgstr "B<status>"
 
 #. type: Plain text
 #: man/i2prouter.1:49
@@ -413,17 +424,17 @@ msgstr "Сообщает, запущен ли I2P сервис."
 #: man/i2prouter.1:51
 #, no-wrap
 msgid "B<dump>"
-msgstr ""
+msgstr "B<dump>"
 
 #. type: Plain text
 #: man/i2prouter.1:53
 msgid "Dumps the current threads into B<wrapper.log>."
-msgstr ""
+msgstr "Сохраняет текщие потоки в B<wrapper.log>."
 
 #. type: Plain text
 #: man/i2prouter.1:61
 msgid "B<i2prouter-nowrapper>(1)"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>(1)"
 
 #. type: TH
 #: man/i2prouter-nowrapper.1:1
@@ -439,7 +450,7 @@ msgstr "i2prouter-nowrapper - запускает роутер I2P"
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8
 msgid "B<i2prouter-nowrapper>"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:14
@@ -467,4 +478,4 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31
 msgid "B<i2prouter>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)"

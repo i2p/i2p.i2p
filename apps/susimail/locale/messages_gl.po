@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-13 18:18+0000\n"
-"PO-Revision-Date: 2018-06-13 18:37+0000\n"
-"Last-Translator: Xosé M. Lamas <correo@xmgz.eu>\n"
+"PO-Revision-Date: 2019-02-11 10:14+0000\n"
+"Last-Translator: Pilar Fernández Pazos <pfernandez@ccontasgalicia.es>\n"
 "Language-Team: Galician (http://www.transifex.com/otf/I2P/language/gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -240,7 +240,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2258
 #: src/src/i2p/susi/webmail/WebMail.java:3074
 msgid "Login"
-msgstr ""
+msgstr "Acceso"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2260
 #: src/src/i2p/susi/webmail/WebMail.java:2386
@@ -409,7 +409,7 @@ msgstr "Contrasinal"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3068
 msgid "Host"
-msgstr ""
+msgstr "Host"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3069
 msgid "POP3 Port"
@@ -439,7 +439,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:3106
 #: src/src/i2p/susi/webmail/WebMail.java:3352
 msgid "New"
-msgstr ""
+msgstr "Novo"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3116
 msgid "Check Mail"
@@ -451,7 +451,7 @@ msgstr "Comprobar Correo"
 #: src/src/i2p/susi/webmail/WebMail.java:3364
 #: src/src/i2p/susi/webmail/WebMail.java:3490
 msgid "Logout"
-msgstr ""
+msgstr "Saír"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3144
 msgid "Mark for deletion"
@@ -460,7 +460,7 @@ msgstr "Marcar para o borrado"
 #: src/src/i2p/susi/webmail/WebMail.java:3147
 #: src/src/i2p/susi/webmail/WebMail.java:3425
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3150
 msgid "Size"
@@ -549,11 +549,11 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:3357
 msgid "Forward"
-msgstr ""
+msgstr "Adiante"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3358
 msgid "Save As"
-msgstr ""
+msgstr "Gardar como"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3360
 #: src/src/i2p/susi/webmail/WebMail.java:3362

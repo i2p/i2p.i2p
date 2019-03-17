@@ -509,6 +509,7 @@ trans.it = installer/resources/readme/readme_it.html
 trans.ja = installer/resources/readme/readme_ja.html
 trans.pl = installer/resources/readme/readme_pl.html
 trans.pt = installer/resources/readme/readme_pt.html
+trans.ru_RU = installer/resources/readme/readme_ru.html
 trans.tr_TR = installer/resources/readme/readme_tr.html
 
 [main]
