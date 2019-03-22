@@ -85,6 +85,7 @@ endif
 #	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs7=" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
+	@/bin/echo -e "build.reproducible=true" >> $(CURDIR)/override.properties
 
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties

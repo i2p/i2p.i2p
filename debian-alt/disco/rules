@@ -24,9 +24,10 @@
 build:
 	@echo 'The build target is disabled. Use the appropriate binary target.'
 
-#JAVA_HOME=/usr/lib/jvm/default-java
-export DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk-$(DEB_HOST_ARCH)
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+JAVA_HOME=/usr/lib/jvm/default-java
+
 I2P=$(CURDIR)/pkg-temp
 ROUTERVERSION=$(CURDIR)/router/java/src/net/i2p/router/RouterVersion.java
 export DEB_BUILD_HARDENING=1
@@ -80,9 +81,9 @@ else
 	@echo "Already found deb in version, not doing anything"
 endif
 	@# build options
-	@/bin/echo -e "javac.version=1.8" > $(CURDIR)/override.properties
-	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
-	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
+#	@/bin/echo -e "javac.version=1.8" > $(CURDIR)/override.properties
+#	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
+#	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.reproducible=true" >> $(CURDIR)/override.properties
 
