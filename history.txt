@@ -1,3 +1,6 @@
+2019-03-22 zzz
+ * i2ptunnel: Escape {} in URLs (ticket #2130)
+
 * 2019-03-21 0.9.39 released
 
 2019-03-16 zzz

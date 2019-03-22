@@ -502,9 +502,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             if (idx > 0) {
                                 String schemeHostPort = request.substring(0, idx);
                                 String rest = request.substring(idx);
+                                // not escaped by all browsers, may be specific to query, see ticket #2130
                                 rest = rest.replace("[", "%5B");
                                 rest = rest.replace("]", "%5D");
                                 rest = rest.replace("|", "%7C");
+                                rest = rest.replace("{", "%7B");
+                                rest = rest.replace("}", "%7D");
                                 String testRequest = schemeHostPort + rest;
                                 if (!testRequest.equals(request)) {
                                     try {
