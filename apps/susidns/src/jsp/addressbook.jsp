@@ -34,13 +34,18 @@
     response.setHeader("Referrer-Policy", "no-referrer");
     response.setHeader("Accept-Ranges", "none");
 
-%>
-<%@page pageEncoding="UTF-8"%>
-<%@ page contentType="text/html"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+%><%@page pageEncoding="UTF-8" contentType="text/html" import="net.i2p.servlet.RequestWrapper"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
 <jsp:useBean id="book" class="i2p.susi.dns.NamingServiceBean" scope="session" />
 <jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
+<%
+   String importMessages = null;
+   if (intl._t("Import").equals(request.getParameter("action"))) {
+       RequestWrapper wrequest = new RequestWrapper(request);
+       importMessages = book.importFile(wrequest);
+   }
+%>
 <jsp:setProperty name="book" property="*" />
 <jsp:setProperty name="book" property="resetDeletionMarks" value="1"/>
 <c:forEach items="${paramValues.checked}" var="checked">
@@ -75,7 +80,11 @@
 <h4><%=intl._t("Storage")%>: ${book.displayName}</h4>
 </div>
 
-<div id="messages">${book.messages}</div>
+<div id="messages">${book.messages}<%
+   if (importMessages != null) {
+       %><%=importMessages%><%
+   }
+%></div>
 
 ${book.loadBookMessages}
 
@@ -253,6 +262,28 @@ ${book.loadBookMessages}
 </p>
 </div>
 </form>
+
+<% if (!book.getBook().equals("published")) { %>
+<form method="POST" action="addressbook" enctype="multipart/form-data" accept-charset="UTF-8">
+<input type="hidden" name="book" value="${book.book}">
+<input type="hidden" name="serial" value="<%=susiNonce%>">
+<input type="hidden" name="begin" value="0">
+<input type="hidden" name="end" value="49">
+<div id="import">
+<h3><%=intl._t("Import from hosts.txt file")%></h3>
+<table>
+<tr>
+<td><b><%=intl._t("File")%></b></td>
+<td><input name="file" type="file" accept=".txt" value="" /></td>
+</tr>
+</table>
+<p class="buttons">
+<input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
+<input class="download" type="submit" name="action" value="<%=intl._t("Import")%>" >
+</p>
+</div>
+</form>
+<% } %>
 
 <div id="footer">
 <hr>

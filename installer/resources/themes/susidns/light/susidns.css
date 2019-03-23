@@ -270,39 +270,40 @@ form[action="subscriptions"] #content {
      line-height: 130%;
 }
 
-div#add {
+div#add, div#import {
      border: 1px solid #7778bf;
      margin-top: -1px;
      padding: 0 15px;
      background: #fafaff;
 }
 
-.iframed #add {
+.iframed #add, .iframed #import {
      margin-top: 10px;
 }
 
-#add h3 {
+#add h3, #import h3 {
      border-bottom: 1px solid #7778bf;
      margin: 0 -15px;
      padding: 5px 10px;
 }
 
-#add table {
+#add table, #import table {
      width: 100%;
      margin: 5px 0;
 }
 
-#add table td:first-child {
+#add table td:first-child,
+#import table td:first-child {
      width: 50px;
      white-space: nowrap;
      text-align: right;
 }
 
-#add td {
+#add td, #import td {
      padding: 3px;
 }
 
-div#add p.buttons {
+div#add p.buttons, div#import p.buttons {
      border: 1px solid #7778bf;
      margin: 0 -16px -1px;
      background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
@@ -327,7 +328,7 @@ div.help {
      font-size: 10pt;
 }
 
-div.help h3, #add h3 {
+div.help h3, #add h3, #import h3 {
      border: 1px solid #7778bf;
      padding: 5px 10px;
      margin: -1px -16px 0;

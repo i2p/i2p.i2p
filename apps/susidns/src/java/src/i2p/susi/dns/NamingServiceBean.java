@@ -21,7 +21,11 @@
 
 package i2p.susi.dns;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -34,9 +38,11 @@ import java.util.Properties;
 import java.util.SortedMap;
 
 import net.i2p.client.naming.NamingService;
+import net.i2p.client.naming.SingleFileNamingService;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.servlet.RequestWrapper;
 
 /**
  *  Talk to the NamingService API instead of modifying the hosts.txt files directly,
@@ -356,7 +362,7 @@ public class NamingServiceBean extends AddressbookBean
 		action = null;
 		
 		if( message.length() > 0 )
-			message = "<p class=\"messages\">" + message + "</p>";
+			message = styleMessage(message);
 		return message;
 	}
 
@@ -494,6 +500,90 @@ public class NamingServiceBean extends AddressbookBean
 		// No post-filtering for hosts.txt naming services. It is what it is.
 	}
 
+	/**
+	 *  @return messages about this action
+	 *  @since 0.9.40
+	 */
+	public String importFile(RequestWrapper wrequest) throws IOException {
+		String message = "";
+		InputStream in = wrequest.getInputStream("file");
+		OutputStream out = null;
+		File tmp = null;
+		SingleFileNamingService sfns = null;
+		try {
+			// non-null but zero bytes if no file entered, don't know why
+			if (in == null || in.available() <= 0) {
+				return styleMessage(_t("You must enter a file"));
+			}
+			// copy to temp file
+			tmp = new File(_context.getTempDir(), "susidns-import-" + _context.random().nextLong() + ".txt");
+			out = new FileOutputStream(tmp);
+			DataHelper.copy(in, out);
+                        in.close();
+                        in = null;
+                        out.close();
+                        out = null;
+			// new SingleFileNamingService
+			sfns = new SingleFileNamingService(_context, tmp.getAbsolutePath());
+			// getEntries, copy over
+			Map<String, Destination> entries = sfns.getEntries();
+			int count = entries.size();
+			if (count <= 0) {
+				return styleMessage(_t("No entries found in file"));
+			} else {
+				NamingService service = getNamingService();
+				int added = 0, dup = 0;
+				Properties nsOptions = new Properties();
+				nsOptions.setProperty("list", getFileName());
+	                        String now = Long.toString(_context.clock().now());
+	                       	nsOptions.setProperty("m", now);
+				String filename = wrequest.getFilename("file");
+				if (filename != null)
+					nsOptions.setProperty("s", _t("Imported from file {0}", filename));
+				else
+					nsOptions.setProperty("s", _t("Imported from file"));
+				for (Map.Entry<String, Destination> e : entries.entrySet()) {
+					String host = e.getKey();
+					Destination dest = e.getValue();
+					boolean ok = service.putIfAbsent(host, dest, nsOptions);
+					if (ok)
+						added++;
+					else
+						dup++;
+				}
+				StringBuilder buf = new StringBuilder(128);
+				if (added > 0)
+					buf.append(styleMessage(ngettext("Loaded {0} entry from file",
+				                                         "Loaded {0} entries from file",
+				                                         added)));
+				if (dup > 0)
+					buf.append(styleMessage(ngettext("Skipped {0} duplicate entry from file",
+				                                         "Skipped {0} duplicate entries from file",
+				                                         dup)));
+				return buf.toString();
+			}
+		} catch (IOException ioe) {
+			return styleMessage(_t("Import from file failed") + " - " + ioe);
+		} finally {
+			if (in != null)
+				try { in.close(); } catch (IOException ioe) {}
+			if (out != null)
+				try { out.close(); } catch (IOException ioe) {}
+			// shutdown SFNS
+			if (sfns != null)
+			    sfns.shutdown();
+			if (tmp != null)
+			    tmp.delete();
+		}
+	}
+
+	/**
+	 *  @since 0.9.40
+	 */
+	private static String styleMessage(String message) {
+		return "<p class=\"messages\">" + message + "</p>";
+	}
+	
 	/**
 	 *  @since 0.9.34
 	 */

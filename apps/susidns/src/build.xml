@@ -97,6 +97,19 @@
         <replace file="WEB-INF/web-out.xml">
             <replacefilter token="&lt;!-- precompiled servlets --&gt;" value="${jspc.web.fragment}" />
         </replace>
+        <!-- Add multipart config to servlets that need them -->
+        <property name="__match1" value="&lt;servlet-class&gt;i2p.susi.dns.jsp." />
+        <property name="__match2" value="_jsp&lt;/servlet-class&gt;" />
+        <property name="__class1" value="${__match1}addressbook${__match2}" />
+        <property name="__multipart" value="&#10;
+       &lt;multipart-config&gt;&#10;
+           &lt;max-file-size&gt;67108864&lt;/max-file-size&gt;&#10;
+           &lt;max-request-size&gt;67108864&lt;/max-request-size&gt;&#10;
+           &lt;file-size-threshold&gt;262144&lt;/file-size-threshold&gt;&#10;
+       &lt;/multipart-config&gt;" />
+        <replace file="WEB-INF/web-out.xml">
+            <replacefilter token="${__class1}" value="${__class1}${__multipart}" />
+        </replace>
     </target>
 
     <uptodate property="precompilejsp.uptodate" targetfile="WEB-INF/web-out.xml">

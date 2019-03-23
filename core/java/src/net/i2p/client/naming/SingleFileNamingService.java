@@ -346,7 +346,7 @@ public class SingleFileNamingService extends NamingService {
     }
 
     /**
-     * @param options As follows:
+     * @param options null OK, or as follows:
      *                Key "search": return only those matching substring
      *                Key "startsWith": return only those starting with
      *                                  ("[0-9]" allowed)
@@ -413,7 +413,7 @@ public class SingleFileNamingService extends NamingService {
     /**
      *  Overridden since we store base64 natively.
      *
-     *  @param options As follows:
+     *  @param options null OK, or as follows:
      *                 Key "search": return only those matching substring
      *                 Key "startsWith": return only those starting with
      *                                   ("[0-9]" allowed)

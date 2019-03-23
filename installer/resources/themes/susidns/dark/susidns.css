@@ -751,14 +751,14 @@ div#book, #emptybook {
      margin: 0;
 }
 
-div#add {
+div#add, div#import {
      border: 1px solid #2a5f29;
      padding: 0 0 10px;
      margin-top: 23px;
      background: #000;
 }
 
-#add h3 {
+#add h3, #import h3 {
      margin-top: -6px;
      margin-left: -1px;
      margin-right: -1px;
@@ -766,21 +766,23 @@ div#add {
      font-size: 10pt;
 }
 
-#add table {
+#add table, #import table {
      width: 100%;
      width: calc(100% - 1px);
      margin: -10px 10px 0 0;
 }
 
-#add td:first-child {
+#add td:first-child,
+#import table td:first-child {
      text-align: right;
 }
 
-#add td:last-child {
+#add td:last-child,
+#import td:last-child {
      width: 94%;
 }
 
-#add p.buttons {
+#add p.buttons, #import p.buttons {
      margin-top: 5px;
      border-top: 1px solid #2a5f29;
      padding-top: 5px;
