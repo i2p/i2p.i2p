@@ -20,12 +20,14 @@ import com.nettgryppa.security.HashCash;
 
 import gnu.getopt.Getopt;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.naming.HostTxtEntry;
+import net.i2p.crypto.Blinding;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
@@ -755,6 +757,15 @@ public class PrivateKeyFile {
         s.append(this.dest != null ? this.dest.toBase64() : "null");
         s.append("\nB32: ");
         s.append(this.dest != null ? this.dest.toBase32() : "null");
+        if (dest != null) {
+            SigningPublicKey spk = dest.getSigningPublicKey();
+            SigType type = spk.getType();
+            if (type == SigType.EdDSA_SHA512_Ed25519 ||
+                type == SigType.RedDSA_SHA512_Ed25519) {
+                I2PAppContext ctx = I2PAppContext.getGlobalContext();
+                s.append("\nBlinded B32: ").append(Blinding.encode(ctx, spk, null));
+            }
+        }
         s.append("\nContains: ");
         s.append(this.dest);
         s.append("\nPrivate Key: ");

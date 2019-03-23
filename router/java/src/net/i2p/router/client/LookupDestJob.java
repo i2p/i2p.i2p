@@ -6,7 +6,9 @@ package net.i2p.router.client;
 
 import java.util.Locale;
 
+import net.i2p.crypto.Blinding;
 import net.i2p.data.Base32;
+import net.i2p.data.BlindData;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -17,12 +19,14 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Look up the lease of a hash, to convert it to a Destination for the client.
  * Or, since 0.9.11, lookup a host name in the naming service.
  */
 class LookupDestJob extends JobImpl {
+    private final Log _log;
     private final ClientConnectionRunner _runner;
     private final long _reqID;
     private final long _timeout;
@@ -52,24 +56,44 @@ class LookupDestJob extends JobImpl {
                          long reqID, long timeout, SessionId sessID, Hash h, String name,
                          Hash fromLocalDest) {
         super(context);
+        _log = context.logManager().getLog(LookupDestJob.class);
         if ((h == null && name == null) ||
             (h != null && name != null) ||
             (reqID >= 0 && sessID == null) ||
-            (reqID < 0 && name != null))
+            (reqID < 0 && name != null)) {
+            _log.warn("bad args");
             throw new IllegalArgumentException();
+        }
         _runner = runner;
         _reqID = reqID;
         _timeout = timeout;
         _sessID = sessID;
         _fromLocalDest = fromLocalDest;
-        if (name != null && name.length() == 60) {
+        if (name != null && name.length() >= 60) {
             // convert a b32 lookup to a hash lookup
             String nlc = name.toLowerCase(Locale.US);
             if (nlc.endsWith(".b32.i2p")) {
-                byte[] b = Base32.decode(nlc.substring(0, 52));
-                if (b != null && b.length == Hash.HASH_LENGTH) {
-                    h = Hash.create(b);
-                    name = null;
+                byte[] b = Base32.decode(nlc.substring(0, nlc.length() - 8));
+                if (b != null) {
+                    if (b.length == Hash.HASH_LENGTH) {
+                        h = Hash.create(b);
+                        if (_log.shouldDebug())
+                            _log.debug("Converting name lookup " + name + " to " + h);
+                        name = null;
+                    } else if (b.length >= 35) {
+                        // encrypted LS2
+                        try {
+                            BlindData bd = Blinding.decode(context, b);
+                            h = bd.getBlindedHash();
+                            if (_log.shouldDebug())
+                                _log.debug("Converting name lookup " + name + " to blinded " + h);
+                            name = null;
+                        } catch (RuntimeException re) {
+                            if (_log.shouldWarn())
+                                _log.debug("Failed blinding conversion of " + name, re);
+                            // lookup as a name, which will probably fail
+                        }
+                    }
                 }
             }
         }
@@ -86,10 +110,15 @@ class LookupDestJob extends JobImpl {
         if (_name != null) {
             // inline, ignore timeout
             Destination d = getContext().namingService().lookup(_name);
-            if (d != null)
+            if (d != null) {
+                if (_log.shouldDebug())
+                    _log.debug("Found name lookup " + _name + " to " + d);
                 returnDest(d);
-            else
+            } else {
+                if (_log.shouldDebug())
+                    _log.debug("Failed name lookup " + _name);
                 returnFail();
+            }
         } else {
             DoneJob done = new DoneJob(getContext());
             getContext().netDb().lookupDestination(_hash, done, _timeout, _fromLocalDest);
@@ -103,10 +132,15 @@ class LookupDestJob extends JobImpl {
         public String getName() { return "LeaseSet Lookup Reply to Client"; }
         public void runJob() {
             Destination dest = getContext().netDb().lookupDestinationLocally(_hash);
-            if (dest != null)
+            if (dest != null) {
+                if (_log.shouldDebug())
+                    _log.debug("Found hash lookup " + _hash + " to " + dest);
                 returnDest(dest);
-            else
+            } else {
+                if (_log.shouldDebug())
+                    _log.debug("Failed hash lookup " + _hash);
                 returnFail();
+            }
         }
     }
 

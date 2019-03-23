@@ -59,10 +59,49 @@ class LookupDest {
     ****/
 
     /** @param h 32 byte hash */
-    static Destination lookupHash(I2PAppContext ctx, byte[] h) throws I2PSessionException {
+    private static Destination lookupHash(I2PAppContext ctx, byte[] h) throws I2PSessionException {
         Hash key = Hash.create(h);
         Destination rv = null;
         I2PClient client = new I2PSimpleClient();
+        Properties opts = getOpts(ctx);
+        I2PSession session = null;
+        try {
+            session = client.createSession(null, opts);
+            session.connect();
+            rv = session.lookupDest(key, DEFAULT_TIMEOUT);
+        } finally {
+            if (session != null)
+                session.destroySession();
+        }
+        return rv;
+    }
+
+    /**
+     * Any hostname, but this is for long-format b32
+     *
+     * @param hostname a "b33" hostname, 64+ chars ending with ".b32.i2p"
+     * @since 0.9.40
+     */
+    static Destination lookupHostname(I2PAppContext ctx, String hostname) throws I2PSessionException {
+        Destination rv = null;
+        I2PClient client = new I2PSimpleClient();
+        Properties opts = getOpts(ctx);
+        I2PSession session = null;
+        try {
+            session = client.createSession(null, opts);
+            session.connect();
+            rv = session.lookupDest(hostname, DEFAULT_TIMEOUT);
+        } finally {
+            if (session != null)
+                session.destroySession();
+        }
+        return rv;
+    }
+
+    /**
+     * @since 0.9.40 split out from above
+     */
+    private static Properties getOpts(I2PAppContext ctx) {
         Properties opts = new Properties();
         if (!ctx.isRouterContext()) {
             String s = ctx.getProperty(I2PClient.PROP_TCP_HOST);
@@ -81,16 +120,7 @@ class LookupDest {
             if (s != null)
                 opts.put(PROP_PW, s);
         }
-        I2PSession session = null;
-        try {
-            session = client.createSession(null, opts);
-            session.connect();
-            rv = session.lookupDest(key, DEFAULT_TIMEOUT);
-        } finally {
-            if (session != null)
-                session.destroySession();
-        }
-        return rv;
+        return opts;
     }
 
     public static void main(String args[]) throws I2PSessionException {

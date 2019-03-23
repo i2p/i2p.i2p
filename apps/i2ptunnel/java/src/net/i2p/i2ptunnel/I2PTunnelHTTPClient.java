@@ -1204,18 +1204,29 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
             } else if("i2p".equals(host)) {
                 clientDest = null;
-            } else if(destination.length() == 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+            } else if (destination.length() >= 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
                 // use existing session to look up for efficiency
                 verifySocketManager();
                 I2PSession sess = sockMgr.getSession();
-                if(!sess.isClosed()) {
-                    byte[] hData = Base32.decode(destination.substring(0, 52));
-                    if(hData != null) {
-                        if(_log.shouldLog(Log.INFO)) {
-                            _log.info("lookup in-session " + destination);
+                if (!sess.isClosed()) {
+                    int len = destination.length();
+                    if (len == 60) {
+                        byte[] hData = Base32.decode(destination.substring(0, 52));
+                        if (hData != null) {
+                            if (_log.shouldInfo())
+                                _log.info("lookup b32 in-session " + destination);
+                            Hash hash = Hash.create(hData);
+                            clientDest = sess.lookupDest(hash, 20*1000);
+                        } else {
+                            clientDest = null;
                         }
-                        Hash hash = Hash.create(hData);
-                        clientDest = sess.lookupDest(hash, 20 * 1000);
+                    } else if (len >= 64) {
+                        if (_log.shouldInfo())
+                            _log.info("lookup b33 in-session " + destination);
+                        clientDest = sess.lookupDest(destination, 20*1000);
+                    } else {
+                        // 61-63 chars, this won't work
+                        clientDest = _context.namingService().lookup(destination);
                     }
                 } else {
                     clientDest = _context.namingService().lookup(destination);

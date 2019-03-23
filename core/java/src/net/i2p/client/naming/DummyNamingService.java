@@ -69,10 +69,16 @@ public class DummyNamingService extends NamingService {
         }
 
         // Try Base32 decoding
-        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p") &&
+        if (hostname.length() >= BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p") &&
                 _context.getBooleanPropertyDefaultTrue(PROP_B32)) {
             try {
-                d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
+                if (hostname.length() == BASE32_HASH_LENGTH + 8) {
+                    // b32
+                    d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
+                } else {
+                    // b33
+                    d = LookupDest.lookupHostname(_context, hostname);
+                }
                 if (d != null) {
                     putCache(hostname, d);
                     return d;
