@@ -14,6 +14,7 @@ import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509CRL;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import javax.crypto.spec.DHPublicKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 import static net.i2p.crypto.SigUtil.intToASN1;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
@@ -245,8 +247,19 @@ public final class SelfSignedGenerator {
         // some simple tests
         PublicKey cpub = cert.getPublicKey();
         cert.verify(cpub);
-        if (!cpub.equals(jpub))
-            throw new GeneralSecurityException("pubkey mismatch");
+        if (!cpub.equals(jpub)) {
+            boolean ok = false;
+            if (cpub.getClass().getName().equals("sun.security.x509.X509Key")) {
+                // X509Certificate will sometimes contain an X509Key rather than the EdDSAPublicKey itself; the contained
+                // key is valid but needs to be instanced as an EdDSAPublicKey before it can be used.
+                try {
+                    cpub = new EdDSAPublicKey(new X509EncodedKeySpec(cpub.getEncoded()));
+                    ok = cpub.equals(jpub);
+                } catch (InvalidKeySpecException ex) {}
+            }
+            if (!ok)
+                throw new GeneralSecurityException("pubkey mismatch, in: " + jpub.getClass() + " cert: " + cpub.getClass());
+        }
         // todo crl tests
 
         Object[] rv = { jpub, jpriv, cert, crl };
@@ -362,10 +375,10 @@ public final class SelfSignedGenerator {
         byte[] version = { (byte) 0xa0, 3, 2, 1, 2 };
 
         // positive serial number (long)
-        byte[] serial = new byte[10];
+        byte[] serial = new byte[11];
         serial[0] = 2;
-        serial[1] = 8;
-        RandomSource.getInstance().nextBytes(serial, 2, 8);
+        serial[1] = 9;
+        RandomSource.getInstance().nextBytes(serial, 2, 9);
         serial[2] &= 0x7f;
 
         // going to use this for both issuer and subject
