@@ -21,6 +21,7 @@ import net.i2p.util.ConvertToHash;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.client.streaming.IncomingConnectionFilter;
 
 /**
  * Coordinate all of the connections for a single local destination.
@@ -38,6 +39,7 @@ class ConnectionManager {
     private final SchedulerChooser _schedulerChooser;
     private final ConnectionPacketHandler _conPacketHandler;
     private final TCBShare _tcbShare;
+    private final IncomingConnectionFilter _connectionFilter;
     /** Inbound stream ID (Long) to Connection map */
     private final ConcurrentHashMap<Long, Connection> _connectionByInboundId;
     /** Ping ID (Long) to PingRequest */
@@ -81,10 +83,14 @@ class ConnectionManager {
     /**
      *  Manage all conns for this session
      */
-    public ConnectionManager(I2PAppContext context, I2PSession session, ConnectionOptions defaultOptions) {
+    public ConnectionManager(I2PAppContext context, 
+                             I2PSession session, 
+                             ConnectionOptions defaultOptions,
+                             IncomingConnectionFilter connectionFilter) {
         _context = context;
         _session = session;
         _defaultOptions = defaultOptions;
+        _connectionFilter = connectionFilter;
         _log = _context.logManager().getLog(ConnectionManager.class);
         _connectionByInboundId = new ConcurrentHashMap<Long,Connection>(32);
         _pendingPings = new ConcurrentHashMap<Long,PingRequest>(4);
@@ -653,6 +659,10 @@ class ConnectionManager {
                 return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
                         " per minute";
+        }
+
+        if (!_connectionFilter.allowDestination(from)) {
+            return "not allowed by filter";
         }
 
         return null;
