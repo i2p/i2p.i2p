@@ -64,6 +64,18 @@ class DefinitionParser {
     }
 
     private static Recorder parseRecorder(String line) throws InvalidDefinitionException {
+        String thresholdString = extractThreshold(line);
+
+        Threshold threshold = parseThreshold(thresholdString);
+
+        String line2 = line.substring(thresholdString.length()).trim();
+        if (line2.length() == 0)
+            throw new InvalidDefinitionException("Invalid definition "+ line);
+        File file = new File(line2);
+        return new Recorder(file, threshold);
+    }
+
+    private static String extractThreshold(String line) {
         StringBuilder thresholdBuilder = new StringBuilder();
         int i = 0;
         while(i < line.length()) {
@@ -71,19 +83,26 @@ class DefinitionParser {
             if (c == ' ' || c == '\t')
                 break;
             i++;
-            thresholdBuilder.append(c); 
+            thresholdBuilder.append(c);
         }
-
-        Threshold threshold = parseThreshold(thresholdBuilder.toString());
-
-        line = line.substring(i);
-        File file = new File(line);
-        return new Recorder(file, threshold);
+        return thresholdBuilder.toString();
     }
 
-    private static FilterDefinitionElement parseElement(String line) {
-        // TODO: implement
-        return null;
+    private static FilterDefinitionElement parseElement(String line) throws InvalidDefinitionException {
+        String thresholdString = extractThreshold(line);
+        Threshold threshold = parseThreshold(thresholdString);
+        String line2 = line.substring(thresholdString.length()).trim();
+        String[] split = line2.split(" \t");
+        if (split.length < 2)
+            throw new InvalidDefinitionException("invalid definition "+line);
+        if ("explicit".equalsIgnoreCase(split[0]))
+            return new ExplicitFilterDefinitionElement(split[1], threshold);
+        if ("file".equalsIgnoreCase(split[0])) {
+            String line3 = line2.substring(4).trim();
+            File file = new File(line3);
+            return new FileFilterDefinitionElement(file, threshold);
+        }
+        throw new InvalidDefinitionException("invalid definition "+line);
     }
 
     private static class DefinitionBuilder {
