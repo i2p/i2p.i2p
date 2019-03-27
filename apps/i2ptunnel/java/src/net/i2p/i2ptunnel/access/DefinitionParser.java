@@ -12,7 +12,7 @@ class DefinitionParser {
         DefinitionBuilder builder = new DefinitionBuilder();
 
         for (String line : definition) {
-            String [] split = line.split(" \t");
+            String [] split = line.split(" ");
             split[0] = split[0].toLowerCase();
             if ("default".equals(split[0])) 
                 builder.setDefaultThreshold(parseThreshold(line.substring(7).trim()));
@@ -77,7 +77,7 @@ class DefinitionParser {
         String thresholdString = extractThreshold(line);
         Threshold threshold = parseThreshold(thresholdString);
         String line2 = line.substring(thresholdString.length()).trim();
-        String[] split = line2.split(" \t");
+        String[] split = line2.split(" ");
         if (split.length < 2)
             throw new InvalidDefinitionException("invalid definition "+line);
         if ("explicit".equalsIgnoreCase(split[0]))
