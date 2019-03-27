@@ -104,7 +104,9 @@ class LookupDestJob extends JobImpl {
                         } catch (RuntimeException re) {
                             if (_log.shouldWarn())
                                 _log.debug("Failed blinding conversion of " + name, re);
-                            // lookup as a name, which will probably fail
+                            // Do NOT lookup as a name, naming service will call us again and infinite loop
+                            name = null;
+                            // h and name both null, runJob will fail immediately
                         }
                     }
                 }
@@ -142,10 +144,13 @@ class LookupDestJob extends JobImpl {
                     _log.debug("Failed name lookup " + _name);
                 returnFail();
             }
-        } else {
+        } else if (_hash != null) {
             DoneJob done = new DoneJob(getContext());
             // TODO tell router this is an encrypted lookup, skip 38 or earlier ffs?
             getContext().netDb().lookupDestination(_hash, done, _timeout, _fromLocalDest);
+        } else {
+            // blinding decode fail
+            returnFail();
         }
     }
 
@@ -199,8 +204,10 @@ class LookupDestJob extends JobImpl {
         I2CPMessage msg;
         if (_reqID >= 0)
             msg = new HostReplyMessage(_sessID, HostReplyMessage.RESULT_FAILURE, _reqID);
-        else
+        else if (_hash != null)
             msg = new DestReplyMessage(_hash);
+        else
+            return; // shouldn't happen
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {}
