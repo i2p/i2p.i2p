@@ -1,40 +1,25 @@
 package net.i2p.i2ptunnel.access;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.io.IOException;
-
 import java.util.List;
 import java.util.ArrayList;
 
+import java.io.File;
+
 class DefinitionParser {
 
-    static FilterDefinition parse(File f) throws IOException, InvalidDefinitionException {
+    static FilterDefinition parse(String []definition) throws InvalidDefinitionException {
         
         DefinitionBuilder builder = new DefinitionBuilder();
 
-        BufferedReader reader = new BufferedReader(new FileReader(f));
-        try {
-            String line;
-            while((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty())
-                    continue;
-                if (line.startsWith("#"))
-                    continue;
-
-                String [] split = line.split(" \t");
-                split[0] = split[0].toLowerCase();
-                if ("default".equals(split[0])) 
-                    builder.setDefaultThreshold(parseThreshold(line.substring(7).trim()));
-                else if ("recorder".equals(split[0]))
-                    builder.addRecorder(parseRecorder(line.substring(8).trim()));
-                else
-                    builder.addElement(parseElement(line));
-            }
-        } finally {
-            if (reader != null) try { reader.close(); } catch (IOException ignored) {}
+        for (String line : definition) {
+            String [] split = line.split(" \t");
+            split[0] = split[0].toLowerCase();
+            if ("default".equals(split[0])) 
+                builder.setDefaultThreshold(parseThreshold(line.substring(7).trim()));
+            else if ("recorder".equals(split[0]))
+                builder.addRecorder(parseRecorder(line.substring(8).trim()));
+            else
+                builder.addElement(parseElement(line));
         }
 
         return builder.build();
