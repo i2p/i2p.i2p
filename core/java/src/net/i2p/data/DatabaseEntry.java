@@ -59,8 +59,9 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     public final static int KEY_TYPE_SERVICE_LIST = 11;
 
     protected volatile Signature _signature;
-    protected volatile Hash _currentRoutingKey;
-    protected volatile long _routingKeyGenMod;
+    // synch: this
+    private Hash _currentRoutingKey;
+    private long _routingKeyGenMod;
 
     /**
      * A common interface to the timestamp of the two subclasses.
@@ -153,11 +154,13 @@ public abstract class DatabaseEntry extends DataStructureImpl {
             throw new IllegalStateException("Not in router context");
         RoutingKeyGenerator gen = ctx.routingKeyGenerator();
         long mod = gen.getLastChanged();
-        if (mod != _routingKeyGenMod) {
-            _currentRoutingKey = gen.getRoutingKey(getHash());
-            _routingKeyGenMod = mod;
+        synchronized(this) {
+            if (mod != _routingKeyGenMod) {
+                _currentRoutingKey = gen.getRoutingKey(getHash());
+                _routingKeyGenMod = mod;
+            }
+            return _currentRoutingKey;
         }
-        return _currentRoutingKey;
     }
 
     /**
