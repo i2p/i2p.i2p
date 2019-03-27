@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 
 import net.i2p.I2PException;
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
@@ -38,6 +39,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.RouterRestartException;
+import net.i2p.client.streaming.IncomingConnectionFilter;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
@@ -45,6 +47,8 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
+import net.i2p.i2ptunnel.access.FilterFactory;
+import net.i2p.i2ptunnel.access.InvalidDefinitionException;
 
 public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
@@ -218,9 +222,20 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 _log.error("Invalid port specified [" + getTunnel().port + "], reverting to " + portNum);
             }
         }
+
+        IncomingConnectionFilter filter = IncomingConnectionFilter.ALLOW;
+        if (getTunnel().filterDefinition != null) {
+            File filterDefinition = new File(getTunnel().filterDefinition);
+            I2PAppContext context = getTunnel().getContext();
+            try {
+                filter = FilterFactory.createFilter(context, filterDefinition);
+            } catch (IOException | InvalidDefinitionException bad) {
+                throw new IllegalArgumentException("Can't create socket manager", bad);
+            }
+        } 
         try {
             I2PSocketManager rv = I2PSocketManagerFactory.createDisconnectedManager(privData, getTunnel().host,
-                                                                                    portNum, props);
+                                                                                    portNum, props, filter);
             rv.setName("I2PTunnel Server");
             getTunnel().addSession(rv.getSession());
             String alt = props.getProperty(PROP_ALT_PKF);

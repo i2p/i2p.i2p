@@ -105,6 +105,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     public long readTimeout = -1;
 
+    public String filterDefinition;
+
     private static final String nocli_args[] = { "-nocli", "-die"};
 
     private final List<I2PTunnelTask> tasks = new CopyOnWriteArrayList<I2PTunnelTask>();

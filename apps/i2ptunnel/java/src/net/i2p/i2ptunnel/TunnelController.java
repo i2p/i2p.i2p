@@ -85,6 +85,7 @@ public class TunnelController implements Logging {
     public static final String PROP_TARGET_HOST = "targetHost";
     public static final String PROP_TARGET_PORT = "targetPort";
     public static final String PROP_TYPE = "type";
+    public static final String PROP_FILTER = "filterDefinition";
     
     /**
      * all of these are @since 0.9.33 (moved from TunnelConfig)
@@ -834,6 +835,8 @@ public class TunnelController implements Logging {
                     _config.setProperty(OPT_SIG_TYPE, PREFERRED_SIGTYPE.name());
             }
             if (!isClient(type)) {
+                _tunnel.filterDefinition = _config.getProperty(PROP_FILTER);
+              
                 String p1 = _config.getProperty(OPT_MAX_CONNS_MIN, "0");
                 String p2 = _config.getProperty(OPT_MAX_CONNS_HOUR, "0");
                 String p3 = _config.getProperty(OPT_MAX_CONNS_DAY, "0");
