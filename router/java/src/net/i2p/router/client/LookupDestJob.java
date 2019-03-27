@@ -9,9 +9,12 @@ import java.util.Locale;
 import net.i2p.crypto.Blinding;
 import net.i2p.data.Base32;
 import net.i2p.data.BlindData;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
+import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.HostReplyMessage;
 import net.i2p.data.i2cp.I2CPMessage;
@@ -34,6 +37,7 @@ class LookupDestJob extends JobImpl {
     private final String _name;
     private final SessionId _sessID;
     private final Hash _fromLocalDest;
+    private final BlindData _blindData;
 
     private static final long DEFAULT_TIMEOUT = 15*1000;
 
@@ -69,6 +73,7 @@ class LookupDestJob extends JobImpl {
         _timeout = timeout;
         _sessID = sessID;
         _fromLocalDest = fromLocalDest;
+        BlindData bd = null;
         if (name != null && name.length() >= 60) {
             // convert a b32 lookup to a hash lookup
             String nlc = name.toLowerCase(Locale.US);
@@ -82,8 +87,16 @@ class LookupDestJob extends JobImpl {
                         name = null;
                     } else if (b.length >= 35) {
                         // encrypted LS2
+                        // lookup the blinded hash
                         try {
-                            BlindData bd = Blinding.decode(context, b);
+                            bd = Blinding.decode(context, b);
+                            SigningPublicKey spk = bd.getUnblindedPubKey();
+                            BlindData bd2 = getContext().netDb().getBlindData(spk);
+                            if (bd2 != null) {
+                                bd = bd2;
+                            } else {
+                                getContext().netDb().setBlindData(bd);
+                            }
                             h = bd.getBlindedHash();
                             if (_log.shouldDebug())
                                 _log.debug("Converting name lookup " + name + " to blinded " + h);
@@ -99,6 +112,7 @@ class LookupDestJob extends JobImpl {
         }
         _hash = h;
         _name = name;
+        _blindData = bd;
     }
     
     public String getName() { return _name != null ?
@@ -107,6 +121,15 @@ class LookupDestJob extends JobImpl {
     }
 
     public void runJob() {
+        if (_blindData != null) {
+            Destination d = _blindData.getDestination();
+            if (d != null) {
+                if (_log.shouldDebug())
+                    _log.debug("Found cached b33 lookup " + _name + " to " + d);
+                returnDest(d);
+                return;
+            }
+        }
         if (_name != null) {
             // inline, ignore timeout
             Destination d = getContext().namingService().lookup(_name);
@@ -121,6 +144,7 @@ class LookupDestJob extends JobImpl {
             }
         } else {
             DoneJob done = new DoneJob(getContext());
+            // TODO tell router this is an encrypted lookup, skip 38 or earlier ffs?
             getContext().netDb().lookupDestination(_hash, done, _timeout, _fromLocalDest);
         }
     }
@@ -132,6 +156,18 @@ class LookupDestJob extends JobImpl {
         public String getName() { return "LeaseSet Lookup Reply to Client"; }
         public void runJob() {
             Destination dest = getContext().netDb().lookupDestinationLocally(_hash);
+            if (dest == null && _blindData != null) {
+                // TODO store and lookup original hash instead
+                LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_hash);
+                if (ls != null && ls.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                    // already decrypted
+                    EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                    LeaseSet decls = encls.getDecryptedLeaseSet();
+                    if (decls != null) {
+                        dest = decls.getDestination();
+                    }
+                }
+            }
             if (dest != null) {
                 if (_log.shouldDebug())
                     _log.debug("Found hash lookup " + _hash + " to " + dest);

@@ -25,6 +25,7 @@ public class BlindData {
     private long _routingKeyGenMod;
 
     /**
+     *  @param secret may be null or zero-length
      *  @throws IllegalArgumentException on various errors
      */
     public BlindData(I2PAppContext ctx, Destination dest, SigType blindType, String secret) {
@@ -33,6 +34,7 @@ public class BlindData {
     }
 
     /**
+     *  @param secret may be null or zero-length
      *  @throws IllegalArgumentException on various errors
      */
     public BlindData(I2PAppContext ctx, SigningPublicKey spk, SigType blindType, String secret) {
@@ -47,11 +49,25 @@ public class BlindData {
     }
 
     /**
-     *  @return The blinded key for the current day
+     *  @return The unblinded SPK, non-null
+     */
+    public SigningPublicKey getUnblindedPubKey() {
+        return _clearSPK;
+    }
+
+    /**
+     *  @return The blinded key for the current day, non-null
      */
     public synchronized SigningPublicKey getBlindedPubKey() {
         calculate();
         return _blindSPK;
+    }
+
+    /**
+     *  @return The hash of the destination if known, or null
+     */
+    public synchronized Hash getDestHash() {
+        return _dest != null ? _dest.getHash() : null;
     }
 
     /**
@@ -126,5 +142,23 @@ public class BlindData {
         DataHelper.toLong(hashData, 0, 2, _blindType.getCode());
         System.arraycopy(_blindSPK.getData(), 0, hashData, 2, _blindSPK.length());
         _blindHash = _context.sha().calculateHash(hashData);
+    }
+    
+    @Override
+    public synchronized String toString() {
+        calculate();
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("[BlindData: ");
+        buf.append("\n\tSigningPublicKey: ").append(_clearSPK);
+        buf.append("\n\tAlpha           : ").append(_alpha);
+        buf.append("\n\tBlindedPublicKey: ").append(_blindSPK);
+        buf.append("\n\tBlinded Hash    : ").append(_blindHash);
+        buf.append("\n\tSecret: ").append(_secret);
+        if (_dest != null)
+            buf.append("\n\tDestination: ").append(_dest);
+        if (_dest != null)
+            buf.append("\n\tDestination: unknown");
+        buf.append(']');
+        return buf.toString();
     }
 }

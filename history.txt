@@ -1,3 +1,13 @@
+2019-03-27 zzz
+ * NetDB: Cache blinding data for lookups and decryption (proposal #123)
+
+2019-03-23 zzz
+ * Data: Preliminary work on new b32 format (proposal #149)
+ * SelfSignedGenerator:
+   - Fix generation with Ed25519ph keys (ticket #2465)
+   - Increase serial number from 63 to 71 bits
+ * SusiDNS: Add import feature (ticket #2447)
+
 2019-03-22 zzz
  * i2ptunnel: Escape {} in URLs (ticket #2130)
 
