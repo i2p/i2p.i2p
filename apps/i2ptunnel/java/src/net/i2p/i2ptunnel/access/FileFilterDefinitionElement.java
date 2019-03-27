@@ -18,6 +18,8 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     @Override
     public void update(Map<String, DestTracker> map) throws IOException {
+        if (!(file.exists() && file.isFile()))
+            return;
         BufferedReader reader = new BufferedReader(new FileReader(file));
         try {
             String b32;
