@@ -75,8 +75,9 @@ class AccessFilter implements IncomingConnectionFilter {
 
     private void reload() throws IOException {
         synchronized(knownDests) {
-            for (FilterDefinitionElement element : definition.getElements())
+            for (FilterDefinitionElement element : definition.getElements()) {
                 element.update(knownDests);
+            }
         }
         
     }
@@ -102,8 +103,9 @@ class AccessFilter implements IncomingConnectionFilter {
                 try {
                     reader = new BufferedReader(new FileReader(file)); 
                     String b32;
-                    while((b32 = reader.readLine()) != null)
+                    while((b32 = reader.readLine()) != null) {
                         breached.add(b32);
+                    }
                 } finally {
                     if (reader != null) try { reader.close(); } catch (IOException ignored) {}
                 }
@@ -128,8 +130,9 @@ class AccessFilter implements IncomingConnectionFilter {
         long olderThan = context.clock().now() - definition.getPurgeMinutes() * 60000;
         
         synchronized(knownDests) {
-            for (DestTracker tracker : knownDests.values())
+            for (DestTracker tracker : knownDests.values()) {
                 tracker.purge(olderThan);
+            }
         }
 
         synchronized(unknownDests) {
