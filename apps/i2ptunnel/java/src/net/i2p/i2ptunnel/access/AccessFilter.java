@@ -92,8 +92,9 @@ class AccessFilter implements IncomingConnectionFilter {
 
             // if the file already exists, add previously breached b32s
             if (file.exists() && file.isFile()) {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
+                BufferedReader reader = null; 
                 try {
+                    reader = new BufferedReader(new FileReader(file)); 
                     String b32;
                     while((b32 = reader.readLine()) != null)
                         breached.add(b32);
@@ -102,8 +103,9 @@ class AccessFilter implements IncomingConnectionFilter {
                 }
             }
 
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            BufferedWriter writer = null; 
             try {
+                writer = new BufferedWriter(new FileWriter(file)); 
                 for (String b32 : breached) {
                     writer.write(b32);
                     writer.newLine();

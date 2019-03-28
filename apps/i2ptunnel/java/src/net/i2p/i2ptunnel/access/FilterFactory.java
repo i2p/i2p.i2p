@@ -16,8 +16,9 @@ public class FilterFactory {
         throws IOException, InvalidDefinitionException {
         List<String> linesList = new ArrayList<String>();
 
-        BufferedReader reader = new BufferedReader(new FileReader(definition));
+        BufferedReader reader = null; 
         try {
+            reader = new BufferedReader(new FileReader(definition));
             String line;
             while((line = reader.readLine()) != null) {
                 line = line.trim();

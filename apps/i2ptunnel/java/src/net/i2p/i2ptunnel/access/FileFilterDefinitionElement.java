@@ -20,8 +20,9 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
     public void update(Map<String, DestTracker> map) throws IOException {
         if (!(file.exists() && file.isFile()))
             return;
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+        BufferedReader reader = null; 
         try {
+            reader = new BufferedReader(new FileReader(file)); 
             String b32;
             while((b32 = reader.readLine()) != null) {
                 if (map.containsKey(b32))
