@@ -533,12 +533,14 @@
                     <%=intl._t("Blacklist")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only allow listed clients to connect to this service")%>"><input value="1" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Whitelist")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Advanced access list configuration")%>"><input value="3" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("3") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Advanced")%></label></span>
             </td>
         </tr>
 
         <tr>
             <td colspan="2">
-                <b><%=intl._t("Access List")%></b> (<%=intl._t("Specify clients, 1 per line")%>)
+                <b><%=intl._t("Access List Description")%></b> (<%=intl._t("Specify clients, 1 per line or describe access list")%>)
             </td>
         </tr>
 

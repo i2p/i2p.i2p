@@ -9,6 +9,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.KeyGenerator;
@@ -75,6 +79,8 @@ public class TunnelConfig {
     private String _newProxyUser;
     private String _newProxyPW;
     private Destination _dest;
+    private boolean _filter;
+    private String _filterDefinition;
 
     public TunnelConfig() {
         _context = I2PAppContext.getGlobalContext();
@@ -304,6 +310,7 @@ public class TunnelConfig {
 
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
+    protected static final String PROP_FILTER = "filterDefinition";
 
     /**
      * Controls how other tunnels are checked for access.
@@ -322,6 +329,9 @@ public class TunnelConfig {
         case 2:
             _booleanOptions.remove(PROP_ENABLE_ACCESS_LIST);
             _booleanOptions.add(PROP_ENABLE_BLACKLIST);
+            break;
+        case 3:
+            _filter = true;
             break;
         default:
             _booleanOptions.remove(PROP_ENABLE_ACCESS_LIST);
@@ -371,8 +381,9 @@ public class TunnelConfig {
     }
 
     public void setAccessList(String val) {
-        if (val != null)
-            _otherOptions.put("i2cp.accessList", val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
+        if (val == null)
+            return;
+        _filterDefinition = val;
     }
 
     public void setJumpList(String val) {
@@ -617,6 +628,21 @@ public class TunnelConfig {
             _booleanOptions.add(TunnelController.PROP_LIMITS_SET);
             for (String p : _booleanServerOpts)
                 config.setProperty(OPT + p, Boolean.toString(_booleanOptions.contains(p)));
+            if (_filter) {
+                String dslFile = _context.getConfigDir() + File.separator + _name+".accessrules";
+                config.setProperty(TunnelController.PROP_FILTER, dslFile);
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(dslFile);
+                    fos.write(_filterDefinition.getBytes());
+                } catch (IOException bad) {
+                    throw new RuntimeException("failed to save access rules", bad);
+                } finally {
+                    if (fos != null) try { fos.close(); } catch (IOException ignored) {}
+                }
+            } else {                
+               _otherOptions.put("i2cp.accessList", _filterDefinition.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
+            }
             for (String p : _otherServerOpts) {
                 if (_otherOptions.containsKey(p))
                     config.setProperty(OPT + p, _otherOptions.get(p));
