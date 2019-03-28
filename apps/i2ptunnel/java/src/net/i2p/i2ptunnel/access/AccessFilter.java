@@ -17,6 +17,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Log;
 import net.i2p.data.Destination;
+import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.client.streaming.IncomingConnectionFilter;
 
 class AccessFilter implements IncomingConnectionFilter {
@@ -26,6 +27,7 @@ class AccessFilter implements IncomingConnectionFilter {
 
     private final FilterDefinition definition;
     private final I2PAppContext context;
+    private final I2PTunnelTask task;
 
     /**
      * Trackers for known destinations defined in access lists
@@ -36,9 +38,11 @@ class AccessFilter implements IncomingConnectionFilter {
      */
     private final Map<String, DestTracker> unknownDests = new HashMap<String, DestTracker>();
 
-    AccessFilter(I2PAppContext context, FilterDefinition definition) throws IOException {
+    AccessFilter(I2PAppContext context, FilterDefinition definition, I2PTunnelTask task) 
+            throws IOException {
         this.context = context;
         this.definition = definition;
+        this.task = task;
 
         reload();
 
@@ -139,6 +143,8 @@ class AccessFilter implements IncomingConnectionFilter {
             super(context.simpleTimer2(), PURGE_INTERVAL);
         }
         public void timeReached() {
+            if (!task.isOpen())
+                return;
             purge();
             schedule(PURGE_INTERVAL);
         }
@@ -149,6 +155,8 @@ class AccessFilter implements IncomingConnectionFilter {
             super(context.simpleTimer2(), SYNC_INTERVAL);
         }
         public void timeReached() {
+            if (!task.isOpen())
+                return;
             try {
                 record();
                 reload();

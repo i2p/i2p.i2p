@@ -228,7 +228,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             File filterDefinition = new File(getTunnel().filterDefinition);
             I2PAppContext context = getTunnel().getContext();
             try {
-                filter = FilterFactory.createFilter(context, filterDefinition);
+                filter = FilterFactory.createFilter(context, filterDefinition, this);
             } catch (IOException | InvalidDefinitionException bad) {
                 throw new IllegalArgumentException("Can't create socket manager", bad);
             }

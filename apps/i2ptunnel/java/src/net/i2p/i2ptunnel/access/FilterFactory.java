@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.i2p.I2PAppContext;
+import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.client.streaming.IncomingConnectionFilter;
 
 public class FilterFactory {
-    public static IncomingConnectionFilter createFilter(I2PAppContext context, File definition) 
+    public static IncomingConnectionFilter createFilter(I2PAppContext context, 
+                                                        File definition,
+                                                        I2PTunnelTask task)
         throws IOException, InvalidDefinitionException {
         List<String> linesList = new ArrayList<String>();
 
@@ -33,6 +36,6 @@ public class FilterFactory {
         }
 
         FilterDefinition parsedDefinition = DefinitionParser.parse(linesList.toArray(new String[0]));
-        return new AccessFilter(context, parsedDefinition);
+        return new AccessFilter(context, parsedDefinition, task);
     }
 }
