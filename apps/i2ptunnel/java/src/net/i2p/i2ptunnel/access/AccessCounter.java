@@ -4,14 +4,32 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Counts connection attempts and decides if specified thresholds have been
+ * breached.
+ *
+ * @since 0.9.40
+ */
 class AccessCounter {
 
+    /**
+     * List of timestamps of each connection attempt
+     */
     private final List<Long> accesses = new ArrayList<Long>();
 
+    /**
+     * records that a connection attempt was made
+     * 
+     * @param now the current time
+     */
     void recordAccess(long now) {
         accesses.add(now);
     }
 
+    /**
+     * @param threshold definition of a threshold
+     * @return true if the given threshold has been breached
+     */
     boolean isBreached(Threshold threshold) {
         if (threshold.getConnections() == 0)
             return !accesses.isEmpty();

@@ -9,10 +9,20 @@ import java.io.IOException;
 
 import net.i2p.data.Hash;
 
+/**
+ * An element of filter definition that reads hashes of remote destinations
+ * from a file.
+ *
+ * @since 0.9.40
+ */
 class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     private final File file;
 
+    /**
+     * @param file file to read the remote destinations from
+     * @param threshold threshold to apply to all those destinations
+     */
     FileFilterDefinitionElement(File file, Threshold threshold) {
         super(threshold);
         this.file = file;

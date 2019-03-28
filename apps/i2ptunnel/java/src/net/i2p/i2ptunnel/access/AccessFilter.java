@@ -22,6 +22,20 @@ import net.i2p.data.Hash;
 import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.client.streaming.IncomingConnectionFilter;
 
+/**
+ * A filter for incoming connections which can be configured
+ * based on access list rules.
+ * 
+ * It keeps a track of known destinations - those defined in existing access
+ * lists and unknown ones - those who are not defined in such lists but have
+ * recently attempted to connect to us.
+ *
+ * Every SYNC_INTERVAL seconds the access lists are reloaded from disk which
+ * allows the user to edit them.  Also, if any recorders are defined in the
+ * access rules, they will write to disk at such interval.
+ *
+ * @since 0.9.40
+ */
 class AccessFilter implements IncomingConnectionFilter {
 
     private static final long PURGE_INTERVAL = 1000;
@@ -40,6 +54,11 @@ class AccessFilter implements IncomingConnectionFilter {
      */
     private final Map<Hash, DestTracker> unknownDests = new HashMap<Hash, DestTracker>();
 
+    /**
+     * @param context the context, used for scheduling and timer purposes
+     * @param definition definition of this filter
+     * @param task the task to query for liveness of the tunnel
+     */
     AccessFilter(I2PAppContext context, FilterDefinition definition, I2PTunnelTask task) 
             throws IOException {
         this.context = context;
@@ -56,7 +75,7 @@ class AccessFilter implements IncomingConnectionFilter {
     public boolean allowDestination(Destination d) {
         Hash hash = d.getHash();
         long now = context.clock().now();
-        DestTracker tracker = null;
+        DestTracker tracker;
         synchronized(knownDests) {
             tracker = knownDests.get(hash);
         }

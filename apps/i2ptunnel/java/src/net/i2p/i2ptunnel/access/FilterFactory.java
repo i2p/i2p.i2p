@@ -12,7 +12,21 @@ import net.i2p.I2PAppContext;
 import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.client.streaming.IncomingConnectionFilter;
 
+/**
+ * Factory for incoming connection filters.  Only public class in this package.
+ *
+ * @since 0.9.40
+ */
 public class FilterFactory {
+
+    /**
+     * Creates an instance of IncomingConnectionFilter based on the definition
+     * contained in the given file.
+     *
+     * @param context the context this is running in
+     * @param definition file containing the filter definition
+     * @param task the I2PTunnelTask instance to query for liveness
+     */
     public static IncomingConnectionFilter createFilter(I2PAppContext context, 
                                                         File definition,
                                                         I2PTunnelTask task)

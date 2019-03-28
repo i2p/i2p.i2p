@@ -1,8 +1,17 @@
 package net.i2p.i2ptunnel.access;
 
+/**
+ * Definition of a Threshold.  
+ *
+ * A Threshold is defined by a number of connections over a period of minutes
+ *
+ * @since 0.9.40
+ */
 class Threshold {
 
+    /** A Threshold that is never breached */
     static final Threshold ALLOW = new Threshold(Integer.MAX_VALUE, 1);
+    /** A Threshold that is always breached */
     static final Threshold DENY = new Threshold(0, 1);
 
     private final int connections;

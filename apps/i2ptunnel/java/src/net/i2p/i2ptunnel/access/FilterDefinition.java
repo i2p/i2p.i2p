@@ -1,5 +1,12 @@
 package net.i2p.i2ptunnel.access;
 
+/**
+ * Definition of an access filter.
+ *
+ * This POJO contains the parsed representation from the filter definition file.
+ *
+ * @since 0.9.40
+ */
 class FilterDefinition {
 
     private final Threshold defaultThreshold;
@@ -7,6 +14,11 @@ class FilterDefinition {
     private final Recorder[] recorders;
     private final int purgeMinutes;
 
+    /**
+     * @param defaultThreshold threshold to apply to unknown remote destinations
+     * @param elements the elements defined in the filter definition, if any
+     * @param recorders the recorders defined in the filter definition, if any
+     */
     FilterDefinition(Threshold defaultThreshold,
                         FilterDefinitionElement[] elements,
                         Recorder[] recorders) {

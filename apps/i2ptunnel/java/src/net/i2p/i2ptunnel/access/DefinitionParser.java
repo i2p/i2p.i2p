@@ -7,8 +7,22 @@ import java.io.File;
 
 import net.i2p.data.DataHelper;
 
+/**
+ * Utility class for parsing filter definitions
+ * 
+ * @since 0.9.40
+ */
 class DefinitionParser {
 
+    /**
+     * Processes an array of String objects containing the human-readable definition of
+     * the filter.
+     * 
+     * TODO: format
+     *
+     * @return a FilterDefinition POJO representation for internal use
+     * @throws InvalidDefinitionException if the definition is malformed
+     */
     static FilterDefinition parse(String []definition) throws InvalidDefinitionException {
         
         DefinitionBuilder builder = new DefinitionBuilder();
