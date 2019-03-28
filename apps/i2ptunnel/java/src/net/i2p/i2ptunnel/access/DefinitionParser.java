@@ -28,9 +28,9 @@ class DefinitionParser {
     }
 
     private static Threshold parseThreshold(String s) throws InvalidDefinitionException {
-        if ("allow".equalsIgnoreCase(s))
+        if ("allow".equals(s))
             return Threshold.ALLOW;
-        if ("deny".equalsIgnoreCase(s))
+        if ("deny".equals(s))
             return Threshold.DENY;
 
         String [] split = DataHelper.split(s,"/");
@@ -82,9 +82,9 @@ class DefinitionParser {
         String[] split = DataHelper.split(line2," ");
         if (split.length < 2)
             throw new InvalidDefinitionException("invalid definition "+line);
-        if ("explicit".equalsIgnoreCase(split[0]))
+        if ("explicit".equals(split[0]))
             return new ExplicitFilterDefinitionElement(split[1], threshold);
-        if ("file".equalsIgnoreCase(split[0])) {
+        if ("file".equals(split[0])) {
             String line3 = line2.substring(4).trim();
             File file = new File(line3);
             return new FileFilterDefinitionElement(file, threshold);
