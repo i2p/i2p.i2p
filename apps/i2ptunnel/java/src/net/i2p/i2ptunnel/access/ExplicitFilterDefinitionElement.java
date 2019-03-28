@@ -2,19 +2,21 @@ package net.i2p.i2ptunnel.access;
 
 import java.util.Map;
 
+import net.i2p.data.Hash;
+
 class ExplicitFilterDefinitionElement extends FilterDefinitionElement {
 
-    private final String b32;
+    private final Hash hash;
 
-    ExplicitFilterDefinitionElement(String b32, Threshold threshold) {
+    ExplicitFilterDefinitionElement(String b32, Threshold threshold) throws InvalidDefinitionException {
         super(threshold);
-        this.b32 = b32;
+        this.hash = fromBase32(b32);
     }
 
     @Override
-    public void update(Map<String, DestTracker> map) {
-        if (map.containsKey(b32))
+    public void update(Map<Hash, DestTracker> map) {
+        if (map.containsKey(hash))
             return;
-        map.put(b32, new DestTracker(b32, threshold));
+        map.put(hash, new DestTracker(hash, threshold));
     }
 }

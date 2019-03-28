@@ -1,20 +1,21 @@
 package net.i2p.i2ptunnel.access;
 
+import net.i2p.data.Hash;
 
 class DestTracker {
     
-    private final String b32;
+    private final Hash hash;
     private final Threshold threshold;
     private final AccessCounter counter;
 
-    DestTracker(String b32, Threshold threshold) {
-        this.b32 = b32;
+    DestTracker(Hash hash, Threshold threshold) {
+        this.hash = hash;
         this.threshold = threshold;
         this.counter = new AccessCounter();
     }
 
-    String getB32() {
-        return b32;
+    Hash getHash() {
+        return hash;
     }
 
     AccessCounter getCounter() {

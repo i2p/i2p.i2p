@@ -18,6 +18,7 @@ import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.client.streaming.IncomingConnectionFilter;
 
@@ -33,11 +34,11 @@ class AccessFilter implements IncomingConnectionFilter {
     /**
      * Trackers for known destinations defined in access lists
      */
-    private final Map<String, DestTracker> knownDests = new HashMap<String, DestTracker>();
+    private final Map<Hash, DestTracker> knownDests = new HashMap<Hash, DestTracker>();
     /**
      * Trackers for unknown destinations not defined in access lists
      */
-    private final Map<String, DestTracker> unknownDests = new HashMap<String, DestTracker>();
+    private final Map<Hash, DestTracker> unknownDests = new HashMap<Hash, DestTracker>();
 
     AccessFilter(I2PAppContext context, FilterDefinition definition, I2PTunnelTask task) 
             throws IOException {
@@ -53,18 +54,18 @@ class AccessFilter implements IncomingConnectionFilter {
 
     @Override
     public boolean allowDestination(Destination d) {
-        String b32 = d.toBase32();
+        Hash hash = d.getHash();
         long now = context.clock().now();
         DestTracker tracker = null;
         synchronized(knownDests) {
-            tracker = knownDests.get(b32);
+            tracker = knownDests.get(hash);
         }
         if (tracker == null) {
             synchronized(unknownDests) {
-                tracker = unknownDests.get(b32);
+                tracker = unknownDests.get(hash);
                 if (tracker == null) {
-                    tracker = new DestTracker(b32, definition.getDefaultThreshold());
-                    unknownDests.put(b32, tracker);
+                    tracker = new DestTracker(hash, definition.getDefaultThreshold());
+                    unknownDests.put(hash, tracker);
                 }
             }
         }
@@ -89,7 +90,7 @@ class AccessFilter implements IncomingConnectionFilter {
                 for (DestTracker tracker : unknownDests.values()) {
                     if (!tracker.getCounter().isBreached(threshold))
                         continue;
-                    breached.add(tracker.getB32());
+                    breached.add(tracker.getHash().toBase32());
                 }
             }
             if (breached.isEmpty())
@@ -132,9 +133,9 @@ class AccessFilter implements IncomingConnectionFilter {
         }
 
         synchronized(unknownDests) {
-            for (Iterator<Map.Entry<String,DestTracker>> iter = unknownDests.entrySet().iterator();
+            for (Iterator<Map.Entry<Hash,DestTracker>> iter = unknownDests.entrySet().iterator();
                     iter.hasNext();) {
-                Map.Entry<String,DestTracker> entry = iter.next();
+                Map.Entry<Hash,DestTracker> entry = iter.next();
                 if (entry.getValue().purge(olderThan))
                     iter.remove();
             }

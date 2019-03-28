@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import net.i2p.data.Hash;
+
 class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     private final File file;
@@ -17,7 +19,7 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
     }
 
     @Override
-    public void update(Map<String, DestTracker> map) throws IOException {
+    public void update(Map<Hash, DestTracker> map) throws IOException {
         if (!(file.exists() && file.isFile()))
             return;
         BufferedReader reader = null; 
@@ -25,10 +27,13 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
             reader = new BufferedReader(new FileReader(file)); 
             String b32;
             while((b32 = reader.readLine()) != null) {
-                if (map.containsKey(b32))
+                Hash hash = fromBase32(b32);
+                if (map.containsKey(hash))
                     continue;
-                map.put(b32, new DestTracker(b32, threshold));
+                map.put(hash, new DestTracker(hash, threshold));
             }
+        } catch (InvalidDefinitionException bad32) {
+            throw new IOException("invalid access list entry", bad32);
         } finally {
             if (reader != null) {
                 try { reader.close(); } catch (IOException ignored) {}
