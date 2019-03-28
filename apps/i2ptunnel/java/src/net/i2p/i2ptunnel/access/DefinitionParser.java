@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import java.io.File;
 
+import net.i2p.data.DataHelper;
+
 class DefinitionParser {
 
     static FilterDefinition parse(String []definition) throws InvalidDefinitionException {
@@ -12,7 +14,7 @@ class DefinitionParser {
         DefinitionBuilder builder = new DefinitionBuilder();
 
         for (String line : definition) {
-            String [] split = line.split(" ");
+            String [] split = DataHelper.split(line," ");
             split[0] = split[0].toLowerCase();
             if ("default".equals(split[0])) 
                 builder.setDefaultThreshold(parseThreshold(line.substring(7).trim()));
@@ -31,7 +33,7 @@ class DefinitionParser {
         if ("deny".equalsIgnoreCase(s))
             return Threshold.DENY;
 
-        String [] split = s.split("/");
+        String [] split = DataHelper.split(s,"/");
         if (split.length != 2)
             throw new InvalidDefinitionException("Invalid threshold " + s);
 
@@ -77,7 +79,7 @@ class DefinitionParser {
         String thresholdString = extractThreshold(line);
         Threshold threshold = parseThreshold(thresholdString);
         String line2 = line.substring(thresholdString.length()).trim();
-        String[] split = line2.split(" ");
+        String[] split = DataHelper.split(line2," ");
         if (split.length < 2)
             throw new InvalidDefinitionException("invalid definition "+line);
         if ("explicit".equalsIgnoreCase(split[0]))
