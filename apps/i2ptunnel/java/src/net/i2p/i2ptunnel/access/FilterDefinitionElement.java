@@ -21,9 +21,9 @@ abstract class FilterDefinitionElement {
     }
 
     protected static Hash fromBase32(String b32) throws InvalidDefinitionException {
-        if (!b32.endsWith("b32.i2p"))
+        if (!b32.endsWith(".b32.i2p"))
             throw new InvalidDefinitionException("Invalid b32 " + b32);
-        b32 = b32.substring(0, b32.length() - 7);
+        b32 = b32.substring(0, b32.length() - 8);
         return new Hash(Base32.decode(b32));
     }
 }
