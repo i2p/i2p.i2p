@@ -9,13 +9,14 @@ import java.util.Iterator;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.client.streaming.IncomingConnectionFilter;
@@ -109,7 +110,9 @@ class AccessFilter implements IncomingConnectionFilter {
 
             BufferedWriter writer = null; 
             try {
-                writer = new BufferedWriter(new FileWriter(file)); 
+                writer = new BufferedWriter(
+                    new OutputStreamWriter(
+                        new SecureFileOutputStream(file)));
                 for (String b32 : breached) {
                     writer.write(b32);
                     writer.newLine();

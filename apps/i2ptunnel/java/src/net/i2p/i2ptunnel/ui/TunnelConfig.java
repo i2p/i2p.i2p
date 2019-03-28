@@ -30,6 +30,7 @@ import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.PasswordManager;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Helper class to generate a valid TunnelController configuration from provided
@@ -633,7 +634,7 @@ public class TunnelConfig {
                 config.setProperty(TunnelController.PROP_FILTER, dslFile);
                 FileOutputStream fos = null;
                 try {
-                    fos = new FileOutputStream(dslFile);
+                    fos = new SecureFileOutputStream(dslFile);
                     fos.write(_filterDefinition.getBytes());
                 } catch (IOException bad) {
                     throw new RuntimeException("failed to save access rules", bad);
