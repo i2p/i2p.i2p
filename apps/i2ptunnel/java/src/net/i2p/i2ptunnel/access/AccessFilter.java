@@ -147,8 +147,15 @@ class AccessFilter implements IncomingConnectionFilter {
             super(context.simpleTimer2(), PURGE_INTERVAL);
         }
         public void timeReached() {
-            if (!task.isOpen())
+            if (!task.isOpen()) {
+                synchronized(knownDests) {
+                    knownDests.clear();
+                }
+                synchronized(unknownDests) {
+                    unknownDests.clear();
+                }
                 return;
+            }
             purge();
             schedule(PURGE_INTERVAL);
         }
