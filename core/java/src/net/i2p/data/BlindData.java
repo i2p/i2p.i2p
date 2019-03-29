@@ -42,7 +42,7 @@ public class BlindData {
         _clearSPK = spk;
         _blindType = blindType;
         _secret = secret;
-        _authType = 0;
+        _authType = -1;
         _authKey = null;
         // defer until needed
         //calculate();
@@ -53,6 +53,13 @@ public class BlindData {
      */
     public SigningPublicKey getUnblindedPubKey() {
         return _clearSPK;
+    }
+
+    /**
+     *  @return The type of the blinded key
+     */
+    public SigType getBlindedSigType() {
+        return _blindType;
     }
 
     /**
@@ -115,10 +122,17 @@ public class BlindData {
     }
 
     /**
-     *  @return 0 for no client auth
+     *  @return -1 for no client auth
      */
     public int getAuthType() {
         return _authType;
+    }
+
+    /**
+     *  @return null for no client auth
+     */
+    public PrivateKey getAuthPrivKey() {
+        return _authKey;
     }
 
     private synchronized void calculate() {
@@ -147,16 +161,24 @@ public class BlindData {
     @Override
     public synchronized String toString() {
         calculate();
-        StringBuilder buf = new StringBuilder(256);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("[BlindData: ");
         buf.append("\n\tSigningPublicKey: ").append(_clearSPK);
         buf.append("\n\tAlpha           : ").append(_alpha);
         buf.append("\n\tBlindedPublicKey: ").append(_blindSPK);
         buf.append("\n\tBlinded Hash    : ").append(_blindHash);
-        buf.append("\n\tSecret: ").append(_secret);
+        if (_secret != null)
+            buf.append("\n\tSecret          : \"").append(_secret).append('"');
+        buf.append("\n\tAuth Type       : ");
+        if (_authType >= 0)
+            buf.append(_authType);
+        else
+            buf.append("none");
+        if (_authKey != null)
+            buf.append("\n\tAuth Key   : ").append(_authKey);
         if (_dest != null)
             buf.append("\n\tDestination: ").append(_dest);
-        if (_dest != null)
+        else
             buf.append("\n\tDestination: unknown");
         buf.append(']');
         return buf.toString();
