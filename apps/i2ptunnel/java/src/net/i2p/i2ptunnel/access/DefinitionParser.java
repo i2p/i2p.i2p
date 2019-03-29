@@ -42,13 +42,15 @@ class DefinitionParser {
      *
      * The threshold format can be one of the following:
      *
-     * * Numeric definition of number of connections over number minutes - "15/5", 
+     * <ul>
+     * <li>Numeric definition of number of connections over number minutes - "15/5", 
      *   "30/60", and so on.  Note that if the number of connections is 1 (as for 
-     *   example in "1/1") the first connection attempt will result in a breach.
-     * * The word "allow".  This threshold is never breached, i.e. infinite number of 
-     *   connection attempts is permitted.
-     * * The word "deny".  This threshold is always breached, i.e. no connection attempts
-     *   will be allowed.
+     *   example in "1/1") the first connection attempt will result in a breach.</li>
+     * <li>The word "allow".  This threshold is never breached, i.e. infinite number of 
+     *   connection attempts is permitted.</li>
+     * <li>The word "deny".  This threshold is always breached, i.e. no connection attempts
+     *   will be allowed.</li>
+     * </ul>
      *
      * Default threshold
      *
@@ -56,43 +58,43 @@ class DefinitionParser {
      * listed in the definition or in any of the referenced files.  To set a default 
      * threshold use the keyword "default".  The following are examples of default thresholds:
      * 
-     * -----------------------------
+     * <pre>
      * default 15/5
      * default allow
      * default deny
-     * -----------------------------
+     * </pre>
      *
      * Explicit thresholds
      * 
      * Explicit thresholds are applied to a remote destination listed in the definition itself.
      * Examples:
      * 
-     * -----------------------------
+     * <pre>
      * 15/5 explicit asdfasdfasdf.b32.i2p
      * allow explicit fdsafdsafdsa.b32.i2p
      * deny explicit qwerqwerqwer.b32.i2p
-     * -----------------------------
+     * </pre>
      *
      * Thresholds for destinations listed in a file
      * 
      * For convenience it is possible to maintain a list of destinations in a file and define
      * a threshold for all of them in bulk.  Examples:
      *
-     * -----------------------------
+     * <pre>
      * 15/5 file /path/throttled_destinations.txt
      * deny file /path/forbidden_destinations.txt
      * allow file /path/unlimited_destinations.txt
-     * -----------------------------
+     * </pre>
      *
      * Recorders
      *
      * Recorders keep track of connection attempts made by a remote destination, and if that
      * breaches a certain threshold, that destination gets recorded in a given file.  Examples:
      *
-     * -----------------------------
+     * <pre>
      * recorder 30/5 /path/aggressive.txt
      * recorder 60/5 /path/very_aggressive.txt
-     * -----------------------------
+     * </pre>
      *
      * It is possible to use a recorder to record aggressive destinations to a given file,
      * and then use that same file to throttle them.  For example, the following snippet will
@@ -100,14 +102,14 @@ class DefinitionParser {
      * destination exceeds 30 attempts per 5 minutes it gets throttled down to 15 attempts per 
      * 5 minutes:
      *
-     * -----------------------------
+     * <pre>
      * # by default there are no limits
      * default allow
      * # but record overly aggressive destinations
      * recorder 30/5 /path/throttled.txt
      * # and any that end up in that file will get throttled in the future
      * 15/5 file /path/throttled.txt
-     * -----------------------------
+     * </pre>
      *
      * It is possible to use a recorder in one tunnel that writes to a file that throttles 
      * another tunnel.  It is possible to reuse the same file with destinations in multiple
@@ -118,12 +120,12 @@ class DefinitionParser {
      * in the file "enemies.txt" and records any aggressive behavior in a file called
      * "suspicious.txt":
      *
-     * -----------------------------
+     * <pre>
      * default 15/5
      * allow file /path/friends.txt
      * deny file /path/enemies.txt
      * recorder 60/5 /path/suspicious.txt
-     * -----------------------------
+     * </pre>
      *
      * @return a FilterDefinition POJO representation for internal use
      * @throws InvalidDefinitionException if the definition is malformed
