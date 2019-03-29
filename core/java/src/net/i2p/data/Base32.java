@@ -115,7 +115,7 @@ public class Base32 {
     private static void decode(InputStream in, OutputStream out) throws IOException {
         byte decoded[] = decode(DataHelper.getUTF8(read(in)));
         if (decoded == null) {
-            System.out.println("FAIL");
+            System.err.println("FAIL");
             return;
         }
         out.write(decoded);
