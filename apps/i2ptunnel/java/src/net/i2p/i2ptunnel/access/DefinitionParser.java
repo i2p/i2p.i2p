@@ -14,6 +14,8 @@ import net.i2p.data.DataHelper;
  */
 class DefinitionParser {
 
+    private static enum Rule { DEFAULT, EXPLICIT, FILE, RECORDER }
+
     /**
      * <p>
      * Processes an array of String objects containing the human-readable definition of
@@ -64,9 +66,9 @@ class DefinitionParser {
      * threshold use the keyword "default".  The following are examples of default thresholds:
      * 
      * <pre>
-     * default 15/5
-     * default allow
-     * default deny
+     * 15/5 default
+     * allow default
+     * deny default
      * </pre>
      *
      * Explicit thresholds are applied to a remote destination listed in the definition itself.
@@ -91,8 +93,8 @@ class DefinitionParser {
      * breaches a certain threshold, that destination gets recorded in a given file.  Examples:
      *
      * <pre>
-     * recorder 30/5 /path/aggressive.txt
-     * recorder 60/5 /path/very_aggressive.txt
+     * 30/5 recorder /path/aggressive.txt
+     * 60/5 recorder /path/very_aggressive.txt
      * </pre>
      * <p>
      * It is possible to use a recorder to record aggressive destinations to a given file,
@@ -103,9 +105,9 @@ class DefinitionParser {
      * </p>
      * <pre>
      * # by default there are no limits
-     * default allow
+     * allow default
      * # but record overly aggressive destinations
-     * recorder 30/5 /path/throttled.txt
+     * 30/5 recorder /path/throttled.txt
      * # and any that end up in that file will get throttled in the future
      * 15/5 file /path/throttled.txt
      * </pre>
@@ -121,10 +123,10 @@ class DefinitionParser {
      * "suspicious.txt":
      * </p>
      * <pre>
-     * default 15/5
+     * 15/5 default
      * allow file /path/friends.txt
      * deny file /path/enemies.txt
-     * recorder 60/5 /path/suspicious.txt
+     * 60/5 recorder /path/suspicious.txt
      * </pre>
      *
      * @return a FilterDefinition POJO representation for internal use
@@ -135,14 +137,28 @@ class DefinitionParser {
         DefinitionBuilder builder = new DefinitionBuilder();
 
         for (String line : definition) {
-            String [] split = DataHelper.split(line," ");
+            String [] split = DataHelper.split(line,"[ \t]");
             split[0] = split[0].toLowerCase();
-            if ("default".equals(split[0])) 
-                builder.setDefaultThreshold(parseThreshold(line.substring(7).trim()));
-            else if ("recorder".equals(split[0]))
-                builder.addRecorder(parseRecorder(line.substring(8).trim()));
-            else
-                builder.addElement(parseElement(line));
+            
+            Threshold threshold = parseThreshold(split[0]);
+            Rule rule = parseRule(split[1]);
+
+            File file;
+            switch(rule) {
+            case DEFAULT:
+                builder.setDefaultThreshold(threshold);
+                break;
+            case EXPLICIT:
+                builder.addElement(new ExplicitFilterDefinitionElement(split[2], threshold));
+                break;
+            case FILE:
+                file = parseFileName(line, split);
+                builder.addElement(new FileFilterDefinitionElement(file, threshold));
+                break;
+            case RECORDER: 
+                file = parseFileName(line, split);
+                builder.addRecorder(new Recorder(file, threshold));
+            }
         }
 
         return builder.build();
@@ -171,47 +187,28 @@ class DefinitionParser {
         }
     }
 
-    private static Recorder parseRecorder(String line) throws InvalidDefinitionException {
-        String thresholdString = extractThreshold(line);
+    private static Rule parseRule(String s) throws InvalidDefinitionException {
+        if ("default".equals(s))
+            return Rule.DEFAULT;
+        if ("explicit".equals(s))
+            return Rule.EXPLICIT;
+        if ("file".equals(s))
+            return Rule.FILE;
+        if ("recorder".equals(s))
+            return Rule.RECORDER;
 
-        Threshold threshold = parseThreshold(thresholdString);
-
-        String line2 = line.substring(thresholdString.length()).trim();
-        if (line2.length() == 0)
-            throw new InvalidDefinitionException("Invalid definition "+ line);
-        File file = new File(line2);
-        return new Recorder(file, threshold);
+        throw new InvalidDefinitionException("unknown rule "+s);
     }
 
-    private static String extractThreshold(String line) {
-        StringBuilder thresholdBuilder = new StringBuilder();
-        int i = 0;
-        while(i < line.length()) {
-            char c = line.charAt(i);
-            if (c == ' ' || c == '\t')
-                break;
-            i++;
-            thresholdBuilder.append(c);
-        }
-        return thresholdBuilder.toString();
+    private static File parseFileName(String s, String[] split) throws InvalidDefinitionException {
+        if (split.length < 3)
+            throw new InvalidDefinitionException("invalid definition "+s);
+        int beginIndex = s.indexOf(split[1]);
+        if (beginIndex < 0)
+            throw new IllegalStateException("shouldn't have gotten here "+s);
+        return new File(s.substring(beginIndex + split[1].length()).trim());
     }
 
-    private static FilterDefinitionElement parseElement(String line) throws InvalidDefinitionException {
-        String thresholdString = extractThreshold(line);
-        Threshold threshold = parseThreshold(thresholdString);
-        String line2 = line.substring(thresholdString.length()).trim();
-        String[] split = DataHelper.split(line2," ");
-        if (split.length < 2)
-            throw new InvalidDefinitionException("invalid definition "+line);
-        if ("explicit".equals(split[0]))
-            return new ExplicitFilterDefinitionElement(split[1], threshold);
-        if ("file".equals(split[0])) {
-            String line3 = line2.substring(4).trim();
-            File file = new File(line3);
-            return new FileFilterDefinitionElement(file, threshold);
-        }
-        throw new InvalidDefinitionException("invalid definition "+line);
-    }
 
     private static class DefinitionBuilder {
         private Threshold threshold;
