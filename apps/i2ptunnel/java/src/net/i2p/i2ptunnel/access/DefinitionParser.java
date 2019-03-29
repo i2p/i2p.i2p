@@ -15,33 +15,40 @@ import net.i2p.data.DataHelper;
 class DefinitionParser {
 
     /**
+     * <p>
      * Processes an array of String objects containing the human-readable definition of
      * the filter.
-     *
+     * </p>
+     * <p>
      * The definition of a filter is a list of Strings.  Each line can represent one of 
      * these items:
-     *
-     * * definition of a default threshold to apply to any remote destinations not
-     *   listed in this file or any of the referenced files
-     * * definition of a threshold to apply to a specific remote destination
-     * * definition of a threshold to apply to remote destinations listed in a file
-     * * definition of a threshold that if breached will cause the offending remote
-     *   destination to be recorded in a specified file
-     *
+     * </p>
+     * <ul>
+     * <li>definition of a default threshold to apply to any remote destinations not
+     *   listed in this file or any of the referenced files</li>
+     * <li>definition of a threshold to apply to a specific remote destination</li>
+     * <li>definition of a threshold to apply to remote destinations listed in a file</li>
+     * <li>definition of a threshold that if breached will cause the offending remote
+     *   destination to be recorded in a specified file</li>
+     * </ul>
+     * <p>
      * The order of the definitions matters.  The first threshold for a given destination
      * (whether explicit or listed in a file) overrides any future thresholds for the
      * same destination, whether explicit or listed in a file.
-     *
+     * </p>
+     * <p>
      * Thresholds:
-     * 
+     * </p>
+     * <p>
      * A threshold is defined by the number of connection attempts a remote destination is
      * permitted to perform over a specified number of minutes before a "breach" occurs.
      * For example the following threshold definition "15/5" means that the same remote
      * destination is allowed to make 14 connection attempts over a 5 minute period,  If
      * it makes one more attempt within the same period, the threshold will be breached.
-     *
+     * </p>
+     * <p>
      * The threshold format can be one of the following:
-     *
+     * </p>
      * <ul>
      * <li>Numeric definition of number of connections over number minutes - "15/5", 
      *   "30/60", and so on.  Note that if the number of connections is 1 (as for 
@@ -51,8 +58,6 @@ class DefinitionParser {
      * <li>The word "deny".  This threshold is always breached, i.e. no connection attempts
      *   will be allowed.</li>
      * </ul>
-     *
-     * Default threshold
      *
      * The default threshold applies to any remote destinations that are not explicitly
      * listed in the definition or in any of the referenced files.  To set a default 
@@ -64,8 +69,6 @@ class DefinitionParser {
      * default deny
      * </pre>
      *
-     * Explicit thresholds
-     * 
      * Explicit thresholds are applied to a remote destination listed in the definition itself.
      * Examples:
      * 
@@ -75,8 +78,6 @@ class DefinitionParser {
      * deny explicit qwerqwerqwer.b32.i2p
      * </pre>
      *
-     * Thresholds for destinations listed in a file
-     * 
      * For convenience it is possible to maintain a list of destinations in a file and define
      * a threshold for all of them in bulk.  Examples:
      *
@@ -86,8 +87,6 @@ class DefinitionParser {
      * allow file /path/unlimited_destinations.txt
      * </pre>
      *
-     * Recorders
-     *
      * Recorders keep track of connection attempts made by a remote destination, and if that
      * breaches a certain threshold, that destination gets recorded in a given file.  Examples:
      *
@@ -95,13 +94,13 @@ class DefinitionParser {
      * recorder 30/5 /path/aggressive.txt
      * recorder 60/5 /path/very_aggressive.txt
      * </pre>
-     *
+     * <p>
      * It is possible to use a recorder to record aggressive destinations to a given file,
      * and then use that same file to throttle them.  For example, the following snippet will
      * define a filter that initially allows all connection attempts, but if any single
      * destination exceeds 30 attempts per 5 minutes it gets throttled down to 15 attempts per 
      * 5 minutes:
-     *
+     * </p>
      * <pre>
      * # by default there are no limits
      * default allow
@@ -110,16 +109,17 @@ class DefinitionParser {
      * # and any that end up in that file will get throttled in the future
      * 15/5 file /path/throttled.txt
      * </pre>
-     *
+     * <p>
      * It is possible to use a recorder in one tunnel that writes to a file that throttles 
      * another tunnel.  It is possible to reuse the same file with destinations in multiple
      * tunnels.  And of course, it is possible to edit these files by hand.
-     *
+     * </p>
+     * <p>
      * Here is an example filter definition that applies some throttling by default, no throttling
      * for destinations in the file "friends.txt", forbids any connections from destinations
      * in the file "enemies.txt" and records any aggressive behavior in a file called
      * "suspicious.txt":
-     *
+     * </p>
      * <pre>
      * default 15/5
      * allow file /path/friends.txt
