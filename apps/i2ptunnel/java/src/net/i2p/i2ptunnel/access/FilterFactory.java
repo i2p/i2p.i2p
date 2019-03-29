@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.i2p.I2PAppContext;
-import net.i2p.i2ptunnel.I2PTunnelTask;
-import net.i2p.client.streaming.IncomingConnectionFilter;
+import net.i2p.client.streaming.StatefulConnectionFilter;
 
 /**
  * Factory for incoming connection filters.  Only public class in this package.
@@ -25,11 +24,9 @@ public class FilterFactory {
      *
      * @param context the context this is running in
      * @param definition file containing the filter definition
-     * @param task the I2PTunnelTask instance to query for liveness
      */
-    public static IncomingConnectionFilter createFilter(I2PAppContext context, 
-                                                        File definition,
-                                                        I2PTunnelTask task)
+    public static StatefulConnectionFilter createFilter(I2PAppContext context, 
+                                                        File definition)
         throws IOException, InvalidDefinitionException {
         List<String> linesList = new ArrayList<String>();
 
@@ -50,6 +47,6 @@ public class FilterFactory {
         }
 
         FilterDefinition parsedDefinition = DefinitionParser.parse(linesList.toArray(new String[0]));
-        return new AccessFilter(context, parsedDefinition, task);
+        return new AccessFilter(context, parsedDefinition);
     }
 }

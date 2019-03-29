@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import java.io.File;
 import java.io.FileReader;
@@ -19,8 +20,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
-import net.i2p.i2ptunnel.I2PTunnelTask;
-import net.i2p.client.streaming.IncomingConnectionFilter;
+import net.i2p.client.streaming.StatefulConnectionFilter;
 
 /**
  * A filter for incoming connections which can be configured
@@ -36,14 +36,15 @@ import net.i2p.client.streaming.IncomingConnectionFilter;
  *
  * @since 0.9.40
  */
-class AccessFilter implements IncomingConnectionFilter {
+class AccessFilter implements StatefulConnectionFilter {
 
     private static final long PURGE_INTERVAL = 1000;
     private static final long SYNC_INTERVAL = 10 * 1000;
 
     private final FilterDefinition definition;
     private final I2PAppContext context;
-    private final I2PTunnelTask task;
+
+    private final AtomicBoolean timersRunning = new AtomicBoolean();
 
     /**
      * Trackers for known destinations defined in access lists
@@ -59,16 +60,25 @@ class AccessFilter implements IncomingConnectionFilter {
      * @param definition definition of this filter
      * @param task the task to query for liveness of the tunnel
      */
-    AccessFilter(I2PAppContext context, FilterDefinition definition, I2PTunnelTask task) 
+    AccessFilter(I2PAppContext context, FilterDefinition definition) 
             throws IOException {
         this.context = context;
         this.definition = definition;
-        this.task = task;
 
         reload();
+    }
 
-        new Purger();
-        new Syncer();
+    @Override
+    public void start() {
+        if (timersRunning.compareAndSet(false, true)) {
+            new Purger();
+            new Syncer();
+        }
+    }
+
+    @Override
+    public void stop() {
+        timersRunning.set(false);
     }
 
     @Override
@@ -169,7 +179,7 @@ class AccessFilter implements IncomingConnectionFilter {
             super(context.simpleTimer2(), PURGE_INTERVAL);
         }
         public void timeReached() {
-            if (!task.isOpen()) {
+            if (!timersRunning.get()) {
                 synchronized(knownDests) {
                     knownDests.clear();
                 }
@@ -188,7 +198,7 @@ class AccessFilter implements IncomingConnectionFilter {
             super(context.simpleTimer2(), SYNC_INTERVAL);
         }
         public void timeReached() {
-            if (!task.isOpen())
+            if (!timersRunning.get())
                 return;
             try {
                 record();

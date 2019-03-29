@@ -40,6 +40,7 @@ import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.RouterRestartException;
 import net.i2p.client.streaming.IncomingConnectionFilter;
+import net.i2p.client.streaming.StatefulConnectionFilter;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
@@ -96,6 +97,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     /** unused? port should always be specified */
     private int DEFAULT_LOCALPORT = 4488;
     protected int localPort = DEFAULT_LOCALPORT;
+
+    private volatile StatefulConnectionFilter _filter;
 
     /**
      *  Non-blocking
@@ -223,16 +226,18 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             }
         }
 
-        IncomingConnectionFilter filter = IncomingConnectionFilter.ALLOW;
         if (getTunnel().filterDefinition != null) {
             File filterDefinition = new File(getTunnel().filterDefinition);
             I2PAppContext context = getTunnel().getContext();
             try {
-                filter = FilterFactory.createFilter(context, filterDefinition, this);
+                _filter = FilterFactory.createFilter(context, filterDefinition);
             } catch (IOException | InvalidDefinitionException bad) {
                 throw new IllegalArgumentException("Can't create socket manager", bad);
             }
-        } 
+        }
+
+        IncomingConnectionFilter filter = _filter == null ? IncomingConnectionFilter.ALLOW : _filter;
+
         try {
             I2PSocketManager rv = I2PSocketManagerFactory.createDisconnectedManager(privData, getTunnel().host,
                                                                                     portNum, props, filter);
@@ -376,6 +381,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     public synchronized void startRunning() {
         connectManager();
+        StatefulConnectionFilter filter = _filter;
+        if (filter != null)
+            filter.start();
         // prevent JVM exit when running outside the router
         boolean isDaemon = getTunnel().getContext().isRouterContext();
         Thread t = new I2PAppThread(this, "Server " + remoteHost + ':' + remotePort, isDaemon);
@@ -430,6 +438,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (task != null) {
             task.close(forced);
         }
+        StatefulConnectionFilter filter = _filter;
+        if (filter != null)
+            filter.stop();
         synchronized (lock) {
             if (!forced && sockMgr.listSockets().size() != 0) {
                 l.log("There are still active connections!");
