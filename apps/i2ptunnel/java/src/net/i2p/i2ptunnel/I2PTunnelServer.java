@@ -438,9 +438,6 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (task != null) {
             task.close(forced);
         }
-        StatefulConnectionFilter filter = _filter;
-        if (filter != null)
-            filter.stop();
         synchronized (lock) {
             if (!forced && sockMgr.listSockets().size() != 0) {
                 l.log("There are still active connections!");
@@ -483,6 +480,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     public synchronized boolean destroy() {
         close(true);
         sockMgr.destroySocketManager();
+        StatefulConnectionFilter filter = _filter;
+        if (filter != null)
+            filter.stop();
         return true;
     }
 
