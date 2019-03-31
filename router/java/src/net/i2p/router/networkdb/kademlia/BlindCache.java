@@ -86,7 +86,7 @@ class BlindCache {
      *  If known to be blinded, returns the current blinded hash.
      *  If not known to be blinded, returns h.
      *
-     *  @param dest may or may not be blinded
+     *  @param h may or may not be blinded
      *  @return the blinded hash or h
      */
     public Hash getHash(Hash h) {
