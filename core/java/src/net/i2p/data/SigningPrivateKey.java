@@ -10,10 +10,12 @@ package net.i2p.data;
  */
 
 import java.util.Arrays;
+import javax.security.auth.Destroyable;
 
 import net.i2p.crypto.Blinding;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Defines the SigningPrivateKey as defined by the I2P data structure spec.
@@ -26,7 +28,7 @@ import net.i2p.crypto.SigType;
  *
  * @author jrandom
  */
-public class SigningPrivateKey extends SimpleDataStructure {
+public class SigningPrivateKey extends SimpleDataStructure implements Destroyable {
     private static final SigType DEF_TYPE = SigType.DSA_SHA1;
     public final static int KEYSIZE_BYTES = DEF_TYPE.getPrivkeyLen();
 
@@ -116,12 +118,35 @@ public class SigningPrivateKey extends SimpleDataStructure {
     }
 
     /**
+     *  javax.security.auth.Destroyable interface
+     *
+     *  @since 0.9.40
+     */
+    public void destroy() {
+        byte[] data = _data;
+        if (data != null) {
+            _data = null;
+            Arrays.fill(data, (byte) 0);
+            SimpleByteCache.release(data);
+        }
+    }
+
+    /**
+     *  javax.security.auth.Destroyable interface
+     *
+     *  @since 0.9.40
+     */
+    public boolean isDestroyed() {
+        return _data == null;
+    }
+
+    /**
      *  @since 0.9.8
      */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("[SigningPrivateKey ").append(_type).append(": ");
+        buf.append("[SigningPrivateKey ").append(_type).append(' ');
         int length = length();
         if (_data == null) {
             buf.append("null");

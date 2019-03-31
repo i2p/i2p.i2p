@@ -10,9 +10,11 @@ package net.i2p.data;
  */
 
 import java.util.Arrays;
+import javax.security.auth.Destroyable;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Defines the PrivateKey as defined by the I2P data structure spec.
@@ -24,7 +26,7 @@ import net.i2p.crypto.KeyGenerator;
  *
  * @author jrandom
  */
-public class PrivateKey extends SimpleDataStructure {
+public class PrivateKey extends SimpleDataStructure implements Destroyable {
     private static final EncType DEF_TYPE = EncType.ELGAMAL_2048;
     public final static int KEYSIZE_BYTES = DEF_TYPE.getPrivkeyLen();
 
@@ -90,12 +92,35 @@ public class PrivateKey extends SimpleDataStructure {
     }
 
     /**
+     *  javax.security.auth.Destroyable interface
+     *
+     *  @since 0.9.40
+     */
+    public void destroy() {
+        byte[] data = _data;
+        if (data != null) {
+            _data = null;
+            Arrays.fill(data, (byte) 0);
+            SimpleByteCache.release(data);
+        }
+    }
+
+    /**
+     *  javax.security.auth.Destroyable interface
+     *
+     *  @since 0.9.40
+     */
+    public boolean isDestroyed() {
+        return _data == null;
+    }
+
+    /**
      *  @since 0.9.38
      */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("[PrivateKey ").append(_type).append(": ");
+        buf.append("[PrivateKey ").append(_type).append(' ');
         int length = length();
         if (_data == null) {
             buf.append("null");
