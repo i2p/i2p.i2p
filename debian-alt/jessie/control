@@ -9,11 +9,10 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,debconf
  ,openjdk-7-jdk
-# Ant requires java 6 tools.jar:
-# Unable to locate tools.jar. Expected to find it in /usr/lib/jvm/java-6-openjdk-amd64/lib/tools.jar
- ,openjdk-6-jdk
  ,libtomcat8-java
  ,dh-apparmor
+ ,dh-systemd
+ ,bash-completion
  ,gettext
  ,libgetopt-java
  ,libjson-simple-java (<< 3)
@@ -33,7 +32,7 @@ Depends: ${java:Depends}, ${shlibs:Depends},
  libjbigi-jni,
  lsb-base (>= 3.0-6),
  service-wrapper
-Description: Anonymous network (I2P)
+Description: Invisible Internet Project (I2P) - anonymous network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
@@ -48,7 +47,7 @@ Section: java
 Priority: optional
 Depends: ${shlibs:Depends}, i2p-router
 Homepage: https://geti2p.net/
-Description: I2P libjbigi library
+Description: Invisible Internet Project (I2P) - libjbigi library
  This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
  .
  libjbigi is a math library that is part of the I2P installation.  Use of this
@@ -62,7 +61,7 @@ Section: doc
 Priority: extra
 Depends: ${misc:Depends}
 Suggests: i2p, default-jdk-doc
-Description: I2P developer documentation
+Description: Invisible Internet Project (I2P) - developer documentation
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
@@ -88,7 +87,7 @@ Recommends: libjbigi-jni, fonts-dejavu
 Suggests: apparmor
  ,privoxy
  ,syndie
-Description: Router for I2P
+Description: Invisible Internet Project (I2P) - Router
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
