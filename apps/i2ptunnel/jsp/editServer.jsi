@@ -535,6 +535,7 @@
                     <%=intl._t("Whitelist")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Advanced access list configuration")%>"><input value="3" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("3") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Advanced")%></label></span>
+                <span><a href="http://i2p-projekt.i2p/spec/filter-format">(<%=intl._t("format")%>)</a></span>
             </td>
         </tr>
 
