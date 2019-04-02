@@ -562,7 +562,7 @@
 
         <tr>
             <td colspan="2">
-                <label for="filterDefinition"><%=intl._t("File containing filter definition")%></label>
+                <label for="filterDefinition"><%=intl._t("Absolute path to file containing filter definition")%></label>
                 <input type="text" id="filterDefinition" name="filterDefinition" value="<%=editBean.getFilterDefinition(curTunnel)%>" size="30"/>
             </td>
         </tr>
