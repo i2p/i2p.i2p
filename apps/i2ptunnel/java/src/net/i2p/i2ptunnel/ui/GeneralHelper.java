@@ -48,7 +48,6 @@ public class GeneralHelper {
 
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
-    protected static final String PROP_FILTER_DEFINITION = "filterDefinition";
 
     private static final String OPT = TunnelController.PFX_OPTION;
 
@@ -616,21 +615,17 @@ public class GeneralHelper {
             return 1;
         if (getBooleanProperty(tunnel, PROP_ENABLE_BLACKLIST))
             return 2;
-        TunnelController tun = getController(tunnel);
-        if (tun.getFilter() != null)
-            return 3;
         return 0;
     }
     
     public String getAccessList(int tunnel) {
-        switch(getAccessMode(tunnel)) {
-            case 0:
-            case 1:
-            case 2:
-                return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
-        }
-        TunnelController tun = getController(tunnel);
-        return FileUtil.readTextFile(tun.getFilter(), -1, true);
+        return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
+    }
+
+    public String getFilterDefinition(int tunnel) {
+        TunnelController tunnelController = getController(tunnel);
+        String filter = tunnelController.getFilter();
+        return filter == null ? "" : filter;
     }
     
     public String getJumpList(int tunnel) {

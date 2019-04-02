@@ -533,9 +533,6 @@
                     <%=intl._t("Blacklist")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only allow listed clients to connect to this service")%>"><input value="1" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Whitelist")%></label></span>
-                <span class="multiOption"><label title="<%=intl._t("Advanced access list configuration")%>"><input value="3" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("3") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Advanced")%></label></span>
-                <span><a href="http://i2p-projekt.i2p/spec/filter-format">(<%=intl._t("format")%>)</a></span>
             </td>
         </tr>
 
@@ -548,6 +545,25 @@
         <tr>
             <td colspan="2">
                 <textarea rows="2" style="height: 8em;" cols="60" name="accessList" title="<%=intl._t("Control access to this service")%>" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <b><%=intl._t("Filter Definition File")%></b>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <%=intl._t("You can define an advanced filter for this tunnel.")%> (<a href="http://i2p-projekt.i2p/spec/filter-format" target="_blank"><%=intl._t("Format Specification")%></a>)  
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <label for="filterDefinition"><%=intl._t("File containing filter definition")%></label>
+                <input type="text" id="filterDefinition" name="filterDefinition" value="<%=editBean.getFilterDefinition(curTunnel)%>" size="30"/>
             </td>
         </tr>
 

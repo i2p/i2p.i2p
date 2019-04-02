@@ -888,6 +888,11 @@ public class IndexBean {
         }
     }
 
+    public void setFilterDefinition(String val) {
+        if (val != null)
+            _config.setFilterDefinition(val);
+    }
+
     public void setDelayOpen(String moo) {
         _config.setDelayOpen(true);
     }

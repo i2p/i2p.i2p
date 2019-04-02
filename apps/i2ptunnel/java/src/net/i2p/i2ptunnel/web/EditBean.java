@@ -270,6 +270,10 @@ public class EditBean extends IndexBean {
     public String getAccessList(int tunnel) {
         return _helper.getAccessList(tunnel);
     }
+
+    public String getFilterDefinition(int tunnel) {
+        return _helper.getFilterDefinition(tunnel);
+    }
     
     public String getJumpList(int tunnel) {
         return _helper.getJumpList(tunnel);
