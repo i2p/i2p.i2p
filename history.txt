@@ -1,3 +1,6 @@
+2019-04-02 zab
+ * I2PTunnel: mplement access filtering (ticket #2464
+
 2019-03-27 zzz
  * NetDB: Cache blinding data for lookups and decryption (proposal #123)
 
