@@ -9,9 +9,6 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,debconf
  ,openjdk-7-jdk
-# Ant requires java 6 tools.jar:
-# Unable to locate tools.jar. Expected to find it in /usr/lib/jvm/java-6-openjdk-amd64/lib/tools.jar
- ,openjdk-6-jdk
  ,glassfish-javaee
  ,dh-apparmor
  ,dh-systemd

@@ -249,7 +249,8 @@ public final class SelfSignedGenerator {
         cert.verify(cpub);
         if (!cpub.equals(jpub)) {
             boolean ok = false;
-            if (cpub.getClass().getName().equals("sun.security.x509.X509Key")) {
+            if ((jpub instanceof EdDSAPublicKey) &&
+                cpub.getClass().getName().equals("sun.security.x509.X509Key")) {
                 // X509Certificate will sometimes contain an X509Key rather than the EdDSAPublicKey itself; the contained
                 // key is valid but needs to be instanced as an EdDSAPublicKey before it can be used.
                 try {

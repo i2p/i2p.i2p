@@ -13,10 +13,12 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
+import net.i2p.data.BlindData;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 
@@ -161,4 +163,19 @@ public abstract class NetworkDatabaseFacade implements Service {
      *  @since 0.9.16
      */
     public boolean isNegativeCachedForever(Hash key) { return false; }
+    
+    /**
+     *  @param spk unblinded key
+     *  @return BlindData or null
+     *  @since 0.9.40
+     */
+    public BlindData getBlindData(SigningPublicKey spk) {
+        return null;
+    }
+    
+    /**
+     *  @param bd new BlindData to put in the cache
+     *  @since 0.9.40
+     */
+    public void setBlindData(BlindData bd) {}
 }

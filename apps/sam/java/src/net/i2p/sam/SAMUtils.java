@@ -171,7 +171,7 @@ class SAMUtils {
             String msg;
             if (s.length() >= 516)
                 msg = "Bad Base64 dest: ";
-            else if (s.length() == 60 && s.endsWith(".b32.i2p"))
+            else if (s.length() >= 60 && s.endsWith(".b32.i2p"))
                 msg = "Lease set not found: ";
             else
                 msg = "Host name not found: ";

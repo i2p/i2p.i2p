@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Anders Nilsson <anders@devode.se>, 2015
 # cacapo <handelsehorisont@gmail.com>, 2015
@@ -11,22 +11,24 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: Jony\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2019-03-26 06:10+0100\n"
+"Last-Translator: Jonatan Nyberg <jonatan.nyberg.karl@gmail.com>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/"
+"sv_SE/)\n"
+"Language: sv_SE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2.1\n"
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:2001
 msgid "Should the I2P router be started at boot?"
-msgstr "Ska I2P routern startas vid systemstart?"
+msgstr "Ska I2P-routern startas vid systemstart?"
 
 #. Type: boolean
 #. Description
@@ -34,7 +36,9 @@ msgstr "Ska I2P routern startas vid systemstart?"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "I2P routern kan köras som en tjänst (demon) som automatiskt startas när datorn startas. Detta är den rekommenderade konfigurationen. "
+msgstr ""
+"I2P-routern kan köras som en tjänst (demon) som automatiskt startas när "
+"datorn startas. Detta är den rekommenderade konfigurationen."
 
 #. Type: string
 #. Description
@@ -46,11 +50,15 @@ msgstr "I2P-demon användare:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "Som standard är I2P inställt för att köras under användaren i2psvc när det körs som tjänst. För att använda ett **existerande** I2P profil, ange en annan användare här. Exempelvis, om din tidigare I2P installation är /home/user/i2p så ange 'user' här."
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"Som standard är I2P konfigurerad för att köras under användaren i2psvc när "
+"det körs som tjänst. Om du vill använda en **befintlig** I2P-profil kan du "
+"ange ett annat kontonamn här. Till exempel, om din tidigare I2P-installation "
+"är på /home/user/I2P, kan du ange \"användare\" här."
 
 #. Type: string
 #. Description
@@ -58,7 +66,9 @@ msgstr "Som standard är I2P inställt för att köras under användaren i2psvc 
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "OBS! Viktigt: Om en annan användare än standard 'i2psvc' skrivs in här. *MÅSTE* det användarnamnet redan existera."
+msgstr ""
+"Mycket viktigt: om en annan användare än standard 'i2psvc' anges här, "
+"*MÅSTE* det valda användarnamnet *redan finnas."
 
 #. Type: string
 #. Description
@@ -70,7 +80,7 @@ msgstr "Minne som kan tilldelas I2P:"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Som standard kommer I2P bara att använda  up till 128MB RAM."
+msgstr "Som standard får I2P endast använda upp till 128 MB RAM."
 
 #. Type: string
 #. Description
@@ -78,13 +88,15 @@ msgstr "Som standard kommer I2P bara att använda  up till 128MB RAM."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "För routrar med hög bandbredd eller routrar med hög aktivitet kan detta behöva ökas"
+msgstr ""
+"För routrar med hög bandbredd samt routrar med en hel del aktiva torrenter / "
+"insticksmoduler, kan detta värde behöva ökas."
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Kör I2P begränsad av AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Ska I2P-demonen vara begränsad med AppArmor?"
 
 #. Type: boolean
 #. Description
@@ -92,4 +104,6 @@ msgstr "Kör I2P begränsad av AppArmor"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Med det här valet aktiverat kommer I2P att köras i sandlåda med AppArmor, som begränsar vilka filer och mappar som kan kommas åt av I2P."
+msgstr ""
+"Med det här alternativet aktiverat kommer I2P att köras i sandlåda med "
+"AppArmor, som begränsar vilka filer och mappar som kan kommas åt av I2P."

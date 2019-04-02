@@ -218,6 +218,7 @@ public final class Blinding {
      *  PRELIMINARY - Subject to change - see proposal 149
      *
      *  @param b 35+ bytes
+     *  @return BlindData structure, use getUnblindedPubKey() for the result
      *  @throws IllegalArgumentException on bad inputs
      *  @throws UnsupportedOperationException unless supported SigTypes
      *  @since 0.9.40
@@ -311,6 +312,15 @@ public final class Blinding {
         b[2] ^= (byte) (check >> 16);
         // todo privkey
         return Base32.encode(b) + ".b32.i2p";
+    }
+
+    public static void main(String args[]) throws Exception {
+        if (args.length != 1) {
+            System.out.println("Usage: blinding {56 chars}.b32.i2p");
+            System.exit(1);
+        }
+        System.out.println("Blinded B32: " + args[0]);
+        System.out.println(decode(I2PAppContext.getGlobalContext(), args[0]).toString());
     }
 
 /******

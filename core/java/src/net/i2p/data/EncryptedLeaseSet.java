@@ -33,6 +33,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     private LeaseSet2 _decryptedLS2;
     private Hash __calculatedHash;
     private SigningPrivateKey _alpha;
+    // to decrypt with if we don't have full dest
+    private SigningPublicKey _unblindedSPK;
     private String _secret;
     private final Log _log;
 
@@ -120,11 +122,31 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             _destination = dest;
         }
         SigningPublicKey spk = dest.getSigningPublicKey();
+        setSigningKey(spk);
+    }
+
+    /**
+     * Overridden to set the blinded key
+     *
+     * @param spk unblinded key non-null, must be EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
+     * @throws IllegalStateException if already signed
+     * @throws IllegalArgumentException if not EdDSA
+     * @since 0.9.40
+     */
+    @Override
+    public void setSigningKey(SigningPublicKey spk) {
+        // TODO already-set checks
         SigType type = spk.getType();
         if (type != SigType.EdDSA_SHA512_Ed25519 &&
             type != SigType.RedDSA_SHA512_Ed25519)
             throw new IllegalArgumentException();
-        SigningPublicKey bpk = blind();
+        if (_unblindedSPK != null) {
+            if (!_unblindedSPK.equals(spk))
+                throw new IllegalArgumentException("unblinded pubkey mismatch");
+        } else {
+            _unblindedSPK = spk;
+        }
+        SigningPublicKey bpk = blind(spk);
         if (_signingKey == null)
             _signingKey = bpk;
         else if (!_signingKey.equals(bpk))
@@ -139,13 +161,12 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      *
      * @since 0.9.39
      */
-    private SigningPublicKey blind() {
-        SigningPublicKey spk = _destination.getSigningPublicKey();
+    private SigningPublicKey blind(SigningPublicKey spk) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         if (_published <= 0)
-            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), _secret);
+            _alpha = Blinding.generateAlpha(ctx, spk, _secret);
         else
-            _alpha = Blinding.generateAlpha(ctx, _destination.getSigningPublicKey(), _secret, _published);
+            _alpha = Blinding.generateAlpha(ctx, spk, _secret, _published);
         SigningPublicKey rv = Blinding.blind(spk, _alpha);
         if (_log.shouldDebug())
             _log.debug("Blind:" +
@@ -476,14 +497,13 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      *  @since 0.9.39
      */
     private byte[] getSubcredential(I2PAppContext ctx) {
-        if (_destination == null)
-            throw new IllegalStateException("no known destination to decrypt with");
-        SigningPublicKey destspk = _destination.getSigningPublicKey();
-        int spklen = destspk.length();
+        if (_unblindedSPK == null)
+            throw new IllegalStateException("no known SPK to decrypt with");
+        int spklen = _unblindedSPK.length();
         byte[] in = new byte[spklen + 4];
         // SHA256("credential" || spk || sigtypein || sigtypeout)
-        System.arraycopy(destspk.getData(), 0, in, 0, spklen);
-        DataHelper.toLong(in, spklen, 2, destspk.getType().getCode());
+        System.arraycopy(_unblindedSPK.getData(), 0, in, 0, spklen);
+        DataHelper.toLong(in, spklen, 2, _unblindedSPK.getType().getCode());
         DataHelper.toLong(in, spklen + 2, 2, SigType.RedDSA_SHA512_Ed25519.getCode());
         byte[] credential = hash(ctx, CREDENTIAL, in);
         byte[] spk = _signingKey.getData();
@@ -572,8 +592,9 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             return false;
         }
         _log.info("ELS2 outer sig verify success");
-        if (_destination == null) {
-            _log.warn("ELS2 no dest to decrypt with");
+        if (_unblindedSPK == null) {
+            if (_log.shouldWarn())
+                _log.warn("ELS2 no dest/SPK to decrypt with", new Exception("I did it"));
             return true;
         }
         try {

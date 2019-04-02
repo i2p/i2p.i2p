@@ -608,7 +608,7 @@ class ClientConnectionRunner {
      * called after a new leaseSet is granted by the client, the NetworkDb has been
      * updated.  This takes care of all the LeaseRequestState stuff (including firing any jobs)
      *
-     * @param ls, if encrypted, the encrypted LS, not the decrypted one
+     * @param ls if encrypted, the encrypted LS, not the decrypted one
      */
     void leaseSetCreated(LeaseSet ls) {
         Hash h = ls.getDestination().calculateHash();
