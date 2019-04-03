@@ -1,5 +1,15 @@
+2019-04-03 zzz
+ * I2PTunnel: Start/stop POST throttle timer
+
 2019-04-02 zab
- * I2PTunnel: mplement access filtering (ticket #2464
+ * I2PTunnel: Implement access filtering (ticket #2464)
+
+2019-03-31 zzz
+ * Data: Implement Destroyable for private keys (ticket #2462)
+
+2019-03-29 zzz
+ * Crypto: SigContext (WIP) (proposal #148)
+ * NetDB: Persist cached blinding data (proposal #123)
 
 2019-03-27 zzz
  * NetDB: Cache blinding data for lookups and decryption (proposal #123)

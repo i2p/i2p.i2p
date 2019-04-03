@@ -39,8 +39,12 @@ class ConnThrottler {
     private final String _action;
     private final Log _log;
     private final DateFormat _fmt;
+    private final SimpleTimer2.TimedEvent _cleaner;
+    private boolean _isRunning;
 
     /*
+     * Caller MUST call start()
+     *
      * @param max per-peer, 0 for unlimited
      * @param totalMax for all peers, 0 for unlimited
      * @param period check window (ms)
@@ -57,7 +61,30 @@ class ConnThrottler {
         // for logging
         _fmt = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
         _fmt.setTimeZone(SystemVersion.getSystemTimeZone());
-        new Cleaner();
+        _cleaner = new Cleaner();
+    }
+
+    /*
+     * If already started, has no effect.
+     *
+     * @since 0.9.40
+     */
+    public synchronized void start() {
+        if (_isRunning)
+            return;
+        _isRunning = true;
+        _cleaner.schedule(_checkPeriod);
+    }
+
+    /*
+     * May be restarted.
+     *
+     * @since 0.9.40
+     */
+    public synchronized void stop() {
+        _isRunning = false;
+        _cleaner.cancel();
+        clear();
     }
 
     /*
@@ -176,9 +203,9 @@ class ConnThrottler {
     }
 
     private class Cleaner extends SimpleTimer2.TimedEvent {
-        /** schedules itself */
+        /** must call schedule() later */
         public Cleaner() {
-            super(SimpleTimer2.getInstance(), _checkPeriod);
+            super(SimpleTimer2.getInstance());
         }
 
         public void timeReached() {

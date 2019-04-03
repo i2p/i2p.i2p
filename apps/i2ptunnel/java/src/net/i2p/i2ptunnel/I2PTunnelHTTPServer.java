@@ -233,6 +233,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _postThrottler = new ConnThrottler(pp, pt, pw, pb, px, "POST/PUT", _log);
                 else
                     _postThrottler.updateLimits(pp, pt, pw, pb, px);
+                _postThrottler.start();
             }
         }
     }
@@ -254,7 +255,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     public boolean close(boolean forced) {
         synchronized(this) {
             if (_postThrottler != null)
-                _postThrottler.clear();
+                _postThrottler.stop();
         }
         return super.close(forced);
     }
