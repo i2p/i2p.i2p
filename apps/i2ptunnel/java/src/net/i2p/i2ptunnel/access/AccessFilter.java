@@ -156,7 +156,7 @@ class AccessFilter implements StatefulConnectionFilter {
     }
 
     private void purge() {
-        long olderThan = context.clock().now() - definition.getPurgeMinutes() * 60000;
+        long olderThan = context.clock().now() - definition.getPurgeSeconds() * 1000;
         
         synchronized(knownDests) {
             for (DestTracker tracker : knownDests.values()) {

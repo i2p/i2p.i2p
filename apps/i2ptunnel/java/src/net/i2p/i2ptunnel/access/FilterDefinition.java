@@ -12,7 +12,7 @@ class FilterDefinition {
     private final Threshold defaultThreshold;
     private final FilterDefinitionElement[] elements;
     private final Recorder[] recorders;
-    private final int purgeMinutes;
+    private final int purgeSeconds;
 
     /**
      * @param defaultThreshold threshold to apply to unknown remote destinations
@@ -26,13 +26,13 @@ class FilterDefinition {
         this.elements = elements;
         this.recorders = recorders;
 
-        int maxMinutes = defaultThreshold.getMinutes();
+        int maxSeconds = defaultThreshold.getSeconds();
         for (FilterDefinitionElement element : elements) 
-            maxMinutes = Math.max(maxMinutes, element.getThreshold().getMinutes());
+            maxSeconds = Math.max(maxSeconds, element.getThreshold().getSeconds());
         for (Recorder recorder : recorders) 
-            maxMinutes = Math.max(maxMinutes, recorder.getThreshold().getMinutes());
+            maxSeconds = Math.max(maxSeconds, recorder.getThreshold().getSeconds());
 
-        this.purgeMinutes = maxMinutes;
+        this.purgeSeconds = maxSeconds;
     }
 
     Threshold getDefaultThreshold() {
@@ -47,7 +47,7 @@ class FilterDefinition {
         return recorders;
     }
 
-    int getPurgeMinutes() {
-        return purgeMinutes;
+    int getPurgeSeconds() {
+        return purgeSeconds;
     }
 }

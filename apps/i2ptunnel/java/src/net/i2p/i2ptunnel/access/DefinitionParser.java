@@ -43,16 +43,16 @@ class DefinitionParser {
      * </p>
      * <p>
      * A threshold is defined by the number of connection attempts a remote destination is
-     * permitted to perform over a specified number of minutes before a "breach" occurs.
+     * permitted to perform over a specified number of seconds before a "breach" occurs.
      * For example the following threshold definition "15/5" means that the same remote
-     * destination is allowed to make 14 connection attempts over a 5 minute period,  If
+     * destination is allowed to make 14 connection attempts over a 5 second period,  If
      * it makes one more attempt within the same period, the threshold will be breached.
      * </p>
      * <p>
      * The threshold format can be one of the following:
      * </p>
      * <ul>
-     * <li>Numeric definition of number of connections over number minutes - "15/5", 
+     * <li>Numeric definition of number of connections over number seconds - "15/5", 
      *   "30/60", and so on.  Note that if the number of connections is 1 (as for 
      *   example in "1/1") the first connection attempt will result in a breach.</li>
      * <li>The word "allow".  This threshold is never breached, i.e. infinite number of 
@@ -100,8 +100,8 @@ class DefinitionParser {
      * It is possible to use a recorder to record aggressive destinations to a given file,
      * and then use that same file to throttle them.  For example, the following snippet will
      * define a filter that initially allows all connection attempts, but if any single
-     * destination exceeds 30 attempts per 5 minutes it gets throttled down to 15 attempts per 
-     * 5 minutes:
+     * destination exceeds 30 attempts per 5 seconds it gets throttled down to 15 attempts per 
+     * 5 seconds:
      * </p>
      * <pre>
      * # by default there are no limits
@@ -176,12 +176,12 @@ class DefinitionParser {
 
         try {
             int connections = Integer.parseInt(split[0]);
-            int minutes = Integer.parseInt(split[1]);
+            int seconds = Integer.parseInt(split[1]);
             if (connections < 0)
                 throw new InvalidDefinitionException("Number of connections cannot be negative " + s);
-            if (minutes < 1)
-                throw new InvalidDefinitionException("Number of minutes must be at least 1 " + s);
-            return new Threshold(connections, minutes);
+            if (seconds < 1)
+                throw new InvalidDefinitionException("Number of seconds must be at least 1 " + s);
+            return new Threshold(connections, seconds);
         } catch (NumberFormatException bad) {
             throw new InvalidDefinitionException("Invalid threshold", bad);
         }

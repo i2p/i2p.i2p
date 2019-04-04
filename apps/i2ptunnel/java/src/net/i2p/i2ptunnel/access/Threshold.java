@@ -3,7 +3,7 @@ package net.i2p.i2ptunnel.access;
 /**
  * Definition of a Threshold.  
  *
- * A Threshold is defined by a number of connections over a period of minutes
+ * A Threshold is defined by a number of connections over a period of seconds
  *
  * @since 0.9.40
  */
@@ -15,22 +15,22 @@ class Threshold {
     static final Threshold DENY = new Threshold(0, 1);
 
     private final int connections;
-    private final int minutes;
+    private final int seconds;
 
-    Threshold(int connections, int minutes) {
-        if (minutes < 1)
-            throw new IllegalArgumentException("Threshold must be defined over at least 1 minute");
+    Threshold(int connections, int seconds) {
+        if (seconds < 1)
+            throw new IllegalArgumentException("Threshold must be defined over at least 1 second");
         if (connections < 0)
             throw new IllegalArgumentException("Accesses cannot be negative");
         this.connections = connections;
-        this.minutes = minutes;
+        this.seconds = seconds;
     }
 
     int getConnections() {
         return connections;
     }
     
-    int getMinutes() {
-        return minutes;
+    int getSeconds() {
+        return seconds;
     }
 }

@@ -38,7 +38,7 @@ class AccessCounter {
         
         for (int i = 0; i <= accesses.size() - threshold.getConnections(); i++) {
             long start = accesses.get(i);
-            long end = start + threshold.getMinutes() * 60000;
+            long end = start + threshold.getSeconds() * 1000;
             if (accesses.get(i + threshold.getConnections() -1) <= end)
                 return true;
         }
