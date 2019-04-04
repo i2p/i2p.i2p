@@ -93,8 +93,8 @@ class DefinitionParser {
      * breaches a certain threshold, that destination gets recorded in a given file.  Examples:
      *
      * <pre>
-     * 30/5 recorder /path/aggressive.txt
-     * 60/5 recorder /path/very_aggressive.txt
+     * 30/5 record /path/aggressive.txt
+     * 60/5 record /path/very_aggressive.txt
      * </pre>
      * <p>
      * It is possible to use a recorder to record aggressive destinations to a given file,
@@ -107,7 +107,7 @@ class DefinitionParser {
      * # by default there are no limits
      * allow default
      * # but record overly aggressive destinations
-     * 30/5 recorder /path/throttled.txt
+     * 30/5 record /path/throttled.txt
      * # and any that end up in that file will get throttled in the future
      * 15/5 file /path/throttled.txt
      * </pre>
@@ -126,7 +126,7 @@ class DefinitionParser {
      * 15/5 default
      * allow file /path/friends.txt
      * deny file /path/enemies.txt
-     * 60/5 recorder /path/suspicious.txt
+     * 60/5 record /path/suspicious.txt
      * </pre>
      *
      * @return a FilterDefinition POJO representation for internal use
@@ -194,7 +194,7 @@ class DefinitionParser {
             return Rule.EXPLICIT;
         if ("file".equals(s))
             return Rule.FILE;
-        if ("recorder".equals(s))
+        if ("record".equals(s))
             return Rule.RECORDER;
 
         throw new InvalidDefinitionException("unknown rule "+s);
