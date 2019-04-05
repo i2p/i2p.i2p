@@ -538,7 +538,7 @@
 
         <tr>
             <td colspan="2">
-                <b><%=intl._t("Access List Description")%></b> (<%=intl._t("Specify clients, 1 per line or describe access list")%>)
+                <b><%=intl._t("Access List Description")%></b> (<%=intl._t("Specify clients, 1 per line")%>)
             </td>
         </tr>
 
