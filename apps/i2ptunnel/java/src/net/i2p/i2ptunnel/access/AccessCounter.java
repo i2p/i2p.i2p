@@ -28,16 +28,20 @@ class AccessCounter {
 
     /**
      * @param threshold definition of a threshold
+     * @param now current time
      * @return true if the given threshold has been breached
      */
-    boolean isBreached(Threshold threshold) {
+    boolean isBreached(Threshold threshold, long now) {
         if (threshold.getConnections() == 0)
             return !accesses.isEmpty();
         if (accesses.size() < threshold.getConnections())
             return false;
         
+        long ignoreOlder = now - threshold.getSeconds() * 1000;
         for (int i = 0; i <= accesses.size() - threshold.getConnections(); i++) {
             long start = accesses.get(i);
+            if (start < ignoreOlder)
+                continue;
             long end = start + threshold.getSeconds() * 1000;
             if (accesses.get(i + threshold.getConnections() -1) <= end)
                 return true;

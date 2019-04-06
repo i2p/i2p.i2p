@@ -36,7 +36,7 @@ class DestTracker {
      */
     synchronized boolean recordAccess(long now) {
         counter.recordAccess(now);
-        return counter.isBreached(threshold);
+        return counter.isBreached(threshold,now);
     }
 
     synchronized boolean purge(long olderThan) {

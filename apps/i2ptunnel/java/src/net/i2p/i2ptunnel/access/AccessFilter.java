@@ -123,13 +123,14 @@ class AccessFilter implements StatefulConnectionFilter {
     }
 
     private void record() throws IOException {
+        final long now = context.clock().now();
         for (Recorder recorder : definition.getRecorders()) {
             Threshold threshold = recorder.getThreshold();
             File file = recorder.getFile();
             Set<String> breached = new HashSet<String>();
             synchronized(unknownDests) {
                 for (DestTracker tracker : unknownDests.values()) {
-                    if (!tracker.getCounter().isBreached(threshold))
+                    if (!tracker.getCounter().isBreached(threshold, now))
                         continue;
                     breached.add(tracker.getHash().toBase32());
                 }
