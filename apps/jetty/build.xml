@@ -528,21 +528,54 @@
             </manifest>
         </jar>
     </target>    
+
     <target name="servletJavadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/servlet-i2p-javadoc" />
-        <javadoc
-            sourcepath="./java/src:../../core/java/src" destdir="./build/servlet-i2p-javadoc"
-            packagenames="net.i2p.servlet.filters.*"
+        <javadoc access="package"
+            source="${javac.version}"
+            destdir="./build/servlet-i2p-javadoc"
+            packagenames="*"
             use="true"
             splitindex="true"
-            windowtitle="I2P Servlet classes" />
+            failonerror="true"
+            additionalparam="-notimestamp"
+            doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
+            windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
+            <group title="Jetty Utilities" packages="*" />
+            <sourcepath>
+                <pathelement location="./java/src" />
+            </sourcepath>
+            <classpath>
+                <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="./jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="./jettylib/javax.servlet.jar" />
+                <pathelement location="./jettylib/jetty-http.jar" />
+                <pathelement location="./jettylib/jetty-io.jar" />
+                <pathelement location="./jettylib/jetty-security.jar" />
+                <pathelement location="./jettylib/jetty-servlet.jar" />
+                <pathelement location="./jettylib/jetty-util.jar" />
+                <pathelement location="./jettylib/jetty-xml.jar" />
+                <!-- following are only for debian builds -->
+                <pathelement location="../../core/java/build/libintl.jar" />
+                <pathelement location="../../core/java/build/gnu-getopt.jar" />
+                <pathelement location="../../core/java/build/json-simple.jar" />
+            </classpath>
+            <!-- These variables are stored in build.properties.
+                  End-users can override by creating the file override.properties -->
+            <link offline="true" href="${javasedocs.url}" packagelistLoc="../../installer/resources/package-lists/java/" />
+            <link offline="true" href="${javaeedocs.url}" packagelistLoc="../../installer/resources/package-lists/javaee/" />
+            <link offline="true" href="${jettydocs.url}" packagelistLoc="../../installer/resources/package-lists/jetty/" />
+            <link offline="true" href="${wrapperdocs.url}" packagelistLoc="../../installer/resources/package-lists/wrapper/" />
+        </javadoc>
     </target>
+
     <target name="servletJavadocJar" depends="servletJavadoc">
         <jar jarfile="./build/servlet-i2p-${release.number}-javadoc.jar">
             <fileset dir="./build/servlet-i2p-javadoc" />
         </jar>
     </target>
+
     <target name="servletSourcesJar">
         <jar jarfile="./build/servlet-i2p-${release.number}-sources.jar">
             <fileset dir="./java/src" includes="net/i2p/servlet/filters/**" />

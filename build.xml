@@ -1925,9 +1925,13 @@
     <!-- end custom installers -->
 
     <!-- unit tests -->
-    <target name="buildTest">
+    <target name="buildCoreTest">
         <ant dir="core/java/" target="jarTest" />
+    </target>
+    <target name="buildRouterTest" depends="buildCoreTest">
         <ant dir="router/java/" target="jarTest" />
+    </target>
+    <target name="buildTest" depends="buildRouterTest">
         <copy file="core/java/build/i2ptest.jar" todir="build" />
         <copy file="router/java/build/routertest.jar" todir="build" />
         <!-- broken -->
@@ -2208,7 +2212,8 @@
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
 
-    <target name="mavenCentral.deps" depends="buildRouter, buildStreaming">
+    <!-- depends on buildCoreTest so that the router unit test javadocs can find the core unit test classes -->
+    <target name="mavenCentral.deps" depends="buildRouter, buildStreaming, buildCoreTest">
         <ant dir="core/java/">
             <target name="javadocJar" />
             <target name="sourcesJar" />
@@ -2252,6 +2257,10 @@
         <copy file="apps/ministreaming/java/build/mstreaming-${release.number}-sources.jar" todir="pkg-mavencentral/" />
         <copy file="apps/streaming/java/build/streaming-${release.number}-sources.jar" todir="pkg-mavencentral/" />
         <copy file="apps/jetty/build/servlet-i2p-${release.number}-sources.jar" todir="pkg-mavencentral/" />
+        <echo message="This requires the Maven Ant Tasks to be installed." />
+        <echo message="If this fails, on Debian jessie or, Ubuntu trusty/xenial:" />
+        <echo message="sudo apt-get install libmaven-ant-tasks-java" />
+        <echo message="Sorry, not available on more recent distributions" />
         <!-- POMs -->
         <artifact:pom id="i2ppom" groupId="net.i2p" artifactId="i2p" version="${release.number}"
                 name="I2P Core"

@@ -237,15 +237,38 @@
     <target name="jarTest" depends="jar, junit.compileTest">
         <jar destfile="./build/streaming.jar" basedir="./build/obj" includes="**/*Test*.class" update="true" />
     </target>
+
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
-        <javadoc
-            sourcepath="./src:../../../core/java/src:../../ministreaming/java/src" destdir="./build/javadoc"
+        <javadoc access="package"
+            source="${javac.version}"
+            destdir="./build/javadoc"
             packagenames="*"
             use="true"
             splitindex="true"
-            windowtitle="Streaming" />
+            failonerror="true"
+            additionalparam="-notimestamp"
+            doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
+            windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
+            <group title="Streaming Library Implementation" packages="*" />
+            <sourcepath>
+                <pathelement location="./src" />
+            </sourcepath>
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
+                <!-- following are only for debian builds -->
+                <pathelement location="../../../core/java/build/libintl.jar" />
+                <pathelement location="../../../core/java/build/gnu-getopt.jar" />
+            </classpath>
+            <!-- These variables are stored in build.properties.
+                  End-users can override by creating the file override.properties -->
+            <link offline="true" href="${javasedocs.url}" packagelistLoc="../../../installer/resources/package-lists/java/" />
+            <link offline="true" href="${javaeedocs.url}" packagelistLoc="../../../installer/resources/package-lists/javaee/" />
+            <link offline="true" href="${jettydocs.url}" packagelistLoc="../../../installer/resources/package-lists/jetty/" />
+            <link offline="true" href="${wrapperdocs.url}" packagelistLoc="../../../installer/resources/package-lists/wrapper/" />
+        </javadoc>
     </target>
 
     <!-- for Maven Central -->
@@ -254,6 +277,7 @@
             <fileset dir="./build/javadoc" />
         </jar>
     </target>
+
     <target name="sourcesJar">
         <jar jarfile="./build/streaming-${release.number}-sources.jar">
             <fileset dir="./src" />
