@@ -128,15 +128,6 @@ class AccessFilter implements StatefulConnectionFilter {
             Threshold threshold = recorder.getThreshold();
             File file = recorder.getFile();
             Set<String> breached = new LinkedHashSet<String>();
-            synchronized(unknownDests) {
-                for (DestTracker tracker : unknownDests.values()) {
-                    if (!tracker.getCounter().isBreached(threshold, now))
-                        continue;
-                    breached.add(tracker.getHash().toBase32());
-                }
-            }
-            if (breached.isEmpty())
-                continue;
 
             // if the file already exists, add previously breached b32s
             if (file.exists() && file.isFile()) {
@@ -151,6 +142,17 @@ class AccessFilter implements StatefulConnectionFilter {
                     if (reader != null) try { reader.close(); } catch (IOException ignored) {}
                 }
             }
+
+            synchronized(unknownDests) {
+                for (DestTracker tracker : unknownDests.values()) {
+                    if (!tracker.getCounter().isBreached(threshold, now))
+                        continue;
+                    breached.add(tracker.getHash().toBase32());
+                }
+            }
+
+            if (breached.isEmpty())
+                continue;
 
             BufferedWriter writer = null; 
             try {
