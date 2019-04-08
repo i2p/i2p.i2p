@@ -2,6 +2,7 @@ package net.i2p.util;
 
 //import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.zip.Deflater;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -50,9 +51,16 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
      * state)
      */
     public static void release(ReusableGZIPOutputStream out) {
-        out.reset();
-        if (ENABLE_CACHING)
-            _available.offer(out);
+        boolean cached;
+        if (ENABLE_CACHING) {
+            out.reset();
+            cached = _available.offer(out);
+        } else {
+            cached = false;
+        }
+        if (!cached) {
+            try { out.destroy(); } catch (IOException ioe) {}
+        }
     }
     
     private final ByteArrayOutputStream _buffer;

@@ -18,6 +18,7 @@ import java.util.zip.DeflaterOutputStream;
 public class ResettableGZIPOutputStream extends DeflaterOutputStream {
     /** has the header been written out yet? */
     private boolean _headerWritten;
+    private boolean _footerWritten;
     /** how much data is in the uncompressed stream? */
     private long _writtenSize;
     private final CRC32 _crc32;
@@ -39,6 +40,7 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         _crc32.reset();
         _writtenSize = 0;
         _headerWritten = false;
+        _footerWritten = false;
     }
     
     private static final byte[] HEADER = new byte[] {
@@ -61,6 +63,7 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
     }
     
     private void writeFooter() throws IOException {
+        if (_footerWritten) return;
         // damn RFC writing their bytes backwards...
         long crcVal = _crc32.getValue();
         out.write((int)(crcVal & 0xFF));
@@ -83,6 +86,16 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
             System.out.print(  Long.toHexString((int)((sizeVal >>> 24) & 0xFF)));
             System.out.println();
         }
+        _footerWritten = true;
+    }
+
+    /**
+     *  Calls super.close(). May not be reused after this.
+     *  @since 0.9.40
+     */
+    public void destroy() throws IOException {
+        def.end();
+        super.close();
     }
     
     @Override
@@ -90,6 +103,7 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         finish();
         super.close();
     }
+
     @Override
     public void finish() throws IOException {
         ensureHeaderIsWritten();
@@ -104,10 +118,12 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         _writtenSize++;
         super.write(b);
     }
+
     @Override
     public void write(byte buf[]) throws IOException {
         write(buf, 0, buf.length);
     }
+
     @Override
     public void write(byte buf[], int off, int len) throws IOException {
         ensureHeaderIsWritten();

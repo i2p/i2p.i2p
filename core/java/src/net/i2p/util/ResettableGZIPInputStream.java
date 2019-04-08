@@ -169,6 +169,15 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     }
 
     /**
+     *  Calls super.close(). May not be reused after this.
+     *  @since 0.9.40
+     */
+    public void destroy() throws IOException {
+        close();
+        super.close();
+    }
+
+    /**
      *  Does NOT call super.close(), as it cannot be reused if we do that.
      *  Broken before 0.9.20.
      *  @since 0.9.20
