@@ -3,7 +3,7 @@ package net.i2p.i2ptunnel.access;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.Executors;
@@ -127,7 +127,7 @@ class AccessFilter implements StatefulConnectionFilter {
         for (Recorder recorder : definition.getRecorders()) {
             Threshold threshold = recorder.getThreshold();
             File file = recorder.getFile();
-            Set<String> breached = new HashSet<String>();
+            Set<String> breached = new LinkedHashSet<String>();
             synchronized(unknownDests) {
                 for (DestTracker tracker : unknownDests.values()) {
                     if (!tracker.getCounter().isBreached(threshold, now))
