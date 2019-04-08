@@ -1,5 +1,6 @@
 package net.i2p.util;
 
+import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -32,13 +33,21 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
         } 
         return rv;
     }
+
     /**
      * Release an instance back into the cache (this will reset the 
      * state)
      */
     public static void release(ReusableGZIPInputStream released) {
-        if (ENABLE_CACHING)
-            _available.offer(released);
+        boolean cached;
+        if (ENABLE_CACHING) {
+            cached = _available.offer(released);
+        } else {
+            cached = false;
+        }
+        if (!cached) {
+            try { released.destroy(); } catch (IOException ioe) {}
+        }
     }
     
     private ReusableGZIPInputStream() { super(); }
