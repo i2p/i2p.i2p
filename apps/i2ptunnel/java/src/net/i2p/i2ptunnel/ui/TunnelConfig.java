@@ -255,6 +255,53 @@ public class TunnelConfig {
         else
             _booleanOptions.remove("i2cp.encryptLeaseSet");
     }
+
+    /** @since 0.9.40 */
+    public void setEncryptMode(int mode) {
+        switch (mode) {
+        case 0:
+        default:
+            setEncrypt(false);
+            _otherOptions.remove("i2cp.leaseSetSecret");
+            break;
+
+        case 1:
+            setEncrypt(true);
+            _otherOptions.remove("i2cp.leaseSetType");
+            // doesn't work, after this in the form
+            _otherOptions.remove("i2cp.leaseSetSecret");
+            break;
+
+        case 4:
+        case 6:
+            // TODO
+            // Fallthrough
+        case 2:
+            setEncrypt(false);
+            _otherOptions.put("i2cp.leaseSetType", "5");
+            // doesn't work, after this in the form
+            _otherOptions.remove("i2cp.leaseSetSecret");
+            break;
+
+        case 5:
+        case 7:
+            // TODO
+            // Fallthrough
+        case 3:
+            setEncrypt(false);
+            _otherOptions.put("i2cp.leaseSetType", "5");
+            break;
+        }
+    }
+    
+    /** @since 0.9.40 */
+    public void setBlindedPassword(String s) {
+        if (s != null && s.length() > 0)
+            _otherOptions.put("i2cp.leaseSetSecret", s);
+        else
+            _otherOptions.remove("i2cp.leaseSetSecret");
+    }
+
     public void setDCC(boolean val) {
         if (val)
             _booleanOptions.add(I2PTunnelIRCClient.PROP_DCC);
@@ -803,8 +850,9 @@ public class TunnelConfig {
          PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
          PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
          PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE,
-        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey",
-         I2PTunnelServer.PROP_ALT_PKF
+         "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey",
+         I2PTunnelServer.PROP_ALT_PKF,
+         "i2cp.leaseSetSecret"
         };
     private static final String _httpServerOpts[] = {
         I2PTunnelHTTPServer.OPT_POST_WINDOW,

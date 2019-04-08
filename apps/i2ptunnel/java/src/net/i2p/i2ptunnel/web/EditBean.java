@@ -213,6 +213,20 @@ public class EditBean extends IndexBean {
     }
     
     /**
+     *  @since 0.9.40
+     */
+    public String getEncryptMode(int tunnel) {
+        return Integer.toString(_helper.getEncryptMode(tunnel));
+    }
+    
+    /**
+     *  @since 0.9.40
+     */
+    public String getBlindedPassword(int tunnel) {
+        return _helper.getBlindedPassword(tunnel);
+    }
+    
+    /**
      *  @param newTunnelType used if tunnel &lt; 0
      *  @since 0.9.12
      */

@@ -494,8 +494,37 @@
 
         <tr>
             <td colspan="2">
-                <label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="1" type="checkbox" id="startOnLoad" name="encrypt"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Only allow clients with the encryption key to connect to this server")%></label>
+                <%
+                   String curEncryptMode = editBean.getEncryptMode(curTunnel);
+                  %>
+                <span class="multiOption"><label title="<%=intl._t("Allow all clients to connect to this service")%>"><input value="0" type="radio" name="encryptMode"<%=(curEncryptMode.equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Disable")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="1" type="radio" name="encryptMode"<%=(curEncryptMode.equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Encrypted")%></label></span>
+                <%
+                    int curSigType = editBean.getSigType(curTunnel, tunnelType);
+                    if (curSigType == 7 || curSigType == 11) {
+                  %>
+                <span class="multiOption"><label title="<%=intl._t("Prevents snooping by floodfills")%>"><input value="2" type="radio" name="encryptMode"<%=(curEncryptMode.equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the password will be able to connect")%>"><input value="3" type="radio" name="encryptMode"<%=(curEncryptMode.equals("3") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded with password")%></label></span>
+                  <%
+                     if (editBean.isAdvanced()) {
+                         // TODO, unimplemented
+                    %>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="4" type="radio" name="encryptMode"<%=(curEncryptMode.equals("4") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded with shared key")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="5" type="radio" name="encryptMode"<%=(curEncryptMode.equals("5") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded with shared key and password")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="6" type="radio" name="encryptMode"<%=(curEncryptMode.equals("6") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded with per-user key")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="7" type="radio" name="encryptMode"<%=(curEncryptMode.equals("7") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded with shared password and per-user key")%></label></span>
+                <%
+                        } // isAdvanced()
+                    } // curSigType
+                  %>
             </td>
         </tr>
 
@@ -518,6 +547,19 @@
                 <button class="control" type="submit" name="action" value="Generate" title="<%=intl._t("Generate new encryption key")%>"><%=intl._t("Generate")%></button>
             </td>
         </tr>
+
+        <%
+            if (curSigType == 7 || curSigType == 11) {
+          %>
+        <tr>
+            <td>
+                <b><%=intl._t("Blinded Password")%>:</b>
+                <input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Set password required to access this service")%>" value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" />
+            </td><td> </td>
+        </tr>
+        <%
+            } // curSigType
+          %>
 
         <tr>
             <th colspan="2">

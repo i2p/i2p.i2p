@@ -537,6 +537,29 @@ public class GeneralHelper {
     public boolean getEncrypt(int tunnel) {
         return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
     }
+    
+    /**
+     *  @since 0.9.40
+     */
+    public int getEncryptMode(int tunnel) {
+        if (getEncrypt(tunnel))
+            return 1;
+        if (getProperty(tunnel, "i2cp.leaseSetType", "1").equals("5")) {
+            String pw = getBlindedPassword(tunnel);
+            if (pw != null && pw.length() > 0)
+                return 3;
+            return 2;
+            // LS auth (rv 4-7) TODO
+        }
+        return 0;
+    }
+    
+    /**
+     *  @since 0.9.40
+     */
+    public String getBlindedPassword(int tunnel) {
+        return getProperty(tunnel, "i2cp.leaseSetSecret", "");
+    }
 
     /**
      *  @param newTunnelType used if tunnel &lt; 0

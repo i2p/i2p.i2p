@@ -825,6 +825,20 @@ public class IndexBean {
         _config.setEncrypt(true);
     }
 
+    /** @since 0.9.40 */
+    public void setEncryptMode(String val) {
+        if (val != null) {
+            try {
+                _config.setEncryptMode(Integer.parseInt(val.trim()));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+    
+    /** @since 0.9.40 */
+    public void setNofilter_blindedPassword(String s) {
+        _config.setBlindedPassword(s);
+    }
+
     /** @since 0.8.9 */
     public void setDCC(String moo) {
         _config.setDCC(true);
