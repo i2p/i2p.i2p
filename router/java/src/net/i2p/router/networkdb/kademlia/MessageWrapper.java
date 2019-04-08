@@ -43,13 +43,11 @@ public class MessageWrapper {
      *  @return null on encrypt failure
      */
     static WrappedMessage wrap(RouterContext ctx, I2NPMessage m, Hash from, RouterInfo to) {
-        PayloadGarlicConfig payload = new PayloadGarlicConfig();
-        payload.setCertificate(Certificate.NULL_CERT);
-        payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        payload.setPayload(m);
+        PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                              ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                              m.getMessageExpiration(),
+                                                              DeliveryInstructions.LOCAL, m);
         payload.setRecipient(to);
-        payload.setDeliveryInstructions(DeliveryInstructions.LOCAL);
-        payload.setExpiration(m.getMessageExpiration());
 
         SessionKeyManager skm;
         if (from != null)
@@ -124,13 +122,11 @@ public class MessageWrapper {
      *  @since 0.9.5
      */
     static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, RouterInfo to) {
-        PayloadGarlicConfig payload = new PayloadGarlicConfig();
-        payload.setCertificate(Certificate.NULL_CERT);
-        payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        payload.setPayload(m);
+        PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                              ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                              m.getMessageExpiration(),
+                                                              DeliveryInstructions.LOCAL, m);
         payload.setRecipient(to);
-        payload.setDeliveryInstructions(DeliveryInstructions.LOCAL);
-        payload.setExpiration(m.getMessageExpiration());
 
         SessionKey sentKey = ctx.keyGenerator().generateSessionKey();
         PublicKey key = to.getIdentity().getPublicKey();
@@ -224,12 +220,10 @@ public class MessageWrapper {
      *  @since 0.9.7
      */
     public static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, SessionKey encryptKey, SessionTag encryptTag) {
-        PayloadGarlicConfig payload = new PayloadGarlicConfig();
-        payload.setCertificate(Certificate.NULL_CERT);
-        payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        payload.setPayload(m);
-        payload.setDeliveryInstructions(DeliveryInstructions.LOCAL);
-        payload.setExpiration(m.getMessageExpiration());
+        PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                              ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                              m.getMessageExpiration(),
+                                                              DeliveryInstructions.LOCAL, m);
 
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 
                                                               null, encryptKey, encryptTag);

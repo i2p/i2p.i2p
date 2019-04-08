@@ -115,13 +115,11 @@ class TestJob extends JobImpl {
         // can't tell its a test.  to simplify this, we encrypt it with a random key and tag,
         // remembering that key+tag so that we can decrypt it later.  this means we can do the
         // garlic encryption without any ElGamal (yay)
-        PayloadGarlicConfig payload = new PayloadGarlicConfig();
-        payload.setCertificate(Certificate.NULL_CERT);
-        payload.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        payload.setPayload(m);
+        PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                              getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                              m.getMessageExpiration(),
+                                                              DeliveryInstructions.LOCAL, m);
         payload.setRecipient(getContext().router().getRouterInfo());
-        payload.setDeliveryInstructions(DeliveryInstructions.LOCAL);
-        payload.setExpiration(m.getMessageExpiration());
 
         SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();
         SessionTag encryptTag = new SessionTag(true);

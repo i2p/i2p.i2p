@@ -903,8 +903,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *  @return null on failure
      */
     private PayloadGarlicConfig buildClove() {
-        PayloadGarlicConfig clove = new PayloadGarlicConfig();
-        
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
         instructions.setDestination(_to.calculateHash());
@@ -914,11 +912,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         //instructions.setDelaySeconds(0);
         //instructions.setEncrypted(false);
         
-        clove.setCertificate(Certificate.NULL_CERT);
-        clove.setDeliveryInstructions(instructions);
-        clove.setExpiration(OVERALL_TIMEOUT_MS_DEFAULT+getContext().clock().now());
-        clove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        
         DataMessage msg = new DataMessage(getContext());
         Payload p = _clientMessage.getPayload();
         if (p == null)
@@ -927,9 +920,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (d == null)
             return null;
         msg.setData(d);
-        msg.setMessageExpiration(clove.getExpiration());
+        long expires = OVERALL_TIMEOUT_MS_DEFAULT + getContext().clock().now();
+        msg.setMessageExpiration(expires);
+        PayloadGarlicConfig clove = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                            getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE), 
+                                                            expires,
+                                                            instructions, msg);
         
-        clove.setPayload(msg);
         // defaults
         //clove.setRecipientPublicKey(null);
         //clove.setRequestAck(false);

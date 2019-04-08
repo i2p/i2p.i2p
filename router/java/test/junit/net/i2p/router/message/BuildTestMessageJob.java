@@ -103,20 +103,20 @@ public class BuildTestMessageJob extends JobImpl {
         _testMessageKey = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         if (_log.shouldLog(Log.INFO))
             _log.info("Test message key: " + _testMessageKey);
-        GarlicConfig config = new GarlicConfig();
-        
-        PayloadGarlicConfig ackClove = buildAckClove();
-        config.addClove(ackClove);
-        
+
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_ROUTER);
         instructions.setRouter(_target.getIdentity().getHash());
         instructions.setTunnelId(null);
         
-        config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
-        config.setDeliveryInstructions(instructions);
-        config.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        config.setExpiration(_timeoutMs+getContext().clock().now()+2*Router.CLOCK_FUDGE_FACTOR);
+        GarlicConfig config = new GarlicConfig(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null),
+                                               getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                               _timeoutMs+getContext().clock().now()+2*Router.CLOCK_FUDGE_FACTOR,
+                                               instructions);
+        
+        PayloadGarlicConfig ackClove = buildAckClove();
+        config.addClove(ackClove);
+        
         config.setRecipient(_target);
         
         return config;
@@ -126,7 +126,6 @@ public class BuildTestMessageJob extends JobImpl {
      * Build a clove that sends a DeliveryStatusMessage to us
      */
     private PayloadGarlicConfig buildAckClove() {
-        PayloadGarlicConfig ackClove = new PayloadGarlicConfig();
         
         DeliveryInstructions ackInstructions = new DeliveryInstructions();
         ackInstructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_ROUTER);
@@ -138,11 +137,11 @@ public class BuildTestMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Delivery status message key: " + _testMessageKey + " arrival: " + msg.getArrival());
         
-        ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
-        ackClove.setDeliveryInstructions(ackInstructions);
-        ackClove.setExpiration(_timeoutMs+getContext().clock().now());
-        ackClove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        ackClove.setPayload(msg);
+        PayloadGarlicConfig ackClove = new PayloadGarlicConfig(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null),
+                                                               getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                               _timeoutMs+getContext().clock().now(),
+                                                               ackInstructions,
+                                                               msg);
         ackClove.setRecipient(_target);
         
         return ackClove;

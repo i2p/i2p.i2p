@@ -8,6 +8,8 @@ package net.i2p.router.message;
  *
  */
 
+import net.i2p.data.Certificate;
+import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.I2NPMessage;
 
 /**
@@ -17,20 +19,18 @@ import net.i2p.data.i2np.I2NPMessage;
  *  for a single garlic-wrapped message by netdb MessageWrapper and tunnel TestJob.
  */
 public class PayloadGarlicConfig extends GarlicConfig {
-    private I2NPMessage _payload;
+    private final I2NPMessage _payload;
 
-    public PayloadGarlicConfig() {
-	super(null);
+    public PayloadGarlicConfig(Certificate cert, long id, long expiration,
+                               DeliveryInstructions di, I2NPMessage message) {
+	super(null, cert, id, expiration, di);
+	_payload = message; 
     }
     
     /**
      * Specify the I2NP message to be sent - if this is set, no other cloves can be included
      * in this block
      */
-    public void setPayload(I2NPMessage message) { 
-	_payload = message; 
-    }
-
     public I2NPMessage getPayload() { return _payload; }
  
     @Override

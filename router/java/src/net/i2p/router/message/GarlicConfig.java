@@ -27,11 +27,11 @@ import net.i2p.data.i2np.DeliveryInstructions;
 class GarlicConfig {
     private RouterInfo _recipient;
     private PublicKey _recipientPublicKey;
-    private Certificate _cert;
-    private long _id;
-    private long _expiration;
+    private final Certificate _cert;
+    private final long _id;
+    private final long _expiration;
     private final List<GarlicConfig> _cloveConfigs;
-    private DeliveryInstructions _instructions;
+    private final DeliveryInstructions _instructions;
     // unused
     //private boolean _requestAck;
     //private RouterInfo _replyThroughRouter; // router through which any replies will be sent before delivery to us
@@ -41,14 +41,17 @@ class GarlicConfig {
     //private long _replyBlockMessageId;
     //private long _replyBlockExpiration;
     
-    public GarlicConfig() {
-	this(new ArrayList<GarlicConfig>(4));
+    public GarlicConfig(Certificate cert, long id, long expiration, DeliveryInstructions di) {
+	this(new ArrayList<GarlicConfig>(4), cert, id, expiration, di);
     }
 
-    protected GarlicConfig(List<GarlicConfig> cloveConfigs) {
-	_id = -1;
-	_expiration = -1;
+    protected GarlicConfig(List<GarlicConfig> cloveConfigs, Certificate cert, long id,
+                           long expiration, DeliveryInstructions di) {
+        _cert = cert;
+	_id = id;
+	_expiration = expiration;
         _cloveConfigs = cloveConfigs;
+        _instructions = di;
 	//_replyBlockMessageId = -1;
 	//_replyBlockExpiration = -1;
     }
@@ -79,28 +82,24 @@ class GarlicConfig {
      * Certificate for the getRecipient() to pay for their processing
      *
      */
-    public void setCertificate(Certificate cert) { _cert = cert; }
     public Certificate getCertificate() { return _cert; }
     
     /**
      * Unique ID of the clove
      *
      */
-    public void setId(long id) { _id = id; }
     public long getId() { return _id; }
     
     /**
      * Expiration of the clove, after which it should be dropped
      *
      */
-    public void setExpiration(long expiration) { _expiration = expiration; }
     public long getExpiration() { return _expiration; }
  
     /**
      * Specify how the I2NPMessage in the clove should be handled.
      *
      */
-    public void setDeliveryInstructions(DeliveryInstructions instructions) { _instructions = instructions; }
     public DeliveryInstructions getDeliveryInstructions() { return _instructions; }
     
     /**

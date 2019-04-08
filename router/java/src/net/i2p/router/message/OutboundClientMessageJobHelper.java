@@ -146,7 +146,9 @@ class OutboundClientMessageJobHelper {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         if (replyToken >= 0 && log.shouldLog(Log.DEBUG))
             log.debug("Reply token: " + replyToken);
-        GarlicConfig config = new GarlicConfig();
+        GarlicConfig config = new GarlicConfig(Certificate.NULL_CERT,
+                                               ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                               expiration, DeliveryInstructions.LOCAL);
         
         if (requireAck) {
             // extend the expiration of the return message
@@ -167,10 +169,6 @@ class OutboundClientMessageJobHelper {
         // and get the leaseset stored before handling the data
         config.addClove(dataClove);
 
-        config.setCertificate(Certificate.NULL_CERT);
-        config.setDeliveryInstructions(DeliveryInstructions.LOCAL);
-        config.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        config.setExpiration(expiration); // +2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipientPublicKey(recipientPK);
         
         if (log.shouldLog(Log.INFO))
@@ -213,11 +211,6 @@ class OutboundClientMessageJobHelper {
         //ackInstructions.setDelaySeconds(0);
         //ackInstructions.setEncrypted(false);
         
-        PayloadGarlicConfig ackClove = new PayloadGarlicConfig();
-        ackClove.setCertificate(Certificate.NULL_CERT);
-        ackClove.setDeliveryInstructions(ackInstructions);
-        ackClove.setExpiration(expiration);
-        ackClove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DeliveryStatusMessage dsm = buildDSM(ctx, replyToken);
         GarlicMessage msg = wrapDSM(ctx, skm, dsm);
         if (msg == null) {
@@ -225,7 +218,9 @@ class OutboundClientMessageJobHelper {
                 log.warn("Failed to wrap ack clove");
             return null;
         }
-        ackClove.setPayload(msg);
+        PayloadGarlicConfig ackClove = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                               ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                               expiration, ackInstructions, msg);
         // this does nothing, the clove is not separately encrypted
         //ackClove.setRecipient(ctx.router().getRouterInfo());
         // defaults
@@ -283,14 +278,11 @@ class OutboundClientMessageJobHelper {
         //instructions.setDelaySeconds(0);
         //instructions.setEncrypted(false);
         
-        PayloadGarlicConfig clove = new PayloadGarlicConfig();
-        clove.setCertificate(Certificate.NULL_CERT);
-        clove.setDeliveryInstructions(instructions);
-        clove.setExpiration(expiration);
-        clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DataMessage msg = new DataMessage(ctx);
         msg.setData(data.getEncryptedData());
-        clove.setPayload(msg);
+        PayloadGarlicConfig clove = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                            ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                            expiration, instructions, msg);
         // defaults
         //clove.setRecipientPublicKey(null);
         //clove.setRequestAck(false);
@@ -303,15 +295,12 @@ class OutboundClientMessageJobHelper {
      * Build a clove that stores the leaseSet locally 
      */
     private static PayloadGarlicConfig buildLeaseSetClove(RouterContext ctx, long expiration, LeaseSet replyLeaseSet) {
-        PayloadGarlicConfig clove = new PayloadGarlicConfig();
-        clove.setCertificate(Certificate.NULL_CERT);
-        clove.setDeliveryInstructions(DeliveryInstructions.LOCAL);
-        clove.setExpiration(expiration);
-        clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DatabaseStoreMessage msg = new DatabaseStoreMessage(ctx);
         msg.setEntry(replyLeaseSet);
         msg.setMessageExpiration(expiration);
-        clove.setPayload(msg);
+        PayloadGarlicConfig clove = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                            ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                            expiration, DeliveryInstructions.LOCAL, msg);
         // defaults
         //clove.setRecipientPublicKey(null);
         //clove.setRequestAck(false);
