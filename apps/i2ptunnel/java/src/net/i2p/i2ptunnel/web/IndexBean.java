@@ -19,6 +19,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
+import net.i2p.crypto.Blinding;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -550,6 +551,26 @@ public class IndexBean {
         Destination d = getDestination(tunnel);
         if (d != null)
             return d.toBase32();
+        return "";
+    }
+    
+    /**
+     *  Works even if tunnel is not running.
+     *  @return "{56 chars}.b32.i2p" or "" if not blinded
+     *  @since 0.9.40
+     */
+    public String getEncryptedBase32(int tunnel) {
+        Destination d = getDestination(tunnel);
+        if (d != null) {
+            int mode = _helper.getEncryptMode(tunnel);
+            if (mode > 1) {
+                try {
+                    String secret = _helper.getBlindedPassword(tunnel);
+                    boolean requireSecret = secret != null && secret.length() > 0;
+                    return Blinding.encode(_context, d.getSigningPublicKey(), requireSecret, false);
+                } catch (RuntimeException re) {}
+            }
+        }
         return "";
     }
 

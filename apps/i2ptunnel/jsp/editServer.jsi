@@ -505,10 +505,10 @@
                     int curSigType = editBean.getSigType(curTunnel, tunnelType);
                     if (curSigType == 7 || curSigType == 11) {
                   %>
-                <span class="multiOption"><label title="<%=intl._t("Prevents snooping by floodfills")%>"><input value="2" type="radio" name="encryptMode"<%=(curEncryptMode.equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <span class="multiOption"><label title="<%=intl._t("Prevents server discovery by floodfills")%>"><input value="2" type="radio" name="encryptMode"<%=(curEncryptMode.equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the password will be able to connect")%>"><input value="3" type="radio" name="encryptMode"<%=(curEncryptMode.equals("3") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with password")%></label></span>
+                    <%=intl._t("Blinded with lookup password")%></label></span>
                   <%
                      if (editBean.isAdvanced()) {
                          // TODO, unimplemented
@@ -516,11 +516,11 @@
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="4" type="radio" name="encryptMode"<%=(curEncryptMode.equals("4") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded with shared key")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="5" type="radio" name="encryptMode"<%=(curEncryptMode.equals("5") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with shared key and password")%></label></span>
+                    <%=intl._t("Blinded with lookup password and shared key")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="6" type="radio" name="encryptMode"<%=(curEncryptMode.equals("6") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded with per-user key")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="7" type="radio" name="encryptMode"<%=(curEncryptMode.equals("7") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with shared password and per-user key")%></label></span>
+                    <%=intl._t("Blinded with lookup password and per-user key")%></label></span>
                 <%
                         } // isAdvanced()
                     } // curSigType
@@ -553,7 +553,7 @@
           %>
         <tr>
             <td>
-                <b><%=intl._t("Blinded Password")%>:</b>
+                <b><%=intl._t("Optional lookup password")%>:</b>
                 <input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Set password required to access this service")%>" value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" />
             </td><td> </td>
         </tr>

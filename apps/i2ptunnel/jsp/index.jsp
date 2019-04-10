@@ -197,15 +197,29 @@
         </td>
     </tr>
 
+    <%
+            String encName = indexBean.getEncryptedBase32(curServer);
+            if (encName != null && encName.length() > 0) {
+      %>
+    <tr>
+        <td class="tunnelDestination" colspan="6">
+            <span class="tunnelDestinationLabel"><b><%=intl._t("Encrypted")%>:</b></span>
+            <%=encName%>
+        </td>
+    </tr>
+    <%
+            } // encName
+      %>
+
     <tr>
         <td class="tunnelDescription" colspan="6">
-            <span class="tunnelDescriptionLabel"><b>Description:</b></span>
+            <span class="tunnelDestinationLabel"><b><%=intl._t("Description")%>:</b></span>
             <%=indexBean.getTunnelDescription(curServer)%>
         </td>
     </tr>
 
         <%
-        }
+        } // for loop
       %>
 
     <tr>

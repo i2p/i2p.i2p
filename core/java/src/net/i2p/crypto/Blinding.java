@@ -33,6 +33,10 @@ public final class Blinding {
     private static final String INFO = "i2pblinding1";
     private static final byte[] INFO_ALPHA = DataHelper.getASCII("I2PGenerateAlpha");
 
+    private static final byte FLAG_TWOBYTE = 0x01;
+    private static final byte FLAG_SECRET = 0x02;
+    private static final byte FLAG_AUTH = 0x04;
+
     // following copied from RouterKeyGenerator
     private static final String FORMAT = "yyyyMMdd";
     private static final int LENGTH = FORMAT.length();
@@ -233,9 +237,9 @@ public final class Blinding {
         int flag = b[0] & 0xff;
         if ((flag & 0xf8) != 0)
             throw new IllegalArgumentException("Corrupt b32 or unsupported options");
-        if ((flag & 0x01) != 0)
+        if ((flag & FLAG_TWOBYTE) != 0)
             throw new IllegalArgumentException("Two byte sig types unsupported");
-        if ((flag & 0x04) != 0)
+        if ((flag & FLAG_AUTH) != 0)
             throw new IllegalArgumentException("Per-client auth unsupported");
         // TODO two-byte sigtypes
         int st1 = b[1] & 0xff;
@@ -258,13 +262,16 @@ public final class Blinding {
         System.arraycopy(b, 3, spkData, 0, spkLen);
         SigningPublicKey spk = new SigningPublicKey(sigt1, spkData);
         String secret;
-        if ((flag & 0x02) != 0) {
-            if (4 + spkLen > b.length)
-                throw new IllegalArgumentException("No secret data");
-            int secLen = b[3 + spkLen] & 0xff;
-            if (4 + spkLen + secLen != b.length)
-                throw new IllegalArgumentException("Bad b32 length");
-            secret = DataHelper.getUTF8(b, 4 + spkLen, secLen);
+        if ((flag & FLAG_SECRET) != 0) {
+            if (4 + spkLen > b.length) {
+                //throw new IllegalArgumentException("No secret data");
+                secret = null;
+            } else {
+                int secLen = b[3 + spkLen] & 0xff;
+                if (4 + spkLen + secLen != b.length)
+                    throw new IllegalArgumentException("Bad b32 length");
+                secret = DataHelper.getUTF8(b, 4 + spkLen, secLen);
+            }
         } else if (3 + spkLen != b.length) {
             throw new IllegalArgumentException("b32 too long");
         } else {
@@ -278,13 +285,42 @@ public final class Blinding {
      *  Encode a public key as a new-format b32 address.
      *  PRELIMINARY - Subject to change - see proposal 149
      *
+     *  @return (56 chars).b32.i2p
+     *  @throws IllegalArgumentException on bad inputs
+     *  @throws UnsupportedOperationException unless supported SigTypes
+     *  @since 0.9.40
+     */
+    public static String encode(I2PAppContext ctx, SigningPublicKey key) throws RuntimeException {
+        return encode(ctx, key, false, false, null);
+    }
+
+    /**
+     *  Encode a public key as a new-format b32 address.
+     *  PRELIMINARY - Subject to change - see proposal 149
+     *
+     *  @return (56 chars).b32.i2p
+     *  @throws IllegalArgumentException on bad inputs
+     *  @throws UnsupportedOperationException unless supported SigTypes
+     *  @since 0.9.40
+     */
+    public static String encode(I2PAppContext ctx, SigningPublicKey key,
+                                boolean requireSecret, boolean requireAuth) throws RuntimeException {
+        return encode(ctx, key, requireSecret, requireAuth, null);
+    }
+
+    /**
+     *  Encode a public key as a new-format b32 address.
+     *  PRELIMINARY - Subject to change - see proposal 149
+     *
      *  @param secret may be empty or null
      *  @return (56+ chars).b32.i2p
      *  @throws IllegalArgumentException on bad inputs
      *  @throws UnsupportedOperationException unless supported SigTypes
      *  @since 0.9.40
      */
-    public static String encode(I2PAppContext ctx, SigningPublicKey key, String secret) throws RuntimeException {
+    public static String encode(I2PAppContext ctx, SigningPublicKey key,
+                                boolean requireSecret, boolean requireAuth,
+                                String secret) throws RuntimeException {
         SigType type = key.getType();
         if (type != TYPE && type != TYPER)
             throw new UnsupportedOperationException();
@@ -303,8 +339,10 @@ public final class Blinding {
         crc.update(b, 3, b.length - 3);
         long check = crc.getValue();
         // TODO two-byte sigtypes
-        if (slen > 0)
-            b[0] = 0x02;
+        if (slen > 0 || requireSecret)
+            b[0] = FLAG_SECRET;
+        if (requireAuth)
+            b[0] |= FLAG_AUTH;
         b[1] = (byte) (type.getCode() & 0xff);
         b[2] = (byte) (TYPER.getCode() & 0xff);
         b[0] ^= (byte) check;
