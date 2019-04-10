@@ -246,16 +246,23 @@ public class I2PDefaultServlet extends DefaultServlet
             
             buf.append(path);
             
-            if (item.isDirectory() && !path.endsWith("/"))
+            boolean isDir = item.isDirectory();
+            if (isDir && !path.endsWith("/"))
                 buf.append(URIUtil.SLASH);
             
             buf.append("\">");
             buf.append(deTag(ls[i]));
             buf.append("</A></TD><TD ALIGN=right>");
-            buf.append(item.length());
-            buf.append(" bytes&nbsp;</TD><TD>");
-            buf.append(dfmt.format(new Date(item.lastModified())));
-            buf.append(" UTC</TD></TR>");
+            if (!isDir) {
+                buf.append(item.length());
+                buf.append(" bytes&nbsp;");
+            }
+            buf.append("</TD><TD>");
+            if (!isDir) {
+                buf.append(dfmt.format(new Date(item.lastModified())));
+                buf.append(" UTC");
+            }
+            buf.append("</TD></TR>");
         }
         buf.append("</TABLE>\n");
         buf.append("</BODY></HTML>\n");
