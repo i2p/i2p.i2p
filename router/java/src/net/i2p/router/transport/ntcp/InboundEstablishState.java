@@ -746,8 +746,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 fail("Clock Skew: " + _peerSkew, null, true);
                 return;
             }
-            // TODO if NTCP1 disabled, we should allow longer padding
-            if (_padlen1 > PADDING1_MAX) {
+            // If NTCP1 disabled, we allow longer padding
+            if (_padlen1 > PADDING1_MAX && _transport.isNTCP1Enabled()) {
                 fail("bad msg 1 padlen: " + _padlen1);
                 return;
             }
