@@ -934,8 +934,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (!isValid) {
             // ignore them 
             if (_log.shouldLog(Log.ERROR))
-                _log.error("The router " + from + " told us we have an invalid IP - " 
-                           + Addresses.toString(ourIP, ourPort) + ".  Lets throw tomatoes at them");
+                _log.error("The router " + from + " told us we have an invalid IP:port " 
+                           + Addresses.toString(ourIP, ourPort));
             markUnreachable(from);
             //_context.banlist().banlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
