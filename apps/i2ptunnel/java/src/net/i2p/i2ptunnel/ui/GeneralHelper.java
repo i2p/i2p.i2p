@@ -647,8 +647,12 @@ public class GeneralHelper {
 
     public String getFilterDefinition(int tunnel) {
         TunnelController tunnelController = getController(tunnel);
-        String filter = tunnelController.getFilter();
-        return filter == null ? "" : filter;
+        if (tunnelController != null) {
+            String filter = tunnelController.getFilter();
+            if (filter != null)
+                return filter;
+        }
+        return "";
     }
     
     public String getJumpList(int tunnel) {

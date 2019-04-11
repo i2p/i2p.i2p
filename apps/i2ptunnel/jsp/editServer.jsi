@@ -741,6 +741,12 @@
                     <label title="<%=intl._t("This is the default, recommended option")%>"><input value="7" type="radio" id="startOnLoad" name="sigType" <%=disabled%> <%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     Ed25519-SHA-512</label>
                 </span>
+<%            }
+              if (editBean.isSigTypeAvailable(11)) { %>
+                <span class="multiOption">
+                    <label title="<%=intl._t("Experimental")%>"><input value="11" type="radio" id="startOnLoad" name="sigType" <%=disabled%> <%=(currentSigType==11 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    Red25519-SHA-512</label>
+                </span>
 <%            }   // isAvailable
 %>
             </td>

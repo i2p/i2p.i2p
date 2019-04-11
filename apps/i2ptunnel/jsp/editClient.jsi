@@ -528,11 +528,12 @@
                     <label title="<%=intl._t("This is the default, recommended option")%>"><input value="7" type="radio" name="sigType" <%=disabled%> <%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     Ed25519-SHA-512</label>
                 </span>
+<%
+              }   // isAvailable
+%>
             </td>
         </tr>
 <%
-              }   // isAvailable
-
             } // isAdvanced
 
             if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
