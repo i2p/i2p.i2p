@@ -417,7 +417,12 @@
                 <b><%=intl._t("Port")%>:</b>
                 <input type="text" id="clientPort" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
             </td>
-        </tr><tr>
+        </tr>
+<%
+            // TODO, encrypted + offline is unimplemented
+            if (!editBean.getIsOfflineKeys(curTunnel)) {
+%>
+        <tr>
             <th colspan="2">
                 <%=intl._t("Encrypt Leaseset")%>
             </th>
@@ -431,10 +436,9 @@
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="1" type="radio" name="encryptMode"<%=(curEncryptMode.equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Encrypted")%></label></span>
 <%
-                    int curSigType = editBean.getSigType(curTunnel, tunnelType);
-                    // TODO, encrypted + offline is unimplemented
-                    boolean allowBlinding = (curSigType == 7 || curSigType == 11) && !editBean.getIsOfflineKeys(curTunnel);
-                    if (allowBlinding) {
+                int curSigType = editBean.getSigType(curTunnel, tunnelType);
+                boolean allowBlinding = (curSigType == 7 || curSigType == 11);
+                if (allowBlinding) {
 %>
                 <span class="multiOption"><label title="<%=intl._t("Prevents server discovery by floodfills")%>"><input value="2" type="radio" name="encryptMode"<%=(curEncryptMode.equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded")%></label></span>
@@ -453,11 +457,12 @@
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="7" type="radio" name="encryptMode"<%=(curEncryptMode.equals("7") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded with lookup password and per-user key")%></label></span>
 <%
-                        } // isAdvanced()
-                    } // allowBlinding
+                     } // isAdvanced()
+                } // allowBlinding
 %>
             </td>
         </tr><tr>
+        <tr>
             <td>
                 <b><%=intl._t("Encryption Key")%></b>
             </td><td>
@@ -471,7 +476,7 @@
             </td>
         </tr>
 <%
-            if (allowBlinding) {
+                if (allowBlinding) {
 %>
         <tr>
             <td>
@@ -480,7 +485,8 @@
             </td><td> </td>
         </tr>
 <%
-            } // allowBlinding
+                } // allowBlinding
+            } // !isOffline
 %>
         <tr>
             <th colspan="2">
