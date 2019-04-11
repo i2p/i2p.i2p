@@ -447,6 +447,26 @@ public class GeneralHelper {
         return null;
     }
 
+    /**
+     *  Works even if tunnel is not running.
+     *  @return true if offline keys
+     *  @since 0.9.40
+     */
+    public boolean isOfflineKeys(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            if (tun.getIsRunning())
+                return tun.getIsOfflineKeys();
+            // do this the hard way
+            File keyFile = tun.getPrivateKeyFile();
+            if (keyFile != null) {
+                PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
+                return pkf.isOffline();
+            }
+        }
+        return false;
+    }
+
     public boolean shouldStartAutomatically(int tunnel) {
         TunnelController tun = getController(tunnel);
         return tun != null ? tun.getStartOnLoad() : false;

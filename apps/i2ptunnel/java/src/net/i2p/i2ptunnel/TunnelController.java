@@ -1080,6 +1080,21 @@ public class TunnelController implements Logging {
         return null;
     }
 
+    /**
+     *  Returns false if not running.
+     *  @return true if offline keys or not running
+     *  @since 0.9.40
+     */
+    public boolean getIsOfflineKeys() {
+        if (_tunnel != null) {
+            List<I2PSession> sessions = _tunnel.getSessions();
+            if (!sessions.isEmpty())
+                return sessions.get(0).isOffline();
+        }
+        return false;
+    }
+
+    // TODO synch
     public boolean getIsRunning() { return _state == TunnelState.RUNNING; }
     public boolean getIsStarting() { return _state == TunnelState.START_ON_LOAD || _state == TunnelState.STARTING; }
 

@@ -432,7 +432,9 @@
                     <%=intl._t("Encrypted")%></label></span>
 <%
                     int curSigType = editBean.getSigType(curTunnel, tunnelType);
-                    if (curSigType == 7 || curSigType == 11) {
+                    // TODO, encrypted + offline is unimplemented
+                    boolean allowBlinding = (curSigType == 7 || curSigType == 11) && !editBean.getIsOfflineKeys(curTunnel);
+                    if (allowBlinding) {
 %>
                 <span class="multiOption"><label title="<%=intl._t("Prevents server discovery by floodfills")%>"><input value="2" type="radio" name="encryptMode"<%=(curEncryptMode.equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded")%></label></span>
@@ -452,7 +454,7 @@
                     <%=intl._t("Blinded with lookup password and per-user key")%></label></span>
 <%
                         } // isAdvanced()
-                    } // curSigType
+                    } // allowBlinding
 %>
             </td>
         </tr><tr>
@@ -469,7 +471,7 @@
             </td>
         </tr>
 <%
-            if (curSigType == 7 || curSigType == 11) {
+            if (allowBlinding) {
 %>
         <tr>
             <td>
@@ -478,7 +480,7 @@
             </td><td> </td>
         </tr>
 <%
-            } // curSigType
+            } // allowBlinding
 %>
         <tr>
             <th colspan="2">

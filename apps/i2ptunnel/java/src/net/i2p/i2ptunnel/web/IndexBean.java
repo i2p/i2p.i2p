@@ -608,6 +608,15 @@ public class IndexBean {
             return d.toBase32();
         return "";
     }
+
+    /**
+     *  Works even if tunnel is not running.
+     *  @return true if offline keys
+     *  @since 0.9.40
+     */
+    public boolean getIsOfflineKeys(int tunnel) {
+        return _helper.isOfflineKeys(tunnel);
+    }
     
     /**
      *  For index.jsp

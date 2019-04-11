@@ -627,6 +627,12 @@ public class PrivateKeyFile {
      *  @since 0.9.38
      */
     public boolean isOffline() {
+        try {
+            // call this to force initialization
+            getDestination();
+        } catch (Exception e) {
+            return false;
+        }
         return _offlineSignature != null;
     }
 
