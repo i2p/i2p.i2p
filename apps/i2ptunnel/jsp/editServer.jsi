@@ -404,7 +404,11 @@
                 </select>
             </td>
         </tr>
-<%          } /* !streamrserver */ %>
+<%
+            } /* !streamrserver */
+
+            if (!editBean.isRouterContext()) {
+%>
         <tr>
             <th colspan="2">
                 <%=intl._t("Router I2CP Address")%>
@@ -412,13 +416,15 @@
         </tr><tr>
             <td>
                 <b><%=intl._t("Host")%>:</b>
-                <input type="text" id="clientHost" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
+                <input type="text" id="clientHost" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" />
             </td><td>
                 <b><%=intl._t("Port")%>:</b>
-                <input type="text" id="clientPort" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
+                <input type="text" id="clientPort" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />
             </td>
         </tr>
 <%
+            } // !isRouterContext
+
             // TODO, encrypted + offline is unimplemented
             if (!editBean.getIsOfflineKeys(curTunnel)) {
 %>
@@ -462,7 +468,6 @@
 %>
             </td>
         </tr><tr>
-        <tr>
             <td>
                 <b><%=intl._t("Encryption Key")%></b>
             </td><td>
