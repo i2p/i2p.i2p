@@ -763,7 +763,7 @@ public class PrivateKeyFile {
             if (type == SigType.EdDSA_SHA512_Ed25519 ||
                 type == SigType.RedDSA_SHA512_Ed25519) {
                 I2PAppContext ctx = I2PAppContext.getGlobalContext();
-                s.append("\nBlinded B32: ").append(Blinding.encode(ctx, spk, null));
+                s.append("\nBlinded B32: ").append(Blinding.encode(ctx, spk));
             }
         }
         s.append("\nContains: ");
