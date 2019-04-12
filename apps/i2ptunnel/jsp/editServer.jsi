@@ -448,10 +448,12 @@
 %>
                 <span class="multiOption"><label title="<%=intl._t("Prevents server discovery by floodfills")%>"><input value="2" type="radio" name="encryptMode"<%=(curEncryptMode.equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded")%></label></span>
+<%
+                     if (editBean.isAdvanced()) {
+%>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the password will be able to connect")%>"><input value="3" type="radio" name="encryptMode"<%=(curEncryptMode.equals("3") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded with lookup password")%></label></span>
 <%
-                     if (editBean.isAdvanced()) {
                          // TODO, unimplemented
 %>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="4" type="radio" name="encryptMode"<%=(curEncryptMode.equals("4") ? " checked=\"checked\"" : "")%> class="tickbox" />
@@ -481,7 +483,7 @@
             </td>
         </tr>
 <%
-                if (allowBlinding) {
+                if (allowBlinding && editBean.isAdvanced()) {
 %>
         <tr>
             <td>
