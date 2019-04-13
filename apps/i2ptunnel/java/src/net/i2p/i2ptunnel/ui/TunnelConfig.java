@@ -76,6 +76,7 @@ public class TunnelConfig {
     private String _newProxyPW;
     private Destination _dest;
     private String _filterDefinition;
+    private int _encryptMode;
 
     public TunnelConfig() {
         _context = I2PAppContext.getGlobalContext();
@@ -258,40 +259,8 @@ public class TunnelConfig {
 
     /** @since 0.9.40 */
     public void setEncryptMode(int mode) {
-        switch (mode) {
-        case 0:
-        default:
-            setEncrypt(false);
-            _otherOptions.remove("i2cp.leaseSetSecret");
-            break;
-
-        case 1:
-            setEncrypt(true);
-            _otherOptions.remove("i2cp.leaseSetType");
-            // doesn't work, after this in the form
-            _otherOptions.remove("i2cp.leaseSetSecret");
-            break;
-
-        case 4:
-        case 6:
-            // TODO
-            // Fallthrough
-        case 2:
-            setEncrypt(false);
-            _otherOptions.put("i2cp.leaseSetType", "5");
-            // doesn't work, after this in the form
-            _otherOptions.remove("i2cp.leaseSetSecret");
-            break;
-
-        case 5:
-        case 7:
-            // TODO
-            // Fallthrough
-        case 3:
-            setEncrypt(false);
-            _otherOptions.put("i2cp.leaseSetType", "5");
-            break;
-        }
+        setEncrypt(mode == 1);
+        _encryptMode = mode;
     }
     
     /** @since 0.9.40 */
@@ -675,11 +644,44 @@ public class TunnelConfig {
             
             // see TunnelController.setConfig()
             _booleanOptions.add(TunnelController.PROP_LIMITS_SET);
-            for (String p : _booleanServerOpts)
+            for (String p : _booleanServerOpts) {
                 config.setProperty(OPT + p, Boolean.toString(_booleanOptions.contains(p)));
+            }
+
             for (String p : _otherServerOpts) {
                 if (_otherOptions.containsKey(p))
                     config.setProperty(OPT + p, _otherOptions.get(p));
+            }
+
+            switch (_encryptMode) {
+              case 0:
+              default:
+                config.remove(OPT + "i2cp.leaseSetSecret");
+                if ("5".equals(config.get(OPT + "i2cp.leaseSetType")))
+                    config.remove(OPT + "i2cp.leaseSetType");
+                break;
+
+              case 1:
+                config.remove(OPT + "i2cp.leaseSetType");
+                config.remove(OPT + "i2cp.leaseSetSecret");
+                break;
+
+              case 4:
+              case 6:
+                // TODO
+                // Fallthrough
+              case 2:
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                config.remove(OPT + "i2cp.leaseSetSecret");
+                break;
+    
+              case 5:
+              case 7:
+                // TODO
+                // Fallthrough
+              case 3:
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                break;
             }
         }
 

@@ -78,7 +78,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <input type="hidden" name="type" value="<%=tunnelType%>" />
                 <input type="submit" class="default" name="action" value="Save changes" />
 <%
-    if (!"new".equals(tunnelType)) {
+    String curEncryptMode = editBean.getEncryptMode(curTunnel);
+    if (!"0".equals(curEncryptMode)) {
+%>
+      <table><tr><td class="infohelp">
+        <%=intl._t("This service uses encrypted leasesets. Registration is not recommended. Registration authentication is disabled.")%>
+      </td></tr>
+<%
+    } else if (!"new".equals(tunnelType)) {
 %>
 
 <table>
