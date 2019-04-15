@@ -1,3 +1,23 @@
+2019-04-15 zzz
+ * Tomcat 8.5.40
+
+2019-04-13 zzz
+ * i2ptunnel:
+   - Config UI for encrypted ls2
+   - Display encrypted b32
+   - Disable registration authentication when encrypted
+   - Hide I2CP config in router context
+   - Disallow any encrypted LS for offline keys
+   - Fix NPE creating server tunnel
+   - Add Red25519 sigtype option for servers
+
+2019-04-10 zzz
+ * Jetty: Hide sizes and dates of directories in listings
+ * NTCP2: Allow longer padding in msg 1 if NTCP1 disabled
+
+2019-04-08 zzz
+ * Util: Fix memory leak in compressor (ticket #2471)
+
 2019-04-03 zzz
  * I2PTunnel: Start/stop POST throttle timer
 
