@@ -753,7 +753,7 @@ public abstract class NamingService {
     public static final synchronized NamingService createInstance(I2PAppContext context) {
         NamingService instance = null;
         String dflt = context.isRouterContext() ? DEFAULT_IMPL : BACKUP_IMPL;
-        String impl = context.getProperty(PROP_IMPL, DEFAULT_IMPL);
+        String impl = context.getProperty(PROP_IMPL, dflt);
         if (impl.equals(OLD_DEFAULT_IMPL))
             impl = dflt;
         try {
