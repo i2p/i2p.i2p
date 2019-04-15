@@ -220,8 +220,10 @@ public class SummaryHelper extends HelperBase {
     private NetworkStateMessage reachability() {
         if (_context.commSystem().isDummy())
             return new NetworkStateMessage(NetworkState.VMCOMM, "VM Comm System");
-        if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
-            !_context.clientManager().isAlive())
+        if (_context.router().getUptime() > 60*1000 &&
+            !_context.clientManager().isAlive() &&
+            !_context.router().gracefulShutdownInProgress() &&
+            !_context.router().isRestarting())
             return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Client Manager I2CP Error - check logs"));  // not a router problem but the user should know
         // Warn based on actual skew from peers, not update status, so if we successfully offset
         // the clock, we don't complain.

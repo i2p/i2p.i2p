@@ -833,6 +833,16 @@ public class Router implements RouterClock.ClockShiftListener {
     }
 
     /**
+     * @return true if router is RESTARTING (soft restart)
+     * @since 0.9.40
+     */
+    public boolean isRestarting() {
+        synchronized(_stateLock) {
+            return _state == State.RESTARTING;
+        }
+    }
+
+    /**
      *  Only for Restarter, after soft restart is complete.
      *  Not for external use.
      *  @since 0.8.12
