@@ -115,6 +115,7 @@ class AccessFilter implements StatefulConnectionFilter {
 
     private void reload() throws IOException {
         synchronized(knownDests) {
+            knownDests.clear();
             for (FilterDefinitionElement element : definition.getElements()) {
                 element.update(knownDests);
             }
