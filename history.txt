@@ -1,4 +1,9 @@
+2019-04-16 zzz
+ * Console: More new icons
+
 2019-04-15 zzz
+ * Console: Don't display I2CP error during soft restart (ticket #2468)
+ * NamingService: Fix class selection in app context (ticket #2469)
  * Tomcat 8.5.40
 
 2019-04-13 zzz
