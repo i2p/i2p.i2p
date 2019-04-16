@@ -114,11 +114,18 @@ class AccessFilter implements StatefulConnectionFilter {
     }
 
     private void reload() throws IOException {
+        Map<Hash, DestTracker> tmp = new HashMap<Hash, DestTracker>();
+        for (FilterDefinitionElement element : definition.getElements()) {
+            element.update(tmp);
+        }
+        
         synchronized(knownDests) {
-            knownDests.clear();
-            for (FilterDefinitionElement element : definition.getElements()) {
-                element.update(knownDests);
-            }
+            knownDests.keySet().retainAll(tmp.keySet());
+            for (Hash newHash : tmp.keySet()) {
+                if (knownDests.containsKey(newHash)) 
+                    continue;
+                knownDests.put(newHash, tmp.get(newHash));
+            }    
         }
         
     }
