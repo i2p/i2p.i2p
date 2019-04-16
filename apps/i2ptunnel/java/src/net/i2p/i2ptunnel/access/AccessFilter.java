@@ -68,7 +68,6 @@ class AccessFilter implements StatefulConnectionFilter {
     /**
      * @param context the context, used for scheduling and timer purposes
      * @param definition definition of this filter
-     * @param task the task to query for liveness of the tunnel
      */
     AccessFilter(I2PAppContext context, FilterDefinition definition) 
             throws IOException {
