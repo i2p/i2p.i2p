@@ -1463,11 +1463,15 @@ public class NTCPTransport extends TransportImpl {
             return;
         }
         // ignore UPnP for now, get everything from SSU if it's enabled
-        if (source != SOURCE_SSU &&
-            _context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
+        boolean ssuEnabled = _context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP);
+        if (source != SOURCE_SSU && ssuEnabled)
             return;
+        Status old = ssuEnabled ? null : getReachabilityStatus();
         boolean isIPv6 = ip != null && ip.length == 16;
-        externalAddressReceived(ip, isIPv6, port);
+        boolean changed = externalAddressReceived(ip, isIPv6, port);
+        if (changed && !ssuEnabled) {
+            addressChanged(old);
+        }
     }
 
     /**
@@ -1491,20 +1495,44 @@ public class NTCPTransport extends TransportImpl {
         if (_log.shouldWarn())
             _log.warn("Removing address, ipv6? " + ipv6 + " from: " + source, new Exception());
         // ignore UPnP for now, get everything from SSU if it's enabled
-        if (source != SOURCE_SSU &&
-            _context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
+        boolean ssuEnabled = _context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP);
+        if (source != SOURCE_SSU && ssuEnabled)
             return;
-        externalAddressReceived(null, ipv6, 0);
+        Status old = ssuEnabled ? null : getReachabilityStatus();
+        boolean changed = externalAddressReceived(null, ipv6, 0);
+        if (changed && !ssuEnabled) {
+            addressChanged(old);
+        }
     }    
+
+    /**
+     *  Only called if SSU is disabled AND our address changed.
+     *  Tell the event log, and tell the router.
+     *
+     *  @since 0.9.40
+     */
+    private void addressChanged(Status old) {
+        Status status = getReachabilityStatus();
+        if (status != old) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Old status: " + old + " New status: " + status +
+                          " from: ", new Exception("traceback"));
+            if (old != Status.UNKNOWN)
+                _context.router().eventLog().addEvent(EventLog.REACHABILITY,
+                   "from " + _t(old.toStatusString()) + " to " +  _t(status.toStatusString()));
+        }
+        _context.router().rebuildRouterInfo();
+    }
     
     /**
      *  UDP changed addresses, tell NTCP and restart.
      *  Port may be set to indicate requested port even if ip is null.
      *
      *  @param ip previously validated; may be null to indicate IPv4 failure or port info only
+     *  @return true if our address changed
      *  @since IPv6 moved from CSFI.notifyReplaceAddress()
      */
-    private synchronized void externalAddressReceived(byte[] ip, boolean isIPv6, int port) {
+    private synchronized boolean externalAddressReceived(byte[] ip, boolean isIPv6, int port) {
         // FIXME just take first address for now
         // FIXME if SSU set to hostname, NTCP will be set to IP
         RouterAddress oldAddr = getCurrentAddress(isIPv6);
@@ -1580,14 +1608,14 @@ public class NTCPTransport extends TransportImpl {
             if (!ssuOK) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("null address with always config", new Exception());
-                return;
+                return false;
             }
             // ip non-null
             String nhost = Addresses.toString(ip);
             if (_log.shouldLog(Log.INFO))
                 _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
             if (nhost == null || nhost.length() <= 0)
-                return;
+                return false;
             if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
                 newProps.setProperty(RouterAddress.PROP_HOST, nhost);
                 if (cost == NTCP2_OUTBOUND_COST)
@@ -1607,7 +1635,7 @@ public class NTCPTransport extends TransportImpl {
                 newAddr.setCost(DEFAULT_COST);
             changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
-            return;
+            return false;
         } else if (Boolean.parseBoolean(enabled) && !ssuOK) {
             // UDP transitioned to not-OK, turn off NTCP address
             // This will commonly happen at startup if we were initially OK
@@ -1639,11 +1667,11 @@ public class NTCPTransport extends TransportImpl {
                     // fall thru and republish
                 } else {
                     _log.info("No change to NTCP Address");
-                    return;
+                    return false;
                 }
             } else {
                 _log.info("No change to NTCP Address");
-                return;
+                return false;
             }
         }
         addNTCP2Options(newProps);
@@ -1665,7 +1693,7 @@ public class NTCPTransport extends TransportImpl {
         restartListening(newAddr, isIPv6);
         if (_log.shouldLog(Log.WARN))
             _log.warn("Updating NTCP Address (ipv6? " + isIPv6 + ") with " + newAddr);
-        return;     	
+        return true;     	
     }
 
     /**
@@ -1686,14 +1714,13 @@ public class NTCPTransport extends TransportImpl {
             else
                 _log.warn("UPnP has failed to open the NTCP port: " + port + " reason: " + reason);
         }
-        // ignore UPnP for now, get everything from SSU if it's enabled
-        if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP)) {
-            // TODO
-            //if (success && ip != null && getExternalIP() != null) {
-            //    if (!isIPv4Firewalled())
-            //        setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
-            //}
-        }
+        // if SSU is disabled, externalAddressReceived() will update our address and call rebuildRouterInfo().
+        // getReachabilityStatus() should report correctly after address is updated.
+        //if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP)) {
+        //    if (success && ip != null && isValid(ip) && !isIPv4Firewalled()) {
+        //        ...
+        //    }
+        //}
     }
 
     /**
@@ -1744,10 +1771,12 @@ public class NTCPTransport extends TransportImpl {
             v6Disabled = false;
         }
         boolean hasV4 = getCurrentAddress(false) != null;
-        // or use _haveIPv6Addrnss ??
         boolean hasV6 = getCurrentAddress(true) != null;
-        if (!hasV4 && !hasV6)
-            return Status.UNKNOWN;
+        boolean showFirewalled = !_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP) &&
+                                 _context.router().getUptime() > 10*60*1000;
+        if (!hasV4 && !hasV6) {
+            return showFirewalled ? Status.REJECT_UNSOLICITED : Status.UNKNOWN;
+        }
         long now = _context.clock().now();
         boolean v4OK = hasV4 && !v4Disabled && now - _lastInboundIPv4 < 10*60*1000;
         boolean v6OK = hasV6 && !v6Disabled && now - _lastInboundIPv6 < 30*60*1000;
@@ -1756,6 +1785,8 @@ public class NTCPTransport extends TransportImpl {
                 return Status.OK;
             if (v6Disabled)
                 return Status.OK;
+            if (!_haveIPv6Address)
+                return Status.OK;
             if (!hasV6)
                 return Status.IPV4_OK_IPV6_UNKNOWN;
         }
@@ -1763,7 +1794,7 @@ public class NTCPTransport extends TransportImpl {
             if (v4Disabled)
                 return Status.IPV4_DISABLED_IPV6_OK;
             if (!hasV4)
-                return Status.IPV4_UNKNOWN_IPV6_OK;
+                return showFirewalled ? Status.IPV4_FIREWALLED_IPV6_OK : Status.IPV4_UNKNOWN_IPV6_OK;
         }
         for (NTCPConnection con : _conByIdent.values()) {
             if (con.isInbound()) {
@@ -1786,19 +1817,22 @@ public class NTCPTransport extends TransportImpl {
                     if (v4Disabled)
                         return Status.IPV4_DISABLED_IPV6_OK;
                     if (!hasV4)
-                        return Status.IPV4_UNKNOWN_IPV6_OK;
+                        return showFirewalled ? Status.IPV4_FIREWALLED_IPV6_OK : Status.IPV4_UNKNOWN_IPV6_OK;
                 }
             }
         }
-        if (v4OK)
+        if (v4OK) {
+            if (!_haveIPv6Address)
+                return Status.OK;
             return Status.IPV4_OK_IPV6_UNKNOWN;
+        }
         if (v6OK)
-            return Status.IPV4_UNKNOWN_IPV6_OK;
+            return showFirewalled ? Status.IPV4_FIREWALLED_IPV6_OK : Status.IPV4_UNKNOWN_IPV6_OK;
         if (v4Disabled)
             return Status.IPV4_DISABLED_IPV6_UNKNOWN;
-        if (v6Disabled)
-            return Status.UNKNOWN;
-        return Status.UNKNOWN;
+        //if (v6Disabled)
+        //    return Status.UNKNOWN;
+        return showFirewalled ? Status.REJECT_UNSOLICITED : Status.UNKNOWN;
     }
 
     /**

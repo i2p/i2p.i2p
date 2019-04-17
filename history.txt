@@ -1,3 +1,6 @@
+2019-04-17 zzz
+ * Transport: More fixes for NTCP when SSU disabled (ticket #1417)
+
 2019-04-16 zzz
  * Console: More new icons
 
