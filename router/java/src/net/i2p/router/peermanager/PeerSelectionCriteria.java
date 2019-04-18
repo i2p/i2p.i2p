@@ -1,4 +1,4 @@
-package net.i2p.router;
+package net.i2p.router.peermanager;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -13,14 +13,16 @@ package net.i2p.router;
  * PeerManager
  *
  * Only used by PeerTestJob, which may not have a point.
+ *
+ * @since moved from router to peermanager in 0.9.40
  */
-public class PeerSelectionCriteria {
+class PeerSelectionCriteria {
     /** The peers will be used in a tunnel */
-    public final static int PURPOSE_TUNNEL = 1;
+    //public final static int PURPOSE_TUNNEL = 1;
     /** The peers will be used for garlic routed messages */
-    public final static int PURPOSE_GARLIC = 2;
+    //public final static int PURPOSE_GARLIC = 2;
     /** The peers will be used for a source routed reply block message */
-    public final static int PURPOSE_SOURCE_ROUTE = 3;
+    //public final static int PURPOSE_SOURCE_ROUTE = 3;
     /** The peers will be used for a test message */
     public final static int PURPOSE_TEST = 4;
     

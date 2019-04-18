@@ -14,7 +14,6 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.PeerManagerFacade;
-import net.i2p.router.PeerSelectionCriteria;
 
 /**
  * Manage peer references and keep them up to date so that when asked for peers,
@@ -27,7 +26,6 @@ public class DummyPeerManagerFacade implements PeerManagerFacade {
     public void startup() {}
     public void restart() {}
     public void renderStatusHTML(Writer out) { }    
-    public List<Hash> selectPeers(PeerSelectionCriteria criteria) { return null; }
     public Set<Hash> getPeersByCapability(char capability) { return null; }
     public void setCapabilities(Hash peer, String caps) {}
     public void removeCapabilities(Hash peer) {}

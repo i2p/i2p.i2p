@@ -12,7 +12,6 @@ import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
-import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -27,7 +26,7 @@ import net.i2p.util.Log;
  * TODO - What's the point? Disable this? See also notes in PeerManager.selectPeers().
  * TODO - Use something besides sending the peer's RI to itself?
  */
-public class PeerTestJob extends JobImpl {
+class PeerTestJob extends JobImpl {
     private final Log _log;
     private PeerManager _manager;
     private boolean _keepTesting;
@@ -49,7 +48,6 @@ public class PeerTestJob extends JobImpl {
     /** number of peers to test each round */
     private int getTestConcurrency() { return 1; }
     
-    // FIXME Exporting non-public type through public API FIXME
     public synchronized void startTesting(PeerManager manager) {
         _manager = manager;
         _keepTesting = true;

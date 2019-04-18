@@ -16,7 +16,6 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.PeerManagerFacade;
-import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -60,10 +59,6 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         _manager.loadProfiles();
     }
     
-    public List<Hash> selectPeers(PeerSelectionCriteria criteria) {
-        return _manager.selectPeers(criteria);
-    }
-
     /**
      *  @param caps non-null
      */

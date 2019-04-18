@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterInfo;
-import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -245,6 +244,7 @@ class PeerManager {
                 //_organizer.selectNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
                 _organizer.selectActiveNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
                 break;
+/****
             case PeerSelectionCriteria.PURPOSE_TUNNEL:
                 // pull all of the fast ones, regardless of how many we 
                 // want - we'll whittle them down later (40 lines from now)
@@ -260,8 +260,9 @@ class PeerManager {
             case PeerSelectionCriteria.PURPOSE_GARLIC:
                 _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, peers);
                 break;
+****/
             default:
-                break;
+                throw new UnsupportedOperationException();
         }
         if (peers.isEmpty()) {
             if (_log.shouldLog(Log.WARN))
