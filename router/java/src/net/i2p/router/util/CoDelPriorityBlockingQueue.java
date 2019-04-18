@@ -230,7 +230,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
                 if (!ok_to_drop) {
                     // sojurn time below target - leave dropping state
                     _dropping = false;
-                } else if (_now >= _drop_next) {
+                } else {
                     // It's time for the next drop. Drop the current packet and dequeue the next.
                     // The dequeue might take us out of dropping state. If not, schedule the next drop.
                     // A large backlog might result in drop rates so high that the next drop should happen now;
