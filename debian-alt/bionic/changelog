@@ -1,3 +1,9 @@
+i2p (0.9.39-2ubuntu1) bionic; urgency=medium
+
+  * Fix compatibility with Jetty 9.4
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 19 Apr 2019 12:12:12 +0000
+
 i2p (0.9.39-1ubuntu1) bionic; urgency=medium
 
   * New upstream version 0.9.39

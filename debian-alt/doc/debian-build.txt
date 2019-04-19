@@ -77,6 +77,7 @@ reprepro -v update xenial
 reprepro -v update bionic
 reprepro -v update cosmic
 reprepro -v update disco
+reprepro -v update eoan
 # todo when set up
 # To add or remove distributions, edit /var/www/debian/conf/distributions
 # and /var/www/debian/conf/updates
@@ -95,7 +96,8 @@ reprepro -v copysrc jessie trusty i2p
 
 # To copy bionic to stretch:
 # Note that syntax is reprepro copysrc TO FROM package!
-reprepro -v copysrc stretch bionic i2p
+TODO bionic (now with jetty 9.4) is no longer compatible with stretch (with jetty 9.2),
+is trusty compatible with stretch?
 
 # To copy disco to sid:
 # Note that syntax is reprepro copysrc TO FROM package!
