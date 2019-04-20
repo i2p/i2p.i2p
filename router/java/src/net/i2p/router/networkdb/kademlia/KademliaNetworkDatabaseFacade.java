@@ -1104,7 +1104,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             return "Peer published " + DataHelper.formatDuration(age) + " ago";
         }
         if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
-            if (routerInfo.getTargetAddress("NTCP") == null)
+            if (routerInfo.getTargetAddresses("NTCP", "NTCP2").isEmpty())
                 return "Peer published > 75m ago, SSU only without introducers";
         }
         return null;

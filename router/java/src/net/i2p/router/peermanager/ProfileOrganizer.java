@@ -692,8 +692,7 @@ public class ProfileOrganizer {
     }                  
 
     /**                
-     * Get the peers the transport layer thinks are unreachable, and
-     * add in the peers with the SSU peer testing bug,
+     * Get the peers the transport layer thinks are unreachable,
      * and peers requiring introducers.
      *                 
      */                
@@ -707,36 +706,27 @@ public class ProfileOrganizer {
         } finally { releaseReadLock(); }
         List<Hash> l = new ArrayList<Hash>(count / 4);
         for (Hash peer : n) {
-            if (_context.commSystem().wasUnreachable(peer))
+            if (_context.commSystem().wasUnreachable(peer)) {
                 l.add(peer);
-            else {
-                // Blacklist <= 0.6.1.32 SSU-only peers, they don't know if they are unreachable,
-                // and we may not know either if they contacted us first, so assume they are.
-                // Also blacklist all peers requiring SSU introducers, because either
+            } else {
+                // Blacklist all peers requiring SSU introducers, because either
                 //  a) it's slow; or
                 //  b) it doesn't work very often; or
                 //  c) in the event they are advertising NTCP, it probably won't work because
                 //     they probably don't have a TCP hole punched in their firewall either.
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null) {
-                    String v = info.getVersion();
-                    // this only works if there is no 0.6.1.34!
-                    if ((!v.equals("0.6.1.33")) &&
-                        v.startsWith("0.6.1.") && info.getTargetAddress("NTCP") == null)
-                        l.add(peer);
-                    else {
                         RouterAddress ra = info.getTargetAddress("SSU");
                         // peers with no SSU address at all are fine.
                         // as long as they have NTCP
                         if (ra == null) {
-                            if (info.getTargetAddress("NTCP") == null)
+                            if (info.getTargetAddresses("NTCP", "NTCP2").isEmpty())
                                 l.add(peer);
                             continue;
                         }
                         // This is the quick way of doing UDPAddress.getIntroducerCount() > 0
                         if (ra.getOption("ihost0") != null)
                             l.add(peer);
-                    }
                 }
             }
         }
