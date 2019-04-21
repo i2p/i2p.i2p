@@ -145,10 +145,10 @@ task codeCoverageReport(type: JacocoReport) {
     dependsOn(javaProjects.test)
 
     jacocoClasspath = project(':core').configurations.jacocoAnt
-    additionalSourceDirs = files(javaProjects.sourceSets.main.allSource.srcDirs)
-    sourceDirectories = files(javaProjects.sourceSets.main.allSource.srcDirs)
-    classDirectories = files(javaProjects.sourceSets.main.output)
-    executionData = files(javaProjects.jacocoTestReport.executionData)
+    additionalSourceDirs.from(files(javaProjects.sourceSets.main.allSource.srcDirs))
+    sourceDirectories.from(files(javaProjects.sourceSets.main.allSource.srcDirs))
+    classDirectories.from(files(javaProjects.sourceSets.main.output))
+    executionData.from(files(javaProjects.jacocoTestReport.executionData))
 
     doFirst {
         executionData = files(executionData.findAll { it.exists() })
