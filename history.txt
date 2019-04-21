@@ -3,6 +3,7 @@
    - Adjust dependencies to match Tomcat and Jetty updates
    - Generate reproducible archives
    - Generate attributes for JAR manifests
+ * Tests: Fix ministreaming tests after access filtering changes
 
 2019-04-17 zzz
  * Transport: More fixes for NTCP when SSU disabled (ticket #1417)

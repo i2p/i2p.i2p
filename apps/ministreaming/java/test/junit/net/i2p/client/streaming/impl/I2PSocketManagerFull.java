@@ -19,6 +19,7 @@ import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.client.streaming.IncomingConnectionFilter;
 import net.i2p.data.Destination;
 
 /**
@@ -40,7 +41,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * @param opts may be null
      * @param name non-null
      */
-    public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
+    public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name,
+                IncomingConnectionFilter connectionFilter) {
         _session = session;
         _opts = opts;
         _name = name;
