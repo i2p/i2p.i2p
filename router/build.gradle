@@ -28,6 +28,9 @@ dependencies {
 
 jar {
     manifest {
+        attributes 'Specification-Title': 'I2P Router'
+        attributes 'Implementation-Title': 'I2P Java Router'
+        attributes 'Main-Class': 'net.i2p.router.CommandLine'
         // so people with very old wrapper.config files will still work with Jetty 6
         attributes 'Class-Path': 'jetty-i2p.jar jetty-java5-threadpool.jar jetty-rewrite-handler.jar jetty-sslengine.jar jetty-start.jar jetty-util.jar'
     }

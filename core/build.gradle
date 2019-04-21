@@ -71,6 +71,14 @@ if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVe
     test.dependsOn scalaTest
 }
 
+jar {
+    manifest {
+        attributes 'Specification-Title': 'I2P Core API'
+        attributes 'Implementation-Title': 'I2P Java Core API'
+        attributes 'Main-Class': 'net.i2p.util.CommandLine'
+    }
+}
+
 configurations {
     tests
 }

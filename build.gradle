@@ -32,6 +32,34 @@ String getBuildExtra() {
     buildExtra
 }
 
+String getBuiltBy() {
+    def builtBy
+    file("override.properties").readLines().findAll({ line ->
+        line.contains("build.built-by")
+    }).first().eachMatch('.*=(.*)', {
+        builtBy = it[1]
+    })
+    builtBy
+}
+
+boolean haveMonotone() {
+    file("_MTN").exists()
+}
+
+String getWorkspaceVersion() {
+    if (haveMonotone()) {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            executable 'mtn'
+            args 'automate', 'get_base_revision_id'
+            standardOutput = stdout
+        }
+        stdout.toString().trim()
+    } else {
+        'unknown'
+    }
+}
+
 String compat(String src) {
     if (src.contains('.')) {
         src.substring(src.lastIndexOf('.') + 1)
@@ -54,6 +82,9 @@ def buildVersion = getBuildVersion()
 def buildExtra = getBuildExtra()
 def fullVersion = "$releaseVersion-$buildVersion$buildExtra"
 
+def builtBy = getBuiltBy()
+def workspaceVersion = getWorkspaceVersion()
+
 // Exclude apps/ dir itself, but include its subdirs
 def javaProjects = subprojects - project(':apps')
 
@@ -73,14 +104,27 @@ configure(javaProjects) {
         testCompile 'org.mockito:mockito-core:2.11.0'
     }
 
-    jar {
-        manifest {
-            attributes 'Implementation-Version': "$fullVersion"
-        }
-    }
-
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
+
+    jar {
+        // Empty attributes are set by each project. They are initialized
+        // here in order to create a defined ordering of the attributes.
+        manifest {
+            attributes 'Specification-Title': ''
+            attributes 'Specification-Version': "$releaseVersion"
+            attributes 'Specification-Vendor': 'The I2P Project https://geti2p.net/'
+            attributes 'Implementation-Title': ''
+            attributes 'Implementation-Version': "$fullVersion"
+            attributes 'Implementation-Vendor': 'The I2P Project https://geti2p.net/'
+            attributes 'Built-By': "$builtBy"
+            attributes 'Build-Date': 'reproducible'
+            attributes 'Base-Revision': "$workspaceVersion"
+            attributes 'Workspace-Changes': ''
+            attributes 'X-Compile-Source-JDK': "$sourceCompatibility"
+            attributes 'X-Compile-Target-JDK': "$targetCompatibility"
+        }
+    }
 
     tasks.withType(AbstractArchiveTask) {
         preserveFileTimestamps = false

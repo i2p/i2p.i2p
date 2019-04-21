@@ -21,6 +21,13 @@ dependencies {
     api project(':core')
 }
 
+jar {
+    manifest {
+        attributes 'Specification-Title': 'I2P Streaming API'
+        attributes 'Implementation-Title': 'I2P Java Streaming API'
+    }
+}
+
 configurations {
     tests
 }

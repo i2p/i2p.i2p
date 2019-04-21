@@ -23,3 +23,10 @@ dependencies {
     api project(':apps:ministreaming')
     testImplementation project(path: ':apps:ministreaming', configuration: 'tests')
 }
+
+jar {
+    manifest {
+        attributes 'Specification-Title': 'I2P Streaming Implementation'
+        attributes 'Implementation-Title': 'I2P Java Streaming Implementation'
+    }
+}
