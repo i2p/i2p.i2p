@@ -82,6 +82,11 @@ configure(javaProjects) {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
 
+    tasks.withType(AbstractArchiveTask) {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+
     def i2pBootClasspath
     // Set java7BootClasspath=/path/to/rt.jar:/path/to/jce.jar in ~/.gradle/gradle.properties if needed
     if (java7BootClasspath) {
