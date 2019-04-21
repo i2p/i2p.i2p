@@ -33,12 +33,15 @@ String getBuildExtra() {
 }
 
 String getBuiltBy() {
-    def builtBy
-    file("override.properties").readLines().findAll({ line ->
-        line.contains("build.built-by")
-    }).first().eachMatch('.*=(.*)', {
-        builtBy = it[1]
-    })
+    def builtBy = ""
+    def overrideProps = file("override.properties")
+    if (overrideProps.exists()) {
+        overrideProps.readLines().findAll({ line ->
+            line.contains("build.built-by")
+        }).first().eachMatch('.*=(.*)', {
+            builtBy = it[1]
+        })
+    }
     builtBy
 }
 
