@@ -1816,15 +1816,51 @@
 
     <target name="installer5" depends="ensureIzpack5, preppkg, buildProperties, util-list-changes, buildUtilityJar" >
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
-        <ant target="installerexe" />
+        <ant target="installer5exe" />
     </target>
 
-    <!-- this makes i2pinstall.exe from install.jar -->
+    <!-- This makes i2pinstall.exe from install.jar using the bundled launch4j.
+         Warning: launch4j-created files CANNOT be Windows-signed.
+         They will be corrupted.
+      -->
     <target name="installerexe" depends="launch4j" unless="noExe">
         <echo message="See the file &quot;build.properties&quot; if this step fails." />
         <!-- now the installer exe -->
         <launch4j configFile="./installer/i2pinstaller.xml" />
         <!-- thazzit -->
+    </target>
+
+    <!-- This makes i2pinstall.exe from install.jar using IzPack5's izpack2exe.py (not bundled)
+         izpack2exe-created files CAN be Windows-signed.
+      -->
+    <target name="installer5exe" unless="noExe">
+        <!-- You must have the optional IzPack utils installed for this -->
+        <!-- izpack doesn't come with +x permission when installed -->
+        <chmod type="file" file="${izpack5.home}/utils/wrappers/izpack2exe/7za" perm="+x" />
+        <chmod type="file" file="${izpack5.home}/utils/wrappers/izpack2exe/izpack2exe.py" perm="+x" />
+        <!--
+             Note that we must specify the 7za path to use the one from IzPack, which is very old.
+             Either 7zr (from Debian package p7zip) or 7za (from Debian package p7zip-full)
+             will work, but ONLY if the 7za/7zr command line is changed in izpack2exe.py
+             as follows, because their default is LZMA2, which dosn't work on Windows.
+             So we don't want any Debian 7za picked up in the PATH.
+             See /usr/share/doc/p7zip/DOC/MANUAL/cmdline/switches/method.htm
+             old:
+             p7zcmd = '"%s" a -mmt -t7z -mx=9 installer.7z "%s"' % (p7z, files)
+             new:
+             p7zcmd = '"%s" a -mmt -t7z -mx=9 -m0=LZMA installer.7z "%s"' % (p7z, files)
+
+             We also use IzPack's customized 7zS.sfx file, which uses a customized icon
+             (but not our icon, sadly)
+
+             More info: https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491541/IzPack+Utilities
+         -->
+        <exec executable="${izpack5.home}/utils/wrappers/izpack2exe/izpack2exe.py" failonerror="true">
+            <arg value="--file=${basedir}/install.jar" />
+            <arg value="--with-7z=${izpack5.home}/utils/wrappers/izpack2exe/7za" />
+            <arg value="--no-upx" />
+            <arg value="--output=${basedir}/i2pinstall.exe" />
+        </exec>
     </target>
 
     <!-- Custom installers -->
@@ -1914,7 +1950,7 @@
     <target name="installer5-windows" depends="ensureIzpack5, clean, preppkg-windows-only, util-list-changes, buildUtilityJar" >
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
-        <ant target="installerexe" />
+        <ant target="installer5exe" />
         <delete file="${basedir}/install.jar" />
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows.exe" />
     </target>
@@ -2132,11 +2168,10 @@
     <!-- this is the same dependency as pkg, but with updater200 in the middle,
          since preppkg puts too much stuff in pkg-temp -->
 <!--
-    <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer-nowindows, delete-nonwindows, installer5-windows">
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer5-windows">
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer5-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
@@ -2176,7 +2211,9 @@
         </fail>
 
         <!-- the gpgsign macro sets the permission of signed files and the sigs themselves to 444 -->
+      <!--
         <gpgsign file="i2pinstall_${release.number}_windows.exe" />
+       -->
         <gpgsign file="i2pinstall_${release.number}.jar" />
         <gpgsign file="i2psource_${release.number}.tar.bz2" />
         <gpgsign file="i2pupdate_${release.number}.zip" />
@@ -2189,18 +2226,27 @@
         <echo message="File sizes:" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
+          <!--
             <arg value="i2pinstall_${release.number}_windows.exe" />
+           -->
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su3" />
+          <!--
             <arg value="i2pinstall_${release.number}_windows.exe.sig" />
+           -->
             <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
             <arg value="i2pupdate_${release.number}.zip.sig" />
         </exec>
+        <echo message="   TBD    i2pinstall_${release.number}_windows.exe" />
+        <echo message="   TBD    i2pinstall_${release.number}_windows.exe.sig" />
         <echo message="SHA256 sums:" />
+      <!--
         <sha256sum file="i2pinstall_${release.number}_windows.exe" />
+       -->
+        <echo message="   TBD    i2pinstall_${release.number}_windows.exe" />
         <sha256sum file="i2pinstall_${release.number}.jar" />
         <sha256sum file="i2psource_${release.number}.tar.bz2" />
         <sha256sum file="i2pupdate_${release.number}.zip" />
@@ -2208,6 +2254,9 @@
         <!-- make torrent files -->
         <copy file="i2pupdate.su3" tofile="i2pupdate-${release.number}.su3" />
         <mktorrent file="i2pupdate-${release.number}.su3" />
+        <echo message="Don't forget to sign i2pinstall_${release.number}_windows.exe on Windows and then:" />
+        <echo message="    ${gpg} -u ${release.gpg.keyid} -b i2pinstall_${release.number}_windows.exe" />
+        <echo message="    sha256sum i2pinstall_${release.number}_windows.exe" />
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>

@@ -1,9 +1,25 @@
+2019-04-22 zzz
+ * Build:
+   - Switch to IzPack 5.1.3 for building releases (ticket #1864)
+   - Use izpack2exe for Windows installer (ticket #2403)
+
 2019-04-21 str4d
  * Gradle:
    - Adjust dependencies to match Tomcat and Jetty updates
    - Generate reproducible archives
    - Generate attributes for JAR manifests
  * Tests: Fix ministreaming tests after access filtering changes
+
+2019-04-20 zzz
+ * Console, SusiDNS: New icons
+ * Debian: Update Bionic/Cosmic to include patch for Jetty 9.4
+ * Router:
+   - Update NTCP checks for NTCP2
+   - Remove old check for 0.6.1.32 and earlier routers
+
+2019-04-18 zzz
+ * Console: Improve error message when graphs disabled (ticket #2452)
+ * Utils: CoDel minor speedup (ticket #2398)
 
 2019-04-17 zzz
  * Transport: More fixes for NTCP when SSU disabled (ticket #1417)
