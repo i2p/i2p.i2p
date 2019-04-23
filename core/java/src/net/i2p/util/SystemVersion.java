@@ -6,6 +6,7 @@ package net.i2p.util;
 
 import java.lang.reflect.Field;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import net.i2p.I2PAppContext;
 
@@ -358,5 +359,18 @@ public abstract class SystemVersion {
         System.out.println("Wrapper  : " + hasWrapper());
         System.out.println("x86      : " + isX86());
         System.out.println("Zero JVM : " + isZeroVM());
+        System.out.println("");
+        System.out.println("System Properties:");
+        TreeSet<String> keys = new TreeSet<String>(System.getProperties().stringPropertyNames());
+        for (String k : keys) {
+            String v = System.getProperty(k);
+            if (k.equals("line.separator")) {
+                if ("\n".equals(v))
+                    v = "\\n";
+                else if ("\r\n".equals(v))
+                    v = "\\r\\n";
+            }
+            System.out.println(k + '=' + v);
+        }
     }
 }
