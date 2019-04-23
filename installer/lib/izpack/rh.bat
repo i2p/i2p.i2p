@@ -18,6 +18,6 @@ set RESFILE=VersionInfo_%FULLVER%.res
 rename %INFILE% %UNSIGNED%
 powershell -Command "(gc VersionInfo_template.rc) -replace 'I2PVER', '%VER%' | Out-File %RCFILE%"
 ResourceHacker.exe -open %RCFILE% -save %RESFILE% -action compile
-ResourceHacker.exe -open %UNSIGNED% -save %TEMPFILE% -action addoverwrite -res VersionInfo1.res -mask VERSIONINFO,,
+ResourceHacker.exe -open %UNSIGNED% -save %TEMPFILE% -action addoverwrite -res %RESFILE% -mask VERSIONINFO,,
 ResourceHacker.exe -open %TEMPFILE% -save %INFILE% -action addoverwrite -res console.ico -mask ICONGROUP,159,
 del %TEMPFILE% %RCFILE% %RESFILE%
