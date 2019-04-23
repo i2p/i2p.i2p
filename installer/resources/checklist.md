@@ -125,7 +125,14 @@
 
 1. `ant release`
 
-  - Sign the windows installer
+  - Copy i2pinstall_${release.number}_windows.exe,
+    console.ico, ../lib/izpack/rh.bat, and ../lib/izpack/VersionInfo_template.rc
+    to Windows machine
+  - Edit rh.bat to set the correct version number
+  - Run rh.bat to edit the resources
+  - Sign the windows installer:
+    Open Visual Studio developer prompt
+    signtool sign /debug i2pinstall_${release.number}_windows.exe
   - GPG sign the signed windows installer: gpg -u keyid -b i2pinstall_${release.number}_windows.exe
   - sha256sum i2pinstall_${release.number}_windows.exe
 
