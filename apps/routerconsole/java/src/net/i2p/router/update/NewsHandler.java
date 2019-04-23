@@ -22,17 +22,20 @@ import static net.i2p.update.UpdateMethod.*;
 class NewsHandler extends UpdateHandler implements Checker {
     
     /**
-     *  Changed in 0.9.11 to the b32 for psi.i2p, run by psi.
-     *  We may be able to change it to psi.i2p in a future release after
-     *  the hostname propagates.
+     *  NOTE: If you change, also change in Android:
+     *  app/src/main/java/net/i2p/android/apps/NewsFetcher.java
      *
      *  @since 0.7.14 not configurable
      */
+    // psi.i2p
     //private static final String BACKUP_NEWS_URL = "http://avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p/news.xml";
     //private static final String BACKUP_NEWS_URL_SU3 = "http://avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p/news.su3";
     // str4d
-    private static final String BACKUP_NEWS_URL = "http://ivk5a6wfjar6hjucjmnbcea5inwmwg5b3hsv72x77xwyhbeaajja.b32.i2p/news/news.xml";
-    private static final String BACKUP_NEWS_URL_SU3 = "http://ivk5a6wfjar6hjucjmnbcea5inwmwg5b3hsv72x77xwyhbeaajja.b32.i2p/news/news.su3";
+    //private static final String BACKUP_NEWS_URL = "http://ivk5a6wfjar6hjucjmnbcea5inwmwg5b3hsv72x77xwyhbeaajja.b32.i2p/news/news.xml";
+    //private static final String BACKUP_NEWS_URL_SU3 = "http://ivk5a6wfjar6hjucjmnbcea5inwmwg5b3hsv72x77xwyhbeaajja.b32.i2p/news/news.su3";
+    // idk
+    private static final String BACKUP_NEWS_URL = "http://dn3tvalnjz432qkqsvpfdqrwpqkw3ye4n4i2uyfr4jexvo3sp5ka.b32.i2p/news/news.atom.xml";
+    private static final String BACKUP_NEWS_URL_SU3 = "http://dn3tvalnjz432qkqsvpfdqrwpqkw3ye4n4i2uyfr4jexvo3sp5ka.b32.i2p/news/news.su3";
 
     public NewsHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
         super(ctx, mgr);
