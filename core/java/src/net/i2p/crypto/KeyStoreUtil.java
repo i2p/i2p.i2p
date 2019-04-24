@@ -11,6 +11,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
+import java.security.ProviderException;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
@@ -1019,6 +1020,9 @@ public final class KeyStoreUtil {
             keyStore.load(fis, pwchars);
             char[] keypwchars = keyPW.toCharArray();
             return (PrivateKey) keyStore.getKey(alias, keypwchars);
+        } catch (ProviderException pe) {
+            // PE is unchecked
+            throw new GeneralSecurityException(pe);
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
@@ -1049,6 +1053,9 @@ public final class KeyStoreUtil {
                 throw new GeneralSecurityException("private key not found: " + alias);
             Certificate[] certs = keyStore.getCertificateChain(alias);
             CertUtil.exportPrivateKey(pk, certs, out);
+        } catch (ProviderException pe) {
+            // PE is unchecked
+            throw new GeneralSecurityException(pe);
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
@@ -1101,6 +1108,9 @@ public final class KeyStoreUtil {
             fos = new SecureFileOutputStream(ks);
             keyStore.store(fos, pwchars);
             return cert;
+        } catch (ProviderException pe) {
+            // PE is unchecked
+            throw new GeneralSecurityException(pe);
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
@@ -1141,6 +1151,9 @@ public final class KeyStoreUtil {
             fos = new SecureFileOutputStream(ks);
             keyStore.store(fos, pwchars);
             return alias;
+        } catch (ProviderException pe) {
+            // PE is unchecked
+            throw new GeneralSecurityException(pe);
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
             try { in.close(); } catch (IOException ioe) {}
@@ -1169,6 +1182,9 @@ public final class KeyStoreUtil {
             char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
             fos = new SecureFileOutputStream(ks);
             keyStore.store(fos, pwchars);
+        } catch (ProviderException pe) {
+            // PE is unchecked
+            throw new GeneralSecurityException(pe);
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
