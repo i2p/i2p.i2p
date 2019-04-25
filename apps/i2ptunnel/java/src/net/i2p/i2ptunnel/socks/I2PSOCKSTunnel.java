@@ -51,6 +51,10 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
      */
     public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel, String pkf) {
         super(localPort, ownDest, l, notifyThis, "SOCKS Proxy on " + tunnel.listenHost + ':' + localPort, tunnel, pkf);
+        // force connect delay and bulk profile
+        Properties opts = tunnel.getClientOptions();
+        opts.setProperty("i2p.streaming.connectDelay", "200");
+        opts.remove("i2p.streaming.maxWindowSize");
 
         setName("SOCKS Proxy on " + tunnel.listenHost + ':' + localPort);
         parseOptions();

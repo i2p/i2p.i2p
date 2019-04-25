@@ -277,6 +277,10 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                                EventDispatcher notifyThis, String handlerName, 
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, handlerName, tunnel);
+        // force connect delay and bulk profile
+        Properties opts = tunnel.getClientOptions();
+        opts.setProperty("i2p.streaming.connectDelay", "200");
+        opts.remove("i2p.streaming.maxWindowSize");
         _proxyList = new ArrayList<String>(4);
         _proxyNonce = new byte[PROXYNONCE_BYTES];
         _context.random().nextBytes(_proxyNonce);
@@ -293,6 +297,10 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             I2PTunnel tunnel, EventDispatcher notifyThis, long clientId )
             throws IllegalArgumentException {
         super(localPort, l, sktMgr, tunnel, notifyThis, clientId);
+        // force connect delay and bulk profile
+        Properties opts = tunnel.getClientOptions();
+        opts.setProperty("i2p.streaming.connectDelay", "200");
+        opts.remove("i2p.streaming.maxWindowSize");
         _proxyList = new ArrayList<String>(4);
         _proxyNonce = new byte[PROXYNONCE_BYTES];
         _context.random().nextBytes(_proxyNonce);

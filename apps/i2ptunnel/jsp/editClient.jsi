@@ -319,7 +319,7 @@
             </td>
         </tr>
 <%
-            if (!"streamrclient".equals(tunnelType)) {
+            if ("client".equals(tunnelType)) {
 %>
         <tr>
             <th>
@@ -340,7 +340,7 @@
             </td>
         </tr>
 <%
-            } // !streamrclient
+            } // client
 
             if (!editBean.isRouterContext()) {
 %>
