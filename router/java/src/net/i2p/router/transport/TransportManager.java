@@ -85,7 +85,7 @@ public class TransportManager implements TransportEventListener {
 
     /** default true */
     private static final String PROP_NTCP1_ENABLE = "i2np.ntcp1.enable";
-    private static final boolean DEFAULT_NTCP1_ENABLE = true;
+    private static final boolean DEFAULT_NTCP1_ENABLE = false;
     private static final String PROP_NTCP2_ENABLE = "i2np.ntcp2.enable";
     private static final boolean DEFAULT_NTCP2_ENABLE = true;
 

@@ -1,3 +1,9 @@
+2019-04-25 zzz
+ * Transport: Disable NTCP 1 by default
+
+2019-04-24 zzz
+ * Crypto: Catch ProviderException in KeyStoreUtil (ticket #2479)
+
 2019-04-22 zzz
  * Build:
    - Switch to IzPack 5.1.3 for building releases (ticket #1864)
