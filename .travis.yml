@@ -3,6 +3,7 @@ language: java
 jdk:
   - oraclejdk11
   - oraclejdk9
+  - openjdk12
   - openjdk11
   - openjdk10
   - openjdk9
@@ -30,6 +31,8 @@ matrix:
         - export TARGET_JAVA_HOME=$JAVA_HOME
         - jdk_switcher use oraclejdk8
         - ./gradlew assemble
+  allow_failures:
+    - jdk: openjdk12
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
