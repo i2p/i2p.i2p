@@ -111,9 +111,6 @@ if [ ! `echo $HOST_OS  |grep osx` ]; then
     rm -f *i2p_service_osx.command
     rm -f net.i2p.router.plist.template
     #rm -f I2P\ Router\ Console.webloc
-else
-    # The example apparmor profile is useless on OSX
-    rm -f ./scripts/home.i2p.i2prouter
 fi
 
 rm -f ./osid
