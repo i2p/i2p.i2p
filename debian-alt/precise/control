@@ -11,7 +11,6 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,openjdk-7-jdk
  ,glassfish-javaee
  ,dh-apparmor
- ,dh-systemd
  ,bash-completion
  ,gettext
  ,libgetopt-java
