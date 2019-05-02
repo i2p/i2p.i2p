@@ -20,7 +20,8 @@
 #include <condition_variable>
 #include <functional>
 
-#include "include/sharedqueue.h"
+// TODO: Configure the project to avoid such includes.
+#include "../include/sharedqueue.h"
 #include "Logger.h"
 
 struct SharedLogWorkerImpl;

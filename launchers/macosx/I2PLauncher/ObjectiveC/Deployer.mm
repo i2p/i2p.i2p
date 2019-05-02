@@ -28,14 +28,16 @@
 #import "I2PLauncher-Swift.h"
 
 #include "AppDelegate.h"
-#include "include/fn.h"
+// TODO: Configure the project to avoid such includes.
+#include "../include/fn.h"
+#include "../include/subprocess.hpp"
+#include "../include/strutil.hpp"
+
 #import "SBridge.h"
 #include "logger_c.h"
 
 #include <string>
 
-#include "include/subprocess.hpp"
-#include "include/strutil.hpp"
 
 #include "Logger.h"
 #include "LoggerWorker.hpp"

@@ -17,7 +17,8 @@
 #include <glob.h>
 #include <string>
 #include <vector>
-#include "include/fn.h"
+// TODO: Configure the project to avoid such includes.
+#include "../include/fn.h"
 
 namespace osx {
   inline void openUrl(NSString* url)

@@ -5,7 +5,10 @@
 #include <stdlib.h>
 
 #ifdef __cplusplus
-#include "include/subprocess.hpp"
+// TODO: Configure the project to avoid such includes.
+#include "../include/subprocess.hpp"
+#include "../include/PidWatcher.h"
+
 #import "I2PLauncher-Swift.h"
 #include "AppDelegate.h"
 
@@ -15,7 +18,6 @@
 #include <sys/sysctl.h>
 #endif
 
-#include "include/PidWatcher.h"
 
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>

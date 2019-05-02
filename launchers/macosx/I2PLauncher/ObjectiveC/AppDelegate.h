@@ -18,9 +18,10 @@
 
 #include "RouterTask.h"
 
-#include "version.h"
+// TODO: Configure the project to avoid such includes.
+#include "../version.h"
 
-@class SwiftMainDelegate;
+@class SwiftApplicationDelegate;
 @class I2PDeployer;
 
 @protocol SwiftMainDelegateProto
@@ -90,7 +91,7 @@ inline void sendUserNotification(NSString* title, NSString* informativeText, boo
 @interface AppDelegate : NSObject <NSUserNotificationCenterDelegate, NSApplicationDelegate>
 @property BOOL enableLogging;
 @property BOOL enableVerboseLogging;
-@property (assign) SwiftMainDelegate *swiftRuntime;
+@property (assign) SwiftApplicationDelegate *swiftRuntime;
 @property (assign) NSUserDefaults *userPreferences;
 @property (assign) ExtractMetaInfo *metaInfo;
 @property (assign) I2PDeployer *deployer;

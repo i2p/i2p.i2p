@@ -25,7 +25,8 @@
 #include "logger_c.h"
 
 #include "AppDelegate.h"
-#include "include/fn.h"
+// TODO: Configure the project to avoid such includes.
+#include "../include/fn.h"
 
 
 @implementation SBridge
