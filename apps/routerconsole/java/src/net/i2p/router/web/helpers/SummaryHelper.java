@@ -247,10 +247,15 @@ public class SummaryHelper extends HelperBase {
             case IPV4_UNKNOWN_IPV6_OK:
             case IPV4_DISABLED_IPV6_OK:
             case IPV4_SNAT_IPV6_OK:
-                RouterAddress ra = routerInfo.getTargetAddress("NTCP");
-                if (ra == null)
+                List<RouterAddress> ras = routerInfo.getTargetAddresses("NTCP", "NTCP2");
+                if (ras.isEmpty())
                     return new NetworkStateMessage(NetworkState.RUNNING, _t(status.toStatusString()));
-                byte[] ip = ra.getIP();
+                byte[] ip = null;
+                for (RouterAddress ra : ras) {
+                    ip = ra.getIP();
+                    if (ip != null)
+                        break;
+                }
                 if (ip == null)
                     return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Unresolved TCP Address"));
                 // TODO set IPv6 arg based on configuration?
@@ -287,7 +292,7 @@ public class SummaryHelper extends HelperBase {
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
             case IPV4_DISABLED_IPV6_UNKNOWN:
             default:
-                ra = routerInfo.getTargetAddress("SSU");
+                RouterAddress ra = routerInfo.getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (getActivePeers() <= 0)
                         return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-No Active Peers, Check Network Connection and Firewall"));
