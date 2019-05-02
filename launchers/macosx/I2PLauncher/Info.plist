@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.3</string>
+	<string>0.1.4</string>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>6</string>
 	<key>I2PRouterVersion</key>
-	<string>0.9.38</string>
+	<string>0.9.39</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -31,7 +31,7 @@
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2018 The I2P Project. All rights reserved.</string>
+	<string>Copyright © 2018-2019 The I2P Project. All rights reserved.</string>
 	<key>NSMainNibFile</key>
 	<string>UserInterfaces</string>
 	<key>NSPrincipalClass</key>
@@ -43,6 +43,6 @@
 	<key>SUFeedURL</key>
 	<string>https://download.i2p2.de/macosx/sparkle/updates/v1/appcast.xml</string>
 	<key>SUPublicEDKey</key>
-	<string>weKSpHXfJzk+5qy3UVfqsUwTeLnT9WCFVMwd9yW0+DA=</string>
+	<string>mYg7wXploT0EGhSROqE8QX61T/6Igv622oZOy5jMCoE=</string>
 </dict>
 </plist>
