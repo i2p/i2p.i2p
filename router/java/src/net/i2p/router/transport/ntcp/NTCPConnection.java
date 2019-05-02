@@ -288,14 +288,14 @@ public class NTCPConnection implements Closeable {
     /**
      *  Valid for inbound; valid for outbound shortly after creation
      */
-    public SocketChannel getChannel() { return _chan; }
+    public synchronized SocketChannel getChannel() { return _chan; }
 
     /**
      *  Valid for inbound; valid for outbound shortly after creation
      */
-    public SelectionKey getKey() { return _conKey; }
-    public void setChannel(SocketChannel chan) { _chan = chan; }
-    public void setKey(SelectionKey key) { _conKey = key; }
+    public synchronized SelectionKey getKey() { return _conKey; }
+    public synchronized void setChannel(SocketChannel chan) { _chan = chan; }
+    public synchronized void setKey(SelectionKey key) { _conKey = key; }
 
     public boolean isInbound() { return _isInbound; }
     public boolean isEstablished() { return _establishState.isComplete(); }
@@ -1125,7 +1125,12 @@ public class NTCPConnection implements Closeable {
      * async callback after the outbound connection was completed (this should NOT block, 
      * as it occurs in the selector thread)
      */
-    void outboundConnected() {
+    synchronized void outboundConnected() {
+        if (_establishState == EstablishBase.FAILED) {
+            _conKey.cancel();
+            try {_chan.close(); } catch (IOException ignored) {}
+            return;
+        }
         _conKey.interestOps(_conKey.interestOps() | SelectionKey.OP_READ);
         // schedule up the beginning of our handshaking by calling prepareNextWrite on the
         // writer thread pool

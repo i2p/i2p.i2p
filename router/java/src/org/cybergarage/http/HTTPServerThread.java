@@ -40,15 +40,18 @@ public class HTTPServerThread extends Thread
 	public void run()
 	{
 		HTTPSocket httpSock = new HTTPSocket(sock);
-		if (httpSock.open() == false)
-			return;
-		HTTPRequest httpReq = new HTTPRequest();
-		httpReq.setSocket(httpSock);
-		while (httpReq.read() == true) {
-			httpServer.performRequestListener(httpReq);
-			if (httpReq.isKeepAlive() == false)
-				break;
+		try {
+			if (httpSock.open() == false)
+				return;
+			HTTPRequest httpReq = new HTTPRequest();
+			httpReq.setSocket(httpSock);
+			while (httpReq.read() == true) {
+				httpServer.performRequestListener(httpReq);
+				if (httpReq.isKeepAlive() == false)
+					break;
+			}
+		} finally {
+			httpSock.close();
 		}
-		httpSock.close();
 	}
 }

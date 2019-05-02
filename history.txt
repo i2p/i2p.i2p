@@ -1,4 +1,12 @@
+2019-05-02 zzz
+ * GeoIP Maxmind 2019-04-29
+ * NTCP: Rare EventPumper 100% CPU fix (ticket #2476)
+ * UPnP: Remove finalize() in HTTPSocket (ticket #2490)
+
 2019-04-25 zzz
+ * Build: Drop unmaintained sample apparmor script (ticket #2319)
+ * i2ptunnel: Force connect delay and bulk profile for most
+   client tunnel types, and hide from UI
  * Transport: Disable NTCP 1 by default
 
 2019-04-24 zzz
