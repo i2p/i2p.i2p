@@ -34,7 +34,7 @@ import Cocoa
   
   
   @objc func actionBtnOpenConsole(_ sender: Any?) {
-    SwiftMainDelegate.openLink(url: "http://localhost:7657")
+    SwiftApplicationDelegate.openLink(url: "http://localhost:7657")
   }
   
   @objc func actionBtnStartRouter(_ sender: Any?) {
@@ -80,7 +80,7 @@ import Cocoa
   @objc func actionBtnLaunchFirefox(_ sender: Any?) {
     DispatchQueue.global(qos: .background).async {
       Swift.print("Starting firefox")
-      FirefoxManager.shared().executeFirefox()
+      let _ = FirefoxManager.shared().executeFirefox()
     }
   }
   

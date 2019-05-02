@@ -8,12 +8,15 @@
 
 import Foundation
 import Cocoa
+import Sparkle
 
 @objc class StatusBarController: NSObject, NSMenuDelegate {
   
   let popover = NSPopover()
-  let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
+  let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
   let storyboard = NSStoryboard(name: "Storyboard", bundle: Bundle.main)
+  
+  let updaterObject: SUUpdater = SUUpdater()
   
   var ctrl : PopoverViewController?
   private static var preferencesController: NSWindowController?
@@ -21,33 +24,14 @@ import Cocoa
 
   @IBOutlet var routerStatusTabView: RouterStatusView?
   
-  @IBAction func handleNativePreferencesClicked(_ sender: Any) {
+  @IBAction func handleNativePrefMenuClicked(_ sender: Any) {
     StatusBarController.launchPreferences(sender)
   }
+  
   //var updateObjectRef : SUUpdater?
   
   @objc func handleOpenConsole(_ sender: Any?) {
-    SwiftMainDelegate.openLink(url: "http://localhost:7657")
-  }
-  
-  @objc func constructMenu() -> NSMenu {
-    let menu = NSMenu()
-    
-    /*let updateMenuItem = NSMenuItem(title: "Check for updates", action: #selector(self.updateObjectRef?.checkForUpdates(_:)), keyEquivalent: "U")
-    updateMenuItem.isEnabled = true
-    */
-    
-    let preferencesMenuItem = NSMenuItem(title: "Preferences", action: #selector(StatusBarController.launchPreferences(_:)), keyEquivalent: "P")
-    preferencesMenuItem.isEnabled = true
-    
-    menu.addItem(NSMenuItem(title: "Open I2P Console", action: #selector(self.handleOpenConsole(_:)), keyEquivalent: "O"))
-    menu.addItem(NSMenuItem.separator())
-    //menu.addItem(updateMenuItem)
-    menu.addItem(preferencesMenuItem)
-    menu.addItem(NSMenuItem.separator())
-    menu.addItem(NSMenuItem(title: "Quit I2P Launcher", action: #selector(SwiftMainDelegate.terminate(_:)), keyEquivalent: "q"))
-    
-    return menu
+    SwiftApplicationDelegate.openLink(url: "http://localhost:7657")
   }
   
   static func onExperimentalConsoleViewClick(_ sender: NSButton) {
@@ -67,7 +51,7 @@ import Cocoa
     }
   }
   
-  static func launchPreferences(_ sender: Any) {
+  @objc static func launchPreferences(_ sender: Any) {
     print("Preferences clicked")
     if !(preferencesController != nil) {
       let storyboard = NSStoryboard(name: "Preferences", bundle: Bundle.main)
@@ -81,10 +65,14 @@ import Cocoa
     }
   }
   
+  @objc func launchPreferencesStaticProxy(_ sender: Any) {
+    StatusBarController.launchPreferences(sender)
+  }
+  
   static func launchRouterConsole(_ sender: Any) {
     if (!Preferences.shared().featureToggleExperimental) {
       // The normal...
-      NSWorkspace.shared().open(URL(string: "http://127.0.0.1:7657")!)
+      NSWorkspace.shared.open(URL(string: "http://127.0.0.1:7657")!)
     } else {
       // Experimental
     }
@@ -92,7 +80,7 @@ import Cocoa
   
   func pidReaction(information:Any?){
     let pidStr = information as! String
-    NSLog("PID! %@", pidStr)
+    NSLog("Router PID is %@", pidStr)
     showPopover(sender: nil)
     RouterManager.shared().lastRouterPid = pidStr
     self.ctrl?.getRouterStatusView()?.needsDisplay = true
@@ -111,12 +99,12 @@ import Cocoa
     
     RouterManager.shared().eventManager.listenTo(eventName: "toggle_popover", action: event_toggle)
     
-    FirefoxManager.shared().tryAutoDetect()
+    let _ = FirefoxManager.shared().tryAutoDetect()
     
     print("Is Firefox found? \(FirefoxManager.shared().IsFirefoxFound())")
     print("Is Firefox profile extracted at \(Preferences.shared()["I2Pref_firefoxProfilePath"] as! String)? \(FirefoxManager.shared().IsProfileExtracted())")
     if (!FirefoxManager.shared().IsProfileExtracted()) {
-      FirefoxManager.shared().unzipProfile()
+      let _ = FirefoxManager.shared().unzipProfile()
     }
     
     if let button = statusItem.button {
@@ -135,27 +123,51 @@ import Cocoa
   }
   
   @IBAction func quitClicked(_ sender: NSMenuItem) {
-    NSApplication.shared().terminate(self)
+    NSApplication.shared.terminate(self)
   }
   
-  // Submenu
+  @objc func checkUpdateClicked(_ sender: NSMenuItem) {
+    //DispatchQueue(label: "updaterqueue").async {}
+    self.updaterObject.checkForUpdates(sender)
+  }
   
-  @IBAction func startRouterClicked(_ sender: NSMenuItem) {
+}
+
+/**
+ *
+ * Here you find menu & popover trigger related code.
+ *
+ */
+
+extension StatusBarController {
+  
+  // This is the construction of the context (right-click) menu spawned at the system tray icon.
+  @objc func constructMenu() -> NSMenu {
+    let menu = NSMenu()
     
-  }
-  
-  @IBAction func restartRouterClicked(_ sender: NSMenuItem) {
+    let updateMenuItem = NSMenuItem(title: "Check for updates", action: #selector(self.checkUpdateClicked(_:)), keyEquivalent: "U")
+    updateMenuItem.isEnabled = true
+    updateMenuItem.target = self
     
-  }
-  
-  @IBAction func stopRouterClicked(_ sender: NSMenuItem) {
     
+    let preferencesMenuItem = NSMenuItem(title: "Preferences", action: #selector(self.launchPreferencesStaticProxy(_:)), keyEquivalent: "P")
+    preferencesMenuItem.isEnabled = true
+    preferencesMenuItem.target = self
+    
+    menu.addItem(NSMenuItem(title: "Open I2P Console", action: #selector(self.handleOpenConsole(_:)), keyEquivalent: "O"))
+    menu.addItem(NSMenuItem.separator())
+    menu.addItem(updateMenuItem)
+    menu.addItem(preferencesMenuItem)
+    menu.addItem(NSMenuItem.separator())
+    menu.addItem(NSMenuItem(title: "Quit I2P Launcher", action: #selector(SwiftApplicationDelegate.terminate(_:)), keyEquivalent: "q"))
+    
+    return menu
   }
   
-  func statusBarButtonClicked(sender: NSStatusBarButton) {
+  @objc func statusBarButtonClicked(sender: NSStatusBarButton) {
     let event = NSApp.currentEvent!
     
-    if event.type == NSEventType.rightMouseUp {
+    if event.type == NSEvent.EventType.rightMouseUp {
       closePopover(sender: nil)
       
       let ctxMenu = constructMenu()
@@ -191,7 +203,4 @@ import Cocoa
   func closePopover(sender: AnyObject?) {
     popover.performClose(sender)
   }
-  
-  
 }
-

@@ -41,7 +41,7 @@ class LogViewerViewController : NSTabViewItem {
         let nextOutput = previousOutput + "\n" + outputString
         self.textFieldView?.string = nextOutput
         
-        let range = NSRange(location:nextOutput.characters.count,length:0)
+        let range = NSRange(location:nextOutput.count,length:0)
         self.textFieldView?.scrollRangeToVisible(range)
       }
       DispatchQueue.main.async(execute: workTask)
