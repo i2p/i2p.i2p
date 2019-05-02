@@ -50,7 +50,7 @@
                     <menuItem isSeparatorItem="YES" id="xT4-H9-l6g"/>
                     <menuItem title="Preferences…" keyEquivalent="," id="2Kn-gO-qBP">
                         <connections>
-                            <action selector="handleNativePreferencesClicked:" target="-1" id="wIn-2L-u1k"/>
+                            <action selector="handleNativePrefMenuClicked:" target="-1" id="LFK-TI-TdY"/>
                         </connections>
                     </menuItem>
                     <menuItem isSeparatorItem="YES" id="45f-s8-MiT"/>
