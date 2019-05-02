@@ -24,7 +24,7 @@ class RouterRunner: NSObject {
   
   let plistName = String(NSString(format: "%@.I2PRouter.plist", APPDOMAIN))
   
-  //let appSupportPath = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
+  let appSupportPath = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
   
   override init() {
     super.init()
@@ -72,7 +72,9 @@ class RouterRunner: NSObject {
     let jars = try! FileManager.default.contentsOfDirectory(atPath: basePath+"/lib")
     var classpath:String = "."
     for jar in jars {
-      classpath += ":"+basePath+"/lib/"+jar
+      if (jar.hasSuffix(".jar")) {
+        classpath += ":"+basePath+"/lib/"+jar
+      }
     }
     
     var cliArgs:[String] = [

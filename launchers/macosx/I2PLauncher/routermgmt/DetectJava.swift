@@ -57,7 +57,7 @@ import Foundation
       // javaHome will have a trailing \n which we remove to not break the cli
       self.javaBinary = (self.javaHome+"/bin/java").replace(target: "\n", withString: "")
       print("DetectJava.javaHome did change to "+self.javaHome)
-      RouterManager.shared().eventManager.trigger(eventName: "java_found", information: self.javaHome)
+      //RouterManager.shared().eventManager.trigger(eventName: "java_found", information: self.javaHome)
     }
   };
   private var testedEnv : Bool = false

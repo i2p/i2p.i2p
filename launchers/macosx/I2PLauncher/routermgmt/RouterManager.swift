@@ -30,7 +30,7 @@ class RouterManager : NSObject {
   
   private static func handleRouterException(information:Any?) {
     Logger.MLog(level:1,"event! - handle router exception")
-    Logger.MLog(level:1,information as! String)
+    Logger.MLog(level:1,information as? String)
   }
   private static func handleRouterStart(information:Any?) {
     Logger.MLog(level:1,"event! - handle router start")
@@ -49,14 +49,15 @@ class RouterManager : NSObject {
     RouterProcessStatus.isRouterRunning = false
   }
   private static func handleRouterPid(information:Any?) {
-    Logger.MLog(level:1,"".appendingFormat("event! - handle router pid: ", information as! String!))
+    Logger.MLog(level:1,"".appendingFormat("event! - handle router pid: ", information as! String))
     if (information != nil) {
       let intPid = Int(information as! String)
+      print("Router pid is \(String(describing: intPid))..")
     }
   }
   private static func handleRouterVersion(information:Any?) {
     do {
-      Logger.MLog(level:1, "".appendingFormat("event! - handle router version: ", information as! String!))
+      Logger.MLog(level:1, "".appendingFormat("event! - handle router version: ", information as! String))
       guard let currentVersion : String = information as? String else {
         throw ErrorsInRouterMgmr.InvalidVersion
       }
