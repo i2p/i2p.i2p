@@ -1128,6 +1128,7 @@ public class NTCPConnection implements Closeable {
     synchronized void outboundConnected() {
         if (_establishState == EstablishBase.FAILED) {
             _conKey.cancel();
+            try {_chan.close(); } catch (IOException ignored) {}
             return;
         }
         _conKey.interestOps(_conKey.interestOps() | SelectionKey.OP_READ);

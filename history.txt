@@ -1,4 +1,5 @@
 2019-05-02 zzz
+ * GeoIP Maxmind 2019-04-29
  * NTCP: Rare EventPumper 100% CPU fix (ticket #2476)
 
 2019-04-25 zzz
