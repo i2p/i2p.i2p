@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:RouterService/RouterService.xcodeproj">
+      location = "group:I2PLauncher.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:I2PLauncher.xcodeproj">
+      location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>
