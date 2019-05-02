@@ -250,11 +250,11 @@ namespace util
   {
     size_t nwritten = 0;
     while (nwritten < length) {
-      int written = write(fd, buf + nwritten, length - nwritten);
+      int written = write(fd, buf + nwritten, (int)length - nwritten);
       if (written == -1) return -1;
       nwritten += written;
     }
-    return nwritten;
+    return (int)nwritten;
   }
 
 
@@ -279,7 +279,7 @@ namespace util
     int eintr_cnter = 0;
 
     while (1) {
-      int read_bytes = read(fd, buf + rbytes, read_upto - rbytes);
+      int read_bytes = read(fd, buf + rbytes, (int)read_upto - rbytes);
       if (read_bytes == -1) {
         if (errno == EINTR) {
           if (eintr_cnter >= 50) return -1;
@@ -313,7 +313,7 @@ namespace util
   static inline int read_all(int fd, Buffer& buf)
   {
     size_t orig_size = buf.size();
-    int increment = orig_size;
+    int increment = (int)orig_size;
     auto buffer = buf.data();
     int total_bytes_read = 0;
 
@@ -322,7 +322,7 @@ namespace util
       if (rd_bytes == increment) {
         // Resize the buffer to accomodate more
         orig_size = orig_size * 1.5;
-        increment = orig_size - buf.size();
+        increment = (int)orig_size - (int)buf.size();
         buf.resize(orig_size);
         //update the buffer pointer
         buffer = buf.data();
@@ -1317,7 +1317,7 @@ namespace detail {
 
       // Close all the inherited fd's except the error write pipe
       if (parent_->close_fds_) {
-        int max_fd = sysconf(_SC_OPEN_MAX);
+        long max_fd = sysconf(_SC_OPEN_MAX);
         if (max_fd == -1) throw OSError("sysconf failed", errno);
 
         for (int i = 3; i < max_fd; i++) {
@@ -1394,7 +1394,7 @@ namespace detail {
   inline int Communication::send(const char* msg, size_t length)
   {
     if (stream_->input() == nullptr) return -1;
-    return std::fwrite(msg, sizeof(char), length, stream_->input());
+    return std::fwrite(msg, sizeof(char), (int)length, stream_->input());
   }
 
   inline int Communication::send(const std::vector<char>& msg)
@@ -1410,14 +1410,14 @@ namespace detail {
     // at all, using select() or threads is unnecessary.
     auto hndls = {stream_->input(), stream_->output(), stream_->error()};
     int count = std::count(std::begin(hndls), std::end(hndls), nullptr);
-    const int len_conv = length;
+    const int len_conv = (int)length;
 
     if (count >= 2) {
       OutBuffer obuf;
       ErrBuffer ebuf;
       if (stream_->input()) {
         if (msg) {
-          int wbytes = std::fwrite(msg, sizeof(char), length, stream_->input());
+          int wbytes = std::fwrite(msg, sizeof(char), (int)length, stream_->input());
           if (wbytes < len_conv) {
             if (errno != EPIPE && errno != EINVAL) {
               throw OSError("fwrite error", errno);
@@ -1474,7 +1474,7 @@ namespace detail {
     OutBuffer obuf;
     ErrBuffer ebuf;
     std::future<int> out_fut, err_fut;
-    const int length_conv = length;
+    const int length_conv = (int)length;
 
     if (stream_->output()) {
       obuf.add_cap(out_buf_cap_);
@@ -1494,7 +1494,7 @@ namespace detail {
     }
     if (stream_->input()) {
       if (msg) {
-        int wbytes = std::fwrite(msg, sizeof(char), length, stream_->input());
+        int wbytes = std::fwrite(msg, sizeof(char), (int)length, stream_->input());
         if (wbytes < length_conv) {
           if (errno != EPIPE && errno != EINVAL) {
             throw OSError("fwrite error", errno);
