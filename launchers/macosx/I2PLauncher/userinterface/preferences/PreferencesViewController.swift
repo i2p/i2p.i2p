@@ -13,13 +13,8 @@ import Cocoa
 import ServiceManagement
 
 
-class PreferencesViewController: NSViewController {
+@objc class PreferencesViewController: NSViewController {
   
-  enum ShowAsMode {
-    case bothIcon
-    case menubarIcon
-    case dockIcon
-  }
   
   var changeDockMenubarIconTimer: Timer?
   
@@ -77,14 +72,14 @@ class PreferencesViewController: NSViewController {
     self.updateRadioButtonEffect(mode: Preferences.shared().showAsIconMode, withSideEffect: false)
     
     if (Preferences.shared().stopRouterOnLauncherShutdown) {
-      self.checkboxStopWithLauncher?.state = NSOnState;
+      self.checkboxStopWithLauncher?.state = NSControl.StateValue.on;
     } else {
-      self.checkboxStopWithLauncher?.state = NSOffState;
+      self.checkboxStopWithLauncher?.state = NSControl.StateValue.off;
     }
     if (Preferences.shared().startRouterOnLauncherStart) {
-      self.checkboxStartWithLauncher?.state = NSOnState;
+      self.checkboxStartWithLauncher?.state = NSControl.StateValue.on;
     } else {
-      self.checkboxStartWithLauncher?.state = NSOffState;
+      self.checkboxStartWithLauncher?.state = NSControl.StateValue.off;
     }
     
     
@@ -101,28 +96,24 @@ class PreferencesViewController: NSViewController {
   
   @IBAction func checkboxStartRouterWithLauncherClicked(_ sender: NSButton) {
     switch sender.state {
-    case NSOnState:
+    case NSControl.StateValue.on:
       print("on")
       Preferences.shared().startRouterOnLauncherStart = true
-    case NSOffState:
+    case NSControl.StateValue.off:
       print("off")
       Preferences.shared().startRouterOnLauncherStart = false
-    case NSMixedState:
-      print("mixed")
     default: break
     }
   }
   
   @IBAction func checkboxStopRouterWithLauncherClicked(_ sender: NSButton) {
     switch sender.state {
-    case NSOnState:
+    case NSControl.StateValue.on:
       print("on")
       Preferences.shared().stopRouterOnLauncherShutdown = true
-    case NSOffState:
+    case NSControl.StateValue.off:
       print("off")
       Preferences.shared().stopRouterOnLauncherShutdown = false
-    case NSMixedState:
-      print("mixed")
     default: break
     }
   }
@@ -137,7 +128,7 @@ class PreferencesViewController: NSViewController {
     let launcherAppId = "net.i2p.bootstrap.macosx.StartupItemApp"
     let startupMgr = Startup()
     switch sender.state {
-    case NSOnState:
+    case NSControl.StateValue.on:
       print("on")
       Preferences.shared()["I2Pref_startLauncherAtLogin"] = true
       if (Preferences.shared()["I2Pref_useServiceManagementAsStartupTool"] as! Bool)
@@ -145,10 +136,10 @@ class PreferencesViewController: NSViewController {
         let success = SMLoginItemSetEnabled(launcherAppId as CFString, true)
         print("SMLoginItemSetEnabled returned \(success)....")
       } else {
-        startupMgr.addLoginItem(Startup.appPath())
+        let _ = startupMgr.addLoginItem(Startup.appPath())
         print("Shared file for auto-startup added. (viewable via OSX Preferences -> Users -> Login Items)")
       }
-    case NSOffState:
+    case NSControl.StateValue.off:
       print("off")
       Preferences.shared()["I2Pref_startLauncherAtLogin"] = false
       if (Preferences.shared()["I2Pref_useServiceManagementAsStartupTool"] as! Bool)
@@ -156,31 +147,27 @@ class PreferencesViewController: NSViewController {
         let success = SMLoginItemSetEnabled(launcherAppId as CFString, false)
         print("SMLoginItemSetEnabled returned \(success)....")
       } else {
-        startupMgr.removeLoginItem(Startup.appPath())
+        let _ = startupMgr.removeLoginItem(Startup.appPath())
         print("Shared file for auto-startup removed (if any). (viewable via OSX Preferences -> Users -> Login Items)")
       }
-    case NSMixedState:
-      print("mixed")
     default: break
     }
   }
   @IBAction func checkboxStartFirefoxAlsoAtLaunchClicked(_ sender: NSButton) {
     switch sender.state {
-    case NSOnState:
+    case NSControl.StateValue.on:
       print("launch firefox: on")
       Preferences.shared().alsoStartFirefoxOnLaunch = true
-    case NSOffState:
+    case NSControl.StateValue.off:
       print("launch firefox: off")
       Preferences.shared().alsoStartFirefoxOnLaunch = false
-    case NSMixedState:
-      print("mixed")
     default: break
     }
   }
   
   // MARK: - Radio buttons functions
   
-  func updateDockMenubarIcons(_ mode: ShowAsMode) -> Bool {
+  func updateDockMenubarIcons(_ mode: Preferences.ShowAsMode) -> Bool {
     // Update preferences with latest choise
     Preferences.shared().showAsIconMode = mode
     // Update runtime
@@ -203,45 +190,45 @@ class PreferencesViewController: NSViewController {
     return false
   }
   
-  func updateRadioButtonEffect(mode: ShowAsMode, withSideEffect: Bool = true) {
+  func updateRadioButtonEffect(mode: Preferences.ShowAsMode, withSideEffect: Bool = true) {
     changeDockMenubarIconTimer?.invalidate()
     
-    radioDockIcon?.state = NSOffState
-    radioMenubarIcon?.state = NSOffState
-    radioBothIcon?.state = NSOffState
+    radioDockIcon?.state = NSControl.StateValue.off
+    radioMenubarIcon?.state = NSControl.StateValue.off
+    radioBothIcon?.state = NSControl.StateValue.off
     
     switch mode {
     case .bothIcon:
-      radioBothIcon?.state = NSOnState
+      radioBothIcon?.state = NSControl.StateValue.on
     case .dockIcon:
-      radioDockIcon?.state = NSOnState
+      radioDockIcon?.state = NSControl.StateValue.on
     case .menubarIcon:
-      radioMenubarIcon?.state = NSOnState
+      radioMenubarIcon?.state = NSControl.StateValue.on
     }
     
     if (withSideEffect) {
       if #available(OSX 10.12, *) {
         changeDockMenubarIconTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false, block: { _ in
           // If we're on 10.12 or later
-          self.updateDockMenubarIcons(mode)
+          let _ = self.updateDockMenubarIcons(mode)
         })
       } else {
         // Fallback on earlier versions
-        self.updateDockMenubarIcons(mode)
+        let _ = self.updateDockMenubarIcons(mode)
       }
     }
   }
   
   @IBAction func radioBothIconSelected(_ sender: Any) {
-    updateRadioButtonEffect(mode: ShowAsMode.bothIcon)
+    updateRadioButtonEffect(mode: Preferences.ShowAsMode.bothIcon)
   }
   
   @IBAction func radioDockIconOnlySelected(_ sender: Any) {
-    updateRadioButtonEffect(mode: ShowAsMode.dockIcon)
+    updateRadioButtonEffect(mode: Preferences.ShowAsMode.dockIcon)
   }
   
   @IBAction func radioMenubarOnlySelected(_ sender: Any) {
-    updateRadioButtonEffect(mode: ShowAsMode.menubarIcon)
+    updateRadioButtonEffect(mode: Preferences.ShowAsMode.menubarIcon)
   }
   
   // MARK: - Triggers
@@ -264,15 +251,15 @@ class PreferencesViewController: NSViewController {
   func triggerDockIconShowHide(showIcon state: Bool) -> Bool {
     var result: Bool
     if state {
-      result = NSApp.setActivationPolicy(NSApplicationActivationPolicy.regular)
+      result = NSApp.setActivationPolicy(NSApplication.ActivationPolicy.regular)
     } else {
-      result = NSApp.setActivationPolicy(NSApplicationActivationPolicy.accessory)
+      result = NSApp.setActivationPolicy(NSApplication.ActivationPolicy.accessory)
     }
     return result
   }
   
   func getDockIconStateIsShowing() -> Bool {
-    if NSApp.activationPolicy() == NSApplicationActivationPolicy.regular {
+    if NSApp.activationPolicy() == NSApplication.ActivationPolicy.regular {
       return true
     } else {
       return false
@@ -284,16 +271,14 @@ class PreferencesViewController: NSViewController {
   
   @IBAction func checkboxEnableAdvancedPreferencesClicked(_ sender: NSButton) {
     switch sender.state {
-    case NSOnState:
+    case NSControl.StateValue.on:
       print("on")
       Preferences.shared().allowAdvancedPreferenceEdit = true
       self.advPrefTableView.isEnabled = true
-    case NSOffState:
+    case NSControl.StateValue.off:
       print("off")
       Preferences.shared().allowAdvancedPreferenceEdit = false
       self.advPrefTableView.isEnabled = false
-    case NSMixedState:
-      print("mixed")
     default: break
     }
   }

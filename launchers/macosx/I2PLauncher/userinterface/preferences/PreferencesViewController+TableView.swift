@@ -24,7 +24,7 @@ extension PreferencesViewController: NSTableViewDelegate {
     static let ValueCell = "ValueColumnID"
   }
   
-  func tableViewDoubleClick(_ sender:AnyObject) {
+  @objc func tableViewDoubleClick(_ sender:AnyObject) {
     print("Double click")
     // 1
     print(self.advPrefTableView.selectedRow)
@@ -32,7 +32,7 @@ extension PreferencesViewController: NSTableViewDelegate {
       let item = Preferences.shared()[self.advPrefTableView.selectedRow] else {
         return
     }
-    print(item.name)
+    print(item.name as Any)
      /*
      if item.isFolder {
      // 2
@@ -47,7 +47,7 @@ extension PreferencesViewController: NSTableViewDelegate {
   
   func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
     // 1
-    guard let sortDescriptor = self.advPrefTableView.sortDescriptors.first else {
+    guard let /*sortDescriptor*/ _ = self.advPrefTableView.sortDescriptors.first else {
       return
     }
     /*if let order = Directory.FileOrder(rawValue: sortDescriptor.key!) {
@@ -85,7 +85,7 @@ extension PreferencesViewController: NSTableViewDelegate {
     }
     
     // 3
-    if let cell = tableView.make(withIdentifier: cellIdentifier, owner: nil) as? NSTableCellView {
+    if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: cellIdentifier), owner: nil) as? NSTableCellView {
       cell.textField?.stringValue = text
       //cell.imageView?.image = image ?? nil
       return cell

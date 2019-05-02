@@ -10,11 +10,19 @@ import Cocoa
 
 class PreferencesWindowController: NSWindowController, NSWindowDelegate {
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
+  override func windowDidLoad() {
+    super.windowDidLoad()
+  
+    let visualEffect = NSVisualEffectView()
+    visualEffect.blendingMode = .behindWindow
+    visualEffect.state = .active
+    visualEffect.material = .dark
+    //self.window?.contentView = visualEffect
     
-        // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-    }
+    //self.window?.titlebarAppearsTransparent = true
+    //self.window?.styleMask.insert(.fullSizeContentView)
+    window?.titlebarAppearsTransparent = true
+  }
   
   func windowShouldClose(_ sender: NSWindow) -> Bool {
     self.window?.orderOut(sender)
