@@ -27,6 +27,7 @@
 
 package org.cybergarage.http;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -49,11 +50,6 @@ public class HTTPSocket
 		setSocket(socket.getSocket());
 		setInputStream(socket.getInputStream());
 		setOutputStream(socket.getOutputStream());
-	}
-	
-	public void finalize()
-	{
-		close();
 	}
 	
 	////////////////////////////////////////////////
@@ -133,17 +129,18 @@ public class HTTPSocket
 
 	public boolean close()
 	{
- 		try {
- 			if (sockIn != null)
+ 		if (sockIn != null)
+ 			try {
 				sockIn.close();
-			if (sockOut != null)
+			} catch (IOException e) {}
+		if (sockOut != null)
+	 		try {
 				sockOut.close();
-			getSocket().close();
-		}
-		catch (Exception e) {
-			//Debug.warning(e);
-			return false;
-		}
+			} catch (IOException e) {}
+		if (socket != null)
+ 			try {
+				socket.close();
+			} catch (IOException e) {}
 		return true;
 	}
 	
