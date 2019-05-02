@@ -24,15 +24,14 @@ extension AppDelegate: NSApplicationDelegate {
   
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     
-    let mainAppIdentifier = "net.i2p.bootstrap-macosx.I2PLauncher"
     let runningApps = NSWorkspace.shared.runningApplications
-    let isRunning = !runningApps.filter { $0.bundleIdentifier == mainAppIdentifier }.isEmpty
+    let isRunning = !runningApps.filter { $0.bundleIdentifier == Identifiers.mainApplicationBundleId }.isEmpty
     
     if !isRunning {
       DistributedNotificationCenter.default().addObserver(self,
                                                           selector: #selector(self.terminate),
                                                           name: .killLauncher,
-                                                          object: mainAppIdentifier)
+                                                          object: Identifiers.mainApplicationBundleId)
       
       let path = Bundle.main.bundlePath as NSString
       var components = path.pathComponents
