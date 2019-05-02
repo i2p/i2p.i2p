@@ -23,7 +23,7 @@ class ReflectionFunctions {
   func methodName(m: Method) -> String? {
     let sel = method_getName(m)
     let nameCString = sel_getName(sel)
-    return String(cString: nameCString!)
+    return String(cString: nameCString)
   }
   
   /// Print the names for each method in a class
@@ -32,7 +32,7 @@ class ReflectionFunctions {
     let methodList = class_copyMethodList(cls, &methodCount)
     if methodList != nil && methodCount > 0 {
       enumerateCArray(array: methodList!, count: methodCount) { i, m in
-        let name = methodName(m: m!) ?? "unknown"
+        let name = methodName(m: m) ?? "unknown"
         print("#\(i): \(name)")
       }
       

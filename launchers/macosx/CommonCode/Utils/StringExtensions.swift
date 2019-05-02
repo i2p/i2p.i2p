@@ -72,3 +72,35 @@ extension String {
   }
 }
 
+/*
+ * This is functions for comparing version numbers.
+ * Example usage:
+ *   "3.0.0" >= "3.0.0.1" // false
+ *   "3.0.0" > "3.0.0.1" // false
+ *   "3.0.0" <= "3.0.0.1" // true
+ *   "3.0.0.1" >= "3.0.0.1" // true
+ */
+extension String {
+  
+  static func ==(lhs: String, rhs: String) -> Bool {
+    return lhs.compare(rhs, options: .numeric) == .orderedSame
+  }
+  
+  static func <(lhs: String, rhs: String) -> Bool {
+    return lhs.compare(rhs, options: .numeric) == .orderedAscending
+  }
+  
+  static func <=(lhs: String, rhs: String) -> Bool {
+    return lhs.compare(rhs, options: .numeric) == .orderedAscending || lhs.compare(rhs, options: .numeric) == .orderedSame
+  }
+  
+  static func >(lhs: String, rhs: String) -> Bool {
+    return lhs.compare(rhs, options: .numeric) == .orderedDescending
+  }
+  
+  static func >=(lhs: String, rhs: String) -> Bool {
+    return lhs.compare(rhs, options: .numeric) == .orderedDescending || lhs.compare(rhs, options: .numeric) == .orderedSame
+  }
+  
+}
+

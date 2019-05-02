@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 class Startup : NSObject {
   
   let loginItemsList : LSSharedFileList = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue();
@@ -21,7 +22,7 @@ class Startup : NSObject {
       return true;
     }
     
-    var path : CFURL = CFURLCreateWithString(nil, Bundle.main.bundleURL.absoluteString as CFString, nil);
+    let path : CFURL = CFURLCreateWithString(nil, Bundle.main.bundleURL.absoluteString as CFString, nil);
     print("Path adding to Login Item list is: ", path);
     
     // add new Login Item at the end of Login Items list
@@ -55,7 +56,7 @@ class Startup : NSObject {
   
   func getLoginItem(_ path : CFURL) -> LSSharedFileListItem! {
     
-    var path : CFURL = CFURLCreateWithString(nil, Bundle.main.bundleURL.absoluteString as CFString, nil);
+    let path : CFURL = CFURLCreateWithString(nil, Bundle.main.bundleURL.absoluteString as CFString, nil);
     
     
     // Copy all login items in the list
@@ -69,7 +70,7 @@ class Startup : NSObject {
     for var i in (0..<loginItems.count)  // CFArrayGetCount(loginItems)
     {
       
-      var nextLoginItem : LSSharedFileListItem = loginItems.object(at: i) as! LSSharedFileListItem; // CFArrayGetValueAtIndex(loginItems, i).;
+      let nextLoginItem : LSSharedFileListItem = loginItems.object(at: i) as! LSSharedFileListItem; // CFArrayGetValueAtIndex(loginItems, i).;
       
       
       if(LSSharedFileListItemResolve(nextLoginItem, 0, &nextItemUrl, nil) == noErr) {

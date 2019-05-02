@@ -25,14 +25,26 @@ class PreferenceRow {
 }
 
 class Preferences  : NSObject {
+  
+  enum ShowAsMode {
+    case bothIcon
+    case menubarIcon
+    case dockIcon
+  }
+  
   private var prefObject: Dictionary<String,Any> = Dictionary<String,Any>()
   private var prefDict = Dictionary<String,PreferenceRow>()
   private var prefDefaultDict: Dictionary<String,Any> = Dictionary<String,Any>()
   
+  var notifyOnStatusChange: Bool {
+    get { return UserDefaults.standard.bool(forKey: "notifyOnStatusChange") }
+    set { UserDefaults.standard.set(newValue, forKey: "notifyOnStatusChange") }
+  }
+  
   var count: Int = 0
   
   // Interface with a string setting in background
-  var showAsIconMode: PreferencesViewController.ShowAsMode {
+  var showAsIconMode: ShowAsMode {
     get {
       var mode = self["I2Pref_showAsIconMode"]
       if (mode == nil) {
@@ -40,13 +52,13 @@ class Preferences  : NSObject {
       }
       switch (mode as! String) {
       case "bothIcon":
-        return PreferencesViewController.ShowAsMode.bothIcon
+        return ShowAsMode.bothIcon
       case "dockIcon":
-        return PreferencesViewController.ShowAsMode.dockIcon
+        return ShowAsMode.dockIcon
       case "menubarIcon":
-        return PreferencesViewController.ShowAsMode.menubarIcon
+        return ShowAsMode.menubarIcon
       default:
-        return PreferencesViewController.ShowAsMode.bothIcon
+        return ShowAsMode.bothIcon
       }
     }
     set(newVal) {
@@ -83,7 +95,7 @@ class Preferences  : NSObject {
   }
   
   func syncPref() {
-    UserDefaults.standard.setPersistentDomain(self.prefObject, forName: APPDOMAIN)
+    UserDefaults.standard.setPersistentDomain(self.prefObject, forName: Identifiers.applicationDomainId)
     UserDefaults.standard.synchronize()
   }
   
@@ -138,7 +150,7 @@ class Preferences  : NSObject {
     }
     preferences.count = preferences.prefDict.keys.count
     UserDefaults.standard.register(defaults: defaults)
-    UserDefaults.standard.setPersistentDomain(preferences.prefObject, forName: APPDOMAIN)
+    UserDefaults.standard.setPersistentDomain(preferences.prefObject, forName: Identifiers.applicationDomainId)
     UserDefaults.standard.synchronize()
     
     print("User Preferences loaded - Got \(preferences.count) items.")
@@ -166,7 +178,7 @@ class Preferences  : NSObject {
   
   private override init() {
     super.init()
-    let fromDisk = UserDefaults.standard.persistentDomain(forName: APPDOMAIN) ?? Dictionary<String,Any>()
+    let fromDisk = UserDefaults.standard.persistentDomain(forName: Identifiers.applicationDomainId) ?? Dictionary<String,Any>()
     for (pKey, pVal) in fromDisk {
       if (pKey.starts(with: "I2P")) {
         print("Preference -> \(pKey)")
