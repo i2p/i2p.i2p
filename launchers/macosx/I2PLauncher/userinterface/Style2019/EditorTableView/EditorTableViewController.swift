@@ -101,9 +101,9 @@ class EditorTableViewController: NSObject, SwitchableTableViewController {
     
     scrollView.frame.size.height = 400
     
-    (NSApp.delegate as? SwiftApplicationDelegate)?.popupController.resizePopup(
+    /*(NSApp.delegate as? SwiftApplicationDelegate)?.popupController.resizePopup(
       height: scrollView.frame.size.height + 30 // bottomBar.frame.size.height
-    )
+    )*/
   }
   
   func willOpenPopup() {
