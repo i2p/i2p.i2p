@@ -81,7 +81,7 @@ public struct TaskPipeline {
   
   /// Run all tasks and return the tasks that did not fail to launch
   private func launchAndReturnNotFailedTasks() -> [Process] {
-    return self.tasks.flatMap { task -> Process? in
+    return self.tasks.compactMap { task -> Process? in
       do {
         try task.launchCapturingExceptions()
         return task
