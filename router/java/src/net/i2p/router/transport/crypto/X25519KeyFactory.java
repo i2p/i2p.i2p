@@ -77,6 +77,17 @@ public class X25519KeyFactory extends I2PThread {
     }
 
     public void run() {
+        try {
+            run2();
+        } catch (IllegalStateException ise) {
+            if (_isRunning)
+                throw ise;
+            // else ignore, thread can be slow to shutdown on Android,
+            // PRNG gets stopped first and throws ISE
+        }
+    }
+
+    private void run2() {
         _isRunning = true;
         while (_isRunning) {
             int startSize = getSize();
