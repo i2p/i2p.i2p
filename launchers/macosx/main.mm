@@ -72,7 +72,8 @@ using namespace subprocess;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   // Init application here
   
-  self.swiftRuntime = [[SwiftMainDelegate alloc] init];
+  // Here we initialize the swift code which would do most of the job from now on.
+  self.swiftRuntime = [[SwiftApplicationDelegate alloc] init];
   
   // This setup allows the application to send notifications
   [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
