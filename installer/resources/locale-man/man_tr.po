@@ -5,13 +5,14 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2017
+# Kaya Zeren <kayazeren@gmail.com>, 2019
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
-"PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2017\n"
+"PO-Revision-Date: 2017-01-26 15:31+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/otf/teams/12694/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgstr ""
 #: man/eepget.1:1
 #, no-wrap
 msgid "EEPGET"
-msgstr "EEPGET"
+msgstr "EepGet"
 
 #. type: TH
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
@@ -46,24 +47,24 @@ msgstr "AD"
 #. type: Plain text
 #: man/eepget.1:5
 msgid "Eepget - I2P downloader"
-msgstr "Eepget - I2P indirici"
+msgstr "EepGet - I2P indirici"
 
 #. type: SH
 #: man/eepget.1:6 man/i2prouter.1:6 man/i2prouter-nowrapper.1:6
 #, no-wrap
 msgid "SYNOPSIS"
-msgstr ""
+msgstr "ÖZET"
 
 #. type: Plain text
 #: man/eepget.1:9
 msgid "B<eepget> [I<options>]I<URL>"
-msgstr ""
+msgstr "B<eepget> [I<options>]I<URL>"
 
 #. type: SH
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
 #, no-wrap
 msgid "DESCRIPTION"
-msgstr ""
+msgstr "AÇIKLAMA"
 
 #. type: Plain text
 #: man/eepget.1:15
@@ -71,6 +72,8 @@ msgid ""
 "Download a file non-interactively via HTTP. Transfers through both I2P and "
 "the regular Internet are supported."
 msgstr ""
+"HTTP üzerinden bir dosyayı etkileşimsiz olarak indirir. Hem I2P hem de "
+"normal İnternet üzerinden aktarım yapılabilir."
 
 #. type: Plain text
 #: man/eepget.1:21
@@ -81,50 +84,55 @@ msgid ""
 "  If supported by the remote server, eepget will instruct the server to "
 "continue the download from the point of interruption."
 msgstr ""
+"EepGet, yavaş ya da dengesiz ağ bağlantılarıyla başa çıkabilir. İndirme "
+"işlemi bir ağ sorunu nedeniyle tamamlanamaz ise, dosya tamamen alınana kadar"
+" (-n seçeneği belirtilmiş ise) yeniden denenir. Uzak sunucu tarafından "
+"destekleniyorsa, eepget sunucuya indirme işlemine kalınan noktadan devam "
+"etme bilgisini verir."
 
 #. type: SH
 #: man/eepget.1:22
 #, no-wrap
 msgid "OPTIONS"
-msgstr ""
+msgstr "AYARLAR"
 
 #. type: Plain text
 #: man/eepget.1:25
 msgid "B<-c>"
-msgstr ""
+msgstr "B<-c>"
 
 #. type: TP
 #: man/eepget.1:25
 #, no-wrap
 msgid "Clearnet. Do not use a proxy. Same as B<-p> :0 ."
-msgstr ""
+msgstr "Basit ağ. Vekil sunucu kullanılmaz. B<-p> ile aynı :0 ."
 
 #. type: Plain text
 #: man/eepget.1:31
 msgid "B<-e> etag"
-msgstr ""
+msgstr "B<-e> etag"
 
 #. type: TP
 #: man/eepget.1:31
 #, no-wrap
 msgid "Sets the etag value in the request headers."
-msgstr ""
+msgstr "İstek üst bilgilerindeki etag değerini ayarlar."
 
 #. type: Plain text
 #: man/eepget.1:37
 msgid "B<-h> name=value"
-msgstr ""
+msgstr "B<-h> ad=değer"
 
 #. type: TP
 #: man/eepget.1:37
 #, no-wrap
 msgid "Adds an arbitrary request header with the given name and value."
-msgstr ""
+msgstr "Belirtilen ad ve değer için isteğe bağlı bir istek üst bilgisi ekler."
 
 #. type: Plain text
 #: man/eepget.1:43
 msgid "B<-l> lineLen"
-msgstr ""
+msgstr "B<-l> SatırUzunluğu"
 
 #. type: TP
 #: man/eepget.1:43
@@ -133,11 +141,13 @@ msgid ""
 "Controls the progress display. B<\\ lineLen > is the length of one progress "
 "line in characters. The default is 40."
 msgstr ""
+"İlerleme çubuğunun görünümünü belirler. B<\\ SatırUzunluğu > karakter "
+"cinsinden bir ilerleme satırının uzunluğunu belirler. Varsayılan değer: 40."
 
 #. type: Plain text
 #: man/eepget.1:49
 msgid "B<-m> markSize"
-msgstr ""
+msgstr "B<-m> İşaretBoyutu"
 
 #. type: TP
 #: man/eepget.1:49
@@ -146,11 +156,13 @@ msgid ""
 "Controls the progress display. B<\\ markSize > is the number of bytes one "
 "'#' character represents. The default is 1024."
 msgstr ""
+"İlerleme çubuğunun görünümünü belirler. B<\\ markSize > bir '#' karakterinin"
+" kaç bayt anlamına geleceğini belirler. Varsayılan değer: 1024."
 
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr ""
+msgstr "B<-n> YenidenDenemeSayısı"
 
 #. type: TP
 #: man/eepget.1:55
@@ -159,11 +171,14 @@ msgid ""
 "Specify the number of times to retry downloading if the download isn't "
 "successful. If this option is not specified, eepget will not retry."
 msgstr ""
+"Tamamlanamayan indirmelerin kaç kez daha yeniden indirilmeye çalışılacağını "
+"belirler.  Bu seçenek belirtilmediğinde EepGet tamamlanmayan indirmeleri "
+"yeniden indirmeyi denemez."
 
 #. type: Plain text
 #: man/eepget.1:61
 msgid "B<-o> file"
-msgstr ""
+msgstr "B<-o> Dosya"
 
 #. type: TP
 #: man/eepget.1:61
@@ -172,11 +187,13 @@ msgid ""
 "Sets the output file to write to. If this option is not given, the output "
 "filename will be determined by the URL."
 msgstr ""
+"Yazılacak çıkış dosyasını belirler. Bu seçenek belirtilmediğinde, çıkış "
+"dosyasının adı İnternet adresine göre belirlenir."
 
 #. type: Plain text
 #: man/eepget.1:67
 msgid "B<-p> proxy_host[:port]"
-msgstr ""
+msgstr "B<-p> VekilSunucu[:KapıNumarası]"
 
 #. type: TP
 #: man/eepget.1:67
@@ -186,33 +203,39 @@ msgid ""
 "eepget will use 4444. If this option is not specified, eepget will use "
 "127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
 msgstr ""
+"Kullanılacak bir I2P vekil sunucusunu (eeproxy) belirler. Kapı numarası "
+"belirtilmediğinde eepget 4444 numaralı kapıyı kullanır. Bu seçenek "
+"belirtilmediğinde EepGet 127.0.0.1:4444 değerini kullanır. eeproxy "
+"seçeneğini devre dışı bırakmak için B<-c> ya da B<-p>:0 kullanın."
 
 #. type: Plain text
 #: man/eepget.1:73
 msgid "B<-t> seconds"
-msgstr ""
+msgstr "B<-t> saniye"
 
 #. type: TP
 #: man/eepget.1:73
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
 msgstr ""
+"Etkinlik olunmayan süre zaman aşımı değeri. Varsayılan değer 60 saniye."
 
 #. type: Plain text
 #: man/eepget.1:79
 msgid "B<-u> username"
-msgstr ""
+msgstr "B<-u> kullanıcı adı"
 
 #. type: TP
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
 msgstr ""
+"Gerekiyorsa, vekil sunucu kimlik doğrulaması için kullanılacak kullanıcı adı"
 
 #. type: Plain text
 #: man/eepget.1:85
 msgid "B<-x> password"
-msgstr ""
+msgstr "B<-x> parola"
 
 #. type: TP
 #: man/eepget.1:85
@@ -221,12 +244,15 @@ msgid ""
 "Sets the password for proxy authorization, if required. If a username is "
 "specified but not a password, EepGet will prompt for the password."
 msgstr ""
+"Gerekiyorsa, vekil sunucu kimlik doğrulaması için kullanılacak parola. Bir "
+"kullanıcı adı belirtilmiş ancak parola belirtilmemiş ise EepGet parolayı "
+"sorar."
 
 #. type: SH
 #: man/eepget.1:89
 #, no-wrap
 msgid "EXIT STATUS"
-msgstr ""
+msgstr "ÇIKIŞ DURUMU"
 
 #. type: Plain text
 #: man/eepget.1:93
@@ -234,12 +260,14 @@ msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
 msgstr ""
+"B<eepget> aktarım sorunsuz tamamlandığında çıkış durumu sıfır olur. İndirme "
+"sırasında sorun çıkarsa değer sıfırdan farklı olur."
 
 #. type: SH
 #: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
 #, no-wrap
 msgid "REPORTING BUGS"
-msgstr ""
+msgstr "HATA BİLDİRİMİ"
 
 #. type: Plain text
 #: man/eepget.1:99 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
@@ -247,28 +275,30 @@ msgid ""
 "Please enter a ticket on E<.UR https://trac.i2p2.de/> the I2P trac page "
 "E<.UE .>"
 msgstr ""
+"Lütfen E<.UR https://trac.i2p2.de/>I2P trac sayfasından E<.UE .> bir destek "
+"çağrısı gönderin"
 
 #. type: SH
 #: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
 #, no-wrap
 msgid "SEE ALSO"
-msgstr ""
+msgstr "DİĞER BİLGİLER"
 
 #. type: Plain text
 #: man/eepget.1:104
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 
 #. type: TH
 #: man/i2prouter.1:1
 #, no-wrap
 msgid "I2PROUTER"
-msgstr ""
+msgstr "I2PROUTER"
 
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr ""
+msgstr "i2prouter - I2P yönelticisini başlatır ve durdurur"
 
 #. type: Plain text
 #: man/i2prouter.1:9
@@ -276,142 +306,148 @@ msgid ""
 "B<i2prouter> "
 "{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 msgstr ""
+"B<i2prouter> "
+"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr ""
+msgstr "I2P hizmerini denetler."
 
 #. type: IP
 #: man/i2prouter.1:15
 #, no-wrap
 msgid "B<console>"
-msgstr ""
+msgstr "B<console>"
 
 #. type: Plain text
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
 msgstr ""
+"I2P yönelticisini geçerli kullanıcı altında bir konsol uygulaması olarak "
+"çalıştırır."
 
 #. type: IP
 #: man/i2prouter.1:19
 #, no-wrap
 msgid "B<start>"
-msgstr ""
+msgstr "B<start>"
 
 #. type: Plain text
 #: man/i2prouter.1:21
 msgid "Starts the I2P service."
-msgstr ""
+msgstr "I2P hizmetini başlatır."
 
 #. type: IP
 #: man/i2prouter.1:23
 #, no-wrap
 msgid "B<stop>"
-msgstr ""
+msgstr "B<stop>"
 
 #. type: Plain text
 #: man/i2prouter.1:25
 msgid "Stops the I2P service."
-msgstr ""
+msgstr "I2P hizmetini durdurur."
 
 #. type: IP
 #: man/i2prouter.1:27
 #, no-wrap
 msgid "B<restart>"
-msgstr ""
+msgstr "B<restart>"
 
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr ""
+msgstr "I2P hizmetini durdurur ve yeniden başlatır."
 
 #. type: IP
 #: man/i2prouter.1:31
 #, no-wrap
 msgid "B<condrestart>"
-msgstr ""
+msgstr "B<condrestart>"
 
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
-msgstr ""
+msgstr "Yalnız zaten çalışıyorsa I2P hizmetini yeniden başlatır."
 
 #. type: IP
 #: man/i2prouter.1:35
 #, no-wrap
 msgid "B<graceful>"
-msgstr ""
+msgstr "B<graceful>"
 
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr ""
+msgstr "I2P yönelticiyi uygun şekilde durdurur (11 dakika kadar sürebilir)"
 
 #. type: IP
 #: man/i2prouter.1:39
 #, no-wrap
 msgid "B<install>"
-msgstr ""
+msgstr "B<install>"
 
 #. type: Plain text
 #: man/i2prouter.1:41
 msgid "Install initscript to start I2P automatically when the system boots."
 msgstr ""
+"Sistem açılırken I2P yönelticiyi otomatik yükleyecek başlatma betiğini "
+"kurar."
 
 #. type: IP
 #: man/i2prouter.1:43
 #, no-wrap
 msgid "B<remove>"
-msgstr ""
+msgstr "B<remove>"
 
 #. type: Plain text
 #: man/i2prouter.1:45
 msgid "Uninstall initscript that was installed with B<install>"
-msgstr ""
+msgstr "B<install> ile kurulmuş başlatma betiğini kaldırır"
 
 #. type: IP
 #: man/i2prouter.1:47
 #, no-wrap
 msgid "B<status>"
-msgstr ""
+msgstr "B<status>"
 
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr ""
+msgstr "I2P hizmetinin çalışıp çalışmadığını yazar."
 
 #. type: IP
 #: man/i2prouter.1:51
 #, no-wrap
 msgid "B<dump>"
-msgstr ""
+msgstr "B<dump>"
 
 #. type: Plain text
 #: man/i2prouter.1:53
 msgid "Dumps the current threads into B<wrapper.log>."
-msgstr ""
+msgstr "Geçerli işlemi B<wrapper.log> içine kaydeder."
 
 #. type: Plain text
 #: man/i2prouter.1:61
 msgid "B<i2prouter-nowrapper>(1)"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>(1)"
 
 #. type: TH
 #: man/i2prouter-nowrapper.1:1
 #, no-wrap
 msgid "I2PROUTER-NOWRAPPER"
-msgstr ""
+msgstr "I2PROUTER-NOWRAPPER"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:5
 msgid "i2prouter-nowrapper - start the I2P router"
-msgstr ""
+msgstr "i2prouter-nowrapper - I2P yönelticiyi başlatır"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8
 msgid "B<i2prouter-nowrapper>"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:14
@@ -420,6 +456,9 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
+"I2P yönelticiyi hizmet kapsayıcı olmadan başlatır. Bu durumda, yöneltici "
+"çökerse yeniden başlatılmaz. Ayrıca I2P için yeterli olmayabilecek şekilde "
+"varsayılan bellek boyutu kullanılır."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
@@ -428,8 +467,11 @@ msgid ""
 "options.  To stop the router, use your browser to access E<.UR "
 "http://localhost:7657/> the router console E<.UE .>"
 msgstr ""
+"Bunun yerine B<i2prouter>(1)  betiğini kullanmalısınız.  Herhangi bir "
+"seçenek yoktur.  Yönelticiyi durdurmak için web tarayıcınızdan E<.UR "
+"http://localhost:7657/> yöneltici konsolunu E<.UE .> açın."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31
 msgid "B<i2prouter>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)"

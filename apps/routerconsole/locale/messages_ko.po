@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-07 10:44+0000\n"
-"PO-Revision-Date: 2019-03-07 10:57+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2019-04-24 14:13+0000\n"
+"PO-Revision-Date: 2019-04-22 05:48+0000\n"
+"Last-Translator: 김진수 <kjs104901@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -143,7 +143,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:918
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:147
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1020
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:612
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:614
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:186
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:381
 msgid "none"
@@ -242,7 +242,7 @@ msgid "Port Conflict"
 msgstr "포트 충돌"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:368
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:237
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:239
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:477
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:476
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fnl_jsp.java:476
@@ -635,7 +635,7 @@ msgstr "{0}에서 이동하는것을 실패했습니다"
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1347
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1411
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1435
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:848
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:850
 msgid "Update downloaded"
 msgstr "업데이트 다운로드됨"
 
@@ -672,7 +672,7 @@ msgstr "{0}으로 복사 실패"
 #: ../java/src/net/i2p/router/update/UnsignedUpdateChecker.java:64
 #: ../java/src/net/i2p/router/update/UnsignedUpdateRunner.java:41
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:155
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:177
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:182
 #: ../java/src/net/i2p/router/web/PluginStarter.java:195
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:582
 msgid "HTTP client proxy tunnel must be running"
@@ -922,7 +922,7 @@ msgstr "{0}에서 새로운 버전이 발견됬습니다"
 
 #: ../java/src/net/i2p/router/web/CSSHelper.java:174
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:222
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
 #: ../java/strings/Strings.java:29
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:292
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:294
@@ -1216,30 +1216,30 @@ msgid ""
 "error logs"
 msgstr "설정 저장 실패 (적용됬으나 저장되지 않음) - 에러 로그를 보세요"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:160
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:165
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:387
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:388
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:525
 msgid "Check for updates"
 msgstr "업데이트 확인"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:167
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:172
 msgid "Update or check already in progress"
 msgstr "업데이트 또는 확인이 이미 작동중입니다"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:190
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:195
 msgid "Update available, attempting to download now"
 msgstr "업데이트 가능, 다운로드 시도중입니다"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:192
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:197
 msgid "Update available, click button on left to download"
 msgstr "업데이트 가능, 왼쪽의 다운로드 버튼을 누르세요"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:198
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:203
 msgid "No update available"
 msgstr "다운로드 불가능"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:202
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:207
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:25
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:28
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:530
@@ -1248,59 +1248,59 @@ msgstr "다운로드 불가능"
 msgid "Save"
 msgstr "저장"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:216
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:221
 #, java-format
 msgid "Updating news URL to {0}"
 msgstr "{0}으로 업데이트 URL 업데이트중"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:223
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:231
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:228
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:236
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:54
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:60
 msgid "internal"
 msgstr "내부"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:227
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:232
 #, java-format
 msgid "Updating proxy host to {0}"
 msgstr "{0}으로 프록시 호스트 업데이트중"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:235
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:240
 #, java-format
 msgid "Updating proxy port to {0}"
 msgstr "{0}으로 프록시 포트 업데이트중"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:253
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:258
 #, java-format
 msgid "Updating refresh frequency to {0}"
 msgstr "새로고침 주기 {0}으로 업데이트중"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:254
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:259
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:126
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:405
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:406
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:298
 msgid "Never"
 msgstr "안함"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:261
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:266
 #, java-format
 msgid "Updating update policy to {0}"
 msgstr "업데이트 정책 {0}으로 업데이트 중"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:270
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:275
 msgid "Updating update URLs."
 msgstr "업데이트 URL 업데이트중."
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:282
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:287
 msgid "Updating trusted keys."
 msgstr "신뢰되는 키 업데이트 중."
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:294
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:299
 #, java-format
 msgid "Updating unsigned update URL to {0}"
 msgstr "서명되지 않은 업데이트 URL {0}으로 업데이트 중"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:306
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:311
 #, java-format
 msgid "Updating signed development build URL to {0}"
 msgstr "서명된 개발 빌드 URL {0}으로 업데이트중"
@@ -1375,7 +1375,7 @@ msgid "Plugin update check complete"
 msgstr "플러그인 업데이트 확인 완료됨"
 
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:399
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:244
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:245
 msgid "Bandwidth usage"
 msgstr "대역폭 사용"
 
@@ -1444,7 +1444,7 @@ msgstr "로컬 SSL 증명서"
 
 #. console
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:34
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:244
 msgid "Router Console"
 msgstr "라우터 콘솔"
@@ -1682,7 +1682,7 @@ msgstr "클라이언트 추가"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:121
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:874
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:585
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:587
 msgid "Client"
 msgstr "클라이언트"
 
@@ -1709,7 +1709,7 @@ msgid "Description"
 msgstr "설명"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:224
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:243
 msgid "Torrents"
 msgstr "토렌트"
@@ -1726,7 +1726,7 @@ msgid "Identification Image Generator"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:230
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:37
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:38
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:290
 msgid "Addressbook"
 msgstr "주소록"
@@ -1741,7 +1741,7 @@ msgstr "주소록"
 #. removing or repositioning elements") + S + "/configsidebar" + S + I +
 #. "info/sidebar.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:232
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:43
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:227
 msgid "Email"
 msgstr "이메일"
@@ -1836,7 +1836,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:22
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:24
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:27
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1155
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1157
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:544
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:564
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:580
@@ -1846,7 +1846,7 @@ msgstr "선택된 항목 삭제"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:23
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:25
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1175
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1177
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:542
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:550
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:562
@@ -1946,8 +1946,8 @@ msgid "Destination"
 msgstr "목적지"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:45
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:250
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1084
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:253
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1086
 msgid "Name"
 msgstr "이름"
 
@@ -2008,8 +2008,8 @@ msgstr "경고"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:90
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:228
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:248
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1082
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:251
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1084
 msgid "Remove"
 msgstr "삭제"
 
@@ -2712,7 +2712,7 @@ msgid "Add a user and password to enable."
 msgstr "활성화하려면 유저와 패스워드를 추가하세요"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:226
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:246
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:249
 msgid "Mark for deletion"
 msgstr "삭제표시"
 
@@ -2862,260 +2862,260 @@ msgstr "이벤트"
 msgid "Details"
 msgstr "세부사항"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:173
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:174
 msgid "Combined bandwidth graph"
 msgstr "합쳐진 대역폭 그래프"
 
 #. e.g. "statname for 60m"
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:193
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:257
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:194
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:258
 #, java-format
 msgid "{0} for {1}"
 msgstr "{1} 중 {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:259
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:260
 #, java-format
 msgid "ending {0} ago"
 msgstr "{0} 전부터 끝내는 중"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:262
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:263
 msgid "Return to main graphs page"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:277
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:278
 msgid "Larger"
 msgstr "더 큰"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:283
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:284
 msgid "Smaller"
 msgstr " 더 작은"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:289
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:290
 msgid "Taller"
 msgstr "더 긴"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:295
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:296
 msgid "Shorter"
 msgstr "더 짧은"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:301
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:302
 msgid "Wider"
 msgstr "더 넓은"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:307
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:308
 msgid "Narrower"
 msgstr "더 좁은"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:314
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:315
 msgid "Larger interval"
 msgstr "더 큰 간격"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:320
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:321
 msgid "Smaller interval"
 msgstr "더 작은 간격"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:327
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:328
 msgid "Previous interval"
 msgstr "전 간격"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:338
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:339
 msgid "Next interval"
 msgstr "다음 간격"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:345
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:346
 msgid "Plot averages"
 msgstr "플롯 평균"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:345
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:346
 msgid "plot events"
 msgstr "플롯 이벤트"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:348
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:349
 msgid "All times are UTC."
 msgstr "모든 시간들은 UTC 시간입니다."
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:381
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:382
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:251
 msgid "Configure Graph Display"
 msgstr "그래프 디스플레이 설정"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:381
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:382
 msgid "Select Stats"
 msgstr "상태 선택"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:386
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:387
 msgid ""
 "Note: Dimensions are for graph only (excludes title, labels and legend)."
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:387
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:388
 msgid "Graph size"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:388
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:389
 msgid "pixels wide"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:389
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:390
 msgid "pixels high"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:392
 msgid "Display period"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:392
 msgid "minutes"
 msgstr "분"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:394
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:395
 msgid "Refresh delay"
 msgstr "새로고침 딜레이"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:410
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:411
 msgid "Plot type"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:411
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:412
 msgid "Averages"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:412
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:413
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:383
 msgid "Events"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:413
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:414
 msgid "Hide legend"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:418
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:419
 msgid "Do not show legend on graphs"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:419
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:420
 msgid "Persistence"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:424
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:425
 msgid "Store graph data on disk"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:425
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:426
 msgid "Save settings and redraw graphs"
 msgstr "설정 저장하고 그래프 재생성"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:483
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:490
 msgid "Graph settings saved"
 msgstr "그래프 설정 저장됨"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:37
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:38
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:288
 msgid "Manage your I2P hosts file here (I2P domain name resolution)"
 msgstr "I2P 호스트 파일을 여기서 관리합니다 (I2P 도메인 이름 관리)"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:38
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:39
 msgid "Configure Bandwidth"
 msgstr "대역폭 설정"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:38
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:39
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:395
 msgid "I2P Bandwidth Configuration"
 msgstr "i2P 대역폭 설정"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:43
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:225
 msgid "Anonymous webmail client"
 msgstr "익명 웹메일 클라이언트"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:250
 msgid "Help"
 msgstr "도움말"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
 msgid "I2P Router Help"
 msgstr "I2P 라우터 도움말"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
 msgid "Install and configure I2P plugins"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
 msgid "Manage Plugins"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:241
 msgid "Built-in anonymous BitTorrent Client"
 msgstr "내장 익명 비트토렌트 클라이언트"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:49
 msgid "Local web server for hosting your own content on I2P"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:190
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:49
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:265
 msgid "Web Server"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:53
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:54
 msgid "The Anoncoin project"
 msgstr "어논코인 프로젝트"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:54
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:55
 msgid "Bug tracker"
 msgstr "버그 트래커"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:54
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:55
 msgid "I2P Bug Reports"
 msgstr ""
 
 #. "colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http
 #. ://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:56
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:57
 msgid "Dev Builds"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:56
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:57
 msgid "Development builds of I2P"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:57
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:58
 msgid "Dev Forum"
 msgstr "개발 포럼"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:57
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:58
 msgid "Development forum"
 msgstr "개발 포럼"
 
 #. _x("diftracker") + S + _x("Bittorrent tracker") + S +
 #. "http://diftracker.i2p/" + S + I + "magnet.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:59
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:60
 msgid "I2P Applications"
 msgstr "I2P 앱"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:61
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:62
 msgid "Frequently Asked Questions"
 msgstr "자주 묻는 질문들"
 
 #. "exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S +
 #. "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:61
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:62
 msgid "I2P FAQ"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:62
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:63
 msgid "Community forum"
 msgstr "커뮤니티 포럼"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:62
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:63
 msgid "I2P Forum"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:65
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:66
 msgid "Anonymous wiki - share the knowledge"
 msgstr "익명 위키 - 지식을 공유하세요"
 
@@ -3124,11 +3124,11 @@ msgstr "익명 위키 - 지식을 공유하세요"
 #. + S + I + "git-logo.png" + S +
 #. "hiddengate [ru]" + S + _x("Russian I2P-related wiki") + S +
 #. "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:65
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:66
 msgid "I2P Wiki"
 msgstr "I2P 위키"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:73
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
 msgid "I2P News"
 msgstr "I2P 뉴스"
 
@@ -3146,33 +3146,33 @@ msgstr "I2P 뉴스"
 #. "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
 #. _x("Pastebin") + S + _x("Encrypted I2P Pastebin") + S +
 #. "http://zerobin.i2p/" + S + I + "paste_plain.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:73
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
 msgid "Planet I2P"
 msgstr "플래닛 I2P"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Add-on directory"
 msgstr "애드온 디렉토리"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "I2P Plugins"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:77
 msgid "Encrypted I2P Pastebin"
 msgstr ""
 
 #. _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S +
 #. "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:77
 msgid "PrivateBin"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:77
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:78
 msgid "I2P home page"
 msgstr "I2P 홈페이지"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:77
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:78
 msgid "Project Website"
 msgstr "프로젝트 웹사이트"
 
@@ -3180,44 +3180,44 @@ msgstr "프로젝트 웹사이트"
 #. "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +
 #. "Salt" + S + "salt.i2p" + S + "http://salt.i2p/" + S + I +
 #. "salt_console.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:80
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:81
 msgid "I2P Network Statistics"
 msgstr "I2P 네트워크 상태"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:81
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:82
 msgid "I2P Technical Docs"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:81
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:82
 msgid "Technical documentation"
 msgstr "기술지원 문서"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:82
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:83
 msgid "Privacy guides and tutorials"
 msgstr "프라이버시 가이드, 튜토리얼"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:82
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:83
 msgid "The Tin Hat"
 msgstr "The Tin Hat"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:83
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:84
 msgid "Trac Wiki"
 msgstr "Trac Wiki"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:125
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
 msgid "The HTTP proxy is not up"
 msgstr "HTTP 프록시가 켜져있지 않습니다"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
 #, java-format
 msgid "Your browser is not properly configured to use the HTTP proxy at {0}"
 msgstr "브라우저 HTTP 프록시를 {0}으로 설정하지 않은 것 같습니다"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:252
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:255
 msgid "URL"
 msgstr "URL"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:279
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:282
 msgid "Add"
 msgstr "추가"
 
@@ -3472,7 +3472,7 @@ msgstr "모든 항목"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:897
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:312
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:234
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:236
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:879
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:481
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:480
@@ -3643,7 +3643,7 @@ msgstr "해당 연결이 신뢰된 시간"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:230
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:289
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:461
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1120
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1122
 msgid "Up"
 msgstr "업"
 
@@ -4329,7 +4329,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:310
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:568
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:570
 msgid "Local Tunnels"
 msgstr "로컬 터널"
 
@@ -4537,7 +4537,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:401
 msgid "Jobs"
-msgstr ""
+msgstr "일감"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:405
 msgid "View active leasesets (debug mode)"
@@ -4790,94 +4790,94 @@ msgstr "터널에 참여한 다른 라우터의 리퀘스트를 큐에 넣었습
 msgid "Backlog"
 msgstr "백로그"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:225
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:227
 msgid "ERR-Client Manager I2CP Error - check logs"
 msgstr "오류 - 클라이언트 매니저 I2CP 오류 - 로그 확인"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:232
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:234
 #, java-format
 msgid "ERR-Clock Skew of {0}"
 msgstr "오류 = {0}의 시간 왜곡"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:253
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:255
 msgid "ERR-Unresolved TCP Address"
 msgstr "오류 - 확인되지 않는 TCP 주소"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:257
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:259
 msgid "ERR-Private TCP Address"
 msgstr "오류 - 개인 TCP 주소"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:261
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:263
 msgid "ERR-SymmetricNAT"
 msgstr "오류 - Symmetric NAT"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:267
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:269
 msgid "WARN-Firewalled with Inbound TCP Enabled"
 msgstr "경고 - 인바운드 TCP와 방화벽 사용됨"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:272
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:274
 msgid "WARN-Firewalled and Floodfill"
 msgstr "경고 - 플러드 필과 방화벽 사용됨"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:278
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:280
 msgid "Disconnected - check network connection"
 msgstr "연결 끊김 - 네트워크 연결 확인"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:281
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:283
 msgid ""
 "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and "
 "restart"
 msgstr "오류 - 사용중인 UDP 포트 - 고급 설정의 i2np.udp.internalPort=xxxx 를 설정한 다음 재시작하세요"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:291
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:293
 msgid "ERR-No Active Peers, Check Network Connection and Firewall"
 msgstr "오류 - 활성화된 피어 없음, 네트워크 연결과 방화벽을 확인하세요"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:294
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:296
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
 msgstr "오류 - UDP 비활성화됨, 수신 TCP 호스트/포트 세팅 안됨"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:296
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:298
 msgid "WARN-Firewalled with UDP Disabled"
 msgstr "경고 - 방화벽 사용중, UDP 비활성화됨"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:565
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:567
 msgid "Add/remove/edit &amp; control your client and server tunnels"
 msgstr "클라이언트 및 서버 터널을 추가·삭제·편집·조작"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:583
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:585
 msgid "Hidden Service"
 msgstr "히든 서비스"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:587
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:589
 msgid "Show tunnels"
 msgstr "터널 보이기"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:599
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:601
 msgid "Leases expired"
 msgstr "만료된 임대 계약"
 
 #. red or yellow light
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:599
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:600
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:601
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:602
 msgid "Rebuilding"
 msgstr "재구축"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:600
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:602
 msgid "ago"
 msgstr "전"
 
 #. green light
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:603
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:605
 msgid "Ready"
 msgstr "준비"
 
 #. yellow light
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:607
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:609
 msgid "Building"
 msgstr "구축"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:607
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:609
 msgid "Building tunnels"
 msgstr "터널 구축중"
 
@@ -4885,35 +4885,35 @@ msgstr "터널 구축중"
 #. nicely under 'local destinations' in the summary bar
 #. note that if the wording changes in i2ptunnel.config, we have to
 #. keep the old string here as well for existing installs
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:622
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:624
 #: ../java/strings/Strings.java:36
 msgid "shared clients"
 msgstr "공유 클라이언트"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:850
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:852
 msgid "Click Restart to install"
 msgstr "설치하려면 재시작을 누르세요"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:852
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:854
 msgid "Click Shutdown and restart to install"
 msgstr "설치하려면 종료 후 재시작하세요"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:853
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:870
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:882
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:894
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:855
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:872
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:884
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:896
 #, java-format
 msgid "Version {0}"
 msgstr "버전 {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:869
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:881
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:893
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:871
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:883
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:895
 msgid "Update available"
 msgstr "업데이트 가능"
 
 #. Note to translators: parameter is a version, e.g. "0.8.4"
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:917
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:919
 #, java-format
 msgid "Download {0} Update"
 msgstr "{0} 업데이트 다운로드함"
@@ -4922,7 +4922,7 @@ msgstr "{0} 업데이트 다운로드함"
 #. <br> is optional, to help the browser make the lines even in the button
 #. If the translation is shorter than the English, you should probably not
 #. include <br>
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:925
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:927
 #, java-format
 msgid "Download Signed<br>Development Update<br>{0}"
 msgstr "서명된<br>개발 업데이트<br>{0} 다운로드"
@@ -4931,61 +4931,61 @@ msgstr "서명된<br>개발 업데이트<br>{0} 다운로드"
 #. <br> is optional, to help the browser make the lines even in the button
 #. If the translation is shorter than the English, you should probably not
 #. include <br>
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:933
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:935
 #, java-format
 msgid "Download Unsigned<br>Update {0}"
 msgstr "서명되지 않은<br>업데이트 {0} 다운로드"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:957
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:959
 msgid "Help with firewall configuration"
 msgstr "방화벽 설정 도움"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:959
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:961
 msgid "Check network connection and NAT/firewall"
 msgstr "네트워크 연결, NAT/방화벽 체크"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:985
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:987
 msgid ""
 "Attempt to download router reference files (if automatic reseed has failed)"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:986
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:988
 msgid "Reseed"
 msgstr "재시드"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1086
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1088
 msgid "Order"
 msgstr "정렬"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1110
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1112
 msgid "Top"
 msgstr "위"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1115
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1117
 msgid "Move to top"
 msgstr "위로 이동"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1125
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1127
 msgid "Move up"
 msgstr "위로"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1133
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1135
 msgid "Down"
 msgstr "아래"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1138
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1140
 msgid "Move down"
 msgstr "아래로 이동"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1143
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1145
 msgid "Bottom"
 msgstr "밑"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1148
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1150
 msgid "Move to bottom"
 msgstr "밑으로 이동"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1159
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1161
 msgid "Select a section to add"
 msgstr "추가할 섹션 선택"
 

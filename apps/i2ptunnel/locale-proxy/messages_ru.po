@@ -7,6 +7,7 @@
 # Aleksey Orekhov <opexob@yandex.ru>, 2013
 # Andrey Lukyanenko <operru32@yandex.ru>, 2013
 # ducki2p <ducki2p@gmail.com>, 2011
+# Evgeny Lavrov <EvgenyLavrov@gmail.com>, 2019
 # foo <foo@bar>, 2009
 # Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
 # gmind, 2012-2013
@@ -20,8 +21,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-07-02 14:17+0000\n"
-"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
+"PO-Revision-Date: 2019-03-20 12:26+0000\n"
+"Last-Translator: Evgeny Lavrov <EvgenyLavrov@gmail.com>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -490,7 +491,7 @@ msgstr "LeaseSet для адреса назначения не найден"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1350
 msgid "Host"
-msgstr "Адрес"
+msgstr "Имя хоста"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1354
 msgid "Base 32"
@@ -577,11 +578,11 @@ msgstr "маршрутизатор"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 msgid "master"
-msgstr "основной"
+msgstr "основная"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
 msgid "private"
-msgstr "приватный"
+msgstr "приватная"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
 #, java-format

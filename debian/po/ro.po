@@ -1,16 +1,16 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
 # Rusu_C <crrusu@yahoo.com>, 2016
-# Predator <Predator@windowslive.com>, 2017
+# Predator <Predator@windowslive.com>, 2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2019-03-30 19:08+0000\n"
 "Last-Translator: Predator <Predator@windowslive.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/otf/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "Router-ul I2P trebuie sa fie pornit la încărcarea? "
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "Router-ul I2P poate fi rulat ca un demon care pornește automat atunci când calculatorul se pornește. Aceasta este configurația recomandată."
+msgstr "Router-ul I2P poate fi folosit ca un demon care pornește automat atunci când calculatorul se pornește. Aceasta este configurația recomandată."
 
 #. Type: string
 #. Description
@@ -80,8 +80,8 @@ msgstr "Routere în bandă largă, precum și routere, cu o mulțime de torente/
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Rulează daemon I2P alături de AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Ar trebui ca daemonul I2P să fie limitat cu AppArmor?"
 
 #. Type: boolean
 #. Description

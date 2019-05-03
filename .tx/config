@@ -480,6 +480,7 @@ trans.de = installer/resources/eepsite/docroot/help/index_de.html
 ;; not yet translated on TX, use old page
 ;;trans.es = installer/resources/eepsite/docroot/help/index_es.html
 trans.fr = installer/resources/eepsite/docroot/help/index_fr.html
+trans.hu = installer/resources/eepsite/docroot/help/index_hu.html
 ;; Java converts id to in
 trans.id = installer/resources/eepsite/docroot/help/index_in.html
 trans.it = installer/resources/eepsite/docroot/help/index_it.html

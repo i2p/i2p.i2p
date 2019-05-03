@@ -4,6 +4,8 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Gergő Doma <domag02@gmail.com>, 2019
+# Hunor Paksy <heds@cock.li>, 2018
 # omgitsadalek <mihalymokus76@gmail.com>, 2013
 # benewfy <benewfy@gmail.com>, 2015
 msgid ""
@@ -11,8 +13,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2019-03-17 20:14+0000\n"
+"Last-Translator: Gergő Doma <domag02@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,7 +56,7 @@ msgid "Angola"
 msgstr "Angola"
 
 msgid "Asia/Pacific Region"
-msgstr ""
+msgstr "Ázsia/Csendes óceáni régió"
 
 msgid "Antarctica"
 msgstr "Antarktika"
@@ -108,7 +110,7 @@ msgid "Benin"
 msgstr "Benin"
 
 msgid "Saint Barthélemy"
-msgstr ""
+msgstr "Saint-Barthélemy"
 
 msgid "Bermuda"
 msgstr "Bermuda"
@@ -120,7 +122,7 @@ msgid "Bolivia"
 msgstr "Bolívia"
 
 msgid "Bonaire"
-msgstr ""
+msgstr "Bonaire"
 
 msgid "Brazil"
 msgstr "Brazília"
@@ -252,7 +254,7 @@ msgid "Falkland Islands (Malvinas)"
 msgstr "Falkland-szigetek"
 
 msgid "Micronesia"
-msgstr ""
+msgstr "Mikronézia"
 
 msgid "Faroe Islands"
 msgstr "Faroe-szigetek"
@@ -354,7 +356,7 @@ msgid "Iraq"
 msgstr "Irak"
 
 msgid "Iran"
-msgstr ""
+msgstr "Irán"
 
 msgid "Iceland"
 msgstr "Izland"
@@ -393,7 +395,7 @@ msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts és Nevis"
 
 msgid "North Korea"
-msgstr ""
+msgstr "Észak-Korea"
 
 msgid "Republic of Korea"
 msgstr "Dél-Korea"
@@ -438,7 +440,7 @@ msgid "Latvia"
 msgstr "Lettország"
 
 msgid "Libya"
-msgstr ""
+msgstr "Líbia"
 
 msgid "Morocco"
 msgstr "Marokkó"
@@ -447,7 +449,7 @@ msgid "Monaco"
 msgstr "Monaco"
 
 msgid "Moldova"
-msgstr ""
+msgstr "Moldova"
 
 msgid "Montenegro"
 msgstr "Montenegró"
@@ -462,7 +464,7 @@ msgid "Marshall Islands"
 msgstr "Marshall-szigetek"
 
 msgid "Macedonia"
-msgstr ""
+msgstr "Makedónia"
 
 msgid "Mali"
 msgstr "Mali"
@@ -474,7 +476,7 @@ msgid "Mongolia"
 msgstr "Mongólia"
 
 msgid "Macau"
-msgstr ""
+msgstr "Makaó"
 
 msgid "Northern Mariana Islands"
 msgstr "Északi-Mariana-szigetek"
@@ -654,7 +656,7 @@ msgid "Suriname"
 msgstr "Suriname"
 
 msgid "South Sudan"
-msgstr ""
+msgstr "Dél-Szudán"
 
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome és Principe"
@@ -663,10 +665,10 @@ msgid "El Salvador"
 msgstr "Salvador"
 
 msgid "Sint Maarten"
-msgstr ""
+msgstr "Szent Márton-sziget"
 
 msgid "Syria"
-msgstr ""
+msgstr "Szíria"
 
 msgid "Swaziland"
 msgstr "Szváziföld"
@@ -717,7 +719,7 @@ msgid "Taiwan"
 msgstr "Taiwan"
 
 msgid "Tanzania"
-msgstr ""
+msgstr "Tanzánia"
 
 msgid "Ukraine"
 msgstr "Ukrajna"
@@ -738,7 +740,7 @@ msgid "Uzbekistan"
 msgstr "Üzbegisztán"
 
 msgid "Vatican"
-msgstr ""
+msgstr "Vatikán"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Saint Vincent és Grenadine-szigetek"
@@ -750,7 +752,7 @@ msgid "Virgin Islands"
 msgstr "Virgin-szigetek"
 
 msgid "Vietnam"
-msgstr ""
+msgstr "Vietnam"
 
 msgid "Vanuatu"
 msgstr "Vanuatu"

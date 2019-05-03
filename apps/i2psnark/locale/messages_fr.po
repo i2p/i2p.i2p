@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# AO <ao@localizationlab.org>, 2018
+# AO <ao@localizationlab.org>, 2018-2019
 # Boxoa590, 2012-2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2019-02-14 12:35+0000\n"
+"PO-Revision-Date: 2019-04-24 18:26+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -881,7 +881,7 @@ msgstr "Impossible de créer un torrent pour des données inexistantes : {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1371
 msgid "Error creating torrent - you must enter a file or directory"
-msgstr "Erreur de création du torrent - vous devez saisir un fichier ou un répertoire"
+msgstr "Erreur de création du torrent — vous devez saisir un fichier ou un répertoire"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1409
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2710

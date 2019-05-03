@@ -6,7 +6,7 @@
 # Translators:
 # pol polearnik <polearnik@mail.ru>, 2013
 # pol polearnik <polearnik@mail.ru>, 2013
-# Predator <Predator@windowslive.com>, 2017
+# Predator <Predator@windowslive.com>, 2017,2019
 # titus <titus0818@gmail.com>, 2015
 # zzzi2p, 2017
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-07-01 15:30+0000\n"
+"PO-Revision-Date: 2019-03-30 19:15+0000\n"
 "Last-Translator: Predator <Predator@windowslive.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/otf/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
@@ -24,29 +24,29 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "Felicitări pentru obținerea I2P instalat!"
+msgstr "Felicitări pentru finalizarea instalării I2P!"
 
 msgid "Welcome to I2P!"
 msgstr "Bine ați venit la I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "Asteptați {0}ai răbdare{1} I2P se incarcă si caută parteneri in rețea."
+msgstr "Te rog {0}ai răbdare{1} I2P se incarcă si caută parteneri in rețea."
 
 #, java-format
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr "În timp ce sunteți în așteptare , vă rugăm {0} să reglați setările de lățime de bandă {1} de pe {2} pagina de configurare {3} ."
+msgstr "În timp ce aștepti , te rog {0} să ajustezi setările lățimii de bandă {1} de pe {2} pagina de configurare {3} ."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "De asemenea, puteți seta browser-ul dvs. să utilizeze proxy I2P pentru a avea acces la eepsites."
+msgstr "De asemenea, poți seta browser-ul să utilizeze proxy I2P pentru a avea acces la eepsites."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr "Introduceți 127.0.0.1 (sau localhost), portul 4444  în setările proxy HTTP a browser-ului dvs."
+msgstr "Doar introduceți 127.0.0.1 (sau localhost), portul 4444  în setările proxy HTTP ale browser-ului."
 
 msgid "Do not use SOCKS for this."
 msgstr "Nu folosiți SOCKS pentru aceasta."
@@ -60,10 +60,10 @@ msgstr "Mai multe informații pot fi găsite pe {0}I2P pagina de configurare a s
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr "Odată ce aveți \"clienți partajați\" destinația listată in stânga paginii, vă rugăm {0}să verificați{1}pagina de{2}FAQ{3}."
+msgstr "Odată ce aveți \"clienți partajați\" listați in stânga paginii, vă rugăm {0}să verificați{1}pagina de{2}FAQ{3}."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr "Indicați clientul dvs de IRC la {0}localhost:6668{1} și salutați-ne la {2}#i2p{3}."
+msgstr "Conectați clientul dvs de IRC la {0}localhost:6668{1} și salutați-ne pe canalul {2}#i2p{3}."
