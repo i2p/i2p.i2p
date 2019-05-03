@@ -1,61 +1,60 @@
-.TH I2PROUTER 1 "January 26, 2017" "" "I2P"
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "26 Ocak 2017" "" I2P
 
-.SH NAME
-i2prouter \- start and stop the I2P router
+.SH AD
+i2prouter \- I2P yönelticisini başlatır ve durdurur
 
-.SH SYNOPSIS
-.B i2prouter
-.RI { console | start | stop | graceful | restart | condrestart | status | dump | install | remove }
+.SH ÖZET
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
 .br
 
-.SH DESCRIPTION
-Control the I2P service.
+.SH AÇIKLAMA
+I2P hizmerini denetler.
 
-.B
-.IP console
-Runs I2P as a console application under the current user.
+.IP \fBconsole\fP
+I2P yönelticisini geçerli kullanıcı altında bir konsol uygulaması olarak
+çalıştırır.
 
-.B
-.IP start
-Starts the I2P service.
+.IP \fBstart\fP
+I2P hizmetini başlatır.
 
-.B
-.IP stop
-Stops the I2P service.
+.IP \fBstop\fP
+I2P hizmetini durdurur.
 
-.B
-.IP restart
-Stops the I2P service and then starts it.
+.IP \fBrestart\fP
+I2P hizmetini durdurur ve yeniden başlatır.
 
-.B
-.IP condrestart
-Restart the I2P service only if it is already running.
+.IP \fBcondrestart\fP
+Yalnız zaten çalışıyorsa I2P hizmetini yeniden başlatır.
 
-.B
-.IP graceful
-Stop I2P gracefully (may take up to 11 minutes)
+.IP \fBgraceful\fP
+I2P yönelticiyi uygun şekilde durdurur (11 dakika kadar sürebilir)
 
-.B
-.IP install
-Install initscript to start I2P automatically when the system boots.
+.IP \fBinstall\fP
+Sistem açılırken I2P yönelticiyi otomatik yükleyecek başlatma betiğini
+kurar.
 
-.B
-.IP remove
-Uninstall initscript that was installed with \fBinstall\fP
+.IP \fBremove\fP
+\fBinstall\fP ile kurulmuş başlatma betiğini kaldırır
 
-.B
-.IP status
-Prints whether the I2P service is running.
+.IP \fBstatus\fP
+I2P hizmetinin çalışıp çalışmadığını yazar.
 
-.B
-.IP dump
-Dumps the current threads into \fBwrapper.log\fP.
+.IP \fBdump\fP
+Geçerli işlemi \fBwrapper.log\fP içine kaydeder.
 
-.SH "REPORTING BUGS"
-Please enter a ticket on
+.SH "HATA BİLDİRİMİ"
+Lütfen
 .UR https://trac.i2p2.de/
-the I2P trac page
+I2P trac sayfasından
 .UE .
+bir destek
+çağrısı gönderin
 
-.SH "SEE ALSO"
-.BR i2prouter-nowrapper (1)
+.SH "DİĞER BİLGİLER"
+\fBi2prouter\-nowrapper\fP(1)

@@ -3,92 +3,94 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH EEPGET 1 "26 Ocak 2017" "" I2P
+.TH EepGet 1 "26 Ocak 2017" "" I2P
 
 .SH AD
-Eepget \- I2P indirici
+EepGet \- I2P indirici
 
-.SH SYNOPSIS
+.SH ÖZET
 \fBeepget\fP [\fIoptions\fP]\fIURL\fP
 .br
 
-.SH DESCRIPTION
+.SH AÇIKLAMA
 .P
-Download a file non\-interactively via HTTP. Transfers through both I2P and
-the regular Internet are supported.
+HTTP üzerinden bir dosyayı etkileşimsiz olarak indirir. Hem I2P hem de
+normal İnternet üzerinden aktarım yapılabilir.
 .P
-Eepget is able to cope with slow or unstable network connections; if a
-download is not successful because of a network problem, it will keep
-retrying until the whole file has been retrieved (if the \-n option is set).
-If supported by the remote server, eepget will instruct the server to
-continue the download from the point of interruption.
+EepGet, yavaş ya da dengesiz ağ bağlantılarıyla başa çıkabilir. İndirme
+işlemi bir ağ sorunu nedeniyle tamamlanamaz ise, dosya tamamen alınana kadar
+(\-n seçeneği belirtilmiş ise) yeniden denenir. Uzak sunucu tarafından
+destekleniyorsa, eepget sunucuya indirme işlemine kalınan noktadan devam
+etme bilgisini verir.
 
-.SH OPTIONS
+.SH AYARLAR
 \fB\-c\fP
 .TP 
-Clearnet. Do not use a proxy. Same as \fB\-p\fP :0 .
+Basit ağ. Vekil sunucu kullanılmaz. \fB\-p\fP ile aynı :0 .
 .TP 
 
 \fB\-e\fP etag
 .TP 
-Sets the etag value in the request headers.
+İstek üst bilgilerindeki etag değerini ayarlar.
 .TP 
 
-\fB\-h\fP name=value
+\fB\-h\fP ad=değer
 .TP 
-Adds an arbitrary request header with the given name and value.
-.TP 
-
-\fB\-l\fP lineLen
-.TP 
-Controls the progress display. \fB\ lineLen \fP is the length of one progress line in characters. The default is 40.
+Belirtilen ad ve değer için isteğe bağlı bir istek üst bilgisi ekler.
 .TP 
 
-\fB\-m\fP markSize
+\fB\-l\fP SatırUzunluğu
 .TP 
-Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. The default is 1024.
-.TP 
-
-\fB\-n\fP retries
-.TP 
-Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will not retry.
+İlerleme çubuğunun görünümünü belirler. \fB\ SatırUzunluğu \fP karakter cinsinden bir ilerleme satırının uzunluğunu belirler. Varsayılan değer: 40.
 .TP 
 
-\fB\-o\fP file
+\fB\-m\fP İşaretBoyutu
 .TP 
-Sets the output file to write to. If this option is not given, the output filename will be determined by the URL.
-.TP 
-
-\fB\-p\fP proxy_host[:port]
-.TP 
-Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-c\fP or \fB\-p\fP :0 to disable the eeproxy.
+İlerleme çubuğunun görünümünü belirler. \fB\ markSize \fP bir '#' karakterinin kaç bayt anlamına geleceğini belirler. Varsayılan değer: 1024.
 .TP 
 
-\fB\-t\fP seconds
+\fB\-n\fP YenidenDenemeSayısı
 .TP 
-Sets the inactivity timeout. The default is 60 seconds.
-.TP 
-
-\fB\-u\fP username
-.TP 
-Sets the username for proxy authorization, if required.
+Tamamlanamayan indirmelerin kaç kez daha yeniden indirilmeye çalışılacağını belirler.  Bu seçenek belirtilmediğinde EepGet tamamlanmayan indirmeleri yeniden indirmeyi denemez.
 .TP 
 
-\fB\-x\fP password
+\fB\-o\fP Dosya
 .TP 
-Sets the password for proxy authorization, if required. If a username is specified but not a password, EepGet will prompt for the password.
+Yazılacak çıkış dosyasını belirler. Bu seçenek belirtilmediğinde, çıkış dosyasının adı İnternet adresine göre belirlenir.
+.TP 
 
-.SH "EXIT STATUS"
+\fB\-p\fP VekilSunucu[:KapıNumarası]
+.TP 
+Kullanılacak bir I2P vekil sunucusunu (eeproxy) belirler. Kapı numarası belirtilmediğinde eepget 4444 numaralı kapıyı kullanır. Bu seçenek belirtilmediğinde EepGet 127.0.0.1:4444 değerini kullanır. eeproxy seçeneğini devre dışı bırakmak için \fB\-c\fP ya da \fB\-p\fP:0 kullanın.
+.TP 
 
-\fBeepget\fP exits with status zero upon successful transfer and non\-zero if
-there were problems with the download.
+\fB\-t\fP saniye
+.TP 
+Etkinlik olunmayan süre zaman aşımı değeri. Varsayılan değer 60 saniye.
+.TP 
 
-.SH "REPORTING BUGS"
-Please enter a ticket on
+\fB\-u\fP kullanıcı adı
+.TP 
+Gerekiyorsa, vekil sunucu kimlik doğrulaması için kullanılacak kullanıcı adı
+.TP 
+
+\fB\-x\fP parola
+.TP 
+Gerekiyorsa, vekil sunucu kimlik doğrulaması için kullanılacak parola. Bir kullanıcı adı belirtilmiş ancak parola belirtilmemiş ise EepGet parolayı sorar.
+
+.SH "ÇIKIŞ DURUMU"
+
+\fBeepget\fP aktarım sorunsuz tamamlandığında çıkış durumu sıfır olur. İndirme
+sırasında sorun çıkarsa değer sıfırdan farklı olur.
+
+.SH "HATA BİLDİRİMİ"
+Lütfen
 .UR https://trac.i2p2.de/
-the I2P trac page
+I2P trac sayfasından
 .UE .
+bir destek
+çağrısı gönderin
 
-.SH "SEE ALSO"
+.SH "DİĞER BİLGİLER"
 \fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
 

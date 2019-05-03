@@ -6,28 +6,31 @@
 .TH I2PROUTER\-NOWRAPPER 1 "26 Ocak 2017" "" I2P
 
 .SH AD
-i2prouter\-nowrapper \- start the I2P router
+i2prouter\-nowrapper \- I2P yönelticiyi başlatır
 
-.SH SYNOPSIS
+.SH ÖZET
 \fBi2prouter\-nowrapper\fP
 .br
 
-.SH DESCRIPTION
-Start the I2P router, without the service wrapper.  This means the router
-will not restart if it crashes.  Also, it will use the default memory size,
-which may not be enough for I2P.
+.SH AÇIKLAMA
+I2P yönelticiyi hizmet kapsayıcı olmadan başlatır. Bu durumda, yöneltici
+çökerse yeniden başlatılmaz. Ayrıca I2P için yeterli olmayabilecek şekilde
+varsayılan bellek boyutu kullanılır.
 .P
-You should really use the \fBi2prouter\fP(1)  script instead.  There are no
-options.  To stop the router, use your browser to access
+Bunun yerine \fBi2prouter\fP(1)  betiğini kullanmalısınız.  Herhangi bir
+seçenek yoktur.  Yönelticiyi durdurmak için web tarayıcınızdan
 .UR http://localhost:7657/
-the router console
+yöneltici konsolunu
 .UE .
+açın.
 
-.SH "REPORTING BUGS"
-Please enter a ticket on
+.SH "HATA BİLDİRİMİ"
+Lütfen
 .UR https://trac.i2p2.de/
-the I2P trac page
+I2P trac sayfasından
 .UE .
+bir destek
+çağrısı gönderin
 
-.SH "SEE ALSO"
+.SH "DİĞER BİLGİLER"
 \fBi2prouter\fP(1)
