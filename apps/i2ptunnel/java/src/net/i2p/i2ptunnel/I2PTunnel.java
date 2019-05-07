@@ -105,6 +105,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     public long readTimeout = -1;
 
+    /**
+     *  Absolute path to filter definition file
+     *  @since 0.9.40
+     */
     public String filterDefinition;
 
     private static final String nocli_args[] = { "-nocli", "-die"};

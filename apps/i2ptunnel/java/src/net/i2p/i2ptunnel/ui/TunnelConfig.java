@@ -346,6 +346,9 @@ public class TunnelConfig {
         }
     }
 
+    /**
+     *  @since 0.9.40
+     */
     public void setFilterDefinition(String filterDefinition) {
         if (filterDefinition != null) {
             filterDefinition = filterDefinition.trim();

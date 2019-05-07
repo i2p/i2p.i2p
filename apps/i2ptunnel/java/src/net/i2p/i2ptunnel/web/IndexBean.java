@@ -934,6 +934,9 @@ public class IndexBean {
         }
     }
 
+    /**
+     *  @since 0.9.40
+     */
     public void setFilterDefinition(String val) {
         if (val != null)
             _config.setFilterDefinition(val);

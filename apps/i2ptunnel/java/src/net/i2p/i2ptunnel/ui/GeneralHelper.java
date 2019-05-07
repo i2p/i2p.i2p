@@ -665,6 +665,9 @@ public class GeneralHelper {
         return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
     }
 
+    /**
+     *  @since 0.9.40
+     */
     public String getFilterDefinition(int tunnel) {
         TunnelController tunnelController = getController(tunnel);
         if (tunnelController != null) {

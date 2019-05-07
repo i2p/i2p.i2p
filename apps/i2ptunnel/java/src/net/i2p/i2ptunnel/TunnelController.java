@@ -934,6 +934,10 @@ public class TunnelController implements Logging {
     public String getDescription() { return _config.getProperty(PROP_DESCR); }
     public String getI2CPHost() { return _config.getProperty(PROP_I2CP_HOST); }
     public String getI2CPPort() { return _config.getProperty(PROP_I2CP_PORT); }
+    /**
+     *  Absolute path to filter definition file
+     *  @since 0.9.40
+     */
     public String getFilter() { return _config.getProperty(PROP_FILTER); }
 
     /**

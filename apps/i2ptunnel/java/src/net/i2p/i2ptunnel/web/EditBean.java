@@ -285,6 +285,9 @@ public class EditBean extends IndexBean {
         return _helper.getAccessList(tunnel);
     }
 
+    /**
+     *  @since 0.9.40
+     */
     public String getFilterDefinition(int tunnel) {
         return _helper.getFilterDefinition(tunnel);
     }
