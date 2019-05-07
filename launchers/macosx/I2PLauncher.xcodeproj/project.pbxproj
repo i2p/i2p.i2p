@@ -61,6 +61,8 @@
 		BFAA37FC226892CA0014EB07 /* DateTimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF53150C2150CE310014EB07 /* DateTimeUtils.swift */; };
 		BFAA37FD226892CA0014EB07 /* EventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE16BF92156DAED0014EB07 /* EventManager.swift */; };
 		BFAA37FE226892CA0014EB07 /* FolderContentMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */; };
+		BFAD9C94227C92480014EB07 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9021BB344D0014EB07 /* Preferences.swift */; };
+		BFAD9C95227C925F0014EB07 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF99FD4322708AB10014EB07 /* Identifiers.swift */; };
 		BFBDCAE9215040670014EB07 /* Subprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAE8215040670014EB07 /* Subprocess.swift */; };
 		BFBDCAEB215041630014EB07 /* TaskPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAEA215041630014EB07 /* TaskPipeline.swift */; };
 		BFBDCAED215041C10014EB07 /* Subprocess+CompactAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAEC215041C10014EB07 /* Subprocess+CompactAPI.swift */; };
@@ -974,7 +976,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run from launchers/macosx\nset -x\n\n# Warning to keep clean files\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" \\) -print0 | xargs -0 wc -l | awk '$1 > 200 && $2 != \"total\" { print $2 \":1: warning: file more than 200 lines\" }'\n\nif [ ! -z \"${REPACK_I2P}\" ]; then\n    export BUILDDIR=$(pwd)\n    export MACOSX_SOURCE_DIR=$SRCROOT\n    export I2P_SOURCE_DIR=$(realpath $SRCROOT/../..)\n    cd $MACOSX_SOURCE_DIR/..\n    # TODO: Find out why sbt hangs when executed in cli\n    #./sbt \";macosx:assembly\"\n    cd ..\n    cd $I2P_SOURCE_DIR\n    ant preppkg-osx jbigi-osx-only\n    cp build/jbigi.jar pkg-temp/lib/jbigi.jar\n    cd pkg-temp\n    rm -f $BUILDDIR/base.zip\n    zip -r -v -9 $BUILDDIR/base.zip *\n    cd $MACOSX_SOURCE_DIR\n    cp $MACOSX_SOURCE_DIR/target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar $BUILDDIR/launcher.jar\nfi\n\n";
+			shellScript = "# Run from launchers/macosx\nset -x\n\n# Warning to keep clean files\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" \\) -print0 | xargs -0 wc -l | awk '$1 > 200 && $2 != \"total\" { print $2 \":1: warning: file more than 200 lines\" }'\n\nif [ ! -z \"${REPACK_I2P}\" ]; then\n    export BUILDDIR=$(pwd)\n    export MACOSX_SOURCE_DIR=$SRCROOT\n    export I2P_SOURCE_DIR=$(realpath $SRCROOT/../..)\n    echo \"I2P Source directory: ${I2P_SOURCE_DIR}\"\n    cd $MACOSX_SOURCE_DIR/..\n    # TODO: Find out why sbt hangs when executed in cli\n    #./sbt \";macosx:assembly\"\n    cd ..\n    cd $I2P_SOURCE_DIR\n    ant distclean preppkg-osx jbigi-osx-only\n    cp build/jbigi.jar pkg-temp/lib/jbigi.jar\n    cd pkg-temp\n    rm -f $BUILDDIR/base.zip\n    zip -r -v -9 $BUILDDIR/base.zip *\n    cd $MACOSX_SOURCE_DIR\n    cp $MACOSX_SOURCE_DIR/target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar $BUILDDIR/launcher.jar\nfi\n\n";
 		};
 		BFD28998227810AF0014EB07 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1161,6 +1163,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFAD9C95227C925F0014EB07 /* Identifiers.swift in Sources */,
+				BFAD9C94227C92480014EB07 /* Preferences.swift in Sources */,
 				BFAA37FA226892CA0014EB07 /* StringExtensions.swift in Sources */,
 				BFAA37FB226892CA0014EB07 /* ArrayExtensions.swift in Sources */,
 				BFAA37FC226892CA0014EB07 /* DateTimeUtils.swift in Sources */,

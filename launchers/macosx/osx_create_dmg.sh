@@ -10,7 +10,7 @@ DMG_BACKGROUND_IMG=${BACKGROUND_IMG:-"Background.png"}
 APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
 VOL_NAME="${APP_NAME}-${VERSION}"
 DMG_TMP="${VOL_NAME}-temp.dmg"
-DMG_FINAL="${VOL_NAME}.dmg"
+DMG_FINAL="${DMG_NAME:-"I2PMacLauncher-fallback"}.dmg"
 STAGING_DIR="/tmp/mkdmg$$"
 
 # Check the background image DPI and convert it if it isn't 72x72
@@ -31,7 +31,7 @@ fi
 
 # copy over the stuff we want in the final disk image to our staging dir
 mkdir -p "${STAGING_DIR}"
-cp -rpf "${APP_NAME}.app" "${STAGING_DIR}"
+cp -Rpf "${APP_NAME}.app" "${STAGING_DIR}"
 # ... cp anything else you want in the DMG - documentation, etc.
 
 # figure out how big our DMG needs to be
