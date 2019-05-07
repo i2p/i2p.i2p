@@ -1,3 +1,5 @@
+* 2019-05-07 0.9.40 released
+
 2019-05-02 zzz
  * Android: Catch ISE from PRNG at shutdown (ticket #2077)
  * GeoIP Maxmind 2019-04-29
