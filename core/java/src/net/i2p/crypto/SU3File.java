@@ -615,7 +615,7 @@ public class SU3File {
             }
 
             int idx = g.getOptind();
-            String cmd = args[idx];
+            String cmd = args[idx].toLowerCase(Locale.US);
             List<String> a = new ArrayList<String>(Arrays.asList(args).subList(idx + 1, args.length));
 
             if (error) {
@@ -641,7 +641,8 @@ public class SU3File {
                 new I2PAppContext(props);
                 ok = genKeysCLI(stype, a.get(0), a.get(1), crlfile, a.get(2), kspass);
             } else if ("extract".equals(cmd)) {
-                ok = extractCLI(a.get(0), a.get(1), shouldVerify, kfile);
+                String outfile = (a.size() > 1) ? a.get(1) : null;
+                ok = extractCLI(a.get(0), outfile, shouldVerify, kfile);
             } else {
                 showUsageCLI();
             }
@@ -661,7 +662,7 @@ public class SU3File {
                            "                            (signs all .zip, .xml, and .xml.gz files in the directory)\n" +
                            "       SU3File showversion  signedFile.su3\n" +
                            "       SU3File verifysig    [-k file.crt] signedFile.su3  ## -k use this pubkey cert for verification\n" +
-                           "       SU3File extract      [-x] [-k file.crt] signedFile.su3 outFile   ## -x don't check sig");
+                           "       SU3File extract      [-x] [-k file.crt] signedFile.su3 [outFile]   ## -x don't check sig");
         System.err.println("Default keystore password: \"" + KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD + '"');
         System.err.println(dumpTypes());
     }
@@ -928,6 +929,7 @@ public class SU3File {
     }
 
     /**
+     *  @param outFile if null, will use a name derived from signedFile
      *  @return success
      *  @since 0.9.9
      */
@@ -938,10 +940,39 @@ public class SU3File {
             if (pkFile != null)
                 file.setPublicKeyCertificate(new File(pkFile));
             file.setVerifySignature(verifySig);
+            if (outFile == null) {
+                outFile = signedFile;
+                if (outFile.endsWith(".su3") && outFile.length() > 4)
+                    outFile = outFile.substring(0, outFile.length() - 4);
+                String sfx;
+                switch (file.getFileType()) {
+                  case TYPE_ZIP:
+                    sfx = ".zip";
+                    break;
+                  case TYPE_XML:
+                    sfx = ".xml";
+                    break;
+                  case TYPE_HTML:
+                    sfx = ".html";
+                    break;
+                  case TYPE_XML_GZ:
+                    sfx = ".xml.gz";
+                    break;
+                  case TYPE_TXT_GZ:
+                    sfx = ".txt.gz";
+                    break;
+                  default:
+                    sfx = ".extracted";
+                    break;
+                }
+                outFile = outFile + sfx;
+                // above causes failure, quick fix
+                file = new SU3File(signedFile);
+            }
             File out = new File(outFile);
             boolean ok = file.verifyAndMigrate(out);
             if (ok)
-                System.out.println("File extracted (signed by " + file.getSignerString() + ' ' + file._sigType + ')');
+                System.out.println("File extracted to " + outFile + " (signed by " + file.getSignerString() + ' ' + file._sigType + ')');
             else
                 System.out.println("Signature INVALID (signed by " + file.getSignerString() + ' ' + file._sigType +')');
             return ok;
