@@ -186,6 +186,7 @@
   - PPA maintainer
   - news.xml maintainer
   - backup news.xml maintainer
+  - OSX launcher maintainer
   - website files maintainer
 
 4. Update Trac:
@@ -220,7 +221,8 @@
 1. Upload files to launchpad release (download mirror)
    (see debian-alt/doc/launchpad.txt for instructions)
 
-2. Wait for files to be updated on download server
+2. Wait for files to be updated on download server,
+   including new OSX launcher version.
    Verify at http://download.i2p2.no/releases/
 
 3. Website files to change:

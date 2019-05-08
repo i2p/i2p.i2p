@@ -126,8 +126,7 @@ The amd64 build produces one deb:
 The i386 build produces three debs:
    i2p-doc (arch-independent), i2p-router (arch-independent), and libjbigi-jni (i386)
 So the build isn't done until both arch builds are complete.
-Don't
-
+Don't do anything else until both builds are done and published.
 
 If it works, copy the series you are running (e.g. yakkety) in your PPA
 so that you can test.

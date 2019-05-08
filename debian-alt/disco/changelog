@@ -1,3 +1,9 @@
+i2p (0.9.40-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.40
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 8 May 2019 12:12:12 +0000
+
 i2p (0.9.39-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.39
