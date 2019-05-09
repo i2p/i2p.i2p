@@ -483,7 +483,7 @@ public class GeoIP {
         String country = ctx.commSystem().getCountry(ourHash);
         if (country != null && !country.equals(oldCountry)) {
             ctx.router().saveConfig(PROP_IP_COUNTRY, country);
-            if (ctx.commSystem().isInBadCountry() && ctx.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
+            if (ctx.commSystem().isInStrictCountry() && ctx.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
                 String name = fullName(country);
                 if (name == null)
                     name = country;

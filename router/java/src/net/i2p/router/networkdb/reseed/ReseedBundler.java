@@ -112,7 +112,7 @@ public class ReseedBundler {
                 continue;
             if (!hasIPv4)
                 continue;
-            if (_context.commSystem().isInBadCountry(ri))
+            if (_context.commSystem().isInStrictCountry(ri))
                 continue;
 
             toWrite.add(ri);

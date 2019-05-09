@@ -253,7 +253,7 @@ class FloodfillPeerSelector extends PeerSelector {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Old: " + entry);
-            } else if (info != null && _context.commSystem().isInBadCountry(info)) {
+            } else if (info != null && _context.commSystem().isInStrictCountry(info)) {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Bad country: " + entry);

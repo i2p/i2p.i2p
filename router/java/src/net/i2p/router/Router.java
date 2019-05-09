@@ -1164,7 +1164,7 @@ public class Router implements RouterClock.ClockShiftListener {
         String h = _context.getProperty(PROP_HIDDEN_HIDDEN);
         if (h != null)
             return Boolean.parseBoolean(h);
-        return _context.commSystem().isInBadCountry();
+        return _context.commSystem().isInStrictCountry();
     }
     
     /**

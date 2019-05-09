@@ -114,13 +114,13 @@ public abstract class CommSystemFacade implements Service {
     public String getOurCountry() { return null; }
 
     /** @since 0.8.13 */
-    public boolean isInBadCountry() { return false; }
+    public boolean isInStrictCountry() { return false; }
 
     /** @since 0.9.16 */
-    public boolean isInBadCountry(Hash peer) { return false; }
+    public boolean isInStrictCountry(Hash peer) { return false; }
 
     /** @since 0.9.16 */
-    public boolean isInBadCountry(RouterInfo ri) { return false; }
+    public boolean isInStrictCountry(RouterInfo ri) { return false; }
 
     public String getCountry(Hash peer) { return null; }
     public String getCountryName(String code) { return code; }

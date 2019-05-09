@@ -1391,7 +1391,7 @@ public class ProfileOrganizer {
             // don't allow them in the high-cap pool, what would the point of that be?
             if (_thresholdCapacityValue <= profile.getCapacityValue() &&
                 isSelectable(peer) &&
-                !_context.commSystem().isInBadCountry(peer)) {
+                !_context.commSystem().isInStrictCountry(peer)) {
                 _highCapacityPeers.put(peer, profile);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("High capacity: \t" + peer);

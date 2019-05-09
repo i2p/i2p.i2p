@@ -125,7 +125,7 @@ class FloodfillMonitorJob extends JobImpl {
         if (!getContext().getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
             return false;
 
-        if (getContext().commSystem().isInBadCountry())
+        if (getContext().commSystem().isInStrictCountry())
             return false;
         String country = getContext().commSystem().getOurCountry();
         // anonymous proxy, satellite provider (not in bad country list)

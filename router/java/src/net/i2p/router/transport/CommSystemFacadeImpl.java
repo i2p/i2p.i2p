@@ -436,7 +436,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  @since 0.8.13
      */
     @Override
-    public boolean isInBadCountry() {
+    public boolean isInStrictCountry() {
         String us = getOurCountry();
         return (us != null && StrictCountries.contains(us)) || _context.getBooleanProperty("router.forceBadCountry");
     }
@@ -447,7 +447,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  @since 0.9.16
      */
     @Override
-    public boolean isInBadCountry(Hash peer) {
+    public boolean isInStrictCountry(Hash peer) {
         String c = getCountry(peer);
         return c != null && StrictCountries.contains(c);
     }
@@ -458,7 +458,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  @since 0.9.16
      */
     @Override
-    public boolean isInBadCountry(RouterInfo ri) {
+    public boolean isInStrictCountry(RouterInfo ri) {
         byte[] ip = getIP(ri);
         if (ip == null)
             return false;
