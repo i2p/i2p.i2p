@@ -128,10 +128,12 @@ class PluginUpdateRunner extends UpdateRunner {
                     _log.error("Error downloading plugin", t);
                 }
             }
-            if (_updated)
+            if (_updated) {
                 _mgr.notifyComplete(this, _newVersion, null);
-            else
+                _mgr.notifyComplete(this, _errMsg);
+            } else {
                 _mgr.notifyTaskFailed(this, _errMsg, null);
+            }
         }
 
     /**
