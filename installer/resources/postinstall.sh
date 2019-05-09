@@ -40,8 +40,12 @@ case $HOST_OS in
     debian | fedora | gentoo | linux | mandrake | redhat | suse )
         # Tanuki-built arm wrapper works on armv5 and armv7 but not on Raspberry Pi armv6.
         # Wrapper we built for Raspberry Pi does not work on Trimslice armv7.
-        if [ `echo $OS_ARCH |grep armv7` ]; then
-            wrapperpath="./lib/wrapper/linux-armv5"
+        if [ `echo $OS_ARCH |grep armv8` ]; then
+            wrapperpath="./lib/wrapper/linux64-armv8"
+        elif [ `echo $OS_ARCH |grep aarch64` ]; then
+            wrapperpath="./lib/wrapper/linux64-armv8"
+        elif [ `echo $OS_ARCH |grep armv7` ]; then
+            wrapperpath="./lib/wrapper/linux-armv7"
         elif [ `echo $OS_ARCH |grep armv6` ]; then
             wrapperpath="./lib/wrapper/linux-armv6"
         elif [ `echo $OS_ARCH |grep arm` ]; then

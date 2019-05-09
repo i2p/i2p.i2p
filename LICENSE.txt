@@ -172,9 +172,9 @@ Launchers:
    Copyright (c) 2002-2018 EPFL, Lausanne / Lightbend, Inc. , unless otherwise specified.
    See licenses/LICENSE-Scala.md
 
-Java Service Wrapper Community Edition 32-bit 3.5.34:
+Java Service Wrapper Community Edition 32-bit 3.5.39:
    (not included in most distribution packages)
-   Copyright (C) 1999-2017 Tanuki Software, Ltd. All Rights Reserved.
+   Copyright (C) 1999-2019 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
 
