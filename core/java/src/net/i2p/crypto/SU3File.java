@@ -968,6 +968,7 @@ public class SU3File {
                 outFile = outFile + sfx;
                 // above causes failure, quick fix
                 file = new SU3File(signedFile);
+                file.setVerifySignature(verifySig);
             }
             File out = new File(outFile);
             boolean ok = file.verifyAndMigrate(out);
