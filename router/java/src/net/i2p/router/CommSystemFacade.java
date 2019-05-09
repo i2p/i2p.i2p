@@ -184,6 +184,12 @@ public abstract class CommSystemFacade implements Service {
      */
     public DHSessionKeyBuilder.Factory getDHFactory() { return null; }
 
+    /**
+     *  Router must call after netdb is initialized
+     *  @since 0.9.41
+     */
+    public void initGeoIP() {}
+
     /*
      *  Reachability status codes
      *

@@ -32,6 +32,7 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
@@ -55,7 +56,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _netMonitorStatus = true;
         _geoIP = new GeoIP(_context);
         _manager = new TransportManager(_context);
-        startGeoIP();
     }
     
     public synchronized void startup() {
@@ -363,8 +363,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * tunnel selection, banlisting, etc.
      */
 
+    /**
+     *  Router must call after netdb is initialized
+     *  @since 0.9.41
+     */
+    @Override
+    public void initGeoIP() {
+        startGeoIP();
+    }
+
     /* We hope the routerinfos are read in and things have settled down by now, but it's not required to be so */
-    private static final int START_DELAY = 5*60*1000;
+    private static final int START_DELAY = SystemVersion.isSlow() ? 5*60*1000 : 5*1000;
     private static final int LOOKUP_TIME = 30*60*1000;
 
     private void startGeoIP() {

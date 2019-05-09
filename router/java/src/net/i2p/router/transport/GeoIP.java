@@ -126,7 +126,7 @@ public class GeoIP {
      * Blocking lookup of all pending IPs.
      * Results will be added to the table and available via get() after completion.
      */
-    public void blockingLookup() {
+    void blockingLookup() {
         if (! _context.getBooleanPropertyDefaultTrue(PROP_GEOIP_ENABLED)) {
             _pendingSearch.clear();
             _pendingIPv6Search.clear();
@@ -153,6 +153,7 @@ public class GeoIP {
                 return;
             File geoip2 = getGeoIP2();
             DatabaseReader dbr = null;
+            long start = _context.clock().now();
             try {
                 // clear the negative cache every few runs, to prevent it from getting too big
                 if (((++_lookupRunCount) % CLEAR) == 0)
@@ -295,6 +296,8 @@ public class GeoIP {
                 if (dbr != null) try { dbr.close(); } catch (IOException ioe) {}
                 _lock.set(false);
             }
+            if (_log.shouldInfo())
+                _log.info("GeoIP processing finished, time: " + (_context.clock().now() - start));
         }
     }
 
@@ -423,7 +426,6 @@ public class GeoIP {
         }
         String[] rv = new String[search.length];
         int idx = 0;
-        long start = _context.clock().now();
         BufferedReader br = null;
         try {
             String buf = null;
@@ -459,9 +461,6 @@ public class GeoIP {
             if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
 
-        if (_log.shouldLog(Log.INFO)) {
-            _log.info("GeoIP processing finished, time: " + (_context.clock().now() - start));
-        }
         return rv;
     }
 
@@ -499,7 +498,7 @@ public class GeoIP {
      * Add to the list needing lookup
      * @param ip IPv4 or IPv6
      */
-    public void add(String ip) {
+    void add(String ip) {
         byte[] pib = Addresses.getIP(ip);
         if (pib == null) return;
         add(pib);
@@ -509,7 +508,7 @@ public class GeoIP {
      * Add to the list needing lookup
      * @param ip IPv4 or IPv6
      */
-    public void add(byte ip[]) {
+    void add(byte ip[]) {
         add(toLong(ip));
     }
 
@@ -529,7 +528,7 @@ public class GeoIP {
      * @param ip IPv4 or IPv6
      * @return lower-case code, generally two letters, or null.
      */
-    public String get(String ip) {
+    String get(String ip) {
         byte[] pib = Addresses.getIP(ip);
         if (pib == null) return null;
         return get(pib);
@@ -540,7 +539,7 @@ public class GeoIP {
      * @param ip IPv4 or IPv6
      * @return lower-case code, generally two letters, or null.
      */
-    public String get(byte ip[]) {
+    String get(byte ip[]) {
         return get(toLong(ip));
     }
 
@@ -597,7 +596,7 @@ public class GeoIP {
      * @param code two-letter lower case code
      * @return untranslated name or null
      */
-    public String fullName(String code) {
+    String fullName(String code) {
         return _codeToName.get(code);
     }
 

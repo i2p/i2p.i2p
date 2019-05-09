@@ -875,6 +875,7 @@ public class Router implements RouterClock.ClockShiftListener {
             // so we probably don't need to throw it to the timer queue,
             // but just to be safe
             _context.simpleTimer2().addEvent(r, 0);
+            _context.commSystem().initGeoIP();
         }
     }
 
