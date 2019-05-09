@@ -173,14 +173,24 @@ public class PluginStarter implements Runnable {
             return;
 
         if (delay) {
+            // wait for router.
+            // i2ptunnel won't start until isRunning()
+            int loop = 0;
+            while (!ctx.router().isRunning()) {
+                try {
+                    Thread.sleep(10*1000);
+                } catch (InterruptedException ie) { return; }
+                // 30 minutes
+                if (loop++ > 180) return;
+            }
             // wait for proxy
             mgr.update(TYPE_DUMMY, 3*60*1000);
             mgr.notifyProgress(null, Messages.getString("Checking for plugin updates", ctx));
-            int loop = 0;
+            loop = 0;
             do {
                 try {
                     Thread.sleep(5*1000);
-                } catch (InterruptedException ie) {}
+                } catch (InterruptedException ie) { break; }
                 if (loop++ > 40) break;
             } while (mgr.isUpdateInProgress(TYPE_DUMMY));
         }
