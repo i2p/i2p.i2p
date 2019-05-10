@@ -125,8 +125,10 @@ public class GeoIP {
     /**
      * Blocking lookup of all pending IPs.
      * Results will be added to the table and available via get() after completion.
+     *
+     * Public for BundleRouterInfos
      */
-    void blockingLookup() {
+    public void blockingLookup() {
         if (! _context.getBooleanPropertyDefaultTrue(PROP_GEOIP_ENABLED)) {
             _pendingSearch.clear();
             _pendingIPv6Search.clear();
@@ -496,9 +498,11 @@ public class GeoIP {
 
     /**
      * Add to the list needing lookup
+     * Public for BundleRouterInfos
+     *
      * @param ip IPv4 or IPv6
      */
-    void add(String ip) {
+    public void add(String ip) {
         byte[] pib = Addresses.getIP(ip);
         if (pib == null) return;
         add(pib);
@@ -506,9 +510,11 @@ public class GeoIP {
 
     /**
      * Add to the list needing lookup
+     * Public for BundleRouterInfos
+     *
      * @param ip IPv4 or IPv6
      */
-    void add(byte ip[]) {
+    public void add(byte ip[]) {
         add(toLong(ip));
     }
 
@@ -525,10 +531,12 @@ public class GeoIP {
 
     /**
      * Get the country for an IP from the cache.
+     * Public for BundleRouterInfos
+     *
      * @param ip IPv4 or IPv6
      * @return lower-case code, generally two letters, or null.
      */
-    String get(String ip) {
+    public String get(String ip) {
         byte[] pib = Addresses.getIP(ip);
         if (pib == null) return null;
         return get(pib);
@@ -593,10 +601,12 @@ public class GeoIP {
 
     /**
      * Get the country for a country code
+     * Public for BundleRouterInfos
+     *
      * @param code two-letter lower case code
      * @return untranslated name or null
      */
-    String fullName(String code) {
+    public String fullName(String code) {
         return _codeToName.get(code);
     }
 
