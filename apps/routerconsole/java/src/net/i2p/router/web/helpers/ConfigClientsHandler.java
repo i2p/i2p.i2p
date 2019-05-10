@@ -244,6 +244,18 @@ public class ConfigClientsHandler extends FormHandler {
     }
     
     private void saveClientChanges() {
+        try {
+            synchronized(ClientAppConfig.class) {
+                saveClientChanges2();
+            }
+            addFormNotice(_t("Client configuration saved successfully"));
+        } catch (IOException ioe) {
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
+            addFormError(ioe.getLocalizedMessage());
+        }
+    }
+
+    private void saveClientChanges2() throws IOException {
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
@@ -287,14 +299,12 @@ public class ConfigClientsHandler extends FormHandler {
                 if (name == null || name.trim().length() <= 0) name = "new client";
                 ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
                                                          _settings.get(newClient + ".enabled") == null);  // true for disabled
-                clients.add(ca);
+                ClientAppConfig.writeClientAppConfig(_context, ca);
                 addFormNotice(_t("New client added") + ": " + name + " (" + clss + ").");
             }
         }
-
+        // Always save, as any of the disabled flags could have changed
         ClientAppConfig.writeClientAppConfig(_context, clients);
-        addFormNotice(_t("Client configuration saved successfully"));
-        //addFormNotice(_t("Restart required to take effect"));
     }
 
     /**
@@ -347,9 +357,14 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_t("Bad client index."));
             return;
         }
-        ClientAppConfig ca = clients.remove(i);
-        ClientAppConfig.writeClientAppConfig(_context, clients);
-        addFormNotice(_t("Client {0} deleted", ca.clientName));
+        ClientAppConfig ca = clients.get(i);
+        try {
+            ClientAppConfig.deleteClientAppConfig(ca);
+            addFormNotice(_t("Client {0} deleted", ca.clientName));
+        } catch (IOException ioe) {
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
+            addFormError(ioe.getLocalizedMessage());
+        }
     }
 
     private void saveWebAppChanges() {

@@ -196,8 +196,17 @@ abstract class MigrateJetty {
             File cfgFile = ClientAppConfig.configFile(ctx);
             boolean ok = backupFile(cfgFile);
             if (ok) {
-                ClientAppConfig.writeClientAppConfig(ctx, apps);
-                System.err.println("WARNING: Migrated clients config file " + cfgFile +
+                try {
+                    ClientAppConfig.writeClientAppConfig(ctx, apps);
+                    System.err.println("WARNING: Migrated clients config file " + cfgFile +
+                                   " from Jetty 5/6 " + OLD_CLASS + '/' + OLD_CLASS_6 +
+                                   " to Jetty 9 " + NEW_CLASS);
+                } catch (IOException ioe) {
+                    ok = false;
+                }
+            }
+            if (!ok) {
+                System.err.println("WARNING: Failed to migrate clients config file " + cfgFile +
                                " from Jetty 5/6 " + OLD_CLASS + '/' + OLD_CLASS_6 +
                                " to Jetty 9 " + NEW_CLASS);
             }

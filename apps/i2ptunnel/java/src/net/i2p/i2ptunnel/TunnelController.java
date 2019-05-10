@@ -789,14 +789,19 @@ public class TunnelController implements Logging {
      *  As of 0.9.1, updates the options on an existing session
      */
     public void setConfig(Properties config, String prefix) {
-        Properties props = new Properties();
-        for (Map.Entry<Object, Object> e : config.entrySet()) {
-            String key = (String) e.getKey();
-            if (key.startsWith(prefix)) {
-                key = key.substring(prefix.length());
-                String val = (String) e.getValue();
-                props.setProperty(key, val);
+        Properties props;
+        if (prefix.length() > 0) {
+            props = new Properties();
+            for (Map.Entry<Object, Object> e : config.entrySet()) {
+                String key = (String) e.getKey();
+                if (key.startsWith(prefix)) {
+                    key = key.substring(prefix.length());
+                    String val = (String) e.getValue();
+                    props.setProperty(key, val);
+                }
             }
+        } else {
+            props = config;
         }
         Properties oldConfig = _config;
         _config = props;
@@ -921,10 +926,14 @@ public class TunnelController implements Logging {
      */
     public Properties getConfig(String prefix) { 
         Properties rv = new Properties();
-        for (Map.Entry<Object, Object> e : _config.entrySet()) {
-            String key = (String) e.getKey();
-            String val = (String) e.getValue();
-            rv.setProperty(prefix + key, val);
+        if (prefix.length() > 0) {
+            for (Map.Entry<Object, Object> e : _config.entrySet()) {
+                String key = (String) e.getKey();
+                String val = (String) e.getValue();
+                rv.setProperty(prefix + key, val);
+            }
+        } else {
+            rv.putAll(_config);
         }
         return rv;
     }

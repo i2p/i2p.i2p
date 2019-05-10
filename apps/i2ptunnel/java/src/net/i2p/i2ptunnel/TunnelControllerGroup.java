@@ -3,6 +3,7 @@ package net.i2p.i2ptunnel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +25,11 @@ import static net.i2p.app.ClientAppState.*;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataHelper;
+import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SecureDirectory;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -42,6 +45,8 @@ public class TunnelControllerGroup implements ClientApp {
     private final ClientAppManager _mgr;
     private static volatile TunnelControllerGroup _instance;
     static final String DEFAULT_CONFIG_FILE = "i2ptunnel.config";
+    private static final String CONFIG_DIR = "i2ptunnel.config.d";
+    private static final String PREFIX = "tunnel.";
     
     private final List<TunnelController> _controllers;
     private final ReadWriteLock _controllersLock;
@@ -265,18 +270,80 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void loadControllers(String configFile) {
         if (_controllersLoaded)
             return;
-
-        Properties cfg = loadConfig(configFile);
+        boolean shouldMigrate = _context.isRouterContext() && !SystemVersion.isAndroid();
+        loadControllers(configFile, shouldMigrate);
+    }
+    
+    /**
+     * @param shouldMigrate migrate to, and load from, i2ptunnel.config.d
+     * @since 0.9.34
+     * @throws IllegalArgumentException if unable to load from file
+     */
+    private synchronized void loadControllers(String configFile, boolean shouldMigrate) {
+        File cfgFile = new File(configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(_context.getConfigDir(), configFile);
+        File dir = new SecureDirectory(cfgFile.getParent(), CONFIG_DIR);
+        List<Properties> props = null;
+        if (cfgFile.exists()) {
+            try {
+                List<Properties> cfgs = loadConfig(cfgFile);
+                if (shouldMigrate) {
+                    boolean ok = migrate(cfgs, cfgFile, dir);
+                    if (!ok) 
+                        shouldMigrate = false;
+                }
+            } catch (IOException ioe) {
+                _log.error("Unable to load the controllers from " + cfgFile.getAbsolutePath());
+                throw new IllegalArgumentException("Unable to load the controllers from " + cfgFile, ioe);
+            }
+        } else if (!shouldMigrate) {
+                throw new IllegalArgumentException("Unable to load the controllers from " + cfgFile);
+        }
         int i = 0;
         _controllersLock.writeLock().lock();
         try {
-            while (true) {
-                String type = cfg.getProperty("tunnel." + i + ".type");
-                if (type == null)
-                    break;
-                TunnelController controller = new TunnelController(cfg, "tunnel." + i + ".");
-                _controllers.add(controller);
-                i++;
+            if (shouldMigrate && dir.isDirectory()) {
+                File[] files = dir.listFiles();
+                if (files != null && files.length > 0) {
+                    // sort so the returned order is consistent
+                    Arrays.sort(files);
+                    for (File f : files) {
+                        if (!f.getName().endsWith(".config"))
+                            continue;
+                        if (!f.isFile())
+                            continue;
+                        try {
+                            props = loadConfig(f);
+                            if (!props.isEmpty()) {
+                                for (Properties cfg : props) {
+                                    String type = cfg.getProperty("type");
+                                    if (type == null)
+                                        continue;
+                                    TunnelController controller = new TunnelController(cfg, "");
+                                    _controllers.add(controller);
+                                    i++;
+                                }
+                            } else {
+                                _log.error("Error loading the client app properties from " + f);
+                                System.out.println("Error loading the client app properties from " + f);
+                            }
+                        } catch (IOException ioe) {
+                            _log.error("Error loading the client app properties from " + f, ioe);
+                            System.out.println("Error loading the client app properties from " + f + ' ' + ioe);
+                        }
+                    }
+                }
+            } else {
+                // use what we got from i2ptunnel.config
+                for (Properties cfg : props) {
+                    String type = cfg.getProperty("type");
+                    if (type == null)
+                        continue;
+                    TunnelController controller = new TunnelController(cfg, "");
+                    _controllers.add(controller);
+                    i++;
+                }
             }
         } finally {
             _controllersLock.writeLock().unlock();
@@ -284,11 +351,53 @@ public class TunnelControllerGroup implements ClientApp {
 
         _controllersLoaded = true;
         if (i > 0) {
+            _controllersLoaded = true;
             if (_log.shouldLog(Log.INFO))
                 _log.info(i + " controllers loaded from " + configFile);
         } else {
-            _log.logAlways(Log.WARN, "No i2ptunnel configurations found in " + configFile);
+            _log.logAlways(Log.WARN, "No i2ptunnel configurations found in " + cfgFile + " or " + dir);
         }
+    }
+
+    /*
+     * Migrate tunnels from file to individual files in dir
+     *
+     * @return success
+     * @since 0.9.34
+     */
+    private boolean migrate(List<Properties> tunnels, File from, File dir) {
+        if (!dir.isDirectory() && !dir.mkdirs())
+            return false;
+        boolean ok = true;
+        for (int i = 0; i < tunnels.size(); i++) {
+            Properties props = tunnels.get(i);
+            String tname = props.getProperty("name");
+            if (tname == null)
+                tname = "tunnel";
+            String name = i + "-" + tname + "-i2ptunnel.config";
+            if (i < 10)
+                name = '0' + name;
+            File f = new File(dir, name);
+            props.setProperty("configFile", f.getAbsolutePath());
+            Properties save = new OrderedProperties();
+            for (Map.Entry<Object, Object> e : props.entrySet()) {
+                String key = (String) e.getKey();
+                String val = (String) e.getValue();
+                save.setProperty(PREFIX + i + '.' + key, val);
+            }
+            try {
+                DataHelper.storeProps(save, f);
+            } catch (IOException ioe) {
+                _log.error("Error migrating the i2ptunnel configuration to " + f, ioe);
+                System.out.println("Error migrating the i2ptunnel configuration to " + f + ' ' + ioe);
+                ok = false;
+            }
+        }
+        if (ok) {
+            if (!FileUtil.rename(from, new File(from.getAbsolutePath() + ".bak")))
+                from.delete();
+        }
+        return ok;
     }
 
     /**
@@ -375,6 +484,7 @@ public class TunnelControllerGroup implements ClientApp {
     /**
      * Stop and remove the given tunnel.
      * Side effect - clears all messages the controller.
+     * Does NOT delete the configuration - must call saveConfig() or removeConfig() also.
      *
      * @return list of messages from the controller as it is stopped
      */
@@ -500,19 +610,22 @@ public class TunnelControllerGroup implements ClientApp {
      * Save the configuration of all known tunnels to the default config 
      * file
      *
+     * @deprecated use saveConfig(TunnelController) or removeConfig(TunnelController)
      */
+    @Deprecated
     public void saveConfig() throws IOException {
         saveConfig(_configFile);
     }
 
     /**
      * Save the configuration of all known tunnels to the given file
-     *
+     * @deprecated
      */
+    @Deprecated
     public synchronized void saveConfig(String configFile) throws IOException {
         File cfgFile = new File(configFile);
         if (!cfgFile.isAbsolute())
-            cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), configFile);
+            cfgFile = new File(_context.getConfigDir(), configFile);
         File parent = cfgFile.getParentFile();
         if ( (parent != null) && (!parent.exists()) )
             parent.mkdirs();
@@ -522,7 +635,7 @@ public class TunnelControllerGroup implements ClientApp {
         try {
             for (int i = 0; i < _controllers.size(); i++) {
                 TunnelController controller = _controllers.get(i);
-                Properties cur = controller.getConfig("tunnel." + i + ".");
+                Properties cur = controller.getConfig(PREFIX + i + ".");
                 map.putAll(cur);
             }
         } finally {
@@ -531,32 +644,50 @@ public class TunnelControllerGroup implements ClientApp {
         
         DataHelper.storeProps(map, cfgFile);
     }
+
+    /**
+     * Save the configuration of this tunnel only, may be new
+     * @since 0.9.34
+     */
+    public synchronized void saveConfig(TunnelController tc) throws IOException {
+    }
+
+    /**
+     * Save the configuration of this tunnel only
+     * @since 0.9.34
+     */
+    public synchronized void removeConfig(TunnelController tc) throws IOException {
+    }
     
     /**
      * Load up the config data from the file
      *
-     * @return properties loaded
-     * @throws IllegalArgumentException if unable to load from file
+     * @return non-null, properties loaded, one for each tunnel
+     * @throws IOException if unable to load from file
      */
-    private synchronized Properties loadConfig(String configFile) {
-        File cfgFile = new File(configFile);
-        if (!cfgFile.isAbsolute())
-            cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), configFile);
-        if (!cfgFile.exists()) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to load the controllers from " + cfgFile.getAbsolutePath());
-            throw new IllegalArgumentException("Unable to load the controllers from " + cfgFile.getAbsolutePath());
+    private synchronized List<Properties> loadConfig(File cfgFile) throws IOException {
+        Properties config = new Properties();
+        DataHelper.loadProps(config, cfgFile);
+        List<Properties> rv = new ArrayList<Properties>();
+        int i = 0;
+        while (true) {
+            String prefix = PREFIX + i + '.';
+            Properties p = new Properties();
+            for (Map.Entry<Object, Object> e : config.entrySet()) {
+                String key = (String) e.getKey();
+                if (key.startsWith(prefix)) {
+                    key = key.substring(prefix.length());
+                    String val = (String) e.getValue();
+                    p.setProperty(key, val);
+                }
+            }
+            if (p.isEmpty())
+                break;
+            p.setProperty("configFile", cfgFile.getAbsolutePath());
+            rv.add(p);
+            i++;
         }
-        
-        Properties props = new Properties();
-        try {
-            DataHelper.loadProps(props, cfgFile);
-            return props;
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error reading the controllers from " + cfgFile.getAbsolutePath(), ioe);
-            throw new IllegalArgumentException("Error reading the controllers from " + cfgFile.getAbsolutePath(), ioe);
-        }
+        return rv;
     }
     
     /**

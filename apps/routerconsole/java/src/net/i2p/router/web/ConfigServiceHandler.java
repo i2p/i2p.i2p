@@ -342,23 +342,29 @@ public class ConfigServiceHandler extends FormHandler {
 
     private void browseOnStartup(boolean shouldLaunchBrowser) {
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
-        boolean found = false;
+        ClientAppConfig ca = null;
         for (int cur = 0; cur < clients.size(); cur++) {
-            ClientAppConfig ca = clients.get(cur);
-            if (UrlLauncher.class.getName().equals(ca.className)) {
+            ClientAppConfig cac = clients.get(cur);
+            if (UrlLauncher.class.getName().equals(cac.className)) {
+                ca = cac;
                 ca.disabled = !shouldLaunchBrowser;
-                found = true;
                 break;
             }
         }
         // releases <= 0.6.5 deleted the entry completely
-        if (shouldLaunchBrowser && !found) {
+        if (shouldLaunchBrowser && ca == null) {
             String url = _context.portMapper().getConsoleURL();
-            ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser",
-                                                     url, 5, false);
-            clients.add(ca);
+            ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser",
+                                     url, 5, false);
         }
-        ClientAppConfig.writeClientAppConfig(_context, clients);
+        try {
+            if (ca != null)
+                ClientAppConfig.writeClientAppConfig(_context, ca);
+            addFormNotice(_t("Configuration saved successfully"));
+        } catch (IOException ioe) {
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
+            addFormError(ioe.getLocalizedMessage());
+        }
     }
 
     /**

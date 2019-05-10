@@ -82,6 +82,7 @@ public class GeneralHelper {
     public static List<String> saveTunnel(
             I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
         List<String> msgs = updateTunnelConfig(tcg, tunnel, config);
+///////////////
         msgs.addAll(saveConfig(context, tcg));
         return msgs;
     }
@@ -175,6 +176,7 @@ public class GeneralHelper {
     protected static List<String> saveConfig(I2PAppContext context, TunnelControllerGroup tcg) { 
         List<String> rv = tcg.clearAllMessages();
         try {
+////////////////
             tcg.saveConfig();
             rv.add(0, _t("Configuration changes saved", context));
         } catch (IOException ioe) {
@@ -205,6 +207,7 @@ public class GeneralHelper {
             return msgs;
         }
 
+////////////////////////
         msgs = tcg.removeController(cur);
         msgs.addAll(saveConfig(context, tcg));
 
