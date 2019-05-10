@@ -43,6 +43,7 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
@@ -67,6 +68,8 @@ class ClientManager {
     // ClientConnectionRunner for clients w/out a Dest yet
     private final Set<ClientConnectionRunner> _pendingRunners;
     private final Set<SessionId> _runnerSessionIds;
+    private final Set<Destination> _metaDests;
+    private final Set<Hash> _metaHashes;
     protected final RouterContext _ctx;
     protected final int _port;
     protected volatile boolean _isStarted;
@@ -100,11 +103,13 @@ class ClientManager {
         //                                      "How large are messages received by the client?", 
         //                                      "ClientMessages", 
         //                                      new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _listeners = new ArrayList<ClientListenerRunner>();
-        _runners = new ConcurrentHashMap<Destination, ClientConnectionRunner>();
-        _runnersByHash = new ConcurrentHashMap<Hash, ClientConnectionRunner>();
-        _pendingRunners = new HashSet<ClientConnectionRunner>();
-        _runnerSessionIds = new HashSet<SessionId>();
+        _listeners = new ArrayList<ClientListenerRunner>(4);
+        _runners = new ConcurrentHashMap<Destination, ClientConnectionRunner>(4);
+        _runnersByHash = new ConcurrentHashMap<Hash, ClientConnectionRunner>(4);
+        _pendingRunners = new HashSet<ClientConnectionRunner>(4);
+        _runnerSessionIds = new HashSet<SessionId>(4);
+        _metaDests = new ConcurrentHashSet<Destination>(4);
+        _metaHashes = new ConcurrentHashSet<Hash>(4);
         _port = port;
         _clientTimestamper = new ClientTimestamper();
         // following are for RequestLeaseSetJob
@@ -368,6 +373,37 @@ class ClientManager {
     }
 
     /**
+     *  Declare that we're going to publish a meta LS for this destination.
+     *  Must be called before publishing the leaseset.
+     *
+     *  @throws I2PSessionException on duplicate dest
+     *  @since 0.9.41
+     */
+    public void registerMetaDest(Destination dest) throws I2PSessionException {
+        synchronized (_runners) {
+            if (_runners.containsKey(dest) || _metaDests.contains(dest)) {
+                String msg = "Client attempted to register duplicate destination " + dest.toBase32();
+                _log.error(msg);
+                throw new I2PSessionException(msg);
+            }
+            _metaDests.add(dest);
+            _metaHashes.add(dest.calculateHash());
+        }
+    }
+
+    /**
+     *  Declare that we're no longer going to publish a meta LS for this destination.
+     *
+     *  @since 0.9.41
+     */
+    public void unregisterMetaDest(Destination dest) {
+        synchronized (_runners) {
+            _metaDests.remove(dest);
+            _metaHashes.remove(dest.calculateHash());
+        }
+    }
+
+    /**
      *  Generate a new random, unused sessionId. Caller must synch on _runners.
      *  @return null on failure
      *  @since 0.9.12
@@ -515,18 +551,20 @@ class ClientManager {
     }
     
     /**
-     *  Unsynchronized
+     *  Unsynchronized.
+     *  DOES contain meta destinations.
      */
     public boolean isLocal(Destination dest) { 
-        return _runners.containsKey(dest);
+        return _runners.containsKey(dest) || _metaDests.contains(dest);
     }
 
     /**
-     *  Unsynchronized
+     *  Unsynchronized.
+     *  DOES contain meta destinations.
      */
     public boolean isLocal(Hash destHash) { 
         if (destHash == null) return false;
-        return _runnersByHash.containsKey(destHash);
+        return _runnersByHash.containsKey(destHash) || _metaHashes.contains(destHash);
     }
     
     /**
@@ -542,7 +580,8 @@ class ClientManager {
     }
 
     /**
-     *  Unsynchronized
+     *  Unsynchronized.
+     *  Does NOT contain meta destinations.
      */
     public Set<Destination> listClients() {
         Set<Destination> rv = new HashSet<Destination>();

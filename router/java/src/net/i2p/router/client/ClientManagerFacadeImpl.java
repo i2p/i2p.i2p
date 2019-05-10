@@ -266,4 +266,28 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
             return _manager.internalConnect();
         throw new I2PSessionException("No manager yet");
     }
+
+    /**
+     *  Declare that we're going to publish a meta LS for this destination.
+     *  Must be called before publishing the leaseset.
+     *
+     *  @throws I2PSessionException on duplicate dest
+     *  @since 0.9.41
+     */
+    @Override
+    public void registerMetaDest(Destination dest) throws I2PSessionException {
+        if (_manager != null)
+            _manager.registerMetaDest(dest);
+    }
+
+    /**
+     *  Declare that we're no longer going to publish a meta LS for this destination.
+     *
+     *  @since 0.9.41
+     */
+    @Override
+    public void unregisterMetaDest(Destination dest) {
+        if (_manager != null)
+            _manager.unregisterMetaDest(dest);
+    }
 }
