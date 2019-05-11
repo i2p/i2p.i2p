@@ -237,7 +237,7 @@ public class I2PSSLSocketFactory {
     private final I2PAppContext _context;
 
     /**
-     * @param relativeCertPath e.g. "certificates/i2cp"
+     * @param relativeCertPath e.g. "certificates/i2cp"; as of 0.9.41, may be absolute
      * @since 0.9.9 was static
      */
     public I2PSSLSocketFactory(I2PAppContext context, boolean loadSystemCerts, String relativeCertPath)
@@ -468,7 +468,10 @@ public class I2PSSLSocketFactory {
 
     /**
      *  Loads certs from
-     *  the ~/.i2p/certificates/ and $I2P/certificates/ directories.
+     *  the ~/.i2p/certificates/ and $I2P/certificates/ directories,
+     *  or from the absolute path given.
+     *
+     *  @param relativeCertPath e.g. "certificates/i2cp"; as of 0.9.41, may be absolute
      */
     private static SSLSocketFactory initSSLContext(I2PAppContext context, boolean loadSystemCerts, String relativeCertPath)
                                throws GeneralSecurityException {
@@ -487,7 +490,10 @@ public class I2PSSLSocketFactory {
             }
         }
 
-        File dir = new File(context.getConfigDir(), relativeCertPath);
+        File dir = new File(relativeCertPath);
+        boolean wasAbsolute = dir.isAbsolute();
+        if (!wasAbsolute)
+            dir = new File(context.getConfigDir(), relativeCertPath);
         int adds = KeyStoreUtil.addCerts(dir, ks);
         int totalAdds = adds;
         if (adds > 0) {
@@ -495,14 +501,20 @@ public class I2PSSLSocketFactory {
                 log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
         }
 
-        File dir2 = new File(context.getBaseDir(), relativeCertPath);
-        if (!dir.getAbsolutePath().equals(dir2.getAbsolutePath())) {
-            adds = KeyStoreUtil.addCerts(dir2, ks);
-            totalAdds += adds;
-            if (adds > 0) {
-                if (log.shouldLog(Log.INFO))
-                    log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
+        File dir2;
+        if (!wasAbsolute) {
+            dir2 = new File(context.getBaseDir(), relativeCertPath);
+            if (!dir.getAbsolutePath().equals(dir2.getAbsolutePath())) {
+                adds = KeyStoreUtil.addCerts(dir2, ks);
+                totalAdds += adds;
+                if (adds > 0) {
+                    if (log.shouldLog(Log.INFO))
+                        log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
+                }
             }
+        } else {
+            // for logging below
+            dir2 = dir;
         }
         if (totalAdds > 0 || loadSystemCerts) {
             if (log.shouldLog(Log.INFO))

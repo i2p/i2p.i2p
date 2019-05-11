@@ -1,3 +1,21 @@
+2019-05-11 zzz
+ * Utils: Allow absolute path to certs in I2PSSLSocketFactory
+
+2019-05-10 zzz
+ * NetDB: Store Meta LS2 to floodfills (proposal #123)
+
+2019-05-09 zzz
+ * Console:
+   - Delay plugin update check until router is ready
+   - Remove plugin install success message (ticket #2494)
+ * Transport: Start first GeoIP lookup when netdb is ready
+ * Wrapper:
+   - Add support for armv7 and aarch64 (ticket #2308)
+   - Update to 3.5.39
+
+2019-05-08 zzz
+ * Utils: Auto-generate su3 output file for extract if not specified
+
 * 2019-05-07 0.9.40 released
 
 2019-05-02 zzz
