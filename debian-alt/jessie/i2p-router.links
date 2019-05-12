@@ -48,6 +48,8 @@ usr/share/java/tomcat8-jasper-el.jar usr/share/i2p/lib/jasper-el.jar
 usr/share/java/tomcat8-el-api.jar usr/share/i2p/lib/commons-el.jar
 usr/share/java/tomcat8-servlet-api.jar usr/share/i2p/lib/javax.servlet.jar
 usr/share/java/tomcat8-jsp-api.jar usr/share/i2p/lib/jsp-api.jar
+# tomcat pulls in ecj, link to it for eepsite webapps needing a compiler
+usr/share/java/ecj.jar usr/share/i2p/lib/ecj.jar
 
 
 # comment out if not building with glassfish-javaee

@@ -366,12 +366,15 @@
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="./jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="./jettylib/jasper-runtime.jar" />
                 <pathelement location="./jettylib/javax.servlet.jar" />
+                <pathelement location="./jettylib/jetty-deploy.jar" />
                 <pathelement location="./jettylib/jetty-http.jar" />
                 <pathelement location="./jettylib/jetty-io.jar" />
                 <pathelement location="./jettylib/jetty-security.jar" />
                 <pathelement location="./jettylib/jetty-servlet.jar" />
                 <pathelement location="./jettylib/jetty-util.jar" />
+                <pathelement location="./jettylib/jetty-webapp.jar" />
                 <pathelement location="./jettylib/jetty-xml.jar" />
             </classpath>
         </depend>
@@ -385,7 +388,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../core/java/build/i2p.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-security.jar:./jettylib/jetty-servlet.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar" >
+            classpath="../../core/java/build/i2p.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-security.jar:./jettylib/jetty-servlet.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar:./jettylib/jetty-deploy.jar:./jettylib/jasper-runtime.jar:./jettylib/jetty-webapp.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>

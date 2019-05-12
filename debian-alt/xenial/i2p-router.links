@@ -48,6 +48,8 @@ usr/share/java/tomcat8-util-scan.jar usr/share/i2p/lib/tomcat-util-scan.jar
 usr/share/java/tomcat8-jasper-el.jar usr/share/i2p/lib/jasper-el.jar
 # legacy name in lib/
 usr/share/java/tomcat8-el-api.jar usr/share/i2p/lib/commons-el.jar
+# tomcat pulls in ecj, link to it for eepsite webapps needing a compiler
+usr/share/java/ecj.jar usr/share/i2p/lib/ecj.jar
 
 
 # comment out if not building with glassfish-javaee

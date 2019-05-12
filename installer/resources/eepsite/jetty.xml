@@ -235,15 +235,33 @@
     <Ref id="DeploymentManager">
       <Call id="webappprovider" name="addAppProvider">
         <Arg>
-          <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+          <New id="WebAppProvider" class="org.eclipse.jetty.deploy.providers.WebAppProvider">
             <Set name="monitoredDirName">./eepsite/webapps</Set>
 	    <Set name="parentLoaderPriority">false</Set>
-	    <Set name="extractWars">false</Set>
+            <!-- this is required because Jetty can't handle jars inside wars,
+                 for example in php-java-bridge's JavaBridgeTemplate.war
+                 See https://bugs.eclipse.org/bugs/show_bug.cgi?id=433708
+                 See our ticket 2477
+              -->
+            <Set name="extractWars">true</Set>
             <Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set>
           </New>
         </Arg>
       </Call>
     </Ref>
+
+    <!-- Fixup for webapps to work, see our ticket 2477
+         Note that for webapps with uncompiled jsps, you will also
+         need a java compiler in the classpath;
+         The easiest way (Debian/Ubuntu) is to put a symlink in $I2P/lib:
+         sudo apt install libecj-java
+         cd $I2P/lib
+         ln -s /usr/share/java/ecj.jar
+         stop and then start i2p (restart alone will not pick up the new jar in the classpath)
+      -->
+    <Call class="net.i2p.servlet.WebAppProviderConfiguration" name="configure">
+      <Arg><Ref refid="WebAppProvider"/></Arg>
+    </Call>
 
     <!-- ===================== -->
     <!-- DefaultHandler config -->
