@@ -244,6 +244,40 @@ public abstract class SystemVersion {
     }
 
     /**
+     *  Handles Android also
+     *
+     *  @param minVersion e.g. 11
+     *  @return true if greater than or equal to minVersion
+     *  @since 0.9.41
+     */
+    public static boolean isJava(int minVersion) {
+        return isJava("1." + minVersion);
+    }
+
+    /**
+     *  Handles Android, and minVersions in both forms (e.g. 11 or 1.11)
+     *
+     *  @param minVersion either 1.x or x form works
+     *  @return true if greater than or equal to minVersion
+     *  @since 0.9.41
+     */
+    public static boolean isJava(String minVersion) {
+        String version = System.getProperty("java.version");
+        if (!version.startsWith("1."))
+            version = "1." + version;
+        if (!minVersion.startsWith("1."))
+            minVersion = "1." + minVersion;
+        if (_isAndroid) {
+            if (minVersion.startsWith("1.6"))
+                return _oneDotSix;
+            if (minVersion.startsWith("1.7"))
+                return _oneDotSeven;
+            return false;
+        }
+        return VersionComparator.comp(version, minVersion) >= 0;
+    }
+
+    /**
      * This isn't always correct.
      * http://stackoverflow.com/questions/807263/how-do-i-detect-which-kind-of-jre-is-installed-32bit-vs-64bit
      * http://mark.koli.ch/2009/10/javas-osarch-system-property-is-the-bitness-of-the-jre-not-the-operating-system.html
@@ -342,6 +376,7 @@ public abstract class SystemVersion {
         System.out.println("Java 9   : " + isJava9());
         System.out.println("Java 10  : " + isJava10());
         System.out.println("Java 11  : " + isJava11());
+        System.out.println("Java 12  : " + isJava(12));
         System.out.println("Android  : " + isAndroid());
         if (isAndroid())
             System.out.println("  Version: " + getAndroidVersion());

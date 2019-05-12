@@ -358,8 +358,7 @@ public class PluginStarter implements Runnable {
         }
 
         minVersion = stripHTML(props, "min-java-version");
-        if (minVersion != null &&
-            VersionComparator.comp(System.getProperty("java.version"), minVersion) < 0) {
+        if (minVersion != null && !SystemVersion.isJava(minVersion)) {
             String foo = "Plugin " + appName + " requires Java version " + minVersion + " or higher";
             log.error(foo);
             disablePlugin(appName);

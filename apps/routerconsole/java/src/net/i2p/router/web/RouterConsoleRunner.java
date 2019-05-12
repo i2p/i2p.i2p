@@ -340,13 +340,13 @@ public class RouterConsoleRunner implements RouterApp {
 
     /** @since 0.9.17 */
     private void checkJavaVersion() {
-        boolean noJava7 = !SystemVersion.isJava7();
+        boolean noJava8 = !SystemVersion.isJava8();
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
         boolean isZero = SystemVersion.isZeroVM();
         boolean isJava11 = false; // SystemVersion.isJava11();
-        if (noJava7 || noPack200 || openARM || isZero || isJava11) {
+        if (noJava8 || noPack200 || openARM || isZero || isJava11) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -354,8 +354,8 @@ public class RouterConsoleRunner implements RouterApp {
             net.i2p.util.Log log = _context.logManager().getLog(RouterConsoleRunner.class);
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
-            if (noJava7) {
-                s = "Java 7 is now required, please upgrade";
+            if (noJava8) {
+                s = "Java 8 or higher will be required in a future release, please upgrade Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }

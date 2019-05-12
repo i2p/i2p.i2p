@@ -264,8 +264,8 @@ class NewsFetcher extends UpdateRunner {
                             }
                             String minJava = args.get(MIN_JAVA_VERSION_KEY);
                             if (minJava != null) {
-                                String ourJava = System.getProperty("java.version");
-                                if (VersionComparator.comp(ourJava, minJava) < 0) {
+                                if (!SystemVersion.isJava(minJava)) {
+                                    String ourJava = System.getProperty("java.version");
                                     String msg = _mgr._t("Requires Java version {0} but installed Java version is {1}", minJava, ourJava);
                                     _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                     _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);

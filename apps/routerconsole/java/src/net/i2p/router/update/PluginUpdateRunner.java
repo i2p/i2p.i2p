@@ -409,8 +409,7 @@ class PluginUpdateRunner extends UpdateRunner {
             }
 
             minVersion = PluginStarter.stripHTML(props, "min-java-version");
-            if (minVersion != null &&
-                VersionComparator.comp(System.getProperty("java.version"), minVersion) < 0) {
+            if (minVersion != null && !SystemVersion.isJava(minVersion)) {
                 to.delete();
                 statusDone("<b>" + _t("This plugin requires Java version {0} or higher", minVersion) + "</b>");
                 return;
