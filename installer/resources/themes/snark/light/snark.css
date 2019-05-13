@@ -686,10 +686,6 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
      white-space: nowrap;
 }
 
-.choked, .unchoked {
-     font-style: italic;
-}
-
 .choked {
      color: #a00 !important;
 }
