@@ -87,6 +87,9 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double POINTS_UNREACHABLE = 4.0;
     private static final double POINTS_NEW = 4.0;
     private static final double POINTS_BANLIST = 25.0;
+    private static final double DEFAULT_BLOCK_THRESHOLD = 50.0;
+    private static final long DEFAULT_BLOCK_TIME = 7*24*60*60*1000L;
+    public static final float MIN_BLOCK_POINTS = 12.01f;
 
     /** Get via getInstance() */
     private Analysis(RouterContext ctx, ClientAppManager mgr, String[] args) {
@@ -339,7 +342,39 @@ public class Analysis extends JobImpl implements RouterApp {
         // Profile analysis
         addProfilePoints(ris, points);
         addVersionPoints(ris, points);
+        if (_context.getBooleanProperty(PROP_BLOCK))
+            doBlocking(points);
         return points;
+    }
+
+    /**
+     *  Blocklist and Banlist if configured
+     *  @since 0.9.41
+     */
+    private void doBlocking(Map<Hash, Points> points) {
+        double threshold = DEFAULT_BLOCK_THRESHOLD;
+        long blockUntil = _context.getProperty(Analysis.PROP_BLOCKTIME, DEFAULT_BLOCK_TIME) + _context.clock().now();
+        try {
+            threshold = Double.parseDouble(_context.getProperty(PROP_THRESHOLD, Double.toString(DEFAULT_BLOCK_THRESHOLD)));
+            if (threshold < MIN_BLOCK_POINTS)
+                threshold = MIN_BLOCK_POINTS;
+        } catch (NumberFormatException nfe) {}
+        for (Map.Entry<Hash, Points> e : points.entrySet()) {
+            double p = e.getValue().getPoints();
+            if (p >= threshold) {
+                Hash h = e.getKey();
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
+                if (ri != null) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        byte[] ip = ra.getIP();
+                        if (ip != null)
+                             _context.blocklist().add(ip);
+                    }
+                }
+                String reason = "Sybil analysis with " + fmt.format(p) + " threat points";
+                _context.banlist().banlistRouter(h, reason, null, null, blockUntil);
+            }
+        }
     }
 
     /**

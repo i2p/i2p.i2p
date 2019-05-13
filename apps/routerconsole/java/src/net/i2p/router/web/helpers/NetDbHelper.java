@@ -232,7 +232,7 @@ public class NetDbHelper extends FormHandler {
                     }
                     String thresh = getJettyString("threshold");
                     if (thresh != null && thresh.length() > 0) {
-                        float val = Float.parseFloat(thresh);
+                        float val = Math.max(Float.parseFloat(thresh), Analysis.MIN_BLOCK_POINTS);
                         toSave.put(Analysis.PROP_THRESHOLD, Float.toString(val));
                     }
                     String days = getJettyString("days");

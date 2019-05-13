@@ -1,3 +1,12 @@
+2019-05-13 zzz
+ * Console: Hide transport table unless advanced
+ * Sybil: Add support for auto-blocking
+ * Tunnels: Fix connection checker for NTCP2
+
+2019-05-12 zzz
+ * Jetty: Fix webapps in eepsite (ticket #2477)
+ * Util: Consolidate Java version checking code, fix bugs
+
 2019-05-11 zzz
  * Utils: Allow absolute path to certs in I2PSSLSocketFactory
 

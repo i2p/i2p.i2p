@@ -301,13 +301,7 @@ public class SybilRenderer {
         }
         boolean auto = _context.getBooleanProperty(Analysis.PROP_BLOCK);
         String thresh = _context.getProperty(Analysis.PROP_THRESHOLD, "50");
-        long days = 7;
-        String time = _context.getProperty(Analysis.PROP_BLOCKTIME);
-        if (time != null) {
-            try {
-                days = Long.parseLong(time) / (24*60*60*1000L);
-            } catch (NumberFormatException nfe) {}
-        }
+        long days = _context.getProperty(Analysis.PROP_BLOCKTIME, 7*24*60*60*1000L) / (24*60*60*1000L);
         buf.append("</select></td></tr>\n<tr><td>" +
                    "Auto-block routers?</td><td><input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"block\" ");
         if (auto)
