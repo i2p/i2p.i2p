@@ -54,9 +54,28 @@ RUN apk --no-cache add build-base git gettext tar bzip2 apache-ant openjdk8 expe
     && ln -sf /opt/jdk/jre /usr/lib/jvm/default-jre \
     && chmod a+x /entrypoint.sh
 
-
-
-EXPOSE 4444 4445 6668 7654 7656 7657 7658 7659 7660 8998 15000-20000
+##
+# Expose some ports used by I2P
+# Description at https://geti2p.net/ports
+#
+# Main ports:
+# 2827 - BOB port
+# 4444 — HTTP proxy
+# 4445 - HTTPS proxy
+# 6668 — Proxy to Irc2P
+# 7650 - I2PControl Plugin
+# 7654 - I2CP
+# 7655 - SAM Bridge (UDP)
+# 7656 - SAM Bridge (TCP)
+# 7657 — router console
+# 7658 — self-hosted eepsite
+# 7659 — SMTP proxy to smtp.postman.i2p
+# 7660 — POP3 proxy to pop.postman.i2p
+# 7661 - I2PBote Plugin SMTP
+# 7662 - Zzzot Plugin
+# 8998 — Proxy to mtn.i2p-projekt.i2p
+##
+EXPOSE 2827 4444 4445 6668 7650 7654 7655 7656 7657 7658 7659 7660 7661 7662 8998 15000-20000
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
