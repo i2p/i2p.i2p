@@ -35,7 +35,7 @@ RUN wget -O /usr/local/bin/gosu https://github.com/tianon/gosu/releases/download
 RUN apk --no-cache add build-base git gettext tar bzip2 apache-ant openjdk8 expect \
     && mkdir -p /usr/src/build \
     && cd /usr/src/build \
-    && git clone -b ${GIT_BRANCH} https://github.com/i2p/i2p.i2p.git \
+    && git clone -b ${GIT_BRANCH} --depth 1 https://github.com/i2p/i2p.i2p.git \
     && cd /usr/src/build/i2p.i2p \
     && echo "noExe=true" >> build.properties \
     && ant installer-linux \
