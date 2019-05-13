@@ -56,7 +56,7 @@ RUN apk --no-cache add build-base git gettext tar bzip2 apache-ant openjdk8 expe
 
 
 
-EXPOSE 7654 7656 7657 7658 4444 6668 8998 7659 7660 4445 15000-20000
+EXPOSE 4444 4445 6668 7654 7656 7657 7658 7659 7660 8998 15000-20000
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
