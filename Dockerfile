@@ -45,7 +45,7 @@ RUN apk --no-cache add build-base git gettext tar bzip2 apache-ant openjdk8 expe
     && chmod u+rw /opt \
     && gosu i2p expect -f /tmp/Docker.expt \
     && cd ${I2P_PREFIX} \
-    && rm -fr man docs *.bat *.command *.app /tmp/i2pinstall.jar /tmp/Docker.expt \
+    && rm -fr man *.bat *.command *.app /tmp/i2pinstall.jar /tmp/Docker.expt \
     && rm -fr /usr/src/build \
     && apk --purge del build-base apache-ant expect tcl expat git openjdk8 openjdk8-jre openjdk8-jre-base openjdk8-jre-lib bzip2 tar \
       binutils-libs binutils pkgconfig libcurl libc-dev musl-dev g++ make fortify-headers pkgconf giflib libssh2 libxdmcp libxcb \
