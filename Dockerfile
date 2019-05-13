@@ -52,7 +52,12 @@ RUN apk --no-cache add build-base git gettext tar bzip2 apache-ant openjdk8 expe
       libx11 pcre alsa-lib libxi libxrender libxml2 readline bash openssl \
     && rm -fr /usr/lib/jvm/default-jre \
     && ln -sf /opt/jdk/jre /usr/lib/jvm/default-jre \
-    && chmod a+x /entrypoint.sh
+    && chmod a+x /entrypoint.sh \
+    && sed -i 's/127\.0\.0\.1/0.0.0.0/g' ${I2P_PREFIX}/i2ptunnel.config \
+    && sed -i 's/::1,127\.0\.0\.1/0.0.0.0/g' ${I2P_PREFIX}/clients.config \
+    && printf "i2cp.tcp.bindAllInterfaces=true\n" >> ${I2P_PREFIX}/router.config \
+    && printf "i2np.ipv4.firewalled=true\ni2np.ntcp.ipv6=false\n" >> ${I2P_PREFIX}/router.config \
+    && printf "i2np.udp.ipv6=false\ni2np.upnp.enable=false\n" >> ${I2P_PREFIX}/router.config
 
 ##
 # Expose some ports used by I2P
