@@ -140,13 +140,16 @@ public class ConfigClientsHelper extends HelperBase {
             boolean isConsole = ca.className.equals("net.i2p.router.web.RouterConsoleRunner");
             boolean showStart;
             boolean showStop;
+            boolean showEdit;
             if (isConsole) {
                 showStart = false;
                 showStop = false;
+                showEdit = true;
             } else {
                 ClientApp clientApp = _context.routerAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
                 showStart = clientApp == null;
                 showStop = clientApp != null && clientApp.getState() == ClientAppState.RUNNING;
+                showEdit = !showStop && (clientApp == null || clientApp.getState() != ClientAppState.STARTING);
             }
             String scur = Integer.toString(cur);
             renderForm(buf, scur, ca.clientName,
@@ -161,8 +164,9 @@ public class ConfigClientsHelper extends HelperBase {
                        // edit
                        allowEdit && scur.equals(_edit),
                        // show edit button, show update button
-                       // Don't allow edit if it's running, or else we would lose the "handle" to the ClientApp to stop it.
-                       allowEdit && !showStop, false, 
+                       // Don't allow edit if it's running or starting, or else we would lose the "handle" to the ClientApp to stop it.
+                       allowEdit && showEdit,
+                       false, 
                        // show stop button
                        showStop,
                        // show delete button, show start button
