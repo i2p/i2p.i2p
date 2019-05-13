@@ -59,6 +59,9 @@ public class Analysis extends JobImpl implements RouterApp {
      */
     public static final String APP_NAME = "sybil";
     public static final String PROP_FREQUENCY = "router.sybilFrequency";
+    public static final String PROP_THRESHOLD = "router.sybilThreshold";
+    public static final String PROP_BLOCK = "router.sybilBlock.enable";
+    public static final String PROP_BLOCKTIME = "router.sybilBlock.period";
     private static final long MIN_FREQUENCY = 60*60*1000L;
     private static final long MIN_UPTIME = 75*60*1000L;
 

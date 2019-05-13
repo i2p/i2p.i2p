@@ -39,6 +39,7 @@ import net.i2p.router.sybil.Points;
 import static net.i2p.router.sybil.Util.biLog2;
 import net.i2p.router.tunnel.pool.TunnelPool;
 import net.i2p.router.util.HashDistance;
+import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
@@ -283,7 +284,7 @@ public class SybilRenderer {
                    "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
                    "<input type=\"hidden\" name=\"m\" value=\"15\">\n" +
                    "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
-                   "Background analysis run frequency: <select name=\"runFrequency\">");
+                   "<table><tr><td>Background analysis run frequency:</td><td><select name=\"runFrequency\">");
         for (int i = 0; i < HOURS.length; i++) {
             buf.append("<option value=\"");
             buf.append(Integer.toString(HOURS[i]));
@@ -298,9 +299,24 @@ public class SybilRenderer {
                 buf.append(_t("Never"));
             buf.append("</option>\n");
         }
-        buf.append("</select> " +
+        boolean auto = _context.getBooleanProperty(Analysis.PROP_BLOCK);
+        String thresh = _context.getProperty(Analysis.PROP_THRESHOLD, "50");
+        long days = 7;
+        String time = _context.getProperty(Analysis.PROP_BLOCKTIME);
+        if (time != null) {
+            try {
+                days = Long.parseLong(time) / (24*60*60*1000L);
+            } catch (NumberFormatException nfe) {}
+        }
+        buf.append("</select></td></tr>\n<tr><td>" +
+                   "Auto-block routers?</td><td><input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"block\" ");
+        if (auto)
+            buf.append(HelperBase.CHECKED);
+        buf.append("></td></tr>\n<tr><td>" +
+                   "Minimum threat points to block:</td><td><input type=\"text\" name=\"threshold\" value=\"").append(thresh).append("\"></td></tr>\n<tr><td>" +
+                   "Days to block:</td><td><input type=\"text\" name=\"days\" value=\"").append(days).append("\"></td></tr>\n<tr><td></td><td>" +
                    "<input type=\"submit\" name=\"action\" class=\"accept\" value=\"Save\" />" +
-                   "</form>\n");
+                   "</td></tr></table></form>\n");
         writeBuf(out, buf);
     }
 

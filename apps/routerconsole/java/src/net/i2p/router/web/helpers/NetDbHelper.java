@@ -1,7 +1,9 @@
 package net.i2p.router.web.helpers;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -221,11 +223,26 @@ public class NetDbHelper extends FormHandler {
         _postOK = "Run new analysis".equals(_action) ||
                   "Review analysis".equals(_action);
         if ("Save".equals(_action)) {
-            String newTime = getJettyString("runFrequency");
-            if (newTime != null) {
                 try {
-                    long ntime = Long.parseLong(newTime) * 60*60*1000;
-                    if (_context.router().saveConfig(Analysis.PROP_FREQUENCY, Long.toString(ntime)))
+                    Map<String, String> toSave = new HashMap<String, String>(4);
+                    String newTime = getJettyString("runFrequency");
+                    if (newTime != null) {
+                        long ntime = Long.parseLong(newTime) * 60*60*1000;
+                        toSave.put(Analysis.PROP_FREQUENCY, Long.toString(ntime));
+                    }
+                    String thresh = getJettyString("threshold");
+                    if (thresh != null && thresh.length() > 0) {
+                        float val = Float.parseFloat(thresh);
+                        toSave.put(Analysis.PROP_THRESHOLD, Float.toString(val));
+                    }
+                    String days = getJettyString("days");
+                    if (days != null && days.length() > 0) {
+                        long val = 24*60*60*1000L * Integer.parseInt(days);
+                        toSave.put(Analysis.PROP_BLOCKTIME, Long.toString(val));
+                    }
+                    String enable = getJettyString("block");
+                    toSave.put(Analysis.PROP_BLOCK, Boolean.toString(enable != null));
+                    if (_context.router().saveConfig(toSave, null))
                         addFormNotice(_t("Configuration saved successfully."));
                     else
                         addFormError("Error saving the configuration (applied but not saved) - please see the error logs");
@@ -233,7 +250,6 @@ public class NetDbHelper extends FormHandler {
                 } catch (NumberFormatException nfe) {
                         addFormError("bad value");
                 }
-            }
         }
     }
 
