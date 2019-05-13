@@ -55,6 +55,7 @@ RUN apk --no-cache add build-base git gettext tar bzip2 apache-ant openjdk8 expe
     && chmod a+x /entrypoint.sh \
     && sed -i 's/127\.0\.0\.1/0.0.0.0/g' ${I2P_PREFIX}/i2ptunnel.config \
     && sed -i 's/::1,127\.0\.0\.1/0.0.0.0/g' ${I2P_PREFIX}/clients.config \
+    && printf "router.updateDisabled=true\n" >> ${I2P_PREFIX}/router.config \
     && printf "i2cp.tcp.bindAllInterfaces=true\n" >> ${I2P_PREFIX}/router.config \
     && printf "i2np.ipv4.firewalled=true\ni2np.ntcp.ipv6=false\n" >> ${I2P_PREFIX}/router.config \
     && printf "i2np.udp.ipv6=false\ni2np.upnp.enable=false\n" >> ${I2P_PREFIX}/router.config
