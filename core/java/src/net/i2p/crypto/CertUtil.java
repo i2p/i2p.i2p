@@ -2,6 +2,7 @@ package net.i2p.crypto;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -64,7 +65,9 @@ public final class CertUtil {
     public static boolean saveCert(Certificate cert, File file) {
         OutputStream os = null;
         try {
-           os = new SecureFileOutputStream(file);
+           // The point is probably to share this, so don't make it 600
+           //os = new SecureFileOutputStream(file);
+           os = new FileOutputStream(file);
            exportCert(cert, os);
            return true;
         } catch (CertificateEncodingException cee) {
