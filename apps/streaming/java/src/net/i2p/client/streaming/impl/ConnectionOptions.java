@@ -899,8 +899,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         buf.append(" inactivityTimeout=").append(_inactivityTimeout);
         buf.append(" inboundBuffer=").append(_inboundBufferSize);
         buf.append(" maxWindowSize=").append(_maxWindowSize);
-        buf.append(" blacklistSize=").append(_blackList.size());
-        buf.append(" whitelistSize=").append(_accessList.size());
+        buf.append(" blacklistSize=").append(_blackList != null ? _blackList.size() : 0);
+        buf.append(" whitelistSize=").append(_accessList != null ? _accessList.size() : 0);
         buf.append(" maxConns=").append(_maxConnsPerMinute).append('/')
                                 .append(_maxConnsPerHour).append('/')
                                 .append(_maxConnsPerDay);
