@@ -63,6 +63,7 @@ public class SybilRenderer {
 
     private final RouterContext _context;
     private final DecimalFormat fmt = new DecimalFormat("#0.00");
+    private final DateFormat dfmt;
 
     private static final int PAIRMAX = Analysis.PAIRMAX;
     private static final int MAX = Analysis.MAX;
@@ -72,6 +73,8 @@ public class SybilRenderer {
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
+        dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+        dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
     }
 
     /**
@@ -146,6 +149,7 @@ public class SybilRenderer {
                    "<div id=\"sybilnav\"><ul><li><a href=\"netdb?f=3\">Review stored analysis</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=14\">Run new analysis</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=15\">Configure periodic analysis</a>" +
+                   "</li><li><a href=\"/profiles?f=3\">Review current bans</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=1\">Floodfill Summary</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=2\">Same Family</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=3\">IP close to us</a>" +
@@ -245,8 +249,6 @@ public class SybilRenderer {
                        "Select stored analysis: " +
                        "<select name=\"date\">\n");
             boolean first = true;
-            DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-            dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
             for (Long date : dates) {
                 buf.append("<option value=\"").append(date).append('\"');
                 if (first) {
@@ -320,8 +322,6 @@ public class SybilRenderer {
     private void renderFFSummary(Writer out, StringBuilder buf, List<RouterInfo> ris, double avgMinDist) throws IOException {
         renderRouterInfo(buf, _context.router().getRouterInfo(), null, true, false);
         buf.append("<h3 id=\"known\" class=\"sybils\">Known Floodfills: ").append(ris.size()).append("</h3>");
-        DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-        dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
         buf.append("<div id=\"sybils_summary\">\n" +
                    "<b>Average closest floodfill distance:</b> ").append(fmt.format(avgMinDist)).append("<br>\n" +
                    "<b>Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
@@ -468,13 +468,8 @@ public class SybilRenderer {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
             Collections.sort(warns, new PointsComparator(points));
             ReasonComparator rcomp = new ReasonComparator();
-            DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-            dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
             buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points as of " + dfmt.format(new Date(date)) + "</h3>");
             for (Hash h : warns) {
-                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
-                if (ri == null)
-                    continue;
                 Points pp = points.get(h);
                 double p = pp.getPoints();
                 if (p < MIN_DISPLAY_POINTS)
@@ -490,7 +485,15 @@ public class SybilRenderer {
                     buf.append("<li><b>").append(s, 0, c+1).append("</b>").append(s, c+1, s.length()).append("</li>");
                 }
                 buf.append("</ul>");
-                renderRouterInfo(buf, ri, null, false, false);
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
+                if (ri != null) {
+                    renderRouterInfo(buf, ri, null, false, false);
+                } else {
+                    String hash = h.toBase64();
+                    buf.append("<a name=\"").append(hash, 0, 6).append("\"></a><table class=\"sybil_routerinfo\"><tr>" +
+                               "<th><b>" + _t("Router") + ":</b> <code>").append(hash).append("</code></th>" +
+                               "<th><b>Router info not available</b></th><th></th></tr></table>\n");
+                }
             }
         }
         writeBuf(out, buf);
@@ -962,9 +965,9 @@ public class SybilRenderer {
         out.write("<h3>Distance to " + from.toBase64() + "</h3>");
         prev = null;
         final int limit = Math.min(10, sybils.size());
-        DateFormat dfmt = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        DateFormat utcfmt = DateFormat.getDateInstance(DateFormat.MEDIUM);
         for (int i = start; i <= days; i++) {
-            out.write("<h3 class=\"tabletitle\">Distance for " + dfmt.format(new Date(now)) +
+            out.write("<h3 class=\"tabletitle\">Distance for " + utcfmt.format(new Date(now)) +
                       "</h3><table class=\"sybil_distance\"><tr><th>Hash<th>Distance<th>Distance from previous</tr>\n");
             Hash rkey = rkgen.getRoutingKey(from, now);
             xor = new XORComparator<Hash>(rkey);

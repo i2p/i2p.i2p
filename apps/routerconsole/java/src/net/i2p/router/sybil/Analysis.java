@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
+import net.i2p.router.Banlist;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
@@ -38,6 +41,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
+import net.i2p.util.SystemVersion;
 
 /**
  *
@@ -353,12 +357,16 @@ public class Analysis extends JobImpl implements RouterApp {
      */
     private void doBlocking(Map<Hash, Points> points) {
         double threshold = DEFAULT_BLOCK_THRESHOLD;
-        long blockUntil = _context.getProperty(Analysis.PROP_BLOCKTIME, DEFAULT_BLOCK_TIME) + _context.clock().now();
+        long now = _context.clock().now();
+        long blockUntil = _context.getProperty(Analysis.PROP_BLOCKTIME, DEFAULT_BLOCK_TIME) + now;
         try {
             threshold = Double.parseDouble(_context.getProperty(PROP_THRESHOLD, Double.toString(DEFAULT_BLOCK_THRESHOLD)));
             if (threshold < MIN_BLOCK_POINTS)
                 threshold = MIN_BLOCK_POINTS;
         } catch (NumberFormatException nfe) {}
+        DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+        dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+        String day = dfmt.format(now);
         for (Map.Entry<Hash, Points> e : points.entrySet()) {
             double p = e.getValue().getPoints();
             if (p >= threshold) {
@@ -371,7 +379,7 @@ public class Analysis extends JobImpl implements RouterApp {
                              _context.blocklist().add(ip);
                     }
                 }
-                String reason = "Sybil analysis with " + fmt.format(p) + " threat points";
+                String reason = "Sybil analysis " + day + " with " + fmt.format(p) + " threat points";
                 _context.banlist().banlistRouter(h, reason, null, null, blockUntil);
             }
         }
@@ -672,12 +680,25 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final long DAY = 24*60*60*1000L;
 
     public void addProfilePoints(List<RouterInfo> ris, Map<Hash, Points> points) {
+        Map<Hash, Banlist.Entry> banEntries = _context.banlist().getEntries();
         long now = _context.clock().now();
         RateAverages ra = RateAverages.getTemp();
         for (RouterInfo info : ris) {
             Hash h = info.getHash();
-            if (_context.banlist().isBanlisted(h))
-                addPoints(points, h, POINTS_BANLIST, "Banlisted");
+            if (_context.banlist().isBanlisted(h)) {
+                StringBuilder buf = new StringBuilder("Banlisted");
+                Banlist.Entry entry = banEntries.get(h);
+                if (entry != null) {
+                    if (entry.cause != null) {
+                        buf.append(": ");
+                        if (entry.causeCode != null)
+                            buf.append(_t(entry.cause, entry.causeCode));
+                        else
+                            buf.append(_t(entry.cause));
+                    }
+                }
+                addPoints(points, h, POINTS_BANLIST, buf.toString());
+            }
             PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(h);
             if (prof != null) {
                 long heard = prof.getFirstHeardAbout();
@@ -775,6 +796,10 @@ public class Analysis extends JobImpl implements RouterApp {
      */
     private static double biLog2(BigInteger a) {
         return Util.biLog2(a);
+    }
+
+    private String _t(String s) {
+        return Messages.getString(s, _context);
     }
 
     /**
