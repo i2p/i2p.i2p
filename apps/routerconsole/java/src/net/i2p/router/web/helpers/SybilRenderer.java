@@ -134,7 +134,7 @@ public class SybilRenderer {
         Hash us = _context.routerHash();
         Analysis analysis = Analysis.getInstance(_context);
         List<RouterInfo> ris = null;
-        if (mode != 0 && mode != 12 && mode != 13 && mode != 14) {
+        if (mode != 0 && mode != 12 && mode != 13 && mode != 14 && mode != 16) {
             ris = analysis.getFloodfills(us);
             if (ris.isEmpty()) {
                 out.write("<h3 class=\"sybils\">No known floodfills</h3>");
@@ -208,10 +208,10 @@ public class SybilRenderer {
             } else {
                 renderThreatsHTML(out, buf, date, points);
             }
-        } else if (mode == 13) {
+        } else if (mode == 13 || mode == 16) {
             // run analysis and store it
             long now = _context.clock().now();
-            points = analysis.backgroundAnalysis();
+            points = analysis.backgroundAnalysis(mode == 16);
             if (!points.isEmpty()) {
                 PersistSybil ps = analysis.getPersister();
                 try {
@@ -273,6 +273,14 @@ public class SybilRenderer {
                    "<input type=\"hidden\" name=\"m\" value=\"13\">\n" +
                    "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
                    "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Run new analysis\" />" +
+                   "(floodfills only)" +
+                   "</form><br>\n");
+        buf.append("<form action=\"netdb\" method=\"POST\">\n" +
+                   "<input type=\"hidden\" name=\"f\" value=\"3\">\n" +
+                   "<input type=\"hidden\" name=\"m\" value=\"16\">\n" +
+                   "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" >\n" +
+                   "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Run new analysis\" />" +
+                   "(all routers)" +
                    "</form>\n");
         writeBuf(out, buf);
     }
@@ -302,11 +310,16 @@ public class SybilRenderer {
             buf.append("</option>\n");
         }
         boolean auto = _context.getBooleanProperty(Analysis.PROP_BLOCK);
+        boolean nonff = _context.getBooleanProperty(Analysis.PROP_NONFF);
         String thresh = _context.getProperty(Analysis.PROP_THRESHOLD, "50");
         long days = _context.getProperty(Analysis.PROP_BLOCKTIME, 7*24*60*60*1000L) / (24*60*60*1000L);
         buf.append("</select></td></tr>\n<tr><td>" +
                    "Auto-block routers?</td><td><input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"block\" ");
         if (auto)
+            buf.append(HelperBase.CHECKED);
+        buf.append("></td></tr>\n<tr><td>" +
+                   "Include non-floodfills?</td><td><input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"nonff\" ");
+        if (nonff)
             buf.append(HelperBase.CHECKED);
         buf.append("></td></tr>\n<tr><td>" +
                    "Minimum threat points to block:</td><td><input type=\"text\" name=\"threshold\" value=\"").append(thresh).append("\"></td></tr>\n<tr><td>" +

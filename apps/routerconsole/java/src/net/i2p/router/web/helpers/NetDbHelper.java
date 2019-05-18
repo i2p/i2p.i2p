@@ -242,6 +242,8 @@ public class NetDbHelper extends FormHandler {
                     }
                     String enable = getJettyString("block");
                     toSave.put(Analysis.PROP_BLOCK, Boolean.toString(enable != null));
+                    String nonff = getJettyString("nonff");
+                    toSave.put(Analysis.PROP_NONFF, Boolean.toString(nonff != null));
                     if (_context.router().saveConfig(toSave, null))
                         addFormNotice(_t("Configuration saved successfully."));
                     else
@@ -273,7 +275,7 @@ public class NetDbHelper extends FormHandler {
             } else if (_full == 3) {
                 if (_mode == 12 && !_postOK)
                     _mode = 0;
-                else if (_mode == 13 && !_postOK)
+                else if ((_mode == 13 || _mode == 16) && !_postOK)
                     _mode = 14;
                 (new SybilRenderer(_context)).getNetDbSummary(_out, _newNonce, _mode, _date);
             } else if (_full == 4) {

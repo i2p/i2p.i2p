@@ -65,6 +65,7 @@ public class Analysis extends JobImpl implements RouterApp {
     public static final String PROP_FREQUENCY = "router.sybilFrequency";
     public static final String PROP_THRESHOLD = "router.sybilThreshold";
     public static final String PROP_BLOCK = "router.sybilBlock.enable";
+    public static final String PROP_NONFF = "router.sybilIncludeAll";
     public static final String PROP_BLOCKTIME = "router.sybilBlock.period";
     private static final long MIN_FREQUENCY = 60*60*1000L;
     private static final long MIN_UPTIME = 75*60*1000L;
@@ -81,6 +82,7 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double POINTS_US24 = 20.0;
     private static final double POINTS_US16 = 10.0;
     private static final double POINTS_FAMILY = -10.0;
+    private static final double POINTS_NONFF = -5.0;
     private static final double POINTS_BAD_OUR_FAMILY = 100.0;
     private static final double POINTS_OUR_FAMILY = -100.0;
     public static final double MIN_CLOSE = 242.0;
@@ -126,7 +128,7 @@ public class Analysis extends JobImpl implements RouterApp {
     public void runJob() {
         long now = _context.clock().now();
         _log.info("Running analysis");
-        Map<Hash, Points> points = backgroundAnalysis();
+        Map<Hash, Points> points = backgroundAnalysis(_context.getBooleanProperty(PROP_NONFF));
         if (!points.isEmpty()) {
             try {
                 _log.info("Storing analysis");
@@ -282,17 +284,30 @@ public class Analysis extends JobImpl implements RouterApp {
     /**
      *  Analyze threats. No output.
      *  Return separate maps for each cause instead?
+     *  @param includeAll false for floodfills only
      *  @since 0.9.38
      */
-    public synchronized Map<Hash, Points> backgroundAnalysis() {
+    public synchronized Map<Hash, Points> backgroundAnalysis(boolean includeAll) {
         _wasRun = true;
         Map<Hash, Points> points = new HashMap<Hash, Points>(64);
         Hash us = _context.routerHash();
         if (us == null)
             return points;
-        List<RouterInfo> ris = getFloodfills(us);
+        List<RouterInfo> ris;
+        if (includeAll) {
+            Set<RouterInfo> set = _context.netDb().getRouters();
+            ris = new ArrayList<RouterInfo>(set.size());
+            for (RouterInfo ri : set) {
+                if (!ri.getIdentity().getHash().equals(us))
+                ris.add(ri);
+            }
+        } else {
+            ris = getFloodfills(us);
+        }
         if (ris.isEmpty())
             return points;
+        if (_log.shouldWarn())
+            _log.warn("Analyzing " + ris.size() + " routers, including non-floodfills? " + includeAll);
 
         double avgMinDist = getAvgMinDist(ris);
 
@@ -396,8 +411,14 @@ public class Analysis extends JobImpl implements RouterApp {
         double total = 0;
         for (int i = 0; i < sz; i++) {
             RouterInfo info1 = ris.get(i);
+            // don't do distance calculation for non-floodfills
+            if (!info1.getCapabilities().contains("f"))
+                continue;
             for (int j = i + 1; j < sz; j++) {
                 RouterInfo info2 = ris.get(j);
+                // don't do distance calculation for non-floodfills
+                if (!info2.getCapabilities().contains("f"))
+                    continue;
                 BigInteger dist = HashDistance.getDistance(info1.getHash(), info2.getHash());
                 if (pairs.isEmpty()) {
                     pairs.add(new Pair(info1, info2, dist));
@@ -699,6 +720,9 @@ public class Analysis extends JobImpl implements RouterApp {
                 }
                 addPoints(points, h, POINTS_BANLIST, buf.toString());
             }
+            // don't do profile calcluations for non-floodfills
+            if (!info.getCapabilities().contains("f"))
+                continue;
             PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(h);
             if (prof != null) {
                 long heard = prof.getFirstHeardAbout();
@@ -748,6 +772,8 @@ public class Analysis extends JobImpl implements RouterApp {
             String caps = info.getCapabilities();
             if (!caps.contains("R"))
                 addPoints(points, h, POINTS_UNREACHABLE, "Unreachable: " + DataHelper.escapeHTML(caps));
+            if (!caps.contains("f"))
+                addPoints(points, h, POINTS_NONFF, "Non-floodfill");
             String hisFullVer = info.getVersion();
             if (!hisFullVer.startsWith("0.9.")) {
                 addPoints(points, h, POINTS_BAD_VERSION, "Strange version " + DataHelper.escapeHTML(hisFullVer));
@@ -779,6 +805,9 @@ public class Analysis extends JobImpl implements RouterApp {
         int count = Math.min(MAX, ris.size());
         for (int i = 0; i < count; i++) {
             RouterInfo ri = ris.get(i);
+            // don't do distance calculation for non-floodfills
+            if (!ri.getCapabilities().contains("f"))
+                continue;
             BigInteger bidist = HashDistance.getDistance(us, ri.getHash());
             double dist = biLog2(bidist);
             double point = MIN_CLOSE - dist;
