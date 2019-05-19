@@ -67,6 +67,7 @@ public class Analysis extends JobImpl implements RouterApp {
     public static final String PROP_BLOCK = "router.sybilEnableBlocking";
     public static final String PROP_NONFF = "router.sybilAnalyzeAll";
     public static final String PROP_BLOCKTIME = "router.sybilBlockPeriod";
+    public static final String PROP_REMOVETIME = "router.sybilDeleteOld";
     private static final long MIN_FREQUENCY = 60*60*1000L;
     private static final long MIN_UPTIME = 75*60*1000L;
 
@@ -133,6 +134,7 @@ public class Analysis extends JobImpl implements RouterApp {
             try {
                 _log.info("Storing analysis");
                 _persister.store(now, points);
+                _persister.removeOld();
                 _log.info("Store complete");
             } catch (IOException ioe) {
                 _log.error("Failed to store analysis", ioe);
@@ -151,6 +153,7 @@ public class Analysis extends JobImpl implements RouterApp {
         changeState(STARTING);
         changeState(RUNNING);
         _cmgr.register(this);
+        _persister.removeOld();
         schedule();
     }
 

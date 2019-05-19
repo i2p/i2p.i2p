@@ -240,6 +240,11 @@ public class NetDbHelper extends FormHandler {
                         long val = 24*60*60*1000L * Integer.parseInt(days);
                         toSave.put(Analysis.PROP_BLOCKTIME, Long.toString(val));
                     }
+                    String age = getJettyString("deleteAge");
+                    if (age != null && age.length() > 0) {
+                        long val = 24*60*60*1000L * Integer.parseInt(age);
+                        toSave.put(Analysis.PROP_REMOVETIME, Long.toString(val));
+                    }
                     String enable = getJettyString("block");
                     toSave.put(Analysis.PROP_BLOCK, Boolean.toString(enable != null));
                     String nonff = getJettyString("nonff");

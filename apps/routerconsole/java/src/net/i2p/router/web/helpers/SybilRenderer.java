@@ -70,6 +70,7 @@ public class SybilRenderer {
     private static final double MIN_CLOSE = Analysis.MIN_CLOSE;
     private static final double MIN_DISPLAY_POINTS = 12.01;
     private static final int[] HOURS = { 1, 6, 24, 7*24, 30*24, 0 };
+    private static final int[] DAYS = { 2, 7, 30, 90, 365, 0 };
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
@@ -134,7 +135,7 @@ public class SybilRenderer {
         Hash us = _context.routerHash();
         Analysis analysis = Analysis.getInstance(_context);
         List<RouterInfo> ris = null;
-        if (mode != 0 && mode != 12 && mode != 13 && mode != 14 && mode != 16) {
+        if (mode != 0 && mode < 12) {
             if (mode >= 2 && mode <= 6) {
                 // review all routers for family and IP analysis
                 ris = analysis.getAllRouters(us);
@@ -302,7 +303,7 @@ public class SybilRenderer {
                    "<table><tr><td>Background analysis run frequency:</td><td><select name=\"runFrequency\">");
         for (int i = 0; i < HOURS.length; i++) {
             buf.append("<option value=\"");
-            buf.append(Integer.toString(HOURS[i]));
+            buf.append(HOURS[i]);
             buf.append('"');
             long time = HOURS[i] * 60*60*1000L;
             if (time == freq)
@@ -328,7 +329,24 @@ public class SybilRenderer {
             buf.append(HelperBase.CHECKED);
         buf.append("></td></tr>\n<tr><td>" +
                    "Minimum threat points to block:</td><td><input type=\"text\" name=\"threshold\" value=\"").append(thresh).append("\"></td></tr>\n<tr><td>" +
-                   "Days to block:</td><td><input type=\"text\" name=\"days\" value=\"").append(days).append("\"></td></tr>\n<tr><td></td><td>" +
+                   "Days to block:</td><td><input type=\"text\" name=\"days\" value=\"").append(days).append("\"></td></tr>\n<tr><td>" +
+                   "Delete stored analysis older than:</td><td><select name=\"deleteAge\">");
+        long age = _context.getProperty(Analysis.PROP_REMOVETIME, 0L);
+        for (int i = 0; i <DAYS.length; i++) {
+            buf.append("<option value=\"");
+            buf.append(DAYS[i]);
+            buf.append('"');
+            long time = DAYS[i] * 24*60*60*1000L;
+            if (time == age)
+                buf.append(" selected=\"selected\"");
+            buf.append('>');
+            if (DAYS[i] > 0)
+                buf.append(DataHelper.formatDuration2(time));
+            else
+                buf.append(_t("Never"));
+            buf.append("</option>\n");
+        }
+        buf.append("</td></tr>\n<tr><td></td><td>" +
                    "<input type=\"submit\" name=\"action\" class=\"accept\" value=\"Save\" />" +
                    "</td></tr></table></form>\n");
         writeBuf(out, buf);

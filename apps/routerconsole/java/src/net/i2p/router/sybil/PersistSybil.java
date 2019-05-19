@@ -170,6 +170,37 @@ public class PersistSybil {
     }
 
     /**
+     *  Remove all files older than configured threshold
+     *  Inline for now, thread later if necessary
+     *
+     *  @since 0.9.41
+     */
+    public synchronized void removeOld() {
+        long age = _context.getProperty(Analysis.PROP_REMOVETIME, 0L);
+        if (age < 60*1000)
+            return;
+        long cutoff = _context.clock().now() - age;
+        File dir = new File(_context.getConfigDir(), DIR);
+        File[] files = dir.listFiles(new FileSuffixFilter(PFX, SFX));
+        if (files == null)
+            return;
+        int deleted = 0;
+        for (File file : files) {
+            try {
+                String name = file.getName();
+                long d = Long.parseLong(name.substring(PFX.length(), name.length() - SFX.length())); 
+                if (d < cutoff) {
+                    if (file.delete())
+                        deleted++;
+                }
+            } catch (NumberFormatException nfe) {}
+        }
+        if (deleted > 0 && _log.shouldWarn())
+            _log.warn("Deleted " + deleted + " old analysis files");
+    }
+
+
+    /**
      *  Delete the file for a particular date
      *
      *  @return success
