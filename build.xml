@@ -296,11 +296,10 @@
       -->
 
     <target name="-setepoch">
-        <script language="javascript">
-            <![CDATA[
-              property = project.setProperty("epoch",Math.floor((new Date()).getTime()/1000));
-            ]]>
-        </script>
+        <exec executable="date" outputproperty="epoch" errorproperty="dc.error" failifexecutionfails="true" >
+            <arg value="+%s" />
+        </exec>
+        <echo message="Epoch is: ${epoch}" />
     </target>
 
     <target name="bbLauncher" depends="build">
@@ -503,20 +502,11 @@
     </target>
 
     <target name="trimMtnRev" depends="getMtnRev">
-        <script language="javascript">
-            <![CDATA[
-            var MtnRev = project.getProperty("workspace.version");
-            if (MtnRev != 'unknown' && MtnRev != null) {
-                echo = project.createTask("echo");
-                var MtnShortHash = MtnRev.substring(0,8);
-                project.setProperty("MtnShortHash", MtnShortHash);
-                echo.setMessage("Trimmed hash: " + MtnShortHash);
-                echo.perform();
-            } else {
-                project.setProperty("MtnShortHash", 'unknown');
-            }
-            ]]>
-        </script>
+        <exec executable="cut" inputstring="${workspace.version}" outputproperty="MtnShortHash" errorproperty="cut.error1" failifexecutionfails="true" >
+            <arg value="-c" />
+            <arg value="1-8" />
+        </exec>
+        <echo message="Short version is: ${MtnShortHash}" />
     </target>
 
     <target name="checkIfBumped">
@@ -534,17 +524,11 @@
 
     <target name="bump" depends="bumpBuild" />
     <target name="bumpBuild" depends="checkIfBumped, getBuildNumber" unless="bumped.already">
-        <script language="javascript">
-            <![CDATA[
-            var newBuildNumber = (Number(project.getProperty("i2p.build.number")) + 1);
-            if (newBuildNumber != 'unknown' && newBuildNumber != null) {
-                echo = project.createTask("echo");
-                project.setProperty("new.i2p.build.number", newBuildNumber);
-                echo.setMessage("Build number is now: " + newBuildNumber + project.getProperty("build.extra"));
-                echo.perform();
-            }
-            ]]>
-        </script>
+        <exec executable="dc" outputproperty="new.i2p.build.number" errorproperty="dc.error" failifexecutionfails="true" >
+            <arg value="-e" />
+            <arg value="${i2p.build.number} 1 + n" />
+        </exec>
+        <echo message="Build number is now: ${new.i2p.build.number}${build.extra}" />
         <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
