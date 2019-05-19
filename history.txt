@@ -1,5 +1,26 @@
+2019-05-19 zzz
+ * Sybil: Run IP and family tests on all routers
+
+2019-05-18 zzz
+ * Javadoc: fixes from FreeBSD ports
+ * Sybil:
+   - Option to run on non-floodfills too
+   - Show routers in analysis even if no RI available
+   - Date format and reason text fixes
+   - Add link to banlist
+
+2019-05-15 zzz
+ * EepGet: Don't continue when requested a partial but didn't
+   get it, and the output is to a stream
+ * Streaming: Fix NPE in debug logging (ticket #2504)
+
+2019-05-14 zzz
+ * Util: Don't set restrictive permissions on exported certs
+
 2019-05-13 zzz
- * Console: Hide transport table unless advanced
+ * Console:
+   - Hide transport table unless advanced
+   - Prevent editing a client while it's starting
  * Sybil: Add support for auto-blocking
  * Tunnels: Fix connection checker for NTCP2
 

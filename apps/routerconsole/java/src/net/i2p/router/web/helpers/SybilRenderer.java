@@ -135,9 +135,14 @@ public class SybilRenderer {
         Analysis analysis = Analysis.getInstance(_context);
         List<RouterInfo> ris = null;
         if (mode != 0 && mode != 12 && mode != 13 && mode != 14 && mode != 16) {
-            ris = analysis.getFloodfills(us);
+            if (mode >= 2 && mode <= 6) {
+                // review all routers for family and IP analysis
+                ris = analysis.getAllRouters(us);
+            } else {
+                ris = analysis.getFloodfills(us);
+            }
             if (ris.isEmpty()) {
-                out.write("<h3 class=\"sybils\">No known floodfills</h3>");
+                out.write("<h3 class=\"sybils\">No known routers</h3>");
                 return;
             }
         }
@@ -565,7 +570,7 @@ public class SybilRenderer {
      */
     private void renderIPGroupsUs(Writer out, StringBuilder buf, List<RouterInfo> ri32,
                                   List<RouterInfo> ri24, List<RouterInfo> ri16) throws IOException {
-        buf.append("<h3 id=\"ourIP\" class=\"sybils\">Floodfills close to Our IP</h3>");
+        buf.append("<h3 id=\"ourIP\" class=\"sybils\">Routers close to Our IP</h3>");
         boolean found = false;
         for (RouterInfo info : ri32) {
              buf.append("<p id=\"sybil_info\"><b>");
@@ -597,7 +602,7 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroups32(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
-        buf.append("<h3 id=\"sameIP\" class=\"sybils\">Floodfills with the Same IP</h3>");
+        buf.append("<h3 id=\"sameIP\" class=\"sybils\">Routers with the Same IP</h3>");
         List<Integer> foo = new ArrayList<Integer>(map.keySet());
         Collections.sort(foo, new FooComparator(map));
         boolean found = false;
@@ -610,7 +615,7 @@ public class SybilRenderer {
             int i2 = (i >> 8) & 0xff;
             int i3 = i & 0xff;
             String sip = i0 + "." + i1 + '.' + i2 + '.' + i3;
-            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
+            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
                .append(sip).append("&amp;sybil\">").append(sip)
                .append("</a>:</b></p>");
             for (RouterInfo info : ris) {
@@ -627,7 +632,7 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroups24(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
-        buf.append("<h3 id=\"same24\" class=\"sybils\">Floodfills in the Same /24 (2 minimum)</h3>");
+        buf.append("<h3 id=\"same24\" class=\"sybils\">Routers in the Same /24 (2 minimum)</h3>");
         List<Integer> foo = new ArrayList<Integer>(map.keySet());
         Collections.sort(foo, new FooComparator(map));
         boolean found = false;
@@ -639,7 +644,7 @@ public class SybilRenderer {
             int i1 = (i >> 8) & 0xff;
             int i2 = i & 0xff;
             String sip = i0 + "." + i1 + '.' + i2 + ".0/24";
-            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
+            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
                .append(sip).append("&amp;sybil\">").append(sip)
                .append("</a>:</b></p>");
             for (RouterInfo info : ris) {
@@ -656,7 +661,7 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroups16(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
-        buf.append("<h3 id=\"same16\" class=\"sybils\">Floodfills in the Same /16 (4 minimum)</h3>");
+        buf.append("<h3 id=\"same16\" class=\"sybils\">Routers in the Same /16 (4 minimum)</h3>");
         List<Integer> foo = new ArrayList<Integer>(map.keySet());
         Collections.sort(foo, new FooComparator(map));
         boolean found = false;
@@ -668,7 +673,7 @@ public class SybilRenderer {
             int i1 = i & 0xff;
             String sip = i0 + "." + i1 + ".0.0/16";
             if (buf != null) {
-                buf.append("<p class=\"sybil_info\"><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
+                buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
                    .append(sip).append("&amp;sybil\">").append(sip)
                    .append("</a></b></p>");
             }
@@ -686,7 +691,7 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroupsFamily(Writer out, StringBuilder buf, Map<String, List<RouterInfo>> map) throws IOException {
-        buf.append("<h3 id=\"samefamily\" class=\"sybils\">Floodfills in the same Family</h3><div class=\"sybil_container\">");
+        buf.append("<h3 id=\"samefamily\" class=\"sybils\">Routers in the same Family</h3><div class=\"sybil_container\">");
         List<String> foo = new ArrayList<String>(map.keySet());
         Collections.sort(foo, new FoofComparator(map));
         FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
@@ -697,7 +702,7 @@ public class SybilRenderer {
             int count = list.size();
             String ss = DataHelper.escapeHTML(s);
             if (count > 1) {
-                buf.append("<p class=\"family\"><b>").append(count).append(" floodfills in family: &nbsp;<a href=\"/netdb?fam=")
+                buf.append("<p class=\"family\"><b>").append(count).append(" routers in family: &nbsp;<a href=\"/netdb?fam=")
                    .append(ss).append("&amp;sybil\">").append(ss).append("</a></b></p>");
                 found = true;
             }
@@ -828,14 +833,14 @@ public class SybilRenderer {
 ;
         if (kr != null) {
             buf.append("<p><b>Routers:</b> ").append(DataHelper.stripHTML(kr)).append("</p>");
-        } else {
-            buf.append("<p class=\"sybil_filler\"><b>Routers:</b> ").append(_t("n/a")).append("</p>");
+        //} else {
+        //    buf.append("<p class=\"sybil_filler\"><b>Routers:</b> ").append(_t("n/a")).append("</p>");
         }
         String kls = info.getOption("netdb.knownLeaseSets");
         if (kls != null) {
             buf.append("<p class=\"sybilinfo_leasesets\"><b>").append(_t("LeaseSets")).append(":</b> ").append(DataHelper.stripHTML(kls)).append("</p>\n");
-        } else {
-            buf.append("<p class=\"sybilinfo_leasesets filler\"><b>").append(_t("LeaseSets")).append(":</b> ").append(_t("n/a")).append("</p>");
+        //} else {
+        //    buf.append("<p class=\"sybilinfo_leasesets filler\"><b>").append(_t("LeaseSets")).append(":</b> ").append(_t("n/a")).append("</p>");
         }
         String fam = info.getOption("family");
         if (fam != null) {
@@ -872,29 +877,29 @@ public class SybilRenderer {
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
                         buf.append("<p><b>").append(_t("Last Good Lookup")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
-                    } else {
-                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
+                    //} else {
+                    //    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastLookupFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
                         buf.append("<p><b>").append(_t("Last Bad Lookup")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
-                    } else {
-                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
+                    //} else {
+                    //    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Lookup")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastStoreSuccessful();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
                         buf.append("<p><b>").append(_t("Last Good Store")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
-                    } else {
-                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Store")).append(":</b> ").append(_t("n/a")).append("</p>");
+                    //} else {
+                    //    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Good Store")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                     heard = dbh.getLastStoreFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
                         buf.append("<p><b>").append(_t("Last Bad Store")).append(":</b> ").append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</p>");
-                    } else {
-                        buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Store")).append(":</b> ").append(_t("n/a")).append("</p>");
+                    //} else {
+                    //    buf.append("<p class=\"sybil_filler\"><b>").append(_t("Last Bad Store")).append(":</b> ").append(_t("n/a")).append("</p>");
                     }
                 }
                 // any other profile stuff?

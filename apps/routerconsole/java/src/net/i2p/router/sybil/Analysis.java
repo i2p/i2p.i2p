@@ -64,9 +64,9 @@ public class Analysis extends JobImpl implements RouterApp {
     public static final String APP_NAME = "sybil";
     public static final String PROP_FREQUENCY = "router.sybilFrequency";
     public static final String PROP_THRESHOLD = "router.sybilThreshold";
-    public static final String PROP_BLOCK = "router.sybilBlock.enable";
-    public static final String PROP_NONFF = "router.sybilIncludeAll";
-    public static final String PROP_BLOCKTIME = "router.sybilBlock.period";
+    public static final String PROP_BLOCK = "router.sybilEnableBlocking";
+    public static final String PROP_NONFF = "router.sybilAnalyzeAll";
+    public static final String PROP_BLOCKTIME = "router.sybilBlockPeriod";
     private static final long MIN_FREQUENCY = 60*60*1000L;
     private static final long MIN_UPTIME = 75*60*1000L;
 
@@ -267,6 +267,20 @@ public class Analysis extends JobImpl implements RouterApp {
         return ris;
     }
 
+    /**
+     *  All the routers, not including us
+     *  @since 0.9.41
+     */
+    public List<RouterInfo> getAllRouters(Hash us) {
+        Set<RouterInfo> set = _context.netDb().getRouters();
+        List<RouterInfo> ris = new ArrayList<RouterInfo>(set.size());
+        for (RouterInfo ri : set) {
+            if (!ri.getIdentity().getHash().equals(us))
+            ris.add(ri);
+        }
+        return ris;
+    }
+
     public double getAvgMinDist(List<RouterInfo> ris) {
         double tot = 0;
         int count = 200;
@@ -295,12 +309,7 @@ public class Analysis extends JobImpl implements RouterApp {
             return points;
         List<RouterInfo> ris;
         if (includeAll) {
-            Set<RouterInfo> set = _context.netDb().getRouters();
-            ris = new ArrayList<RouterInfo>(set.size());
-            for (RouterInfo ri : set) {
-                if (!ri.getIdentity().getHash().equals(us))
-                ris.add(ri);
-            }
+            ris = getAllRouters(us);
         } else {
             ris = getFloodfills(us);
         }
