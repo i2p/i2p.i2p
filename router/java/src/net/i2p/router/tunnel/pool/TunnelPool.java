@@ -1131,7 +1131,7 @@ public class TunnelPool {
             int len = settings.getLengthOverride();
             if (len < 0)
                 len = settings.getLength();
-            if (len > 0 && (!settings.isExploratory()) && _context.random().nextBoolean()) {
+            if (len > 0 && (!settings.isExploratory()) && _context.random().nextInt(4) < 3) {  // 75%
                 // look for a tunnel to reuse, if the right length and expiring soon
                 // ignore variance for now.
                 len++;   // us
