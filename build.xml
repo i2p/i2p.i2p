@@ -1050,6 +1050,7 @@
         <delete dir="./build" />
         <delete dir="./reports" />
         <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />
+        <ant dir="installer/lib/izpack5/patches/java/" target="clean" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />
@@ -1091,6 +1092,7 @@
         <delete dir="core/c/jcpuid/lib" />
         <ant dir="installer/resources/locale" target="distclean" />
         <ant dir="installer/tools/java" target="distclean" />
+        <ant dir="installer/lib/izpack5/patches/java/" target="distclean" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
@@ -1798,7 +1800,11 @@
                  classname="com.izforge.izpack.ant.IzPackTask" />
     </target>
 
-    <target name="installer5" depends="ensureIzpack5, preppkg, buildProperties, util-list-changes, buildUtilityJar" >
+    <target name="izpack5-patches" depends="ensureIzpack5, buildProperties" >
+        <ant dir="installer/lib/izpack5/patches/java/" target="jar" />
+    </target>
+
+    <target name="installer5" depends="izpack5-patches, preppkg, buildProperties, util-list-changes, buildUtilityJar" >
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installer5exe" />
     </target>
@@ -1855,7 +1861,7 @@
     </target>
 
     <!-- IzPack 5 -->
-    <target name="installer5-nowindows" depends="ensureIzpack5, clean, preppkg-nowindows" >
+    <target name="installer5-nowindows" depends="clean, izpack5-patches, preppkg-nowindows" >
         <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
     </target>
@@ -1873,7 +1879,7 @@
     </target>
 
     <!-- IzPack 5 -->
-    <target name="installer5-linux" depends="ensureIzpack5, clean, preppkg-linux-only" >
+    <target name="installer5-linux" depends="clean, izpack5-patches, preppkg-linux-only" >
         <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
@@ -1931,7 +1937,7 @@
     </target>
 
     <!-- IzPack 5 -->
-    <target name="installer5-windows" depends="ensureIzpack5, clean, preppkg-windows-only, util-list-changes, buildUtilityJar" >
+    <target name="installer5-windows" depends="clean, izpack5-patches, preppkg-windows-only, util-list-changes, buildUtilityJar" >
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installer5exe" />
@@ -2152,10 +2158,10 @@
     <!-- this is the same dependency as pkg, but with updater200 in the middle,
          since preppkg puts too much stuff in pkg-temp -->
 <!--
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer-nowindows, delete-nonwindows, installer5-windows">
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer5-windows">
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows">
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows">
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer5-windows">
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />

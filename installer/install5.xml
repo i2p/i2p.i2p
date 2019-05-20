@@ -136,6 +136,9 @@ https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491730/GUI+Preferences
         </condition>
     </conditions>
 
+    <!-- XInfoConsolePanel -->
+    <jar src="installer/lib/izpack5/patches/java/build/izpack-i2p.jar" />
+
     <panels>
         <panel classname="HelloPanel"/>
         <panel classname="InfoPanel"/>
