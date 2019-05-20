@@ -64,6 +64,8 @@ public class PersistSybil {
         Writer out = null;
         try {
             out = new OutputStreamWriter(new GZIPOutputStream(new SecureFileOutputStream(file)));
+            out.write("# Format (one per line)\n");
+            out.write("# Base64 router hash:total points%points:reason%points:reason ...\n");
             for (Map.Entry<Hash, Points> entry : entries.entrySet()) {
                 Hash h = entry.getKey();
                 Points p = entry.getValue();
@@ -114,6 +116,8 @@ public class PersistSybil {
             in = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
             String line;
             while ((line = in.readLine()) != null) {
+                if (line.startsWith("#"))
+                    continue;
                 int colon = line.indexOf(':');
                 if (colon != 44)
                     continue;
@@ -192,6 +196,8 @@ public class PersistSybil {
                 if (d < cutoff) {
                     if (file.delete())
                         deleted++;
+                    else if (_log.shouldWarn())
+                        _log.warn("Failed to delete: " + file);
                 }
             } catch (NumberFormatException nfe) {}
         }

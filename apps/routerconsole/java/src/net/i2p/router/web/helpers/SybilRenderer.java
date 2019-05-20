@@ -62,6 +62,7 @@ import net.i2p.util.VersionComparator;
 public class SybilRenderer {
 
     private final RouterContext _context;
+    private final Log _log;
     private final DecimalFormat fmt = new DecimalFormat("#0.00");
     private final DateFormat dfmt;
 
@@ -74,6 +75,7 @@ public class SybilRenderer {
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
+        _log = ctx.logManager().getLog(SybilRenderer.class);
         dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
         dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
     }
@@ -206,11 +208,14 @@ public class SybilRenderer {
             try {
                 points = ps.load(date);
             } catch (IOException ioe) {
-                out.write("<b>No analysis found for " + new Date(date) + "</b>");
+                _log.error("loading stored analysis for date: " + date, ioe);
+                out.write("<b>Failed to load analysis for " + dfmt.format(new Date(date)) + "</b>: " +
+                          DataHelper.escapeHTML(ioe.toString()));
                 return;
             }
             if (points.isEmpty()) {
-                out.write("<b>No analysis found for " + new Date(date) + "</b>");
+                _log.error("empty stored analysis or bad file format for date: " + date);
+                out.write("<b>Corrupt analysis file for " + dfmt.format(new Date(date)) + "</b>");
             } else {
                 renderThreatsHTML(out, buf, date, points);
             }

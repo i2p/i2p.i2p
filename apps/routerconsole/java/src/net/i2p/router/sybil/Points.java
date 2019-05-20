@@ -81,7 +81,7 @@ public class Points implements Comparable<Points> {
     public void toString(StringBuilder buf) {
         buf.append(points);
         for (String r : reasons) {
-            buf.append('%').append(r);
+            buf.append('%').append(r.replace("%", "&#x25;"));
         }
     }
 
