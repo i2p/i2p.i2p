@@ -1,5 +1,22 @@
+2019-05-21 zzz
+ * Profiles: Omit comments from stored profiles
+
+2019-05-20 zzz
+ * Console: Hide some columns on /peers SSU tab unless advanced
+ * Installer:
+   - Fix -console install for Izpack 5 (ticket #2492)
+   - Switch to Izpack 5 for non-windows release installer
+ * Sybil:
+   - Escape % in stored reasons
+   - Improve error handling when loading files
+   - Skip comment lines in stored files
+ * Tunnels: Increase tunnel reuse probability
+
 2019-05-19 zzz
- * Sybil: Run IP and family tests on all routers
+ * Build: Remove dependencies on Nashorn (ticket #2367)
+ * Sybil:
+   - Run IP and family tests on all routers
+   - Delete old stored analysis if configured
 
 2019-05-18 zzz
  * Javadoc: fixes from FreeBSD ports

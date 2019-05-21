@@ -15,29 +15,45 @@ import net.i2p.util.Log;
 class PersistenceHelper {
     private final static String NL = System.getProperty("line.separator");
 
-    public final static void add(StringBuilder buf, String prefix, String name, String description, double value) {
-        buf.append("# ").append(prefix).append(name).append(NL);
-        buf.append("# ").append(description).append(NL);
-        buf.append(prefix).append(name).append('=').append(value).append(NL).append(NL);
+    public final static void add(StringBuilder buf, boolean addComments, String prefix, String name, String description, double value) {
+        if (addComments) {
+            buf.append("# ").append(prefix).append(name).append(NL);
+            buf.append("# ").append(description).append(NL);
+        }
+        buf.append(prefix).append(name).append('=').append(value).append(NL);
+        if (addComments)
+           buf.append(NL);
     }
 
     /** @since 0.8.5 */
-    public final static void addDate(StringBuilder buf, String prefix, String name, String description, long value) {
-        String when = value > 0 ? (new Date(value)).toString() : "Never";
-        add(buf, prefix, name, description + ' ' + when, value);
+    public final static void addDate(StringBuilder buf, boolean addComments, String prefix, String name, String description, long value) {
+        if (addComments) {
+            String when = value > 0 ? (new Date(value)).toString() : "Never";
+            add(buf, true, prefix, name, description + ' ' + when, value);
+       } else {
+            add(buf, false, prefix, name, description, value);
+       }
     }
 
     /** @since 0.8.5 */
-    public final static void addTime(StringBuilder buf, String prefix, String name, String description, long value) {
-        String when = DataHelper.formatDuration(value);
-        add(buf, prefix, name, description + ' ' + when, value);
-    }
+    public final static void addTime(StringBuilder buf, boolean addComments, String prefix, String name, String description, long value) {
+        if (addComments) {
+            String when = DataHelper.formatDuration(value);
+            add(buf, true, prefix, name, description + ' ' + when, value);
+       } else {
+            add(buf, false, prefix, name, description, value);
+       }
+   }
 
     /** @param value non-negative */
-    public final static void add(StringBuilder buf, String prefix, String name, String description, long value) {
-        buf.append("# ").append(prefix).append(name).append(NL);
-        buf.append("# ").append(description).append(NL);
-        buf.append(prefix).append(name).append('=').append(value).append(NL).append(NL);
+    public final static void add(StringBuilder buf, boolean addComments, String prefix, String name, String description, long value) {
+        if (addComments) {
+            buf.append("# ").append(prefix).append(name).append(NL);
+            buf.append("# ").append(description).append(NL);
+        }
+        buf.append(prefix).append(name).append('=').append(value).append(NL);
+        if (addComments)
+           buf.append(NL);
     }
 
     /**
