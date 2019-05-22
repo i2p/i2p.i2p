@@ -25,11 +25,37 @@ public class BlindData {
     private long _routingKeyGenMod;
 
     /**
+     * bits 3-0 including per-client bit
+     * @since 0.9.41
+     */
+    public static final int AUTH_NONE = 0;
+    /**
+     * bits 3-0 including per-client bit
+     * @since 0.9.41
+     */
+    public static final int AUTH_DH = 1;
+    /**
+     * bits 3-0 including per-client bit
+     * @since 0.9.41
+     */
+    public static final int AUTH_PSK = 3;
+
+    /**
      *  @param secret may be null or zero-length
      *  @throws IllegalArgumentException on various errors
      */
     public BlindData(I2PAppContext ctx, Destination dest, SigType blindType, String secret) {
-        this(ctx, dest.getSigningPublicKey(), blindType, secret);
+        this(ctx, dest, blindType, secret, AUTH_NONE, null);
+    }
+
+    /**
+     *  @param secret may be null or zero-length
+     *  @throws IllegalArgumentException on various errors
+     *  @since 0.9.41
+     */
+    public BlindData(I2PAppContext ctx, Destination dest, SigType blindType, String secret,
+                     int authType, PrivateKey authKey) {
+        this(ctx, dest.getSigningPublicKey(), blindType, secret, authType, authKey);
         _dest = dest;
     }
 
@@ -38,12 +64,25 @@ public class BlindData {
      *  @throws IllegalArgumentException on various errors
      */
     public BlindData(I2PAppContext ctx, SigningPublicKey spk, SigType blindType, String secret) {
+        this(ctx, spk, blindType, secret, AUTH_NONE, null);
+    }
+
+    /**
+     *  @param secret may be null or zero-length
+     *  @throws IllegalArgumentException on various errors
+     *  @since 0.9.41
+     */
+    public BlindData(I2PAppContext ctx, SigningPublicKey spk, SigType blindType, String secret,
+                     int authType, PrivateKey authKey) {
         _context = ctx;
         _clearSPK = spk;
         _blindType = blindType;
         _secret = secret;
-        _authType = -1;
-        _authKey = null;
+        if ((authType != AUTH_NONE && authKey == null) ||
+            (authType == AUTH_NONE && authKey != null))
+            throw new IllegalArgumentException();
+        _authType = authType;
+        _authKey = authKey;
         // defer until needed
         //calculate();
     }
@@ -122,7 +161,7 @@ public class BlindData {
     }
 
     /**
-     *  @return -1 for no client auth
+     *  @return 0 for no client auth, 1 for DH, 3 for PSK
      */
     public int getAuthType() {
         return _authType;
@@ -170,7 +209,7 @@ public class BlindData {
         if (_secret != null)
             buf.append("\n\tSecret          : \"").append(_secret).append('"');
         buf.append("\n\tAuth Type       : ");
-        if (_authType >= 0)
+        if (_authType > 0)
             buf.append(_authType);
         else
             buf.append("none");
