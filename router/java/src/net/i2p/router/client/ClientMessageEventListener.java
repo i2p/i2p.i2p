@@ -14,6 +14,7 @@ import java.util.Properties;
 import net.i2p.CoreVersion;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -646,6 +647,16 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 if (secret != null) {
                     EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
                     encls.setSecret(secret);
+                }
+                // per-client auth
+                String pk = cfg.getOptions().getProperty("i2cp.leaseSetPrivKey");
+                if (pk != null) {
+                    byte[] priv = Base64.decode(pk);
+                    if (priv == null)
+                        throw new IllegalArgumentException("bad privkey");
+                    PrivateKey privkey = new PrivateKey(EncType.ECIES_X25519, priv);
+                    EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                    encls.setClientPrivateKey(privkey);
                 }
             }
             if (_log.shouldDebug())
