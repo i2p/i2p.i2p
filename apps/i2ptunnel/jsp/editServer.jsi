@@ -461,9 +461,13 @@
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="5" type="radio" name="encryptMode"<%=(curEncryptMode.equals("5") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Blinded with lookup password and shared key")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="6" type="radio" name="encryptMode"<%=(curEncryptMode.equals("6") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with per-user key")%></label></span>
+                    <%=intl._t("Blinded with per-user key")%> (PSK)</label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="7" type="radio" name="encryptMode"<%=(curEncryptMode.equals("7") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with lookup password and per-user key")%></label></span>
+                    <%=intl._t("Blinded with lookup password and per-user key")%> (PSK)</label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="8" type="radio" name="encryptMode"<%=(curEncryptMode.equals("8") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded with per-user key")%> (DH)</label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="9" type="radio" name="encryptMode"<%=(curEncryptMode.equals("9") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blinded with lookup password and per-user key")%> (DH)</label></span>
 <%
                      } // isAdvanced()
                 } // allowBlinding

@@ -565,11 +565,23 @@ public class GeneralHelper {
         if (getEncrypt(tunnel))
             return 1;
         if (getProperty(tunnel, "i2cp.leaseSetType", "1").equals("5")) {
+            int rv;
+            String authType = getProperty(tunnel, "i2cp.leaseSetAuthType", "0");
+            if (authType.equals("2")) {
+                rv = 6;
+            } else if (authType.equals("1")) {
+                // shared DH key
+                rv = 4;
+                // per-client DH key
+                //rv = 8;
+            } else {
+                rv = 2;
+            }
+
             String pw = getBlindedPassword(tunnel);
             if (pw != null && pw.length() > 0)
-                return 3;
-            return 2;
-            // LS auth (rv 4-7) TODO
+                rv++;
+            return rv;
         }
         return 0;
     }

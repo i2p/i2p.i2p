@@ -657,34 +657,63 @@ public class TunnelConfig {
             }
 
             switch (_encryptMode) {
-              case 0:
+              case 0:  // none
               default:
                 config.remove(OPT + "i2cp.leaseSetSecret");
                 if ("5".equals(config.get(OPT + "i2cp.leaseSetType")))
                     config.remove(OPT + "i2cp.leaseSetType");
                 break;
 
-              case 1:
+              case 1:  // LS1
                 config.remove(OPT + "i2cp.leaseSetType");
                 config.remove(OPT + "i2cp.leaseSetSecret");
+                config.remove(OPT + "i2cp.leaseSetAuthType");
                 break;
 
-              case 4:
-              case 6:
-                // TODO
-                // Fallthrough
-              case 2:
+              case 2:  // blinded
                 config.put(OPT + "i2cp.leaseSetType", "5");
                 config.remove(OPT + "i2cp.leaseSetSecret");
+                config.remove(OPT + "i2cp.leaseSetAuthType");
                 break;
     
-              case 5:
-              case 7:
-                // TODO
-                // Fallthrough
-              case 3:
+              case 3:  // blinded + secret
                 config.put(OPT + "i2cp.leaseSetType", "5");
+                config.remove(OPT + "i2cp.leaseSetAuthType");
                 break;
+
+              case 4:  // blinded, shared key (implicit DH)
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                config.remove(OPT + "i2cp.leaseSetSecret");
+                config.put(OPT + "i2cp.leaseSetAuthType", "1");
+                break;
+    
+              case 5:  // blinded, secret, shared key (implicit DH)
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                config.put(OPT + "i2cp.leaseSetAuthType", "1");
+                break;
+
+              case 6:  // blinded, per-client PSK
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                config.remove(OPT + "i2cp.leaseSetSecret");
+                config.put(OPT + "i2cp.leaseSetAuthType", "2");
+                break;
+    
+              case 7:  // blinded, secret, per-client PSK
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                config.put(OPT + "i2cp.leaseSetAuthType", "2");
+                break;
+
+              case 8:  // blinded, per-client DH
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                config.remove(OPT + "i2cp.leaseSetSecret");
+                config.put(OPT + "i2cp.leaseSetAuthType", "1");
+                break;
+    
+              case 9:  // blinded, secret, per-client DH
+                config.put(OPT + "i2cp.leaseSetType", "5");
+                config.put(OPT + "i2cp.leaseSetAuthType", "1");
+                break;
+
             }
         }
 
@@ -857,7 +886,7 @@ public class TunnelConfig {
          PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE,
          "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey",
          I2PTunnelServer.PROP_ALT_PKF,
-         "i2cp.leaseSetSecret"
+         "i2cp.leaseSetSecret", "i2cp.leaseSetType", "i2cp.leaseSetAuthType"
         };
     private static final String _httpServerOpts[] = {
         I2PTunnelHTTPServer.OPT_POST_WINDOW,

@@ -567,8 +567,8 @@ public class IndexBean {
                 try {
                     String secret = _helper.getBlindedPassword(tunnel);
                     boolean requireSecret = secret != null && secret.length() > 0 &&
-                                            (mode == 3 || mode == 5 || mode == 7);
-                    boolean requireAuth = mode >= 4 && mode <= 7;
+                                            (mode == 3 || mode == 5 || mode == 7 || mode == 9);
+                    boolean requireAuth = mode >= 4 && mode <= 9;
                     return Blinding.encode(_context, d.getSigningPublicKey(), requireSecret, requireAuth);
                 } catch (RuntimeException re) {}
             }
