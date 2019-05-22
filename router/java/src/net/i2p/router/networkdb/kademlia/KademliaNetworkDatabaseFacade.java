@@ -943,6 +943,13 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 } else {
                     encls.setSigningKey(bd.getUnblindedPubKey());
                 }
+                // secret
+                String secret = bd.getSecret();
+                if (secret != null)
+                    encls.setSecret(secret);
+                // per-client auth
+                if (bd.getAuthType() != BlindData.AUTH_NONE)
+                    encls.setClientPrivateKey(bd.getAuthPrivKey());
             } else {
                 if (_log.shouldWarn())
                     _log.warn("No blind data found for encls: " + encls);

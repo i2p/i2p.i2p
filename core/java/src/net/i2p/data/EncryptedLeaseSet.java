@@ -40,6 +40,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     // to decrypt with if we don't have full dest
     private SigningPublicKey _unblindedSPK;
     private String _secret;
+    private PrivateKey _clientPrivateKey;
     private final Log _log;
 
     private static final int MIN_ENCRYPTED_SIZE = 8 + 16;
@@ -79,6 +80,16 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     public void setSecret(String secret) {
         _secret = secret;
+    }
+
+    /**
+     *  Must be set before verify for per-client auth.
+     *
+     *  @param privKey non-null
+     *  @since 0.9.41
+     */
+    public void setClientPrivateKey(PrivateKey privKey) {
+        _clientPrivateKey = privKey;
     }
 
     ///// overrides below here
@@ -840,12 +851,13 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      * Overridden to decrypt if possible, and verify inner sig also.
      *
      * Must call setDestination() prior to this if attempting decryption.
+     * Must call setClientKey() prior to this if attempting decryption.
      *
      * @return valid
      */
     @Override
     public boolean verifySignature() {
-        return verifySignature((PrivateKey) null);
+        return verifySignature(_clientPrivateKey);
     }
 
     /**
