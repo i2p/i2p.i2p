@@ -568,12 +568,13 @@ public class GeneralHelper {
             int rv;
             String authType = getProperty(tunnel, "i2cp.leaseSetAuthType", "0");
             if (authType.equals("2")) {
-                rv = 6;
-            } else if (authType.equals("1")) {
-                // shared DH key
+                // shared PSK key
                 rv = 4;
-                // per-client DH key
-                //rv = 8;
+                // per-client PSK key
+                // TODO
+                //rv = 6;
+            } else if (authType.equals("1")) {
+                rv = 8;
             } else {
                 rv = 2;
             }

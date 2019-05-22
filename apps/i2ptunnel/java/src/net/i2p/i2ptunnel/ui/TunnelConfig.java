@@ -681,15 +681,15 @@ public class TunnelConfig {
                 config.remove(OPT + "i2cp.leaseSetAuthType");
                 break;
 
-              case 4:  // blinded, shared key (implicit DH)
+              case 4:  // blinded, shared key (implicit PSK)
                 config.put(OPT + "i2cp.leaseSetType", "5");
                 config.remove(OPT + "i2cp.leaseSetSecret");
-                config.put(OPT + "i2cp.leaseSetAuthType", "1");
+                config.put(OPT + "i2cp.leaseSetAuthType", "2");
                 break;
     
-              case 5:  // blinded, secret, shared key (implicit DH)
+              case 5:  // blinded, secret, shared key (implicit PSK)
                 config.put(OPT + "i2cp.leaseSetType", "5");
-                config.put(OPT + "i2cp.leaseSetAuthType", "1");
+                config.put(OPT + "i2cp.leaseSetAuthType", "2");
                 break;
 
               case 6:  // blinded, per-client PSK
