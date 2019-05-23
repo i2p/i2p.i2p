@@ -122,8 +122,14 @@ public class TunnelControllerGroup implements ClientApp {
             _configFile = DEFAULT_CONFIG_FILE;
             _configDirectory = CONFIG_DIR;
         }else if (args.length == 1){
-            _configFile = args[0];
-            _configDirectory = CONFIG_DIR;
+            File check = new File(args[0]);
+            if (check.isFile()) {
+                _configFile = args[0];
+                _configDirectory = CONFIG_DIR;
+            }else{
+                _configFile = DEFAULT_CONFIG_FILE;
+                _configDirectory = args[0];
+            }
         }else if (args.length == 2){
             _configFile = args[0];
             _configDirectory = args[1];
@@ -629,19 +635,23 @@ public class TunnelControllerGroup implements ClientApp {
      */
     @Deprecated
     public void saveConfig() throws IOException {
-        List<String> fileList = configFiles();
-        for (int i = 0; i < fileList.size(); i++) {
-            String configFile = fileList.get(i);
-            saveConfig(configFile);
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                saveConfig(controller);
+            }
+        } finally {
+            _controllersLock.readLock().unlock();
         }
     }
 
     /**
      * Save the configuration of all known tunnels to the given file
      * @deprecated
-     */
+     *//*
     @Deprecated
-    public synchronized void saveConfig(String configFile) throws IOException {
+    private synchronized void saveConfig(String configFile) throws IOException {
         File cfgFile = new File(configFile);
         if (!cfgFile.isAbsolute())
             cfgFile = new File(_context.getConfigDir(), configFile);
@@ -662,7 +672,7 @@ public class TunnelControllerGroup implements ClientApp {
         }
 
         DataHelper.storeProps(map, cfgFile);
-    }
+    }*/
 
     /**
      * Save the configuration of this tunnel only, may be new
@@ -700,6 +710,7 @@ public class TunnelControllerGroup implements ClientApp {
 
                 DataHelper.storeProps(map, cfgFile);
                 done = true;
+                break;
             }
         }
         if (! done) {
@@ -731,10 +742,42 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Save the configuration of this tunnel only
+     * Remove the configuration of this tunnel only
      * @since 0.9.34
      */
     public synchronized void removeConfig(TunnelController tc) throws IOException {
+        List<String> fileList = configFiles();
+        boolean done = false;
+        Properties inputController = tc.getConfig("");
+        String inputName = inputController.getProperty("name");
+        Properties map = new OrderedProperties();
+        for (int i = 0; i < fileList.size(); i++) {
+            if (inConfig(tc, fileList.get(i)) != "") {
+                File cfgFile = new File(fileList.get(i));
+                if (!cfgFile.isAbsolute())
+                    cfgFile = new File(_context.getConfigDir(), fileList.get(i));
+                File parent = cfgFile.getParentFile();
+                if ( (parent != null) && (!parent.exists()) )
+                    parent.mkdirs();
+
+                _controllersLock.readLock().lock();
+                try {
+                    for (int j = 0; j < _controllers.size(); j++) {
+                        TunnelController controller = _controllers.get(j);
+                        Properties controllerProperties = controller.getConfig(PREFIX + j + ".");
+                        String curName = controllerProperties.getProperty("name");
+                        if (curName != inputName) {
+                            map.putAll(controllerProperties);
+                        }
+                    }
+                } finally {
+                    _controllersLock.readLock().unlock();
+                }
+
+                DataHelper.storeProps(map, cfgFile);
+                done = true;
+            }
+        }
     }
 
     /**
@@ -793,13 +836,15 @@ public class TunnelControllerGroup implements ClientApp {
         File folder = new File(_configDirectory);
         File[] listOfFiles = folder.listFiles();
         List<String> files = new ArrayList<String>();
+        boolean shouldMigrate = _context.isRouterContext() && !SystemVersion.isAndroid();
 
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 files.add(listOfFiles[i].getName());
             }
         }
-        files.add(_configFile);
+        if (! shouldMigrate)
+            files.add(_configFile);
 
         return files;
     }
