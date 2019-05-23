@@ -20,6 +20,7 @@ import net.i2p.I2PException;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.crypto.Blinding;
+import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -1285,11 +1286,11 @@ public class IndexBean {
         }
         byte[] data = new byte[SessionKey.KEYSIZE_BYTES];
         _context.random().nextBytes(data);
-        SessionKey sk = new SessionKey(data);
-        setEncryptKey(sk.toBase64());
+        String b64 = Base64.encode(data);
+        setEncryptKey(b64);
         setEncrypt("");
         saveChanges();
-        return "New Leaseset Encryption Key: " + sk.toBase64();
+        return "New Leaseset Encryption Key: " + b64;
      }
 
     /**

@@ -487,26 +487,28 @@
             <td>
                 <b><%=intl._t("Encryption Key")%></b>
             </td><td>
-                <b><%=intl._t("Generate New Key")%></b> (<%=intl._t("Tunnel must be stopped first")%>)
-            </td>
-        </tr><tr>
-            <td>
-                <textarea rows="1" style="height: 3em;" cols="44" id="leasesetKey" name="encryptKey" title="<%=intl._t("Encryption key required to access this service")%>" wrap="off" spellcheck="false"><%=editBean.getEncryptKey(curTunnel)%></textarea>
-            </td><td>
-                <button class="control" type="submit" name="action" value="Generate" title="<%=intl._t("Generate new encryption key")%>"><%=intl._t("Generate")%></button>
-            </td>
-        </tr>
 <%
                 if (allowBlinding && editBean.isAdvanced()) {
 %>
-        <tr>
-            <td>
                 <b><%=intl._t("Optional lookup password")%>:</b>
-                <input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Set password required to access this service")%>" value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" />
-            </td><td> </td>
-        </tr>
 <%
                 } // allowBlinding
+%>
+            </td>
+        </tr><tr>
+            <td>
+                <textarea rows="1" style="height: 3em;" cols="44" id="leasesetKey" name="encryptKey" title="<%=intl._t("Encryption key required to access this service")%>" wrap="off" readonly="readonly"><%=editBean.getEncryptKey(curTunnel)%></textarea>
+            </td><td>
+<%
+                if (allowBlinding && editBean.isAdvanced()) {
+%>
+                <input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Set password required to access this service")%>" value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" />
+<%
+                } // allowBlinding
+%>
+            </td>
+        </tr>
+<%
             } // !isOffline
 %>
         <tr>

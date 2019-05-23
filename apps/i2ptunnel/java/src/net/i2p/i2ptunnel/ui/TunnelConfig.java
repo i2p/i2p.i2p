@@ -655,72 +655,7 @@ public class TunnelConfig {
                 if (_otherOptions.containsKey(p))
                     config.setProperty(OPT + p, _otherOptions.get(p));
             }
-
-            switch (_encryptMode) {
-              case 0:  // none
-              default:
-                config.remove(OPT + "i2cp.leaseSetSecret");
-                if ("5".equals(config.get(OPT + "i2cp.leaseSetType")))
-                    config.remove(OPT + "i2cp.leaseSetType");
-                break;
-
-              case 1:  // LS1
-                config.remove(OPT + "i2cp.leaseSetType");
-                config.remove(OPT + "i2cp.leaseSetSecret");
-                config.remove(OPT + "i2cp.leaseSetAuthType");
-                break;
-
-              case 2:  // blinded
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.remove(OPT + "i2cp.leaseSetSecret");
-                config.remove(OPT + "i2cp.leaseSetAuthType");
-                break;
-    
-              case 3:  // blinded + secret
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.remove(OPT + "i2cp.leaseSetAuthType");
-                break;
-
-              case 4:  // blinded, shared key (implicit PSK)
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.remove(OPT + "i2cp.leaseSetSecret");
-                config.put(OPT + "i2cp.leaseSetAuthType", "2");
-                break;
-    
-              case 5:  // blinded, secret, shared key (implicit PSK)
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.put(OPT + "i2cp.leaseSetAuthType", "2");
-                break;
-
-              case 6:  // blinded, per-client PSK
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.remove(OPT + "i2cp.leaseSetSecret");
-                config.put(OPT + "i2cp.leaseSetAuthType", "2");
-                break;
-    
-              case 7:  // blinded, secret, per-client PSK
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.put(OPT + "i2cp.leaseSetAuthType", "2");
-                break;
-
-              case 8:  // blinded, per-client DH
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.remove(OPT + "i2cp.leaseSetSecret");
-                config.put(OPT + "i2cp.leaseSetAuthType", "1");
-                break;
-    
-              case 9:  // blinded, secret, per-client DH
-                config.put(OPT + "i2cp.leaseSetType", "5");
-                config.put(OPT + "i2cp.leaseSetAuthType", "1");
-                break;
-    
-              case 10:  // none (LS2)
-                config.put(OPT + "i2cp.leaseSetType", "3");
-                config.remove(OPT + "i2cp.leaseSetSecret");
-                config.remove(OPT + "i2cp.leaseSetAuthType");
-                break;
-
-            }
+            processEncryptMode(config);
         }
 
         // override bundle setting set above
@@ -844,6 +779,112 @@ public class TunnelConfig {
         }
 
         return config;
+    }
+
+    /**
+     *  Servers only.
+     *  @since 0.9.41 pulled out from getConfig() above
+     */
+    private void processEncryptMode(Properties config) {
+        switch (_encryptMode) {
+          case 0:  // none
+          default:
+            config.remove(OPT + "i2cp.leaseSetSecret");
+            config.remove(OPT + "i2cp.leaseSetType");
+            config.remove(OPT + "i2cp.leaseSetKey");
+            config.remove(OPT + "i2cp.leaseSetPrivKey");
+            break;
+    
+          case 10:  // none (LS2)
+            config.put(OPT + "i2cp.leaseSetType", "3");
+            config.remove(OPT + "i2cp.leaseSetSecret");
+            config.remove(OPT + "i2cp.leaseSetAuthType");
+            config.remove(OPT + "i2cp.leaseSetKey");
+            config.remove(OPT + "i2cp.leaseSetPrivKey");
+            break;
+
+          case 1:  // encrypted LS1
+            addLeaseSetPrivKey(config, false);
+            config.remove(OPT + "i2cp.leaseSetSecret");
+            config.remove(OPT + "i2cp.leaseSetAuthType");
+            break;
+
+          case 2:  // blinded
+            config.put(OPT + "i2cp.leaseSetType", "5");
+            config.remove(OPT + "i2cp.leaseSetSecret");
+            config.remove(OPT + "i2cp.leaseSetAuthType");
+            config.remove(OPT + "i2cp.leaseSetKey");
+            config.remove(OPT + "i2cp.leaseSetPrivKey");
+            break;
+    
+          case 3:  // blinded + secret
+            config.put(OPT + "i2cp.leaseSetType", "5");
+            config.remove(OPT + "i2cp.leaseSetAuthType");
+            config.remove(OPT + "i2cp.leaseSetKey");
+            config.remove(OPT + "i2cp.leaseSetPrivKey");
+            break;
+
+          case 4:  // blinded, shared key (implicit PSK)
+            addLeaseSetPrivKey(config, true);
+            config.remove(OPT + "i2cp.leaseSetSecret");
+            config.put(OPT + "i2cp.leaseSetAuthType", "2");
+            break;
+    
+          case 5:  // blinded, secret, shared key (implicit PSK)
+            addLeaseSetPrivKey(config, true);
+            config.put(OPT + "i2cp.leaseSetAuthType", "2");
+            break;
+
+          case 6:  // blinded, per-client PSK
+            addLeaseSetPrivKey(config, true);
+            config.remove(OPT + "i2cp.leaseSetSecret");
+            config.put(OPT + "i2cp.leaseSetAuthType", "2");
+            break;
+    
+          case 7:  // blinded, secret, per-client PSK
+            addLeaseSetPrivKey(config, true);
+            config.put(OPT + "i2cp.leaseSetAuthType", "2");
+            break;
+
+          case 8:  // blinded, per-client DH
+            addLeaseSetPrivKey(config, true);
+            config.remove(OPT + "i2cp.leaseSetSecret");
+            config.put(OPT + "i2cp.leaseSetAuthType", "1");
+            break;
+    
+          case 9:  // blinded, secret, per-client DH
+            addLeaseSetPrivKey(config, true);
+            config.put(OPT + "i2cp.leaseSetAuthType", "1");
+            break;
+
+        }
+    }
+
+    /**
+     *  Servers only.
+     *  Also sets/clears i2cp.leaseSetType
+     *  @since 0.9.41
+     */
+    private void addLeaseSetPrivKey(Properties config, boolean isBlinded) {
+        // LS1 is AES, blinded is X25519, both are 32 random bytes.
+        // we always store in i2cp.leaseSetKey where the UI can find it.
+        // if blinded, we also store in i2cp.leaseSetPrivKey
+        String opt = OPT + "i2cp.leaseSetKey";
+        String bopt = OPT + "i2cp.leaseSetPrivKey";
+        String b64 = config.getProperty(opt);
+        if (b64 == null) {
+            byte[] data = new byte[32];
+            _context.random().nextBytes(data);
+            b64 = Base64.encode(data);
+            config.setProperty(opt, b64);
+        }
+        if (isBlinded) {
+            config.setProperty(bopt, b64);
+            config.put(OPT + "i2cp.leaseSetType", "5");
+        } else {
+            config.remove(bopt);
+            config.remove(OPT + "i2cp.leaseSetType");
+        }
     }
     
     private static final String _noShowOpts[] = {
