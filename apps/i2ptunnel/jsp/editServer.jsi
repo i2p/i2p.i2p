@@ -437,41 +437,51 @@
 <%
                    String curEncryptMode = editBean.getEncryptMode(curTunnel);
 %>
-                <span class="multiOption"><label title="<%=intl._t("Allow all clients to connect to this service")%>"><input value="0" type="radio" name="encryptMode"<%=(curEncryptMode.equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Disable")%></label></span>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="1" type="radio" name="encryptMode"<%=(curEncryptMode.equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Encrypted")%></label></span>
+                <select id="encryptMode" name="encryptMode">" class="selectbox">
+                <option title="<%=intl._t("Allow all clients to connect to this service")%>" value="0" <%=(curEncryptMode.equals("0") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Disable")%></option>
+<%
+                if (editBean.isAdvanced() || curEncryptMode.equals("10")) {
+%>
+                <option title="<%=intl._t("Allow all clients to connect to this service")%>" value="10" <%=(curEncryptMode.equals("10") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Disable")%> (LS2)</option>
+<%
+                } // isAdvanced()
+%>
+                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="1" <%=(curEncryptMode.equals("1") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Encrypted")%></option>
 <%
                 int curSigType = editBean.getSigType(curTunnel, tunnelType);
                 boolean allowBlinding = (curSigType == 7 || curSigType == 11);
                 if (allowBlinding) {
 %>
-                <span class="multiOption"><label title="<%=intl._t("Prevents server discovery by floodfills")%>"><input value="2" type="radio" name="encryptMode"<%=(curEncryptMode.equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded")%></label></span>
+                <option title="<%=intl._t("Prevents server discovery by floodfills")%>" value="2" <%=(curEncryptMode.equals("2") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded")%></option>
 <%
                      if (editBean.isAdvanced()) {
 %>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the password will be able to connect")%>"><input value="3" type="radio" name="encryptMode"<%=(curEncryptMode.equals("3") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with lookup password")%></label></span>
+                <option title="<%=intl._t("Only clients with the password will be able to connect")%>" value="3" <%=(curEncryptMode.equals("3") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded with lookup password")%></option>
 <%
                          // TODO, unimplemented
 %>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="4" type="radio" name="encryptMode"<%=(curEncryptMode.equals("4") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with shared key")%></label></span>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="5" type="radio" name="encryptMode"<%=(curEncryptMode.equals("5") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with lookup password and shared key")%></label></span>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="6" type="radio" name="encryptMode"<%=(curEncryptMode.equals("6") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with per-user key")%> (PSK)</label></span>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="7" type="radio" name="encryptMode"<%=(curEncryptMode.equals("7") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with lookup password and per-user key")%> (PSK)</label></span>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the encryption key will be able to connect")%>"><input value="8" type="radio" name="encryptMode"<%=(curEncryptMode.equals("8") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with per-user key")%> (DH)</label></span>
-                <span class="multiOption"><label title="<%=intl._t("Only clients with the password and key will be able to connect")%>"><input value="9" type="radio" name="encryptMode"<%=(curEncryptMode.equals("9") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blinded with lookup password and per-user key")%> (DH)</label></span>
+                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="4" <%=(curEncryptMode.equals("4") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded with shared key")%></option>
+                <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="5" <%=(curEncryptMode.equals("5") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded with lookup password and shared key")%></option>
+                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="6" <%=(curEncryptMode.equals("6") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded with per-user key")%> (PSK)</option>
+                <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="7" <%=(curEncryptMode.equals("7") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded with lookup password and per-user key")%> (PSK)</option>
+                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="8" <%=(curEncryptMode.equals("8") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded with per-user key")%> (DH)</option>
+                <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="9" <%=(curEncryptMode.equals("9") ? " selected=\"selected\"" : "")%>  />
+                    <%=intl._t("Blinded with lookup password and per-user key")%> (DH)</option>
 <%
                      } // isAdvanced()
                 } // allowBlinding
 %>
+                </select>
             </td>
         </tr><tr>
             <td>

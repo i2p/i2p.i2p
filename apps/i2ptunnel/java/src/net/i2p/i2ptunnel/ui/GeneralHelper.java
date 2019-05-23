@@ -564,7 +564,8 @@ public class GeneralHelper {
     public int getEncryptMode(int tunnel) {
         if (getEncrypt(tunnel))
             return 1;
-        if (getProperty(tunnel, "i2cp.leaseSetType", "1").equals("5")) {
+        String lstype = getProperty(tunnel, "i2cp.leaseSetType", "1");
+        if (lstype.equals("5")) {
             int rv;
             String authType = getProperty(tunnel, "i2cp.leaseSetAuthType", "0");
             if (authType.equals("2")) {
@@ -583,6 +584,8 @@ public class GeneralHelper {
             if (pw != null && pw.length() > 0)
                 rv++;
             return rv;
+        } else if (lstype.equals("3")) {
+            return 10;
         }
         return 0;
     }

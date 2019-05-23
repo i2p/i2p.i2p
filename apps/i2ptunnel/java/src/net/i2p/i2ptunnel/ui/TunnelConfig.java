@@ -713,6 +713,12 @@ public class TunnelConfig {
                 config.put(OPT + "i2cp.leaseSetType", "5");
                 config.put(OPT + "i2cp.leaseSetAuthType", "1");
                 break;
+    
+              case 10:  // none (LS2)
+                config.put(OPT + "i2cp.leaseSetType", "3");
+                config.remove(OPT + "i2cp.leaseSetSecret");
+                config.remove(OPT + "i2cp.leaseSetAuthType");
+                break;
 
             }
         }
