@@ -155,7 +155,7 @@
             </th>
         </tr><tr>
             <td>
-                <div class="displayText" style="user-select: all;" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=editBean.getDestinationBase64(curTunnel)%></div>
+                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=editBean.getDestinationBase64(curTunnel)%></div>
             </td><td>
                     <% String value3 = editBean.getPrivateKeyFile(curTunnel);
                        if (value3 == null || "".equals(value3.trim())) {
@@ -514,7 +514,7 @@
                 } // allowBlinding
 %>
             </td><td>
-                <input type="<%=showSharedKey ? "text" : "hidden"%>" style="user-select: all;" size="44" id="leasesetKey" name="encryptKey" title="<%=intl._t("Encryption key required to access this service")%>" readonly="readonly" value="<%=editBean.getEncryptKey(curTunnel)%>" class="freetext"/>
+                <input type="<%=showSharedKey ? "text" : "hidden"%>" size="44" id="leasesetKey" name="encryptKey" title="<%=intl._t("Encryption key required to access this service")%>" readonly="readonly" value="<%=editBean.getEncryptKey(curTunnel)%>" class="freetext"/>
             </td>
         </tr>
 <%
@@ -548,7 +548,7 @@
                 <tr>
                 <td><input value="<%=i%>" type="checkbox" name="revokeClient" class="tickbox" />
                     <input type="text" value="<%=cname%>" size="44" name="nofilter_clientName" class="freetext" /></td>
-                <td><input type="text" id="leasesetKey" style="user-select: all;" value="<%=ckey%>" size="44" name="clientKey" readonly="readonly" class="freetext" />
+                <td><input type="text" id="leasesetKey" value="<%=ckey%>" size="44" name="clientKey" readonly="readonly" class="freetext" />
                 </tr>
 <%
                                 i++;

@@ -150,7 +150,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <div class="displayText" tabindex="0" style="user-select: all; "title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
+            <div class="displayText" tabindex="0" "title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
 </table>
@@ -171,7 +171,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <div class="displayText" tabindex="0" style="user-select: all;" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.writeRemove(out); %></div>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.writeRemove(out); %></div>
         </td>
     </tr>
 
@@ -211,7 +211,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <div class="displayText" tabindex="0" style="user-select: all;" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -244,7 +244,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <div class="displayText" tabindex="0" style="user-select: all;" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -281,7 +281,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
     <tr>
         <td>
-            <div class="displayText" tabindex="0" style="user-select: all;" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -318,7 +318,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <div class="displayText" tabindex="0" style="user-select: all;" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -351,7 +351,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                        props2.setProperty(HostTxtEntry.PROP_OLDDEST, b64);
                        he2.signInner(spk);
                        he2.sign(spk3);
-                %><tr><td><div class="displayText" tabindex="0" style="user-select: all;" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he2.write(out); %></div></td></tr>
+                %><tr><td><div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he2.write(out); %></div></td></tr>
                 <tr><td class="infohelp"><%=intl._t("This will add an alternate destination for {0}", name)%></td></tr>
 <%
                    } else {
@@ -385,7 +385,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
     <tr>
         <td>
-            <div class="displayText" tabindex="0" style="user-select: all;" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
