@@ -2,7 +2,10 @@ package net.i2p.i2ptunnel.ui;
 
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -14,6 +17,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SimpleDataStructure;
 import net.i2p.i2ptunnel.I2PTunnelClientBase;
@@ -77,6 +81,13 @@ public class TunnelConfig {
     private Destination _dest;
     private String _filterDefinition;
     private int _encryptMode;
+    private String[] _clientNames;
+    private String[] _clientKeys;
+    private Set<Integer> _clientRevocations;
+    // b64name : b64key
+    private String _newClientName;
+    private String _newClientKey;
+    private boolean _addClientAuth;
 
     public TunnelConfig() {
         _context = I2PAppContext.getGlobalContext();
@@ -269,6 +280,59 @@ public class TunnelConfig {
             _otherOptions.put("i2cp.leaseSetSecret", s);
         else
             _otherOptions.remove("i2cp.leaseSetSecret");
+    }
+
+    /**
+     * Multiple entries in form
+     * @since 0.9.41
+     */
+    public void addClientNames(String[] s) {
+       _clientNames = s;
+    }
+
+    /**
+     * Multiple entries in form
+     * Handles either order addClientName/addClientKey
+     * @since 0.9.41
+     */
+    public void addClientKeys(String[] s) {
+       _clientKeys = s;
+    }
+
+    /**
+     * Multiple entries in form
+     * @since 0.9.41
+     */
+    public void revokeClients(String[] s) {
+        _clientRevocations = new HashSet<Integer>(4);
+        for (String k : s) {
+            try {
+                _clientRevocations.add(Integer.valueOf(Integer.parseInt(k)));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
+    /**
+     * Handles either order newClientName/newClientKey
+     * @since 0.9.41
+     */
+    public void newClientName(String s) {
+        _newClientName = s;
+    }
+
+    /**
+     * Handles either order newClientName/newClientKey
+     * @since 0.9.41
+     */
+    public void newClientKey(String s) {
+        _newClientKey = s;
+    }
+
+    /**
+     * @since 0.9.41
+     */
+    public void setAddClient(boolean val) {
+        _addClientAuth = val;
     }
 
     public void setDCC(boolean val) {
@@ -858,6 +922,74 @@ public class TunnelConfig {
             break;
 
         }
+
+        // per-client keys
+        String pfx;
+        if (_encryptMode == 6 || _encryptMode == 7) {
+            pfx = OPT + "i2cp.leaseSetClient.psk.";
+        } else if (_encryptMode == 8 || _encryptMode == 9) {
+            pfx = OPT + "i2cp.leaseSetClient.dh.";
+        } else {
+            pfx = null;
+        }
+        List<String> clientAuth = null;
+        if (pfx != null) {
+            if (_clientNames != null && _clientKeys != null && _clientNames.length == _clientKeys.length) {
+                clientAuth = new ArrayList<String>(4);
+            } else if (_addClientAuth || _encryptMode == 6 || _encryptMode == 7) {
+                // force one client for per-client PSK
+                clientAuth = new ArrayList<String>(1);
+                if (!_addClientAuth) {
+                    _addClientAuth = true;
+                    if (_newClientName == null || _newClientName.length() == 0)
+                        _newClientName = Base64.encode(DataHelper.getUTF8(GeneralHelper._t("Client", _context) + " 1"));
+                }
+            }
+        }
+        if (pfx != null && clientAuth != null) {
+            if (_clientNames != null && _clientKeys != null && _clientNames.length == _clientKeys.length) {
+                for (int i = 0; i < _clientNames.length; i++) {
+                    if (_clientRevocations != null && _clientRevocations.contains(Integer.valueOf(i)))
+                       continue;
+                    String name = _clientNames[i];
+                    String key = _clientKeys[i];
+                    byte[] b = Base64.decode(key);
+                    if (b == null || b.length != 32)
+                       continue;
+                    if (name.length() > 0)
+                        name = Base64.encode(DataHelper.getUTF8(name));
+                    else
+                        name = Base64.encode(DataHelper.getUTF8(GeneralHelper._t("Client", _context) + ' ' + (i + 1)));
+                    clientAuth.add(name + ':' + key);
+                }
+            }
+            if (_addClientAuth && _newClientName != null) {
+                String name = _newClientName;
+                if (name.length() > 0)
+                    name = Base64.encode(DataHelper.getUTF8(name));
+                else
+                    name = Base64.encode(DataHelper.getUTF8(GeneralHelper._t("Client", _context) + ' ' + (clientAuth.size() + 1)));
+                String key;
+                if (_encryptMode == 6 || _encryptMode == 7) {
+                    byte[] b = new byte[32];
+                    _context.random().nextBytes(b);
+                    key = Base64.encode(b);
+                    clientAuth.add(name + ':' + key);
+                } else if (_encryptMode == 8 || _encryptMode == 9) {
+                    key = _newClientKey;
+                    byte[] b = Base64.decode(key);
+                    if (b != null && b.length == 32) {
+                        // key required for DH
+                        clientAuth.add(name + ':' + key);
+                    }
+                }
+            }
+            int i = 0;
+            for (String auth : clientAuth) {
+                config.put(pfx + i, auth);
+                i++;
+            }
+        }
     }
 
     /**
@@ -933,7 +1065,7 @@ public class TunnelConfig {
          PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE,
          "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey",
          I2PTunnelServer.PROP_ALT_PKF,
-         "i2cp.leaseSetSecret", "i2cp.leaseSetType", "i2cp.leaseSetAuthType"
+         "i2cp.leaseSetSecret", "i2cp.leaseSetType", "i2cp.leaseSetAuthType", "i2cp.leaseSetPrivKey"
         };
     private static final String _httpServerOpts[] = {
         I2PTunnelHTTPServer.OPT_POST_WINDOW,

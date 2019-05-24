@@ -872,6 +872,63 @@ public class IndexBean {
         _config.setBlindedPassword(s);
     }
 
+    /**
+     * Multiple entries in form
+     * @since 0.9.41
+     */
+    public void setNofilter_clientName(String[] s) {
+        if (s != null) {
+            _config.addClientNames(s);
+        }
+    }
+
+
+    /**
+     * Multiple entries in form
+     * @since 0.9.41
+     */
+    public void setclientKey(String[] s) {
+        if (s != null) {
+            _config.addClientKeys(s);
+        }
+    }
+
+    /**
+     * Multiple entries in form
+     * Values are integers
+     * @since 0.9.41
+     */
+    public void setRevokeClient(String[] s) {
+        if (s != null) {
+            _config.revokeClients(s);
+        }
+    }
+
+    /**
+     * @since 0.9.41
+     */
+    public void setNofilter_newClientName(String s) {
+        if (s != null) {
+            _config.newClientName(s.trim());
+        }
+    }
+
+    /**
+     * @since 0.9.41
+     */
+    public void setNewClientKey(String s) {
+        if (s != null) {
+            _config.newClientKey(s.trim());
+        }
+    }
+
+    /**
+     * @since 0.9.41
+     */
+    public void setAddClient(String moo) {
+        _config.setAddClient(true);
+    }
+
     /** @since 0.8.9 */
     public void setDCC(String moo) {
         _config.setDCC(true);

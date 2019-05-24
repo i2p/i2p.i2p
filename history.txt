@@ -1,3 +1,22 @@
+2019-05-24 zzz
+ * i2ptunnel:
+   - Per-client auth config
+   - Hide encryption key for per-client auth
+   - User-select: all for key fields
+
+2019-05-23 zzz
+ * i2ptunnel:
+   - Rework server encryption key UI in prep for blinded keys
+   - Remove generate button, automatically generate when required
+   - Refactor auto configuration
+   - Add LS2 option, change to select box
+   - Select box for sig type
+
+2019-05-22 zzz
+ * Crypto: Add X25519 DH class
+ * Data: Per-client auth for enc. LS2 (proposal 123)
+ * Transport: Use KeyGenerator for X25519 keys
+
 2019-05-21 zzz
  * Profiles: Omit comments from stored profiles
 

@@ -155,7 +155,7 @@
             </th>
         </tr><tr>
             <td>
-                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=editBean.getDestinationBase64(curTunnel)%></div>
+                <div class="displayText" style="user-select: all;" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=editBean.getDestinationBase64(curTunnel)%></div>
             </td><td>
                     <% String value3 = editBean.getPrivateKeyFile(curTunnel);
                        if (value3 == null || "".equals(value3.trim())) {
@@ -485,8 +485,6 @@
             </td>
         </tr><tr>
             <td>
-                <b><%=intl._t("Encryption Key")%></b>
-            </td><td>
 <%
                 if (allowBlinding && editBean.isAdvanced()) {
 %>
@@ -494,11 +492,20 @@
 <%
                 } // allowBlinding
 %>
+            </td><td>
+<%
+                // even if not shown, we need to preserve the param as a hidden input below
+                // as it's the key we use to decrypt the PSK/DH LS on the router side
+                boolean showSharedKey = curEncryptMode.equals("1") || curEncryptMode.equals("4") || curEncryptMode.equals("5");
+                if (showSharedKey) {
+%>
+                <b><%=intl._t("Encryption Key")%></b>
+<%
+                } // showSharedKey
+%>
             </td>
         </tr><tr>
             <td>
-                <textarea rows="1" style="height: 3em;" cols="44" id="leasesetKey" name="encryptKey" title="<%=intl._t("Encryption key required to access this service")%>" wrap="off" readonly="readonly"><%=editBean.getEncryptKey(curTunnel)%></textarea>
-            </td><td>
 <%
                 if (allowBlinding && editBean.isAdvanced()) {
 %>
@@ -506,9 +513,71 @@
 <%
                 } // allowBlinding
 %>
+            </td><td>
+                <input type="<%=showSharedKey ? "text" : "hidden"%>" style="user-select: all;" size="44" id="leasesetKey" name="encryptKey" title="<%=intl._t("Encryption key required to access this service")%>" readonly="readonly" value="<%=editBean.getEncryptKey(curTunnel)%>" class="freetext"/>
             </td>
         </tr>
 <%
+                if (allowBlinding && editBean.isAdvanced()) {
+                    boolean pskClient = curEncryptMode.equals("6") || curEncryptMode.equals("7");
+                    boolean dhClient = curEncryptMode.equals("8") || curEncryptMode.equals("9");
+                    if (pskClient || dhClient) {
+                        // b64Name:b64Key
+                        java.util.List<String> clientAuths = editBean.getClientAuths(curTunnel, dhClient);
+                        if (!clientAuths.isEmpty()) {
+%>
+        <tr><td><b><%=intl._t("Revoke?")%>&nbsp;&nbsp;&nbsp;&nbsp;<%=intl._t("Client Name")%></b></td><td><b><%=intl._t("Client Key")%></b></td></tr>
+<%
+                            int i = 0;
+                            for (String clientAuth : clientAuths) {
+                                String[] split = net.i2p.data.DataHelper.split(clientAuth, ":", 2);
+                                String cname, ckey;
+                                if (split.length == 2) {
+                                    cname = split[0];
+                                    ckey = split[1];
+                                } else {
+                                    cname = "";
+                                    ckey = split[0];
+                                }
+                                if (cname.length() > 0) {
+                                    cname = net.i2p.data.DataHelper.escapeHTML(net.i2p.data.DataHelper.getUTF8(net.i2p.data.Base64.decode(cname)));
+                                } else {
+                                    cname = intl._t("Client") + ' ' + (i + 1);
+                                }
+%>
+                <tr>
+                <td><input value="<%=i%>" type="checkbox" name="revokeClient" class="tickbox" />
+                    <input type="text" value="<%=cname%>" size="44" name="nofilter_clientName" class="freetext" /></td>
+                <td><input type="text" id="leasesetKey" style="user-select: all;" value="<%=ckey%>" size="44" name="clientKey" readonly="readonly" class="freetext" />
+                </tr>
+<%
+                                i++;
+                            } // for
+                        } // isEmpty
+%>
+        <tr><td><b><%=intl._t("Add?")%>&nbsp;&nbsp;&nbsp;&nbsp;<%=intl._t("Client Name")%></b></td><td>
+<%
+                            if (dhClient) {
+%>
+                    <b><%=intl._t("Client Key")%></b>
+<%
+                            } // dhClient
+%>
+                </td></tr><tr>
+                <td><input value="1" type="checkbox" name="addClient" class="tickbox" />
+                    <input type="text" value="<%=intl._t("Client") + ' ' + (clientAuths.size() + 1)%>" size="44" name="nofilter_newClientName" class="freetext" /></td>
+                <td>
+<%
+                            if (dhClient) {
+%>
+                    <input type="text" id="leasesetKey" value="" size="44" maxlength="44" name="newClientKey" class="freetext" />
+<%
+                            } // dhClient
+%>
+                </td></tr>
+<%
+                    } // pskClient || dhClient
+                } // allowBlinding
             } // !isOffline
 %>
         <tr>

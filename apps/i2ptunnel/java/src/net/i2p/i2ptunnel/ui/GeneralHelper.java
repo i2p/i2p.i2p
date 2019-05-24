@@ -569,11 +569,13 @@ public class GeneralHelper {
             int rv;
             String authType = getProperty(tunnel, "i2cp.leaseSetAuthType", "0");
             if (authType.equals("2")) {
-                // shared PSK key
-                rv = 4;
-                // per-client PSK key
-                // TODO
-                //rv = 6;
+                if (getProperty(tunnel, "i2cp.leaseSetClient.psk.0", null) != null) {
+                    // per-client PSK key
+                    rv = 6;
+                } else {
+                    // shared PSK key
+                    rv = 4;
+                }
             } else if (authType.equals("1")) {
                 rv = 8;
             } else {
@@ -595,6 +597,25 @@ public class GeneralHelper {
      */
     public String getBlindedPassword(int tunnel) {
         return getProperty(tunnel, "i2cp.leaseSetSecret", "");
+    }
+    
+    /**
+     *  List of b64 name : b64key
+     *  Pubkeys for DH, privkeys for PSK
+     *  @param isDH true for DH, false for PSK
+     *  @return non-null
+     *  @since 0.9.41
+     */
+    public List<String> getClientAuths(int tunnel, boolean isDH) {
+        List<String> rv = new ArrayList<String>(4);
+        String pfx = isDH ? "i2cp.leaseSetClient.dh." : "i2cp.leaseSetClient.psk.";
+        int i = 0;
+        String p;
+        while ((p = getProperty(tunnel, pfx + i, null)) != null) {
+             rv.add(p);
+             i++;
+        }
+        return rv;
     }
 
     /**
@@ -867,6 +888,8 @@ public class GeneralHelper {
                 // hide for SOCKS until migrated to MD5
                 if ((!isMD5Proxy) &&
                     TunnelConfig._nonProxyNoShowSet.contains(key))
+                    continue;
+                if (key.startsWith("i2cp.leaseSetClient."))
                     continue;
                 sorted.put(key, (String)e.getValue());
             }
