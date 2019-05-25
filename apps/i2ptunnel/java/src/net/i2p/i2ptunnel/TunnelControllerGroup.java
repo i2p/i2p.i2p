@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -321,15 +322,21 @@ public class TunnelControllerGroup implements ClientApp {
         _controllersLock.writeLock().lock();
         try {
             if (shouldMigrate && dir.isDirectory()) {
-                File[] files = dir.listFiles();
-                if (files != null && files.length > 0) {
+                List<File> files = listFiles();
+                if (files != null && files.size() > 0) {
                     // sort so the returned order is consistent
-                    Arrays.sort(files);
+                    Collections.sort(files);
                     for (File f : files) {
-                        if (!f.getName().endsWith(".config"))
+                        if (!f.getName().endsWith(".config")){
+                            _log.error(f + "Is not a .config file");
+                            System.out.println(f + "Is not a .config file");
                             continue;
-                        if (!f.isFile())
+                        }
+                        if (!f.isFile()){
+                            _log.error(f + "Is not a file");
+                            System.out.println(f + "Is not a file");
                             continue;
+                        }
                         try {
                             props = loadConfig(f);
                             if (!props.isEmpty()) {
@@ -679,66 +686,29 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.34
      */
     public synchronized void saveConfig(TunnelController tc) throws IOException {
-        List<String> fileList = configFiles();
-        boolean done = false;
+
         Properties inputController = tc.getConfig("");
         String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
-        for (int i = 0; i < fileList.size(); i++) {
-            if (inConfig(tc, fileList.get(i)) != "") {
-                File cfgFile = new File(fileList.get(i));
-                if (!cfgFile.isAbsolute())
-                    cfgFile = new File(_context.getConfigDir(), fileList.get(i));
-                File parent = cfgFile.getParentFile();
-                if ( (parent != null) && (!parent.exists()) )
-                    parent.mkdirs();
+        String foundConfigFile = inConfig(tc);
 
-                _controllersLock.readLock().lock();
-                try {
-                    for (int j = 0; j < _controllers.size(); j++) {
-                        TunnelController controller = _controllers.get(j);
-                        Properties controllerProperties = controller.getConfig(PREFIX + j + ".");
-                        String curName = controllerProperties.getProperty("name");
-                        if (curName != inputName) {
-                            map.putAll(controllerProperties);
-                        }
-                    }
-                } finally {
-                    map.putAll(inputController);
-                    _controllersLock.readLock().unlock();
-                }
+        _log.logAlways(Log.DEBUG, "found " + foundConfigFile);
 
-                DataHelper.storeProps(map, cfgFile);
-                done = true;
-                break;
-            }
+        File cfgFile = new File(foundConfigFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(_context.getConfigDir(), foundConfigFile);
+        File parent = cfgFile.getParentFile();
+        if ( (parent != null) && (!parent.exists()) )
+            parent.mkdirs();
+
+        _controllersLock.readLock().lock();
+        try {
+            map.putAll(inputController);
+        } finally {
+            _controllersLock.readLock().unlock();
         }
-        if (! done) {
-            String newConfigFile = _configDirectory + "/" + inputName + ".config";
-            File cfgFile = new File(newConfigFile);
-            if (!cfgFile.isAbsolute())
-                cfgFile = new File(_context.getConfigDir(), newConfigFile);
-            File parent = cfgFile.getParentFile();
-            if ( (parent != null) && (!parent.exists()) )
-                parent.mkdirs();
 
-            _controllersLock.readLock().lock();
-            try {
-                for (int j = 0; j < _controllers.size(); j++) {
-                    TunnelController controller = _controllers.get(j);
-                    Properties controllerProperties = controller.getConfig(PREFIX + j + ".");
-                    String curName = controllerProperties.getProperty("name");
-                    if (curName != inputName) {
-                        map.putAll(controllerProperties);
-                    }
-                }
-            } finally {
-                map.putAll(inputController);
-                _controllersLock.readLock().unlock();
-            }
-
-            DataHelper.storeProps(map, cfgFile);
-        }
+        DataHelper.storeProps(map, cfgFile);
     }
 
     /**
@@ -746,38 +716,33 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.34
      */
     public synchronized void removeConfig(TunnelController tc) throws IOException {
-        List<String> fileList = configFiles();
+        //List<File> fileList = listFiles();
         boolean done = false;
         Properties inputController = tc.getConfig("");
         String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
-        for (int i = 0; i < fileList.size(); i++) {
-            if (inConfig(tc, fileList.get(i)) != "") {
-                File cfgFile = new File(fileList.get(i));
-                if (!cfgFile.isAbsolute())
-                    cfgFile = new File(_context.getConfigDir(), fileList.get(i));
-                File parent = cfgFile.getParentFile();
-                if ( (parent != null) && (!parent.exists()) )
-                    parent.mkdirs();
+        String foundConfigFile = inConfig(tc);
 
-                _controllersLock.readLock().lock();
-                try {
-                    for (int j = 0; j < _controllers.size(); j++) {
-                        TunnelController controller = _controllers.get(j);
-                        Properties controllerProperties = controller.getConfig(PREFIX + j + ".");
-                        String curName = controllerProperties.getProperty("name");
-                        if (curName != inputName) {
-                            map.putAll(controllerProperties);
-                        }
-                    }
-                } finally {
-                    _controllersLock.readLock().unlock();
-                }
+        File cfgFile = new File(foundConfigFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(_context.getConfigDir(), foundConfigFile);
+        File parent = cfgFile.getParentFile();
+        if ( (parent != null) && (!parent.exists()) )
+            parent.mkdirs();
 
-                DataHelper.storeProps(map, cfgFile);
-                done = true;
+        _controllersLock.readLock().lock();
+        try {
+            _controllers.remove(tc);
+            for (TunnelController c : _controllers) {
+                saveConfig(c);
             }
+        } finally {
+            _controllersLock.readLock().unlock();
         }
+
+        DataHelper.storeProps(map, cfgFile);
+        done = true;
+
     }
 
     /**
@@ -786,6 +751,7 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized String inConfig(TunnelController tc) throws IOException {
         List<String> fileList = configFiles();
+        _log.logAlways(Log.DEBUG, "checking for tunnel controller presence");
         for (int i = 0; i < fileList.size(); i++) {
             String configFile = fileList.get(i);
             return inConfig(tc, configFile);
@@ -817,11 +783,18 @@ public class TunnelControllerGroup implements ClientApp {
                 Properties controllerProperties = controller.getConfig(PREFIX + i + ".");
                 String curName = controllerProperties.getProperty("name");
                 if (curName == inputName) {
-                    outputName = curName;
+                    outputName = cfgFile.toString();
                 }
             }
         } finally {
             _controllersLock.readLock().unlock();
+        }
+        if (outputName == "") {
+            _log.debug("config " + inputName + " not found in " + configFile);
+            System.out.println("config " + inputName + " not found in " + configFile);
+        }else{
+            _log.debug("config " + inputName + " found in " + configFile);
+           System.out.println("config " + inputName + " found in " + configFile);
         }
         return outputName;
     }
@@ -833,23 +806,42 @@ public class TunnelControllerGroup implements ClientApp {
      * with one member, "i2ptunnel.config"
      */
     private List<String> configFiles() {
-        File folder = new File(_configDirectory);
-        File[] listOfFiles = folder.listFiles();
+        List<File> listOfFiles = listFiles();
         List<String> files = new ArrayList<String>();
         boolean shouldMigrate = _context.isRouterContext() && !SystemVersion.isAndroid();
-
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                files.add(listOfFiles[i].getName());
+        if (listOfFiles != null && listOfFiles.size() > 0) {
+            for (int i = 0; i < listOfFiles.size(); i++) {
+                files.add(listOfFiles.get(i).getName());
             }
         }
-        if (! shouldMigrate)
-            files.add(_configFile);
 
         return files;
     }
 
+    private List<File> listFiles() {
+        File folder = new File(_configDirectory);
+        if (!folder.isAbsolute())
+            folder = new File(_context.getConfigDir(), _configDirectory);
+        if ( (folder != null) && (!folder.exists()) )
+            folder.mkdirs();
+        File[] listOfFiles = folder.listFiles();
+        List<File> files = new ArrayList<File>();
+        //
+        if (listOfFiles != null && listOfFiles.length > 0) {
+            for (File afile : listOfFiles) {
+                if (afile.isFile() && afile.exists()) {
+                    files.add(afile);
+                }
+            }
+        }
+        File file = new File(_configFile);
+        if (!file.isAbsolute())
+            file = new File(_context.getConfigDir(), _configFile);
+        if (file.exists() && file.isFile())
+            files.add(file);
 
+        return files;
+    }
 
     /**
      * Load up the config data from the file
