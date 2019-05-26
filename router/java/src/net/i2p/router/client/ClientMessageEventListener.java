@@ -559,6 +559,15 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 _runner.disconnectClient(re.toString());
                 return;
             }
+            // per-client auth
+            // we have to do this before verifySignature()
+            String pk = cfg.getOptions().getProperty("i2cp.leaseSetPrivKey");
+            if (pk != null) {
+                byte[] priv = Base64.decode(pk);
+                PrivateKey privkey = new PrivateKey(EncType.ECIES_X25519, priv);
+                EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                encls.setClientPrivateKey(privkey);
+            }
             // we have to do this before checking encryption keys below
             if (!ls.verifySignature()) {
                 if (_log.shouldError())
@@ -647,16 +656,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 if (secret != null) {
                     EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
                     encls.setSecret(secret);
-                }
-                // per-client auth
-                String pk = cfg.getOptions().getProperty("i2cp.leaseSetPrivKey");
-                if (pk != null) {
-                    byte[] priv = Base64.decode(pk);
-                    if (priv == null)
-                        throw new IllegalArgumentException("bad privkey");
-                    PrivateKey privkey = new PrivateKey(EncType.ECIES_X25519, priv);
-                    EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
-                    encls.setClientPrivateKey(privkey);
                 }
             }
             if (_log.shouldDebug())
