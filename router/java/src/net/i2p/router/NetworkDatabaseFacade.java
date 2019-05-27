@@ -11,6 +11,7 @@ package net.i2p.router;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.i2p.data.BlindData;
@@ -178,4 +179,12 @@ public abstract class NetworkDatabaseFacade implements Service {
      *  @since 0.9.40
      */
     public void setBlindData(BlindData bd) {}
+
+    /**
+     *  For console ConfigKeyringHelper
+     *  @since 0.9.41
+     */
+    public List<BlindData> getBlindData() {
+        return null;
+    }
 }
