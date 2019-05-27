@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.Blinding;
@@ -223,6 +225,16 @@ class BlindCache {
         for (BlindData bd : _cache.values()) {
             _reverseCache.put(bd.getBlindedPubKey(), bd);
         }
+    }
+
+    /**
+     *  For console ConfigKeyringHelper
+     *  @since 0.9.41
+     */
+    public synchronized List<BlindData> getData() {
+        List<BlindData> rv = new ArrayList<BlindData>(_cache.size());
+        rv.addAll(_cache.values());
+        return rv;
     }
 
     /**

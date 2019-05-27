@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -491,6 +492,14 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (_log.shouldWarn())
             _log.warn("Adding to blind cache: " + bd);
         _blindCache.addToCache(bd);
+    }
+
+    /**
+     *  For console ConfigKeyringHelper
+     *  @since 0.9.41
+     */
+    public List<BlindData> getBlindData() {
+        return _blindCache.getData();
     }
     
     /**

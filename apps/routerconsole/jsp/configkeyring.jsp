@@ -38,10 +38,31 @@
           </td>
         </tr><tr>
           <td align="right"><b><%=intl._t("Full destination, name, base 32, or hash")%>:</b></td>
-          <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off" spellcheck="false"></textarea></td>
+          <td><input type="text" name="peer" size="55"></td>
+        </tr><tr>
+          <td align="right"><b><%=intl._t("Type")%>:</b></td>
+          <td><select id="encryptMode" name="encryptMode" class="selectbox">
+          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="1">
+              <%=intl._t("Encrypted")%></option>
+          <option title="<%=intl._t("Prevents server discovery by floodfills")%>" value="2">
+              <%=intl._t("Blinded")%></option>
+          <option title="<%=intl._t("Only clients with the password will be able to connect")%>" value="3">
+              <%=intl._t("Blinded with lookup password")%></option>
+          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="4">
+              <%=intl._t("Blinded with shared key")%></option>
+          <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="5">
+              <%=intl._t("Blinded with lookup password and shared key")%></option>
+          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="8">
+              <%=intl._t("Blinded with per-user key")%> (DH)</option>
+          <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="9">
+              <%=intl._t("Blinded with lookup password and per-user key")%> (DH)</option>
+          </select></td>
         </tr><tr>
           <td align="right"><b><%=intl._t("Encryption Key")%>:</b></td>
-          <td><input type="text" size="55" name="key" ></td>
+          <td><input type="text" size="55" name="key" title="<%=intl._t("Leave blank for DH, will be generated automatically")%>"></td>
+        </tr><tr>
+           <td align="right"><b><%=intl._t("Optional lookup password")%>:</b></td>
+           <td><input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Set password required to access this service")%>" class="freetext password" /></td>
         </tr><tr>
           <td align="right" colspan="2">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
