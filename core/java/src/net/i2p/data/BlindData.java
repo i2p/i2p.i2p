@@ -23,6 +23,8 @@ public class BlindData {
     private SigningPrivateKey _alpha;
     private Destination _dest;
     private long _routingKeyGenMod;
+    private boolean _secretRequired;
+    private boolean _authRequired;
 
     /**
      * bits 3-0 including per-client bit
@@ -39,6 +41,11 @@ public class BlindData {
      * @since 0.9.41
      */
     public static final int AUTH_PSK = 3;
+    /**
+     * Enabled, unspecified type
+     * @since 0.9.41
+     */
+    public static final int AUTH_ON = 999;
 
     /**
      *  @param secret may be null or zero-length
@@ -83,6 +90,10 @@ public class BlindData {
             throw new IllegalArgumentException();
         _authType = authType;
         _authKey = authKey;
+        if (secret != null)
+            _secretRequired = true;
+        if (authKey != null)
+            _authRequired = true;
         // defer until needed
         //calculate();
     }
@@ -196,7 +207,43 @@ public class BlindData {
         System.arraycopy(_blindSPK.getData(), 0, hashData, 2, _blindSPK.length());
         _blindHash = _context.sha().calculateHash(hashData);
     }
-    
+
+    /**
+     *  b33 format
+     *  @since 0.9.41
+     */
+    public synchronized String toBase32() {
+        return Blinding.encode(_clearSPK, _secret != null, _authKey != null);
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public void setSecretRequired() {
+        _secretRequired = true;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public boolean getSecretRequired() {
+        return _secretRequired;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public void setAuthRequired() {
+        _authRequired = true;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public boolean getAuthRequired() {
+        return _authRequired;
+    }
+
     @Override
     public synchronized String toString() {
         calculate();
@@ -219,6 +266,7 @@ public class BlindData {
             buf.append("\n\tDestination: ").append(_dest);
         else
             buf.append("\n\tDestination: unknown");
+        buf.append("\n\tB32             : ").append(toBase32());
         buf.append(']');
         return buf.toString();
     }

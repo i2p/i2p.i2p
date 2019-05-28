@@ -462,13 +462,10 @@
 %>
                 <option title="<%=intl._t("Only clients with the password will be able to connect")%>" value="3" <%=(curEncryptMode.equals("3") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Blinded with lookup password")%></option>
-<%
-                         // TODO, unimplemented
-%>
                 <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="4" <%=(curEncryptMode.equals("4") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with shared key")%></option>
+                    <%=intl._t("Blinded with shared key")%> (PSK)</option>
                 <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="5" <%=(curEncryptMode.equals("5") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with lookup password and shared key")%></option>
+                    <%=intl._t("Blinded with lookup password and shared key")%> (PSK)</option>
                 <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="6" <%=(curEncryptMode.equals("6") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Blinded with per-user key")%> (PSK)</option>
                 <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="7" <%=(curEncryptMode.equals("7") ? " selected=\"selected\"" : "")%> >

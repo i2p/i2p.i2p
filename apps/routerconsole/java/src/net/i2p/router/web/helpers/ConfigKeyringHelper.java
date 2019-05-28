@@ -85,15 +85,15 @@ public class ConfigKeyringHelper extends HelperBase {
             List<BlindData> bdata = _context.netDb().getBlindData();
             // TODO sort by hostname
             for (BlindData bd : bdata) {
-                Hash h = bd.getDestHash();
-                if (h == null)
-                    continue;
                 buf.append("\n<tr><td>");
-                buf.append(h.toBase32());
+                buf.append(bd.toBase32());
                 buf.append("</td><td>");
-                String host = _context.namingService().reverseLookup(h);
-                if (host != null)
-                    buf.append(host);
+                Hash h = bd.getDestHash();
+                if (h != null) {
+                    String host = _context.namingService().reverseLookup(h);
+                    if (host != null)
+                        buf.append(host);
+                }
                 buf.append("</td><td>");
                 int type = bd.getAuthType();
                 PrivateKey pk = bd.getAuthPrivKey();

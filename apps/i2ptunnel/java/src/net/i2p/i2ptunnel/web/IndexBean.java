@@ -564,13 +564,13 @@ public class IndexBean {
         Destination d = getDestination(tunnel);
         if (d != null) {
             int mode = _helper.getEncryptMode(tunnel);
-            if (mode > 1) {
+            if (mode > 1 && mode < 10) {
                 try {
                     String secret = _helper.getBlindedPassword(tunnel);
                     boolean requireSecret = secret != null && secret.length() > 0 &&
                                             (mode == 3 || mode == 5 || mode == 7 || mode == 9);
                     boolean requireAuth = mode >= 4 && mode <= 9;
-                    return Blinding.encode(_context, d.getSigningPublicKey(), requireSecret, requireAuth);
+                    return Blinding.encode(d.getSigningPublicKey(), requireSecret, requireAuth);
                 } catch (RuntimeException re) {}
             }
         }

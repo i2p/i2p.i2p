@@ -168,7 +168,19 @@ class BlindCache {
         }
     }
 
+    /**
+     *  Persists immediately if secret or privkey is non-null
+     */
     public void addToCache(BlindData bd) {
+        storeInCache(bd);
+        if (bd.getSecret() != null || bd.getAuthPrivKey() != null)
+            store();
+    }
+
+    /**
+     *  @since 0.9.41 from addToCache()
+     */
+    private void storeInCache(BlindData bd) {
         _cache.put(bd.getUnblindedPubKey(), bd);
         _reverseCache.put(bd.getBlindedPubKey(), bd);
         Destination dest = bd.getDestination();
@@ -257,7 +269,7 @@ class BlindCache {
                 if (line.startsWith("#"))
                     continue;
                 try {
-                    addToCache(fromPersistentString(line));
+                    storeInCache(fromPersistentString(line));
                     count++;
                 } catch (IllegalArgumentException iae) {
                     if (log.shouldLog(Log.WARN))

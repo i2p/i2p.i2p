@@ -52,9 +52,9 @@
               <%=intl._t("Blinded with shared key")%></option>
           <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="5">
               <%=intl._t("Blinded with lookup password and shared key")%></option>
-          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="8">
+          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="6">
               <%=intl._t("Blinded with per-user key")%> (DH)</option>
-          <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="9">
+          <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="7">
               <%=intl._t("Blinded with lookup password and per-user key")%> (DH)</option>
           </select></td>
         </tr><tr>
