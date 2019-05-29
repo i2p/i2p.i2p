@@ -277,7 +277,7 @@ public class TunnelConfig {
     /** @since 0.9.40 */
     public void setBlindedPassword(String s) {
         if (s != null && s.length() > 0)
-            _otherOptions.put("i2cp.leaseSetSecret", s);
+            _otherOptions.put("i2cp.leaseSetSecret", Base64.encode(DataHelper.getUTF8(s.trim())));
         else
             _otherOptions.remove("i2cp.leaseSetSecret");
     }

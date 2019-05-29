@@ -14,6 +14,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -596,7 +597,12 @@ public class GeneralHelper {
      *  @since 0.9.40
      */
     public String getBlindedPassword(int tunnel) {
-        return getProperty(tunnel, "i2cp.leaseSetSecret", "");
+        String rv = getProperty(tunnel, "i2cp.leaseSetSecret", null);
+        if (rv != null)
+            rv = DataHelper.getUTF8(Base64.decode(rv));
+        if (rv == null)
+            rv = "";
+        return rv;
     }
     
     /**

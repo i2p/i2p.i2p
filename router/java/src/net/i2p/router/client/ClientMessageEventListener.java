@@ -655,6 +655,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 String secret = cfg.getOptions().getProperty("i2cp.leaseSetSecret");
                 if (secret != null) {
                     EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                    secret = DataHelper.getUTF8(Base64.decode(secret));
                     encls.setSecret(secret);
                 }
             }

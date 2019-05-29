@@ -132,8 +132,10 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                 EncryptedLeaseSet encls2 = new EncryptedLeaseSet();
                 String secret = session.getOptions().getProperty(PROP_SECRET);
-                if (secret != null)
+                if (secret != null) {
+                    secret = DataHelper.getUTF8(Base64.decode(secret));
                     encls2.setSecret(secret);
+                }
                 leaseSet = encls2;
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {
                 leaseSet = new MetaLeaseSet();
