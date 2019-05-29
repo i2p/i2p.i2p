@@ -255,6 +255,8 @@ public class BlindData {
         buf.append("\n\tBlinded Hash    : ").append(_blindHash);
         if (_secret != null)
             buf.append("\n\tSecret          : \"").append(_secret).append('"');
+        else
+            buf.append("\n\tSecret Required : ").append(_secretRequired);
         buf.append("\n\tAuth Type       : ");
         if (_authType > 0)
             buf.append(_authType);
@@ -262,10 +264,12 @@ public class BlindData {
             buf.append("none");
         if (_authKey != null)
             buf.append("\n\tAuth Key   : ").append(_authKey);
-        if (_dest != null)
-            buf.append("\n\tDestination: ").append(_dest);
         else
-            buf.append("\n\tDestination: unknown");
+            buf.append("\n\tAuth Required   : ").append(_authRequired);
+        if (_dest != null)
+            buf.append("\n\tDestination     : ").append(_dest);
+        else
+            buf.append("\n\tDestination     : unknown");
         buf.append("\n\tB32             : ").append(toBase32());
         buf.append(']');
         return buf.toString();
