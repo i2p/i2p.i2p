@@ -551,6 +551,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         Destination dest = cfg.getDestination();
         if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
             // so we can decrypt it
+            // secret must be set before destination
+            String secret = cfg.getOptions().getProperty("i2cp.leaseSetSecret");
+            if (secret != null) {
+                EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                secret = DataHelper.getUTF8(Base64.decode(secret));
+                encls.setSecret(secret);
+            }
             try {
                 ls.setDestination(dest);
             } catch (RuntimeException re) {
@@ -651,12 +658,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 if (!ok) {
                     _runner.disconnectClient("Duplicate hash of encrypted LS2");
                     return;
-                }
-                String secret = cfg.getOptions().getProperty("i2cp.leaseSetSecret");
-                if (secret != null) {
-                    EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
-                    secret = DataHelper.getUTF8(Base64.decode(secret));
-                    encls.setSecret(secret);
                 }
             }
             if (_log.shouldDebug())

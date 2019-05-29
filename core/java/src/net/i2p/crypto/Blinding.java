@@ -327,7 +327,7 @@ public final class Blinding {
         SigningPrivateKey priv = (SigningPrivateKey) keys[1];
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         //String b32 = encode(pub, null);
-        String b32 = encode(pub, "foobarbaz");
+        String b32 = encode(pub, true, false);
         System.out.println("pub b32 is " + b32);
         BlindData bd = decode(ctx, b32);
         if (bd.getBlindedPubKey().equals(pub))

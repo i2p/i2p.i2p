@@ -1,3 +1,16 @@
+2019-05-29 zzz
+ * I2CP: Fix bugs with lookup password
+ * Util: Store save time in config files
+
+2019-05-28 zzz
+ * Console: Form handling on /configkeyring for LS2
+
+2019-05-27 zzz
+ * Console: Start rework of /configkeyring for LS2
+
+2019-05-26 zzz
+ * I2CP: Add per-client auth to generated leaseset
+
 2019-05-24 zzz
  * i2ptunnel:
    - Per-client auth config

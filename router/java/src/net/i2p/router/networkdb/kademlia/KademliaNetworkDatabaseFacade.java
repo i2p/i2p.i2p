@@ -946,16 +946,16 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 if (_log.shouldWarn())
                     _log.warn("Found blind data for encls: " + bd);
                 encls = (EncryptedLeaseSet) leaseSet;
+                // secret must be set before destination
+                String secret = bd.getSecret();
+                if (secret != null)
+                    encls.setSecret(secret);
                 Destination dest = bd.getDestination();
                 if (dest != null) {
                     encls.setDestination(dest);
                 } else {
                     encls.setSigningKey(bd.getUnblindedPubKey());
                 }
-                // secret
-                String secret = bd.getSecret();
-                if (secret != null)
-                    encls.setSecret(secret);
                 // per-client auth
                 if (bd.getAuthType() != BlindData.AUTH_NONE)
                     encls.setClientPrivateKey(bd.getAuthPrivKey());

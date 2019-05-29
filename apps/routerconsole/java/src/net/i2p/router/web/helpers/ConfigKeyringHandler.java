@@ -153,8 +153,8 @@ public class ConfigKeyringHandler extends FormHandler {
                         bdout = new BlindData(_context, spk, blindType, _secret, atype, pk);
                     }
                     if (bdold != null) {
-                        // debug
-                        addFormNotice("already cached: " + bdold);
+                        if (_log.shouldDebug())
+                            _log.debug("already cached: " + bdold);
                     }
                     try {
                         _context.netDb().setBlindData(bdout);

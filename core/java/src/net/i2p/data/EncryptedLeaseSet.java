@@ -42,6 +42,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     private String _secret;
     private PrivateKey _clientPrivateKey;
     private final Log _log;
+    // debug
+    private int _authType, _numKeys;
 
     private static final int MIN_ENCRYPTED_SIZE = 8 + 16;
     private static final int MAX_ENCRYPTED_SIZE = 4096;
@@ -74,11 +76,17 @@ public class EncryptedLeaseSet extends LeaseSet2 {
 
     /**
      *  Must be set before sign or verify.
+     *  Must be called before setDestination() or setSigningKey(), or alpha will be wrong.
      *
      *  @param secret null or "" for none (default)
      *  @since 0.9.39
      */
     public void setSecret(String secret) {
+        if (_signingKey != null && !DataHelper.eq(secret, _secret)) {
+            if (_log.shouldWarn())
+                _log.warn("setSecret() after setSigningKey()" +
+                          " was: " + _secret + " now: " + secret);
+        }
         _secret = secret;
     }
 
@@ -128,7 +136,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     }
 
     /**
-     * Overridden to set the blinded key
+     * Overridden to set the blinded key.
+     * setSecret() MUST be called before this for non-null secret, or alpha will be wrong.
      *
      * @param dest non-null, must be EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      * @throws IllegalStateException if already signed
@@ -147,7 +156,8 @@ public class EncryptedLeaseSet extends LeaseSet2 {
     }
 
     /**
-     * Overridden to set the blinded key
+     * Overridden to set the blinded key.
+     * setSecret() MUST be called before this for non-null secret, or alpha will be wrong.
      *
      * @param spk unblinded key non-null, must be EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      * @throws IllegalStateException if already signed
@@ -156,7 +166,6 @@ public class EncryptedLeaseSet extends LeaseSet2 {
      */
     @Override
     public void setSigningKey(SigningPublicKey spk) {
-        // TODO already-set checks
         SigType type = spk.getType();
         if (type != SigType.EdDSA_SHA512_Ed25519 &&
             type != SigType.RedDSA_SHA512_Ed25519)
@@ -192,6 +201,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         if (_log.shouldDebug())
             _log.debug("Blind:" +
                        "\norig:    " + spk +
+                       "\nsecret:  " + _secret +
                        "\nalpha:   " + _alpha +
                        "\nblinded: " + rv);
         return rv;
@@ -415,12 +425,14 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         // use first 12 bytes only
         byte[] iv = new byte[32];
         int authLen;
+        _authType = authType;  // debug
         if (authType == BlindData.AUTH_NONE) {
             authLen = 1;
         } else if (authType == BlindData.AUTH_DH ||
                    authType == BlindData.AUTH_PSK) {
             if (clientKeys == null || clientKeys.isEmpty())
                 throw new IllegalArgumentException("No client keys provided");
+            _numKeys = clientKeys.size();  // debug
             authLen = 1 + SALT_LEN + 2 + (clientKeys.size() * CLIENT_LEN);
         } else {
             throw new IllegalArgumentException("Bad auth type " + authType);
@@ -609,6 +621,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         }
 
         int authType = plaintext[0] & 0x0f;
+        _authType = authType;  // debug
         int authLen;
         if (authType == BlindData.AUTH_NONE) {
             authLen = 1;
@@ -622,6 +635,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             byte[] seed = new byte[32];
             System.arraycopy(plaintext, 1, seed, 0, 32);
             int count = (int) DataHelper.fromLong(plaintext, 33, 2);
+            _numKeys = count;  // debug
             if (count == 0)
                 throw new DataFormatException("No client entries");
             authLen = 1 + SALT_LEN + 2 + (count * CLIENT_LEN);
@@ -948,7 +962,13 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));
+        buf.append("\n\tAuth Type: ").append(_authType);
+        buf.append("\n\tClient Keys: ").append(_numKeys);
         if (_decryptedLS2 != null) {
+            if (_secret != null)
+                buf.append("\n\tSecret: ").append(_secret);
+            if (_clientPrivateKey != null)
+                buf.append("\n\tClient Private Key: ").append(_clientPrivateKey.toBase64());
             buf.append("\n\tDecrypted LS:\n").append(_decryptedLS2);
         } else if (_destination != null) {
             buf.append("\n\tDestination: ").append(_destination);

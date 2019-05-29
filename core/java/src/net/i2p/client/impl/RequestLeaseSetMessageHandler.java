@@ -130,13 +130,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             if (_ls2Type == DatabaseEntry.KEY_TYPE_LS2) {
                 leaseSet = new LeaseSet2();
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
-                EncryptedLeaseSet encls2 = new EncryptedLeaseSet();
-                String secret = session.getOptions().getProperty(PROP_SECRET);
-                if (secret != null) {
-                    secret = DataHelper.getUTF8(Base64.decode(secret));
-                    encls2.setSecret(secret);
-                }
-                leaseSet = encls2;
+                leaseSet = new EncryptedLeaseSet();
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {
                 leaseSet = new MetaLeaseSet();
             } else {
@@ -174,6 +168,15 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
      *  @since 0.9.7
      */
     protected synchronized void signLeaseSet(LeaseSet leaseSet, boolean isLS2, I2PSessionImpl session) {
+        // must be before setDestination()
+        if (isLS2 && _ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+            String secret = session.getOptions().getProperty(PROP_SECRET);
+            if (secret != null) {
+                EncryptedLeaseSet encls2 = (EncryptedLeaseSet) leaseSet;
+                secret = DataHelper.getUTF8(Base64.decode(secret));
+                encls2.setSecret(secret);
+            }
+        }
         Destination dest = session.getMyDestination();
         // also, if this session is connected to multiple routers, include other leases here
         leaseSet.setDestination(dest);

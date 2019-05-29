@@ -523,7 +523,7 @@
                         java.util.List<String> clientAuths = editBean.getClientAuths(curTunnel, dhClient);
                         if (!clientAuths.isEmpty()) {
 %>
-        <tr><td><b><%=intl._t("Revoke?")%>&nbsp;&nbsp;&nbsp;&nbsp;<%=intl._t("Client Name")%></b></td><td><b><%=intl._t("Client Key")%></b></td></tr>
+        <tr><td><b><%=intl._t("Revoke")%>&nbsp;&nbsp;&nbsp;&nbsp;<%=intl._t("Client Name")%></b></td><td><b><%=intl._t("Client Key")%></b></td></tr>
 <%
                             int i = 0;
                             for (String clientAuth : clientAuths) {
@@ -552,7 +552,7 @@
                             } // for
                         } // isEmpty
 %>
-        <tr><td><b><%=intl._t("Add?")%>&nbsp;&nbsp;&nbsp;&nbsp;<%=intl._t("Client Name")%></b></td><td>
+        <tr><td><b><%=intl._t("Add")%>&nbsp;&nbsp;&nbsp;&nbsp;<%=intl._t("Client Name")%></b></td><td>
 <%
                             if (dhClient) {
 %>
