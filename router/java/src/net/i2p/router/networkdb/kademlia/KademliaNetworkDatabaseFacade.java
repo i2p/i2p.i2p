@@ -961,7 +961,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                     encls.setClientPrivateKey(bd.getAuthPrivKey());
             } else {
                 if (_log.shouldWarn())
-                    _log.warn("No blind data found for encls: " + encls);
+                    _log.warn("No blind data found for encls: " + leaseSet);
             }
         }
 
