@@ -2425,6 +2425,31 @@
         <echo message="Now upload mavencentral-*.jar to Maven Central." />
     </target>
 
+    <target name="mavenLocal.deps" depends="buildRouter, buildStreaming">
+        <ant dir="core/java/">
+        </ant>
+        <ant dir="router/java/">
+        </ant>
+        <ant dir="apps/ministreaming/java/">
+        </ant>
+        <ant dir="apps/streaming/java/">
+        </ant>
+        <ant dir="apps/jetty/">
+            <target name="servletJar" />
+        </ant>
+    </target>
+
+    <target name="mavenLocal" depends="-pre-release, distclean, testscripts, mavenLocal.deps">
+        <mkdir dir="./pkg-mavencentral" />
+        <!-- Libraries -->
+        <copy file="build/i2p.jar" tofile="pkg-mavencentral/i2p-${release.number}.jar" />
+        <copy file="build/router.jar" tofile="pkg-mavencentral/router-${release.number}.jar" />
+        <copy file="build/mstreaming.jar" tofile="pkg-mavencentral/mstreaming-${release.number}.jar" />
+        <copy file="build/streaming.jar" tofile="pkg-mavencentral/streaming-${release.number}.jar" />
+        <copy file="apps/jetty/build/servlet-i2p-${release.number}.jar" todir="pkg-mavencentral/" />
+    </target>
+
+
     <target name="debian" depends="debian-clean, debchange, debian-binary" />
     <target name="precise" depends="copy-precise, debian" />
     <target name="wheezy" depends="precise" />

@@ -8,11 +8,10 @@ fi
 BUILD_NUMBER="$1"
 
 cd $I2P_SOURCE_DIR
-ant mavenCentral || (echo "Build failed!!!" && exit 1)
+ant mavenLocal || (echo "Build failed!!!" && exit 1)
 
 # Append right build number to jar files (and everything else but we don't care)
 cd $I2P_SOURCE_DIR/pkg-mavencentral
-rm -f *-javadoc.jar *-sources.jar
 for file in `ls -1`; do
   filename=$(basename -- "$file")
   extension="${filename##*.}"
