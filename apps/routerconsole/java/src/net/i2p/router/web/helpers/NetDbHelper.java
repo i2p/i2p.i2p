@@ -40,8 +40,9 @@ public class NetDbHelper extends FormHandler {
                                            _x("Router Lookup"),                 // 2
                                            _x("All Routers"),                   // 3
                                            _x("All Routers with Full Stats"),   // 4
-                                           "LeaseSet Debug",                    // 5
-                                           _x("LeaseSets"),                     // 6
+                                           _x("LeaseSets"),                     // 5
+                                           // advanced below here
+                                           "LeaseSet Debug",                    // 6
                                            "Sybil",                             // 7
                                            "Advanced Lookup"   };               // 8
 
@@ -51,8 +52,8 @@ public class NetDbHelper extends FormHandler {
                                            "",                                  // 2
                                            "?f=2",                              // 3
                                            "?f=1",                              // 4
-                                           "?l=2",                              // 5
-                                           "?l=1",                              // 6
+                                           "?l=1",                              // 5
+                                           "?l=2",                              // 6
                                            "?f=3",                              // 7
                                            "?f=4" };                            // 8
 
@@ -299,9 +300,9 @@ public class NetDbHelper extends FormHandler {
      */
     private int getTab() {
         if (_debug)
-            return 5;
-        if (_lease)
             return 6;
+        if (_lease)
+            return 5;
         if (".".equals(_routerPrefix))
             return 1;
         if (_routerPrefix != null || _version != null || _country != null ||
@@ -333,7 +334,7 @@ public class NetDbHelper extends FormHandler {
         for (int i = 0; i < titles.length; i++) {
             if (i == 2 && tab != 2)
                 continue;   // can't nav to lookup
-            if ((i == 5 || i == 7 || i == 8) && !isAdvanced())
+            if (i > 5 && !isAdvanced())
                 continue;
             if (i == tab) {
                 // we are there
