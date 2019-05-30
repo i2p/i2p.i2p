@@ -2431,7 +2431,8 @@
         </ant>
     </target>
 
-    <target name="mavenLocal" depends="-pre-release, distclean, testscripts, mavenLocal.deps">
+    <target name="mavenLocal" depends="mavenLocal.deps">
+        <delete dir="./pkg-mavencentral" />
         <mkdir dir="./pkg-mavencentral" />
         <!-- Libraries -->
         <copy file="build/i2p.jar" tofile="pkg-mavencentral/i2p-${release.number}.jar" />
