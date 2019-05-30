@@ -2426,14 +2426,6 @@
     </target>
 
     <target name="mavenLocal.deps" depends="buildRouter, buildStreaming">
-        <ant dir="core/java/">
-        </ant>
-        <ant dir="router/java/">
-        </ant>
-        <ant dir="apps/ministreaming/java/">
-        </ant>
-        <ant dir="apps/streaming/java/">
-        </ant>
         <ant dir="apps/jetty/">
             <target name="servletJar" />
         </ant>

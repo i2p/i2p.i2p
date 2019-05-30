@@ -4,6 +4,7 @@ I2P_SOURCE_DIR="$(realpath $SCRIPT_DIR/../..)"
 
 if [[ -z "$1"  ]]; then
   echo "You must run the script with the build number as first argument. Example ./script 6"
+  exit 1
 fi
 BUILD_NUMBER="$1"
 
@@ -11,7 +12,7 @@ cd $I2P_SOURCE_DIR
 ant mavenLocal || (echo "Build failed!!!" && exit 1)
 
 # Append right build number to jar files (and everything else but we don't care)
-cd $I2P_SOURCE_DIR/pkg-mavencentral
+cd $I2P_SOURCE_DIR/pkg-mavencentral || (echo "Build failed!!!" && exit 1)
 for file in `ls -1`; do
   filename=$(basename -- "$file")
   extension="${filename##*.}"
