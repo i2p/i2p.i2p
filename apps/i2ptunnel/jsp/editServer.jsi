@@ -441,15 +441,15 @@
                 <option title="<%=intl._t("Allow all clients to connect to this service")%>" value="0" <%=(curEncryptMode.equals("0") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Disable")%></option>
 <%
-                if (editBean.isAdvanced() || curEncryptMode.equals("10")) {
+                if (curEncryptMode.equals("10")) {
 %>
                 <option title="<%=intl._t("Allow all clients to connect to this service")%>" value="10" <%=(curEncryptMode.equals("10") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Disable")%> (LS2)</option>
 <%
-                } // isAdvanced()
+                } // mode = 10
 %>
-                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="1" <%=(curEncryptMode.equals("1") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Encrypted")%></option>
+                <option title="<%=intl._t("Send key to all users.")%>" value="1" <%=(curEncryptMode.equals("1") ? " selected=\"selected\"" : "")%> >
+                    <%=intl._t("Encrypted")%> (AES)</option>
 <%
                 int curSigType = editBean.getSigType(curTunnel, tunnelType);
                 boolean allowBlinding = (curSigType == 7 || curSigType == 11);
@@ -458,22 +458,22 @@
                 <option title="<%=intl._t("Prevents server discovery by floodfills")%>" value="2" <%=(curEncryptMode.equals("2") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Blinded")%></option>
 <%
-                     if (editBean.isAdvanced()) {
+                     if (true /* editBean.isAdvanced() */) {
 %>
-                <option title="<%=intl._t("Only clients with the password will be able to connect")%>" value="3" <%=(curEncryptMode.equals("3") ? " selected=\"selected\"" : "")%> >
+                <option title="<%=intl._t("Send password to all users.")%>" value="3" <%=(curEncryptMode.equals("3") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Blinded with lookup password")%></option>
-                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="4" <%=(curEncryptMode.equals("4") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with shared key")%> (PSK)</option>
-                <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="5" <%=(curEncryptMode.equals("5") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with lookup password and shared key")%> (PSK)</option>
-                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="6" <%=(curEncryptMode.equals("6") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with per-user key")%> (PSK)</option>
-                <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="7" <%=(curEncryptMode.equals("7") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with lookup password and per-user key")%> (PSK)</option>
-                <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="8" <%=(curEncryptMode.equals("8") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with per-user key")%> (DH)</option>
-                <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="9" <%=(curEncryptMode.equals("9") ? " selected=\"selected\"" : "")%> >
-                    <%=intl._t("Blinded with lookup password and per-user key")%> (DH)</option>
+                <option title="<%=intl._t("Send key to all users.")%>" value="4" <%=(curEncryptMode.equals("4") ? " selected=\"selected\"" : "")%> >
+                    <%=intl._t("Encrypted")%> (PSK)</option>
+                <option title="<%=intl._t("Send key and password to all users.")%>" value="5" <%=(curEncryptMode.equals("5") ? " selected=\"selected\"" : "")%> >
+                    <%=intl._t("Encrypted with lookup password")%> (PSK)</option>
+                <option title="<%=intl._t("Send individual key to each user.")%>" value="6" <%=(curEncryptMode.equals("6") ? " selected=\"selected\"" : "")%> >
+                    <%=intl._t("Encrypted with per-user key")%> (PSK)</option>
+                <option title="<%=intl._t("Send individual key to each user.")%> <%=intl._t("Send password to all users.")%>" value="7" <%=(curEncryptMode.equals("7") ? " selected=\"selected\"" : "")%> >
+                    <%=intl._t("Encrypted with lookup password and per-user key")%> (PSK)</option>
+                <option title="<%=intl._t("Enter key from each user.")%>" value="8" <%=(curEncryptMode.equals("8") ? " selected=\"selected\"" : "")%> >
+                    <%=intl._t("Encrypted with per-user key")%> (DH)</option>
+                <option title="<%=intl._t("Enter key from each user.")%> <%=intl._t("Send password to all users.")%>" value="9" <%=(curEncryptMode.equals("9") ? " selected=\"selected\"" : "")%> >
+                    <%=intl._t("Encrypted with lookup password and per-user key")%> (DH)</option>
 <%
                      } // isAdvanced()
                 } // allowBlinding
@@ -483,7 +483,7 @@
         </tr><tr>
             <td>
 <%
-                if (allowBlinding && editBean.isAdvanced()) {
+                if (allowBlinding /* && editBean.isAdvanced() */) {
 %>
                 <b><%=intl._t("Optional lookup password")%>:</b>
 <%
@@ -504,7 +504,7 @@
         </tr><tr>
             <td>
 <%
-                if (allowBlinding && editBean.isAdvanced()) {
+                if (allowBlinding /* && editBean.isAdvanced() */) {
 %>
                 <input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Set password required to access this service")%>" value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" />
 <%
@@ -515,7 +515,7 @@
             </td>
         </tr>
 <%
-                if (allowBlinding && editBean.isAdvanced()) {
+                if (allowBlinding /* && editBean.isAdvanced() */) {
                     boolean pskClient = curEncryptMode.equals("6") || curEncryptMode.equals("7");
                     boolean dhClient = curEncryptMode.equals("8") || curEncryptMode.equals("9");
                     if (pskClient || dhClient) {

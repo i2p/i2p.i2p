@@ -79,7 +79,7 @@ public class ConfigKeyringHelper extends HelperBase {
             }
             buf.append("</td><td>");
             if (!local)
-                buf.append(_t("Encrypted")).append("</td><td>");
+                buf.append(_t("Encrypted")).append(" (AES)</td><td>");
             SessionKey sk = e.getValue();
             buf.append(sk.toBase64());
             if (!local)
@@ -110,14 +110,14 @@ public class ConfigKeyringHelper extends HelperBase {
                 String s;
                 if (type == BlindData.AUTH_DH) {
                     if (secret != null)
-                        s = _t("Blinded with lookup password and per-user key");
+                        s = _t("Encrypted with lookup password") + " (DH)";
                     else
-                        s = _t("Blinded with per-user key");
+                        s = _t("Encrypted") + " (DH)";
                 } else if (type == BlindData.AUTH_PSK) {
                     if (secret != null)
-                        s = _t("Blinded with lookup password and shared key");
+                        s = _t("Encrypted with lookup password") + " (PSK)";
                     else
-                        s = _t("Blinded with shared key");
+                        s = _t("Encrypted") + " (PSK)";
                 } else  {
                     if (secret != null)
                         s = _t("Blinded with lookup password");

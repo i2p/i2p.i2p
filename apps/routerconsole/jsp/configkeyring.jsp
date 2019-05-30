@@ -46,20 +46,20 @@
         </tr><tr>
           <td align="right"><b><%=intl._t("Type")%>:</b></td>
           <td><select id="encryptMode" name="encryptMode" class="selectbox">
-          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="1">
-              <%=intl._t("Encrypted")%></option>
+          <option title="<%=intl._t("Enter key provided by server operator.")%>" value="1">
+              <%=intl._t("Encrypted")%> (AES)</option>
           <option title="<%=intl._t("Prevents server discovery by floodfills")%>" value="2">
               <%=intl._t("Blinded")%></option>
-          <option title="<%=intl._t("Only clients with the password will be able to connect")%>" value="3">
+          <option title="<%=intl._t("Enter password provided by server operator.")%>" value="3">
               <%=intl._t("Blinded with lookup password")%></option>
-          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="4" selected="selected">
-              <%=intl._t("Blinded with shared key")%></option>
-          <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="5">
-              <%=intl._t("Blinded with lookup password and shared key")%></option>
-          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="6">
-              <%=intl._t("Blinded with per-user key")%> (DH)</option>
-          <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="7">
-              <%=intl._t("Blinded with lookup password and per-user key")%> (DH)</option>
+          <option title="<%=intl._t("Enter key provided by server operator.")%>" value="4" selected="selected">
+              <%=intl._t("Encrypted")%> (PSK)</option>
+          <option title="<%=intl._t("Enter key and password provided by server operator.")%>" value="5">
+              <%=intl._t("Encrypted with lookup password")%> (PSK)</option>
+          <option title="<%=intl._t("Key will be generated.")%> <%=intl._t("Send key to server operator.")%>" value="6">
+              <%=intl._t("Encrypted")%> (DH)</option>
+          <option title="<%=intl._t("Enter password provided by server operator.")%> <%=intl._t("Key will be generated.")%> <%=intl._t("Send key to server operator.")%>" value="7">
+              <%=intl._t("Encrypted with lookup password")%> (DH)</option>
           </select></td>
         </tr><tr>
           <td align="right"><b><%=intl._t("Encryption Key")%>:</b></td>
