@@ -63,10 +63,10 @@
           </select></td>
         </tr><tr>
           <td align="right"><b><%=intl._t("Encryption Key")%>:</b></td>
-          <td><input type="text" size="55" name="key" title="<%=intl._t("Leave blank for DH, will be generated automatically")%>"></td>
+          <td><input type="text" size="55" name="key" title="<%=intl._t("Enter key provided by server operator.")%> <%=intl._t("Leave blank for DH option.")%> <%=intl._t("Key will be generated.")%>"></td>
         </tr><tr>
            <td align="right"><b><%=intl._t("Optional lookup password")%>:</b></td>
-           <td><input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Set password required to access this service")%>" class="freetext password" /></td>
+           <td><input type="password" name="nofilter_blindedPassword" title="<%=intl._t("Enter password provided by server operator.")%>" class="freetext password" /></td>
         </tr><tr>
           <td align="right" colspan="2">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
