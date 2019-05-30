@@ -942,7 +942,7 @@ public class TunnelConfig {
                 if (!_addClientAuth) {
                     _addClientAuth = true;
                     if (_newClientName == null || _newClientName.length() == 0)
-                        _newClientName = Base64.encode(DataHelper.getUTF8(GeneralHelper._t("Client", _context) + " 1"));
+                        _newClientName = GeneralHelper._t("Client", _context) + " 1";
                 }
             }
         }
@@ -961,6 +961,11 @@ public class TunnelConfig {
                     else
                         name = Base64.encode(DataHelper.getUTF8(GeneralHelper._t("Client", _context) + ' ' + (i + 1)));
                     clientAuth.add(name + ':' + key);
+                }
+                if (clientAuth.isEmpty() && !_addClientAuth) {
+                    // if we revoked all of them, add a new one
+                    _addClientAuth = true;
+                    _newClientName = GeneralHelper._t("Client", _context) + " 1";
                 }
             }
             if (_addClientAuth && _newClientName != null) {
