@@ -21,12 +21,12 @@ public class ConfigKeyringHandler extends FormHandler {
     private String _peer;
     private String _key;
     private String _secret;
+    private String[] _revokes;
     private int _mode;
     
     @Override
     protected void processForm() {
-        boolean adding = _action.equals(_t("Add key"));
-        if (adding || _action.equals(_t("Delete key"))) {
+        if (_action.equals(_t("Add key"))) {
             if (_peer == null) {
                 addFormError(_t("You must enter a destination"));
                 return;
@@ -36,7 +36,7 @@ public class ConfigKeyringHandler extends FormHandler {
                 // don't wait for several seconds for b33 lookup
                 h = ConvertToHash.getHash(_peer);
             }
-            if (adding) {
+
                 byte[] b = null;
                 if (_mode == 1 || _mode == 4 || _mode == 5) {
                     if (_key == null) {
@@ -166,18 +166,37 @@ public class ConfigKeyringHandler extends FormHandler {
                         addFormError(_t("Invalid destination") + ": " + iae.getMessage());
                     }
                 }
-            } else {  // Delete
-                if (h != null && h.getData() != null) {
-                    if (_context.clientManager().isLocal(h)) {
-                        // don't bother translating
-                        addFormError("Cannot remove key for local destination. Disable encryption in the Hidden Services Manager.");
-                    } else if (_context.keyRing().remove(h) != null) {
-                        addFormNotice(_t("Key for {0} removed from keyring", h.toBase32()));
-                    } else {
-                        addFormNotice(_t("Key for {0} not found in keyring", h.toBase32()));
+
+        } else if (_action.equals(_t("Delete key")) && _revokes != null) {
+            // these should all be b32s or b33s
+            for (String p : _revokes) {
+                boolean removed = false;
+                if (p.length() == 60) {
+                    // don't wait for several seconds for b33 lookup
+                    Hash h = ConvertToHash.getHash(p);
+                    if (h != null) {
+                        if (_context.clientManager().isLocal(h)) {
+                            // don't bother translating
+                            addFormError("Cannot remove key for local destination. Disable encryption in the Hidden Services Manager.");
+                        } else if (_context.keyRing().remove(h) != null) {
+                            removed = true;
+                        }
                     }
+                } else if (p.length() > 60) {
+                    try {
+                        BlindData bd = Blinding.decode(_context, p);
+                        if (bd != null) {
+                            SigningPublicKey spk = bd.getUnblindedPubKey();
+                            removed = _context.netDb().removeBlindData(spk);
+                        }
+                    } catch (IllegalArgumentException iae) {}
                 } else {
-                    addFormError(_t("Invalid destination"));
+                    addFormError(_t("Invalid destination") + ": " + p);
+                }
+                if (removed) {
+                    addFormNotice(_t("Key for {0} removed from keyring", p));
+                } else {
+                    addFormError(_t("Key for {0} not found in keyring", p));
                 }
             }
         } else {
@@ -203,4 +222,7 @@ public class ConfigKeyringHandler extends FormHandler {
              _mode = Integer.parseInt(m);
         } catch (NumberFormatException nfe) {}
     }
+
+    /** @since 0.9.41 */
+    public void setRevokeClient(String[] revokes) { _revokes = revokes; }
 }

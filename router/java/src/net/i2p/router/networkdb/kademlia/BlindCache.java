@@ -250,6 +250,28 @@ class BlindCache {
     }
 
     /**
+     *  For console ConfigKeyringHelper.
+     *  Persists immediately if removed.
+     *
+     *  @param spk the unblinded public key
+     *  @return true if removed
+     *  @since 0.9.41
+     */
+    public boolean removeBlindData(SigningPublicKey spk) {
+        boolean rv = false;
+        BlindData bd = _cache.remove(spk);
+        if (bd != null) {
+            rv = true;
+            _reverseCache.remove(bd.getBlindedPubKey());
+            Hash h = bd.getDestHash();
+            if (h != null)
+                _hashCache.remove(h);
+            store();
+        }
+        return rv;
+    }
+
+    /**
      *  Load from file.
      *  Format:
      *  sigtype,bsigtype,b64 pubkey,[b64 secret],[b64 dest]

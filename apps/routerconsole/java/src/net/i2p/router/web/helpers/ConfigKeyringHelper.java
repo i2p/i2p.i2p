@@ -45,7 +45,10 @@ public class ConfigKeyringHelper extends HelperBase {
      *  @param local true for local (Enc. LS1 only), false for remote (all types)
      */
     private void render(StringBuilder buf, boolean local) {
-        buf.append("\n<table class=\"configtable\"><tr><th align=\"left\">").append(_t("Destination"))
+        buf.append("\n<table class=\"configtable\"><tr>");
+        if (!local)
+            buf.append("<th align=\"left\">").append(_t("Delete"));
+        buf.append("<th align=\"left\">").append(_t("Destination"))
            .append("<th align=\"left\">").append(_t("Name"));
         if (!local)
             buf.append("<th align=\"left\">").append(_t("Type"));
@@ -59,7 +62,10 @@ public class ConfigKeyringHelper extends HelperBase {
             if (local != _context.clientManager().isLocal(h))
                 continue;
             buf.append("\n<tr><td>");
-            buf.append(h.toBase32());
+            String b32 = h.toBase32();
+            if (!local)
+                buf.append("<input value=\"").append(b32).append("\" type=\"checkbox\" name=\"revokeClient\" class=\"tickbox\"/></td><td>");
+            buf.append(b32);
             buf.append("</td><td>");
             Destination dest = _context.netDb().lookupDestinationLocally(h);
             if (dest != null && local) {
@@ -86,7 +92,10 @@ public class ConfigKeyringHelper extends HelperBase {
             // TODO sort by hostname
             for (BlindData bd : bdata) {
                 buf.append("\n<tr><td>");
-                buf.append(bd.toBase32());
+                String b32 = bd.toBase32();
+                if (!local)
+                    buf.append("<input value=\"").append(b32).append("\" type=\"checkbox\" name=\"revokeClient\" class=\"tickbox\"/></td><td>");
+                buf.append(b32);
                 buf.append("</td><td>");
                 Hash h = bd.getDestHash();
                 if (h != null) {

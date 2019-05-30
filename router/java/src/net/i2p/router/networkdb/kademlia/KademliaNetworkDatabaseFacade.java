@@ -501,6 +501,16 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     public List<BlindData> getBlindData() {
         return _blindCache.getData();
     }
+
+    /**
+     *  For console ConfigKeyringHelper
+     *  @param spk the unblinded public key
+     *  @return true if removed
+     *  @since 0.9.41
+     */
+    public boolean removeBlindData(SigningPublicKey spk) {
+        return _blindCache.removeBlindData(spk);
+    }
     
     /**
      *  @return RouterInfo, LeaseSet, or null, validated

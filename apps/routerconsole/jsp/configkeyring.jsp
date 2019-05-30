@@ -21,9 +21,13 @@
 <p id="keyringhelp" class="infohelp">
  <%=intl._t("The router keyring is used to decrypt encrypted leaseSets.")%>
  <%=intl._t("The keyring may contain keys for local or remote encrypted destinations.")%></p>
- <jsp:getProperty name="keyringhelper" property="summary" />
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+ <jsp:getProperty name="keyringhelper" property="summary" />
+ <table id="addkeyring"><tr><td align="right">
+ <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+ <input type="submit" name="action" class="delete" value="<%=intl._t("Delete key")%>" >
+ </td></tr></table>
  <h3 class="tabletitle"><%=intl._t("Manual Keyring Addition")%></h3>
  <table id="addkeyring">
         <tr>
@@ -48,7 +52,7 @@
               <%=intl._t("Blinded")%></option>
           <option title="<%=intl._t("Only clients with the password will be able to connect")%>" value="3">
               <%=intl._t("Blinded with lookup password")%></option>
-          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="4">
+          <option title="<%=intl._t("Only clients with the encryption key will be able to connect")%>" value="4" selected="selected">
               <%=intl._t("Blinded with shared key")%></option>
           <option title="<%=intl._t("Only clients with the password and key will be able to connect")%>" value="5">
               <%=intl._t("Blinded with lookup password and shared key")%></option>
@@ -66,6 +70,5 @@
         </tr><tr>
           <td align="right" colspan="2">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-<input type="submit" name="action" class="delete" value="<%=intl._t("Delete key")%>" >
 <input type="submit" name="action" class="add" value="<%=intl._t("Add key")%>" >
 </td></tr></table></form></div></body></html>

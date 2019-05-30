@@ -187,4 +187,13 @@ public abstract class NetworkDatabaseFacade implements Service {
     public List<BlindData> getBlindData() {
         return null;
     }
+
+    /**
+     *  For console ConfigKeyringHelper
+     *  @return true if removed
+     *  @since 0.9.41
+     */
+    public boolean removeBlindData(SigningPublicKey spk) {
+        return false;
+    }
 }
