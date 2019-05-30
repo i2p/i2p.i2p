@@ -468,11 +468,11 @@
                     <%=intl._t("Encrypted with lookup password")%> (PSK)</option>
                 <option title="<%=intl._t("Send individual key to each user.")%>" value="6" <%=(curEncryptMode.equals("6") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Encrypted with per-user key")%> (PSK)</option>
-                <option title="<%=intl._t("Send individual key to each user.")%> <%=intl._t("Send password to all users.")%>" value="7" <%=(curEncryptMode.equals("7") ? " selected=\"selected\"" : "")%> >
+                <option title="<%=intl._t("Send individual key to each user.") + ' '%> <%=intl._t("Send password to all users.")%>" value="7" <%=(curEncryptMode.equals("7") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Encrypted with lookup password and per-user key")%> (PSK)</option>
                 <option title="<%=intl._t("Enter key from each user.")%>" value="8" <%=(curEncryptMode.equals("8") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Encrypted with per-user key")%> (DH)</option>
-                <option title="<%=intl._t("Enter key from each user.")%> <%=intl._t("Send password to all users.")%>" value="9" <%=(curEncryptMode.equals("9") ? " selected=\"selected\"" : "")%> >
+                <option title="<%=intl._t("Enter key from each user.") + ' '%> <%=intl._t("Send password to all users.")%>" value="9" <%=(curEncryptMode.equals("9") ? " selected=\"selected\"" : "")%> >
                     <%=intl._t("Encrypted with lookup password and per-user key")%> (DH)</option>
 <%
                      } // isAdvanced()
