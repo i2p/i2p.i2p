@@ -380,15 +380,15 @@ class BlindCache {
             privkey = null;
         }
         BlindData rv;
-        // TODO pass privkey
         if (ss[7].length() > 0) {
             Destination dest = new Destination(ss[7]);
             if (!spk.equals(dest.getSigningPublicKey()))
                 throw new DataFormatException("spk mismatch");
-            rv = new BlindData(_context, dest, st2, secret);
+            rv = new BlindData(_context, dest, st2, secret, auth, privkey);
         } else {
-            rv = new BlindData(_context, spk, st2, secret);
+            rv = new BlindData(_context, spk, st2, secret, auth, privkey);
         }
+        rv.setDate(time);
         return rv;
     }
 
@@ -402,8 +402,7 @@ class BlindCache {
         buf.append(spk.getType().getCode()).append(',');
         buf.append(bd.getBlindedSigType().getCode()).append(',');
         buf.append(bd.getAuthType()).append(',');
-        // timestamp todo
-        buf.append('0').append(',');
+        buf.append(bd.getDate()).append(',');
         buf.append(spk.toBase64()).append(',');
         String secret = bd.getSecret();
         if (secret != null && secret.length() > 0)

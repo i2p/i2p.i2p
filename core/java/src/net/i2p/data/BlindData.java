@@ -1,5 +1,7 @@
 package net.i2p.data;
 
+import java.util.Date;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.Blinding;
 import net.i2p.crypto.SigType;
@@ -25,6 +27,7 @@ public class BlindData {
     private long _routingKeyGenMod;
     private boolean _secretRequired;
     private boolean _authRequired;
+    private long _date;
 
     /**
      * bits 3-0 including per-client bit
@@ -94,6 +97,7 @@ public class BlindData {
             _secretRequired = true;
         if (authKey != null)
             _authRequired = true;
+        _date = _context.clock().now();
         // defer until needed
         //calculate();
     }
@@ -244,6 +248,21 @@ public class BlindData {
         return _authRequired;
     }
 
+    /**
+     *  @since 0.9.41
+     */
+    public void setDate(long date) {
+        _date = date;
+    }
+
+    /**
+     *  @return creation date or as overridden by setDate()
+     *  @since 0.9.41
+     */
+    public long getDate() {
+        return _date;
+    }
+
     @Override
     public synchronized String toString() {
         calculate();
@@ -271,6 +290,7 @@ public class BlindData {
         else
             buf.append("\n\tDestination     : unknown");
         buf.append("\n\tB32             : ").append(toBase32());
+        buf.append("\n\tCreated         : ").append((new Date(_date)).toString());
         buf.append(']');
         return buf.toString();
     }
