@@ -1,7 +1,10 @@
 package net.i2p.router.web.helpers;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +92,8 @@ public class ConfigKeyringHelper extends HelperBase {
         // LS2
         if (!local) {
             List<BlindData> bdata = _context.netDb().getBlindData();
-            // TODO sort by hostname
+            if (bdata.size() > 1)
+                Collections.sort(bdata, new BDComparator());
             for (BlindData bd : bdata) {
                 buf.append("\n<tr><td>");
                 String b32 = bd.toBase32();
@@ -140,5 +144,12 @@ public class ConfigKeyringHelper extends HelperBase {
             }
         }
         buf.append("</table>\n");
+    }
+
+    /** @since 0.9.41 */
+    private static class BDComparator implements Comparator<BlindData>, Serializable {
+         public int compare(BlindData l, BlindData r) {
+             return l.toBase32().compareTo(r.toBase32());
+        }
     }
 }

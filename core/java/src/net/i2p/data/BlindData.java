@@ -28,6 +28,7 @@ public class BlindData {
     private boolean _secretRequired;
     private boolean _authRequired;
     private long _date;
+    private String _b32;
 
     /**
      * bits 3-0 including per-client bit
@@ -217,14 +218,17 @@ public class BlindData {
      *  @since 0.9.41
      */
     public synchronized String toBase32() {
-        return Blinding.encode(_clearSPK, _secret != null, _authKey != null);
+        if (_b32 == null)
+            _b32 = Blinding.encode(_clearSPK, _secretRequired, _authRequired);
+        return _b32;
     }
 
     /**
      *  @since 0.9.41
      */
-    public void setSecretRequired() {
+    public synchronized void setSecretRequired() {
         _secretRequired = true;
+        _b32 = null;
     }
 
     /**
@@ -237,8 +241,9 @@ public class BlindData {
     /**
      *  @since 0.9.41
      */
-    public void setAuthRequired() {
+    public synchronized void setAuthRequired() {
         _authRequired = true;
+        _b32 = null;
     }
 
     /**
