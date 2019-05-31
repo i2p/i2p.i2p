@@ -52,6 +52,7 @@ import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.tasks.*;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.transport.UPnPScannerCallback;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
@@ -103,6 +104,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private FamilyKeyCrypto _familyKeyCrypto;
     private boolean _familyKeyCryptoFail;
     public final Object _familyKeyLock = new Object();
+    private UPnPScannerCallback _upnpScannerCallback;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -384,6 +386,8 @@ public class Router implements RouterClock.ClockShiftListener {
             } catch (NumberFormatException nfe) {}
         }
         _networkID = id;
+        // for testing
+        setUPnPScannerCallback(new LoggerCallback());
         changeState(State.INITIALIZED);
         // *********  Start no threads before here ********* //
     }
@@ -606,6 +610,32 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public RouterContext getContext() { return _context; }
     
+    private class LoggerCallback implements UPnPScannerCallback {
+        public void beforeScan() { _log.info("SSDP beforeScan()"); }
+        public void afterScan() { _log.info("SSDP afterScan()"); }
+    }
+
+    /**
+     *  For Android only.
+     *  MUST be set before runRouter() is called.
+     *
+     *  @param callback the callback or null to clear it
+     *  @since 0.9.41
+     */
+    public synchronized void setUPnPScannerCallback(UPnPScannerCallback callback) {
+        _upnpScannerCallback = callback;
+    }
+
+    /**
+     *  For Android only.
+     *
+     *  @return the callback or null if none
+     *  @since 0.9.41
+     */
+    public synchronized UPnPScannerCallback getUPnPScannerCallback() {
+        return _upnpScannerCallback;
+    }
+
     /**
      *  This must be called after instantiation.
      *  Starts the threads. Does not install updates.

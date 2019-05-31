@@ -34,6 +34,8 @@ class UPnPManager {
     private final RouterContext _context;
     private final UPnP _upnp;
     private final UPnPCallback _upnpCallback;
+    private final UPnPScannerCallback _scannerCallback;
+    private final DelayedCallback _delayedCallback;
     private volatile boolean _isRunning;
     private volatile boolean _shouldBeRunning;
     private volatile long _lastRescan;
@@ -73,6 +75,8 @@ class UPnPManager {
         Debug.initialize(context);
         _upnp = new UPnP(context);
         _upnpCallback = new UPnPCallback();
+        _scannerCallback = _context.router().getUPnPScannerCallback();
+        _delayedCallback = (_scannerCallback != null) ? new DelayedCallback() : null;
         _rescanner = new Rescanner();
     }
     
@@ -91,7 +95,16 @@ class UPnPManager {
                 // and will eventually hit 1024 and then negative
                 _upnp.setHTTPPort(_context.getProperty(PROP_HTTP_PORT, DEFAULT_HTTP_PORT));
                 _upnp.setSSDPPort(_context.getProperty(PROP_SSDP_PORT, DEFAULT_SSDP_PORT));
+                if (_scannerCallback != null) {
+                    _scannerCallback.beforeScan();
+                }
                 _isRunning = _upnp.runPlugin();
+                if (_scannerCallback != null) {
+                    if (_isRunning)
+                        _delayedCallback.reschedule();
+                    else
+                        _scannerCallback.afterScan();
+                }
                 if (_log.shouldDebug())
                     _log.info("UPnP runPlugin took " + (_context.clock().now() - b));
             } catch (RuntimeException e) {
@@ -99,6 +112,9 @@ class UPnPManager {
                 if (!_errorLogged) {
                     _log.error("UPnP error, please report", e);
                     _errorLogged = true;
+                }
+                if (_scannerCallback != null) {
+                    _scannerCallback.afterScan();
                 }
             }
         }
@@ -156,6 +172,8 @@ class UPnPManager {
             return false;
         _lastRescan = now;
         if (_isRunning) {
+            if (_scannerCallback != null)
+                _scannerCallback.beforeScan();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("UPnP Rescan");
             // TODO default search MX (jitter) is 3 seconds... reduce?
@@ -163,6 +181,8 @@ class UPnPManager {
             // Adaptive Jitter Control for UPnP M-Search
             // Kevin Mills and Christopher Dabrowski
             _upnp.search();
+            if (_scannerCallback != null)
+                _delayedCallback.reschedule();
         } else {
             start();
         }
@@ -186,6 +206,33 @@ class UPnPManager {
                 rescan();
                 reschedule(_isRunning ? RESCAN_LONG_DELAY : RESCAN_SHORT_DELAY);
             }
+        }
+    }
+
+    /**
+     * Delayed Callback
+     *
+     * @since 0.9.41
+     */
+    private class DelayedCallback extends SimpleTimer2.TimedEvent {
+
+        /** caller must reschedule() */
+        public DelayedCallback() {
+            super(_context.simpleTimer2());
+        }
+
+        public void timeReached() {
+             _scannerCallback.afterScan();
+        }
+
+        /**
+         *  Pushes out.
+         *  We do it this way because we may have two scans running concurrently,
+         *  we only want to call afterScan() once.
+         */
+        void reschedule() {
+            // false == use latest time
+            reschedule((_upnp.getSearchMx() * 1000) + 500, false);
         }
     }
     
