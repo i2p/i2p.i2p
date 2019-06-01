@@ -169,10 +169,11 @@ public class TunnelControllerGroup implements ClientApp {
      *  @since 0.9.4
      */
     public void startup() {
-        List<String> fileList = configFiles();
-        for (int i = 0; i < fileList.size(); i++) {
-            String configFile = fileList.get(i);
+        List<File> fileList = listFiles();
+        for (File afile : fileList) {
+            String configFile = afile.toString();
             try {
+                _log.logAlways(Log.WARN, "Configuring a tunnel " + configFile);
                 loadControllers(configFile);
             } catch (IllegalArgumentException iae) {
                 if (DEFAULT_CONFIG_FILE.equals(configFile) && !_context.isRouterContext()) {
@@ -353,7 +354,7 @@ public class TunnelControllerGroup implements ClientApp {
                                 System.out.println("Error loading the client app properties from " + f);
                             }
                         } catch (IOException ioe) {
-                            _log.error("Error loading the client app properties from " + f, ioe);
+                            _log.error("Error loading the client app properties from " + f + ' '+ ioe);
                             System.out.println("Error loading the client app properties from " + f + ' ' + ioe);
                         }
                     }
@@ -464,9 +465,9 @@ public class TunnelControllerGroup implements ClientApp {
      * @throws IllegalArgumentException if unable to reload config file
      */
     public synchronized void reloadControllers() {
-        List<String> fileList = configFiles();
+        List<File> fileList = listFiles();
         for (int i = 0; i < fileList.size(); i++) {
-            String configFile = fileList.get(i);
+            String configFile = fileList.get(i).toString();
             unloadControllers();
             loadControllers(configFile);
             startControllers();
@@ -692,7 +693,7 @@ public class TunnelControllerGroup implements ClientApp {
         Properties map = new OrderedProperties();
         String foundConfigFile = inConfig(tc);
 
-        _log.logAlways(Log.DEBUG, "found " + foundConfigFile);
+        _log.logAlways(Log.WARN, "found " + foundConfigFile);
 
         File cfgFile = new File(foundConfigFile);
         if (!cfgFile.isAbsolute())
@@ -750,10 +751,10 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.41
      */
     public synchronized String inConfig(TunnelController tc) throws IOException {
-        List<String> fileList = configFiles();
+        List<File> fileList = listFiles();
         _log.logAlways(Log.DEBUG, "checking for tunnel controller presence");
-        for (int i = 0; i < fileList.size(); i++) {
-            String configFile = fileList.get(i);
+        for (File afile : fileList) {
+            String configFile = afile.toString();
             return inConfig(tc, configFile);
         }
         return "";
@@ -790,34 +791,21 @@ public class TunnelControllerGroup implements ClientApp {
             _controllersLock.readLock().unlock();
         }
         if (outputName == "") {
-            _log.debug("config " + inputName + " not found in " + configFile);
+            _log.logAlways(Log.WARN, "config " + inputName + " not found in " + configFile);
             System.out.println("config " + inputName + " not found in " + configFile);
         }else{
-            _log.debug("config " + inputName + " found in " + configFile);
+            _log.logAlways(Log.WARN, "config " + inputName + " found in " + configFile);
            System.out.println("config " + inputName + " found in " + configFile);
         }
         return outputName;
     }
 
     /**
-     * Return a list of config files in the config dir as strings
+     * List all the config files in the config directory, followed by the
+     * config file, if they exist
      *
-     * @return non-null, properties loaded, one for each tunnel, or a list
-     * with one member, "i2ptunnel.config"
+     * @return non-null list of files
      */
-    private List<String> configFiles() {
-        List<File> listOfFiles = listFiles();
-        List<String> files = new ArrayList<String>();
-        boolean shouldMigrate = _context.isRouterContext() && !SystemVersion.isAndroid();
-        if (listOfFiles != null && listOfFiles.size() > 0) {
-            for (int i = 0; i < listOfFiles.size(); i++) {
-                files.add(listOfFiles.get(i).getName());
-            }
-        }
-
-        return files;
-    }
-
     private List<File> listFiles() {
         File folder = new File(_configDirectory);
         if (!folder.isAbsolute())
@@ -829,7 +817,7 @@ public class TunnelControllerGroup implements ClientApp {
         //
         if (listOfFiles != null && listOfFiles.length > 0) {
             for (File afile : listOfFiles) {
-                if (afile.isFile() && afile.exists()) {
+                if (afile.isFile() && afile.exists() && afile.getName().endsWith(".config")) {
                     files.add(afile);
                 }
             }
@@ -837,7 +825,7 @@ public class TunnelControllerGroup implements ClientApp {
         File file = new File(_configFile);
         if (!file.isAbsolute())
             file = new File(_context.getConfigDir(), _configFile);
-        if (file.exists() && file.isFile())
+        if (file.exists() && file.isFile() && file.getName().endsWith(".config"))
             files.add(file);
 
         return files;
@@ -854,8 +842,9 @@ public class TunnelControllerGroup implements ClientApp {
         DataHelper.loadProps(config, cfgFile);
         List<Properties> rv = new ArrayList<Properties>();
         int i = 0;
+        int maxFiles = listFiles().size();
         while (true) {
-            String prefix = PREFIX + i + '.';
+            String prefix = PREFIX + i + ".";
             Properties p = new Properties();
             for (Map.Entry<Object, Object> e : config.entrySet()) {
                 String key = (String) e.getKey();
@@ -865,7 +854,10 @@ public class TunnelControllerGroup implements ClientApp {
                     p.setProperty(key, val);
                 }
             }
-            if (p.isEmpty())
+            // OK so I don't really like this, but working around the numbered
+            // tunnel configurations requires either something like this, or
+            // altering the config file format which is probably even worse. idk
+            if (p.isEmpty() && i > maxFiles)
                 break;
             p.setProperty("configFile", cfgFile.getAbsolutePath());
             rv.add(p);
@@ -884,10 +876,10 @@ public class TunnelControllerGroup implements ClientApp {
      * @throws IllegalArgumentException if unable to load config from file
      */
      public List<TunnelController> getControllers() {
-        List<String> fileList = configFiles();
+        List<File> fileList = listFiles();
         List<TunnelController> _tempControllers = new ArrayList<TunnelController>();
-        for (int i = 0; i < fileList.size(); i++) {
-            String configFile = fileList.get(i);
+        for (File afile : fileList) {
+            String configFile = afile.toString();
             _tempControllers.addAll(getControllers(configFile));
         }
         return _tempControllers;
