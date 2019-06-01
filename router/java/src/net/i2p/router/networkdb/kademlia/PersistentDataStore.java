@@ -40,6 +40,7 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  * Write out keys to disk when we get them and periodically read ones we don't know
@@ -434,10 +435,19 @@ public class PersistentDataStore extends TransientDataStore {
                     }
                 }
                 Collections.shuffle(toRead, _context.random());
+                int i = 0;
                 for (File file : toRead) {
                     Hash key = getRouterInfoHash(file.getName());
-                    if (key != null && !isKnown(key))
+                    if (key != null && !isKnown(key)) {
                         (new ReadRouterJob(file, key)).runJob();
+                        if (i++ == 150 && SystemVersion.isAndroid() && !_initialized) {
+                            // Can take 2 minutes to load them all on Android,
+                            // after we have already built expl. tunnels.
+                            // This is enough to let i2ptunnel get started.
+                            // Do not set _initialized yet so we don't start rescanning.
+                            _context.router().setNetDbReady();
+                        }
+                    }
                 }
             }
             
