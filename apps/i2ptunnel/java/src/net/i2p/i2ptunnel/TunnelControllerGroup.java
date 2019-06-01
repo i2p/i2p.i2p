@@ -323,21 +323,11 @@ public class TunnelControllerGroup implements ClientApp {
         _controllersLock.writeLock().lock();
         try {
             if (shouldMigrate && dir.isDirectory()) {
-                List<File> files = listFiles();
-                if (files != null && files.size() > 0) {
+                List<File> fileList = listFiles();
+                if (fileList != null && fileList.size() > 0) {
                     // sort so the returned order is consistent
-                    Collections.sort(files);
-                    for (File f : files) {
-                        if (!f.getName().endsWith(".config")){
-                            _log.error(f + "Is not a .config file");
-                            System.out.println(f + "Is not a .config file");
-                            continue;
-                        }
-                        if (!f.isFile()){
-                            _log.error(f + "Is not a file");
-                            System.out.println(f + "Is not a file");
-                            continue;
-                        }
+                    Collections.sort(fileList);
+                    for (File f : fileList) {
                         try {
                             props = loadConfig(f);
                             if (!props.isEmpty()) {
@@ -391,7 +381,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.34
      */
     private boolean migrate(List<Properties> tunnels, File from, File dir) {
-        if (!dir.isDirectory() && !dir.mkdirs())
+        if (!dir.isDirectory()) // && !dir.mkdirs())
             return false;
         boolean ok = true;
         for (int i = 0; i < tunnels.size(); i++) {
@@ -657,7 +647,7 @@ public class TunnelControllerGroup implements ClientApp {
     /**
      * Save the configuration of all known tunnels to the given file
      * @deprecated
-     *//*
+     */
     @Deprecated
     private synchronized void saveConfig(String configFile) throws IOException {
         File cfgFile = new File(configFile);
@@ -680,14 +670,14 @@ public class TunnelControllerGroup implements ClientApp {
         }
 
         DataHelper.storeProps(map, cfgFile);
-    }*/
+    }
 
     /**
      * Save the configuration of this tunnel only, may be new
      * @since 0.9.34
      */
     public synchronized void saveConfig(TunnelController tc) throws IOException {
-
+        _log.logAlways(Log.WARN, "Saving tunnel configuration");
         Properties inputController = tc.getConfig("");
         String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
@@ -717,12 +707,14 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.34
      */
     public synchronized void removeConfig(TunnelController tc) throws IOException {
-        //List<File> fileList = listFiles();
+        _log.logAlways(Log.WARN, "Removing tunnel configuration");
         boolean done = false;
         Properties inputController = tc.getConfig("");
         String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
         String foundConfigFile = inConfig(tc);
+
+        _log.logAlways(Log.WARN, "found " + foundConfigFile);
 
         File cfgFile = new File(foundConfigFile);
         if (!cfgFile.isAbsolute())
@@ -827,7 +819,7 @@ public class TunnelControllerGroup implements ClientApp {
             file = new File(_context.getConfigDir(), _configFile);
         if (file.exists() && file.isFile() && file.getName().endsWith(".config"))
             files.add(file);
-
+        Collections.sort(files);
         return files;
     }
 
@@ -876,16 +868,13 @@ public class TunnelControllerGroup implements ClientApp {
      * @throws IllegalArgumentException if unable to load config from file
      */
      public List<TunnelController> getControllers() {
-        List<File> fileList = listFiles();
         List<TunnelController> _tempControllers = new ArrayList<TunnelController>();
-        for (File afile : fileList) {
-            String configFile = afile.toString();
-            _tempControllers.addAll(getControllers(configFile));
-        }
+        _tempControllers.addAll(getControllers(_configFile));
         return _tempControllers;
      }
 
     public List<TunnelController> getControllers(String configFile) {
+        _log.logAlways(Log.WARN, "Getting controllers from config file " + configFile);
         synchronized (this) {
             if (!_controllersLoaded)
                 loadControllers(configFile);
@@ -893,7 +882,9 @@ public class TunnelControllerGroup implements ClientApp {
 
         _controllersLock.readLock().lock();
         try {
-            return new ArrayList<TunnelController>(_controllers);
+            List<TunnelController> _tempController = new ArrayList<TunnelController>(_controllers);
+            //Collections.sort(_tempControllers);
+            return _tempController;
         } finally {
             _controllersLock.readLock().unlock();
         }
