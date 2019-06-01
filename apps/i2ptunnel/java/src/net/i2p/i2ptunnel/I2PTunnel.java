@@ -961,14 +961,12 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                     if (args.length == 3)
                         proxy = args[2];
                 } else if ("false".equalsIgnoreCase(args[1].trim())) {
-                    _log.warn("args[1] == [" + args[1] + "] and rejected explicitly");
                     isShared = false;
                     if (args.length == 3)
                         proxy = args[2];
                 } else if (args.length == 3) {
                     isShared = false; // not "true"
                     proxy = args[2];
-                    _log.warn("args[1] == [" + args[1] + "] but rejected");
                 } else {
                     // isShared not specified, default to true
                     isShared = true;
@@ -1030,14 +1028,12 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                     if (args.length == 3)
                         proxy = args[2];
                 } else if ("false".equalsIgnoreCase(args[1].trim())) {
-                    _log.warn("args[1] == [" + args[1] + "] and rejected explicitly");
                     isShared = false;
                     if (args.length == 3)
                         proxy = args[2];
                 } else if (args.length == 3) {
                     isShared = false; // not "true"
                     proxy = args[2];
-                    _log.warn("args[1] == [" + args[1] + "] but rejected");
                 } else {
                     // isShared not specified, default to true
                     isShared = true;
@@ -1099,7 +1095,6 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 if (Boolean.parseBoolean(args[2].trim())) {
                     isShared = true;
                 } else if ("false".equalsIgnoreCase(args[2].trim())) {
-                    _log.warn("args[2] == [" + args[2] + "] and rejected explicitly");
                     isShared = false;
                 } else {
                     // isShared not specified, default to true
