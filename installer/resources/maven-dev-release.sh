@@ -13,7 +13,7 @@ ant mavenLocal || (echo "Build failed!!!" && exit 1)
 
 # Append right build number to jar files (and everything else but we don't care)
 cd $I2P_SOURCE_DIR/pkg-mavencentral || (echo "Build failed!!!" && exit 1)
-for file in `ls -1`; do
+for file in `ls -1 *.jar`; do
   filename=$(basename -- "$file")
   extension="${filename##*.}"
   filename="${filename%.*}"
