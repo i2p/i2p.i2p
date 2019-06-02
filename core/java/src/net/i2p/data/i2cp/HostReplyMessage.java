@@ -7,6 +7,7 @@ package net.i2p.data.i2cp;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -30,6 +31,12 @@ public class HostReplyMessage extends I2CPMessageImpl {
     public static final int RESULT_SUCCESS = 0;
     /** generic fail, other codes TBD */
     public static final int RESULT_FAILURE = 1;
+    /** @since 0.9.41 */
+    public static final int RESULT_SECRET_REQUIRED = 2;
+    /** @since 0.9.41 */
+    public static final int RESULT_KEY_REQUIRED = 3;
+    /** @since 0.9.41 */
+    public static final int RESULT_SECRET_AND_KEY_REQUIRED = 4;
 
     private static final long MAX_INT = (1L << 32) - 1;
 
@@ -109,7 +116,9 @@ public class HostReplyMessage extends I2CPMessageImpl {
             _sessionId = new SessionId();
             _sessionId.readBytes(in);
             _reqID = DataHelper.readLong(in, 4);
-            _code = (int) DataHelper.readLong(in, 1);
+            _code = in.read();
+            if (_code < 0)
+                throw new EOFException();
             if (_code == RESULT_SUCCESS)
                 _dest = Destination.create(in);
         } catch (DataFormatException dfe) {

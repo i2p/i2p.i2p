@@ -179,6 +179,15 @@ public class MessageStatusMessage extends I2CPMessageImpl {
      */
     public final static int STATUS_SEND_FAILURE_NO_LEASESET = 21;
 
+    /**
+     *  The far-end destination's lease set was a meta lease set,
+     *  and cannot be sent to. The client should request the meta
+     *  lease set's contents with a HostLookupMessage, and select
+     *  one of the hashes contained within to lookup and send to.
+     *  This is a guaranteed failure.
+     *  @since 0.9.41
+     */
+    public final static int STATUS_SEND_FAILURE_META_LEASESET = 22;
 
 
     public MessageStatusMessage() {
@@ -301,7 +310,8 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         try {
             _sessionId = (int) DataHelper.readLong(in, 2);
             _messageId = DataHelper.readLong(in, 4);
-            _status = (int) DataHelper.readLong(in, 1);
+            _status = in.read();
+            // EOF will be caught below
             _size = DataHelper.readLong(in, 4);
             _nonce = DataHelper.readLong(in, 4);
         } catch (DataFormatException dfe) {

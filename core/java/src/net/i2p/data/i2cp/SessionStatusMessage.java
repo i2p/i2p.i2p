@@ -10,6 +10,7 @@ package net.i2p.data.i2cp;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -69,7 +70,9 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         try {
             _sessionId = new SessionId();
             _sessionId.readBytes(in);
-            _status = (int) DataHelper.readLong(in, 1);
+            _status = in.read();
+            if (_status < 0)
+                throw new EOFException();
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }

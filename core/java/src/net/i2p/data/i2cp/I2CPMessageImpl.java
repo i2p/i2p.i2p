@@ -9,6 +9,7 @@ package net.i2p.data.i2cp;
  *
  */
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,12 +41,9 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
             throw new I2CPMessageException("Error reading the length bytes", dfe);
         }
         if (length < 0) throw new I2CPMessageException("Invalid message length specified");
-        int type = -1;
-        try {
-            type = (int) DataHelper.readLong(in, 1);
-        } catch (DataFormatException dfe) {
-            throw new I2CPMessageException("Error reading the type byte", dfe);
-        }
+        int type = in.read();
+        if (type < 0)
+            throw new EOFException();
         readMessage(in, length, type);
     }
 
