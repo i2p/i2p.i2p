@@ -1,3 +1,17 @@
+2019-06-02 zzz
+ * Build: Fix Debian (ticket #2517)
+
+2019-06-01 zzz
+ * NetDB: Don't wait for all RIs to be read in on Android
+ * Tunnels: Ensure GW Pumper threads stop on Android
+
+2019-05-31 zzz
+ * Blinding: Bug fixes
+ * Transport: UPnP fixes for Android (ticket #2499)
+
+2019-05-30 zzz
+ * Console: Support deleting blinded entries on /configkeyring
+
 2019-05-29 zzz
  * I2CP: Fix bugs with lookup password
  * Util: Store save time in config files
