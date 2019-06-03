@@ -28,7 +28,7 @@ import net.i2p.stat.RateStat;
  *  For /tunnels.jsp, used by TunnelHelper.
  */
 class TunnelRenderer {
-    private RouterContext _context;
+    private final RouterContext _context;
 
     private static final int DISPLAY_LIMIT = 200;
 
