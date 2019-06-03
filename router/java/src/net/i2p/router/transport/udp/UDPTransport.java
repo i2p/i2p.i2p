@@ -51,6 +51,7 @@ import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -1070,7 +1071,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // laptop mode
                 // For now, only do this at startup
                 if (oldIP != null &&
-                    System.getProperty("wrapper.version") != null &&
+                    SystemVersion.hasWrapper() &&
                     _context.getBooleanProperty(PROP_LAPTOP_MODE) &&
                     now - lastChanged > 10*60*1000 &&
                     _context.router().getUptime() < 10*60*1000) {

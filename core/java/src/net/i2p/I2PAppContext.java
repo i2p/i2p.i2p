@@ -36,6 +36,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
@@ -928,7 +929,7 @@ public class I2PAppContext {
      *  @since 0.8.8
      */
     public boolean hasWrapper() {
-        return System.getProperty("wrapper.version") != null;
+        return SystemVersion.hasWrapper();
     }
 
     /**
