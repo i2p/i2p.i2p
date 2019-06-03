@@ -478,7 +478,11 @@ public class PeerState {
      */
     //public boolean getRemoteWantsPreviousACKs() { return _remoteWantsPreviousACKs; }
 
-    /** how many bytes should we send to the peer in a second */
+    /**
+     *  how many bytes should we send to the peer in a second
+     *  1st stat in CWND column, otherwise unused,
+     *  candidate for removal
+     */
     public int getSendWindowBytes() {
         synchronized(_outboundMessages) {
             return _sendWindowBytes;
@@ -682,11 +686,6 @@ public class PeerState {
      */
     //public void remoteDoesNotWantPreviousACKs() { _remoteWantsPreviousACKs = false; }
     
-    /** should we ignore the peer state's congestion window, and let anything through? */
-    private static final boolean IGNORE_CWIN = false;
-    /** should we ignore the congestion window on the first push of every message? */
-    private static final boolean ALWAYS_ALLOW_FIRST_PUSH = false;
-    
     /** 
      * Decrement the remaining bytes in the current period's window,
      * returning true if the full size can be decremented, false if it
@@ -717,8 +716,16 @@ public class PeerState {
             //_sendACKBytes = 0;
             _lastSendRefill = now;
         }
-        //if (true) return true;
-        if (IGNORE_CWIN || size <= _sendWindowBytesRemaining || (ALWAYS_ALLOW_FIRST_PUSH && messagePushCount == 0)) {
+
+        // Ticket 2505
+        // We always send all unacked fragments for a message,
+        // because we don't have any mechanism in OutboundMessageFragments
+        // to track the next send time for fragments individually.
+        // Huge messages that are larger than the window size could never
+        // get sent and block the outbound queue forever.
+        // So we let it through when the window is empty (full window remaining).
+        if (size <= _sendWindowBytesRemaining ||
+            (size > _sendWindowBytes && _sendWindowBytesRemaining >= _sendWindowBytes)) {
             if ( (messagePushCount == 0) && (_concurrentMessagesActive > _concurrentMessagesAllowed) ) {
                 _consecutiveRejections++;
                 _context.statManager().addRateData("udp.rejectConcurrentActive", _concurrentMessagesActive, _consecutiveRejections);
@@ -731,6 +738,8 @@ public class PeerState {
                 _consecutiveRejections = 0;
             }
             _sendWindowBytesRemaining -= size; 
+            if (_sendWindowBytesRemaining < 0)
+                _sendWindowBytesRemaining = 0; 
             _sendBytes += size;
             _lastSendTime = now;
             //if (isForACK) 
@@ -767,20 +776,36 @@ public class PeerState {
     }
   ****/
 
+    /**
+     *  stat in SST column, otherwise unused,
+     *  candidate for removal
+     */
     public int getSlowStartThreshold() { return _slowStartThreshold; }
 
+    /**
+     *  2nd stat in CWND column, otherwise unused,
+     *  candidate for removal
+     */
     public int getConcurrentSends() {
         synchronized(_outboundMessages) {
             return _concurrentMessagesActive;
         }
     }
 
+    /**
+     *  3rd stat in CWND column, otherwise unused,
+     *  candidate for removal
+     */
     public int getConcurrentSendWindow() {
         synchronized(_outboundMessages) {
             return _concurrentMessagesAllowed;
         }
     }
 
+    /**
+     *  4th stat in CWND column, otherwise unused,
+     *  candidate for removal
+     */
     public int getConsecutiveSendRejections() {
         synchronized(_outboundMessages) {
             return _consecutiveRejections;

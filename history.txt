@@ -1,5 +1,10 @@
+2019-06-03 zzz
+ * Transport: Fix large messages in SSU (ticket #2505)
+
 2019-06-02 zzz
  * Build: Fix Debian (ticket #2517)
+ * i2ptunnel: Add new getInstance() method for Android
+ * Update PAC file for additional security
 
 2019-06-01 zzz
  * NetDB: Don't wait for all RIs to be read in on Android
