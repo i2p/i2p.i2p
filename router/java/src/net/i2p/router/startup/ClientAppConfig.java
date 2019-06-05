@@ -17,6 +17,7 @@ import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.SystemVersion;
 
 
 /**
@@ -131,7 +132,8 @@ public class ClientAppConfig {
         try {
             List<ClientAppConfig> cacs = getClientApps(cf);
             if (!cacs.isEmpty()) {
-                MigrateJetty.migrate(ctx, cacs);
+                if (!SystemVersion.isAndroid())
+                    MigrateJetty.migrate(ctx, cacs);
                 boolean ok = migrate(ctx, cacs, cf, dir);
                 if (!ok)
                     rv.addAll(cacs);
@@ -193,6 +195,9 @@ public class ClientAppConfig {
      * @since 0.9.42
      */
     private static boolean migrate(I2PAppContext ctx, List<ClientAppConfig> apps, File from, File dir) {
+        // don't migrate Android
+        if (SystemVersion.isAndroid())
+            return false;
         // don't migrate portable
         try {
             if (ctx.getConfigDir().getCanonicalPath().equals(ctx.getBaseDir().getCanonicalPath()))
