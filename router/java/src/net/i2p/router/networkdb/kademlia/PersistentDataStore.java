@@ -446,6 +446,7 @@ public class PersistentDataStore extends TransientDataStore {
                             // after we have already built expl. tunnels.
                             // This is enough to let i2ptunnel get started.
                             // Do not set _initialized yet so we don't start rescanning.
+                            _setNetDbReady = true;
                             _context.router().setNetDbReady();
                         }
                     }

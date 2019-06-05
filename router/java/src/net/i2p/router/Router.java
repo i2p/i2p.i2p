@@ -895,6 +895,8 @@ public class Router implements RouterClock.ClockShiftListener {
             } else if (_state == State.EXPL_TUNNELS_READY) {
                 changeState(State.RUNNING);
                 changed = true;
+            } else {
+                _log.warn("Invalid state " + _state + " for setNetDbReady()");
             }
         }
         if (changed) {
@@ -920,6 +922,8 @@ public class Router implements RouterClock.ClockShiftListener {
                 changeState(State.EXPL_TUNNELS_READY);
             else if (_state == State.NETDB_READY)
                 changeState(State.RUNNING);
+            else
+                _log.warn("Invalid state " + _state + " for setExplTunnelsReady()");
         }
     }
 
