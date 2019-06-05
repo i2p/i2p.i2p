@@ -89,6 +89,9 @@ public class BlindData {
         _clearSPK = spk;
         _blindType = blindType;
         _secret = secret;
+        // fix, previous default was -1
+        if (authType < 0)
+            authType = AUTH_NONE;
         if ((authType != AUTH_NONE && authKey == null) ||
             (authType == AUTH_NONE && authKey != null))
             throw new IllegalArgumentException();
