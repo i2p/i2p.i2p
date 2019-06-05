@@ -343,6 +343,7 @@ public class PersistentDataStore extends TransientDataStore {
     private class ReadJob extends JobImpl {
         private volatile long _lastModified;
         private volatile long _lastReseed;
+        private volatile boolean _setNetDbReady;
         private static final int MIN_ROUTERS = KademliaNetworkDatabaseFacade.MIN_RESEED;
         private static final long MIN_RESEED_INTERVAL = 90*60*1000;
 
@@ -457,6 +458,7 @@ public class PersistentDataStore extends TransientDataStore {
                     _lastReseed = _context.clock().now();
                     // checkReseed will call wakeup() when done and we will run again
                 } else {
+                    _setNetDbReady = true;
                     _context.router().setNetDbReady();
                 }
             } else if (_lastReseed < _context.clock().now() - MIN_RESEED_INTERVAL) {
@@ -466,7 +468,19 @@ public class PersistentDataStore extends TransientDataStore {
                         _lastReseed = _context.clock().now();
                         // checkReseed will call wakeup() when done and we will run again
                 } else {
-                    _context.router().setNetDbReady();
+                    if (!_setNetDbReady) {
+                        _setNetDbReady = true;
+                        _context.router().setNetDbReady();
+                    }
+                }
+            } else {
+                // second time through, reseed called wakeup()
+                if (!_setNetDbReady) {
+                    int count = Math.min(routerCount, size());
+                    if (count >= MIN_ROUTERS) {
+                        _setNetDbReady = true;
+                        _context.router().setNetDbReady();
+                    }
                 }
             }
         }
