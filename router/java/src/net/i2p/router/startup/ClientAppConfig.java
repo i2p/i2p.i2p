@@ -92,7 +92,7 @@ public class ClientAppConfig {
     public final String stopargs;
     /** @since 0.7.12 */
     public final String uninstallargs;
-    /** @since 0.0.34 */
+    /** @since 0.9.42 */
     private File configFile;
 
     public ClientAppConfig(String cl, String client, String a, long d, boolean dis) {
@@ -190,9 +190,14 @@ public class ClientAppConfig {
      * Migrate apps from file to individual files in dir
      *
      * @return success
-     * @since 0.9.34
+     * @since 0.9.42
      */
     private static boolean migrate(I2PAppContext ctx, List<ClientAppConfig> apps, File from, File dir) {
+        // don't migrate portable
+        try {
+            if (ctx.getConfigDir().getCanonicalPath().equals(ctx.getBaseDir().getCanonicalPath()))
+                return false;
+        } catch (IOException ioe) {}
         if (!dir.isDirectory() && !dir.mkdirs())
             return false;
         boolean ok = true;
@@ -242,7 +247,7 @@ public class ClientAppConfig {
      * with this prefix
      *
      * @return null if none
-     * @since 0.9.34 split out from above
+     * @since 0.9.42 split out from above
      */
     private static ClientAppConfig getClientApp(Properties clientApps, String prefix) {
             String className = clientApps.getProperty(prefix + ".main");
@@ -283,7 +288,7 @@ public class ClientAppConfig {
      * Do not use if multiple apps in a single file - use writeClientAppConfig(ctx, apps).
      * If app.configFile is null, a new file will be created and assigned.
      *
-     * @since 0.9.34
+     * @since 0.9.42
      */
     public synchronized static void writeClientAppConfig(I2PAppContext ctx, ClientAppConfig app) throws IOException {
         if (app.configFile == null) {
@@ -313,7 +318,7 @@ public class ClientAppConfig {
      * Do not add apps with this method - use writeClientAppConfig(ctx, app).
      * Do not delete apps with this method - use deleteClientAppConfig().
      *
-     * @since 0.9.34 split out from above
+     * @since 0.9.42 split out from above
      */
     public synchronized static void writeClientAppConfig(I2PAppContext ctx, List<ClientAppConfig> apps) throws IOException {
         // Gather the set of config files
@@ -350,7 +355,7 @@ public class ClientAppConfig {
      * All to a single file, apps.configFile ignored
      *
      * @throws IllegalArgumentException if null cfgFile
-     * @since 0.9.34 split out from above
+     * @since 0.9.42 split out from above
      */
     private static void writeClientAppConfig(List<ClientAppConfig> apps, File cfgFile) throws IOException {
         if (cfgFile == null)
@@ -372,7 +377,7 @@ public class ClientAppConfig {
     /**
      * @return success
      * @throws IllegalArgumentException if cac has a null configfile
-     * @since 0.9.34
+     * @since 0.9.42
      */
     public synchronized static boolean deleteClientAppConfig(ClientAppConfig cac) throws IOException {
         File f = cac.configFile;
@@ -389,7 +394,7 @@ public class ClientAppConfig {
     }
 
     /**
-     * @since 0.9.34
+     * @since 0.9.42
      */
     @Override
     public int hashCode() {
@@ -398,7 +403,7 @@ public class ClientAppConfig {
 
     /**
      * Matches on class, args, and name only
-     * @since 0.9.34
+     * @since 0.9.42
      */
     @Override
     public boolean equals(Object o) {
