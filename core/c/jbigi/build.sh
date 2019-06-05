@@ -6,8 +6,8 @@
 #     Set $I2P to point to your I2P installation
 #     Set $JAVA_HOME to point to your Java SDK
 #     build.sh
-#       This script downloads gmp-4.3.2.tar.bz2 to this directory
-#       (if a different version, change the GMP_VER= line below)
+#       This script downloads gmp-6.1.2.tar.bz2 to this directory
+#       (if a different version, change the GMP_VER= line in download_gmp.sh)
 #
 #  To build a dynamic library (you must have a libgmp.so somewhere in your system)
 #     Set $I2P to point to your I2P installation
