@@ -1,3 +1,12 @@
+2019-06-06 zzz
+ * CPUID/NBI:
+   - Add Skylake support (ticket #1869)
+   - Recognize more Intel "Lake" processors
+
+2019-06-05 zzz
+ * NetDb: Fix to set netDb ready immediately after reseed
+ * Util: Add EKU to selfsigned certs
+
 2019-06-03 zzz
  * Transport: Fix large messages in SSU (ticket #2505)
 

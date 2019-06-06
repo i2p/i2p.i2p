@@ -151,7 +151,11 @@ public class PublicKey extends SimpleDataStructure {
         if (_data == null) {
             buf.append("null");
         } else {
-            buf.append("size: ").append(length());
+            int length = length();
+            if (length <= 32)
+                buf.append(toBase64());
+            else
+                buf.append("size: ").append(length);
         }
         buf.append(']');
         return buf.toString();

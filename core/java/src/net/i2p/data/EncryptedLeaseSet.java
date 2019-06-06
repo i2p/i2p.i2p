@@ -994,13 +994,17 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         pkf.createIfAbsent(SigType.EdDSA_SHA512_Ed25519);
         System.out.println("Online test");
         java.io.File f2 = new java.io.File("online-encls2.dat");
-        test(pkf, f2, false, BlindData.AUTH_NONE, null);
+        //test(pkf, f2, false, BlindData.AUTH_NONE, null);
         List<KeyPair> keys = new java.util.ArrayList<KeyPair>(4);
         for (int i = 0; i < 4; i++) {
-            keys.add(net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys(net.i2p.crypto.EncType.ECIES_X25519));
+            KeyPair kp = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys(net.i2p.crypto.EncType.ECIES_X25519);
+            keys.add(kp);
+            System.out.println("Client key " + i + ":\n  Private: " + kp.getPrivate() + "\n  Public:  " + kp.getPublic());
         }
-        System.out.println("Online test with DH Keys");
-        test(pkf, f2, false, BlindData.AUTH_DH, keys);
+        //f2 = new java.io.File("online-encls2-dh.dat");
+        //System.out.println("Online test with DH Keys");
+        //test(pkf, f2, false, BlindData.AUTH_DH, keys);
+        f2 = new java.io.File("online-encls2-psk.dat");
         System.out.println("Online test with PSK Keys");
         test(pkf, f2, false, BlindData.AUTH_PSK, keys);
         //System.out.println("Offline test");
@@ -1033,7 +1037,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         net.i2p.crypto.KeyPair encKeys2 = net.i2p.crypto.KeyGenerator.getInstance().generatePKIKeys(net.i2p.crypto.EncType.ECIES_X25519);
         pubKey = encKeys2.getPublic();
         ls2.addEncryptionKey(pubKey);
-        ls2.setSecret("foobar");
+        //ls2.setSecret("foobar");
         SigningPrivateKey spk = pkf.getSigningPrivKey();
         if (offline) {
             now += 365*24*60*60*1000L;

@@ -121,11 +121,14 @@ public class PrivateKey extends SimpleDataStructure implements Destroyable {
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
         buf.append("[PrivateKey ").append(_type).append(' ');
-        int length = length();
         if (_data == null) {
             buf.append("null");
         } else {
-            buf.append("size: ").append(length);
+            int length = length();
+            if (length <= 32)
+                buf.append(toBase64());
+            else
+                buf.append("size: ").append(length);
         }
         buf.append(']');
         return buf.toString();
