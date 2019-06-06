@@ -340,12 +340,12 @@ public class CPUID {
                                name + " file in the library path, or set -Djava.library.path=. in the command line");
         }
         System.out.println("JCPUID Version: " + _jcpuidVersion);
-        System.out.println(" **CPUInfo**");
+        System.out.println("**CPUInfo**");
         String mname = getCPUModelName();
         if (mname != null)
-            System.out.println("CPU Model Name: " + mname);
+            System.out.println("CPU Name:     " + mname);
         String vendor = getCPUVendorID();
-        System.out.println("CPU Vendor: " + vendor);
+        System.out.println("CPU Vendor:   " + vendor);
         // http://en.wikipedia.org/wiki/Cpuid
         // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
         // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
@@ -358,8 +358,8 @@ public class CPUID {
         if (family == 15) {
             family += getCPUExtendedFamily();
         }
-        System.out.println("CPU Family: " + family);
-        System.out.println("CPU Model: " + model);
+        System.out.println("CPU Family:   " + family);
+        System.out.println("CPU Model:    " + model + " (0x" + Integer.toHexString(model) + ')');
         System.out.println("CPU Stepping: " + getCPUStepping());
         System.out.println("CPU Flags (EDX):      0x" + Integer.toHexString(getEDXCPUFlags()));
         System.out.println("CPU Flags (ECX):      0x" + Integer.toHexString(getECXCPUFlags()));
@@ -369,8 +369,8 @@ public class CPUID {
         System.out.println("CPU Ext. Feat. (ECX): 0x" + Integer.toHexString(getExtendedECXFeatureFlags()));
 
         CPUInfo c = getInfo();
-        System.out.println("\n **More CPUInfo**");
-        System.out.println("CPU model string: " + c.getCPUModelString());
+        System.out.println("\n**More CPUInfo**");
+        System.out.println("CPU model name: " + c.getCPUModelString());
         System.out.println("CPU has MMX:    " + c.hasMMX());
         System.out.println("CPU has SSE:    " + c.hasSSE());
         System.out.println("CPU has SSE2:   " + c.hasSSE2());
@@ -390,34 +390,36 @@ public class CPUID {
         System.out.println("CPU has MOVBE:  " + c.hasMOVBE());
         System.out.println("CPU has ABM:    " + c.hasABM());
         if(c instanceof IntelCPUInfo){
-            System.out.println("\n **Intel-info**");
-            System.out.println("Is PII-compatible:       "+((IntelCPUInfo)c).IsPentium2Compatible());
-            System.out.println("Is PIII-compatible:      "+((IntelCPUInfo)c).IsPentium3Compatible());
-            System.out.println("Is PIV-compatible:       "+((IntelCPUInfo)c).IsPentium4Compatible());
-            System.out.println("Is Atom-compatible:      "+((IntelCPUInfo)c).IsAtomCompatible());
-            System.out.println("Is Pentium M compatible: "+((IntelCPUInfo)c).IsPentiumMCompatible());
-            System.out.println("Is Core2-compatible:     "+((IntelCPUInfo)c).IsCore2Compatible());
-            System.out.println("Is Corei-compatible:     "+((IntelCPUInfo)c).IsCoreiCompatible());
-            System.out.println("Is Sandy-compatible:     "+((IntelCPUInfo)c).IsSandyCompatible());
-            System.out.println("Is Ivy-compatible:       "+((IntelCPUInfo)c).IsIvyCompatible());
-            System.out.println("Is Haswell-compatible:   "+((IntelCPUInfo)c).IsHaswellCompatible());
-            System.out.println("Is Broadwell-compatible: "+((IntelCPUInfo)c).IsBroadwellCompatible());
-        }
-        if(c instanceof AMDCPUInfo){
-            System.out.println("\n **AMD-info**");
-            System.out.println("Is K6-compatible:          "+((AMDCPUInfo)c).IsK6Compatible());
-            System.out.println("Is K6_2-compatible:        "+((AMDCPUInfo)c).IsK6_2_Compatible());
-            System.out.println("Is K6_3-compatible:        "+((AMDCPUInfo)c).IsK6_3_Compatible());
-            System.out.println("Is Geode-compatible:       "+((AMDCPUInfo)c).IsGeodeCompatible());
-            System.out.println("Is Athlon-compatible:      "+((AMDCPUInfo)c).IsAthlonCompatible());
-            System.out.println("Is Athlon64-compatible:    "+((AMDCPUInfo)c).IsAthlon64Compatible());
-            System.out.println("Is Bobcat-compatible:      "+((AMDCPUInfo)c).IsBobcatCompatible());
-            System.out.println("Is K10-compatible:         "+((AMDCPUInfo)c).IsK10Compatible());
-            System.out.println("Is Jaguar-compatible:      "+((AMDCPUInfo)c).IsJaguarCompatible());
-            System.out.println("Is Bulldozer-compatible:   "+((AMDCPUInfo)c).IsBulldozerCompatible());
-            System.out.println("Is Piledriver-compatible:  "+((AMDCPUInfo)c).IsPiledriverCompatible());
-            System.out.println("Is Steamroller-compatible: "+((AMDCPUInfo)c).IsSteamrollerCompatible());
-            System.out.println("Is Excavator-compatible:   "+((AMDCPUInfo)c).IsExcavatorCompatible());
+            IntelCPUInfo cc = (IntelCPUInfo) c;
+            System.out.println("\n**Intel-info**");
+            System.out.println("Is PII-compatible:       " + cc.IsPentium2Compatible());
+            System.out.println("Is PIII-compatible:      " + cc.IsPentium3Compatible());
+            System.out.println("Is PIV-compatible:       " + cc.IsPentium4Compatible());
+            System.out.println("Is Atom-compatible:      " + cc.IsAtomCompatible());
+            System.out.println("Is Pentium M compatible: " + cc.IsPentiumMCompatible());
+            System.out.println("Is Core2-compatible:     " + cc.IsCore2Compatible());
+            System.out.println("Is Corei-compatible:     " + cc.IsCoreiCompatible());
+            System.out.println("Is Sandy-compatible:     " + cc.IsSandyCompatible());
+            System.out.println("Is Ivy-compatible:       " + cc.IsIvyCompatible());
+            System.out.println("Is Haswell-compatible:   " + cc.IsHaswellCompatible());
+            System.out.println("Is Broadwell-compatible: " + cc.IsBroadwellCompatible());
+            System.out.println("Is Skylake-compatible:   " + cc.IsSkylakeCompatible());
+        } else if (c instanceof AMDCPUInfo) {
+            AMDCPUInfo cc = (AMDCPUInfo) c;
+            System.out.println("\n**AMD-info**");
+            System.out.println("Is K6-compatible:          " + cc.IsK6Compatible());
+            System.out.println("Is K6_2-compatible:        " + cc.IsK6_2_Compatible());
+            System.out.println("Is K6_3-compatible:        " + cc.IsK6_3_Compatible());
+            System.out.println("Is Geode-compatible:       " + cc.IsGeodeCompatible());
+            System.out.println("Is Athlon-compatible:      " + cc.IsAthlonCompatible());
+            System.out.println("Is Athlon64-compatible:    " + cc.IsAthlon64Compatible());
+            System.out.println("Is Bobcat-compatible:      " + cc.IsBobcatCompatible());
+            System.out.println("Is K10-compatible:         " + cc.IsK10Compatible());
+            System.out.println("Is Jaguar-compatible:      " + cc.IsJaguarCompatible());
+            System.out.println("Is Bulldozer-compatible:   " + cc.IsBulldozerCompatible());
+            System.out.println("Is Piledriver-compatible:  " + cc.IsPiledriverCompatible());
+            System.out.println("Is Steamroller-compatible: " + cc.IsSteamrollerCompatible());
+            System.out.println("Is Excavator-compatible:   " + cc.IsExcavatorCompatible());
         }
     }
 

@@ -139,4 +139,11 @@ public interface IntelCPUInfo extends CPUInfo {
      * @since 0.9.26
      */
     public boolean IsBroadwellCompatible();
+
+    /**
+     * Supports the AVX-512 instrutions.
+     *
+     * @since 0.9.41
+     */
+    public boolean IsSkylakeCompatible();
 }
