@@ -711,6 +711,19 @@
         </jar>
     </target>
 
+    <target name="jbigi-linux-x86-64-only"  depends="buildProperties, jbigi-list-changes">
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
+        <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*linux*_64.so" excludes="*linux-arm*.so,*linux-ppc*.so" />
+            <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
+            </manifest>
+        </jar>
+    </target>
 
     <target name="jbigi-linux-nonx86-only"  depends="buildProperties, jbigi-list-changes">
         <!-- set if unset -->
