@@ -306,7 +306,7 @@ public class TunnelControllerGroup implements ClientApp {
         List<Properties> props = null;
         if (cfgFile.exists()) {
             try {
-                List<Properties> cfgs = loadConfig(cfgFile);
+                List<Properties> cfgs = loadMonolithicConfig(cfgFile);
                 if (shouldMigrate) {
                     boolean ok = migrate(cfgs, cfgFile, dir);
                     if (!ok)
@@ -329,7 +329,7 @@ public class TunnelControllerGroup implements ClientApp {
                     Collections.sort(fileList);
                     for (File f : fileList) {
                         try {
-                            props = loadConfig(f);
+                            props = loadSplitConfig(f);
                             if (!props.isEmpty()) {
                                 for (Properties cfg : props) {
                                     String type = cfg.getProperty("type");
@@ -381,7 +381,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.34
      */
     private boolean migrate(List<Properties> tunnels, File from, File dir) {
-        if (!dir.isDirectory()) // && !dir.mkdirs())
+        if (!dir.isDirectory() && !dir.mkdirs())
             return false;
         boolean ok = true;
         for (int i = 0; i < tunnels.size(); i++) {
@@ -398,7 +398,7 @@ public class TunnelControllerGroup implements ClientApp {
             for (Map.Entry<Object, Object> e : props.entrySet()) {
                 String key = (String) e.getKey();
                 String val = (String) e.getValue();
-                save.setProperty(PREFIX + i + '.' + key, val);
+                save.setProperty(PREFIX + key, val);
             }
             try {
                 DataHelper.storeProps(save, f);
@@ -456,12 +456,12 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized void reloadControllers() {
         List<File> fileList = listFiles();
+        unloadControllers();
         for (int i = 0; i < fileList.size(); i++) {
             String configFile = fileList.get(i).toString();
-            unloadControllers();
             loadControllers(configFile);
-            startControllers();
         }
+        startControllers();
     }
 
     /**
@@ -662,7 +662,7 @@ public class TunnelControllerGroup implements ClientApp {
         try {
             for (int i = 0; i < _controllers.size(); i++) {
                 TunnelController controller = _controllers.get(i);
-                Properties cur = controller.getConfig(PREFIX + i + ".");
+                Properties cur = controller.getConfig(PREFIX);
                 map.putAll(cur);
             }
         } finally {
@@ -681,16 +681,8 @@ public class TunnelControllerGroup implements ClientApp {
         Properties inputController = tc.getConfig("");
         String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
-        String foundConfigFile = inConfig(tc);
 
-        _log.logAlways(Log.WARN, "found " + foundConfigFile);
-
-        File cfgFile = new File(foundConfigFile);
-        if (!cfgFile.isAbsolute())
-            cfgFile = new File(_context.getConfigDir(), foundConfigFile);
-        File parent = cfgFile.getParentFile();
-        if ( (parent != null) && (!parent.exists()) )
-            parent.mkdirs();
+        File cfgFile = inConfig(tc);
 
         _controllersLock.readLock().lock();
         try {
@@ -707,21 +699,11 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.34
      */
     public synchronized void removeConfig(TunnelController tc) throws IOException {
-        _log.logAlways(Log.WARN, "Removing tunnel configuration");
-        boolean done = false;
         Properties inputController = tc.getConfig("");
         String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
-        String foundConfigFile = inConfig(tc);
 
-        _log.logAlways(Log.WARN, "found " + foundConfigFile);
-
-        File cfgFile = new File(foundConfigFile);
-        if (!cfgFile.isAbsolute())
-            cfgFile = new File(_context.getConfigDir(), foundConfigFile);
-        File parent = cfgFile.getParentFile();
-        if ( (parent != null) && (!parent.exists()) )
-            parent.mkdirs();
+        File cfgFile = inConfig(tc);
 
         _controllersLock.readLock().lock();
         try {
@@ -733,63 +715,23 @@ public class TunnelControllerGroup implements ClientApp {
             _controllersLock.readLock().unlock();
         }
 
-        DataHelper.storeProps(map, cfgFile);
-        done = true;
-
+        if (!FileUtil.rename(cfgFile, new File(cfgFile.getAbsolutePath() + ".bak")))
+            if (! cfgFile.delete())
+                _log.debug("could not delete config file" + cfgFile.toString());
     }
 
     /**
-     * Check if the tunnel is present in any config file
+     * return the configFile value contained in the tunnelController
      * @since 0.9.41
      */
-    public synchronized String inConfig(TunnelController tc) throws IOException {
-        List<File> fileList = listFiles();
-        _log.logAlways(Log.DEBUG, "checking for tunnel controller presence");
-        for (File afile : fileList) {
-            String configFile = afile.toString();
-            return inConfig(tc, configFile);
-        }
-        return "";
-    }
-
-    /**
-     * Check if the tunnel is present in the specified config file
-     * @since 0.9.41
-     */
-    public synchronized String inConfig(TunnelController tc, String configFile) throws IOException {
-        File cfgFile = new File(configFile);
-        if (!cfgFile.isAbsolute())
-            cfgFile = new File(_context.getConfigDir(), configFile);
-        File parent = cfgFile.getParentFile();
-        if ( (parent != null) && (!parent.exists()) )
-            parent.mkdirs();
-
+    public synchronized File inConfig(TunnelController tc) throws IOException {
         Properties inputController = tc.getConfig("");
-        String inputName = inputController.getProperty("name");
-        String outputName = "";
+        String configFileName = inputController.getProperty("configFile");
+        File file = new File(configFileName);
+        if (!file.isAbsolute())
+            file = new File(configFileName, _configDirectory);
 
-        Properties map = new OrderedProperties();
-        _controllersLock.readLock().lock();
-        try {
-            for (int i = 0; i < _controllers.size(); i++) {
-                TunnelController controller = _controllers.get(i);
-                Properties controllerProperties = controller.getConfig(PREFIX + i + ".");
-                String curName = controllerProperties.getProperty("name");
-                if (curName == inputName) {
-                    outputName = cfgFile.toString();
-                }
-            }
-        } finally {
-            _controllersLock.readLock().unlock();
-        }
-        if (outputName == "") {
-            _log.logAlways(Log.WARN, "config " + inputName + " not found in " + configFile);
-            System.out.println("config " + inputName + " not found in " + configFile);
-        }else{
-            _log.logAlways(Log.WARN, "config " + inputName + " found in " + configFile);
-           System.out.println("config " + inputName + " found in " + configFile);
-        }
-        return outputName;
+        return file;
     }
 
     /**
@@ -802,8 +744,6 @@ public class TunnelControllerGroup implements ClientApp {
         File folder = new File(_configDirectory);
         if (!folder.isAbsolute())
             folder = new File(_context.getConfigDir(), _configDirectory);
-        if ( (folder != null) && (!folder.exists()) )
-            folder.mkdirs();
         File[] listOfFiles = folder.listFiles();
         List<File> files = new ArrayList<File>();
         //
@@ -814,22 +754,64 @@ public class TunnelControllerGroup implements ClientApp {
                 }
             }
         }
-        File file = new File(_configFile);
-        if (!file.isAbsolute())
-            file = new File(_context.getConfigDir(), _configFile);
-        if (file.exists() && file.isFile() && file.getName().endsWith(".config"))
-            files.add(file);
         Collections.sort(files);
         return files;
     }
 
     /**
-     * Load up the config data from the file
+     * Load up the config data from the file, try and determine whether it's a
+     * split or monolithic config automatically by attempting to detect a
+     * tunnel.0 config
      *
      * @return non-null, properties loaded, one for each tunnel
      * @throws IOException if unable to load from file
      */
     private synchronized List<Properties> loadConfig(File cfgFile) throws IOException {
+        Properties config = new Properties();
+        DataHelper.loadProps(config, cfgFile);
+        for (String key : config.stringPropertyNames()){
+            if (key.startsWith(PREFIX+"0"))
+                return loadMonolithicConfig(cfgFile);
+            else
+                break;
+        }
+        return loadSplitConfig(cfgFile);
+
+    }
+
+
+    /**
+     * Load up the config data from the file, a "Split Config" is a non-numbered
+     * single-tunnel config file
+     *
+     * @return non-null, properties loaded, one for each tunnel
+     * @throws IOException if unable to load from file
+     */
+    private synchronized List<Properties> loadSplitConfig(File cfgFile) throws IOException {
+        Properties config = new Properties();
+        DataHelper.loadProps(config, cfgFile);
+        List<Properties> rv = new ArrayList<Properties>();
+        Properties p = new Properties();
+
+        for (Map.Entry<Object, Object> e : config.entrySet()) {
+            String key = (String) e.getKey();
+            key = key.substring(PREFIX.length());
+            String val = (String) e.getValue();
+            p.setProperty(key, val);
+        }
+        p.setProperty("configFile", cfgFile.getAbsolutePath());
+        rv.add(p);
+        return rv;
+    }
+
+    /**
+     * Load up the config data from the file, this is the old version for the
+     * numbered config file
+     *
+     * @return non-null, properties loaded, one for each tunnel
+     * @throws IOException if unable to load from file
+     */
+    private synchronized List<Properties> loadMonolithicConfig(File cfgFile) throws IOException {
         Properties config = new Properties();
         DataHelper.loadProps(config, cfgFile);
         List<Properties> rv = new ArrayList<Properties>();
@@ -846,10 +828,7 @@ public class TunnelControllerGroup implements ClientApp {
                     p.setProperty(key, val);
                 }
             }
-            // OK so I don't really like this, but working around the numbered
-            // tunnel configurations requires either something like this, or
-            // altering the config file format which is probably even worse. idk
-            if (p.isEmpty() && i > maxFiles)
+            if (p.isEmpty())
                 break;
             p.setProperty("configFile", cfgFile.getAbsolutePath());
             rv.add(p);
@@ -873,6 +852,13 @@ public class TunnelControllerGroup implements ClientApp {
         return _tempControllers;
      }
 
+
+    /**
+     *
+     *
+     *
+     *
+    */
     public List<TunnelController> getControllers(String configFile) {
         _log.logAlways(Log.WARN, "Getting controllers from config file " + configFile);
         synchronized (this) {
