@@ -322,7 +322,7 @@ class BuildHandler implements Runnable {
                 if (record < 0) {
                     _log.error("Bad status index " + i);
                     // don't leak
-                    _exec.buildComplete(cfg, cfg.getTunnelPool());
+                    _exec.buildComplete(cfg);
                     return;
                 }
 
@@ -379,14 +379,14 @@ class BuildHandler implements Runnable {
                     // This will happen very rarely. We check for dups when
                     // creating the config, but we don't track IDs for builds in progress.
                     _context.statManager().addRateData("tunnel.ownDupID", 1);
-                    _exec.buildComplete(cfg, cfg.getTunnelPool());
+                    _exec.buildComplete(cfg);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dup ID for our own tunnel " + cfg);
                     return;
                 }
                 cfg.getTunnelPool().addTunnel(cfg); // self.self.self.foo!
                 // call buildComplete() after addTunnel() so we don't try another build.
-                _exec.buildComplete(cfg, cfg.getTunnelPool());
+                _exec.buildComplete(cfg);
                 _exec.buildSuccessful(cfg);
 
                 if (cfg.getTunnelPool().getSettings().isExploratory()) {
@@ -421,8 +421,7 @@ class BuildHandler implements Runnable {
                     }
                 }
                 
-                ExpireJob expireJob = new ExpireJob(_context, cfg, cfg.getTunnelPool());
-                cfg.setExpireJob(expireJob);
+                ExpireJob expireJob = new ExpireJob(_context, cfg);
                 _context.jobQueue().addJob(expireJob);
                 if (cfg.getDestination() == null)
                     _context.statManager().addRateData("tunnel.buildExploratorySuccess", rtt);
@@ -430,7 +429,7 @@ class BuildHandler implements Runnable {
                     _context.statManager().addRateData("tunnel.buildClientSuccess", rtt);
             } else {
                 // someone is no fun
-                _exec.buildComplete(cfg, cfg.getTunnelPool());
+                _exec.buildComplete(cfg);
                 if (cfg.getDestination() == null)
                     _context.statManager().addRateData("tunnel.buildExploratoryReject", rtt);
                 else
@@ -441,7 +440,7 @@ class BuildHandler implements Runnable {
                 _log.warn(msg.getUniqueId() + ": Tunnel reply could not be decrypted for tunnel " + cfg);
             _context.statManager().addRateData("tunnel.corruptBuildReply", 1);
             // don't leak
-            _exec.buildComplete(cfg, cfg.getTunnelPool());
+            _exec.buildComplete(cfg);
         }
     }
     
@@ -723,8 +722,9 @@ class BuildHandler implements Runnable {
         // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it was not.
         // As of 0.9.16, allow + 5 minutes to - 65 minutes.
         long time = req.readRequestTime();
-        long now = (_context.clock().now() / (60l*60l*1000l)) * (60*60*1000);
-        long timeDiff = now - time;
+        long now = _context.clock().now();
+        long roundedNow = (now / (60l*60l*1000l)) * (60*60*1000);
+        long timeDiff = roundedNow - time;
         if (timeDiff > MAX_REQUEST_AGE) {
             _context.statManager().addRateData("tunnel.rejectTooOld", 1);
             if (_log.shouldLog(Log.WARN))
@@ -763,7 +763,7 @@ class BuildHandler implements Runnable {
         //if ( (response == 0) && (_context.random().nextInt(50) <= 1) )
         //    response = TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
         
-        long recvDelay = _context.clock().now()-state.recvTime;
+        long recvDelay = now - state.recvTime;
 
         if (response == 0) {
             // unused
@@ -833,8 +833,8 @@ class BuildHandler implements Runnable {
         HopConfig cfg = null;
         if (response == 0) {
             cfg = new HopConfig();
-            cfg.setCreation(_context.clock().now());
-            cfg.setExpiration(_context.clock().now() + 10*60*1000);
+            cfg.setCreation(now);
+            cfg.setExpiration(now + 10*60*1000);
             cfg.setIVKey(req.readIVKey());
             cfg.setLayerKey(req.readLayerKey());
             if (isInGW) {
@@ -935,7 +935,7 @@ class BuildHandler implements Runnable {
                       + " recvDelay " + recvDelay + " replyMessage " + req.readReplyMessageId());
 
         // now actually send the response
-        long expires = _context.clock().now() + NEXT_HOP_SEND_TIMEOUT;
+        long expires = now + NEXT_HOP_SEND_TIMEOUT;
         if (!isOutEnd) {
             state.msg.setUniqueId(req.readReplyMessageId());
             state.msg.setMessageExpiration(expires);

@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.tunnel.TunnelCreatorConfig;
 
 /**
  *  This runs twice for each tunnel.
@@ -13,17 +12,15 @@ import net.i2p.router.tunnel.TunnelCreatorConfig;
  *  The second time, stop accepting data for it.
  */
 class ExpireJob extends JobImpl {
-    private final TunnelPool _pool;
-    private final TunnelCreatorConfig _cfg;
+    private final PooledTunnelCreatorConfig _cfg;
     private final AtomicBoolean _leaseUpdated = new AtomicBoolean(false);
     private final long _dropAfter;
 
     private static final long OB_EARLY_EXPIRE = 30*1000;
     private static final long IB_EARLY_EXPIRE = OB_EARLY_EXPIRE + 7500;
 
-    public ExpireJob(RouterContext ctx, TunnelCreatorConfig cfg, TunnelPool pool) {
+    public ExpireJob(RouterContext ctx, PooledTunnelCreatorConfig cfg) {
         super(ctx);
-        _pool = pool;
         _cfg = cfg;
         // we act as if this tunnel expires a random skew before it actually does
         // so we rebuild out of sync.  otoh, we will honor tunnel messages on it
@@ -31,7 +28,7 @@ class ExpireJob extends JobImpl {
         // others may be sending to the published lease expirations
         // Also skew the inbound away from the outbound
         long expire = cfg.getExpiration();
-        if (_pool.getSettings().isInbound()) {
+        if (cfg.getTunnelPool().getSettings().isInbound()) {
             // wait extra long for IB so we don't drop msgs that
             // got all the way to us.
             _dropAfter = expire + (2 * Router.CLOCK_FUDGE_FACTOR);
@@ -51,10 +48,11 @@ class ExpireJob extends JobImpl {
 
     public void runJob() {
         if (_leaseUpdated.compareAndSet(false,true)) {
+            TunnelPool pool = _cfg.getTunnelPool();
             // First run
-            _pool.removeTunnel(_cfg);
+            pool.removeTunnel(_cfg);
             // noop for outbound
-            _pool.refreshLeaseSet();
+            pool.refreshLeaseSet();
             long timeToDrop = _dropAfter - getContext().clock().now();
             requeue(timeToDrop);
         } else {
