@@ -1211,19 +1211,22 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             if (DatabaseEntry.isLeaseSet(etype)) {
                 LeaseSet ls = (LeaseSet) entry;
                 Destination d = ls.getDestination();
-                Certificate c = d.getCertificate();
-                if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
-                    try {
-                        KeyCertificate kc = c.toKeyCertificate();
-                        SigType type = kc.getSigType();
-                        if (type == null || !type.isAvailable() || type.getBaseAlgorithm() == SigAlgo.RSA) {
-                            failPermanently(d);
-                            String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("Unsupported sig type " + stype + " for destination " + h);
-                            throw new UnsupportedCryptoException("Sig type " + stype);
-                        }
-                    } catch (DataFormatException dfe) {}
+                // will be null for encrypted LS
+                if (d != null) {
+                    Certificate c = d.getCertificate();
+                    if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+                        try {
+                            KeyCertificate kc = c.toKeyCertificate();
+                            SigType type = kc.getSigType();
+                            if (type == null || !type.isAvailable() || type.getBaseAlgorithm() == SigAlgo.RSA) {
+                                failPermanently(d);
+                                String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn("Unsupported sig type " + stype + " for destination " + h);
+                                throw new UnsupportedCryptoException("Sig type " + stype);
+                            }
+                        } catch (DataFormatException dfe) {}
+                    }
                 }
             } else if (etype == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 RouterInfo ri = (RouterInfo) entry;
