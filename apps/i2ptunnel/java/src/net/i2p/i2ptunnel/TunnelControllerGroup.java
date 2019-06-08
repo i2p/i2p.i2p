@@ -289,8 +289,12 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void loadControllers(String configFile) {
         if (_controllersLoaded)
             return;
-        boolean shouldMigrate = _context.isRouterContext() && !SystemVersion.isAndroid();
-        loadControllers(configFile, shouldMigrate);
+        try {
+            boolean shouldMigrate = false;//_context.isRouterContext() && !SystemVersion.isAndroid() && !_context.getConfigDir().getCanonicalPath().equals(_context.getBaseDir().getCanonicalPath());
+            loadControllers(configFile, shouldMigrate);
+        } catch (IOException ioe){
+            loadControllers(configFile, false);
+        }
     }
 
     /**
@@ -306,9 +310,9 @@ public class TunnelControllerGroup implements ClientApp {
         List<Properties> props = null;
         if (cfgFile.exists()) {
             try {
-                List<Properties> cfgs = loadMonolithicConfig(cfgFile);
+                props = loadConfig(cfgFile);
                 if (shouldMigrate) {
-                    boolean ok = migrate(cfgs, cfgFile, dir);
+                    boolean ok = migrate(props, cfgFile, dir);
                     if (!ok)
                         shouldMigrate = false;
                 }
@@ -329,7 +333,7 @@ public class TunnelControllerGroup implements ClientApp {
                     Collections.sort(fileList);
                     for (File f : fileList) {
                         try {
-                            props = loadSplitConfig(f);
+                            props = loadConfig(f);
                             if (!props.isEmpty()) {
                                 for (Properties cfg : props) {
                                     String type = cfg.getProperty("type");
@@ -337,7 +341,7 @@ public class TunnelControllerGroup implements ClientApp {
                                         continue;
                                     TunnelController controller = new TunnelController(cfg, "");
                                     _controllers.add(controller);
-                                    i++;
+                                    //i++;
                                 }
                             } else {
                                 _log.error("Error loading the client app properties from " + f);
@@ -734,10 +738,10 @@ public class TunnelControllerGroup implements ClientApp {
             file = new File(folder, configFileName);
         }
 
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Found config file " + file.toString());
         if (!file.exists())
             file.createNewFile();
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Found config file " + file.toString());
         return file;
     }
 
@@ -765,6 +769,31 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
+     * Load up the config data from either type of config file automatically
+     *
+     * @return non-null, properties loaded, one for each tunnel
+     * @throws IOException if unable to load from file
+     */
+    private synchronized List<Properties> loadConfig(File cfgFile) throws IOException {
+        Properties config = new Properties();
+        DataHelper.loadProps(config, cfgFile);
+        Properties p = new Properties();
+        for (Map.Entry<Object, Object> e : config.entrySet()) {
+            String key = (String) e.getKey();
+            if (key.startsWith(PREFIX)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Found monolithic config file " +key+ cfgFile.toString());
+                return loadMonolithicConfig(cfgFile);
+            }else{
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Found split config file " +key+ cfgFile.toString());
+                break;
+            }
+        }
+        return loadSplitConfig(cfgFile);
+    }
+
+    /**
      * Load up the config data from the file, a "Split Config" is a non-numbered
      * single-tunnel config file
      *
@@ -775,15 +804,8 @@ public class TunnelControllerGroup implements ClientApp {
         Properties config = new Properties();
         DataHelper.loadProps(config, cfgFile);
         List<Properties> rv = new ArrayList<Properties>();
-        Properties p = new Properties();
-
-        for (Map.Entry<Object, Object> e : config.entrySet()) {
-            String key = (String) e.getKey();
-            String val = (String) e.getValue();
-            p.setProperty(key, val);
-        }
-        p.setProperty("configFile", cfgFile.getAbsolutePath());
-        rv.add(p);
+        config.setProperty("configFile", cfgFile.getAbsolutePath());
+        rv.add(config);
         return rv;
     }
 
@@ -799,7 +821,6 @@ public class TunnelControllerGroup implements ClientApp {
         DataHelper.loadProps(config, cfgFile);
         List<Properties> rv = new ArrayList<Properties>();
         int i = 0;
-        int maxFiles = listFiles().size();
         while (true) {
             String prefix = PREFIX + i + ".";
             Properties p = new Properties();
