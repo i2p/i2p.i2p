@@ -727,7 +727,7 @@ public class TunnelControllerGroup implements ClientApp {
                 configFileName = _controllers.size() + "-tunnel-i2ptunnel.config";
 
         File file = new File(configFileName);
-        if (!file.isAbsolute()){
+        if (!file.isAbsolute()) {
             File folder = new File(_configDirectory);
             if (!folder.isAbsolute())
                 folder = new File(_context.getConfigDir(), _configDirectory);
@@ -753,7 +753,6 @@ public class TunnelControllerGroup implements ClientApp {
             folder = new File(_context.getConfigDir(), _configDirectory);
         File[] listOfFiles = folder.listFiles();
         List<File> files = new ArrayList<File>();
-        //
         if (listOfFiles != null && listOfFiles.length > 0) {
             for (File afile : listOfFiles) {
                 if (afile.isFile() && afile.exists() && afile.getName().endsWith(".config")) {
@@ -780,7 +779,6 @@ public class TunnelControllerGroup implements ClientApp {
 
         for (Map.Entry<Object, Object> e : config.entrySet()) {
             String key = (String) e.getKey();
-//            key = key.substring(PREFIX.length());
             String val = (String) e.getValue();
             p.setProperty(key, val);
         }
