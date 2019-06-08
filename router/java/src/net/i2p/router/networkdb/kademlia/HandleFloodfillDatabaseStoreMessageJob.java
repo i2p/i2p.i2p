@@ -21,6 +21,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -293,14 +294,45 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 tgm2.setMessageExpiration(msg.getMessageExpiration());
                 getContext().tunnelDispatcher().dispatch(tgm2);
             }
-        } else if (toUs || getContext().commSystem().isEstablished(toPeer)) {
+            return;
+        }
+        if (toUs) {
             Job send = new SendMessageDirectJob(getContext(), msg, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
             send.runJob();
             if (msg2 != null) {
                 Job send2 = new SendMessageDirectJob(getContext(), msg2, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
                 send2.runJob();
             }
-        } else {
+            return;
+        }
+        boolean isEstab = getContext().commSystem().isEstablished(toPeer);
+        if (isEstab) {
+            I2NPMessage out1 = msg;
+            I2NPMessage out2 = msg2;
+            if (replyTunnel != null) {
+                // wrap reply in a TGM
+                TunnelGatewayMessage tgm = new TunnelGatewayMessage(getContext());
+                tgm.setMessage(msg);
+                tgm.setTunnelId(replyTunnel);
+                tgm.setMessageExpiration(msg.getMessageExpiration());
+                out1 = tgm;
+                if (out2 != null) {
+                    TunnelGatewayMessage tgm2 = new TunnelGatewayMessage(getContext());
+                    tgm2.setMessage(msg2);
+                    tgm2.setTunnelId(replyTunnel);
+                    tgm2.setMessageExpiration(msg.getMessageExpiration());
+                    out2 = tgm2;
+                }
+            }
+            Job send = new SendMessageDirectJob(getContext(), out1, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+            send.runJob();
+            if (msg2 != null) {
+                Job send2 = new SendMessageDirectJob(getContext(), out2, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+                send2.runJob();
+            }
+            return;
+        }
+
             // pick tunnel with endpoint closest to toPeer
             TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(toPeer);
             if (outTunnel == null) {
@@ -313,7 +345,6 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             if (msg2 != null)
                 getContext().tunnelDispatcher().dispatchOutbound(msg2, outTunnel.getSendTunnelId(0),
                                                                  replyTunnel, toPeer);
-        }
     }
  
     public String getName() { return "Handle Database Store Message"; }
