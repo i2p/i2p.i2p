@@ -71,7 +71,7 @@ public class GeneralHelper {
         if (tcg == null) return null;
         List<TunnelController> controllers = tcg.getControllers();
         if (controllers.size() > tunnel)
-            return controllers.get(tunnel); 
+            return controllers.get(tunnel);
         else
             return null;
     }
@@ -129,13 +129,13 @@ public class GeneralHelper {
                         // config now contains new keystore props
                         String name = props.getProperty(TunnelController.PROP_NAME, "");
                         msgs.add("Created new self-signed certificate for tunnel " + name);
-                    }        
-                } catch (IOException ioe) {       
+                    }
+                } catch (IOException ioe) {
                     msgs.add("Failed to create new self-signed certificate for tunnel " +
                             getTunnelName(tcg, tunnel) + ", check logs: " + ioe);
-                }        
-            }        
-        }        
+                }
+            }
+        }
         if (cur == null) {
             // creating new
             cur = new TunnelController(props, "", true);
@@ -173,7 +173,7 @@ public class GeneralHelper {
         return msgs;
     }
 
-    protected static List<String> saveConfig(I2PAppContext context, TunnelControllerGroup tcg) { 
+    protected static List<String> saveConfig(I2PAppContext context, TunnelControllerGroup tcg) {
         List<String> rv = tcg.clearAllMessages();
         try {
 ////////////////
@@ -209,6 +209,11 @@ public class GeneralHelper {
 
 ////////////////////////
         msgs = tcg.removeController(cur);
+        try {
+            tcg.removeConfig(cur);
+        }catch (IOException ioe){
+            msgs.add(ioe.toString());
+        }
         msgs.addAll(saveConfig(context, tcg));
 
         // Rename private key file if it was a default name in
@@ -560,7 +565,7 @@ public class GeneralHelper {
     public boolean getEncrypt(int tunnel) {
         return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
     }
-    
+
     /**
      *  @since 0.9.40
      */
@@ -576,7 +581,7 @@ public class GeneralHelper {
         }
         return 0;
     }
-    
+
     /**
      *  @since 0.9.40
      */
@@ -663,7 +668,7 @@ public class GeneralHelper {
             return 2;
         return 0;
     }
-    
+
     public String getAccessList(int tunnel) {
         return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
     }
@@ -680,12 +685,12 @@ public class GeneralHelper {
         }
         return "";
     }
-    
+
     public String getJumpList(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
                            I2PTunnelHTTPClient.DEFAULT_JUMP_SERVERS).replace(",", "\n");
     }
-    
+
     public boolean getCloseOnIdle(int tunnel, boolean def) {
         return getBooleanProperty(tunnel, "i2cp.closeOnIdle", def);
     }
@@ -736,15 +741,15 @@ public class GeneralHelper {
     public String getProxyAuth(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH, "false");
     }
-    
+
     public boolean getOutproxyAuth(int tunnel) {
         return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH);
     }
-    
+
     public String getOutproxyUsername(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER, "");
     }
-    
+
     public String getOutproxyPassword(int tunnel) {
         if (getOutproxyUsername(tunnel).length() <= 0)
             return "";
