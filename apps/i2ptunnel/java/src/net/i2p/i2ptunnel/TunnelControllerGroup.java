@@ -119,10 +119,10 @@ public class TunnelControllerGroup implements ClientApp {
         _log = _context.logManager().getLog(TunnelControllerGroup.class);
         _controllers = new ArrayList<TunnelController>();
         _controllersLock = new ReentrantReadWriteLock(true);
-        if (args == null || args.length <= 0){
+        if (args == null || args.length <= 0) {
             _configFile = DEFAULT_CONFIG_FILE;
             _configDirectory = CONFIG_DIR;
-        }else if (args.length == 1){
+        }else if (args.length == 1) {
             File check = new File(args[0]);
             if (check.isFile()) {
                 _configFile = args[0];
@@ -131,7 +131,7 @@ public class TunnelControllerGroup implements ClientApp {
                 _configFile = DEFAULT_CONFIG_FILE;
                 _configDirectory = args[0];
             }
-        }else if (args.length == 2){
+        }else if (args.length == 2) {
             _configFile = args[0];
             _configDirectory = args[1];
         }else{
@@ -404,7 +404,7 @@ public class TunnelControllerGroup implements ClientApp {
                 DataHelper.storeProps(save, f);
             } catch (IOException ioe) {
                 _log.error("Error migrating the i2ptunnel configuration to " + f, ioe);
-                System.out.println("Error migrating the i2ptunnel configuration to " + f + ' ' + ioe);
+                System.out.println("Error migrating the i2ptunnel configuration to " + f + ' ' + ioe.toString());
                 ok = false;
             }
         }
@@ -435,8 +435,7 @@ public class TunnelControllerGroup implements ClientApp {
                         _log.logAlways(Log.WARN, "No configured tunnels to start");
                         return;
                     }
-                    for (int i = 0; i < _controllers.size(); i++) {
-                        TunnelController controller = _controllers.get(i);
+                    for (TunnelController controller : _controllers) {
                         if (controller.getStartOnLoad())
                             controller.startTunnelBackground();
                     }
@@ -457,10 +456,7 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void reloadControllers() {
         List<File> fileList = listFiles();
         unloadControllers();
-//        for (int i = 0; i < fileList.size(); i++) {
-//            String configFile = fileList.get(i).toString();
-            loadControllers(_configFile);
-//        }
+        loadControllers(_configFile);
         startControllers();
     }
 
@@ -531,8 +527,7 @@ public class TunnelControllerGroup implements ClientApp {
         List<String> msgs = new ArrayList<String>();
         _controllersLock.readLock().lock();
         try {
-            for (int i = 0; i < _controllers.size(); i++) {
-                TunnelController controller = _controllers.get(i);
+            for (TunnelController controller : _controllers) {
                 controller.stopTunnel();
                 msgs.addAll(controller.clearMessages());
             }
@@ -551,8 +546,7 @@ public class TunnelControllerGroup implements ClientApp {
      *  @since 0.9.17
      */
     private void destroyAllControllers() {
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
+        for (TunnelController controller : _controllers) {
             controller.destroyTunnel();
         }
         if (_log.shouldLog(Log.INFO))
@@ -569,8 +563,7 @@ public class TunnelControllerGroup implements ClientApp {
         List<String> msgs = new ArrayList<String>();
         _controllersLock.readLock().lock();
         try {
-            for (int i = 0; i < _controllers.size(); i++) {
-                TunnelController controller = _controllers.get(i);
+            for (TunnelController controller : _controllers) {
                 controller.startTunnelBackground();
                 msgs.addAll(controller.clearMessages());
             }
@@ -593,8 +586,7 @@ public class TunnelControllerGroup implements ClientApp {
         List<String> msgs = new ArrayList<String>();
         _controllersLock.readLock().lock();
         try {
-            for (int i = 0; i < _controllers.size(); i++) {
-                TunnelController controller = _controllers.get(i);
+            for (TunnelController controller : _controllers) {
                 controller.restartTunnel();
                 msgs.addAll(controller.clearMessages());
             }
@@ -615,8 +607,6 @@ public class TunnelControllerGroup implements ClientApp {
         List<String> msgs = new ArrayList<String>();
         _controllersLock.readLock().lock();
         try {
- //           for (int i = 0; i < _controllers.size(); i++) {
-//                TunnelController controller = _controllers.get(i);
             for (TunnelController controller : _controllers) {
                 msgs.addAll(controller.clearMessages());
             }
@@ -648,7 +638,7 @@ public class TunnelControllerGroup implements ClientApp {
      * Save the configuration of all known tunnels to the given file
      * @deprecated
      */
-/*    @Deprecated
+    @Deprecated
     private synchronized void saveConfig(String configFile) throws IOException {
         File cfgFile = new File(configFile);
         if (!cfgFile.isAbsolute())
@@ -670,7 +660,7 @@ public class TunnelControllerGroup implements ClientApp {
         }
 
         DataHelper.storeProps(map, cfgFile);
-    }*/
+    }
 
     /**
      * Save the configuration of this tunnel only, may be new
@@ -683,6 +673,7 @@ public class TunnelControllerGroup implements ClientApp {
         Properties map = new OrderedProperties();
 
         File cfgFile = inConfig(tc);
+        inputController.setProperty("configFile", cfgFile.getAbsolutePath());
 
         _controllersLock.readLock().lock();
         try {
@@ -720,19 +711,33 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * return the configFile value contained in the tunnelController
+     * return the config File associated with a TunnelController or a default
+     * value based on the tunnel name
+     *
      * @since 0.9.41
+     * @return the File ready for use
      */
     public synchronized File inConfig(TunnelController tc) throws IOException {
         Properties inputController = tc.getConfig("");
         String configFileName = inputController.getProperty("configFile");
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Found config file" + configFileName);
+        if (configFileName == null)
+            configFileName = _controllers.size() + "-" + inputController.getProperty("name") + "-i2ptunnel.config";
+            String fileName = inputController.getProperty("name");
+            if (fileName == null)
+                configFileName = _controllers.size() + "-tunnel-i2ptunnel.config";
 
         File file = new File(configFileName);
-        if (!file.isAbsolute())
-            file = new File(configFileName, _configDirectory);
+        if (!file.isAbsolute()){
+            File folder = new File(_configDirectory);
+            if (!folder.isAbsolute())
+                folder = new File(_context.getConfigDir(), _configDirectory);
+            file = new File(folder, configFileName);
+        }
 
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Found config file " + file.toString());
+        if (!file.exists())
+            file.createNewFile();
         return file;
     }
 
