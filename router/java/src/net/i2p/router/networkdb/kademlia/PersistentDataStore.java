@@ -441,11 +441,15 @@ public class PersistentDataStore extends TransientDataStore {
                     Hash key = getRouterInfoHash(file.getName());
                     if (key != null && !isKnown(key)) {
                         (new ReadRouterJob(file, key)).runJob();
-                        if (i++ == 150 && SystemVersion.isAndroid() && !_initialized) {
+                        if (i++ == 150 && SystemVersion.isSlow() && !_initialized) {
                             // Can take 2 minutes to load them all on Android,
                             // after we have already built expl. tunnels.
                             // This is enough to let i2ptunnel get started.
                             // Do not set _initialized yet so we don't start rescanning.
+                            _setNetDbReady = true;
+                            _context.router().setNetDbReady();
+                        } else if (i == 500 && !_setNetDbReady) {
+                            // do this for faster systems also at 500
                             _setNetDbReady = true;
                             _context.router().setNetDbReady();
                         }
