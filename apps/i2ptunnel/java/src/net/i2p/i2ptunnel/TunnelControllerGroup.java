@@ -672,7 +672,7 @@ public class TunnelControllerGroup implements ClientApp {
         String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
 
-        File cfgFile = inConfig(tc);
+        File cfgFile = assureConfigFile(tc);
         inputController.setProperty("configFile", cfgFile.getAbsolutePath());
 
         _controllersLock.readLock().lock();
@@ -692,7 +692,7 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void removeConfig(TunnelController tc) throws IOException {
         Properties map = new OrderedProperties();
 
-        File cfgFile = inConfig(tc);
+        File cfgFile = assureConfigFile(tc);
 
         _controllersLock.readLock().lock();
         try {
@@ -712,12 +712,12 @@ public class TunnelControllerGroup implements ClientApp {
 
     /**
      * return the config File associated with a TunnelController or a default
-     * value based on the tunnel name
+     * File based on the tunnel name
      *
      * @since 0.9.41
      * @return the File ready for use
      */
-    public synchronized File inConfig(TunnelController tc) throws IOException {
+    public synchronized File assureConfigFile(TunnelController tc) throws IOException {
         Properties inputController = tc.getConfig("");
         String configFileName = inputController.getProperty("configFile");
         if (configFileName == null)
