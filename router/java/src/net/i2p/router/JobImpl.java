@@ -59,7 +59,9 @@ public abstract class JobImpl implements Job {
      *  @return null always
      */
     @Deprecated
+    @SuppressWarnings("deprecation")
     public Exception getAddedBy() { return null; }
+
     public long getMadeReadyOn() { return _madeReadyOn; }
     public void madeReady() { _madeReadyOn = _context.clock().now(); }
     public void dropped() {}

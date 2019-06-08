@@ -144,9 +144,7 @@ class JobQueueRunner extends I2PThread {
         } catch (Throwable t) {
             //_state = 21;
             _log.log(Log.CRIT, "Error processing job [" + _currentJob.getName() 
-                                   + "] on thread " + _id + ": " + t.getMessage(), t);
-            //if (_log.shouldLog(Log.ERROR))
-            //    _log.error("The above job was enqueued by: ", _currentJob.getAddedBy());
+                                   + "] on thread " + _id + ": " + t, t);
         }
     }
 }

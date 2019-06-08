@@ -30,6 +30,11 @@ public interface Job {
      */
     public void runJob();
     
+    /**
+     *  @deprecated
+     *  @return null always
+     */
+    @Deprecated
     public Exception getAddedBy();
     
     /** 
