@@ -123,16 +123,16 @@ check_hosts() {
             OLDIFS=$IFS
             IFS=":"
             set -- $HOST
-            HOSTNAME=$1
+            HOSTNAM=$1
             PORT=$2
             IFS=$OLDIFS
         else
-            HOSTNAME=$HOST
+            HOSTNAM=$HOST
             PORT=443
         fi
 
-        echo -n "Checking $HOSTNAME:$PORT..."
-        if retry connect "$HOSTNAME" "$PORT"  < /dev/null 1> "$WORK/$HOST"; then
+        echo -n "Checking $HOSTNAM:$PORT..."
+        if retry connect "$HOSTNAM" "$PORT"  < /dev/null 1> "$WORK/$HOST"; then
 
             # OpenSSL returns "return code: 0 (ok)"
             # GnuTLS returns "certificate is trusted"

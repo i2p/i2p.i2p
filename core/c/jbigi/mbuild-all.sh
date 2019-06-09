@@ -84,7 +84,7 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     exit 1
 fi
 
-if ! command -v m4 > /dev/null; then
+if ! command m4 > /dev/null; then
     printf "\aWARNING: \`m4\` not found. Install m4 " >&2
     printf "and re-run this script.\n\n\n\a" >&2
     exit 1
@@ -140,7 +140,7 @@ else
   exit 1
 fi
 
-if ! command -v ${CC} > /dev/null; then
+if ! command ${CC} > /dev/null; then
   echo "The compiler you've selected \"$CC\" does not appear to exist"
   exit 1
 fi
