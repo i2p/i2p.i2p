@@ -277,6 +277,7 @@ trans.da = apps/susimail/locale/messages_da.po
 trans.de = apps/susimail/locale/messages_de.po
 trans.el = apps/susimail/locale/messages_el.po
 trans.es = apps/susimail/locale/messages_es.po
+trans.fa = apps/susimail/locale/messages_fa.po
 trans.fi = apps/susimail/locale/messages_fi.po
 trans.fr = apps/susimail/locale/messages_fr.po
 trans.gl = apps/susimail/locale/messages_gl.po
