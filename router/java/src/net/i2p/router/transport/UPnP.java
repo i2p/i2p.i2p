@@ -910,7 +910,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		add.setArgumentValue("NewProtocol", protocol);
 		add.setArgumentValue("NewPortMappingDescription", description);
 		add.setArgumentValue("NewEnabled","1");
-		add.setArgumentValue("NewLeaseDuration", 0);
+                // 3 hours
+                // MUST be longer than max RI republish which is 52 minutes
+		add.setArgumentValue("NewLeaseDuration", 3*60*60);
 		
 		boolean rv = add.postControlAction();
 		if(rv) {
@@ -1085,17 +1087,19 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				// Ports in ports but not in portsToForwardNow we must forward
 				// Ports in portsToForwardNow but not in ports we must dump
 				for(ForwardPort port: ports) {
+                                        // Always add, since we now have a 3 hour lease duration,
+                                        // so we have to keep refreshing the lease.
 					//if(portsToForward.contains(port)) {
 					// If not in portsForwarded, it wasn't successful, try again
-					if(portsForwarded.contains(port)) {
+					//if(portsForwarded.contains(port)) {
 						// We have forwarded it, and it should be forwarded, cool.
 						// Big problem here, if firewall resets, we don't know it.
 						// Do we need to re-forward anyway? or poll the router?
-					} else {
+					//} else {
 						// Needs forwarding
 						if(portsToForwardNow == null) portsToForwardNow = new HashSet<ForwardPort>();
 						portsToForwardNow.add(port);
-					}
+					//}
 				}
 				for(ForwardPort port : portsToForward) {
 					if(ports.contains(port)) {
