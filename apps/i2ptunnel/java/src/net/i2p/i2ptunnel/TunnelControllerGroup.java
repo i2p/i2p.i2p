@@ -20,6 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
@@ -290,11 +292,33 @@ public class TunnelControllerGroup implements ClientApp {
         if (_controllersLoaded)
             return;
         try {
-            boolean shouldMigrate = false;//_context.isRouterContext() && !SystemVersion.isAndroid() && !_context.getConfigDir().getCanonicalPath().equals(_context.getBaseDir().getCanonicalPath());
-            loadControllers(configFile, shouldMigrate);
+            boolean shouldMigrate = _context.isRouterContext() && !SystemVersion.isAndroid() && !_context.getConfigDir().getCanonicalPath().equals(_context.getBaseDir().getCanonicalPath());
+            loadControllers(configFile, shouldMigrate());
         } catch (IOException ioe){
             loadControllers(configFile, false);
         }
+    }
+
+    /**
+     * Detects whether a migration to split configuration files should/will/has
+     * happened based on the platform and installation type. Does not tell
+     * whether a migration has actually occurred.
+     *
+     * @returns true if a migration is relevant to the platform, false if not
+    */
+    public boolean shouldMigrate() {
+        try {
+            if (_context.isRouterContext()) {
+                if (!SystemVersion.isAndroid()) {
+                    if (!_context.getConfigDir().getCanonicalPath().equals(_context.getBaseDir().getCanonicalPath())) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -629,12 +653,20 @@ public class TunnelControllerGroup implements ClientApp {
     @Deprecated
     public void saveConfig() throws IOException {
         _controllersLock.readLock().lock();
-        try {
-            for (TunnelController controller : _controllers) {
-                saveConfig(controller);
+        if (shouldMigrate()) {
+            try {
+                for (TunnelController controller : _controllers) {
+                    saveConfig(controller);
+                }
+            } finally {
+                _controllersLock.readLock().unlock();
             }
-        } finally {
-            _controllersLock.readLock().unlock();
+        }else {
+            try {
+                saveConfig(_configFile);
+            } finally {
+                _controllersLock.readLock().unlock();
+            }
         }
     }
 
@@ -650,19 +682,17 @@ public class TunnelControllerGroup implements ClientApp {
         File parent = cfgFile.getParentFile();
         if ( (parent != null) && (!parent.exists()) )
             parent.mkdirs();
-
         Properties map = new OrderedProperties();
         _controllersLock.readLock().lock();
         try {
             for (int i = 0; i < _controllers.size(); i++) {
                 TunnelController controller = _controllers.get(i);
-                Properties cur = controller.getConfig(PREFIX);
+                Properties cur = controller.getConfig(PREFIX + i + ".");
                 map.putAll(cur);
             }
         } finally {
             _controllersLock.readLock().unlock();
         }
-
         DataHelper.storeProps(map, cfgFile);
     }
 
@@ -673,7 +703,6 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void saveConfig(TunnelController tc) throws IOException {
         _log.logAlways(Log.WARN, "Saving tunnel configuration");
         Properties inputController = tc.getConfig("");
-        String inputName = inputController.getProperty("name");
         Properties map = new OrderedProperties();
 
         File cfgFile = assureConfigFile(tc);
@@ -729,6 +758,9 @@ public class TunnelControllerGroup implements ClientApp {
             String fileName = inputController.getProperty("name");
             if (fileName == null)
                 configFileName = _controllers.size() + "-tunnel-i2ptunnel.config";
+
+        if (_controllers.size() < 10)
+                configFileName = '0' + configFileName;
 
         File file = new File(configFileName);
         if (!file.isAbsolute()) {
