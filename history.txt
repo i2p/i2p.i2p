@@ -1,3 +1,21 @@
+2019-06-15 zzz
+ * Console: Fix stopping webapps at shutdown (ticket #2508)
+
+2019-06-09 zzz
+ * Eepsite Help page: Add links to Arabic, Hungarian, Indonesian.
+   fix link to Italian
+ * SusiMail: Add Farsi translation
+ * Tests: Fix some bashisms, add more files to bashisms check
+ * UPnP: Set lease duration of 3 hours, always refresh the lease
+
+2019-06-08 zzz
+ * NetDB:
+   - Fix Deliv. Status msg sent direct to tunnel
+   - Faster startup for non-Android
+
+2019-06-07 zzz
+ * NetDB: Fix NPE on failed decrypt of enc. ls2
+
 2019-06-06 zzz
  * CPUID/NBI:
    - Add Skylake support (ticket #1869)

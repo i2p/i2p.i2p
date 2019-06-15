@@ -17,6 +17,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.jetty.server.Server;
+
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
@@ -541,12 +543,24 @@ public class PluginStarter implements Runnable {
      *  @throws Exception just about anything, caller would be wise to catch Throwable
      */
     public static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
+        Server s = RouterConsoleRunner.getConsoleServer(ctx);
+        return stopPlugin(ctx, s, appName);
+    }
+
+    /**
+     *  @return true on success
+     *  @throws Exception just about anything, caller would be wise to catch Throwable
+     *  @since 0.9.41
+     */
+    protected static boolean stopPlugin(RouterContext ctx, Server s, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot stop nonexistent plugin: " + appName);
             return false;
         }
+        if (log.shouldLog(Log.WARN))
+            log.warn("Stopping plugin: " + appName);
 
         // stop things in clients.config
         File clientConfig = new File(pluginDir, "clients.config");
@@ -575,13 +589,16 @@ public class PluginStarter implements Runnable {
                 }
             }
         */
-            if(pluginWars.containsKey(appName)) {
-                Iterator <String> wars = pluginWars.get(appName).iterator();
-                while (wars.hasNext()) {
-                    String warName = wars.next();
-                    WebAppStarter.stopWebApp(ctx, warName);
+            if (s != null) {
+                Collection<String> wars = pluginWars.get(appName);
+                if (wars != null) {
+                    for (String warName : wars) {
+                        if (log.shouldInfo())
+                            log.info("Stopping webapp " + warName + " in plugin " + appName);
+                        WebAppStarter.stopWebApp(ctx, s, warName);
+                    }
+                    wars.clear();
                 }
-                pluginWars.get(appName).clear();
             }
         //}
 
@@ -593,8 +610,6 @@ public class PluginStarter implements Runnable {
         if (name != null && name.length() > 0)
             NavHelper.unregisterApp(name);
 
-        if (log.shouldLog(Log.WARN))
-            log.warn("Stopping plugin: " + appName);
         return true;
     }
 
@@ -947,6 +962,14 @@ public class PluginStarter implements Runnable {
     }
 
     public static boolean isPluginRunning(String pluginName, RouterContext ctx) {
+        Server s = RouterConsoleRunner.getConsoleServer(ctx);
+        return isPluginRunning(pluginName, ctx, s);
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    protected static boolean isPluginRunning(String pluginName, RouterContext ctx, Server s) {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         
         boolean isJobRunning = false;
@@ -955,13 +978,16 @@ public class PluginStarter implements Runnable {
             // TODO have a pending indication too
             isJobRunning = true;
         }
+
         boolean isWarRunning = false;
-        if(pluginWars.containsKey(pluginName)) {
-            Iterator <String> it = pluginWars.get(pluginName).iterator();
-            while(it.hasNext() && !isWarRunning) {
-                String warName = it.next();
-                if(WebAppStarter.isWebAppRunning(ctx, warName)) {
-                    isWarRunning = true;
+        if (s != null) {
+            Collection<String> wars = pluginWars.get(pluginName);
+            if (wars != null) {
+                for (String warName : wars) {
+                    if (WebAppStarter.isWebAppRunning(s, warName)) {
+                        isWarRunning = true;
+                        break;
+                    }
                 }
             }
         }

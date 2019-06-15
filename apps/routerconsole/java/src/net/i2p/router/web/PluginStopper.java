@@ -2,6 +2,9 @@ package net.i2p.router.web;
 
 import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.jetty.server.Server;
+
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -11,15 +14,18 @@ import net.i2p.util.Log;
  *  @since 0.7.13
  *  @author zzz
  */
-public class PluginStopper extends PluginStarter {
+class PluginStopper extends PluginStarter {
 
-    public PluginStopper(RouterContext ctx) {
+    private final Server _server;
+
+    public PluginStopper(RouterContext ctx, Server server) {
         super(ctx);
+        _server = server;
     }
 
     @Override
     public void run() {
-        stopPlugins(_context);
+        stopPlugins();
     }
 
     /**
@@ -27,18 +33,23 @@ public class PluginStopper extends PluginStarter {
      *
      *  this shouldn't throw anything
      */
-    private static void stopPlugins(RouterContext ctx) {
-        Log log = ctx.logManager().getLog(PluginStopper.class);
+    private void stopPlugins() {
+        Log log = _context.logManager().getLog(PluginStopper.class);
         List<String> pl = getPlugins();
         Collections.reverse(pl); // reverse the order
         for (String app : pl) {
-            if (isPluginRunning(app, ctx)) {
+            if (isPluginRunning(app, _context, _server)) {
                 try {
-                   stopPlugin(ctx, app);
+                    if (log.shouldInfo())
+                        log.info("Stopping plugin: " + app);
+                    stopPlugin(_context, _server, app);
                 } catch (Throwable e) {
                    if (log.shouldLog(Log.WARN))
                        log.warn("Failed to stop plugin: " + app, e);
                 }
+            } else {
+                if (log.shouldInfo())
+                    log.info("Plugin not running: " + app);
             }
         }
     }
