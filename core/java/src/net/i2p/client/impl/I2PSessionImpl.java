@@ -21,10 +21,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -165,6 +167,18 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         CLOSING,
         CLOSED
     }
+
+    private static final Set<State> STATES_CLOSED =
+        EnumSet.of(State.INIT, State.CLOSED);
+
+    private static final Set<State> STATES_OPENING =
+        EnumSet.of(State.INIT, State.OPENING);
+
+    private static final Set<State> STATES_CLOSED_OR_OPENING =
+        EnumSet.of(State.INIT, State.CLOSED, State.OPENING);
+
+    private static final Set<State> STATES_CLOSED_OR_CLOSING =
+        EnumSet.of(State.INIT, State.CLOSED, State.CLOSING);
 
     protected State _state = State.INIT;
     protected final Object _stateLock = new Object();
@@ -850,7 +864,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 synchronized(_stateLock) {
                     if (_state == State.GOTDATE)
                         break;
-                    if (_state != State.OPENING && _state != State.INIT)
+                    if (!STATES_OPENING.contains(_state))
                         throw new IOException("Socket closed, state=" + _state);
                     // InterruptedException caught by caller
                     _stateLock.wait(1000);
@@ -1165,7 +1179,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     public boolean isClosed() {
         synchronized (_stateLock) {
-            return _state == State.CLOSED || _state == State.INIT;
+            return STATES_CLOSED.contains(_state);
         }
     }
 
@@ -1281,7 +1295,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     public void destroySession(boolean sendDisconnect) {
         synchronized(_stateLock) {
-            if (_state == State.CLOSING || _state == State.CLOSED || _state == State.INIT)
+            if (STATES_CLOSED_OR_CLOSING.contains(_state))
                 return;
             changeState(State.CLOSING);
         }
@@ -1378,7 +1392,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected void disconnect() {
         State oldState;
         synchronized(_stateLock) {
-            if (_state == State.CLOSING || _state == State.CLOSED || _state == State.INIT)
+            if (STATES_CLOSED_OR_CLOSING.contains(_state))
                 return;
             oldState = _state;
             changeState(State.CLOSING);
@@ -1606,9 +1620,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         synchronized (_stateLock) {
             // not before GOTDATE
-            if (_state == State.CLOSED ||
-                _state == State.INIT ||
-                _state == State.OPENING) {
+            if (STATES_CLOSED_OR_OPENING.contains(_state)) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Session closed, cannot lookup " + h);
                 return null;
@@ -1750,9 +1762,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     public int[] bandwidthLimits() throws I2PSessionException {
         synchronized (_stateLock) {
             // not before GOTDATE
-            if (_state == State.CLOSED ||
-                _state == State.INIT ||
-                _state == State.OPENING) {
+            if (STATES_CLOSED_OR_OPENING.contains(_state)) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Session closed, cannot get bw limits");
                 return null;
