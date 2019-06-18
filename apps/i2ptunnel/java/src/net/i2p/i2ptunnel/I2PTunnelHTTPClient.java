@@ -871,9 +871,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             }
                             if(currentProxy == null) {
                                 if(_log.shouldLog(Log.WARN)) {
-                                    _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
+                                    _log.warn("No outproxy configured for request: " + requestURI);
                                 }
-                                l.log("No outproxy found for the request.");
                                 try {
                                     out.write(getErrorPage("noproxy", ERR_NO_OUTPROXY).getBytes("UTF-8"));
                                     writeFooter(out);
