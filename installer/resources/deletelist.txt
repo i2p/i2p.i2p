@@ -112,3 +112,4 @@ certificates/ssl/netdb.i2p2.no.crt
 # vanished
 certificates/news/killyourtv_at_mail.i2p.crt
 certificates/router/killyourtv_at_mail.i2p.crt
+certificates/reseed/atomike_at_mail.i2p.crt
