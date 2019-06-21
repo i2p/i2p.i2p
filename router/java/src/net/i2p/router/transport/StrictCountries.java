@@ -53,7 +53,6 @@ public abstract class StrictCountries {
             /* Thailand */ "TH",
             /* Turkmenistan */ "TM",
             /* Venezuela */ "VE",
-            /* Vietnam */ "VN",
             /* United Arab Emirates */ "AE",
             /* Uzbekistan */ "UZ",
             /* Western Sahara */ "EH",
