@@ -109,7 +109,7 @@ public class I2CPMessageReader {
 
         /**
          * Notify the listener that an exception was thrown while reading from the given
-         * reader
+         * reader. For most errors, disconnected() will also be called, as of 0.9.41.
          *
 	 * @param reader I2CPMessageReader to notify
 	 * @param error Exception that was thrown, non-null
@@ -117,8 +117,8 @@ public class I2CPMessageReader {
         public void readError(I2CPMessageReader reader, Exception error);
 
         /**
-         * Notify the listener that the stream the given reader was running off
-         * closed
+         * Notify the listener that the stream this reader was reading was
+         * closed. For most errors, readError() will be called first, as of 0.9.41
          *
 	 * @param reader I2CPMessageReader to notify
 	 */
@@ -165,6 +165,7 @@ public class I2CPMessageReader {
             } catch (RuntimeException e) {
                 _log.log(Log.CRIT, "Uncaught I2CP error", e);
                 _listener.readError(I2CPMessageReader.this, e);
+                _listener.disconnected(I2CPMessageReader.this);
                 cancelRunner();
             }
         }
@@ -190,6 +191,7 @@ public class I2CPMessageReader {
                         cancelRunner();
                     } catch (IOException ioe) {
                         _log.warn("IO Error handling message", ioe);
+                        _listener.readError(I2CPMessageReader.this, ioe);
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();
                     } catch (OutOfMemoryError oom) {
@@ -197,6 +199,7 @@ public class I2CPMessageReader {
                         throw oom;
                     } catch (RuntimeException e) {
                         _log.log(Log.CRIT, "Unhandled error reading I2CP stream", e);
+                        _listener.readError(I2CPMessageReader.this, e);
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();
                     }

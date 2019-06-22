@@ -1115,12 +1115,14 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /** 
      * The I2CPMessageEventListener callback.
      * Recieve notifiation of an error reading the I2CP stream.
+     * As of 0.9.41, does NOT call sessionlistener.disconnected(),
+     * the I2CPMessageReader will call disconnected() also.
+     *
      * @param reader unused
      * @param error non-null
      */
     public void readError(I2CPMessageReader reader, Exception error) {
         propogateError("There was an error reading data", error);
-        disconnect();
     }
 
     /**
@@ -1160,7 +1162,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Retrieve the configuration options, filtered.
      * All defaults passed in via constructor have been promoted to the primary map.
      *
-     * @return non-null, if insantiated with null options, this will be the System properties.
+     * @return non-null, if instantiated with null options, this will be the System properties.
      */
     Properties getOptions() { return _options; }
 
@@ -1257,6 +1259,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /**
      * Pass off the error to the listener
      * Misspelled, oh well.
+     * Calls sessionlistener.errorOccurred()
+     *
      * @param error non-null
      */
     void propogateError(String msg, Throwable error) {
@@ -1292,6 +1296,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Tear down the session, and do NOT reconnect.
      * 
      * Will interrupt an open in progress.
+     * Calls sessionlistener.disconnected()
      */
     public void destroySession(boolean sendDisconnect) {
         synchronized(_stateLock) {
@@ -1379,15 +1384,16 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /**
      * The I2CPMessageEventListener callback.
      * Recieve notification that the I2CP connection was disconnected.
+     * Calls sessionlistener.disconnected()
      * @param reader unused
      */
     public void disconnected(I2CPMessageReader reader) {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnected", new Exception("Disconnected"));
         disconnect();
     }
 
     /**
      * Will interrupt a connect in progress.
+     * Calls sessionlistener.disconnected()
      */
     protected void disconnect() {
         State oldState;
@@ -1397,7 +1403,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             oldState = _state;
             changeState(State.CLOSING);
         }
-        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnect() called", new Exception("Disconnect"));
+        if (_log.shouldWarn())
+            _log.warn(getPrefix() + "Disconnected", new Exception("Disconnected"));
+        if (_sessionListener != null) _sessionListener.disconnected(this);
         // don't try to reconnect if it failed before GETTDATE
         if (oldState != State.OPENING && shouldReconnect()) {
             if (reconnect()) {
@@ -1409,7 +1417,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
         if (_log.shouldLog(Log.ERROR))
             _log.error(getPrefix() + "Disconned from the router, and not trying to reconnect");
-        if (_sessionListener != null) _sessionListener.disconnected(this);
 
         closeSocket();
         changeState(State.CLOSED);
@@ -1459,7 +1466,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected String getPrefix() {
         StringBuilder buf = new StringBuilder();
         buf.append('[');
-        buf.append(_state.toString()).append(' ');
         String s = _options.getProperty("inbound.nickname");
         if (s != null)
             buf.append(s);
@@ -1468,6 +1474,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SessionId id = _sessionId;
         if (id != null)
             buf.append(" #").append(id.getSessionId());
+        buf.append('(').append(_state.toString()).append(')');
         buf.append("]: ");
         return buf.toString();
     }

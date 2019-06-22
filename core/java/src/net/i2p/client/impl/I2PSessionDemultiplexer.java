@@ -23,6 +23,7 @@ import net.i2p.util.Log;
  * messageAvailable() only calls one listener, not all that apply.
  * The others call all listeners.
  *
+ * @since 0.7.1
  * @author zzz
  */
 public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
@@ -31,7 +32,7 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
 
     public I2PSessionDemultiplexer(I2PAppContext ctx) {
         _log = ctx.logManager().getLog(I2PSessionDemultiplexer.class);
-        _listeners = new ConcurrentHashMap<Integer, I2PSessionMuxedListener>();
+        _listeners = new ConcurrentHashMap<Integer, I2PSessionMuxedListener>(4);
     }
 
     /** unused */
@@ -39,9 +40,9 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
 
     public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromport, int toport ) {
         I2PSessionMuxedListener l = findListener(proto, toport);
-        if (l != null)
+        if (l != null) {
             l.messageAvailable(session, msgId, size, proto, fromport, toport);
-        else {
+        } else {
             // no listener, throw it out
             if (_listeners.isEmpty()) {
                 if (_log.shouldLog(Log.WARN))
@@ -58,18 +59,25 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
     }
 
     public void reportAbuse(I2PSession session, int severity) {
-        for (I2PSessionMuxedListener l : _listeners.values())
+        for (I2PSessionMuxedListener l : _listeners.values()) {
             l.reportAbuse(session, severity);
+        }
     }
 
     public void disconnected(I2PSession session) {
-        for (I2PSessionMuxedListener l : _listeners.values())
+        for (I2PSessionMuxedListener l : _listeners.values()) {
+            if (_log.shouldInfo())
+                _log.info("Sending disconnected() to " + l);
             l.disconnected(session);
+        }
     }
 
     public void errorOccurred(I2PSession session, String message, Throwable error) {
-        for (I2PSessionMuxedListener l : _listeners.values())
+        for (I2PSessionMuxedListener l : _listeners.values()) {
+            if (_log.shouldInfo())
+                 _log.info("Sending errorOccurred() \"" + message + "\" to " + l);
             l.errorOccurred(session, message, error);
+        }
     }
 
     /**
@@ -78,6 +86,10 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
      *  (Streaming lib)
      */
     public void addListener(I2PSessionListener l, int proto, int port) {
+        if (proto < 0 || proto > 254 || port < 0 || port > 65535)
+            throw new IllegalArgumentException();
+        if (_log.shouldInfo())
+            _log.info("Old addListener() " + l + ' ' + proto + ' ' + port);
         I2PSessionListener old = _listeners.put(key(proto, port), new NoPortsListener(l));
         if (old != null && _log.shouldLog(Log.WARN))
             _log.warn("Listener " + l + " replaces " + old + " for proto: " + proto + " port: " + port);
@@ -88,12 +100,20 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
      *  UDP perhaps
      */
     public void addMuxedListener(I2PSessionMuxedListener l, int proto, int port) {
+        if (proto < 0 || proto > 254 || port < 0 || port > 65535)
+            throw new IllegalArgumentException();
+        if (_log.shouldInfo())
+            _log.info("addMuxedListener() " + l + ' ' + proto + ' ' + port);
         I2PSessionListener old = _listeners.put(key(proto, port), l);
         if (old != null && _log.shouldLog(Log.WARN))
             _log.warn("Listener " + l + " replaces " + old + " for proto: " + proto + " port: " + port);
     }
 
     public void removeListener(int proto, int port) {
+        if (proto < 0 || proto > 254 || port < 0 || port > 65535)
+            throw new IllegalArgumentException();
+        if (_log.shouldInfo())
+            _log.info("removeListener() " + proto + ' ' + port);
         _listeners.remove(key(proto, port));
     }
 

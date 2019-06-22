@@ -1,3 +1,24 @@
+2019-06-22 zzz
+ * Console: New logo
+ * I2CP: Ensure that callbacks are called on abnormal close
+
+2019-06-21 zzz
+ * Transport: Update hidden mode country list
+
+2019-06-18 zzz
+ * i2ptunnel: Improve logging when no outproxy configured (ticket #2338)
+ * Reseed: Remove atomike
+
+2019-06-17 zzz
+ * Console: Hide news section in summary bar if
+   news fetching is disabled (ticket #2301)
+ * Router: Don't check for ping file at startup on Android
+
+2019-06-16 zzz
+ * i2psnark:
+   - Increase DHT blacklist time (ticket #2275)
+   - Fix QupZilla detection (ticket #2026)
+
 2019-06-15 zzz
  * Console: Fix stopping webapps at shutdown (ticket #2508)
 
