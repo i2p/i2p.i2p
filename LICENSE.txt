@@ -287,6 +287,11 @@ Applications:
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
        Feather icons: Copyright (c) 2013-2017 Cole Bemis; see licenses/LICENSE-Feather.txt
 
+   Router Console unthemed and light theme logo:
+   Copyright (c) 2019 The Invisible Internet Project. All rights reserved.
+   Creative Commons Attribution-ShareAlike 4.0 International License
+   See https://creativecommons.org/licenses/by-sa/4.0/
+
    Router Console and I2PSnark themes:
    Some images licensed under a Creative Commons 2.0 license.
        Silk icons: See licenses/LICENSE-SilkIcons.txt
