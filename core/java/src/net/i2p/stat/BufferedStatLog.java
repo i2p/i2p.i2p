@@ -18,6 +18,9 @@ import net.i2p.util.Log;
 /**
  * Note - if no filter is defined in stat.logFilters at startup, this class will not
  * be instantiated - see StatManager.
+ *
+ * Deprecated - unused - to be removed.
+ * Not for external use - not a public API.
  */
 public class BufferedStatLog implements StatLog {
     private final I2PAppContext _context;

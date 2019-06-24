@@ -38,6 +38,11 @@ public class RateStat {
             _rates[i] = rate;
         }
     }
+
+    /**
+     *  Sets the default stat log for this RateStat.
+     *  Deprecated, unused, to be disabled in a future release.
+     */
     public void setStatLog(StatLog sl) { _statLog = sl; }
     
     /** 
