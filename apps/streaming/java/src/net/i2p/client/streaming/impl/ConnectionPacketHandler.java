@@ -567,6 +567,14 @@ class ConnectionPacketHandler {
      */
     private void verifyReset(Packet packet, Connection con) {
         if (con.getReceiveStreamId() == packet.getSendStreamId()) {
+            // check dest. match since 0.9.41
+            Destination d1 = con.getRemotePeer();
+            Destination d2 = packet.getOptionalFrom();
+            if (d1 != null && d2 != null && !d1.equals(d2)) {
+                if (_log.shouldWarn())
+                    _log.warn("Received RST from wrong destination on " + con);
+                return;
+            }
             SigningPublicKey spk = con.getRemoteSPK();
             ByteArray ba = _cache.acquire();
             boolean ok = packet.verifySignature(_context, spk, ba.getData());
@@ -602,6 +610,12 @@ class ConnectionPacketHandler {
      * @throws I2PException if the signature was necessary and it was invalid
      */
     private void verifySignature(Packet packet, Connection con) throws I2PException {
+        // check dest. match since 0.9.41
+        Destination d1 = con.getRemotePeer();
+        Destination d2 = packet.getOptionalFrom();
+        if (d1 != null && d2 != null && !d1.equals(d2)) {
+            throw new I2PException("Received packet from wrong destination on " + con);
+        }
         // verify the signature if necessary
         if (con.getOptions().getRequireFullySigned() || 
             packet.isFlagSet(Packet.FLAG_SYNCHRONIZE | Packet.FLAG_CLOSE | Packet.FLAG_SIGNATURE_INCLUDED)) {
