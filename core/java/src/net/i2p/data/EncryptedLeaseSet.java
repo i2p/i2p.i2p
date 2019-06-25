@@ -67,7 +67,6 @@ public class EncryptedLeaseSet extends LeaseSet2 {
 
     /**
      *  @return leaseset or null if not decrypted.
-     *          Also returns null if we created and encrypted it.
      *  @since 0.9.39
      */
     public LeaseSet2 getDecryptedLeaseSet() {
@@ -532,11 +531,14 @@ public class EncryptedLeaseSet extends LeaseSet2 {
                     off += ID_LEN;
                     ChaCha20.encrypt(clientKey, clientIVandID, authcookie, 0, ciphertext, off, authcookie.length);
                     if (_log.shouldDebug()) {
-                        _log.debug("Added client ID/enc.cookie:\n" +
+                        _log.debug("Added client key:\n" +
+                                   net.i2p.util.HexDump.dump(clientKey) +
+                                   "client IV:\n:" +
+                                   net.i2p.util.HexDump.dump(clientIVandID, 0, IV_LEN) +
+                                   "client ID:\n:" +
                                    net.i2p.util.HexDump.dump(clientIVandID, IV_LEN, ID_LEN) +
-                                   net.i2p.util.HexDump.dump(ciphertext, off, COOKIE_LEN) +
-                                   "for client key:\n" +
-                                   net.i2p.util.HexDump.dump(clientKey));
+                                   "client cookie:\n:" +
+                                   net.i2p.util.HexDump.dump(ciphertext, off, COOKIE_LEN));
                     }
                     off += COOKIE_LEN;
                 }
@@ -640,7 +642,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
                 throw new DataFormatException("No client entries");
             authLen = 1 + SALT_LEN + 2 + (count * CLIENT_LEN);
             if (_log.shouldDebug()) {
-                 _log.debug("Found " + count + " client entries, seed is:\n" +
+                 _log.debug("Found " + count + " client entries, authsalt is:\n" +
                             net.i2p.util.HexDump.dump(seed));
             }
             byte[] clientKey = new byte[32];
@@ -1001,12 +1003,12 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             keys.add(kp);
             System.out.println("Client key " + i + ":\n  Private: " + kp.getPrivate() + "\n  Public:  " + kp.getPublic());
         }
-        //f2 = new java.io.File("online-encls2-dh.dat");
-        //System.out.println("Online test with DH Keys");
-        //test(pkf, f2, false, BlindData.AUTH_DH, keys);
-        f2 = new java.io.File("online-encls2-psk.dat");
-        System.out.println("Online test with PSK Keys");
-        test(pkf, f2, false, BlindData.AUTH_PSK, keys);
+        f2 = new java.io.File("online-encls2-dh.dat");
+        System.out.println("Online test with DH Keys");
+        test(pkf, f2, false, BlindData.AUTH_DH, keys);
+        //f2 = new java.io.File("online-encls2-psk.dat");
+        //System.out.println("Online test with PSK Keys");
+        //test(pkf, f2, false, BlindData.AUTH_PSK, keys);
         //System.out.println("Offline test");
         //f2 = new java.io.File("offline-encls2.dat");
         //test(pkf, f2, true);
