@@ -951,11 +951,11 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (leaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
             // set dest or key before validate() calls verifySignature() which
             // will do the decryption
+            encls = (EncryptedLeaseSet) leaseSet;
             BlindData bd = _blindCache.getReverseData(leaseSet.getSigningKey());
             if (bd != null) {
                 if (_log.shouldWarn())
                     _log.warn("Found blind data for encls: " + bd);
-                encls = (EncryptedLeaseSet) leaseSet;
                 // secret must be set before destination
                 String secret = bd.getSecret();
                 if (secret != null)
@@ -970,7 +970,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 if (bd.getAuthType() != BlindData.AUTH_NONE)
                     encls.setClientPrivateKey(bd.getAuthPrivKey());
             } else {
-                if (_log.shouldWarn())
+                // if we created it, there's no blind data, but it's still decrypted
+                if (encls.getDecryptedLeaseSet() == null && _log.shouldWarn())
                     _log.warn("No blind data found for encls: " + leaseSet);
             }
         }
