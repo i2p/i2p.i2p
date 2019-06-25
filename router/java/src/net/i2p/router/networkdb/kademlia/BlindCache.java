@@ -241,6 +241,7 @@ class BlindCache {
 
     /**
      *  For console ConfigKeyringHelper
+     *  @return list is copied
      *  @since 0.9.41
      */
     public synchronized List<BlindData> getData() {
@@ -295,10 +296,10 @@ class BlindCache {
                     count++;
                 } catch (IllegalArgumentException iae) {
                     if (log.shouldLog(Log.WARN))
-                        log.warn("Error reading cache entry", iae);
+                        log.warn("Error reading cache entry: " + line, iae);
                 } catch (DataFormatException dfe) {
                     if (log.shouldLog(Log.WARN))
-                        log.warn("Error reading cache entry", dfe);
+                        log.warn("Error reading cache entry: " + line, dfe);
                 }
             }
         } catch (IOException ioe) {
