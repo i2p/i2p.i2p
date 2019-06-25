@@ -37,6 +37,8 @@ public class HostReplyMessage extends I2CPMessageImpl {
     public static final int RESULT_KEY_REQUIRED = 3;
     /** @since 0.9.41 */
     public static final int RESULT_SECRET_AND_KEY_REQUIRED = 4;
+    /** @since 0.9.41 */
+    public static final int RESULT_DECRYPTION_FAILURE = 5;
 
     private static final long MAX_INT = (1L << 32) - 1;
 
