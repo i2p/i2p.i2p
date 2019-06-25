@@ -28,4 +28,29 @@ public final class RedKeyPairGenerator extends KeyPairGenerator {
 
         return new KeyPair(new EdDSAPublicKey(pubKey), new EdDSAPrivateKey(privKey));
     }
+
+/****
+    public static void main(String[] args) {
+        (new RedKeyPairGenerator()).test();
+    }
+
+    public void test() {
+        if (!initialized)
+            initialize(DEFAULT_KEYSIZE, RandomSource.getInstance());
+
+        // 64 bytes
+        byte[] seed = new byte[edParams.getCurve().getField().getb()/4];
+        random.nextBytes(seed);
+        byte[] b = EdDSABlinding.reduce(seed);
+        b[0] &= 0xf0;
+
+        for (int i = 0; i < 16; i++) {
+            EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(b, null, edParams);
+            EdDSAPrivateKey pk = new EdDSAPrivateKey(privKey);
+            System.out.println("Privkey:\n" + net.i2p.util.HexDump.dump(b));
+            System.out.println("Pubkey:\n" + net.i2p.util.HexDump.dump(pk.getAbyte()));
+            b[0]++;
+        }
+    }
+****/
 }
