@@ -17,6 +17,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  * Simply act as a pen register of messages sent in and out of the router.
@@ -25,6 +26,7 @@ import net.i2p.util.SecureFileOutputStream;
  * analyze the entire network, if everyone provides their logs honestly)
  *
  * This is always instantiated in the context and the WriteJob runs every minute,
+ * (except on Android, we don't set up the WriteJob)
  * but unless router.keepHistory=true it does nothing.
  * It generates a LARGE log file.
  */
@@ -92,6 +94,8 @@ public class MessageHistory {
      *
      */
     public synchronized void initialize(boolean forceReinitialize) {
+        if (SystemVersion.isAndroid())
+            return;
         if (!forceReinitialize) return;
         Router router = _context.router();
         if (router == null) {
