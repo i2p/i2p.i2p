@@ -445,6 +445,15 @@ class ClientManager {
             Job j = new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce);
             //_ctx.jobQueue().addJob(j);
             j.runJob();
+        } else if (!_metaDests.isEmpty() && _metaDests.contains(toDest)) {
+            // meta dests don't have runners but are local, and you can't send to them
+            ClientConnectionRunner sender = getRunner(fromDest);
+            if (sender == null) {
+                // sender went away
+                return;
+            }
+            int rc = MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
+            sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, rc);
         } else {
             // remote.  w00t
             if (_log.shouldLog(Log.DEBUG))
@@ -764,7 +773,7 @@ class ClientManager {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Message received but we don't have a connection to " 
                               + dest + "/" + _msg.getDestinationHash() 
-                              + " currently.  DROPPED");
+                              + " currently.  DROPPED", new Exception());
             }
         }
     }
