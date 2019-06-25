@@ -1,3 +1,11 @@
+2019-06-25 zzz
+ * I2CP: Prevent sending message to a local meta destination
+ * imagegen: Catch render error (ticket #2507)
+ * Router: Disable MessageHistory job on Android
+ * Streaming:
+   - Check that destinations match in signatures
+   - Increase size of recently-closed cache
+
 2019-06-22 zzz
  * Console: New logo
  * I2CP: Ensure that callbacks are called on abnormal close
