@@ -110,7 +110,7 @@ class ConnectionManager {
         int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
         _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
         _outboundQueue = new PacketQueue(_context, _timer);
-        _recentlyClosed = new LHMCache<Long, Object>(64);
+        _recentlyClosed = new LHMCache<Long, Object>(128);
         /** Socket timeout for accept() */
         _soTimeout = -1;
 
