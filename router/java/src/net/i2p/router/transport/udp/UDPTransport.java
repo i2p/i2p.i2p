@@ -1044,8 +1044,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (ourIP.length == 4 && !fixedPort)
                 changes.put(PROP_EXTERNAL_PORT, Integer.toString(ourPort));
             // queue a country code lookup of the new IP
-            if (ourIP.length == 4)
-                _context.commSystem().queueLookup(ourIP);
+            _context.commSystem().queueLookup(ourIP);
             // store these for laptop-mode (change ident on restart... or every time... when IP changes)
             // IPV4 ONLY
             String oldIP = _context.getProperty(PROP_IP);

@@ -24,8 +24,11 @@ import com.maxmind.geoip2.DatabaseReader;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -160,6 +163,14 @@ public class GeoIP {
                 // clear the negative cache every few runs, to prevent it from getting too big
                 if (((++_lookupRunCount) % CLEAR) == 0)
                     _notFound.clear();
+                // add our detected addresses
+                Set<String> addrs = Addresses.getAddresses(false, true);
+                for (String ip : addrs) {
+                    add(ip);
+                }
+                String lastIP = _context.getProperty(UDPTransport.PROP_IP);
+                if (lastIP != null)
+                    add(lastIP);
                 // IPv4
                 Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
                 _pendingSearch.clear();
@@ -477,23 +488,53 @@ public class GeoIP {
             return;
         RouterContext ctx = (RouterContext) _context;
         String oldCountry = ctx.router().getConfigSetting(PROP_IP_COUNTRY);
-        Hash ourHash = ctx.routerHash();
+        RouterInfo us = ctx.router().getRouterInfo();
+        String country = null;
         // we should always have a RouterInfo by now, but we had one report of an NPE here
-        if (ourHash == null)
-            return;
-        String country = ctx.commSystem().getCountry(ourHash);
+        if (us != null) {
+            // try our published addresses
+            for (RouterAddress ra : us.getAddresses()) {
+                byte[] ip = ra.getIP();
+                if (ip != null) {
+                    country = get(ip);
+                    if (country != null)
+                        break;
+                }
+            }
+        }
+        if (country == null) {
+            // try our detected addresses
+            Set<String> addrs = Addresses.getAddresses(false, true);
+            for (String ip : addrs) {
+                country = get(ip);
+                if (country != null)
+                    break;
+            }
+            if (country == null) {
+                String lastIP = _context.getProperty(UDPTransport.PROP_IP);
+                if (lastIP != null)
+                    country = get(lastIP);
+            }
+        }
+        if (_log.shouldInfo())
+            _log.info("Old country was " + oldCountry + " new country is " + country);
         if (country != null && !country.equals(oldCountry)) {
+            boolean wasStrict = ctx.commSystem().isInStrictCountry();
             ctx.router().saveConfig(PROP_IP_COUNTRY, country);
-            if (ctx.commSystem().isInStrictCountry() && ctx.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
-                String name = fullName(country);
-                if (name == null)
-                    name = country;
-                _log.logAlways(Log.WARN, "Setting hidden mode to protect you in " + name +
-                                         ", you may override on the network configuration page");
+            boolean isStrict = ctx.commSystem().isInStrictCountry();
+            if (_log.shouldInfo())
+                _log.info("Old country was strict? " + wasStrict + "; new country is strict? " + isStrict);
+            if (wasStrict != isStrict && ctx.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
+                if (isStrict) {
+                    String name = fullName(country);
+                    if (name == null)
+                        name = country;
+                    _log.logAlways(Log.WARN, "Setting hidden mode to protect you in " + name +
+                                             ", you may override on the network configuration page");
+                }
                 ctx.router().rebuildRouterInfo();
             }
         }
-        /****/
     }
 
     /**

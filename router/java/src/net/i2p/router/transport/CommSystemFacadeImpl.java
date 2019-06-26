@@ -426,6 +426,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
     }
 
+    /**
+     *  @param ip ipv4 or ipv6
+     */
     @Override
     public void queueLookup(byte[] ip) {
         _geoIP.add(ip);
@@ -441,17 +444,20 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /**
-     *  Are we in a bad place
+     *  Are we in a strict country
      *  @since 0.8.13
      */
     @Override
     public boolean isInStrictCountry() {
         String us = getOurCountry();
-        return (us != null && StrictCountries.contains(us)) || _context.getBooleanProperty("router.forceBadCountry");
+        return (us != null && StrictCountries.contains(us)) || _context.getBooleanProperty("router.forceStrictCountry");
     }
 
     /**
-     *  Are they in a bad place
+     *  Are they in a strict country.
+     *  Not recommended for our local router hash, as we may not be either in the cache or netdb,
+     *  or may not be publishing an IP.
+     *
      *  @param peer non-null
      *  @since 0.9.16
      */
@@ -462,7 +468,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /**
-     *  Are they in a bad place
+     *  Are they in a strict country
      *  @param ri non-null
      *  @since 0.9.16
      */
@@ -478,6 +484,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the IP from the netDb.
+     *  Not recommended for our local router hash, as we may not be either in the cache or netdb,
+     *  or may not be publishing an IP.
      *
      *  As of 0.9.32, works only for literal IPs, returns null for host names.
      *

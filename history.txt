@@ -1,3 +1,6 @@
+2019-06-26 zzz
+ * Transport: Fix issues with leaving hidden mode (ticket #2557)
+
 2019-06-25 zzz
  * I2CP: Prevent sending message to a local meta destination
  * imagegen: Catch render error (ticket #2507)
