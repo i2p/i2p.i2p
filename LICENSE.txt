@@ -287,7 +287,7 @@ Applications:
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
        Feather icons: Copyright (c) 2013-2017 Cole Bemis; see licenses/LICENSE-Feather.txt
 
-   Router Console unthemed and light theme logo:
+   Router Console unthemed, light, and dark theme logos:
    Copyright (c) 2019 The Invisible Internet Project. All rights reserved.
    Creative Commons Attribution-ShareAlike 4.0 International License
    See https://creativecommons.org/licenses/by-sa/4.0/
