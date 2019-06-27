@@ -721,6 +721,20 @@ public class I2PAppContext {
         }
     }
 
+    /**
+     * Overwrites the LogManager instance to be used by the router.
+     * This should only be called after the Router is instantiated but
+     * before it is started.  Calling this at any other time can have
+     * unpredictable side effects.
+     * @since 0.9.41
+     */
+    public void setLogManager(LogManager logManager) {
+        synchronized (_lock8) {
+            _logManager = logManager;
+            _logManagerInitialized = true;
+        }
+    }
+
     /** 
      * There is absolutely no good reason to make this context specific, 
      * other than for consistency, and perhaps later we'll want to 
