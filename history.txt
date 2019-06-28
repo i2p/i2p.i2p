@@ -1,3 +1,6 @@
+2019-06-28 zzz
+ * Update translations from Transifex
+
 2019-06-26 zzz
  * Transport: Fix issues with leaving hidden mode (ticket #2557)
 
