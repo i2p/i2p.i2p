@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2015-2018
+# Kaya Zeren <kayazeren@gmail.com>, 2015-2019
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2018-08-12 21:45+0000\n"
+"PO-Revision-Date: 2019-05-21 05:19+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -232,7 +232,7 @@ msgstr "Daraltılabilir panolar devre dışı bırakıldı."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1323
 msgid "Configuration unchanged."
-msgstr "Ayarlar değiştirilmedi."
+msgstr "Yapılandırma değiştirilmedi."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1355
 msgid "Open Tracker list changed - torrent restart required to take effect."
@@ -881,7 +881,7 @@ msgstr "Seçilmişleri sil"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1409
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2712
 msgid "Save tracker configuration"
-msgstr "İzleyici ayarlarını kaydet"
+msgstr "İzleyici yapılandırmasını kaydet"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1426
 msgid "Removed"
@@ -1432,7 +1432,7 @@ msgstr "I2CP ayarları"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2625
 msgid "Save configuration"
-msgstr "Ayarları kaydet"
+msgstr "Yapılandırmayı kaydet"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2643
 msgid "Select trackers for removal from I2PSnark's known list"

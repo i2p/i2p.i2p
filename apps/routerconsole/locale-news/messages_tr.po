@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2015,2018
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2015,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2018-02-11 15:43+0000\n"
+"PO-Revision-Date: 2019-05-21 05:21+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr "Lütfen I2P yüklenip eşleri bulana kadar {0}sabırlı olun{1}."
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr "Beklerken, lütfen {2}ayarlar sayfasından{3} {0}bant genişliği ayarlarınızı{1} yapın."
+msgstr "Beklerken, lütfen {2}yapılandırma bölümünden{3} {0}bant genişliği ayarlarınızı{1} yapın."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."

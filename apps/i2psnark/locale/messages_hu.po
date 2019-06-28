@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Gergő Doma <domag02@gmail.com>, 2019
 # omgitsadalek <mihalymokus76@gmail.com>, 2013
 # benewfy <benewfy@gmail.com>, 2015
 msgid ""
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-08 18:48+0000\n"
-"PO-Revision-Date: 2018-08-08 18:52+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2019-05-10 23:00+0000\n"
+"Last-Translator: Gergő Doma <domag02@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,14 +45,14 @@ msgstr "Mágnes"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1160
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1268
 msgid "No write permissions for data directory"
-msgstr ""
+msgstr "Nincs írási jogosultság az adatkönyvtárra"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:956
 #: ../java/src/org/klomp/snark/SnarkManager.java:1100
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:717
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1036
 msgid "Data directory cannot be created"
-msgstr ""
+msgstr "Adatkönyvtár nem hozható létre"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1018
 #, java-format
@@ -103,16 +104,16 @@ msgstr "Az új fájlok nyilvánosan nem lesznek olvashatók"
 #: ../java/src/org/klomp/snark/SnarkManager.java:1095
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1032
 msgid "Data directory must be an absolute path"
-msgstr ""
+msgstr "Az adatkönyvtár elérési útjának abszolútnak kell lennie"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1099
 msgid "Data directory does not exist"
-msgstr ""
+msgstr "Az adatkönyvtár nem létezik"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1102
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:719
 msgid "Not a directory"
-msgstr ""
+msgstr "Nem könyvtár"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1104
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:721
@@ -122,7 +123,7 @@ msgstr ""
 #: ../java/src/org/klomp/snark/SnarkManager.java:1111
 #, java-format
 msgid "Data directory changed to {0}"
-msgstr ""
+msgstr "Adatkönyvtár megváltoztatva erre: {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1192
 msgid "I2CP and tunnel changes will take effect after stopping all torrents"
@@ -832,7 +833,7 @@ msgstr ""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1284
 #, java-format
 msgid "Cannot add a torrent including an I2P directory: {0}"
-msgstr ""
+msgstr "Az I2P könyvtárát tartalmazó torrent nem adható hozzá: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1299
 #, java-format
@@ -1021,7 +1022,7 @@ msgstr "Torrent részletek"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1757
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3633
 msgid "Comments"
-msgstr ""
+msgstr "Megjegyzések"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1781
 msgid "View files"
@@ -1284,7 +1285,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2410
 msgid "Language"
-msgstr ""
+msgstr "Nyelv"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2421
 msgid "Theme"
@@ -1302,7 +1303,7 @@ msgstr ""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2531
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3622
 msgid "Configure"
-msgstr ""
+msgstr "Beállít"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2448
 msgid "Refresh time"
@@ -1584,7 +1585,7 @@ msgstr ""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3313
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3324
 msgid "Resource"
-msgstr ""
+msgstr "Forrás"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3314
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3325

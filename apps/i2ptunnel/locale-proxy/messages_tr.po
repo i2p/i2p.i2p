@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2016-2018
+# Kaya Zeren <kayazeren@gmail.com>, 2016-2019
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
 # zzzi2p, 2018
 msgid ""
@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2018-08-12 21:29+0000\n"
+"PO-Revision-Date: 2019-05-21 05:22+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -63,7 +63,7 @@ msgstr "I2P Yöneltici Konsolu"
 #: ../java/build/Proxy.java:190 ../java/build/Proxy.java:200
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:215
 msgid "Configuration"
-msgstr "Ayarlar"
+msgstr "Yapılandırma"
 
 #: ../java/build/Proxy.java:9 ../java/build/Proxy.java:21
 #: ../java/build/Proxy.java:34 ../java/build/Proxy.java:46
@@ -405,7 +405,7 @@ msgstr "Vekil sunucu erişim için bir kullanıcı adı ve parola isteyecek şek
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
-msgstr "Lütfen kullanıcı adı ve parolayı yazın ya da {0}yöneltici ayarlarını{1} ya da {2}I2PTunnel Ayarlarını{3} denetleyin."
+msgstr "Lütfen kullanıcı adı ve parolayı yazın ya da {0}yöneltici yapılandırmasını{1} ya da {2}I2PTunnel Yapılandırmasını{3} denetleyin."
 
 #: ../java/build/Proxy.java:173
 #, java-format
@@ -413,7 +413,7 @@ msgid ""
 "To disable authorization, remove the configuration "
 "{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
 "tunnel."
-msgstr "Kimlik doğrulamasını devre dışı bırakmak için {0}i2ptunnel.proxy.auth=basic{1} ayarlarını silin ve HTTP vekil sunucu tünelini durdurup yeniden başlatın."
+msgstr "Kimlik doğrulamasını devre dışı bırakmak için {0}i2ptunnel.proxy.auth=basic{1} yapılandırmasını silin ve HTTP vekil sunucu tünelini durdurup yeniden başlatın."
 
 #: ../java/build/Proxy.java:181
 msgid "The connection to the proxy was reset."

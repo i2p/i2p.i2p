@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-04-26 02:55+0000\n"
+"PO-Revision-Date: 2019-05-21 05:26+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -258,7 +258,7 @@ msgstr "Kaydedin"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:101
 msgid "Configuration saved."
-msgstr "Ayarlar kaydedildi."
+msgstr "Yapılandırma kaydedildi."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
@@ -269,7 +269,7 @@ msgstr "Yeniden yükleyin"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:104
 msgid "Configuration reloaded."
-msgstr "Ayarlar yeniden yüklendi"
+msgstr "Yapılandırma yeniden yüklendi"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:113
 #, java-format
@@ -417,7 +417,7 @@ msgstr "Abonelikler"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:194
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:198
 msgid "Configuration"
-msgstr "Ayarlar"
+msgstr "Yapılandırma"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:233
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:201
@@ -525,7 +525,7 @@ msgstr "Dosya"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:185
 msgid "configuration"
-msgstr "ayarlar"
+msgstr "yapılandırma"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:211
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:202
@@ -731,7 +731,7 @@ msgstr "hosts.txt dosyanızı düzenli olarak dağıtılmışkaynaklar ya da \"a
 #, java-format
 msgid ""
 "In the default configuration, the address book is only subscribed to {0}."
-msgstr "Varsayılan ayarlarda, adres defteri yalnız {0} üzerine abonedir."
+msgstr "Varsayılan yapılandırmada, adres defteri yalnız {0} üzerine abonedir."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:204
 msgid ""
@@ -835,7 +835,7 @@ msgstr "Yayınlanmış Adres Defteri"
 msgid ""
 "To configure SusiDNS to push your Router address book to your Published "
 "address book, set 'should_publish=true' on the configuration page."
-msgstr "SusiDNS tarafından Yöneltici adresinizin yayınlanmış adres defterine gönderilmesini yapılandırmak için, yapılandırma bölümünden 'should_publish=true' seçeneğini ayarlayın."
+msgstr "SusiDNS tarafından Yöneltici adresinizin yayınlanmış adres defterine gönderilmesini sağlamak için, yapılandırma bölümünden 'should_publish=true' seçeneğini ayarlayın."
 
 #: build/HowSVG.java:8
 msgid ""
