@@ -1105,7 +1105,7 @@
         <delete dir="core/c/jcpuid/lib" />
         <ant dir="installer/resources/locale" target="distclean" />
         <ant dir="installer/tools/java" target="distclean" />
-        <ant dir="installer/lib/izpack5/patches/java/" target="distclean" />
+        <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
