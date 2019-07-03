@@ -150,7 +150,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <div class="displayText" tabindex="0" "title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
 </table>

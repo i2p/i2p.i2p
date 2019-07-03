@@ -1,3 +1,5 @@
+* 2019-07-03 0.9.41 released
+
 2019-06-28 zzz
  * Update translations from Transifex
 
