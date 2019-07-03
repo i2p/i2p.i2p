@@ -1063,7 +1063,7 @@
         <delete dir="./build" />
         <delete dir="./reports" />
         <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />
-        <ant dir="installer/lib/izpack5/patches/java/" target="clean" />
+        <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />
