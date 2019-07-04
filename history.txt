@@ -1,3 +1,6 @@
+2019-07-04 zzz
+ * Console: Hide netdb RI and LS tabs (ticket #2558)
+
 * 2019-07-03 0.9.41 released
 
 2019-06-28 zzz

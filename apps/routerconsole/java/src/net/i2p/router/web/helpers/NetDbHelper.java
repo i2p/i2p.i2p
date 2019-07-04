@@ -38,10 +38,10 @@ public class NetDbHelper extends FormHandler {
                                           {_x("Summary"),                       // 0
                                            _x("Local Router"),                  // 1
                                            _x("Router Lookup"),                 // 2
+                                           // advanced below here
                                            _x("All Routers"),                   // 3
                                            _x("All Routers with Full Stats"),   // 4
                                            _x("LeaseSets"),                     // 5
-                                           // advanced below here
                                            "LeaseSet Debug",                    // 6
                                            "Sybil",                             // 7
                                            "Advanced Lookup"   };               // 8
@@ -334,7 +334,7 @@ public class NetDbHelper extends FormHandler {
         for (int i = 0; i < titles.length; i++) {
             if (i == 2 && tab != 2)
                 continue;   // can't nav to lookup
-            if (i > 5 && !isAdvanced())
+            if (i > 2 && i != tab && !isAdvanced())
                 continue;
             if (i == tab) {
                 // we are there
