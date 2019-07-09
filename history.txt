@@ -1,3 +1,9 @@
+2019-07-09 zzz
+ * NetDb:
+   - Fix NPE on store of Encrypted LS (ticket #2563)
+   - Pick alternate reply GW for netdb store reply
+     if connected, to reduce connections
+
 2019-07-04 zzz
  * Console: Hide netdb RI and LS tabs (ticket #2558)
 

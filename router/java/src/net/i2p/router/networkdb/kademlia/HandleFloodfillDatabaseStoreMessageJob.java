@@ -13,6 +13,7 @@ import java.util.Date;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
+import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
 import net.i2p.data.TunnelId;
@@ -306,6 +307,54 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             return;
         }
         boolean isEstab = getContext().commSystem().isEstablished(toPeer);
+        if (!isEstab && replyTunnel != null) {
+            DatabaseEntry entry = _message.getEntry();
+            int type = entry.getType();
+            if (type == DatabaseEntry.KEY_TYPE_LEASESET || type == DatabaseEntry.KEY_TYPE_LS2) {
+                // As of 0.9.42,
+                // if reply GW and tunnel are in the LS, we can pick a different one from the LS,
+                // so look for one that's connected to reduce connections
+                LeaseSet ls = (LeaseSet) entry;
+                int count = ls.getLeaseCount();
+                if (count > 1) {
+                    boolean found = false;
+                    for (int i = 0; i < count; i++) {
+                        Lease lease = ls.getLease(i);
+                        if (lease.getGateway().equals(toPeer) && lease.getTunnelId().equals(replyTunnel)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        //_log.warn("Looking for alternate to " + toPeer + " reply gw in LS with " + count + " leases");
+                        for (int i = 0; i < count; i++) {
+                            Lease lease = ls.getLease(i);
+                            Hash gw = lease.getGateway();
+                            if (gw.equals(toPeer))
+                                continue;
+                            if (lease.isExpired())
+                                continue;
+                            if (getContext().commSystem().isEstablished(gw)) {
+                                // switch to use this lease instead
+                                toPeer = gw;
+                                replyTunnel = lease.getTunnelId();
+                                isEstab = true;
+                                break;
+                            }
+                        }
+                        if (_log.shouldWarn()) {
+                            if (isEstab)
+                                _log.warn("Switched to alt connected peer " + toPeer + " in LS with " + count + " leases");
+                            else
+                                _log.warn("Alt connected peer not found in LS with " + count + " leases");
+                        }
+                    } else {
+                        if (_log.shouldWarn())
+                            _log.warn("Reply gw not found in LS with " + count + " leases");
+                    }
+                }
+            }
+        }
         if (isEstab) {
             I2NPMessage out1 = msg;
             I2NPMessage out2 = msg2;
