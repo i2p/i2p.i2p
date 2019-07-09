@@ -944,8 +944,12 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         
         // spoof / hash collision detection
         // todo allow non-exp to overwrite exp
-        if (rv != null && !leaseSet.getDestination().equals(rv.getDestination()))
-            throw new IllegalArgumentException("LS Hash collision");
+        if (rv != null) {
+            Destination d1 = leaseSet.getDestination();
+            Destination d2 = rv.getDestination();
+            if (d1 != null && d2 != null && !d1.equals(d2))
+                throw new IllegalArgumentException("LS Hash collision");
+        }
 
         EncryptedLeaseSet encls = null;
         if (leaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
