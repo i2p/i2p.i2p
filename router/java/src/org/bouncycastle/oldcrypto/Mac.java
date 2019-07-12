@@ -31,6 +31,8 @@ package org.bouncycastle.oldcrypto;
  * The base interface for implementations of message authentication codes (MACs).
  *
  * modified by jrandom to use the session key byte array directly
+ *
+ * Not a public API - Not for external use!
  */
 public interface Mac
 {

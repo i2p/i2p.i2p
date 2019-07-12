@@ -1619,7 +1619,7 @@ class PacketBuilder {
         int hmacLen = totalSize + UDPPacket.IV_SIZE + 2;
         //Hash hmac = _context.hmac().calculate(macKey, data, hmacOff, hmacLen);
         byte[] ba = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-        _context.hmac().calculate(macKey, data, hmacOff, hmacLen, ba, 0);
+        _transport.getHMAC().calculate(macKey, data, hmacOff, hmacLen, ba, 0);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Authenticating " + pkt.getLength() +

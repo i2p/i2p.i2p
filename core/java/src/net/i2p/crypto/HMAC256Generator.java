@@ -13,8 +13,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
-import org.bouncycastle.oldcrypto.macs.I2PHMac;
-
 /**
  * Calculate the HMAC-SHA256 of a key+message.
  * This is compatible with javax.crypto.Mac.getInstance("HmacSHA256").
@@ -28,31 +26,7 @@ public final class HMAC256Generator extends HMACGenerator {
     /**
      *  @param context unused
      */
-    public HMAC256Generator(I2PAppContext context) { super(context); }
-    
-    /**
-     *  @deprecated unused (not even by Syndie)
-     *  @throws UnsupportedOperationException since 0.9.12
-     */
-    @Override
-    @Deprecated
-    protected I2PHMac acquire() {
-        throw new UnsupportedOperationException();
-    }
-    
-    /**
-     *  Calculate the HMAC of the data with the given key
-     *
-     *  @return the first 16 bytes contain the HMAC, the last 16 bytes are zero
-     *  @deprecated unused (not even by Syndie)
-     *  @throws UnsupportedOperationException always
-     *  @since 0.9.12 overrides HMACGenerator
-     */
-    @Override
-    @Deprecated
-    public Hash calculate(SessionKey key, byte data[]) {
-        throw new UnsupportedOperationException();
-    }
+    public HMAC256Generator(I2PAppContext context) { super(); }
     
     /**
      *  Calculate the HMAC of the data with the given key.

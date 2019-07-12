@@ -1,3 +1,10 @@
+2019-07-12 zzz
+ * Build: Move SSU HMAC implementation from core to router
+ * Test: Fix broken unit test build
+
+2019-07-11 zzz
+ * imagegen: Improve QR font rendering
+
 2019-07-09 zzz
  * NetDb:
    - Fix NPE on store of Encrypted LS (ticket #2563)

@@ -51,7 +51,7 @@ import org.bouncycastle.oldcrypto.Mac;
  * As of 0.9.12, refactored to use standard MessageDigest.
  *
  * Deprecated - Do not use outside of router or Syndie.
- * To be moved to router.
+ * Not a public API - Not for external use!
  */
 public class I2PHMac
 implements Mac

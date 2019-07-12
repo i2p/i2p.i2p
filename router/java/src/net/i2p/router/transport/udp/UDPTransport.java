@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -87,6 +88,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _introducersSelectedOn;
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
+    private final SSUHMACGenerator _hmac;
     private int _mtu;
     private int _mtu_ipv6;
     private boolean _mismatchLogged;
@@ -272,6 +274,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
+        _hmac = new SSUHMACGenerator();
         _mtu = PeerState.LARGE_MTU;
         _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
         setupPort();
@@ -614,6 +617,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         UDPPacket.clearCache();
         UDPAddress.clearCache();
         _lastInboundIPv6 = 0;
+        _hmac.clearCache();
     }
 
     /**
@@ -2746,6 +2750,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     DHSessionKeyBuilder.Factory getDHFactory() {
         return _dhFactory;
+    }
+    
+    /**
+     *  @return the SSU HMAC
+     *  @since 0.9.42
+     */
+    HMACGenerator getHMAC() {
+        return _hmac;
     }
     
     /**

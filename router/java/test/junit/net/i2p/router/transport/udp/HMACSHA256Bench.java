@@ -1,4 +1,4 @@
-package net.i2p.crypto;
+package net.i2p.router.transport.udp;
 
 /* 
  * Copyright (c) 2003, TheCrypto
@@ -36,6 +36,10 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
+/**
+ *  Warning, misnamed, this tests the SSU HMAC,
+ *  not net.i2p.crypto.HMAC256Generator
+ */
 public class HMACSHA256Bench {
         public static void main(String args[]) {
             runTest(new I2PAppContext());
@@ -48,7 +52,8 @@ public class HMACSHA256Bench {
         private static void runTest(I2PAppContext ctx) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
         byte[] output = new byte[32];
-		ctx.hmac().calculate(key, "qwerty".getBytes(), 0, 6, output, 0);
+        SSUHMACGenerator hmac = new SSUHMACGenerator();
+		hmac.calculate(key, "qwerty".getBytes(), 0, 6, output, 0);
 			
 		int times = 100000;
 		long shorttime = 0;
@@ -84,27 +89,27 @@ public class HMACSHA256Bench {
 		byte[] lmess = DataHelper.getASCII(buf.toString());
 
 		// warm up the engines
-        ctx.hmac().calculate(key, smess, 0, smess.length, output, 0);
-        ctx.hmac().calculate(key, mmess, 0, mmess.length, output, 0);
-        ctx.hmac().calculate(key, lmess, 0, lmess.length, output, 0);
+        hmac.calculate(key, smess, 0, smess.length, output, 0);
+        hmac.calculate(key, mmess, 0, mmess.length, output, 0);
+        hmac.calculate(key, lmess, 0, lmess.length, output, 0);
         
         long before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, smess, 0, smess.length, output, 0);
+            hmac.calculate(key, smess, 0, smess.length, output, 0);
         long after = System.currentTimeMillis();
         
         display(times, before, after, smess.length, "3 byte");
         
         before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, mmess, 0, mmess.length, output, 0);
+            hmac.calculate(key, mmess, 0, mmess.length, output, 0);
         after = System.currentTimeMillis();
 
         display(times, before, after, mmess.length, "2KB");
         
         before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, lmess, 0, lmess.length, output, 0);
+            hmac.calculate(key, lmess, 0, lmess.length, output, 0);
         after = System.currentTimeMillis();
 
         display(times, before, after, lmess.length, "10KB");
