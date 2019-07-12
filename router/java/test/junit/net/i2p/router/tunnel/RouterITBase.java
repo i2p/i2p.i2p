@@ -42,7 +42,7 @@ public abstract class RouterITBase {
             _context.random().nextBytes(tunnelIds[i]);
         }
         
-        TunnelCreatorConfig config = new TunnelCreatorConfig(_context, numHops, false);
+        TunnelCreatorConfig config = new TCConfig(_context, numHops, false);
         for (int i = 0; i < numHops; i++) {
             config.setPeer(i, peers[i]);
             HopConfig cfg = config.getConfig(i);
