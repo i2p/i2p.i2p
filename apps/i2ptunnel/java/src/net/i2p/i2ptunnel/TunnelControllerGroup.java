@@ -322,12 +322,12 @@ public class TunnelControllerGroup implements ClientApp {
      * @throws IllegalArgumentException if unable to load from file
      */
     private synchronized void loadControllers(File cfgFile, boolean shouldMigrate) {
-        File dir = new SecureDirectory(cfgFile.getParent(), CONFIG_DIR);
+        File dir = new SecureDirectory(_context.getConfigDir(), CONFIG_DIR);
         List<Properties> props = null;
         if (cfgFile.exists()) {
             try {
-                props = loadConfig(cfgFile);
                 if (shouldMigrate && !dir.exists()) {
+                    props = loadConfig(cfgFile);
                     boolean ok = migrate(props, cfgFile, dir);
                     if (!ok)
                         shouldMigrate = false;
@@ -653,7 +653,10 @@ public class TunnelControllerGroup implements ClientApp {
             }
         }else {
             try {
-                saveConfig(_configFile);
+                File cfgFile = new File(_configFile);
+                if (!cfgFile.isAbsolute())
+                    cfgFile = new File(_context.getConfigDir(), _configFile);
+                saveConfig(cfgFile);
             } finally {
                 _controllersLock.readLock().unlock();
             }
@@ -665,20 +668,18 @@ public class TunnelControllerGroup implements ClientApp {
      * @deprecated
      */
     @Deprecated
-    private synchronized void saveConfig(String configFile) throws IOException {
-        File cfgFile = new File(configFile);
-        if (!cfgFile.isAbsolute())
-            cfgFile = new File(_context.getConfigDir(), configFile);
+    private synchronized void saveConfig(File cfgFile) throws IOException {
         File parent = cfgFile.getParentFile();
         if ( (parent != null) && (!parent.exists()) )
             parent.mkdirs();
         Properties map = new OrderedProperties();
         _controllersLock.readLock().lock();
         try {
-            for (int i = 0; i < _controllers.size(); i++) {
-                TunnelController controller = _controllers.get(i);
+            int i = 0;
+            for (TunnelController controller : _controllers) {
                 Properties cur = controller.getConfig(PREFIX + i + ".");
                 map.putAll(cur);
+                i++;
             }
         } finally {
             _controllersLock.readLock().unlock();
