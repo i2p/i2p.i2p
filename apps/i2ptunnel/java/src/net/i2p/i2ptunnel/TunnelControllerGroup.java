@@ -172,8 +172,7 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public void startup() {
         List<File> fileList = listFiles();
-        for (File afile : fileList) {
-            String configFile = afile.toString();
+        for (File configFile : fileList) {
             try {
                 _log.logAlways(Log.WARN, "Configuring a tunnel " + configFile);
                 loadControllers(configFile);
@@ -279,27 +278,6 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Load up all of the tunnels configured in the given file.
-     * Prior to 0.9.20, also started the tunnels.
-     * As of 0.9.20, does not start the tunnels, you must call startup()
-     * or getInstance() instead of loadControllers().
-     *
-     * DEPRECATED for use outside this class. Use startup() or getInstance().
-     *
-     * @throws IllegalArgumentException if unable to load from file
-     */
-    public synchronized void loadControllers(String configFile) {
-        if (_controllersLoaded)
-            return;
-        try {
-            boolean shouldMigrate = _context.isRouterContext() && !SystemVersion.isAndroid() && !_context.getConfigDir().getCanonicalPath().equals(_context.getBaseDir().getCanonicalPath());
-            loadControllers(configFile, shouldMigrate());
-        } catch (IOException ioe){
-            loadControllers(configFile, false);
-        }
-    }
-
-    /**
      * Detects whether a migration to split configuration files should/will/has
      * happened based on the platform and installation type. Does not tell
      * whether a migration has actually occurred.
@@ -322,26 +300,41 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
+     * Load up all of the tunnels configured in the given file.
+     * Prior to 0.9.20, also started the tunnels.
+     * As of 0.9.20, does not start the tunnels, you must call startup()
+     * or getInstance() instead of loadControllers().
+     *
+     * DEPRECATED for use outside this class. Use startup() or getInstance().
+     *
+     * @throws IllegalArgumentException if unable to load from file
+     */
+    public synchronized void loadControllers(File cfgFile) {
+        if (_controllersLoaded)
+            return;
+
+        loadControllers(cfgFile, shouldMigrate());
+    }
+
+    /**
      * @param shouldMigrate migrate to, and load from, i2ptunnel.config.d
      * @since 0.9.34
      * @throws IllegalArgumentException if unable to load from file
      */
-    private synchronized void loadControllers(String configFile, boolean shouldMigrate) {
-        File cfgFile = new File(configFile);
-        if (!cfgFile.isAbsolute())
-            cfgFile = new File(_context.getConfigDir(), configFile);
+    private synchronized void loadControllers(File cfgFile, boolean shouldMigrate) {
         File dir = new SecureDirectory(cfgFile.getParent(), CONFIG_DIR);
         List<Properties> props = null;
         if (cfgFile.exists()) {
             try {
                 props = loadConfig(cfgFile);
-                if (shouldMigrate) {
+                if (shouldMigrate && !dir.exists()) {
                     boolean ok = migrate(props, cfgFile, dir);
                     if (!ok)
                         shouldMigrate = false;
                 }
             } catch (IOException ioe) {
-                _log.error("Unable to load the controllers from " + cfgFile.getAbsolutePath());
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Unable to load the controllers from " + cfgFile.getAbsolutePath());
                 throw new IllegalArgumentException("Unable to load the controllers from " + cfgFile, ioe);
             }
         } else if (!shouldMigrate) {
@@ -352,29 +345,24 @@ public class TunnelControllerGroup implements ClientApp {
         try {
             if (shouldMigrate && dir.isDirectory()) {
                 List<File> fileList = listFiles();
-                if (fileList != null && fileList.size() > 0) {
-                    // sort so the returned order is consistent
-                    Collections.sort(fileList);
-                    for (File f : fileList) {
-                        try {
-                            props = loadConfig(f);
-                            if (!props.isEmpty()) {
-                                for (Properties cfg : props) {
-                                    String type = cfg.getProperty("type");
-                                    if (type == null)
-                                        continue;
-                                    TunnelController controller = new TunnelController(cfg, "");
-                                    _controllers.add(controller);
-                                    //i++;
-                                }
-                            } else {
-                                _log.error("Error loading the client app properties from " + f);
-                                System.out.println("Error loading the client app properties from " + f);
+                for (File f : fileList) {
+                    try {
+                        props = loadConfig(f);
+                        if (!props.isEmpty()) {
+                            for (Properties cfg : props) {
+                                String type = cfg.getProperty("type");
+                                if (type == null)
+                                    continue;
+                                TunnelController controller = new TunnelController(cfg, "");
+                                _controllers.add(controller);
                             }
-                        } catch (IOException ioe) {
-                            _log.error("Error loading the client app properties from " + f + ' '+ ioe);
-                            System.out.println("Error loading the client app properties from " + f + ' ' + ioe);
+                        } else {
+                            if (_log.shouldLog(Log.ERROR))
+                                _log.error("Error loading the client app properties from " + f);
                         }
+                    } catch (IOException ioe) {
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Error loading the client app properties from " + f + ' '+ ioe);
                     }
                 }
             } else {
@@ -396,7 +384,7 @@ public class TunnelControllerGroup implements ClientApp {
         if (i > 0) {
             _controllersLoaded = true;
             if (_log.shouldLog(Log.INFO))
-                _log.info(i + " controllers loaded from " + configFile);
+                _log.info(i + " controllers loaded from " + cfgFile);
         } else {
             _log.logAlways(Log.WARN, "No i2ptunnel configurations found in " + cfgFile + " or " + dir);
         }
@@ -431,8 +419,8 @@ public class TunnelControllerGroup implements ClientApp {
             try {
                 DataHelper.storeProps(save, f);
             } catch (IOException ioe) {
-                _log.error("Error migrating the i2ptunnel configuration to " + f, ioe);
-                System.out.println("Error migrating the i2ptunnel configuration to " + f + ' ' + ioe.toString());
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Error migrating the i2ptunnel configuration to " + f, ioe);
                 ok = false;
             }
         }
@@ -482,9 +470,11 @@ public class TunnelControllerGroup implements ClientApp {
      * @throws IllegalArgumentException if unable to reload config file
      */
     public synchronized void reloadControllers() {
-        List<File> fileList = listFiles();
         unloadControllers();
-        loadControllers(_configFile);
+        File cfgFile = new File(_configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(_context.getConfigDir(), _configFile);
+        loadControllers(cfgFile);
         startControllers();
     }
 
@@ -787,14 +777,10 @@ public class TunnelControllerGroup implements ClientApp {
         File folder = new File(_configDirectory);
         if (!folder.isAbsolute())
             folder = new File(_context.getConfigDir(), _configDirectory);
-        File[] listOfFiles = folder.listFiles();
+        File[] listOfFiles = folder.listFiles(new FileSuffixFilter(".config"));
         List<File> files = new ArrayList<File>();
-        if (listOfFiles != null && listOfFiles.length > 0) {
-            for (File afile : listOfFiles) {
-                if (afile.isFile() && afile.exists() && afile.getName().endsWith(".config")) {
-                    files.add(afile);
-                }
-            }
+        for (File afile : listOfFiles) {
+            files.add(afile);
         }
         Collections.sort(files);
         return files;
@@ -882,24 +868,30 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of TunnelController objects
      * @throws IllegalArgumentException if unable to load config from file
      */
-     public List<TunnelController> getControllers() {
+    public List<TunnelController> getControllers() {
         List<TunnelController> _tempControllers = new ArrayList<TunnelController>();
-        _tempControllers.addAll(getControllers(_configFile));
+        File cfgFile = new File(_configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(_context.getConfigDir(), _configFile);
+        _tempControllers.addAll(getControllers(cfgFile));
         return _tempControllers;
      }
 
-
     /**
+     * Retrieve a list of tunnels known.
      *
+     * Side effect: if the tunnels have not been loaded from config yet, they
+     * will be.
      *
-     *
-     *
-    */
-    public List<TunnelController> getControllers(String configFile) {
-        _log.logAlways(Log.WARN, "Getting controllers from config file " + configFile);
+     * @return list of TunnelController objects
+     * @throws IllegalArgumentException if unable to load config from file
+     */
+    public List<TunnelController> getControllers(File cfgFile) {
+        _log.logAlways(Log.WARN, "Getting controllers from config file " + cfgFile);
+
         synchronized (this) {
             if (!_controllersLoaded)
-                loadControllers(configFile);
+                loadControllers(cfgFile);
         }
 
         _controllersLock.readLock().lock();
@@ -965,7 +957,8 @@ public class TunnelControllerGroup implements ClientApp {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Session destroyed: " + session);
             } catch (I2PSessionException ise) {
-                _log.error("Error closing the client session", ise);
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Error closing the client session", ise);
             }
         }
     }
