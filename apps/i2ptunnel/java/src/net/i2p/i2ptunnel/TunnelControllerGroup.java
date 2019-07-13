@@ -780,8 +780,10 @@ public class TunnelControllerGroup implements ClientApp {
             folder = new File(_context.getConfigDir(), _configDirectory);
         File[] listOfFiles = folder.listFiles(new FileSuffixFilter(".config"));
         List<File> files = new ArrayList<File>();
-        for (File afile : listOfFiles) {
-            files.add(afile);
+        if (listOfFiles != null){
+            for (File afile : listOfFiles) {
+                files.add(afile);
+            }
         }
         Collections.sort(files);
         return files;
