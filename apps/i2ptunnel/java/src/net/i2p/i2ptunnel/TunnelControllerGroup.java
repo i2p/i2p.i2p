@@ -171,29 +171,29 @@ public class TunnelControllerGroup implements ClientApp {
      *  @since 0.9.4
      */
     public void startup() {
-        List<File> fileList = listFiles();
-        for (File configFile : fileList) {
-            try {
-                _log.logAlways(Log.WARN, "Configuring a tunnel " + configFile);
-                loadControllers(configFile);
-            } catch (IllegalArgumentException iae) {
-                if (DEFAULT_CONFIG_FILE.equals(configFile) && !_context.isRouterContext()) {
-                    // for i2ptunnel command line
-                    synchronized (this) {
-                        _controllersLoaded = true;
-                    }
-                    _log.logAlways(Log.WARN, "Not in router context and no preconfigured tunnels");
-                } else {
-                    throw iae;
+        File configFile = new File(_configFile);
+        if (!configFile.isAbsolute())
+            configFile = new File(_context.getConfigDir(), _configFile);
+        try {
+            _log.logAlways(Log.WARN, "Configuring a tunnel " + configFile);
+            loadControllers(configFile);
+        } catch (IllegalArgumentException iae) {
+            if (DEFAULT_CONFIG_FILE.equals(configFile) && !_context.isRouterContext()) {
+                // for i2ptunnel command line
+                synchronized (this) {
+                    _controllersLoaded = true;
                 }
+                _log.logAlways(Log.WARN, "Not in router context and no preconfigured tunnels");
+            } else {
+                throw iae;
             }
-            startControllers();
-            if (_mgr != null)
-                _mgr.register(this);
-                // RouterAppManager registers its own shutdown hook
-            else
-                _context.addShutdownTask(new Shutdown());
         }
+        startControllers();
+        if (_mgr != null)
+            _mgr.register(this);
+            // RouterAppManager registers its own shutdown hook
+        else
+            _context.addShutdownTask(new Shutdown());
     }
 
     /**
@@ -784,6 +784,11 @@ public class TunnelControllerGroup implements ClientApp {
             for (File afile : listOfFiles) {
                 files.add(afile);
             }
+        }else{
+            File cfgFile = new File(_configFile);
+            if (!cfgFile.isAbsolute())
+                cfgFile = new File(_context.getConfigDir(), _configFile);
+            files.add(cfgFile);
         }
         Collections.sort(files);
         return files;
