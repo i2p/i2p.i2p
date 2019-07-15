@@ -75,6 +75,19 @@ public class GeneralHelper {
         else
             return null;
     }
+    public static TunnelController getController(TunnelControllerGroup tcg, TunnelController tc) {
+        if (tcg == null) return null;
+        List<TunnelController> controllers = tcg.getControllers();
+        int i = 0;
+        for (TunnelController controller : controllers){
+            if (controller.getName() == tc.getName()) {
+                return controllers.get(i);
+            }
+            i++;
+        }
+
+        return null;
+    }
 
     public List<String> saveTunnel(int tunnel, TunnelConfig config) {
         return saveTunnel(_context, _group, tunnel, config);
@@ -83,7 +96,7 @@ public class GeneralHelper {
             I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
         List<String> msgs = updateTunnelConfig(tcg, tunnel, config);
 ///////////////
-        msgs.addAll(saveConfig(context, tcg));
+        msgs.addAll(saveConfig(context, tcg, tunnel));
         return msgs;
     }
 
@@ -142,8 +155,20 @@ public class GeneralHelper {
             tcg.addController(cur);
             if (cur.getStartOnLoad())
                 cur.startTunnelBackground();
+            try {
+                tcg.saveConfig(cur);
+            } catch (IOException ioe) {
+                msgs.add("Failed to save initial tunnel config after creation " +
+                    getTunnelName(tcg, cur) + ", check logs:" + ioe);
+            }
         } else {
             cur.setConfig(props, "");
+            try {
+                tcg.saveConfig(cur);
+            } catch (IOException ioe) {
+                msgs.add("Failed to save initial tunnel config after creation " +
+                    getTunnelName(tcg, cur) + ", check logs:" + ioe);
+            }
         }
         // Only modify other shared tunnels
         // if the current tunnel is shared, and of supported type
@@ -166,6 +191,12 @@ public class GeneralHelper {
                     cOpt.setProperty("option.outbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
 
                     c.setConfig(cOpt, "");
+                    try {
+                        tcg.saveConfig(c);
+                    } catch (IOException ioe) {
+                        msgs.add("Failed to save initial tunnel config after creation " +
+                            getTunnelName(tcg, c) + ", check logs:" + ioe);
+                    }
                 }
             }
         }
@@ -173,11 +204,17 @@ public class GeneralHelper {
         return msgs;
     }
 
-    protected static List<String> saveConfig(I2PAppContext context, TunnelControllerGroup tcg) {
+    protected static List<String> saveConfig(
+            I2PAppContext context, TunnelControllerGroup tcg, int tunnel) {
         List<String> rv = tcg.clearAllMessages();
         try {
-////////////////
-            tcg.saveConfig();
+            TunnelController cur = getController(tcg, tunnel);
+            if (cur == null) {
+                //List<String> msgs = new ArrayList<String>();
+                rv.add("Invalid tunnel number");
+                return rv;
+            }
+            tcg.saveConfig(cur);
             rv.add(0, _t("Configuration changes saved", context));
         } catch (IOException ioe) {
             Log log = context.logManager().getLog(GeneralHelper.class);
@@ -214,7 +251,7 @@ public class GeneralHelper {
         }catch (IOException ioe){
             msgs.add(ioe.toString());
         }
-        msgs.addAll(saveConfig(context, tcg));
+        msgs.addAll(saveConfig(context, tcg, tunnel));
 
         // Rename private key file if it was a default name in
         // the default directory, so it doesn't get reused when a new
@@ -273,6 +310,14 @@ public class GeneralHelper {
      *  @return null if unset
      */
     public static String getTunnelName(TunnelControllerGroup tcg, int tunnel) {
+        TunnelController tun = getController(tcg, tunnel);
+        return tun != null ? tun.getName() : null;
+    }
+
+    /**
+     *  @return null if unset
+     */
+    public static String getTunnelName(TunnelControllerGroup tcg, TunnelController tunnel) {
         TunnelController tun = getController(tcg, tunnel);
         return tun != null ? tun.getName() : null;
     }
