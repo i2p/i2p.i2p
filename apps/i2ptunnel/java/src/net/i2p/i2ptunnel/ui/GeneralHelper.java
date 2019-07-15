@@ -80,7 +80,7 @@ public class GeneralHelper {
         List<TunnelController> controllers = tcg.getControllers();
         int i = 0;
         for (TunnelController controller : controllers){
-            if (controller.getName() == tc.getName()) {
+            if (controller.getName().equals(tc.getName())) {
                 return controllers.get(i);
             }
             i++;
