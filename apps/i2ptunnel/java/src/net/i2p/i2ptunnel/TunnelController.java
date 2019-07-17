@@ -1152,18 +1152,6 @@ public class TunnelController implements Logging {
        ****/
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof TunnelController)) {
-            return false;
-        }
-        TunnelController other = (TunnelController) o;
-        return getName().equals(other.getName());
-    }
-
-    public int hashCode() {
-        return getName().hashCode();
-    }
-
   /****
     private void getHttpClientSummary(StringBuilder buf) {
         String description = getDescription();

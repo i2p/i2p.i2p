@@ -884,7 +884,6 @@ public class TunnelControllerGroup implements ClientApp {
         _controllersLock.readLock().lock();
         try {
             List<TunnelController> rv = new ArrayList<TunnelController>(_controllers);
-            //Collections.sort(rv);
             return rv;
         } finally {
             _controllersLock.readLock().unlock();

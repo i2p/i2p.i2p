@@ -66,6 +66,7 @@ public class GeneralHelper {
     public TunnelController getController(int tunnel) {
         return getController(_group, tunnel);
     }
+
     public static TunnelController getController(TunnelControllerGroup tcg, int tunnel) {
         if (tunnel < 0) return null;
         if (tcg == null) return null;
@@ -75,23 +76,11 @@ public class GeneralHelper {
         else
             return null;
     }
-    public static TunnelController getController(TunnelControllerGroup tcg, TunnelController tc) {
-        if (tcg == null) return null;
-        List<TunnelController> controllers = tcg.getControllers();
-        int i = 0;
-        for (TunnelController controller : controllers){
-            if (controller.getName().equals(tc.getName())) {
-                return controllers.get(i);
-            }
-            i++;
-        }
-
-        return null;
-    }
 
     public List<String> saveTunnel(int tunnel, TunnelConfig config) {
         return saveTunnel(_context, _group, tunnel, config);
     }
+
     public static List<String> saveTunnel(
             I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
         List<String> msgs = updateTunnelConfig(tcg, tunnel, config);
@@ -159,7 +148,7 @@ public class GeneralHelper {
                 tcg.saveConfig(cur);
             } catch (IOException ioe) {
                 msgs.add("Failed to save initial tunnel config after creation " +
-                    getTunnelName(tcg, cur) + ", check logs:" + ioe);
+                    cur.getName() + ", check logs:" + ioe);
             }
         } else {
             cur.setConfig(props, "");
@@ -167,7 +156,7 @@ public class GeneralHelper {
                 tcg.saveConfig(cur);
             } catch (IOException ioe) {
                 msgs.add("Failed to save initial tunnel config after creation " +
-                    getTunnelName(tcg, cur) + ", check logs:" + ioe);
+                    cur.getName() + ", check logs:" + ioe);
             }
         }
         // Only modify other shared tunnels
@@ -195,7 +184,7 @@ public class GeneralHelper {
                         tcg.saveConfig(c);
                     } catch (IOException ioe) {
                         msgs.add("Failed to save initial tunnel config after creation " +
-                            getTunnelName(tcg, c) + ", check logs:" + ioe);
+                            cur.getName() + ", check logs:" + ioe);
                     }
                 }
             }
@@ -309,14 +298,6 @@ public class GeneralHelper {
      *  @return null if unset
      */
     public static String getTunnelName(TunnelControllerGroup tcg, int tunnel) {
-        TunnelController tun = getController(tcg, tunnel);
-        return tun != null ? tun.getName() : null;
-    }
-
-    /**
-     *  @return null if unset
-     */
-    public static String getTunnelName(TunnelControllerGroup tcg, TunnelController tunnel) {
         TunnelController tun = getController(tcg, tunnel);
         return tun != null ? tun.getName() : null;
     }
