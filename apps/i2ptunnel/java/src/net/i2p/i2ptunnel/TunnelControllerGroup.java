@@ -1,8 +1,6 @@
 package net.i2p.i2ptunnel;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
