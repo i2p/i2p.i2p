@@ -251,7 +251,6 @@ public class GeneralHelper {
         }catch (IOException ioe){
             msgs.add(ioe.toString());
         }
-        msgs.addAll(saveConfig(context, tcg, tunnel));
 
         // Rename private key file if it was a default name in
         // the default directory, so it doesn't get reused when a new

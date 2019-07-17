@@ -1,6 +1,8 @@
 package net.i2p.i2ptunnel;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -327,8 +329,8 @@ public class TunnelControllerGroup implements ClientApp {
         List<Properties> props = null;
         if (cfgFile.exists()) {
             try {
+                props = loadConfig(cfgFile);
                 if (shouldMigrate && !dir.exists()) {
-                    props = loadConfig(cfgFile);
                     boolean ok = migrate(props, cfgFile, dir);
                     if (!ok)
                         shouldMigrate = false;
@@ -689,6 +691,7 @@ public class TunnelControllerGroup implements ClientApp {
                 map.putAll(cur);
                 i++;
             }
+            map.setProperty("configFile", cfgFile.getAbsolutePath());
         } finally {
             _controllersLock.readLock().unlock();
         }
@@ -700,12 +703,17 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.42
      */
     public synchronized void saveConfig(TunnelController tc) throws IOException {
+        if (!shouldMigrate()){
+            saveConfig();
+            return;
+        }
         if (_log.shouldInfo())
             _log.info("Saving tunnel configuration for " + tc);
         Properties inputController = tc.getConfig("");
         File cfgFile = assureConfigFile(tc);
         inputController.setProperty("configFile", cfgFile.getAbsolutePath());
         DataHelper.storeProps(inputController, cfgFile);
+        tc.setConfig(inputController, "");
     }
 
     /**
@@ -714,21 +722,12 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized void removeConfig(TunnelController tc) throws IOException {
         File cfgFile = assureConfigFile(tc);
-        _controllersLock.writeLock().lock();
-        try {
-            _controllers.remove(tc);
-            // FIXME
-            for (TunnelController c : _controllers) {
-                saveConfig(c);
-            }
-        } finally {
-            _controllersLock.writeLock().unlock();
-            if (!FileUtil.rename(cfgFile, new File(cfgFile.getAbsolutePath() + ".bak")))
-                if (! cfgFile.delete())
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("could not delete config file" + cfgFile.toString());
-        }
-
+        if (!FileUtil.rename(cfgFile, new File(cfgFile.getAbsolutePath() + ".bak")))
+            if (! cfgFile.delete())
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("could not delete config file" + cfgFile.toString());
+        if (!shouldMigrate())
+            saveConfig();
     }
 
     /**
@@ -742,9 +741,11 @@ public class TunnelControllerGroup implements ClientApp {
         Properties inputController = tc.getConfig("");
         String configFileName = inputController.getProperty("configFile");
         if (configFileName == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("configFile property not found");
             String fileName = inputController.getProperty("name");
             if (fileName == null)
-                fileName = "tunnel";
+                fileName = "New Tunnel";
             configFileName = _controllers.size() + "-" + fileName + "-i2ptunnel.config";
             if (_controllers.size() < 10)
                 configFileName = '0' + configFileName;
