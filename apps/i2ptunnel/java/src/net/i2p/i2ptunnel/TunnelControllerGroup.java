@@ -400,8 +400,8 @@ public class TunnelControllerGroup implements ClientApp {
         if (!dir.isDirectory() && !dir.mkdirs())
             return false;
         boolean ok = true;
-        for (int i = 0; i < tunnels.size(); i++) {
-            Properties props = tunnels.get(i);
+        int i = 0;
+        for (Properties props : tunnels) {
             String tname = props.getProperty("name");
             if (tname == null)
                 tname = "tunnel";
@@ -423,6 +423,7 @@ public class TunnelControllerGroup implements ClientApp {
                     _log.error("Error migrating the i2ptunnel configuration to " + f, ioe);
                 ok = false;
             }
+            i++;
         }
         if (ok) {
             if (!FileUtil.rename(from, new File(from.getAbsolutePath() + ".bak")))
