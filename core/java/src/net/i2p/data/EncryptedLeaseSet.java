@@ -401,6 +401,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         // inner LS is always unpublished
         int saveFlags = _flags;
         setUnpublished();
+        setBlindedWhenPublished();
         try {
             // Inner layer - type - data covered by sig
             baos.write(KEY_TYPE_LS2);
