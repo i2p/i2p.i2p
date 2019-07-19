@@ -7250,11 +7250,6 @@ td.optionsave {
      width: calc(100% - 22px) !important;
      overflow-y: hidden;
 }
-
-#help .confignav, #debug .confignav {
-     position: sticky;
-     top: 0;
-}
 }
 
 @media screen and (min-width: 1460px) {
@@ -7426,13 +7421,6 @@ table#permabanned {
 
 .langbox img {
      margin-bottom: -1px;
-}
-
-#help .confignav {
-     padding: 0 !important;
-     position: sticky;
-     top: -1px;
-     z-index: 999;
 }
 
 #help .tab {

@@ -150,6 +150,22 @@ public class PeerHelper extends HelperBase {
             out.write(buf.toString());
         } else if ("upnp".equals(_transport)) {
             // UPnP Status
+            StringBuilder buf = new StringBuilder(512);
+            buf.append("<h3>").append(_t("UPnP Overview"))
+               .append("</h3><div id=\"upnpoverview\"><p>")
+               .append(_t("UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports."))
+               .append(' ')
+               .append(_t("If UPnP is not working, it may be for one of the following reasons:"))
+               .append("</p><ul id=\"upnphelp\"><li>").append(_t("No UPnP-compatible device present"))
+               .append("</li>\n<li>").append(_t("UPnP disabled on the device"))
+               .append("</li>\n<li>").append(_t("Software firewall interference with UPnP"))
+               .append("</li>\n<li>").append(_t("Bugs in the device's UPnP implementation"))
+               .append("</li>\n<li>").append(_t("Multiple firewall/routers in the internet connection path"))
+               .append("</li>\n<li>").append(_t("UPnP device change, reset, or address change"))
+               .append("</li>\n</ul><p>")
+               .append(_t("UPnP may be enabled or disabled on the Network Configuration page, but a change requires a router restart to take effect."))
+               .append("</p></div>");
+            out.write(buf.toString());
             _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
         }
         out.flush();

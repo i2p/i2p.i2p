@@ -28,8 +28,13 @@
  <h3 id="bwlimiter" class="tabletitle"><%=intl._t("Bandwidth Limiter")%>&nbsp;<a href="confignet">[<%=intl._t("Advanced Network Configuration")%>]</a></h3>
  <table id="bandwidthconfig" class="configtable">
  <tr><td class="infohelp" colspan="2">
- <b><%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%></b>
- </td></tr>
+ <b><%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%></b><p>
+<%=intl._t("All sidebar values are in bytes per second, not bits per second.")%>
+<%=intl._t("You may change your bandwidth limits here.")%>
+<%=intl._t("The more bandwidth you make available, the more you help the network and improve your own anonymity, so please take the time to review the settings.")%>
+<%=intl._t("If you are unsure of your network's speed, use the <a href=\"/welcome?page=3\">Bandwidth Test</a>.")%>
+<%=intl._t("Your upstream share amount (KBps Out) will determine your overall contribution to the network.")%>
+</p></td></tr>
 <%-- display burst, set standard, handler will fix up --%>
    <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" >
           <%=intl._t("KBps In")%>

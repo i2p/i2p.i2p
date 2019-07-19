@@ -1743,14 +1743,6 @@ h1, .confignav {
      background: linear-gradient(to bottom, rgba(31, 43, 63, 0.7), rgba(31, 43, 63,.2) 50%, rgba(31, 43, 63, 0) 50%, rgba(31, 43, 63, 0.4) 50%, rgba(31, 43, 63, 0.5)), linear-gradient( to right, #6288cb, #7fadff, #6288cb);
 }
 
-@media screen and (min-width: 1400px) {
-#help .confignav, #debug .confignav {
-     position: sticky;
-     top: -1px;
-     z-index: 999;
-}
-}
-
 /* end topnav */
 
 .th_title a, .th_title a:hover {

@@ -12,7 +12,7 @@ import net.i2p.router.web.FormHandler;
 
 
 /**
- *  Simple summary bar configuration.
+ *  Simple sidebar configuration.
  *
  *  @since 0.9.1
  */
@@ -39,12 +39,12 @@ public class ConfigSummaryHandler extends FormHandler {
             }
         } else if (_action.equals(_t("Restore full default"))) {
             _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", isAdvanced() ? SummaryHelper.DEFAULT_FULL_ADVANCED : SummaryHelper.DEFAULT_FULL);
-            addFormNotice(_t("Full summary bar default restored.") + " " +
-                          _t("Summary bar will refresh shortly."));
+            addFormNotice(_t("Full sidebar default restored.") + " " +
+                          _t("Sidebar will refresh shortly."));
         } else if (_action.equals(_t("Restore minimal default"))) {
             _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", isAdvanced() ? SummaryHelper.DEFAULT_MINIMAL_ADVANCED : SummaryHelper.DEFAULT_MINIMAL);
-            addFormNotice(_t("Minimal summary bar default restored.") + " " +
-                          _t("Summary bar will refresh shortly."));
+            addFormNotice(_t("Minimal sidebar default restored.") + " " +
+                          _t("Sidebar will refresh shortly."));
         } else if (adding || deleting || saving || moving) {
             Map<Integer, String> sections = new TreeMap<Integer, String>();
             for (Object o : _settings.keySet()) {
@@ -137,7 +137,7 @@ public class ConfigSummaryHandler extends FormHandler {
             }
             SummaryHelper.saveSummaryBarSections(_context, "default", sections);
             addFormNotice(_t("Saved order of sections.") + " " +
-                          _t("Summary bar will refresh shortly."));
+                          _t("Sidebar will refresh shortly."));
         } else {
             //addFormError(_t("Unsupported"));
         }

@@ -27,7 +27,7 @@ public class ConfigNavHelper extends HelperBase {
                                            "reseed", "advanced", "family" };
 
     private static final String titles[] =
-                                          {_x("Bandwidth"), _x("Network"), _x("UI"), _x("Summary Bar"), _x("Home Page"),
+                                          {_x("Bandwidth"), _x("Network"), _x("UI"), _x("Sidebar"), _x("Home Page"),
                                            _x("Service"), _x("Update"), _x("Tunnels"),
                                            _x("Clients"), _x("Peers"), _x("Keyring"), _x("Logging"), _x("Stats"),
                                            _x("I2CP"), _x("Plugins"), _x("Web Apps"),

@@ -28,7 +28,7 @@
 <%
     if (!intl.allowIFrame(request.getHeader("User-Agent"))) {
 %>
-  <a href="/summaryframe"><%=intl._t("Summary Bar")%></a>
+  <a href="/summaryframe"><%=intl._t("Sidebar")%></a>
 <%
     }
 %>

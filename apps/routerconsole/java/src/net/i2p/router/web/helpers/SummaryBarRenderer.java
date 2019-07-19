@@ -152,22 +152,10 @@ class SummaryBarRenderer {
 
                    "<table id=\"sb_help\"><tr><td>" +
 
-                   "<a href=\"/help#advancedsettings\" target=\"_top\" title=\"")
-           .append(_t("A guide to some of the less-used configuration settings"))
-           .append("\">")
-           .append(nbsp(_t("Advanced Settings")))
-           .append("</a>\n" +
-
-                   "<a href=\"/help#changelog\" target=\"_top\" title=\"")
+                   "<a href=\"/viewhistory\" target=\"_top\" title=\"")
            .append(_t("Recent development changes to the router"))
            .append("\">")
            .append(nbsp(_t("Changelog")))
-           .append("</a>\n" +
-
-                   "<a href=\"/help#configurationhelp\" target=\"_top\" title=\"")
-           .append(_t("An introduction to configuring your router"))
-           .append("\">")
-           .append(nbsp(_t("Configuration")))
            .append("</a>\n" +
 
                    "<a href=\"/help#faq\" target=\"_top\" title=\"")
@@ -176,7 +164,7 @@ class SummaryBarRenderer {
            .append(nbsp(_t("FAQ")))
            .append("</a>\n" +
 
-                   "<a href=\"/help#legal\" target=\"_top\" title=\"")
+                   "<a href=\"/viewlicense\" target=\"_top\" title=\"")
            .append(_t("Information regarding software and licenses used by I2P"))
            .append("\">")
            .append(nbsp(_t("Legal")))
