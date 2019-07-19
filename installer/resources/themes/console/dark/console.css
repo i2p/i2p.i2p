@@ -5624,21 +5624,11 @@ h3#pairs {
 
 /* /confignet, /configadvanced */
 
-h3#iptransport a, th#upnpconfig a, h3#bwlimiter a, #config_stats h3 a, #config_logging h3 a, h3#graphdisplay a, #logs h3 a, h3#advancedconfig a, .h3navlinks {
+h3#iptransport a, th#upnpconfig a, h3#bwlimiter a, #config_stats h3 a, #config_logging h3 a, h3#graphdisplay a, #logs h3 a, h3#advancedconfig a {
      float: right;
      font-size: 9pt;
      text-transform: none;
      letter-spacing: normal;
-}
-
-.h3navlinks a {
-     text-transform: capitalize;
-     letter-spacing: normal;
-     margin-left: 5px;
-}
-
-.h3navlinks a:hover {
-     color: #f60;
 }
 
 h3#iptransport a:not(old), h3#advancedconfig a:not(old) {

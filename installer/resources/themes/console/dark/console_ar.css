@@ -366,7 +366,7 @@ td.optionsave {
      text-align: right;
 }
 
-.h3navlinks, h3#servicedebug a, h3#graphinfo a, #config_stats.main h3 a, #config_logging.main h3 a, #configstats th a {
+h3#servicedebug a, h3#graphinfo a, #config_stats.main h3 a, #config_logging.main h3 a, #configstats th a {
      float: left;
 }
 

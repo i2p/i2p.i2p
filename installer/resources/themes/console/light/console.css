@@ -1776,21 +1776,11 @@ h1, .confignav {
      word-spacing: normal;
 }
 
-h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, th#upnpconfig a, h3#graphinfo a, h3#graphdisplay a, .h3navlinks {
+h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, th#upnpconfig a, h3#graphinfo a, h3#graphdisplay a {
      float: right;
      font-size: 9pt;
      letter-spacing: normal;
      text-transform: capitalize;
-}
-
-.h3navlinks a {
-     text-transform: capitalize;
-     letter-spacing: normal;
-     margin-left: 2px;
-}
-
-.h3navlinks a:hover {
-     color: #f60;
 }
 
 h3 a.script, th a.script {
