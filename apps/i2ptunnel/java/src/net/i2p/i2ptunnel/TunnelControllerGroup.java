@@ -285,7 +285,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @returns true if a migration is relevant to the platform, false if not
      * @since 0.9.42
      */
-    public boolean shouldMigrate() {
+    private boolean shouldMigrate() {
         try {
             if (_context.isRouterContext()) {
                 if (!SystemVersion.isAndroid()) {
@@ -294,9 +294,7 @@ public class TunnelControllerGroup implements ClientApp {
                     }
                 }
             }
-        } catch (IOException ioe) {
-            return false;
-        }
+        } catch (IOException ioe) {}
         return false;
     }
 
@@ -405,19 +403,15 @@ public class TunnelControllerGroup implements ClientApp {
             String tname = props.getProperty("name");
             if (tname == null)
                 tname = "tunnel";
+            else
+                tname = sanitize(tname);
             String name = i + "-" + tname + "-i2ptunnel.config";
             if (i < 10)
                 name = '0' + name;
             File f = new File(dir, name);
-            props.setProperty("configFile", f.getAbsolutePath());
-            Properties save = new OrderedProperties();
-            for (Map.Entry<Object, Object> e : props.entrySet()) {
-                String key = (String) e.getKey();
-                String val = (String) e.getValue();
-                save.setProperty(key, val);
-            }
+            props.setProperty(TunnelController.PROP_CONFIG_FILE, f.getAbsolutePath());
             try {
-                DataHelper.storeProps(save, f);
+                DataHelper.storeProps(props, f);
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error migrating the i2ptunnel configuration to " + f, ioe);
@@ -674,7 +668,8 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Save the configuration of all known tunnels to the given file
+     * Save the configuration of all known tunnels to the given file.
+     * Side effect: for split config, sets "confFile" property to absolute path.
      * @since 0.9.42
      */
     private synchronized void saveConfig(File cfgFile) throws IOException {
@@ -690,7 +685,7 @@ public class TunnelControllerGroup implements ClientApp {
                 map.putAll(cur);
                 i++;
             }
-            map.setProperty("configFile", cfgFile.getAbsolutePath());
+            map.setProperty(TunnelController.PROP_CONFIG_FILE, cfgFile.getAbsolutePath());
         } finally {
             _controllersLock.readLock().unlock();
         }
@@ -698,7 +693,8 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Save the configuration of this tunnel only, may be new
+     * Save the configuration of this tunnel only, may be new.
+     * Side effect: for split config, sets "confFile" property to absolute path.
      * @since 0.9.42
      */
     public synchronized void saveConfig(TunnelController tc) throws IOException {
@@ -708,9 +704,10 @@ public class TunnelControllerGroup implements ClientApp {
         }
         if (_log.shouldInfo())
             _log.info("Saving tunnel configuration for " + tc);
-        Properties inputController = tc.getConfig("");
+        Properties inputController = new OrderedProperties();
+        inputController.putAll(tc.getConfig(""));
         File cfgFile = assureConfigFile(tc);
-        inputController.setProperty("configFile", cfgFile.getAbsolutePath());
+        inputController.setProperty(TunnelController.PROP_CONFIG_FILE, cfgFile.getAbsolutePath());
         DataHelper.storeProps(inputController, cfgFile);
         tc.setConfig(inputController, "");
     }
@@ -729,6 +726,32 @@ public class TunnelControllerGroup implements ClientApp {
             saveConfig();
     }
 
+    /** From i2psnark Storage.java */
+    private static final char[] ILLEGAL = new char[] {
+        '<', '>', ':', '"', '/', '\\', '|', '?', '*',
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+        0x7f,
+        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
+        0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
+        0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
+        0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f,
+        // unicode newlines
+        0x2028, 0x2029
+    };
+
+    /**
+     * Replace problematic characters in file name
+     * @since 0.9.42
+     */
+    private static String sanitize(String rv) {
+        for (int i = 0; i < ILLEGAL.length; i++) {
+            if (rv.indexOf(ILLEGAL[i]) >= 0)
+                rv = rv.replace(ILLEGAL[i], '_');
+        }
+        return rv;
+    }
+
     /**
      * return the config File associated with a TunnelController or a default
      * File based on the tunnel name.
@@ -737,26 +760,23 @@ public class TunnelControllerGroup implements ClientApp {
      * @return the File ready for use
      */
     private synchronized File assureConfigFile(TunnelController tc) throws IOException {
+        File file = tc.getConfigFile();
+        if (file != null)
+            return file;
         Properties inputController = tc.getConfig("");
-        String configFileName = inputController.getProperty("configFile");
-        if (configFileName == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("configFile property not found");
-            String fileName = inputController.getProperty("name");
-            if (fileName == null)
-                fileName = "New Tunnel";
-            configFileName = _controllers.size() + "-" + fileName + "-i2ptunnel.config";
-            if (_controllers.size() < 10)
-                configFileName = '0' + configFileName;
-        }
-
-        File file = new File(configFileName);
-        if (!file.isAbsolute()) {
-            File folder = new File(_configDirectory);
-            if (!folder.isAbsolute())
-                folder = new File(_context.getConfigDir(), _configDirectory);
-            file = new File(folder, configFileName);
-        }
+        String fileName = inputController.getProperty("name");
+        if (fileName == null)
+            fileName = "New Tunnel";
+        else
+            fileName = sanitize(fileName);
+        String configFileName = _controllers.size() + "-" + fileName + "-i2ptunnel.config";
+        if (_controllers.size() < 10)
+            configFileName = '0' + configFileName;
+        File folder = new File(_configDirectory);
+        if (!folder.isAbsolute())
+            folder = new File(_context.getConfigDir(), _configDirectory);
+        file = new File(folder, configFileName);
+        tc.setConfigFile(file);
         return file;
     }
 
@@ -788,7 +808,8 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Load up the config data from either type of config file automatically
+     * Load up the config data from either type of config file automatically.
+     * Side effect: for split config, sets "confFile" property to absolute path.
      *
      * @return non-null, properties loaded, one for each tunnel
      * @throws IOException if unable to load from file
@@ -806,7 +827,7 @@ public class TunnelControllerGroup implements ClientApp {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Found split config file " +key+ cfgFile.toString());
                 List<Properties> rv = new ArrayList<Properties>(1);
-                config.setProperty("configFile", cfgFile.getAbsolutePath());
+                config.setProperty(TunnelController.PROP_CONFIG_FILE, cfgFile.getAbsolutePath());
                 rv.add(config);
                 return rv;
             }
@@ -827,7 +848,7 @@ public class TunnelControllerGroup implements ClientApp {
         int i = 0;
         while (true) {
             String prefix = PREFIX + i + ".";
-            Properties p = new Properties();
+            Properties p = new OrderedProperties();
             for (Map.Entry<Object, Object> e : config.entrySet()) {
                 String key = (String) e.getKey();
                 if (key.startsWith(prefix)) {
@@ -838,7 +859,6 @@ public class TunnelControllerGroup implements ClientApp {
             }
             if (p.isEmpty())
                 break;
-            p.setProperty("configFile", cfgFile);
             rv.add(p);
             i++;
         }

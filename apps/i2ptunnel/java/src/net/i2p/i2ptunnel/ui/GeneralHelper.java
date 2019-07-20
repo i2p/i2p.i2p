@@ -84,7 +84,6 @@ public class GeneralHelper {
     public static List<String> saveTunnel(
             I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
         List<String> msgs = updateTunnelConfig(tcg, tunnel, config);
-///////////////
         msgs.addAll(saveConfig(context, tcg, tunnel));
         return msgs;
     }
@@ -233,7 +232,6 @@ public class GeneralHelper {
             return msgs;
         }
 
-////////////////////////
         msgs = tcg.removeController(cur);
         try {
             tcg.removeConfig(cur);

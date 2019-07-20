@@ -51,6 +51,7 @@ import net.i2p.util.SystemVersion;
 public class TunnelController implements Logging {
     private final Log _log;
     private Properties _config;
+    private File _configFile;
     private final I2PTunnel _tunnel;
     private final List<String> _messages;
     private List<I2PSession> _sessions;
@@ -86,6 +87,8 @@ public class TunnelController implements Logging {
     public static final String PROP_TARGET_PORT = "targetPort";
     public static final String PROP_TYPE = "type";
     public static final String PROP_FILTER = "filterDefinition";
+    /** @since 0.9.42 */
+    public static final String PROP_CONFIG_FILE = "configFile";
 
     /**
      * all of these are @since 0.9.33 (moved from TunnelConfig)
@@ -175,6 +178,9 @@ public class TunnelController implements Logging {
      * the prefix should be used (and, in turn, that prefix should be stripped off
      * before being interpreted by this controller)
      *
+     * If config contains the "configFile" property, it will be set as the config path
+     * and may be retrieved with getConfigFile().
+     *
      * Defaults in config properties are not recommended, they may or may not be honored.
      *
      * @param config original key=value mapping non-null
@@ -185,6 +191,14 @@ public class TunnelController implements Logging {
     }
 
     /**
+     * Create a new controller for a tunnel out of the specific config options.
+     * The config may contain a large number of options - only ones that begin in
+     * the prefix should be used (and, in turn, that prefix should be stripped off
+     * before being interpreted by this controller)
+     *
+     * If config contains the "configFile" property, it will be set as the config path
+     * and may be retrieved with getConfigFile().
+     *
      * Defaults in config properties are not recommended, they may or may not be honored.
      *
      * @param config original key=value mapping non-null
@@ -806,6 +820,11 @@ public class TunnelController implements Logging {
         Properties oldConfig = _config;
         _config = props;
 
+        // save the config file this was loaded from, if passed in
+        String cname = _config.getProperty(PROP_CONFIG_FILE);
+        if (cname != null && _configFile == null)
+            _configFile = new File(cname);
+
         // Set up some per-type defaults
         // This really isn't the best spot to do this but for servers in particular,
         // it's hard to override settings in the subclass since the session connect
@@ -938,11 +957,25 @@ public class TunnelController implements Logging {
         return rv;
     }
 
+    /**
+     *  @return the config file as passed into constructor via "configFile" property,
+     *          or as set later, or null
+     *  @since 0.9.42
+     */
+    public File getConfigFile() { return _configFile; }
+
+    /**
+     *  Set the config file. Only do this if previously null.
+     *  @since 0.9.42
+     */
+    public void setConfigFile(File file) { _configFile = file; }
+
     public String getType() { return _config.getProperty(PROP_TYPE); }
     public String getName() { return _config.getProperty(PROP_NAME); }
     public String getDescription() { return _config.getProperty(PROP_DESCR); }
     public String getI2CPHost() { return _config.getProperty(PROP_I2CP_HOST); }
     public String getI2CPPort() { return _config.getProperty(PROP_I2CP_PORT); }
+
     /**
      *  Absolute path to filter definition file
      *  @since 0.9.40
