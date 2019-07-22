@@ -952,7 +952,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
 
         EncryptedLeaseSet encls = null;
-        if (leaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+        int type = leaseSet.getType();
+        if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
             // set dest or key before validate() calls verifySignature() which
             // will do the decryption
             encls = (EncryptedLeaseSet) leaseSet;
@@ -997,6 +998,14 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 Destination dest = decls.getDestination();
                 store(dest.getHash(), decls);
                 _blindCache.setBlinded(dest);
+            }
+        } else if (type == DatabaseEntry.KEY_TYPE_LS2 || type == DatabaseEntry.KEY_TYPE_META_LS2) {
+             // if it came in via garlic
+             LeaseSet2 ls2 = (LeaseSet2) leaseSet;
+             if (ls2.isBlindedWhenPublished()) {
+                 Destination dest = leaseSet.getDestination();
+                 if (dest != null)
+                    _blindCache.setBlinded(dest, null, null);
             }
         }
 
