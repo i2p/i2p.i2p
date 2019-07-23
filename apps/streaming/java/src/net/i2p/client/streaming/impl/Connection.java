@@ -1342,7 +1342,7 @@ class Connection {
         else
             buf.append(" to ");
         if (_remotePeer != null)
-            buf.append(_remotePeer.calculateHash().toBase64().substring(0,4));
+            buf.append(_remotePeer.toBase32());
         else
             buf.append("unknown");
         buf.append(" up ").append(DataHelper.formatDuration(_context.clock().now() - _createdOn));

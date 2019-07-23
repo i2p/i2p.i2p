@@ -50,6 +50,7 @@ class ConnectionPacketHandler {
         boolean ok = verifyPacket(packet, con);
         if (!ok) {
             boolean isTooFast = con.getSendStreamId() <= 0;
+            // Apparently an i2pd bug... see verifyPacket()
             if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (!isTooFast) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Packet does NOT verify: " + packet + " on " + con);
             packet.releasePayload();
@@ -543,7 +544,7 @@ class ConnectionPacketHandler {
                     }
                 }
             } else {
-                // getting a lot of these - why? mostly/all for acks...
+                // Apparently an i2pd bug...
                 if (con.getSendStreamId() != packet.getReceiveStreamId()) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Packet received with the wrong reply stream id: " 
