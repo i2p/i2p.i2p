@@ -11,7 +11,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
 
 /**
- * PRELIMINARY - unused - subject to change
+ * PRELIMINARY - subject to change
  *
  * Defines the properties for various encryption types
  * that I2P supports or may someday support.
@@ -33,18 +33,21 @@ public enum EncType {
     /**
      *  Used by i2pd. Not yet supported by Java I2P.
      *  Pubkey 64 bytes; privkey 32 bytes.
+     *  See proposal 145.
      */
     EC_P256(1, 64, 32, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P256_SPEC, "0.9.38"),
 
     /**
      *  Reserved, not used by anybody.
      *  Pubkey 96 bytes; privkey 48 bytes.
+     *  See proposal 145.
      */
     EC_P384(2, 96, 48, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P384_SPEC, "0.9.38"),
 
     /**
      *  Reserved, not used by anybody.
      *  Pubkey 132 bytes; privkey 66 bytes.
+     *  See proposal 145.
      */
     EC_P521(3, 132, 66, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P521_SPEC, "0.9.38"),
 
@@ -54,8 +57,6 @@ public enum EncType {
      *  @since 0.9.38
      */
     ECIES_X25519(4, 32, 32, EncAlgo.ECIES, "EC/None/NoPadding", X25519_SPEC, "0.9.38");
-
-
 
 
     private final int code, pubkeyLen, privkeyLen;
@@ -71,6 +72,8 @@ public enum EncType {
      */
     EncType(int cod, int pubLen, int privLen, EncAlgo baseAlgo,
             String transformation, AlgorithmParameterSpec pSpec, String supportedSince) {
+        if (pubLen > 256)
+            throw new IllegalArgumentException("fixup PublicKey for longer keys");
         code = cod;
         pubkeyLen = pubLen;
         privkeyLen = privLen;

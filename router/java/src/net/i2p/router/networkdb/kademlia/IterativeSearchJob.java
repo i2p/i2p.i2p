@@ -10,6 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -425,6 +426,13 @@ public class IterativeSearchJob extends FloodSearchJob {
                     // request encrypted reply
                     // now covered by version check above, which is more recent
                     //if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
+                    EncType type = ri.getIdentity().getPublicKey().getType();
+                    if (type != EncType.ELGAMAL_2048) {
+                        failed(peer, false);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(getJobId() + ": Can't do encrypted lookup to " + peer + " with EncType " + type);
+                        return;
+                    }
                     if (true) {
                         MessageWrapper.OneTimeSession sess;
                         if (isClientReplyTunnel)

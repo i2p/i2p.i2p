@@ -3,6 +3,7 @@ package net.i2p.router.networkdb.kademlia;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Certificate;
@@ -40,9 +41,14 @@ public class MessageWrapper {
      *
      *  @param from must be a local client with a session key manager,
      *              or null to use the router's session key manager
+     *  @param to must be ELGAMAL_2048 EncType
      *  @return null on encrypt failure
      */
     static WrappedMessage wrap(RouterContext ctx, I2NPMessage m, Hash from, RouterInfo to) {
+        PublicKey sentTo = to.getIdentity().getPublicKey();
+        if (sentTo.getType() != EncType.ELGAMAL_2048)
+            return null;
+
         PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                               ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                               m.getMessageExpiration(),
@@ -63,7 +69,6 @@ public class MessageWrapper {
         if (msg == null)
             return null;
         TagSetHandle tsh = null;
-        PublicKey sentTo = to.getIdentity().getPublicKey();
         if (!sentTags.isEmpty())
             tsh = skm.tagsDelivered(sentTo, sentKey, sentTags);
         //if (_log.shouldLog(Log.DEBUG))
@@ -118,10 +123,15 @@ public class MessageWrapper {
      *  to hide the contents from the OBEP.
      *  Forces ElGamal.
      *
+     *  @param to must be ELGAMAL_2048 EncType
      *  @return null on encrypt failure
      *  @since 0.9.5
      */
     static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, RouterInfo to) {
+        PublicKey key = to.getIdentity().getPublicKey();
+        if (key.getType() != EncType.ELGAMAL_2048)
+            return null;
+
         PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                               ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                               m.getMessageExpiration(),
@@ -129,7 +139,6 @@ public class MessageWrapper {
         payload.setRecipient(to);
 
         SessionKey sentKey = ctx.keyGenerator().generateSessionKey();
-        PublicKey key = to.getIdentity().getPublicKey();
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 
                                                               key, sentKey, null);
         return msg;

@@ -17,6 +17,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.AESEngine;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -97,6 +98,8 @@ public final class ElGamalAESEngine {
                 _log.error("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
             return null;
         }
+        if (targetPrivateKey.getType() != EncType.ELGAMAL_2048)
+            return null;
 
         byte tag[] = new byte[32];
         System.arraycopy(data, 0, tag, 0, 32);
@@ -399,7 +402,8 @@ public final class ElGamalAESEngine {
      * no less than the paddedSize parameter, but may be more.  This method uses the 
      * ElGamal+AES algorithm in the data structure spec.
      *
-     * @param target public key to which the data should be encrypted. 
+     * @param target public key to which the data should be encrypted, must be ELGAMAL_2048.
+     *               May be null if key and currentTag are non-null.
      * @param key session key to use during encryption
      * @param tagsForDelivery session tags to be associated with the key (or newKey if specified), or null;
      *                        200 max enforced at receiver
@@ -407,11 +411,17 @@ public final class ElGamalAESEngine {
      * @param newKey key to be delivered to the target, with which the tagsForDelivery should be associated, or null
      * @param paddedSize minimum size in bytes of the body after padding it (if less than the
      *          body's real size, no bytes are appended but the body is not truncated)
+     * @throws IllegalArgumentException on bad target EncType
      *
      * Unused externally, only called by below (i.e. newKey is always null)
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
                                  SessionTag currentTag, SessionKey newKey, long paddedSize) {
+        if (target != null) {
+            EncType type = target.getType();
+            if (type != EncType.ELGAMAL_2048)
+                throw new IllegalArgumentException("Bad public key type " + type);
+        }
         if (currentTag == null) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Current tag is null, encrypting as new session");
@@ -420,8 +430,9 @@ public final class ElGamalAESEngine {
         }
         //if (_log.shouldLog(Log.INFO))
         //    _log.info("Current tag is NOT null, encrypting as existing session");
+        // target unused, using key and tag only
         _context.statManager().updateFrequency("crypto.elGamalAES.encryptExistingSession");
-        byte rv[] = encryptExistingSession(data, target, key, tagsForDelivery, currentTag, newKey, paddedSize);
+        byte rv[] = encryptExistingSession(data, key, tagsForDelivery, currentTag, newKey, paddedSize);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Existing session encrypted with tag: " + currentTag.toString() + ": " + rv.length + " bytes and key: " + key.toBase64() /* + ": " + Base64.encode(rv, 0, 64) */);
         return rv;
@@ -447,13 +458,15 @@ public final class ElGamalAESEngine {
      * or a 514-byte ElGamal block and several 32-byte session tags for a new session.
      * So the returned encrypted data will be at least 32 bytes larger than paddedSize.
      *
-     * @param target public key to which the data should be encrypted. 
+     * @param target public key to which the data should be encrypted, must be ELGAMAL_2048.
+     *               May be null if key and currentTag are non-null.
      * @param key session key to use during encryption
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
      * @param currentTag sessionTag to use, or null if it should use ElG (i.e. new session)
      * @param paddedSize minimum size in bytes of the body after padding it (if less than the
      *          body's real size, no bytes are appended but the body is not truncated)
+     * @throws IllegalArgumentException on bad target EncType
      *
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
@@ -468,6 +481,7 @@ public final class ElGamalAESEngine {
      *
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
+     * @throws IllegalArgumentException on bad target EncType
      * @deprecated unused
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery, long paddedSize) {
@@ -479,6 +493,7 @@ public final class ElGamalAESEngine {
      * No new session key
      * No current tag (encrypt as new session)
      *
+     * @throws IllegalArgumentException on bad target EncType
      * @deprecated unused
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, long paddedSize) {
@@ -573,11 +588,10 @@ public final class ElGamalAESEngine {
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
      * </pre>
      *
-     * @param target unused, this is AES encrypt only using the session key and tag
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
      */
-    private byte[] encryptExistingSession(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
+    private byte[] encryptExistingSession(byte data[], SessionKey key, Set<SessionTag> tagsForDelivery,
                                          SessionTag currentTag, SessionKey newKey, long paddedSize) {
         //_log.debug("Encrypting to an EXISTING session");
         byte rawTag[] = currentTag.getData();

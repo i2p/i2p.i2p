@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
 
@@ -68,6 +69,22 @@ public class KeysAndCert extends DataStructureImpl {
         return SigType.DSA_SHA1;
     }
 
+    /**
+     *  @return null if not set or unknown
+     *  @since 0.9.42
+     */
+    public EncType getEncType() {
+        if (_certificate == null)
+            return null;
+        if (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            try {
+                KeyCertificate kcert = _certificate.toKeyCertificate();
+                return kcert.getEncType();
+            } catch (DataFormatException dfe) {}
+        }
+        return EncType.ELGAMAL_2048;
+    }
+
     public PublicKey getPublicKey() {
         return _publicKey;
     }
@@ -117,28 +134,48 @@ public class KeysAndCert extends DataStructureImpl {
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         if (_publicKey != null || _signingKey != null || _certificate != null)
             throw new IllegalStateException();
-        _publicKey = PublicKey.create(in);
+        PublicKey pk = PublicKey.create(in);
         SigningPublicKey spk = SigningPublicKey.create(in);
-        Certificate  cert = Certificate.create(in);
+        Certificate cert = Certificate.create(in);
         if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
-            // convert SPK to new SPK and padding
+            // convert PK and SPK to new PK and SPK and padding
             KeyCertificate kcert = cert.toKeyCertificate();
+            _publicKey = pk.toTypedKey(kcert);
             _signingKey = spk.toTypedKey(kcert);
-            _padding = spk.getPadding(kcert);
+            byte[] pad1 = pk.getPadding(kcert);
+            byte[] pad2 = spk.getPadding(kcert);
+            _padding = combinePadding(pad1, pad2);
             _certificate = kcert;
         } else {
+            _publicKey = pk;
             _signingKey = spk;
             _certificate = cert;
         }
     }
     
+    /**
+     * @return null if both are null
+     * @since 0.9.42
+     */
+    protected static byte[] combinePadding(byte[] pad1, byte[] pad2) {
+        if (pad1 == null)
+            return pad2;
+        if (pad2 == null)
+            return pad1;
+        byte[] rv = new byte[pad1.length + pad2.length];
+        System.arraycopy(pad1, 0, rv, 0, pad1.length);
+        System.arraycopy(pad2, 0, rv, pad1.length, pad2.length);
+        return rv;
+    }
+
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
             throw new DataFormatException("Not enough data to format the router identity");
         _publicKey.writeBytes(out);
         if (_padding != null)
             out.write(_padding);
-        else if (_signingKey.length() < SigningPublicKey.KEYSIZE_BYTES)
+        else if (_signingKey.length() < SigningPublicKey.KEYSIZE_BYTES ||
+                 _publicKey.length() < PublicKey.KEYSIZE_BYTES)
             throw new DataFormatException("No padding set");
         _signingKey.writeTruncatedBytes(out);
         _certificate.writeBytes(out);

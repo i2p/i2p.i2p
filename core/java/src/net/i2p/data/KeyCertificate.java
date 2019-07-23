@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 
 /**
@@ -145,6 +146,14 @@ public class KeyCertificate extends Certificate {
      */
     public SigType getSigType() {
         return SigType.getByCode(getSigTypeCode());
+    }
+
+    /**
+     *  @return null if unset or unknown
+     *  @since 0.9.42
+     */
+    public EncType getEncType() {
+        return EncType.getByCode(getCryptoTypeCode());
     }
 
     /**
