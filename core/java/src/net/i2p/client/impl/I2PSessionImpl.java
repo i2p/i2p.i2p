@@ -38,6 +38,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionListener;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
@@ -88,9 +89,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /** who we are */
     private final Destination _myDestination;
     /** private key for decryption */
-    private final PrivateKey _privateKey;
+    private PrivateKey _privateKey;
     /** private key for signing */
-    private   /* final */   SigningPrivateKey _signingPrivateKey;
+    private SigningPrivateKey _signingPrivateKey;
     /** configuration options */
     private final Properties _options;
     /** this session's Id */
@@ -587,6 +588,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     private void readDestination(InputStream destKeyStream) throws DataFormatException, IOException {
         _myDestination.readBytes(destKeyStream);
+        // we don't support EncTypes in Destinations,
+        // but i2pd does, and also, this code is used from PrivateKeyFile to
+        // read in router.keys.dat files and we will support EncTypes for RouterIdentities
+        EncType etype = _myDestination.getPublicKey().getType();
+        if (etype != EncType.ELGAMAL_2048)
+            _privateKey = new PrivateKey(etype);
         _privateKey.readBytes(destKeyStream);
         SigType dtype = _myDestination.getSigningPublicKey().getType();
         _signingPrivateKey = new SigningPrivateKey(dtype);
