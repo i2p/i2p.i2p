@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -256,12 +257,21 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     private void saveClientChanges2() throws IOException {
+        // will save if not split config
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
+        // will save if split config
+        List<ClientAppConfig> saveClients = new ArrayList<ClientAppConfig>(clients.size() + 1);
+        boolean isSplitConfig = ClientAppConfig.isSplitConfig(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
             Object val = _settings.get(cur + ".enabled");
-            if (! (RouterConsoleRunner.class.getName().equals(ca.className)))
-                ca.disabled = val == null;
+            if (! (RouterConsoleRunner.class.getName().equals(ca.className))) {
+                boolean newval = val == null;
+                if (ca.disabled != newval) {
+                    ca.disabled = newval;
+                    saveClients.add(ca);
+                }
+            }
             // edit of an existing entry
             if (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_CLIENT_CHANGE) ||
                 isAdvanced()) {
@@ -277,6 +287,7 @@ public class ConfigClientsHandler extends FormHandler {
                     ca.className = clss;
                     ca.args = args;
                     ca.clientName = getJettyString("nofilter_name" + cur);
+                    saveClients.add(ca);
                 }
             }
         }
@@ -299,12 +310,21 @@ public class ConfigClientsHandler extends FormHandler {
                 if (name == null || name.trim().length() <= 0) name = "new client";
                 ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
                                                          _settings.get(newClient + ".enabled") == null);  // true for disabled
-                ClientAppConfig.writeClientAppConfig(_context, ca);
+                clients.add(ca);
+                saveClients.add(ca);
                 addFormNotice(_t("New client added") + ": " + name + " (" + clss + ").");
             }
         }
-        // Always save, as any of the disabled flags could have changed
-        ClientAppConfig.writeClientAppConfig(_context, clients);
+        if (isSplitConfig) {
+            // Only save what changed
+            // TODO this will lose other clients in the same file
+            for (ClientAppConfig ca : saveClients) {
+                ClientAppConfig.writeClientAppConfig(_context, ca);
+            }
+        } else {
+            // Save all
+            ClientAppConfig.writeClientAppConfig(_context, clients);
+        }
     }
 
     /**

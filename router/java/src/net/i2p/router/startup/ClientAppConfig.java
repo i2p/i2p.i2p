@@ -112,6 +112,19 @@ public class ClientAppConfig {
         uninstallargs = ua;
     }
 
+    /*
+     * Only valid for the router's clients (not plugins).
+     * Only valid after getClientApps(ctx) has been called.
+     * @since 0.9.42
+     */
+    public synchronized static boolean isSplitConfig(RouterContext ctx) {
+        File dir = new File(ctx.getConfigDir(), CLIENT_CONFIG_DIR);
+        return dir.exists() && !configFile(ctx).exists();
+    }
+
+    /*
+     * This is the old config file. Only valid if not a split config.
+     */
     public static File configFile(I2PAppContext ctx) {
         String clientConfigFile = ctx.getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
         File cfgFile = new File(clientConfigFile);
@@ -380,6 +393,10 @@ public class ClientAppConfig {
     }
 
     /**
+     * This works for both split and non-split config.
+     * If this is the only config in the file, the file will be deleted;
+     * otherwise the file will be saved with the remaining configs.
+     *
      * @return success
      * @throws IllegalArgumentException if cac has a null configfile
      * @since 0.9.42
