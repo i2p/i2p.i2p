@@ -1,3 +1,17 @@
+2019-07-26 zzz
+ * Debian: Change debian files from stretch (Jetty 9.2, Tomcat 8, Java 8)
+   to buster (Jetty 9.4, Tomcat 9, Java 11)
+ * Prop from i2p.i2p.zzz.confsplit:
+   Split clients.config and i2ptunnel.config into individual files
+   for each client and tunnel, except on android and portable.
+
+2019-07-23 zzz
+ * Data: Initial support for enc types
+ * Router: Checks for new enc types
+
+2019-07-22 zzz
+ * NetDB: Handle LS2 blinded flag bit
+
 2019-07-19 zzz
  * Console: Split up /help page, prep for translation (ticket #2298)
 
