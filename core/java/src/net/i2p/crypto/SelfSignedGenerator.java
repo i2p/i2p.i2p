@@ -88,6 +88,10 @@ public final class SelfSignedGenerator {
     private static final String OID_POLICY_ANY = "2.5.29.32.0";
     // Authority Key Identifier
     private static final String OID_AKI = "2.5.29.35";
+    // Extended Key Usage
+    private static final String OID_EKU = "2.5.29.37";
+    // ID-KP-ServerAuth
+    private static final String OID_ID_KP_SERVERAUTH = "1.3.6.1.5.5.7.3.1";
 
     private static final Map<String, String> OIDS;
     static {
@@ -403,6 +407,7 @@ public final class SelfSignedGenerator {
         // ProviderException thrown here
         byte[] pubbytes = jpub.getEncoded();
         byte[] extbytes = getExtensions(pubbytes, cname, altNames);
+        //System.out.println("Extensions:\n" + HexDump.dump(extbytes));
 
         int len = version.length + serial.length + sigoid.length + issuer.length +
                   validity.length + subject.length + pubbytes.length + extbytes.length;
@@ -623,6 +628,8 @@ public final class SelfSignedGenerator {
         byte[] oid7 = getEncodedOID(OID_POLICY_ANY);
         byte[] oid8 = getEncodedOID(OID_QT_UNOTICE);
         byte[] oid9 = getEncodedOID(OID_QT_CPSURI);
+        byte[] oid10 = getEncodedOID(OID_EKU);
+        byte[] oid11 = getEncodedOID(OID_ID_KP_SERVERAUTH);
         byte[] TRUE = new byte[] { 1, 1, (byte) 0xff };
 
         // extXlen does NOT include the 0x30 and length
@@ -681,9 +688,12 @@ public final class SelfSignedGenerator {
         int wrap68len = spaceFor(wrap67len); // Policies seq
         int ext6len = oid6.length + spaceFor(wrap68len); // OID + octet string
 
+        int wrap7len = spaceFor(oid11.length); // EKU OID
+        int ext7len = oid10.length + spaceFor(wrap7len); // EKU
+
         int extslen = spaceFor(ext1len) + spaceFor(ext2len) + spaceFor(ext4len) + spaceFor(ext5len);
         if (isCA)
-            extslen += spaceFor(ext3len) + spaceFor(ext6len);
+            extslen += spaceFor(ext3len) + spaceFor(ext6len) + spaceFor(ext7len);
         int seqlen = spaceFor(extslen);
         int totlen = spaceFor(seqlen);
         byte[] rv = new byte[totlen];
@@ -820,6 +830,20 @@ public final class SelfSignedGenerator {
             idx = intToASN1(rv, idx, policyTextBytes.length);
             System.arraycopy(policyTextBytes, 0, rv, idx, policyTextBytes.length);
             idx += policyTextBytes.length;
+        }
+
+        // EKU
+        if (isCA) {
+            rv[idx++] = (byte) 0x30;
+            idx = intToASN1(rv, idx, ext7len);
+            System.arraycopy(oid10, 0, rv, idx, oid10.length);
+            idx += oid10.length;
+            rv[idx++] = (byte) 0x04;  // octet string wraps a sequence
+            idx = intToASN1(rv, idx, wrap7len);
+            rv[idx++] = (byte) 0x30;  // seq.
+            idx = intToASN1(rv, idx, oid11.length);
+            System.arraycopy(oid11, 0, rv, idx, oid11.length);
+            idx += oid11.length;
         }
 
         return rv;

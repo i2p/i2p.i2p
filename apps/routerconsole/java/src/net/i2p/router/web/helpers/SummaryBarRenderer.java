@@ -16,6 +16,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.news.NewsEntry;
 import net.i2p.router.news.NewsManager;
+import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.NavHelper;
@@ -151,22 +152,10 @@ class SummaryBarRenderer {
 
                    "<table id=\"sb_help\"><tr><td>" +
 
-                   "<a href=\"/help#advancedsettings\" target=\"_top\" title=\"")
-           .append(_t("A guide to some of the less-used configuration settings"))
-           .append("\">")
-           .append(nbsp(_t("Advanced Settings")))
-           .append("</a>\n" +
-
-                   "<a href=\"/help#changelog\" target=\"_top\" title=\"")
+                   "<a href=\"/viewhistory\" target=\"_top\" title=\"")
            .append(_t("Recent development changes to the router"))
            .append("\">")
            .append(nbsp(_t("Changelog")))
-           .append("</a>\n" +
-
-                   "<a href=\"/help#configurationhelp\" target=\"_top\" title=\"")
-           .append(_t("An introduction to configuring your router"))
-           .append("\">")
-           .append(nbsp(_t("Configuration")))
            .append("</a>\n" +
 
                    "<a href=\"/help#faq\" target=\"_top\" title=\"")
@@ -175,7 +164,7 @@ class SummaryBarRenderer {
            .append(nbsp(_t("FAQ")))
            .append("</a>\n" +
 
-                   "<a href=\"/help#legal\" target=\"_top\" title=\"")
+                   "<a href=\"/viewlicense\" target=\"_top\" title=\"")
            .append(_t("Information regarding software and licenses used by I2P"))
            .append("\">")
            .append(nbsp(_t("Legal")))
@@ -974,11 +963,6 @@ class SummaryBarRenderer {
         StringBuilder buf = new StringBuilder(512);
         String consoleNonce = CSSHelper.getNonce();
         if (consoleNonce != null) {
-            // Set up title and pre-headings stuff.
-            //buf.append("<h3><a href=\"/configupdate\">")
-            buf.append("<h3><a href=\"/news\">")
-               .append(_t("News &amp; Updates"))
-               .append("</a></h3><hr class=\"b\"><div class=\"sb_newsheadings\">\n");
             // Get news content.
             List<NewsEntry> entries = Collections.emptyList();
             ClientAppManager cmgr = _context.clientAppManager();
@@ -988,18 +972,33 @@ class SummaryBarRenderer {
                     entries = nmgr.getEntries();
             }
             if (!entries.isEmpty()) {
-                buf.append("<table>\n");
                 DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                 // the router sets the JVM time zone to UTC but saves the original here so we can get it
                 fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 int i = 0;
                 // show a min of 1, max of 3, none older than 60 days over min
-                final int min = 1;
+                // Except, if news fetching is disabled, min is 0 and oldest is 7 days.
+                // We still show news even if disabled, because the user could click it manually
+                String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY,
+                                                   ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY);
+                long ms = ConfigUpdateHandler.DEFAULT_REFRESH_FREQ;
+                try { 
+                    ms = Long.parseLong(freq);
+                } catch (NumberFormatException nfe) {}
+                final int min = (ms > 0) ? 1 : 0;
                 final int max = 3;
+                final long age = (ms > 0) ? 60*24*60*60*1000L : 7*24*60*60*1000L;
+                final long oldest = _context.clock().now() - age;
                 for (NewsEntry entry : entries) {
                     if (i >= min && entry.updated > 0 &&
-                        entry.updated < _context.clock().now() - 60*24*60*60*1000L)
+                        entry.updated < oldest)
                         break;
+                    if (i == 0) {
+                        // Set up title and pre-headings stuff.
+                        buf.append("<h3><a href=\"/news\">")
+                           .append(_t("News &amp; Updates"))
+                           .append("</a></h3><hr class=\"b\"><div class=\"sb_newsheadings\">\n<table>\n");
+                    }
                     buf.append("<tr><td><a href=\"/?news=1&amp;consoleNonce=")
                        .append(consoleNonce)
                        .append("\"");
@@ -1014,17 +1013,9 @@ class SummaryBarRenderer {
                     if (++i >= max)
                         break;
                 }
-                buf.append("</table>\n");
-            } else {
-                buf.append("<center><i>")
-                   .append(_t("none"))
-                   .append("</i></center>");
+                if (i > 0)
+                    buf.append("</table>\n</div>\n");
             }
-            // Add post-headings stuff.
-            //buf.append("<a href=\"/news\">")
-                //.append(_t("Show all news"))
-                //.append("</a>\n");
-            buf.append("</div>\n");
         }
         return buf.toString();
     }

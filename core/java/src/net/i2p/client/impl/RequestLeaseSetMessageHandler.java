@@ -25,6 +25,8 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
+import net.i2p.data.BlindData;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -66,6 +68,10 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     public static final String PROP_LS_TYPE = "i2cp.leaseSetType";
     private static final String PROP_LS_ENCTYPE = "i2cp.leaseSetEncType";
     private static final String PROP_SECRET = "i2cp.leaseSetSecret";
+    private static final String PROP_AUTH_TYPE = "i2cp.leaseSetAuthType";
+    private static final String PROP_PRIV_KEY = "i2cp.leaseSetPrivKey";
+    private static final String PROP_DH = "i2cp.leaseSetClient.dh.";
+    private static final String PROP_PSK = "i2cp.leaseSetClient.psk.";
 
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
         this(context, RequestLeaseSetMessage.MESSAGE_TYPE);
@@ -124,11 +130,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             if (_ls2Type == DatabaseEntry.KEY_TYPE_LS2) {
                 leaseSet = new LeaseSet2();
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
-                EncryptedLeaseSet encls2 = new EncryptedLeaseSet();
-                String secret = session.getOptions().getProperty(PROP_SECRET);
-                if (secret != null)
-                    encls2.setSecret(secret);
-                leaseSet = encls2;
+                leaseSet = new EncryptedLeaseSet();
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {
                 leaseSet = new MetaLeaseSet();
             } else {
@@ -166,6 +168,15 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
      *  @since 0.9.7
      */
     protected synchronized void signLeaseSet(LeaseSet leaseSet, boolean isLS2, I2PSessionImpl session) {
+        // must be before setDestination()
+        if (isLS2 && _ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+            String secret = session.getOptions().getProperty(PROP_SECRET);
+            if (secret != null) {
+                EncryptedLeaseSet encls2 = (EncryptedLeaseSet) leaseSet;
+                secret = DataHelper.getUTF8(Base64.decode(secret));
+                encls2.setSecret(secret);
+            }
+        }
         Destination dest = session.getMyDestination();
         // also, if this session is connected to multiple routers, include other leases here
         leaseSet.setDestination(dest);
@@ -309,7 +320,77 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             }
         }
         try {
-            leaseSet.sign(session.getPrivateKey());
+            if (isLS2 && _ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+                EncryptedLeaseSet els2 = (EncryptedLeaseSet) leaseSet;
+                String at = opts.getProperty(PROP_AUTH_TYPE, "0");
+                if (at.equals("1")) {
+                    int authType = BlindData.AUTH_DH;
+                    List<PublicKey> clientKeys = new ArrayList<PublicKey>(4);
+                    String pfx = PROP_DH;
+                    String p = opts.getProperty(PROP_PRIV_KEY);
+                    if (p == null) {
+                        _log.error("No " + PROP_PRIV_KEY + " for DH auth");
+                    } else {
+                        byte[] b = Base64.decode(p);
+                        try {
+                            PrivateKey pk = new PrivateKey(EncType.ECIES_X25519, b);
+                            clientKeys.add(pk.toPublic());
+                        } catch (IllegalArgumentException iae) {
+                            _log.error("Bad priv key: " + p, iae);
+                        }
+                    }
+                    int i = 0;
+                    while ((p = opts.getProperty(pfx + i)) != null) {
+                        int colon = p.indexOf(':');
+                        if (colon >= 0)
+                            p = p.substring(colon + 1);
+                        byte[] b = Base64.decode(p);
+                        try {
+                            PublicKey pk = new PublicKey(EncType.ECIES_X25519, b);
+                            clientKeys.add(pk);
+                        } catch (IllegalArgumentException iae) {
+                            _log.error("Bad client key: " + p, iae);
+                        }
+                        i++;
+                    }
+                    els2.sign(session.getPrivateKey(), authType, clientKeys);
+                } else if (at.equals("2")) {
+                    int authType = BlindData.AUTH_PSK;
+                    List<PrivateKey> clientKeys = new ArrayList<PrivateKey>(4);
+                    String pfx = PROP_PSK;
+                    String p = opts.getProperty(PROP_PRIV_KEY);
+                    if (p == null) {
+                        _log.error("No " + PROP_PRIV_KEY + " for PSK auth");
+                    } else {
+                        byte[] b = Base64.decode(p);
+                        try {
+                            PrivateKey pk = new PrivateKey(EncType.ECIES_X25519, b);
+                            clientKeys.add(pk);
+                        } catch (IllegalArgumentException iae) {
+                            _log.error("Bad priv key: " + p, iae);
+                        }
+                    }
+                    int i = 0;
+                    while ((p = opts.getProperty(pfx + i)) != null) {
+                        int colon = p.indexOf(':');
+                        if (colon >= 0)
+                            p = p.substring(colon + 1);
+                        byte[] b = Base64.decode(p);
+                        try {
+                            PrivateKey pk = new PrivateKey(EncType.ECIES_X25519, b);
+                            clientKeys.add(pk);
+                        } catch (IllegalArgumentException iae) {
+                            _log.error("Bad client key: " + p, iae);
+                        }
+                        i++;
+                    }
+                    els2.sign(session.getPrivateKey(), authType, clientKeys);
+                } else {
+                    els2.sign(session.getPrivateKey());
+                }
+            } else {
+                leaseSet.sign(session.getPrivateKey());
+            }
             SigningPrivateKey spk = li.getSigningPrivateKey();
             if (isLS2) {
                 // no revocation key in LS2

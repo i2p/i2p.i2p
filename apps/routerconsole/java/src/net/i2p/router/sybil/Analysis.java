@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
+import net.i2p.router.Banlist;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
@@ -38,6 +41,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
+import net.i2p.util.SystemVersion;
 
 /**
  *
@@ -59,6 +63,11 @@ public class Analysis extends JobImpl implements RouterApp {
      */
     public static final String APP_NAME = "sybil";
     public static final String PROP_FREQUENCY = "router.sybilFrequency";
+    public static final String PROP_THRESHOLD = "router.sybilThreshold";
+    public static final String PROP_BLOCK = "router.sybilEnableBlocking";
+    public static final String PROP_NONFF = "router.sybilAnalyzeAll";
+    public static final String PROP_BLOCKTIME = "router.sybilBlockPeriod";
+    public static final String PROP_REMOVETIME = "router.sybilDeleteOld";
     private static final long MIN_FREQUENCY = 60*60*1000L;
     private static final long MIN_UPTIME = 75*60*1000L;
 
@@ -74,6 +83,7 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double POINTS_US24 = 20.0;
     private static final double POINTS_US16 = 10.0;
     private static final double POINTS_FAMILY = -10.0;
+    private static final double POINTS_NONFF = -5.0;
     private static final double POINTS_BAD_OUR_FAMILY = 100.0;
     private static final double POINTS_OUR_FAMILY = -100.0;
     public static final double MIN_CLOSE = 242.0;
@@ -84,6 +94,9 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double POINTS_UNREACHABLE = 4.0;
     private static final double POINTS_NEW = 4.0;
     private static final double POINTS_BANLIST = 25.0;
+    private static final double DEFAULT_BLOCK_THRESHOLD = 50.0;
+    private static final long DEFAULT_BLOCK_TIME = 7*24*60*60*1000L;
+    public static final float MIN_BLOCK_POINTS = 12.01f;
 
     /** Get via getInstance() */
     private Analysis(RouterContext ctx, ClientAppManager mgr, String[] args) {
@@ -116,11 +129,12 @@ public class Analysis extends JobImpl implements RouterApp {
     public void runJob() {
         long now = _context.clock().now();
         _log.info("Running analysis");
-        Map<Hash, Points> points = backgroundAnalysis();
+        Map<Hash, Points> points = backgroundAnalysis(_context.getBooleanProperty(PROP_NONFF));
         if (!points.isEmpty()) {
             try {
                 _log.info("Storing analysis");
                 _persister.store(now, points);
+                _persister.removeOld();
                 _log.info("Store complete");
             } catch (IOException ioe) {
                 _log.error("Failed to store analysis", ioe);
@@ -139,6 +153,7 @@ public class Analysis extends JobImpl implements RouterApp {
         changeState(STARTING);
         changeState(RUNNING);
         _cmgr.register(this);
+        _persister.removeOld();
         schedule();
     }
 
@@ -255,6 +270,20 @@ public class Analysis extends JobImpl implements RouterApp {
         return ris;
     }
 
+    /**
+     *  All the routers, not including us
+     *  @since 0.9.41
+     */
+    public List<RouterInfo> getAllRouters(Hash us) {
+        Set<RouterInfo> set = _context.netDb().getRouters();
+        List<RouterInfo> ris = new ArrayList<RouterInfo>(set.size());
+        for (RouterInfo ri : set) {
+            if (!ri.getIdentity().getHash().equals(us))
+            ris.add(ri);
+        }
+        return ris;
+    }
+
     public double getAvgMinDist(List<RouterInfo> ris) {
         double tot = 0;
         int count = 200;
@@ -272,17 +301,25 @@ public class Analysis extends JobImpl implements RouterApp {
     /**
      *  Analyze threats. No output.
      *  Return separate maps for each cause instead?
+     *  @param includeAll false for floodfills only
      *  @since 0.9.38
      */
-    public synchronized Map<Hash, Points> backgroundAnalysis() {
+    public synchronized Map<Hash, Points> backgroundAnalysis(boolean includeAll) {
         _wasRun = true;
         Map<Hash, Points> points = new HashMap<Hash, Points>(64);
         Hash us = _context.routerHash();
         if (us == null)
             return points;
-        List<RouterInfo> ris = getFloodfills(us);
+        List<RouterInfo> ris;
+        if (includeAll) {
+            ris = getAllRouters(us);
+        } else {
+            ris = getFloodfills(us);
+        }
         if (ris.isEmpty())
             return points;
+        if (_log.shouldWarn())
+            _log.warn("Analyzing " + ris.size() + " routers, including non-floodfills? " + includeAll);
 
         double avgMinDist = getAvgMinDist(ris);
 
@@ -336,7 +373,43 @@ public class Analysis extends JobImpl implements RouterApp {
         // Profile analysis
         addProfilePoints(ris, points);
         addVersionPoints(ris, points);
+        if (_context.getBooleanProperty(PROP_BLOCK))
+            doBlocking(points);
         return points;
+    }
+
+    /**
+     *  Blocklist and Banlist if configured
+     *  @since 0.9.41
+     */
+    private void doBlocking(Map<Hash, Points> points) {
+        double threshold = DEFAULT_BLOCK_THRESHOLD;
+        long now = _context.clock().now();
+        long blockUntil = _context.getProperty(Analysis.PROP_BLOCKTIME, DEFAULT_BLOCK_TIME) + now;
+        try {
+            threshold = Double.parseDouble(_context.getProperty(PROP_THRESHOLD, Double.toString(DEFAULT_BLOCK_THRESHOLD)));
+            if (threshold < MIN_BLOCK_POINTS)
+                threshold = MIN_BLOCK_POINTS;
+        } catch (NumberFormatException nfe) {}
+        DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+        dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+        String day = dfmt.format(now);
+        for (Map.Entry<Hash, Points> e : points.entrySet()) {
+            double p = e.getValue().getPoints();
+            if (p >= threshold) {
+                Hash h = e.getKey();
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
+                if (ri != null) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        byte[] ip = ra.getIP();
+                        if (ip != null)
+                             _context.blocklist().add(ip);
+                    }
+                }
+                String reason = "Sybil analysis " + day + " with " + fmt.format(p) + " threat points";
+                _context.banlist().banlistRouter(h, reason, null, null, blockUntil);
+            }
+        }
     }
 
     /**
@@ -350,8 +423,14 @@ public class Analysis extends JobImpl implements RouterApp {
         double total = 0;
         for (int i = 0; i < sz; i++) {
             RouterInfo info1 = ris.get(i);
+            // don't do distance calculation for non-floodfills
+            if (!info1.getCapabilities().contains("f"))
+                continue;
             for (int j = i + 1; j < sz; j++) {
                 RouterInfo info2 = ris.get(j);
+                // don't do distance calculation for non-floodfills
+                if (!info2.getCapabilities().contains("f"))
+                    continue;
                 BigInteger dist = HashDistance.getDistance(info1.getHash(), info2.getHash());
                 if (pairs.isEmpty()) {
                     pairs.add(new Pair(info1, info2, dist));
@@ -634,12 +713,28 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final long DAY = 24*60*60*1000L;
 
     public void addProfilePoints(List<RouterInfo> ris, Map<Hash, Points> points) {
+        Map<Hash, Banlist.Entry> banEntries = _context.banlist().getEntries();
         long now = _context.clock().now();
         RateAverages ra = RateAverages.getTemp();
         for (RouterInfo info : ris) {
             Hash h = info.getHash();
-            if (_context.banlist().isBanlisted(h))
-                addPoints(points, h, POINTS_BANLIST, "Banlisted");
+            if (_context.banlist().isBanlisted(h)) {
+                StringBuilder buf = new StringBuilder("Banlisted");
+                Banlist.Entry entry = banEntries.get(h);
+                if (entry != null) {
+                    if (entry.cause != null) {
+                        buf.append(": ");
+                        if (entry.causeCode != null)
+                            buf.append(_t(entry.cause, entry.causeCode));
+                        else
+                            buf.append(_t(entry.cause));
+                    }
+                }
+                addPoints(points, h, POINTS_BANLIST, buf.toString());
+            }
+            // don't do profile calcluations for non-floodfills
+            if (!info.getCapabilities().contains("f"))
+                continue;
             PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(h);
             if (prof != null) {
                 long heard = prof.getFirstHeardAbout();
@@ -689,6 +784,8 @@ public class Analysis extends JobImpl implements RouterApp {
             String caps = info.getCapabilities();
             if (!caps.contains("R"))
                 addPoints(points, h, POINTS_UNREACHABLE, "Unreachable: " + DataHelper.escapeHTML(caps));
+            if (!caps.contains("f"))
+                addPoints(points, h, POINTS_NONFF, "Non-floodfill");
             String hisFullVer = info.getVersion();
             if (!hisFullVer.startsWith("0.9.")) {
                 addPoints(points, h, POINTS_BAD_VERSION, "Strange version " + DataHelper.escapeHTML(hisFullVer));
@@ -720,6 +817,9 @@ public class Analysis extends JobImpl implements RouterApp {
         int count = Math.min(MAX, ris.size());
         for (int i = 0; i < count; i++) {
             RouterInfo ri = ris.get(i);
+            // don't do distance calculation for non-floodfills
+            if (!ri.getCapabilities().contains("f"))
+                continue;
             BigInteger bidist = HashDistance.getDistance(us, ri.getHash());
             double dist = biLog2(bidist);
             double point = MIN_CLOSE - dist;
@@ -737,6 +837,10 @@ public class Analysis extends JobImpl implements RouterApp {
      */
     private static double biLog2(BigInteger a) {
         return Util.biLog2(a);
+    }
+
+    private String _t(String s) {
+        return Messages.getString(s, _context);
     }
 
     /**

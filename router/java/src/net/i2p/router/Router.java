@@ -52,6 +52,7 @@ import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.tasks.*;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.transport.UPnPScannerCallback;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
@@ -103,6 +104,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private FamilyKeyCrypto _familyKeyCrypto;
     private boolean _familyKeyCryptoFail;
     public final Object _familyKeyLock = new Object();
+    private UPnPScannerCallback _upnpScannerCallback;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -336,33 +338,35 @@ public class Router implements RouterClock.ClockShiftListener {
         // for the ping file
         // Check for other router but do not start a thread yet so the update doesn't cause
         // a NCDFE
-        for (int i = 0; i < 14; i++) {
-            // Wrapper can start us up too quickly after a crash, the ping file
-            // may still be less than LIVELINESS_DELAY (60s) old.
-            // So wait at least 60s to be sure.
-            if (isOnlyRouterRunning()) {
-                if (i > 0)
-                    System.err.println("INFO: No, there wasn't another router already running. Proceeding with startup.");
-                break;
-            }
-            if (i < 13) {
-                if (i == 0)
-                    System.err.println("WARN: There may be another router already running. Waiting a while to be sure...");
-                // yes this is ugly to sleep in the constructor.
-                try { Thread.sleep(5000); } catch (InterruptedException ie) {}
-            } else {
-                _eventLog.addEvent(EventLog.ABORTED, "Another router running");
-                System.err.println("ERROR: There appears to be another router already running!");
-                System.err.println("       Please make sure to shut down old instances before starting up");
-                System.err.println("       a new one.  If you are positive that no other instance is running,");
-                System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
-                //System.exit(-1);
-                // throw exception instead, for embedded
-                throw new IllegalStateException(
-                                   "ERROR: There appears to be another router already running!" +
-                                   " Please make sure to shut down old instances before starting up" +
-                                   " a new one.  If you are positive that no other instance is running," +
-                                   " please delete the file " + getPingFile().getAbsolutePath());
+        if (!SystemVersion.isAndroid()) {
+            for (int i = 0; i < 14; i++) {
+                // Wrapper can start us up too quickly after a crash, the ping file
+                // may still be less than LIVELINESS_DELAY (60s) old.
+                // So wait at least 60s to be sure.
+                if (isOnlyRouterRunning()) {
+                    if (i > 0)
+                        System.err.println("INFO: No, there wasn't another router already running. Proceeding with startup.");
+                    break;
+                }
+                if (i < 13) {
+                    if (i == 0)
+                        System.err.println("WARN: There may be another router already running. Waiting a while to be sure...");
+                    // yes this is ugly to sleep in the constructor.
+                    try { Thread.sleep(5000); } catch (InterruptedException ie) {}
+                } else {
+                    _eventLog.addEvent(EventLog.ABORTED, "Another router running");
+                    System.err.println("ERROR: There appears to be another router already running!");
+                    System.err.println("       Please make sure to shut down old instances before starting up");
+                    System.err.println("       a new one.  If you are positive that no other instance is running,");
+                    System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
+                    //System.exit(-1);
+                    // throw exception instead, for embedded
+                    throw new IllegalStateException(
+                                       "ERROR: There appears to be another router already running!" +
+                                       " Please make sure to shut down old instances before starting up" +
+                                       " a new one.  If you are positive that no other instance is running," +
+                                       " please delete the file " + getPingFile().getAbsolutePath());
+                }
             }
         }
 
@@ -384,6 +388,8 @@ public class Router implements RouterClock.ClockShiftListener {
             } catch (NumberFormatException nfe) {}
         }
         _networkID = id;
+        // for testing
+        setUPnPScannerCallback(new LoggerCallback());
         changeState(State.INITIALIZED);
         // *********  Start no threads before here ********* //
     }
@@ -606,6 +612,32 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public RouterContext getContext() { return _context; }
     
+    private class LoggerCallback implements UPnPScannerCallback {
+        public void beforeScan() { _log.info("SSDP beforeScan()"); }
+        public void afterScan() { _log.info("SSDP afterScan()"); }
+    }
+
+    /**
+     *  For Android only.
+     *  MUST be set before runRouter() is called.
+     *
+     *  @param callback the callback or null to clear it
+     *  @since 0.9.41
+     */
+    public synchronized void setUPnPScannerCallback(UPnPScannerCallback callback) {
+        _upnpScannerCallback = callback;
+    }
+
+    /**
+     *  For Android only.
+     *
+     *  @return the callback or null if none
+     *  @since 0.9.41
+     */
+    public synchronized UPnPScannerCallback getUPnPScannerCallback() {
+        return _upnpScannerCallback;
+    }
+
     /**
      *  This must be called after instantiation.
      *  Starts the threads. Does not install updates.
@@ -865,6 +897,8 @@ public class Router implements RouterClock.ClockShiftListener {
             } else if (_state == State.EXPL_TUNNELS_READY) {
                 changeState(State.RUNNING);
                 changed = true;
+            } else {
+                _log.warn("Invalid state " + _state + " for setNetDbReady()");
             }
         }
         if (changed) {
@@ -890,6 +924,8 @@ public class Router implements RouterClock.ClockShiftListener {
                 changeState(State.EXPL_TUNNELS_READY);
             else if (_state == State.NETDB_READY)
                 changeState(State.RUNNING);
+            else
+                _log.warn("Invalid state " + _state + " for setExplTunnelsReady()");
         }
     }
 

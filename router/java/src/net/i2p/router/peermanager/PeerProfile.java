@@ -482,10 +482,6 @@ public class PeerProfile {
         if (_tunnelHistory == null)
             _tunnelHistory = new TunnelHistory(_context, group);
 
-        //_sendSuccessSize.setStatLog(_context.statManager().getStatLog());
-        //_receiveSize.setStatLog(_context.statManager().getStatLog());
-        _tunnelCreateResponseTime.setStatLog(_context.statManager().getStatLog());
-        _tunnelTestResponseTime.setStatLog(_context.statManager().getStatLog());
         _expanded = true;
     }
 
@@ -502,8 +498,6 @@ public class PeerProfile {
         if (_dbHistory == null)
             _dbHistory = new DBHistory(_context, group);
 
-        _dbResponseTime.setStatLog(_context.statManager().getStatLog());
-        _dbIntroduction.setStatLog(_context.statManager().getStatLog());
         _expandedDB = true;
     }
 

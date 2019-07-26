@@ -10,6 +10,7 @@ package net.i2p.data.i2cp;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -91,7 +92,9 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
                 throw new IllegalStateException();
             _sessionId = new SessionId();
             _sessionId.readBytes(in);
-            int numTunnels = (int) DataHelper.readLong(in, 1);
+            int numTunnels = in.read();
+            if (numTunnels < 0)
+                throw new EOFException();
             for (int i = 0; i < numTunnels; i++) {
                 Lease lease = new Lease();
                 lease.readBytes(in);

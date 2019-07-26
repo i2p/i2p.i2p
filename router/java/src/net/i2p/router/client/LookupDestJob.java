@@ -99,7 +99,8 @@ class LookupDestJob extends JobImpl {
                             }
                             h = bd.getBlindedHash();
                             if (_log.shouldDebug())
-                                _log.debug("Converting name lookup " + name + " to blinded " + h);
+                                _log.debug("Converting name lookup " + name + " to blinded " + h +
+                                           " using BlindData:\n" + bd);
                             name = null;
                         } catch (RuntimeException re) {
                             if (_log.shouldWarn())

@@ -10,6 +10,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.SessionKey;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
@@ -181,6 +182,13 @@ class PacketHandler {
         return rv;
     }
 
+    /**
+     * @since 0.9.42
+     */
+    private boolean validate(UDPPacket packet, SessionKey key) {
+        return packet.validate(key, _transport.getHMAC());
+    }
+
     /** the packet is from a peer we are establishing an outbound con to, but failed validation, so fallback */
     private static final short OUTBOUND_FALLBACK = 1;
     /** the packet is from a peer we are establishing an inbound con to, but failed validation, so fallback */
@@ -325,17 +333,17 @@ class PacketHandler {
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, PeerState state) {
             _state = 17;
             AuthType auth = AuthType.NONE;
-            boolean isValid = packet.validate(state.getCurrentMACKey());
+            boolean isValid = validate(packet, state.getCurrentMACKey());
             if (!isValid) {
                 _state = 18;
                 if (state.getNextMACKey() != null)
-                    isValid = packet.validate(state.getNextMACKey());
+                    isValid = validate(packet, state.getNextMACKey());
                 if (!isValid) {
                     _state = 19;
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Failed validation with existing con, trying as new con: " + packet);
 
-                    isValid = packet.validate(_transport.getIntroKey());
+                    isValid = validate(packet, _transport.getIntroKey());
                     if (isValid) {
                         _state = 20;
                         // this is a stray packet from an inbound establishment
@@ -388,7 +396,7 @@ class PacketHandler {
          */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, short peerType) {
             _state = 27;
-            boolean isValid = packet.validate(_transport.getIntroKey());
+            boolean isValid = validate(packet, _transport.getIntroKey());
             if (!isValid) {
                 // Note that the vast majority of these are NOT corrupted packets, but
                 // packets for which we don't have the PeerState (i.e. SessionKey)
@@ -425,7 +433,7 @@ class PacketHandler {
                             }
                             if (ps.getRemotePort() == newPort) {
                                 foundSamePort = true;
-                            } else if (packet.validate(ps.getCurrentMACKey())) {
+                            } else if (validate(packet, ps.getCurrentMACKey())) {
                                 packet.decrypt(ps.getCurrentCipherKey());
                                 reader.initialize(packet);
                                 if (_log.shouldLog(Log.WARN))
@@ -513,7 +521,7 @@ class PacketHandler {
             }
             boolean isValid = false;
             if (state.getMACKey() != null) {
-                isValid = packet.validate(state.getMACKey());
+                isValid = validate(packet, state.getMACKey());
                 if (isValid) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Valid introduction packet received for inbound con: " + packet);
@@ -558,7 +566,7 @@ class PacketHandler {
             boolean isValid = false;
             if (state.getMACKey() != null) {
                 _state = 36;
-                isValid = packet.validate(state.getMACKey());
+                isValid = validate(packet, state.getMACKey());
                 if (isValid) {
                     // this should be the Session Confirmed packet
                     if (_log.shouldLog(Log.INFO))
@@ -572,7 +580,7 @@ class PacketHandler {
             }
 
             // keys not yet exchanged, lets try it with the peer's intro key
-            isValid = packet.validate(state.getIntroKey());
+            isValid = validate(packet, state.getIntroKey());
             if (isValid) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Valid packet received for " + state + " with Bob's intro key: " + packet);

@@ -42,7 +42,7 @@
     } else {
         // Text browsers don't render the two divs side-by-side, so just provide a link
         out.print("<a href=\"/summaryframe\">");
-        out.print(intl._t("Summary Bar"));
+        out.print(intl._t("Sidebar"));
         out.print("</a>");
     }
 

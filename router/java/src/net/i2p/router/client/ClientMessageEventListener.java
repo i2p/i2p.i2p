@@ -14,6 +14,7 @@ import java.util.Properties;
 import net.i2p.CoreVersion;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -550,6 +551,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         Destination dest = cfg.getDestination();
         if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
             // so we can decrypt it
+            // secret must be set before destination
+            String secret = cfg.getOptions().getProperty("i2cp.leaseSetSecret");
+            if (secret != null) {
+                EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                secret = DataHelper.getUTF8(Base64.decode(secret));
+                encls.setSecret(secret);
+            }
             try {
                 ls.setDestination(dest);
             } catch (RuntimeException re) {
@@ -557,6 +565,15 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                     _log.error("Error decrypting leaseset from client", re);
                 _runner.disconnectClient(re.toString());
                 return;
+            }
+            // per-client auth
+            // we have to do this before verifySignature()
+            String pk = cfg.getOptions().getProperty("i2cp.leaseSetPrivKey");
+            if (pk != null) {
+                byte[] priv = Base64.decode(pk);
+                PrivateKey privkey = new PrivateKey(EncType.ECIES_X25519, priv);
+                EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
+                encls.setClientPrivateKey(privkey);
             }
             // we have to do this before checking encryption keys below
             if (!ls.verifySignature()) {
@@ -641,11 +658,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 if (!ok) {
                     _runner.disconnectClient("Duplicate hash of encrypted LS2");
                     return;
-                }
-                String secret = cfg.getOptions().getProperty("i2cp.leaseSetSecret");
-                if (secret != null) {
-                    EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
-                    encls.setSecret(secret);
                 }
             }
             if (_log.shouldDebug())

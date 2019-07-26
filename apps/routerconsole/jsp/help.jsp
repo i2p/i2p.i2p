@@ -18,30 +18,14 @@
 
 <div class="confignav">
 <span class="tab"><a href="#sidebarhelp">Sidebar</a></span>
-<span class="tab"><a href="#configurationhelp">Configuration</a></span>
 <span class="tab"><a href="#reachabilityhelp">Reachability</a></span>
-<span class="tab"><a href="#advancedsettings">Advanced Settings</a></span>
 <span class="tab"><a href="#faq">FAQ</a></span>
-<span class="tab"><a href="#legal">Legal</a></span>
-<span class="tab"><a href="#changelog">Change Log</a></span>
+<span class="tab"><a href="/viewlicense">Legal</a></span>
+<span class="tab"><a href="/viewhistory">Change Log</a></span>
 </div>
 
 <div id="volunteer"><%@include file="help.jsi" %></div>
 <div id="sidebarhelp"><%@include file="help-sidebar.jsi" %></div>
-<div id="configurationhelp"><%@include file="help-configuration.jsi" %></div>
 <div id="reachabilityhelp"><%@include file="help-reachability.jsi" %></div>
-<div id="advancedsettings"><%@include file="help-advancedsettings.jsi" %></div>
 <div id="faq"><%@include file="help-faq.jsi" %></div>
-<div id="legal"><%@include file="help-legal.jsi" %></div>
-<div id="changelog">
-<h2>Change Log</h2>
- <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
- <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
- <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
- <jsp:setProperty name="contenthelper" property="maxLines" value="512" />
- <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
- <jsp:getProperty name="contenthelper" property="textContent" />
-<p id="fullhistory"><a href="/history.txt" target="_blank">View the full change log</a></p>
-</div>
-
 </div></body></html>

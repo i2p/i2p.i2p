@@ -44,6 +44,11 @@
     </servlet-mapping>
     
     <servlet-mapping> 
+      <servlet-name>net.i2p.router.web.jsp.viewlicense_jsp</servlet-name>
+      <url-pattern>/license.txt</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping> 
       <servlet-name>net.i2p.router.web.jsp.viewrouterlog_jsp</servlet-name>
       <url-pattern>/router.log</url-pattern>
     </servlet-mapping>

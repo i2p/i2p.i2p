@@ -17,8 +17,10 @@ import com.docuverse.identicon.IdenticonRenderer;
 import com.docuverse.identicon.IdenticonUtil;
 import com.docuverse.identicon.NineBlockIdenticonRenderer2;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.util.ConvertToHash;
+import net.i2p.util.Log;
 
 
 /**
@@ -146,12 +148,22 @@ public class IdenticonServlet extends HttpServlet {
 			if (cache == null
 					|| (imageBytes = cache.get(identiconETag)) == null) {
 				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-				RenderedImage image = renderer.render(code, size);
+				RenderedImage image;
+				try {
+					image = renderer.render(code, size);
+				} catch (Throwable t) {
+					// java.lang.NoClassDefFoundError: Could not initialize class java.awt.GraphicsEnvironment$LocalGE
+					Log log = I2PAppContext.getGlobalContext().logManager().getLog(IdenticonServlet.class);
+					log.logAlways(Log.WARN, "Identicon render failure: " + t);
+					response.setStatus(403);
+					return;
+				}
 				ImageIO.write(image, IDENTICON_IMAGE_FORMAT, byteOut);
 				imageBytes = byteOut.toByteArray();
 				if (cache != null)
 					cache.add(identiconETag, imageBytes);
 			} else {
+				// FIXME this sends 403 if cached
 				response.setStatus(403);
 				return;
 			}

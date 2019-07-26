@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 
 /**
@@ -90,6 +91,35 @@ public class KeyCertificate extends Certificate {
     }
 
     /**
+     *  A KeyCertificate with enc type from the given public key,
+     *  and the signature type and extra data from the given public key.
+     *  EncType lengths greater than 256 not supported.
+     *
+     *  @param spk non-null data non-null
+     *  @param pk non-null
+     *  @throws IllegalArgumentException
+     *  @since 0.9.42
+     */
+    public KeyCertificate(SigningPublicKey spk, PublicKey pk) {
+         super(CERTIFICATE_TYPE_KEY, null);
+         if (spk == null || spk.getData() == null ||
+             pk == null || pk.getData() == null)
+             throw new IllegalArgumentException();
+         SigType type = spk.getType();
+         int len = type.getPubkeyLen();
+         int extra = Math.max(0, len - 128);
+         _payload = new byte[HEADER_LENGTH + extra];
+         int code = type.getCode();
+         _payload[0] = (byte) (code >> 8);
+         _payload[1] = (byte) (code & 0xff);
+         code = pk.getType().getCode();
+         _payload[2] = (byte) (code >> 8);
+         _payload[3] = (byte) (code & 0xff);
+         if (extra > 0)
+             System.arraycopy(spk.getData(), 128, _payload, HEADER_LENGTH, extra);
+    }
+
+    /**
      *  A KeyCertificate with crypto type 0 (ElGamal)
      *  and the signature type as specified.
      *  Payload is created.
@@ -100,6 +130,23 @@ public class KeyCertificate extends Certificate {
      *  @throws IllegalArgumentException
      */
     public KeyCertificate(SigType type) {
+        this(type, EncType.ELGAMAL_2048);
+    }
+
+    /**
+     *  A KeyCertificate with crypto type
+     *  and the signature type as specified.
+     *  Payload is created.
+     *  If type.getPubkeyLen() is greater than 128, caller MUST
+     *  fill in the extra key data in the payload.
+     *  EncType lengths greater than 256 not supported.
+     *
+     *  @param type non-null
+     *  @param etype non-null
+     *  @throws IllegalArgumentException
+     *  @since 0.9.42
+     */
+    public KeyCertificate(SigType type, EncType etype) {
          super(CERTIFICATE_TYPE_KEY, null);
          int len = type.getPubkeyLen();
          int extra = Math.max(0, len - 128);
@@ -107,7 +154,9 @@ public class KeyCertificate extends Certificate {
          int code = type.getCode();
          _payload[0] = (byte) (code >> 8);
          _payload[1] = (byte) (code & 0xff);
-         // 2 and 3 always 0, it is the only crypto code for now
+         code = etype.getCode();
+         _payload[2] = (byte) (code >> 8);
+         _payload[3] = (byte) (code & 0xff);
     }
 
     /**
@@ -145,6 +194,14 @@ public class KeyCertificate extends Certificate {
      */
     public SigType getSigType() {
         return SigType.getByCode(getSigTypeCode());
+    }
+
+    /**
+     *  @return null if unset or unknown
+     *  @since 0.9.42
+     */
+    public EncType getEncType() {
+        return EncType.getByCode(getCryptoTypeCode());
     }
 
     /**

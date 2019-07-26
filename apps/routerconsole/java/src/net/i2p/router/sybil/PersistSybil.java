@@ -64,6 +64,8 @@ public class PersistSybil {
         Writer out = null;
         try {
             out = new OutputStreamWriter(new GZIPOutputStream(new SecureFileOutputStream(file)));
+            out.write("# Format (one per line)\n");
+            out.write("# Base64 router hash:total points%points:reason%points:reason ...\n");
             for (Map.Entry<Hash, Points> entry : entries.entrySet()) {
                 Hash h = entry.getKey();
                 Points p = entry.getValue();
@@ -114,6 +116,8 @@ public class PersistSybil {
             in = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
             String line;
             while ((line = in.readLine()) != null) {
+                if (line.startsWith("#"))
+                    continue;
                 int colon = line.indexOf(':');
                 if (colon != 44)
                     continue;
@@ -168,6 +172,39 @@ public class PersistSybil {
         }
         return rv;
     }
+
+    /**
+     *  Remove all files older than configured threshold
+     *  Inline for now, thread later if necessary
+     *
+     *  @since 0.9.41
+     */
+    public synchronized void removeOld() {
+        long age = _context.getProperty(Analysis.PROP_REMOVETIME, 0L);
+        if (age < 60*1000)
+            return;
+        long cutoff = _context.clock().now() - age;
+        File dir = new File(_context.getConfigDir(), DIR);
+        File[] files = dir.listFiles(new FileSuffixFilter(PFX, SFX));
+        if (files == null)
+            return;
+        int deleted = 0;
+        for (File file : files) {
+            try {
+                String name = file.getName();
+                long d = Long.parseLong(name.substring(PFX.length(), name.length() - SFX.length())); 
+                if (d < cutoff) {
+                    if (file.delete())
+                        deleted++;
+                    else if (_log.shouldWarn())
+                        _log.warn("Failed to delete: " + file);
+                }
+            } catch (NumberFormatException nfe) {}
+        }
+        if (deleted > 0 && _log.shouldWarn())
+            _log.warn("Deleted " + deleted + " old analysis files");
+    }
+
 
     /**
      *  Delete the file for a particular date

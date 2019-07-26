@@ -6,6 +6,7 @@ package net.i2p.data.i2cp;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -127,7 +128,9 @@ public class HostLookupMessage extends I2CPMessageImpl {
             _sessionId.readBytes(in);
             _reqID = DataHelper.readLong(in, 4);
             _timeout = DataHelper.readLong(in, 4);
-            _lookupType = (int) DataHelper.readLong(in, 1);
+            _lookupType = in.read();
+            if (_lookupType < 0)
+                throw new EOFException();
             if (_lookupType == LOOKUP_HASH) {
                 _hash = Hash.create(in);
             } else if (_lookupType == LOOKUP_HOST) {

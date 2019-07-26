@@ -83,6 +83,7 @@ reprepro -v update eoan
 # and /var/www/debian/conf/updates
 # and then: reprepro -v export foo (for new foo)
 # and then: reprepro -v update foo
+# and:      reprepro -v copysrc foo buster i2p-keyring
 # If you remove, you must do: reprepro clearvanished
 
 
@@ -94,14 +95,17 @@ reprepro -v copysrc wheezy precise i2p
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc jessie trusty i2p
 
-# To copy bionic to stretch:
+# To copy trusty to stretch:
 # Note that syntax is reprepro copysrc TO FROM package!
-TODO bionic (now with jetty 9.4) is no longer compatible with stretch (with jetty 9.2),
-is trusty compatible with stretch?
+# WARNING bionic (now with jetty 9.4) is no longer compatible with stretch (with jetty 9.2)
+# WARNING xenial is not compatible with stretch,
+# see https://www.reddit.com/r/i2p/comments/bnvcn4/i2p_router_console_inaccessible_to_firefox_on/
+reprepro -v copysrc stretch trusty i2p
 
-# To copy disco to sid:
+# To copy disco to sid and buster:
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc sid disco i2p
+reprepro -v copysrc buster disco i2p
 
 # install in the architectures not copied from ubuntu
 # 'flood' should do this but forgot how, can't make it work any more

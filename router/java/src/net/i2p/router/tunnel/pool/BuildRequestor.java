@@ -16,6 +16,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
+import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.BuildMessageGenerator;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
@@ -117,24 +118,25 @@ abstract class BuildRequestor {
      *  @param cfg ReplyMessageId must be set
      *  @return success
      */
-    public static boolean request(RouterContext ctx, TunnelPool pool,
+    public static boolean request(RouterContext ctx,
                                   PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
         // new style crypto fills in all the blanks, while the old style waits for replies to fill in the next hop, etc
         prepare(ctx, cfg);
         
         if (cfg.getLength() <= 1) {
-            buildZeroHop(ctx, pool, cfg, exec);
+            buildZeroHop(ctx, cfg, exec);
             return true;
         }
         
         Log log = ctx.logManager().getLog(BuildRequestor.class);
-        cfg.setTunnelPool(pool);
+        final TunnelPool pool = cfg.getTunnelPool();
+        final TunnelPoolSettings settings = pool.getSettings();
         
         TunnelInfo pairedTunnel = null;
         Hash farEnd = cfg.getFarEnd();
         TunnelManagerFacade mgr = ctx.tunnelManager();
-        boolean isInbound = pool.getSettings().isInbound();
-        if (pool.getSettings().isExploratory() || !usePairedTunnels(ctx)) {
+        boolean isInbound = settings.isInbound();
+        if (settings.isExploratory() || !usePairedTunnels(ctx)) {
             if (isInbound)
                 pairedTunnel = mgr.selectOutboundExploratoryTunnel(farEnd);
             else
@@ -142,9 +144,9 @@ abstract class BuildRequestor {
         } else {
             // building a client tunnel
             if (isInbound)
-                pairedTunnel = mgr.selectOutboundTunnel(pool.getSettings().getDestination(), farEnd);
+                pairedTunnel = mgr.selectOutboundTunnel(settings.getDestination(), farEnd);
             else
-                pairedTunnel = mgr.selectInboundTunnel(pool.getSettings().getDestination(), farEnd);
+                pairedTunnel = mgr.selectInboundTunnel(settings.getDestination(), farEnd);
             if (pairedTunnel == null) {   
                 if (isInbound) {
                     // random more reliable than closest ??
@@ -178,12 +180,12 @@ abstract class BuildRequestor {
         if (pairedTunnel == null) {
             if (log.shouldLog(Log.WARN))
                 log.warn("Tunnel build failed, as we couldn't find a paired tunnel for " + cfg);
-            exec.buildComplete(cfg, pool);
+            exec.buildComplete(cfg);
             // Not even an exploratory tunnel? We are in big trouble.
             // Let's not spin through here too fast.
             // But don't let a client tunnel waiting for exploratories slow things down too much,
             // as there may be other tunnel pools who can build
-            int ms = pool.getSettings().isExploratory() ? 250 : 25;
+            int ms = settings.isExploratory() ? 250 : 25;
             try { Thread.sleep(ms); } catch (InterruptedException ie) {}
             return false;
         }
@@ -194,7 +196,7 @@ abstract class BuildRequestor {
         if (msg == null) {
             if (log.shouldLog(Log.WARN))
                 log.warn("Tunnel build failed, as we couldn't create the tunnel build message for " + cfg);
-            exec.buildComplete(cfg, pool);
+            exec.buildComplete(cfg);
             return false;
         }
         
@@ -225,11 +227,11 @@ abstract class BuildRequestor {
             if (peer == null) {
                 if (log.shouldLog(Log.WARN))
                     log.warn("Could not find the next hop to send the outbound request to: " + cfg);
-                exec.buildComplete(cfg, pool);
+                exec.buildComplete(cfg);
                 return false;
             }
             OutNetMessage outMsg = new OutNetMessage(ctx, msg, ctx.clock().now() + FIRST_HOP_TIMEOUT, PRIORITY, peer);
-            outMsg.setOnFailedSendJob(new TunnelBuildFirstHopFailJob(ctx, pool, cfg, exec));
+            outMsg.setOnFailedSendJob(new TunnelBuildFirstHopFailJob(ctx, cfg, exec));
             try {
                 ctx.outNetMessagePool().add(outMsg);
             } catch (RuntimeException re) {
@@ -365,20 +367,19 @@ keep this here for the next time we change the build protocol
         return msg;
     }
     
-    private static void buildZeroHop(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
+    private static void buildZeroHop(RouterContext ctx, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
         Log log = ctx.logManager().getLog(BuildRequestor.class);
         if (log.shouldLog(Log.DEBUG))
             log.debug("Build zero hop tunnel " + cfg);            
 
-        exec.buildComplete(cfg, pool);
+        exec.buildComplete(cfg);
         if (cfg.isInbound())
             ctx.tunnelDispatcher().joinInbound(cfg);
         else
             ctx.tunnelDispatcher().joinOutbound(cfg);
-        pool.addTunnel(cfg);
+        cfg.getTunnelPool().addTunnel(cfg);
         exec.buildSuccessful(cfg);
-        ExpireJob expireJob = new ExpireJob(ctx, cfg, pool);
-        cfg.setExpireJob(expireJob);
+        ExpireJob expireJob = new ExpireJob(ctx, cfg);
         ctx.jobQueue().addJob(expireJob);
         // can it get much easier?
     }
@@ -393,18 +394,16 @@ keep this here for the next time we change the build protocol
      *  Can't do this for inbound tunnels since the msg goes out an expl. tunnel.
      */
     private static class TunnelBuildFirstHopFailJob extends JobImpl {
-        private final TunnelPool _pool;
         private final PooledTunnelCreatorConfig _cfg;
         private final BuildExecutor _exec;
-        private TunnelBuildFirstHopFailJob(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
+        private TunnelBuildFirstHopFailJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
             super(ctx);
             _cfg = cfg;
             _exec = exec;
-            _pool = pool;
         }
         public String getName() { return "Timeout contacting first peer for OB tunnel"; }
         public void runJob() {
-            _exec.buildComplete(_cfg, _pool);
+            _exec.buildComplete(_cfg);
             getContext().profileManager().tunnelTimedOut(_cfg.getPeer(1));
             getContext().statManager().addRateData("tunnel.buildFailFirstHop", 1, 0);
             // static, no _log

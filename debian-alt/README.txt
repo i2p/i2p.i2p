@@ -1,20 +1,20 @@
-The files in ../debian/ are for stretch.
-You may also use them for jessie if you have libjetty9-java from jessie-backports.
+The files in ../debian/ are for the current stable distribution (buster).
+They should also work with bullseye, experimental, sid, testing.
 
 Alternates are in the subdirectories here.
 To use them, copy them over the files in ../debian/  .
 
 Built file compatibility:
 trusty may be copied to vivid.
-trusty may be used for jessie without libjetty9-java from backports.
+trusty may be used for jessie with libjetty9-java from backports.
 xenial may be copied to yakkety, zesty
 bionic may be copied to cosmic
 disco may be copied to eoan
 
 Not maintained:
 wheezy files are not maintained. Use the precise files instead.
-jessie files may not be maintained. Use the trusty files instead.
-buster and sid files are not maintained, see the latest in Debian.
+jessie files are not be maintained. Use the trusty files instead.
+stretch files may not be maintained. Use the trusty files instead.
 
 Note on systemd:
 

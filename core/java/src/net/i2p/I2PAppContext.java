@@ -15,7 +15,6 @@ import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMAC256Generator;
-import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
@@ -36,6 +35,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
@@ -75,7 +75,6 @@ public class I2PAppContext {
     private ElGamalEngine _elGamalEngine;
     private AESEngine _AESEngine;
     private LogManager _logManager;
-    private HMACGenerator _hmac;
     private HMAC256Generator _hmac256;
     private SHA256Generator _sha;
     protected Clock _clock; // overridden in RouterContext
@@ -94,7 +93,6 @@ public class I2PAppContext {
     private volatile boolean _elGamalEngineInitialized;
     private volatile boolean _AESEngineInitialized;
     private volatile boolean _logManagerInitialized;
-    private volatile boolean _hmacInitialized;
     private volatile boolean _hmac256Initialized;
     private volatile boolean _shaInitialized;
     protected volatile boolean _clockInitialized; // used in RouterContext
@@ -118,7 +116,7 @@ public class I2PAppContext {
     // split up big lock on this to avoid deadlocks
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
                          _lock5 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
-                         _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
+                         _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
                          _lock13 = new Object(), _lock14 = new Object(), _lock16 = new Object(),
                          _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object();
 
@@ -720,26 +718,17 @@ public class I2PAppContext {
         }
     }
 
-    /** 
-     * There is absolutely no good reason to make this context specific, 
-     * other than for consistency, and perhaps later we'll want to 
-     * include some stats.
-     *
-     * DEPRECATED - non-standard and used only by SSU.
-     * To be moved from context to SSU.
+    /**
+     * Overwrites the LogManager instance to be used by the router.
+     * This should only be called after the Router is instantiated but
+     * before it is started.  Calling this at any other time can have
+     * unpredictable side effects.
+     * @since 0.9.41
      */
-    public HMACGenerator hmac() { 
-        if (!_hmacInitialized)
-            initializeHMAC();
-        return _hmac;
-    }
-
-    private void initializeHMAC() {
-        synchronized (_lock9) {
-            if (_hmac == null) {
-                _hmac= new HMACGenerator(this);
-            }
-            _hmacInitialized = true;
+    public void setLogManager(LogManager logManager) {
+        synchronized (_lock8) {
+            _logManager = logManager;
+            _logManagerInitialized = true;
         }
     }
 
@@ -928,7 +917,7 @@ public class I2PAppContext {
      *  @since 0.8.8
      */
     public boolean hasWrapper() {
-        return System.getProperty("wrapper.version") != null;
+        return SystemVersion.hasWrapper();
     }
 
     /**

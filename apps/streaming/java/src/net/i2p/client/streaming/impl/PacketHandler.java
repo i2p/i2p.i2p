@@ -191,6 +191,7 @@ class PacketHandler {
                         } else if (oldId == packet.getReceiveStreamId()) {
                             // ok, as expected...
                         } else {
+                            // Apparently an i2pd bug...
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Received a syn with the wrong IDs, con=" + con + " packet=" + packet);
                             sendReset(packet);

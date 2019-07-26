@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<title>Anonimowy serwer hostingowy I2P</title>
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="lib/eepsite.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+   <div class="main">
+
+   <div class="langbar">
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+      <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+</div>
+
+    <h1>Anonimowy serwer hostingowy I2P</h1>
+
+    <h2>Poradnik serwera I2P</h2>
+
+    <p>To jest Twój własny serwer stron internetowych w sieci I2P (znanych też pod nazwą „<i>eepsite</i>”). Aby udostępnić swoją treść, po prostu zredaguj pliki w katalogu głównym serwera stron i strona będzie publicznie dostępna po wykonaniu czynności opisanych poniżej.</p>
+
+    <p id="dir">Katalog główny serwera stron znajduje się w następującej lokalizacji, zależnie od używanego systemu operacyjnego:</p>
+
+    <ul>
+<li>
+<b>Linuks</b><br>
+        Normalna instalacja: <code>~/.i2p/eepsite/docroot/</code><br>
+        Instalacja z paczek, działa jako usługa: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+</li>
+      <li>
+<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+</li>        
+      <li>
+<b>Mac</b><br><code>/Users/(użytkownik)/Library/Application Support/i2p</code>
+</li>
+    </ul>
+<p>W I2P ukryte usługi otrzymują adres Base32 kończący się „.b32.i2p” lub „adres przeznaczenia” reprezentowany jako długi ciąg Base64.
+Adres Base32 można użyć jako nazwy hosta do czasu zarejestrowania własnej nazwy, co jest opisane poniżej.
+Adres przeznaczenia jest jak adres IP, i jest on wyświetlany na <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">stronie konfiguracji ukrytych usług</a>.</p>
+
+    <p>Następująca instrukcja opisuje w jako sposób przypisać adres „mojadres.i2p” do swojej strony i go rozpropagować.
+Możesz dostać się do swojej strony lokalnie na <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
+
+    <h2>Jak skonfigurować i rozpropagować swoją ukrytą usługę</h2>
+
+     <p>Serwer stron jest domyślnie włączony, ale nie jest dostępny dla ludzi z zewnątrz przed uruchomieniem tunelu ukrytej usługi.
+Po uruchomieniu tunelu serwera stron I2P będzie trudno innym osobom go znaleźć.
+Można się do strony dostać tylko poprzez długi adres przeznaczenia lub krótszy Base32 (.b32.i2p), który jest sumą kontrolną adresu przeznaczenia.
+Możesz po prostu przekazać innym ten adres, ale na szczęście I2P posiada książkę adresową i inne sposoby na rozpropagowanie swojej strony.
+Poniżej dokładna instrukcja.</p>
+
+    <ul>
+<li>Wybierz nazwę dla swojej strony (<i>cośtam</i>.i2p), małymi literami, bez polskich znaków. Najpierw sprawdź w <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">książce adresowej</a> swojego węzła, czy wybrana nazwa nie została już zarezerwowana. Wpisz nową nazwę dla swojej strony na <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">stronie konfiguracji ukrytej usługi</a> w polu „nazwa strony”. To zastąpi domyślną nazwę „mojastrona.i2p”. Jeżeli chcesz, aby tunel serwera strony internetowej automatycznie uruchamiał się podczas startu I2P, zaznacz pole „automatyczne uruchamianie”. Twoja strona uruchomi się przy każdym uruchomieniu węzła. Kliknij „zapisz”.</li>
+      <li>Na <a href="http://127.0.0.1:7657/i2ptunnel/">stronie głównej konfiguracji ukrytych usług</a> kliknij „uruchom” przy tunelu swojej strony internetowej. Powinieneś go zobaczyć w <a href="http://127.0.0.1:7657/">konsoli węzła</a> po lewej stronie w zakładce „lokalne tunele”. Twoja strona jest teraz uruchomiona.</li>
+      <li>Zaznacz i skopiuj cały lokalny adres przeznaczenia ze <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">strony konfiguracji ukrytej usługi</a>. Upewnij się, że kopiujesz pełny adres, przeszło 500 znaków.</li>
+      <li>Wpisz wybraną nazwę i wklej adres przeznaczenia do swojej <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">książki adresowej</a>. Kliknij „dodaj”, aby zapisać.</li>
+      <li>Wpisz w przeglądarkę nowy adres swojej strony (<i>mojastronka</i>.i2p) i powinna się ona otworzyć. Mamy nadzieję, że to zadziałało!</li>
+      <li>Zanim ogłosisz światu swoją nową stronę, powinieneś dodać jakąś treść. Wejdź do katalogu głównego serwera <a href="#dir">wspomnianego powyżej</a> i zamień index.html i stronę przekierowania swoją własną treścią.</li>
+    </ul>
+<p>Spisy katalogów także są dostępne, więc można hostować wszystkie pliki z podkatalogu bez udostępniania linków do każdego z plików. Możesz zmienić wygląd katalogu podając zmieniony plik <a href="lib/jetty-dir.css">jetty-dir.css</a> dla każdego katalogu. <a href="lib/">Podkatalog „lib”</a> prezentuje własny styl. <a href="lib/resources">Podkatalog „resources”</a> prezentuje domyślny styl. Jeżeli potrzebujesz szablonu dla prostej strony, możesz zredagować <a href="pagetemplate.html">tę stronę</a> i <a href="lib/">powiązaną zawartość</a>.</p>
+
+    <p>Jeżeli ta strona dalej pokazuje się po zredagowaniu zawartości, spróbuj wyczyścić pamięć podręczną przeglądarki:</p>
+
+    <ul>
+<li>
+<b>Firefox:</b> Preferencje ➜ Zaawansowane ➜ Sieć ➜ Pamięć podręczna ➜ Wyczyść</li>
+      <li>
+<b>Chrome/Chromium:</b> Ustawienia ➜ Zaawansowane ➜ Prywatność ➜ Wyczyść pamięć podręczną</li>
+      <li>
+<b>Opera:</b> Ustawienia ➜ Prywatność ➜ Wyczyść pamięć podręczną</li>
+    </ul>
+<h2>Rejestracja własnej domeny I2P</h2>
+
+    <p>Teraz jest pora dodać swoją stronę do książki adresowej I2P udostępnianej na stronach takich jak <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> lub <a href="http://no.i2p/" target="_blank">no.i2p</a>.  Będziesz musiał wpisać nazwę strony i adres przeznaczenia (lub ciąg uwierzytelniania rejestracji) na niektórych z tych stron.</p>
+<p>Niektóre strony rejestrujące wymagają adresu przeznaczenia. W tym wypadku, skopiuj cały adres przeznaczenia ze <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">strony konfiguracji ukrytej usługi</a>. Upewnij się, że kopiujesz pełny adres, przeszło 500 znaków.</p>
+<p>Niektóre strony rejestrujące – wliczając <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a> – wymagają ciąg uwierzytelniania rejestracji. Można go znaleźć na <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">stronie autoryzacji rejestracji</a> dostępnej ze <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">strony konfiguracji ukrytej usługi</a>. Skopiuj cały ciąg uwierzytelniania i wklej na stronie rejestracji. Upewnij się, że kopiujesz cały ciąg, przeszło 500 znaków. Jeżeli jest to wymagane, zwięźle opisz swoją stronę. Jeżeli Twoja strona jest usługą HTTP, pozostaw zaznaczone pole, w przeciwnym razie je odznacz.</p>
+<p>Dla wszelkich stron rejestrujących, uważnie przeczytaj warunki użytkowania. Kliknij „dodaj” i poczekaj na rezultat. Ponieważ wiele węzłów regularnie pobiera aktualizacje książki adresowej z tych stron, po kilku godzinach inni ludzie będą mogli odwiedzić Twoją stronę zwyczajnie wpisując jej nazwę w przeglądarkę.</p>
+
+    <h2>Dodawanie subskrypcji książki adresowej</h2>
+
+    <p>Będąc przy temacie aktualizacji książki adresowej, dobrze byłoby dodać kilka subskrypcji do Twojej książki adresowej. Przejdź na <a href="http://127.0.0.1:7657/susidns/subscriptions">stronę konfiguracji subskrypcji</a> i dodaj jakieś, aby automatycznie aktualizować listę nowych strony w sieci I2P:</p>
+
+    <ul>
+<li>
+<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+      <li>
+<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+    </ul>
+<p>Jeżeli Ci się spieszy i nie możesz poczekać kilku godzin, poproś ludzi o skorzystanie z „usługi skoków” (jump service). To zadziała po kilku minutach od rejestracji strony na tej samej stronie. Wypróbuj ją wpisując w przeglądarkę <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>cośtam</i>.i2p</code>. Kiedy to zadziała, powiadom o tym innych użytkowników.</p>
+
+    <p>Niektórzy sprawdzają listy stron takie jak <a href="http://identiguy.i2p/" target="_blank">identiguy.i2p</a> lub <a href="http://no.i2p/browse/" target="_blank">no.i2p</a> w poszukiwaniu nowych stron I2P, więc Twoja strona powinna uzyskać kilku gości. Istnieją inne sposoby na rozpropagowanie swojej strony:</p>
+
+    <ul>
+<li>Ogłoś się na <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> i zareklamuj swoją nową stronę!</li>
+      <li>Zagadaj ludzi na IRC-u na kanałach #i2p lub #i2p-chat.</li>
+      <li>Wrzuć ją na <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>.</li>
+    </ul>
+<p>Zauważ, że niektóre strony wymagają podania bardzo długiego adresu docelowego. Możesz go podać, ale nie musisz, jeżeli poprawnie zarejestrowałeś swoją stronę, sprawdziłeś ją w usłudze skoków i poczekałeś 24 godziny aż aktualizacje książki adresowej zostały dostarczone dla wszystkich.</p>
+
+    <h2>Użycie alternatywnego serwera www do hostowania strony</h2>
+
+    <p>Ta strona (i konsola węzła I2P) działa na <a href="https://pl.wikipedia.org/wiki/Jetty" target="_blank">serwerze www Jetty</a>, ale możesz użyć innego serwera, aby hostować swoją stronę. Aby zapewnić anonimowość, upewnij się, że Twój serwer www jest skonfigurowany tak, aby akceptować tylko połączenia z localhost (127.0.0.1) i sprawdź dokumentację, czy nie ogłasza on jakiś detali mogących skompromitować Twoją anonimowość.</p>
+
+     <p>Aby skonfigurować swój serwer stron do współpracy z I2P, powinieneś albo skorzystać z istniejącego tunelu i <a href="http://127.0.0.1:7657/configclients">wyłączyć domyślny serwer</a> lub utworzyć nowy serwerowy tunel HTTP w <a href="http://127.0.0.1:7657/i2ptunnelmgr">menadżerze ukrytych usług</a>. Upewnij się, że port nasłuchu Twojego serwera (domyślnie 7658)  jest także skonfigurowany w ustawieniach ukrytej usługi. Przykładowo jeżeli Twój serwer www nasłuchuje na adresie 127.0.0.1, port 80, upewnij się, że port docelowy w menadżerze ukrytych usług także jest ustawiony na 80.</p> 
+
+        <p>Miej świadomość, że nieprawidłowo skonfigurowany serwer lub aplikacja webowa może potencjalnie wyjawić informacje takie jak adres IP lub detale serwera, co może zmniejszyć Twoją anonimowość lub narazić stronę na atak hakera. Zaleca się użycie domyślnego serwera, chyba że czujesz się ekspertem od administrowania serwerami. Upewnij się, że serwer www jest zabezpieczony przed podłączeniem go do sieci. Jest mnóstwo poradników online, wpisz w wyszukiwarkę „nginx security hardening guide” i przestudiuj wszelkie zalecenia.</p> 
+
+        <p>Jest pewien problem z serwerem Apache. Moduły Apache <code>mod_status</code> i <code>mod_info</code> są domyślnie włączone na niektórych systemach. Te moduły wyjawiają wewnętrzne dane, które mogą poważnie naruszyć Twoją anonimowość podczas użytku w anonimowej sieci. Usunięcie z pliku konfiguracyjnego linii odpowiedzialnych za ładowanie tych modułów jest najłatwiejszym sposobem, aby temu zapobiec.</p>
+
+    <h2>Dalsze wsparcie</h2>
+
+        <p>Jeżeli masz jakieś pytania, szukaj pomocy na:</p>
+
+        <ul>
+<li>naszym kanale pomocy na IRC:<ul>
+<li><a href="irc://irc.freenode.net/i2p">#i2p na Freenode</a></li>
+                <li>anonimowo poprzez lokalny <a href="irc://127.0.0.1:6668/i2p">tunel I2P IRC</a>
+</li>
+             </ul>
+</li>
+<li>forum projektu: <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>
+</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
+        </ul>
+<hr>
+<div class="notify">Ta strona, strona projektu i konsola węzła wymagają tłumaczenia! Prosimy pomóc projektowi się rozwijać oferując <a href="http://i2p-projekt.i2p/pl/get-involved" target="_blank">swój wkład</a> bądź <a href="http://i2p-projekt.i2p/pl/get-involved/guides/new-translators" target="_blank">tłumaczenie</a>.</div>
+        <hr>
+</div>
+</body>
+</html>

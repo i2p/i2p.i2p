@@ -151,6 +151,10 @@ public class WebAppStarter {
     /**
      *  Stop it and remove the context.
      *  Throws just about anything, caller would be wise to catch Throwable
+     *
+     *  Warning, this will NOT work during shutdown, because
+     *  the console is already unregistered.
+     *
      *  @since public since 0.9.33, was package private
      */
     public static void stopWebApp(RouterContext ctx, String appName) {
@@ -172,8 +176,34 @@ public class WebAppStarter {
     }
 
     /**
+     *  Stop it and remove the context.
+     *  Throws just about anything, caller would be wise to catch Throwable
+     *  @since 0.9.41
+     */
+    static void stopWebApp(RouterContext ctx, Server s, String appName) {
+        ContextHandlerCollection server = getConsoleServer(s);
+        if (server == null)
+            return;
+        ContextHandler wac = getWebApp(server, appName);
+        if (wac == null)
+            return;
+        ctx.portMapper().unregister(appName);
+        try {
+            // not graceful is default in Jetty 6?
+            wac.stop();
+        } catch (Exception ie) {}
+        try {
+            server.removeHandler(wac);
+            server.mapContexts();
+        } catch (IllegalStateException ise) {}
+    }
+
+    /**
      *  As of 0.9.34, the appName will be registered with the PortMapper,
      *  and PortMapper.isRegistered() will be more efficient than this.
+     *
+     *  Warning, this will NOT work during shutdown, because
+     *  the console is already unregistered.
      *
      *  @since public since 0.9.33; was package private
      */
@@ -184,11 +214,43 @@ public class WebAppStarter {
         return wac.isStarted();
     }
     
-    /** @since Jetty 6 */
+    /**
+     *  @since 0.9.41
+     */
+    static boolean isWebAppRunning(Server s, String appName) {
+        ContextHandler wac = getWebApp(s, appName);
+        if (wac == null)
+            return false;
+        return wac.isStarted();
+    }
+    
+    /**
+     *  Warning, this will NOT work during shutdown, because
+     *  the console is already unregistered.
+     *
+     *  @since Jetty 6
+     */
     static ContextHandler getWebApp(I2PAppContext ctx, String appName) {
         ContextHandlerCollection server = getConsoleServer(ctx);
         if (server == null)
             return null;
+        return getWebApp(server, appName);
+    }
+    
+    /**
+     *  @since 0.9.41
+     */
+    static ContextHandler getWebApp(Server s, String appName) {
+        ContextHandlerCollection server = getConsoleServer(s);
+        if (server == null)
+            return null;
+        return getWebApp(server, appName);
+    }
+    
+    /**
+     *  @since 0.9.41
+     */
+    private static ContextHandler getWebApp(ContextHandlerCollection server, String appName) {
         Handler handlers[] = server.getHandlers();
         if (handlers == null)
             return null;
@@ -205,12 +267,23 @@ public class WebAppStarter {
 
     /**
      *  See comments in ConfigClientsHandler
+     *
+     *  Warning, this will NOT work during shutdown, because
+     *  the console is already unregistered.
+     *
      *  @since public since 0.9.33, was package private
      */
     public static ContextHandlerCollection getConsoleServer(I2PAppContext ctx) {
         Server s = RouterConsoleRunner.getConsoleServer(ctx);
         if (s == null)
             return null;
+        return getConsoleServer(s);
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    private static ContextHandlerCollection getConsoleServer(Server s) {
         Handler h = s.getChildHandlerByClass(ContextHandlerCollection.class);
         if (h == null)
             return null;

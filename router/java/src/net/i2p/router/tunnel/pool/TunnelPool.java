@@ -661,7 +661,7 @@ public class TunnelPool {
                 _log.info(toString() + ": building a fallback tunnel (usable: " + usable + " needed: " + quantity + ")");
             
             // runs inline, since its 0hop
-            _manager.getExecutor().buildTunnel(this, configureNewTunnel(true));
+            _manager.getExecutor().buildTunnel(configureNewTunnel(true));
             return true;
         }
         return false;
@@ -1131,7 +1131,7 @@ public class TunnelPool {
             int len = settings.getLengthOverride();
             if (len < 0)
                 len = settings.getLength();
-            if (len > 0 && (!settings.isExploratory()) && _context.random().nextBoolean()) {
+            if (len > 0 && (!settings.isExploratory()) && _context.random().nextInt(4) < 3) {  // 75%
                 // look for a tunnel to reuse, if the right length and expiring soon
                 // ignore variance for now.
                 len++;   // us
@@ -1172,8 +1172,8 @@ public class TunnelPool {
         }
 
         PooledTunnelCreatorConfig cfg = new PooledTunnelCreatorConfig(_context, peers.size(),
-                                                settings.isInbound(), settings.getDestination());
-        cfg.setTunnelPool(this);
+                                                settings.isInbound(), settings.getDestination(),
+                                                this);
         // peers list is ordered endpoint first, but cfg.getPeer() is ordered gateway first
         for (int i = 0; i < peers.size(); i++) {
             int j = peers.size() - 1 - i;
@@ -1204,7 +1204,6 @@ public class TunnelPool {
      */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         synchronized (_inProgress) { _inProgress.remove(cfg); }
-        cfg.setTunnelPool(this);
         //_manager.buildComplete(cfg);
     }
     

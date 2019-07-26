@@ -22,7 +22,7 @@
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
- <h3 id="iptransport" class="tabletitle"><%=intl._t("IP and Transport Configuration")%>&nbsp;<a title="<%=intl._t("Help with router configuration")%>" href="/help#configurationhelp">[<%=intl._t("Configuration Help")%>]</a></h3>
+ <h3 id="iptransport" class="tabletitle"><%=intl._t("IP and Transport Configuration")%></h3>
  <table id="netconfig" class="configtable">
  <tr>
   <td class="infohelp">
@@ -33,6 +33,20 @@
  <tr>
   <td class="infohelp">
    <b><%=intl._t("Do not reveal your port numbers to anyone, as they can be used to discover your IP address.")%></b>
+<p>
+  <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>&nbsp;
+</p>
+<p>
+  <%=intl._t("If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you.")%>&nbsp;
+  <%=intl._t("If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic.")%>&nbsp;
+  <%=intl._t("Most of the options on the Network Configuration page are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm.")%>&nbsp;
+  <%=intl._t("Certain firewalls such as symmetric NATs may not work well with I2P.")%>
+</p>
+<p>
+  <%=intl._t("Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.")%>&nbsp;
+  <%=intl._t("If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially.")%>&nbsp;
+  <%=intl._t("When in doubt, leave the settings at the defaults.")%>&nbsp;
+</p>
   </td>
  </tr>
  <tr>

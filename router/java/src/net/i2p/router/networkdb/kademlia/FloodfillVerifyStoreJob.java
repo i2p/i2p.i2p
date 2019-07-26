@@ -103,7 +103,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
 
         boolean isInboundExploratory;
         TunnelInfo replyTunnelInfo;
-        if (_isRouterInfo || getContext().keyRing().get(_key) != null) {
+        if (_isRouterInfo || getContext().keyRing().get(_key) != null ||
+            _type == DatabaseEntry.KEY_TYPE_META_LS2) {
             replyTunnelInfo = getContext().tunnelManager().selectInboundExploratoryTunnel(_target);
             isInboundExploratory = true;
         } else {
@@ -122,10 +123,12 @@ class FloodfillVerifyStoreJob extends JobImpl {
         // to avoid association by the exploratory tunnel OBEP.
         // Unless it is an encrypted leaseset.
         TunnelInfo outTunnel;
-        if (_isRouterInfo || getContext().keyRing().get(_key) != null)
+        if (_isRouterInfo || getContext().keyRing().get(_key) != null ||
+            _type == DatabaseEntry.KEY_TYPE_META_LS2) {
             outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(_target);
-        else
+        } else {
             outTunnel = getContext().tunnelManager().selectOutboundTunnel(_client, _target);
+        }
         if (outTunnel == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No outbound tunnels to verify a store");

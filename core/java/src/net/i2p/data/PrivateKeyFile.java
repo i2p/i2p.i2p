@@ -29,7 +29,9 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.crypto.Blinding;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.RandomSource;
@@ -90,18 +92,23 @@ public class PrivateKeyFile {
     public static void main(String args[]) {
         int hashEffort = HASH_EFFORT;
         String stype = null;
+        String etype = null;
         String ttype = null;
         String hostname = null;
         String offline = null;
         int days = 365;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:");
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:p:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
             case 'c':
                 stype = g.getOptarg();
+                break;
+
+            case 'p':
+                etype = g.getOptarg();
                 break;
 
             case 't':
@@ -171,7 +178,21 @@ public class PrivateKeyFile {
             boolean exists = f.exists();
             PrivateKeyFile pkf = new PrivateKeyFile(f, client);
             Destination d;
-            if (stype != null) {
+            if (etype != null && !exists) {
+                // create router.keys.dat format, no support in I2PClient
+                SigType type;
+                if (stype == null) {
+                    type = SigType.EdDSA_SHA512_Ed25519;
+                } else {
+                    type = SigType.parseSigType(stype);
+                    if (type == null)
+                        throw new IllegalArgumentException("Signature type " + stype + " is not supported");
+                }
+                EncType ptype = EncType.parseEncType(etype);
+                if (ptype == null)
+                    throw new IllegalArgumentException("Encryption type " + etype + " is not supported");
+                d = pkf.createIfAbsent(type, ptype);
+            } else if (stype != null) {
                 SigType type = SigType.parseSigType(stype);
                 if (type == null)
                     throw new IllegalArgumentException("Signature type " + stype + " is not supported");
@@ -319,10 +340,11 @@ public class PrivateKeyFile {
                            "      -x                   (changes to hidden cert)\n" +
                            "   \nother options:\n" +
                            "      -a example.i2p       (generate addressbook authentication string)\n" +
-                           "      -d days              (specify expiration in days of offline sig, default 365)\n" +
                            "      -c sigtype           (specify sig type of destination)\n" +
+                           "      -d days              (specify expiration in days of offline sig, default 365)\n" +
                            "      -e effort            (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
                            "      -o offlinedestfile   (generate the online key file using the offline key file specified)\n" +
+                           "      -p enctype           (specify enc type of destination)\n" +
                            "      -r sigtype           (specify sig type of transient key, default Ed25519)\n" +
                            "      -t sigtype           (changes to KeyCertificate of the given sig type)\n" +
                            "");
@@ -411,7 +433,7 @@ public class PrivateKeyFile {
     public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
         return createIfAbsent(I2PClient.DEFAULT_SIGTYPE);
     }
-    
+
     /**
      *  Create with the specified signature type if nonexistent.
      *
@@ -424,11 +446,12 @@ public class PrivateKeyFile {
         if(!this.file.exists()) {
             OutputStream out = null;
             try {
-                out = new SecureFileOutputStream(this.file);
-                if (this.client != null)
+                if (this.client != null) {
+                    out = new SecureFileOutputStream(this.file);
                     this.client.createDestination(out, type);
-                else
+                } else {
                     write();
+                }
             } finally {
                 if (out != null) {
                     try { out.close(); } catch (IOException ioe) {}
@@ -437,7 +460,70 @@ public class PrivateKeyFile {
         }
         return getDestination();
     }
-    
+
+    /**
+     *  Create with the specified signature and encryption types if nonexistent.
+     *  Private for now, only for router.keys.dat testing.
+     *
+     *  Also reads in the file to get the privKey and signingPrivKey, 
+     *  which aren't available from I2PClient.
+     *
+     *  @since 0.9.42
+     */
+    private Destination createIfAbsent(SigType type, EncType ptype) throws I2PException, IOException, DataFormatException {
+        if(!this.file.exists()) {
+            OutputStream out = null;
+            try {
+                if (this.client != null) {
+                    out = new SecureFileOutputStream(this.file);
+                    // no support for this in I2PClient,
+                    // so we modify code from CreateRouterInfoJob.createRouterInfo()
+                    I2PAppContext ctx = I2PAppContext.getGlobalContext();
+                    KeyPair keypair = ctx.keyGenerator().generatePKIKeys(ptype);
+                    PublicKey pub = keypair.getPublic();
+                    PrivateKey priv = keypair.getPrivate();
+                    SimpleDataStructure signingKeypair[] = ctx.keyGenerator().generateSigningKeys(type);
+                    SigningPublicKey spub = (SigningPublicKey)signingKeypair[0];
+                    SigningPrivateKey spriv = (SigningPrivateKey)signingKeypair[1];
+                    Certificate cert;
+                    if (type != SigType.DSA_SHA1 || ptype != EncType.ELGAMAL_2048) {
+                        // TODO long sig types
+                        if (type.getPubkeyLen() > 128)
+                            throw new UnsupportedOperationException("TODO");
+                        cert = new KeyCertificate(type, ptype);
+                    } else {
+                        cert = Certificate.NULL_CERT;
+                    }
+                    byte[] padding;
+                    int padLen = (SigningPublicKey.KEYSIZE_BYTES - spub.length()) +
+                                 (PublicKey.KEYSIZE_BYTES - pub.length());
+                    if (padLen > 0) {
+                        padding = new byte[padLen];
+                        ctx.random().nextBytes(padding);
+                    } else {
+                        padding = null;
+                    }
+                    pub.writeBytes(out);
+                    if (padding != null)
+                        out.write(padding);
+                    spub.writeBytes(out);
+                    cert.writeBytes(out);
+                    priv.writeBytes(out);
+                    spriv.writeBytes(out);
+                } else {
+                    write();
+                }
+            } catch (GeneralSecurityException gse) {
+                throw new RuntimeException("keygen fail", gse);
+            } finally {
+                if (out != null) {
+                    try { out.close(); } catch (IOException ioe) {}
+                }
+            }
+        }
+        return getDestination();
+    }
+
     /**
      *  If the destination is not set, read it in from the file.
      *  Also sets the local privKey and signingPrivKey.
@@ -769,7 +855,7 @@ public class PrivateKeyFile {
             if (type == SigType.EdDSA_SHA512_Ed25519 ||
                 type == SigType.RedDSA_SHA512_Ed25519) {
                 I2PAppContext ctx = I2PAppContext.getGlobalContext();
-                s.append("\nBlinded B32: ").append(Blinding.encode(ctx, spk));
+                s.append("\nBlinded B32: ").append(Blinding.encode(spk));
             }
         }
         s.append("\nContains: ");

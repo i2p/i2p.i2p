@@ -4006,7 +4006,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // check for user agents that can't toggle the collapsible panels...
         String ua = req.getHeader("user-agent");
         return ua != null && (ua.contains("Konq") || ua.contains("konq") ||
-                              ua.contains("Qupzilla") || ua.contains("Dillo") ||
+                              ua.contains("QupZilla") || ua.contains("Dillo") ||
                               ua.contains("Netsurf") || ua.contains("Midori"));
     }
 

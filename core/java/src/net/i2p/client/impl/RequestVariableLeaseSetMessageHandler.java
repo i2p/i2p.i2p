@@ -58,7 +58,7 @@ class RequestVariableLeaseSetMessageHandler extends RequestLeaseSetMessageHandle
         } else {
             leaseSet = new LeaseSet();
         }
-        // Full Meta and Encrypted support TODO
+        // Full Meta support TODO
         for (int i = 0; i < msg.getEndpoints(); i++) {
             Lease lease;
             if (isLS2) {

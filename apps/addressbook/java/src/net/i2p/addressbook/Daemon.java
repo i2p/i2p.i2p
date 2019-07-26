@@ -856,10 +856,10 @@ class Daemon {
         
         if (!homeFile.exists()) {
             boolean created = homeFile.mkdirs();
-            if (created)
-                System.out.println("INFO:  Addressbook directory " + homeFile.getName() + " created");
-            else
-                System.out.println("ERROR: Addressbook directory " + homeFile.getName() + " could not be created");
+            if (!created)
+                System.out.println("ERROR: Addressbook directory " + homeFile.getAbsolutePath() + " could not be created");
+            //else
+            //    System.out.println("INFO: Addressbook directory " + homeFile.getAbsolutePath() + " created");
         }
         
         File settingsFile = new File(homeFile, settingsLocation);

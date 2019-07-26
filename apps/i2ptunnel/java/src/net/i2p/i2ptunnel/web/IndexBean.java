@@ -20,6 +20,7 @@ import net.i2p.I2PException;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.crypto.Blinding;
+import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -563,13 +564,13 @@ public class IndexBean {
         Destination d = getDestination(tunnel);
         if (d != null) {
             int mode = _helper.getEncryptMode(tunnel);
-            if (mode > 1) {
+            if (mode > 1 && mode < 10) {
                 try {
                     String secret = _helper.getBlindedPassword(tunnel);
                     boolean requireSecret = secret != null && secret.length() > 0 &&
-                                            (mode == 3 || mode == 5 || mode == 7);
-                    boolean requireAuth = mode >= 4 && mode <= 7;
-                    return Blinding.encode(_context, d.getSigningPublicKey(), requireSecret, requireAuth);
+                                            (mode == 3 || mode == 5 || mode == 7 || mode == 9);
+                    boolean requireAuth = mode >= 4 && mode <= 9;
+                    return Blinding.encode(d.getSigningPublicKey(), requireSecret, requireAuth);
                 } catch (RuntimeException re) {}
             }
         }
@@ -869,6 +870,63 @@ public class IndexBean {
     /** @since 0.9.40 */
     public void setNofilter_blindedPassword(String s) {
         _config.setBlindedPassword(s);
+    }
+
+    /**
+     * Multiple entries in form
+     * @since 0.9.41
+     */
+    public void setNofilter_clientName(String[] s) {
+        if (s != null) {
+            _config.addClientNames(s);
+        }
+    }
+
+
+    /**
+     * Multiple entries in form
+     * @since 0.9.41
+     */
+    public void setclientKey(String[] s) {
+        if (s != null) {
+            _config.addClientKeys(s);
+        }
+    }
+
+    /**
+     * Multiple entries in form
+     * Values are integers
+     * @since 0.9.41
+     */
+    public void setRevokeClient(String[] s) {
+        if (s != null) {
+            _config.revokeClients(s);
+        }
+    }
+
+    /**
+     * @since 0.9.41
+     */
+    public void setNofilter_newClientName(String s) {
+        if (s != null) {
+            _config.newClientName(s.trim());
+        }
+    }
+
+    /**
+     * @since 0.9.41
+     */
+    public void setNewClientKey(String s) {
+        if (s != null) {
+            _config.newClientKey(s.trim());
+        }
+    }
+
+    /**
+     * @since 0.9.41
+     */
+    public void setAddClient(String moo) {
+        _config.setAddClient(true);
     }
 
     /** @since 0.8.9 */
@@ -1285,11 +1343,11 @@ public class IndexBean {
         }
         byte[] data = new byte[SessionKey.KEYSIZE_BYTES];
         _context.random().nextBytes(data);
-        SessionKey sk = new SessionKey(data);
-        setEncryptKey(sk.toBase64());
+        String b64 = Base64.encode(data);
+        setEncryptKey(b64);
         setEncrypt("");
         saveChanges();
-        return "New Leaseset Encryption Key: " + sk.toBase64();
+        return "New Leaseset Encryption Key: " + b64;
      }
 
     /**

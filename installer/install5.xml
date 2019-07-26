@@ -10,7 +10,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.9.40</appversion>
+        <appversion>0.9.41</appversion>
         <authors>
             <author name="I2P" email="https://geti2p.net/"/>
         </authors>
@@ -135,6 +135,9 @@ https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491730/GUI+Preferences
             <value>64</value>
         </condition>
     </conditions>
+
+    <!-- XInfoConsolePanel -->
+    <jar src="installer/lib/izpack5/patches/java/build/izpack-i2p.jar" />
 
     <panels>
         <panel classname="HelloPanel"/>

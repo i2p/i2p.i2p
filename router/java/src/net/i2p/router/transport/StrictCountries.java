@@ -14,47 +14,48 @@ public abstract class StrictCountries {
 
     private static final Set<String> _countries;
 
-    // zzz.i2p/topics/969
-    // List created based on the Press Freedom Index. Those countries with a score of higher than 50 are included:
-    // http://en.wikipedia.org/wiki/Press_Freedom_Index
-    // Except (quote):
-    // I don't really think that is usage of I2P is dangerous in countries from CIS
-    // General situation is really bad (like in Russia) but people here doesn't have problems with Ecnryption usage.
+    // List updated using the Freedom in the World Index 2019
+    // https://freedomhouse.org/report/countries-world-freedom-2019
+    // General guidance: Include countries with a Civil Liberties (CL) score of 6 or 7.
 
     static {
         String[] c = {
             /* Afghanistan */ "AF",
+            /* Azerbaijan */ "AZ",
             /* Bahrain */ "BH",
+            /* Belarus */ "BY",
             /* Brunei */ "BN",
-            /* Burma */ "MM",
+            /* Burundi */ "BI",
+            /* Cameroon */ "CM",
+            /* Central African Republic */ "CF",
+            /* Chad */ "TD",
             /* China */ "CN",
-            /* Colombia */ "CO",
             /* Cuba */ "CU",
             /* Democratic Republic of the Congo */ "CD",
+            /* Egypt */ "EG",
             /* Equatorial Guinea */ "GQ",
             /* Eritrea */ "ER",
             /* Ethiopia */ "ET",
-            /* Fiji */ "FJ",
-            /* Honduras */ "HN",
             /* Iran */ "IR",
             /* Laos */ "LA",
             /* Libya */ "LY",
-            /* Malaysia */ "MY",
-            /* Nigeria */ "NG",
+            /* Myanmar */ "MM",
             /* North Korea */ "KP",
-            /* Pakistan */ "PK",
             /* Palestinian Territories */ "PS",
-            /* Philippines */ "PH",
             /* Rwanda */ "RW",
             /* Saudi Arabia */ "SA",
             /* Somalia */ "SO",
-            /* Sri Lanka */ "LK",
+            /* South Sudan */ "SS",
             /* Sudan */ "SD",
-            /* Swaziland */ "SZ",
+            /* Eswatini (Swaziland) */ "SZ",
             /* Syria */ "SY",
+            /* Tajikistan */ "TJ",
             /* Thailand */ "TH",
-            /* Tunisia */ "TN",
-            /* Vietnam */ "VN",
+            /* Turkmenistan */ "TM",
+            /* Venezuela */ "VE",
+            /* United Arab Emirates */ "AE",
+            /* Uzbekistan */ "UZ",
+            /* Western Sahara */ "EH",
             /* Yemen */ "YE"
         };
         _countries = new HashSet<String>(Arrays.asList(c));

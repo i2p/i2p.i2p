@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
@@ -469,6 +470,9 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             maxLen++;
         if (cap.length() <= maxLen)
             return true;
+        if (peer.getIdentity().getPublicKey().getType() != EncType.ELGAMAL_2048)
+            return true;
+
         // otherwise, it contains flags we aren't trying to focus on,
         // so don't exclude it based on published capacity
 

@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -492,6 +493,24 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _log.warn("Adding to blind cache: " + bd);
         _blindCache.addToCache(bd);
     }
+
+    /**
+     *  For console ConfigKeyringHelper
+     *  @since 0.9.41
+     */
+    public List<BlindData> getBlindData() {
+        return _blindCache.getData();
+    }
+
+    /**
+     *  For console ConfigKeyringHelper
+     *  @param spk the unblinded public key
+     *  @return true if removed
+     *  @since 0.9.41
+     */
+    public boolean removeBlindData(SigningPublicKey spk) {
+        return _blindCache.removeBlindData(spk);
+    }
     
     /**
      *  @return RouterInfo, LeaseSet, or null, validated
@@ -925,27 +944,40 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         
         // spoof / hash collision detection
         // todo allow non-exp to overwrite exp
-        if (rv != null && !leaseSet.getDestination().equals(rv.getDestination()))
-            throw new IllegalArgumentException("LS Hash collision");
+        if (rv != null) {
+            Destination d1 = leaseSet.getDestination();
+            Destination d2 = rv.getDestination();
+            if (d1 != null && d2 != null && !d1.equals(d2))
+                throw new IllegalArgumentException("LS Hash collision");
+        }
 
         EncryptedLeaseSet encls = null;
-        if (leaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
+        int type = leaseSet.getType();
+        if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
             // set dest or key before validate() calls verifySignature() which
             // will do the decryption
+            encls = (EncryptedLeaseSet) leaseSet;
             BlindData bd = _blindCache.getReverseData(leaseSet.getSigningKey());
             if (bd != null) {
                 if (_log.shouldWarn())
                     _log.warn("Found blind data for encls: " + bd);
-                encls = (EncryptedLeaseSet) leaseSet;
+                // secret must be set before destination
+                String secret = bd.getSecret();
+                if (secret != null)
+                    encls.setSecret(secret);
                 Destination dest = bd.getDestination();
                 if (dest != null) {
                     encls.setDestination(dest);
                 } else {
                     encls.setSigningKey(bd.getUnblindedPubKey());
                 }
+                // per-client auth
+                if (bd.getAuthType() != BlindData.AUTH_NONE)
+                    encls.setClientPrivateKey(bd.getAuthPrivKey());
             } else {
-                if (_log.shouldWarn())
-                    _log.warn("No blind data found for encls: " + encls);
+                // if we created it, there's no blind data, but it's still decrypted
+                if (encls.getDecryptedLeaseSet() == null && _log.shouldWarn())
+                    _log.warn("No blind data found for encls: " + leaseSet);
             }
         }
 
@@ -966,6 +998,14 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 Destination dest = decls.getDestination();
                 store(dest.getHash(), decls);
                 _blindCache.setBlinded(dest);
+            }
+        } else if (type == DatabaseEntry.KEY_TYPE_LS2 || type == DatabaseEntry.KEY_TYPE_META_LS2) {
+             // if it came in via garlic
+             LeaseSet2 ls2 = (LeaseSet2) leaseSet;
+             if (ls2.isBlindedWhenPublished()) {
+                 Destination dest = leaseSet.getDestination();
+                 if (dest != null)
+                    _blindCache.setBlinded(dest, null, null);
             }
         }
 
@@ -1185,19 +1225,22 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             if (DatabaseEntry.isLeaseSet(etype)) {
                 LeaseSet ls = (LeaseSet) entry;
                 Destination d = ls.getDestination();
-                Certificate c = d.getCertificate();
-                if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
-                    try {
-                        KeyCertificate kc = c.toKeyCertificate();
-                        SigType type = kc.getSigType();
-                        if (type == null || !type.isAvailable() || type.getBaseAlgorithm() == SigAlgo.RSA) {
-                            failPermanently(d);
-                            String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("Unsupported sig type " + stype + " for destination " + h);
-                            throw new UnsupportedCryptoException("Sig type " + stype);
-                        }
-                    } catch (DataFormatException dfe) {}
+                // will be null for encrypted LS
+                if (d != null) {
+                    Certificate c = d.getCertificate();
+                    if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+                        try {
+                            KeyCertificate kc = c.toKeyCertificate();
+                            SigType type = kc.getSigType();
+                            if (type == null || !type.isAvailable() || type.getBaseAlgorithm() == SigAlgo.RSA) {
+                                failPermanently(d);
+                                String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn("Unsupported sig type " + stype + " for destination " + h);
+                                throw new UnsupportedCryptoException("Sig type " + stype);
+                            }
+                        } catch (DataFormatException dfe) {}
+                    }
                 }
             } else if (etype == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 RouterInfo ri = (RouterInfo) entry;

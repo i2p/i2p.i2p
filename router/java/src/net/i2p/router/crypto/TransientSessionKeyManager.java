@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.DataHelper;
@@ -283,6 +284,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      * Retrieve the session key currently associated with encryption to the target.
      * Generates a new session and session key if not previously exising.
      *
+     * @param target public key to which the data should be encrypted, must be ELGAMAL_2048.
+     * @throws IllegalArgumentException on bad target EncType
      * @return non-null
      * @since 0.9
      */
@@ -310,6 +313,9 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *
      * Racy if called after getCurrentKey() to check for a current session;
      * use getCurrentOrNewKey() in that case.
+     *
+     * @param target public key to which the data should be encrypted, must be ELGAMAL_2048.
+     * @throws IllegalArgumentException on bad target EncType
      */
     @Override
     public void createSession(PublicKey target, SessionKey key) {
@@ -322,6 +328,9 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     private OutboundSession createAndReturnSession(PublicKey target, SessionKey key) {
+        EncType type = target.getType();
+        if (type != EncType.ELGAMAL_2048)
+            throw new IllegalArgumentException("Bad public key type " + type);
         if (_log.shouldLog(Log.INFO))
             _log.info("New OB session, sesskey: " + key + " target: " + toString(target));
         OutboundSession sess = new OutboundSession(_context, _log, target, key);

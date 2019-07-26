@@ -471,13 +471,13 @@ public final class KeyGenerator {
         else
             System.out.println(type + " private-to-public test FAILED");
         //System.out.println("privkey " + keys[1]);
-          MessageDigest md = type.getDigestInstance();
+        MessageDigest md = type.getDigestInstance();
         for (int i = 0; i < runs; i++) {
             RandomSource.getInstance().nextBytes(src);
-              md.update(src);
-              byte[] sha = md.digest();
-              SimpleDataStructure hash = type.getHashInstance();
-              hash.setData(sha);
+            md.update(src);
+            byte[] sha = md.digest();
+            SimpleDataStructure hash = type.getHashInstance();
+            hash.setData(sha);
             long start = System.nanoTime();
             Signature sig = DSAEngine.getInstance().sign(src, privkey);
             Signature sig2 = DSAEngine.getInstance().sign(hash, privkey);
@@ -492,16 +492,18 @@ public final class KeyGenerator {
             stime += mid - start;
             vtime += end - mid;
             if (!ok)
-                throw new GeneralSecurityException(type + " V(S(data)) fail");
+                throw new GeneralSecurityException(type + " V(S(data)) fail on run " + i);
             if (!ok2)
-                throw new GeneralSecurityException(type + " V(S(H(data))) fail");
+                throw new GeneralSecurityException(type + " V(S(H(data))) fail on run" + i);
         }
         stime /= 1000*1000;
         vtime /= 1000*1000;
+        // we do two of each per run above
+        int runs2 = runs * 2;
         System.out.println(type + " sign/verify " + runs + " times: " + (vtime+stime) + " ms = " +
-                           (((double) stime) / runs) + " each sign, " +
-                           (((double) vtime) / runs) + " each verify, " +
-                           (((double) (stime + vtime)) / runs) + " s+v");
+                           (((double) stime) / runs2) + " each sign, " +
+                           (((double) vtime) / runs2) + " each verify, " +
+                           (((double) (stime + vtime)) / runs2) + " s+v");
     }
 
 /******

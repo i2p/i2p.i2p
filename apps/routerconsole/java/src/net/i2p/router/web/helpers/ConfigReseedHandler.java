@@ -65,9 +65,9 @@ public class ConfigReseedHandler extends FormHandler {
                     }
                     if (!addCheckerStatus(checker)) {
                         if (checker.inProgress()) {
-                            addFormNotice(_t("Reseed in progress, check summary bar for status"));
+                            addFormNotice(_t("Reseed in progress, check sidebar for status"));
                         } else {
-                            addFormNotice(_t("Reseed complete, check summary bar for status"));
+                            addFormNotice(_t("Reseed complete, check sidebar for status"));
                         }
                     }
                 }

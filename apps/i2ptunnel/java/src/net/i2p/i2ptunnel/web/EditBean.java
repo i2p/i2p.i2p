@@ -227,6 +227,17 @@ public class EditBean extends IndexBean {
     }
     
     /**
+     *  List of b64 name : b64key
+     *  Pubkeys for DH, privkeys for PSK
+     *  @param isDH true for DH, false for PSK
+     *  @return non-null
+     *  @since 0.9.41
+     */
+    public List<String> getClientAuths(int tunnel, boolean isDH) {
+        return _helper.getClientAuths(tunnel, isDH);
+    }
+    
+    /**
      *  @param newTunnelType used if tunnel &lt; 0
      *  @since 0.9.12
      */

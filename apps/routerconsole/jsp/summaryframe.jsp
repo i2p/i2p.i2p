@@ -10,7 +10,7 @@
 %>
 <html><head>
 <%@include file="css.jsi" %>
-<title>Summary Bar</title>
+<title>Sidebar</title>
 <%
     // try hard to avoid an error page in the iframe after shutdown
     String action = request.getParameter("action");

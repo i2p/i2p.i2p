@@ -156,7 +156,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 63*1000;
     private static final long EXPLORE_TIME = 877*1000;
-    private static final long BLACKLIST_CLEAN_TIME = 17*60*1000;
+    private static final long BLACKLIST_CLEAN_TIME = 67*60*1000;
+    private static final int BLACKLIST_MAX_PEERS = 500;
     private static final long NODES_SAVE_TIME = 3*60*60*1000;
     public static final String DHT_FILE_SUFFIX = ".dht.dat";
 
@@ -1232,10 +1233,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Removed after consecutive timeouts: " + nInfo);
             }
-            if (!_blacklist.contains(nid)) {
-                // used as when-added time
-                nid.setLastSeen();
-                _blacklist.add(nid);
+            // remove and add back with new date, may not be same object
+            // used as when-added time
+            nid.setLastSeen();
+            boolean already = _blacklist.remove(nid);
+            _blacklist.add(nid);
+            if (!already) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Blacklisted: " + nid);
             }
@@ -1685,6 +1688,14 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 // lastSeen() is actually when-added
                 if (nid.lastSeen() < expire)
                     iter.remove();
+            }
+            int sz = _blacklist.size();
+            if (sz > BLACKLIST_MAX_PEERS) {
+                // just remove random peers
+                for (Iterator<NID> iter = _blacklist.iterator(); iter.hasNext() && sz > BLACKLIST_MAX_PEERS; sz--) {
+                    iter.next();
+                    iter.remove();
+                }
             }
             if (now - _nodesLastSaved > NODES_SAVE_TIME) {
                 PersistDHT.saveDHT(_knownNodes, false, _dhtFile);

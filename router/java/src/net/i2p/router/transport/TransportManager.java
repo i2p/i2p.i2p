@@ -341,7 +341,10 @@ public class TransportManager implements TransportEventListener {
         // Maybe we need a config option to force on? Probably not.
         // What firewall supports UPnP and is configured with a public address on the LAN side?
         // Unlikely.
-        if (_upnpManager != null && Addresses.getAnyAddress() == null)
+        // Always start on Android, as we may have a cellular IPv4 address but
+        // are routing all traffic through WiFi.
+        // Also, conditions may change rapidly.
+        if (_upnpManager != null && (SystemVersion.isAndroid() || Addresses.getAnyAddress() == null))
             _upnpManager.start();
         configTransports();
         _log.debug("Starting up the transport manager");

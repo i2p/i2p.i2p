@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.SimpleTimer;
@@ -23,6 +25,7 @@ class TunnelGatewayPumper implements Runnable {
     private final RouterContext _context;
     private final Set<PumpedTunnelGateway> _wantsPumping;
     private final Set<PumpedTunnelGateway> _backlogged;
+    private final List<Thread> _threads;
     private volatile boolean _stop;
     private static final int MIN_PUMPERS = 1;
     private static final int MAX_PUMPERS = 4;
@@ -39,14 +42,18 @@ class TunnelGatewayPumper implements Runnable {
         _context = ctx;
         _wantsPumping = new LinkedHashSet<PumpedTunnelGateway>(16);
         _backlogged = new HashSet<PumpedTunnelGateway>(16);
+        _threads = new CopyOnWriteArrayList<Thread>();
         if (ctx.getBooleanProperty("i2p.dummyTunnelManager")) {
             _pumpers = 1;
         } else {
             long maxMemory = SystemVersion.getMaxMemory();
             _pumpers = (int) Math.max(MIN_PUMPERS, Math.min(MAX_PUMPERS, 1 + (maxMemory / (32*1024*1024))));
         }
-        for (int i = 0; i < _pumpers; i++)
-            new I2PThread(this, "Tunnel GW pumper " + (i+1) + '/' + _pumpers, true).start();
+        for (int i = 0; i < _pumpers; i++) {
+            Thread t = new I2PThread(this, "Tunnel GW pumper " + (i+1) + '/' + _pumpers, true);
+            _threads.add(t);
+            t.start();
+        }
     }
 
     public void stopPumping() {
@@ -61,6 +68,10 @@ class TunnelGatewayPumper implements Runnable {
                 Thread.sleep(i * 50);
             } catch (InterruptedException ie) {}
         }
+        for (Thread t : _threads) {
+            t.interrupt();
+        }
+        _threads.clear();
         _wantsPumping.clear();
     }
     
@@ -74,6 +85,14 @@ class TunnelGatewayPumper implements Runnable {
     }
     
     public void run() {
+        try {
+            run2();
+        } finally {
+            _threads.remove(Thread.currentThread());
+        }
+    }
+
+    private void run2() {
         PumpedTunnelGateway gw = null;
         List<PendingGatewayMessage> queueBuf = new ArrayList<PendingGatewayMessage>(32);
         boolean requeue = false;

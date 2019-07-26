@@ -2,8 +2,6 @@ package net.i2p.router.transport.crypto;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.southernstorm.noise.crypto.x25519.Curve25519;
-
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyPair;
@@ -139,15 +137,7 @@ public class X25519KeyFactory extends I2PThread {
 
     private KeyPair precalc() {
         long start = System.currentTimeMillis();
-        byte[] priv = new byte[32];
-        do {
-            _context.random().nextBytes(priv);
-            // little endian, loop if too small
-            // worth doing?
-        } while (priv[31] == 0);
-        byte[] pub = new byte[32];
-        Curve25519.eval(pub, 0, priv, null);
-        KeyPair rv = new KeyPair(new PublicKey(EncType.ECIES_X25519, pub), new PrivateKey(EncType.ECIES_X25519, priv));
+        KeyPair rv = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
         long end = System.currentTimeMillis();
         long diff = end - start;
         _context.statManager().addRateData("crypto.XDHGenerateTime", diff);

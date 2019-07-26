@@ -415,7 +415,7 @@ class BuildExecutor implements Runnable {
                                 _context.statManager().addRateData("tunnel.buildConfigTime", pTime, 0);
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
-                                buildTunnel(pool, cfg);
+                                buildTunnel(cfg);
                                 //realBuilt++;
                             } else {
                                 i--;
@@ -507,7 +507,7 @@ class BuildExecutor implements Runnable {
                 if (cfg != null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Configuring short tunnel " + i + " for " + pool + ": " + cfg);
-                    buildTunnel(pool, cfg);
+                    buildTunnel(cfg);
                     if (cfg.getLength() > 1) {
                         allowed--; // oops... shouldn't have done that, but hey, its not that bad...
                     }
@@ -524,7 +524,7 @@ class BuildExecutor implements Runnable {
     
     public boolean isRunning() { return _isRunning; }
     
-    void buildTunnel(TunnelPool pool, PooledTunnelCreatorConfig cfg) {
+    void buildTunnel(PooledTunnelCreatorConfig cfg) {
         long beforeBuild = System.currentTimeMillis();
         if (cfg.getLength() > 1) {
             do {
@@ -532,7 +532,7 @@ class BuildExecutor implements Runnable {
                 cfg.setReplyMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             } while (addToBuilding(cfg)); // if a dup, go araound again
         }
-        boolean ok = BuildRequestor.request(_context, pool, cfg, this);
+        boolean ok = BuildRequestor.request(_context, cfg, this);
         if (!ok)
             return;
         if (cfg.getLength() > 1) {
@@ -556,10 +556,10 @@ class BuildExecutor implements Runnable {
      *  This wakes up the executor, so call this after TunnelPool.addTunnel()
      *  so we don't build too many.
      */
-    public void buildComplete(PooledTunnelCreatorConfig cfg, TunnelPool pool) {
+    public void buildComplete(PooledTunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Build complete for " + cfg, new Exception());
-        pool.buildComplete(cfg);
+        cfg.getTunnelPool().buildComplete(cfg);
         if (cfg.getLength() > 1)
             removeFromBuilding(cfg.getReplyMessageId());
         // Only wake up the build thread if it took a reasonable amount of time -

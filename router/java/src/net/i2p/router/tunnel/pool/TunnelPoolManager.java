@@ -129,7 +129,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         if (_log.shouldLog(Log.ERROR))
             _log.error("Want the inbound tunnel for " + destination.toBase32() +
-                     " but there isn't a pool?");
+                     " but there isn't a pool?", new Exception());
         return null;
     }
 
@@ -205,7 +205,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         if (_log.shouldLog(Log.ERROR))
             _log.error("Want the inbound tunnel for " + destination.toBase32() +
-                     " but there isn't a pool?");
+                     " but there isn't a pool?", new Exception());
         return null;
     }
 
@@ -561,25 +561,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
              _context.router().isHidden() ||
              _context.router().getRouterInfo().getAddressCount() <= 0)) {
             TunnelPool pool = cfg.getTunnelPool();
-            if (pool == null) {
-                // never seen this before, do we reallly need to bother
-                // trying so hard to find his pool?
-                _log.error("How does this not have a pool?  " + cfg, new Exception("baf"));
-                if (cfg.getDestination() != null) {
-                    if (cfg.isInbound()) {
-                            pool = _clientInboundPools.get(cfg.getDestination());
-                    } else {
-                            pool = _clientOutboundPools.get(cfg.getDestination());
-                    }
-                } else {
-                    if (cfg.isInbound()) {
-                        pool = _inboundExploratory;
-                    } else {
-                        pool = _outboundExploratory;
-                    }
-                }
-                cfg.setTunnelPool(pool);
-            }
             _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
         }
     }

@@ -42,6 +42,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import static net.i2p.router.sybil.Util.biLog2;
+import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.Log;
@@ -765,23 +766,26 @@ class NetDbRenderer {
         start = end;
 
         // transports table
-        buf.append("<table id=\"netdbtransports\">\n");
-        buf.append("<tr><th align=\"left\">" + _t("Transports") + "</th><th>" + _t("Count") + "</th></tr>\n");
-        for (int i = 0; i < TNAMES.length; i++) {
-            int num = transportCount[i];
-            if (num > 0) {
-                buf.append("<tr><td>").append(_t(TNAMES[i]));
-                buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
+        boolean showTransports = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
+        if (showTransports) {
+            buf.append("<table id=\"netdbtransports\">\n");
+            buf.append("<tr><th align=\"left\">" + _t("Transports") + "</th><th>" + _t("Count") + "</th></tr>\n");
+            for (int i = 0; i < TNAMES.length; i++) {
+                int num = transportCount[i];
+                if (num > 0) {
+                    buf.append("<tr><td>").append(_t(TNAMES[i]));
+                    buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
+                }
             }
+            buf.append("</table>\n");
+            buf.append("</td><td style=\"vertical-align: top;\">");
+            out.write(buf.toString());
+            buf.setLength(0);
+            end = System.currentTimeMillis();
+            if (log.shouldWarn())
+                log.warn("part 3 took " + (end - start));
+            start = end;
         }
-        buf.append("</table>\n");
-        buf.append("</td><td style=\"vertical-align: top;\">");
-        out.write(buf.toString());
-        buf.setLength(0);
-        end = System.currentTimeMillis();
-        if (log.shouldWarn())
-            log.warn("part 3 took " + (end - start));
-        start = end;
 
         // country table
         List<String> countryList = new ArrayList<String>(countries.objects());

@@ -50,7 +50,7 @@ TRANSLATE_NAME_armv7a="armv7"
 # Note! these build on 32bit as 32bit when operating as 32bit...
 # starting with k10 added for 6.0.0
 # As of GMP 6.0.0, libgmp 3,
-X86_64_PLATFORMS="coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
+X86_64_PLATFORMS="skylake coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
 TRANSLATE_NAME_x86_64="none" # Rename x86_64 to none_64, since that is what NativeBigInteger refers to it as
 
 # Note! these are 32bit _ONLY_ (after the 64 bit ones)
@@ -66,6 +66,12 @@ FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
 NETBSD_PLATFORMS="${FREEBSD_PLATFORMS} ${MISC_LINUX_PLATFORMS} ${MISC_NETBSD_PLATFORMS}"
 OPENBSD_PLATFORM="${X86_PLATFORMS} ${MISC_OPENBSD_PLATFORMS}"
 
+# Android
+# https://developer.android.com/ndk/guides/other_build_systems
+ANDROID_64_PLATFORMS="aarch64"
+ANDROID_32_PLATFORMS="armv7a"
+
+
 
 # Import gmp version variables and download gmp.
 . ./download_gmp.sh
@@ -78,7 +84,7 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     exit 1
 fi
 
-if ! command -v m4 > /dev/null; then
+if ! command m4 > /dev/null; then
     printf "\aWARNING: \`m4\` not found. Install m4 " >&2
     printf "and re-run this script.\n\n\n\a" >&2
     exit 1
@@ -114,32 +120,35 @@ if [ -z $CC ]; then
   printf "\aCC variable not set, defaulting to $CC\n\a" >&2
 fi
 
-# FIXME -m32 and -m64 are only for x86
+# Allow TARGET to be overridden (e.g. for use with cross compilers)
+[ -z $TARGET ] && TARGET=$(uname -s |tr "[A-Z]" "[a-z]")
+
 if [ $BITS -eq 32 ]; then
   export ABI=32
-  export CFLAGS="-m32"
-  export LDFLAGS="-m32"
+  if [ "$TARGET" != "android" ]; then
+      export CFLAGS="-m32"
+      export LDFLAGS="-m32"
+  fi
 elif [ $BITS -eq 64 ]; then
   export ABI=64
-  export CFLAGS="-m64"
-  export LDFLAGS="-m64"
+  if [ "$TARGET" != "android" ]; then
+      export CFLAGS="-m64"
+      export LDFLAGS="-m64"
+  fi
 else
   printf "\aBITS value \"$BITS\" not valid, please select 32 or 64\n\a" >&2
   exit 1
 fi
 
-if ! command -v ${CC} > /dev/null; then
+if ! command ${CC} > /dev/null; then
   echo "The compiler you've selected \"$CC\" does not appear to exist"
   exit 1
 fi
 
 # Set the "_64" filname filename suffix for 64-bit builds
-if [ $BITS -ne 32 ]; then
+if [ $BITS -ne 32 -a "$TARGET" != "android" ]; then
     [ -z $SUFFIX ] && SUFFIX="_64"
 fi
-
-# Allow TARGET to be overridden (e.g. for use with cross compilers)
-[ -z $TARGET ] && TARGET=$(uname -s |tr "[A-Z]" "[a-z]")
 
 # Note, this line does not support windows (and needs to generate a win32/win64 string for that to work)
 BUILD_OS=$(uname -s | tr "[A-Z]" "[a-z]")
@@ -189,6 +198,29 @@ if [ "$TARGET" != "$BUILD_OS" ]; then
 #       ;;
 #     esac
 #   ;;
+  android)
+    ANDROID_NDK=`realpath ../../../../android-ndk-r19c`
+    export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
+    if [ $BITS -eq 32 ]; then
+        HOST_CONFIGURE_FLAG=armv7a-linux-androideabi
+        export AR=$TOOLCHAIN/bin/arm-linux-androideabi-ar
+        export AS=$TOOLCHAIN/bin/arm-linux-androideabi-as
+        export CC=$TOOLCHAIN/bin/armv7a-linux-androideabi16-clang
+        export CXX=$TOOLCHAIN/bin/armv7a-linux-androideabi16-clang++
+        export LD=$TOOLCHAIN/bin/arm-linux-androideabi-ld
+        export RANLIB=$TOOLCHAIN/bin/arm-linux-androideabi-ranlib
+        export STRIP=$TOOLCHAIN/bin/arm-linux-androideabi-strip
+     else
+        HOST_CONFIGURE_FLAG=aarch64-linux-android
+        export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
+        export AS=$TOOLCHAIN/bin/aarch64-linux-android-as
+        export CC=$TOOLCHAIN/bin/aarch64-linux-android21-clang
+        export CXX=$TOOLCHAIN/bin/aarch64-linux-android21-clang++
+        export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
+        export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
+        export STRIP=$TOOLCHAIN/bin/aarch64-linux-android-strip
+     fi
+    ;;
   esac
 fi
 
@@ -277,6 +309,17 @@ netbsd*|freebsd*|openbsd*)
                         esac
         esac
         echo "Building ${TARGET} .sos for ${ARCH}";;
+android)
+        NAME="libjbigi"
+        TYPE="so"
+        if [ $BITS -eq 32 ]; then
+            PLATFORM_LIST="${ANDROID_32_PLATFORMS}"
+            ARCH="armv7a"
+        else
+            PLATFORM_LIST="${ANDROID_64_PLATFORMS}"
+            ARCH="aarch64"
+        fi
+        echo "Building Android .so for ${PLATFORM_LIST}";;
 *)
         echo "Unsupported build environment"
         exit;;

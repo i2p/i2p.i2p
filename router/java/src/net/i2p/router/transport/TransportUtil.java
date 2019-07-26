@@ -237,7 +237,7 @@ public abstract class TransportUtil {
      *  @since 0.9.17 moved from logic in individual transports
      */
     public static boolean isValidPort(int port) {
-        // update log message in UDPEndpoint if you update this list
+        // update log message below if you update this list
         return port >= 1024 &&
                port <= 65535 &&
                port != 1900 &&  // UPnP SSDP
@@ -257,7 +257,7 @@ public abstract class TransportUtil {
                port != 9050 &&  // Tor
                port != 9100 &&  // network printer
                port != 9150 &&  // Tor browser
-               // do not block anything in 9111 - 30777, this is the standard random selection range
+               // do not block anything in 9151 - 30777, this is the standard random selection range
                port != 31000 && // Wrapper
                port != 32000;   // Wrapper
     }

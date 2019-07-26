@@ -129,7 +129,10 @@ public class RouterAppManager extends ClientAppManagerImpl {
           case STOPPING:
           case STOPPED:
             _clients.remove(app);
-            _registered.remove(app.getName(), app);
+            boolean removed = _registered.remove(app.getName(), app);
+            if (removed && _log.shouldInfo()) {
+                _log.info("Client " + app.getDisplayName() + " UNREGISTERED AS " + app.getName());
+            }
             if (message == null)
                 message = "";
             if (_log.shouldLog(Log.INFO))
@@ -140,7 +143,10 @@ public class RouterAppManager extends ClientAppManagerImpl {
           case CRASHED:
           case START_FAILED:
             _clients.remove(app);
-            _registered.remove(app.getName(), app);
+            boolean removed2 = _registered.remove(app.getName(), app);
+            if (removed2 && _log.shouldInfo()) {
+                _log.info("Client " + app.getDisplayName() + " UNREGISTERED AS " + app.getName());
+            }
             if (message == null)
                 message = "";
             _log.log(Log.CRIT, "Client " + app.getDisplayName() + ' ' + state +
@@ -170,6 +176,22 @@ public class RouterAppManager extends ClientAppManagerImpl {
             _log.info("Client " + app.getDisplayName() + " REGISTERED AS " + app.getName());
         // TODO if old app in there is not running and != this app, allow replacement
         return super.register(app);
+    }
+    
+    /**
+     *  Unregister with the manager. Name must be the same as that from register().
+     *  Only required for apps used by other apps.
+     *
+     *  @param app non-null
+     *  @since 0.9.41 overridden for logging only
+     */
+    @Override
+    public void unregister(ClientApp app) {
+        if (_log.shouldInfo()) {
+            if (getRegisteredApp(app.getName()) != null)
+                _log.info("Client " + app.getDisplayName() + " UNREGISTERED AS " + app.getName());
+        }
+        super.unregister(app);
     }
 
     /// end ClientAppManager interface

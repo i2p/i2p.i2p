@@ -49,8 +49,6 @@ public class TunnelHistory {
     private void createRates(String statGroup) {
         _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", statGroup, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _failRate = new RateStat("tunnelHistory.failRate", "How often do tunnels this peer accepts fail?", statGroup, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _rejectRate.setStatLog(_context.statManager().getStatLog());
-        _failRate.setStatLog(_context.statManager().getStatLog());
     }
     
     /** total tunnels the peer has agreed to participate in */
@@ -137,33 +135,51 @@ public class TunnelHistory {
     private final static String NL = System.getProperty("line.separator");
     
     public void store(OutputStream out) throws IOException {
+        store(out, true);
+    }
+
+    /**
+     * write out the data from the profile to the stream
+     * @param addComments add comment lines to the output
+     * @since 0.9.41
+     */
+    public void store(OutputStream out, boolean addComments) throws IOException {
         StringBuilder buf = new StringBuilder(512);
-        buf.append(NL);
-        buf.append("#################").append(NL);
-        buf.append("# Tunnel history").append(NL);
-        buf.append("###").append(NL);
-        addDate(buf, "lastAgreedTo", _lastAgreedTo, "When did the peer last agree to participate in a tunnel?");
-        addDate(buf, "lastFailed", _lastFailed, "When was the last time a tunnel that the peer agreed to participate failed?");
-        addDate(buf, "lastRejectedCritical", _lastRejectedCritical, "When was the last time the peer refused to participate in a tunnel (Critical response code)?");
-        addDate(buf, "lastRejectedBandwidth", _lastRejectedBandwidth, "When was the last time the peer refused to participate in a tunnel (Bandwidth response code)?");
-        addDate(buf, "lastRejectedTransient", _lastRejectedTransient, "When was the last time the peer refused to participate in a tunnel (Transient load response code)?");
-        addDate(buf, "lastRejectedProbabalistic", _lastRejectedProbabalistic, "When was the last time the peer refused to participate in a tunnel (Probabalistic response code)?");
-        add(buf, "lifetimeAgreedTo", _lifetimeAgreedTo.get(), "How many tunnels has the peer ever agreed to participate in?");
-        add(buf, "lifetimeFailed", _lifetimeFailed.get(), "How many tunnels has the peer ever agreed to participate in that failed prematurely?");
-        add(buf, "lifetimeRejected", _lifetimeRejected.get(), "How many tunnels has the peer ever refused to participate in?");
+        if (addComments) {
+            buf.append(NL);
+            buf.append("#################").append(NL);
+            buf.append("# Tunnel history").append(NL);
+            buf.append("###").append(NL);
+        }
+        addDate(buf, addComments, "lastAgreedTo", _lastAgreedTo, "When did the peer last agree to participate in a tunnel?");
+        addDate(buf, addComments, "lastFailed", _lastFailed, "When was the last time a tunnel that the peer agreed to participate failed?");
+        addDate(buf, addComments, "lastRejectedCritical", _lastRejectedCritical, "When was the last time the peer refused to participate in a tunnel (Critical response code)?");
+        addDate(buf, addComments, "lastRejectedBandwidth", _lastRejectedBandwidth, "When was the last time the peer refused to participate in a tunnel (Bandwidth response code)?");
+        addDate(buf, addComments, "lastRejectedTransient", _lastRejectedTransient, "When was the last time the peer refused to participate in a tunnel (Transient load response code)?");
+        addDate(buf, addComments, "lastRejectedProbabalistic", _lastRejectedProbabalistic, "When was the last time the peer refused to participate in a tunnel (Probabalistic response code)?");
+        add(buf, addComments, "lifetimeAgreedTo", _lifetimeAgreedTo.get(), "How many tunnels has the peer ever agreed to participate in?");
+        add(buf, addComments, "lifetimeFailed", _lifetimeFailed.get(), "How many tunnels has the peer ever agreed to participate in that failed prematurely?");
+        add(buf, addComments, "lifetimeRejected", _lifetimeRejected.get(), "How many tunnels has the peer ever refused to participate in?");
         out.write(buf.toString().getBytes("UTF-8"));
-        _rejectRate.store(out, "tunnelHistory.rejectRate");
-        _failRate.store(out, "tunnelHistory.failRate");
+        _rejectRate.store(out, "tunnelHistory.rejectRate", addComments);
+        _failRate.store(out, "tunnelHistory.failRate", addComments);
     }
     
-    private static void addDate(StringBuilder buf, String name, long val, String description) {
-        String when = val > 0 ? (new Date(val)).toString() : "Never";
-        add(buf, name, val, description + ' ' + when);
+    private static void addDate(StringBuilder buf, boolean addComments, String name, long val, String description) {
+        if (addComments) {
+            String when = val > 0 ? (new Date(val)).toString() : "Never";
+            add(buf, true, name, val, description + ' ' + when);
+        } else {
+            add(buf, false, name, val, description);
+        }
     }
     
-    private static void add(StringBuilder buf, String name, long val, String description) {
-        buf.append("# ").append(name).append(NL).append("# ").append(description).append(NL);
-        buf.append("tunnels.").append(name).append('=').append(val).append(NL).append(NL);
+    private static void add(StringBuilder buf, boolean addComments, String name, long val, String description) {
+        if (addComments)
+            buf.append("# ").append(name).append(NL).append("# ").append(description).append(NL);
+        buf.append("tunnels.").append(name).append('=').append(val).append(NL);
+        if (addComments)
+            buf.append(NL);
     }
     
     public void load(Properties props) {

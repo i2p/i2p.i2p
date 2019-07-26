@@ -60,8 +60,12 @@ public class Destination extends KeysAndCert {
         byte[] padding;
         if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
             // convert SPK to new SPK and padding
+            // EncTypes 1-3 allowed in Destinations, see proposal 145
             KeyCertificate kcert = c.toKeyCertificate();
-            padding = sk.getPadding(kcert);
+            byte[] pad1 = pk.getPadding(kcert);
+            byte[] pad2 = sk.getPadding(kcert);
+            padding = combinePadding(pad1, pad2);
+            pk = pk.toTypedKey(kcert);
             sk = sk.toTypedKey(kcert);
             c = kcert;
         } else {
@@ -70,7 +74,8 @@ public class Destination extends KeysAndCert {
         Destination rv;
         synchronized(_cache) {
             rv = _cache.get(sk);
-            if (rv != null && rv.getPublicKey().equals(pk) && rv.getCertificate().equals(c)) {
+            if (rv != null && rv.getPublicKey().equals(pk) && rv.getCertificate().equals(c) &&
+                DataHelper.eq(rv.getPadding(), padding)) {
                 //if (STATS)
                 //    I2PAppContext.getGlobalContext().statManager().addRateData("DestCache", 1);
                 return rv;
@@ -97,6 +102,11 @@ public class Destination extends KeysAndCert {
      * @since 0.9.9
      */
     private Destination(PublicKey pk, SigningPublicKey sk, Certificate c, byte[] padding) {
+        if (padding != null) {
+            int sz = pk.length() + sk.length() + padding.length;
+            if (sz != 384)
+                throw new IllegalArgumentException("bad total length " + sz);
+        }
         _publicKey = pk;
         _signingKey = sk;
         _certificate = c;

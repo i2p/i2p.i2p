@@ -112,7 +112,7 @@ public class Reseeder {
         "https://reseed.i2p.net.in/"          + ',' +   // reseedi2pnetin_at_mail.i2p.crt  // CA                   // Java 8+ only, TLS 1.2 only
         "https://i2p.novg.net/"               + ',' +   // igor_at_novg.net.crt      // CA                         // Java 8+ only
         "https://i2pseed.creativecowpat.net:8443/" + ',' + // creativecowpat_at_mail.i2p.crt // i2pseed.creativecowpat.net.crt // Java 7+
-        "https://itoopie.atomike.ninja/"      + ',' +   // atomike_at_mail.i2p.crt   // CA                         // Java 8+ only
+        //"https://itoopie.atomike.ninja/"      + ',' +   // atomike_at_mail.i2p.crt   // CA                         // Java 8+ only
         "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // reseed.onion.im.crt        // Java 8+ only
         "https://reseed.memcpy.io/"           + ',' +   // hottuna_at_mail.i2p.crt   // CA                         // SNI required
         //"https://reseed.atomike.ninja/"       + ',' +   // atomike_at_mail.i2p.crt   // CA                         // SNI required, Java 8+ only
@@ -798,6 +798,11 @@ public class Reseeder {
                     stats = extractZip(contentRaw);
                 fetched = stats[0];
                 errors = stats[1];
+                if (fetched == 0) {
+                    s = "Reseed got no router infos " + s;
+                    System.err.println(s);
+                    _log.error(s);
+                }
             } catch (Throwable t) {
                 String s = getDisplayString(seedURL);
                 System.err.println("Error reseeding " + s + ": " + t);

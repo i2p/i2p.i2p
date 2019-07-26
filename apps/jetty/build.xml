@@ -364,14 +364,17 @@
             srcdir="./java/src" 
             destdir="./build/obj" >
             <classpath>
-                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../core/java/build/i2p.jar" />
                 <pathelement location="./jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="./jettylib/jasper-runtime.jar" />
                 <pathelement location="./jettylib/javax.servlet.jar" />
+                <pathelement location="./jettylib/jetty-deploy.jar" />
                 <pathelement location="./jettylib/jetty-http.jar" />
                 <pathelement location="./jettylib/jetty-io.jar" />
                 <pathelement location="./jettylib/jetty-security.jar" />
                 <pathelement location="./jettylib/jetty-servlet.jar" />
                 <pathelement location="./jettylib/jetty-util.jar" />
+                <pathelement location="./jettylib/jetty-webapp.jar" />
                 <pathelement location="./jettylib/jetty-xml.jar" />
             </classpath>
         </depend>
@@ -384,8 +387,23 @@
             srcdir="./java/src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
-            includeAntRuntime="false"
-            classpath="../../core/java/build/i2p.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-security.jar:./jettylib/jetty-servlet.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar" >
+            includeAntRuntime="false" >
+            <classpath>
+                <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="./jettylib/jasper-runtime.jar" />
+                <pathelement location="./jettylib/javax.servlet.jar" />
+                <pathelement location="./jettylib/jetty-deploy.jar" />
+                <pathelement location="./jettylib/jetty-http.jar" />
+                <pathelement location="./jettylib/jetty-io.jar" />
+                <pathelement location="./jettylib/jetty-security.jar" />
+                <pathelement location="./jettylib/jetty-servlet.jar" />
+                <pathelement location="./jettylib/jetty-util.jar" />
+                <pathelement location="./jettylib/jetty-webapp.jar" />
+                <pathelement location="./jettylib/jetty-xml.jar" />
+                <pathelement location="./jettylib/org.mortbay.jetty.jar" />
+                <!-- following jar only present for debian builds -->
+                <pathelement location="./jettylib/tomcat-api.jar" />
+            </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -550,16 +568,20 @@
                 <pathelement location="../../core/java/build/i2p.jar" />
                 <pathelement location="./jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="./jettylib/javax.servlet.jar" />
+                <pathelement location="./jettylib/jasper-runtime.jar" />
+                <pathelement location="./jettylib/jetty-deploy.jar" />
                 <pathelement location="./jettylib/jetty-http.jar" />
                 <pathelement location="./jettylib/jetty-io.jar" />
                 <pathelement location="./jettylib/jetty-security.jar" />
                 <pathelement location="./jettylib/jetty-servlet.jar" />
                 <pathelement location="./jettylib/jetty-util.jar" />
+                <pathelement location="./jettylib/jetty-webapp.jar" />
                 <pathelement location="./jettylib/jetty-xml.jar" />
                 <!-- following are only for debian builds -->
                 <pathelement location="../../core/java/build/libintl.jar" />
                 <pathelement location="../../core/java/build/gnu-getopt.jar" />
                 <pathelement location="../../core/java/build/json-simple.jar" />
+                <pathelement location="./jettylib/tomcat-api.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
                   End-users can override by creating the file override.properties -->

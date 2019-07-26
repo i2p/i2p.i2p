@@ -29,7 +29,7 @@
      <input type="submit" class="cancel" name="action" value="<%=intl._t("Cancel graceful shutdown")%>" >
  <% } %>
  </div>
- <% if (System.getProperty("wrapper.version") != null) { %>
+ <% if (net.i2p.util.SystemVersion.hasWrapper()) { %>
  <h3 class="ptitle" id="restartrouter"><%=intl._t("Restart the router")%></h3>
  <p class="infohelp">
     <%=intl._t("If you want the router to restart itself after shutting down, you can choose one of the following.")%>
@@ -72,7 +72,7 @@
 
  <h3 class="ptitle" id="servicedebug"><%=intl._t("Debugging")%>&nbsp;<a href="/jobs">[<%=intl._t("View the job queue")%>]</a></h3>
  <p class="infohelp">
-<% if (System.getProperty("wrapper.version") != null) { %>
+<% if (net.i2p.util.SystemVersion.hasWrapper()) { %>
     <%=intl._t("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%>
 <% } else { // hack to make layout work for non-wrapper %>
     &nbsp;
@@ -81,7 +81,7 @@
  <hr>
  <div class="formaction" id="dumpthreads">
  <input type="submit" class="reload" name="action" value="<%=intl._t("Force GC")%>" >
-<% if (System.getProperty("wrapper.version") != null) { %>
+<% if (net.i2p.util.SystemVersion.hasWrapper()) { %>
  <input type="submit" class="download" name="action" value="<%=intl._t("Dump threads")%>" >
 <% } %>
  </div>

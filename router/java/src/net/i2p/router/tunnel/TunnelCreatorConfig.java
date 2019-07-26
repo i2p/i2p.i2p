@@ -16,8 +16,9 @@ import net.i2p.router.TunnelInfo;
  * Coordinate the info that the tunnel creator keeps track of, including what 
  * peers are in the tunnel and what their configuration is
  *
+ * See PooledTunnelCreatorConfig for the non-abstract class
  */
-public class TunnelCreatorConfig implements TunnelInfo {
+public abstract class TunnelCreatorConfig implements TunnelInfo {
     protected final RouterContext _context;
     /** only necessary for client tunnels */
     private final Hash _destination;

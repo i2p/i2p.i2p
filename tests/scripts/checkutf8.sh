@@ -35,7 +35,7 @@ DIRS="\
 for i in `find $DIRS -maxdepth 1 -type f`
 do
 	#echo "Checking $i ..."
-	iconv -f UTF8 -t UTF8 $i -o /dev/null
+	iconv -f UTF8 -t UTF8 $i > /dev/null
         if [ $? -ne 0 ]
 	then
 		echo "********* FAILED CHECK FOR $i *************"
@@ -47,7 +47,7 @@ echo "Checking all Java and Scala files ..."
 for i in `find . \( -name \*.java -o -name \*.scala \) -type f`
 do
 	#echo "Checking $i ..."
-	iconv -f UTF8 -t UTF8 $i -o /dev/null
+	iconv -f UTF8 -t UTF8 $i > /dev/null
 	if [ $? -ne 0 ]
 	then
 		echo "********* FAILED CHECK FOR $i *************"
@@ -61,7 +61,7 @@ echo "Checking getopt properties files ..."
 for i in `find core/java/src/gnu/getopt -name \*.properties -type f`
 do
 	#echo "Checking $i ..."
-	iconv -f ISO-8859-1 -t ISO-8859-1 $i -o /dev/null
+	iconv -f ISO-8859-1 -t ISO-8859-1 $i > /dev/null
         if [ $? -ne 0 ]
 	then
 		echo "********* FAILED CHECK FOR $i *************"

@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
+import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -104,4 +105,20 @@ public abstract class ClientManagerFacade implements Service {
 
     /** @since 0.8.8 */
     public abstract void shutdown(String msg);
+
+    /**
+     *  Declare that we're going to publish a meta LS for this destination.
+     *  Must be called before publishing the leaseset.
+     *
+     *  @throws I2PSessionException on duplicate dest
+     *  @since 0.9.41
+     */
+    public void registerMetaDest(Destination dest) throws I2PSessionException {}
+
+    /**
+     *  Declare that we're no longer going to publish a meta LS for this destination.
+     *
+     *  @since 0.9.41
+     */
+    public void unregisterMetaDest(Destination dest) {}
 }

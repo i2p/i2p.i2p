@@ -452,41 +452,52 @@ public class Rate {
         return out;
     }
 
+    /**
+     * Includes comment lines
+     */
     public synchronized void store(String prefix, StringBuilder buf) throws IOException {
-        PersistenceHelper.addTime(buf, prefix, ".period", "Length of the period:", _period);
-        PersistenceHelper.addDate(buf, prefix, ".creationDate",
+        store(prefix, buf, true);
+    }
+
+    /**
+     * @param addComments add comment lines to the output
+     * @since 0.9.41
+     */
+    public synchronized void store(String prefix, StringBuilder buf, boolean addComments) throws IOException {
+        PersistenceHelper.addTime(buf, addComments, prefix, ".period", "Length of the period:", _period);
+        PersistenceHelper.addDate(buf, addComments, prefix, ".creationDate",
                               "When was this rate created?", _creationDate);
-        PersistenceHelper.addDate(buf, prefix, ".lastCoalesceDate",
+        PersistenceHelper.addDate(buf, addComments, prefix, ".lastCoalesceDate",
                               "When did we last coalesce this rate?",
                               _lastCoalesceDate);
-        PersistenceHelper.addDate(buf, prefix, ".currentDate",
+        PersistenceHelper.addDate(buf, addComments, prefix, ".currentDate",
                               "When was this data written?", now());
-        PersistenceHelper.add(buf, prefix, ".currentTotalValue",
+        PersistenceHelper.add(buf, addComments, prefix, ".currentTotalValue",
                               "Total value of data points in the current (uncoalesced) period", _currentTotalValue);
-        PersistenceHelper.add(buf, prefix, ".currentEventCount",
+        PersistenceHelper.add(buf, addComments, prefix, ".currentEventCount",
                               "How many events have occurred in the current (uncoalesced) period?", _currentEventCount);
-        PersistenceHelper.addTime(buf, prefix, ".currentTotalEventTime",
+        PersistenceHelper.addTime(buf, addComments, prefix, ".currentTotalEventTime",
                               "How much time have the events in the current (uncoalesced) period consumed?",
                               _currentTotalEventTime);
-        PersistenceHelper.add(buf, prefix, ".lastTotalValue",
+        PersistenceHelper.add(buf, addComments, prefix, ".lastTotalValue",
                               "Total value of data points in the most recent (coalesced) period", _lastTotalValue);
-        PersistenceHelper.add(buf, prefix, ".lastEventCount",
+        PersistenceHelper.add(buf, addComments, prefix, ".lastEventCount",
                               "How many events have occurred in the most recent (coalesced) period?", _lastEventCount);
-        PersistenceHelper.addTime(buf, prefix, ".lastTotalEventTime",
+        PersistenceHelper.addTime(buf, addComments, prefix, ".lastTotalEventTime",
                               "How much time have the events in the most recent (coalesced) period consumed?",
                               _lastTotalEventTime);
-        PersistenceHelper.add(buf, prefix, ".extremeTotalValue",
+        PersistenceHelper.add(buf, addComments, prefix, ".extremeTotalValue",
                               "Total value of data points in the most extreme period", _extremeTotalValue);
-        PersistenceHelper.add(buf, prefix, ".extremeEventCount",
+        PersistenceHelper.add(buf, addComments, prefix, ".extremeEventCount",
                               "How many events have occurred in the most extreme period?", _extremeEventCount);
-        PersistenceHelper.addTime(buf, prefix, ".extremeTotalEventTime",
+        PersistenceHelper.addTime(buf, addComments, prefix, ".extremeTotalEventTime",
                               "How much time have the events in the most extreme period consumed?",
                               _extremeTotalEventTime);
-        PersistenceHelper.add(buf, prefix, ".lifetimeTotalValue",
+        PersistenceHelper.add(buf, addComments, prefix, ".lifetimeTotalValue",
                               "Total value of data points since this stat was created", _lifetimeTotalValue);
-        PersistenceHelper.add(buf, prefix, ".lifetimeEventCount",
+        PersistenceHelper.add(buf, addComments, prefix, ".lifetimeEventCount",
                               "How many events have occurred since this stat was created?", _lifetimeEventCount);
-        PersistenceHelper.addTime(buf, prefix, ".lifetimeTotalEventTime",
+        PersistenceHelper.addTime(buf, addComments, prefix, ".lifetimeTotalEventTime",
                               "How much total time was consumed by the events since this stat was created?",
                               _lifetimeTotalEventTime);
     }

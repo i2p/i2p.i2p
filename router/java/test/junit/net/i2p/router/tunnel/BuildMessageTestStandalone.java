@@ -162,7 +162,7 @@ public class BuildMessageTestStandalone extends TestCase {
             _privKeys[i] = (PrivateKey)kp[1];
         }
         
-        TunnelCreatorConfig cfg = new TunnelCreatorConfig(null, _peers.length, false);
+        TunnelCreatorConfig cfg = new TCConfig(null, _peers.length, false);
         long now = ctx.clock().now();
         // peers[] is ordered endpoint first, but cfg.getPeer() is ordered gateway first
         for (int i = 0; i < _peers.length; i++) {

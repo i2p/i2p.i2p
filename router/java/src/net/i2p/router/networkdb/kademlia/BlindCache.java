@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.Blinding;
@@ -166,7 +168,19 @@ class BlindCache {
         }
     }
 
+    /**
+     *  Persists immediately if secret or privkey is non-null
+     */
     public void addToCache(BlindData bd) {
+        storeInCache(bd);
+        if (bd.getSecret() != null || bd.getAuthPrivKey() != null)
+            store();
+    }
+
+    /**
+     *  @since 0.9.41 from addToCache()
+     */
+    private void storeInCache(BlindData bd) {
         _cache.put(bd.getUnblindedPubKey(), bd);
         _reverseCache.put(bd.getBlindedPubKey(), bd);
         Destination dest = bd.getDestination();
@@ -226,6 +240,39 @@ class BlindCache {
     }
 
     /**
+     *  For console ConfigKeyringHelper
+     *  @return list is copied
+     *  @since 0.9.41
+     */
+    public synchronized List<BlindData> getData() {
+        List<BlindData> rv = new ArrayList<BlindData>(_cache.size());
+        rv.addAll(_cache.values());
+        return rv;
+    }
+
+    /**
+     *  For console ConfigKeyringHelper.
+     *  Persists immediately if removed.
+     *
+     *  @param spk the unblinded public key
+     *  @return true if removed
+     *  @since 0.9.41
+     */
+    public boolean removeBlindData(SigningPublicKey spk) {
+        boolean rv = false;
+        BlindData bd = _cache.remove(spk);
+        if (bd != null) {
+            rv = true;
+            _reverseCache.remove(bd.getBlindedPubKey());
+            Hash h = bd.getDestHash();
+            if (h != null)
+                _hashCache.remove(h);
+            store();
+        }
+        return rv;
+    }
+
+    /**
      *  Load from file.
      *  Format:
      *  sigtype,bsigtype,b64 pubkey,[b64 secret],[b64 dest]
@@ -245,14 +292,14 @@ class BlindCache {
                 if (line.startsWith("#"))
                     continue;
                 try {
-                    addToCache(fromPersistentString(line));
+                    storeInCache(fromPersistentString(line));
                     count++;
                 } catch (IllegalArgumentException iae) {
                     if (log.shouldLog(Log.WARN))
-                        log.warn("Error reading cache entry", iae);
+                        log.warn("Error reading cache entry: " + line, iae);
                 } catch (DataFormatException dfe) {
                     if (log.shouldLog(Log.WARN))
-                        log.warn("Error reading cache entry", dfe);
+                        log.warn("Error reading cache entry: " + line, dfe);
                 }
             }
         } catch (IOException ioe) {
@@ -334,15 +381,15 @@ class BlindCache {
             privkey = null;
         }
         BlindData rv;
-        // TODO pass privkey
         if (ss[7].length() > 0) {
             Destination dest = new Destination(ss[7]);
             if (!spk.equals(dest.getSigningPublicKey()))
                 throw new DataFormatException("spk mismatch");
-            rv = new BlindData(_context, dest, st2, secret);
+            rv = new BlindData(_context, dest, st2, secret, auth, privkey);
         } else {
-            rv = new BlindData(_context, spk, st2, secret);
+            rv = new BlindData(_context, spk, st2, secret, auth, privkey);
         }
+        rv.setDate(time);
         return rv;
     }
 
@@ -356,8 +403,7 @@ class BlindCache {
         buf.append(spk.getType().getCode()).append(',');
         buf.append(bd.getBlindedSigType().getCode()).append(',');
         buf.append(bd.getAuthType()).append(',');
-        // timestamp todo
-        buf.append('0').append(',');
+        buf.append(bd.getDate()).append(',');
         buf.append(spk.toBase64()).append(',');
         String secret = bd.getSecret();
         if (secret != null && secret.length() > 0)

@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -51,6 +52,7 @@ import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -86,6 +88,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _introducersSelectedOn;
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
+    private final SSUHMACGenerator _hmac;
     private int _mtu;
     private int _mtu_ipv6;
     private boolean _mismatchLogged;
@@ -271,6 +274,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
+        _hmac = new SSUHMACGenerator();
         _mtu = PeerState.LARGE_MTU;
         _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
         setupPort();
@@ -613,6 +617,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         UDPPacket.clearCache();
         UDPAddress.clearCache();
         _lastInboundIPv6 = 0;
+        _hmac.clearCache();
     }
 
     /**
@@ -1043,8 +1048,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (ourIP.length == 4 && !fixedPort)
                 changes.put(PROP_EXTERNAL_PORT, Integer.toString(ourPort));
             // queue a country code lookup of the new IP
-            if (ourIP.length == 4)
-                _context.commSystem().queueLookup(ourIP);
+            _context.commSystem().queueLookup(ourIP);
             // store these for laptop-mode (change ident on restart... or every time... when IP changes)
             // IPV4 ONLY
             String oldIP = _context.getProperty(PROP_IP);
@@ -1070,7 +1074,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // laptop mode
                 // For now, only do this at startup
                 if (oldIP != null &&
-                    System.getProperty("wrapper.version") != null &&
+                    SystemVersion.hasWrapper() &&
                     _context.getBooleanProperty(PROP_LAPTOP_MODE) &&
                     now - lastChanged > 10*60*1000 &&
                     _context.router().getUptime() < 10*60*1000) {
@@ -2746,6 +2750,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     DHSessionKeyBuilder.Factory getDHFactory() {
         return _dhFactory;
+    }
+    
+    /**
+     *  @return the SSU HMAC
+     *  @since 0.9.42
+     */
+    HMACGenerator getHMAC() {
+        return _hmac;
     }
     
     /**

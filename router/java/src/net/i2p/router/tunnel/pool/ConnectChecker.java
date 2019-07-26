@@ -298,7 +298,7 @@ public class ConnectChecker {
         for (RouterAddress ra : addrs) {
             String style = ra.getTransportStyle();
             String host = ra.getHost();
-            if ("NTCP".equals(style)) {
+            if ("NTCP".equals(style) || "NTCP2".equals(style)) {
                 if (host != null) {
                     if (host.contains(":"))
                         rv |= NTCP_V6;

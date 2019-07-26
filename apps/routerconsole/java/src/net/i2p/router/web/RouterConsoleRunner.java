@@ -239,9 +239,10 @@ public class RouterConsoleRunner implements RouterApp {
     public synchronized void shutdown(String[] args) {
         if (_state == STOPPED)
             return;
+        // this unregisters us with the ClientAppManager
         changeState(STOPPING);
         if (PluginStarter.pluginsEnabled(_context))
-            (new I2PAppThread(new PluginStopper(_context), "PluginStopper")).start();
+            (new I2PAppThread(new PluginStopper(_context, _server), "PluginStopper")).start();
         stopAllWebApps();
         try {
             _server.stop();
@@ -293,7 +294,10 @@ public class RouterConsoleRunner implements RouterApp {
     }
 
     /**
-     *  To get to Jetty
+     *  To get to Jetty.
+     *  Warning, this will NOT work during shutdown, because
+     *  changeState(STOPPING) will unregister us first.
+     *
      *  @return may be null or stopped perhaps
      *  @since 0.9.38
      */
@@ -340,13 +344,13 @@ public class RouterConsoleRunner implements RouterApp {
 
     /** @since 0.9.17 */
     private void checkJavaVersion() {
-        boolean noJava7 = !SystemVersion.isJava7();
+        boolean noJava8 = !SystemVersion.isJava8();
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
         boolean isZero = SystemVersion.isZeroVM();
         boolean isJava11 = false; // SystemVersion.isJava11();
-        if (noJava7 || noPack200 || openARM || isZero || isJava11) {
+        if (noJava8 || noPack200 || openARM || isZero || isJava11) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -354,8 +358,8 @@ public class RouterConsoleRunner implements RouterApp {
             net.i2p.util.Log log = _context.logManager().getLog(RouterConsoleRunner.class);
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
-            if (noJava7) {
-                s = "Java 7 is now required, please upgrade";
+            if (noJava8) {
+                s = "Java 8 or higher will be required in a future release, please upgrade Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -1137,6 +1141,9 @@ public class RouterConsoleRunner implements RouterApp {
      *  @since 0.9.30
      */
     private void stopAllWebApps() {
+        net.i2p.util.Log log = _context.logManager().getLog(RouterConsoleRunner.class);
+        if (log.shouldWarn())
+            log.warn("Stop all webapps");
         Properties props = webAppProperties(_context);
         Set<String> keys = props.stringPropertyNames();
         for (String name : keys) {
@@ -1144,10 +1151,15 @@ public class RouterConsoleRunner implements RouterApp {
                 String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
                 if (ROUTERCONSOLE.equals(app))
                     continue;
-                if (WebAppStarter.isWebAppRunning(_context, app)) {
+                if (_context.portMapper().isRegistered(app)) {
+                    if (log.shouldWarn())
+                        log.warn("Stopping " + app);
                     try {
-                        WebAppStarter.stopWebApp(_context, app);
+                        WebAppStarter.stopWebApp(_context, _server, app);
                     } catch (Throwable t) { t.printStackTrace(); }
+                } else {
+                    if (log.shouldWarn())
+                        log.info("Not Stoppping, isn't running " + app);
                 }
             }
         }

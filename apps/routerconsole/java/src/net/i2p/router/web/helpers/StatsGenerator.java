@@ -23,7 +23,7 @@ import net.i2p.stat.RateStat;
  * Dump the stats to the web admin interface
  */
 public class StatsGenerator {
-    private RouterContext _context;
+    private final RouterContext _context;
 
     public StatsGenerator(RouterContext context) {
         _context = context;

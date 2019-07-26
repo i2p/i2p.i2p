@@ -30,6 +30,11 @@ public class StatManager {
     /** may be null */
     private StatLog _statLog;
 
+    private int coalesceCounter;
+    /** every this many minutes for frequencies */
+    private static final int FREQ_COALESCE_RATE = 9;
+
+
     /**
      *  Comma-separated stats or * for all.
      *  This property must be set at startup, or
@@ -47,7 +52,7 @@ public class StatManager {
      * appropriate application context itself.
      *
      */
-	public StatManager(I2PAppContext context) {
+    public StatManager(I2PAppContext context) {
         _context = context;
         _frequencyStats = new ConcurrentHashMap<String,FrequencyStat>(8);
         _rateStats = new ConcurrentHashMap<String,RateStat>(128);
@@ -57,18 +62,29 @@ public class StatManager {
     }
     
     /** @since 0.8.8 */
-    public void shutdown() {
+    public synchronized void shutdown() {
         _frequencyStats.clear();
         _rateStats.clear();
     }
 
-    /** may be null */
-    public StatLog getStatLog() { return _statLog; }
-    public void setStatLog(StatLog log) { 
+    /**
+     *  Gets the default stat log for RateStats
+     *  Deprecated, unused
+     *  @return null always
+     */
+    public synchronized StatLog getStatLog() { return _statLog; }
+
+    /**
+     *  Sets the default stat log for ALL known RateStats.
+     *  Deprecated, unused
+     *  @deprecated unused
+     */
+    @Deprecated
+    public synchronized void setStatLog(StatLog log) { 
         _statLog = log; 
-            for (RateStat rs : _rateStats.values()) {
-                rs.setStatLog(log);
-            }
+        for (RateStat rs : _rateStats.values()) {
+            rs.setStatLog(log);
+        }
     }
 
     /**
@@ -158,11 +174,7 @@ public class StatManager {
         if (stat != null) stat.addData(data);
     }
 
-    private int coalesceCounter;
-    /** every this many minutes for frequencies */
-    private static final int FREQ_COALESCE_RATE = 9;
-
-    public void coalesceStats() {
+    public synchronized void coalesceStats() {
         if (++coalesceCounter % FREQ_COALESCE_RATE == 0) {
                 for (FrequencyStat stat : _frequencyStats.values()) {
                     if (stat != null) {
@@ -170,15 +182,13 @@ public class StatManager {
                     }
                 }
         }
-            for (RateStat stat : _rateStats.values()) {
-                if (stat != null) {
-                    stat.coalesceStats();
-                }
-            }
+        for (RateStat stat : _rateStats.values()) {
+            stat.coalesceStats();
+        }
     }
 
     /**
-     *  Misnamed, as it returns a FrequenceyStat, not a Frequency.
+     *  Misnamed, as it returns a FrequencyStat, not a Frequency.
      */
     public FrequencyStat getFrequency(String name) {
         return _frequencyStats.get(name);
@@ -191,10 +201,12 @@ public class StatManager {
         return _rateStats.get(name);
     }
 
+    /** @return a copy */
     public Set<String> getFrequencyNames() {
         return new HashSet<String>(_frequencyStats.keySet());
     }
 
+    /** @return a copy */
     public Set<String> getRateNames() {
         return new HashSet<String>(_rateStats.keySet());
     }
@@ -258,9 +270,11 @@ public class StatManager {
      * @since 0.9.23
      */
     public void store(OutputStream out, String prefix) throws IOException {
-        for (FrequencyStat fs : _frequencyStats.values())
+        for (FrequencyStat fs : _frequencyStats.values()) {
             fs.store(out, prefix);
-        for (RateStat rs : _rateStats.values())
+        }
+        for (RateStat rs : _rateStats.values()) {
             rs.store(out,prefix);
+        }
     }
 }

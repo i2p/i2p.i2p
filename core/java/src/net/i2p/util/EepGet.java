@@ -141,12 +141,20 @@ public class EepGet {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, allowCaching, etag, lastModified, null);
     }
 
+    /**
+     *  @param outputFile ignored if outputStream is non-null
+     *  @param outputStream takes precedence over outputFile
+     */
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
                   int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream,
                   String url, boolean allowCaching, String etag, String postData) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, minSize, maxSize, outputFile, outputStream, url, allowCaching, etag, null, postData);
     }
 
+    /**
+     *  @param outputFile ignored if outputStream is non-null
+     *  @param outputStream takes precedence over outputFile
+     */
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
                   int numRetries, long minSize, long maxSize,
                   String outputFile, OutputStream outputStream, String url, boolean allowCaching,
@@ -592,6 +600,8 @@ public class EepGet {
      * Blocking fetch, returning true if the URL was retrieved, false if all retries failed.
      *
      * Header timeout default 45 sec, total timeout default none, inactivity timeout default 60 sec.
+     *
+     * @return success
      */
     public boolean fetch() { return fetch(_fetchHeaderTimeout); }
 
@@ -601,6 +611,8 @@ public class EepGet {
      * wait indefinitely.
      *
      * Total timeout default none, inactivity timeout default 60 sec.
+     *
+     * @return success
      */
     public boolean fetch(long fetchHeaderTimeout) {
         return fetch(fetchHeaderTimeout, -1, -1);
@@ -612,6 +624,7 @@ public class EepGet {
      * @param fetchHeaderTimeout &lt;= 0 for none (proxy will timeout if none, none isn't recommended if no proxy)
      * @param totalTimeout &lt;= 0 for default none
      * @param inactivityTimeout &lt;= 0 for default 60 sec
+     * @return success
      */
     public boolean fetch(long fetchHeaderTimeout, long totalTimeout, long inactivityTimeout) {
         _fetchHeaderTimeout = (int) Math.min(fetchHeaderTimeout, Integer.MAX_VALUE);
@@ -937,10 +950,19 @@ public class EepGet {
             case 207:
             case 208:
             case 226:
-                if (_outputStream != null)
+                if (_outputStream != null) {
+                    if (_alreadyTransferred > 0) {
+                        // asked for partial but didn't get it,
+                        // can't rewind the stream
+                        rcOk = true;
+                        _keepFetching = false;
+                        _transferFailed = true;
+                        break;
+                    }
                     _out = _outputStream;
-		else
+                } else {
 		    _out = new FileOutputStream(_outputFile, false);
+                }
                 _alreadyTransferred = 0;
                 rcOk = true;
                 break;
@@ -1321,13 +1343,13 @@ public class EepGet {
         try {
             url = new URI(_actualURL);
         } catch (URISyntaxException use) {
-            IOException ioe = new MalformedURLException("Bad URL");
+            IOException ioe = new MalformedURLException("Bad URL: " + _actualURL);
             ioe.initCause(use);
             throw ioe;
         }
         String host = url.getHost();
         if (host == null || host.length() <= 0)
-            throw new MalformedURLException("Bad URL, no host");
+            throw new MalformedURLException("Bad URL, no host: " + url);
         int port = url.getPort();
         String path = url.getRawPath();
         String query = url.getRawQuery();

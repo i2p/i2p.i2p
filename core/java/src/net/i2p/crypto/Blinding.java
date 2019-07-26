@@ -53,14 +53,13 @@ public final class Blinding {
      *  @param key must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      *  @param alpha must be SigType RedDSA_SHA512_Ed25519
      *  @return SigType RedDSA_SHA512_Ed25519
-     *  @throws UnsupportedOperationException unless supported SigTypes
-     *  @throws IllegalArgumentException on bad inputs
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      */
     public static SigningPublicKey blind(SigningPublicKey key, SigningPrivateKey alpha) {
         SigType type = key.getType();
         if ((type != TYPE && type != TYPER) ||
             alpha.getType() != TYPER)
-            throw new UnsupportedOperationException();
+            throw new IllegalArgumentException("Unsupported blinding from " + type + " to " + alpha.getType());
         try {
             EdDSAPublicKey jk = SigUtil.toJavaEdDSAKey(key);
             EdDSAPrivateKey ajk = SigUtil.toJavaEdDSAKey(alpha);
@@ -77,14 +76,13 @@ public final class Blinding {
      *  @param key must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
      *  @param alpha must be SigType RedDSA_SHA512_Ed25519
      *  @return SigType RedDSA_SHA512_Ed25519
-     *  @throws UnsupportedOperationException unless supported SigTypes
-     *  @throws IllegalArgumentException on bad inputs
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      */
     public static SigningPrivateKey blind(SigningPrivateKey key, SigningPrivateKey alpha) {
         SigType type = key.getType();
         if ((type != TYPE && type != TYPER) ||
             alpha.getType() != TYPER)
-            throw new UnsupportedOperationException();
+            throw new IllegalArgumentException("Unsupported blinding from " + type + " to " + alpha.getType());
         try {
             EdDSAPrivateKey jk = SigUtil.toJavaEdDSAKey(key);
             EdDSAPrivateKey ajk = SigUtil.toJavaEdDSAKey(alpha);
@@ -101,12 +99,11 @@ public final class Blinding {
      *  @param key must be SigType RedDSA_SHA512_Ed25519
      *  @param alpha must be SigType RedDSA_SHA512_Ed25519
      *  @return SigType EdDSA_SHA512_Ed25519
-     *  @throws UnsupportedOperationException unless supported SigTypes
-     *  @throws IllegalArgumentException on bad inputs
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      */
     public static SigningPrivateKey unblind(SigningPrivateKey key, SigningPrivateKey alpha) {
         if (key.getType() != TYPER || alpha.getType() != TYPER)
-            throw new UnsupportedOperationException();
+            throw new IllegalArgumentException("Unsupported blinding from " + key.getType() + " / " + alpha.getType());
         try {
             EdDSAPrivateKey bjk = SigUtil.toJavaEdDSAKey(key);
             EdDSAPrivateKey ajk = SigUtil.toJavaEdDSAKey(alpha);
@@ -124,8 +121,7 @@ public final class Blinding {
      *  @param destspk must be SigType EdDSA_SHA512_Ed25519
      *  @param secret may be null or zero-length
      *  @return SigType RedDSA_SHA512_Ed25519
-     *  @throws UnsupportedOperationException unless supported SigTypes
-     *  @throws IllegalArgumentException on bad inputs
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      *  @since 0.9.39
      */
     public static SigningPrivateKey generateAlpha(I2PAppContext ctx, SigningPublicKey destspk, String secret) {
@@ -141,12 +137,14 @@ public final class Blinding {
      *  @param secret may be null or zero-length
      *  @param now for what time?
      *  @return SigType RedDSA_SHA512_Ed25519
-     *  @throws UnsupportedOperationException unless supported SigTypes
-     *  @throws IllegalArgumentException on bad inputs
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      *  @since 0.9.39
      */
     public static SigningPrivateKey generateAlpha(I2PAppContext ctx, SigningPublicKey destspk,
                                                   String secret, long now) {
+        SigType type = destspk.getType();
+        if (type != TYPE && type != TYPER)
+            throw new IllegalArgumentException("Unsupported blinding from " + type);
         String modVal;
         synchronized(_fmt) {
             modVal = _fmt.format(now);
@@ -170,7 +168,7 @@ public final class Blinding {
         // SHA256("I2PGenerateAlpha" || spk || sigtypein || sigtypeout)
         System.arraycopy(INFO_ALPHA, 0, in, 0, INFO_ALPHA.length);
         System.arraycopy(destspk.getData(), 0, in, INFO_ALPHA.length, destspk.length());
-        DataHelper.toLong(in, stoff, 2, destspk.getType().getCode());
+        DataHelper.toLong(in, stoff, 2, type.getCode());
         DataHelper.toLong(in, stoff + 2, 2, TYPER.getCode());
         Hash salt = ctx.sha().calculateHash(in);
         hkdf.calculate(salt.getData(), data, INFO, out, out, 32);
@@ -198,14 +196,13 @@ public final class Blinding {
 
     /**
      *  Decode a new-format b32 address.
-     *  PRELIMINARY - Subject to change - see proposal 149
+     *  See proposal 149.
      *
      *  @param address ending with ".b32.i2p"
-     *  @throws IllegalArgumentException on bad inputs
-     *  @throws UnsupportedOperationException unless supported SigTypes
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      *  @since 0.9.40
      */
-    public static BlindData decode(I2PAppContext ctx, String address) throws RuntimeException {
+    public static BlindData decode(I2PAppContext ctx, String address) throws IllegalArgumentException {
         address = address.toLowerCase(Locale.US);
         if (!address.endsWith(".b32.i2p"))
             throw new IllegalArgumentException("Not a .b32.i2p address");
@@ -219,15 +216,15 @@ public final class Blinding {
 
     /**
      *  Decode a new-format b32 address.
-     *  PRELIMINARY - Subject to change - see proposal 149
+     *  See proposal 149.
+     *  NOTE: Not for external use, use decode(String)
      *
      *  @param b 35+ bytes
      *  @return BlindData structure, use getUnblindedPubKey() for the result
-     *  @throws IllegalArgumentException on bad inputs
-     *  @throws UnsupportedOperationException unless supported SigTypes
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      *  @since 0.9.40
      */
-    public static BlindData decode(I2PAppContext ctx, byte[] b) throws RuntimeException {
+    public static BlindData decode(I2PAppContext ctx, byte[] b) throws IllegalArgumentException {
         Checksum crc = new CRC32();
         crc.update(b, 3, b.length - 3);
         long check = crc.getValue();
@@ -239,8 +236,6 @@ public final class Blinding {
             throw new IllegalArgumentException("Corrupt b32 or unsupported options");
         if ((flag & FLAG_TWOBYTE) != 0)
             throw new IllegalArgumentException("Two byte sig types unsupported");
-        if ((flag & FLAG_AUTH) != 0)
-            throw new IllegalArgumentException("Per-client auth unsupported");
         // TODO two-byte sigtypes
         int st1 = b[1] & 0xff;
         int st2 = b[2] & 0xff;
@@ -261,85 +256,49 @@ public final class Blinding {
         byte[] spkData = new byte[spkLen];
         System.arraycopy(b, 3, spkData, 0, spkLen);
         SigningPublicKey spk = new SigningPublicKey(sigt1, spkData);
-        String secret;
-        if ((flag & FLAG_SECRET) != 0) {
-            if (4 + spkLen > b.length) {
-                //throw new IllegalArgumentException("No secret data");
-                secret = null;
-            } else {
-                int secLen = b[3 + spkLen] & 0xff;
-                if (4 + spkLen + secLen != b.length)
-                    throw new IllegalArgumentException("Bad b32 length");
-                secret = DataHelper.getUTF8(b, 4 + spkLen, secLen);
-            }
-        } else if (3 + spkLen != b.length) {
+        if (3 + spkLen != b.length)
             throw new IllegalArgumentException("b32 too long");
-        } else {
-            secret = null;
-        }
-        BlindData rv = new BlindData(ctx, spk, sigt2, secret);
+        BlindData rv = new BlindData(ctx, spk, sigt2, null);
+        if ((flag & FLAG_SECRET) != 0)
+            rv.setSecretRequired();
+        if ((flag & FLAG_AUTH) != 0)
+            rv.setAuthRequired();
         return rv;
     }
 
     /**
      *  Encode a public key as a new-format b32 address.
-     *  PRELIMINARY - Subject to change - see proposal 149
+     *  See proposal 149.
      *
      *  @return (56 chars).b32.i2p
-     *  @throws IllegalArgumentException on bad inputs
-     *  @throws UnsupportedOperationException unless supported SigTypes
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      *  @since 0.9.40
      */
-    public static String encode(I2PAppContext ctx, SigningPublicKey key) throws RuntimeException {
-        return encode(ctx, key, false, false, null);
+    public static String encode(SigningPublicKey key) throws IllegalArgumentException {
+        return encode(key, false, false);
     }
 
     /**
      *  Encode a public key as a new-format b32 address.
-     *  PRELIMINARY - Subject to change - see proposal 149
+     *  See proposal 149.
      *
      *  @return (56 chars).b32.i2p
-     *  @throws IllegalArgumentException on bad inputs
-     *  @throws UnsupportedOperationException unless supported SigTypes
+     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      *  @since 0.9.40
      */
-    public static String encode(I2PAppContext ctx, SigningPublicKey key,
-                                boolean requireSecret, boolean requireAuth) throws RuntimeException {
-        return encode(ctx, key, requireSecret, requireAuth, null);
-    }
-
-    /**
-     *  Encode a public key as a new-format b32 address.
-     *  PRELIMINARY - Subject to change - see proposal 149
-     *
-     *  @param secret may be empty or null
-     *  @return (56+ chars).b32.i2p
-     *  @throws IllegalArgumentException on bad inputs
-     *  @throws UnsupportedOperationException unless supported SigTypes
-     *  @since 0.9.40
-     */
-    public static String encode(I2PAppContext ctx, SigningPublicKey key,
-                                boolean requireSecret, boolean requireAuth,
-                                String secret) throws RuntimeException {
+    public static String encode(SigningPublicKey key,
+                                boolean requireSecret, boolean requireAuth) throws IllegalArgumentException {
         SigType type = key.getType();
         if (type != TYPE && type != TYPER)
-            throw new UnsupportedOperationException();
-        byte sdata[] = (secret != null) ? DataHelper.getUTF8(secret) : null;
-        int slen = (secret != null) ? 1 + sdata.length : 0;
-        if (slen > 256)
-            throw new IllegalArgumentException("secret too long");
+            throw new IllegalArgumentException("Unsupported blinding from " + type);
         byte[] d = key.getData();
-        byte[] b = new byte[d.length + slen + 3];
+        byte[] b = new byte[d.length + 3];
         System.arraycopy(d, 0, b, 3, d.length);
-        if (slen > 0) {
-            b[3 + d.length] = (byte) sdata.length;
-            System.arraycopy(sdata, 0, b, 4 + d.length, sdata.length);
-        }
         Checksum crc = new CRC32();
         crc.update(b, 3, b.length - 3);
         long check = crc.getValue();
         // TODO two-byte sigtypes
-        if (slen > 0 || requireSecret)
+        if (requireSecret)
             b[0] = FLAG_SECRET;
         if (requireAuth)
             b[0] |= FLAG_AUTH;
@@ -367,8 +326,8 @@ public final class Blinding {
         SigningPublicKey pub = (SigningPublicKey) keys[0];
         SigningPrivateKey priv = (SigningPrivateKey) keys[1];
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        //String b32 = encode(ctx, pub, null);
-        String b32 = encode(ctx, pub, "foobarbaz");
+        //String b32 = encode(pub, null);
+        String b32 = encode(pub, true, false);
         System.out.println("pub b32 is " + b32);
         BlindData bd = decode(ctx, b32);
         if (bd.getBlindedPubKey().equals(pub))

@@ -84,20 +84,49 @@ public class TunnelControllerGroup implements ClientApp {
 
     /**
      *  In I2PAppContext will instantiate if necessary and always return non-null.
-     *  As of 0.9.4, when in RouterContext, will return null (except in Android)
+     *  As of 0.9.4, when in RouterContext, will return null
      *  if the TCG has not yet been started by the router.
+     *  As of 0.9.41, that's true for Android as well.
      *
      *  @throws IllegalArgumentException if unable to load from i2ptunnel.config
      */
-    public static TunnelControllerGroup getInstance() {
+    public static TunnelControllerGroup getInstance() { 
         synchronized (TunnelControllerGroup.class) {
             if (_instance == null) {
-                I2PAppContext ctx = I2PAppContext.getGlobalContext();
+                if (!SystemVersion.isAndroid()) {
+                    I2PAppContext ctx = I2PAppContext.getGlobalContext();
+                    if (!ctx.isRouterContext()) {
+                        _instance = new TunnelControllerGroup(ctx, null, null);
+                        _instance.startup();
+                    }
+                } // else wait for the router to start it
+            }
+            return _instance; 
+        }
+    }
+
+    /**
+     *  In I2PAppContext will instantiate if necessary and always return non-null.
+     *  When in RouterContext, will return null (except in Android)
+     *  if the TCG has not yet been started by the router.
+     *  In Android, if the old instance uses a stale context, it will replace it.
+     *
+     *  @throws IllegalArgumentException if unable to load from i2ptunnel.config
+     *  @since 0.9.41
+     */
+    public static TunnelControllerGroup getInstance(I2PAppContext ctx) { 
+        synchronized (TunnelControllerGroup.class) {
+            if (_instance == null) {
                 if (SystemVersion.isAndroid() || !ctx.isRouterContext()) {
                     _instance = new TunnelControllerGroup(ctx, null, null);
-                    if (!SystemVersion.isAndroid())
-                        _instance.startup();
+                    _instance.startup();
                 } // else wait for the router to start it
+            } else {
+                if (SystemVersion.isAndroid() && _instance._context != ctx) {
+                    ctx.logManager().getLog(TunnelControllerGroup.class).warn("Old context in TCG");
+                    _instance.shutdown();
+                    _instance = new TunnelControllerGroup(ctx, null, null);
+                 }
             }
             return _instance;
         }
@@ -140,13 +169,13 @@ public class TunnelControllerGroup implements ClientApp {
         }
         _sessions = new HashMap<I2PSession, Set<TunnelController>>(4);
         synchronized (TunnelControllerGroup.class) {
-            if (_instance == null)
+            if (_instance == null) {
                 _instance = this;
-        }
-        if (_instance != this) {
-            _log.logAlways(Log.WARN, "New TunnelControllerGroup, now you have two");
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("I did it", new Exception());
+            } else {
+                _log.logAlways(Log.WARN, "New TunnelControllerGroup, now you have two");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("I did it", new Exception());
+            }
         }
         _state = INITIALIZED;
     }

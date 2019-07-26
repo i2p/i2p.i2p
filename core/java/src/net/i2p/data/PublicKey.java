@@ -11,6 +11,7 @@ package net.i2p.data;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import net.i2p.crypto.EncType;
 
@@ -20,6 +21,7 @@ import net.i2p.crypto.EncType;
  * exponent, not the primes, which are constant and defined in the crypto spec.
  *
  * As of release 0.9.38, keys of arbitrary length and type are supported.
+ * Note: Support for keys longer than 256 bytes unimplemented.
  * See EncType.
  *
  * @author jrandom
@@ -135,6 +137,63 @@ public class PublicKey extends SimpleDataStructure {
     }
 
     /**
+     *  Up-convert this from an untyped (type 0) PK to a typed PK based on the Key Cert given.
+     *  The type of the returned key will be null if the kcert sigtype is null.
+     *
+     *  @throws IllegalArgumentException if this is already typed to a different type
+     *  @since 0.9.42
+     */
+    public PublicKey toTypedKey(KeyCertificate kcert) {
+        if (_data == null)
+            throw new IllegalStateException();
+        EncType newType = kcert.getEncType();
+        if (_type == newType)
+            return this;
+        if (_type != EncType.ELGAMAL_2048)
+            throw new IllegalArgumentException("Cannot convert " + _type + " to " + newType);
+        // unknown type, keep the 256 bytes of data
+        if (newType == null)
+            return new PublicKey(null, _data);
+        int newLen = newType.getPubkeyLen();
+        if (newLen == KEYSIZE_BYTES)
+            return new PublicKey(newType, _data);
+        byte[] newData = new byte[newLen];
+        if (newLen < KEYSIZE_BYTES) {
+            // LEFT justified, padding at end
+            System.arraycopy(_data, 0, newData, 0, newLen);
+        } else {
+            // full 256 bytes + fragment in kcert
+            throw new IllegalArgumentException("TODO");
+        }
+        return new PublicKey(newType, newData);
+    }
+
+    /**
+     *  Get the portion of this (type 0) PK that is really padding based on the Key Cert type given,
+     *  if any
+     *
+     *  @return trailing padding length &gt; 0 or null if no padding or type is unknown
+     *  @throws IllegalArgumentException if this is already typed to a different type
+     *  @since 0.9.42
+     */
+    public byte[] getPadding(KeyCertificate kcert) {
+        if (_data == null)
+            throw new IllegalStateException();
+        EncType newType = kcert.getEncType();
+        if (_type == newType || newType == null)
+            return null;
+        if (_type != EncType.ELGAMAL_2048)
+            throw new IllegalStateException("Cannot convert " + _type + " to " + newType);
+        int newLen = newType.getPubkeyLen();
+        if (newLen >= KEYSIZE_BYTES)
+            return null;
+        int padLen = KEYSIZE_BYTES - newLen;
+        byte[] pad = new byte[padLen];
+        System.arraycopy(_data, _data.length - padLen, pad, 0, padLen);
+        return pad;
+    }
+
+    /**
      *  @since 0.9.17
      */
     public static void clearCache() {
@@ -151,9 +210,32 @@ public class PublicKey extends SimpleDataStructure {
         if (_data == null) {
             buf.append("null");
         } else {
-            buf.append("size: ").append(length());
+            int length = length();
+            if (length <= 32)
+                buf.append(toBase64());
+            else
+                buf.append("size: ").append(length);
         }
         buf.append(']');
         return buf.toString();
+    }
+
+    /**
+     *  @since 0.9.42
+     */
+    @Override
+    public int hashCode() {
+        return DataHelper.hashCode(_type) ^ super.hashCode();
+    }
+
+    /**
+     *  @since 0.9.42
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || !(obj instanceof PublicKey)) return false;
+        PublicKey s = (PublicKey) obj;
+        return _type == s._type && Arrays.equals(_data, s._data);
     }
 }

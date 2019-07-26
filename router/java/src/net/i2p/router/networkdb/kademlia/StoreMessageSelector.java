@@ -39,9 +39,9 @@ class StoreMessageSelector implements MessageSelector {
     public long getExpiration() { return _expiration; }
 
     public boolean isMatch(I2NPMessage message) {
-        if (_log.shouldDebug())
-            _log.debug(_storeJobId + ": isMatch(" + message.getClass().getSimpleName() + ") [want DSM from " 
-                       + _peer + ']');
+        //if (_log.shouldDebug())
+        //    _log.debug(_storeJobId + ": isMatch(" + message.getClass().getSimpleName() + ") [want DSM from " 
+        //               + _peer + ']');
         if (message.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
             DeliveryStatusMessage msg = (DeliveryStatusMessage)message;
             if (msg.getMessageId() == _waitingForId) {
@@ -50,9 +50,9 @@ class StoreMessageSelector implements MessageSelector {
                 _found = true;
                 return true;
             } else {
-                if (_log.shouldDebug())
-                    _log.debug(_storeJobId + ": DeliveryStatusMessage of " + msg.getMessageId() +
-                               " but waiting for " + _waitingForId);
+                //if (_log.shouldDebug())
+                //    _log.debug(_storeJobId + ": DeliveryStatusMessage of " + msg.getMessageId() +
+                //               " but waiting for " + _waitingForId);
                 return false;
             }
         } else {

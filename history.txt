@@ -1,3 +1,205 @@
+2019-07-19 zzz
+ * Console: Split up /help page, prep for translation (ticket #2298)
+
+2019-07-18 zzz
+ * Data: Set LS2 flag bit when blinded
+
+2019-07-12 zzz
+ * Build: Move SSU HMAC implementation from core to router
+ * Test: Fix broken unit test build
+
+2019-07-11 zzz
+ * imagegen: Improve QR font rendering
+
+2019-07-09 zzz
+ * NetDb:
+   - Fix NPE on store of Encrypted LS (ticket #2563)
+   - Pick alternate reply GW for netdb store reply
+     if connected, to reduce connections
+
+2019-07-04 zzz
+ * Console: Hide netdb RI and LS tabs (ticket #2558)
+
+* 2019-07-03 0.9.41 released
+
+2019-06-28 zzz
+ * Update translations from Transifex
+
+2019-06-26 zzz
+ * Transport: Fix issues with leaving hidden mode (ticket #2557)
+
+2019-06-25 zzz
+ * I2CP: Prevent sending message to a local meta destination
+ * imagegen: Catch render error (ticket #2507)
+ * Router: Disable MessageHistory job on Android
+ * Streaming:
+   - Check that destinations match in signatures
+   - Increase size of recently-closed cache
+
+2019-06-22 zzz
+ * Console: New logo
+ * I2CP: Ensure that callbacks are called on abnormal close
+
+2019-06-21 zzz
+ * Transport: Update hidden mode country list
+
+2019-06-18 zzz
+ * i2ptunnel: Improve logging when no outproxy configured (ticket #2338)
+ * Reseed: Remove atomike
+
+2019-06-17 zzz
+ * Console: Hide news section in summary bar if
+   news fetching is disabled (ticket #2301)
+ * Router: Don't check for ping file at startup on Android
+
+2019-06-16 zzz
+ * i2psnark:
+   - Increase DHT blacklist time (ticket #2275)
+   - Fix QupZilla detection (ticket #2026)
+
+2019-06-15 zzz
+ * Console: Fix stopping webapps at shutdown (ticket #2508)
+
+2019-06-09 zzz
+ * Eepsite Help page: Add links to Arabic, Hungarian, Indonesian.
+   fix link to Italian
+ * SusiMail: Add Farsi translation
+ * Tests: Fix some bashisms, add more files to bashisms check
+ * UPnP: Set lease duration of 3 hours, always refresh the lease
+
+2019-06-08 zzz
+ * NetDB:
+   - Fix Deliv. Status msg sent direct to tunnel
+   - Faster startup for non-Android
+
+2019-06-07 zzz
+ * NetDB: Fix NPE on failed decrypt of enc. ls2
+
+2019-06-06 zzz
+ * CPUID/NBI:
+   - Add Skylake support (ticket #1869)
+   - Recognize more Intel "Lake" processors
+
+2019-06-05 zzz
+ * NetDb: Fix to set netDb ready immediately after reseed
+ * Util: Add EKU to selfsigned certs
+
+2019-06-03 zzz
+ * Transport: Fix large messages in SSU (ticket #2505)
+
+2019-06-02 zzz
+ * Build: Fix Debian (ticket #2517)
+ * i2ptunnel: Add new getInstance() method for Android
+ * Update PAC file for additional security
+
+2019-06-01 zzz
+ * NetDB: Don't wait for all RIs to be read in on Android
+ * Tunnels: Ensure GW Pumper threads stop on Android
+
+2019-05-31 zzz
+ * Blinding: Bug fixes
+ * Transport: UPnP fixes for Android (ticket #2499)
+
+2019-05-30 zzz
+ * Console: Support deleting blinded entries on /configkeyring
+
+2019-05-29 zzz
+ * I2CP: Fix bugs with lookup password
+ * Util: Store save time in config files
+
+2019-05-28 zzz
+ * Console: Form handling on /configkeyring for LS2
+
+2019-05-27 zzz
+ * Console: Start rework of /configkeyring for LS2
+
+2019-05-26 zzz
+ * I2CP: Add per-client auth to generated leaseset
+
+2019-05-24 zzz
+ * i2ptunnel:
+   - Per-client auth config
+   - Hide encryption key for per-client auth
+   - User-select: all for key fields
+
+2019-05-23 zzz
+ * i2ptunnel:
+   - Rework server encryption key UI in prep for blinded keys
+   - Remove generate button, automatically generate when required
+   - Refactor auto configuration
+   - Add LS2 option, change to select box
+   - Select box for sig type
+
+2019-05-22 zzz
+ * Crypto: Add X25519 DH class
+ * Data: Per-client auth for enc. LS2 (proposal 123)
+ * Transport: Use KeyGenerator for X25519 keys
+
+2019-05-21 zzz
+ * Profiles: Omit comments from stored profiles
+
+2019-05-20 zzz
+ * Console: Hide some columns on /peers SSU tab unless advanced
+ * Installer:
+   - Fix -console install for Izpack 5 (ticket #2492)
+   - Switch to Izpack 5 for non-windows release installer
+ * Sybil:
+   - Escape % in stored reasons
+   - Improve error handling when loading files
+   - Skip comment lines in stored files
+ * Tunnels: Increase tunnel reuse probability
+
+2019-05-19 zzz
+ * Build: Remove dependencies on Nashorn (ticket #2367)
+ * Sybil:
+   - Run IP and family tests on all routers
+   - Delete old stored analysis if configured
+
+2019-05-18 zzz
+ * Javadoc: fixes from FreeBSD ports
+ * Sybil:
+   - Option to run on non-floodfills too
+   - Show routers in analysis even if no RI available
+   - Date format and reason text fixes
+   - Add link to banlist
+
+2019-05-15 zzz
+ * EepGet: Don't continue when requested a partial but didn't
+   get it, and the output is to a stream
+ * Streaming: Fix NPE in debug logging (ticket #2504)
+
+2019-05-14 zzz
+ * Util: Don't set restrictive permissions on exported certs
+
+2019-05-13 zzz
+ * Console:
+   - Hide transport table unless advanced
+   - Prevent editing a client while it's starting
+ * Sybil: Add support for auto-blocking
+ * Tunnels: Fix connection checker for NTCP2
+
+2019-05-12 zzz
+ * Jetty: Fix webapps in eepsite (ticket #2477)
+ * Util: Consolidate Java version checking code, fix bugs
+
+2019-05-11 zzz
+ * Utils: Allow absolute path to certs in I2PSSLSocketFactory
+
+2019-05-10 zzz
+ * NetDB: Store Meta LS2 to floodfills (proposal #123)
+
+2019-05-09 zzz
+ * Console:
+   - Delay plugin update check until router is ready
+   - Remove plugin install success message (ticket #2494)
+ * Transport: Start first GeoIP lookup when netdb is ready
+ * Wrapper:
+   - Add support for armv7 and aarch64 (ticket #2308)
+   - Update to 3.5.39
+
+2019-05-08 zzz
+ * Utils: Auto-generate su3 output file for extract if not specified
+
 * 2019-05-07 0.9.40 released
 
 2019-05-02 zzz

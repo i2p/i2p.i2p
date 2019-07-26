@@ -633,7 +633,6 @@ th.snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type=
 
 .choked, .unchoked {
      font-weight: bold;
-     font-style: italic;
 }
 
 /* end main torrents listing */

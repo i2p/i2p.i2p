@@ -1743,14 +1743,6 @@ h1, .confignav {
      background: linear-gradient(to bottom, rgba(31, 43, 63, 0.7), rgba(31, 43, 63,.2) 50%, rgba(31, 43, 63, 0) 50%, rgba(31, 43, 63, 0.4) 50%, rgba(31, 43, 63, 0.5)), linear-gradient( to right, #6288cb, #7fadff, #6288cb);
 }
 
-@media screen and (min-width: 1400px) {
-#help .confignav, #debug .confignav {
-     position: sticky;
-     top: -1px;
-     z-index: 999;
-}
-}
-
 /* end topnav */
 
 .th_title a, .th_title a:hover {
@@ -1776,21 +1768,11 @@ h1, .confignav {
      word-spacing: normal;
 }
 
-h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, th#upnpconfig a, h3#graphinfo a, h3#graphdisplay a, .h3navlinks {
+h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, th#upnpconfig a, h3#graphinfo a, h3#graphdisplay a {
      float: right;
      font-size: 9pt;
      letter-spacing: normal;
      text-transform: capitalize;
-}
-
-.h3navlinks a {
-     text-transform: capitalize;
-     letter-spacing: normal;
-     margin-left: 2px;
-}
-
-.h3navlinks a:hover {
-     color: #f60;
 }
 
 h3 a.script, th a.script {

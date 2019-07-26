@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="tooljar">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <!-- noop -->
+    </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../../build"
+            srcdir="./src"
+            destdir="./build/obj" >
+        </depend>
+    </target>
+
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.classpath" value="" />
+    <property name="javac.version" value="1.7" />
+    <property name="izpack5.version" value="5.1.3" />
+
+    <property name="izpack.lib" value="${izpack5.home}/lib" />
+
+    <target name="compile" depends="depend">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+            includeAntRuntime="false"
+            destdir="./build/obj" >
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="${javac.classpath}" />
+                <pathelement location="${izpack.lib}/izpack-api-${izpack5.version}.jar" />
+                <pathelement location="${izpack.lib}/izpack-core-${zpack.ver}.jar" />
+                <pathelement location="${izpack.lib}/izpack-installer-${izpack5.version}.jar" />
+                <pathelement location="${izpack.lib}/izpack-panel-${izpack5.version}.jar" />
+                <pathelement location="${izpack.lib}/izpack-util-${izpack5.version}.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="build/izpack-i2p.jar">
+            <fileset dir="./build/obj" includes="**" />
+            <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+    </target>
+    <target name="distclean" depends="clean">
+    </target>
+</project>

@@ -5,6 +5,9 @@
 ** License: Public Domain
 ** Date:    11 May 2004
 **
+** Revised: 06 Jun 2019
+** Changes:
+**       Changed statusKeyword to limited
 ** Revised: 07 Sep 2004
 ** Changes:
 **       Proxy recursion disabled by default (strict)
@@ -78,7 +81,7 @@ var proxyStatus = "auto";
 **
 */
 
-var statusKeyword = "all";
+var statusKeyword = "limited";
 
 /*
 **   By default if proxyStatus is set to "auto" the config script

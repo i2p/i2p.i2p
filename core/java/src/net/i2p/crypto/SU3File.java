@@ -623,22 +623,30 @@ public class SU3File {
             } else if ("showversion".equals(cmd)) {
                 ok = showVersionCLI(a.get(0));
             } else if ("sign".equals(cmd)) {
-                // speed things up by specifying a small PRNG buffer size
-                Properties props = new Properties();
-                props.setProperty("prng.bufferSize", "16384");
-                new I2PAppContext(props);
+                if (I2PAppContext.getCurrentContext() == null) {
+                    // speed things up by specifying a small PRNG buffer size
+                    Properties props = new Properties();
+                    props.setProperty("prng.bufferSize", "16384");
+                    new I2PAppContext(props);
+                }
                 ok = signCLI(stype, ctype, ftype, a.get(0), a.get(1), a.get(2), a.get(3), a.get(4), "", kspass);
             } else if ("bulksign".equals(cmd)) {
-                Properties props = new Properties();
-                props.setProperty("prng.bufferSize", "16384");
-                new I2PAppContext(props);
+                if (I2PAppContext.getCurrentContext() == null) {
+                    // speed things up by specifying a small PRNG buffer size
+                    Properties props = new Properties();
+                    props.setProperty("prng.bufferSize", "16384");
+                    new I2PAppContext(props);
+                }
                 ok = bulkSignCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3), kspass);
             } else if ("verifysig".equals(cmd)) {
                 ok = verifySigCLI(a.get(0), kfile);
             } else if ("keygen".equals(cmd)) {
-                Properties props = new Properties();
-                props.setProperty("prng.bufferSize", "16384");
-                new I2PAppContext(props);
+                if (I2PAppContext.getCurrentContext() == null) {
+                    // speed things up by specifying a small PRNG buffer size
+                    Properties props = new Properties();
+                    props.setProperty("prng.bufferSize", "16384");
+                    new I2PAppContext(props);
+                }
                 ok = genKeysCLI(stype, a.get(0), a.get(1), crlfile, a.get(2), kspass);
             } else if ("extract".equals(cmd)) {
                 String outfile = (a.size() > 1) ? a.get(1) : null;

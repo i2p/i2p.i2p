@@ -1,5 +1,7 @@
 package net.i2p.data;
 
+import java.util.Date;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.Blinding;
 import net.i2p.crypto.SigType;
@@ -23,13 +25,48 @@ public class BlindData {
     private SigningPrivateKey _alpha;
     private Destination _dest;
     private long _routingKeyGenMod;
+    private boolean _secretRequired;
+    private boolean _authRequired;
+    private long _date;
+    private String _b32;
+
+    /**
+     * bits 3-0 including per-client bit
+     * @since 0.9.41
+     */
+    public static final int AUTH_NONE = 0;
+    /**
+     * bits 3-0 including per-client bit
+     * @since 0.9.41
+     */
+    public static final int AUTH_DH = 1;
+    /**
+     * bits 3-0 including per-client bit
+     * @since 0.9.41
+     */
+    public static final int AUTH_PSK = 3;
+    /**
+     * Enabled, unspecified type
+     * @since 0.9.41
+     */
+    public static final int AUTH_ON = 999;
 
     /**
      *  @param secret may be null or zero-length
      *  @throws IllegalArgumentException on various errors
      */
     public BlindData(I2PAppContext ctx, Destination dest, SigType blindType, String secret) {
-        this(ctx, dest.getSigningPublicKey(), blindType, secret);
+        this(ctx, dest, blindType, secret, AUTH_NONE, null);
+    }
+
+    /**
+     *  @param secret may be null or zero-length
+     *  @throws IllegalArgumentException on various errors
+     *  @since 0.9.41
+     */
+    public BlindData(I2PAppContext ctx, Destination dest, SigType blindType, String secret,
+                     int authType, PrivateKey authKey) {
+        this(ctx, dest.getSigningPublicKey(), blindType, secret, authType, authKey);
         _dest = dest;
     }
 
@@ -38,12 +75,33 @@ public class BlindData {
      *  @throws IllegalArgumentException on various errors
      */
     public BlindData(I2PAppContext ctx, SigningPublicKey spk, SigType blindType, String secret) {
+        this(ctx, spk, blindType, secret, AUTH_NONE, null);
+    }
+
+    /**
+     *  @param secret may be null or zero-length
+     *  @throws IllegalArgumentException on various errors
+     *  @since 0.9.41
+     */
+    public BlindData(I2PAppContext ctx, SigningPublicKey spk, SigType blindType, String secret,
+                     int authType, PrivateKey authKey) {
         _context = ctx;
         _clearSPK = spk;
         _blindType = blindType;
         _secret = secret;
-        _authType = -1;
-        _authKey = null;
+        // fix, previous default was -1
+        if (authType < 0)
+            authType = AUTH_NONE;
+        if ((authType != AUTH_NONE && authKey == null) ||
+            (authType == AUTH_NONE && authKey != null))
+            throw new IllegalArgumentException();
+        _authType = authType;
+        _authKey = authKey;
+        if (secret != null)
+            _secretRequired = true;
+        if (authKey != null)
+            _authRequired = true;
+        _date = _context.clock().now();
         // defer until needed
         //calculate();
     }
@@ -122,7 +180,7 @@ public class BlindData {
     }
 
     /**
-     *  @return -1 for no client auth
+     *  @return 0 for no client auth, 1 for DH, 3 for PSK
      */
     public int getAuthType() {
         return _authType;
@@ -157,7 +215,62 @@ public class BlindData {
         System.arraycopy(_blindSPK.getData(), 0, hashData, 2, _blindSPK.length());
         _blindHash = _context.sha().calculateHash(hashData);
     }
-    
+
+    /**
+     *  b33 format
+     *  @since 0.9.41
+     */
+    public synchronized String toBase32() {
+        if (_b32 == null)
+            _b32 = Blinding.encode(_clearSPK, _secretRequired, _authRequired);
+        return _b32;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public synchronized void setSecretRequired() {
+        _secretRequired = true;
+        _b32 = null;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public boolean getSecretRequired() {
+        return _secretRequired;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public synchronized void setAuthRequired() {
+        _authRequired = true;
+        _b32 = null;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public boolean getAuthRequired() {
+        return _authRequired;
+    }
+
+    /**
+     *  @since 0.9.41
+     */
+    public void setDate(long date) {
+        _date = date;
+    }
+
+    /**
+     *  @return creation date or as overridden by setDate()
+     *  @since 0.9.41
+     */
+    public long getDate() {
+        return _date;
+    }
+
     @Override
     public synchronized String toString() {
         calculate();
@@ -169,17 +282,23 @@ public class BlindData {
         buf.append("\n\tBlinded Hash    : ").append(_blindHash);
         if (_secret != null)
             buf.append("\n\tSecret          : \"").append(_secret).append('"');
+        else
+            buf.append("\n\tSecret Required : ").append(_secretRequired);
         buf.append("\n\tAuth Type       : ");
-        if (_authType >= 0)
+        if (_authType > 0)
             buf.append(_authType);
         else
             buf.append("none");
         if (_authKey != null)
             buf.append("\n\tAuth Key   : ").append(_authKey);
-        if (_dest != null)
-            buf.append("\n\tDestination: ").append(_dest);
         else
-            buf.append("\n\tDestination: unknown");
+            buf.append("\n\tAuth Required   : ").append(_authRequired);
+        if (_dest != null)
+            buf.append("\n\tDestination     : ").append(_dest);
+        else
+            buf.append("\n\tDestination     : unknown");
+        buf.append("\n\tB32             : ").append(toBase32());
+        buf.append("\n\tCreated         : ").append((new Date(_date)).toString());
         buf.append(']');
         return buf.toString();
     }

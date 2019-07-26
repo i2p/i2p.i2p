@@ -86,7 +86,6 @@ public class InNetMessagePool implements Service {
         _context.statManager().createRateStat("inNetPool.dropped", "How often do we drop a message", "InNetPool", new long[] { 60*60*1000l });
         _context.statManager().createRateStat("inNetPool.droppedDeliveryStatusDelay", "How long after a delivery status message is created do we receive it back again (for messages that are too slow to be handled)", "InNetPool", new long[] { 60*60*1000l });
         _context.statManager().createRateStat("inNetPool.duplicate", "How often do we receive a duplicate message", "InNetPool", new long[] { 60*60*1000l });
-        //_context.statManager().createRateStat("inNetPool.droppedTunnelCreateStatusMessage", "How often we drop a slow-to-arrive tunnel request response", "InNetPool", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("inNetPool.droppedDbLookupResponseMessage", "How often we drop a slow-to-arrive db search response", "InNetPool", new long[] { 60*60*1000l });
     }
   
@@ -175,13 +174,18 @@ public class InNetMessagePool implements Service {
         boolean jobFound = false;
         boolean allowMatches = true;
         
-        if (type == TunnelGatewayMessage.MESSAGE_TYPE) {
+        switch (type) { 
+          case TunnelGatewayMessage.MESSAGE_TYPE:
             shortCircuitTunnelGateway(messageBody);
             allowMatches = false;
-        } else if (type == TunnelDataMessage.MESSAGE_TYPE) {
+            break;
+
+          case TunnelDataMessage.MESSAGE_TYPE:
             shortCircuitTunnelData(messageBody, fromRouterHash);
             allowMatches = false;
-        } else {
+            break;
+
+          default:
             // why don't we allow type 0? There used to be a message of type 0 long ago...
             if ( (type > 0) && (type < _handlerJobBuilders.length) ) {
                 HandlerJobBuilder builder = _handlerJobBuilders[type];
@@ -203,7 +207,8 @@ public class InNetMessagePool implements Service {
                     }
                 }
             }
-        }
+            break;
+        } // switch
 
         if (allowMatches) {
             int replies = handleReplies(messageBody);
@@ -213,7 +218,9 @@ public class InNetMessagePool implements Service {
                 if (!jobFound) { 
                     // was not handled via HandlerJobBuilder
                     _context.messageHistory().droppedOtherMessage(messageBody, (fromRouter != null ? fromRouter.calculateHash() : fromRouterHash));
-                    if (type == DeliveryStatusMessage.MESSAGE_TYPE) {
+
+                    switch (type) { 
+                      case DeliveryStatusMessage.MESSAGE_TYPE:
                         // Avoid logging side effect from a horrible UDP EstablishmentManager hack
                         // We could set up a separate stat for it but don't bother for now
                         long arr = ((DeliveryStatusMessage)messageBody).getArrival();
@@ -223,25 +230,28 @@ public class InNetMessagePool implements Service {
                                 _log.warn("Dropping unhandled delivery status message created " + timeSinceSent + "ms ago: " + messageBody);
                             _context.statManager().addRateData("inNetPool.droppedDeliveryStatusDelay", timeSinceSent);
                         }
-                    //} else if (type == TunnelCreateStatusMessage.MESSAGE_TYPE) {
-                    //    if (_log.shouldLog(Log.INFO))
-                    //        _log.info("Dropping slow tunnel create request response: " + messageBody);
-                    //    _context.statManager().addRateData("inNetPool.droppedTunnelCreateStatusMessage", 1, 0);
-                    } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
+                        break;
+
+                      case DatabaseSearchReplyMessage.MESSAGE_TYPE:
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Dropping slow db lookup response: " + messageBody);
                         _context.statManager().addRateData("inNetPool.droppedDbLookupResponseMessage", 1);
-                    } else if (type == DatabaseLookupMessage.MESSAGE_TYPE) {
+                        break;
+
+                      case DatabaseLookupMessage.MESSAGE_TYPE:
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Dropping netDb lookup due to throttling");
-                    } else {
+                        break;
+
+                      default:
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Message expiring on " 
                                       + messageBody.getMessageExpiration()
                                       + " was not handled by a HandlerJobBuilder - DROPPING: " + messageBody, 
                                       new Exception("f00!"));
                         _context.statManager().addRateData("inNetPool.dropped", 1);
-                    }
+                        break;
+                    }  // switch
                 } else {
                     String mtype = messageBody.getClass().getName();
                     _context.messageHistory().receiveMessage(mtype, messageBody.getUniqueId(), 

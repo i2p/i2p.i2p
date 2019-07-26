@@ -172,6 +172,8 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_EXCAVATOR   = "excavator";
     private final static String JBIGI_OPTIMIZATION_BOBCAT      = "bobcat";
     private final static String JBIGI_OPTIMIZATION_JAGUAR      = "jaguar";
+    /** @since 0.9.41 */
+    private final static String JBIGI_OPTIMIZATION_SKYLAKE     = "skylake";
 
     /**
      * Non-x86, no fallbacks to older libs or to "none"
@@ -233,7 +235,8 @@ public class NativeBigInteger extends BigInteger {
     private final static String[] JBIGI_COMPAT_LIST_INTEL_PENTIUM = {JBIGI_OPTIMIZATION_PENTIUM4, JBIGI_OPTIMIZATION_PENTIUMM, JBIGI_OPTIMIZATION_PENTIUM3,
                                                                      JBIGI_OPTIMIZATION_PENTIUM2, JBIGI_OPTIMIZATION_PENTIUMMMX, JBIGI_OPTIMIZATION_PENTIUM,
                                                                      JBIGI_OPTIMIZATION_X86};
-    private final static String[] JBIGI_COMPAT_LIST_INTEL_CORE    = {JBIGI_OPTIMIZATION_COREI_BWL, JBIGI_OPTIMIZATION_COREI_HWL, JBIGI_OPTIMIZATION_COREI_SBR,
+    private final static String[] JBIGI_COMPAT_LIST_INTEL_CORE    = {JBIGI_OPTIMIZATION_SKYLAKE,
+                                                                     JBIGI_OPTIMIZATION_COREI_BWL, JBIGI_OPTIMIZATION_COREI_HWL, JBIGI_OPTIMIZATION_COREI_SBR,
                                                                      JBIGI_OPTIMIZATION_COREI, JBIGI_OPTIMIZATION_CORE2, JBIGI_OPTIMIZATION_PENTIUMM,
                                                                      JBIGI_OPTIMIZATION_PENTIUM3, JBIGI_OPTIMIZATION_X86};
 
@@ -293,6 +296,7 @@ public class NativeBigInteger extends BigInteger {
         put(JBIGI_OPTIMIZATION_COREI_SBR, JBIGI_COMPAT_LIST_INTEL_CORE);
         put(JBIGI_OPTIMIZATION_COREI_HWL, JBIGI_COMPAT_LIST_INTEL_CORE);
         put(JBIGI_OPTIMIZATION_COREI_BWL, JBIGI_COMPAT_LIST_INTEL_CORE);
+        put(JBIGI_OPTIMIZATION_SKYLAKE,   JBIGI_COMPAT_LIST_INTEL_CORE);
     }};
 
     /**
@@ -387,6 +391,8 @@ public class NativeBigInteger extends BigInteger {
                         return JBIGI_OPTIMIZATION_K6;
                 } else if (c instanceof IntelCPUInfo) {
                     IntelCPUInfo intelcpu = (IntelCPUInfo) c;
+                    if (intelcpu.IsSkylakeCompatible())
+                        return JBIGI_OPTIMIZATION_SKYLAKE;
                     if (intelcpu.IsBroadwellCompatible())
                         return JBIGI_OPTIMIZATION_COREI_BWL;
                     if (intelcpu.IsHaswellCompatible())

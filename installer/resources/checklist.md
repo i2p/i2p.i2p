@@ -1,5 +1,10 @@
 # Release checklist and process
 
+## Two weeks before
+
+- Review Google Play crash reports, fix any related issues
+
+
 ## One week before
 
 - Announce string freeze on #i2p-dev
@@ -21,12 +26,13 @@
 - Tickets: Check if any blocker or critical tickets for this release remain open;
   get them fixed and closed, or reclassified.
 
-- Review Google Play crash reports, fix any related issues
-
 - Initial review: Review the complete diff from the last release, fix any issues
 
 - Trial Debian build: Build and test a preliminary Debian build
   with 'ant debian' and fix any issues
+
+- Javadoc test: 'ant javadoc' with an Oracle JDK, fix any issues
+  Oracle JDK will error on things that OpenJDK does not!
 
 
 ## A day or two before

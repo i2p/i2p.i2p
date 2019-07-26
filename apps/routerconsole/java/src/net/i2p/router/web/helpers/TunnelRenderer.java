@@ -28,7 +28,7 @@ import net.i2p.stat.RateStat;
  *  For /tunnels.jsp, used by TunnelHelper.
  */
 class TunnelRenderer {
-    private RouterContext _context;
+    private final RouterContext _context;
 
     private static final int DISPLAY_LIMIT = 200;
 
@@ -115,7 +115,7 @@ class TunnelRenderer {
         if (bwShare > 12) {
         // Don't bother re-indenting
         if (!participating.isEmpty()) {
-            Collections.sort(participating, new TunnelComparator());
+            DataHelper.sort(participating, new TunnelComparator());
             out.write("<table class=\"tunneldisplay tunnels_participating\"><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
                   + _t("Send on") + "</th><th>" + _t("To") + "</th><th>" + _t("Expiration") + "</th>"
                   + "<th>" + _t("Usage") + "</th><th>" + _t("Rate") + "</th><th>" + _t("Role") + "</th></tr>\n");

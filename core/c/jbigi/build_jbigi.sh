@@ -77,6 +77,16 @@ sunos*|openbsd*|netbsd*|*freebsd*|linux*)
         fi
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;
+android)
+        BUILD_OS="linux"
+        if [ $BITS -eq 32 ]; then
+            COMPILEFLAGS="-O2 -pedantic -fomit-frame-pointer -march=armv7-a -mfloat-abi=softfp -mtune=cortex-a5 -fPIC -DPIC"
+        else
+            COMPILEFLAGS="-O2 -pedantic -march=armv8-a -Wa,--noexecstack -fPIC -DPIC"
+        fi
+        LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
+        LIBFILE="libjbigi.so";;
 *)
         echo "Unsupported system type."
         exit 1;;
@@ -110,5 +120,8 @@ else
 fi
 echo "Link: \"$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH\""
 $CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1
-
+if [ ! -z "$STRIP" ]; then
+    echo "Strip: \"$STRIP $LIBFILE\""
+    $STRIP $LIBFILE
+fi
 exit 0

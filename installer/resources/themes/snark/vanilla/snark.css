@@ -1135,10 +1135,6 @@ thead img.disable, img.disable:hover {
      color: #008000 !important;
 }
 
-.choked, .unchoked {
-     font-style: italic;
-}
-
 .thumb {
      transition: ease all 0.2s;
      max-width: 16px;

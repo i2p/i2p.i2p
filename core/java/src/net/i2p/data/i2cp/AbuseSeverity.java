@@ -9,6 +9,7 @@ package net.i2p.data.i2cp;
  *
  */
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,7 +41,9 @@ public class AbuseSeverity extends DataStructureImpl {
     }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _severityId = (int) DataHelper.readLong(in, 1);
+        _severityId = in.read();
+        if (_severityId < 0)
+            throw new EOFException();
     }
 
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {

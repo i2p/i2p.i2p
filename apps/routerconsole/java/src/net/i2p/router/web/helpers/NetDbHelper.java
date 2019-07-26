@@ -1,7 +1,9 @@
 package net.i2p.router.web.helpers;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -36,10 +38,11 @@ public class NetDbHelper extends FormHandler {
                                           {_x("Summary"),                       // 0
                                            _x("Local Router"),                  // 1
                                            _x("Router Lookup"),                 // 2
+                                           // advanced below here
                                            _x("All Routers"),                   // 3
                                            _x("All Routers with Full Stats"),   // 4
-                                           "LeaseSet Debug",                    // 5
-                                           _x("LeaseSets"),                     // 6
+                                           _x("LeaseSets"),                     // 5
+                                           "LeaseSet Debug",                    // 6
                                            "Sybil",                             // 7
                                            "Advanced Lookup"   };               // 8
 
@@ -49,8 +52,8 @@ public class NetDbHelper extends FormHandler {
                                            "",                                  // 2
                                            "?f=2",                              // 3
                                            "?f=1",                              // 4
-                                           "?l=2",                              // 5
-                                           "?l=1",                              // 6
+                                           "?l=1",                              // 5
+                                           "?l=2",                              // 6
                                            "?f=3",                              // 7
                                            "?f=4" };                            // 8
 
@@ -221,11 +224,33 @@ public class NetDbHelper extends FormHandler {
         _postOK = "Run new analysis".equals(_action) ||
                   "Review analysis".equals(_action);
         if ("Save".equals(_action)) {
-            String newTime = getJettyString("runFrequency");
-            if (newTime != null) {
                 try {
-                    long ntime = Long.parseLong(newTime) * 60*60*1000;
-                    if (_context.router().saveConfig(Analysis.PROP_FREQUENCY, Long.toString(ntime)))
+                    Map<String, String> toSave = new HashMap<String, String>(4);
+                    String newTime = getJettyString("runFrequency");
+                    if (newTime != null) {
+                        long ntime = Long.parseLong(newTime) * 60*60*1000;
+                        toSave.put(Analysis.PROP_FREQUENCY, Long.toString(ntime));
+                    }
+                    String thresh = getJettyString("threshold");
+                    if (thresh != null && thresh.length() > 0) {
+                        float val = Math.max(Float.parseFloat(thresh), Analysis.MIN_BLOCK_POINTS);
+                        toSave.put(Analysis.PROP_THRESHOLD, Float.toString(val));
+                    }
+                    String days = getJettyString("days");
+                    if (days != null && days.length() > 0) {
+                        long val = 24*60*60*1000L * Integer.parseInt(days);
+                        toSave.put(Analysis.PROP_BLOCKTIME, Long.toString(val));
+                    }
+                    String age = getJettyString("deleteAge");
+                    if (age != null && age.length() > 0) {
+                        long val = 24*60*60*1000L * Integer.parseInt(age);
+                        toSave.put(Analysis.PROP_REMOVETIME, Long.toString(val));
+                    }
+                    String enable = getJettyString("block");
+                    toSave.put(Analysis.PROP_BLOCK, Boolean.toString(enable != null));
+                    String nonff = getJettyString("nonff");
+                    toSave.put(Analysis.PROP_NONFF, Boolean.toString(nonff != null));
+                    if (_context.router().saveConfig(toSave, null))
                         addFormNotice(_t("Configuration saved successfully."));
                     else
                         addFormError("Error saving the configuration (applied but not saved) - please see the error logs");
@@ -233,7 +258,6 @@ public class NetDbHelper extends FormHandler {
                 } catch (NumberFormatException nfe) {
                         addFormError("bad value");
                 }
-            }
         }
     }
 
@@ -257,7 +281,7 @@ public class NetDbHelper extends FormHandler {
             } else if (_full == 3) {
                 if (_mode == 12 && !_postOK)
                     _mode = 0;
-                else if (_mode == 13 && !_postOK)
+                else if ((_mode == 13 || _mode == 16) && !_postOK)
                     _mode = 14;
                 (new SybilRenderer(_context)).getNetDbSummary(_out, _newNonce, _mode, _date);
             } else if (_full == 4) {
@@ -276,9 +300,9 @@ public class NetDbHelper extends FormHandler {
      */
     private int getTab() {
         if (_debug)
-            return 5;
-        if (_lease)
             return 6;
+        if (_lease)
+            return 5;
         if (".".equals(_routerPrefix))
             return 1;
         if (_routerPrefix != null || _version != null || _country != null ||
@@ -310,7 +334,7 @@ public class NetDbHelper extends FormHandler {
         for (int i = 0; i < titles.length; i++) {
             if (i == 2 && tab != 2)
                 continue;   // can't nav to lookup
-            if ((i == 5 || i == 7 || i == 8) && !isAdvanced())
+            if (i > 2 && i != tab && !isAdvanced())
                 continue;
             if (i == tab) {
                 // we are there

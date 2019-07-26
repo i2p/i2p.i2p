@@ -21,10 +21,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -36,6 +38,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionListener;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
@@ -86,9 +89,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /** who we are */
     private final Destination _myDestination;
     /** private key for decryption */
-    private final PrivateKey _privateKey;
+    private PrivateKey _privateKey;
     /** private key for signing */
-    private   /* final */   SigningPrivateKey _signingPrivateKey;
+    private SigningPrivateKey _signingPrivateKey;
     /** configuration options */
     private final Properties _options;
     /** this session's Id */
@@ -165,6 +168,18 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         CLOSING,
         CLOSED
     }
+
+    private static final Set<State> STATES_CLOSED =
+        EnumSet.of(State.INIT, State.CLOSED);
+
+    private static final Set<State> STATES_OPENING =
+        EnumSet.of(State.INIT, State.OPENING);
+
+    private static final Set<State> STATES_CLOSED_OR_OPENING =
+        EnumSet.of(State.INIT, State.CLOSED, State.OPENING);
+
+    private static final Set<State> STATES_CLOSED_OR_CLOSING =
+        EnumSet.of(State.INIT, State.CLOSED, State.CLOSING);
 
     protected State _state = State.INIT;
     protected final Object _stateLock = new Object();
@@ -573,6 +588,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     private void readDestination(InputStream destKeyStream) throws DataFormatException, IOException {
         _myDestination.readBytes(destKeyStream);
+        // we don't support EncTypes in Destinations,
+        // but i2pd does, and also, this code is used from PrivateKeyFile to
+        // read in router.keys.dat files and we will support EncTypes for RouterIdentities
+        EncType etype = _myDestination.getPublicKey().getType();
+        if (etype != EncType.ELGAMAL_2048)
+            _privateKey = new PrivateKey(etype);
         _privateKey.readBytes(destKeyStream);
         SigType dtype = _myDestination.getSigningPublicKey().getType();
         _signingPrivateKey = new SigningPrivateKey(dtype);
@@ -850,7 +871,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 synchronized(_stateLock) {
                     if (_state == State.GOTDATE)
                         break;
-                    if (_state != State.OPENING && _state != State.INIT)
+                    if (!STATES_OPENING.contains(_state))
                         throw new IOException("Socket closed, state=" + _state);
                     // InterruptedException caught by caller
                     _stateLock.wait(1000);
@@ -1101,12 +1122,14 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /** 
      * The I2CPMessageEventListener callback.
      * Recieve notifiation of an error reading the I2CP stream.
+     * As of 0.9.41, does NOT call sessionlistener.disconnected(),
+     * the I2CPMessageReader will call disconnected() also.
+     *
      * @param reader unused
      * @param error non-null
      */
     public void readError(I2CPMessageReader reader, Exception error) {
         propogateError("There was an error reading data", error);
-        disconnect();
     }
 
     /**
@@ -1146,7 +1169,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Retrieve the configuration options, filtered.
      * All defaults passed in via constructor have been promoted to the primary map.
      *
-     * @return non-null, if insantiated with null options, this will be the System properties.
+     * @return non-null, if instantiated with null options, this will be the System properties.
      */
     Properties getOptions() { return _options; }
 
@@ -1165,7 +1188,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     public boolean isClosed() {
         synchronized (_stateLock) {
-            return _state == State.CLOSED || _state == State.INIT;
+            return STATES_CLOSED.contains(_state);
         }
     }
 
@@ -1243,6 +1266,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /**
      * Pass off the error to the listener
      * Misspelled, oh well.
+     * Calls sessionlistener.errorOccurred()
+     *
      * @param error non-null
      */
     void propogateError(String msg, Throwable error) {
@@ -1278,10 +1303,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Tear down the session, and do NOT reconnect.
      * 
      * Will interrupt an open in progress.
+     * Calls sessionlistener.disconnected()
      */
     public void destroySession(boolean sendDisconnect) {
         synchronized(_stateLock) {
-            if (_state == State.CLOSING || _state == State.CLOSED || _state == State.INIT)
+            if (STATES_CLOSED_OR_CLOSING.contains(_state))
                 return;
             changeState(State.CLOSING);
         }
@@ -1365,25 +1391,28 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /**
      * The I2CPMessageEventListener callback.
      * Recieve notification that the I2CP connection was disconnected.
+     * Calls sessionlistener.disconnected()
      * @param reader unused
      */
     public void disconnected(I2CPMessageReader reader) {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnected", new Exception("Disconnected"));
         disconnect();
     }
 
     /**
      * Will interrupt a connect in progress.
+     * Calls sessionlistener.disconnected()
      */
     protected void disconnect() {
         State oldState;
         synchronized(_stateLock) {
-            if (_state == State.CLOSING || _state == State.CLOSED || _state == State.INIT)
+            if (STATES_CLOSED_OR_CLOSING.contains(_state))
                 return;
             oldState = _state;
             changeState(State.CLOSING);
         }
-        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnect() called", new Exception("Disconnect"));
+        if (_log.shouldWarn())
+            _log.warn(getPrefix() + "Disconnected", new Exception("Disconnected"));
+        if (_sessionListener != null) _sessionListener.disconnected(this);
         // don't try to reconnect if it failed before GETTDATE
         if (oldState != State.OPENING && shouldReconnect()) {
             if (reconnect()) {
@@ -1395,7 +1424,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
         if (_log.shouldLog(Log.ERROR))
             _log.error(getPrefix() + "Disconned from the router, and not trying to reconnect");
-        if (_sessionListener != null) _sessionListener.disconnected(this);
 
         closeSocket();
         changeState(State.CLOSED);
@@ -1445,7 +1473,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected String getPrefix() {
         StringBuilder buf = new StringBuilder();
         buf.append('[');
-        buf.append(_state.toString()).append(' ');
         String s = _options.getProperty("inbound.nickname");
         if (s != null)
             buf.append(s);
@@ -1454,6 +1481,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SessionId id = _sessionId;
         if (id != null)
             buf.append(" #").append(id.getSessionId());
+        buf.append('(').append(_state.toString()).append(')');
         buf.append("]: ");
         return buf.toString();
     }
@@ -1606,9 +1634,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         synchronized (_stateLock) {
             // not before GOTDATE
-            if (_state == State.CLOSED ||
-                _state == State.INIT ||
-                _state == State.OPENING) {
+            if (STATES_CLOSED_OR_OPENING.contains(_state)) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Session closed, cannot lookup " + h);
                 return null;
@@ -1750,9 +1776,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     public int[] bandwidthLimits() throws I2PSessionException {
         synchronized (_stateLock) {
             // not before GOTDATE
-            if (_state == State.CLOSED ||
-                _state == State.INIT ||
-                _state == State.OPENING) {
+            if (STATES_CLOSED_OR_OPENING.contains(_state)) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Session closed, cannot get bw limits");
                 return null;
