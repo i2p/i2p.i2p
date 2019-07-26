@@ -83,6 +83,7 @@ reprepro -v update eoan
 # and /var/www/debian/conf/updates
 # and then: reprepro -v export foo (for new foo)
 # and then: reprepro -v update foo
+# and:      reprepro -v copysrc foo buster i2p-keyring
 # If you remove, you must do: reprepro clearvanished
 
 

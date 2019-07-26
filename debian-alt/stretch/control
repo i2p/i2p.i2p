@@ -1,18 +1,17 @@
 Source: i2p
-Maintainer: Masayuki Hatta <mhatta@debian.org>
+Maintainer: zzz <zzz@i2pmail.org>
 Section: net
-Standards-Version: 4.1.3
+Standards-Version: 3.9.8
 Priority: optional
+Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
-Vcs-Browser: https://salsa.debian.org/debian/i2p
-Vcs-Git: https://salsa.debian.org/debian/i2p.git
 Build-Depends: debhelper (>= 9.20160709)
  ,ant (>= 1.8)
  ,debconf
- ,openjdk-9-jdk
- ,libjetty9-java (>= 9.2.22)
+ ,openjdk-8-jdk
+ ,libjetty9-java
  ,libtaglibs-standard-jstlel-java
- ,libtomcat9-java
+ ,libtomcat8-java
  ,dh-apparmor
  ,bash-completion
  ,gettext
@@ -28,13 +27,11 @@ Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  adduser,
- apparmor,
  debconf,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni,
- lsb-base (>= 3.0-6),
- service-wrapper,
- ucf (>= 0.28)
+ lsb-base,
+ service-wrapper
 Description: Invisible Internet Project (I2P) - anonymous network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
@@ -61,7 +58,7 @@ Description: Invisible Internet Project (I2P) - libjbigi library
 Package: i2p-doc
 Architecture: all
 Section: doc
-Priority: optional
+Priority: extra
 Depends: ${misc:Depends}
 Suggests: i2p, default-jdk-doc
 Description: Invisible Internet Project (I2P) - developer documentation
@@ -84,9 +81,8 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  libjson-simple-java (<< 3),
  libjetty9-java,
  libtaglibs-standard-jstlel-java,
- libtomcat9-java,
- famfamfam-flag-png,
- sensible-utils
+ libtomcat8-java,
+ famfamfam-flag-png
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, fonts-dejavu

@@ -1,3 +1,87 @@
+i2p (0.9.41-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.41
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 3 Jul 2019 12:12:12 +0000
+
+i2p (0.9.40-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.40
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 8 May 2019 12:12:12 +0000
+
+i2p (0.9.39-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.39
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 22 Mar 2019 12:12:12 +0000
+
+i2p (0.9.38-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.38
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 23 Jan 2019 12:12:12 +0000
+
+i2p (0.9.37-1ubuntu1) bionic; urgency=medium
+
+  * New upstream version 0.9.37
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 05 Oct 2018 12:12:12 +0000
+
+i2p (0.9.36-2ubuntu1) bionic; urgency=medium
+
+  * New upstream version 0.9.36
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 23 Aug 2018 12:12:12 +0000
+
+i2p (0.9.35-1ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.35
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 27 Jun 2018 12:12:12 +0000
+
+i2p (0.9.34-2ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.34
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Apr 2018 12:12:12 +0000
+
+i2p (0.9.33-1ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.33
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 30 Jan 2018 12:12:12 +0000
+
+i2p (0.9.32-1ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.32
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 08 Nov 2017 12:12:12 +0000
+
+i2p (0.9.31-1ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.31
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 09 Aug 2017 12:12:12 +0000
+
+i2p (0.9.30-3ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.30
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 03 May 2017 12:12:12 +0000
+
+i2p (0.9.29-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.29
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 27 Feb 2017 12:12:12 +0000
+
+i2p (0.9.28-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.28
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 13 Dec 2016 12:12:12 +0000
+
 i2p (0.9.27-1~deb8u+1) stable; urgency=medium
 
   * Backport to Jessie

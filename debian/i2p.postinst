@@ -71,8 +71,8 @@ case "$1" in
             sed -e "s/User=.*/User=$I2PUSER/" < "$systemdservice" > "$systemdservice.tmp"
             mv -f "$systemdservice.tmp" "$systemdservice"
             chmod 0644 -f "$systemdservice"
-            if grep -q 'systemd' /proc/1/comm > /dev/null 2>&1; then
-                systemctl --system daemon-reload
+            if [ -d /run/systemd/system ]; then
+                systemctl --system daemon-reload || true
                 if [ $RUN_DAEMON = 'true' ]; then
                     deb-systemd-helper enable i2p.service
                 else
