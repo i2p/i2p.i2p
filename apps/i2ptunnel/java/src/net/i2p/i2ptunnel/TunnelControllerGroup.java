@@ -359,6 +359,9 @@ public class TunnelControllerGroup implements ClientApp {
                     boolean ok = migrate(props, cfgFile, dir);
                     if (!ok)
                         shouldMigrate = false;
+                } else {
+                    _log.logAlways(Log.WARN, "Using new tunnel configurations in " + dir +
+                                             " - ignoring old tunnel configuration in " + cfgFile);
                 }
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.ERROR))
@@ -368,7 +371,6 @@ public class TunnelControllerGroup implements ClientApp {
         } else if (!shouldMigrate) {
                 throw new IllegalArgumentException("Unable to load the controllers from " + cfgFile);
         }
-        int i = 0;
         _controllersLock.writeLock().lock();
         try {
             if (shouldMigrate && dir.isDirectory()) {
@@ -401,7 +403,6 @@ public class TunnelControllerGroup implements ClientApp {
                         continue;
                     TunnelController controller = new TunnelController(cfg, "");
                     _controllers.add(controller);
-                    i++;
                 }
             }
         } finally {
@@ -409,6 +410,7 @@ public class TunnelControllerGroup implements ClientApp {
         }
 
         _controllersLoaded = true;
+        int i = _controllers.size();
         if (i > 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(i + " controllers loaded from " + cfgFile);
@@ -849,12 +851,12 @@ public class TunnelControllerGroup implements ClientApp {
         DataHelper.loadProps(config, cfgFile);
         for (String key : config.stringPropertyNames()) {
             if (key.startsWith(PREFIX)) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Found monolithic config file " +key+ cfgFile.toString());
+                if (_log.shouldDebug())
+                    _log.debug("Found monolithic config file " + cfgFile);
                 return loadMonolithicConfig(config, cfgFile.getAbsolutePath());
             } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Found split config file " +key+ cfgFile.toString());
+                if (_log.shouldDebug())
+                    _log.debug("Found split config file " + cfgFile);
                 List<Properties> rv = new ArrayList<Properties>(1);
                 config.setProperty(TunnelController.PROP_CONFIG_FILE, cfgFile.getAbsolutePath());
                 rv.add(config);
