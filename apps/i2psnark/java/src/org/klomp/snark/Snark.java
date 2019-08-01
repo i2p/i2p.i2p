@@ -656,10 +656,10 @@ public class Snark
             ioe.printStackTrace();
         }
         savedUploaded = nowUploaded;
-        if (changed && completeListener != null)
-            completeListener.updateStatus(this);
-        // TODO should save comments at shutdown even if never started...
+        // SnarkManager.stopAllTorrents() will save comments at shutdown even if never started...
         if (completeListener != null) {
+            if (changed)
+                completeListener.updateStatus(this);
             synchronized(_commentLock) {
                 if (_comments != null) {
                     synchronized(_comments) {

@@ -3106,7 +3106,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 long dat = meta.getCreationDate();
                 // needs locale configured for automatic translation
-                SimpleDateFormat fmt = new SimpleDateFormat("HH:mm, EEEE dd MMMM yyyy");
+                SimpleDateFormat fmt = new SimpleDateFormat("EEEE dd MMMM yyyy HH:mm");
                 fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 if (dat > 0) {
                     String date = fmt.format(new Date(dat));
@@ -3146,6 +3146,18 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append(_t("Completed")).append(":</b> ")
                        .append(date)
                        .append("</td></tr>\n");
+                }
+                if (storage != null) {
+                    dat = storage.getActivity();
+                    if (dat > 0) {
+                        String date = fmt.format(new Date(dat));
+                        buf.append("<tr><td>");
+                        toThemeImg(buf, "details");
+                        buf.append("</td><td><b>")
+                           .append(_t("Last activity")).append(":</b> ")
+                           .append(date)
+                           .append("</td></tr>\n");
+                    }
                 }
             }
 

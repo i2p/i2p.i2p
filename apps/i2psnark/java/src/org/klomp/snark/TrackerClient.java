@@ -292,7 +292,7 @@ public class TrackerClient implements Runnable {
                 _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Skipping invalid or non-i2p announce: " + primary);
+                _log.warn("Skipping invalid or non-i2p announce: " + primary + " for torrent " + snark.getBaseName());
         }
     } else {
         _log.warn("No primary announce");
@@ -366,7 +366,7 @@ public class TrackerClient implements Runnable {
       Hash h = getHostHash(ann);
       if (h == null) {
           if (_log.shouldLog(Log.WARN))
-              _log.warn("Bad announce URL: [" + ann + ']');
+              _log.warn("Bad announce URL: [" + ann + "] for torrent " + snark.getBaseName());
           return false;
       }
       // comment this out if tracker.welterde.i2p upgrades
@@ -374,19 +374,19 @@ public class TrackerClient implements Runnable {
           Destination dest = _util.getMyDestination();
           if (dest != null && dest.getSigType() != SigType.DSA_SHA1) {
               if (_log.shouldLog(Log.WARN))
-                  _log.warn("Skipping incompatible tracker: " + ann);
+                  _log.warn("Skipping incompatible tracker: " + ann + " for torrent " + snark.getBaseName());
               return false;
           }
       }
       if (existing.size() >= MAX_TRACKERS) {
           if (_log.shouldLog(Log.INFO))
-              _log.info("Not using announce URL, we have enough: [" + ann + ']');
+              _log.info("Not using announce URL, we have enough: [" + ann + "] for torrent " + snark.getBaseName());
           return false;
       }
       boolean rv = existing.add(h);
       if (!rv) {
           if (_log.shouldLog(Log.INFO))
-             _log.info("Dup announce URL: [" + ann + ']');
+             _log.info("Dup announce URL: [" + ann + "] for torrent " + snark.getBaseName());
       }
       return rv;
   }
@@ -605,7 +605,7 @@ public class TrackerClient implements Runnable {
                             tplc.startsWith(ERROR_GOT_HTML) ||   // fake msg from doRequest()
                             (!tr.isPrimary && tr.registerFails > MAX_REGISTER_FAILS / 2))
                           if (_log.shouldLog(Log.WARN))
-                              _log.warn("Not longer announcing to " + tr.announce + " : " +
+                              _log.warn("No longer announcing to " + tr.announce + " : " +
                                         tr.trackerProblems + " after " + tr.registerFails + " failures");
                           tr.stop = true;
                       //
@@ -917,8 +917,21 @@ public class TrackerClient implements Runnable {
     if (!"http".equals(url.getScheme()))
         return null;
     String host = url.getHost();
-    if (host == null)
+    if (host == null) {
+        // URI can't handle b64dest or b64dest.i2p if it contains '~'
+        // but it doesn't throw an exception, just returns a null host
+        if (ann.startsWith("http://") && ann.length() >= 7 + 516 && ann.contains("~")) {
+            ann = ann.substring(7);
+            int slash = ann.indexOf('/');
+            if (slash >= 516) {
+                ann = ann.substring(0, slash);
+                if (ann.endsWith(".i2p"))
+                    ann = ann.substring(0, ann.length() - 4);
+                return ConvertToHash.getHash(ann);
+            }
+        }
         return null;
+    }
     if (host.endsWith(".i2p")) {
         String path = url.getPath();
         if (path == null || !path.startsWith("/"))

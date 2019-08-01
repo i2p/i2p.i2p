@@ -116,6 +116,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
     private static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
     /** @since 0.9.31 */
     private static final String PROP_META_COMMENTS = "comments";
+    /** @since 0.9.42 */
+    private static final String PROP_META_ACTIVITY = "activity";
 
     private static final String CONFIG_FILE_SUFFIX = ".config";
     private static final String CONFIG_FILE = "i2psnark" + CONFIG_FILE_SUFFIX;
@@ -1609,13 +1611,16 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         // ok, snark created, now lets start it up or configure it further
         Properties config = getConfig(torrent);
-        boolean running;
-        String  prop = config.getProperty(PROP_META_RUNNING);
-        if(prop == null || Boolean.parseBoolean(prop)) {
-            running = true;
-        } else {
-            running = false;
+        String prop = config.getProperty(PROP_META_RUNNING);
+        boolean running = prop == null || Boolean.parseBoolean(prop);
+        prop = config.getProperty(PROP_META_ACTIVITY);
+        if (prop != null && torrent.getStorage() != null) {
+            try {
+                long activity = Long.parseLong(prop);
+                torrent.getStorage().setActivity(activity);
+            } catch (NumberFormatException nfe) {}
         }
+
         // Were we running last time?
         String link = linkify(torrent);
         if (!dontAutoStart && shouldAutoStart() && running) {
@@ -1779,7 +1784,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                 return false;
             } else if (bitfield != null) {
-                saveTorrentStatus(metainfo, bitfield, null, false, baseFile, true, 0, true); // no file priorities
+                saveTorrentStatus(metainfo, bitfield, null, false, baseFile, true, 0, 0, true); // no file priorities
             }
             // so addTorrent won't recheck            
             if (filename == null) {
@@ -2041,7 +2046,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
             return;
         saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(), storage.getInOrder(),
                           storage.getBase(), storage.getPreserveFileNames(),
-                          snark.getUploaded(), snark.isStopped(), comments);
+                          snark.getUploaded(), storage.getActivity(), snark.isStopped(), comments);
     }
 
     /**
@@ -2057,8 +2062,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
      * @param base may be null
      */
     private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, boolean inOrder,
-                                   File base, boolean preserveNames, long uploaded, boolean stopped) {
-        saveTorrentStatus(metainfo, bitfield, priorities, inOrder, base, preserveNames, uploaded, stopped, null);
+                                   File base, boolean preserveNames, long uploaded, long activity, boolean stopped) {
+        saveTorrentStatus(metainfo, bitfield, priorities, inOrder, base, preserveNames, uploaded, activity, stopped, null);
     }
 
     /*
@@ -2066,15 +2071,15 @@ public class SnarkManager implements CompleteListener, ClientApp {
      * @since 0.9.31
      */
     private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, boolean inOrder,
-                                   File base, boolean preserveNames, long uploaded, boolean stopped,
+                                   File base, boolean preserveNames, long uploaded, long activity, boolean stopped,
                                    Boolean comments) {
         synchronized (_configLock) {
-            locked_saveTorrentStatus(metainfo, bitfield, priorities, inOrder, base, preserveNames, uploaded, stopped, comments);
+            locked_saveTorrentStatus(metainfo, bitfield, priorities, inOrder, base, preserveNames, uploaded, activity, stopped, comments);
         }
     }
 
     private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, boolean inOrder,
-                                          File base, boolean preserveNames, long uploaded, boolean stopped,
+                                          File base, boolean preserveNames, long uploaded, long activity, boolean stopped,
                                           Boolean comments) {
         byte[] ih = metainfo.getInfoHash();
         Properties config = getConfig(ih);
@@ -2104,6 +2109,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
             config.setProperty(PROP_META_BASE, base.getAbsolutePath());
         if (comments != null)
             config.setProperty(PROP_META_COMMENTS, comments.toString());
+        if (activity > 0)
+            config.setProperty(PROP_META_ACTIVITY, Long.toString(activity));
 
         // now the file priorities
         if (priorities != null) {
@@ -2469,7 +2476,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         Storage storage = snark.getStorage();
         if (meta != null && storage != null)
             saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(), storage.getInOrder(),
-                              storage.getBase(), storage.getPreserveFileNames(), snark.getUploaded(), 
+                              storage.getBase(), storage.getPreserveFileNames(), snark.getUploaded(), storage.getActivity(),
                               snark.isStopped());
     }
     
@@ -2493,7 +2500,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 return null;
             }
             saveTorrentStatus(meta, storage.getBitField(), null, false,
-                              storage.getBase(), storage.getPreserveFileNames(), 0, 
+                              storage.getBase(), storage.getPreserveFileNames(), 0, 0,
                               snark.isStopped());
             // temp for addMessage() in case canonical throws
             String name = storage.getBaseName();

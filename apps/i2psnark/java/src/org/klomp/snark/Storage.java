@@ -35,12 +35,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import gnu.getopt.Getopt;
 
@@ -78,6 +80,7 @@ public class Storage implements Closeable
   private boolean _inOrder;
   private final AtomicInteger _allocateCount = new AtomicInteger();
   private final AtomicInteger _checkProgress = new AtomicInteger();
+  private final AtomicLong _activity = new AtomicLong();
 
   /** The default piece size. */
   private static final int DEFAULT_PIECE_SIZE = 256*1024;
@@ -318,6 +321,28 @@ public class Storage implements Closeable
   void clearChanged() {
       changed = false;
   }
+
+    /**
+     *  @since 0.9.42
+     */
+    public long getActivity() {
+        return _activity.get();
+    }
+
+    /**
+     *  @since 0.9.42
+     */
+    private void setActivity() {
+        setActivity(I2PAppContext.getGlobalContext().clock().now());
+    }
+
+    /**
+     *  @since 0.9.42
+     */
+    public void setActivity(long time) {
+        _activity.set(time);
+        changed = true;
+    }
 
   /**
    *  File checking in progress.
@@ -827,6 +852,13 @@ public class Storage implements Closeable
         0x2028, 0x2029
      };
 
+  // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
+  private static final String[] WIN_ILLEGAL = new String[] {
+        "con", "prn", "aux", "nul",
+        "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9",
+        "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9"
+     };
+
   /**
    *  Filter the name, but only if configured to do so.
    *  We will do so on torrents received from others, but not
@@ -859,8 +891,18 @@ public class Storage implements Closeable
         rv = "_";
     } else {
         rv = name;
-        if (rv.startsWith("."))
+        if (rv.startsWith(".")) {
             rv = '_' + rv.substring(1);
+        } else if (SystemVersion.isWindows()) {
+            // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
+            String iname = name.toLowerCase(Locale.US);
+            for (int i = 0; i < WIN_ILLEGAL.length; i++) {
+                String w = WIN_ILLEGAL[i];
+                if (iname.equals(w) ||
+                    (iname.startsWith(w + '.') && w.indexOf('.', w.length() + 1) < 0))
+                    rv = '_' + rv;
+            }
+        }
         if (rv.endsWith(".") || rv.endsWith(" "))
             rv = rv.substring(0, rv.length() - 1) + '_';
         for (int i = 0; i < ILLEGAL.length; i++) {
@@ -1227,6 +1269,7 @@ public class Storage implements Closeable
     }
     bs = rv.getData();
     getUncheckedPiece(piece, bs, off, len);
+    setActivity();
     return rv;
   }
 
@@ -1311,7 +1354,7 @@ public class Storage implements Closeable
           pp.release();
       }
 
-    changed = true;
+    setActivity();
 
     // do this after the write, so we know it succeeded, and we don't set the
     // needed count to zero, which would cause checkRAF() to open the file readonly.
@@ -1567,8 +1610,7 @@ public class Storage implements Closeable
        *  Caller must synchronize and call checkRAF() or openRAF().
        *  @since 0.9.1
        */
-      public synchronized void balloonFile() throws IOException
-      {
+      private synchronized void balloonFile() throws IOException {
           long remaining = length;
           final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
           byte[] zeros = new byte[ZEROBLOCKSIZE];

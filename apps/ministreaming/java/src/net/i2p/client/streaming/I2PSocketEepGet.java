@@ -15,6 +15,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Base32;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -39,7 +40,8 @@ import net.i2p.util.SocketTimeout;
  *  Supports http://example.i2p/blah
  *  Supports http://B32KEY.b32.i2p/blah
  *  Supports http://i2p/B64KEY/blah for compatibility with the eepproxy
- *  Supports http://B64KEY/blah for compatibility with the eepproxy
+ *  Supports http://B64KEY/blah for as of 0.9.42
+ *  Supports http://B64KEY.i2p/blah as of 0.9.42
  *  Warning - does not support /eepproxy/blah, address helpers, http://B64KEY.i2p/blah,
  *  or other odd things that may be found in the HTTP proxy.
  *
@@ -115,9 +117,28 @@ public class I2PSocketEepGet extends EepGet {
         try {
             URI url = new URI(_actualURL);
             if ("http".equals(url.getScheme())) {
+                Destination dest = null;
                 String host = url.getHost();
-                if (host == null)
-                    throw new MalformedURLException("no hostname: " + _actualURL);
+                if (host == null) {
+                    String ann = _actualURL;
+                    // URI can't handle b64dest.i2p if it contains '~'
+                    // but it doesn't throw an exception, just returns a null host
+                    if (ann.startsWith("http://") && ann.length() >= 7 + 516 && ann.contains("~")) {
+                        ann = ann.substring(7);
+                        int slash = ann.indexOf('/');
+                        if (slash >= 516) {
+                            ann = ann.substring(0, slash);
+                            if (ann.endsWith(".i2p"))
+                                ann = ann.substring(0, ann.length() - 4);
+                            try {
+                                dest = new Destination(ann);
+                            } catch (DataFormatException dfe) {}
+                        }
+                    }
+                    if (dest == null)
+                        throw new MalformedURLException("no hostname: " + _actualURL);
+                    // won't pick up the port either, but the path will be OK
+                }
                 int port = url.getPort();
                 if (port <= 0 || port > 65535)
                     port = 80;
@@ -139,31 +160,32 @@ public class I2PSocketEepGet extends EepGet {
                     }
                 }
 
-                // Use existing I2PSession for lookups.
-                // This is much more efficient than using the naming service
-                Destination dest;
-                I2PSession sess = _socketManager.getSession();
-                if (sess != null && !sess.isClosed()) {
-                    try {
-                        if (host.length() == 60 && host.endsWith(".b32.i2p")) {
-                            byte[] b = Base32.decode(host.substring(0, 52));
-                            if (b != null) {
-                                Hash h = Hash.create(b);
-                                dest = sess.lookupDest(h, 20*1000);
+                if (dest == null) {
+                    // Use existing I2PSession for lookups.
+                    // This is much more efficient than using the naming service
+                    I2PSession sess = _socketManager.getSession();
+                    if (sess != null && !sess.isClosed()) {
+                        try {
+                            if (host.length() == 60 && host.endsWith(".b32.i2p")) {
+                                byte[] b = Base32.decode(host.substring(0, 52));
+                                if (b != null) {
+                                    Hash h = Hash.create(b);
+                                    dest = sess.lookupDest(h, 20*1000);
+                                } else {
+                                    dest = null;
+                                }
                             } else {
-                                dest = null;
+                                dest = sess.lookupDest(host, 20*1000);
                             }
-                        } else {
-                            dest = sess.lookupDest(host, 20*1000);
+                        } catch (I2PSessionException ise) {
+                            dest = null;
                         }
-                    } catch (I2PSessionException ise) {
-                        dest = null;
+                    } else {
+                        dest = _context.namingService().lookup(host);
                     }
-                } else {
-                    dest = _context.namingService().lookup(host);
+                    if (dest == null)
+                        throw new UnknownHostException("Unknown or non-i2p host: " + host);
                 }
-                if (dest == null)
-                    throw new UnknownHostException("Unknown or non-i2p host: " + host);
 
                 // Set the timeouts, using the other existing options in the socket manager
                 // This currently duplicates what SocketTimeout is doing in EepGet,
@@ -257,7 +279,7 @@ public class I2PSocketEepGet extends EepGet {
      * Uses I2CP at localhost:7654 with a single 1-hop tunnel each direction.
      * Tunnel build time not included in the timeout.
      *
-     * This is just for testing, it will be commented out someday.
+     * This is just for testing.
      * Real command line apps should use EepGet.main(),
      * which has more options, and you don't have to wait for tunnels to be built.
      */ 
