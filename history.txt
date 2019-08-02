@@ -1,3 +1,15 @@
+2019-08-02 zzz
+ * Router: Fix Bloom filter false positives
+
+2019-08-01 zzz
+ * i2psnark:
+   - Fix announce hosts of the form b64dest[.i2p]
+   - Add last activity stat
+   - Disallow illegal filenames on Windows
+
+2019-07-27 zzz
+ * JBigI: GMP 6.1.2 for linux 64 bit (ticket #1869)
+
 2019-07-26 zzz
  * Debian: Change debian files from stretch (Jetty 9.2, Tomcat 8, Java 8)
    to buster (Jetty 9.4, Tomcat 9, Java 11)

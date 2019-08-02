@@ -32,8 +32,6 @@ public class DecayingBloomFilter {
     protected final int _durationMs;
     protected final int _entryBytes;
     private final byte _extenders[][];
-    private final byte _extended[];
-    private final byte _longToEntry[];
     private final long _longToEntryMask;
     protected long _currentDuplicates;
     protected volatile boolean _keepDecaying;
@@ -57,8 +55,6 @@ public class DecayingBloomFilter {
         _durationMs = durationMs;
         // all final
         _extenders = null;
-        _extended = null;
-        _longToEntry = null;
         _longToEntryMask = 0;
         context.addShutdownTask(new Shutdown());
         _keepDecaying = true;
@@ -121,17 +117,15 @@ public class DecayingBloomFilter {
         int numExtenders = (32+ (entryBytes-1))/entryBytes - 1;
         if (numExtenders < 0)
             numExtenders = 0;
-        _extenders = new byte[numExtenders][entryBytes];
-        for (int i = 0; i < numExtenders; i++)
-            _context.random().nextBytes(_extenders[i]);
         if (numExtenders > 0) {
-            _extended = new byte[32];
-            _longToEntry = new byte[_entryBytes];
+            _extenders = new byte[numExtenders][entryBytes];
+            for (int i = 0; i < numExtenders; i++) {
+                _context.random().nextBytes(_extenders[i]);
+            }
             _longToEntryMask = (1l << (_entryBytes * 8l)) -1;
         } else {
             // final
-            _extended = null;
-            _longToEntry = null;
+            _extenders = null;
             _longToEntryMask = 0;
         }
         _keepDecaying = true;
@@ -208,18 +202,19 @@ public class DecayingBloomFilter {
      */
     public boolean add(long entry) {
         if (ALWAYS_MISS) return false;
+        byte[] longToEntry = new byte[_entryBytes];
         if (_entryBytes <= 7)
             entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask);
             //entry &= _longToEntryMask; 
         if (entry < 0) {
-            DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
-            _longToEntry[0] |= (1 << 7);
+            DataHelper.toLong(longToEntry, 0, _entryBytes, 0-entry);
+            longToEntry[0] |= (1 << 7);
         } else {
-            DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
+            DataHelper.toLong(longToEntry, 0, _entryBytes, entry);
         }
         getReadLock();
         try {
-            return locked_add(_longToEntry, 0, _longToEntry.length, true);
+            return locked_add(longToEntry, 0, _entryBytes, true);
         } finally { releaseReadLock(); }
     }
     
@@ -230,28 +225,30 @@ public class DecayingBloomFilter {
      */
     public boolean isKnown(long entry) {
         if (ALWAYS_MISS) return false;
+        byte[] longToEntry = new byte[_entryBytes];
         if (_entryBytes <= 7)
             entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask); 
         if (entry < 0) {
-            DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
-            _longToEntry[0] |= (1 << 7);
+            DataHelper.toLong(longToEntry, 0, _entryBytes, 0-entry);
+            longToEntry[0] |= (1 << 7);
         } else {
-            DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
+            DataHelper.toLong(longToEntry, 0, _entryBytes, entry);
         }
         getReadLock();
         try {
-            return locked_add(_longToEntry, 0, _longToEntry.length, false);
+            return locked_add(longToEntry, 0, _entryBytes, false);
         } finally { releaseReadLock(); }
     }
     
     private boolean locked_add(byte entry[], int offset, int len, boolean addIfNew) {
-        if (_extended != null) {
+        if (_extenders != null) {
             // extend the entry to 32 bytes
-            System.arraycopy(entry, offset, _extended, 0, len);
-            for (int i = 0; i < _extenders.length; i++)
-                DataHelper.xor(entry, offset, _extenders[i], 0, _extended, _entryBytes * (i+1), _entryBytes);
-
-            BloomSHA1.FilterKey key = _current.getFilterKey(_extended, 0, 32);
+            byte[] extended = new byte[32];
+            System.arraycopy(entry, offset, extended, 0, len);
+            for (int i = 0; i < _extenders.length; i++) {
+                DataHelper.xor(entry, offset, _extenders[i], 0, extended, _entryBytes * (i+1), _entryBytes);
+            }
+            BloomSHA1.FilterKey key = _current.getFilterKey(extended, 0, 32);
             boolean seen = _current.locked_member(key);
             if (!seen)
                 seen = _previous.locked_member(key);
