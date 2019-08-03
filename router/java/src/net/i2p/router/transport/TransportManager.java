@@ -241,7 +241,8 @@ public class TransportManager implements TransportEventListener {
     private void initializeAddress(Collection<Transport> ts) {
         if (ts.isEmpty())
             return;
-        Set<String> ipset = Addresses.getAddresses(false, true);  // non-local, include IPv6
+        // non-local (unless test mode), don't include loopback, include IPv6
+        Set<String> ipset = Addresses.getAddresses(_context.getBooleanProperty("i2np.allowLocal"), false, true);
         //
         // Avoid IPv6 temporary addresses if we have a non-temporary one
         //
