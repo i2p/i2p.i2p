@@ -1537,6 +1537,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
      *
      *  @param filename the absolute path to save the metainfo to, generally ending in ".torrent"
      *  @param baseFile may be null, if so look in dataDir
+     *  @param dontAutoStart must be false, AND running=true or null in torrent config file, to start
      *  @throws RuntimeException via Snark.fatal()
      *  @return success
      */
@@ -1549,6 +1550,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
      *
      *  @param filename the absolute path to save the metainfo to, generally ending in ".torrent"
      *  @param baseFile may be null, if so look in dataDir
+     *  @param dontAutoStart must be false, AND running=true or null in torrent config file, to start
      *  @param dataDir must exist, or null to default to snark data directory
      *  @throws RuntimeException via Snark.fatal()
      *  @return success
@@ -1652,8 +1654,6 @@ public class SnarkManager implements CompleteListener, ClientApp {
                     synchronized (_snarks) {
                         putSnark(filename, torrent);
                     }
-                    if (shouldAutoStart())
-                        torrent.startTorrent();
                 } catch (IOException ioe) {
                     // close before rename/delete for windows
                     if (fis != null) try { fis.close(); fis = null; } catch (IOException ioe2) {}
@@ -2705,16 +2705,17 @@ public class SnarkManager implements CompleteListener, ClientApp {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("DirMon found: " + DataHelper.toString(foundNames) + " existing: " + DataHelper.toString(existingNames));
         // lets find new ones first...
+        boolean shouldStart = shouldAutoStart();
         for (String name : foundNames) {
             if (existingNames.contains(name)) {
                 // already known.  noop
             } else {
-                if (shouldAutoStart() && !_util.connect())
+                if (shouldStart && !_util.connect())
                     addMessage(_t("Unable to connect to I2P!"));
                 try {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
-                    boolean ok = addTorrent(name, null, !shouldAutoStart());
+                    boolean ok = addTorrent(name, null, !shouldStart);
                     if (!ok) {
                         addMessage(_t("Error: Could not add the torrent {0}", name));
                         _log.error("Unable to add the torrent " + name);

@@ -648,7 +648,10 @@ public class Snark
         // TODO: Cache the config-in-mem to compare vs config-on-disk
         // (needed for auto-save to not double-save in some cases)
         long nowUploaded = getUploaded();
-        boolean changed = storage.isChanged() || nowUploaded != savedUploaded;
+        // If autoStart is enabled, always save the config, so we know
+        // whether to start it up next time
+        boolean changed = storage.isChanged() || nowUploaded != savedUploaded ||
+                          (completeListener != null && completeListener.shouldAutoStart());
         try { 
             storage.close(); 
         } catch (IOException ioe) {

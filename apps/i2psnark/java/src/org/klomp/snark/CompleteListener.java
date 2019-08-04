@@ -78,4 +78,9 @@ public interface CompleteListener {
      * @since 0.9.31
      */
     public void locked_saveComments(Snark snark, CommentSet comments);
+
+    /**
+     * @since 0.9.42
+     */
+    public boolean shouldAutoStart();
 }

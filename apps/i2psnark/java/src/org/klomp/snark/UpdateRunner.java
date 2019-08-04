@@ -314,6 +314,11 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         _smgr.locked_saveComments(snark, comments);
     }
 
+    /** @since 0.9.42 */
+    public boolean shouldAutoStart() {
+        return _smgr.shouldAutoStart();
+    }
+
     //////// end CompleteListener methods
 
     private static String linkify(String url) {
