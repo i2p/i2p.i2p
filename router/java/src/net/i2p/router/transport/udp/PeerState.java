@@ -1482,7 +1482,10 @@ public class PeerState {
             _log.debug("Adding to " + _remotePeer + ": " + state.getMessageId());
         int rv = 0;
         // will never fail for CDPQ
-        boolean fail = !_outboundQueue.offer(state);
+        boolean fail;
+        synchronized (_outboundQueue) {
+            fail = !_outboundQueue.offer(state);
+        }
 /****
         synchronized (_outboundMessages) {
             rv = _outboundMessages.size() + 1;
@@ -1555,7 +1558,9 @@ public class PeerState {
                     _outboundMessages.clear();
             }
             //_outboundQueue.drainAllTo(tempList);
-            _outboundQueue.drainTo(tempList);
+            synchronized (_outboundQueue) {
+                _outboundQueue.drainTo(tempList);
+            }
             for (OutboundMessageState oms : tempList) {
                 _transport.failed(oms, false);
             }
@@ -1710,19 +1715,27 @@ public class PeerState {
             // If so, pull it off, put it in _outbundMessages, test
             // again for bandwidth if necessary, and return it.
             OutboundMessageState state;
-            while ((state = _outboundQueue.peek()) != null &&
-                   ShouldSend.YES == locked_shouldSend(state)) {
-                // we could get a different state, or null, when we poll,
-                // due to AQM drops, so we test again if necessary
-                OutboundMessageState dequeuedState = _outboundQueue.poll();
-                if (dequeuedState != null) {
-                    _outboundMessages.add(dequeuedState);
-                    if (dequeuedState == state || ShouldSend.YES == locked_shouldSend(state)) {
+            synchronized (_outboundQueue) {
+                while ((state = _outboundQueue.peek()) != null &&
+                       ShouldSend.YES == locked_shouldSend(state)) {
+                    // This is guaranted to be the same as what we got in peek(),
+                    // due to locking and because we aren't using the dropping CDPBQ.
+                    // If we do switch to CDPBQ,
+                    // we could get a different state, or null, when we poll,
+                    // due to AQM drops, so we test again if necessary
+                    OutboundMessageState dequeuedState = _outboundQueue.poll();
+                    if (dequeuedState != null) {
+                        _outboundMessages.add(dequeuedState);
+                        // TODO if we switch to CDPBQ, see ticket #2582
+                        //if (dequeuedState != state) {
+                        //    // ignore result, always send?
+                        //    locked_shouldSend(dequeuedState);
+                        //}
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Allocate sending (NEW) to " + _remotePeer + ": " + dequeuedState.getMessageId());
                         if (rv == null)
                             rv = new ArrayList<OutboundMessageState>(MAX_ALLOCATE_SEND);
-                        rv.add(state);
+                        rv.add(dequeuedState);
                         if (rv.size() >= MAX_ALLOCATE_SEND)
                             return rv;
                     }
