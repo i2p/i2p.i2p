@@ -30,6 +30,9 @@ class ConnectionPacketHandler {
 
     public static final int MAX_SLOW_START_WINDOW = 24;
     
+    // see tickets 1939 and 2584
+    private static final int IMMEDIATE_ACK_DELAY = 150;
+
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(ConnectionPacketHandler.class);
@@ -198,7 +201,8 @@ class ConnectionPacketHandler {
                 // TODO the 250 below _may_ be a big limiter in how fast local "loopback" connections
                 // can go, however if it goes too fast then we start choking which causes
                 // frequent stalls anyway.
-                con.setNextSendTime(_context.clock().now() + 250);
+                // see tickets 1939 and 2584
+                con.setNextSendTime(_context.clock().now() + IMMEDIATE_ACK_DELAY);
             } else {
                 int delay = con.getOptions().getSendAckDelay();
                 if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) // delayed ACK requested
