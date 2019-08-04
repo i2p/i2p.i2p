@@ -180,7 +180,9 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
                     _mgr.addMessage(_t("Torrent already in the queue: {0}", name));
             } else {
                 // This may take a LONG time to create the storage.
-                _mgr.copyAndAddTorrent(file, canonical, _dataDir);
+                boolean ok = _mgr.copyAndAddTorrent(file, canonical, _dataDir);
+                if (!ok)
+                    throw new IOException("Unknown error - check logs");
                 snark = _mgr.getTorrentByBaseName(originalName);
                 if (snark != null)
                     snark.startTorrent();
