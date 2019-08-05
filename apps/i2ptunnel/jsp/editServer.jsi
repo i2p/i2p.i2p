@@ -831,7 +831,7 @@
                     Ed25519-SHA-512</option>
 <%            }
               if (editBean.isSigTypeAvailable(11)) { %>
-                    <option title="<%=intl._t("Experimental")%>" value="11" <%=(currentSigType==11 ? " selected=\"selected\"" : disabled)%> >
+                    <option title="<%=intl._t("Recommended for blinded and encrypted destinations")%>" value="11" <%=(currentSigType==11 ? " selected=\"selected\"" : disabled)%> >
                     Red25519-SHA-512</option>
 <%            }   // isAvailable
 %>
