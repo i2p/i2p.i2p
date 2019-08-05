@@ -1,5 +1,16 @@
+2019-08-05 zzz
+ * i2ptunnel:
+   - Add configs to override user agent
+   - Add failsafe timeouts for local sockets (ticket #2568)
+ * Reseed: Send network ID in query string (proposal 147)
+ * Transports: Implement cross-network detection (proposal 147)
+
 2019-08-04 zzz
+ * i2psnark:
+   - Add checks for dup data dirs (ticket #2291)
+   - Fix autostart to only start torrents running previously (ticket #2120)
  * SSU: Fix stall when higher-priority message is queued (ticket #2582)
+ * Streaming: Reduce immediate ack delay (ticket #2584)
 
 2019-08-03 zzz
  * Transport: Allow local addresses when configured

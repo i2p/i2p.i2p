@@ -77,6 +77,12 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      */
     protected static final int INITIAL_SO_TIMEOUT = 15*1000;
 
+    /**
+     *  Failsafe
+     *  @since 0.9.42
+     */
+    protected static final int BROWSER_READ_TIMEOUT = 4*60*60*1000;
+
     private static final String ERR_AUTH1 =
             "HTTP/1.1 407 Proxy Authentication Required\r\n" +
             "Content-Type: text/html; charset=UTF-8\r\n" +

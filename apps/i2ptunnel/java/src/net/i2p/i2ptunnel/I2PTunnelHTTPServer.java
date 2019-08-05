@@ -92,6 +92,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     // We set it to forever so that it won't timeout when sending a large response.
     // The server will presumably have its own timeout implemented for POST
     private static final long DEFAULT_HTTP_READ_TIMEOUT = -1;
+    // Set a relatively short timeout for GET/HEAD,
+    // and a long failsafe timeout for POST/CONNECT, since the user
+    // could be POSTing a massive file
+    private static final int SERVER_READ_TIMEOUT_GET = 5*60*1000;
+    private static final int SERVER_READ_TIMEOUT_POST = 4*60*60*1000;
     
     private long _startedOn = 0L;
     private ConnThrottler _postThrottler;
@@ -556,6 +561,14 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             String modifiedHeader = formatHeaders(headers, command);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Modified header: [" + modifiedHeader + "]");
+
+            // Set a relatively short timeout for GET/HEAD,
+            // and a long failsafe timeout for POST/CONNECT, since the user
+            // could be POSTing a massive file
+            if (modifiedHeader.startsWith("GET ") || modifiedHeader.startsWith("HEAD "))
+                s.setSoTimeout(SERVER_READ_TIMEOUT_GET);
+            else
+                s.setSoTimeout(SERVER_READ_TIMEOUT_POST);
             
             Runnable t;
             if (allowGZIP && useGZIP) {

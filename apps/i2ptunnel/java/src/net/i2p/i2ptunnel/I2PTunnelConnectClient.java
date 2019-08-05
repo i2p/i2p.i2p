@@ -286,7 +286,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         }
                     }
                     newRequest.append("\r\n"); // HTTP spec
-                    s.setSoTimeout(0);
+                    s.setSoTimeout(BROWSER_READ_TIMEOUT);
                     // do it
                     break;
                 }

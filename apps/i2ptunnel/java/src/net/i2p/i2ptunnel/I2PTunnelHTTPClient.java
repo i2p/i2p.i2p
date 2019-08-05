@@ -1102,7 +1102,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         newRequest.append("\r\n");
                     else
                         newRequest.append("Connection: close\r\n\r\n");
-                    s.setSoTimeout(0);
+                    s.setSoTimeout(BROWSER_READ_TIMEOUT);
                     break;
                 } else {
                     newRequest.append(line).append("\r\n"); // HTTP spec
