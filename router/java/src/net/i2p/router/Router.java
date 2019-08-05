@@ -385,7 +385,11 @@ public class Router implements RouterClock.ClockShiftListener {
         if (sid != null) {
             try {
                 id = Integer.parseInt(sid);
-            } catch (NumberFormatException nfe) {}
+                if (id < 2 || id > 254)
+                    throw new IllegalArgumentException("Invalid " + PROP_NETWORK_ID);
+            } catch (NumberFormatException nfe) {
+                throw new IllegalArgumentException("Invalid " + PROP_NETWORK_ID);
+            }
         }
         _networkID = id;
         // for testing
@@ -600,6 +604,8 @@ public class Router implements RouterClock.ClockShiftListener {
      *  The network ID. Default 2.
      *  May be changed with the config property router.networkID (restart required).
      *  Change only if running a test network to prevent cross-network contamination.
+     *
+     *  @return 2 - 254
      *  @since 0.9.25
      */
     public int getNetworkID() { return _networkID; }

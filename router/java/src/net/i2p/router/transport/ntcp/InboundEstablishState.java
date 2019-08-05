@@ -729,6 +729,20 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 fail("Bad version: " + v);
                 return;
             }
+            // network ID cross-check, proposal 147, as of 0.9.42
+            v = options[0] & 0xff;
+            if (v != 0 && v != _context.router().getNetworkID()) {
+                InetAddress addr = _con.getChannel().socket().getInetAddress();
+                if (addr != null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Dropping inbound connection from wrong network: " + addr);
+                    byte[] ip = addr.getAddress();
+                    // So next time we will not accept the con from this IP
+                    _context.blocklist().add(ip);
+                }
+                fail("Bad network id: " + v);
+                return;
+            }
             _padlen1 = (int) DataHelper.fromLong(options, 2, 2);
             _msg3p2len = (int) DataHelper.fromLong(options, 4, 2);
             long tsA = DataHelper.fromLong(options, 8, 4);

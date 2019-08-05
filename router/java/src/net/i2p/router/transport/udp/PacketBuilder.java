@@ -1614,7 +1614,14 @@ class PacketBuilder {
         off += totalSize;
         System.arraycopy(iv, 0, data, off, UDPPacket.IV_SIZE);
         off += UDPPacket.IV_SIZE;
-        DataHelper.toLong(data, off, 2, totalSize /* ^ PROTOCOL_VERSION */ );
+        // version is zero, unlikely to ever change
+        int plval = totalSize /* ^ PacketBuilder.PROTOCOL_VERSION */ ;
+        // network ID cross-check, proposal 147
+        int netid = _context.router().getNetworkID();
+        if (netid != 2) {
+            plval ^= (netid - 2) << 8;
+        }
+        DataHelper.toLong(data, off, 2, plval);
         
         int hmacLen = totalSize + UDPPacket.IV_SIZE + 2;
         //Hash hmac = _context.hmac().calculate(macKey, data, hmacOff, hmacLen);

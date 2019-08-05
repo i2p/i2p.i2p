@@ -242,7 +242,14 @@ class UDPPacket implements CDQEntry {
             off += payloadLength;
             System.arraycopy(_data, _packet.getOffset() + MAC_SIZE, _validateBuf, off, IV_SIZE);
             off += IV_SIZE;
-            DataHelper.toLong(_validateBuf, off, 2, payloadLength /* ^ PacketBuilder.PROTOCOL_VERSION */ );
+            // version is zero, unlikely to ever change
+            int plval = payloadLength /* ^ PacketBuilder.PROTOCOL_VERSION */ ;
+            // network ID cross-check, proposal 147
+            int netid = _context.router().getNetworkID();
+            if (netid != 2) {
+                plval ^= (netid - 2) << 8;
+            }
+            DataHelper.toLong(_validateBuf, off, 2, plval);
             off += 2;
 
             eq = hmac.verify(macKey, _validateBuf, 0, off, _data, _packet.getOffset(), MAC_SIZE);
