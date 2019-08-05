@@ -91,6 +91,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private static final String UA_CLEARNET = "User-Agent: " +
                                               "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0" +
                                               "\r\n";
+    // overrides
+    private static final String PROP_UA_I2P = "httpclient.userAgent.i2p";
+    private static final String PROP_UA_CLEARNET = "httpclient.userAgent.outproxy";
 
     /**
      *  These are backups if the xxx.ht error page is missing.
@@ -1062,11 +1065,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     if(!shout && !method.toUpperCase(Locale.US).equals("CONNECT")) {
                         if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             // let's not advertise to external sites that we are from I2P
-                            if(usingWWWProxy || usingInternalOutproxy) {
-                                newRequest.append(UA_CLEARNET);
+                            String ua;
+                            if (usingWWWProxy || usingInternalOutproxy) {
+                                ua = getTunnel().getClientOptions().getProperty(PROP_UA_CLEARNET);
+                                if (ua != null)
+                                    ua = "User-Agent: " + ua + "\r\n";
+                                else
+                                    ua = UA_CLEARNET;
                             } else {
-                                newRequest.append(UA_I2P);
+                                ua = getTunnel().getClientOptions().getProperty(PROP_UA_I2P);
+                                if (ua != null)
+                                    ua = "User-Agent: " + ua + "\r\n";
+                                else
+                                    ua = UA_I2P;
                             }
+                            newRequest.append(ua);
                         }
                     }
                     // Add Proxy-Authentication header for next hop (outproxy)
