@@ -1,5 +1,6 @@
 2019-08-10 str4d:
  * EdDSA: Reduce diff between vendored code and upstream
+ * Jetty: Fix Gradle build
 
 2019-08-05 zzz
  * i2ptunnel:

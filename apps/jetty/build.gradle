@@ -21,13 +21,13 @@ dependencies {
     compile 'org.eclipse.jetty:jetty-xml:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:apache-jsp:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-continuation:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-deploy:' + ext.jettyVersion
+    compile 'org.eclipse.jetty:jetty-deploy:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-jmx:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-rewrite:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-servlets:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-start:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
-    runtime 'org.apache.tomcat:tomcat-api:' + ext.tomcatVersion
+    compile 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
+    compile 'org.apache.tomcat:tomcat-api:' + ext.tomcatVersion
     runtime 'org.apache.tomcat:tomcat-el-api:' + ext.tomcatVersion
     runtime 'org.apache.tomcat:tomcat-jasper:' + ext.tomcatVersion
     runtime 'org.apache.tomcat:tomcat-jasper-el:' + ext.tomcatVersion
