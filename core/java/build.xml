@@ -237,14 +237,6 @@
             </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
-        <!-- EdDSA test vectors -->
-        <copy todir="./build/obj">
-            <fileset dir="./test/junit/">
-                <include name="net/i2p/crypto/eddsa/test.data"/>
-                <include name="net/i2p/crypto/eddsa/math/baseDblPrecmp"/>
-                <include name="net/i2p/crypto/eddsa/math/basePrecmp"/>
-            </fileset>
-        </copy>
     </target>
     <!-- jars with tests -->
     <target name="jarScalaTest" depends="scalatest.compileTest">
@@ -321,6 +313,7 @@
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
+                <pathelement location="./test/resources" />
                 <pathelement location="../../build/jbigi.jar" />
                 <pathelement location="${with.clover}" />
                 <pathelement location="${with.cobertura}" />
@@ -363,6 +356,7 @@
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
+                <pathelement location="./test/resources" />
                 <pathelement location="../../build/jbigi.jar" />
                 <pathelement location="${with.clover}" />
                 <pathelement location="${with.cobertura}" />

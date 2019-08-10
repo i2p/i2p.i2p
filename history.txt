@@ -5,6 +5,7 @@
    - Fix compilation bug after SSU HMAC implementation move
    - Temporarily mitigate discrepancy between Ant and Gradle in
      SingleFileNamingServiceTest
+   - Unify core test resources across JUnit and ScalaTest
 
 2019-08-05 zzz
  * i2ptunnel:

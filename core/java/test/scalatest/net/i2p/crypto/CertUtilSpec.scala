@@ -10,10 +10,7 @@ import org.scalatest.Matchers
 class CertUtilSpec extends FunSpec with Matchers {
 
   describe("CertUtil") {
-    // For some stupid gradle issues, it don't copies reosurces. So hacky way.
-    // When added to junit directory, it get copied. Until a better way is found,
-    // this is the non-optimal solution.
-    val certFileUrl = getClass.getResource("/resources/meeh_at_mail.i2p.crt")
+    val certFileUrl = getClass.getResource("/meeh_at_mail.i2p.crt")
     val certFile = new File(certFileUrl.toURI)
 
     it("should be able to read a certificate") {
