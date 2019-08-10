@@ -3,6 +3,8 @@
  * Jetty: Fix Gradle build
  * Tests:
    - Fix compilation bug after SSU HMAC implementation move
+   - Temporarily mitigate discrepancy between Ant and Gradle in
+     SingleFileNamingServiceTest
 
 2019-08-05 zzz
  * i2ptunnel:

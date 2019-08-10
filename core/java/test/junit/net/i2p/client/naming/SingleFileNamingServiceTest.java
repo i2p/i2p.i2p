@@ -58,8 +58,14 @@ public class SingleFileNamingServiceTest extends TestCase {
         ns.remove("test.i2p");
         assertThat(ns.lookup("test.i2p"), is(nullValue()));
         assertThat(ns.reverseLookup(testDest2), is(nullValue()));
-        // Odd quirk - the above lookups don't update size, but getEntries() does...
-        assertThat(ns.size(), is(equalTo(1)));
+        // Odd quirk:
+        // - When running this test with Ant, the above lookups don't update
+        //   size, but getEntries() does.
+        // - When running this test with Gradle, the above lookups correctly
+        //   update size.
+        // So we can't enforce it either way until we know why.
+        // TODO: Figure out the discrepancy here.
+        //assertThat(ns.size(), is(equalTo(1)));
         assertThat(ns.getEntries(), is(equalTo(Collections.EMPTY_MAP)));
         assertThat(ns.size(), is(equalTo(0)));
     }
