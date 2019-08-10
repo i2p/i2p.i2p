@@ -6,6 +6,7 @@
    - Temporarily mitigate discrepancy between Ant and Gradle in
      SingleFileNamingServiceTest
    - Unify core test resources across JUnit and ScalaTest
+   - Fix streaming integration tests after access filtering changes
 
 2019-08-05 zzz
  * i2ptunnel:

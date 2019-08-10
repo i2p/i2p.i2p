@@ -10,6 +10,7 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.client.streaming.IncomingConnectionFilter;
 import net.i2p.util.Log;
 
 /**
@@ -64,7 +65,8 @@ public class ConnectIT extends StreamingITBase {
         public void run() {
             try {
                 Properties opts = new Properties();
-                I2PSocketManager mgr = new I2PSocketManagerFull(_context, _session, opts, "client");
+                I2PSocketManager mgr = new I2PSocketManagerFull(
+                    _context, _session, opts, "client", IncomingConnectionFilter.ALLOW);
                 _log.debug("manager created");
                 I2PServerSocket ssocket = mgr.getServerSocket();
                 _log.debug("server socket created");
@@ -89,7 +91,8 @@ public class ConnectIT extends StreamingITBase {
         public void run() {
             try {
                 Properties opts = new Properties();
-                I2PSocketManager mgr = new I2PSocketManagerFull(_context, _session, opts, "client");
+                I2PSocketManager mgr = new I2PSocketManagerFull(
+                    _context, _session, opts, "client", IncomingConnectionFilter.ALLOW);
                 _log.debug("manager created");
                 I2PSocket socket = mgr.connect(_server.getMyDestination());
                 _log.debug("socket created");
