@@ -1,10 +1,21 @@
+/**
+ * EdDSA-Java by str4d
+ *
+ * To the extent possible under law, the person who associated CC0 with
+ * EdDSA-Java has waived all copyright and related or neighboring rights
+ * to EdDSA-Java.
+ *
+ * You should have received a copy of the CC0 legalcode along with this
+ * work. If not, see <https://creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ */
 package net.i2p.crypto.eddsa.math;
 
 import java.io.Serializable;
 
 /**
  * A twisted Edwards curve.
- * Points on the curve satisfy -x^2 + y^2 = 1 + d x^2y^2
+ * Points on the curve satisfy $-x^2 + y^2 = 1 + d x^2y^2$
  *
  * @since 0.9.15
  * @author str4d

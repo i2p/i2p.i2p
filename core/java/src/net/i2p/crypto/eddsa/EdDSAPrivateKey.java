@@ -1,3 +1,14 @@
+/**
+ * EdDSA-Java by str4d
+ *
+ * To the extent possible under law, the person who associated CC0 with
+ * EdDSA-Java has waived all copyright and related or neighboring rights
+ * to EdDSA-Java.
+ *
+ * You should have received a copy of the CC0 legalcode along with this
+ * work. If not, see <https://creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ */
 package net.i2p.crypto.eddsa;
 
 import java.security.PrivateKey;
@@ -12,21 +23,16 @@ import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 
 /**
  * An EdDSA private key.
- *<p>
- * Warning: Private key encoding is based on the current curdle WG draft,
- * and is subject to change. See getEncoded().
- *</p><p>
- * For compatibility with older releases, decoding supports both the old and new
- * draft specifications. See decode().
- *</p><p>
- * Ref: https://tools.ietf.org/html/draft-ietf-curdle-pkix-04
- *</p><p>
- * Old Ref: https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
- *</p>
+ * <p>
+ * For compatibility with older releases, decoding supports both RFC 8410 and an
+ * older draft specifications.
  *
  * @since 0.9.15
  * @author str4d
- *
+ * @see <a href="https://tools.ietf.org/html/rfc8410">RFC 8410</a>
+ * @see <a href=
+ *      "https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04">Older draft
+ *      specification</a>
  */
 public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
     private static final long serialVersionUID = 23495873459878957L;
@@ -72,62 +78,62 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
 
     /**
      * Returns the private key in its canonical encoding.
-     *<p>
+     * <p>
      * This implements the following specs:
-     *<ul><li>
-     * General encoding: https://tools.ietf.org/html/draft-ietf-curdle-pkix-04
-     *</li><li>
-     * Key encoding: https://tools.ietf.org/html/rfc8032
-     *</li></ul>
-     *<p>
-     * This encodes the seed. It will return null if constructed from
-     * a spec which was directly constructed from H, in which case seed is null.
-     *</p><p>
+     * <ul>
+     * <li>General encoding: https://tools.ietf.org/html/rfc8410</li>
+     * <li>Key encoding: https://tools.ietf.org/html/rfc8032</li>
+     * </ul>
+     * <p>
+     * This encodes the seed. It will return null if constructed from a spec which
+     * was directly constructed from H, in which case seed is null.
+     * <p>
      * For keys in older formats, decoding and then re-encoding is sufficient to
      * migrate them to the canonical encoding.
-     *</p>
+     * <p>
      * Relevant spec quotes:
-     *<pre>
+     *
+     * <pre>
      *  OneAsymmetricKey ::= SEQUENCE {
      *    version Version,
      *    privateKeyAlgorithm PrivateKeyAlgorithmIdentifier,
      *    privateKey PrivateKey,
-     *    attributes [0] Attributes OPTIONAL,
+     *    attributes [0] IMPLICIT Attributes OPTIONAL,
      *    ...,
-     *    [[2: publicKey [1] PublicKey OPTIONAL ]],
+     *    [[2: publicKey [1] IMPLICIT PublicKey OPTIONAL ]],
      *    ...
      *  }
      *
      *  Version ::= INTEGER
      *  PrivateKeyAlgorithmIdentifier ::= AlgorithmIdentifier
      *  PrivateKey ::= OCTET STRING
-     *  PublicKey ::= OCTET STRING
+     *  PublicKey ::= BIT STRING
      *  Attributes ::= SET OF Attribute
-     *</pre>
+     * </pre>
      *
-     *<pre>
+     * <pre>
      *  ... when encoding a OneAsymmetricKey object, the private key is wrapped
      *  in a CurvePrivateKey object and wrapped by the OCTET STRING of the
-     *  'privateKey' field.
+     *  "privateKey" field.
      *
      *  CurvePrivateKey ::= OCTET STRING
-     *</pre>
+     * </pre>
      *
-     *<pre>
+     * <pre>
      *  AlgorithmIdentifier  ::=  SEQUENCE  {
      *    algorithm   OBJECT IDENTIFIER,
      *    parameters  ANY DEFINED BY algorithm OPTIONAL
      *  }
      *
      *  For all of the OIDs, the parameters MUST be absent.
-     *</pre>
+     * </pre>
      *
-     *<pre>
+     * <pre>
      *  id-Ed25519   OBJECT IDENTIFIER ::= { 1 3 101 112 }
-     *</pre>
+     * </pre>
      *
-     *  @return 48 bytes for Ed25519, null for other curves
-     *  @since implemented in 0.9.25
+     * @return 48 bytes for Ed25519, null for other curves
+     * @since implemented in 0.9.25
      */
     @Override
     public byte[] getEncoded() {
@@ -171,22 +177,20 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
 
     /**
      * Extracts the private key bytes from the provided encoding.
-     *<p>
-     * This will decode data conforming to the current spec at
-     * https://tools.ietf.org/html/draft-ietf-curdle-pkix-04
-     * or as inferred from the old spec at
-     * https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04.
-     *</p><p>
-     * Contrary to draft-ietf-curdle-pkix-04, it WILL accept a parameter value
-     * of NULL, as it is required for interoperability with the default Java
-     * keystore. Other implementations MUST NOT copy this behaviour from here
-     * unless they also need to read keys from the default Java keystore.
-     *</p><p>
+     * <p>
+     * This will decode data conforming to RFC 8410 or as inferred from the older
+     * draft spec at https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04.
+     * <p>
+     * Per RFC 8410 section 3, this function WILL accept a parameter value of
+     * NULL, as it is required for interoperability with the default Java keystore.
+     * Other implementations MUST NOT copy this behaviour from here unless they also
+     * need to read keys from the default Java keystore.
+     * <p>
      * This is really dumb for now. It does not use a general-purpose ASN.1 decoder.
      * See also getEncoded().
      *
-     *  @return 32 bytes for Ed25519, throws for other curves
-     *  @since 0.9.25
+     * @return 32 bytes for Ed25519, throws for other curves
+     * @since 0.9.25
      */
     private static byte[] decode(byte[] d) throws InvalidKeySpecException {
         try {
@@ -244,13 +248,18 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
             } else {
                 // Handle parameter value of NULL
                 //
-                // Quote https://tools.ietf.org/html/draft-ietf-curdle-pkix-04 :
-                //   For all of the OIDs, the parameters MUST be absent.
-                //   Regardless of the defect in the original 1997 syntax,
-                //   implementations MUST NOT accept a parameters value of NULL.
+                // Quoting RFC 8410 section 3:
+                // > For all of the OIDs, the parameters MUST be absent.
+                // >
+                // > It is possible to find systems that require the parameters to be
+                // > present. This can be due to either a defect in the original 1997
+                // > syntax or a programming error where developers never got input where
+                // > this was not true. The optimal solution is to fix these systems;
+                // > where this is not possible, the problem needs to be restricted to
+                // > that subsystem and not propagated to the Internet.
                 //
-                // But Java's default keystore puts it in (when decoding as
-                // PKCS8 and then re-encoding to pass on), so we must accept it.
+                // Java's default keystore puts it in (when decoding as PKCS8 and then
+                // re-encoding to pass on), so we must accept it.
                 if (idlen == 7) {
                     if (d[idx++] != 0x05 ||
                         d[idx++] != 0) {
@@ -281,36 +290,36 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
     }
 
     /**
-     *  @return will be null if constructed from a spec which was
-     *          directly constructed from H
+     * @return will be null if constructed from a spec which was directly
+     *         constructed from H
      */
     public byte[] getSeed() {
         return seed;
     }
 
     /**
-     *  @return the hash of the seed
+     * @return the hash of the seed
      */
     public byte[] getH() {
         return h;
     }
 
     /**
-     *  @return the private key
+     * @return the private key
      */
     public byte[] geta() {
         return a;
     }
 
     /**
-     *  @return the public key
+     * @return the public key
      */
     public GroupElement getA() {
         return A;
     }
 
     /**
-     *  @return the public key
+     * @return the public key
      */
     public byte[] getAbyte() {
         return Abyte;

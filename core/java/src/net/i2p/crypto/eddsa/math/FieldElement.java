@@ -1,13 +1,22 @@
+/**
+ * EdDSA-Java by str4d
+ *
+ * To the extent possible under law, the person who associated CC0 with
+ * EdDSA-Java has waived all copyright and related or neighboring rights
+ * to EdDSA-Java.
+ *
+ * You should have received a copy of the CC0 legalcode along with this
+ * work. If not, see <https://creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ */
 package net.i2p.crypto.eddsa.math;
 
 import java.io.Serializable;
 
 /**
- *
  * Note: concrete subclasses must implement hashCode() and equals()
  *
  * @since 0.9.15
- *
  */
 public abstract class FieldElement implements Serializable {
     private static final long serialVersionUID = 1239527465875676L;
@@ -22,8 +31,8 @@ public abstract class FieldElement implements Serializable {
     }
 
     /**
-     * Encode a FieldElement in its (b-1)-bit encoding.
-     * @return the (b-1)-bit encoding of this FieldElement.
+     * Encode a FieldElement in its $(b-1)$-bit encoding.
+     * @return the $(b-1)$-bit encoding of this FieldElement.
      */
     public byte[] toByteArray() {
         return f.getEncoding().encode(this);

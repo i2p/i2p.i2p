@@ -1,3 +1,6 @@
+2019-08-10 str4d:
+ * EdDSA: Reduce diff between vendored code and upstream
+
 2019-08-05 zzz
  * i2ptunnel:
    - Add configs to override user agent

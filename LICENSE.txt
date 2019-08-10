@@ -82,6 +82,9 @@ Public domain except as listed below:
    Copyright (c) 1998 by Aaron M. Renn (arenn@urbanophile.com)
    See licenses/LICENSE-LGPLv2.1.txt
 
+   EdDSA-Java:
+   See licenses/LICENSE-CC0-1.0-Universal.txt
+
    HostnameVerifier:
    From Apache HttpClient 4.4.1 and HttpCore 4.4.1
    See licenses/LICENSE-Apache2.0.txt

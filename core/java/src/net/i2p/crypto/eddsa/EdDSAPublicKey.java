@@ -1,3 +1,14 @@
+/**
+ * EdDSA-Java by str4d
+ *
+ * To the extent possible under law, the person who associated CC0 with
+ * EdDSA-Java has waived all copyright and related or neighboring rights
+ * to EdDSA-Java.
+ *
+ * You should have received a copy of the CC0 legalcode along with this
+ * work. If not, see <https://creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ */
 package net.i2p.crypto.eddsa;
 
 import java.security.PublicKey;
@@ -12,26 +23,21 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
  * An EdDSA public key.
- *<p>
- * Warning: Public key encoding is is based on the current curdle WG draft,
- * and is subject to change. See getEncoded().
- *</p><p>
- * For compatibility with older releases, decoding supports both the old and new
- * draft specifications. See decode().
- *</p><p>
- * Ref: https://tools.ietf.org/html/draft-ietf-curdle-pkix-04
- *</p><p>
- * Old Ref: https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
- *</p>
+ * <p>
+ * For compatibility with older releases, decoding supports both RFC 8410 and an
+ * older draft specification.
  *
  * @since 0.9.15
  * @author str4d
- *
+ * @see <a href="https://tools.ietf.org/html/rfc8410">RFC 8410</a>
+ * @see <a href=
+ *      "https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04">Older draft
+ *      specification</a>
  */
 public class EdDSAPublicKey implements EdDSAKey, PublicKey {
     private static final long serialVersionUID = 9837459837498475L;
     private final GroupElement A;
-    private GroupElement Aneg;
+    private GroupElement Aneg = null;
     private final byte[] Abyte;
     private final EdDSAParameterSpec edDsaSpec;
 
@@ -67,19 +73,19 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
 
     /**
      * Returns the public key in its canonical encoding.
-     *<p>
+     * <p>
      * This implements the following specs:
-     *<ul><li>
-     * General encoding: https://tools.ietf.org/html/draft-ietf-curdle-pkix-04
-     *</li><li>
-     * Key encoding: https://tools.ietf.org/html/rfc8032
-     *</li></ul>
-     *<p>
+     * <ul>
+     * <li>General encoding: https://tools.ietf.org/html/rfc8410</li>
+     * <li>Key encoding: https://tools.ietf.org/html/rfc8032</li>
+     * </ul>
+     * <p>
      * For keys in older formats, decoding and then re-encoding is sufficient to
      * migrate them to the canonical encoding.
-     *</p>
+     * <p>
      * Relevant spec quotes:
-     *<pre>
+     *
+     * <pre>
      *  In the X.509 certificate, the subjectPublicKeyInfo field has the
      *  SubjectPublicKeyInfo type, which has the following ASN.1 syntax:
      *
@@ -87,23 +93,23 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
      *    algorithm         AlgorithmIdentifier,
      *    subjectPublicKey  BIT STRING
      *  }
-     *</pre>
+     * </pre>
      *
-     *<pre>
+     * <pre>
      *  AlgorithmIdentifier  ::=  SEQUENCE  {
      *    algorithm   OBJECT IDENTIFIER,
      *    parameters  ANY DEFINED BY algorithm OPTIONAL
      *  }
      *
      *  For all of the OIDs, the parameters MUST be absent.
-     *</pre>
+     * </pre>
      *
-     *<pre>
+     * <pre>
      *  id-Ed25519   OBJECT IDENTIFIER ::= { 1 3 101 112 }
-     *</pre>
+     * </pre>
      *
-     *  @return 44 bytes for Ed25519, null for other curves
-     *  @since implemented in 0.9.25
+     * @return 44 bytes for Ed25519, null for other curves
+     * @since implemented in 0.9.25
      */
     @Override
     public byte[] getEncoded() {
@@ -137,23 +143,20 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
 
     /**
      * Extracts the public key bytes from the provided encoding.
-     *<p>
-     * This will decode data conforming to the current spec at
-     * https://tools.ietf.org/html/draft-ietf-curdle-pkix-04
-     * or the old spec at
+     * <p>
+     * This will decode data conforming to RFC 8410 or the older draft spec at
      * https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04.
-     *</p><p>
-     * Contrary to draft-ietf-curdle-pkix-04, it WILL accept a parameter value
-     * of NULL, as it is required for interoperability with the default Java
-     * keystore. Other implementations MUST NOT copy this behaviour from here
-     * unless they also need to read keys from the default Java keystore.
-     *</p><p>
+     * <p>
+     * Per RFC 8410 section 3, this function WILL accept a parameter value of
+     * NULL, as it is required for interoperability with the default Java keystore.
+     * Other implementations MUST NOT copy this behaviour from here unless they also
+     * need to read keys from the default Java keystore.
+     * <p>
      * This is really dumb for now. It does not use a general-purpose ASN.1 decoder.
      * See also getEncoded().
-     *</p>
      *
-     *  @return 32 bytes for Ed25519, throws for other curves
-     *  @since 0.9.25
+     * @return 32 bytes for Ed25519, throws for other curves
+     * @since 0.9.25
      */
     private static byte[] decode(byte[] d) throws InvalidKeySpecException {
         try {
@@ -208,13 +211,18 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
             } else {
                 // Handle parameter value of NULL
                 //
-                // Quote https://tools.ietf.org/html/draft-ietf-curdle-pkix-04 :
-                //   For all of the OIDs, the parameters MUST be absent.
-                //   Regardless of the defect in the original 1997 syntax,
-                //   implementations MUST NOT accept a parameters value of NULL.
+                // Quoting RFC 8410 section 3:
+                // > For all of the OIDs, the parameters MUST be absent.
+                // >
+                // > It is possible to find systems that require the parameters to be
+                // > present. This can be due to either a defect in the original 1997
+                // > syntax or a programming error where developers never got input where
+                // > this was not true. The optimal solution is to fix these systems;
+                // > where this is not possible, the problem needs to be restricted to
+                // > that subsystem and not propagated to the Internet.
                 //
-                // But Java's default keystore puts it in (when decoding as
-                // PKCS8 and then re-encoding to pass on), so we must accept it.
+                // Java's default keystore puts it in (when decoding as PKCS8 and then
+                // re-encoding to pass on), so we must accept it.
                 if (idlen == 7) {
                     if (d[idx++] != 0x05 ||
                         d[idx++] != 0) {
@@ -245,7 +253,8 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
     }
 
     public GroupElement getNegativeA() {
-        // Only read Aneg once, otherwise read re-ordering might occur between here and return. Requires all GroupElement's fields to be final.
+        // Only read Aneg once, otherwise read re-ordering might occur between
+        // here and return. Requires all GroupElement's fields to be final.
         GroupElement ourAneg = Aneg;
         if(ourAneg == null) {
             ourAneg = A.negate();

@@ -1,3 +1,14 @@
+/**
+ * EdDSA-Java by str4d
+ *
+ * To the extent possible under law, the person who associated CC0 with
+ * EdDSA-Java has waived all copyright and related or neighboring rights
+ * to EdDSA-Java.
+ *
+ * You should have received a copy of the CC0 legalcode along with this
+ * work. If not, see <https://creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ */
 package net.i2p.crypto.eddsa.math.ed25519;
 
 import net.i2p.crypto.eddsa.math.*;
@@ -9,40 +20,60 @@ import net.i2p.crypto.eddsa.math.*;
  */
 public class Ed25519LittleEndianEncoding extends Encoding {
     /**
-     * Encodes a given field element in its 32 byte representation. This is done in TWO steps.
-     * Step 1: Reduce the value of the field element modulo p.
-     * Step 2: Convert the field element to the 32 byte representation.
-     * <p>
-     * The idea for the modulo p reduction algorithm is as follows:
-     * <p>
-     * Assumption:
-     * </p><ul>
-     * <li>p = 2^255 - 19
-     * <li>h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 &lt;= |hi| &lt; 2^27 for all i=0,...,9.
-     * <li>h congruent r modulo p, i.e. h = r + q * p for some suitable 0 &lt;= r &lt; p and an integer q.
+     * Encodes a given field element in its 32 byte representation. This is done in two steps:
+     * <ol>
+     * <li>Reduce the value of the field element modulo $p$.
+     * <li>Convert the field element to the 32 byte representation.
+     * </ol><p>
+     * The idea for the modulo $p$ reduction algorithm is as follows:
+     * </p>
+     * <h2>Assumption:</h2>
+     * <ul>
+     * <li>$p = 2^{255} - 19$
+     * <li>$h = h_0 + 2^{25} * h_1 + 2^{(26+25)} * h_2 + \dots + 2^{230} * h_9$ where $0 \le |h_i| \lt 2^{27}$ for all $i=0,\dots,9$.
+     * <li>$h \cong r \mod p$, i.e. $h = r + q * p$ for some suitable $0 \le r \lt p$ and an integer $q$.
      * </ul><p>
-     * Then q = [2^-255 * (h + 19 * 2^-25 * h9 + 1/2)] where [x] = floor(x).
-     * <p>
-     * Proof:
+     * Then $q = [2^{-255} * (h + 19 * 2^{-25} * h_9 + 1/2)]$ where $[x] = floor(x)$.
+     * </p>
+     * <h2>Proof:</h2>
      * <p>
      * We begin with some very raw estimation for the bounds of some expressions:
-     * <pre>|h| &lt; 2^230 * 2^30 = 2^260 ==&gt; |r + q * p| &lt; 2^260 ==&gt; |q| &lt; 2^10.
-     * ==&gt; -1/4 &lt;= a := 19^2 * 2^-255 * q &lt; 1/4.
-     * |h - 2^230 * h9| = |h0 + ... + 2^204 * h8| &lt; 2^204 * 2^30 = 2^234.
-     * ==&gt; -1/4 &lt;= b := 19 * 2^-255 * (h - 2^230 * h9) &lt; 1/4</pre>
-     * Therefore 0 &lt; 1/2 - a - b &lt; 1.
      * <p>
-     * Set x := r + 19 * 2^-255 * r + 1/2 - a - b then
-     * 0 &lt;= x &lt; 255 - 20 + 19 + 1 = 2^255 ==&gt; 0 &lt;= 2^-255 * x &lt; 1. Since q is an integer we have
-     *
-     * <pre>[q + 2^-255 * x] = q        (1)</pre>
+     * $$
+     * \begin{equation}
+     * |h| \lt 2^{230} * 2^{30} = 2^{260} \Rightarrow |r + q * p| \lt 2^{260} \Rightarrow |q| \lt 2^{10}. \\
+     * \Rightarrow -1/4 \le a := 19^2 * 2^{-255} * q \lt 1/4. \\
+     * |h - 2^{230} * h_9| = |h_0 + \dots + 2^{204} * h_8| \lt 2^{204} * 2^{30} = 2^{234}. \\
+     * \Rightarrow -1/4 \le b := 19 * 2^{-255} * (h - 2^{230} * h_9) \lt 1/4
+     * \end{equation}
+     * $$
      * <p>
-     * Have a closer look at x:
-     * <pre>x = h - q * (2^255 - 19) + 19 * 2^-255 * (h - q * (2^255 - 19)) + 1/2 - 19^2 * 2^-255 * q - 19 * 2^-255 * (h - 2^230 * h9)
-     *   = h - q * 2^255 + 19 * q + 19 * 2^-255 * h - 19 * q + 19^2 * 2^-255 * q + 1/2 - 19^2 * 2^-255 * q - 19 * 2^-255 * h + 19 * 2^-25 * h9
-     *   = h + 19 * 2^-25 * h9 + 1/2 - q^255.</pre>
+     * Therefore $0 \lt 1/2 - a - b \lt 1$.
      * <p>
-     * Inserting the expression for x into (1) we get the desired expression for q.
+     * Set $x := r + 19 * 2^{-255} * r + 1/2 - a - b$. Then:
+     * <p>
+     * $$
+     * 0 \le x \lt 255 - 20 + 19 + 1 = 2^{255} \\
+     * \Rightarrow 0 \le 2^{-255} * x \lt 1.
+     * $$
+     * <p>
+     * Since $q$ is an integer we have
+     * <p>
+     * $$
+     * [q + 2^{-255} * x] = q \quad (1)
+     * $$
+     * <p>
+     * Have a closer look at $x$:
+     * <p>
+     * $$
+     * \begin{align}
+     * x &amp;= h - q * (2^{255} - 19) + 19 * 2^{-255} * (h - q * (2^{255} - 19)) + 1/2 - 19^2 * 2^{-255} * q - 19 * 2^{-255} * (h - 2^{230} * h_9) \\
+     *   &amp;= h - q * 2^{255} + 19 * q + 19 * 2^{-255} * h - 19 * q + 19^2 * 2^{-255} * q + 1/2 - 19^2 * 2^{-255} * q - 19 * 2^{-255} * h + 19 * 2^{-25} * h_9 \\
+     *   &amp;= h + 19 * 2^{-25} * h_9 + 1/2 - q^{255}.
+     * \end{align}
+     * $$
+     * <p>
+     * Inserting the expression for $x$ into $(1)$ we get the desired expression for $q$.
      */
     public byte[] encode(FieldElement x) {
         int[] h = ((Ed25519FieldElement)x).t;
@@ -150,10 +181,10 @@ public class Ed25519LittleEndianEncoding extends Encoding {
     }
 
     /**
-     * Decodes a given field element in its 10 byte 2^25.5 representation.
+     * Decodes a given field element in its 10 byte $2^{25.5}$ representation.
      *
      * @param in The 32 byte representation.
-     * @return The field element in its 2^25.5 bit representation.
+     * @return The field element in its $2^{25.5}$ bit representation.
      */
     public FieldElement decode(byte[] in) {
         long h0 = load_4(in, 0);
@@ -207,15 +238,15 @@ public class Ed25519LittleEndianEncoding extends Encoding {
     /**
      * Is the FieldElement negative in this encoding?
      * <p>
-     * Return true if x is in {1,3,5,...,q-2}<br>
-     * Return false if x is in {0,2,4,...,q-1}
+     * Return true if $x$ is in $\{1,3,5,\dots,q-2\}$<br>
+     * Return false if $x$ is in $\{0,2,4,\dots,q-1\}$
      * <p>
      * Preconditions:
      * </p><ul>
-     * <li>|x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     * <li>$|x|$ bounded by $1.1*2^{26},1.1*2^{25},1.1*2^{26},1.1*2^{25}$, etc.
      * </ul>
      *
-     * @return true if x is in {1,3,5,...,q-2}, false otherwise.
+     * @return true if $x$ is in $\{1,3,5,\dots,q-2\}$, false otherwise.
      */
     public boolean isNegative(FieldElement x) {
         byte[] s = encode(x);

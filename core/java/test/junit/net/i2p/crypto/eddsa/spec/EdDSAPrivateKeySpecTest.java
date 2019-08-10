@@ -1,3 +1,14 @@
+/**
+ * EdDSA-Java by str4d
+ *
+ * To the extent possible under law, the person who associated CC0 with
+ * EdDSA-Java has waived all copyright and related or neighboring rights
+ * to EdDSA-Java.
+ *
+ * You should have received a copy of the CC0 legalcode along with this
+ * work. If not, see <https://creativecommons.org/publicdomain/zero/1.0/>.
+ *
+ */
 package net.i2p.crypto.eddsa.spec;
 
 import static org.hamcrest.Matchers.*;
@@ -38,7 +49,7 @@ public class EdDSAPrivateKeySpecTest {
     public void incorrectSeedLengthThrows() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("seed length is wrong");
-        EdDSAPrivateKeySpec key = new EdDSAPrivateKeySpec(new byte[2], ed25519);
+        new EdDSAPrivateKeySpec(new byte[2], ed25519);
     }
 
     /**
@@ -56,6 +67,6 @@ public class EdDSAPrivateKeySpecTest {
     public void incorrectHashLengthThrows() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("hash length is wrong");
-        EdDSAPrivateKeySpec key = new EdDSAPrivateKeySpec(ed25519, new byte[2]);
+        new EdDSAPrivateKeySpec(ed25519, new byte[2]);
     }
 }
