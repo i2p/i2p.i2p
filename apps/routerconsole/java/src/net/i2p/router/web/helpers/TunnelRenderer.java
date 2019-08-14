@@ -76,7 +76,7 @@ class TunnelRenderer {
                 dname = DataHelper.escapeHTML(_t(name));
             }
             out.write("<h3 class=\"tabletitle\" id=\"" + b64
-                      + "\" >" + _t("Client tunnels for") + ' ' + dname);
+                      + "\" >" + _t("Client tunnels for {0}", dname));
             if (isLocal) {
                 // links are set to float:right in CSS so they will be displayed in reverse order
                 out.write(" <a href=\"/configtunnels#" + b64 + "\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a>");
@@ -97,7 +97,7 @@ class TunnelRenderer {
                             if (aname == null)
                                 aname = ab64;
                             out.write("<h3 class=\"tabletitle\" id=\"" + ab64
-                                      + "\" >" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(aname)));
+                                      + "\" >" + _t("Client tunnels for {0}", DataHelper.escapeHTML(_t(aname))));
                             if (isLocal)
                                 out.write(" <a href=\"/configtunnels#" + b64 + "\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
                             else

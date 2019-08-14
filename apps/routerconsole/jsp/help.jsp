@@ -2,28 +2,22 @@
 <%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<%
-  /*
-   *   Do not tag this file for translation - copy it to help_xx.jsp and translate inline.
-   */
-%>
-<html><head><title>I2P Router Console - help</title>
+<html><head>
 <%@include file="css.jsi" %>
+<%=intl.title("help")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1>I2P Router Help &amp; Support</h1>
+<h1><%=intl._t("I2P Router Help and Support")%></h1>
 <div class="main" id="help">
-
 <div class="confignav">
-<span class="tab"><a href="#sidebarhelp">Sidebar</a></span>
-<span class="tab"><a href="#reachabilityhelp">Reachability</a></span>
-<span class="tab"><a href="#faq">FAQ</a></span>
-<span class="tab"><a href="/viewlicense">Legal</a></span>
-<span class="tab"><a href="/viewhistory">Change Log</a></span>
+<span class="tab"><a href="#sidebarhelp"><%=intl._t("Sidebar")%></a></span>
+<span class="tab"><a href="#reachabilityhelp"><%=intl._t("Reachability")%></a></span>
+<span class="tab"><a href="#faq"><%=intl._t("FAQ")%></a></span>
+<span class="tab"><a href="/viewlicense"><%=intl._t("Legal")%></a></span>
+<span class="tab"><a href="/viewhistory"><%=intl._t("Change Log")%></a></span>
 </div>
-
 <div id="volunteer"><%@include file="help.jsi" %></div>
 <div id="sidebarhelp"><%@include file="help-sidebar.jsi" %></div>
 <div id="reachabilityhelp"><%@include file="help-reachability.jsi" %></div>

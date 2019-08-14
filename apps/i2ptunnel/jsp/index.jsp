@@ -35,10 +35,8 @@
 </head><body id="tunnelListPage">
 <div class="panel" id="overview"><h2><%=intl._t("Hidden Services Manager")%></h2><p>
 <%=intl._t("These are the local services provided by your router.")%>
-<%=intl._t("They may be clients started through the Tunnel Manager or external programs connecting through SAM, BOB, or directly to I2CP.")%>
-<%=intl._t("By default, most of your client services (mail, http proxy, IRC) will share the same set of tunnels (for performance reasons) and be listed as \"Shared Clients\" and \"Shared Clients(DSA)\".")%>
-<%=intl._t("However, if you experience a tunnel failure, all your services will go offline at the same time, so in some scenarios you may wish to configure client services to use their own set of tunnels.")%>
-<%=intl._t("This can be done by unchecking the \"Share tunnels with other clients&hellip;\" option listed under \"Shared Clients\" on the configuration page of the relevant client service, after which you will need to restart the client service from this page.")%>
+&nbsp;
+<%=intl._t("By default, most of your client services (email, HTTP proxy, IRC) will share the same set of tunnels and be listed as \"Shared Clients\" and \"Shared Clients(DSA)\".")%>
 </p></div>
 <%
   boolean isInitialized = indexBean.isInitialized();

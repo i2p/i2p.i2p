@@ -107,6 +107,9 @@ class NetDbRenderer {
         StringBuilder buf = new StringBuilder(4*1024);
         List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
         if (".".equals(routerPrefix)) {
+            buf.append("<table><tr><td class=\"infohelp\">")
+               .append(_t("Never reveal your router identity to anyone, as it is uniquely linked to your IP address in the network database."))
+               .append("</td></tr></table>");
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
             StringBuilder ubuf = new StringBuilder();

@@ -70,3 +70,9 @@
      <%=intl._t("Do you have another I2P instance running? Stop the conflicting program and restart I2P.")%>
   </li>
 </ul>
+
+<h3><%=intl._t("Clock Skew")%></h3>
+<%=intl._t("The skew (offset) of your computer's clock relative to the network-synced time.")%>
+<%=intl._t("I2P requires your computer's time be accurate.")%>
+<%=intl._t("If the skew is more than a few seconds, please correct the problem by adjusting your computer's time.")%>
+<%=intl._t("If I2P cannot connect to the internet, a reading of 0ms may be indicated.")%>

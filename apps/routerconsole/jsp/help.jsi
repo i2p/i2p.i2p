@@ -1,9 +1,10 @@
-<h2>Further Assistance</h2>
-<p>If you'd like to help improve or translate the documentation, or help with other aspects of the project, please see the documentation for <a href="http://i2p-projekt.i2p/en/get-involved" target="_blank">volunteers.</a></p>
-<p>Further assistance is available here:</p>
+<h2><%=intl._t("Further Assistance")%></h2>
+<p><%=intl._t("If you would like to help improve or translate the documentation, or help with other aspects of the project, please see the documentation for <a href=\"http://i2p-projekt.i2p/en/get-involved\" target=\"_blank\">volunteers.</a>")%></p>
+<p><%=intl._t("Further assistance is available here:")%></p>
 <ul class="links">
-<li><a href="http://i2p-projekt.i2p/en/faq" target="_blank">FAQ on i2p-projekt.i2p</a></li>
-<li><a href="http://i2pwiki.i2p/" target="_blank">I2PWiki</a></li>
+<li><a href="http://i2p-projekt.i2p/en/faq" target="_blank"><%=intl._t("FAQ on i2p-projekt.i2p")%></a></li>
+<li><a href="http://i2pwiki.i2p/" target="_blank"><%=intl._t("I2P Wiki")%></a></li>
 </ul>
-<p>You may also try <a href="http://zzz.i2p/" target="_blank">zzz's developer forum</a>,
-or <a href="irc://127.0.0.1:6668/i2p">I2P's IRC network</a>.</p>
+<p><%=intl._t("You may also try {0} or {1}.",
+"<a href=\"http://i2pforum.i2p/\" target=\"_blank\">" + intl._t("I2P Forum") + "</a>",
+"<a href=\"irc://127.0.0.1:6668/i2p\">" + intl._t("I2P's IRC network") + "</a>")%></p>

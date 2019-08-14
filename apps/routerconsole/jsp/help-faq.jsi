@@ -1,78 +1,70 @@
-<h2>Abridged I2P FAQ</h2>
+<h2><%=intl._t("Abridged I2P FAQ")%></h2>
+<p class="infohelp"><%=intl._t("This is a shortened version of the official FAQ.")%> 
+<%=intl._t("For the full version, please visit {0} or {1}.",
+"<a href=\"https://geti2p.net/faq\" target=\"_blank\">geti2p.net/faq</a>",
+"<a href=\"http://i2p-projekt.i2p/faq\" target=\"_blank\">i2p-projekt.i2p/faq</a>")%>
 
-<p class="infohelp">This is a shortened version of the official FAQ. 
-For the full version, please visit <a href="https://geti2p.net/faq" target="_blank">https://geti2p.net/faq</a> or <a href="http://i2p-projekt.i2p/faq" target="_blank">http://i2p-projekt.i2p/faq</a>.
+<h3><%=intl._t("My router has been up for several minutes and has zero or very few connections")%></h3>
+<p><%=intl._t("If after a few minutes of uptime your router is indicating 0 Active Peers and 0 Known Peers, with a notification in the sidebar that you need to check your network connection, verify that you can access the internet.")%>
+<%=intl._t("If your internet connection is functional, you may need to unblock Java in your firewall.")%>
+<%=intl._t("Otherwise, you may need to reseed your I2P router. Visit the <a href=\"/configreseed#reseedconfig\">Reseed Configuration page</a> and click the \"Save Changes and Reseed Now\" button.")%></p>
 
-<h3>My router has been up for several minutes and has zero or very few connections</h3>
+<h3><%=intl._t("My router has very few active peers, is this OK?")%></h3>
+<p><%=intl._t("If your router has 10 or more active peers, everything is fine.")%>
+<%=intl._t("The router should maintain connections to a few peers at all times.")%>
+<%=intl._t("The best way to stay connected to the network is to <a href=\"/config\">share more bandwidth</a>.")%></p>
 
-<p>If after a few minutes of uptime your router is indicating 0 Active Peers and 0 Known Peers, with a notification in the sidebar that you need to check your network connection, verify that you can access the internet. 
-If your internet connection is functional, you may need to unblock Java in your firewall. 
-Otherwise, you may need to reseed your I2P router. Visit the <a href="/configreseed#reseedconfig">Reseed Configuration page</a> and click the "Save Changes and Reseed Now" button.</p>
+<h3 id="addressbooksubs"><%=intl._t("I am missing lots of hosts in my addressbook. What are some good subscription links?")%></h3>
+<p><%=intl._t("The default subscription is to {0} which is seldom updated.", "<code>i2p-projekt.i2p</code>")%>
+<%=intl._t("If you don't have another subscription, you may use \"jump\" links which are slower, but ensure that your addressbook only contains the default addresses and sites that you use.")%>
+<%=intl._t("To speed up browsing on I2P, it's a good idea to add some addressbook subscriptions.")%></p>
 
-<h3>My router has very few active peers, is this OK?</h3>
-
-<p>If your router has 10 or more active peers, everything is fine. 
-The router should maintain connections to a few peers at all times. 
-The best way to stay "better-connected" to the network is to <a href="/config">share more bandwidth</a>.</p>
-
-<h3 id="addressbooksubs">I'm missing lots of hosts in my addressbook. What are some good subscription links?</h3>
-
-<p>The default subscription is to <code>http://i2p-projekt.i2p/hosts.txt</code> which is seldom updated. 
-If you don't have another subscription, you may often have to use "jump" links which is much slower but ensures that your addressbook is only populated by sites you use (in addition to the default subscription addresses). 
-To speed up browsing on I2P, it's a good idea to add some addressbook subscriptions.</p>
-
-<p>Here are some other public addressbook subscription links. 
-You may wish to add one or two to your <a href="/susidns/subscriptions">susidns subscription list</a>. 
-In the event that addresses conflict in the subscriptions, the lists placed at the top of your susidns configuration will take precedence over those placed further down.</p>
-
+<p><%=intl._t("Here are some other public addressbook subscription links.")%>
+<%=intl._t("You may wish to add one or two to your <a href=\"/susidns/subscriptions\">subscription list</a>.")%> 
 <ul>
 <li><code>http://stats.i2p/cgi-bin/newhosts.txt</code></li>
 <li><code>http://no.i2p/export/alive-hosts.txt</code></li>
 <li><code>http://identiguy.i2p/hosts.txt</code></li>
 </ul>
 
-<p>Note that subscribing to a hosts.txt service is an act of trust, as a malicious subscription could give you incorrect addresses, so be careful subscribing to lists from unknown sources. 
-The operators of these services may have various policies for listing hosts. 
-Presence on this list does not imply endorsement.</p>
+<p><%=intl._t("Note that subscribing to a hosts.txt service is an act of trust, as a malicious subscription could give you incorrect addresses, so be careful subscribing to lists from unknown sources.")%>
+<%=intl._t("The operators of these services may have various policies for listing hosts.")%>
+<%=intl._t("Presence on this list does not imply endorsement.")%></p>
 
-<h3>How do I access IRC, BitTorrent, or other services on the regular Internet?</h3>
+<h3><%=intl._t("How do I access IRC, BitTorrent, or other services on the regular Internet?")%></h3>
+<p><%=intl._t("Unless an outproxy has been set up for the service you want to connect to, this is not possible.")%>
+<%=intl._t("There are only three types of outproxies running right now: HTTP, HTTPS, and email.")%>
+<%=intl._t("Note that there is currently no public SOCKS outproxy.")%></p>
 
-<p>Unless an outproxy has been set up for the service you want to connect to, this is not possible. 
-There are only three types of outproxies running right now: HTTP, HTTPS, and email. 
-Note that there is currently no publicly listed SOCKS outproxy. 
-If this type of service is required, try <a href="https://torproject.org/" target="_blank">Tor</a>.</p>
+<h3><%=intl._t("How do I configure my browser to access I2P websites?")%></h3>
+<p><%=intl._t("You will need to configure your browser to use the HTTP proxy server on host <code>127.0.0.1</code> port <code>4444</code>).")%>
+<%=intl._t("See the {0} for a more detailed explanation.",
+"<a href=\"https://geti2p.net/en/about/browser-config\" target=\"_blank\">" + intl._t("Browser Proxy Configuration Guide") + "</a>")%></p>
 
-<h3>How do I configure my browser to access .i2p websites?</h3>
-<p>You will need to configure your browser to use the HTTP proxy server (by default on host: <code>127.0.0.1</code> port: <code>4444</code>). 
-See the <a href="https://geti2p.net/en/about/browser-config" target="_blank">Browser Proxy Configuration Guide</a> for a more detailed explanation.</p>
+<h3><%=intl._t("What is an eepsite?")%></h3>
+<p><%=intl._t("An eepsite is a website that is hosted anonymously on the I2P network.")%>
+<%=intl._t("You can access it by configuring your web browser to use I2P's HTTP proxy and browsing to the website.")%></p>
 
-<h3>What is an eepsite?</h3>
+<h3><%=intl._t("Most of the eepsites are down?")%></h3>
+<p><%=intl._t("If you consider every eepsite that has ever been created, yes, most of them are down.")%> 
+<%=intl._t("People and eepsites come and go.")%>
+<%=intl._t("A good way to get started in I2P is check out a list of eepsites that are currently up.")%>
+<%=intl._t("{0} tracks active eepsites.",
+"<a href=\"http://identiguy.i2p\" target=\"_blank\">identiguy.i2p</a>")%></p>
 
-<p>An eepsite is a website that is hosted anonymously on the I2P network - you can access it by configuring your web browser to use I2P's HTTP proxy (see above) and browsing to the <code>.i2p</code> suffixed website (e.g. <a href="http://i2p-projekt.i2p" target="_blank">http://i2p-projekt.i2p</a>). 
-Also ensure your browser is configured to resolve DNS remotely when using the proxy to avoid DNS leaks.</p>
+<h3><%=intl._t("How do I connect to IRC within I2P?")%></h3>
+<p><%=intl._t("A tunnel to the main IRC server network within I2P, Irc2P, is automatically started when the I2P router starts.")%>
+<%=intl._t("To connect to it, tell your IRC client to connect to server: <code>127.0.0.1</code> port: <code>6668</code>.")%></p>
 
-<h3>Most of the eepsites are down?</h3>
+<p><%=intl._t("HexChat-like client users can create a new network with the server <code>127.0.0.1/6668</code>, or you can connect with the command <code>/server 127.0.0.1 6668</code>.")%>
+<%=intl._t("Different IRC clients may require a different command, consult the client documentation.")%></p>
 
-<p>If you consider every eepsite that has ever been created, yes, most of them are down. 
-People and eepsites come and go. 
-A good way to get started in I2P is check out a list of eepsites that are currently up. 
-<a href="http://identiguy.i2p" target="_blank">http://identiguy.i2p</a> tracks active eepsites.</p>
-
-<h3>How do I connect to IRC within I2P?</h3>
-
-<p>A tunnel to the main IRC server network within I2P, Irc2P, is created when I2P is installed (see the <a href="/i2ptunnelmgr">I2P Tunnel Manager</a>), and is automatically started when the I2P router starts. 
-To connect to it, tell your IRC client to connect to server: <code>127.0.0.1</code> port: <code>6668</code>.</p>
-
-<p>HexChat-like client users can create a new network with the server <code>127.0.0.1/6668</code> (remember to tick "Bypass proxy server" if you have a proxy server configured), or you can connect with the command <code>/server 127.0.0.1 6668</code>. 
-Different IRC clients may require a different command, consult your IRC client's manual for more information.</p>
-
-<h3>What ports does I2P use?</h3>
-
+<h3><%=intl._t("What ports does I2P use?")%></h3>
 <table id="portfaq">
-<tr><th colspan="3">LOCAL PORTS</th></tr>
-<tr><td colspan="3" class="infohelp">These are the local I2P port mappings, listening only to local connections by default, except where noted. 
-Unless you require access from other machines, they should only be accessible from localhost.</td></tr>
-<tr><th>Port</th><th>Function</th><th>Notes</th></tr>
+<tr><th colspan="3"><%=intl._t("Local ports")%></th></tr>
+<tr><td colspan="3" class="infohelp"><%=intl._t("These are the local I2P port mappings, listening only to local connections by default, except where noted.")%>
+<%=intl._t("Unless you require access from other machines, they should only be accessible from localhost.")%></td></tr>
+<tr><th><%=intl._t("Port")%></th><th><%=intl._t("Function")%></th><th><%=intl._t("Notes")%></th></tr>
 <tr><td>1900</td>
 <td>UPnP SSDP UDP multicast listener</td>
 <td>Cannot be changed. 
@@ -149,9 +141,10 @@ To change, see the <a href="http://wrapper.tanukisoftware.com/doc/english/prop-p
 <tr><td>32000</td>
 <td>Local control channel for the service wrapper</td>
 <td>To change, see the <a href="http://wrapper.tanukisoftware.com/doc/english/prop-port.html" target="_blank">wrapper documentation</a>.</td></tr>
-<tr><th colspan="3">INTERNET FACING PORTS</th></tr>
-<tr><td colspan="3" class="infohelp">I2P selects a random port between 9000 and 31000 to communicate with other routers when the program is run for the first time, or when your external IP address changes when running in <a href="/confignet#ipchange">Laptop Mode</a>. 
-The <a href="/confignet#udpconfig">selected port</a> is shown on the <a href="/confignet">Network Configuration page</a>.</td></tr>
+
+<tr><th colspan="3"><%=intl._t("Internet facing ports")%></th></tr>
+<tr><td colspan="3" class="infohelp"><%=intl._t("I2P selects a random port to communicate with other routers when the program is run for the first time.")%>
+<%=intl._t("The selected port is shown on the <a href=\"/confignet\">Network Configuration page</a>.")%></td></tr>
 <tr><td colspan="3">Outbound UDP from the <a href="/confignet#udpconfig">random port</a> noted on the Network Configuration page to arbitrary remote UDP ports, allowing replies.</td></tr>
 <tr><td colspan="3">Outbound TCP from random high ports to arbitrary remote TCP ports.</td></tr>
 <tr><td colspan="3">Inbound UDP to the <a href="/confignet#udpconfig">port</a> noted on the Network Configuration page from arbitrary locations (optional, but recommended).</td></tr>
@@ -159,4 +152,3 @@ The <a href="/confignet#udpconfig">selected port</a> is shown on the <a href="/c
 <a href="/confignet#tcpconfig">Inbound TCP</a> may be disabled on the Network Configuration page.</td></tr>
 <tr><td colspan="3">Outbound UDP on port 123, allowing replies: this is necessary for I2P's internal time sync (via SNTP - querying a random SNTP host in <code>pool.ntp.org</code> or another server you specify).</td></tr>
 </table>
-

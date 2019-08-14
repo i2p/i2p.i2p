@@ -1,4 +1,7 @@
-2019-08-10 str4d:
+2019-08-14 zzz
+ * Console: Clean up help text, tag for translation (ticket #2298)
+
+2019-08-10 str4d
  * EdDSA: Reduce diff between vendored code and upstream
  * Jetty: Fix Gradle build
  * Tests:

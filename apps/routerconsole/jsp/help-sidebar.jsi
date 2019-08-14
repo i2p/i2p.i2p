@@ -1,69 +1,43 @@
-<h2>Sidebar Information</h2>
-
-<p>Many of the stats on the sidebar may be <a href="configstats">configured</a> to be <a href="graphs">graphed</a> for further analysis. 
-You may also customize the sections that appear on the Sidebar and their positioning on the <a href="configsidebar">Sidebar Configuration page</a>.
+<h2><%=intl._t("Sidebar Information")%></h2>
+<p><%=intl._t("Many of the stats on the sidebar may be <a href=\"configstats\">configured</a> to be <a href=\"graphs\">graphed</a> for further analysis.")%>
+<%=intl._t("You may also customize the sections that appear on the Sidebar and their positioning on the <a href=\"configsidebar\">Sidebar Configuration page</a>.")%>
 </p>
 
-<h3>Router Info</h3>
+<h3><%=intl._t("Bandwidth in/out")%></h3>
+<p><%=intl._t("This section indicates your average bandwidth speeds and total usage for the session.")%> 
+<%=intl._t("All values are in bytes per second, not bits per second.")%>
+<%=intl._t("You may change your bandwidth limits on the <a href=\"config\">Bandwidth Configuration page</a>.")%>
+<%=intl._t("The more bandwidth you make available, the more you help the network and improve your own anonymity, so please take the time to review the settings.")%>
+<%=intl._t("Your upstream share amount (KBps Out) will determine your overall contribution to the network.")%>
+</p>
 
+
+<h3><%=intl._t("Peers")%></h3>
 <ul>
 <li>
-<b>Local Identity:</b>
-If you hover over the "Router Info" heading, your truncated router identity will be shown (the first four characters (24 bits) of your 44-character (256-bit) Base64 router hash). 
-The full hash is shown on your <a href="netdb?r=.">Network Database entry</a>. 
-Never reveal this to anyone, as your router identity is uniquely linked to your IP address in the network database.</li>
+<b><%=intl._t("Active")%>:</b> <%=intl._t("The first number is the number of peers your router has sent or received a message from in the last few minutes.")%>
+<%=intl._t("This may range from 8-10 to several hundred, depending on your total bandwidth, shared bandwidth, and locally-generated traffic.")%>
+<%=intl._t("The second number is the number of peers seen in the last hour or so.")%>
+<%=intl._t("Do not be concerned if these numbers vary widely.")%>
+</li>
 <li>
-<b>Clock Skew:</b>
-The skew (offset) of your computer's clock relative to the network-synced time (if known). 
-I2P requires your computer's time be accurate. 
-If the skew is more than a few seconds, please correct the problem by adjusting your computer's time. 
-If I2P cannot connect to the internet, a reading of 0ms may be indicated. 
-<b>Note:</b> This is only displayed in the "Router Information (advanced)" section. 
-You may add this section to your Sidebar on the <a href="configsidebar">Sidebar Configuration page</a>.
+<b><%=intl._t("Fast")%>:</b> <%=intl._t("This is the number of peers your router has available for building client tunnels.")%>
+<%=intl._t("These peers are shown on the <a href=\"profiles\">profiles page</a>.")%>
+</li>
+<li><b><%=intl._t("High Capacity")%>:</b>
+<%=intl._t("This is the number of peers your router has available for building your exploratory tunnels which are used to determine network performance.")%>
+<%=intl._t("The fast peers are included in the high capacity tier.")%>
+<%=intl._t("These peers are shown on the <a href=\"profiles\">profiles page</a>.")%>
+</li>
+<li>
+<b><%=intl._t("Integrated")%>:</b> <%=intl._t("This is the number of peers your router will use for network database inquiries.")%>
+<%=intl._t("These are usually the floodfill routers responsible for maintaining network integrity.")%>
+<%=intl._t("These peers are shown on the <a href=\"profiles\">profiles page</a>.")%>
+</li>
+<li>
+<b><%=intl._t("Known")%>:</b> <%=intl._t("This is the total number of peers that are known by your router.")%>
+<%=intl._t("This may range from under 100 to several thousand.")%>
+<%=intl._t("This number is not the total size of the network; it may vary widely depending on your total bandwidth, shared bandwidth, and locally-generated traffic.")%>
+<%=intl._t("I2P does not require a router to know every other router in the network.")%>
 </li>
 </ul>
-
-<h3>Peers</h3>
-
-<ul>
-<li>
-<b>Active:</b> The first number is the number of peers your router has sent or received a message from in the last few minutes. 
-This may range from 8-10 to several hundred, depending on your total bandwidth, shared bandwidth, and locally-generated traffic. 
-The second number is the number of peers seen in the last hour or so. 
-Do not be concerned if these numbers vary widely. 
-<a href="configstats#router.activePeers">[Enable graphing]</a>.
-</li>
-<li>
-<b>Fast:</b> This is the number of peers your router has available for building client tunnels. 
-It is generally in the range 8-30. Your fast peers are shown on the <a href="profiles">Profiles page</a>. 
-<a href="configstats#router.fastPeers">[Enable graphing]</a>
-</li>
-<li><b>High Capacity:</b>
-This is the number of peers your router has available for building your exploratory tunnels which are used to determine network performance. 
-It is generally in the range 8-75. 
-The fast peers are included in the high capacity tier. 
-Your high capacity peers are shown on the <a href="profiles">Profiles page</a>. 
-<a href="configstats#router.highCapacityPeers">[Enable graphing]</a>
-</li>
-<li>
-<b>Integrated:</b> This is the number of peers your router will use for network database inquiries. 
-These are usually the "floodfill" routers which are responsible for maintaining network integrity. 
-Your well integrated peers are shown on the bottom of the <a href="profiles">Profiles page</a>.
-</li>
-<li>
-<b>Known:</b> This is the total number of peers that are known by your router. 
-They are listed on the <a href="netdb">Network Database page</a>. 
-This may range from under 100 to 1000 or more. 
-This number is not the total size of the network; it may vary widely depending on your total bandwidth, shared bandwidth, and locally-generated traffic. 
-I2P does not require a router to know every other router in the network.
-</li>
-</ul>
-
-<p> This section indicates your average bandwidth speeds and total usage for the session. 
-All values are in bytes per second, not bits per second. 
-You may change your bandwidth limits on the <a href="config">Bandwidth Configuration page</a>. 
-The more bandwidth you make available, the more you help the network and improve your own anonymity, so please take the time to review the settings. 
-If you are unsure of your network's speed, using a service such as <a href="https://speedtest.net/">SpeedTest</a> or similar will give you a good indication of your bandwidth capability. 
-Your upstream share amount (KBps Out) will determine your overall contribution to the network. 
-Bandwidth is <a href="graphs">graphed</a> by default.</p>
-
