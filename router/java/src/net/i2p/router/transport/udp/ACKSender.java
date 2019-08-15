@@ -28,7 +28,7 @@ class ACKSender implements Runnable {
     private static final long POISON_PS = -9999999999l;
     
     /** how frequently do we want to send ACKs to a peer? */
-    static final int ACK_FREQUENCY = 250;
+    static final int ACK_FREQUENCY = 150;
     
     public ACKSender(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
