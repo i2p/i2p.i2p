@@ -28,7 +28,7 @@ class BatchedRouterPreprocessor extends BatchedPreprocessor {
     /** for exploratory OBGWs only (our tunnel tests and build messages) */
     public static final int OB_EXPL_BATCH_FREQ = 100;
     /** for IBGWs for efficiency (not our data) */
-    public static final int DEFAULT_BATCH_FREQUENCY = 175;
+    public static final int DEFAULT_BATCH_FREQUENCY = 150;
     
     /** for OBGWs */
     public BatchedRouterPreprocessor(RouterContext ctx, TunnelCreatorConfig cfg) {
