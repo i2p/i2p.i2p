@@ -151,8 +151,10 @@ public class X25519KeyFactory extends I2PThread {
      * to be put back onto the queue for reuse.
      */
     public void returnUnused(KeyPair kp) {
+/*
         _context.statManager().addRateData("crypto.XDHReused", 1);
         _keys.offer(kp);
+*/
     }
 
     /** @return true if successful, false if full */
