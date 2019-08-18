@@ -90,7 +90,7 @@ public class TunnelControllerGroup implements ClientApp {
      *
      *  @throws IllegalArgumentException if unable to load from i2ptunnel.config
      */
-    public static TunnelControllerGroup getInstance() { 
+    public static TunnelControllerGroup getInstance() {
         synchronized (TunnelControllerGroup.class) {
             if (_instance == null) {
                 if (!SystemVersion.isAndroid()) {
@@ -101,7 +101,7 @@ public class TunnelControllerGroup implements ClientApp {
                     }
                 } // else wait for the router to start it
             }
-            return _instance; 
+            return _instance;
         }
     }
 
@@ -114,7 +114,7 @@ public class TunnelControllerGroup implements ClientApp {
      *  @throws IllegalArgumentException if unable to load from i2ptunnel.config
      *  @since 0.9.41
      */
-    public static TunnelControllerGroup getInstance(I2PAppContext ctx) { 
+    public static TunnelControllerGroup getInstance(I2PAppContext ctx) {
         synchronized (TunnelControllerGroup.class) {
             if (_instance == null) {
                 if (SystemVersion.isAndroid() || !ctx.isRouterContext()) {
@@ -137,8 +137,10 @@ public class TunnelControllerGroup implements ClientApp {
      *  Config file problems will not throw exception until startup().
      *
      *  @param mgr may be null
-     *  @param args one arg, the config file, if not absolute will be relative to the context's config dir,
-     *              if empty or null, the default is i2ptunnel.config
+     *  @param args zero or one args, which may be a one config file or one config
+     *  directory. If not absolute will be relative to the context's config dir,
+     *              if empty or null, the default is i2ptunnel.config for a
+     *              config file and i2ptunnel.config.d for a config directory
      *  @throws IllegalArgumentException if too many args
      *  @since 0.9.4
      */
@@ -153,17 +155,9 @@ public class TunnelControllerGroup implements ClientApp {
             _configFile = DEFAULT_CONFIG_FILE;
             _configDirectory = CONFIG_DIR;
         } else if (args.length == 1) {
-            File check = new File(args[0]);
-            if (check.isFile()) {
-                _configFile = args[0];
-                _configDirectory = CONFIG_DIR;
-            } else {
-                _configFile = DEFAULT_CONFIG_FILE;
-                _configDirectory = args[0];
-            }
-        } else if (args.length == 2) {
-            _configFile = args[0];
-            _configDirectory = args[1];
+            String[] answer = setupArguments(args);
+            _configFile = answer[0];
+            _configDirectory = answer[1];
         } else {
             throw new IllegalArgumentException("Usage: TunnelControllerGroup [filename] [configdirectory] ");
         }
@@ -178,6 +172,30 @@ public class TunnelControllerGroup implements ClientApp {
             }
         }
         _state = INITIALIZED;
+    }
+
+    /**
+     * Reads argument list and returns two strings that can be used to
+     * instantiate _configFile and _configDirectory. After calling this
+     * method, the returned Strings must be assigned to _configFile and
+     * _configDirectory.
+     *
+     * @param args must be the args passed to TunnelControllerGroup.
+     * @return an array of exactly 2 strings, where [0] is the the value for
+     * _configFile and [1] is the value for _configDirectory
+    */
+    private String[] setupArguments(String args[]){
+        String configFile = DEFAULT_CONFIG_FILE;
+        String configDirectory = CONFIG_DIR;
+        File check = new File(args[0]);
+        if (!check.isAbsolute())
+            check = new File(_context.getConfigDir(), args[0]);
+        if (check.isFile()) {
+            configFile = args[0];
+        } else if (check.isDirectory()) {
+            configDirectory = args[0];
+        }
+        return new String[]{configFile, configDirectory};
     }
 
     /**
@@ -385,6 +403,9 @@ public class TunnelControllerGroup implements ClientApp {
                                     continue;
                                 TunnelController controller = new TunnelController(cfg, "");
                                 _controllers.add(controller);
+                            }
+                            if (_log.shouldLog(Log.INFO)) {
+                                _log.info("Loaded application config from " + f.toString());
                             }
                         } else {
                             if (_log.shouldLog(Log.ERROR))
@@ -822,11 +843,15 @@ public class TunnelControllerGroup implements ClientApp {
         File folder = new File(_configDirectory);
         if (!folder.isAbsolute())
             folder = new File(_context.getConfigDir(), _configDirectory);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Seeking controller configs in " + folder.toString());
         File[] listOfFiles = folder.listFiles(new FileSuffixFilter(".config"));
         List<File> files = new ArrayList<File>();
         if (listOfFiles != null && listOfFiles.length > 0){
             for (File afile : listOfFiles) {
                 files.add(afile);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Found controller config " + afile.toString());
             }
             Collections.sort(files);
         } else {
