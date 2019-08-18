@@ -73,7 +73,10 @@ public class I2PLogger implements Logger
         } else if (_log.shouldLog(Log.INFO)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
-                _log.info(_buffer.toString());
+                if (arg1 != null && arg1 instanceof Throwable)
+                    _log.info(_buffer.toString(), (Throwable) arg1);
+                else
+                    _log.info(_buffer.toString());
             }
         }
     }
@@ -92,7 +95,10 @@ public class I2PLogger implements Logger
         } else if (_log.shouldLog(Log.DEBUG)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
-                _log.debug(_buffer.toString());
+                if (arg1 != null && arg1 instanceof Throwable)
+                    _log.debug(_buffer.toString(), (Throwable) arg1);
+                else
+                    _log.debug(_buffer.toString());
             }
         }
     }
@@ -106,7 +112,10 @@ public class I2PLogger implements Logger
         } else if (_log.shouldLog(Log.WARN)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
-                _log.warn(_buffer.toString());
+                if (arg1 != null && arg1 instanceof Throwable)
+                    _log.warn(_buffer.toString(), (Throwable) arg1);
+                else
+                    _log.warn(_buffer.toString());
             }
         }
     }
