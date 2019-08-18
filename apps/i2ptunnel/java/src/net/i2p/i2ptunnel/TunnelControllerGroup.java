@@ -137,7 +137,7 @@ public class TunnelControllerGroup implements ClientApp {
      *  Config file problems will not throw exception until startup().
      *
      *  @param mgr may be null
-     *  @param args zero or one args, which may be a one config file or one config
+     *  @param args zero or one args, which may be one config file or one config
      *  directory. If not absolute will be relative to the context's config dir,
      *              if empty or null, the default is i2ptunnel.config for a
      *              config file and i2ptunnel.config.d for a config directory
