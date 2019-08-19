@@ -127,8 +127,10 @@ public class PeerState {
     /** how many bytes can we send to the peer in the current second */
     private int _sendWindowBytesRemaining;
     private long _lastSendRefill;
+    // smoothed value, for display only
     private int _sendBps;
     private int _sendBytes;
+    // smoothed value, for display only
     private int _receiveBps;
     private int _receiveBytes;
     //private int _sendACKBps;
@@ -227,10 +229,14 @@ public class PeerState {
     /** have we migrated away from this peer to another newer one? */
     private volatile boolean _dead;
 
-    /** Make sure a 4229 byte TunnelBuildMessage can be sent in one volley with small MTU */
+    /** The minimum number of outstanding messages (NOT fragments/packets) */
     private static final int MIN_CONCURRENT_MSGS = 8;
-    /** how many concurrent outbound messages do we allow throws OutboundMessageFragments to send */
-    private int _concurrentMessagesAllowed = MIN_CONCURRENT_MSGS;
+    /** @since 0.9.42 */
+    private static final int INIT_CONCURRENT_MSGS = 20;
+    /** how many concurrent outbound messages do we allow OutboundMessageFragments to send
+        This counts full messages, NOT fragments (UDP packets)
+     */
+    private int _concurrentMessagesAllowed = INIT_CONCURRENT_MSGS;
     /** 
      * how many outbound messages are currently being transmitted.  Not thread safe, as we're not strict
      */
@@ -649,8 +655,16 @@ public class PeerState {
         return Math.max(Math.max(_lastSendTime, _lastACKSend), _lastPingTime);
     }
 
-    /** return the smoothed send transfer rate */
+    /**
+     * An approximation, for display only
+     * @return the smoothed send transfer rate
+     */
     public int getSendBps() { return _sendBps; }
+
+    /**
+     * An approximation, for display only
+     * @return the smoothed receive transfer rate
+     */
     public synchronized int getReceiveBps() { return _receiveBps; }
 
     public int incrementConsecutiveFailedSends() { 
@@ -694,9 +708,9 @@ public class PeerState {
      *
      *  Caller should synch
      */
-    private boolean allocateSendingBytes(int size, int messagePushCount) { return allocateSendingBytes(size, false, messagePushCount); }
-
-    //private boolean allocateSendingBytes(int size, boolean isForACK) { return allocateSendingBytes(size, isForACK, -1); }
+    private boolean allocateSendingBytes(int size, int messagePushCount) {
+        return allocateSendingBytes(size, false, messagePushCount);
+    }
 
     /**
      *  Caller should synch
@@ -726,6 +740,7 @@ public class PeerState {
         // So we let it through when the window is empty (full window remaining).
         if (size <= _sendWindowBytesRemaining ||
             (size > _sendWindowBytes && _sendWindowBytesRemaining >= _sendWindowBytes)) {
+            // move this check to getSendWindowBytesRemaining() ?
             if ( (messagePushCount == 0) && (_concurrentMessagesActive > _concurrentMessagesAllowed) ) {
                 _consecutiveRejections++;
                 _context.statManager().addRateData("udp.rejectConcurrentActive", _concurrentMessagesActive, _consecutiveRejections);

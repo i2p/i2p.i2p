@@ -1,3 +1,6 @@
+2019-08-19 zzz
+ * SSU: Increase initial concurrent messages limit (ticket #2576)
+
 2019-08-18 zzz
  * Jetty: Log stack trace if 2nd arg is a Throwable (ticket #2592)
 
