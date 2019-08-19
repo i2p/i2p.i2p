@@ -36,7 +36,7 @@ public class SSDPSearchResponseSocketList extends Vector<SSDPSearchResponseSocke
 	}
 	/**
 	 * 
-	 * @param binds The host to bind.Use <tt>null</tt> for the default behavior
+	 * @param binds The host to bind.Use <code>null</code> for the default behavior
 	 */
 	public SSDPSearchResponseSocketList(InetAddress[] binds) {
 		this.binds = binds;

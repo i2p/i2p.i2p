@@ -35,7 +35,7 @@ public class SSDPNotifySocketList extends Vector<SSDPNotifySocket>
 	
 	/**
 	 * 
-	 * @param binds The host to bind the service <tt>null</tt> means to bind to default.
+	 * @param binds The host to bind the service <code>null</code> means to bind to default.
 	 * @since 1.8
 	 */
 	public SSDPNotifySocketList(InetAddress[] binds){

@@ -178,7 +178,7 @@ public class DeviceData extends NodeData
 	
 	/**
 	 * 
-	 * @param inets The <tt>InetAddress</tt> that will be binded for listing this service. 
+	 * @param inets The <code>InetAddress</code> that will be binded for listing this service. 
 	 * 		Use <code>null</code> for the default behaviur. 
 	 * @see org.cybergarage.upnp.ssdp
 	 * @see org.cybergarage.upnp
@@ -191,7 +191,7 @@ public class DeviceData extends NodeData
 	
 	/**
 	 * 
-	 * @return inets The <tt>InetAddress</tt> that will be binded for this service
+	 * @return inets The <code>InetAddress</code> that will be binded for this service
 	 * 		<code>null</code> means that defulat behaviur will be used
 	 * @since 1.8
 	 */	

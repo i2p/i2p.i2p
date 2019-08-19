@@ -51,7 +51,7 @@ and currently set to 0.  Peers using a different protocol version will
 not be able to communicate with this peer, though earlier versions not
 using this flag are.</p>
 
-<h2><a name="payload">Payload</a></h2>
+<h2 id="payload">Payload</h2>
 
 <p>Within the AES encrypted payload, there is a minimal common structure
 to the various messages - a one byte flag and a four byte sending 
