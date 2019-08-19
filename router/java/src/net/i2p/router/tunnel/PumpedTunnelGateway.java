@@ -138,7 +138,12 @@ class PumpedTunnelGateway extends TunnelGateway {
             return false;
         boolean rv = !_prequeue.isEmpty();
 
-        long startAdd = System.currentTimeMillis();
+        final boolean debug = _log.shouldDebug();
+        long startAdd;
+        if (debug)
+            startAdd = System.currentTimeMillis();
+        else
+            startAdd = 0;
         long beforeLock = startAdd;
         long afterAdded = -1;
         boolean delayedFlush = false;
@@ -148,11 +153,13 @@ class PumpedTunnelGateway extends TunnelGateway {
         long afterExpire = 0;
         synchronized (_queue) {
             _queue.addAll(queueBuf);
-            afterAdded = System.currentTimeMillis();
-            if (_log.shouldLog(Log.DEBUG))
+            if (debug) {
+                afterAdded = System.currentTimeMillis();
                 _log.debug("Added before direct flush preprocessing for " + toString() + ": " + _queue);
+            }
             delayedFlush = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
-            afterPreprocess = System.currentTimeMillis();
+            if (debug)
+                afterPreprocess = System.currentTimeMillis();
             if (delayedFlush)
                 delayAmount = _preprocessor.getDelayAmount();
             _lastFlush = _context.clock().now();
@@ -161,23 +168,25 @@ class PumpedTunnelGateway extends TunnelGateway {
             for (int i = 0; i < _queue.size(); i++) {
                 PendingGatewayMessage m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
-                    if (_log.shouldLog(Log.DEBUG))
+                    if (debug)
                         _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);
                     _queue.remove(i);
                     i--;
                 }
             }
-            afterExpire = System.currentTimeMillis();
             remaining = _queue.size();
-            if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
-                _log.debug("Remaining after preprocessing: " + _queue);
+            if (debug) {
+                afterExpire = System.currentTimeMillis();
+                if (remaining > 0)
+                    _log.debug("Remaining after preprocessing: " + _queue);
+            }
         }
         
         if (delayedFlush) {
             _delayedFlush.reschedule(delayAmount);
         }
         //_context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
-        if (_log.shouldLog(Log.DEBUG)) {
+        if (debug) {
             long complete = System.currentTimeMillis();
             _log.debug("Time to add " + queueBuf.size() + " messages to " + toString() + ": " + (complete-startAdd)
                        + " delayed? " + delayedFlush + " remaining: " + remaining
