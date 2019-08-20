@@ -37,6 +37,7 @@ public abstract class StrictCountries {
             /* Eritrea */ "ER",
             /* Ethiopia */ "ET",
             /* Iran */ "IR",
+            /* Kazakhstan */ "KZ",
             /* Laos */ "LA",
             /* Libya */ "LY",
             /* Myanmar */ "MM",
