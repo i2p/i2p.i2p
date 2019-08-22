@@ -150,18 +150,18 @@ pre {
 }
 
 .routersummary img[src$="i2plogo.png"] {
-     opacity: 0.7;
+     opacity: 1;
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
      margin: 0 !important;
      width: 190px;
      height: auto;
-     filter: drop-shadow(0 0 1px #ccf);
+     filter: drop-shadow(0 0 1px #4661A9);
 }
 
 .routersummary img[src$="i2plogo.png"]:hover {
      opacity: 1;
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
-     filter: drop-shadow(0 0 1px #f60);
+     filter: drop-shadow(0 0 1px #60AB60);
 }
 
 .routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
@@ -698,7 +698,7 @@ p:empty + .sb_notice {
      width: 100%;
      padding: 4px 2px 4px 24px;
      text-align: left;
-     border-bottom: 1px dotted #ddf;
+     border-bottom: 1px;
      background: #f8f8ff url(/themes/console/images/plugin.png) 3px center no-repeat;
      background: rgba(248, 248, 255, 0.8) url(/themes/console/images/plugin.png) 3px center no-repeat;
      background-size: 16px 16px !important;
@@ -772,7 +772,7 @@ p:empty + .sb_notice {
 }
 
 .routersummary a:hover {
-     color: #f60;
+     color: #FF7F50;
 }
 
 .routersummary td {
@@ -2606,7 +2606,7 @@ div.app {
      padding: 0;
      min-width: 140px;
      text-align: center !important;
-     border: 1px solid #7778bf;
+     border: 1px solid #4661A9;
      border-radius: 2px;
      margin: 3px;
      background: #eef;
@@ -2615,26 +2615,26 @@ div.app {
 }
 
 div.app:hover {
-     border: 1px solid #f60;
+     border: 1px solid #60AB60;
      background: #fff;
      box-shadow: none;
      cursor: pointer;
 }
 
 div.app:hover a:link, div.app:hover a:visited {
-    color: #f60;
+    color: #60AB60;
 }
 
 div.app:hover img.app, .app:hover img {
-     filter: drop-shadow(0 0 2px #f60);
+     filter: drop-shadow(0 0 2px #60AB60);
      transition: ease filter 0.3s 0s;
      opacity: 1;
 }
 
 div.app:hover .applabel {
-     border-color: #f60;
+     border-color: #60AB60;
      background: #fff !important;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ffe8bf 50%, #efd9b3 100%) !important;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ced4da 100%) !important;
 }
 
 div.app:active .applabel {
@@ -2660,7 +2660,7 @@ div.appgroup {
      width: auto;
 }
 
-/* optional homepage search */ 
+/* optional homepage search */
 
 div.search {
      margin: 10px 10px 0 0;
@@ -2919,7 +2919,7 @@ p.infohelp, p#sybilinfo, p#debugmode, p#upnpstatus, p#pluginconfigtext, p#gather
      line-height: 130%;
 }
 
-p#upnpstatus, p#keyringhelp, .widescroll + p.infohelp, #profiles ul#banlist, #config_reseed .confignav + p.infohelp 
+p#upnpstatus, p#keyringhelp, .widescroll + p.infohelp, #profiles ul#banlist, #config_reseed .confignav + p.infohelp
 p#sybilinfo, p#debugmode, #config_family p.infohelp, p#profiles_overview, p#gatherstats {
      border-radius: 2px;
      filter: drop-shadow(0 0 1px #ccf);
