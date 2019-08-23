@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2018
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2018-02-11 15:42+0000\n"
+"PO-Revision-Date: 2019-08-17 06:16+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: ../i2prouter:223
 msgid "Failed to load the wrapper"
-msgstr "Sarıcı yüklenemedi"
+msgstr "Kapsayıcı yüklenemedi"
 
 #: ../i2prouter:988 ../i2prouter:1016 ../i2prouter:1090 ../i2prouter:1118
 #: ../i2prouter:1139

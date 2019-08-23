@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2019-05-21 05:21+0000\n"
+"PO-Revision-Date: 2019-08-17 06:20+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -50,7 +50,7 @@ msgstr "SOCKS kullanmayın."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "Ayrıntılı bilgi için {0}I2P web tarayıcı vekil sunucu ayarları sayfasına{1} bakın."
+msgstr "Ayrıntılı bilgi için {0}I2P web tarayıcı vekil sunucu ayarları sayfasına{1} bakabilirsiniz."
 
 #, java-format
 msgid ""

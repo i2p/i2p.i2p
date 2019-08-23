@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-05-21 05:26+0000\n"
+"PO-Revision-Date: 2019-08-17 13:01+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -254,7 +254,7 @@ msgstr "Sorun sürerse, tarayıcınızda çerezlerin etkinleştirilmiş olduğun
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:224
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:215
 msgid "Save"
-msgstr "Kaydedin"
+msgstr "Kaydet"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:101
 msgid "Configuration saved."
@@ -265,7 +265,7 @@ msgstr "Yapılandırma kaydedildi."
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:222
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:213
 msgid "Reload"
-msgstr "Yeniden yükleyin"
+msgstr "Yeniden yükle"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:104
 msgid "Configuration reloaded."
@@ -743,7 +743,7 @@ msgstr "Ek sitelere kolayca abone olabilirsiniz. Yalnızca siteleri <a href=\"su
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
-msgstr "I2P adlandırmaları hakkında ayrıntılı bilgi almak için <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">özet bölümüne</a> bakın."
+msgstr "I2P adlandırmaları hakkında ayrıntılı bilgi almak için <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">özet bölümüne</a> bakabilirsiniz."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:208
 msgid "How does the addressbook application work?"
@@ -818,7 +818,7 @@ msgstr "Bu nedenle güncel adresleri bulunduran sitelerin aboneliğini eklemek i
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:227
 msgid "See the FAQ for a list of subscription URLs."
-msgstr "Abonelik İnternet adreslerinin listesi için SSS bölümüne bakın."
+msgstr "Abonelik İnternet adreslerinin listesi için SSS bölümüne bakabilirsiniz."
 
 #: build/HowSVG.java:5
 msgid ""

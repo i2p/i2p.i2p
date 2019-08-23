@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-06-28 10:25+0000\n"
+"PO-Revision-Date: 2019-07-04 14:14+0000\n"
 "Last-Translator: Reza Ghasemi\n"
 "Language-Team: Persian (http://www.transifex.com/otf/I2P/language/fa/)\n"
 "MIME-Version: 1.0\n"
@@ -301,7 +301,7 @@ msgstr "تازه سازی صفحه برای بروزرسانی ها"
 #: src/src/i2p/susi/webmail/WebMail.java:3226
 #: src/src/i2p/susi/webmail/WebMail.java:3443
 msgid "no subject"
-msgstr ""
+msgstr "بدون موضوع"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2757
 msgid "Found no valid sender address."
@@ -332,11 +332,11 @@ msgstr "ارسال ایمیل."
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:346
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:351
 msgid "Error sending mail"
-msgstr ""
+msgstr "خطا در ارسال ایمیل"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2873
 msgid "Mail sent."
-msgstr ""
+msgstr "ایمیل ارسال شد."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2965
 msgid "Send"
@@ -542,7 +542,7 @@ msgstr "پاسخ"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3389
 msgid "Reply All"
-msgstr ""
+msgstr "پاسخ همه"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3390
 msgid "Forward"
@@ -569,7 +569,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:3504
 msgid "Folder Page Size"
-msgstr ""
+msgstr "اندازه صفحه پوشه"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3507
 msgid "Set"
@@ -591,7 +591,7 @@ msgstr "ذخیره سازی پیکربندی"
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:978
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1199
 msgid "No response from server"
-msgstr ""
+msgstr "هیچ پاسخ از جانب سرور"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."

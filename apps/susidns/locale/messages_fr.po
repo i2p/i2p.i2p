@@ -22,7 +22,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-04-24 19:10+0000\n"
+"PO-Revision-Date: 2019-08-21 14:27+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -91,7 +91,7 @@ msgstr "Type {0}"
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:259
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:262
 msgid "DSA 1024 bit"
-msgstr "DSA 1024 bits"
+msgstr "DSA 1024 bits"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:191
 #, java-format
