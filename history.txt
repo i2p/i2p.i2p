@@ -1,3 +1,6 @@
+2019-08-23 zzz
+ * Translation updates
+
 2019-08-19 zzz
  * SSU: Increase initial concurrent messages limit (ticket #2576)
 
@@ -6,7 +9,7 @@
 
 2019-08-15 zzz
  * SSU: Reduce ACK time to 150 (ticket #2574)
- * Tunnels: Reduce IBGW batching ti9me (ticket #2586)
+ * Tunnels: Reduce IBGW batching time (ticket #2586)
 
 2019-08-14 zzz
  * Console: Clean up help text, tag for translation (ticket #2298)
