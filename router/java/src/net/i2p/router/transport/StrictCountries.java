@@ -52,6 +52,7 @@ public abstract class StrictCountries {
             /* Syria */ "SY",
             /* Tajikistan */ "TJ",
             /* Thailand */ "TH",
+            /* Turkey */ "TR",
             /* Turkmenistan */ "TM",
             /* Venezuela */ "VE",
             /* United Arab Emirates */ "AE",
