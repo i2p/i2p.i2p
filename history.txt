@@ -1,3 +1,5 @@
+* 2019-08-27 0.9.42 released
+
 2019-08-23 zzz
  * Translation updates
 
