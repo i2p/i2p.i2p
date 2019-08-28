@@ -168,7 +168,7 @@ public class MathUtils {
     }
 
     /**
-     * Gets a random field element where |t[i]| <= 2^24 for 0 <= i <= 9.
+     * Gets a random field element where |t[i]| &lt;= 2^24 for 0 &lt;= i &lt;= 9.
      *
      * @return The field element.
      */
