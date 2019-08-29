@@ -1771,12 +1771,6 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
      line-height: 120%;
 }
 
-.debuginfo td:first-child {
-     background: url(images/debuginfo.png) center center no-repeat;
-     background-size: 14px 14px;
-     background-blend-mode: luminosity;
-}
-
 .debuginfo b {
      text-transform: capitalize;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;

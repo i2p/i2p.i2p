@@ -2099,11 +2099,6 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
 
 /* debug */
 
-.debuginfo td:first-child {
-     background: url(images/debuginfo.png) center center no-repeat;
-     background-size: 14px 14px;
-}
-
 .debuginfo, .debugConnection, .debugConnStat, .debugRequests {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
 }

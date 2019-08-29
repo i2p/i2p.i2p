@@ -1989,12 +1989,6 @@ input.toggle_input { /* hide checkbox and use label as faux panel heading */
 
 /* debug */
 
-.debuginfo td:first-child {
-     background: url(images/debuginfo.png) center center no-repeat;
-     mix-blend-mode: luminosity !important;
-     background-size: 14px 14px;
-}
-
 .debuginfo b {
      text-transform: capitalize;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
