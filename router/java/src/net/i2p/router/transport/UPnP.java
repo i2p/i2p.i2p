@@ -786,7 +786,6 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (udn != null)
 				sb.append("<br>UDN: ").append(DataHelper.escapeHTML(udn));
 		}
-		sb.append("</p>");
 		listSubServices(dev, sb);
 		
 		DeviceList dl = dev.getDeviceList();
