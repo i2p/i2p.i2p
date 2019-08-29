@@ -1,4 +1,4 @@
-package org.bouncycastle.oldcrypto.macs;
+package net.i2p.router.transport.udp;
 /*
  * Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
  * (http://www.bouncycastle.org)
@@ -33,8 +33,6 @@ import java.util.Arrays;
 
 import net.i2p.util.SimpleByteCache;
 
-import org.bouncycastle.oldcrypto.Mac;
-
 /**
  * HMAC implementation based on RFC2104
  *
@@ -52,9 +50,10 @@ import org.bouncycastle.oldcrypto.Mac;
  *
  * Deprecated - Do not use outside of router or Syndie.
  * Not a public API - Not for external use!
+ *
+ * @since 0.9.43 moved from org.bouncycastle.oldcrypto.macs
  */
-public class I2PHMac
-implements Mac
+class I2PHMac
 {
     private final static int BLOCK_LENGTH = 64;
 

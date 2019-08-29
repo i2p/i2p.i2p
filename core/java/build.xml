@@ -291,7 +291,6 @@
                 <exclude name="freenet/**/*.class" />
                 <exclude name="gnu/**/*.class" />
                 <exclude name="net/metanotion/**/*.class" />
-                <exclude name="org/bouncycastle/**/*.class" />
                 <exclude name="org/xlattice/**/*.class" />
             </fileset>
         </cobertura-instrument>
