@@ -31,7 +31,7 @@
 - Trial Debian build: Build and test a preliminary Debian build
   with 'ant debian' and fix any issues
 
-- Javadoc test: 'ant javadoc' with an Oracle JDK, fix any issues
+- Javadoc test: 'ant javadoc' and 'ant mavenCentral' with an Oracle JDK, fix any issues
   Oracle JDK will error on things that OpenJDK does not!
 
 
@@ -104,7 +104,20 @@
 
 5. Copy latest trust list _MTN/monotonerc from website or some other workspace
 
-6. Change revision in:
+6. Verify that no untrusted revisions were inadvertently blessed by a trusted party:
+
+    ```
+    ant revisions
+    ```
+
+7. Review the complete diff from the last release:
+
+    ```
+    mtn diff -r t:i2p-0.9.(xx-1) > out.diff
+    vi out.diff
+    ```
+
+8. Change revision in:
   - `history.txt`
   - `installer/install.xml`
   - `installer/install5.xml`
@@ -112,20 +125,8 @@
   - `router/java/src/net/i2p/router/RouterVersion.java`
     - (change to BUILD = 0 and EXTRA = "")
 
-7. `mtn ci`
+9. `mtn ci`
 
-8. Review the complete diff from the last release:
-
-    ```
-    mtn diff -r t:i2p-0.9.(xx-1) > out.diff
-    vi out.diff
-    ```
-
-9. Verify that no untrusted revisions were inadvertently blessed by a trusted party:
-
-    ```
-    ant revisions
-    ```
 
 ### Build and test
 

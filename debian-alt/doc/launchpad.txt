@@ -58,7 +58,7 @@ Generate files to upload
 
 - export TZ=UTC
 - cd i2p.i2p.foobar
-- copy debian-alt/(series)/changelog to debian/
+- copy debian-alt/(series)/* to debian/
 - edit debian/changelog to add the release at the top
   * version MUST be 0.9.XX-1ubuntu1
     next version for fixes would be 0.9.XX-2ubunutu1
@@ -66,8 +66,10 @@ Generate files to upload
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
     (or add -kkeyid argument to debuild, which you must do
-     if you want to sign with a subkey)
+     if you want to sign with a subkey. As of recent versions,
+     the keyid argument must be a 16-char fingerprint, not a short key.)
     run gpg -K to list your private keys
+- Remove patch files in debian/patches that are not listed in debian/patches/series
 - ant debian-release-tarball (this is currently for bionic and higher)
   (ant precise-release-tarball for precise thru wily... only do this once for both the precise and trusty build)
   (ant xenial-release-tarball for xenial)
