@@ -272,8 +272,8 @@ public abstract class TransportImpl implements Transport {
             msg.transportFailed(getStyle());
 
         if (msToSend > 1500) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(getStyle() + " afterSend slow: " + (sendSuccessful ? "success " : "FAIL ")
+            if (_log.shouldDebug())
+                _log.debug(getStyle() + " afterSend slow: " + (sendSuccessful ? "success " : "FAIL ")
                           + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + ' ' + msg.getMessageId() + " to "
                           + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + " took " + msToSend + " ms");
@@ -283,17 +283,17 @@ public abstract class TransportImpl implements Transport {
 
         long lifetime = msg.getLifetime();
         if (lifetime > 3000) {
-            int level = Log.INFO;
-            if (!sendSuccessful)
-                level = Log.DEBUG;
+            int level = Log.DEBUG;
+            //if (!sendSuccessful)
+            //    level = Log.DEBUG;
             if (_log.shouldLog(level))
                 _log.log(level, getStyle() + " afterSend slow (" + (sendSuccessful ? "success " : "FAIL ")
                           + lifetime + "/" + msToSend + "): " + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + ": " + msg.toString());
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(getStyle() + " afterSend: " + (sendSuccessful ? "success " : "FAIL ")
+            if (_log.shouldDebug())
+                _log.debug(getStyle() + " afterSend: " + (sendSuccessful ? "success " : "FAIL ")
                           + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + "\n" + msg.toString());
@@ -309,8 +309,8 @@ public abstract class TransportImpl implements Transport {
             log = true;
             msg.discardData();
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(getStyle() + " Failed to send " + msg.getMessageType()
+            if (_log.shouldDebug())
+                _log.debug(getStyle() + " Failed to send " + msg.getMessageType()
                           + " to " + msg.getTarget().getIdentity().getHash().toBase64()
                           + " (details: " + msg + ')');
             if (msg.getExpiration() < _context.clock().now())
@@ -450,7 +450,7 @@ public abstract class TransportImpl implements Transport {
      * @param remoteIdentHash may be null, calculated from remoteIdent if null
      */
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
-        int level = Log.INFO;
+        int level = Log.DEBUG;
         //if (msToReceive > 5000)
         //    level = Log.WARN;
         if (_log.shouldLog(level)) {
