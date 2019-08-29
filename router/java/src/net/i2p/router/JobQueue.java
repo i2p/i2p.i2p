@@ -156,7 +156,6 @@ public class JobQueue {
         _context.statManager().createRateStat("jobQueue.jobRunSlow", "How long jobs that take over a second take", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRequiredRateStat("jobQueue.jobLag", "Job run delay (ms)", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobWait", "How long does a job sit on the job queue?", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
-        //_context.statManager().createRateStat("jobQueue.jobRunnerInactive", "How long are runners inactive?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         _readyJobs = new LinkedBlockingQueue<Job>();
         _timedJobs = new TreeSet<Job>(new JobComparator());
@@ -172,10 +171,6 @@ public class JobQueue {
      */
     public void addJob(Job job) {
         if (job == null || !_alive) return;
-
-        // This does nothing
-        //if (job instanceof JobImpl)
-        //    ((JobImpl)job).addedToQueue();
 
         long numReady;
         boolean alreadyExists = false;
@@ -487,11 +482,8 @@ public class JobQueue {
     
     /**
      * Start up the queue with the specified number of concurrent processors.
-     * If this method has already been called, it will adjust the number of 
-     * runners to meet the new number.  This does not kill jobs running on
-     * excess threads, it merely instructs the threads to die after finishing
-     * the current job.
-     *
+     * If this method has already been called, it will increase the number of 
+     * runners if necessary.  This does not ever stop or reduce threads.
      */
     public synchronized void runQueue(int numThreads) {
             // we're still starting up [serially] and we've got at least one runner,
@@ -511,14 +503,18 @@ public class JobQueue {
                     runner.start();
                 }
             } else if (_queueRunners.size() == numThreads) {
-                for (JobQueueRunner runner : _queueRunners.values()) {
-                    runner.startRunning();
-                }
+                //for (JobQueueRunner runner : _queueRunners.values()) {
+                //    runner.startRunning();
+                //}
+                if (_log.shouldWarn())
+                    _log.warn("Already have " + numThreads + " threads");
             } else { // numThreads < # runners, so shrink
                 //for (int i = _queueRunners.size(); i > numThreads; i++) {
                 //     QueueRunner runner = (QueueRunner)_queueRunners.get(new Integer(i));
                 //     runner.stopRunning();
                 //}
+                if (_log.shouldWarn())
+                    _log.warn("Already have " + _queueRunners.size() + " threads, not decreasing");
             }
     }
         
