@@ -1,3 +1,9 @@
+2019-08-29 zzz
+ * Router: Job Queue cleanups and javadocs (ticket #2590)
+ * Transport:
+   - Move I2PHMac to udp package
+   - UPnP HTML output fix
+
 * 2019-08-27 0.9.42 released
 
 2019-08-23 zzz
