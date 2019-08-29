@@ -137,8 +137,10 @@ public class Destination extends KeysAndCert {
      * deprecated was used only by Packet.java in streaming, now unused
      * Warning - used by i2p-bote. Does NOT support alternate key types. DSA-SHA1 only.
      *
+     * @deprecated
      * @throws IllegalStateException if data already set
      */
+    @Deprecated
     public int readBytes(byte source[], int offset) throws DataFormatException {
         if (source == null) throw new DataFormatException("Null source");
         if (source.length <= offset + PublicKey.KEYSIZE_BYTES + SigningPublicKey.KEYSIZE_BYTES) 
