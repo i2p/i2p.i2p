@@ -248,17 +248,26 @@ public class NewsManager implements ClientApp {
                 int colon = newsContent.indexOf(": ");
                 if (colon > 0 && colon <= 10) {
                     //  Parse the format we wrote it out in, in NewsFetcher.outputOldNewsXML()
-                    //  Doesn't work if the date has a : in it, but SHORT hopefully does not
-                    DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+                    //  Doesn't work if the date has a : in it, but SHORT and MEDIUM hopefully do not
+                    //  Was originally SHORT, switched to MEDIUM in 0.9.43
+                    DateFormat fmt = DateFormat.getDateInstance(DateFormat.MEDIUM);
                     // the router sets the JVM time zone to UTC but saves the original here so we can get it
                     fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                     try {
                         Date date = fmt.parse(newsContent.substring(0, colon));
                         entry.updated = date.getTime();
-                        newsContent = newsContent.substring(colon + 2);
                     } catch (ParseException pe) {
-                        // can't find date, will be zero
+                        // try SHORT
+                        try {
+                            fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+                            fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+                            Date date = fmt.parse(newsContent.substring(0, colon));
+                            entry.updated = date.getTime();
+                        } catch (ParseException pe2) {
+                            // can't find date, will be zero
+                        }
                     }
+                    newsContent = newsContent.substring(colon + 2);
                 }
             }
             int end = newsContent.indexOf("</h3>");

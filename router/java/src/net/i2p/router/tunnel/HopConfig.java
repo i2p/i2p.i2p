@@ -1,5 +1,7 @@
 package net.i2p.router.tunnel;
 
+import java.util.Date;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -188,7 +190,7 @@ public class HopConfig {
                 buf.append(DataHelper.fromLong(_sendTunnelId, 0, 4));
         }
         
-        buf.append(" exp. ").append(TunnelCreatorConfig.format(_expiration));
+        buf.append(" exp. ").append(new Date(_expiration));
         int messagesProcessed = getProcessedMessagesCount();
         if (messagesProcessed > 0)
             buf.append(" used ").append(messagesProcessed).append("KB");

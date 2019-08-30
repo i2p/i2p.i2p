@@ -1,11 +1,9 @@
 package net.i2p.router.web.helpers;
 
 import java.text.Collator;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -289,7 +287,7 @@ public class ConfigClientsHelper extends HelperBase {
                         ms = Long.parseLong(s);
                     } catch (NumberFormatException nfe) {}
                     if (ms > 0) {
-                        String date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date(ms));
+                        String date = DataHelper.formatTime(ms);
                         desc.append("<tr><td><b>")
                             .append(_t("Date")).append("</b></td><td>").append(date);
                     }

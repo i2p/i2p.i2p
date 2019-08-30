@@ -2,7 +2,6 @@ package net.i2p.util;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -75,19 +74,16 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
 
     public void setTimeoutCommand(Runnable job) { _command = job; }
     
-    private static final SimpleDateFormat _fmt = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss.SSS");
-    private static String ts(long when) { synchronized (_fmt) { return _fmt.format(new Date(when)); } }
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("SocketTimeout started on ");
-        buf.append(ts(_startTime));
+        buf.append(new Date(_startTime));
         buf.append(" idle for ");
         buf.append(System.currentTimeMillis() - _lastActivity);
         buf.append("ms ");
         if (_totalTimeoutTime > 0)
-            buf.append("total timeout at ").append(ts(_totalTimeoutTime));
+            buf.append("total timeout at ").append(new Date(_totalTimeoutTime));
         buf.append("cancelled? ").append(_cancelled);
         return buf.toString();
     }

@@ -8,7 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -417,18 +416,10 @@ public class OutNetMessage implements CDPQEntry {
                     else
                         buf.append(0);
                     buf.append("ms: \t").append(name);
-                    buf.append('=').append(formatDate(when.longValue()));
+                    buf.append('=').append(new Date(when.longValue()));
                     buf.append("]\n");
                     lastWhen = when.longValue();
                 }
             }
-    }
-    
-    private final static SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
-    private final static String formatDate(long when) {
-        Date d = new Date(when);
-        synchronized (_fmt) {
-            return _fmt.format(d);
-        }
     }
 }

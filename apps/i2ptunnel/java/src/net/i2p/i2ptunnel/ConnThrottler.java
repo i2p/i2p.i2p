@@ -1,8 +1,6 @@
 package net.i2p.i2ptunnel;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -38,7 +36,6 @@ class ConnThrottler {
     private long _totalThrottleUntil;
     private final String _action;
     private final Log _log;
-    private final DateFormat _fmt;
     private final SimpleTimer2.TimedEvent _cleaner;
     private boolean _isRunning;
 
@@ -58,9 +55,6 @@ class ConnThrottler {
         _peers = new HashMap<Hash, Record>(4);
         _action = action;
         _log = log;
-        // for logging
-        _fmt = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-        _fmt.setTimeZone(SystemVersion.getSystemTimeZone());
         _cleaner = new Cleaner();
     }
 
@@ -124,7 +118,7 @@ class ConnThrottler {
                 long now = Clock.getInstance().now();
                 if (rec.countSince(now - _checkPeriod) > _max) {
                     long until = now + _throttlePeriod;
-                    String date = _fmt.format(new Date(until));
+                    String date = DataHelper.formatTime(until);
                     _log.logAlways(Log.WARN, "Throttling " + _action + " until " + date +
                                              " after exceeding max of " + _max +
                                              " in " + DataHelper.formatDuration(_checkPeriod) +
@@ -139,7 +133,7 @@ class ConnThrottler {
         if (_totalMax > 0 && ++_currentTotal > _totalMax) {
             if (_totalThrottleUntil == 0) {
                 _totalThrottleUntil = Clock.getInstance().now() + _totalThrottlePeriod;
-                String date = _fmt.format(new Date(_totalThrottleUntil));
+                String date = DataHelper.formatTime(_totalThrottleUntil);
                 _log.logAlways(Log.WARN, "*** Throttling " + _action + " from ALL peers until " + date +
                                          " after exceeding max of " + _max +
                                          " in " + DataHelper.formatDuration(_checkPeriod));

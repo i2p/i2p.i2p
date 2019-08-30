@@ -7,13 +7,11 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -1803,11 +1801,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(formatSize(total-remaining) + thinsp(noThinsp) + formatSize(total));
             out.write("</div></div></div>");
         } else if (remaining == 0) {
-            // needs locale configured for automatic translation
-            SimpleDateFormat fmt = new SimpleDateFormat("HH:mm, EEE dd MMM yyyy");
-            fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
             long[] dates = _manager.getSavedAddedAndCompleted(snark);
-            String date = fmt.format(new Date(dates[1]));
+            String date = DataHelper.formatTime(dates[1]);
             out.write("<div class=\"percentBarComplete\" title=\"");
             out.write(_t("Completed") + ": " + date + "\">");
             out.write(formatSize(total)); // 3GB
@@ -3105,11 +3100,8 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append("</td></tr>\n");
                 }
                 long dat = meta.getCreationDate();
-                // needs locale configured for automatic translation
-                SimpleDateFormat fmt = new SimpleDateFormat("EEEE dd MMMM yyyy HH:mm");
-                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 if (dat > 0) {
-                    String date = fmt.format(new Date(dat));
+                    String date = DataHelper.formatTime(dat);
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
@@ -3130,7 +3122,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 long[] dates = _manager.getSavedAddedAndCompleted(snark);
                 if (dates[0] > 0) {
-                    String date = fmt.format(new Date(dates[0]));
+                    String date = DataHelper.formatTime(dates[0]);
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
@@ -3139,7 +3131,7 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append("</td></tr>\n");
                 }
                 if (dates[1] > 0) {
-                    String date = fmt.format(new Date(dates[1]));
+                    String date = DataHelper.formatTime(dates[1]);
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
@@ -3150,7 +3142,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (storage != null) {
                     dat = storage.getActivity();
                     if (dat > 0) {
-                        String date = fmt.format(new Date(dat));
+                        String date = DataHelper.formatTime(dat);
                         buf.append("<tr><td>");
                         toThemeImg(buf, "details");
                         buf.append("</td><td><b>")
@@ -3451,8 +3443,6 @@ public class I2PSnarkServlet extends BasicServlet {
            .append("</A></td></tr>\n");
 
 
-        //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
-        //                                               DateFormat.MEDIUM);
         boolean showSaveButton = false;
         boolean rowEven = true;
         boolean inOrder = storage != null && storage.getInOrder();
@@ -3553,7 +3543,6 @@ public class I2PSnarkServlet extends BasicServlet {
             if (!item.isDirectory())
                 buf.append(formatSize(length));
             buf.append("</td><td class=\"snarkFileStatus\">");
-            //buf.append(dfmt.format(new Date(item.lastModified())));
             buf.append(status);
             buf.append("</td>");
             if (showPriority) {
@@ -3740,8 +3729,6 @@ public class I2PSnarkServlet extends BasicServlet {
             // existing ratings / comments table
             int ccount = 0;
             if (iter != null) {
-                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 buf.append("<table class=\"snarkComments\">");
 
                 while (iter.hasNext()) {
@@ -3766,7 +3753,7 @@ public class I2PSnarkServlet extends BasicServlet {
                             }
                         }
                     }
-                    buf.append("</td><td class=\"commentDate\">").append(fmt.format(new Date(c.getTime())));
+                    buf.append("</td><td class=\"commentDate\">").append(DataHelper.formatTime(c.getTime()));
                     buf.append("</td><td class=\"commentText\">");
                     if (esc) {
                         if (c.getText() != null) {

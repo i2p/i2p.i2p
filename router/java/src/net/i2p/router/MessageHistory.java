@@ -3,7 +3,6 @@ package net.i2p.router;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
@@ -52,13 +51,9 @@ public class MessageHistory {
     public final static String PROP_MESSAGE_HISTORY_FILENAME = "router.historyFilename";
     public final static String DEFAULT_MESSAGE_HISTORY_FILENAME = "messageHistory.txt";
 
-    private final SimpleDateFormat _fmt;
-
     public MessageHistory(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(getClass());
-         _fmt = new SimpleDateFormat("yy/MM/dd.HH:mm:ss.SSS");
-        _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         _unwrittenEntries = new LinkedBlockingQueue<String>();
         _reinitializeJob = new ReinitializeJob();
         _writeJob = new WriteJob();
@@ -601,9 +596,7 @@ public class MessageHistory {
     }
     
     private final String getTime(long when) {
-        synchronized (_fmt) {
-            return _fmt.format(new Date(when));
-        }
+        return DataHelper.formatTime(when);
     }
     
     /**

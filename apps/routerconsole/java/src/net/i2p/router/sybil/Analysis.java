@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -391,9 +390,7 @@ public class Analysis extends JobImpl implements RouterApp {
             if (threshold < MIN_BLOCK_POINTS)
                 threshold = MIN_BLOCK_POINTS;
         } catch (NumberFormatException nfe) {}
-        DateFormat dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-        dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
-        String day = dfmt.format(now);
+        String day = DataHelper.formatTime(now);
         for (Map.Entry<Hash, Points> e : points.entrySet()) {
             double p = e.getValue().getPoints();
             if (p >= threshold) {

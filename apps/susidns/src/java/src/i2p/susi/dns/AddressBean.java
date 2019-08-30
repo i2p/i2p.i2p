@@ -279,7 +279,7 @@ public class AddressBean
 		String d = getProp(key);
 		if (d.length() > 0) {
 			try {
-				d = FormatDate.format(Long.parseLong(d));
+				d = DataHelper.formatTime(Long.parseLong(d));
 			} catch (NumberFormatException nfe) {}
 		}
 		return d;

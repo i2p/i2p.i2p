@@ -3,9 +3,7 @@ package net.i2p.router.web.helpers;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -972,9 +970,6 @@ class SummaryBarRenderer {
                     entries = nmgr.getEntries();
             }
             if (!entries.isEmpty()) {
-                DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
-                // the router sets the JVM time zone to UTC but saves the original here so we can get it
-                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 int i = 0;
                 // show a min of 1, max of 3, none older than 60 days over min
                 // Except, if news fetching is disabled, min is 0 and oldest is 7 days.
@@ -1003,9 +998,8 @@ class SummaryBarRenderer {
                        .append(consoleNonce)
                        .append("\"");
                     if (entry.updated > 0) {
-                        Date date = new Date(entry.updated);
                         buf.append(" title=\"")
-                           .append(_t("Published")).append(": ").append(fmt.format(date)).append("\"");
+                           .append(_t("Published")).append(": ").append(DataHelper.formatDate(entry.updated)).append("\"");
                     }
                     buf.append(">");
                     buf.append(entry.title)

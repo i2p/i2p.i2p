@@ -2,12 +2,9 @@ package net.i2p.router.web.helpers;
 
 import java.io.IOException;
 import java.text.Collator;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,17 +184,13 @@ public class EventLogHelper extends FormHandler {
         }
         buf.append("</th></tr>");
 
-        SimpleDateFormat fmt = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-        // the router sets the JVM time zone to UTC but saves the original here so we can get it
-        fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
-
         List<Map.Entry<Long, String>> entries = new ArrayList<Map.Entry<Long, String>>(events.entrySet());
         Collections.reverse(entries);
         for (Map.Entry<Long, String> e : entries) {
             long time = e.getKey().longValue();
             String event = e.getValue();
             buf.append("<tr><td>");
-            buf.append(fmt.format(new Date(time)));
+            buf.append(DataHelper.formatTime(time));
             buf.append("</td><td>");
             if (isAll) {
                  String[] s = DataHelper.split(event, " ", 2);

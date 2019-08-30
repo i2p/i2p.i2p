@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -106,6 +107,17 @@ public class DataHelper {
 
     private static final Pattern ILLEGAL_KEY =  Pattern.compile("[#=\r\n;]");
     private static final Pattern ILLEGAL_VALUE =  Pattern.compile("[#\r\n]");
+
+    /**
+     *  The default formatting for date/time, current locale, local time zone
+     *  @since 0.9.43
+     */
+    private static final DateFormat DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);
+    private static final DateFormat TIME_FORMAT = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+    static {
+        DATE_FORMAT.setTimeZone(SystemVersion.getSystemTimeZone());
+        TIME_FORMAT.setTimeZone(SystemVersion.getSystemTimeZone());
+    }
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -1606,6 +1618,34 @@ public class DataHelper {
             case 7: return str + "Z";
             case 8: return str + "Y";
             default: return bytes + space;
+        }
+    }
+
+    /**
+     *  The default formatting for date, current locale, local time zone.
+     *  Warning - NOT UTC!
+     *  Examples:
+     *  en: Aug 30, 2019
+     *  de: 30.08.2019
+     *  @since 0.9.43
+     */
+    public static String formatDate(long now) {
+        synchronized(DATE_FORMAT) {
+            return DATE_FORMAT.format(new Date(now));
+        }
+    }
+
+    /**
+     *  The default formatting for date/time, current locale, local time zone.
+     *  Warning - NOT UTC!
+     *  Examples:
+     *  en: Aug 30, 2019 12:38 PM
+     *  de: 30.08.2019 12:38
+     *  @since 0.9.43
+     */
+    public static String formatTime(long now) {
+        synchronized(TIME_FORMAT) {
+            return TIME_FORMAT.format(new Date(now));
         }
     }
     

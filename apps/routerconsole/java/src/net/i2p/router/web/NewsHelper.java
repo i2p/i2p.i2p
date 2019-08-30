@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -201,7 +199,7 @@ public class NewsHelper extends ContentHelper {
 
     /**
      *  Convert long date stamp to
-     *  '07-Jul 21:09 UTC' with month name in the system locale
+     *  date/time in the system locale, local time zone
      *  @return null if ver = null
      *  @since 0.9.4 moved from NewsFetcher
      */
@@ -209,7 +207,7 @@ public class NewsHelper extends ContentHelper {
         if (ver != null) {
             try {
                 long modtime = Long.parseLong(ver);
-                return (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime)) + " UTC";
+                return DataHelper.formatTime(modtime);
             } catch (NumberFormatException nfe) {}
         }
         return null;

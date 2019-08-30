@@ -65,7 +65,7 @@ public class NewsFeedHelper extends HelperBase {
             }
         }
         if (!entries.isEmpty()) {
-            DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+            DateFormat fmt = DateFormat.getDateInstance(DateFormat.MEDIUM);
             // the router sets the JVM time zone to UTC but saves the original here so we can get it
             fmt.setTimeZone(SystemVersion.getSystemTimeZone(ctx));
             int i = 0;

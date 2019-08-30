@@ -64,7 +64,6 @@ public class SybilRenderer {
     private final RouterContext _context;
     private final Log _log;
     private final DecimalFormat fmt = new DecimalFormat("#0.00");
-    private final DateFormat dfmt;
 
     private static final int PAIRMAX = Analysis.PAIRMAX;
     private static final int MAX = Analysis.MAX;
@@ -76,8 +75,6 @@ public class SybilRenderer {
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(SybilRenderer.class);
-        dfmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-        dfmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
     }
 
     /**
@@ -209,13 +206,13 @@ public class SybilRenderer {
                 points = ps.load(date);
             } catch (IOException ioe) {
                 _log.error("loading stored analysis for date: " + date, ioe);
-                out.write("<b>Failed to load analysis for " + dfmt.format(new Date(date)) + "</b>: " +
+                out.write("<b>Failed to load analysis for " + DataHelper.formatTime(date) + "</b>: " +
                           DataHelper.escapeHTML(ioe.toString()));
                 return;
             }
             if (points.isEmpty()) {
                 _log.error("empty stored analysis or bad file format for date: " + date);
-                out.write("<b>Corrupt analysis file for " + dfmt.format(new Date(date)) + "</b>");
+                out.write("<b>Corrupt analysis file for " + DataHelper.formatTime(date) + "</b>");
             } else {
                 renderThreatsHTML(out, buf, date, points);
             }
@@ -266,7 +263,7 @@ public class SybilRenderer {
                     buf.append(" selected=\"selected\"");
                     first = false;
                 }
-                buf.append('>').append(dfmt.format(new Date(date.longValue()))).append("</option>\n");
+                buf.append('>').append(DataHelper.formatTime(date.longValue())).append("</option>\n");
             }        
             buf.append("</select>\n" +
                        "<input type=\"submit\" name=\"action\" class=\"go\" value=\"Review analysis\" />" +
@@ -366,7 +363,7 @@ public class SybilRenderer {
         buf.append("<div id=\"sybils_summary\">\n" +
                    "<b>Average closest floodfill distance:</b> ").append(fmt.format(avgMinDist)).append("<br>\n" +
                    "<b>Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
-           .append("\" <b>Last Changed:</b> ").append(dfmt.format(new Date(_context.routerKeyGenerator().getLastChanged()))).append("<br>\n" +
+           .append("\" <b>Last Changed:</b> ").append(DataHelper.formatTime(_context.routerKeyGenerator().getLastChanged())).append("<br>\n" +
                    "<b>Next Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData()))
            .append("\" <b>Rotates in:</b> ").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight())).append("\n" +
                    "</div>\n");
@@ -509,7 +506,7 @@ public class SybilRenderer {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
             Collections.sort(warns, new PointsComparator(points));
             ReasonComparator rcomp = new ReasonComparator();
-            buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points as of " + dfmt.format(new Date(date)) + "</h3>");
+            buf.append("<h3 id=\"threats\" class=\"sybils\">Routers with Most Threat Points as of " + DataHelper.formatTime(date) + "</h3>");
             for (Hash h : warns) {
                 Points pp = points.get(h);
                 double p = pp.getPoints();

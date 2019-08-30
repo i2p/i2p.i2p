@@ -67,7 +67,7 @@ public class DatabaseInfo {
     public static final int NETSPEED_EDITION_REV1 = 32;
     public static final int NETSPEED_EDITION_REV1_V6 = 33;
 
-    private static SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
 
     private String info;
 

@@ -503,7 +503,7 @@ public class LogManager implements Flushable {
             return true;
         
         try {
-            SimpleDateFormat fmt = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            SimpleDateFormat fmt = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
             if (!format.equals(""))
                 fmt.applyPattern(format);
             // the router sets the JVM time zone to UTC but saves the original here so we can get it
@@ -722,9 +722,13 @@ public class LogManager implements Flushable {
         _format = fmt;
     }
 
+    /**
+     *  Any usage of returned formatter must be synchronized!
+     */
     public SimpleDateFormat getDateFormat() {
         return _dateFormat;
     }
+
     public String getDateFormatPattern() {
         return _dateFormatPattern;
     }
