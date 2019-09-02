@@ -814,7 +814,7 @@ tr:hover .percentBarText {
 /* download bars */
 
 .snarkTorrentDownloaded {
-     width: 110px !important;
+     width: 120px !important;
      text-align: center !important;
 }
 
@@ -901,7 +901,7 @@ tr:hover .percentBarText {
 }
 
 .snarkTorrentDownloaded .percentBarText, .snarkTorrentDownloaded .percentBarOuter {
-     width: 110px !important;
+     width: 120px !important;
 }
 
 .snarkDirInfo .percentBarText, .snarkDirInfo .percentBarOuter, .peerinfo .percentBarText, .peerinfo .percentBarOuter {
@@ -2187,7 +2187,6 @@ hr.debug:last-child {
 
 .commentText {
      white-space: normal !important;
-     text-align: justify;
      width: 90%;
 }
 
@@ -2528,7 +2527,7 @@ b.alwaysShow {
 }
 
 .snarkTorrentDownloaded .percentBarText, .snarkTorrentDownloaded .percentBarOuter {
-     width: 100px !important;
+     width: 120px !important;
 }
 
 .peerinfo .snarkTorrentDownloaded .percentBarText, .peerinfo .snarkTorrentDownloaded .percentBarOuter {

@@ -1005,7 +1005,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
 }
 
 .percentBarText, .percentBarOuter {
-     width: 110px;
+     width: 120px;
      text-align: center;
      vertical-align: middle;
 }
@@ -2580,7 +2580,6 @@ input.toggle_input, input.toggle_input:checked { /* hide checkbox and use label 
 
 .commentText {
      white-space: normal !important;
-     text-align: justify;
      width: 90%;
 }
 
@@ -2743,7 +2742,7 @@ td#bwHelp a {
 }
 
 .percentBarText, .percentBarOuter, .snarkTorrentDownloaded {
-     width: 100px;
+     width: 120px;
 }
 
 .snarkFileStatus img[src*="clock"] {
@@ -2813,7 +2812,7 @@ body, .snarkTorrents td, .snarkAddInfo, th, td,  code, textarea, input, input[ty
 .snarkTorrentDownloaded {
      white-space: nowrap;
      padding: 0 8px;
-     width: 110px;
+     width: 120px;
      text-align: center;
 }
 

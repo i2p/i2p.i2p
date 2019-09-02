@@ -1012,7 +1012,7 @@ thead img.disable, img.disable:hover {
 /* download bars */
 
 .snarkTorrentDownloaded {
-     width: 110px !important;
+     width: 120px !important;
      text-align: right !important;
 }
 
@@ -1026,7 +1026,7 @@ thead img.disable, img.disable:hover {
 }
 
 .percentBarOuter, .percentBarText {
-     width: 110px;
+     width: 120px;
 }
 
 .snarkDirInfo .percentBarText, .snarkDirInfo .percentBarOuter {
@@ -2486,7 +2486,6 @@ td#bwHelp a {
 
 .commentText {
      white-space: normal !important;
-     text-align: justify;
      padding-right: 0;
 }
 
@@ -2649,7 +2648,7 @@ td.snarkGraphicStatus img {
 }
 
 .percentBarOuter, .percentBarText, .snarkTorrentDownloaded {
-     width: 100px !important;
+     width: 120px !important;
 }
 
 .snarkFileStatus .percentBarText {
