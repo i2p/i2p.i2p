@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.data.Hash;
+import net.i2p.router.ProfileManager;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
@@ -79,8 +80,13 @@ class InboundEndpointProcessor {
             int rtt = 0; // dunno... may not be related to an rtt
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received a " + length + "byte message through tunnel " + _config);
-            for (int i = 0; i < _config.getLength(); i++)
-                _context.profileManager().tunnelDataPushed(_config.getPeer(i), rtt, length);
+            ProfileManager pm = _context.profileManager();
+            // null for unit tests
+            if (pm != null) {
+                for (int i = 0; i < _config.getLength(); i++) {
+                    pm.tunnelDataPushed(_config.getPeer(i), rtt, length);
+                }
+            }
             _config.incrementVerifiedBytesTransferred(length);
         }
         
