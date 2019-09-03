@@ -44,6 +44,10 @@ class InboundEndpointProcessor {
      * Undo all of the encryption done by the peers in the tunnel, recovering the
      * preprocessed data sent by the gateway.  
      *
+     * @param orig original data with an extra 16 byte IV prepended.
+     * @param offset index into the array where the extra 16 bytes (IV) begins
+     * @param length how much of orig can we write to (must be a multiple of 16).
+     *               Should always be 1024 bytes.
      * @return true if the data was recovered (and written in place to orig), false
      *         if it was a duplicate or from the wrong peer.
      */
@@ -57,29 +61,23 @@ class InboundEndpointProcessor {
             return false;
         }
         
-        byte iv[] = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
-        System.arraycopy(orig, offset, iv, 0, iv.length);
         //if (_config.getLength() > 1)
         //    _log.debug("IV at inbound endpoint before decrypt: " + Base64.encode(iv));
 
-        boolean ok = _validator.receiveIV(iv, 0, orig, offset + HopProcessor.IV_LENGTH);
+        boolean ok = _validator.receiveIV(orig, offset, orig, offset + HopProcessor.IV_LENGTH);
         if (!ok) {
             if (_log.shouldLog(Log.WARN)) 
                 _log.warn("Invalid IV, dropping at IBEP " + _config);
-            SimpleByteCache.release(iv);
             return false;
         }
         
         // inbound endpoints and outbound gateways have to undo the crypto in the same way
-        //if (USE_ENCRYPTION)
-            decrypt(_context, _config, iv, orig, offset, length);
-        
-        SimpleByteCache.release(iv);
+        decrypt(_context, _config, orig, offset, length);
         
         if (_config.getLength() > 0) {
             int rtt = 0; // dunno... may not be related to an rtt
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Received a " + length + "byte message through tunnel " + _config);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Received a " + length + "byte message through tunnel " + _config);
             ProfileManager pm = _context.profileManager();
             // null for unit tests
             if (pm != null) {
@@ -95,18 +93,21 @@ class InboundEndpointProcessor {
     
     /**
      * Iteratively undo the crypto that the various layers in the tunnel added.
+     *
+     * @param orig original data with an extra 16 byte IV prepended.
+     * @param offset index into the array where the extra 16 bytes (IV) begins
+     * @param length how much of orig can we write to (must be a multiple of 16).
+     *               Should always be 1024 bytes.
      */
-    private void decrypt(RouterContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
-        //Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
-        byte cur[] = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
-        for (int i = cfg.getLength()-2; i >= 0; i--) { // dont include the endpoint, since that is the creator
-            OutboundGatewayProcessor.decrypt(ctx, iv, orig, offset, length, cur, cfg.getConfig(i));
-            //if (log.shouldLog(Log.DEBUG)) {
-                //log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, HopProcessor.IV_LENGTH));
-                //log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
+    private void decrypt(RouterContext ctx, TunnelCreatorConfig cfg, byte orig[], int offset, int length) {
+        // dont include the endpoint, since that is the creator
+        for (int i = cfg.getLength() - 2; i >= 0; i--) {
+            OutboundGatewayProcessor.decrypt(ctx, orig, offset, length, cfg.getConfig(i));
+            //if (_log.shouldLog(Log.DEBUG)) {
+                //_log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, HopProcessor.IV_LENGTH));
+                //_log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
             //}
         }
-        SimpleByteCache.release(cur);
     }
     
 }

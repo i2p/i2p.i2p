@@ -1,7 +1,10 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.AESEngine;
+import net.i2p.data.Base64;
 import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 
 /**
@@ -28,7 +31,6 @@ class HopProcessor {
      *
      * See: http://osdir.com/ml/network.i2p/2005-07/msg00031.html
      */
-    //static final boolean USE_DOUBLE_IV_ENCRYPTION = true;
     static final int IV_LENGTH = 16;
 
     /**
@@ -62,7 +64,8 @@ class HopProcessor {
      *
      * @param orig IV+data of the message
      * @param offset index into orig where the IV begins
-     * @param length how long after the offset does the message go for?
+     * @param length how long after the offset does the IV+message go for?
+     *               Should always be 1024 bytes.
      * @param prev previous hop in the tunnel, or null if we are the gateway
      * @return true if the message was updated and valid, false if it was not.
      */
@@ -88,34 +91,23 @@ class HopProcessor {
         }
         
         //if (_log.shouldLog(Log.DEBUG)) {
-            //_log.debug("IV received: " + Base64.encode(iv));
-            //_log.debug("Before:" + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
+        //    _log.debug("IV received before decrypt: " + Base64.encode(orig, offset, IV_LENGTH));
+        //    _log.debug("Data before processing:\n" + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
         //}
-        //if (USE_ENCRYPTION) {
-            //if (USE_DOUBLE_IV_ENCRYPTION) 
-                updateIV(orig, offset);
-            encrypt(orig, offset, length);
-            updateIV(orig, offset);
-        //}
+
+        SessionKey ivkey = _config.getIVKey();
+        AESEngine aes = _context.aes();
+        // double IV encryption
+        aes.encryptBlock(orig, offset, ivkey, orig, offset);
+        aes.encrypt(orig, offset + IV_LENGTH, orig, offset + IV_LENGTH, _config.getLayerKey(),
+                    orig, offset, length - IV_LENGTH);
+        aes.encryptBlock(orig, offset, ivkey, orig, offset);
+
         //if (_log.shouldLog(Log.DEBUG)) {
-            //_log.debug("Data after processing: " + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
-            //_log.debug("IV sent: " + Base64.encode(orig, 0, IV_LENGTH));
+        //    _log.debug("IV sent: " + Base64.encode(orig, offset, IV_LENGTH));
+        //    _log.debug("Data after processing:\n" + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
         //}
         return true;
-    }
-    
-    private final void encrypt(byte data[], int offset, int length) {
-        for (int off = offset + IV_LENGTH; off < length; off += IV_LENGTH) {
-            //DataHelper.xor(data, off - IV_LENGTH, data, off, data, off, IV_LENGTH);
-            for (int j = 0; j < IV_LENGTH; j++) {
-                data[off + j] ^= data[(off - IV_LENGTH) + j];
-            }
-            _context.aes().encryptBlock(data, off, _config.getLayerKey(), data, off);
-        }
-    }
-    
-    private final void updateIV(byte orig[], int offset) {
-        _context.aes().encryptBlock(orig, offset, _config.getIVKey(), orig, offset);
     }
 
     /**

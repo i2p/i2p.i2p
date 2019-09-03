@@ -16,6 +16,8 @@ public interface IVValidator {
      * not the IV alone (since the tunnel is encrypted via AES/CBC).  Thanks to
      * dvorak for pointing out that tagging!
      *
+     * @param iv data will not be modified
+     * @param iv payload will not be modified
      */
     public boolean receiveIV(byte iv[], int ivOffset, byte payload[], int payloadOffset);
 }
