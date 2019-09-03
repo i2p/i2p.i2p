@@ -45,9 +45,9 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
             long sinceRunV6 = now - _lastTestedV6.get();
             boolean configV4fw = _transport.isIPv4Firewalled();
             boolean configV6fw = _transport.isIPv6Firewalled();
-            if (!configV4fw && (_forceRun == FORCE_IPV4 || sinceRunV4 >= MIN_TEST_FREQUENCY)) {
+            if (!configV4fw && _forceRun == FORCE_IPV4 && sinceRunV4 >= MIN_TEST_FREQUENCY) {
                 locked_runTest(false);
-            } else if (!configV6fw && _transport.hasIPv6Address() && (_forceRun == FORCE_IPV6 || sinceRunV6 >= MIN_TEST_FREQUENCY)) {
+            } else if (!configV6fw && _forceRun == FORCE_IPV6 && _transport.hasIPv6Address() && sinceRunV6 >= MIN_TEST_FREQUENCY) {
                 locked_runTest(true);
             } else if (!configV4fw && sinceRunV4 >= TEST_FREQUENCY && _transport.getIPv6Config() != IPV6_ONLY) {
                 locked_runTest(false);
@@ -58,12 +58,17 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
                     _log.info("PTE timeReached(), no test run, last v4 test: " + new java.util.Date(_lastTested.get()) +
                               " last v6 test: " + new java.util.Date(_lastTestedV6.get()));
             }
+        } else {
+            if (_log.shouldDebug())
+                _log.info("shouldTest() false");
         }
         if (_alive) {
             long delay = (TEST_FREQUENCY / 2) + _context.random().nextInt(TEST_FREQUENCY);
             // if we have 2 addresses, give IPv6 a chance also
             if (_transport.hasIPv6Address() && _transport.getIPv6Config() != IPV6_ONLY)
                 delay /= 2;
+            if (_log.shouldDebug())
+                _log.debug("reschedule for " + net.i2p.data.DataHelper.formatDuration(delay));
             schedule(delay);
         }
     }
@@ -79,6 +84,8 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to run peer test, no peers available - v6? " + isIPv6);
         }
+        // We switch to NO_FORCE even if no peers,
+        // so we don't get stuck running the same test over and over
         _forceRun = NO_FORCE;
     }
         
@@ -95,11 +102,15 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
      *  @since 0.9.39
      */
     public synchronized void forceRunSoon(boolean isIPv6, long delay) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("PTE.forceRunSoon() - v6? " + isIPv6, new Exception());
         if (!isIPv6 && _transport.isIPv4Firewalled())
             return;
         if (isIPv6 && _transport.isIPv6Firewalled())
             return;
         _forceRun = isIPv6 ? FORCE_IPV6 : FORCE_IPV4;
+        if (_log.shouldDebug())
+            _log.debug("reschedule for " + net.i2p.data.DataHelper.formatDuration(delay));
         reschedule(delay);
     }
         
@@ -113,9 +124,13 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
     }
         
     public synchronized void setIsAlive(boolean isAlive) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("PTE.setIsAlive(), isAlive? " + isAlive, new Exception());
         _alive = isAlive;
         if (isAlive) {
             long delay = _context.random().nextInt(2*TEST_FREQUENCY);
+            if (_log.shouldDebug())
+                _log.debug("reschedule for " + net.i2p.data.DataHelper.formatDuration(delay));
             reschedule(delay);
         } else {
             cancel();
