@@ -285,7 +285,9 @@ public class I2PSSLSocketFactory {
     }
 
     /**
-     *  Validate the hostname
+     *  Validate the hostname.
+     *  Warning - be sure to remove [] from IPv6 addresses in host parameter if you
+     *  got it from URI.getHost().
      *
      *  ref: https://developer.android.com/training/articles/security-ssl.html
      *  ref: http://op-co.de/blog/posts/java_sslsocket_mitm/

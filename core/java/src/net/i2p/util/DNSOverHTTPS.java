@@ -63,9 +63,10 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     static {
         // Warning: All hostnames MUST be in loop check in lookup() below
         // Google
-        // Certs for 8.8.8.8 and 8.8.4.4 don't work
-        v4urls.add("https://dns.google.com/resolve?edns_client_subnet=0.0.0.0/0&");
-        v6urls.add("https://dns.google.com/resolve?edns_client_subnet=0.0.0.0/0&");
+        // https://developers.google.com/speed/public-dns/docs/doh/
+        // 8.8.8.8 and 8.8.4.4 now redirect to dns.google, but SSLEepGet doesn't support redirect
+        v4urls.add("https://dns.google/resolve?edns_client_subnet=0.0.0.0/0&");
+        v6urls.add("https://dns.google/resolve?edns_client_subnet=0.0.0.0/0&");
         // Cloudflare cloudflare-dns.com
         // https://developers.cloudflare.com/1.1.1.1/nitty-gritty-details/
         // 1.1.1.1 is a privacy centric resolver so it does not send any client IP information
@@ -74,6 +75,12 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         v4urls.add("https://1.0.0.1/dns-query?ct=application/dns-json&");
         v6urls.add("https://[2606:4700:4700::1111]/dns-query?ct=application/dns-json&");
         v6urls.add("https://[2606:4700:4700::1001]/dns-query?ct=application/dns-json&");
+        // Quad9
+        // https://quad9.net/doh-quad9-dns-servers/
+        v4urls.add("https://9.9.9.9:5053/dns-query?");
+        v4urls.add("https://149.112.112.112:5053/dns-query?");
+        v6urls.add("https://[2620:fe::fe]:5053/dns-query?");
+        v6urls.add("https://[2620:fe::fe:9]:5053/dns-query?");
     }
 
     // keep the timeout very short, as we try multiple addresses,
@@ -138,7 +145,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
             }
         }
         // don't loop via SSLEepGet
-        if (host.equals("dns.google.com"))
+        if (host.equals("dns.google"))
             return "8.8.8.8";
         if (type == Type.V4_ONLY || type == Type.V4_PREFERRED) {
             // v4 lookup

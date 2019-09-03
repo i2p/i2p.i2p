@@ -769,8 +769,13 @@ public class SSLEepGet extends EepGet {
                 SSLSocket socket = (SSLSocket) _proxy;
                 I2PSSLSocketFactory.setProtocolsAndCiphers(socket);
                 if (!_bypassVerification) {
+                    String vhost = originalHost;
+                    if (vhost.startsWith("[") && vhost.endsWith("]")) {
+                        // URI.getHost() does not strip []
+                        vhost = vhost.substring(1, vhost.length() - 1);
+                    }
                     try {
-                        I2PSSLSocketFactory.verifyHostname(_context, socket, originalHost);
+                        I2PSSLSocketFactory.verifyHostname(_context, socket, vhost);
                     } catch (SSLException ssle) {
                         if (_saveCerts > 0 && _stm != null)
                             saveCerts(host, _stm);
