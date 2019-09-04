@@ -491,6 +491,7 @@ trans.it = installer/resources/eepsite/docroot/help/index_it.html
 ;;trans.nl = installer/resources/eepsite/docroot/help/index_nl.html
 trans.pl = installer/resources/eepsite/docroot/help/index_pl.html
 trans.pt = installer/resources/eepsite/docroot/help/index_pt.html
+trans.ro = installer/resources/eepsite/docroot/help/index_ro.html
 trans.ru_RU = installer/resources/eepsite/docroot/help/index_ru.html
 ;; not yet translated on TX, use old page
 ;;trans.sv_SE = installer/resources/eepsite/docroot/help/index_sv.html

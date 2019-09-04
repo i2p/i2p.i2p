@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<title>I2P Anonim WebServer</title>
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="lib/eepsite.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+   <div class="main">
+
+   <div class="langbar">
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+      <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+</div>
+
+    <h1>I2P Webserver anonim</h1>
+
+    <h2>Ghidul serviciului de servicii anonime pe I2P</h2>
+
+    <p>Acesta este propriul dvs. server web anonim I2P (denumit în mod tradițional <i>eepsite</i>).
+Pentru a vă servi propriul conținut, pur și simplu editați fișierele din directorul rădăcină al serverului Web, iar site-ul va fi public după ce urmați instrucțiunile de mai jos.</p>
+
+    <p id="dir">Directorul rădăcină al webserverului poate fi găsit într-una din următoarele locații, în funcție de sistemul de operare:</p>
+
+    <ul>
+<li>
+<b>Linux</b><br>
+        Instalare standard: <code>~/.i2p/eepsite/docroot/</code><br>
+        Instalarea pachetului, care rulează ca serviciu: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+</li>
+      <li>
+<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+</li>        
+      <li>
+<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+</li>
+    </ul>
+<p>În I2P, serviciile ascunse sunt adresate folosind o adresă Base32 care se termină în „.b32.i2p”, sau o destinație reprezentată ca un șir lung Base64.
+Adresa Base32 poate fi utilizată ca nume de gazdă, până când atribuiți unui registru un nume urmând instrucțiunile de mai jos.
+Destinația este oarecum ca o adresă IP și este afișată în <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">pagina Configurare a serviciilor ascunse</a>.</p>
+
+    <p>Instrucțiunile de mai jos detaliază cum să atribuiți un nume de genul "mysite.i2p" site-ului dvs. web și să permiteți accesul altora.
+Puteți accesa site-ul dvs. local prin <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
+
+    <h2>Cum să configurați și să anunțați serviciul ascuns</h2>
+
+     <p>Site-ul dvs. Web rulează în mod implicit, dar nu este accesibil de către alții până nu porniți tunelul de servicii ascuns.
+După ce porniți tunelul dvs. I2P Webserver, va fi dificil să găsească alte persoane
+Poate fi accesat numai cu destinația lungă sau cu adresa Base32 mai scurtă (.b32.i2p), care este un haș al Destinației.
+Ați putea spune oamenilor destinația sau adresa Base32, dar, din fericire, I2P are o carte de adrese și mai multe modalități ușoare de a spune oamenilor despre site-ul dvs. web.
+Iată instrucțiuni detaliate.</p>
+
+    <ul>
+<li>Alegeți un nume pentru site-ul dvs. web (<i>ceva</i>.i2p), cu minuscule.
+Poate doriți să consultați mai întâi <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">cartea de adrese</a> a routerului dvs. pentru a vedea dacă numele dvs. este deja luat.
+Introduceți noul nume pentru site-ul dvs. web în <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">pagina de configurare a serviciilor ascunse</a>, unde scrie „Nume site”.
+Aceasta va înlocui „mysite.i2p” implicit.
+De asemenea, dacă doriți ca tunelul dvs. web server I2P să fie pornit automat la pornirea I2P, bifați caseta „Pornire automată”.
+Site-ul dvs. web va începe de fiecare dată când porniți routerul.
+Asigurați-vă că faceți clic pe „Salvați”.</li>
+      <li>Faceți clic pe butonul de pornire pentru tunelul dvs. de server Web din <a href="http://127.0.0.1:7657/i2ptunnel/">pagina principală a serviciului ascuns de servicii</a>.
+Acum ar trebui să-l vedeți listat la „Tuneluri locale” din partea stângă a <a href="http://127.0.0.1:7657/">consolei de router I2P</a>.
+Site-ul dvs. web funcționează acum.</li>
+      <li>Evidențiați și copiați întreaga destinație locală în <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">pagina Configurare a serviciului ascuns</a>.
+Asigurați-vă că copiați întregul lucru, este format din peste 500 de caractere.</li>
+      <li>Introduceți numele și lipiți destinația în <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">agenda de adrese</a>.
+Faceți clic pe „Adăugare” pentru a salva noua intrare.</li>
+      <li>În browser-ul dvs., introduceți numele site-ului (<i>ceva</i>.i2p) și ar trebui să vă aflați chiar aici.
+Sper să funcționeze!</li>
+      <li>Înainte de a spune lumii despre noul site web dvs. , ar trebui să adăugați conținut.
+Accesați directorul rădăcină al serverului <a href="#dir">enumerat mai sus</a> și înlocuiți pagina de redirecționare index.html cu propriul  conținut.</li>
+    </ul>
+<p>Listarea directoarelor este activată, astfel încât să puteți găzdui fișiere dintr-un subdirector fără a furniza o pagină cu link-uri către fișiere.
+Puteți modifica aspectul directorului prin furnizarea unui fișier <a href="lib/jetty-dir.css">jetty-dir.css</a> editat pentru fiecare director.
+<a href="lib/">Subdirectorul lib</a> demonstrează un stil personalizat.
+<a href="lib/resources">Subdirectorul resurselor</a> demonstrează stilul implicit.
+Dacă aveți nevoie de un șablon pentru un site de bază, nu ezitați să adaptați <a href="pagetemplate.html">această pagină</a> și <a href="lib/">conținutul asociat</a>.</p>
+
+    <p>Dacă ați revenit la această pagină după editarea conținutului, încercați să ștergeți memoria cache web a browserului:</p>
+
+    <ul>
+<li>
+<b>Firefox:</b> Preferințe ➜ Avansat ➜ Rețea Content Conținut Web în cache ➜ Ștergeți acum</li>
+      <li>
+<b>Chrome/Chromium:</b> Setări ➜ Setări avansate ➜ Confidențialitate ➜ Ștergeți datele de navigare</li>
+      <li>
+<b>Opera:</b> Setări ➜ Confidențialitate ➜ Ștergeți datele de navigare</li>
+    </ul>
+<h2>Înregistrați-vă propriul dvs. domeniu I2P</h2>
+
+    <p>Acum este timpul să adăugați site-ul dvs. web la o carte de adrese I2P găzduită de un site, cum ar fi <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> sau <a href="http://no.i2p/" target="_blank">no.i2p</a>.
+Trebuie să introduceți numele și destinația site-ului (sau șirul de autentificare de înregistrare) pe unul sau mai multe dintre aceste site-uri.</p>
+<p>Unele site-uri de înregistrare necesită Destinația.
+Dacă da, evidențiați și copiați întreaga destinație locală în <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">pagina Configurare a serviciului ascuns</a>.
+Asigurați-vă că copiați întregul lucru, este format din peste 500 de caractere.</p>
+<p>Unele site-uri de înregistrare, inclusiv <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, necesită șirul de autentificare înregistrare.
+Se găsește pe <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">pagina de autentificare de înregistrare</a> legată de <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">pagina de configurare a serviciului ascuns</a>.
+Copiați întregul șir de autentificare și lipiți-l pe pagina de înregistrare.
+Asigurați-vă că copiați întregul lucru, este format din peste 500 de caractere.
+Descrieți pe scurt site-ul dvs. dacă site-ul solicită aceste informații.
+Dacă site-ul dvs. este un serviciu HTTP, lăsați caseta de selectare; dacă nu, deselectați-l.</p>
+<p>Pentru toate site-urile de înregistrare, citiți cu atenție Termenii de utilizare.
+Faceți clic pe butonul „Trimite”.
+Verificați trimiterea a fost reușită.
+Deoarece multe routere primesc periodic actualizări ale agendei de adrese de pe aceste site-uri, în câteva ore, alții vor putea găsi site-ul dvs., introducând pur și simplu numele dvs. de gazdă în browserul lor.</p>
+
+    <h2>Adăugarea abonamentelor la adresa de adrese</h2>
+
+    <p>Vorbind despre actualizări ale agendei de adrese, acesta ar fi un moment bun pentru a adăuga alte cărți de adrese la propria listă de abonamente.
+Accesați <a href="http://127.0.0.1:7657/susidns/subscriptions">pagina dvs. Configurare abonamente</a> și adăugați una sau mai multe pentru o listă actualizată automat de noi gazde:</p>
+
+    <ul>
+<li>
+<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+      <li>
+<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+    </ul>
+<p>Dacă vă grăbiți și nu puteți aștepta câteva ore, puteți spune oamenilor să utilizeze un serviciu de redirecționare a adresei de asistență.
+Acest lucru va funcționa în câteva minute de la înregistrarea numelui dvs. de gazdă pe același site.
+Încercați-l mai întâi introducând <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>ceva</i>.i2p</code> în browser.
+Odată ce funcționează, puteți spune altora să îl folosească.</p>
+
+    <p>Unii verifică listele de site-uri, cum ar fi <a href="http://identiguy.i2p/" target="_blank">lista de stări a eepsitului Identiguy</a> sau <a href="http://no.i2p/browse/" target="_blank">lista gazdă activă a no.i2p</a> pentru eepsite noi, astfel încât site-ul dvs. poate începe să obțină trafic.
+Există o mulțime de alte modalități de a spune oamenilor. Iată câteva idei:</p>
+
+    <ul>
+<li>Postează un mesaj pe <a href="http://i2pforum.i2p/" target="_blank">forumul I2P</a> care spune tuturor despre noul tău site I2P!</li>
+      <li>Spune-le oamenilor despre asta pe canalele de chat #i2p sau #i2p de pe IRC.</li>
+      <li>Puneți-l pe <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">indexul Eepsit I2PWiki</a>
+</li>
+    </ul>
+<p>Rețineți că unele site-uri recomandă lipirea în acea destinație cu adevărat lungă.
+Puteți, dacă doriți, dar dacă ați înregistrat cu succes numele dvs. de gazdă pe un serviciu de înregistrare, l-ați testat folosind un serviciu de sărituri și ați așteptat 24 de ore ca actualizarea caietului de adrese să se propage către alții, asta nu ar trebui să fie necesar.</p>
+
+    <h2>Utilizarea unui server web alternativ pentru a vă găzdui site-ul</h2>
+
+    <p>Acest site (și consola de router I2P) rulează pe <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">serverul Web Jetty</a>, dar poate doriți să utilizați un server web diferit pentru a vă găzdui conținutul.
+Pentru a menține anonimatul, asigurați-vă că serverul dvs. Web este configurat pentru a permite conexiunile numai de la localhost (127.0.0.1) și verificați documentația pentru a vă asigura că serverul dvs. Web nu prezintă detalii de publicitate care vă pot compromite anonimatul.</p>
+
+     <p>Pentru a configura serverul dvs. Web pentru a fi utilizat pe I2P, puteți utiliza fie tunelul de webserver existent și <a href="http://127.0.0.1:7657/configclients">dezactivați executarea serverului web implicit</a>, fie creați un nou tunel Server HTTP în <a href="http://127.0.0.1:7657/i2ptunnelmgr">Managerul de servicii ascunse</a>.
+Asigurați-vă că portul de ascultare configurat pentru serverul Web (7658 implicit) este configurat și în setările Serviciilor ascunse.
+De exemplu, dacă serverul dvs. Web ascultă în mod implicit pe adresa 127.0.0.1 port 80, ar trebui să vă asigurați, de asemenea, că portul țintă din pagina de setări a Managerului de servicii ascunse pentru serviciu este configurat și pentru port 80.</p> 
+
+        <p>Atenție că un server web sau o aplicație web prost configurate poate scurge informații potențial compromițătoare, cum ar fi
+adresa dvs. IP reală sau detaliile serverului care vă pot reduce anonimatul sau pot ajuta un hacker.
+Vă recomandăm să utilizați serverul implicit, cu excepția cazului în care vă simțiți confortabil când faceți administrarea serverului.
+Vă rugăm să vă asigurați că serverul dvs. web este sigur înainte de a-l plasa online.
+Există o mulțime de ghiduri online, de exemplu, dacă căutați „nginx security hardening guide”, veți găsi o serie de ghiduri care au recomandări bune.</p> 
+
+        <p>Există o problemă importantă cu serverul web Apache.
+Modulele <code>mod_status</code> și <code>mod_info</code> Apache sunt activate în mod implicit pe unele sisteme de operare.
+Aceste module expun date interne care pot duce la compromisuri grave ale anonimatului atunci când sunt utilizate într-o rețea anonimă.
+Eliminarea liniilor din fișierul de configurare în care sunt încărcate aceste module este cea mai simplă modalitate de a preveni aceste probleme.</p>
+
+    <h2>Asistență suplimentară</h2>
+
+        <p>Dacă aveți întrebări, următoarele locuri sunt disponibile pentru asistență:</p>
+
+        <ul>
+<li>Canalul nostru de asistență IRC:<ul>
+<li><a href="irc://irc.freenode.net/i2p">#i2p pe Freenode</a></li>
+                <li>Folosind anonimul tău <a href="irc://127.0.0.1:6668/i2p">tunel IRC local I2P</a>.</li>
+             </ul>
+</li>
+<li>Forumul proiectului <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">Ghid de gazduire Eepsite I2PWiki</a></li>
+        </ul>
+<hr>
+<div class="notify">Această pagină, site-ul proiectului și consola routerului au nevoie de traduceri!
+Vă rugăm să ajutați proiectul să crească <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">implicându-vă</a> sau <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">traducând</a>.</div>
+        <hr>
+</div>
+</body>
+</html>
