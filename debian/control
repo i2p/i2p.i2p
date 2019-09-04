@@ -11,7 +11,7 @@ Build-Depends: debhelper (>= 9.20160709)
  ,ant (>= 1.8)
  ,debconf
  ,default-jdk
- ,libjetty9-java
+ ,libjetty9-java (>= 9.4)
  ,libtaglibs-standard-jstlel-java
  ,libtomcat9-java
  ,dh-apparmor
@@ -78,12 +78,12 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-11-jre-headless | java11-runtime-headless,
+ openjdk-14-jre-headless |openjdk-13-jre-headless | openjdk-12-jre-headless | openjdk-11-jre-headless | openjdk-8-jre-headless | default-jre-headless | java14-runtime-headless | java13-runtime-headless | java12-runtime-headless | java11-runtime-headless | java8-runtime-headless,
  geoip-database,
  gettext-base,
  libgetopt-java,
  libjson-simple-java (<< 3),
- libjetty9-java,
+ libjetty9-java (>= 9.4),
  libtaglibs-standard-jstlel-java,
  libtomcat9-java,
  famfamfam-flag-png,
