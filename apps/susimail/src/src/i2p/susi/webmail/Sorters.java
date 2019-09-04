@@ -82,6 +82,40 @@ class Sorters {
 	}
 
 	/**
+	 * sorts Mail objects by to: fields
+	 * 
+	 * @since 0.9.43
+	 */
+	public static class ToSorter extends SorterBase {
+
+		private final Comparator<Object> collator = Collator.getInstance();
+
+		public ToSorter(MailCache mailCache) {
+			super(mailCache);
+		}
+		
+		protected int compare(Mail a, Mail b) {
+			if (a.to == null)
+				return b.to == null ? 0 : -1;
+			if (b.to == null)
+				return 1;
+			int minsz = Math.min(a.to.length, b.to.length);
+			for (int i = 0; i < minsz; i++) {
+				String as = a.to[i].replace("\"", "").replace("<", "").replace(">", "");
+				String bs = b.to[i].replace("\"", "").replace("<", "").replace(">", "");
+				int rv = collator.compare(as, bs);
+				if (rv != 0)
+					return rv;
+			}		
+			if (a.to.length > minsz)
+				return 1;
+			if (b.to.length > minsz)
+				return -1;
+			return 0;
+		}		
+	}
+
+	/**
 	 * sorts Mail objects by subject field
 	 * @author susi
 	 */

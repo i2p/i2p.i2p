@@ -93,7 +93,10 @@ class MailCache {
 		Folder<String> folder = new Folder<String>();	
 		// setElements() sorts, so configure the sorting first
 		//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
-		folder.addSorter(WebMail.SORT_SENDER, new SenderSorter(this));
+		if (folderName.equals(WebMail.DIR_DRAFTS) || folderName.equals(WebMail.DIR_SENT))
+			folder.addSorter(WebMail.SORT_SENDER, new ToSorter(this));
+		else
+			folder.addSorter(WebMail.SORT_SENDER, new SenderSorter(this));
 		folder.addSorter(WebMail.SORT_SUBJECT, new SubjectSorter(this));
 		folder.addSorter(WebMail.SORT_DATE, new DateSorter(this));
 		folder.addSorter(WebMail.SORT_SIZE, new SizeSorter(this));

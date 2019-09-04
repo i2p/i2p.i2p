@@ -89,6 +89,7 @@ class Mail {
 	public Date date;
 	private Buffer header, body;
 	private MailPart part;
+        /** May be null. Non-empty if non-null. Not HTML escaped. */
 	String[] to, cc;        // addresses only, enclosed by <>
 	private boolean isNew, isSpam;
 	public String contentType;

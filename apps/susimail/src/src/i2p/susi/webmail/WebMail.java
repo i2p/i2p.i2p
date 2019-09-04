@@ -212,7 +212,7 @@ public class WebMail extends HttpServlet
 
 	static final String DIR_FOLDER = "cur"; // MailDir-like
 	public static final String DIR_DRAFTS = _x("Drafts"); // MailDir-like
-	private static final String DIR_SENT = _x("Sent"); // MailDir-like
+	public static final String DIR_SENT = _x("Sent"); // MailDir-like
 	private static final String DIR_TRASH = _x("Trash"); // MailDir-like
 	private static final String DIR_SPAM = _x("Bulk Mail"); // MailDir-like
 	// internal/on-disk names
@@ -426,7 +426,8 @@ public class WebMail extends HttpServlet
 	 * @return the string
 	 */
 	private static String sortHeader(String name, String label, String imgPath,
-	                                 String currentName, SortOrder currentOrder, int page)
+	                                 String currentName, SortOrder currentOrder, int page,
+	                                 String folder)
 	{
 		StringBuilder buf = new StringBuilder(128);
 		buf.append(label).append("&nbsp;&nbsp;");
@@ -434,14 +435,16 @@ public class WebMail extends HttpServlet
 		if (name.equals(currentName) && currentOrder == SortOrder.UP) {
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">\n");
 		} else {
-			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=-").append(name).append("\">");
+			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=-")
+			    .append(name).append("&amp;folder=").append(folder).append("\">");
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.4;\">");
 			buf.append("</a>\n");
 		}
 		if (name.equals(currentName) && currentOrder == SortOrder.DOWN) {
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
 		} else {
-			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=").append(name).append("\">");
+			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=")
+			    .append(name).append("&amp;folder=").append(folder).append("\">");
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.4;\">");
 			buf.append("</a>");
 		}
@@ -3154,6 +3157,7 @@ public class WebMail extends HttpServlet
 			floc = '&' + CURRENT_FOLDER + '=' + folderName;
 		}
 		boolean isSpamFolder = folderName.equals(DIR_SPAM);
+		boolean showToColumn = folderName.equals(DIR_DRAFTS) || folderName.equals(DIR_SENT);
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _t("Logout") ));
@@ -3175,12 +3179,11 @@ public class WebMail extends HttpServlet
 		SortOrder curOrder = folder.getCurrentSortingDirection();
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_SENDER, _t("From"), sessionObject.imgPath, curSort, curOrder, page) + "</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder, page) + "</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder, page) +
-			//sortHeader( SORT_ID, "", sessionObject.imgPath ) +
+			thSpacer + "<th>" + sortHeader(SORT_SENDER, showToColumn ? _t("To") : _t("From"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th>" +
+			thSpacer + "<th>" + sortHeader(SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th>" +
+			thSpacer + "<th>" + sortHeader(SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder, page, folderName) +
 			"</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder, page) + "</th></tr>" );
+			thSpacer + "<th>" + sortHeader(SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
 		for (Iterator<String> it = folder.currentPageIterator(); it != null && it.hasNext(); ) {
@@ -3228,9 +3231,33 @@ public class WebMail extends HttpServlet
 					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" + 
 					" onclick=\"deleteboxclicked();\" " +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
-					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _t("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
-                                        // mail.shortSender and mail.shortSubject already html encoded
-					link + mail.shortSender + "</a></td><td " + jslink + ">" +
+					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _t("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">");
+			// mail.shortSender and mail.shortSubject already html encoded
+			if (showToColumn) {
+				if (mail.to != null) {
+					StringBuilder buf = new StringBuilder(mail.to.length * 16);
+					for (int j = 0; j < mail.to.length; j++) {
+						buf.append(mail.to[j]);
+						if (j < mail.to.length - 1)
+							buf.append(", ");
+						if (buf.length() > 45)
+							break;
+					}
+					String to = buf.toString();
+					boolean trim = to.length() > 45;
+					if (trim)
+						to = ServletUtil.truncate(to, 42).trim();
+					to = quoteHTML(to);
+					out.print(link);
+					out.print(to);
+					if (trim)
+						out.print("&hellip;");  // must be after html encode
+					out.println("</a>");
+				}
+			} else {
+				out.println(link + mail.shortSender + "</a>");
+			}
+			out.println("</td><td " + jslink + ">" +
 					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _t("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					link + subj + "</a></td><td " + jslink + ">" +
 					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _t("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
