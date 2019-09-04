@@ -938,10 +938,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         if (!isValid) {
             // ignore them 
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("The router " + from + " told us we have an invalid IP:port " 
-                           + Addresses.toString(ourIP, ourPort));
-            markUnreachable(from);
+            // ticket #2467 natted to an invalid port
+            // if the port is the only issue, don't call markUnreachable()
+            if (ourPort < 1024 || ourPort > 65535 || !isValid(ourIP)) {
+                if (_log.shouldWarn())
+                    _log.warn("The router " + from + " told us we have an invalid IP:port " 
+                               + Addresses.toString(ourIP, ourPort));
+                markUnreachable(from);
+            } else {
+                _log.logAlways(Log.WARN, "The router " + from + " told us we have an invalid port " 
+                                         + ourPort
+                                         + ", check NAT/firewall configuration, the IANA recommended dynamic outside port range is 49152-65535");
+            }
             //_context.banlist().banlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
         }
