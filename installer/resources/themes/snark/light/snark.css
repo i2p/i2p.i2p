@@ -1435,16 +1435,6 @@ img:hover {
      line-height: 100%;
 }
 
-img[src$="magnet.png"] {
-     transform: rotate(-90deg);
-}
-
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-img[src$="magnet.png"] {
-     transform: none;
-}
-}
-
 img[src$="details.png"] {
      opacity: 0.8;
 }

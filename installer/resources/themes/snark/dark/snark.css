@@ -1604,10 +1604,6 @@ img:hover {
      line-height: 100%;
 }
 
-img[src$="magnet.png"] {
-     transform: rotate(-90deg);
-}
-
 #pagenav img.disable, #pagenav img.disable:hover {
      opacity: 0.3;
      margin: 0 2px !important;

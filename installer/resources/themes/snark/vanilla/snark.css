@@ -1701,10 +1701,6 @@ a:hover img, a:focus img {
      mix-blend-mode: normal;
 }
 
-img[src$="magnet.png"] {
-     transform: rotate(-90deg);
-}
-
 img[src$="details.png"] {
      mix-blend-mode: luminosity;
 }

@@ -1797,10 +1797,6 @@ img:hover {
      line-height: 100%;
 }
 
-img[src$="magnet.png"] {
-     transform: rotate(-90deg);
-}
-
 @keyframes slide-in {
 0% {
      transform: translateY(-50px);
