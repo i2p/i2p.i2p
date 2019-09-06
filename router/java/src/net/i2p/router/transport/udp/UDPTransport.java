@@ -960,8 +960,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // Note that this fails us if we switch from one IP to a second, then back to the first,
             // as some routers still have the first IP and will successfully connect,
             // leaving us thinking the second IP is still good.
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Ignoring IP address suggestion, since we have received an inbound con recently");
+            if (_log.shouldDebug())
+                _log.debug("Ignoring IP address suggestion, since we have received an inbound con recently");
         } else {
             // New IP
             boolean changeIt = false;
@@ -982,7 +982,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (changeIt) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info(from + " and " + _lastFrom + " agree we have a new IP - " 
+                    _log.info(from + " and " + _lastFrom + " agree we have the IP " 
                               + Addresses.toString(ourIP, ourPort) + ".  Changing address.");
                 changeAddress(ourIP, ourPort);
             }
@@ -1011,8 +1011,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             byte[] externalListenHost = current != null ? current.getIP() : null;
             int externalListenPort = current != null ? current.getPort() : getRequestedPort(isIPv6);
 
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Change address? status = " + _reachabilityStatus +
+            if (_log.shouldDebug())
+                _log.debug("Change address? status = " + _reachabilityStatus +
                       " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
                       " old = " + Addresses.toString(externalListenHost, externalListenPort) +
                       " new = " + Addresses.toString(ourIP, ourPort));
@@ -1041,8 +1041,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     //}
                 } else {
                     // matched what we expect
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Same address as the current one");
+                    if (_log.shouldDebug())
+                        _log.debug("Same address as the current one");
                 }
         }
 
@@ -1288,8 +1288,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     boolean addRemotePeerState(PeerState peer) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Add remote peer state: " + peer);
+        if (_log.shouldDebug())
+            _log.debug("Add remote peer state: " + peer);
         synchronized(_addDropLock) {
             return locked_addRemotePeerState(peer);
         }
@@ -1485,7 +1485,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @param shouldBanlist doesn't really, only sets unreachable
      */
     void dropPeer(PeerState peer, boolean shouldBanlist, String why) {
-        if (_log.shouldLog(Log.INFO)) {
+        if (_log.shouldDebug()) {
             long now = _context.clock().now();
             StringBuilder buf = new StringBuilder(4096);
             long timeSinceSend = now - peer.getLastSendTime();
@@ -1529,7 +1529,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
              */
-            _log.info(buf.toString(), new Exception("Dropped by"));
+            _log.debug(buf.toString(), new Exception("Dropped by"));
         }
         synchronized(_addDropLock) {
             locked_dropPeer(peer, shouldBanlist, why);
@@ -2334,16 +2334,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
                 replaceCurrentExternalAddress(local, isIPv6);
             }
-            if (getCurrentAddress(false) != null) {
-                // We must remove current address, otherwise the user will see
-                // "firewalled with inbound NTCP enabled" warning in console.
-                // Remove the IPv4 address only
-                removeAddress(false);
-                // warning, this calls back into us with allowRebuildRouterInfo = false,
-                // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
-                if (allowRebuildRouterInfo)
-                    _context.router().rebuildRouterInfo();
-            }
+            removeExternalAddress(isIPv6, allowRebuildRouterInfo);
             return null;
         }
     }
@@ -2362,6 +2353,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _currentOurV6Address = ra;
         else
             _currentOurV4Address = ra;
+    }
+
+    /**
+     *  @since 0.9.43 pulled out of locked_rebuildExternalAddress
+     */
+    private void removeExternalAddress(boolean isIPv6, boolean allowRebuildRouterInfo) {
+        synchronized (_rebuildLock) {
+            if (getCurrentAddress(isIPv6) != null) {
+                // We must remove current address, otherwise the user will see
+                // "firewalled with inbound NTCP enabled" warning in console.
+                // Remove the v4/v6 address only
+                removeAddress(isIPv6);
+                // warning, this calls back into us with allowRebuildRouterInfo = false,
+                // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
+                if (allowRebuildRouterInfo)
+                    _context.router().rebuildRouterInfo();
+            }
+        }
     }
 
     /**
@@ -2885,8 +2894,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
 
             if (!_expireBuffer.isEmpty()) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Expiring " + _expireBuffer.size() + " peers");
+                if (_log.shouldDebug())
+                    _log.debug("Expiring " + _expireBuffer.size() + " peers");
                 for (PeerState peer : _expireBuffer) {
                     sendDestroy(peer);
                     dropPeer(peer, false, "idle too long");
@@ -3014,8 +3023,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // Always rebuild when the status changes, even if our address hasn't changed,
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.
-            // if (needsRebuild())
+            if (isIPv6) {
+                if (status == Status.IPV4_OK_IPV6_FIREWALLED ||
+                    status == Status.IPV4_UNKNOWN_IPV6_FIREWALLED ||
+                    status == Status.IPV4_DISABLED_IPV6_FIREWALLED) {
+                    removeExternalAddress(true, true);
+                }
+            } else {
                 rebuildExternalAddress();
+            }
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Status unchanged: " + _reachabilityStatus +

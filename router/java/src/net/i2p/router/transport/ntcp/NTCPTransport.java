@@ -1674,7 +1674,15 @@ public class NTCPTransport extends TransportImpl {
                 return false;
             }
         }
-        addNTCP2Options(newProps);
+
+        if (!isIPv6 || newProps.containsKey(RouterAddress.PROP_HOST) || getIPv6Config() == IPV6_ONLY) {
+            addNTCP2Options(newProps);
+        } else {
+            // IPv6
+            // We have an IPv4 address, IPv6 transitioned to firewalled,
+            // so just remove the v6 address
+            newAddr = null;
+        }
 
         // stopListening stops the pumper, readers, and writers, so required even if
         // oldAddr == null since startListening starts them all again

@@ -371,7 +371,8 @@ public abstract class TransportImpl implements Transport {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Took too long from preparation to afterSend(ok? " + sendSuccessful
                           + "): " + allTime + "ms/" + sendTime + "ms after failing on: "
-                          + msg.getFailedTransports() + " and succeeding on " + getStyle());
+                          + msg.getFailedTransports()
+                          + (sendSuccessful ? (" and succeeding on " + getStyle()) : ""));
             if ( (allTime > 60*1000) && (sendSuccessful) ) {
                 // VERY slow
                 if (_log.shouldLog(Log.WARN))
@@ -942,8 +943,8 @@ public abstract class TransportImpl implements Transport {
                 _wasUnreachableEntries.remove(peer);
             }
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer,
+        if (_log.shouldDebug())
+            _log.debug(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer,
                       yes ? new Exception() : null);
     }
 

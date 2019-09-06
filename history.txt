@@ -1,5 +1,19 @@
+2019-09-06 zzz
+ * Transports: Remove IPv6 addresses on transition to IPv6 firewalled
+
+2019-09-04 zzz
+ * SSU: Don't mark peer unreachable if it reports
+   we have a bad port (ticket #2467)
+ * SusiMail:
+   - Show "to" rather than "from" in sent and drafts folder (ticket #2571)
+   - Fix sort links going to wrong folder
+
 2019-09-03 zzz
+ * SSU: Fix IPv6 peer test not firing
  * Tunnels: Use context AES for hop processing
+ * Utils:
+   - Fix SAN verification for IPv6 hostnames
+   - Add Quad9 DoH servers
 
 2019-09-02 zzz
  * Unit test fixes
