@@ -2,8 +2,13 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
@@ -38,7 +43,23 @@ public class WebAppStarter {
 
     private static final Map<String, Long> warModTimes = new ConcurrentHashMap<String, Long>();
     static final Map<String, String> INIT_PARAMS = new HashMap<String, String>(4);
-    //static private Log _log;
+
+    // There are 4 additional jars that are required to do the Servlet 3.0 annotation scanning.
+    // The following 4 classes were the first to get thrown as not found, for each jar.
+    // So use them to see if we have the 4 jars.
+    // jetty-annotations.jar
+    private static final String CLASS_ANNOT = "org.eclipse.jetty.annotations.AnnotationConfiguration";
+    // jetty-plus.jar
+    private static final String CLASS_ANNOT2 = "org.eclipse.jetty.plus.annotation.LifeCycleCallback";
+    // asm.jar
+    private static final String CLASS_ANNOT3 = "org.objectweb.asm.Type";
+    // javax-annotations-api.jar
+    private static final String CLASS_ANNOT4 = "javax.annotation.security.RunAs";
+
+    private static final String CLASS_CONFIG = "org.eclipse.jetty.webapp.JettyWebXmlConfiguration";
+
+    private static final boolean HAS_ANNOTATION_CLASSES;
+    private static final Set<String> BUILTINS = new HashSet<String>(8);
 
     static {
         //_log = ContextHelper.getContext(null).logManager().getLog(WebAppStarter.class); ;
@@ -46,6 +67,20 @@ public class WebAppStarter {
         String pfx = "org.eclipse.jetty.servlet.Default.";
         INIT_PARAMS.put(pfx + "cacheControl", "max-age=86400");
         INIT_PARAMS.put(pfx + "dirAllowed", "false");
+
+        boolean found = false;
+        try {
+            Class<?> cls = Class.forName(CLASS_ANNOT, false, ClassLoader.getSystemClassLoader());
+            cls = Class.forName(CLASS_ANNOT2, false, ClassLoader.getSystemClassLoader());
+            cls = Class.forName(CLASS_ANNOT3, false, ClassLoader.getSystemClassLoader());
+            cls = Class.forName(CLASS_ANNOT4, false, ClassLoader.getSystemClassLoader());
+            found = true;
+        } catch (Exception e) {}
+        HAS_ANNOTATION_CLASSES = found;
+
+        // don't scan these wars
+        BUILTINS.addAll(Arrays.asList(new String[] {"i2psnark", "i2ptunnel", "imagegen", "jsonrpc",
+                                                    "routerconsole", "susidns", "susimail"} ));
     }
 
 
@@ -115,20 +150,31 @@ public class WebAppStarter {
         tmpdir.mkdir();
         wac.setTempDirectory(tmpdir);
         // all the JSPs are precompiled, no need to extract
-        wac.setExtractWAR(false);
+        // UNLESS it's a plugin and we want to scan it for annotations.
+        // We do not use Servlet 3.0 for any built-in wars.
+        // Jetty bug - annotation scanning fails unless we extract the war:
+        // org.eclipse.jetty.server.Server: Skipping scan on invalid file jar:file:/home/.../i2p/webapps/routerconsole.war!/WEB-INF/classes/net/i2p/router/web/servlets/CodedIconRendererServlet.class
+        // See AnnotationParser.isValidClassFileName()
+        // Server must be at DEBUG level to see what's happening
+        boolean scanAnnotations = HAS_ANNOTATION_CLASSES && !BUILTINS.contains(appName);
+        System.out.println("Scanning " + appName + " for annotations? " + scanAnnotations);
+        wac.setExtractWAR(scanAnnotations);
 
         // this does the passwords...
         RouterConsoleRunner.initialize(ctx, wac);
-        setWebAppConfiguration(wac);
+        setWebAppConfiguration(wac, scanAnnotations);
         server.addHandler(wac);
         server.mapContexts();
         return wac;
     }
 
     /**
+     *  @param scanAnnotations Should we check for Servlet 3.0 annotations?
+     *                         The war MUST be set to extract (due to Jetty bug),
+     *                         and annotation classes MUST be available
      *  @since Jetty 9
      */
-    static void setWebAppConfiguration(WebAppContext wac) {
+    static void setWebAppConfiguration(WebAppContext wac, boolean scanAnnotations) {
         // see WebAppConfiguration for info
         String[] classNames = wac.getConfigurationClasses();
         // In Jetty 9, it doesn't set the defaults if we've already added one, but the
@@ -138,14 +184,24 @@ public class WebAppStarter {
         // See WebAppContext.loadConfigurations() in source
         if (classNames.length == 0)
             classNames = wac.getDefaultConfigurationClasses();
-        String[] newClassNames = new String[classNames.length + 1];
-        for (int j = 0; j < classNames.length; j++) {
-             newClassNames[j] = classNames[j];
+        List<String> newClassNames = new ArrayList<String>(Arrays.asList(classNames));
+        for (String name : newClassNames) {
              // fix for Jetty 9.4 ticket #2385
-             wac.prependServerClass("-" + classNames[j]);
+             wac.prependServerClass("-" + name);
         }
-        newClassNames[classNames.length] = WebAppConfiguration.class.getName();
-        wac.setConfigurationClasses(newClassNames);
+        // https://www.eclipse.org/jetty/documentation/current/using-annotations.html
+        // https://www.eclipse.org/jetty/documentation/9.4.x/using-annotations-embedded.html
+        if (scanAnnotations) {
+            if (!newClassNames.contains(CLASS_ANNOT)) {
+                int idx = newClassNames.indexOf(CLASS_CONFIG);
+                if (idx >= 0)
+                    newClassNames.add(idx, CLASS_ANNOT);
+                else
+                    newClassNames.add(CLASS_ANNOT);
+            }
+        }
+        newClassNames.add(WebAppConfiguration.class.getName());
+        wac.setConfigurationClasses(newClassNames.toArray(new String[newClassNames.size()]));
     }
 
     /**

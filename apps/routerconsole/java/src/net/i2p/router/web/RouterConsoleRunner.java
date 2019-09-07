@@ -717,7 +717,7 @@ public class RouterConsoleRunner implements RouterApp {
             }
             WebAppContext wac = (WebAppContext)(rootWebApp.getHandler());
             initialize(_context, wac);
-            WebAppStarter.setWebAppConfiguration(wac);
+            WebAppStarter.setWebAppConfiguration(wac, false);
             chColl.addHandler(rootWebApp);
 
         } catch (Exception ioe) {
