@@ -26,8 +26,6 @@ import net.i2p.util.Log;
  *
  * PRELIMINARY - Subject to change - see proposal 123
  *
- * Per-client auth TODO
- *
  * @since 0.9.38
  */
 public class EncryptedLeaseSet extends LeaseSet2 {
@@ -499,7 +497,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
                     off += ID_LEN;
                     ChaCha20.encrypt(clientKey, clientIVandID, authcookie, 0, ciphertext, off, authcookie.length);
                     if (_log.shouldDebug()) {
-                        _log.debug("Added client ID/enc.cookie:\n" +
+                        _log.debug("DH: Added client ID/enc.cookie:\n" +
                                    net.i2p.util.HexDump.dump(clientIVandID, IV_LEN, ID_LEN) +
                                    net.i2p.util.HexDump.dump(ciphertext, off, COOKIE_LEN) +
                                    "for client key:\n" +
@@ -519,7 +517,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
                 byte[] clientIVandID = new byte[32];
                 for (SimpleDataStructure sds : clientKeys) {
                     if (!(sds instanceof PrivateKey))
-                        throw new IllegalArgumentException("Bad DH client key type: " + sds);
+                        throw new IllegalArgumentException("Bad PSK client key type: " + sds);
                     PrivateKey csk = (PrivateKey) sds;
                     if (csk.getType() != EncType.ECIES_X25519)
                         throw new IllegalArgumentException("Bad PSK client key type: " + csk);
@@ -532,7 +530,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
                     off += ID_LEN;
                     ChaCha20.encrypt(clientKey, clientIVandID, authcookie, 0, ciphertext, off, authcookie.length);
                     if (_log.shouldDebug()) {
-                        _log.debug("Added client key:\n" +
+                        _log.debug("PSK: Added client key:\n" +
                                    net.i2p.util.HexDump.dump(clientKey) +
                                    "client IV:\n:" +
                                    net.i2p.util.HexDump.dump(clientIVandID, 0, IV_LEN) +
@@ -643,7 +641,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
                 throw new DataFormatException("No client entries");
             authLen = 1 + SALT_LEN + 2 + (count * CLIENT_LEN);
             if (_log.shouldDebug()) {
-                 _log.debug("Found " + count + " client entries, authsalt is:\n" +
+                 _log.debug("Auth type " + authType + ", found " + count + " client entries, authsalt is:\n" +
                             net.i2p.util.HexDump.dump(seed));
             }
             byte[] clientKey = new byte[32];
