@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -114,10 +115,7 @@ public class DataHelper {
      */
     private static final DateFormat DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);
     private static final DateFormat TIME_FORMAT = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-    static {
-        DATE_FORMAT.setTimeZone(SystemVersion.getSystemTimeZone());
-        TIME_FORMAT.setTimeZone(SystemVersion.getSystemTimeZone());
-    }
+    private static boolean _date_tz_set, _time_tz_set;
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -526,7 +524,7 @@ public class DataHelper {
             fos = new SecureFileOutputStream(tmpFile);
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
-            out.println("# Last saved: " + new Date(System.currentTimeMillis()));
+            out.println("# Last saved: " + formatTime(System.currentTimeMillis()));
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
@@ -1631,6 +1629,12 @@ public class DataHelper {
      */
     public static String formatDate(long now) {
         synchronized(DATE_FORMAT) {
+            if (!_date_tz_set) {
+                // delayed set, too early if done in static block
+                TimeZone tz = SystemVersion.getSystemTimeZone();
+                DATE_FORMAT.setTimeZone(tz);
+                _date_tz_set = true;
+            }
             return DATE_FORMAT.format(new Date(now));
         }
     }
@@ -1645,6 +1649,12 @@ public class DataHelper {
      */
     public static String formatTime(long now) {
         synchronized(TIME_FORMAT) {
+            if (!_time_tz_set) {
+                // delayed set, too early if done in static block
+                TimeZone tz = SystemVersion.getSystemTimeZone();
+                TIME_FORMAT.setTimeZone(tz);
+                _time_tz_set = true;
+            }
             return TIME_FORMAT.format(new Date(now));
         }
     }
