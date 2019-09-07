@@ -1,3 +1,7 @@
+2019-09-07 zzz
+ * Console: Fix first row of version info not selectable (ticket #2615)
+ * Transport: Detect IPv6 address changes
+
 2019-09-06 zzz
  * Transports: Remove IPv6 addresses on transition to IPv6 firewalled
 

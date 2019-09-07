@@ -243,6 +243,8 @@ public class TransportManager implements TransportEventListener {
             return;
         // non-local (unless test mode), don't include loopback, include IPv6
         Set<String> ipset = Addresses.getAddresses(_context.getBooleanProperty("i2np.allowLocal"), false, true);
+        String lastv4 = _context.getProperty(UDPTransport.PROP_IP);
+        String lastv6 = _context.getProperty(UDPTransport.PROP_IPV6);
         //
         // Avoid IPv6 temporary addresses if we have a non-temporary one
         //
@@ -260,15 +262,20 @@ public class TransportManager implements TransportEventListener {
                     //        _log.warn("Not binding to deprecated temporary address " + bt);
                     //    continue;
                     //}
-                    if (Addresses.isTemporary(v6addr)) {
+                    if (Addresses.isTemporary(v6addr) && !ips.equals(lastv6)) {
                         // Save temporary addresses
-                        // we only use these if we don't have a non-temporary adress
+                        // we only use these if we don't have a non-temporary address,
+                        // unless it's the last IP we used
                         tempV6Addresses.add(v6addr);
                         continue;
                     }
                     hasNonTempV6Address = true;
                 }
-                addresses.add(addr);
+                // put previously used addresses at the front of the list
+                if (ips.equals(lastv4) || ips.equals(lastv6))
+                    addresses.add(0, addr);
+                else
+                    addresses.add(addr);
             } catch (UnknownHostException e) {
                 _log.error("UDP failed to bind to local address", e);
             }
@@ -286,8 +293,20 @@ public class TransportManager implements TransportEventListener {
             }
         }
         for (Transport t : ts) {
+            // the transports really don't like being called with more than one of each
+            boolean hasv4 = false;
+            boolean hasv6 = false;
             for (InetAddress ia : addresses) {
                 byte[] ip = ia.getAddress();
+                if (ip.length == 4) {
+                    if (hasv4)
+                        continue;
+                    hasv4 = true;
+                } else {
+                    if (hasv6)
+                        continue;
+                    hasv6 = true;
+                }
                 t.externalAddressReceived(SOURCE_INTERFACE, ip, 0);
             }
         }

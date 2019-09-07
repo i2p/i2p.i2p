@@ -262,7 +262,8 @@ public abstract class TransportImpl implements Transport {
             // Bail out now as it will NPE in a dozen places below.
             return;
         }
-        boolean log = false;
+        //boolean log = false;
+        final boolean debug = _log.shouldDebug();
         if (sendSuccessful)
             msg.timestamp("afterSend(successful)");
         else
@@ -272,7 +273,7 @@ public abstract class TransportImpl implements Transport {
             msg.transportFailed(getStyle());
 
         if (msToSend > 1500) {
-            if (_log.shouldDebug())
+            if (debug)
                 _log.debug(getStyle() + " afterSend slow: " + (sendSuccessful ? "success " : "FAIL ")
                           + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + ' ' + msg.getMessageId() + " to "
@@ -292,7 +293,7 @@ public abstract class TransportImpl implements Transport {
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + ": " + msg.toString());
         } else {
-            if (_log.shouldDebug())
+            if (debug)
                 _log.debug(getStyle() + " afterSend: " + (sendSuccessful ? "success " : "FAIL ")
                           + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
@@ -300,16 +301,16 @@ public abstract class TransportImpl implements Transport {
         }
 
         if (sendSuccessful) {
-            if (_log.shouldLog(Log.DEBUG))
+            if (debug)
                 _log.debug(getStyle() + " Sent " + msg.getMessageType() + " successfully to "
                            + msg.getTarget().getIdentity().getHash().toBase64());
             Job j = msg.getOnSendJob();
             if (j != null)
                 _context.jobQueue().addJob(j);
-            log = true;
+            //log = true;
             msg.discardData();
         } else {
-            if (_log.shouldDebug())
+            if (debug)
                 _log.debug(getStyle() + " Failed to send " + msg.getMessageType()
                           + " to " + msg.getTarget().getIdentity().getHash().toBase64()
                           + " (details: " + msg + ')');
@@ -323,8 +324,8 @@ public abstract class TransportImpl implements Transport {
                     _context.outNetMessagePool().add(msg);
                     // don't discard the data yet!
                 } else {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("No more time left (" + new Date(msg.getExpiration())
+                    if (debug)
+                        _log.debug("No more time left (" + new Date(msg.getExpiration())
                                   + ", expiring without sending successfully the "
                                   + msg.getMessageType());
                     if (msg.getOnFailedSendJob() != null)
@@ -333,13 +334,13 @@ public abstract class TransportImpl implements Transport {
                     if (selector != null) {
                         _context.messageRegistry().unregisterPending(msg);
                     }
-                    log = true;
+                    //log = true;
                     msg.discardData();
                 }
             } else {
                 MessageSelector selector = msg.getReplySelector();
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Failed and no requeue allowed for a "
+                if (debug)
+                    _log.debug("Failed and no requeue allowed for a "
                               + msg.getMessageSize() + " byte "
                               + msg.getMessageType() + " message with selector " + selector, new Exception("fail cause"));
                 if (msg.getOnFailedSendJob() != null)
@@ -348,28 +349,28 @@ public abstract class TransportImpl implements Transport {
                     _context.jobQueue().addJob(msg.getOnFailedReplyJob());
                 if (selector != null)
                     _context.messageRegistry().unregisterPending(msg);
-                log = true;
+                //log = true;
                 msg.discardData();
             }
         }
 
+/****
         if (log) {
-            /*
             String type = msg.getMessageType();
             // the udp transport logs some further details
             _context.messageHistory().sendMessage(type, msg.getMessageId(),
                                                   msg.getExpiration(),
                                                   msg.getTarget().getIdentity().getHash(),
                                                   sendSuccessful);
-             */
         }
+****/
 
         long now = _context.clock().now();
         long sendTime = now - msg.getSendBegin();
         long allTime = now - msg.getCreated();
         if (allTime > 5*1000) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Took too long from preparation to afterSend(ok? " + sendSuccessful
+            if (debug)
+                _log.debug("Took too long from preparation to afterSend(ok? " + sendSuccessful
                           + "): " + allTime + "ms/" + sendTime + "ms after failing on: "
                           + msg.getFailedTransports()
                           + (sendSuccessful ? (" and succeeding on " + getStyle()) : ""));
