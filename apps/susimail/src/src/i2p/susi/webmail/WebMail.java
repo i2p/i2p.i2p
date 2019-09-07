@@ -3502,6 +3502,8 @@ public class WebMail extends HttpServlet
 
 	/**
 	 *  TODO this is addresses only, we don't save the full line in Mail
+	 *
+	 *  @param to non-null
 	 *  @since 0.9.33
 	 */
 	private static String buildRecipientLine(String[] to) {

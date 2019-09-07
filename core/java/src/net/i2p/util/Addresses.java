@@ -304,7 +304,7 @@ public abstract class Addresses {
     /**
      *  Convenience method to convert an IP address and port to a String
      *  without throwing an exception.
-     *  @return "ip:port"
+     *  @return "ipv4:port" or "[ipv6]:port"
      *  @since 0.8.12
      */
     public static String toString(byte[] addr, int port) {
