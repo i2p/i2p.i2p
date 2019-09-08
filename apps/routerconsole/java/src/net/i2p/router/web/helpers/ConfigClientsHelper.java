@@ -258,7 +258,8 @@ public class ConfigClientsHelper extends HelperBase {
            .append(_t("Control")).append("</th><th align=\"left\">")
            .append(_t("Description")).append("</th></tr>\n");
         Properties props = PluginStarter.pluginProperties();
-        Set<String> keys = new TreeSet<String>(props.stringPropertyNames());
+        Set<String> keys = new TreeSet<String>(Collator.getInstance());
+        keys.addAll(props.stringPropertyNames());
         for (String name : keys) {
             if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
