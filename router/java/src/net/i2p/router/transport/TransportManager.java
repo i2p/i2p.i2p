@@ -245,31 +245,38 @@ public class TransportManager implements TransportEventListener {
         Set<String> ipset = Addresses.getAddresses(_context.getBooleanProperty("i2np.allowLocal"), false, true);
         String lastv4 = _context.getProperty(UDPTransport.PROP_IP);
         String lastv6 = _context.getProperty(UDPTransport.PROP_IPV6);
+        boolean preferTemp = _context.getBooleanProperty(UDPTransport.PROP_LAPTOP_MODE);
         //
-        // Avoid IPv6 temporary addresses if we have a non-temporary one
+        // Avoid IPv6 temporary addresses if we have a non-temporary one,
+        // unless laptop mode
         //
-        boolean hasNonTempV6Address = false;
+        boolean hasPreferredV6Address = false;
         List<InetAddress> addresses = new ArrayList<InetAddress>(4);
-        List<Inet6Address> tempV6Addresses = new ArrayList<Inet6Address>(4);
+        List<Inet6Address> nonPreferredV6Addresses = new ArrayList<Inet6Address>(4);
         for (String ips : ipset) {
             try {
                 InetAddress addr = InetAddress.getByName(ips);
                 if (ips.contains(":") && (addr instanceof Inet6Address)) {
                     Inet6Address v6addr = (Inet6Address) addr;
                     // getAddresses(false, true) will not return deprecated addresses
-                    //if (Addresses.isDeprecated(v6addr)) {
-                    //    if (_log.shouldWarn())
-                    //        _log.warn("Not binding to deprecated temporary address " + bt);
-                    //    continue;
-                    //}
-                    if (Addresses.isTemporary(v6addr) && !ips.equals(lastv6)) {
-                        // Save temporary addresses
-                        // we only use these if we don't have a non-temporary address,
-                        // unless it's the last IP we used
-                        tempV6Addresses.add(v6addr);
-                        continue;
+                    boolean isTemp = Addresses.isTemporary(v6addr);
+                    if (preferTemp) {
+                        if (!isTemp) {
+                            // Save permanent addresses
+                            // we only use these if we don't have a temporary address,
+                            nonPreferredV6Addresses.add(v6addr);
+                            continue;
+                        }
+                    } else {
+                        if (isTemp && !ips.equals(lastv6)) {
+                            // Save temporary addresses
+                            // we only use these if we don't have a permanent address,
+                            // unless it's the last IP we used
+                            nonPreferredV6Addresses.add(v6addr);
+                            continue;
+                        }
                     }
-                    hasNonTempV6Address = true;
+                    hasPreferredV6Address = true;
                 }
                 // put previously used addresses at the front of the list
                 if (ips.equals(lastv4) || ips.equals(lastv6))
@@ -280,16 +287,21 @@ public class TransportManager implements TransportEventListener {
                 _log.error("UDP failed to bind to local address", e);
             }
         }
-        // we only use these if we don't have a non-temporary adress
-        if (!tempV6Addresses.isEmpty()) {
-            if (hasNonTempV6Address) {
+        // we only use these if we don't have a preferred adress
+        if (!nonPreferredV6Addresses.isEmpty()) {
+            if (hasPreferredV6Address) {
                 if (_log.shouldWarn()) {
-                    for (Inet6Address addr : tempV6Addresses) {
-                        _log.warn("Not binding to temporary address " + addr.getHostAddress());
+                    for (Inet6Address addr : nonPreferredV6Addresses) {
+                        _log.warn("Not binding to address " + addr.getHostAddress());
                     }
                 }
             } else {
-                addresses.addAll(tempV6Addresses);
+                addresses.addAll(nonPreferredV6Addresses);
+            }
+        }
+        if (_log.shouldWarn()) {
+            for (InetAddress ia : addresses) {
+                _log.warn("Transport address: " + ia.getHostAddress());
             }
         }
         for (Transport t : ts) {
