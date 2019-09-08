@@ -171,6 +171,9 @@ public class GeoIP {
                 String lastIP = _context.getProperty(UDPTransport.PROP_IP);
                 if (lastIP != null)
                     add(lastIP);
+                lastIP = _context.getProperty(UDPTransport.PROP_IPV6);
+                if (lastIP != null)
+                    add(lastIP);
                 // IPv4
                 Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
                 _pendingSearch.clear();
@@ -512,8 +515,14 @@ public class GeoIP {
             }
             if (country == null) {
                 String lastIP = _context.getProperty(UDPTransport.PROP_IP);
-                if (lastIP != null)
+                if (lastIP != null) {
                     country = get(lastIP);
+                    if (country == null) {
+                        lastIP = _context.getProperty(UDPTransport.PROP_IPV6);
+                        if (lastIP != null)
+                            country = get(lastIP);
+                    }
+                }
             }
         }
         if (_log.shouldInfo())
