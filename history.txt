@@ -1,6 +1,14 @@
+2019-09-08 zzz
+ * Transport:
+   - Don't automatically transition from firewalled
+     to non-firewalled when IPv6 address changes
+   - Prefer temporary IPv6 addresses when in laptop mode
+   - Also use saved IPv6 address for local router GeoIP lookup
+
 2019-09-07 zzz
  * Console: Fix first row of version info not selectable (ticket #2615)
- * Transport: Detect IPv6 address changes
+ * Jetty: Support annotation scanning of plugins for Servlet 3.0 @WebServlet
+ * Transport: Detect IPv6 address changes (ticket #2175)
 
 2019-09-06 zzz
  * Transports: Remove IPv6 addresses on transition to IPv6 firewalled

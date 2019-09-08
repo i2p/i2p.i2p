@@ -1040,6 +1040,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
                 if (ourPort > 0 &&
                     !eq(externalListenHost, externalListenPort, ourIP, ourPort)) {
+                    boolean rebuild = true;
                     if (isIPv6) {
                         // For IPv6, we only accept changes if this is one of our local addresses
                         Set<String> ipset = Addresses.getAddresses(false, true);
@@ -1049,6 +1050,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                 _log.info("New IPv6 address received but not one of our local addresses: " + ipstr, new Exception());
                             return false;
                         }
+                        if (_reachabilityStatus == Status.IPV4_OK_IPV6_FIREWALLED ||
+                            _reachabilityStatus == Status.IPV4_UNKNOWN_IPV6_FIREWALLED ||
+                            _reachabilityStatus == Status.IPV4_DISABLED_IPV6_FIREWALLED ||
+                            _reachabilityStatus == Status.DIFFERENT ||
+                            _reachabilityStatus == Status.REJECT_UNSOLICITED) {
+                            // If we were firewalled before, let's assume we're still firewalled.
+                            // Save the new IP and fire a test
+                            String oldIP = _context.getProperty(PROP_IPV6);
+                            String newIP = Addresses.toString(ourIP);
+                            if (!newIP.equals(oldIP)) {
+                                Map<String, String> changes = new HashMap<String, String>(1);
+                                changes.put(PROP_IPV6, newIP);
+                                _context.router().saveConfig(changes, null);
+                                if (oldIP != null) {
+                                    _context.router().eventLog().addEvent(EventLog.CHANGE_IP, newIP);
+                                }
+                            }
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("New IPv6 address, assuming still firewalled " +
+                                          Addresses.toString(ourIP, ourPort));
+                            rebuild = false;
+                            fireTest = true;
+                        }
                     }
 
                     // This prevents us from changing our IP when we are not firewalled
@@ -1056,11 +1080,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     //     (_externalListenHost == null) || (_externalListenPort <= 0) ||
                     //     (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
+                    if (rebuild) {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Trying to change our external address to " +
                                           Addresses.toString(ourIP, ourPort));
                             RouterAddress newAddr = rebuildExternalAddress(ourIP, ourPort, true);
                             updated = newAddr != null;
+                    }
+
                     //} else {
                     //    // they told us something different, but our tests are recent and positive,
                     //    // so lets test again
@@ -1076,7 +1103,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
 
         if (fireTest) {
-            // always false, commented out above
             _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1);
             _testEvent.forceRunImmediately(isIPv6);
         } else if (updated) {
