@@ -615,9 +615,7 @@ class SummaryBarRenderer {
 
     public String renderRestartStatusHTML() {
         if (_helper == null) return "";
-        StringBuilder buf = new StringBuilder(512);
-        buf.append(_helper.getRestartStatus());
-        return buf.toString();
+        return _helper.getRestartStatus();
     }
 
     public String renderPeersHTML() {
@@ -770,9 +768,7 @@ class SummaryBarRenderer {
 
     public String renderFirewallAndReseedStatusHTML() {
         if (_helper == null) return "";
-        StringBuilder buf = new StringBuilder(512);
-        buf.append(_helper.getFirewallAndReseedStatus());
-        return buf.toString();
+        return _helper.getFirewallAndReseedStatus();
     }
 
     public String renderBandwidthHTML() {
@@ -948,9 +944,7 @@ class SummaryBarRenderer {
 
     public String renderDestinationsHTML() {
         if (_helper == null) return "";
-        StringBuilder buf = new StringBuilder(512);
-        buf.append(_helper.getDestinations());
-        return buf.toString();
+        return _helper.getDestinations();
     }
 
     /** @since 0.9.1 */
