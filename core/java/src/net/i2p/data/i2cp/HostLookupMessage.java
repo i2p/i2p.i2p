@@ -163,7 +163,7 @@ public class HostLookupMessage extends I2CPMessageImpl {
             _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 4, _reqID);
             DataHelper.writeLong(os, 4, _timeout);
-            DataHelper.writeLong(os, 1, _lookupType);
+            os.write((byte) _lookupType);
             if (_lookupType == LOOKUP_HASH) {
                 _hash.writeBytes(os);
             } else {

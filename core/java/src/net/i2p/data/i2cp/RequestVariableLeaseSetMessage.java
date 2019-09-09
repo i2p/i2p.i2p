@@ -112,7 +112,7 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
         ByteArrayOutputStream os = new ByteArrayOutputStream(256);
         try {
             _sessionId.writeBytes(os);
-            DataHelper.writeLong(os, 1, _endpoints.size());
+            os.write((byte) _endpoints.size());
             for (int i = 0; i < _endpoints.size(); i++) {
                 _endpoints.get(i).writeBytes(os);
             }

@@ -85,7 +85,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         ByteArrayOutputStream os = new ByteArrayOutputStream(64);
         try {
             _sessionId.writeBytes(os);
-            DataHelper.writeLong(os, 1, _status);
+            os.write((byte) _status);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Error writing out the message data", dfe);
         }

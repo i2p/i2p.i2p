@@ -139,7 +139,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
         try {
             _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 4, _reqID);
-            DataHelper.writeLong(os, 1, _code);
+            os.write((byte) _code);
             if (_code == RESULT_SUCCESS)
                 _dest.writeBytes(os);
         } catch (DataFormatException dfe) {
