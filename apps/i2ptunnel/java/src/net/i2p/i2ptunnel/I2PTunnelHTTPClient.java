@@ -24,12 +24,15 @@ import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.I2PSession;
+import net.i2p.client.LookupResult;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.crypto.Blinding;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
+import net.i2p.data.BlindData;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -1231,7 +1234,25 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } else if (len >= 64) {
                         if (_log.shouldInfo())
                             _log.info("lookup b33 in-session " + destination);
-                        clientDest = sess.lookupDest(destination, 20*1000);
+                        try {
+                            BlindData bd = Blinding.decode(_context, destination);
+                            if (_log.shouldWarn())
+                                _log.warn("Resolved b33 " + bd);
+                            // TESTING
+                            //sess.sendBlindingInfo(bd, 24*60*60*1000);
+                        } catch (IllegalArgumentException iae) {
+                            if (_log.shouldWarn())
+                                _log.warn("Unable to resolve b33 " + destination, iae);
+                            // TODO new error page
+                        }
+                        LookupResult lresult = sess.lookupDest2(destination, 20*1000);
+                        clientDest = lresult.getDestination();
+                        int code = lresult.getResultCode();
+                        if (code != 0) {
+                            if (_log.shouldWarn())
+                                _log.warn("Unable to resolve b33 " + destination + " error code " + code);
+                            // TODO new form
+                        }
                     } else {
                         // 61-63 chars, this won't work
                         clientDest = _context.namingService().lookup(destination);

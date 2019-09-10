@@ -278,6 +278,7 @@ public class BlindData {
         buf.append("[BlindData: ");
         buf.append("\n\tSigningPublicKey: ").append(_clearSPK);
         buf.append("\n\tAlpha           : ").append(_alpha);
+        buf.append("\n\tAlpha valid for : ").append((new Date(_date)).toString());
         buf.append("\n\tBlindedPublicKey: ").append(_blindSPK);
         buf.append("\n\tBlinded Hash    : ").append(_blindHash);
         if (_secret != null)
@@ -298,7 +299,12 @@ public class BlindData {
         else
             buf.append("\n\tDestination     : unknown");
         buf.append("\n\tB32             : ").append(toBase32());
-        buf.append("\n\tCreated         : ").append((new Date(_date)).toString());
+        if (!_authRequired)
+            buf.append("\n\t  + auth        : ").append(Blinding.encode(_clearSPK, _secretRequired, true));
+        if (!_secretRequired)
+            buf.append("\n\t  + secret      : ").append(Blinding.encode(_clearSPK, true, _authRequired));
+        if (!(_authRequired || _secretRequired))
+            buf.append("\n\t  + auth,secret : ").append(Blinding.encode(_clearSPK, true, true));
         buf.append(']');
         return buf.toString();
     }

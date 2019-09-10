@@ -93,6 +93,7 @@ class LookupDestJob extends JobImpl {
                             SigningPublicKey spk = bd.getUnblindedPubKey();
                             BlindData bd2 = getContext().netDb().getBlindData(spk);
                             if (bd2 != null) {
+                                // BlindData from database may have privkey or secret
                                 bd = bd2;
                             } else {
                                 getContext().netDb().setBlindData(bd);
@@ -132,6 +133,20 @@ class LookupDestJob extends JobImpl {
                 returnDest(d);
                 return;
             }
+            boolean fail1 = _blindData.getAuthRequired() && _blindData.getAuthPrivKey() == null;
+            boolean fail2 = _blindData.getSecretRequired() && _blindData.getSecret() == null;
+            if (fail1 || fail2) {
+                int code;
+                if (fail1 && fail2)
+                    code = HostReplyMessage.RESULT_SECRET_AND_KEY_REQUIRED;
+                else if (fail1)
+                    code = HostReplyMessage.RESULT_KEY_REQUIRED;
+                else
+                    code = HostReplyMessage.RESULT_SECRET_REQUIRED;
+                if (_log.shouldDebug())
+                    _log.debug("Failed b33 lookup " + _name + " with code " + code);
+                returnFail(code);
+            }
         }
         if (_name != null) {
             // inline, ignore timeout
@@ -151,7 +166,7 @@ class LookupDestJob extends JobImpl {
             getContext().netDb().lookupDestination(_hash, done, _timeout, _fromLocalDest);
         } else {
             // blinding decode fail
-            returnFail();
+            returnFail(HostReplyMessage.RESULT_DECRYPTION_FAILURE);
         }
     }
 
@@ -198,13 +213,22 @@ class LookupDestJob extends JobImpl {
     }
 
     /**
-     *  Return the failed hash so the client can correlate replies with requests
+     *  Return the request ID or failed hash so the client can correlate replies with requests
      *  @since 0.8.3
      */
     private void returnFail() {
+        returnFail(HostReplyMessage.RESULT_FAILURE);
+    }
+
+    /**
+     *  Return the request ID or failed hash so the client can correlate replies with requests
+     *  @param code failure code, greater than zero, only used for HostReplyMessage
+     *  @since 0.9.43
+     */
+    private void returnFail(int code) {
         I2CPMessage msg;
         if (_reqID >= 0)
-            msg = new HostReplyMessage(_sessID, HostReplyMessage.RESULT_FAILURE, _reqID);
+            msg = new HostReplyMessage(_sessID, code, _reqID);
         else if (_hash != null)
             msg = new DestReplyMessage(_hash);
         else

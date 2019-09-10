@@ -15,6 +15,7 @@ import net.i2p.CoreVersion;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.BlindData;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -25,7 +26,9 @@ import net.i2p.data.LeaseSet2;
 import net.i2p.data.Payload;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
+import net.i2p.data.i2cp.BlindingInfoMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateLeaseSet2Message;
 import net.i2p.data.i2cp.CreateSessionMessage;
@@ -151,6 +154,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 break;
             case GetBandwidthLimitsMessage.MESSAGE_TYPE:
                 handleGetBWLimits((GetBandwidthLimitsMessage)message);
+                break;
+            case BlindingInfoMessage.MESSAGE_TYPE:
+                handleBlindingInfo((BlindingInfoMessage)message);
                 break;
             default:
                 if (_log.shouldLog(Log.ERROR))
@@ -774,6 +780,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * Divide router limit by 1.75 for overhead.
      * This could someday give a different answer to each client.
      * But it's not enforced anywhere.
+     *
+     * protected for unit test override
      */
     protected void handleGetBWLimits(GetBandwidthLimitsMessage message) {
         if (_log.shouldLog(Log.INFO))
@@ -789,4 +797,41 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         }
     }
 
+    /**
+     *
+     * @since 0.9.43
+     */
+    private void handleBlindingInfo(BlindingInfoMessage message) {
+        if (_log.shouldInfo())
+            _log.info("Got Blinding info");
+        BlindData bd = message.getBlindData();
+        SigningPublicKey spk = bd.getUnblindedPubKey();
+        if (spk == null || bd == null) {
+            // hash or hostname lookup? don't support for now
+            if (_log.shouldWarn())
+                _log.warn("Unsupported BlindingInfo type: " + message);
+            return;
+        }
+        BlindData obd = _context.netDb().getBlindData(spk);
+        if (obd == null) {
+            _context.netDb().setBlindData(bd);
+            if (_log.shouldWarn())
+                _log.warn("New: " + bd);
+        } else {
+            // update if changed
+            PrivateKey okey = obd.getAuthPrivKey();
+            PrivateKey nkey = bd.getAuthPrivKey();
+            String osec = obd.getSecret();
+            String nsec = bd.getSecret();
+            if ((nkey != null && !nkey.equals(okey)) ||
+                (nsec != null && !nsec.equals(osec))) {
+                _context.netDb().setBlindData(bd);
+                if (_log.shouldWarn())
+                    _log.warn("Updated: " + bd);
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("No change: " + obd);
+            }
+        }
+    }
 }

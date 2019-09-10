@@ -1,3 +1,6 @@
+2019-09-10 zzz
+ * I2CP: New Blinding Info message (proposal 123)
+
 2019-09-08 zzz
  * Transport:
    - Don't automatically transition from firewalled

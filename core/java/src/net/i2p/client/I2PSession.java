@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.data.BlindData;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
@@ -410,6 +411,17 @@ public interface I2PSession {
     public Destination lookupDest(String name, long maxWait) throws I2PSessionException;
 
     /**
+     *  Ask the router to lookup a Destination by host name.
+     *  Blocking. See above for details.
+     *  Same as lookupDest() but with a failure code in the return value
+     *
+     *  @param maxWait ms
+     *  @since 0.9.43
+     *  @return non-null
+     */
+    public LookupResult lookupDest2(String name, long maxWait) throws I2PSessionException;
+
+    /**
      *  Pass updated options to the router.
      *  Does not remove properties previously present but missing from this options parameter.
      *  Fails silently if session is not connected.
@@ -424,6 +436,13 @@ public interface I2PSession {
      * @since 0.8.3
      */
     public int[] bandwidthLimits() throws I2PSessionException;
+
+    /**
+     *
+     *  @param expiration ms from now, 0 means forever
+     *  @since 0.9.43
+     */
+    public void sendBlindingInfo(BlindData bd, int expiration) throws I2PSessionException;
 
     /**
      *  Listen on specified protocol and port.

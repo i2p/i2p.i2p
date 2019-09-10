@@ -263,8 +263,8 @@ class SubSession extends I2PSessionMuxedImpl {
      *  on reception of HostReplyMessage
      */
     @Override
-    void destLookupFailed(long nonce) {
-        _primary.destLookupFailed(nonce);
+    void destLookupFailed(long nonce, int code) {
+        _primary.destLookupFailed(nonce, code);
     }
 
     /**

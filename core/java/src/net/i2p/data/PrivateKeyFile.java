@@ -845,9 +845,9 @@ public class PrivateKeyFile {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(128);
-        s.append("Dest: ");
+        s.append("Destination: ");
         s.append(this.dest != null ? this.dest.toBase64() : "null");
-        s.append("\nB32: ");
+        s.append("\nB32        : ");
         s.append(this.dest != null ? this.dest.toBase32() : "null");
         if (dest != null) {
             SigningPublicKey spk = dest.getSigningPublicKey();
@@ -856,6 +856,9 @@ public class PrivateKeyFile {
                 type == SigType.RedDSA_SHA512_Ed25519) {
                 I2PAppContext ctx = I2PAppContext.getGlobalContext();
                 s.append("\nBlinded B32: ").append(Blinding.encode(spk));
+                s.append("\n + auth key: ").append(Blinding.encode(spk, false, true));
+                s.append("\n + password: ").append(Blinding.encode(spk, true, false));
+                s.append("\n + auth/pw : ").append(Blinding.encode(spk, true, true));
             }
         }
         s.append("\nContains: ");

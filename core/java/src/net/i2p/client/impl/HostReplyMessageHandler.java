@@ -32,7 +32,7 @@ class HostReplyMessageHandler extends HandlerImpl {
         if (d != null) {
             session.destReceived(id, d);
         } else {
-            session.destLookupFailed(id);
+            session.destLookupFailed(id, msg.getResultCode());
         }
     }
 }

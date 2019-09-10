@@ -199,6 +199,7 @@ public final class Blinding {
      *  See proposal 149.
      *
      *  @param address ending with ".b32.i2p"
+     *  @return BlindData structure, use getUnblindedPubKey() for the result
      *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
      *  @since 0.9.40
      */
