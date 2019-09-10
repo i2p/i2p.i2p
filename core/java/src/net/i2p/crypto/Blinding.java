@@ -209,7 +209,7 @@ public final class Blinding {
             throw new IllegalArgumentException("Not a .b32.i2p address");
         byte[] b = Base32.decode(address.substring(0, address.length() - 8));
         if (b == null)
-            throw new IllegalArgumentException("Bad base32 encoding");
+            throw new IllegalArgumentException("Corrupt b32 address");
         if (b.length < 35)
             throw new IllegalArgumentException("Not a new-format address");
         return decode(ctx, b);
@@ -234,22 +234,22 @@ public final class Blinding {
         b[2] ^= (byte) (check >> 16);
         int flag = b[0] & 0xff;
         if ((flag & 0xf8) != 0)
-            throw new IllegalArgumentException("Corrupt b32 or unsupported options");
+            throw new IllegalArgumentException("Corrupt b32 address (or unsupported options)");
         if ((flag & FLAG_TWOBYTE) != 0)
-            throw new IllegalArgumentException("Two byte sig types unsupported");
+            throw new IllegalArgumentException("Two byte signature types unsupported");
         // TODO two-byte sigtypes
         int st1 = b[1] & 0xff;
         int st2 = b[2] & 0xff;
         SigType sigt1 = SigType.getByCode(st1);
         SigType sigt2 = SigType.getByCode(st2);
         if (sigt1 == null)
-            throw new IllegalArgumentException("Unknown sig type " + st1);
+            throw new IllegalArgumentException("Unsupported signature type " + st1);
         if (!sigt1.isAvailable())
-            throw new IllegalArgumentException("Unavailable sig type " + sigt1);
+            throw new IllegalArgumentException("Unavailable signature type " + sigt1);
         if (sigt2 == null)
-            throw new IllegalArgumentException("Unknown blinded sig type " + st2);
+            throw new IllegalArgumentException("Unsupported blinded signature type " + st2);
         if (!sigt2.isAvailable())
-            throw new IllegalArgumentException("Unavailable blinded sig type " + sigt2);
+            throw new IllegalArgumentException("Unavailable blinded signature type " + sigt2);
         // todo secret/privkey
         int spkLen = sigt1.getPubkeyLen();
         if (3 + spkLen > b.length)

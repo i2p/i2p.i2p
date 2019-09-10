@@ -235,6 +235,8 @@ public class Base32 {
                 fivebits = DECODABET[source[i] - '2'];
 
             if (fivebits >= 0) {
+                 if (outBuffPosn >= len58)
+                     return null;
                  if (usedbits == 0) {
                      outBuff[outBuffPosn] = (byte) ((fivebits << 3) & 0xf8);
                      usedbits = 5;

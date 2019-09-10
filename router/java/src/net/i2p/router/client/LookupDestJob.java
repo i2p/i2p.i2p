@@ -129,7 +129,7 @@ class LookupDestJob extends JobImpl {
             Destination d = _blindData.getDestination();
             if (d != null) {
                 if (_log.shouldDebug())
-                    _log.debug("Found cached b33 lookup " + _name + " to " + d);
+                    _log.debug("Found cached b33 lookup " + _blindData.getUnblindedPubKey() + " to " + d);
                 returnDest(d);
                 return;
             }
@@ -144,7 +144,7 @@ class LookupDestJob extends JobImpl {
                 else
                     code = HostReplyMessage.RESULT_SECRET_REQUIRED;
                 if (_log.shouldDebug())
-                    _log.debug("Failed b33 lookup " + _name + " with code " + code);
+                    _log.debug("Failed b33 lookup " + _blindData.getUnblindedPubKey() + " with code " + code);
                 returnFail(code);
             }
         }

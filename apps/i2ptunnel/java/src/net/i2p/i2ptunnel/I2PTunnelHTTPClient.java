@@ -1215,12 +1215,39 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
             } else if("i2p".equals(host)) {
                 clientDest = null;
-            } else if (destination.length() >= 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+            } else if (destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+                int len = destination.length();
+                if (len < 60 || (len >= 61 && len <= 63)) {
+                    // 8-59 or 61-63 chars, this won't work
+                    String header = getErrorPage("b32", ERR_DESTINATION_UNKNOWN);
+                    try {
+                        writeErrorMessage(header, _t("Corrupt b32 address"), out, targetRequest, false, destination);
+                    } catch (IOException ioe) {}
+                    return;
+                }
+                if (len >= 64) {
+                    // catch b33 errors before session lookup
+                    try {
+                        BlindData bd = Blinding.decode(_context, destination);
+                        if (_log.shouldWarn())
+                            _log.warn("Resolved b33 " + bd);
+                        // TESTING
+                        //sess.sendBlindingInfo(bd, 24*60*60*1000);
+                    } catch (IllegalArgumentException iae) {
+                        if (_log.shouldWarn())
+                            _log.warn("Unable to resolve b33 " + destination, iae);
+                        // b33 error page
+                        String header = getErrorPage("b32", ERR_DESTINATION_UNKNOWN);
+                        try {
+                            writeErrorMessage(header, iae.getMessage(), out, targetRequest, false, destination);
+                        } catch (IOException ioe) {}
+                        return;
+                    }
+                }
                 // use existing session to look up for efficiency
                 verifySocketManager();
                 I2PSession sess = sockMgr.getSession();
                 if (!sess.isClosed()) {
-                    int len = destination.length();
                     if (len == 60) {
                         byte[] hData = Base32.decode(destination.substring(0, 52));
                         if (hData != null) {
@@ -1234,33 +1261,43 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } else if (len >= 64) {
                         if (_log.shouldInfo())
                             _log.info("lookup b33 in-session " + destination);
-                        try {
-                            BlindData bd = Blinding.decode(_context, destination);
-                            if (_log.shouldWarn())
-                                _log.warn("Resolved b33 " + bd);
-                            // TESTING
-                            //sess.sendBlindingInfo(bd, 24*60*60*1000);
-                        } catch (IllegalArgumentException iae) {
-                            if (_log.shouldWarn())
-                                _log.warn("Unable to resolve b33 " + destination, iae);
-                            // TODO new error page
-                        }
                         LookupResult lresult = sess.lookupDest2(destination, 20*1000);
                         clientDest = lresult.getDestination();
                         int code = lresult.getResultCode();
-                        if (code != 0) {
+                        if (code != LookupResult.RESULT_SUCCESS) {
                             if (_log.shouldWarn())
                                 _log.warn("Unable to resolve b33 " + destination + " error code " + code);
-                            // TODO new form
+                            // TODO new form to supply missing data
+                            if (code != LookupResult.RESULT_FAILURE) {
+                                String header = getErrorPage("b32", ERR_DESTINATION_UNKNOWN);
+                                String msg;
+                                if (code == LookupResult.RESULT_SECRET_REQUIRED)
+                                    msg = "b32 address requires lookup password";
+                                else if (code == LookupResult.RESULT_KEY_REQUIRED)
+                                    msg = "b32 address requires encryption key";
+                                else if (code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED)
+                                    msg = "b32 address requires encryption key and lookup password";
+                                else if (code == LookupResult.RESULT_DECRYPTION_FAILURE)
+                                    msg = "b32 address decryption failure, check encryption key";
+                                else
+                                    msg = "lookup failure code " + code;
+                                try {
+                                    writeErrorMessage(header, msg, out, targetRequest, false, destination);
+                                } catch (IOException ioe) {}
+                                return;
+
+                            }
                         }
-                    } else {
-                        // 61-63 chars, this won't work
-                        clientDest = _context.namingService().lookup(destination);
                     }
                 } else {
+                    if (_log.shouldInfo())
+                        _log.info("lookup b32 out of session " + destination);
+                    // TODO can't get result code from here
                     clientDest = _context.namingService().lookup(destination);
                 }
             } else {
+                if (_log.shouldInfo())
+                    _log.info("lookup hostname " + destination);
                 clientDest = _context.namingService().lookup(destination);
             }
 
@@ -1518,7 +1555,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         if(host == null) {
             return null;
         }
-        if(host.length() == 60 && host.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+        if (host.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
             return host;
         }
         Destination dest = _context.namingService().lookup(host);
