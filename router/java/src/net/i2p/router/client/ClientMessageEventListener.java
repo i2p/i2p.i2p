@@ -825,6 +825,16 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             String nsec = bd.getSecret();
             if ((nkey != null && !nkey.equals(okey)) ||
                 (nsec != null && !nsec.equals(osec))) {
+                // don't lose destination
+                if (obd.getDestination() != null && bd.getDestination() == null) {
+                    try {
+                        bd.setDestination(obd.getDestination());
+                    } catch (IllegalArgumentException iae) {
+                        if (_log.shouldWarn())
+                            _log.warn("Dest mismatch: " + obd + bd, iae);
+                        return;
+                    }
+                }
                 _context.netDb().setBlindData(bd);
                 if (_log.shouldWarn())
                     _log.warn("Updated: " + bd);

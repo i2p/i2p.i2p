@@ -54,6 +54,10 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
     public BlindingInfoMessage() {}
 
     /**
+     *  This is the constructor used by I2CP client-side.
+     *  Will create a DEST or KEY message type, depending on whether
+     *  BlindData has the full destination.
+     *
      *  @param expiration ms from now or 0 for forever
      */
     public BlindingInfoMessage(BlindData bd,
@@ -75,11 +79,15 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
     }
 
     /**
+     *  HASH not supported by router and may not be useful
+     *
      *  @param authType 0 (none), 1 (DH), 3 (PSK)
      *  @param expiration ms from now or 0 for forever
      *  @param privKey null for auth none, non-null for DH/PSK
-     *  @param secret may be null
+     *  @param secret may be null, 255 UTF-8 bytes max
+     *  @deprecated unimplemented on router side
      */
+    @Deprecated
     public BlindingInfoMessage(Hash h,
                                SessionId id, int expiration,
                                int authType, SigType blindType,
@@ -92,12 +100,16 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
     }
 
     /**
+     *  HOST not supported by router and may not be useful
+     *
      *  @param h hostname
      *  @param authType 0 (none), 1 (DH), 3 (PSK)
      *  @param expiration ms from now or 0 for forever
      *  @param privKey null for auth none, non-null for DH/PSK
-     *  @param secret may be null
+     *  @param secret may be null, 255 UTF-8 bytes max
+     *  @deprecated unimplemented on router side
      */
+    @Deprecated
     public BlindingInfoMessage(String h,
                                SessionId id, int expiration,
                                int authType, SigType blindType,
@@ -113,7 +125,7 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
      *  @param authType 0 (none), 1 (DH), 3 (PSK)
      *  @param expiration ms from now or 0 for forever
      *  @param privKey null for auth none, non-null for DH/PSK
-     *  @param secret may be null
+     *  @param secret may be null, 255 UTF-8 bytes max
      */
     public BlindingInfoMessage(Destination d,
                                SessionId id, int expiration,
@@ -132,7 +144,7 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
      *  @param authType 0 (none), 1 (DH), 3 (PSK)
      *  @param expiration ms from now or 0 for forever
      *  @param privKey null for auth none, non-null for DH/PSK
-     *  @param secret may be null
+     *  @param secret may be null, 255 UTF-8 bytes max
      */
     public BlindingInfoMessage(SigningPublicKey s,
                                SessionId id, int expiration,
@@ -250,6 +262,7 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
             _blindData = new BlindData(I2PAppContext.getGlobalContext(), _dest, _blindType, _secret, _authType, _privkey);
         else if (_endpointType == TYPE_KEY)
             _blindData = new BlindData(I2PAppContext.getGlobalContext(), _pubkey, _blindType, _secret, _authType, _privkey);
+        // HASH and HOST not supported by router yet
         return _blindData;
     }
 
@@ -301,19 +314,22 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        int len;
         if (_endpointType == TYPE_HASH) {
             if (_hash == null)
                 throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-            len = 11 + Hash.HASH_LENGTH;
         } else if (_endpointType == TYPE_HOST) {
             if (_host == null)
                 throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-            len = 12 + _host.length();
+        } else if (_endpointType == TYPE_DEST) {
+            if (_dest == null)
+                throw new I2CPMessageException("Unable to write out the message as there is not enough data");
+        } else if (_endpointType == TYPE_KEY) {
+            if (_pubkey == null)
+                throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         } else {
             throw new I2CPMessageException("bad type");
         }
-        ByteArrayOutputStream os = new ByteArrayOutputStream(len);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(512);
         try {
             _sessionId.writeBytes(os);
             byte flags = (byte) _authType;
