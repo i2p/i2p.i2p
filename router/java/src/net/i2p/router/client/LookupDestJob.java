@@ -94,7 +94,16 @@ class LookupDestJob extends JobImpl {
                             BlindData bd2 = getContext().netDb().getBlindData(spk);
                             if (bd2 != null) {
                                 // BlindData from database may have privkey or secret
-                                bd = bd2;
+                                // check if we need it but don't have it
+                                if ((bd.getAuthRequired() && bd2.getAuthPrivKey() == null) ||
+                                    (bd.getSecretRequired() && (bd2.getSecret() == null || bd2.getSecret().length() == 0))) {
+                                    // don't copy over existing info, this will force an immediate
+                                    // failure in runJob()
+                                    if (_log.shouldDebug())
+                                        _log.debug("No auth or secret, immediate fail " + bd);
+                                } else {
+                                    bd = bd2;
+                                }
                             } else {
                                 getContext().netDb().setBlindData(bd);
                             }
@@ -126,15 +135,9 @@ class LookupDestJob extends JobImpl {
 
     public void runJob() {
         if (_blindData != null) {
-            Destination d = _blindData.getDestination();
-            if (d != null) {
-                if (_log.shouldDebug())
-                    _log.debug("Found cached b33 lookup " + _blindData.getUnblindedPubKey() + " to " + d);
-                returnDest(d);
-                return;
-            }
             boolean fail1 = _blindData.getAuthRequired() && _blindData.getAuthPrivKey() == null;
-            boolean fail2 = _blindData.getSecretRequired() && _blindData.getSecret() == null;
+            boolean fail2 = _blindData.getSecretRequired() &&
+                            (_blindData.getSecret() == null || _blindData.getSecret().length() == 0);
             if (fail1 || fail2) {
                 int code;
                 if (fail1 && fail2)
@@ -146,6 +149,15 @@ class LookupDestJob extends JobImpl {
                 if (_log.shouldDebug())
                     _log.debug("Failed b33 lookup " + _blindData.getUnblindedPubKey() + " with code " + code);
                 returnFail(code);
+            }
+            // do this after the fail checks above, because even if we
+            // have the dest, it won't help get a LS.
+            Destination d = _blindData.getDestination();
+            if (d != null) {
+                if (_log.shouldDebug())
+                    _log.debug("Found cached b33 lookup " + _blindData.getUnblindedPubKey() + " to " + d);
+                returnDest(d);
+                return;
             }
         }
         if (_name != null) {
