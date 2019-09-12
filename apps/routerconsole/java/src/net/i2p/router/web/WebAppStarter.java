@@ -157,7 +157,7 @@ public class WebAppStarter {
         // See AnnotationParser.isValidClassFileName()
         // Server must be at DEBUG level to see what's happening
         boolean scanAnnotations = HAS_ANNOTATION_CLASSES && !BUILTINS.contains(appName);
-        System.out.println("Scanning " + appName + " for annotations? " + scanAnnotations);
+        //System.out.println("Scanning " + appName + " for annotations? " + scanAnnotations);
         wac.setExtractWAR(scanAnnotations);
 
         // this does the passwords...
