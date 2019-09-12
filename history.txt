@@ -1,5 +1,11 @@
+2019-09-12 zzz
+ * I2CP: BlindingInfo fixes
+ * i2ptunnel: New form for blinding info
+
 2019-09-10 zzz
  * I2CP: New Blinding Info message (proposal 123)
+ * i2ptunnel: New b32 error page
+ * Util: Fix AIOOBE on bad input to base 32 decode
 
 2019-09-08 zzz
  * Transport:

@@ -12,10 +12,21 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.client.naming.NamingService;
+import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.crypto.Blinding;
+import net.i2p.crypto.EncType;
+import net.i2p.crypto.KeyPair;
+import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
+import net.i2p.data.BlindData;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.util.FileUtil;
 import net.i2p.util.PortMapper;
@@ -51,6 +62,14 @@ public abstract class LocalHTTPServer {
          "\r\n"+
          "Add to addressbook failed - bad parameters";
 
+    private final static String ERR_B32 =
+         "HTTP/1.1 409 Bad\r\n"+
+         "Content-Type: text/plain\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "B32 update failed - bad parameters";
+
     private final static String OK =
          "HTTP/1.1 200 OK\r\n" +
          "Content-Type: text/plain\r\n" +
@@ -79,10 +98,12 @@ public abstract class LocalHTTPServer {
      *  uncaught vulnerabilities.
      *  Restrict to the /themes/ directory for now.
      *
+     *  @param sockMgr only for /b32, otherwise ignored
      *  @param targetRequest decoded path only, non-null
      *  @param query raw (encoded), may be null
      */
-    public static void serveLocalFile(OutputStream out, String method, String targetRequest,
+    public static void serveLocalFile(I2PAppContext context, I2PSocketManager sockMgr,
+                                      OutputStream out, String method, String targetRequest,
                                       String query, String proxyNonce) throws IOException {
         //System.err.println("targetRequest: \"" + targetRequest + "\"");
         // a home page message for the curious...
@@ -102,8 +123,8 @@ public abstract class LocalHTTPServer {
             }
             // theme hack
             if (filename.startsWith("console/default/"))
-                filename = filename.replaceFirst("default", I2PAppContext.getGlobalContext().getProperty("routerconsole.theme", "light"));
-            File themesDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs/themes");
+                filename = filename.replaceFirst("default", context.getProperty("routerconsole.theme", "light"));
+            File themesDir = new File(context.getBaseDir(), "docs/themes");
             File file = new File(themesDir, filename);
             if (file.exists() && !file.isDirectory()) {
                 String type;
@@ -167,7 +188,7 @@ public abstract class LocalHTTPServer {
             //System.err.println("book         : \"" + book          + "\"");
             //System.err.println("nonce        : \"" + nonce         + "\"");
             if (proxyNonce.equals(nonce) && url != null && host != null && dest != null) {
-                NamingService ns = I2PAppContext.getGlobalContext().namingService();
+                NamingService ns = context.namingService();
                 Properties nsOptions = new Properties();
                 nsOptions.setProperty("list", book);
                 if (referer != null && referer.startsWith("http")) {
@@ -182,6 +203,88 @@ public abstract class LocalHTTPServer {
                 return;
             }
             out.write(ERR_ADD.getBytes("UTF-8"));
+
+        } else if (targetRequest.equals("/b32")) {
+            // Send a blinding info message (form submit)
+            // Parameters are url, host, dest, nonce, and master | router | private.
+            // Do the add and redirect.
+            if (query == null) {
+                out.write(ERR_ADD.getBytes("UTF-8"));
+                return;
+            }
+            Map<String, String> opts = new HashMap<String, String>(8);
+            // FIXME
+            // this only works if all keys are followed by =value
+            StringTokenizer tok = new StringTokenizer(query, "=&;");
+            while (tok.hasMoreTokens()) {
+                String k = tok.nextToken();
+                if (!tok.hasMoreTokens())
+                    break;
+                String v = tok.nextToken();
+                opts.put(decode(k), decode(v));
+            }
+
+            String err = null;
+            String url = opts.get("url");
+            String host = opts.get("host");
+            String nonce = opts.get("nonce");
+            String code = opts.get("code");
+            String privkey = opts.get("privkey");
+            String secret = opts.get("secret");
+            String action = opts.get("action");
+            if (proxyNonce.equals(nonce) && url != null && host != null && code != null) {
+                boolean success = true;
+                PrivateKey privateKey = null;
+                if (!code.equals("2") && !code.equals("4")) {
+                    secret = null;
+                } else if (secret == null || secret.length() == 0) {
+                    err = "Missing lookup password";
+                    success = false;
+                }
+
+                int authType = BlindData.AUTH_NONE;
+                if (!code.equals("3") && !code.equals("4")) {
+                    privkey = null;
+                } else if ("newdh".equals(action) || "newpsk".equals(action)) {
+                    // newpsk probably not required
+                    KeyPair kp = context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+                    privateKey = kp.getPrivate();
+                    authType = action.equals("newdh") ? BlindData.AUTH_DH : BlindData.AUTH_PSK;
+                } else if (privkey == null || privkey.length() == 0) {
+                    err = "Missing private key";
+                    success = false;
+                } else {
+                    byte[] data = Base64.decode(privkey);
+                    if (data == null || data.length != 32) {
+                        err = "Bad private key";
+                        success = false;
+                    } else {
+                        privateKey = new PrivateKey(EncType.ECIES_X25519, data);
+                        authType = BlindData.AUTH_PSK;
+                    }
+                }
+
+                if (success) {
+                    try {
+                        // get spk and blind type
+                        BlindData bd = Blinding.decode(context, host);
+                        SigningPublicKey spk = bd.getUnblindedPubKey();
+                        SigType bt = bd.getBlindedSigType();
+                        bd = new BlindData(context, spk, bt, secret, authType, privateKey);
+                        I2PSession sess = sockMgr.getSession();
+                        sess.sendBlindingInfo(bd, 365*60*60*1000);
+                        writeRedirectPage(out, success, host, "FIXME", url);
+                        return;
+                    } catch (IllegalArgumentException iae) {
+                        err = iae.toString();
+                    } catch (I2PSessionException ise) {
+                        err = ise.toString();
+                    }
+                }
+            }
+            out.write(ERR_B32.getBytes("UTF-8"));
+            if (err != null)
+                out.write(("\n\n" + err + "\n\nGo back and fix it").getBytes("UTF-8"));
         } else {
             out.write(ERR_404.getBytes("UTF-8"));
         }

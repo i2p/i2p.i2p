@@ -291,7 +291,7 @@ public class BlindData {
         else
             buf.append("none");
         if (_authKey != null)
-            buf.append("\n\tAuth Key   : ").append(_authKey);
+            buf.append("\n\tAuth Key        : ").append(_authKey);
         else
             buf.append("\n\tAuth Required   : ").append(_authRequired);
         if (_dest != null)

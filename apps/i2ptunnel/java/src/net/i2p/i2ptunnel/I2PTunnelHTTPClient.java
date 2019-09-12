@@ -1163,7 +1163,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER))) {
                         out.write(ERR_HELPER_DISABLED.getBytes("UTF-8"));
                     } else {
-                        LocalHTTPServer.serveLocalFile(out, method, internalPath, internalRawQuery, _proxyNonce);
+                        LocalHTTPServer.serveLocalFile(_context, sockMgr, out, method, internalPath, internalRawQuery, _proxyNonce);
                     }
                 } catch (IOException ioe) {
                     // ignore
@@ -1267,26 +1267,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if (code != LookupResult.RESULT_SUCCESS) {
                             if (_log.shouldWarn())
                                 _log.warn("Unable to resolve b33 " + destination + " error code " + code);
-                            // TODO new form to supply missing data
                             if (code != LookupResult.RESULT_FAILURE) {
-                                String header = getErrorPage("b32", ERR_DESTINATION_UNKNOWN);
-                                String msg;
-                                if (code == LookupResult.RESULT_SECRET_REQUIRED)
-                                    msg = "b32 address requires lookup password";
-                                else if (code == LookupResult.RESULT_KEY_REQUIRED)
-                                    msg = "b32 address requires encryption key";
-                                else if (code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED)
-                                    msg = "b32 address requires encryption key and lookup password";
-                                else if (code == LookupResult.RESULT_DECRYPTION_FAILURE)
-                                    msg = "b32 address decryption failure, check encryption key";
-                                else
-                                    msg = "lookup failure code " + code;
-                                try {
-                                    writeErrorMessage(header, msg, out, targetRequest, false, destination);
-                                } catch (IOException ioe) {}
+                                // form to supply missing data
+                                writeB32SaveForm(out, destination, code, targetRequest);
                                 return;
 
                             }
+                            // fall through to standard destination unreachable error page
                         }
                     }
                 } else {
@@ -1501,6 +1488,63 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             out.write("<input type=\"hidden\" name=\"referer\" value=\"" + referer + "\">\n");
         out.write("<input type=\"hidden\" name=\"url\" value=\"" + targetRequest + "\">\n" +
                 "</form>\n</div>\n");
+        writeFooter(out);
+    }
+
+    /** @since 0.9.43 */
+    private void writeB32SaveForm(OutputStream outs, String destination, int code,
+                                     String targetRequest) throws IOException {
+        if(outs == null)
+            return;
+        Writer out = new BufferedWriter(new OutputStreamWriter(outs, "UTF-8"));
+        String header = getErrorPage("b32", ERR_DESTINATION_UNKNOWN);
+        out.write(header);
+        out.write("<table id=\"proxyNewHost\">\n<tr><td align=\"right\">" + _t("Host") +
+                "</td><td>" + destination + "</td></tr>\n");
+        out.write("<tr><td align=\"right\">" + _t("Base 32") + "</td>" +
+                  "<td><a href=\"http://" + destination + "/\">" + destination + "</a></td></tr>");
+        out.write("\n</table>\n" + "<hr>");
+        String msg;
+        if (code == LookupResult.RESULT_SECRET_REQUIRED)
+            msg = _t("b32 address requires lookup password");
+        else if (code == LookupResult.RESULT_KEY_REQUIRED)
+            msg = _t("b32 address requires encryption key");
+        else if (code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED)
+            msg = _t("b32 address requires encryption key and lookup password");
+        else if (code == LookupResult.RESULT_DECRYPTION_FAILURE)
+            msg = _t("b32 address decryption failure, check encryption key");
+        else
+            msg = "lookup failure code " + code;
+        out.write("<p><b>" + msg + "</b></p>");
+        out.write("<form method=\"GET\" action=\"http://" + LOCAL_SERVER + "/b32\">\n" +
+                  "<input type=\"hidden\" name=\"host\" value=\"" + destination + "\">\n" +
+                  "<input type=\"hidden\" name=\"url\" value=\"" + targetRequest + "\">\n" +
+                  "<input type=\"hidden\" name=\"code\" value=\"" + code + "\">\n" +
+                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _proxyNonce + "\">\n");
+
+        if (code == LookupResult.RESULT_KEY_REQUIRED || code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED) {
+            String label = _t("Generate");
+            out.write("<h4>" + _t("Encryption key") + "</h4>\n<p>" +
+                      "<p>" + _t("You must either enter a PSK encryption key provided by the server operator, or generate a DH encryption key and send that to the server operator.") +
+                      ' ' + _t("Ask the server operator for help.") +
+                      "</p>\n" +
+
+                      "<input type=\"text\" size=\"55\" name=\"privkey\" value=\"\"></p>\n" +
+                      "<p>" + _t("Generate new DH encryption key") +
+                      "<button type=\"submit\" class=\"accept\" name=\"action\" value=\"newdh\">" + label + "</button>\n");
+                      //"<p>" + _t("Generate new PSK encryption key") +
+                      //"<button type=\"submit\" class=\"accept\" name=\"action\" value=\"newpsk\">" + label + "</button>\n");
+        }
+        if (code == LookupResult.RESULT_SECRET_REQUIRED || code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED) {
+            out.write("<h4>" + _t("Lookup password") + "</h4>\n<p>" +
+                      "<input type=\"text\" size=\"55\" name=\"secret\" value=\"\"></p>\n");
+        }
+
+        // FIXME wasn't escaped
+        String label = _t("Save & continue").replace("&", "&amp;");
+        out.write("<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"action\" value=\"save\">" +
+                  label + "</button></div>\n" +
+                  "</form>\n</div>\n");
         writeFooter(out);
     }
 
