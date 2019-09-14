@@ -341,7 +341,7 @@ public class Reseeder {
                 if (lc.endsWith(".su3")) {
                     URI uri;
                     try {
-                        uri = new URI(_url.toString() + SU3_FILENAME + NETID_PARAM + _context.router().getNetworkID());
+                        uri = new URI(_url.toString() + NETID_PARAM + _context.router().getNetworkID());
                     } catch (URISyntaxException use) {
                         throw new IllegalArgumentException("Bad URL " + _url, use);
                     }
