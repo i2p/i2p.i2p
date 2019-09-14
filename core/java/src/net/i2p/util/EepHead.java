@@ -139,10 +139,16 @@ public class EepHead extends EepGet {
             get.addAuthorization(username, password);
         }
         if (get.fetch(45*1000, -1, inactivityTimeout)) {
-            System.err.println("Content-Type: " + get.getContentType());
+            String x = get.getContentType();
+            if (x != null)
+                System.err.println("Content-Type: " + x);
             System.err.println("Content-Length: " + get.getContentLength());
-            System.err.println("Last-Modified: " + get.getLastModified());
-            System.err.println("Etag: " + get.getETag());
+            x = get.getLastModified();
+            if (x != null)
+                System.err.println("Last-Modified: " + x);
+            x = get.getETag();
+            if (x != null)
+                System.err.println("Etag: " + x);
         } else {
             System.err.println("Failed " + url);
             System.exit(1);
