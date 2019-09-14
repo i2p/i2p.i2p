@@ -487,6 +487,9 @@ public final class KeyStoreUtil {
                     // https://www.sslshopper.com/ssl-converter.html
                     // No idea if all these formats can actually be read by CertificateFactory
                     String alias = f.getName().toLowerCase(Locale.US);
+                    // Mac .DS_STORE
+                    if (alias.startsWith("."))
+                        continue;
                     if (alias.endsWith(".crt") || alias.endsWith(".pem") || alias.endsWith(".key") ||
                         alias.endsWith(".der") || alias.endsWith(".key") || alias.endsWith(".p7b") ||
                         alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12") ||
