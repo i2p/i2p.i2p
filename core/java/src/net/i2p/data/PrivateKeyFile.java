@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException; 
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -32,6 +33,7 @@ import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.KeyPair;
+import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.RandomSource;
@@ -332,13 +334,13 @@ public class PrivateKeyFile {
 
     private static void usage() {
         System.err.println("Usage: PrivateKeyFile filename (generates if nonexistent, then prints)\n" +
-                           "   \ncertificate options:\n" +
+                           "\ncertificate options:\n" +
                            "      -h                   (generates if nonexistent, adds hashcash cert)\n" +
                            "      -n                   (changes to null cert)\n" +
                            "      -s signwithdestfile  (generates if nonexistent, adds cert signed by 2nd dest)\n" +
                            "      -u                   (changes to unknown cert)\n" +
                            "      -x                   (changes to hidden cert)\n" +
-                           "   \nother options:\n" +
+                           "\nother options:\n" +
                            "      -a example.i2p       (generate addressbook authentication string)\n" +
                            "      -c sigtype           (specify sig type of destination)\n" +
                            "      -d days              (specify expiration in days of offline sig, default 365)\n" +
@@ -348,6 +350,30 @@ public class PrivateKeyFile {
                            "      -r sigtype           (specify sig type of transient key, default Ed25519)\n" +
                            "      -t sigtype           (changes to KeyCertificate of the given sig type)\n" +
                            "");
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("Available signature types:\n");
+        for (SigType t : EnumSet.allOf(SigType.class)) {
+            if (!t.isAvailable())
+                continue;
+            if (t.getBaseAlgorithm().equals(SigAlgo.RSA))
+                continue;
+            if (t.getCode() == 8)
+                continue;
+            buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
+            if (t.getCode() == 0)
+                buf.append(" DEFAULT");
+            buf.append('\n');
+        }
+        buf.append("\nAvailable encryption types:\n");
+        for (EncType t : EnumSet.allOf(EncType.class)) {
+            if (!t.isAvailable())
+                continue;
+            buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
+            if (t.getCode() == 0)
+                buf.append(" DEFAULT");
+            buf.append('\n');
+        }
+        System.out.println(buf.toString());
     }
     
     public PrivateKeyFile(String file) {

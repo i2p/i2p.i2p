@@ -688,8 +688,6 @@ public class SU3File {
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
             if (t.getCode() == DEFAULT_SIG_CODE)
                 buf.append(" DEFAULT");
-            if (!t.isAvailable())
-                buf.append(" UNAVAILABLE");
             buf.append('\n');
         }
         buf.append("Available content types (-c):\n");
