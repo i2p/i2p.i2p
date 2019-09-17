@@ -152,7 +152,7 @@
                     <%=intl._t("Basic tunnel for connecting to a single service inside I2P.")%>
                     <%=intl._t("Try this if none of the tunnel types below fit your requirements, or you don't know what type of tunnel you need.")%>
                 </td></tr>
-                <tr><td>HTTP</td><td>
+                <tr><td>HTTP/HTTPS</td><td>
                     <%=intl._t("Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P.")%>
                     <%=intl._t("Set your browser to use this tunnel as an http proxy, or set your \"http_proxy\" environment variable for command-line applications in GNU/Linux.")%>
                     <%=intl._t("Websites outside I2P can also be reached if an HTTP proxy within I2P is known.")%>
@@ -171,14 +171,6 @@
                     <%=intl._t("With this tunnel type, IRC networks in I2P can be reached by typing the I2P address into your IRC client, and configuring the IRC client to use this SOCKS tunnel.")%>
                     <%=intl._t("This means that only one I2P tunnel is required rather than a separate tunnel per IRC network.")%>
                     <%=intl._t("IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P is known, though it depends on whether or not the outproxy has been blocked by the IRC network.")%>
-                </td></tr>
-                <tr><td>CONNECT</td><td>
-                    <%=intl._t("A client tunnel that implements the HTTP CONNECT command.")%>
-                    <%=intl._t("This enables TCP connections to be made through an HTTP outproxy, assuming the proxy supports the CONNECT command.")%>
-                </td></tr>
-                <tr><td>Streamr</td><td>
-                    <%=intl._t("A customised client tunnel for Streamr.")%><%
-                    //XXX TODO<%=intl._t("I have no idea what this is.")%>
                 </td></tr><%
                 } else {
                 %>
@@ -190,17 +182,9 @@
                     <%=intl._t("A server tunnel that is customised for HTTP connections.")%>
                     <%=intl._t("Use this tunnel type if you want to host an eepsite.")%>
                 </td></tr>
-                <tr><td>HTTP bidir</td><td>
-                    <%=intl._t("A customised server tunnel that can both serve HTTP data and connect to other server tunnels.")%>
-                    <%=intl._t("This tunnel type is predominantly used when running a Seedless server.")%>
-                </td></tr>
                 <tr><td>IRC</td><td>
                     <%=intl._t("A customised server tunnel for hosting IRC networks inside I2P.")%>
                     <%=intl._t("Usually, a separate tunnel needs to be created for each IRC server that is to be accessible inside I2P.")%>
-                </td></tr>
-                <tr><td>Streamr</td><td>
-                    <%=intl._t("A customised server tunnel for Streamr.")%><%
-                    //XXX TODO<%=intl._t("I have no idea what this is.")%>
                 </td></tr><%
                 }
                 %>
@@ -214,20 +198,16 @@
                 if (tunnelIsClient) {
                 %><select name="type">
                     <option value="client"><%=intl._t("Standard")%></option>
-                    <option value="httpclient">HTTP/CONNECT</option>
+                    <option value="httpclient">HTTP/HTTPS</option>
                     <option value="ircclient">IRC</option>
                     <option value="sockstunnel">SOCKS 4/4a/5</option>
                     <option value="socksirctunnel">SOCKS IRC</option>
-                    <option value="connectclient">CONNECT</option>
-                    <option value="streamrclient">Streamr</option>
                 </select><%
                 } else {
                 %><select name="type">
                     <option value="server"><%=intl._t("Standard")%></option>
                     <option value="httpserver">HTTP</option>
-                    <option value="httpbidirserver">HTTP bidir</option>
                     <option value="ircserver">IRC</option>
-                    <option value="streamrserver">Streamr</option>
                 </select><%
                 } /* tunnelIsClient */ %>
                     </td>
@@ -298,7 +278,7 @@
                 } else {
             %><input type="hidden" name="proxyList" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("proxyList"))%>" /><%
                 } /* curPage 4 */
-              } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
+              } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) {
                 if (curPage == 4) {
             %>
     <tr>
@@ -314,9 +294,7 @@
             <span class="tag"><%=intl._t("Tunnel Destination")%>:</span>
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="<%=intl._t("Enter a b64 or .i2p address here")%>" value="<%=(!"null".equals(request.getParameter("targetDestination")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("targetDestination")) : "" ) %>" class="freetext" />
             &nbsp;(<%=intl._t("name, name:port, or destination")%>
-                     <% if ("streamrclient".equals(tunnelType)) { /* deferred resolution unimplemented in streamr client */ %>
-                         - <%=intl._t("b32 not recommended")%>
-                     <% } %> )
+                     )
         </td>
     </tr>
             <%
@@ -330,7 +308,7 @@
 
             <% /* Page 5 - Binding ports and addresses*/
 
-            if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) {
+            if (!tunnelIsClient) {
               if (curPage == 5) {
             %>
     <tr>
@@ -375,14 +353,13 @@
               } /* curPage 5 */
             } /* !tunnelIsClient */ %>
             <%
-            if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) {
+            if (tunnelIsClient) {
               if (curPage == 5) {
             %>
     <tr>
         <td>
             <p>
                 <%=intl._t("This is the port that the client tunnel will be accessed from locally.")%>
-                <%=intl._t("This is also the client port for the HTTPBidir server tunnel.")%>
             </p>
         </td>
     </tr>
@@ -398,7 +375,7 @@
               } /* curPage 5 */
             } /* tunnelIsClient or httpbidirserver */ %>
             <%
-            if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) {
+            if (tunnelIsClient) {
               if (curPage == 5) {
             %>
     <tr>
@@ -503,18 +480,12 @@
                     <%=intl._t("Standard")%><%
                 } else if ("httpclient".equals(tunnelType) || "httpserver".equals(tunnelType)) { %>
                     HTTP<%
-                } else if ("httpbidirserver".equals(tunnelType)) { %>
-                    HTTP bidir<%
                 } else if ("ircclient".equals(tunnelType) || "ircserver".equals(tunnelType)) { %>
                     IRC<%
                 } else if ("sockstunnel".equals(tunnelType)) { %>
                     SOCKS 4/4a/5<%
                 } else if ("socksirctunnel".equals(tunnelType)) { %>
                     SOCKS IRC<%
-                } else if ("connectclient".equals(tunnelType)) { %>
-                    CONNECT<%
-                } else if ("streamrclient".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
-                    Streamr<%
                 } %>
                 </td></tr>
                 <tr><td><%=intl._t("Tunnel name")%></td>
@@ -526,23 +497,23 @@
                 <tr><td><%=intl._t("Tunnel destination")%></td><td><%
                   if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
                     <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("proxyList"))%><%
-                  } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) { %>
+                  } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) { %>
                     <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetDestination"))%><%
                   } %>
                 </td></tr><%
                 } %>
                 <%
-                if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) { %>
+                if (!tunnelIsClient) { %>
                     <tr><td><%=intl._t("Binding address")%></td><td>
                     <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetHost"))%></td></tr><%
                 }
                 if (!tunnelIsClient) { %>
                     <tr><td><%=intl._t("Tunnel port")%></td><td><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetPort"))%></td></tr><%
                 }
-                if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) { %>
+                if (tunnelIsClient) { %>
                     <tr><td><%=intl._t("Port")%></td><td><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("port"))%></td></tr><%
                 }
-                if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
+                if (tunnelIsClient) { %>
                     <tr><td><%=intl._t("Reachable by")%></td><td><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("reachableBy"))%></td></tr><%
                 } %>
                 <tr><td><%=intl._t("Tunnel auto-start")%></td><td><%
@@ -568,45 +539,14 @@
             <input type="hidden" name="tunnelBackupQuantity" value="0" />
             <input type="hidden" name="clientHost" value="internal" />
             <input type="hidden" name="clientport" value="internal" />
-            <input type="hidden" name="nofilter_customOptions" value="" />
-
-            <%
-              if (!"streamrclient".equals(tunnelType)) {
-            %><input type="hidden" name="profile" value="bulk" />
             <input type="hidden" name="reduceCount" value="1" />
             <input type="hidden" name="reduceTime" value="20" /><%
-              } /* !streamrclient */ %>
 
-            <%
               if (tunnelIsClient) { /* Client-only defaults */
-                if (!"streamrclient".equals(tunnelType)) {
             %><input type="hidden" name="newDest" value="0" />
             <input type="hidden" name="closeTime" value="30" /><%
-                }
-                if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
-            %><input type="hidden" name="proxyUsername" value="" />
-            <input type="hidden" name="nofilter_proxyPassword" value="" />
-            <input type="hidden" name="outproxyUsername" value="" />
-            <input type="hidden" name="nofilter_outproxyPassword" value="" /><%
-                }
-                if ("httpclient".equals(tunnelType)) {
-            %><input type="hidden" name="jumpList" value="http://i2host.i2p/cgi-bin/i2hostjump?
-http://stats.i2p/cgi-bin/jump.cgi?a=" /><%
-                } /* httpclient */
               } else { /* Server-only defaults */
             %><input type="hidden" name="privKeyFile" value="<%=editBean.getPrivateKeyFile(-1)%>" />
-            <input type="hidden" name="encrypt" value="" />
-            <input type="hidden" name="encryptKey" value="" />
-            <input type="hidden" name="accessMode" value="0" />
-            <input type="hidden" name="accessList" value="" />
-            <input type="hidden" name="limitMinute" value="0" />
-            <input type="hidden" name="limitHour" value="0" />
-            <input type="hidden" name="limitDay" value="0" />
-            <input type="hidden" name="totalMinute" value="0" />
-            <input type="hidden" name="totalHour" value="0" />
-            <input type="hidden" name="totalDay" value="0" />
-            <input type="hidden" name="maxStreams" value="0" />
-            <input type="hidden" name="cert" value="0" />
         </td>
     </tr>
             <%
