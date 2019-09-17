@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
@@ -153,16 +152,7 @@ public abstract class LocalHTTPServer {
                 out.write(ERR_ADD.getBytes("UTF-8"));
                 return;
             }
-            Map<String, String> opts = new HashMap<String, String>(8);
-            // this only works if all keys are followed by =value
-            StringTokenizer tok = new StringTokenizer(query, "=&;");
-            while (tok.hasMoreTokens()) {
-                String k = tok.nextToken();
-                if (!tok.hasMoreTokens())
-                    break;
-                String v = tok.nextToken();
-                opts.put(decode(k), decode(v));
-            }
+            Map<String, String> opts = decodeQuery(query);
 
             String url = opts.get("url");
             String host = opts.get("host");
@@ -212,17 +202,7 @@ public abstract class LocalHTTPServer {
                 out.write(ERR_ADD.getBytes("UTF-8"));
                 return;
             }
-            Map<String, String> opts = new HashMap<String, String>(8);
-            // FIXME
-            // this only works if all keys are followed by =value
-            StringTokenizer tok = new StringTokenizer(query, "=&;");
-            while (tok.hasMoreTokens()) {
-                String k = tok.nextToken();
-                if (!tok.hasMoreTokens())
-                    break;
-                String v = tok.nextToken();
-                opts.put(decode(k), decode(v));
-            }
+            Map<String, String> opts = decodeQuery(query);
 
             String err = null;
             String url = opts.get("url");
@@ -341,6 +321,49 @@ public abstract class LocalHTTPServer {
     }
 
     /**
+     *  Parse an encoded query.
+     *  Only supports ONE value per key.
+     *
+     *  @param query an ENCODED query, non-null
+     *  @return map of DECODED keys to DECODED values, non-null. Values may be empty.
+     *  @since 0.9.43 adapted from I2PTunnelHTTPClient.removeHelper()
+     */
+    private static Map<String, String> decodeQuery(String query) {
+        Map<String, String> rv = new HashMap<String, String>(8);
+        int keystart = 0;
+        int valstart = -1;
+        String key = null;
+        for (int i = 0; i <= query.length(); i++) {
+            char c = i < query.length() ? query.charAt(i) : '&';
+            if (c == ';' || c == '&') {
+                // end of key or value
+                if (valstart < 0)
+                    key = query.substring(keystart, i);
+                if (key.length() > 0) {
+                    String decodedKey = decode(key);
+                    String newQuery = keystart > 0 ? query.substring(0, keystart - 1) : "";
+                    if (i < query.length() - 1) {
+                        if (keystart > 0)
+                            newQuery += query.substring(i);
+                        else
+                            newQuery += query.substring(i + 1);
+                    }
+                    String value = valstart >= 0 ? query.substring(valstart, i) : "";
+                    String decodedValue = decode(value);
+                    rv.put(decodedKey, decodedValue);
+                }
+                keystart = i + 1;
+                valstart = -1;
+            } else if (c == '=' && valstart < 0) {
+                // end of key
+                key = query.substring(keystart, i);
+                valstart = i + 1;
+            }
+        }
+        return rv;
+    }
+
+    /**
      *  Decode %xx encoding
      *  @since 0.8.7
      */
@@ -383,4 +406,36 @@ public abstract class LocalHTTPServer {
         return Translate.getString(key, o, o2, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
+/****
+    private static String[] tests = {
+        "", "foo", "foo=bar", "&", "&=&", "===", "&&",
+        "a&b&c&d",
+        "a&b&c&",
+        "i2paddresshelper=foo",
+        "i2paddresshelper=foo===",
+        "i2paddresshelper=%66oo",
+        "%692paddresshelper=foo",
+        "i2paddresshelper=foo&a=b",
+        "a=b&i2paddresshelper=foo",
+        "a=b&i2paddresshelper&c=d",
+        "a=b&i2paddresshelper=foo&c=d",
+        "a=b;i2paddresshelper=foo;c=d",
+        "a=b&i2paddresshelper=foo&c",
+        "a=b&i2paddresshelper=foo==&c",
+        "a=b&i2paddresshelper=foo%3d%3d&c",
+        "a=b&i2paddresshelper=f%6f%6F==&c",
+        "a=b&i2paddresshelper=foo&i2paddresshelper=bar&c",
+        "a=b&i2paddresshelper=foo&c%3F%3f%26%3b%3B%3d%3Dc=x%3F%3f%26%3b%3B%3d%3Dx"
+    };
+
+    public static void main(String[] args) {
+        for (int i = 0; i < tests.length; i++) {
+            Map<String, String> m = decodeQuery(tests[i]);
+            System.out.println("\nTest \"" + tests[i] + '"');
+            for (Map.Entry<String, String> e : m.entrySet()) {
+                System.out.println("    \"" + e.getKey() + "\" = \"" + e.getValue() + '"');
+            }
+        }
+    }
+****/
 }
