@@ -1497,22 +1497,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         if(outs == null)
             return;
         Writer out = new BufferedWriter(new OutputStreamWriter(outs, "UTF-8"));
-        String header = getErrorPage("b32", ERR_DESTINATION_UNKNOWN);
+        String header = getErrorPage("b32-auth", ERR_DESTINATION_UNKNOWN);
         out.write(header);
-        out.write("<table id=\"proxyNewHost\">\n<tr><td align=\"right\">" + _t("Host") +
-                "</td><td>" + destination + "</td></tr>\n");
-        out.write("<tr><td align=\"right\">" + _t("Base 32") + "</td>" +
-                  "<td><a href=\"http://" + destination + "/\">" + destination + "</a></td></tr>");
-        out.write("\n</table>\n" + "<hr>");
+        out.write("<table id=\"proxyNewHost\">\n" +
+                  "<tr><td align=\"right\">" + _t("Base 32") + "</td>" +
+                  "<td>" + destination + "</td></tr>" +
+                  "\n</table>\n" + "<hr>");
         String msg;
         if (code == LookupResult.RESULT_SECRET_REQUIRED)
-            msg = _t("b32 address requires lookup password");
+            msg = _t("Base 32 address requires lookup password");
         else if (code == LookupResult.RESULT_KEY_REQUIRED)
-            msg = _t("b32 address requires encryption key");
+            msg = _t("Base 32 address requires encryption key");
         else if (code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED)
-            msg = _t("b32 address requires encryption key and lookup password");
+            msg = _t("Base 32 address requires encryption key and lookup password");
         else if (code == LookupResult.RESULT_DECRYPTION_FAILURE)
-            msg = _t("b32 address decryption failure, check encryption key");
+            msg = _t("Base 32 address decryption failure, check encryption key");
         else
             msg = "lookup failure code " + code;
         out.write("<p><b>" + msg + "</b></p>");
@@ -1529,20 +1528,26 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                       ' ' + _t("Ask the server operator for help.") +
                       "</p>\n" +
 
-                      "<input type=\"text\" size=\"55\" name=\"privkey\" value=\"\"></p>\n" +
+                      "<p>" + _t("Enter PSK encryption key") +
+                      "</p>\n" +
+                      "<input type=\"text\" size=\"55\" name=\"privkey\" value=\"\">\n" +
                       "<p>" + _t("Generate new DH encryption key") +
-                      "<button type=\"submit\" class=\"accept\" name=\"action\" value=\"newdh\">" + label + "</button>\n");
+                      "<div class=\"formaction\">" +
+                      "<button type=\"submit\" class=\"accept\" name=\"action\" value=\"newdh\">" + label +
+                      "</button></div>\n");
                       //"<p>" + _t("Generate new PSK encryption key") +
                       //"<button type=\"submit\" class=\"accept\" name=\"action\" value=\"newpsk\">" + label + "</button>\n");
         }
         if (code == LookupResult.RESULT_SECRET_REQUIRED || code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED) {
             out.write("<h4>" + _t("Lookup password") + "</h4>\n<p>" +
-                      "<input type=\"text\" size=\"55\" name=\"secret\" value=\"\"></p>\n");
+                      "<p>" + _t("You must enter the password provided by the server operator.") +
+                      "</p>\n" +
+                      "<input type=\"text\" size=\"55\" name=\"secret\" value=\"\">\n");
         }
 
         // FIXME wasn't escaped
         String label = _t("Save & continue").replace("&", "&amp;");
-        out.write("<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"action\" value=\"save\">" +
+        out.write("<p><div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"action\" value=\"save\">" +
                   label + "</button></div>\n" +
                   "</form>\n</div>\n");
         writeFooter(out);
