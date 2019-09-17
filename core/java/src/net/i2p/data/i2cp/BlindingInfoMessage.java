@@ -337,6 +337,8 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
         try {
             _sessionId.writeBytes(os);
             byte flags = (byte) _authType;
+            if (_privkey != null)
+                flags |= FLAG_AUTH;
             if (_secret != null)
                 flags |= FLAG_SECRET;
             os.write(flags);
@@ -349,10 +351,13 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
                 DataHelper.writeString(os, _host);
             } else if (_endpointType == TYPE_DEST) {
                 _dest.writeBytes(os);
-            } else {
+            } else {  // TYPE_KEY
+                DataHelper.writeLong(os, 2, _pubkey.getType().getCode());
+                os.write(_pubkey.getData());
+            }
+            if (_privkey != null) {
                 DataHelper.writeLong(os, 2, _privkey.getType().getCode());
                 os.write(_privkey.getData());
-                DataHelper.writeString(os, _host);
             }
             if (_secret != null)
                 DataHelper.writeString(os, _secret);
