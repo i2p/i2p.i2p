@@ -210,7 +210,11 @@ public abstract class LocalHTTPServer {
             String nonce = opts.get("nonce");
             String code = opts.get("code");
             String privkey = opts.get("privkey");
+            if (privkey != null)
+                privkey = privkey.trim();
             String secret = opts.get("secret");
+            if (secret != null)
+                secret = secret.trim();
             String action = opts.get("action");
             if (proxyNonce.equals(nonce) && url != null && host != null && code != null) {
                 boolean success = true;
@@ -218,7 +222,7 @@ public abstract class LocalHTTPServer {
                 if (!code.equals("2") && !code.equals("4")) {
                     secret = null;
                 } else if (secret == null || secret.length() == 0) {
-                    err = "Missing lookup password";
+                    err = _t("Missing lookup password");
                     success = false;
                 }
 
@@ -231,12 +235,12 @@ public abstract class LocalHTTPServer {
                     privateKey = kp.getPrivate();
                     authType = action.equals("newdh") ? BlindData.AUTH_DH : BlindData.AUTH_PSK;
                 } else if (privkey == null || privkey.length() == 0) {
-                    err = "Missing private key";
+                    err = _t("Missing private key");
                     success = false;
                 } else {
                     byte[] data = Base64.decode(privkey);
                     if (data == null || data.length != 32) {
-                        err = "Bad private key";
+                        err = _t("Invalid private key");
                         success = false;
                     } else {
                         privateKey = new PrivateKey(EncType.ECIES_X25519, data);
@@ -258,7 +262,7 @@ public abstract class LocalHTTPServer {
                         bd.setExpiration(exp);
                         I2PSession sess = sockMgr.getSession();
                         sess.sendBlindingInfo(bd);
-                        writeRedirectPage(out, success, host, "FIXME", url);
+                        writeB32RedirectPage(out, host, url);
                         return;
                     } catch (IllegalArgumentException iae) {
                         err = iae.toString();
@@ -269,7 +273,7 @@ public abstract class LocalHTTPServer {
             }
             out.write(ERR_B32.getBytes("UTF-8"));
             if (err != null)
-                out.write(("\n\n" + err + "\n\nGo back and fix it").getBytes("UTF-8"));
+                out.write(("\n\n" + err + "\n\n" + _t("Go back and fix the error")).getBytes("UTF-8"));
         } else {
             out.write(ERR_404.getBytes("UTF-8"));
         }
@@ -313,6 +317,38 @@ public abstract class LocalHTTPServer {
                   (success ?
                            _t("Saved {0} to the {1} addressbook, redirecting now.", host, tbook) :
                            _t("Failed to save {0} to the {1} addressbook, redirecting now.", host, tbook)) +
+                  "</h3>\n<p><a href=\"" + url + "\">" +
+                  _t("Click here if you are not redirected automatically.") +
+                  "</a></p></div>").getBytes("UTF-8"));
+        I2PTunnelHTTPClient.writeFooter(out);
+        out.flush();
+    }
+
+    /** @since 0.9.43 */
+    private static void writeB32RedirectPage(OutputStream out, String host, String url) throws IOException {
+        PortMapper pm = I2PAppContext.getGlobalContext().portMapper();
+        String conURL = pm.getConsoleURL();
+        out.write(("HTTP/1.1 200 OK\r\n"+
+                  "Content-Type: text/html; charset=UTF-8\r\n"+
+                  "Referrer-Policy: no-referrer\r\n"+
+                  "Connection: close\r\n"+
+                  "Proxy-Connection: close\r\n"+
+                  "\r\n"+
+                  "<html><head>"+
+                  "<title>" + _t("Redirecting to {0}", host) + "</title>\n" +
+                  "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
+                  "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
+                  "<meta http-equiv=\"Refresh\" content=\"1; url=" + url + "\">\n" +
+                  "</head><body>\n" +
+                  "<div class=logo>\n" +
+                  "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
+                  "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a>").getBytes("UTF-8"));
+        if (pm.isRegistered(PortMapper.SVC_SUSIDNS))
+            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Addressbook") + "</a>\n").getBytes("UTF-8"));
+        out.write(("</div>" +
+                  "<div class=warning id=warning>\n" +
+                  "<h3>" +
+                  _t("Saved the authentication for {0}, redirecting now.", host) +
                   "</h3>\n<p><a href=\"" + url + "\">" +
                   _t("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
