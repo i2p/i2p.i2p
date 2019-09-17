@@ -275,13 +275,17 @@ class BlindCache {
     /**
      *  Load from file.
      *  Format:
-     *  sigtype,bsigtype,b64 pubkey,[b64 secret],[b64 dest]
+     *  sigtype,bsigtype,authtype,timestamp,b64 pubkey,[b64 secret],[b64 auth privkey],[b64 dest]
+     *
+     *  If timestamp is positive, it's a creation date;
+     *  if negative, it's a negative expiration date.
      */
     private synchronized void load() {
         File file = new File(_context.getConfigDir(), PERSIST_FILE);
         if (!file.exists())
             return;
         Log log = _context.logManager().getLog(BlindCache.class);
+        long now = _context.clock().now();
         int count = 0;
         BufferedReader br = null;
         try {
@@ -292,7 +296,14 @@ class BlindCache {
                 if (line.startsWith("#"))
                     continue;
                 try {
-                    storeInCache(fromPersistentString(line));
+                    BlindData bd = fromPersistentString(line);
+                    long exp = bd.getExpiration();
+                    if (exp > 0 && exp < now) {
+                        if (log.shouldInfo())
+                            log.info("Skipping expired entry " + bd);
+                        continue;
+                    }
+                    storeInCache(bd);
                     count++;
                 } catch (IllegalArgumentException iae) {
                     if (log.shouldLog(Log.WARN))
@@ -341,6 +352,9 @@ class BlindCache {
     /**
      *  Format:
      *  sigtype,bsigtype,authtype,timestamp,b64 pubkey,[b64 secret],[b64 auth privkey],[b64 dest]
+     *
+     *  If timestamp is positive, it's a creation date;
+     *  if negative, it's a negative expiration date.
      */
     private BlindData fromPersistentString(String line) throws DataFormatException {
         String[] ss = DataHelper.split(line, ",", 8);
@@ -389,13 +403,21 @@ class BlindCache {
         } else {
             rv = new BlindData(_context, spk, st2, secret, auth, privkey);
         }
-        rv.setDate(time);
+        if (time >= 0) {
+            rv.setDate(time);
+        } else {
+            rv.setDate(_context.clock().now());
+            rv.setExpiration(0 - time);
+        }
         return rv;
     }
 
     /**
      *  Format:
      *  sigtype,bsigtype,authtype,timestamp,b64 pubkey,[b64 secret],[b64 auth privkey],[b64 dest]
+     *
+     *  If timestamp is positive, it's a creation date;
+     *  if negative, it's a negative expiration date.
      */
     private static String toPersistentString(BlindData bd) {
         StringBuilder buf = new StringBuilder(1024);
@@ -403,7 +425,12 @@ class BlindCache {
         buf.append(spk.getType().getCode()).append(',');
         buf.append(bd.getBlindedSigType().getCode()).append(',');
         buf.append(bd.getAuthType()).append(',');
-        buf.append(bd.getDate()).append(',');
+        long time = bd.getExpiration();
+        if (time > 0)
+            time = 0 - time;
+        else
+            time = bd.getDate();
+        buf.append(time).append(',');
         buf.append(spk.toBase64()).append(',');
         String secret = bd.getSecret();
         if (secret != null && secret.length() > 0)

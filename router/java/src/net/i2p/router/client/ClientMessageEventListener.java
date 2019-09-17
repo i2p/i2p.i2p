@@ -839,8 +839,16 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 if (_log.shouldWarn())
                     _log.warn("Updated: " + bd);
             } else {
-                if (_log.shouldWarn())
-                    _log.warn("No change: " + obd);
+                long oexp = obd.getExpiration();
+                long nexp = bd.getExpiration();
+                if (nexp > oexp) {
+                    obd.setExpiration(nexp);
+                    if (_log.shouldWarn())
+                        _log.warn("Updated expiration: " + obd);
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("No change: " + obd);
+                }
             }
         }
     }

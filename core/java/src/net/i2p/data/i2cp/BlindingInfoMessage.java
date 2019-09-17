@@ -60,9 +60,8 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
      *
      *  @param expiration ms from now or 0 for forever
      */
-    public BlindingInfoMessage(BlindData bd,
-                               SessionId id, int expiration) {
-        this(id, expiration, bd.getAuthType(), bd.getBlindedSigType(), bd.getAuthPrivKey(), bd.getSecret());
+    public BlindingInfoMessage(BlindData bd, SessionId id) {
+        this(id, bd.getExpiration(), bd.getAuthType(), bd.getBlindedSigType(), bd.getAuthPrivKey(), bd.getSecret());
         Destination dest = bd.getDestination();
         if (dest != null) {
             _dest = dest;
@@ -157,13 +156,13 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
         _endpointType = TYPE_KEY;
     }
 
-    private BlindingInfoMessage(SessionId id, int expiration, int authType, SigType blindType,
+    private BlindingInfoMessage(SessionId id, long expiration, int authType, SigType blindType,
                                 PrivateKey privKey, String secret) {
         if (id == null || blindType == null)
             throw new IllegalArgumentException();
         if (authType != BlindData.AUTH_NONE && authType != BlindData.AUTH_DH &&
             authType != BlindData.AUTH_PSK)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Bad auth type");
         if (authType == BlindData.AUTH_NONE && privKey != null)
             throw new IllegalArgumentException("no key required");
         if (authType != BlindData.AUTH_NONE && privKey == null)
@@ -171,8 +170,9 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
         _sessionId = id;
         _authType = authType;
         _blindType = blindType;
-        if (expiration > 0)
-        _expiration = expiration + I2PAppContext.getGlobalContext().clock().now();
+        _expiration = expiration;
+        if (expiration > 0 && expiration < Integer.MAX_VALUE)
+            _expiration += I2PAppContext.getGlobalContext().clock().now();
         _privkey = privKey;
         _secret = secret;
     }
@@ -262,6 +262,10 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
             _blindData = new BlindData(I2PAppContext.getGlobalContext(), _dest, _blindType, _secret, _authType, _privkey);
         else if (_endpointType == TYPE_KEY)
             _blindData = new BlindData(I2PAppContext.getGlobalContext(), _pubkey, _blindType, _secret, _authType, _privkey);
+        if (_blindData != null) {
+            _blindData.setDate(I2PAppContext.getGlobalContext().clock().now());
+            _blindData.setExpiration(_expiration);
+        }
         // HASH and HOST not supported by router yet
         return _blindData;
     }
@@ -278,7 +282,7 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
             _blindType = SigType.getByCode(bt);
             if (_blindType == null)
                 throw new I2CPMessageException("unsupported sig type " + bt);
-            _expiration = DataHelper.readLong(in, 4);
+            _expiration = DataHelper.readLong(in, 4) * 1000;
             if (_endpointType == TYPE_HASH) {
                 _hash = Hash.create(in);
             } else if (_endpointType == TYPE_HOST) {
@@ -338,7 +342,7 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
             os.write(flags);
             os.write((byte) _endpointType);
             DataHelper.writeLong(os, 2, _blindType.getCode());
-            DataHelper.writeLong(os, 4, _expiration);
+            DataHelper.writeLong(os, 4, _expiration / 1000);
             if (_endpointType == TYPE_HASH) {
                 _hash.writeBytes(os);
             } else if (_endpointType == TYPE_HOST) {

@@ -63,7 +63,7 @@ public abstract class LocalHTTPServer {
          "Add to addressbook failed - bad parameters";
 
     private final static String ERR_B32 =
-         "HTTP/1.1 409 Bad\r\n"+
+         "HTTP/1.1 400 Bad\r\n"+
          "Content-Type: text/plain\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
@@ -271,8 +271,13 @@ public abstract class LocalHTTPServer {
                         SigningPublicKey spk = bd.getUnblindedPubKey();
                         SigType bt = bd.getBlindedSigType();
                         bd = new BlindData(context, spk, bt, secret, authType, privateKey);
+                        long now = context.clock().now();
+                        bd.setDate(now);
+                        long exp = now + ((bd.getAuthRequired() || bd.getSecretRequired()) ? 365*24*60*60*1000L
+                                                                                           :  90*24*68*60*1000L);
+                        bd.setExpiration(exp);
                         I2PSession sess = sockMgr.getSession();
-                        sess.sendBlindingInfo(bd, 365*60*60*1000);
+                        sess.sendBlindingInfo(bd);
                         writeRedirectPage(out, success, host, "FIXME", url);
                         return;
                     } catch (IllegalArgumentException iae) {

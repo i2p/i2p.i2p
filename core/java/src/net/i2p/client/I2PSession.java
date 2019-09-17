@@ -439,10 +439,9 @@ public interface I2PSession {
 
     /**
      *
-     *  @param expiration ms from now, 0 means forever
      *  @since 0.9.43
      */
-    public void sendBlindingInfo(BlindData bd, int expiration) throws I2PSessionException;
+    public void sendBlindingInfo(BlindData bd) throws I2PSessionException;
 
     /**
      *  Listen on specified protocol and port.

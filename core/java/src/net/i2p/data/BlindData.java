@@ -28,6 +28,7 @@ public class BlindData {
     private boolean _secretRequired;
     private boolean _authRequired;
     private long _date;
+    private long _expiration;
     private String _b32;
 
     /**
@@ -257,6 +258,7 @@ public class BlindData {
     }
 
     /**
+     *  Creation date. Absolute timestamp.
      *  @since 0.9.41
      */
     public void setDate(long date) {
@@ -264,11 +266,33 @@ public class BlindData {
     }
 
     /**
+     *  Creation date. Absolute timestamp.
+     *  Returns zero if not specified.
+     *
      *  @return creation date or as overridden by setDate()
      *  @since 0.9.41
      */
     public long getDate() {
         return _date;
+    }
+
+    /**
+     *  Expiration date. Absolute timestamp.
+     *  @since 0.9.43
+     */
+    public void setExpiration(long date) {
+        _expiration = date;
+    }
+
+    /**
+     *  Expiration date. Absolute timestamp.
+     *  Returns zero if not specified.
+     *
+     *  @return expiration date or as overridden by setExpiration()
+     *  @since 0.9.43
+     */
+    public long getExpiration() {
+        return _expiration;
     }
 
     @Override
@@ -277,8 +301,8 @@ public class BlindData {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("[BlindData: ");
         buf.append("\n\tSigningPublicKey: ").append(_clearSPK);
-        buf.append("\n\tAlpha           : ").append(_alpha);
-        buf.append("\n\tAlpha valid for : ").append((new Date(_date)).toString());
+        buf.append("\n\tAlpha           : ").append(getAlpha());
+        buf.append("\n\tAlpha valid for : ").append((new Date(_routingKeyGenMod)).toString());
         buf.append("\n\tBlindedPublicKey: ").append(_blindSPK);
         buf.append("\n\tBlinded Hash    : ").append(_blindHash);
         if (_secret != null)
@@ -305,6 +329,10 @@ public class BlindData {
             buf.append("\n\t  + secret      : ").append(Blinding.encode(_clearSPK, true, _authRequired));
         if (!(_authRequired || _secretRequired))
             buf.append("\n\t  + auth,secret : ").append(Blinding.encode(_clearSPK, true, true));
+        if (_date > 0)
+            buf.append("\n\tCreated         : ").append((new Date(_date)).toString());
+        if (_expiration > 0)
+            buf.append("\n\tExpires         : ").append((new Date(_expiration)).toString());
         buf.append(']');
         return buf.toString();
     }

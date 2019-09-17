@@ -1860,10 +1860,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /**
      *
-     *  @param expiration ms from now, 0 means forever
      *  @since 0.9.43
      */
-    public void sendBlindingInfo(BlindData bd, int expiration) throws I2PSessionException {
+    public void sendBlindingInfo(BlindData bd) throws I2PSessionException {
         if (!_routerSupportsBlindingInfo)
             throw new I2PSessionException("Router does not support BlindingInfo");
         if (_log.shouldInfo())
@@ -1871,7 +1870,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SessionId id = _sessionId;
         if (id == null)
             id = DUMMY_SESSION;
-        sendMessage_unchecked(new BlindingInfoMessage(bd, id, expiration));
+        sendMessage_unchecked(new BlindingInfoMessage(bd, id));
     }
 
     protected void updateActivity() {
