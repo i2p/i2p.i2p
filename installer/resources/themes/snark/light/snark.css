@@ -2062,7 +2062,7 @@ hr.debug:last-child {
 #torrentInfoStats span {
      white-space: nowrap;
      display: inline-block;
-     margin-right: 7px;
+     margin-right: 8px;
 }
 
 /* Comments Section */

@@ -594,7 +594,7 @@ th.snarkTorrentStatus {
 #torrentInfoStats span {
      white-space: nowrap;
      display: inline-block;
-     margin-right: 3px;
+     margin-right: 8px;
 }
 
 .snarkTorrentInfo input[type="submit"] {

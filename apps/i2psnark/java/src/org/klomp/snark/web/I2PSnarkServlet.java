@@ -3020,7 +3020,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<table class=\"snarkTorrentInfo\">\n" +
                        "<tr><th></th><th><b>")
                .append(_t("Torrent"))
-               .append(":</b> ")
+               .append("</b></th><th>")
                .append(DataHelper.escapeHTML(snark.getBaseName()))
                .append("</th></tr>\n");
 
@@ -3030,7 +3030,7 @@ public class I2PSnarkServlet extends BasicServlet {
             toThemeImg(buf, "file");
             buf.append("</td><td><b>")
                .append(_t("Torrent file"))
-               .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
+               .append("</b></td><td><a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
             if (storage != null) {
@@ -3038,7 +3038,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 toThemeImg(buf, "file");
                 buf.append("</td><td><b>")
                    .append(_t("Data location"))
-                   .append(":</b> ")
+                   .append("</b></td><td>")
                    .append(DataHelper.escapeHTML(storage.getBase().getPath()))
                    .append("</td></tr>\n");
             }
@@ -3047,7 +3047,7 @@ public class I2PSnarkServlet extends BasicServlet {
             toThemeImg(buf, "details");
             buf.append("</td><td><b>")
                .append(_t("Info hash"))
-               .append(":</b> <span id=\"infohash\">")
+               .append("</b></td><td><span id=\"infohash\">")
                .append(hex.toUpperCase(Locale.US))
                .append("</span></td></tr>\n");
 
@@ -3061,7 +3061,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     announce = DataHelper.stripHTML(announce);
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
-                    buf.append("</td><td><b>").append(_t("Primary Tracker")).append(":</b> <span class=\"info_tracker\">");
+                    buf.append("</td><td><b>").append(_t("Primary Tracker")).append("</b></td><td><span class=\"info_tracker\">");
                     buf.append(getShortTrackerLink(announce, snark.getInfoHash()));
                     buf.append("</span></td></tr>");
                 }
@@ -3070,7 +3070,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
-                       .append(_t("Tracker List")).append(":</b> ");
+                       .append(_t("Tracker List")).append("</b></td><td>");
                     for (List<String> alist2 : alist) {
                         buf.append("<span class=\"info_tracker\">");
                         boolean more = false;
@@ -3095,7 +3095,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
-                       .append(_t("Comment")).append(":</b> ")
+                       .append(_t("Comment")).append("</b></td><td>")
                        .append(DataHelper.stripHTML(com))
                        .append("</td></tr>\n");
                 }
@@ -3105,7 +3105,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
-                       .append(_t("Created")).append(":</b> ")
+                       .append(_t("Created")).append("</b></td><td>")
                        .append(date)
                        .append("</td></tr>\n");
                 }
@@ -3116,7 +3116,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
-                       .append(_t("Created By")).append(":</b> ")
+                       .append(_t("Created By")).append("</b></td><td>")
                        .append(DataHelper.stripHTML(cby))
                        .append("</td></tr>\n");
                 }
@@ -3126,7 +3126,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
-                       .append(_t("Added")).append(":</b> ")
+                       .append(_t("Added")).append("</b></td><td>")
                        .append(date)
                        .append("</td></tr>\n");
                 }
@@ -3135,7 +3135,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
-                       .append(_t("Completed")).append(":</b> ")
+                       .append(_t("Completed")).append("</b></td><td>")
                        .append(date)
                        .append("</td></tr>\n");
                 }
@@ -3146,7 +3146,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         buf.append("<tr><td>");
                         toThemeImg(buf, "details");
                         buf.append("</td><td><b>")
-                           .append(_t("Last activity")).append(":</b> ")
+                           .append(_t("Last activity")).append("</b></td><td>")
                            .append(date)
                            .append("</td></tr>\n");
                     }
@@ -3160,7 +3160,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("&amp;tr=").append(announce);
                 buf.append("\">")
                    .append(toImg("magnet", _t("Magnet link")))
-                   .append("</a></td><td><b>Magnet:</b> <a href=\"")
+                   .append("</a></td><td><b>Magnet</b></td><td><a href=\"")
                    .append(MagnetURI.MAGNET_FULL).append(hex);
                 if (announce != null)
                     buf.append("&amp;tr=").append(announce);
@@ -3182,7 +3182,7 @@ public class I2PSnarkServlet extends BasicServlet {
             //buf.append("<tr><td>").append(_t("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
 
-            buf.append("<tr id=\"torrentInfoStats\"><td colspan=\"2\"><span>");
+            buf.append("<tr><td colspan=\"3\">&nbsp;</td></tr><tr id=\"torrentInfoStats\"><td colspan=\"3\"><span>");
             toThemeImg(buf, "size");
             buf.append("<b>")
                .append(_t("Size"))
@@ -3262,7 +3262,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
             // buttons
             if (showStopStart) {
-                buf.append("<tr id=\"torrentInfoControl\"><td colspan=\"2\">");
+                buf.append("<tr id=\"torrentInfoControl\"><td colspan=\"3\">");
                 if (snark.isChecking()) {
                     buf.append("<span id=\"fileCheck\"><b>").append(_t("Checking")).append("&hellip; ")
                        .append((new DecimalFormat("0.00%")).format(snark.getCheckingProgress()))
@@ -3293,7 +3293,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                       meta != null;
                 if (showInOrder) {
                     buf.append("</td></tr>\n" +
-                               "<tr id=\"torrentOrderControl\"><td colspan=\"2\">");
+                               "<tr id=\"torrentOrderControl\"><td colspan=\"3\">");
                     String txt = (meta.getFiles() != null && meta.getFiles().size() > 1) ?
                                  _t("Download files in order") :
                                  _t("Download pieces in order");
@@ -3312,7 +3312,7 @@ public class I2PSnarkServlet extends BasicServlet {
         } else {
             // snark == null
             // shouldn't happen
-            buf.append("<table class=\"resourceError\" id=\"NotFound\"><tr><th colspan=\"2\">")
+            buf.append("<table class=\"resourceError\" id=\"NotFound\"><tr><th colspan=\"3\">")
                .append(_t("Resource Not found"))
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
@@ -3323,7 +3323,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (snark != null && !r.exists()) {
             // fixup TODO
-            buf.append("<table class=\"resourceError\" id=\"DoesNotExist\"><tr><th colspan=\"2\">")
+            buf.append("<table class=\"resourceError\" id=\"DoesNotExist\"><tr><th colspan=\"3\">")
                .append(_t("Resource Does Not Exist"))
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
