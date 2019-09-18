@@ -167,6 +167,8 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
             throw new IllegalArgumentException("no key required");
         if (authType != BlindData.AUTH_NONE && privKey == null)
             throw new IllegalArgumentException("key required");
+        if (privKey != null && privKey.getType() != EncType.ECIES_X25519)
+            throw new IllegalArgumentException("Bad privkey type");
         _sessionId = id;
         _authType = authType;
         _blindType = blindType;
@@ -336,9 +338,7 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
         ByteArrayOutputStream os = new ByteArrayOutputStream(512);
         try {
             _sessionId.writeBytes(os);
-            byte flags = (byte) _authType;
-            if (_privkey != null)
-                flags |= FLAG_AUTH;
+            byte flags = (byte) (_authType & FLAG_AUTH);
             if (_secret != null)
                 flags |= FLAG_SECRET;
             os.write(flags);
@@ -356,7 +356,6 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
                 os.write(_pubkey.getData());
             }
             if (_privkey != null) {
-                DataHelper.writeLong(os, 2, _privkey.getType().getCode());
                 os.write(_privkey.getData());
             }
             if (_secret != null)
@@ -377,6 +376,7 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
         buf.append("[BlindingInfoMessage: ");
         buf.append("\n\tSession: ").append(_sessionId);
         buf.append("\n\tTimeout: ").append(_expiration);
+        buf.append("\n\tAuthTyp: ").append(_authType);
         if (_endpointType == TYPE_HASH)
             buf.append("\n\tHash: ").append(_hash.toBase32());
         else if (_endpointType == TYPE_HOST)

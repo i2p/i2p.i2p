@@ -1,3 +1,22 @@
+2019-09-18 zzz
+ * I2CP:
+   - More BlindingInfo serialization fixes
+   - Shorten lookup timeout on router side
+
+2019-09-17 zzz
+ * I2CP: Fix BlindingInfo serialization
+ * i2ptunnel:
+   - Remove streamr, connect, and httpbidir from wizard
+   - B32 auth form improvements
+   - Improve query parsing in local HTTP server
+   - New CLI BlindingInfo test
+ * Router: Implement expiration for BlindData entries
+
+2019-09-14 zzz
+ * i2ptunnel: Fix SSL wizard for split config (ticket #2610)
+ * Reseed: Fix adding netid param (ticket #2621)
+ * Util: Don't attempt to load hidden cert files (ticket #2622)
+
 2019-09-12 zzz
  * I2CP: BlindingInfo fixes
  * i2ptunnel: New form for blinding info
