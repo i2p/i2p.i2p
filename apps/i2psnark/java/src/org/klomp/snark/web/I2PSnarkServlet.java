@@ -2864,7 +2864,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" >\n" +
                                                "<thead>\n";
 
-    private static final String FOOTER = "</div></center>\n</body>\n</html>";
+    private static final String FOOTER = "</div></center></body></html>";
 
 
     /**
@@ -3182,26 +3182,25 @@ public class I2PSnarkServlet extends BasicServlet {
             //buf.append("<tr><td>").append(_t("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
 
-            buf.append("<tr><td colspan=\"3\">&nbsp;</td></tr><tr id=\"torrentInfoStats\"><td colspan=\"3\"><span>");
-            toThemeImg(buf, "size");
-            buf.append("<b>")
-               .append(_t("Size"))
-               .append(":</b> ")
-               .append(formatSize(snark.getTotalLength()));
+            buf.append("<tr id=\"torrentInfoStats\"><td><span>");
+            toThemeImg(buf, "head_rx");
+            buf.append("</td><td><b>");
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
-            buf.append("</span>&nbsp;<span>");
-            toThemeImg(buf, "head_rx");
-            buf.append("<b>");
             if (completion < 1.0)
                 buf.append(_t("Completion"))
                    .append(":</b> ")
                    .append((new DecimalFormat("0.00%")).format(completion));
             else
                 buf.append(_t("Complete")).append("</b>");
+            buf.append("</td><td><span>");
+            buf.append("<b>")
+               .append(_t("Size"))
+               .append(":</b> ")
+               .append(formatSize(snark.getTotalLength()));
+            buf.append("</span>&nbsp;<span>");
             // up ratio
             buf.append("</span>&nbsp;<span>");
-            toThemeImg(buf, "head_tx");
             buf.append("<b>")
                .append(_t("Upload ratio"))
                .append(":</b> ");
@@ -3221,7 +3220,6 @@ public class I2PSnarkServlet extends BasicServlet {
             }
             if (needed > 0) {
                 buf.append("</span>&nbsp;<span>");
-                toThemeImg(buf, "head_rx");
                 buf.append("<b>")
                    .append(_t("Remaining"))
                    .append(":</b> ")
@@ -3230,7 +3228,6 @@ public class I2PSnarkServlet extends BasicServlet {
             long skipped = snark.getSkippedLength();
             if (skipped > 0) {
                 buf.append("</span>&nbsp;<span>");
-                toThemeImg(buf, "head_rx");
                 buf.append("<b>")
                    .append(_t("Skipped"))
                    .append(":</b> ")
@@ -3240,20 +3237,17 @@ public class I2PSnarkServlet extends BasicServlet {
                 List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
                 buf.append("</span>&nbsp;<span>");
-                toThemeImg(buf, "file");
                 buf.append("<b>")
                    .append(_t("Files"))
                    .append(":</b> ")
                    .append(fileCount);
             }
             buf.append("</span>&nbsp;<span>");
-            toThemeImg(buf, "file");
             buf.append("<b>")
                .append(_t("Pieces"))
                .append(":</b> ")
                .append(pieces);
             buf.append("</span>&nbsp;<span>");
-            toThemeImg(buf, "file");
             buf.append("<b>")
                .append(_t("Piece size"))
                .append(":</b> ")
@@ -3328,7 +3322,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
                .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(DataHelper.escapeHTML(torrentName))
-               .append("</td></tr></table></div></div></center>\n</body>\n</html>");
+               .append("</td></tr></table></div></div></center></body></html>");
             return buf.toString();
         }
 
@@ -3343,7 +3337,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 displayComments(snark, er, ec, esc, buf);
             if (includeForm)
                 buf.append("</form>");
-            buf.append("</div></div>\n</body>\n</html>");
+            buf.append("</div></div></body></html>");
             return buf.toString();
         }
 
@@ -3597,7 +3591,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // for stop/start/check
         if (includeForm)
             buf.append("</form>");
-        buf.append("</div></div>\n</body>\n</html>\n");
+        buf.append("</div></div></body></html>");
 
         return buf.toString();
     }
