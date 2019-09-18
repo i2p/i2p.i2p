@@ -3306,7 +3306,7 @@ public class I2PSnarkServlet extends BasicServlet {
         } else {
             // snark == null
             // shouldn't happen
-            buf.append("<table class=\"resourceError\" id=\"NotFound\"><tr><th colspan=\"3\">")
+            buf.append("<table class=\"resourceError\" id=\"NotFound\"><tr><th colspan=\"2\">")
                .append(_t("Resource Not found"))
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
@@ -3317,7 +3317,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (snark != null && !r.exists()) {
             // fixup TODO
-            buf.append("<table class=\"resourceError\" id=\"DoesNotExist\"><tr><th colspan=\"3\">")
+            buf.append("<table class=\"resourceError\" id=\"DoesNotExist\"><tr><th colspan=\"2\">")
                .append(_t("Resource Does Not Exist"))
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
