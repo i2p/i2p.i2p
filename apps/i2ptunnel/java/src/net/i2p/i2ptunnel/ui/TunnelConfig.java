@@ -4,6 +4,7 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1121,14 +1122,10 @@ public class TunnelConfig {
         if (_privKeyFile != null)
             config.setProperty(TunnelController.PROP_FILE, _privKeyFile);
         
-        if (_customOptions != null) {
-            StringTokenizer tok = new StringTokenizer(_customOptions);
-            while (tok.hasMoreTokens()) {
-                String pair = tok.nextToken();
-                int eq = pair.indexOf('=');
-                if ( (eq <= 0) || (eq >= pair.length()) )
-                    continue;
-                String key = pair.substring(0, eq);
+        if (_customOptions != null && _customOptions.length() > 0) {
+            Map<String, String> custom = parseCustomOptions(_customOptions);
+            for (Map.Entry<String, String> e : custom.entrySet()) {
+                String key = e.getKey();
                 if (_noShowSet.contains(key))
                     continue;
                 // leave in for HTTP and Connect so it can get migrated to MD5
@@ -1137,7 +1134,7 @@ public class TunnelConfig {
                     (!TunnelController.TYPE_CONNECT.equals(_type)) &&
                     _nonProxyNoShowSet.contains(key))
                     continue;
-                String val = pair.substring(eq+1);
+                String val = e.getValue();
                 config.setProperty(OPT + key, val);
             }
         }
@@ -1197,4 +1194,119 @@ public class TunnelConfig {
             config.setProperty("option.outbound.backupQuantity", Integer.toString(_tunnelBackupQuantityOut));
         }
     }
+
+    /**
+     *  Parse the args submitted in the custom options field.
+     *
+     *  Modified from EepGet.parseAuthArgs()
+     *  Spaces or tabs separate args.
+     *  Args may be single- or double-quoted if they contain spaces or tabs.
+     *  There is no provision for escaping quotes.
+     *  A quoted string may not contain a quote of any kind.
+     *  Double quotes around values are stripped.
+     *  No quotes allowed for keys.
+     *  Keys without values, e.g. key= or key will be returned with "" for the value.
+     *
+     *  @param args non-null
+     *  @since 0.9.43
+     */
+    private static Map<String, String> parseCustomOptions(String args) {
+        Map<String, String> rv = new HashMap<String, String>(8);
+        StringBuilder buf = new StringBuilder(32);
+        boolean isQuoted = false;
+        String key = null;
+        for (int i = 0; i < args.length(); i++) {
+            char c = args.charAt(i);
+            switch (c) {
+                case '\'':
+                case '"':
+                    if (isQuoted) {
+                        // keys never quoted
+                        if (key != null) {
+                            rv.put(key, buf.toString().trim());
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    isQuoted = !isQuoted;
+                    break;
+
+                case ' ':
+                case '\r':
+                case '\n':
+                case '\t':
+                case ',':
+                    // whitespace - if we're in a quoted section, keep this as part of the quote,
+                    // otherwise use it as a delim
+                    if (isQuoted) {
+                        buf.append(c);
+                    } else {
+                        if (key != null) {
+                            if (key.length() > 0)
+                                rv.put(key, buf.toString().trim());
+                            key = null;
+                        } else {
+                          String k = buf.toString().trim();
+                          if (k.length() > 0)
+                              rv.put(k, "");
+                        }
+                        buf.setLength(0);
+                    }
+                    break;
+
+                case '=':
+                    if (isQuoted || key != null) {
+                        buf.append(c);
+                    } else {
+                        key = buf.toString().trim();
+                        buf.setLength(0);
+                    }
+                    break;
+
+                default:
+                    buf.append(c);
+                    break;
+            }
+        }
+        if (key != null) {
+            if (key.length() > 0)
+                rv.put(key, buf.toString().trim());
+        } else {
+            key = buf.toString().trim();
+            if (key.length() > 0)
+                rv.put(key, "");
+        }
+        return rv;
+    }
+
+/****
+    private static String[] tests = {
+        "", "foo", "foo=bar",
+        "f=b x", "x f=b",
+        "  aaa=bbb ccc=ddd   ",
+        "aaa=bbb ccc=ddd x",
+        "aaa=bbb ccc=ddd x=",
+        "a=\"w x y z\" b c= d='1 2 3 4'",
+        "klsjdf owi=\"w\tx y\tz\"",
+        "z= aaa= ",
+        "=", " = ", "=foo", " =fpp ",
+        "a=\"\", b='', c='xxx\" d='aaa'",
+        "xx=\"missingquote",
+        "'zxw=123'",
+        "'zxw=123",
+        "'zxw=123' a=b c d e",
+        "x====", "x====x",
+        "aaa=b=cc====dddddd====",
+    };
+
+    public static void main(String[] args) {
+        for (int i = 0; i < tests.length; i++) {
+            Map<String, String> m = parseCustomOptions(tests[i]);
+            System.out.println("\nTest \"" + tests[i] + '"');
+            for (Map.Entry<String, String> e : m.entrySet()) {
+                System.out.println("    \"" + e.getKey() + "\" = \"" + e.getValue() + '"');
+            }
+        }
+    }
+****/
 }

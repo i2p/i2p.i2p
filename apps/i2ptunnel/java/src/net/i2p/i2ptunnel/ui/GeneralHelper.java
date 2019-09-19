@@ -939,7 +939,13 @@ public class GeneralHelper {
                     buf.append(' ');
                 else
                     space = true;
-                buf.append(e.getKey()).append('=').append(e.getValue());
+                buf.append(e.getKey()).append('=');
+                String v = e.getValue();
+                if (v.contains(" ") || v.contains("\t")) {
+                    buf.append('"').append(v).append('"');
+                } else {
+                    buf.append(v);
+                }
             }
             return DataHelper.escapeHTML(buf.toString());
         } else {
