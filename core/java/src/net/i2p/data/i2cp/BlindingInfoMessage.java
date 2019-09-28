@@ -58,7 +58,6 @@ public class BlindingInfoMessage extends I2CPMessageImpl {
      *  Will create a DEST or KEY message type, depending on whether
      *  BlindData has the full destination.
      *
-     *  @param expiration ms from now or 0 for forever
      */
     public BlindingInfoMessage(BlindData bd, SessionId id) {
         this(id, bd.getExpiration(), bd.getAuthType(), bd.getBlindedSigType(), bd.getAuthPrivKey(), bd.getSecret());
