@@ -1562,7 +1562,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
             boolean ok = _util.connect();
             if (!ok) {
                 addMessage(_t("Error connecting to I2P - check your I2CP settings!"));
-                return false;
+                // this would rename the torrent to .BAD
+                //return false;
             }
         }
         File sfile = new File(filename);
@@ -1584,8 +1585,10 @@ public class SnarkManager implements CompleteListener, ClientApp {
             synchronized (_addSnarkLock) {
                 // double-check
                 synchronized (_snarks) {
-                    if(_snarks.get(filename) != null)
+                    if(_snarks.get(filename) != null) {
+                        addMessage(_t("Torrent already running: {0}", filename));
                         return false;
+                    }
                 }
 
                 FileInputStream fis = null;
@@ -1670,6 +1673,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 }
             }
         } else {
+            addMessage(_t("Torrent already running: {0}", filename));
             return false;
         }
         // ok, snark created, now lets start it up or configure it further
@@ -2881,7 +2885,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
      */
     public void startTorrent(Snark snark) {
         if (snark.isStarting() || !snark.isStopped()) {
-            addMessage("Torrent already started");
+            addMessageNoEscape(_t("Torrent already running: {0}", linkify(snark)));
             return;
         }
         boolean connected = _util.connected();
