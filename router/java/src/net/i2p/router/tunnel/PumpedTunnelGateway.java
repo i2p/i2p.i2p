@@ -164,7 +164,7 @@ class PumpedTunnelGateway extends TunnelGateway {
                 delayAmount = _preprocessor.getDelayAmount();
             _lastFlush = _context.clock().now();
             
-            // expire any as necessary, even if its framented
+            // expire any as necessary, even if its fragmented
             for (int i = 0; i < _queue.size(); i++) {
                 PendingGatewayMessage m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
