@@ -3818,11 +3818,13 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "html";
         else if (mime.equals("text/plain") ||
                  mime.equals("text/x-sfv") ||
-                 mime.equals("application/rtf") ||
-                 plc.endsWith(".azw4"))
+                 mime.equals("application/rtf"))
             icon = "page";
         else if  (mime.equals("application/epub+zip") ||
-                 mime.equals("application/x-mobipocket-ebook"))
+                 mime.equals("application/x-mobipocket-ebook") ||
+                 plc.endsWith(".fb2") ||
+                 plc.endsWith(".azw3") ||
+                 plc.endsWith(".azw4"))
             icon = "ebook";
         else if (mime.equals("application/java-archive") ||
                  plc.endsWith(".deb"))
