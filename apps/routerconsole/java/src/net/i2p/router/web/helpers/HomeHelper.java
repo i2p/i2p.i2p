@@ -63,7 +63,7 @@ public class HomeHelper extends HelperBase {
         _x("I2P Forum") + S + _x("Community forum") + S + "http://i2pforum.i2p/" + S + I + "group.png" + S +
         //"git.repo.i2p" + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
         //"hiddengate [ru]" + S + _x("Russian I2P-related wiki") + S + "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
-        _x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
+        //_x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
         //"Ident " + _x("Microblog") + S + _x("Your premier microblogging service on I2P") + S + "http://id3nt.i2p/" + S + I + "ident_icon_blue.png" + S +
         //_x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "education.png" + S +
         //"jisko.i2p" + S + _x("Simple and fast microblogging website") + S + "http://jisko.i2p/" + S + I + "jisko_console_icon.png" + S +
@@ -196,18 +196,10 @@ public class HomeHelper extends HelperBase {
         for (App app : apps) {
             String url;
             if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
-                int port = pm.getPort(PortMapper.SVC_EEPSITE);
-                int sslPort = pm.getPort(PortMapper.SVC_HTTPS_EEPSITE);
-                if (port <= 0 && sslPort <= 0)
-                    continue;
                 // fixup eepsite link
-                if (sslPort > 0) {
-                    url = "https://" + pm.getActualHost(PortMapper.SVC_HTTPS_EEPSITE, "127.0.0.1") +
-                      ':' + sslPort + '/';
-                } else {
-                    url = "http://" + pm.getActualHost(PortMapper.SVC_EEPSITE, "127.0.0.1") +
-                      ':' + port + '/';
-                }
+                url = SummaryBarRenderer.getEepsiteURL(pm);
+                if (url == null)
+                    continue;
             } else {
                 url = app.url;
                 // check for disabled webapps and other things

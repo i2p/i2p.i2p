@@ -1,3 +1,13 @@
+2019-10-01 zzz
+ * Console: Remove i2pwiki.i2p (ticket #2626)
+ * PortMapper: Fix URL generation for IPv6 hosts
+
+2019-09-21 zzz
+ * Tomcat 8.5.46
+
+2019-09-19 zzz
+ * i2ptunnel: Support quoting for custom options (ticket #2603)
+
 2019-09-18 zzz
  * I2CP:
    - More BlindingInfo serialization fixes

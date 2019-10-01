@@ -231,31 +231,51 @@ class SummaryBarRenderer {
            .append("</a>\n");
         }
 
-        int port = pm.getPort(PortMapper.SVC_EEPSITE);
-        int sslPort = pm.getPort(PortMapper.SVC_HTTPS_EEPSITE);
-        if (sslPort > 0 || port > 0) {
-           String svc;
-           if (sslPort > 0) {
-               buf.append("<a href=\"https://");
-               svc = PortMapper.SVC_HTTPS_EEPSITE;
-               port = sslPort;
-           } else {
-               buf.append("<a href=\"http://");
-               svc = PortMapper.SVC_EEPSITE;
-           }
-           buf.append(pm.getActualHost(svc, "127.0.0.1"))
-           .append(':')
-           .append(port)
-           .append("/\" target=\"_blank\" title=\"")
-           .append(_t("Local web server"))
-           .append("\">")
-           .append(nbsp(_t("Web Server")))
-           .append("</a>\n");
+        String url = getEepsiteURL(pm);
+        if (url != null) {
+            buf.append("<a href=\"")
+               .append(url)
+               .append("\" target=\"_blank\" title=\"")
+               .append(_t("Local web server"))
+               .append("\">")
+               .append(nbsp(_t("Web Server")))
+               .append("</a>\n");
         }
 
         buf.append(NavHelper.getClientAppLinks(_context))
 
            .append("</td></tr></table>\n");
+        return buf.toString();
+    }
+
+    /**
+     *  @return null if none
+     *  @since 0.9.43 split out from above, used by HomeHelper, fixed for IPv6
+     */
+    static String getEepsiteURL(PortMapper pm) {
+        int port = pm.getPort(PortMapper.SVC_EEPSITE);
+        int sslPort = pm.getPort(PortMapper.SVC_HTTPS_EEPSITE);
+        if (port <= 0 && sslPort <= 0)
+            return null;
+        String svc;
+        StringBuilder buf = new StringBuilder(32);
+        if (sslPort > 0) {
+            buf.append("https://");
+            svc = PortMapper.SVC_HTTPS_EEPSITE;
+            port = sslPort;
+        } else {
+            buf.append("http://");
+            svc = PortMapper.SVC_EEPSITE;
+        }
+        String host = pm.getActualHost(svc, "127.0.0.1");
+        if (host.contains(":"))
+            buf.append('[');
+        buf.append(host);
+        if (host.contains(":"))
+            buf.append(']');
+        buf.append(':')
+           .append(port)
+           .append('/');
         return buf.toString();
     }
 

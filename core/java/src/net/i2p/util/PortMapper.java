@@ -280,10 +280,15 @@ public class PortMapper {
         int httpPort = getPort(SVC_CONSOLE, DEFAULT_CONSOLE_PORT);
         int httpsPort = getPort(SVC_HTTPS_CONSOLE);
         boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
-        if (httpsOnly)
+        if (httpsOnly) {
+            if (httpsHost.contains(":"))
+                return "https://[" + httpsHost + "]:" + httpsPort + '/';
             return "https://" + httpsHost + ':' + httpsPort + '/';
+        }
         if (httpHost.equals(unset))
             httpHost = DEFAULT_HOST;
+        if (httpHost.contains(":"))
+            return "http://[" + httpHost + "]:" + httpPort + '/';
         return "http://" + httpHost + ':' + httpPort + '/';
     }
 
@@ -298,10 +303,15 @@ public class PortMapper {
         int httpPort = getPort(SVC_CONSOLE);
         int httpsPort = getPort(SVC_HTTPS_CONSOLE, DEFAULT_HTTPS_CONSOLE_PORT);
         boolean httpOnly = httpPort > 0 && httpsHost.equals(unset) && !httpHost.equals(unset);
-        if (httpOnly)
+        if (httpOnly) {
+            if (httpHost.contains(":"))
+                return "http://[" + httpHost + "]:" + httpPort + '/';
             return "http://" + httpHost + ':' + httpPort + '/';
+        }
         if (httpsHost.equals(unset))
             return "http://" + DEFAULT_HOST + ':' + DEFAULT_CONSOLE_PORT + '/';
+        if (httpsHost.contains(":"))
+            return "https://[" + httpsHost + "]:" + httpsPort + '/';
         return "https://" + httpsHost + ':' + httpsPort + '/';
     }
 
