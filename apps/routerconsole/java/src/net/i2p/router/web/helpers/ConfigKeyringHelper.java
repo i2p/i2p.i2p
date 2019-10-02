@@ -90,8 +90,8 @@ public class ConfigKeyringHelper extends HelperBase {
             SessionKey sk = e.getValue();
             buf.append(sk.toBase64());
             if (!local)
-                buf.append("</td><td>");
-            buf.append("</td>\n");
+                buf.append("</td><td></td><td></td><td>");
+            buf.append("</td></tr>\n");
         }
         // LS2
         if (!local) {
@@ -152,7 +152,7 @@ public class ConfigKeyringHelper extends HelperBase {
                 t = bd.getExpiration();
                 if (t > 0)
                     buf.append(DataHelper.formatDate(t));
-                buf.append("</td><tr>");
+                buf.append("</td></tr>");
             }
         }
         buf.append("</table>\n");
