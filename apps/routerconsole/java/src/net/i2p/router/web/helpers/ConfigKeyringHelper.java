@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.i2p.data.BlindData;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
@@ -56,8 +57,11 @@ public class ConfigKeyringHelper extends HelperBase {
         if (!local)
             buf.append("<th align=\"left\">").append(_t("Type"));
         buf.append("<th align=\"left\">").append(_t("Encryption Key"));
-        if (!local)
+        if (!local) {
             buf.append("<th align=\"left\">").append(_t("Lookup Password"));
+            buf.append("<th align=\"left\">").append(_t("Created"));
+            buf.append("<th align=\"left\">").append(_t("Expires"));
+        }
         buf.append("</tr>");
         // Enc. LS1
         for (Map.Entry<Hash, SessionKey> e : _context.keyRing().entrySet()) {
@@ -140,6 +144,14 @@ public class ConfigKeyringHelper extends HelperBase {
                 buf.append("</td><td>");
                 if (secret != null)
                     buf.append(secret);
+                buf.append("</td><td>");
+                long t = bd.getDate();
+                if (t > 0)
+                    buf.append(DataHelper.formatDate(t));
+                buf.append("</td><td>");
+                t = bd.getExpiration();
+                if (t > 0)
+                    buf.append(DataHelper.formatDate(t));
                 buf.append("</td><tr>");
             }
         }
