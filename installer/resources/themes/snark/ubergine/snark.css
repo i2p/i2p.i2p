@@ -829,6 +829,7 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
 #infohash {
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 
@@ -1104,6 +1105,7 @@ tr:hover .percentBarInner {
      box-shadow: inset 0 0 0 1px #212;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 
@@ -1168,6 +1170,7 @@ th.headerpriority br, .snarkTorrents thead th br {
 .toggleview, .snarkConfigTitle, .snarknavbar, img, input[type="image"], label, th img {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 
@@ -3380,6 +3383,7 @@ th a img {
 .snarkTorrentStatus {
      -moz-user-select: none !important;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 }

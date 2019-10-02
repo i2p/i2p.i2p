@@ -67,6 +67,7 @@ tt, code, pre, textarea, #logs li {
 .newsAuthor, #netdbcountrylist img, .viewfullentry, .sybil_routerinfo th img, .graphspanel, #themeoptions, #graphopts, #newsDisplay {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 
@@ -2398,6 +2399,7 @@ table#wrapperlogs {
 #enviro {
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
      cursor: text;
 }
@@ -6283,6 +6285,7 @@ h3#ntcpcon, h3#udpcon {
      user-select: all;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
 }
 
 #portfaq {
@@ -6561,6 +6564,7 @@ a[href^="configpeer?peer"]:hover {
 th code {
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 
@@ -7025,6 +7029,7 @@ b.netdb_transport {
 .revision, .sha256, .unsignedmod {
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 
@@ -7910,6 +7915,7 @@ th.options {
 #enviro tr:first-child td {
      -moz-user-select: none !important;
      -webkit-user-select: none !important;
+     -ms-user-select: none !important;
      user-select: none !important;
 }
 

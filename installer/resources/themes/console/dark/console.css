@@ -36,6 +36,7 @@ body {
 .routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 
@@ -4170,6 +4171,7 @@ ul#upnphelp li:last-child, #legal ul li:last-child {
      user-select: all;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
 }
 
 #faq li code {
@@ -4420,7 +4422,8 @@ img.unknownflag {
 
 #enviro:hover {
      -moz-user-select: all;
-     --webkit-user-select: all;
+     -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
      cursor: text;
 }
@@ -6543,6 +6546,7 @@ tt a, img + tt {
 th code {
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 
@@ -7047,6 +7051,7 @@ b.netdb_transport {
      display: inline-block;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 

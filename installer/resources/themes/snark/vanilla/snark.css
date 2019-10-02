@@ -125,6 +125,7 @@ th a:active, th a:visited:active, td a:active, td a:visited:active {
 .toggleview, .snarkConfigTitle, .snarknavbar, img, input[type="image"] {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 
@@ -912,6 +913,7 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
      color: #050;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 
@@ -1844,6 +1846,7 @@ code, tt {
      font-family: "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", monospace;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 

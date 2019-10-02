@@ -42,6 +42,7 @@ body.iframed {
 #pagenav, .sort, .topbuttons, h3 {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 
@@ -62,6 +63,7 @@ body.iframed {
 #mailbox td:first-child, #mailbox td:nth-child(2), #mailbox td:nth-child(4), #mailbox td:nth-child(6), #mailbox td:nth-child(8) {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 

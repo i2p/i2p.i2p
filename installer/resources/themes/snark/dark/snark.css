@@ -68,6 +68,7 @@ body.iframed {
 .toggleview, .snarkConfigTitle, .snarknavbar, img, input[type="image"] {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 
@@ -641,6 +642,7 @@ th.snarkTorrentStatus {
      color: #cc0;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 
@@ -1959,6 +1961,7 @@ code {
 .snarkAddInfo code {
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
 }
 

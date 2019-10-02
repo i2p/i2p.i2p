@@ -33,6 +33,7 @@ body.iframed {
 #navi, .buttons, #buttons, #host_list tr:first-child, #host_list img, #host_list td:nth-child(n+2) a {
      -moz-user-select: none;
      -webkit-user-select: none;
+     -ms-user-select: none;
      user-select: none;
 }
 
@@ -1116,6 +1117,7 @@ p.book {
      padding: 3px 10px !important;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
      overflow: hidden;
      text-overflow: ellipsis;

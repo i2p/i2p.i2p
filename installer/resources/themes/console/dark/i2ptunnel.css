@@ -1175,6 +1175,7 @@ input[type="text"] + label {
      padding: 4px;
      -moz-user-select: all;
      -webkit-user-select: all;
+     -ms-user-select: all;
      user-select: all;
      border: 1px solid #494;
      background: #000;
