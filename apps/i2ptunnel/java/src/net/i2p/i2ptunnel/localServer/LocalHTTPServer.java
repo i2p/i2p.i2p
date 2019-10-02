@@ -25,8 +25,9 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.util.FileUtil;
 import net.i2p.util.PortMapper;
 import net.i2p.util.Translate;
@@ -77,6 +78,15 @@ public abstract class LocalHTTPServer {
          "Proxy-Connection: close\r\n"+
          "\r\n"+
          "I2P HTTP proxy OK";
+
+    private final static String NEWKEY =
+         "HTTP/1.1 200 OK\r\n" +
+         "Content-Type: text/html; charset=UTF-8\r\n" +
+         "Referrer-Policy: no-referrer\r\n"+
+         "Cache-Control: no-cache\r\n" +
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n";
 
     /**
      *  Very simple web server.
@@ -219,6 +229,7 @@ public abstract class LocalHTTPServer {
             if (proxyNonce.equals(nonce) && url != null && host != null && code != null) {
                 boolean success = true;
                 PrivateKey privateKey = null;
+                PublicKey publicKey = null;
                 if (!code.equals("2") && !code.equals("4")) {
                     secret = null;
                 } else if (secret == null || secret.length() == 0) {
@@ -233,6 +244,7 @@ public abstract class LocalHTTPServer {
                     // newpsk probably not required
                     KeyPair kp = context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
                     privateKey = kp.getPrivate();
+                    publicKey = kp.getPublic();
                     authType = action.equals("newdh") ? BlindData.AUTH_DH : BlindData.AUTH_PSK;
                 } else if (privkey == null || privkey.length() == 0) {
                     err = _t("Missing private key");
@@ -262,7 +274,54 @@ public abstract class LocalHTTPServer {
                         bd.setExpiration(exp);
                         I2PSession sess = sockMgr.getSession();
                         sess.sendBlindingInfo(bd);
-                        writeB32RedirectPage(out, host, url);
+                        if ("newdh".equals(action) || "newpsk".equals(action)) {
+                            String key;
+                            if ("newdh".equals(action))
+                                key = publicKey.toBase64();
+                            else
+                                key = privateKey.toBase64();
+                            StringBuilder buf = new StringBuilder(1024);
+                            PortMapper pm = context.portMapper();
+                            String conURL = pm.getConsoleURL();
+                            buf.append(NEWKEY)
+                               .append("<html><head><title>")
+                               .append(_t("Your new encrytpion key"))
+                               .append("</title>\n" +
+                                       "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
+                                       "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
+                                       "</head><body>\n" +
+                                       "<div class=logo>\n" +
+                                       "<a href=\"")
+                               .append(conURL).append("\" title=\"").append(_t("Router Console"))
+                               .append("\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
+                                       "<a href=\"")
+                               .append(conURL).append("config\">").append(_t("Configuration")).append("</a> <a href=\"")
+                               .append(conURL).append("help.jsp\">").append(_t("Help")).append("</a>");
+                            if (pm.isRegistered(PortMapper.SVC_SUSIDNS)) {
+                                buf.append(" <a href=\"").append(conURL).append("susidns/index\">")
+                                   .append(_t("Addressbook")).append("</a>\n");
+                            }
+                            buf.append("</div>" +
+                                       "<div class=warning id=warning>\n" +
+                                       "<h3>")
+                               .append(_t("Your new encrytpion key"))
+                               .append("</h3>\n<p>" +
+                                       "<textarea rows=\"1\" style=\"min-width: 0; min-height: 0;\" cols=\"70\" wrap=\"off\" readonly=\"readonly\" >")
+                               .append(key)
+                               .append("</textarea><p>")
+                               .append(_t("Copy the key and send it to the server operator."))
+                               .append(' ')
+                               .append(_t("After you are granted permission, you may proceed to the website."))
+                               .append("<p><a href=\"")
+                               .append(url)
+                               .append("\">")
+                               .append(url)
+                               .append("</a></div>");
+                            out.write(buf.toString().getBytes("UTF-8"));
+                            I2PTunnelHTTPClientBase.writeFooter(out);
+                        } else {
+                            writeB32RedirectPage(out, host, url);
+                        }
                         return;
                     } catch (IllegalArgumentException iae) {
                         err = iae.toString();
@@ -320,7 +379,7 @@ public abstract class LocalHTTPServer {
                   "</h3>\n<p><a href=\"" + url + "\">" +
                   _t("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
-        I2PTunnelHTTPClient.writeFooter(out);
+        I2PTunnelHTTPClientBase.writeFooter(out);
         out.flush();
     }
 
@@ -352,7 +411,7 @@ public abstract class LocalHTTPServer {
                   "</h3>\n<p><a href=\"" + url + "\">" +
                   _t("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
-        I2PTunnelHTTPClient.writeFooter(out);
+        I2PTunnelHTTPClientBase.writeFooter(out);
         out.flush();
     }
 

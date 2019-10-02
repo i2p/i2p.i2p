@@ -1528,11 +1528,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                       ' ' + _t("Ask the server operator for help.") +
                       "</p>\n" +
 
-                      "<p>" + _t("Enter PSK encryption key") +
-                      "</p>\n" +
+                      "<p><b>PSK:</b> " + _t("Enter PSK encryption key") +
+                      ": ]</p>\n" +
                       "<input type=\"text\" size=\"55\" name=\"privkey\" value=\"\">\n" +
-                      "<p>" + _t("Generate new DH encryption key") +
-                      "<div class=\"formaction\">" +
+                      "<p><b>DH:</b> " + _t("Generate new DH encryption key") +
+                      ": <div class=\"formaction_xx\">" +
                       "<button type=\"submit\" class=\"accept\" name=\"action\" value=\"newdh\">" + label +
                       "</button></div>\n");
                       //"<p>" + _t("Generate new PSK encryption key") +
