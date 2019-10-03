@@ -29,13 +29,14 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
     private int _consec;
     private int _consecNotRunning;
     private boolean _isIdle;
-    private String _lastIn = "3";
-    private String _lastOut = "3";
+    private String _lastIn = DEFAULT_QTY;
+    private String _lastOut = DEFAULT_QTY;
     private final Object _lock = new Object();
 
     private static final long CHECK_TIME = 63*1000;
     private static final int MAX_CONSEC_IDLE = 4;
     private static final int MAX_CONSEC_NOT_RUNNING = 20;
+    private static final String DEFAULT_QTY = "2";
 
     /**
      *  Caller must schedule
@@ -93,8 +94,8 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
             _isIdle = false;
             _consec = 0;
             _consecNotRunning = 0;
-            _lastIn = "3";
-            _lastOut = "3";
+            _lastIn = DEFAULT_QTY;
+            _lastOut = DEFAULT_QTY;
         }
         schedule(CHECK_TIME);
     }
