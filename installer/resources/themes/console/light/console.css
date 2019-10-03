@@ -1881,7 +1881,13 @@ h3#passwordheading {
      filter: none;
 }
 
-h3#langheading, h3#themeheading, h3#pluginmanage, h3#pconfig, h3#webappconfig, h3#advancedclientconfig, h3#i2pclientconfig, #config_stats h3 {
+.mlabtable {
+    width: 30%;
+    position: absolute;
+    top: 36%;
+}
+
+h3#themeheading, h3#pluginmanage, h3#pconfig, h3#webappconfig, h3#advancedclientconfig, h3#i2pclientconfig, #config_stats h3 {
      border: 1px solid #7778bf;
      border-radius: 0;
      box-shadow: inset 0 0 0 1px #fff;
@@ -2152,15 +2158,20 @@ h3#graphdisplay {
 .messages {
      margin: 15px 0;
      padding: 10px 15px;
+     z-index: 999;
      border-radius: 2px;
      border: 1px solid #7778bf;
      background: #eef;
      background: linear-gradient(to right, #fafaff, #eef);
      background-size: auto 100%, 100% 100%;
-     font-weight: bold;
      box-shadow: inset 0 0 0 1px #fff;
-     line-height: 130%;
      filter: drop-shadow(0 0 1px #ccf);
+     font-weight: bold;
+     line-height: 130%;
+     position: absolute;
+     top: 5%;
+     right: 5%;
+     width: 20%;
 }
 
 .main#config_update .messages {
@@ -2233,11 +2244,11 @@ table {
 td.optionsave {
      text-align: right;
      padding: 5px !important;
-     background: #fafaff;
-     border-top: 1px solid #7778bf !important;
+     background: none;
+     /*border-top: 1px solid #7778bf !important;*/
 }
 
-td.optionsave, .formaction, form[action="configpeer"] tr:last-child td, table#addkeyring tr:last-child td {
+.formaction, form[action="configpeer"] tr:last-child td, table#addkeyring tr:last-child td {
      background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
 }
 
@@ -2249,6 +2260,13 @@ td.optionsave, .formaction, form[action="configpeer"] tr:last-child td, table#ad
 
 .configtable {
      box-shadow: none !important;
+     white-space: normal;
+}
+
+#bandwidthconfig table.configtable {
+    border: none;
+    bottom: 5rem;
+    right: 10rem;
 }
 
 .configtable td {
@@ -2256,15 +2274,24 @@ td.optionsave, .formaction, form[action="configpeer"] tr:last-child td, table#ad
 }
 
 .configtable tr:last-child td {
-     border-top: 1px solid #7778bf !important;
+    border-top: 1px solid #7778bf;
+}
+
+.wizard tr:last-child td {
+    border-top: none !important;
+}
+
+#bandwidthconfig .configtable tr:last-child td {
+     border: none;
 }
 
 td.infohelp, #help tr:hover td.infohelp, #eventlog tr:hover .infohelp {
      background: #fff url(/themes/console/images/info/infohelp.png) 12px center no-repeat;
      background: url(/themes/console/images/info/infohelp.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
      padding: 15px 15px 15px 50px;
-     border-bottom: 1px solid #7778bf !important;
-     border-top: 1px solid #7778bf !important;
+     /*border-bottom: 1px solid #7778bf !important;
+     border-top: 1px solid #7778bf !important;*/
+     border: unset;
      text-align: justify;
 }
 
@@ -2549,6 +2576,57 @@ td {
      margin-left: 3px !important;
 }
 
+#wizardheading {
+    border: none;
+    width: 50%;
+    padding: 2%;
+    margin: 2% 24%;
+    top: 2%;
+    font-size: xx-large;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    word-spacing: 0.1em;
+    color: #41465f;
+    position: absolute;
+    background: none !important;
+    box-shadow: none !important;
+}
+
+#infodiv {
+    position: absolute;
+    right: 12%;
+    width: 16%;
+    top: 36%;
+    background: #eef linear-gradient(to right, #fafaff, #eef);
+    background-size: auto 100%, 100% 100%;
+    box-shadow: inset 0 0 0 1px #fff;
+    filter: drop-shadow(0 0 1px #ccf);
+}
+
+#bandwidthconfig {
+    border: 1px solid #7778bf;
+}
+
+#bandwidthconfig.configtable.wizard {
+    width: 35%;
+    top: 36%;
+    left: 31%;
+    position: absolute;
+    background: none;
+    font-size: larger;
+}
+
+.configtable.wizard {
+    width: 20%;
+    bottom: 5rem;
+    right: 10rem;
+    position: absolute;
+    box-shadow: none !important;
+    white-space: normal;
+    background: none;
+    font-size: larger;
+}
+
 #bandwidthconfig td:first-child {
      width: 200px;
      white-space: nowrap;
@@ -2557,6 +2635,44 @@ td {
 
 #bandwidthconfig td:last-child {
      white-space: normal;
+     background: none;
+     font-size: larger;
+}
+
+#bandwidthconfig.configtable td {
+     white-space: normal;
+     background: none;
+     font-size: larger;
+}
+
+#bandwidthconfig.configtable.wizard td {
+     white-space: normal;
+     background: none;
+     font-size: small;
+}
+
+#xhr.notification {
+    width: 30%;
+    position: absolute;
+    left: 30%;
+    top: 38%;
+    font-size: larger;
+    background: #eef;
+    box-shadow: inset 0 0 0 1px #fff;
+    filter: drop-shadow(0 0 1px #ccf);
+}
+
+#xhr2.notification {
+    width: 30%;
+    position: absolute;
+    left: 30%;
+    top: 40%;
+    font-size: larger;
+    background: #eef;
+    background: linear-gradient(to right, #fafaff, #eef);
+    background-size: auto 100%, 100% 100%;
+    box-shadow: inset 0 0 0 1px #fff;
+    filter: drop-shadow(0 0 1px #ccf);
 }
 
 /* begin home page */
@@ -3758,6 +3874,7 @@ button:active, input[type="submit"]:active, input[type="reset"]:active {
 input.accept, button.accept {
      background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
+     font-size: large;
 }
 
 input.accept:hover, button.accept:hover, input.accept:focus, button.accept:focus {
@@ -3797,6 +3914,7 @@ input.accept[value^="Filter"]:focus, button.accept[value^="Filter"]:focus {
 input.add, button.add {
      background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
+     font-size: large;
 }
 
 input.add:hover, button.add:hover,
@@ -3817,6 +3935,7 @@ input.add[value^="Adjust"]:focus, button.add[value^="Adjust"]:focus {
 input.cancel, button.cancel {
      background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
+     font-size: large;
 }
 
 input.cancel:hover, button.cancel:hover,
@@ -3873,6 +3992,7 @@ input.check[value$="updates"]:focus, button.check[value$="updates"]:focus {
 input.delete, button.delete {
      background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
+     font-size: large;
 }
 
 input.delete:hover, button.delete:hover,
@@ -3893,6 +4013,7 @@ input.delete[value^="Ban"]:focus, button.delete[value^="Ban"]:focus {
 input.download, button.download {
      background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
+     font-size: large;
 }
 
 input.download:hover, button.download:hover,
@@ -3936,6 +4057,7 @@ input.download[value^="Dump"]:focus, button.download[value^="Dump"]:focus {
 input.go, button.go, input[value="GO"] {
      background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
+     font-size: large;
 }
 
 input.go:hover, button.go:hover, input[value="GO"]:hover,
@@ -3966,6 +4088,7 @@ input.back:focus {
 input.reload, button.reload {
      background: url(/themes/console/images/buttons/restore.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
+     font-size: large;
 }
 
 input.reload:hover, button.reload:hover,
@@ -4595,11 +4718,18 @@ body.iframed {
 
 /* Theme choice & Language selection in /configui */
 
-#themeui.formaction, #langui.formaction {
+#themeui.formaction {
      border: none;
      border-top: 1px solid #7778bf;
      background: none;
      margin: 5px -5px 0;
+}
+
+#langui.formaction {
+     border: none;
+     border-top: 1px solid #7778bf;
+     background: none;
+     margin: 5px 0 0;
 }
 
 #consolepass.formaction {
@@ -4704,8 +4834,8 @@ body.iframed {
 p#helptranslate {
      position: relative;
      top: 4px;
-     padding: 15px 10px 15px 50px !important;
      text-align: left !important;
+     padding: 15px 10px 15px 50px !important;
      border-top: 1px solid #7778bf;
      background: url(/themes/console/images/info/notice.png) left 14px center no-repeat, #fff;
      background: url(/themes/console/images/info/notice.png) left 14px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
@@ -4771,32 +4901,85 @@ div#themesettings {
      background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(248, 248, 255, 0.3) 3px, #fafaff 5px);
 }
 
-div#langsettings {
+select#langsettings {
      padding: 4px 5px 0;
-     border: 1px solid #7778bf;
-     margin: -16px 0 0;
-     background: #fafaff;
-     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(248, 248, 255, 0.3) 3px, #fafaff 5px);
+     font-size: large;
+     height: 3rem;
+     width: 15rem;
+}
+
+div#langsettings {
+    border: 1px solid #7778bf;
+}
+
+div#wizlangsettings.wizard {
+     position: absolute;
+     left: 15rem;
+     bottom: 10rem;
 }
 
 #themesettings hr, #langsettings hr {
      display: none;
 }
 
+img.wizard.progress {
+    position: absolute;
+    top: 2%;
+    left: 0%;
+    width: 31%;
+    max-width: 31%;
+    mix-blend-mode: multiply;
+}
+
+.wizard {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-top: none !important;
+}
+
+#bwconfigheader {
+    background: white;
+}
+
+.wizardtext {
+    width: 25%;
+    position: absolute;
+    top: 36%;
+    left: 5%;
+    font-size: larger;
+}
+
+#wizard {
+    z-index: -1;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    background-color: #f8f9fa;
+}
+
 .langselect { /* containing box for lang selection */
-     width: 115px;
+     width: 40%;
      min-height: 64px;
      float: left;
      margin: 4px;
      text-align: center;
-     border: 1px solid #7778bf;
      padding: 4px 4px 0;
-     border-radius: 2px;
-     background: #fff;
-     background: linear-gradient(to bottom, #fff, #ddf);
+     background-color: white;
+     border: none;
+     float: left;
+     margin-left: 15%;
      transition: transform 0.3s ease 0s;
-     box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px #ccf);
+}
+
+.wizardimg {
+    max-width: 100%;
+    max-height: 100vh;
+    margin: auto;
+    mix-blend-mode: multiply;
 }
 
 .langselect:hover {
@@ -4964,7 +5147,6 @@ p#helptranslate {
      clear: both;
      padding: 5px 10px 10px;
      text-align: right;
-     margin: 0 -5px;
 }
 
 /* configui password*/

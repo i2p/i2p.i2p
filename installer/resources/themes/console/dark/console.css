@@ -1245,6 +1245,26 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
 
 /* end topnav */
 
+.messages {
+      margin: 15px 0;
+      padding: 10px 15px;
+      z-index: 999;
+      border-radius: 2px;
+      border: 1px solid #7778bf;
+      background: #eef;
+      background: linear-gradient(to right, #fafaff, #eef);
+      background-size: auto 100%, 100% 100%;
+      box-shadow: inset 0 0 0 1px #fff;
+      filter: drop-shadow(0 0 1px #ccf);
+      font-weight: bold;
+      line-height: 130%;
+      filter: drop-shadow(0 0 1px #ccf);
+      position: absolute;
+      top: 5%;
+      right: 5%;
+      width: 20%;
+ }
+
 div.messages {
      padding: 20px 10px 20px 50px;
      margin: 10px 0 15px 0;
@@ -1879,6 +1899,12 @@ h1 {
      box-shadow: 0 1px 5px #000;
 }
 
+.mlabtable {
+    width: 30%;
+    position: absolute;
+    top: 36%;
+}
+
 span.newtab {
      text-align: right;
      font-size: 8pt;
@@ -2292,6 +2318,7 @@ input[type="submit"], input[type="reset"], select, button {
 input[type="submit"], input[type="reset"], button {
      padding: 5px 8px !important;
      outline: none;
+     font-size: large
 }
 
 .statusnotes {
@@ -2991,7 +3018,6 @@ tr#addnew, tr#addnew:hover {
 p#helptranslate {
      position: relative;
      top: 8px;
-     margin: 0 -7px;
      padding: 15px 10px 15px 50px !important;
      text-align: left !important;
      border-top: 1px solid #494;
@@ -3021,7 +3047,7 @@ p#helptranslate {
      white-space: nowrap;
 }
 
-h3#themeheading, h3#langheading, h3#passwordheading {
+h3#themeheading, h3#passwordheading {
      border-radius: 0;
      border: 1px solid #494;
      padding: 8px 10px;
@@ -3053,15 +3079,15 @@ td#themeselect {
 }
 
 .langselect { /* containing box for lang selection */
-     background: #000;
-     background: linear-gradient(to bottom, #010 0%, #000 80%);
-     width: 120px;
+     width: 40%;
      float: left;
      margin: 4px;
      text-align: center;
-     border: 1px solid #262;
      padding: 8px 4px 0;
      border-radius: 2px;
+     border: none;
+     float: left;
+     margin-left: 15%;
 }
 
 .langselect:hover {
@@ -3202,6 +3228,58 @@ td#themeselect {
 
 /* end flag as radio icons */
 
+#wizardheading {
+    border: none;
+    width: 50%;
+    padding: 2%;
+    margin: 2% 24%;
+    top: 2%;
+    font-size: xx-large;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    word-spacing: 0.1em;
+    color: #41465f;
+    position: absolute;
+    background: none !important;
+    box-shadow: none !important;
+    z-index: 999;
+}
+
+#infodiv {
+    position: absolute;
+    right: 12%;
+    width: 16%;
+    top: 36%;
+    background: linear-gradient(to right, #fafaff, #000);
+    background-size: auto 100%, 100% 100%;
+    box-shadow: inset 0 0 0 1px #fff;
+    filter: drop-shadow(0 0 1px #ccf);
+}
+
+#bandwidthconfig {
+    border: 1px solid #7778bf;
+}
+
+#bandwidthconfig.configtable.wizard {
+    width: 35%;
+    top: 36%;
+    left: 31%;
+    position: absolute;
+    background: none;
+    font-size: larger;
+}
+
+.configtable.wizard {
+    width: 20%;
+    bottom: 5rem;
+    right: 10rem;
+    position: absolute;
+    box-shadow: none !important;
+    white-space: normal;
+    background: none;
+    font-size: larger;
+}
+
 div.ui_lang { /* lang text label */
      text-align: center;
      background: #001000;
@@ -3227,12 +3305,26 @@ h3#langheading {
      margin-bottom: 0;
 }
 
-div#langsettings {
+select#langsettings {
      border: 1px solid #494;
      padding: 8px 7px 12px;
      margin-top: -1px;
      margin-bottom: -12px;
      background: #000;
+     font-size: large;
+     height: 3rem;
+     width: 15rem;
+}
+
+div#langsettings {
+    border: 1px solid #7778bf;
+}
+
+div#wizlangsettings.wizard {
+     border: none;
+     position: absolute;
+     left: 15rem;
+     bottom: 10rem;
 }
 
 #langsettings hr {
@@ -3240,7 +3332,7 @@ div#langsettings {
 }
 
 .formaction#langui {
-     margin: 7px -8px -15px;
+     margin: 5px 0 0;
      padding: 5px;
      border: 1px solid #494;
      background: #000;
@@ -3451,6 +3543,75 @@ p#ipconfig, p#ipv4config, p#udpconfig, p#externaltcp {
      background: #001000;
 }
 
+#bandwidthconfig table.configtable {
+    border: none;
+    bottom: 5rem;
+    right: 10rem;
+}
+
+.configtable tr:last-child td {
+    border-top: 1px solid #7778bf !important;
+}
+
+.configtable.wizard tr:last-child td {
+    border-top: none;
+}
+
+img.wizard.progress {
+    position: absolute;
+    top: 2%;
+    left: 0%;
+    width: 31%;
+    max-width: 31%;
+    -webkit-filter: invert(1);
+    filter: invert(1);
+    z-index: 500;
+}
+
+.wizard {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-top: none !important;
+}
+
+#bwconfigheader {
+    background: white;
+}
+
+.wizardtext {
+    width: 25%;
+    position: absolute;
+    top: 36%;
+    left: 5%;
+    font-size: larger;
+}
+
+#wizard {
+    z-index: -1;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    background-color: #000;
+}
+
+.wizardimg {
+    max-width: 100%;
+    max-height: 100vh;
+    margin: auto;
+    -webkit-filter: invert(1);
+    filter: invert(1);
+    z-index: -1;
+    position: absolute;
+    left: 31%;
+}
+
+#bandwidthconfig .configtable tr:last-child td {
+     border: none;
+}
+
 table#bandwidthconfig {
      margin-bottom: 1px;
 }
@@ -3458,6 +3619,48 @@ table#bandwidthconfig {
 table#bandwidthconfig td:first-child {
      width: 200px;
      white-space: nowrap;
+}
+
+#bandwidthconfig td:last-child {
+     white-space: normal;
+     background: none;
+     font-size: larger;
+}
+
+#bandwidthconfig.configtable td {
+     white-space: normal;
+     background: none;
+     font-size: larger;
+}
+
+#bandwidthconfig.configtable.wizard td {
+     white-space: normal;
+     background: none;
+     font-size: small;
+}
+
+#xhr.notification {
+    width: 30%;
+    position: absolute;
+    left: 30%;
+    top: 38%;
+    font-size: larger;
+    background: #000;
+    box-shadow: inset 0 0 0 1px #fff;
+    filter: drop-shadow(0 0 1px #ccf);
+}
+
+#xhr2.notification {
+    width: 30%;
+    position: absolute;
+    left: 30%;
+    top: 40%;
+    font-size: larger;
+    background: #000;
+    background: linear-gradient(to right, #fafaff, #000);
+    background-size: auto 100%, 100% 100%;
+    box-shadow: inset 0 0 0 1px #fff;
+    filter: drop-shadow(0 0 1px #ccf);
 }
 
 table#bandwidthconfig {
@@ -3694,6 +3897,16 @@ table#tunnelconfig td:first-child {
 }
 
 /* end /configtunnels */
+
+input.cancel, button.cancel {
+    padding: 5px 7px 5px 22px;
+    /*font-size: large;*/
+}
+
+input.go, button.go, input[value="GO"] {
+    padding: 5px 7px 5px 22px;
+    /*font-size: large;*/
+}
 
 /* /configupdate */
 
@@ -5695,8 +5908,8 @@ textarea#advancedsettings {
      padding: 15px 15px 15px 50px !important;
      text-align: justify;
      line-height: 130% !important;
-     border-bottom: 1px solid #494;
-     border-top: 1px solid #494;
+     /*border-bottom: 1px solid #494;
+     border-top: 1px solid #494;*/
      white-space: normal !important;
      font-weight: normal !important;
      background-size: 28px 28px !important;
@@ -5728,7 +5941,7 @@ td.optionsave {
      padding: 5px !important;
      white-space: nowrap;
 /*     width: 50px;*/
-     background: #000;
+     background: none;
 }
 
 #floodfillconfig form, #plugininstall form, #plugininstall2 form, #updateplugins form, .configtable form {

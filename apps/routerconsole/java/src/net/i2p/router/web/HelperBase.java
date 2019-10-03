@@ -15,6 +15,7 @@ public abstract class HelperBase {
     public static final String PROP_ADVANCED = "routerconsole.advanced";
     /** @since public since 0.9.33, was package private */
     public static final String CHECKED = " checked=\"checked\" ";
+    public static final String SELECTED = " selected=\"selected\" ";
 
     /**
      * Configure this bean to query a particular router context
