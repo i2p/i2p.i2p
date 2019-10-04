@@ -1245,26 +1245,6 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
 
 /* end topnav */
 
-.messages {
-      margin: 15px 0;
-      padding: 10px 15px;
-      z-index: 999;
-      border-radius: 2px;
-      border: 1px solid #7778bf;
-      background: #eef;
-      background: linear-gradient(to right, #fafaff, #eef);
-      background-size: auto 100%, 100% 100%;
-      box-shadow: inset 0 0 0 1px #fff;
-      filter: drop-shadow(0 0 1px #ccf);
-      font-weight: bold;
-      line-height: 130%;
-      filter: drop-shadow(0 0 1px #ccf);
-      position: absolute;
-      top: 5%;
-      right: 5%;
-      width: 20%;
- }
-
 div.messages {
      padding: 20px 10px 20px 50px;
      margin: 10px 0 15px 0;

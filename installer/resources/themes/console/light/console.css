@@ -2169,7 +2169,6 @@ h3#graphdisplay {
      filter: drop-shadow(0 0 1px #ccf);
      font-weight: bold;
      line-height: 130%;
-     position: absolute;
 }
 
 .main#config_update .messages {
