@@ -1885,6 +1885,7 @@ h3#passwordheading {
     width: 30%;
     position: absolute;
     top: 36%;
+    font-size: larger;
 }
 
 h3#themeheading, h3#pluginmanage, h3#pconfig, h3#webappconfig, h3#advancedclientconfig, h3#i2pclientconfig, #config_stats h3 {
@@ -2169,9 +2170,6 @@ h3#graphdisplay {
      font-weight: bold;
      line-height: 130%;
      position: absolute;
-     top: 5%;
-     right: 5%;
-     width: 20%;
 }
 
 .main#config_update .messages {
@@ -2279,6 +2277,13 @@ td.optionsave {
 
 .wizard tr:last-child td {
     border-top: none !important;
+}
+
+.wizardnotice {
+     position: absolute;
+     top: 5%;
+     right: 5%;
+     width: 20%;
 }
 
 #bandwidthconfig .configtable tr:last-child td {
@@ -2578,9 +2583,9 @@ td {
 
 #wizardheading {
     border: none;
-    width: 50%;
+    width: 100%;
     padding: 2%;
-    margin: 2% 24%;
+    margin: auto;
     top: 2%;
     font-size: xx-large;
     text-transform: uppercase;
@@ -2601,13 +2606,14 @@ td {
     background-size: auto 100%, 100% 100%;
     box-shadow: inset 0 0 0 1px #fff;
     filter: drop-shadow(0 0 1px #ccf);
+    font-size: larger;
 }
 
 #bandwidthconfig {
     border: 1px solid #7778bf;
 }
 
-#bandwidthconfig.configtable.wizard {
+#bandwidthconfig.configtable.wizardtable {
     width: 35%;
     top: 36%;
     left: 31%;
@@ -2636,19 +2642,16 @@ td {
 #bandwidthconfig td:last-child {
      white-space: normal;
      background: none;
-     font-size: larger;
 }
 
 #bandwidthconfig.configtable td {
      white-space: normal;
      background: none;
-     font-size: larger;
 }
 
 #bandwidthconfig.configtable.wizard td {
      white-space: normal;
      background: none;
-     font-size: small;
 }
 
 #xhr.notification {
@@ -3871,10 +3874,13 @@ button:active, input[type="submit"]:active, input[type="reset"]:active {
      transition: ease box-shadow 0.05s;
 }
 
+input.wizardbutton, button.wizardbutton {
+    font-size: large;
+}
+
 input.accept, button.accept {
      background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
-     font-size: large;
 }
 
 input.accept:hover, button.accept:hover, input.accept:focus, button.accept:focus {
@@ -3914,7 +3920,6 @@ input.accept[value^="Filter"]:focus, button.accept[value^="Filter"]:focus {
 input.add, button.add {
      background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
-     font-size: large;
 }
 
 input.add:hover, button.add:hover,
@@ -3935,7 +3940,6 @@ input.add[value^="Adjust"]:focus, button.add[value^="Adjust"]:focus {
 input.cancel, button.cancel {
      background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
-     font-size: large;
 }
 
 input.cancel:hover, button.cancel:hover,
@@ -3992,7 +3996,6 @@ input.check[value$="updates"]:focus, button.check[value$="updates"]:focus {
 input.delete, button.delete {
      background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
-     font-size: large;
 }
 
 input.delete:hover, button.delete:hover,
@@ -4013,7 +4016,6 @@ input.delete[value^="Ban"]:focus, button.delete[value^="Ban"]:focus {
 input.download, button.download {
      background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
-     font-size: large;
 }
 
 input.download:hover, button.download:hover,
@@ -4057,7 +4059,6 @@ input.download[value^="Dump"]:focus, button.download[value^="Dump"]:focus {
 input.go, button.go, input[value="GO"] {
      background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
-     font-size: large;
 }
 
 input.go:hover, button.go:hover, input[value="GO"]:hover,
@@ -4088,7 +4089,6 @@ input.back:focus {
 input.reload, button.reload {
      background: url(/themes/console/images/buttons/restore.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
-     font-size: large;
 }
 
 input.reload:hover, button.reload:hover,
@@ -4914,8 +4914,8 @@ div#langsettings {
 
 div#wizlangsettings.wizard {
      position: absolute;
-     left: 15rem;
-     bottom: 10rem;
+     left: 15%;
+     top: 30%;
 }
 
 #themesettings hr, #langsettings hr {
@@ -4926,8 +4926,9 @@ img.wizard.progress {
     position: absolute;
     top: 2%;
     left: 0%;
-    width: 31%;
-    max-width: 31%;
+    max-width: 25%;
+    height: 15%;
+    max-height: 15%;
     mix-blend-mode: multiply;
 }
 
@@ -4945,7 +4946,7 @@ img.wizard.progress {
 .wizardtext {
     width: 25%;
     position: absolute;
-    top: 36%;
+    top: 15%;
     left: 5%;
     font-size: larger;
 }
@@ -6237,6 +6238,10 @@ table#schedjobs {
 
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn {
      font-size: 9pt;
+}
+
+.infodiv {
+    font-size: larger;
 }
 
 #peerdefs td:first-child {

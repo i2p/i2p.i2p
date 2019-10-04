@@ -94,12 +94,16 @@
 %>
 <!--<h2><%=intl._t("New Install Wizard")%> <%=ipg%>/<%=LAST_PAGE%></h2>-->
 <div id="wizard">
+
 <jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="request" />
+
 <%
     // Bind the session-scope Helper to the request-scope Handler
     formhandler.setWizardHelper(wizhelper);
 %>
+<div class="wizardnotice">
 <%@include file="formhandler.jsi" %>
+</div>
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>">
 <input type="hidden" name="action" value="blah" >
@@ -181,7 +185,7 @@
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/logogrey5.png">
 <h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_startup_life.png">
+<img class="wizardimg bwtest" src="/themes/console/images/wizard/undraw_metrics.png">
 <table class="mlabtable">
 <tr><td><%=intl._t("Test running?")%></td><td><%=wizhelper.isNDTRunning()%></td></tr>
 <tr><td><%=intl._t("Test complete?")%></td><td><%=wizhelper.isNDTComplete()%></td></tr>
@@ -210,8 +214,8 @@
 }
 </style>
 <img class="wizardimg" src="/themes/console/images/wizard/undraw_metrics.png">
-<table id="bandwidthconfig" class="configtable wizard">
-<tr><td class="infohelp" colspan="2">
+<table id="bandwidthconfig" class="configtable wizardtable">
+<tr><td class="infohelp infodiv" colspan="2">
 <%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%>
 </td></tr>
 <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="wizhelper" property="inboundBurstRate" />" >
@@ -256,7 +260,7 @@
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Browser Setup")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_High_five.png">
+<img class="wizardimg" src="/themes/console/images/wizard/undraw_startup_life.png">
 <div class="wizardtext"><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
 <%=intl._t("We currently provide an I2P Browser which configures itself automatically")%>
@@ -283,7 +287,7 @@
         // Done
 %>
 <h3 id="wizardheading" class="wizard"><%=intl._t("Welcome to I2P!")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_metrics.png">
+<img class="wizardimg" src="/themes/console/images/wizard/undraw_High_five.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("When you start I2P, it may take a few minutes to bootstrap (integrate) your router into the network and find additional peers, so please be patient.")%>
@@ -305,28 +309,28 @@
 <%
     if (ipg != 1) {
 %>
-<input type="submit" class="back" name="prev" value="<%=intl._t("Previous")%>" >
+<input type="submit" class="back wizardbutton" name="prev" value="<%=intl._t("Previous")%>" >
 <%
     }
     if (ipg != LAST_PAGE) {
 %>
-<input type="submit" class="cancel" name="skip" value="<%=intl._t("Skip Setup")%>" >
+<input type="submit" class="cancel wizardbutton" name="skip" value="<%=intl._t("Skip Setup")%>" >
 <%
         if (ipg == 3) {
 %>
-<input type="submit" class="cancel" name="skipbw" value="<%=intl._t("Skip Bandwidth Test")%>" >
+<input type="submit" class="cancel wizardbutton" name="skipbw" value="<%=intl._t("Skip Bandwidth Test")%>" >
 <%
         } else if (ipg == 4) {
 %>
-<input type="submit" class="cancel" name="cancelbw" value="<%=intl._t("Cancel Bandwidth Test")%>" >
+<input type="submit" class="cancel wizardbutton" name="cancelbw" value="<%=intl._t("Cancel Bandwidth Test")%>" >
 <%
         }
 %>
-<input type="submit" class="go" name="next" value="<%=intl._t("Next")%>" >
+<input type="submit" class="go wizardbutton" name="next" value="<%=intl._t("Next")%>" >
 <%
     } else {
 %>
-<input type="submit" class="accept" name="done" value="<%=intl._t("Finished")%>" >
+<input type="submit" class="accept wizardbutton" name="done" value="<%=intl._t("Finished")%>" >
 <%
     }
 %>

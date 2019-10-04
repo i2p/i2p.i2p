@@ -2318,7 +2318,6 @@ input[type="submit"], input[type="reset"], select, button {
 input[type="submit"], input[type="reset"], button {
      padding: 5px 8px !important;
      outline: none;
-     font-size: large
 }
 
 .statusnotes {
@@ -3601,6 +3600,7 @@ img.wizard.progress {
     max-width: 100%;
     max-height: 100vh;
     margin: auto;
+    top: 0;
     -webkit-filter: invert(1);
     filter: invert(1);
     z-index: -1;
@@ -3636,7 +3636,7 @@ table#bandwidthconfig td:first-child {
 #bandwidthconfig.configtable.wizard td {
      white-space: normal;
      background: none;
-     font-size: small;
+     /*font-size: small;*/
 }
 
 #xhr.notification {
@@ -3900,12 +3900,10 @@ table#tunnelconfig td:first-child {
 
 input.cancel, button.cancel {
     padding: 5px 7px 5px 22px;
-    /*font-size: large;*/
 }
 
 input.go, button.go, input[value="GO"] {
     padding: 5px 7px 5px 22px;
-    /*font-size: large;*/
 }
 
 /* /configupdate */
