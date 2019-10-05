@@ -76,7 +76,7 @@ if (c != null &&
             throw ioe;
         }
     } finally {
-        if (fin != null) 
+        if (fin != null)
             try { fin.close(); } catch (java.io.IOException ioe) {}
     }
 } else {

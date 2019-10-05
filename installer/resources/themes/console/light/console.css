@@ -2601,8 +2601,6 @@ td {
     right: 12%;
     width: 16%;
     top: 36%;
-    background: #eef linear-gradient(to right, #fafaff, #eef);
-    background-size: auto 100%, 100% 100%;
     box-shadow: inset 0 0 0 1px #fff;
     filter: drop-shadow(0 0 1px #ccf);
     font-size: larger;
@@ -2622,9 +2620,9 @@ td {
 }
 
 .configtable.wizard {
-    width: 20%;
-    bottom: 5rem;
-    right: 10rem;
+    bottom: 10%;
+    right: 10%;
+    width: max-content;
     position: absolute;
     box-shadow: none !important;
     white-space: normal;
@@ -2667,8 +2665,8 @@ td {
 #xhr2.notification {
     width: 30%;
     position: absolute;
-    left: 30%;
-    top: 40%;
+    left: 60%;
+    top: 45%;
     font-size: larger;
     background: #eef;
     background: linear-gradient(to right, #fafaff, #eef);
@@ -4925,10 +4923,14 @@ img.wizard.progress {
     position: absolute;
     top: 2%;
     left: 0%;
-    max-width: 25%;
+    width: auto;
     height: 15%;
     max-height: 15%;
     mix-blend-mode: multiply;
+}
+
+.overlay {
+    height: 100vh 100%;
 }
 
 .wizard {
@@ -4945,13 +4947,13 @@ img.wizard.progress {
 .wizardtext {
     width: 25%;
     position: absolute;
-    top: 15%;
+    top: 17%;
     left: 5%;
     font-size: larger;
 }
 
 #wizard {
-    z-index: -1;
+    z-index: 0;
     position: absolute;
     left: 0px;
     top: 0px;
@@ -4977,9 +4979,12 @@ img.wizard.progress {
 
 .wizardimg {
     max-width: 100%;
-    max-height: 100vh;
+    height: 100%;
     margin: auto;
     mix-blend-mode: multiply;
+    position: absolute;
+    z-index: 0;
+    right: 0%;
 }
 
 .langselect:hover {

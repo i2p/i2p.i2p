@@ -93,7 +93,7 @@
     }
 %>
 <!--<h2><%=intl._t("New Install Wizard")%> <%=ipg%>/<%=LAST_PAGE%></h2>-->
-<div id="wizard">
+<div id="wizard" class="overlay">
 
 <jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="request" />
 
@@ -183,7 +183,7 @@
         if (request.getParameter("skipbw") == null) {
             // don't display this if we skipped the test
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey5.png">
+<img class="wizard progress bwtest" src="/themes/console/images/wizard/logogrey5.png">
 <h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
 <img class="wizardimg bwtest" src="/themes/console/images/wizard/undraw_metrics.png">
 <table class="mlabtable">
