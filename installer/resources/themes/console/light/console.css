@@ -1884,7 +1884,7 @@ h3#passwordheading {
 .mlabtable {
     width: 30%;
     position: absolute;
-    top: 36%;
+    top: 17%;
     font-size: larger;
 }
 
@@ -2603,6 +2603,7 @@ td {
     top: 36%;
     box-shadow: inset 0 0 0 1px #fff;
     filter: drop-shadow(0 0 1px #ccf);
+    background: rgba(255,255,255,0.7);
     font-size: larger;
 }
 
@@ -2612,8 +2613,8 @@ td {
 
 #bandwidthconfig.configtable.wizardtable {
     width: 35%;
-    top: 36%;
-    left: 31%;
+    top: 17%;
+    left: 32%;
     position: absolute;
     background: none;
     font-size: larger;
@@ -3749,6 +3750,10 @@ div[lang="de"] .links li {
      float: right;
      vertical-align: middle;
      opacity: 1 !important;
+}
+
+.langbox > select#langsettings {
+    height: unset;
 }
 
 .langbox img {
@@ -4921,16 +4926,15 @@ div#wizlangsettings.wizard {
 
 img.wizard.progress {
     position: absolute;
-    top: 2%;
+    top: 6%;
     left: 0%;
-    width: auto;
-    height: 15%;
-    max-height: 15%;
+    max-height: 10%;
+    max-width: 30%;
     mix-blend-mode: multiply;
 }
 
 .overlay {
-    height: 100vh 100%;
+    height:  100%;
 }
 
 .wizard {
@@ -4950,6 +4954,7 @@ img.wizard.progress {
     top: 17%;
     left: 5%;
     font-size: larger;
+    background: rgba(255,255,255,0.7);
 }
 
 #wizard {
@@ -4978,8 +4983,8 @@ img.wizard.progress {
 }
 
 .wizardimg {
-    max-width: 100%;
-    height: 100%;
+    max-width: 75%;
+    max-height: 100%;
     margin: auto;
     mix-blend-mode: multiply;
     position: absolute;

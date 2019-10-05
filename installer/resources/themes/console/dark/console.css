@@ -1890,6 +1890,7 @@ h1 {
     width: 30%;
     position: absolute;
     top: 17%;
+    z-index: 499;
 }
 
 span.newtab {
@@ -2028,6 +2029,10 @@ button:active {
      float: right;
      vertical-align: middle;
      line-height: 16px;
+}
+
+.langbox > select#langsettings {
+    height: unset;
 }
 
 .langbox img {
@@ -3216,9 +3221,9 @@ td#themeselect {
 
 #wizardheading {
     border: none;
-    width: 50%;
+    width: 100%;
     padding: 2%;
-    margin: 2% 24%;
+    margin: auto;
     top: 2%;
     font-size: xx-large;
     text-transform: uppercase;
@@ -3233,11 +3238,12 @@ td#themeselect {
 
 #infodiv {
     position: absolute;
-    right: 12%;
+    left: 76%;
     width: 16%;
     top: 17%;
     box-shadow: inset 0 0 0 1px #fff;
     filter: drop-shadow(0 0 1px #ccf);
+    background: rgba(0,0,0,0.7);
 }
 
 #bandwidthconfig {
@@ -3255,8 +3261,8 @@ td#themeselect {
 
 .configtable.wizard {
     width: 20%;
-    bottom: 5rem;
-    right: 10rem;
+    bottom: 5%;
+    right: 10%;
     position: absolute;
     box-shadow: none !important;
     white-space: normal;
@@ -3307,8 +3313,8 @@ div#langsettings {
 div#wizlangsettings.wizard {
      border: none;
      position: absolute;
-     left: 15rem;
-     bottom: 10rem;
+     left: 15%;
+     top: 30%;
 }
 
 #langsettings hr {
@@ -3543,11 +3549,10 @@ p#ipconfig, p#ipv4config, p#udpconfig, p#externaltcp {
 
 img.wizard.progress {
     position: absolute;
-    top: 2%;
+    top: 6%;
     left: 0%;
-    width: auto;
-    height: 15%;
-    max-height: 15%;
+    max-height: 10%;
+    max-width: 30%;
     -webkit-filter: invert(1);
     filter: invert(1);
     z-index: 500;
@@ -3558,6 +3563,7 @@ img.wizard.progress {
     background: none !important;
     box-shadow: none !important;
     border-top: none !important;
+    background: rgba(0,0,0,0.7);
 }
 
 #bwconfigheader {
@@ -3567,7 +3573,7 @@ img.wizard.progress {
 #bandwidthconfig.configtable.wizardtable {
     width: 35%;
     top: 17%;
-    left: 31%;
+    left: 32%;
     position: absolute;
     background: none;
     font-size: larger;
@@ -3592,8 +3598,8 @@ img.wizard.progress {
 }
 
 .wizardimg {
-    max-width: 100%;
-    max-height: 100vh;
+    max-width: 75%;
+    max-height: 100%;
     margin: auto;
     top: 0;
     -webkit-filter: invert(1);
