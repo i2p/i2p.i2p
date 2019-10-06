@@ -1,3 +1,12 @@
+2019-10-06 zzz
+ * I2NP: Remove unused I2NPMessageHandler methods
+
+2019-10-03 zzz
+ * i2psnark: Start with minimum tunnel count (ticket #2623)
+
+2019-10-03 idk
+ * Console: Wizard updates (ticket #2415)
+
 2019-10-01 zzz
  * Console: Remove i2pwiki.i2p (ticket #2626)
  * PortMapper: Fix URL generation for IPv6 hosts

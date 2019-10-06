@@ -22,16 +22,11 @@ import net.i2p.util.Log;
 public class I2NPMessageHandler {
     private final Log _log;
     private final I2PAppContext _context;
-    private long _lastReadBegin;
-    private long _lastReadEnd;
-    private int _lastSize;
-    private byte _messageBuffer[];
     private I2NPMessage _lastRead;
     
     public I2NPMessageHandler(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(I2NPMessageHandler.class);
-        _lastSize = -1;
     }
     
     /** clear the last message read from a byte array with an offset */
@@ -74,11 +69,10 @@ public class I2NPMessageHandler {
         // we will assume that maxLen is >= 1 here. It's checked to be >= 16 in readBytes()
         int type = data[cur] & 0xff;
         cur++;
-        _lastReadBegin = System.currentTimeMillis();
         I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);
         try {
-            _lastSize = msg.readBytes(data, type, cur, maxLen - 1);
-            cur += _lastSize;
+            int lastSize = msg.readBytes(data, type, cur, maxLen - 1);
+            cur += lastSize;
         } catch (I2NPMessageException ime) {
             throw ime;
         } catch (RuntimeException e) {
@@ -86,12 +80,7 @@ public class I2NPMessageHandler {
                 _log.warn("Error reading the stream", e);
             throw new I2NPMessageException("Unknown error reading the " + msg.getClass().getSimpleName(), e); 
         }
-        _lastReadEnd = System.currentTimeMillis();
         _lastRead = msg;
         return cur - offset;
     }
-    
-    public long getLastReadTime() { return _lastReadEnd - _lastReadBegin; }
-    public int getLastSize() { return _lastSize; }
-    
 }
