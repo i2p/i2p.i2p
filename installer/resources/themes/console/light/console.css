@@ -3752,7 +3752,7 @@ div[lang="de"] .links li {
      opacity: 1 !important;
 }
 
-.langbox > select#langsettings {
+.langbox > form > select#langsettings {
     height: unset;
 }
 

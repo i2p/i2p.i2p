@@ -375,11 +375,15 @@ public class TunnelControllerGroup implements ClientApp {
                 props = loadConfig(cfgFile);
                 if (shouldMigrate && !dir.exists()) {
                     boolean ok = migrate(props, cfgFile, dir);
-                    if (!ok)
+                    if (!ok) {
                         shouldMigrate = false;
+                    } else {
+                        _log.logAlways(Log.WARN, "Using new tunnel configurations in " + dir +
+                         " - ignoring old tunnel configuration in " + cfgFile);
+                    }
                 } else {
-                    _log.logAlways(Log.WARN, "Using new tunnel configurations in " + dir +
-                                             " - ignoring old tunnel configuration in " + cfgFile);
+                    _log.logAlways(Log.WARN, "Not migrating tunnel configurations on excluded platform " +
+                    " - using tunnel configuration in " + cfgFile);
                 }
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.ERROR))
