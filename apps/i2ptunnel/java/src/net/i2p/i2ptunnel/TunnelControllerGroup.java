@@ -382,8 +382,7 @@ public class TunnelControllerGroup implements ClientApp {
                          " - ignoring old tunnel configuration in " + cfgFile);
                     }
                 } else {
-                    _log.logAlways(Log.WARN, "Not migrating tunnel configurations on excluded platform " +
-                    " - using tunnel configuration in " + cfgFile);
+                    _log.logAlways(Log.WARN, "Not migrating tunnel configurations");
                 }
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.ERROR))
