@@ -2450,6 +2450,9 @@
         </ant>
     </target>
 
+    <!--
+      - See installer/resources/maven-dev-release.sh
+      -->
     <target name="mavenLocal" depends="mavenLocal.deps">
         <delete dir="./pkg-mavencentral" />
         <mkdir dir="./pkg-mavencentral" />
