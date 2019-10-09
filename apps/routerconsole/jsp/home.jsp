@@ -58,8 +58,8 @@
 <jsp:setProperty name="homehelper" property="contextId" value="<%=i2pcontextId%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
 <div class="welcome" >
-  <div class="langbox" title="<%=intl._t("Language Configuration")%>"> <% /* English, then alphabetical by English name please */ %>
-    <a href="/configui#langheading"><img src="/themes/console/images/info/control.png" alt=<%=intl._t("Configure Language")%>></a>
+  <div class="langbox" title="<%=intl._t("Configure Language")%>">
+    <a href="/configui#langheading"><img src="/themes/console/images/info/control.png" alt="<%=intl._t("Configure Language")%>"></a>
   </div>
   <h2><%=intl._t("Welcome to I2P")%></h2>
 </div>
