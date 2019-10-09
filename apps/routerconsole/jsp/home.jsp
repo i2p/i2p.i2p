@@ -57,9 +57,9 @@
 <jsp:useBean class="net.i2p.router.web.helpers.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=i2pcontextId%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
-<div class="welcome" title="<%=intl._t("Use the menu to select a language. Click 'Configure UI' below to change it later.")%>">
-  <div class="langbox"> <% /* English, then alphabetical by English name please */ %>
-    <a href="/configui"><img src="/themes/console/images/info/control.png" alt=<%=intl._t("Configure Language")%>></a>
+<div class="welcome" >
+  <div class="langbox" title="<%=intl._t("Language Configuration")%>"> <% /* English, then alphabetical by English name please */ %>
+    <a href="/configui#langheading"><img src="/themes/console/images/info/control.png" alt=<%=intl._t("Configure Language")%>></a>
   </div>
   <h2><%=intl._t("Welcome to I2P")%></h2>
 </div>

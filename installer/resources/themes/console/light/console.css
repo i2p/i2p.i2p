@@ -3763,6 +3763,8 @@ div[lang="de"] .links li {
      border: 1px solid #99f;
      filter: none;
      border-radius: 1px;
+     height: 6%;
+     height: 1.8rem;
 }
 
 .langbox img:hover, .langbox a:focus img {

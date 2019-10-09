@@ -31,8 +31,8 @@
 </div><div class="main" id="console">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <div class="welcome">
-  <div class="langbox"> <% /* English, then alphabetical by English name please */ %>
-    <a href="/configui"><img src="/themes/console/images/info/control.png" alt=<%=intl._t("Configure Language")%>></a>
+  <div class="langbox" title="<%=intl._t("Language Configuration")%>"> <% /* English, then alphabetical by English name please */ %>
+    <a href="/configui#langheading"><img src="/themes/console/images/info/control.png" alt=<%=intl._t("Configure Language")%>></a>
   </div>
   <a name="top"></a>
   <h2><%=intl._t("Welcome to I2P")%></h2>
