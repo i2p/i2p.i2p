@@ -88,6 +88,10 @@ public class TunnelControllerGroup implements ClientApp {
      *  if the TCG has not yet been started by the router.
      *  As of 0.9.41, that's true for Android as well.
      *
+     *  In Android, this should be used for all calls except from LoadClientsJob,
+     *  as we do not want to instantiate TCG too early. Android must do null
+     *  checks on the return value.
+     *
      *  @throws IllegalArgumentException if unable to load from i2ptunnel.config
      */
     public static TunnelControllerGroup getInstance() {
@@ -110,6 +114,9 @@ public class TunnelControllerGroup implements ClientApp {
      *  When in RouterContext, will return null (except in Android)
      *  if the TCG has not yet been started by the router.
      *  In Android, if the old instance uses a stale context, it will replace it.
+     *
+     *  In Android, this should only be called from LoadClientsJob, as we do not
+     *  want to instantiate TCG too early.
      *
      *  @throws IllegalArgumentException if unable to load from i2ptunnel.config
      *  @since 0.9.41
