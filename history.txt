@@ -1,3 +1,9 @@
+2019-10-12 zzz
+ * NTCP: Performance improvement (tickets #2619, #2620)
+
+2019-10-11 zzz
+ * Console: Fix mime type and encoding on javadoc pages
+
 2019-10-06 zzz
  * I2NP: Remove unused I2NPMessageHandler methods
 

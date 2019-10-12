@@ -64,9 +64,8 @@ class Reader {
                 already = true;
             } else {
                 _pendingConnections.add(con);
-                // only notify here if added?
+                _pendingConnections.notify();
             }
-            _pendingConnections.notify();
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("wantsRead: " + con + " already live? " + already);
