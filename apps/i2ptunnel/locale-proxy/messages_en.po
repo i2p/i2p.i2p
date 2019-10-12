@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-09 18:54+0000\n"
+"POT-Creation-Date: 2019-10-12 14:14+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -651,7 +651,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:288
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
-msgid "Your new encrytpion key"
+msgid "Your new encryption key"
 msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:312
