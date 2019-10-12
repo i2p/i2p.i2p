@@ -285,7 +285,7 @@ public abstract class LocalHTTPServer {
                             String conURL = pm.getConsoleURL();
                             buf.append(NEWKEY)
                                .append("<html><head><title>")
-                               .append(_t("Your new encrytpion key"))
+                               .append(_t("Your new encryption key"))
                                .append("</title>\n" +
                                        "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
                                        "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
@@ -304,7 +304,7 @@ public abstract class LocalHTTPServer {
                             buf.append("</div>" +
                                        "<div class=warning id=warning>\n" +
                                        "<h3>")
-                               .append(_t("Your new encrytpion key"))
+                               .append(_t("Your new encryption key"))
                                .append("</h3>\n<p>" +
                                        "<textarea rows=\"1\" style=\"min-width: 0; min-height: 0;\" cols=\"70\" wrap=\"off\" readonly=\"readonly\" >")
                                .append(key)
