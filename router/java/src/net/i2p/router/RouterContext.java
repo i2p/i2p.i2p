@@ -79,11 +79,15 @@ public class RouterContext extends I2PAppContext {
     
     /**
      *  Caller MUST call initAll() after instantiation.
+     *
+     *  @param router may be null for unit tests if you are careful
      */
     public RouterContext(Router router) { this(router, null); }
 
     /**
      *  Caller MUST call initAll() after instantiation.
+     *
+     *  @param router may be null for unit tests if you are careful
      */
     public RouterContext(Router router, Properties envProps) { 
         this(router, envProps, true);
@@ -93,6 +97,7 @@ public class RouterContext extends I2PAppContext {
      *  Caller MUST call initAll() after instantiation.
      *  NOT a public API, for use by Router only, NOT for external use.
      *
+     *  @param router may be null for unit tests if you are careful
      *  @param doInit should this context be used as the global one (if necessary)?
      *                Will only apply if there is no global context now.
      *                If false, caller should call setGlobalContext() afterwards.
@@ -101,6 +106,11 @@ public class RouterContext extends I2PAppContext {
     RouterContext(Router router, Properties envProps, boolean doInit) { 
         super(doInit, filterProps(envProps));
         _router = router;
+        if (router == null) {
+            // disable NTP when doing unit tests
+            setProperty("time.disabled", "true");
+        }
+
         // Disabled here so that the router can get a context and get the
         // directory locations from it, to do an update, without having
         // to init everything. Caller MUST call initAll() afterwards.
