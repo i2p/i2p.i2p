@@ -1359,7 +1359,7 @@
             <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png hu.png id.png ir.png it.png jp.png nl.png pl.png pt.png ro.png ru.png se.png tr.png us.png" />
         </copy>
         <copy todir="pkg-temp/docs/icons/flags" >
-          <!-- base flags/ dir only. flags16x11/ and flags48x48/ dirs already copied by prepConsoleDocs target -->
+          <!-- base flags/ dir only. flags16x11/ dir already copied by prepConsoleDocs target -->
           <fileset dir="installer/resources/icons/flags" />
         </copy>
     </target>
@@ -1539,8 +1539,6 @@
                which may be symlinked in package installs.
            -->
           <fileset dir="installer/resources/" includes="icons/flags16x11/*" />
-          <!-- flags48x48 added in 0.9.32 -->
-          <fileset dir="installer/resources/" includes="icons/flags48x48/*" />
         </copy>
     </target>
 

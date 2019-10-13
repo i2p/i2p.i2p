@@ -9,7 +9,6 @@
 
 /**
  *  flags.jsp?c=de => icons/flags/de.png
- *  flags.jsp?c=de&s=48 => icons/flags48x48/de.png
  *  with headers set so the browser caches.
  *
  *  As of 0.9.36:
@@ -25,9 +24,7 @@ if (c != null &&
     c.replaceAll("[a-z0-9_]", "").length() == 0) {
     String flagSet = "flags16x11";
     String s = request.getParameter("s");
-    if ("48".equals(s)) {
-        flagSet = "flags48x48";
-    }
+
     String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
                   java.io.File.separatorChar +
                   "docs" + java.io.File.separatorChar + "icons";
