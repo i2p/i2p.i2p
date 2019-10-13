@@ -90,8 +90,8 @@ class SessionIdleTimer implements SimpleTimer.TimedEvent {
             return;
         long now = _context.clock().now();
         long lastActivity = _session.lastActivity();
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Fire idle timer, last activity: " + DataHelper.formatDuration(now - lastActivity) + " ago ");
+        if (_log.shouldDebug())
+            _log.debug("Fire idle timer, last activity: " + DataHelper.formatDuration(now - lastActivity) + " ago ");
         long nextDelay = 0;
         if (_shutdownEnabled && now - lastActivity >= _shutdownTime) {
             if (_log.shouldLog(Log.WARN))
@@ -99,12 +99,12 @@ class SessionIdleTimer implements SimpleTimer.TimedEvent {
             _session.destroySession();
             return;
         } else if (lastActivity <= _lastActive && !_shutdownEnabled) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Still idle, sleeping again " + _session);
+            if (_log.shouldDebug())
+                _log.debug("Still idle, sleeping again " + _session);
             nextDelay = _reduceTime;
         } else if (_reduceEnabled && now - lastActivity >= _reduceTime) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Reducing quantity on idle " + _session);
+            if (_log.shouldDebug())
+                _log.debug("Reducing quantity on idle " + _session);
             try {
                 _session.getProducer().updateTunnels(_session, _reduceQuantity);
             } catch (I2PSessionException ise) {
