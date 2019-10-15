@@ -2280,8 +2280,8 @@ td.optionsave {
 
 .wizardnotice {
      position: absolute;
-     top: 5%;
-     right: 5%;
+     top: 75%;
+     left: 5%;
      width: 20%;
 }
 
@@ -4929,7 +4929,7 @@ div#wizlangsettings.wizard {
 img.wizard.progress {
     position: absolute;
     top: 6%;
-    left: 0%;
+    left: 1%;
     max-height: 10%;
     max-width: 30%;
     mix-blend-mode: multiply;
@@ -4956,7 +4956,6 @@ img.wizard.progress {
     top: 17%;
     left: 5%;
     font-size: larger;
-    background: rgba(255,255,255,0.7);
 }
 
 #wizard {

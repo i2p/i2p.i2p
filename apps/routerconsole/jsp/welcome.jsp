@@ -133,8 +133,10 @@
 <h3 id="wizardheading" class="wizard"><%=intl._t("Why I2P?")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/undraw_connected_world.png">
 <div class="wizardtext">
+<p>
 <%=intl._t("I2P is a communication tool for people who value privacy and wish to remain anonymous online.")%>
 <%=intl._t("I2P is a peer to peer network where you can browse and create hidden services.")%>
+</p>
 </div>
 <%
 
@@ -213,7 +215,7 @@
     display: none;
 }
 </style>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_metrics.png">
+<img class="wizardimg bwtest" src="/themes/console/images/wizard/undraw_metrics.png">
 <table id="bandwidthconfig" class="configtable wizardtable">
 <tr><td class="infohelp infodiv" colspan="2">
 <%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%>
