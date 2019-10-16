@@ -211,7 +211,8 @@ public class EepGet {
                     int colon = s.indexOf(':');
                     if (colon >= 0) {
                         // Todo IPv6 [a:b:c]:4444
-                        proxyHost = s.substring(0, colon);
+                        if (colon > 0)
+                            proxyHost = s.substring(0, colon);
                         String port = s.substring(colon + 1);
                         proxyPort = Integer.parseInt(port);
                     } else {
