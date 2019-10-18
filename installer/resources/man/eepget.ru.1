@@ -27,7 +27,7 @@ Eepget способна работать с медленными или нест
 .SH ОПЦИИ
 \fB\-c\fP
 .TP 
-Clearnet. Do not use a proxy. Same as \fB\-p\fP :0 .
+Клирнет. Не использовать прокси. Аналогично как \fB\-p\fP :0 .
 .TP 
 
 \fB\-e\fP etag
@@ -60,9 +60,9 @@ Clearnet. Do not use a proxy. Same as \fB\-p\fP :0 .
 Задает выходной файл для записи. Если этот параметр не указан, то имя выходного файла определяется URL\-адресом.
 .TP 
 
-\fB\-p\fP proxy_host[:port]
+\fB\-p\fP прокси_хост[:порт]
 .TP 
-Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-c\fP or \fB\-p\fP :0 to disable the eeproxy.
+Укажите I2P прокси\-сервер (eeproxy) для использования. Если порт не указан, eepget будет использовать 4444. Если эта опция не указана, eepget будет использовать 127.0.0.1:4444. Укажите \fB\-c\fP или \fB\-p\fP :0 для отключения eeproxy.
 .TP 
 
 \fB\-t\fP секунд
@@ -81,8 +81,8 @@ Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepg
 
 .SH "СТАТУС ВЫХОДА"
 
-\fBeepget\fP exits with status zero upon successful transfer and non\-zero if
-there were problems with the download.
+\fBeepget\fP завершается с нулевым статусом при успешной передаче и ненулевым,
+если были проблемы с загрузкой.
 
 .SH "СООБЩИТЬ ОБ ОШИБКАХ"
 Пожалуйста, заведите тикет на

@@ -5,13 +5,7 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# yume, 2017
-# Mykola Demianko <nikdemqr@gmail.com>, 2017
-# Alexander Georgievskiy <galeksandrp@gmail.com>, 2017
-# Filipp Chertiev <f@fzfx.ru>, 2017
-# 1 2 <sulyukin@gmail.com>, 2017
-# Boris Shminke, 2017
-# R4SAS, 2019
+# polearnik <polearnik@mail.ru>, 2019
 # zzzi2p, 2019
 # 
 msgid ""
@@ -20,12 +14,12 @@ msgstr ""
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:31+0000\n"
 "Last-Translator: zzzi2p, 2019\n"
-"Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
+"Language-Team: Romanian (https://www.transifex.com/otf/teams/12694/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru_RU\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
 #. type: TH
 #: man/eepget.1:1
@@ -37,7 +31,7 @@ msgstr "EEPGET"
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
 #, no-wrap
 msgid "January 26, 2017"
-msgstr "26 января 2017"
+msgstr "26 ianuarie 2017"
 
 #. type: TH
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
@@ -49,18 +43,18 @@ msgstr "I2P"
 #: man/eepget.1:3 man/i2prouter.1:3 man/i2prouter-nowrapper.1:3
 #, no-wrap
 msgid "NAME"
-msgstr "ИМЯ"
+msgstr "NUME"
 
 #. type: Plain text
 #: man/eepget.1:5
 msgid "Eepget - I2P downloader"
-msgstr "Eepget - загрузчик I2P"
+msgstr "Eepget - I2P downloader"
 
 #. type: SH
 #: man/eepget.1:6 man/i2prouter.1:6 man/i2prouter-nowrapper.1:6
 #, no-wrap
 msgid "SYNOPSIS"
-msgstr "СИНОПСИС"
+msgstr "REZUMAT"
 
 #. type: Plain text
 #: man/eepget.1:9
@@ -71,7 +65,7 @@ msgstr "B<eepget> [I<options>]I<URL>"
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
 #, no-wrap
 msgid "DESCRIPTION"
-msgstr "ОПИСАНИЕ"
+msgstr "DESCRIERE"
 
 #. type: Plain text
 #: man/eepget.1:15
@@ -79,8 +73,8 @@ msgid ""
 "Download a file non-interactively via HTTP. Transfers through both I2P and "
 "the regular Internet are supported."
 msgstr ""
-"Неинтерактивное скачивание файла через HTTP. Поддерживается передача как "
-"через I2P, так и через обычный Интернет."
+"Descărcați un fișier fără interacțiune prin HTTP. Sunt acceptate "
+"transferurile atât prin I2P, cât și prin internetul obișnuit."
 
 #. type: Plain text
 #: man/eepget.1:21
@@ -91,18 +85,18 @@ msgid ""
 "  If supported by the remote server, eepget will instruct the server to "
 "continue the download from the point of interruption."
 msgstr ""
-"Eepget способна работать с медленными или нестабильными сетевыми "
-"подключениями; в случае неудочной загрузки из-за сетевых неполадок, будут "
-"предприниматься попытки переподключения до тех пор, пока файл не будет "
-"скачан полностью (если установлен параметр -n). Eepget отправит команду "
-"серверу на продолжение загрузки из точки прерывания, если удаленный сервер "
-"поддерживает такую возможность."
+"Eepget este capabil să facă față conexiunilor de rețea lente sau instabile; "
+"dacă o descărcare nu este reușită din cauza unei probleme de rețea, aceasta "
+"va continua să reîncerce până când întregul fișier va fi recuperat (dacă "
+"opțiunea -n este setată). Dacă este acceptat de serverul de la distanță, "
+"eepget va instrui serverul să continue descărcarea din punctul de "
+"întrerupere."
 
 #. type: SH
 #: man/eepget.1:22
 #, no-wrap
 msgid "OPTIONS"
-msgstr "ОПЦИИ"
+msgstr "OPȚIUNI"
 
 #. type: Plain text
 #: man/eepget.1:25
@@ -113,7 +107,7 @@ msgstr "B<-c>"
 #: man/eepget.1:25
 #, no-wrap
 msgid "Clearnet. Do not use a proxy. Same as B<-p> :0 ."
-msgstr "Клирнет. Не использовать прокси. Аналогично как B<-p> :0 ."
+msgstr "Clearnet. Nu folosiți un proxy. La fel ca B<-p>: 0."
 
 #. type: Plain text
 #: man/eepget.1:31
@@ -124,24 +118,23 @@ msgstr "B<-e> etag"
 #: man/eepget.1:31
 #, no-wrap
 msgid "Sets the etag value in the request headers."
-msgstr "Устанавливает значение etag в заголовке запроса."
+msgstr "Setează valoarea etag în anteturile cererii."
 
 #. type: Plain text
 #: man/eepget.1:37
 msgid "B<-h> name=value"
-msgstr "B<-h>имя=значение"
+msgstr "B<-h> nume = valoare"
 
 #. type: TP
 #: man/eepget.1:37
 #, no-wrap
 msgid "Adds an arbitrary request header with the given name and value."
-msgstr ""
-"Добавляет произвольный заголовок запроса с заданным именем и значением."
+msgstr "Adaugă un antet de solicitare arbitrară cu numele și valoarea dată."
 
 #. type: Plain text
 #: man/eepget.1:43
 msgid "B<-l> lineLen"
-msgstr "B<-l> lineLen"
+msgstr "B<-l> linieLen"
 
 #. type: TP
 #: man/eepget.1:43
@@ -150,13 +143,13 @@ msgid ""
 "Controls the progress display. B<\\ lineLen > is the length of one progress "
 "line in characters. The default is 40."
 msgstr ""
-"Контролирует отображение прогресса. B<\\ lineLen > - это длина одной строчки"
-" прогресс-бара в символах. По умолчанию равна 40."
+"Controlează afișarea progresului. B<\\ lineLen> este lungimea unei linii de "
+"progres în caractere. Valoarea implicită este 40."
 
 #. type: Plain text
 #: man/eepget.1:49
 msgid "B<-m> markSize"
-msgstr "B<-m> markSize"
+msgstr "B<-m>Marcă Dimensiune"
 
 #. type: TP
 #: man/eepget.1:49
@@ -165,13 +158,13 @@ msgid ""
 "Controls the progress display. B<\\ markSize > is the number of bytes one "
 "'#' character represents. The default is 1024."
 msgstr ""
-"Контролирует отображение прогресса. B<\\ markSize > - это количество байт, "
-"которое означает один символ \"#\". По умолчанию равно 1024."
+"Controlează afișarea progresului. B<\\ markSize> este numărul de bytes pe "
+"care îl reprezintă un caracter „#”. Valoarea implicită este 1024."
 
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr "B<-n> попыток"
+msgstr "B<-n> reîncercările"
 
 #. type: TP
 #: man/eepget.1:55
@@ -180,13 +173,14 @@ msgid ""
 "Specify the number of times to retry downloading if the download isn't "
 "successful. If this option is not specified, eepget will not retry."
 msgstr ""
-"Укажите сколько раз нужно повторить попытку, если загрузка не удалась. Если "
-"значение не указано, то eepget не будет повторять попытку."
+"Specificați numărul de ori pentru a reîncărca descărcarea dacă descărcarea "
+"nu are succes. Dacă această opțiune nu este specificată, eepget nu va "
+"reîncerca."
 
 #. type: Plain text
 #: man/eepget.1:61
 msgid "B<-o> file"
-msgstr "B<-o> файл"
+msgstr "B<-o> fisier"
 
 #. type: TP
 #: man/eepget.1:61
@@ -195,13 +189,13 @@ msgid ""
 "Sets the output file to write to. If this option is not given, the output "
 "filename will be determined by the URL."
 msgstr ""
-"Задает выходной файл для записи. Если этот параметр не указан, то имя "
-"выходного файла определяется URL-адресом."
+"Setează fișierul de ieșire la care să scrie. Dacă această opțiune nu este "
+"dată, numele fișierului de ieșire va fi determinat de adresa URL."
 
 #. type: Plain text
 #: man/eepget.1:67
 msgid "B<-p> proxy_host[:port]"
-msgstr "B<-p> прокси_хост[:порт]"
+msgstr "B<-p> proxy_host[:port]"
 
 #. type: TP
 #: man/eepget.1:67
@@ -211,37 +205,39 @@ msgid ""
 "eepget will use 4444. If this option is not specified, eepget will use "
 "127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
 msgstr ""
-"Укажите I2P прокси-сервер (eeproxy) для использования. Если порт не указан, "
-"eepget будет использовать 4444. Если эта опция не указана, eepget будет "
-"использовать 127.0.0.1:4444. Укажите B<-c> или B<-p> :0 для отключения "
-"eeproxy."
+"Specifica un server proxy I2P (eeproxy) pentru a fi utilizat. Dacă portul nu"
+" este specificat, eepget va utiliza 4444. Dacă această opțiune nu este "
+"specificată, eepget va utiliza 127.0.0.1:4444. Specificați B<-c> sau B<-p>: "
+"0 pentru a dezactiva eeproxiul."
 
 #. type: Plain text
 #: man/eepget.1:73
 msgid "B<-t> seconds"
-msgstr "B<-t> секунд"
+msgstr "B<-t> secunde"
 
 #. type: TP
 #: man/eepget.1:73
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
-msgstr "Устанавливает тайм-аут соединения. По умолчанию 60 секунд."
+msgstr ""
+"Setează timpul de inactivitate. Valoarea implicită este de 60 de secunde."
 
 #. type: Plain text
 #: man/eepget.1:79
 msgid "B<-u> username"
-msgstr "B<-u> имя пользователя"
+msgstr "B<-u> Numele utilizatorului"
 
 #. type: TP
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
-msgstr "Задайте имя пользователя для авторизации прокси, если требуется."
+msgstr ""
+"Setează numele de utilizator pentru autorizarea proxy, dacă este necesar."
 
 #. type: Plain text
 #: man/eepget.1:85
 msgid "B<-x> password"
-msgstr "B<-x> пароль"
+msgstr "B<-x>Parola"
 
 #. type: TP
 #: man/eepget.1:85
@@ -250,14 +246,15 @@ msgid ""
 "Sets the password for proxy authorization, if required. If a username is "
 "specified but not a password, EepGet will prompt for the password."
 msgstr ""
-"Устанавливает пароль для авторизации на прокси, если он требуется. Если имя "
-"пользователя задано, а пароль - нет, EepGet будет запрашивать пароль."
+"Setează parola pentru autorizarea proxy, dacă este necesar. Dacă este "
+"specificat un nume de utilizator, dar nu o parolă, EepGet vă va solicita "
+"parola."
 
 #. type: SH
 #: man/eepget.1:89
 #, no-wrap
 msgid "EXIT STATUS"
-msgstr "СТАТУС ВЫХОДА"
+msgstr "STATUS IEȘIRE"
 
 #. type: Plain text
 #: man/eepget.1:93
@@ -265,14 +262,14 @@ msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
 msgstr ""
-"B<eepget> завершается с нулевым статусом при успешной передаче и ненулевым, "
-"если были проблемы с загрузкой."
+"B<eepget> iesiri cu status zero la transferul reușit și non-zero dacă au "
+"fost probleme cu descărcarea."
 
 #. type: SH
 #: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
 #, no-wrap
 msgid "REPORTING BUGS"
-msgstr "СООБЩИТЬ ОБ ОШИБКАХ"
+msgstr "Raportarea erorilor"
 
 #. type: Plain text
 #: man/eepget.1:99 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
@@ -280,14 +277,14 @@ msgid ""
 "Please enter a ticket on E<.UR https://trac.i2p2.de/> the I2P trac page "
 "E<.UE .>"
 msgstr ""
-"Пожалуйста, заведите тикет на E<.UR https://trac.i2p2.de/> странице трекера "
-"I2P E<.UE .>."
+"Vă rugăm să introduceți un bilet pe E<.UR https://trac.i2p2.de/> pagina I2P "
+"trac E<.UE.>"
 
 #. type: SH
 #: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
 #, no-wrap
 msgid "SEE ALSO"
-msgstr "СМ. ТАКЖЕ"
+msgstr "VEZI SI"
 
 #. type: Plain text
 #: man/eepget.1:104
@@ -303,7 +300,7 @@ msgstr "I2PROUTER"
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr "i2prouter - запускает и останавливает роутер I2P"
+msgstr "i2prouter - porniți și opriți routerul I2P"
 
 #. type: Plain text
 #: man/i2prouter.1:9
@@ -317,7 +314,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr "Контроль службы I2P"
+msgstr "Controlează serviciul I2P."
 
 #. type: IP
 #: man/i2prouter.1:15
@@ -328,7 +325,7 @@ msgstr "B<console>"
 #. type: Plain text
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
-msgstr "Запускает I2P как консольное приложение от текущего пользователя."
+msgstr "Rulează I2P ca aplicație de consolă sub utilizatorul curent."
 
 #. type: IP
 #: man/i2prouter.1:19
@@ -339,7 +336,7 @@ msgstr "B<start>"
 #. type: Plain text
 #: man/i2prouter.1:21
 msgid "Starts the I2P service."
-msgstr "Запускает сервис I2P"
+msgstr "Începe serviciul I2P."
 
 #. type: IP
 #: man/i2prouter.1:23
@@ -350,7 +347,7 @@ msgstr "B<stop>"
 #. type: Plain text
 #: man/i2prouter.1:25
 msgid "Stops the I2P service."
-msgstr "Останавливает сервис I2P"
+msgstr "Oprește serviciul I2P."
 
 #. type: IP
 #: man/i2prouter.1:27
@@ -361,7 +358,7 @@ msgstr "B<restart>"
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr "Останавливает сервис I2P и затем запускет его."
+msgstr "Oprește serviciul I2P și apoi îl pornește."
 
 #. type: IP
 #: man/i2prouter.1:31
@@ -372,7 +369,7 @@ msgstr "B<condrestart>"
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
-msgstr "Перезапускает сервис I2P, только если он уже запущен."
+msgstr "Reporniți serviciul I2P numai dacă este deja în curs de execuție."
 
 #. type: IP
 #: man/i2prouter.1:35
@@ -383,7 +380,7 @@ msgstr "B<graceful>"
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr "Постепенно остановить сервис I2P (может занять до 11 минут)"
+msgstr "Oprirea cu grație I2P (poate dura până la 11 minute)"
 
 #. type: IP
 #: man/i2prouter.1:39
@@ -395,8 +392,8 @@ msgstr "B<install>"
 #: man/i2prouter.1:41
 msgid "Install initscript to start I2P automatically when the system boots."
 msgstr ""
-"Установите initscript, чтобы I2P запускался автоматически при загрузке "
-"системы."
+"Instalați initscript pentru a porni I2P automat atunci când sistemul "
+"pornește."
 
 #. type: IP
 #: man/i2prouter.1:43
@@ -407,8 +404,7 @@ msgstr "B<remove>"
 #. type: Plain text
 #: man/i2prouter.1:45
 msgid "Uninstall initscript that was installed with B<install>"
-msgstr ""
-"Удалить скрипт инициализации, который был установлен с помощью B<install>"
+msgstr "Dezinstalați initscript care a fost instalat cu B<install>"
 
 #. type: IP
 #: man/i2prouter.1:47
@@ -419,7 +415,7 @@ msgstr "B<status>"
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr "Сообщает, запущен ли I2P сервис."
+msgstr "Tipărește dacă serviciul I2P funcționează."
 
 #. type: IP
 #: man/i2prouter.1:51
@@ -430,7 +426,7 @@ msgstr "B<dump>"
 #. type: Plain text
 #: man/i2prouter.1:53
 msgid "Dumps the current threads into B<wrapper.log>."
-msgstr "Сохраняет текщие потоки в B<wrapper.log>."
+msgstr "Aruncă firele curente în B<wrapper.log>."
 
 #. type: Plain text
 #: man/i2prouter.1:61
@@ -446,7 +442,7 @@ msgstr "I2PROUTER-NOWRAPPER"
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:5
 msgid "i2prouter-nowrapper - start the I2P router"
-msgstr "i2prouter-nowrapper - запускает роутер I2P"
+msgstr "i2prouter-nowrapper - porniți routerul I2P"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8
@@ -460,9 +456,9 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
-"Запускает роутер I2P без сервисного враппера. Это значит что роутер не будет"
-" перезапущен в случае ошибки.  Также по умолчанию используется стандартный "
-"лимит память, чего может быть недостаточно для I2P."
+"Porniți routerul I2P, fără învelișul de serviciu. Aceasta înseamnă că "
+"routerul nu va reporni dacă se va bloca. De asemenea, va folosi dimensiunea "
+"implicită a memoriei, care poate să nu fie suficientă pentru I2P."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
@@ -471,10 +467,9 @@ msgid ""
 "options.  To stop the router, use your browser to access E<.UR "
 "http://localhost:7657/> the router console E<.UE .>"
 msgstr ""
-"Вам действительно стоит использовать скрипт B<i2prouter>(1) вместо этого "
-"скрипта. У этого скрипта нет параметров. Чтобы остановить маршрутизатор, "
-"используйте свой браузер, чтобы получить доступ к  E<.UR "
-"http://localhost:7657/> консоли маршрутизатора E<.UE .>"
+"În schimb, ar trebui să folosiți scriptul B<i2prouter>(1). Nu există "
+"opțiuni. Pentru a opri routerul, utilizați browserul dvs. pentru a accesa "
+"E<.UR http://localhost:7657/> consola de router E<.UE .>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31

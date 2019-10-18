@@ -1,0 +1,96 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "26 ianuarie 2017" "" I2P
+
+.SH NUME
+Eepget \- I2P downloader
+
+.SH REZUMAT
+\fBeepget\fP [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH DESCRIERE
+.P
+Descărcați un fișier fără interacțiune prin HTTP. Sunt acceptate
+transferurile atât prin I2P, cât și prin internetul obișnuit.
+.P
+Eepget este capabil să facă față conexiunilor de rețea lente sau instabile;
+dacă o descărcare nu este reușită din cauza unei probleme de rețea, aceasta
+va continua să reîncerce până când întregul fișier va fi recuperat (dacă
+opțiunea \-n este setată). Dacă este acceptat de serverul de la distanță,
+eepget va instrui serverul să continue descărcarea din punctul de
+întrerupere.
+
+.SH OPȚIUNI
+\fB\-c\fP
+.TP 
+Clearnet. Nu folosiți un proxy. La fel ca \fB\-p\fP: 0.
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Setează valoarea etag în anteturile cererii.
+.TP 
+
+\fB\-h\fP nume = valoare
+.TP 
+Adaugă un antet de solicitare arbitrară cu numele și valoarea dată.
+.TP 
+
+\fB\-l\fP linieLen
+.TP 
+Controlează afișarea progresului. \fB\ lineLen\fP este lungimea unei linii de progres în caractere. Valoarea implicită este 40.
+.TP 
+
+\fB\-m\fPMarcă Dimensiune
+.TP 
+Controlează afișarea progresului. \fB\ markSize\fP este numărul de bytes pe care îl reprezintă un caracter „#”. Valoarea implicită este 1024.
+.TP 
+
+\fB\-n\fP reîncercările
+.TP 
+Specificați numărul de ori pentru a reîncărca descărcarea dacă descărcarea nu are succes. Dacă această opțiune nu este specificată, eepget nu va reîncerca.
+.TP 
+
+\fB\-o\fP fisier
+.TP 
+Setează fișierul de ieșire la care să scrie. Dacă această opțiune nu este dată, numele fișierului de ieșire va fi determinat de adresa URL.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+Specifica un server proxy I2P (eeproxy) pentru a fi utilizat. Dacă portul nu este specificat, eepget va utiliza 4444. Dacă această opțiune nu este specificată, eepget va utiliza 127.0.0.1:4444. Specificați \fB\-c\fP sau \fB\-p\fP: 0 pentru a dezactiva eeproxiul.
+.TP 
+
+\fB\-t\fP secunde
+.TP 
+Setează timpul de inactivitate. Valoarea implicită este de 60 de secunde.
+.TP 
+
+\fB\-u\fP Numele utilizatorului
+.TP 
+Setează numele de utilizator pentru autorizarea proxy, dacă este necesar.
+.TP 
+
+\fB\-x\fPParola
+.TP 
+Setează parola pentru autorizarea proxy, dacă este necesar. Dacă este specificat un nume de utilizator, dar nu o parolă, EepGet vă va solicita parola.
+
+.SH "STATUS IEȘIRE"
+
+\fBeepget\fP iesiri cu status zero la transferul reușit și non\-zero dacă au
+fost probleme cu descărcarea.
+
+.SH "Raportarea erorilor"
+Vă rugăm să introduceți un bilet pe
+.UR https://trac.i2p2.de/
+pagina I2P
+trac
+.UE.
+
+.SH "VEZI SI"
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+

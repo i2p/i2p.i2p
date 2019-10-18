@@ -199,6 +199,7 @@ trans.tr_TR = apps/i2psnark/locale/messages_tr.po
 trans.uk_UA = apps/i2psnark/locale/messages_uk.po
 trans.vi = apps/i2psnark/locale/messages_vi.po
 trans.zh_CN = apps/i2psnark/locale/messages_zh.po
+trans.zh_TW = apps/i2psnark/locale/messages_zh_TW.po
 
 [I2P.susidns]
 source_file = apps/susidns/locale/messages_en.po
@@ -268,6 +269,7 @@ trans.uk_UA = apps/desktopgui/locale/messages_uk.po
 trans.tr_TR = apps/desktopgui/locale/messages_tr.po
 trans.vi = apps/desktopgui/locale/messages_vi.po
 trans.zh_CN = apps/desktopgui/locale/messages_zh.po
+trans.zh_TW = apps/desktopgui/locale/messages_zh_TW.po
 
 [I2P.susimail]
 source_file = apps/susimail/locale/messages_en.po
@@ -446,6 +448,7 @@ trans.zh_CN = apps/ministreaming/locale/messages_zh.po
 [I2P.manpages]
 ;;
 ;; after adding languages here, add to debian/*.manpages also
+;; You must run installer/resources/poupdate-man.sh first.
 ;;
 type = PO
 source_file = installer/resources/locale-man/man.pot
@@ -463,6 +466,7 @@ trans.nl = installer/resources/locale-man/man_nl.po
 trans.pl = installer/resources/locale-man/man_pl.po
 trans.pt = installer/resources/locale-man/man_pt.po
 trans.pt_BR = installer/resources/locale-man/man_pt_BR.po
+trans.ro = installer/resources/locale-man/man_ro.po
 trans.ru_RU = installer/resources/locale-man/man_ru.po
 trans.sv_SE = installer/resources/locale-man/man_sv.po
 trans.tr_TR = installer/resources/locale-man/man_tr.po
@@ -517,6 +521,7 @@ trans.pt = installer/resources/readme/readme_pt.html
 trans.ro = installer/resources/readme/readme_ro.html
 trans.ru_RU = installer/resources/readme/readme_ru.html
 trans.tr_TR = installer/resources/readme/readme_tr.html
+trans.zh_CN = installer/resources/readme/readme_zh.html
 
 [main]
 host = https://www.transifex.com

@@ -1,0 +1,58 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "26 ianuarie 2017" "" I2P
+
+.SH NUME
+i2prouter \- porniți și opriți routerul I2P
+
+.SH REZUMAT
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH DESCRIERE
+Controlează serviciul I2P.
+
+.IP \fBconsole\fP
+Rulează I2P ca aplicație de consolă sub utilizatorul curent.
+
+.IP \fBstart\fP
+Începe serviciul I2P.
+
+.IP \fBstop\fP
+Oprește serviciul I2P.
+
+.IP \fBrestart\fP
+Oprește serviciul I2P și apoi îl pornește.
+
+.IP \fBcondrestart\fP
+Reporniți serviciul I2P numai dacă este deja în curs de execuție.
+
+.IP \fBgraceful\fP
+Oprirea cu grație I2P (poate dura până la 11 minute)
+
+.IP \fBinstall\fP
+Instalați initscript pentru a porni I2P automat atunci când sistemul
+pornește.
+
+.IP \fBremove\fP
+Dezinstalați initscript care a fost instalat cu \fBinstall\fP
+
+.IP \fBstatus\fP
+Tipărește dacă serviciul I2P funcționează.
+
+.IP \fBdump\fP
+Aruncă firele curente în \fBwrapper.log\fP.
+
+.SH "Raportarea erorilor"
+Vă rugăm să introduceți un bilet pe
+.UR https://trac.i2p2.de/
+pagina I2P
+trac
+.UE.
+
+.SH "VEZI SI"
+\fBi2prouter\-nowrapper\fP(1)
