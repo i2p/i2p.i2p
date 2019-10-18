@@ -210,8 +210,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(CACHE_MAX_SIZE);
     private static final String MIN_HOST_LOOKUP_VERSION = "0.9.11";
-// todo change to false for release
-    private static final boolean TEST_BLINDINFO = true;
 
     /** SSL interface (only) @since 0.8.3 */
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
@@ -248,7 +246,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_LS2_VERSION) >= 0);
         _routerSupportsBlindingInfo = isrc ||
-                                    TEST_BLINDINFO ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_BLINDINFO_VERSION) >= 0);
         synchronized (_stateLock) {
