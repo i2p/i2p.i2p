@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-04-24 14:22+0000\n"
+"PO-Revision-Date: 2019-10-02 08:58+0000\n"
 "Last-Translator: erinm\n"
 "Language-Team: Arabic (http://www.transifex.com/otf/I2P/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -698,7 +698,7 @@ msgstr "مفتاح التوقيع"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:319
 msgid "Certificate"
-msgstr ""
+msgstr "شهادة"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:325
 msgid "Validated"
@@ -706,11 +706,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:327
 msgid "no"
-msgstr ""
+msgstr "لا"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:327
 msgid "yes"
-msgstr ""
+msgstr "نعم"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:333
 msgid "Source"

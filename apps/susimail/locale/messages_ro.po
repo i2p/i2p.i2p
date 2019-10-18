@@ -5,14 +5,15 @@
 # 
 # Translators:
 # CimpianAlin <inactive+CimpianAlin@transifex.com>, 2013
-# pol polearnik <polearnik@mail.ru>, 2013
+# polearnik <polearnik@mail.ru>, 2019
+# polearnik <polearnik@mail.ru>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-04-24 14:21+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2019-09-07 15:46+0000\n"
+"Last-Translator: polearnik <polearnik@mail.ru>\n"
 "Language-Team: Romanian (http://www.transifex.com/otf/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,7 +37,7 @@ msgstr "Re:"
 #: src/src/i2p/susi/webmail/WebMail.java:1251
 #: src/src/i2p/susi/webmail/WebMail.java:1252
 msgid "Fwd:"
-msgstr ""
+msgstr "Fwd:"
 
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:214
@@ -56,7 +57,7 @@ msgstr "Gunoi"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:217
 msgid "Bulk Mail"
-msgstr ""
+msgstr "E-Mail În Vrac "
 
 #. untranslated, translate on use
 #: src/src/i2p/susi/webmail/WebMail.java:221
@@ -81,7 +82,7 @@ msgstr "Partea ({0}) nu apare, din cauza {1}"
 #: src/src/i2p/susi/webmail/WebMail.java:642
 #, java-format
 msgid "Download attachment {0}"
-msgstr ""
+msgstr "Descărcați atașamentul {0} "
 
 #: src/src/i2p/susi/webmail/WebMail.java:643
 msgid "File is packed into a zipfile for security reasons."
@@ -139,12 +140,12 @@ msgstr "Numărul de port SMTP este invalid."
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:243
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:258
 msgid "Cannot connect"
-msgstr ""
+msgstr "Nu se poate conecta "
 
 #: src/src/i2p/susi/webmail/WebMail.java:926
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:744
 msgid "Error connecting to server"
-msgstr ""
+msgstr "Eroare la conectarea la server"
 
 #. _t("Internal error, lost connection.") + '\n' +
 #: src/src/i2p/susi/webmail/WebMail.java:970
@@ -154,14 +155,14 @@ msgstr "Utilizatorul sa deconectat."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1035
 msgid "Draft saved."
-msgstr ""
+msgstr "Proiectul salvat. "
 
 #: src/src/i2p/susi/webmail/WebMail.java:1045
 #: src/src/i2p/susi/webmail/WebMail.java:1286
 #: src/src/i2p/susi/webmail/WebMail.java:2721
 #: src/src/i2p/susi/webmail/WebMail.java:2902
 msgid "Unable to save mail."
-msgstr ""
+msgstr "Nu pot salva poșta."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1175
 #, java-format
@@ -203,7 +204,7 @@ msgstr "Nu sa găsit nici o codificare la {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1592
 msgid "Attachment not found."
-msgstr ""
+msgstr "Atașamentul nu a fost găsit."
 
 #. error if we get here
 #: src/src/i2p/susi/webmail/WebMail.java:1621
@@ -211,7 +212,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2314
 #: src/src/i2p/susi/webmail/WebMail.java:3471
 msgid "Message not found."
-msgstr ""
+msgstr "Mesajul nu a fost găsit."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1726
 #, java-format
@@ -229,11 +230,11 @@ msgstr "Nu sunt mesaje marcate pentru ștergere."
 #: src/src/i2p/susi/webmail/WebMail.java:1802
 #, java-format
 msgid "Host unchanged. Edit configation file {0} to change host."
-msgstr ""
+msgstr "Gazda neschimbată. Editează fișierul de configurare {0} pentru a schimba gazda."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1822
 msgid "Configuration saved"
-msgstr ""
+msgstr "Configurația salvată"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1844
 msgid "Invalid pagesize number, resetting to default value."
@@ -248,7 +249,7 @@ msgstr "Autentificare"
 #: src/src/i2p/susi/webmail/WebMail.java:2420
 #: src/src/i2p/susi/webmail/WebMail.java:3124
 msgid "Loading emails, please wait..."
-msgstr ""
+msgstr "Încărcarea e-mailuri, vă rugăm să așteptați..."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2302
 #, java-format
@@ -269,7 +270,7 @@ msgstr "Arată mesajul"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2317
 msgid "New Message"
-msgstr ""
+msgstr "Mesaj Nou"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2319
 msgid "Configuration"
@@ -283,22 +284,22 @@ msgstr "Email"
 #, java-format
 msgid "{0} new message"
 msgid_plural "{0} new messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} mesaj nou"
+msgstr[1] "{0} mesaje noi"
+msgstr[2] "{0} mesaje noi"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2409
 msgid "No new messages"
-msgstr ""
+msgstr "Nu sunt mesaje noi"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2422
 msgid "Checking for new emails on server"
-msgstr ""
+msgstr "Verificarea pentru noi e-mailuri pe server"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2424
 #: src/src/i2p/susi/webmail/WebMail.java:3126
 msgid "Refresh the page for updates"
-msgstr ""
+msgstr "Reîmprospătează pagina pentru actualizări"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2629
 #: src/src/i2p/susi/webmail/WebMail.java:3226
@@ -323,19 +324,19 @@ msgstr "Nici un destinatar găsit."
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:302
 #, java-format
 msgid "Email is too large, max is {0}"
-msgstr ""
+msgstr "E-mail este prea mare, max este {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2834
 #: src/src/i2p/susi/webmail/WebMail.java:2915
 msgid "Sending mail."
-msgstr ""
+msgstr "Trimiterea de e-mail."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2839
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:254
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:346
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:351
 msgid "Error sending mail"
-msgstr ""
+msgstr "Eroare la trimiterea corespondenței"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2873
 msgid "Mail sent."
@@ -347,7 +348,7 @@ msgstr "Trimite"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2966
 msgid "Save as Draft"
-msgstr ""
+msgstr "Salvează ca schiţa "
 
 #: src/src/i2p/susi/webmail/WebMail.java:2967
 #: src/src/i2p/susi/webmail/WebMail.java:3258
@@ -370,11 +371,11 @@ msgstr "Pentru"
 #: src/src/i2p/susi/webmail/WebMail.java:3056
 #: src/src/i2p/susi/webmail/WebMail.java:3455
 msgid "Cc"
-msgstr ""
+msgstr "Cc"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3057
 msgid "Bcc"
-msgstr ""
+msgstr "Bcc"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3058
 #: src/src/i2p/susi/webmail/WebMail.java:3179
@@ -384,7 +385,7 @@ msgstr "Subiect"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3061
 msgid "Add Attachment"
-msgstr ""
+msgstr "Adaugă Anexă"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3067
 msgid "Attachments"
@@ -392,11 +393,11 @@ msgstr "Atașamente"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3076
 msgid "Delete selected attachments"
-msgstr ""
+msgstr "Șterge atașamentele selectate"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3093
 msgid "Email Login"
-msgstr ""
+msgstr "Conectare Prin E-Mail"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:3095
@@ -413,15 +414,15 @@ msgstr "Gazdă"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3102
 msgid "POP3 Port"
-msgstr ""
+msgstr "POP3 Port"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3103
 msgid "SMTP Port"
-msgstr ""
+msgstr "SMTP Port"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3108
 msgid "Read Mail Offline"
-msgstr ""
+msgstr "Citește Offline Mail"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3112
 #: src/src/i2p/susi/webmail/WebMail.java:3277
@@ -468,15 +469,15 @@ msgstr "Dimensiune"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3231
 msgid "Message is new"
-msgstr ""
+msgstr "Mesajul e nou."
 
 #: src/src/i2p/susi/webmail/WebMail.java:3234
 msgid "Message has an attachment"
-msgstr ""
+msgstr "Mesajul are un atașament."
 
 #: src/src/i2p/susi/webmail/WebMail.java:3236
 msgid "Message is spam"
-msgstr ""
+msgstr "Mesajul e spam."
 
 #. TODO ngettext
 #: src/src/i2p/susi/webmail/WebMail.java:3256
@@ -497,16 +498,16 @@ msgstr "Marchează toate"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3264
 msgid "Clear All"
-msgstr ""
+msgstr "Şterge tot."
 
 #: src/src/i2p/susi/webmail/WebMail.java:3289
 msgid "Folder"
-msgstr ""
+msgstr "Dosar"
 
 #. TODO css to center it
 #: src/src/i2p/susi/webmail/WebMail.java:3290
 msgid "Change to Folder"
-msgstr ""
+msgstr "Schimbă dosarul"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3296
 msgid "First"
@@ -564,7 +565,7 @@ msgstr "Șterge"
 #. can't move from drafts
 #: src/src/i2p/susi/webmail/WebMail.java:3401
 msgid "Move to Folder"
-msgstr ""
+msgstr "Mută dosarul"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3421
 msgid "Back to Folder"
@@ -572,7 +573,7 @@ msgstr "Înapoi la Dosar"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3504
 msgid "Folder Page Size"
-msgstr ""
+msgstr "Dimensiunea Paginii Dosarului"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3507
 msgid "Set"
@@ -584,7 +585,7 @@ msgstr "Configurație avansată"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3520
 msgid "Save Configuration"
-msgstr ""
+msgstr "Salvează Configurația"
 
 #. this appears in the UI so translate
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:108
@@ -594,28 +595,28 @@ msgstr ""
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:978
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1199
 msgid "No response from server"
-msgstr ""
+msgstr "Nici un răspuns de la server"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."
-msgstr ""
+msgstr "Conectare server Mail nu a reușit, nume de utilizator greșit sau parolă."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr ""
+msgstr "Logare și apoi autentificare din nou cu numele de utilizator corect și parola."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:314
 msgid "Login failed"
-msgstr ""
+msgstr "Conectare eșuată"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:256
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:285
 msgid "Server refused connection"
-msgstr ""
+msgstr "Server refuzat conexiune"
 
 #. TODO which recipient?
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:327
 msgid "Mail rejected"
-msgstr ""
+msgstr "Corespondență respinsă"

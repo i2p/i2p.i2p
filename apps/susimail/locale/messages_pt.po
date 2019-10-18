@@ -5,15 +5,15 @@
 # 
 # Translators:
 # kgtm <fabio.h.f.antunes@gmail.com>, 2014
-# MS <manuelarodsilva@gmail.com>, 2017
+# Manuela Silva <manuelarodsilva@gmail.com>, 2017
 # Tulio Simoes Martins Padilha <tuliouel@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-04-24 14:21+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2019-10-02 08:58+0000\n"
+"Last-Translator: Martus Translations <translations@martus.org>\n"
 "Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -145,7 +145,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:926
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:744
 msgid "Error connecting to server"
-msgstr ""
+msgstr "Erro ao conectar ao servidor"
 
 #. _t("Internal error, lost connection.") + '\n' +
 #: src/src/i2p/susi/webmail/WebMail.java:970
@@ -382,7 +382,7 @@ msgstr "Assunto"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3061
 msgid "Add Attachment"
-msgstr ""
+msgstr "Adicionar Anexo"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3067
 msgid "Attachments"

@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-04-24 14:22+0000\n"
-"Last-Translator: erinm\n"
+"PO-Revision-Date: 2019-10-02 08:58+0000\n"
+"Last-Translator: Chi-Hsun Tsai\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -648,7 +648,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:307
 msgid "Public Key"
-msgstr ""
+msgstr "公開金鑰"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:309
 msgid "ElGamal 2048 bit"
@@ -660,7 +660,7 @@ msgstr "簽名金鑰"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:319
 msgid "Certificate"
-msgstr ""
+msgstr "憑證"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:325
 msgid "Validated"
@@ -676,7 +676,7 @@ msgstr "是"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:333
 msgid "Source"
-msgstr ""
+msgstr "來源"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:339
 msgid "Added Date"
