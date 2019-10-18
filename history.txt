@@ -1,3 +1,7 @@
+2019-10-18 zzz
+ * Translation updates
+ * GeoIP update
+
 2019-10-12 zzz
  * NTCP: Performance improvement (tickets #2619, #2620)
 
