@@ -187,7 +187,6 @@
 %>
 <img class="wizard progress bwtest" src="/themes/console/images/wizard/logogrey5.png">
 <h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
-<img class="wizardimg bwtest" src="/themes/console/images/wizard/undraw_metrics.png">
 <table class="mlabtable">
 <tr><td><%=intl._t("Test running?")%></td><td><%=wizhelper.isNDTRunning()%></td></tr>
 <tr><td><%=intl._t("Test complete?")%></td><td><%=wizhelper.isNDTComplete()%></td></tr>
@@ -215,7 +214,6 @@
     display: none;
 }
 </style>
-<img class="wizardimg bwtest" src="/themes/console/images/wizard/undraw_metrics.png">
 <table id="bandwidthconfig" class="configtable wizardtable">
 <tr><td class="infohelp infodiv" colspan="2">
 <%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%>
