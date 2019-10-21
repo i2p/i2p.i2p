@@ -1,3 +1,5 @@
+* 2019-10-22 0.9.43 released
+
 2019-10-18 zzz
  * Translation updates
  * GeoIP update
