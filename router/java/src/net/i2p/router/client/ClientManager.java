@@ -79,6 +79,8 @@ class ClientManager {
     private static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
     /** SSL interface (only) @since 0.8.3 */
     private static final String PROP_ENABLE_SSL = "i2cp.SSL";
+    /** Disable local-local "loopback", force all traffic through tunnels @since 0.9.44 */
+    private static final String PROP_DISABLE_LOOPBACK = "i2cp.disableLoopback";
 
     private static final int INTERNAL_QUEUE_SIZE = 256;
 
@@ -431,8 +433,13 @@ class ClientManager {
      */
     void distributeMessage(Destination fromDest, Destination toDest, Payload payload,
                            MessageId msgId, long messageNonce, long expiration, int flags) { 
-        // check if there is a runner for it
-        ClientConnectionRunner runner = getRunner(toDest);
+        ClientConnectionRunner runner;
+        if (_ctx.getBooleanProperty(PROP_DISABLE_LOOPBACK)) {
+            runner = null;
+        } else {
+            // check if there is a runner for it
+            runner = getRunner(toDest);
+        }
         if (runner != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Message " + msgId + " is targeting a local destination.  distribute it as such");
