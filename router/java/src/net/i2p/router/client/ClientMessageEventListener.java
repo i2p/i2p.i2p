@@ -621,6 +621,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                         _runner.disconnectClient("Private/public crypto key mismatch in LS");
                         return;
                     }
+                    // just register new SPK, don't verify, unused
+                    _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
                 } else {
                     // LS2
                     LeaseSet2 ls2 = (LeaseSet2) ls;
@@ -645,9 +647,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                             return;
                         }
                     }
+                    // just register new SPK, don't verify, unused
+                    _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), pks);
                 }
-                // just register new SPK, don't verify, unused
-                _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
             } else if (message.getSigningPrivateKey() != null &&
                        !message.getSigningPrivateKey().equals(keys.getRevocationKey())) {
                 // just register new SPK, don't verify, unused
