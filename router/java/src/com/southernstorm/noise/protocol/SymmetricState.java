@@ -34,32 +34,42 @@ import javax.crypto.ShortBufferException;
 /**
  * Symmetric state for helping manage a Noise handshake.
  */
-class SymmetricState implements Destroyable {
+class SymmetricState implements Destroyable, Cloneable {
 	
 	// precalculated hash of the Noise name
-	private static final byte[] INIT_HASH;
+	private static final byte[] INIT_HASH_XK;
+	private static final byte[] INIT_HASH_IK;
 
 	static {
+		INIT_HASH_XK = initHash(HandshakeState.protocolName);
+		INIT_HASH_IK = initHash(HandshakeState.protocolName2);
+	}
+
+	/**
+	 * @since 0.9.44
+	 */
+        private static byte[] initHash(String protocolName) {
 		byte[] protocolNameBytes;
 		try {
-			protocolNameBytes = HandshakeState.protocolName.getBytes("UTF-8");
+			protocolNameBytes = protocolName.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			// If UTF-8 is not supported, then we are definitely in trouble!
 			throw new UnsupportedOperationException("UTF-8 encoding is not supported");
 		}
-		INIT_HASH = new byte[32];
+		byte[] rv = new byte[32];
 		if (protocolNameBytes.length <= 32) {
-			System.arraycopy(protocolNameBytes, 0, INIT_HASH, 0, protocolNameBytes.length);
-			Arrays.fill(INIT_HASH, protocolNameBytes.length, 32, (byte)0);
+			System.arraycopy(protocolNameBytes, 0, rv, 0, protocolNameBytes.length);
+			Arrays.fill(rv, protocolNameBytes.length, 32, (byte)0);
 		} else {
 			try {
 				MessageDigest hash = Noise.createHash("SHA256");
 				hash.update(protocolNameBytes, 0, protocolNameBytes.length);
-				hash.digest(INIT_HASH, 0, 32);
+				hash.digest(rv, 0, 32);
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
 		}
+		return rv;
 	}
 
 	private final CipherState cipher;
@@ -78,7 +88,7 @@ class SymmetricState implements Destroyable {
 	 * @throws NoSuchAlgorithmException The cipher or hash algorithm in the
 	 * protocol name is not supported.
 	 */
-	public SymmetricState(String cipherName, String hashName) throws NoSuchAlgorithmException
+	public SymmetricState(String cipherName, String hashName, String patternId) throws NoSuchAlgorithmException
 	{
 		cipher = Noise.createCipher(cipherName);
 		hash = Noise.createHash(hashName);
@@ -87,8 +97,27 @@ class SymmetricState implements Destroyable {
 		h = new byte [hashLength];
 		prev_h = new byte [hashLength];
 		
-		System.arraycopy(INIT_HASH, 0, h, 0, hashLength);
+		byte[] initHash;
+		if (patternId.equals(HandshakeState.PATTERN_ID_XK))
+			initHash = INIT_HASH_XK;
+		else if (patternId.equals(HandshakeState.PATTERN_ID_IK))
+			initHash = INIT_HASH_IK;
+		else
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		System.arraycopy(initHash, 0, h, 0, hashLength);
 		System.arraycopy(h, 0, ck, 0, hashLength);
+	}
+
+	/**
+	 * Copy constructor for cloning
+	 * @since 0.9.44
+	 */
+	protected SymmetricState(SymmetricState o) throws CloneNotSupportedException {
+		cipher = o.cipher.clone();
+		hash = (MessageDigest) o.hash.clone();
+		ck = Arrays.copyOf(o.ck, o.ck.length);
+		h = Arrays.copyOf(o.h, o.h.length);
+		prev_h = Arrays.copyOf(o.prev_h, o.prev_h.length);
 	}
 
 	/**
@@ -480,6 +509,15 @@ class SymmetricState implements Destroyable {
 		byte[] rv = new byte[ck.length];
 		System.arraycopy(ck, 0, rv, 0, ck.length);
 		return rv;
+	}
+
+	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	@Override
+	public SymmetricState clone() throws CloneNotSupportedException {
+		return new SymmetricState(this);
 	}
 
 	/**

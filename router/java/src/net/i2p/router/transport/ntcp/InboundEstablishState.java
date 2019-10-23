@@ -682,7 +682,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             }
 
             try {
-                _handshakeState = new HandshakeState(HandshakeState.RESPONDER, _transport.getXDHFactory());
+                _handshakeState = new HandshakeState(HandshakeState.PATTERN_ID_XK, HandshakeState.RESPONDER, _transport.getXDHFactory());
             } catch (GeneralSecurityException gse) {
                 throw new IllegalStateException("bad proto", gse);
             }

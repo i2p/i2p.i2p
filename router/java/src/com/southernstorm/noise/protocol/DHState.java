@@ -25,7 +25,7 @@ package com.southernstorm.noise.protocol;
 /**
  * Interface to a Diffie-Hellman algorithm for the Noise protocol.
  */
-public interface DHState extends Destroyable {
+public interface DHState extends Destroyable, Cloneable {
 
 	/**
 	 * Gets the Noise protocol name for this Diffie-Hellman algorithm.
@@ -133,6 +133,26 @@ public interface DHState extends Destroyable {
 	boolean isNullPublicKey();
 
 	/**
+	 * Determine if this object contains an optional encoded public key.
+	 * 
+	 * @return Returns true if this object contains an encoded public key,
+	 * or false if the public key has not yet been set.
+	 * 
+	 * @since 0.9.44 
+	 */
+	boolean hasEncodedPublicKey();
+
+	/**
+	 * Gets the public key associated with this object.
+	 * 
+	 * @param key The buffer to copy the public key to.
+	 * @param offset The first offset in the key buffer to copy to.
+	 * 
+	 * @since 0.9.44 
+	 */
+	void getEncodedPublicKey(byte[] key, int offset);
+
+	/**
 	 * Performs a Diffie-Hellman calculation with this object as the private key.
 	 * 
 	 * @param sharedKey Buffer to put the shared key into.
@@ -153,4 +173,10 @@ public interface DHState extends Destroyable {
 	 * the same type as this object.
 	 */
 	void copyFrom(DHState other);
+
+	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	public DHState clone() throws CloneNotSupportedException;
 }

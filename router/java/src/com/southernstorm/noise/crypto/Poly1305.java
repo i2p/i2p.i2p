@@ -29,7 +29,7 @@ import com.southernstorm.noise.protocol.Destroyable;
 /**
  * Simple implementation of the Poly1305 message authenticator.
  */
-public final class Poly1305 implements Destroyable {
+public final class Poly1305 implements Destroyable, Cloneable {
 
 	// The 130-bit intermediate values are broken up into five 26-bit words.
 	private final byte[] nonce;
@@ -323,5 +323,14 @@ public final class Poly1305 implements Destroyable {
 		Arrays.fill(r, 0);
 		Arrays.fill(c, 0);
 		Arrays.fill(t, (long)0);
+	}
+
+	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	@Override
+	public Poly1305 clone() throws CloneNotSupportedException {
+		return (Poly1305) super.clone();
 	}
 }

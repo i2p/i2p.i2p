@@ -106,7 +106,7 @@ class OutboundNTCP2State implements EstablishState {
         _state = State.OB_INIT;
         _tmp = new byte[TOTAL1_MAX];
         try {
-            _handshakeState = new HandshakeState(HandshakeState.INITIATOR, _transport.getXDHFactory());
+            _handshakeState = new HandshakeState(HandshakeState.PATTERN_ID_XK, HandshakeState.INITIATOR, _transport.getXDHFactory());
         } catch (GeneralSecurityException gse) {
             throw new IllegalStateException("bad proto", gse);
         }

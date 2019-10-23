@@ -26,23 +26,25 @@ import java.util.Arrays;
 
 import com.southernstorm.noise.crypto.x25519.Curve25519;
 
+import net.i2p.crypto.KeyFactory;
 import net.i2p.crypto.KeyPair;
-import net.i2p.router.transport.crypto.X25519KeyFactory;
+import net.i2p.router.crypto.ratchet.Elg2KeyPair;
 
 /**
  * Implementation of the Curve25519 algorithm for the Noise protocol.
  */
-class Curve25519DHState implements DHState {
+class Curve25519DHState implements DHState, Cloneable {
 
 	private final byte[] publicKey;
 	private final byte[] privateKey;
 	private int mode;
-	private final X25519KeyFactory _xdh;
+	private final KeyFactory _xdh;
+	private byte[] encodedPublicKey;
 
 	/**
 	 * Constructs a new Diffie-Hellman object for Curve25519.
 	 */
-	public Curve25519DHState(X25519KeyFactory xdh)
+	public Curve25519DHState(KeyFactory xdh)
 	{
 		publicKey = new byte [32];
 		privateKey = new byte [32];
@@ -80,6 +82,11 @@ class Curve25519DHState implements DHState {
 		KeyPair kp = _xdh.getKeys();
 		System.arraycopy(kp.getPrivate().getData(), 0, privateKey, 0, 32);
 		System.arraycopy(kp.getPublic().getData(), 0, publicKey, 0, 32);
+		if (kp instanceof Elg2KeyPair) {
+			Elg2KeyPair ekp = (Elg2KeyPair) kp;
+			encodedPublicKey = new byte[32];
+			System.arraycopy(ekp.getEncoded(), 0, encodedPublicKey, 0, 32);
+		}
 		mode = 0x03;
 	}
 
@@ -111,6 +118,10 @@ class Curve25519DHState implements DHState {
 	public void setToNullPublicKey() {
 		Arrays.fill(publicKey, (byte)0);
 		Arrays.fill(privateKey, (byte)0);
+		if (encodedPublicKey != null) {
+			Arrays.fill(encodedPublicKey, (byte)0);
+			encodedPublicKey = null;
+		}
 		mode = 0x01;
 	}
 
@@ -118,6 +129,10 @@ class Curve25519DHState implements DHState {
 	public void clearKey() {
 		Noise.destroy(publicKey);
 		Noise.destroy(privateKey);
+		if (encodedPublicKey != null) {
+			Noise.destroy(encodedPublicKey);
+			encodedPublicKey = null;
+		}
 		mode = 0;
 	}
 
@@ -141,6 +156,26 @@ class Curve25519DHState implements DHState {
 		return temp == 0;
 	}
 
+	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	@Override
+	public boolean hasEncodedPublicKey() {
+		return encodedPublicKey != null;
+	}
+
+	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	@Override
+	public void getEncodedPublicKey(byte[] key, int offset) {
+		if (encodedPublicKey == null)
+			throw new IllegalStateException();
+		System.arraycopy(encodedPublicKey, 0, key, offset, 32);
+	}
+
 	@Override
 	public void calculate(byte[] sharedKey, int offset, DHState publicDH) {
 		if (!(publicDH instanceof Curve25519DHState))
@@ -158,5 +193,14 @@ class Curve25519DHState implements DHState {
 		System.arraycopy(dh.privateKey, 0, privateKey, 0, 32);
 		System.arraycopy(dh.publicKey, 0, publicKey, 0, 32);
 		mode = dh.mode;
+	}
+
+	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	@Override
+	public Curve25519DHState clone() throws CloneNotSupportedException {
+		return (Curve25519DHState) super.clone();
 	}
 }

@@ -41,6 +41,10 @@ public class ChaChaPolyCipherState implements CipherState {
 	private final byte[] polyKey;
 	private long n;
 	private boolean haskey;
+	// Debug only
+	private byte[] initialKey;
+
+	private static final boolean DEBUG = false;
 	
 	/**
 	 * Constructs a new cipher state for the "ChaChaPoly" algorithm.
@@ -53,6 +57,20 @@ public class ChaChaPolyCipherState implements CipherState {
 		polyKey = new byte [32];
 		n = 0;
 		haskey = false;
+	}
+
+	/**
+	 * Copy constructor for cloning
+	 * @since 0.9.44
+	 */
+	protected ChaChaPolyCipherState(ChaChaPolyCipherState o) throws CloneNotSupportedException {
+		poly = o.poly.clone();
+		input = Arrays.copyOf(o.input, o.input.length);
+		output = Arrays.copyOf(o.output, o.output.length);
+		polyKey = Arrays.copyOf(o.polyKey, o.polyKey.length);
+		n = o.n;
+		haskey = o.haskey;
+		initialKey = o.initialKey;
 	}
 
 	@Override
@@ -80,6 +98,10 @@ public class ChaChaPolyCipherState implements CipherState {
 
 	@Override
 	public void initializeKey(byte[] key, int offset) {
+		if (DEBUG) {
+			initialKey = new byte[32];
+			System.arraycopy(key, 0, initialKey, 0, 32);
+		}
 		ChaChaCore.initKey256(input, key, offset);
 		n = 0;
 		haskey = true;
@@ -250,6 +272,15 @@ public class ChaChaPolyCipherState implements CipherState {
 	}
 
 	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	@Override
+	public ChaChaPolyCipherState clone() throws CloneNotSupportedException {
+		return new ChaChaPolyCipherState(this);
+	}
+
+	/**
 	 *  I2P debug
 	 */
 	@Override
@@ -258,6 +289,15 @@ public class ChaChaPolyCipherState implements CipherState {
 		buf.append("  Cipher State:\n" +
 		           "    nonce: ");
 		buf.append(n);
+		// I2P debug
+		if (DEBUG) {
+			buf.append("\n" +
+			           "    init key: ");
+			if (haskey)
+				buf.append(net.i2p.data.Base64.encode(initialKey));
+			else
+				buf.append("null");
+		}
 		buf.append("\n    poly key: ");
 		if (haskey)
 			buf.append(net.i2p.data.Base64.encode(polyKey));

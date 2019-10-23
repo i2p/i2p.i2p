@@ -71,6 +71,23 @@ class Pattern {
 	    SE
 	};
 
+	private static final short[] noise_pattern_IK = {
+	    FLAG_LOCAL_STATIC |
+	    FLAG_LOCAL_EPHEMERAL |
+	    FLAG_REMOTE_STATIC |
+	    FLAG_REMOTE_EPHEMERAL |
+	    FLAG_REMOTE_REQUIRED,
+
+	    E,
+	    ES,
+	    S,
+	    SS,
+	    FLIP_DIR,
+	    E,
+	    EE,
+	    SE
+	};
+
 	/**
 	 * Look up the description information for a pattern.
 	 * 
@@ -81,6 +98,8 @@ class Pattern {
 	{
 		if (name.equals("XK"))
 			return noise_pattern_XK;
+		else if (name.equals("IK"))
+			return noise_pattern_IK;
 		return null;
 	}
 

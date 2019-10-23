@@ -28,12 +28,12 @@ import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.ShortBufferException;
 
-import net.i2p.router.transport.crypto.X25519KeyFactory;
+import net.i2p.crypto.KeyFactory;
 
 /**
  * Interface to a Noise handshake.
  */
-public class HandshakeState implements Destroyable {
+public class HandshakeState implements Destroyable, Cloneable {
 
 	private final SymmetricState symmetric;
 	private final boolean isInitiator;
@@ -128,36 +128,53 @@ public class HandshakeState implements Destroyable {
 	private static final int FALLBACK_POSSIBLE = 0x40;
 
 	public static final String protocolName = "Noise_XKaesobfse+hs2+hs3_25519_ChaChaPoly_SHA256";
+	public static final String protocolName2 = "Noise_IKelg2+hs2_25519_ChaChaPoly_SHA256";
 	private static final String prefix;
-	private static final String patternId;
+	private final String patternId;
+	public static final String PATTERN_ID_XK = "XK";
+	public static final String PATTERN_ID_IK = "IK";
 	private static String dh;
 	private static final String cipher;
 	private static final String hash;
-	private static final short[] pattern;
+	private final short[] pattern;
+	private static final short[] PATTERN_XK;
+	private static final short[] PATTERN_IK;
 
 	static {
 		// Parse the protocol name into its components.
+                // XK
 		String[] components = protocolName.split("_");
 		if (components.length != 5)
 			throw new IllegalArgumentException("Protocol name must have 5 components");
 		prefix = components[0];
-		patternId = components[1].substring(0, 2);
+		String id = components[1].substring(0, 2);
+		if (!PATTERN_ID_XK.equals(id))
+			throw new IllegalArgumentException();
 		dh = components[2];
 		cipher = components[3];
 		hash = components[4];
 		if (!prefix.equals("Noise") && !prefix.equals("NoisePSK"))
 			throw new IllegalArgumentException("Prefix must be Noise or NoisePSK");
-		pattern = Pattern.lookup(patternId);
-		if (pattern == null)
+		PATTERN_XK = Pattern.lookup(id);
+		if (PATTERN_XK == null)
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		if (!dh.equals("25519"))
 			throw new IllegalArgumentException("Unknown Noise DH algorithm name: " + dh);
+                // IK
+		components = protocolName2.split("_");
+		id = components[1].substring(0, 2);
+		if (!PATTERN_ID_IK.equals(id))
+			throw new IllegalArgumentException();
+		PATTERN_IK = Pattern.lookup(id);
+		if (PATTERN_IK == null)
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
 	}
 
 	/**
 	 * Creates a new Noise handshake.
 	 * Noise protocol name is hardcoded.
 	 * 
+	 * @param patternId XK or IK
 	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER.
 	 * @param xdh The key pair factory for ephemeral keys
 	 * 
@@ -167,8 +184,15 @@ public class HandshakeState implements Destroyable {
 	 * @throws NoSuchAlgorithmException One of the cryptographic algorithms
 	 * that is specified in the protocolName is not supported.
 	 */
-	public HandshakeState(int role, X25519KeyFactory xdh) throws NoSuchAlgorithmException
+	public HandshakeState(String patternId, int role, KeyFactory xdh) throws NoSuchAlgorithmException
 	{
+		this.patternId = patternId;
+		if (patternId.equals(PATTERN_ID_XK))
+			pattern = PATTERN_XK;
+		else if (patternId.equals(PATTERN_ID_IK))
+			pattern = PATTERN_IK;
+		else
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		short flags = pattern[0];
 		int extraReqs = 0;
 		if ((flags & Pattern.FLAG_REMOTE_REQUIRED) != 0 && patternId.length() > 1)
@@ -183,7 +207,7 @@ public class HandshakeState implements Destroyable {
 			throw new IllegalArgumentException("Role must be initiator or responder");
 
 		// Initialize this object.  This will also create the cipher and hash objects.
-		symmetric = new SymmetricState(cipher, hash);
+		symmetric = new SymmetricState(cipher, hash, patternId);
 		isInitiator = (role == INITIATOR);
 		action = NO_ACTION;
 		requirements = extraReqs | computeRequirements(flags, prefix, role, false);
@@ -199,6 +223,27 @@ public class HandshakeState implements Destroyable {
 		if ((flags & Pattern.FLAG_REMOTE_EPHEMERAL) != 0)
 			remoteEphemeral = new Curve25519DHState(xdh);
 		
+	}
+
+	/**
+	 * Copy constructor for cloning
+	 * @since 0.9.44
+	 */
+	protected HandshakeState(HandshakeState o) throws CloneNotSupportedException {
+		// everything is shallow copied except for symmetric state
+		symmetric = o.symmetric.clone();
+		isInitiator = o.isInitiator;
+		localKeyPair = o.localKeyPair;
+		localEphemeral = o.localEphemeral;
+		remotePublicKey = o.remotePublicKey;
+		remoteEphemeral = o.remoteEphemeral;
+		action = o.action;
+		if (action == SPLIT || action == COMPLETE)
+			throw new CloneNotSupportedException("clone after NSR");
+		requirements = o.requirements;
+		patternIndex = o.patternIndex;
+		patternId = o.patternId;
+		pattern = o.pattern;
 	}
 
 	/**
@@ -229,6 +274,19 @@ public class HandshakeState implements Destroyable {
 	public DHState getLocalKeyPair()
 	{
 		return localKeyPair;
+	}
+
+	/**
+	 * Gets the keypair object for the local ephemeral key.
+	 * 
+	 * I2P
+	 * 
+	 * @return The keypair, or null if a local ephemeral key is not required or has not been generated.
+	 * @since 0.9.44
+	 */
+	public DHState getLocalEphemeralKeyPair()
+	{
+		return localEphemeral;
 	}
 
 	/**
@@ -534,6 +592,13 @@ public class HandshakeState implements Destroyable {
 					}
 					break;
 
+					case Pattern.SS:
+					{
+						// DH operation with initiator and responder static keys.
+						mixDH(localKeyPair, remotePublicKey);
+					}
+					break;
+
 					default:
 					{
 						// Unknown token code.  Abort.
@@ -691,6 +756,13 @@ public class HandshakeState implements Destroyable {
 							mixDH(localEphemeral, remotePublicKey);
 					}
 					break;
+
+					case Pattern.SS:
+					{
+						// DH operation with initiator and responder static keys.
+						mixDH(localKeyPair, remotePublicKey);
+					}
+					break;
 	
 					default:
 					{
@@ -845,12 +917,24 @@ public class HandshakeState implements Destroyable {
 	}
 
 	/**
+	 *  I2P
+	 *  Must be called before both eph. keys set.
+	 *  @since 0.9.44
+	 */
+	@Override
+	public synchronized HandshakeState clone() throws CloneNotSupportedException {
+		return new HandshakeState(this);
+	}
+
+
+	/**
 	 *  I2P debug
 	 */
 	@Override
 	public String toString() {
-		StringBuilder buf = new StringBuilder();
-		buf.append("Handshake State:\n");
+		StringBuilder buf = new StringBuilder(256);
+		buf.append(patternId);
+		buf.append(" Handshake State:\n");
 		buf.append(symmetric.toString());
 
 		byte[] tmp = new byte[32];

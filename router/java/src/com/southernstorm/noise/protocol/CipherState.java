@@ -33,7 +33,7 @@ import javax.crypto.ShortBufferException;
  * will create two CipherState objects for encrypting packets sent to
  * the other party, and decrypting packets received from the other party.
  */
-public interface CipherState extends Destroyable {
+public interface CipherState extends Destroyable, Cloneable {
 
 	/**
 	 * Gets the Noise protocol name for this cipher.
@@ -155,4 +155,10 @@ public interface CipherState extends Destroyable {
 	 * value goes backwards then security may be compromised.
 	 */
 	void setNonce(long nonce);
+
+	/**
+	 *  I2P
+	 *  @since 0.9.44
+	 */
+	public CipherState clone() throws CloneNotSupportedException;
 }
