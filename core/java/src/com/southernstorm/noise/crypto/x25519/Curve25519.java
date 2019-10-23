@@ -476,7 +476,7 @@ public final class Curve25519 {
 		Curve25519 state = new Curve25519();
 		try {
 			// Unpack the public key value.  If null, use 9 as the base point.
-			Arrays.fill(state.x_1, 0);
+			//Arrays.fill(state.x_1, 0);
 			if (publicKey != null) {
 				// Convert the input value from little-endian into 26-bit limbs.
 			    for (int index = 0; index < 32; ++index) {
@@ -502,11 +502,11 @@ public final class Curve25519 {
 			}
 
 			// Initialize the other temporary variables.
-			Arrays.fill(state.x_2, 0);			// x_2 = 1
+			//Arrays.fill(state.x_2, 0);			// x_2 = 1
 			state.x_2[0] = 1;
-			Arrays.fill(state.z_2, 0);			// z_2 = 0
+			//Arrays.fill(state.z_2, 0);			// z_2 = 0
 			System.arraycopy(state.x_1, 0, state.x_3, 0, state.x_1.length);  // x_3 = x_1
-			Arrays.fill(state.z_3, 0);			// z_3 = 1
+			//Arrays.fill(state.z_3, 0);			// z_3 = 1
 			state.z_3[0] = 1;
 			
 			// Evaluate the curve for every bit of the private key.
