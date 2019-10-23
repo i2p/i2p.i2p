@@ -97,7 +97,7 @@ do
         # only generate for non-source language
         echo "Generating ${CLASS}_$LG ResourceBundle..."
 
-        msgfmt -V | grep -q '0\.19'
+        msgfmt -V | grep -q -E ' 0\.((19)|[2-9])'
         if [ $? -ne 0 ]
         then
             # slow way
