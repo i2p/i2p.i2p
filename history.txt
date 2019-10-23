@@ -1,3 +1,7 @@
+2019-10-23 zzz
+ * Build: Recognize gettext 0.20
+ * Data: Reduce SessionTag size
+
 * 2019-10-22 0.9.43 released
 
 2019-10-18 zzz

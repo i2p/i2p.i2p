@@ -9,55 +9,58 @@ package net.i2p.data;
  *
  */
 
-import java.io.InputStream;
-import java.io.IOException;
+import java.util.Arrays;
 
+import net.i2p.data.Base64;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SipHash;
 
 /**
  *  32 bytes, usually of random data.
- *  Changed from ByteArray to SimpleDataStructure in 0.8.2.
+ *
+ *  Not recommended for external use, subject to change.
+ *
+ *  As of 0.9.44, does NOT extend SimpleDataStructure, to save space
  */
-public class SessionTag extends SimpleDataStructure {
+public class SessionTag {
     public final static int BYTE_LENGTH = 32;
-    private int _cachedHashCode;
+    private final int _cachedHashCode;
+    private final byte[] _data;
 
+    /**
+     *  Instantiate the data array and fill it with random data.
+     */
     public SessionTag() {
-        super();
+        _data = SimpleByteCache.acquire(BYTE_LENGTH);
+        RandomSource.getInstance().nextBytes(_data);
+        _cachedHashCode = SipHash.hashCode(_data);
     }
 
     /**
-     *  @param create if true, instantiate the data array and fill it with random data.
+     *  Instantiate the data array and fill it with random data.
+     *  @param create ignored as of 0.9.44, assumed true
      */
     public SessionTag(boolean create) {
-        super();
-        if (create) {
-            _data = SimpleByteCache.acquire(BYTE_LENGTH);
-            RandomSource.getInstance().nextBytes(_data);
-            _cachedHashCode = SipHash.hashCode(_data);
-        }
+        this();
     }
 
+    /**
+     *  @param val as of 0.9.44, non-null
+     */
     public SessionTag(byte val[]) {
-        super(val);
+        if (val.length != BYTE_LENGTH)
+            throw new IllegalArgumentException();
+        _data = val;
+        _cachedHashCode = SipHash.hashCode(val);
+    }
+    
+    public byte[] getData() {
+        return _data;
     }
     
     public int length() {
         return BYTE_LENGTH;
-    }
-
-    @Override
-    public void setData(byte[] data) {
-        super.setData(data);
-        _cachedHashCode = SipHash.hashCode(data);
-    }
-
-    @Override
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-        super.readBytes(in);
-        _cachedHashCode = SipHash.hashCode(_data);
     }
 
     /**
@@ -70,4 +73,23 @@ public class SessionTag extends SimpleDataStructure {
         return _cachedHashCode;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if ((obj == null) || !(obj instanceof SessionTag)) return false;
+        return Arrays.equals(_data, ((SessionTag) obj)._data);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("[SessionTag: ");
+        if (_data == null) {
+            buf.append("null");
+        } else {
+            buf.append(Base64.encode(_data));
+        }
+        buf.append(']');
+        return buf.toString();
+    }
 }
