@@ -12,6 +12,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
@@ -157,7 +158,7 @@ public class ClientAppConfig {
         }
         // clients.config.d
         if (dir.isDirectory()) {
-            File[] files = dir.listFiles();
+            File[] files = dir.listFiles(new FileSuffixFilter(".config"));
             if (files != null && files.length > 0) {
                 // sort so the returned order is consistent
                 Arrays.sort(files);

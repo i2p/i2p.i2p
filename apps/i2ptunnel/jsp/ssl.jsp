@@ -591,7 +591,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     File[] configFiles;
     if (!isSingleFile) {
         File clientsConfigD = new File(configDir, "clients.config.d");
-        configFiles = clientsConfigD.listFiles();
+        configFiles = clientsConfigD.listFiles(new net.i2p.util.FileSuffixFilter(".config"));
     } else {
         configFiles = null;
     }
