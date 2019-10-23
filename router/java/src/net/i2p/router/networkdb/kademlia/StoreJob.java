@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
@@ -25,6 +26,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
@@ -482,7 +484,8 @@ abstract class StoreJob extends JobImpl {
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel(client, to);
         if (outTunnel != null) {
             I2NPMessage sent;
-
+            LeaseSetKeys lsk = getContext().keyManager().getKeys(client);
+            if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
                 // garlic encrypt
                 MessageWrapper.WrappedMessage wm = MessageWrapper.wrap(getContext(), msg, client, peer);
                 if (wm == null) {
@@ -493,7 +496,12 @@ abstract class StoreJob extends JobImpl {
                 }
                 sent = wm.getMessage();
                 _state.addPending(to, wm);
-
+            } else {
+                // We don't yet have any way to request/get a ECIES-tagged reply,
+                // so send it unencrypted.
+                sent = msg;
+                _state.addPending(to);
+            }
             SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, sent.getMessageSize());
             FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
             StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);

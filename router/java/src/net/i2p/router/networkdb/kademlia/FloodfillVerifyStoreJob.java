@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.crypto.EncType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
@@ -16,6 +17,7 @@ import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.JobImpl;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.ProfileManager;
 import net.i2p.router.ReplyJob;
@@ -54,7 +56,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
     
     /**
      *  Delay a few seconds, then start the verify
-     *  @param client generally the same as key, unless encrypted LS2
+     *  @param client generally the same as key, unless encrypted LS2; non-null
      *  @param published getDate() for RI or LS1, getPublished() for LS2
      *  @param sentTo who to give the credit or blame to, can be null
      */
@@ -150,10 +152,21 @@ class FloodfillVerifyStoreJob extends JobImpl {
             if (isInboundExploratory) {
                 sess = MessageWrapper.generateSession(getContext());
             } else {
-                sess = MessageWrapper.generateSession(getContext(), _client);
-                if (sess == null) {
-                     if (_log.shouldLog(Log.WARN))
-                         _log.warn("No SKM to reply to");
+                LeaseSetKeys lsk = getContext().keyManager().getKeys(_client);
+                if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
+                    // garlic encrypt
+                    sess = MessageWrapper.generateSession(getContext(), _client);
+                    if (sess == null) {
+                         if (_log.shouldLog(Log.WARN))
+                             _log.warn("No SKM to reply to");
+                        _facade.verifyFinished(_key);
+                        return;
+                    }
+                } else {
+                    // We don't yet have any way to request/get a ECIES-tagged reply,
+                    // skip it for now.
+                     if (_log.shouldWarn())
+                         _log.warn("Skipping store verify for ECIES client " + _client.toBase32());
                     _facade.verifyFinished(_key);
                     return;
                 }
