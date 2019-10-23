@@ -31,6 +31,8 @@ public class PrivateKey extends SimpleDataStructure implements Destroyable {
     public final static int KEYSIZE_BYTES = DEF_TYPE.getPrivkeyLen();
 
     private final EncType _type;
+    // cache
+    private PublicKey _pubKey;
 
     public PrivateKey() {
         this(DEF_TYPE);
@@ -61,6 +63,19 @@ public class PrivateKey extends SimpleDataStructure implements Destroyable {
         setData(data);
     }
 
+    /**
+     *  @param type non-null
+     *  @param data must be non-null
+     *  @param pubKey corresponding pubKey to be cached
+     *  @since 0.9.44
+     */
+    public PrivateKey(EncType type, byte data[], PublicKey pubKey) {
+        this(type, data);
+        if (type != pubKey.getType())
+            throw new IllegalArgumentException("Pubkey mismatch");
+        _pubKey = pubKey;
+    }
+
     /** constructs from base64
      * @param base64Data a string of base64 data (the output of .toBase64() called
      * on a prior instance of PrivateKey
@@ -82,13 +97,18 @@ public class PrivateKey extends SimpleDataStructure implements Destroyable {
         return _type;
     }
 
-    /** derives a new PublicKey object derived from the secret contents
-     * of this PrivateKey
+    /**
+     * Derives a new PublicKey object derived from the secret contents
+     * of this PrivateKey.
+     * As of 0.9.44, the PublicKey is cached.
+     *
      * @return a PublicKey object
      * @throws IllegalArgumentException on bad key
      */
     public PublicKey toPublic() {
-        return KeyGenerator.getPublicKey(this);
+        if (_pubKey == null)
+            _pubKey = KeyGenerator.getPublicKey(this);
+        return _pubKey;
     }
 
     /**
