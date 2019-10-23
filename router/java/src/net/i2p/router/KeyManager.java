@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -110,13 +111,27 @@ public class KeyManager {
     public synchronized SigningPublicKey getSigningPublicKey() { return _signingPublicKey; }
     
     /**
-     *  client
+     *  Client with a single key
+     *
      *  @param leaseRevocationPrivateKey unused, may be null
      */
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Registering keys for destination " + dest.calculateHash().toBase64());
+        if (_log.shouldInfo())
+            _log.info("Registering keys for destination " + dest.toBase32());
         LeaseSetKeys keys = new LeaseSetKeys(dest, leaseRevocationPrivateKey, endpointDecryptionKey);
+        _leaseSetKeys.put(dest.calculateHash(), keys);
+    }
+    
+    /**
+     *  Client with multiple keys
+     *
+     *  @param leaseRevocationPrivateKey unused, may be null
+     *  @since 0.9.44
+     */
+    public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, List<PrivateKey> endpointDecryptionKeys) {
+        if (_log.shouldInfo())
+            _log.info("Registering keys for destination " + dest.toBase32());
+        LeaseSetKeys keys = new LeaseSetKeys(dest, leaseRevocationPrivateKey, endpointDecryptionKeys);
         _leaseSetKeys.put(dest.calculateHash(), keys);
     }
    
@@ -129,7 +144,7 @@ public class KeyManager {
 
     /** client */
     public LeaseSetKeys unregisterKeys(Destination dest) {
-        if (_log.shouldLog(Log.INFO))
+        if (_log.shouldInfo())
             _log.info("Unregistering keys for destination " + dest.calculateHash().toBase64());
         return _leaseSetKeys.remove(dest.calculateHash());
     }
