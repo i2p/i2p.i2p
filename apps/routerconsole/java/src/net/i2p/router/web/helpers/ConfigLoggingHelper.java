@@ -82,7 +82,7 @@ public class ConfigLoggingHelper extends HelperBase {
             String l = levels[i];
             buf.append("<option value=\"").append(l).append('\"');
             if (l.equals(cur))
-                buf.append(" selected=\"selected\"");
+                buf.append(SELECTED);
             buf.append('>').append(_t(l)).append("</option>\n");
         }        
         

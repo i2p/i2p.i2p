@@ -226,7 +226,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
-                buf.append("selected=\"selected\" ");
+                buf.append(SELECTED);
             buf.append(">").append(ngettext(DUMMY1 + name, DUMMY2 + name + 's', i));
             buf.append("</option>\n");
         }

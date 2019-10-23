@@ -78,7 +78,7 @@ public class SearchHelper extends HelperBase {
         for (String name : _engines.keySet()) {
             buf.append("<option value=\"").append(name).append('\"');
             if (name.equals(dflt))
-                buf.append(" selected=\"selected\"");
+                buf.append(SELECTED);
             buf.append('>').append(name).append("</option>\n");
         }
         buf.append("</select>\n");

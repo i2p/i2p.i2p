@@ -358,7 +358,7 @@ public class ConfigNetHelper extends HelperBase {
             }
             buf.append("<option style=\"text-align: right;\" value=\"").append(val).append("\" ");
             if (pct == val) {
-                buf.append("selected=\"selected\" ");
+                buf.append(SELECTED);
                 found = true;
             }
             buf.append(">").append(val).append("%</option>\n");

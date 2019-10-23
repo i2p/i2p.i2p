@@ -260,7 +260,7 @@ public class SybilRenderer {
             for (Long date : dates) {
                 buf.append("<option value=\"").append(date).append('\"');
                 if (first) {
-                    buf.append(" selected=\"selected\"");
+                    buf.append(HelperBase.SELECTED);
                     first = false;
                 }
                 buf.append('>').append(DataHelper.formatTime(date.longValue())).append("</option>\n");
@@ -309,7 +309,7 @@ public class SybilRenderer {
             buf.append('"');
             long time = HOURS[i] * 60*60*1000L;
             if (time == freq)
-                buf.append(" selected=\"selected\"");
+                buf.append(HelperBase.SELECTED);
             buf.append('>');
             if (HOURS[i] > 0)
                 buf.append(DataHelper.formatDuration2(time));
@@ -340,7 +340,7 @@ public class SybilRenderer {
             buf.append('"');
             long time = DAYS[i] * 24*60*60*1000L;
             if (time == age)
-                buf.append(" selected=\"selected\"");
+                buf.append(HelperBase.SELECTED);
             buf.append('>');
             if (DAYS[i] > 0)
                 buf.append(DataHelper.formatDuration2(time));

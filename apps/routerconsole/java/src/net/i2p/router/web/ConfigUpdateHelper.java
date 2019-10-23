@@ -120,7 +120,7 @@ public class ConfigUpdateHelper extends HelperBase {
         for (int i = 0; i < PERIODS.length; i++) {
             buf.append("<option value=\"").append(PERIODS[i]);
             if (PERIODS[i] == ms)
-                buf.append("\" selected=\"selected");
+                buf.append('"').append(SELECTED);
             
             if (PERIODS[i] == -1)
                 buf.append("\">").append(_t("Never")).append("</option>\n");
@@ -142,14 +142,14 @@ public class ConfigUpdateHelper extends HelperBase {
         
         buf.append("<option value=\"notify\"");
         if ("notify".equals(policy) || _dontInstall)
-            buf.append(" selected=\"selected\"");
+            buf.append(SELECTED);
         buf.append('>').append(_t("Notify only")).append("</option>");
 
         buf.append("<option value=\"download\"");
         if (_dontInstall)
             buf.append(" disabled=\"disabled\"");
         else if ("download".equals(policy))
-            buf.append(" selected=\"selected\"");
+            buf.append(SELECTED);
         buf.append('>').append(_t("Download and verify only")).append("</option>");
         
         if (_context.hasWrapper()) {
@@ -157,7 +157,7 @@ public class ConfigUpdateHelper extends HelperBase {
             if (_dontInstall)
                 buf.append(" disabled=\"disabled\"");
             else if ("install".equals(policy))
-                buf.append(" selected=\"selected\"");
+                buf.append(SELECTED);
             buf.append('>').append(_t("Download, verify, and restart")).append("</option>");
         }
         

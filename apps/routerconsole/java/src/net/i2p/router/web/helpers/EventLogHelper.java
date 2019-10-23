@@ -14,6 +14,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.util.EventLog;
 import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.FormHandler;
+import net.i2p.router.web.HelperBase;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -128,7 +129,7 @@ public class EventLogHelper extends FormHandler {
          _out.write(val);
          _out.write("\"");
          if (val.equals(_event))
-             _out.write(" selected=\"selected\"");
+             _out.write(HelperBase.SELECTED);
          _out.write(">");
          _out.write(key);
          _out.write("</option>\n");
@@ -139,7 +140,7 @@ public class EventLogHelper extends FormHandler {
          _out.write(Long.toString(age));
          _out.write("\"");
          if (age == _age)
-             _out.write(" selected=\"selected\"");
+             _out.write(HelperBase.SELECTED);
          _out.write(">");
          if (age == 0)
              _out.write(_t("All events"));
