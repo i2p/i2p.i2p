@@ -63,9 +63,9 @@ public class ClientMessagePool {
      *
      */
     public void add(ClientMessage msg, boolean isDefinitelyRemote) {
-        if ( !isDefinitelyRemote ||
-             (_context.clientManager().isLocal(msg.getDestination())) ||
-             (_context.clientManager().isLocal(msg.getDestinationHash())) ) {
+        if (!isDefinitelyRemote &&
+            (_context.clientManager().isLocal(msg.getDestination()) ||
+             _context.clientManager().isLocal(msg.getDestinationHash()))) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding message for local delivery");
             _context.clientManager().messageReceived(msg);
