@@ -552,7 +552,7 @@ class ClientConnectionRunner {
         sp.config = config;
         SessionParams old = _sessions.putIfAbsent(destHash, sp);
         if (old != null)
-            return SessionStatusMessage.STATUS_INVALID;
+            return SessionStatusMessage.STATUS_DUP_DEST;
         // We process a few options here, but most are handled by the tunnel manager.
         // The ones here can't be changed later.
         Properties opts = config.getOptions();

@@ -325,7 +325,7 @@ class ClientManager {
         synchronized (_runners) {
             boolean fail = _runnersByHash.containsKey(dest.calculateHash());
             if (fail) {
-                rv = SessionStatusMessage.STATUS_INVALID;
+                rv = SessionStatusMessage.STATUS_DUP_DEST;
             } else {
                 SessionId id = locked_getNextSessionId();
                 if (id != null) {
@@ -339,7 +339,7 @@ class ClientManager {
                 }
             }
         }
-        if (rv == SessionStatusMessage.STATUS_INVALID) {
+        if (rv == SessionStatusMessage.STATUS_DUP_DEST) {
             _log.log(Log.CRIT, "Client attempted to register duplicate destination " + dest.toBase32());
         } else if (rv == SessionStatusMessage.STATUS_REFUSED) {
             _log.error("Max sessions exceeded " + dest.toBase32());
