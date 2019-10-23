@@ -260,6 +260,14 @@ public class EditBean extends IndexBean {
     }
 
     /**
+     *  @param encType code
+     *  @since 0.9.44
+     */
+    public boolean hasEncType(int tunnel, int encType) {
+        return _helper.hasEncType(tunnel, encType);
+    }
+
+    /**
      *  Random keys, hidden in forms
      *  @since 0.9.18
      */

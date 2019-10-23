@@ -55,10 +55,16 @@ public class GeneralHelper {
     private final I2PAppContext _context;
     protected final TunnelControllerGroup _group;
 
+    /**
+     *  @param tcg may be null ???
+     */
     public GeneralHelper(TunnelControllerGroup tcg) {
         this(I2PAppContext.getGlobalContext(), tcg);
     }
 
+    /**
+     *  @param tcg may be null ???
+     */
     public GeneralHelper(I2PAppContext context, TunnelControllerGroup tcg) {
         _context = context;
         _group = tcg;
@@ -68,6 +74,10 @@ public class GeneralHelper {
         return getController(_group, tunnel);
     }
 
+    /**
+     *  @param tcg may be null
+     *  @return null if not found or tcg is null
+     */
     public static TunnelController getController(TunnelControllerGroup tcg, int tunnel) {
         if (tunnel < 0) return null;
         if (tcg == null) return null;
@@ -694,6 +704,21 @@ public class GeneralHelper {
                 type = SigType.DSA_SHA1;
         }
         return type.getCode();
+    }
+
+    /**
+     *  @param encType code
+     *  @since 0.9.44
+     */
+    public boolean hasEncType(int tunnel, int encType) {
+        String senc = getProperty(tunnel, "i2cp.leaseSetEncType", "0");
+        String[] senca = DataHelper.split(senc, ",");
+        String se = Integer.toString(encType);
+        for (int i = 0; i < senca.length; i++) {
+            if (se.equals(senca[i]))
+                return true;
+        }
+        return false;
     }
 
     /**

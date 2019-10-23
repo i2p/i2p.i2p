@@ -1240,6 +1240,14 @@ public class IndexBean {
     }
 
     /**
+     * Adds to existing, comma separated
+     * @since 0.9.44
+     */
+    public void setEncType(String s) {
+        _config.setEncType(s);
+    }
+
+    /**
      *  Random keys, hidden in forms
      *  @since 0.9.18
      */

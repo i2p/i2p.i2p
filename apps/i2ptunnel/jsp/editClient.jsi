@@ -487,13 +487,12 @@
 <%
             } // if httpclient
 
-            if (true /* editBean.isAdvanced() */ ) {
-                int currentSigType = editBean.getSigType(curTunnel, tunnelType);
-                String disabled = editBean.canChangeSigType(curTunnel) ? "" : " disabled=\"disabled\" ";
+            int currentSigType = editBean.getSigType(curTunnel, tunnelType);
+            String disabled = editBean.canChangeSigType(curTunnel) ? "" : " disabled=\"disabled\" ";
 %>
         <tr>
             <th colspan="2">
-                <%=intl._t("Signature type")%> <%-- (<%=intl._t("Experts only!")%>) --%>
+                <%=intl._t("Signature type")%>
             </th>
         </tr><tr>
             <td colspan="2">
@@ -527,6 +526,31 @@
               }   // isAvailable
 %>
                 </select>
+            </td>
+        </tr>
+<%
+            if (editBean.isAdvanced()) {
+                boolean has0 = editBean.hasEncType(curTunnel, 0);
+                boolean has4 = editBean.hasEncType(curTunnel, 4);
+%>
+        <tr>
+            <th colspan="2">
+                <%=intl._t("Encryption types")%>
+            </th>
+        </tr><tr>
+            <td colspan="2">
+                <span class="multiOption">
+                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=(has0 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    ElGamal-2048</label>
+                </span>
+                <span class="multiOption">
+                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=(has4 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    ECIES-X25519 (<%=intl._t("Experts only!")%>)</label>
+                </span>
+                <span class="multiOption">
+                    <label><input value="0,4" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Both")%> (<%=intl._t("Experts only!")%>)</label>
+                </span>
             </td>
         </tr>
 <%

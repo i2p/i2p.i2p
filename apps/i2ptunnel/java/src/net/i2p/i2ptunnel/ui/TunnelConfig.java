@@ -633,6 +633,19 @@ public class TunnelConfig {
     }
 
     /**
+     * Adds to existing, comma separated
+     * @since 0.9.44
+     */
+    public void setEncType(String val) {
+        if (val != null) {
+            String p = _otherOptions.get("i2cp.leaseSetEncType");
+            if (p != null)
+                val = p + ',' + val;
+            _otherOptions.put("i2cp.leaseSetEncType", val);
+        }
+    }
+
+    /**
      * Random keys
      */
     public void setInboundRandomKey(String s) {
@@ -837,6 +850,7 @@ public class TunnelConfig {
                     p = OPT + "i2cp.leaseSetPrivateKey";
                     keys = KeyGenerator.getInstance().generatePKIKeys();
                     config.setProperty(p, "ELGAMAL_2048:" + keys[1].toBase64());
+                    // TODO ECIES key
                 } catch (GeneralSecurityException gse) {
                     // so much for that
                 }
@@ -1062,7 +1076,8 @@ public class TunnelConfig {
         I2PClient.PROP_SIGTYPE,
         I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES,
         // following are mostly server but could also be persistent client
-        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey"
+        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey",
+        "i2cp.leaseSetEncType"
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
@@ -1071,7 +1086,8 @@ public class TunnelConfig {
          PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE,
          "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey",
          I2PTunnelServer.PROP_ALT_PKF,
-         "i2cp.leaseSetSecret", "i2cp.leaseSetType", "i2cp.leaseSetAuthType", "i2cp.leaseSetPrivKey"
+         "i2cp.leaseSetSecret", "i2cp.leaseSetType", "i2cp.leaseSetAuthType", "i2cp.leaseSetPrivKey",
+        "i2cp.leaseSetEncType"
         };
     private static final String _httpServerOpts[] = {
         I2PTunnelHTTPServer.OPT_POST_WINDOW,
