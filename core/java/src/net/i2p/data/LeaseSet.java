@@ -16,9 +16,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
@@ -132,11 +134,28 @@ public class LeaseSet extends DatabaseEntry {
     }
 
     /**
+     *  If more than one key, return the first supported one.
+     *  If none supported, return null.
+     *
+     *  @param supported what return types are allowed
+     *  @return ElGamal key or null if ElGamal not in supported
+     *  @since 0.9.44
+     */
+    public PublicKey getEncryptionKey(Set<EncType> supported) {
+        if (supported.contains(EncType.ELGAMAL_2048))
+                return _encryptionKey;
+        return null;
+    }
+
+    /**
      * @throws IllegalStateException if already signed
      */
     public void setEncryptionKey(PublicKey encryptionKey) {
         if (_signature != null)
             throw new IllegalStateException();
+        // subclasses may set an ECIES key
+        //if (encryptionKey.getType() != EncType.ELGAMAL_2048)
+        //    throw new IllegalArgumentException();
         _encryptionKey = encryptionKey;
     }
 

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.Blinding;
@@ -130,6 +131,20 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         if (_decryptedLS2 != null)
             return _decryptedLS2.getEncryptionKeys();
         return super.getEncryptionKeys();
+    }
+
+    /**
+     *  If more than one key, return the first supported one.
+     *  If none supported, return null.
+     *
+     *  @return first supported key or null
+     *  @since 0.9.44
+     */
+    @Override
+    public PublicKey getEncryptionKey(Set<EncType> supported) {
+        if (_decryptedLS2 != null)
+            return _decryptedLS2.getEncryptionKey(supported);
+        return super.getEncryptionKey(supported);
     }
 
     /**

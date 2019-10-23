@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
@@ -141,7 +142,25 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     /**
+     *  If more than one key, return the first supported one.
+     *  If none supported, return null.
+     *
+     *  @return first supported key or null
+     *  @since 0.9.44
+     */
+    @Override
+    public PublicKey getEncryptionKey(Set<EncType> supported) {
+        for (PublicKey pk : getEncryptionKeys()) {
+            if (supported.contains(pk.getType()))
+                return pk;
+        }
+        return null;
+    }
+
+    /**
      *  Add an encryption key.
+     *
+     *  Encryption keys should be added in order of server preference, most-preferred first.
      */
     public void addEncryptionKey(PublicKey key) {
         if (_encryptionKey == null) {
@@ -160,6 +179,11 @@ public class LeaseSet2 extends LeaseSet {
 
     /**
      *  This returns all the keys. getEncryptionKey() returns the first one.
+     *
+     *  Encryption keys should be in order of server preference, most-preferred first.
+     *  Client behavior should be to select the first key with a supported encryption type.
+     *  Clients may use other selection algorithms based on encryption support, relative performance, and other factors.
+     *
      *  @return not a copy, do not modify, null if none
      */
     public List<PublicKey> getEncryptionKeys() {
