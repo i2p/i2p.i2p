@@ -206,8 +206,8 @@ public abstract class LocalHTTPServer {
 
         } else if (targetRequest.equals("/b32")) {
             // Send a blinding info message (form submit)
-            // Parameters are url, host, dest, nonce, and master | router | private.
-            // Do the add and redirect.
+            // Parameters are url, host, nonce, code, privkey, secret, action.
+            // Store the results and either display them or redirect.
             if (query == null) {
                 out.write(ERR_ADD.getBytes("UTF-8"));
                 return;
