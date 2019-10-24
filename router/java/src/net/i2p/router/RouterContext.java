@@ -16,6 +16,7 @@ import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.crypto.ElGamalAESEngine;
+import net.i2p.router.crypto.ratchet.ECIESAEADEngine;
 import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
 import net.i2p.router.message.GarlicMessageParser;
@@ -70,6 +71,7 @@ public class RouterContext extends I2PAppContext {
     private RouterKeyGenerator _routingKeyGenerator;
     private GarlicMessageParser _garlicMessageParser;
     private ElGamalAESEngine _elGamalAESEngine;
+    private ECIESAEADEngine _eciesEngine;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
     private volatile boolean _initialized;
@@ -224,6 +226,7 @@ public class RouterContext extends I2PAppContext {
             // internal client manager is null
         }
         _elGamalAESEngine = new ElGamalAESEngine(this);
+        _eciesEngine = new ECIESAEADEngine(this);
         _garlicMessageParser = new GarlicMessageParser(this);
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
@@ -691,5 +694,16 @@ public class RouterContext extends I2PAppContext {
      */
     public ElGamalAESEngine elGamalAESEngine() {
         return _elGamalAESEngine;
+    }
+
+    /**
+     * Access the ECIES/AEAD engine for this context.  The algorithm
+     * makes use of the sessionKeyManager to coordinate transparent
+     * access to the sessionKeys and sessionTags.
+     *
+     * @since 0.9.44
+     */
+    public ECIESAEADEngine eciesEngine() {
+        return _eciesEngine;
     }
 }
