@@ -1,0 +1,50 @@
+package net.i2p.router.crypto.ratchet;
+
+import java.util.List;
+
+import net.i2p.crypto.EncType;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.PrivateKey;
+import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
+
+/**
+ * Handles the actual decryption using the
+ * supplied keys and data.
+ *
+ * @since 0.9.44
+ */
+public final class MuxedEngine {
+    private final RouterContext _context;
+    private final Log _log;
+
+    public MuxedEngine(RouterContext ctx) {
+        _context = ctx;
+        _log = _context.logManager().getLog(MuxedEngine.class);
+    }
+
+    /**
+     * Decrypt the message with the given private keys
+     *
+     * @return decrypted data or null on failure
+     */
+    public byte[] decrypt(byte data[], PrivateKey elgKey, PrivateKey ecKey, MuxedSKM keyManager) throws DataFormatException {
+        if (elgKey.getType() != EncType.ELGAMAL_2048 ||
+            ecKey.getType() != EncType.ECIES_X25519)
+            throw new IllegalArgumentException();
+        byte[] rv = null;
+        boolean tryElg = false;
+        // See proposal 144
+        if (data.length >= 128) {
+            int mod = data.length % 16;
+            if (mod == 0 || mod == 2)
+                tryElg = true;
+        }
+        // Always try ElG first, for now
+        if (tryElg)
+            rv = _context.elGamalAESEngine().decrypt(data, elgKey, keyManager.getElgSKM());
+        if (rv == null)
+            rv = _context.eciesEngine().decrypt(data, ecKey, keyManager.getECSKM());
+        return rv;
+    }
+}
