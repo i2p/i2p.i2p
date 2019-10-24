@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-package android.util;
-
-import android.annotation.UnsupportedAppUsage;
-
-import com.android.internal.util.ArrayUtils;
-import com.android.internal.util.GrowingArrayUtils;
-
-import libcore.util.EmptyArray;
+package net.i2p.router.crypto.ratchet;
 
 /**
  * <code>SparseArray</code> maps integers to Objects and, unlike a normal array of Objects,
@@ -53,15 +46,14 @@ import libcore.util.EmptyArray;
  * keys in ascending order. In the case of <code>valueAt(int)</code>, the
  * values corresponding to the keys are returned in ascending order.
  */
-public class SparseArray<E> implements Cloneable {
+class SparseArray<E> implements Cloneable {
+    private static final int[] EMPTY_INTS = new int[0];
+    private static final Object[] EMPTY_OBJECTS = new Object[0];
     private static final Object DELETED = new Object();
     private boolean mGarbage = false;
 
-    @UnsupportedAppUsage(maxTargetSdk = 28) // Use keyAt(int)
     private int[] mKeys;
-    @UnsupportedAppUsage(maxTargetSdk = 28) // Use valueAt(int), setValueAt(int, E)
     private Object[] mValues;
-    @UnsupportedAppUsage(maxTargetSdk = 28) // Use size()
     private int mSize;
 
     /**
@@ -80,8 +72,8 @@ public class SparseArray<E> implements Cloneable {
      */
     public SparseArray(int initialCapacity) {
         if (initialCapacity == 0) {
-            mKeys = EmptyArray.INT;
-            mValues = EmptyArray.OBJECT;
+            mKeys = EMPTY_INTS;
+            mValues = EMPTY_OBJECTS;
         } else {
             mValues = ArrayUtils.newUnpaddedObjectArray(initialCapacity);
             mKeys = new int[mValues.length];
@@ -141,9 +133,9 @@ public class SparseArray<E> implements Cloneable {
     }
 
     /**
-     * @hide
      * Removes the mapping from the specified key, if there was any, returning the old value.
      */
+    @SuppressWarnings("unchecked")
     public E removeReturnOld(int key) {
         int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
 
@@ -169,12 +161,11 @@ public class SparseArray<E> implements Cloneable {
      * Removes the mapping at the specified index.
      *
      * <p>For indices outside of the range <code>0...size()-1</code>,
-     * the behavior is undefined for apps targeting {@link android.os.Build.VERSION_CODES#P} and
-     * earlier, and an {@link ArrayIndexOutOfBoundsException} is thrown for apps targeting
-     * {@link android.os.Build.VERSION_CODES#Q} and later.</p>
+     * a {@link ArrayIndexOutOfBoundsException} is thrown.
+     * </p>
      */
     public void removeAt(int index) {
-        if (index >= mSize && UtilConfig.sThrowExceptionForUpperArrayOutOfBounds) {
+        if (index >= mSize) {
             // The array might be slightly bigger than mSize, in which case, indexing won't fail.
             // Check if exception should be thrown outside of the critical path.
             throw new ArrayIndexOutOfBoundsException(index);
@@ -284,12 +275,11 @@ public class SparseArray<E> implements Cloneable {
      * key.</p>
      *
      * <p>For indices outside of the range <code>0...size()-1</code>,
-     * the behavior is undefined for apps targeting {@link android.os.Build.VERSION_CODES#P} and
-     * earlier, and an {@link ArrayIndexOutOfBoundsException} is thrown for apps targeting
-     * {@link android.os.Build.VERSION_CODES#Q} and later.</p>
+     * a {@link ArrayIndexOutOfBoundsException} is thrown.
+     * </p>
      */
     public int keyAt(int index) {
-        if (index >= mSize && UtilConfig.sThrowExceptionForUpperArrayOutOfBounds) {
+        if (index >= mSize) {
             // The array might be slightly bigger than mSize, in which case, indexing won't fail.
             // Check if exception should be thrown outside of the critical path.
             throw new ArrayIndexOutOfBoundsException(index);
@@ -313,13 +303,12 @@ public class SparseArray<E> implements Cloneable {
      * associated with the largest key.</p>
      *
      * <p>For indices outside of the range <code>0...size()-1</code>,
-     * the behavior is undefined for apps targeting {@link android.os.Build.VERSION_CODES#P} and
-     * earlier, and an {@link ArrayIndexOutOfBoundsException} is thrown for apps targeting
-     * {@link android.os.Build.VERSION_CODES#Q} and later.</p>
+     * a {@link ArrayIndexOutOfBoundsException} is thrown.
+     * </p>
      */
     @SuppressWarnings("unchecked")
     public E valueAt(int index) {
-        if (index >= mSize && UtilConfig.sThrowExceptionForUpperArrayOutOfBounds) {
+        if (index >= mSize) {
             // The array might be slightly bigger than mSize, in which case, indexing won't fail.
             // Check if exception should be thrown outside of the critical path.
             throw new ArrayIndexOutOfBoundsException(index);
@@ -336,13 +325,12 @@ public class SparseArray<E> implements Cloneable {
      * value for the <code>index</code>th key-value mapping that this
      * SparseArray stores.
      *
-     * <p>For indices outside of the range <code>0...size()-1</code>, the behavior is undefined for
-     * apps targeting {@link android.os.Build.VERSION_CODES#P} and earlier, and an
-     * {@link ArrayIndexOutOfBoundsException} is thrown for apps targeting
-     * {@link android.os.Build.VERSION_CODES#Q} and later.</p>
+     * <p>For indices outside of the range <code>0...size()-1</code>,
+     * a {@link ArrayIndexOutOfBoundsException} is thrown.
+     * </p>
      */
     public void setValueAt(int index, E value) {
-        if (index >= mSize && UtilConfig.sThrowExceptionForUpperArrayOutOfBounds) {
+        if (index >= mSize) {
             // The array might be slightly bigger than mSize, in which case, indexing won't fail.
             // Check if exception should be thrown outside of the critical path.
             throw new ArrayIndexOutOfBoundsException(index);
@@ -399,7 +387,6 @@ public class SparseArray<E> implements Cloneable {
      * and that multiple keys can map to the same value and this will
      * find only one of them.
      * <p>Note also that this method uses {@code equals} unlike {@code indexOfValue}.
-     * @hide
      */
     public int indexOfValueByValue(E value) {
         if (mGarbage) {

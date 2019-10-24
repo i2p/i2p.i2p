@@ -16,8 +16,6 @@
 
 package net.i2p.router.crypto.ratchet;
 
-import android.annotation.UnsupportedAppUsage;
-
 /**
  * A helper class that aims to provide comparable growth performance to ArrayList, but on primitive
  * arrays. Common array operations are implemented for efficient use in dynamic containers.
@@ -26,9 +24,8 @@ import android.annotation.UnsupportedAppUsage;
  * NOT the number of elements in the array. The current size of the array is always passed in as a
  * parameter.
  *
- * @hide
  */
-public final class GrowingArrayUtils {
+final class GrowingArrayUtils {
 
     /**
      * Appends an element to the end of the array, growing the array if there is no more room.
@@ -39,7 +36,6 @@ public final class GrowingArrayUtils {
      * @return the array to which the element was appended. This may be different than the given
      *         array.
      */
-    @UnsupportedAppUsage
     public static <T> T[] append(T[] array, int currentSize, T element) {
         assert currentSize <= array.length;
 
@@ -57,57 +53,11 @@ public final class GrowingArrayUtils {
     /**
      * Primitive int version of {@link #append(Object[], int, Object)}.
      */
-    @UnsupportedAppUsage
     public static int[] append(int[] array, int currentSize, int element) {
         assert currentSize <= array.length;
 
         if (currentSize + 1 > array.length) {
             int[] newArray = ArrayUtils.newUnpaddedIntArray(growSize(currentSize));
-            System.arraycopy(array, 0, newArray, 0, currentSize);
-            array = newArray;
-        }
-        array[currentSize] = element;
-        return array;
-    }
-
-    /**
-     * Primitive long version of {@link #append(Object[], int, Object)}.
-     */
-    public static long[] append(long[] array, int currentSize, long element) {
-        assert currentSize <= array.length;
-
-        if (currentSize + 1 > array.length) {
-            long[] newArray = ArrayUtils.newUnpaddedLongArray(growSize(currentSize));
-            System.arraycopy(array, 0, newArray, 0, currentSize);
-            array = newArray;
-        }
-        array[currentSize] = element;
-        return array;
-    }
-
-    /**
-     * Primitive boolean version of {@link #append(Object[], int, Object)}.
-     */
-    public static boolean[] append(boolean[] array, int currentSize, boolean element) {
-        assert currentSize <= array.length;
-
-        if (currentSize + 1 > array.length) {
-            boolean[] newArray = ArrayUtils.newUnpaddedBooleanArray(growSize(currentSize));
-            System.arraycopy(array, 0, newArray, 0, currentSize);
-            array = newArray;
-        }
-        array[currentSize] = element;
-        return array;
-    }
-
-    /**
-     * Primitive float version of {@link #append(Object[], int, Object)}.
-     */
-    public static float[] append(float[] array, int currentSize, float element) {
-        assert currentSize <= array.length;
-
-        if (currentSize + 1 > array.length) {
-            float[] newArray = ArrayUtils.newUnpaddedFloatArray(growSize(currentSize));
             System.arraycopy(array, 0, newArray, 0, currentSize);
             array = newArray;
         }
@@ -157,44 +107,6 @@ public final class GrowingArrayUtils {
         }
 
         int[] newArray = ArrayUtils.newUnpaddedIntArray(growSize(currentSize));
-        System.arraycopy(array, 0, newArray, 0, index);
-        newArray[index] = element;
-        System.arraycopy(array, index, newArray, index + 1, array.length - index);
-        return newArray;
-    }
-
-    /**
-     * Primitive long version of {@link #insert(Object[], int, int, Object)}.
-     */
-    public static long[] insert(long[] array, int currentSize, int index, long element) {
-        assert currentSize <= array.length;
-
-        if (currentSize + 1 <= array.length) {
-            System.arraycopy(array, index, array, index + 1, currentSize - index);
-            array[index] = element;
-            return array;
-        }
-
-        long[] newArray = ArrayUtils.newUnpaddedLongArray(growSize(currentSize));
-        System.arraycopy(array, 0, newArray, 0, index);
-        newArray[index] = element;
-        System.arraycopy(array, index, newArray, index + 1, array.length - index);
-        return newArray;
-    }
-
-    /**
-     * Primitive boolean version of {@link #insert(Object[], int, int, Object)}.
-     */
-    public static boolean[] insert(boolean[] array, int currentSize, int index, boolean element) {
-        assert currentSize <= array.length;
-
-        if (currentSize + 1 <= array.length) {
-            System.arraycopy(array, index, array, index + 1, currentSize - index);
-            array[index] = element;
-            return array;
-        }
-
-        boolean[] newArray = ArrayUtils.newUnpaddedBooleanArray(growSize(currentSize));
         System.arraycopy(array, 0, newArray, 0, index);
         newArray[index] = element;
         System.arraycopy(array, index, newArray, index + 1, array.length - index);
