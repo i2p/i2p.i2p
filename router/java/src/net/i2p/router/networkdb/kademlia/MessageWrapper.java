@@ -139,7 +139,7 @@ public class MessageWrapper {
         payload.setRecipient(to);
 
         SessionKey sentKey = ctx.keyGenerator().generateSessionKey();
-        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, 
                                                               key, sentKey, null);
         return msg;
     }
@@ -234,7 +234,7 @@ public class MessageWrapper {
                                                               m.getMessageExpiration(),
                                                               DeliveryInstructions.LOCAL, m);
 
-        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, 
                                                               null, encryptKey, encryptTag);
         return msg;
     }

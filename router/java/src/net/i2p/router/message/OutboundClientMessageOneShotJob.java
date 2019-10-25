@@ -32,6 +32,7 @@ import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.JobImpl;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
@@ -116,6 +117,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private LeaseSet _leaseSet;
     /** Actual lease the message is being routed through */
     private Lease _lease;
+    /** Actual target encryption key from the LS being used */
+    private PublicKey _encryptionKey;
     private final long _start;
     /** note we can succeed after failure, but not vice versa */
     private enum Result {NONE, FAIL, SUCCESS}
@@ -373,8 +376,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
     
     /**
-     *  Choose a lease from his leaseset to send the message to. Sets _lease.
+     *  Choose a lease from his leaseset to send the message to.
+     *
+     *  Side effects:
+     *  Sets _lease.
      *  Sets _wantACK if it's new or changed.
+     *  Sets _encryptionKey.
+     *
      *  Does several checks to see if we can actually send to this leaseset,
      *  and returns nonzero failure code if unable to.
      *
@@ -399,12 +407,21 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             lsType != DatabaseEntry.KEY_TYPE_LS2) {
             return MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
         }
-        PublicKey pk = _leaseSet.getEncryptionKey();
-        if (pk == null)
+
+        // select an encryption key from the leaseset
+        Set<EncType> supported;
+        LeaseSetKeys ourKeys = getContext().keyManager().getKeys(_from);
+        if (ourKeys != null)
+            supported = ourKeys.getSupportedEncryption();
+        else
+            supported = LeaseSetKeys.SET_ELG;
+        _encryptionKey = _leaseSet.getEncryptionKey(supported);
+        if (_encryptionKey == null) {
+            if (_leaseSet.getEncryptionKey() != null)
+                return MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION;
+            // no keys at all?
             return MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
-        EncType encType = pk.getType();
-        if (encType == null || !encType.isAvailable())
-            return MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION;
+        }
 
         // Use the same lease if it's still good
         // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
@@ -590,7 +607,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         int tagsRequired = SendMessageOptions.getTagThreshold(sendFlags);
         boolean wantACK = _wantACK ||
                           shouldRequestReply ||
-                          GarlicMessageBuilder.needsTags(getContext(), _leaseSet.getEncryptionKey(),
+                          GarlicMessageBuilder.needsTags(getContext(), _encryptionKey,
                                                          _from.calculateHash(), tagsRequired);
         
         LeaseSet replyLeaseSet;
@@ -627,17 +644,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION);
             return;
         }
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug(getJobId() + ": Clove built to " + _toString);
 
-        PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set<SessionTag> tags = new HashSet<SessionTag>();
 
         // Per-message flag > 0 overrides per-session option
         int tagsToSend = SendMessageOptions.getTagsToSend(sendFlags);
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
-                                                                               _overallExpiration, key, 
+                                                                               _overallExpiration, _encryptionKey, 
                                                                                clove, _from.calculateHash(), 
                                                                                _to, _inTunnel, tagsToSend,
                                                                                tagsRequired, sessKey, tags, 
@@ -664,7 +678,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (!tags.isEmpty()) {
                     SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
                     if (skm != null)
-                        tsh = skm.tagsDelivered(_leaseSet.getEncryptionKey(), sessKey, tags);
+                        tsh = skm.tagsDelivered(_encryptionKey, sessKey, tags);
             }
             onReply = new SendSuccessJob(getContext(), sessKey, tsh);
             onFail = new SendTimeoutJob(getContext(), sessKey, tsh);
@@ -1019,7 +1033,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 if (_key != null && _tags != null && _leaseSet != null) {
                     SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
                     if (skm != null)
-                        skm.tagsAcked(_leaseSet.getEncryptionKey(), _key, _tags);
+                        skm.tagsAcked(_encryptionKey, _key, _tags);
                 }
             }
 
@@ -1110,7 +1124,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 if (_key != null && _tags != null && _leaseSet != null) {
                     SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
                     if (skm != null)
-                        skm.failTags(_leaseSet.getEncryptionKey(), _key, _tags);
+                        skm.failTags(_encryptionKey, _key, _tags);
                 }
             }
             if (old == Result.NONE)

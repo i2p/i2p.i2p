@@ -14,17 +14,22 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.ratchet.MuxedSKM;
+import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.util.Log;
 
 /**
@@ -34,10 +39,14 @@ import net.i2p.util.Log;
 public class GarlicMessageBuilder {
 
     /**
+     *  ELGAMAL_2048 only.
+     *
      *  @param local non-null; do not use this method for the router's SessionKeyManager
      *  @param minTagOverride 0 for no override, &gt; 0 to override SKM's settings
      */
     static boolean needsTags(RouterContext ctx, PublicKey key, Hash local, int minTagOverride) {
+        if (key.getType() == EncType.ECIES_X25519)
+            return false;
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);
         if (skm == null)
             return true;
@@ -51,6 +60,7 @@ public class GarlicMessageBuilder {
     
     /**
      * Unused and probably a bad idea.
+     * ELGAMAL_2048 only.
      *
      * Used below only on a recursive call if the garlic message contains a garlic message.
      * We don't need the SessionKey or SesssionTags returned
@@ -60,6 +70,7 @@ public class GarlicMessageBuilder {
      *
      * @param ctx scope
      * @param config how/what to wrap
+     * @return null if expired
      * @throws IllegalArgumentException on error
      */
     private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config) {
@@ -70,14 +81,17 @@ public class GarlicMessageBuilder {
 
     /**
      * Now unused, since we have to generate a reply token first in OCMOSJ but we don't know if tags are required yet.
+     * ELGAMAL_2048 only.
      *
      * @param ctx scope
      * @param config how/what to wrap
-     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedKey non-null with null data,
+     *                   output parameter that will be filled with the SessionKey used
      * @param wrappedTags Output parameter that will be filled with the sessionTags used.
                           If non-empty on return you must call skm.tagsDelivered() when sent
                           and then call skm.tagsAcked() or skm.failTags() later.
      * @param skm non-null
+     * @return null if expired
      * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
@@ -94,11 +108,13 @@ public class GarlicMessageBuilder {
     ***/
 
     /**
-     * called by OCMJH
+     * ELGAMAL_2048 only.
+     * Called by OCMJH.
      *
      * @param ctx scope
      * @param config how/what to wrap
-     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedKey non-null with null data,
+     *                   output parameter that will be filled with the SessionKey used
      * @param wrappedTags Output parameter that will be filled with the sessionTags used.
                           If non-empty on return you must call skm.tagsDelivered() when sent
                           and then call skm.tagsAcked() or skm.failTags() later.
@@ -106,6 +122,7 @@ public class GarlicMessageBuilder {
                                Set to zero to disable tag delivery. You must set to zero if you are not
                                equipped to confirm delivery and call skm.tagsAcked() or skm.failTags() later.
      * @param skm non-null
+     * @return null if expired
      * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
@@ -114,11 +131,13 @@ public class GarlicMessageBuilder {
     }
 
     /**
-     * called by netdb and above
+     * ELGAMAL_2048 only.
+     * Called by netdb and above.
      *
      * @param ctx scope
      * @param config how/what to wrap
-     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedKey non-null with null data,
+     *                   output parameter that will be filled with the SessionKey used
      * @param wrappedTags Output parameter that will be filled with the sessionTags used.
                           If non-empty on return you must call skm.tagsDelivered() when sent
                           and then call skm.tagsAcked() or skm.failTags() later.
@@ -128,6 +147,7 @@ public class GarlicMessageBuilder {
                                If this is always 0, it forces ElGamal every time.
      * @param lowTagsThreshold the threshold
      * @param skm non-null
+     * @return null if expired
      * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
@@ -144,14 +164,14 @@ public class GarlicMessageBuilder {
             } else
                 key = config.getRecipient().getIdentity().getPublicKey();
         }
+        if (key.getType() != EncType.ELGAMAL_2048)
+            throw new IllegalArgumentException();
         
         if (log.shouldLog(Log.INFO))
             log.info("Encrypted with public key to expire on " + new Date(config.getExpiration()));
         
         SessionKey curKey = skm.getCurrentOrNewKey(key);
-        SessionTag curTag = null;
-
-            curTag = skm.consumeNextAvailableTag(key, curKey);
+        SessionTag curTag = skm.consumeNextAvailableTag(key, curKey);
             
             if (log.shouldLog(Log.DEBUG)) {
                 int availTags = skm.getAvailableTags(key, curKey);
@@ -167,25 +187,26 @@ public class GarlicMessageBuilder {
 
         wrappedKey.setData(curKey.getData());
         
-        return buildMessage(ctx, config, wrappedKey, wrappedTags, key, curKey, curTag);
+        return buildMessage(ctx, config, wrappedTags, key, curKey, curTag);
     }
     
     /**
-     *  used by TestJob and directly above
-     *  and for encrypting DatabaseLookupMessages
+     *  ELGAMAL_2048 only.
+     *  Used by TestJob, and directly above,
+     *  and by MessageWrapper for encrypting DatabaseLookupMessages
      *
      * @param ctx scope
      * @param config how/what to wrap
-     * @param wrappedKey unused - why??
      * @param wrappedTags New tags to be sent along with the message.
      *                    200 max enforced at receiver; null OK
      * @param target public key of the location being garlic routed to (may be null if we 
      *               know the encryptKey and encryptTag)
      * @param encryptKey sessionKey used to encrypt the current message, non-null
      * @param encryptTag sessionTag used to encrypt the current message, null to force ElG
+     * @return null if expired
      * @throws IllegalArgumentException on error
      */
-    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, Set<SessionTag> wrappedTags,
                                              PublicKey target, SessionKey encryptKey, SessionTag encryptTag) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         if (config == null)
@@ -199,6 +220,11 @@ public class GarlicMessageBuilder {
         
         // TODO - 128 is the minimum padded size - should it be more? less? random?
         byte encData[] = ctx.elGamalAESEngine().encrypt(cloveSet, target, encryptKey, wrappedTags, encryptTag, 128);
+        if (encData == null) {
+            if (log.shouldWarn())
+                log.warn("ElG encrypt fail");
+            return null;
+        }
         msg.setData(encData);
         msg.setMessageExpiration(config.getExpiration());
         
@@ -213,6 +239,69 @@ public class GarlicMessageBuilder {
             log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId() + " is " + cloveSet.length
                      + " bytes and encrypted message data is " + encData.length + " bytes");
         
+        return msg;
+    }
+    
+    /**
+     * ECIES_X25519 only.
+     * Called by GarlicMessageBuilder only.
+     *
+     * @param ctx scope
+     * @param config how/what to wrap
+     * @param target public key of the location being garlic routed to (may be null if we 
+     *               know the encryptKey and encryptTag)
+     * @return null if expired or on other errors
+     * @throws IllegalArgumentException on error
+     * @since 0.9.44
+     */
+    static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config,
+                                           PublicKey target, Hash from, SessionKeyManager skm) {
+        PublicKey key = config.getRecipientPublicKey();
+        if (key.getType() != EncType.ECIES_X25519)
+            throw new IllegalArgumentException();
+        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        GarlicMessage msg = new GarlicMessage(ctx);
+        byte cloveSet[] = buildCloveSet(ctx, config);
+        LeaseSetKeys lsk = ctx.keyManager().getKeys(from);
+        if (lsk == null) {
+            if (log.shouldWarn())
+                log.warn("No LSK for " + from.toBase32());
+            return null;
+        }
+        PrivateKey priv = lsk.getDecryptionKey(EncType.ECIES_X25519);
+        if (priv == null) {
+            if (log.shouldWarn())
+                log.warn("No key for " + from.toBase32());
+            return null;
+        }
+
+        RatchetSKM rskm;
+        if (skm instanceof RatchetSKM) {
+            rskm = (RatchetSKM) skm;
+        } else if (skm instanceof MuxedSKM) {
+            rskm = ((MuxedSKM) skm).getECSKM();
+        } else {
+            if (log.shouldWarn())
+                log.warn("No SKM for " + from.toBase32());
+            return null;
+        }
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, config.getExpiration());
+        if (encData == null) {
+            if (log.shouldWarn())
+                log.warn("Encrypt fail for " + from.toBase32());
+            return null;
+        }
+        msg.setData(encData);
+        msg.setMessageExpiration(config.getExpiration());
+        long timeFromNow = config.getExpiration() - ctx.clock().now();
+        if (timeFromNow < 1*1000) {
+            if (log.shouldDebug())
+                log.debug("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
+            return null;
+        }
+        if (log.shouldDebug())
+            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId() + " is " + cloveSet.length
+                     + " bytes and encrypted message data is " + encData.length + " bytes");
         return msg;
     }
     
@@ -237,8 +326,7 @@ public class GarlicMessageBuilder {
      * @throws IllegalArgumentException on error
      */
     private static byte[] buildCloveSet(RouterContext ctx, GarlicConfig config) {
-        ByteArrayOutputStream baos = null;
-        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        ByteArrayOutputStream baos;
         try {
             if (config instanceof PayloadGarlicConfig) {
                 byte clove[] = buildClove(ctx, (PayloadGarlicConfig)config);
@@ -253,7 +341,7 @@ public class GarlicMessageBuilder {
                         //log.debug("Subclove IS a payload garlic clove");
                         cloves[i] = buildClove(ctx, (PayloadGarlicConfig)c);
                     } else {
-                        log.debug("Subclove IS NOT a payload garlic clove");
+                        //log.debug("Subclove IS NOT a payload garlic clove");
                         // See notes below
                         cloves[i] = buildClove(ctx, c);
                     }
@@ -271,10 +359,8 @@ public class GarlicMessageBuilder {
             DataHelper.writeLong(baos, 4, config.getId());
             DataHelper.writeLong(baos, DataHelper.DATE_LENGTH, config.getExpiration());
         } catch (IOException ioe) {
-            log.error("Error building the clove set", ioe);
             throw new IllegalArgumentException("Error building the clove set", ioe);
         } catch (DataFormatException dfe) {
-            log.error("Error building the clove set", dfe);
             throw new IllegalArgumentException("Error building the clove set", dfe);
         }
         return baos.toByteArray();

@@ -10,6 +10,7 @@ package net.i2p.router.message;
 
 import java.util.Set;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
@@ -72,9 +73,8 @@ class OutboundClientMessageJobHelper {
      *
      * For now, its just a tunneled DeliveryStatusMessage
      *
-     * Unused?
-     *
-     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedKey non-null with null data,
+     *                   output parameter that will be filled with the SessionKey used
      * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @param bundledReplyLeaseSet if specified, the given LeaseSet will be packaged with the message (allowing
      *                             much faster replies, since their netDb search will return almost instantly)
@@ -101,7 +101,8 @@ class OutboundClientMessageJobHelper {
      *
      * @param tagsToSendOverride if &gt; 0, use this instead of skm's default
      * @param lowTagsOverride if &gt; 0, use this instead of skm's default
-     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedKey non-null with null data,
+     *                   output parameter that will be filled with the SessionKey used
      * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @param replyTunnel non-null if requireAck is true or bundledReplyLeaseSet is non-null
      * @param requireAck if true, bundle replyToken in an ack clove
@@ -120,11 +121,16 @@ class OutboundClientMessageJobHelper {
                                                  from, dest, replyTunnel, requireAck, bundledReplyLeaseSet, skm);
         if (config == null)
             return null;
-        // no use sending tags unless we have a reply token set up already
-        int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
-        int lowThreshold = lowTagsOverride > 0 ? lowTagsOverride : skm.getLowThreshold();
-        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags,
-                                                              tagsToSend, lowThreshold, skm);
+        GarlicMessage msg;
+        if (recipientPK.getType() == EncType.ECIES_X25519) {
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm);
+        } else {
+            // no use sending tags unless we have a reply token set up already
+            int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
+            int lowThreshold = lowTagsOverride > 0 ? lowTagsOverride : skm.getLowThreshold();
+            msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags,
+                                                    tagsToSend, lowThreshold, skm);
+        }
         return msg;
     }
     
@@ -150,7 +156,8 @@ class OutboundClientMessageJobHelper {
                                                ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                expiration, DeliveryInstructions.LOCAL);
         
-        if (requireAck) {
+        // for now, skip this for ratchet
+        if (requireAck && recipientPK.getType() == EncType.ELGAMAL_2048) {
             // extend the expiration of the return message
             PayloadGarlicConfig ackClove = buildAckClove(ctx, from, replyTunnel, replyToken,
                                                          expiration + ACK_EXTRA_EXPIRATION, skm);

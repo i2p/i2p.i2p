@@ -10,6 +10,7 @@ package net.i2p.router.message;
 
 import java.util.Date;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
@@ -18,6 +19,8 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.ratchet.MuxedSKM;
+import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.util.Log;
 
 /**
@@ -41,16 +44,45 @@ public class GarlicMessageParser {
     }
     
     /**
+     *  Supports both ELGAMAL_2048 and ECIES_X25519.
+     *
+     *  @param encryptionKey either type TODO need both for muxed
      *  @param skm use tags from this session key manager
      *  @return null on error
      */
-    public CloveSet getGarlicCloves(GarlicMessage message, PrivateKey encryptionKey, SessionKeyManager skm) {
+    CloveSet getGarlicCloves(GarlicMessage message, PrivateKey encryptionKey, SessionKeyManager skm) {
         byte encData[] = message.getData();
         byte decrData[];
         try {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Decrypting with private key " + encryptionKey);
-            decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey, skm);
+            EncType type = encryptionKey.getType();
+            if (type == EncType.ELGAMAL_2048) {
+                decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey, skm);
+            } else if (type == EncType.ECIES_X25519) {
+                RatchetSKM rskm;
+                if (skm instanceof RatchetSKM) {
+                    rskm = (RatchetSKM) skm;
+                } else if (skm instanceof MuxedSKM) {
+                    rskm = ((MuxedSKM) skm).getECSKM();
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("No SKM to decrypt ECIES");
+                    return null;
+                }
+                decrData = _context.eciesEngine().decrypt(encData, encryptionKey, rskm);
+                if (decrData != null) {
+                    if (_log.shouldWarn())
+                        _log.warn("ECIES decrypt success, length: " + decrData.length);
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("ECIES decrypt fail");
+                }
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Can't decrypt with key type " + type);
+                return null;
+            }
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error decrypting", dfe);
@@ -63,7 +95,10 @@ public class GarlicMessageParser {
             return null;
         } else {
             try {
-                return readCloveSet(decrData); 
+                CloveSet rv = readCloveSet(decrData, 0); 
+                if (_log.shouldDebug())
+                    _log.debug("Got cloves: " + rv.getCloveCount());
+                return rv; 
             } catch (DataFormatException dfe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to read cloveSet", dfe);
@@ -72,13 +107,15 @@ public class GarlicMessageParser {
         }
     }
     
-    private CloveSet readCloveSet(byte data[]) throws DataFormatException {
-        int offset = 0;
-        
+    /**
+     *  @param offset where in data to start
+     *  @return non-null, throws on all errors
+     */
+    private CloveSet readCloveSet(byte data[], int offset) throws DataFormatException {
         int numCloves = data[offset] & 0xff;
         offset++;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("# cloves to read: " + numCloves);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("# cloves to read: " + numCloves);
         if (numCloves <= 0 || numCloves > MAX_CLOVES)
             throw new DataFormatException("bad clove count " + numCloves);
         GarlicClove[] cloves = new GarlicClove[numCloves];

@@ -8,6 +8,7 @@ package net.i2p.router.message;
  *
  */
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -21,7 +22,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Unencrypt a garlic message and pass off any valid cloves to the configured
+ * Decrypt a garlic message and pass off any valid cloves to the configured
  * receiver to dispatch as they choose.
  *
  */
@@ -61,7 +62,16 @@ public class GarlicMessageReceiver {
             LeaseSetKeys keys = _context.keyManager().getKeys(_clientDestination);
             skm = _context.clientManager().getClientSessionKeyManager(_clientDestination);
             if (keys != null && skm != null) {
+                // TODO need to pass both keys if available for muxed decrypt
                 decryptionKey = keys.getDecryptionKey();
+                if (decryptionKey == null) {
+                    decryptionKey = keys.getDecryptionKey(EncType.ECIES_X25519);
+                    if (decryptionKey == null) {
+                        if (_log.shouldWarn())
+                            _log.warn("No key to decrypt for " + _clientDestination.toBase32());
+                        return;
+                    }
+                }
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Not trying to decrypt a garlic routed message to a disconnected client");
@@ -72,6 +82,7 @@ public class GarlicMessageReceiver {
             skm = _context.sessionKeyManager();
         }
         
+        // TODO need to pass both keys if available for muxed decrypt
         CloveSet set = _context.garlicMessageParser().getGarlicCloves(message, decryptionKey, skm);
         if (set != null) {
             for (int i = 0; i < set.getCloveCount(); i++) {
@@ -79,9 +90,13 @@ public class GarlicMessageReceiver {
                 handleClove(clove);
             }
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("CloveMessageParser failed to decrypt the message [" + message.getUniqueId() 
-                           + "]", new Exception("Decrypt garlic failed"));
+            if (_log.shouldLog(Log.WARN)) {
+                String d = (_clientDestination != null) ? _clientDestination.toBase32() : "the router";
+                _log.warn("CloveMessageParser failed to decrypt the " + message.getData().length +
+                          " byte message [" + message.getUniqueId() 
+                           + "] for " + d + " with key " + decryptionKey.getType(),
+                          new Exception("Decrypt garlic failed"));
+            }
             _context.statManager().addRateData("crypto.garlic.decryptFail", 1);
             _context.messageHistory().messageProcessingError(message.getUniqueId(), 
                                                              message.getClass().getName(), 
@@ -110,10 +125,10 @@ public class GarlicMessageReceiver {
         boolean rv = invalidReason == null;
         if (!rv) {
             String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Clove is NOT valid: id=" + clove.getCloveId() 
+            if (_log.shouldInfo())
+                _log.info("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago", new Exception("Invalid within..."));
-            else if (_log.shouldLog(Log.WARN))
+            else if (_log.shouldWarn())
                 _log.warn("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago: " + invalidReason + ": " + clove);
             _context.messageHistory().messageProcessingError(clove.getCloveId(), 
