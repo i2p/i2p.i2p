@@ -1,6 +1,35 @@
+2019-10-25 zzz
+ * Router (proposal 144):
+   - Set client SKM based on configured encryption
+   - Select target key in LS based on local client's support
+   - Hook new SKMs and engines into Garlic Message encryption/decryption
+ * Transport: Publish IPv6 address on transition to non-firewalled
+   (ticket #2175)
+
+2019-10-24 zzz
+ * Router: New SKMs and Engines for Ratchet (proposal 144)
+
 2019-10-23 zzz
- * Build: Recognize gettext 0.20
- * Data: Reduce SessionTag size
+ * Build:
+   - Recognize gettext 0.20
+   - Make 3 release targets, with jbigi/geoip/neither
+ * Crypto:
+   - New KeyFactory interface
+   - Base classes for ECIES-Ratchet (proposal 144)
+ * Data:
+   - Reduce SessionTag size
+   - Cache public key in private key class
+   - Add LeaseSet methods to get encryption key by type
+ * I2CP:
+   - Fix error message for config errors (ticket #2639)
+   - Add config to disable loopback for testing
+ * i2ptunnel: Add encrytion type selection to form (proposal 144)
+ * NetDb: Don't garlic encrypt netdb messages with a ECIES key
+ * Router (proposal 144):
+   - Add KeyManager support for multiple leaseset private keys
+   - Fix logic error in check for local destinations
+   - Register all LS2 keys with KeyManager
+ * Startup: clients.config.d files must end in ".config"
 
 * 2019-10-22 0.9.43 released
 

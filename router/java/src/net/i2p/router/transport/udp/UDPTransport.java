@@ -878,7 +878,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (!isIPv4Firewalled())
                     setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
             } else if (ip.length == 16) {
-                // TODO this will set non-firewalled every time our IPv6 address changes
+                // TODO if we start periodically scanning our interfaces (we don't now),
+                // this will set non-firewalled every time our IPv6 address changes
                 if (!isIPv6Firewalled())
                     setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
             }
@@ -3092,6 +3093,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     status == Status.IPV4_UNKNOWN_IPV6_FIREWALLED ||
                     status == Status.IPV4_DISABLED_IPV6_FIREWALLED) {
                     removeExternalAddress(true, true);
+                } else if ((old == Status.IPV4_OK_IPV6_FIREWALLED ||
+                            old == Status.IPV4_UNKNOWN_IPV6_FIREWALLED ||
+                            old == Status.IPV4_DISABLED_IPV6_FIREWALLED) &&
+                           (status == Status.OK ||
+                            status == Status.IPV4_UNKNOWN_IPV6_OK ||
+                            status == Status.IPV4_FIREWALLED_IPV6_OK ||
+                            status == Status.IPV4_DISABLED_IPV6_OK ||
+                            status == Status.IPV4_SNAT_IPV6_OK) &&
+                           _lastOurIPv6 != null &&
+                           !explicitAddressSpecified()){
+                     String addr = Addresses.toString(_lastOurIPv6);
+                     int port = _context.getProperty(PROP_EXTERNAL_PORT, -1);
+                     rebuildExternalAddress(addr, port, true);
                 }
             } else {
                 rebuildExternalAddress();
