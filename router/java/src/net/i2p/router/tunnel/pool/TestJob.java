@@ -124,9 +124,8 @@ class TestJob extends JobImpl {
         SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();
         SessionTag encryptTag = new SessionTag(true);
         _encryptTag = encryptTag;
-        SessionKey sentKey = new SessionKey();
         Set<SessionTag> sentTags = null;
-        GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentKey, sentTags, 
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentTags, 
                                                               getContext().keyManager().getPublicKey(), 
                                                               encryptKey, encryptTag);
 
