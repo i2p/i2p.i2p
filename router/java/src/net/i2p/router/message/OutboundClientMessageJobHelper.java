@@ -27,6 +27,7 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
@@ -156,8 +157,8 @@ class OutboundClientMessageJobHelper {
                                                ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                expiration, DeliveryInstructions.LOCAL);
         
-        // for now, skip this for ratchet
-        if (requireAck && recipientPK.getType() == EncType.ELGAMAL_2048) {
+        // for now, skip this for ratchet if there's no LS to bundle
+        if (requireAck && (bundledReplyLeaseSet != null || recipientPK.getType() == EncType.ELGAMAL_2048)) {
             // extend the expiration of the return message
             PayloadGarlicConfig ackClove = buildAckClove(ctx, from, replyTunnel, replyToken,
                                                          expiration + ACK_EXTRA_EXPIRATION, skm);
@@ -219,11 +220,18 @@ class OutboundClientMessageJobHelper {
         //ackInstructions.setEncrypted(false);
         
         DeliveryStatusMessage dsm = buildDSM(ctx, replyToken);
-        GarlicMessage msg = wrapDSM(ctx, skm, dsm);
-        if (msg == null) {
-            if (log.shouldLog(Log.WARN))
-                log.warn("Failed to wrap ack clove");
-            return null;
+        // wrap the DSM if we can
+        LeaseSetKeys lsk = ctx.keyManager().getKeys(from);
+        I2NPMessage msg;
+        if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
+            msg = wrapDSM(ctx, skm, dsm);
+            if (msg == null) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Failed to wrap ack clove");
+                return null;
+            }
+        } else {
+            msg = dsm;
         }
         PayloadGarlicConfig ackClove = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                                ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
