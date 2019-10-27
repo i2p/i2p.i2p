@@ -22,6 +22,7 @@ import net.i2p.kademlia.KBucketSet;
 import net.i2p.kademlia.XORComparator;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Job;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
@@ -339,10 +340,19 @@ public class IterativeSearchJob extends FloodSearchJob {
                 outTunnel = tm.selectOutboundTunnel(_fromLocalDest, peer);
                 if (outTunnel == null)
                     outTunnel = tm.selectOutboundExploratoryTunnel(peer);
-                replyTunnel = tm.selectInboundTunnel(_fromLocalDest, peer);
-                isClientReplyTunnel = replyTunnel != null;
-                if (!isClientReplyTunnel)
+                LeaseSetKeys lsk = getContext().keyManager().getKeys(_fromLocalDest);
+                if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
+                    // garlic encrypt to dest SKM
+                    replyTunnel = tm.selectInboundTunnel(_fromLocalDest, peer);
+                    isClientReplyTunnel = replyTunnel != null;
+                    if (!isClientReplyTunnel)
+                        replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                } else {
+                    // We don't yet have any way to request/get a ECIES-tagged reply,
+                    // so send it to the router SKM
+                    isClientReplyTunnel = false;
                     replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                }
                 isDirect = false;
             } else if ((!_isLease) && ri != null && getContext().commSystem().isEstablished(peer)) {
                 // If it's a RI lookup, not from a client, and we're already connected, just ask directly
