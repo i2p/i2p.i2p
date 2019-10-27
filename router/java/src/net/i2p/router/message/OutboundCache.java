@@ -67,7 +67,7 @@ public class OutboundCache {
       *
       * Concurrent.
       */
-    final Map<HashPair, LeaseSet> leaseSetCache = new ConcurrentHashMap<HashPair, LeaseSet>(64);
+    final ConcurrentHashMap<HashPair, LeaseSet> leaseSetCache = new ConcurrentHashMap<HashPair, LeaseSet>(64);
 
     /**
      * Use the same inbound tunnel (i.e. lease) as we did for the same destination previously,
