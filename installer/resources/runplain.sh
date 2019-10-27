@@ -25,7 +25,7 @@ CP=
 
 # Try using the Java binary that I2P was installed with.
 # If it's not found, try looking in the system PATH.
-JAVA=$(which %JAVA_HOME/bin/java || which java)
+JAVA=$(which "%JAVA_HOME"/bin/java || which java)
 
 if [ -z $JAVA ] || [ ! -x $JAVA ]; then
     echo "Error: Cannot find java." >&2
