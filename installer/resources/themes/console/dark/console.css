@@ -2919,16 +2919,16 @@ tr#addnew, tr#addnew:hover {
      background: #000;
 }
 
-.themechoice object {
+.themechoice img {
      opacity: 0.6;
 }
 
-.themechoice .optbox:checked + object {
+.themechoice .optbox:checked + img {
      filter: none;
      opacity: 1;
 }
 
-.themechoice:hover object {
+.themechoice:hover img {
      filter: drop-shadow(0 0 1px #f60);
      transition: ease transform 0.05s;
 }
@@ -2944,27 +2944,27 @@ tr#addnew, tr#addnew:hover {
      box-shadow: inset 0 0 0 1px #000 !important;
 }
 
-.themechoice .optbox:checked + object, .themechoice .optbox:checked + img {
+.themechoice .optbox:checked + img, .themechoice .optbox:checked + img {
      transform: scale(0.9);
 }
 
-.themechoice .optbox:hover + object ~ .themelabel {
+.themechoice .optbox:hover + img ~ .themelabel {
      color: #f60;
 }
 
-.themechoice .optbox:checked + object ~ .themelabel {
+.themechoice .optbox:checked + img ~ .themelabel {
      background: #030 !important;
      color: #ee9;
      font-weight: bold;
      box-shadow: none !important
 }
 
-.themechoice .optbox:focus + object ~ .themelabel {
+.themechoice .optbox:focus + img ~ .themelabel {
      color: #f60 !important;
      box-shadow: inset 0 0 10px 3px #000 !important;
 }
 
-.themechoice .optbox:active + object ~ .themelabel {
+.themechoice .optbox:active + img ~ .themelabel {
      color: #ee9 !important;
      box-shadow: inset 0 0 0 1px #000 !important;
 }
@@ -2979,7 +2979,7 @@ tr#addnew, tr#addnew:hover {
      position: absolute;
 }
 
-.themechoice object {
+.themechoice img {
      padding: 3px 0;
 }
 

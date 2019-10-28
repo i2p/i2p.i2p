@@ -4769,19 +4769,19 @@ body.iframed {
      transition: filter ease 0.3s 0s;
 }
 
-.themechoice:hover > object ~ .themelabel {
+.themechoice:hover > img ~ .themelabel {
      border-top: 1px solid #f60 !important;
      background: #fff !important;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ffe8bf 50%, #efd9b3 100%) !important;
      color: #f60;
 }
 
-.themechoice:active > object ~ .themelabel {
+.themechoice:active > img ~ .themelabel {
      background: #f60 !important;
      color: #fff;
 }
 
-.themechoice:hover > object {
+.themechoice:hover > img {
      filter: drop-shadow(0 0 1px #f60);
 }
 
@@ -4796,18 +4796,18 @@ body.iframed {
      position: absolute;
 }
 
-.themechoice .optbox + object {
+.themechoice .optbox + img {
      margin-left: -1px;
      margin-top: 6px;
      padding: 2px 0 !important;
      margin-bottom: 31px;
 }
 
-.themechoice img, .themechoice object {
+.themechoice img, .themechoice img {
      margin-bottom: 31px !important;
 }
 
-.themechoice .optbox:checked + object, .themechoice .optbox:checked + img {
+.themechoice .optbox:checked + img, .themechoice .optbox:checked + img {
      transform: scale(0.9);
      animation: glow 20s 10s infinite;
 }
@@ -4864,26 +4864,26 @@ div.themelabel {
      font-weight: bold;
 }
 
-.themechoice .optbox:checked + object ~ .themelabel {
+.themechoice .optbox:checked + img ~ .themelabel {
      background: #ddf !important;
      color: #338 !important;
      font-weight: bold;
 }
 
-.themechoice .optbox:focus + object ~ .themelabel {
+.themechoice .optbox:focus + img ~ .themelabel {
      color: #f60 !important;
      box-shadow: inset 0 0 0 1px #fff;
      background: linear-gradient(to right, #eef, #fff, #eef) !important;
 }
 
-.themechoice .optbox:active + object ~ .themelabel {
+.themechoice .optbox:active + img ~ .themelabel {
      color: #fff !important;
      box-shadow: inset 0 0 0 1px #fff;
      box-shadow: inset 0 0 0 1px #fff9ef, inset 2px 2px 3px #7f3000;
      background: #f60 !important;
 }
 
-.themechoice .optbox:checked:active + object ~ .themelabel {
+.themechoice .optbox:checked:active + img ~ .themelabel {
      color: #f60 !important;
      background: linear-gradient(to right, #eef, #fff, #eef) !important;
      box-shadow: inset 0 0 0 1px #fff !important;
