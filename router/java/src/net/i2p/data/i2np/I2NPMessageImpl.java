@@ -108,6 +108,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *  Set a limit on the max to read from the data buffer, so that
      *  we can use a large buffer but prevent the reader from reading off the end.
      *
+     *  @param type the message type or -1 if we should read it here
+     *  @return total length of the message
      *  @param maxLen read no more than this many bytes from data starting at offset, even if it is longer
      *                This includes the type byte only if type &lt; 0
      *  @since 0.8.12
@@ -236,7 +238,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
 
     /** 
-     * write the message to the buffer, returning the number of bytes written.
+     * Write the message to the buffer, returning the new offset (NOT the length).
      * the data is formatted so as to be self contained, with the type, size,
      * expiration, unique id, as well as a checksum bundled along.  
      * Full 16 byte header for NTCP 1.
@@ -290,7 +292,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *  THe header consists of a one-byte type and a 4-byte expiration in seconds only.
      *  Used by SSU only!
      *
-     *  @return the new written length
+     *  @return the new offset (NOT the length)
      */
     public int toRawByteArray(byte buffer[]) {
         try {
@@ -308,7 +310,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
 
     /**
-     * write the message to the buffer, returning the number of bytes written.
+     * Write the message to the buffer, returning the new offset (NOT the length).
      * the data is is not self contained - it does not include the size,
      * unique id, or any checksum, but does include the type and expiration.
      * Short 9 byte header for NTCP 2.

@@ -9,6 +9,7 @@ package net.i2p.data.i2np;
  */
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 
 /**
@@ -99,7 +100,11 @@ public class DataMessage extends FastI2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DataMessage: ");
-        buf.append("\n\tData: ").append(DataHelper.toString(_data, 64));
+        buf.append("\n\tData: ");
+        if (_data != null)
+            buf.append(_data.length).append(" bytes: ").append(Base64.encode(_data));
+        else
+            buf.append("null");
         buf.append("]");
         return buf.toString();
     }
