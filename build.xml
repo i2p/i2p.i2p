@@ -2144,7 +2144,7 @@
             <arg value="-auxclasspath"/>
             <arg value="build/commons-el.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:build/jrobin.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar"/>
             <arg value="-sourcepath"/>
-            <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
+            <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/desktopgui/src:apps/i2pcontrol/java:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/imagegen/identicon/core/src/main/java:apps/imagegen/imagegen/webapp/src/main/java:apps/imagegen/zxing/core/src/main/java:apps/jetty/java/src:apps/jrobin/java/src:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
             <!-- start of the files to be analyzed -->
             <arg value="build/BOB.jar"/>
             <arg value="build/addressbook.jar"/>
@@ -2155,6 +2155,7 @@
             <arg value="build/i2ptunnel.war"/>
             <arg value="build/imagegen.war"/>
             <arg value="build/jetty-i2p.jar"/>
+            <arg value="build/jrobin.jar"/>
             <arg value="build/jsonrpc.war"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
