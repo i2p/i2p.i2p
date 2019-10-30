@@ -812,8 +812,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (_log.shouldInfo())
             _log.info("Got Blinding info");
         BlindData bd = message.getBlindData();
+        if (bd == null) {
+            // hash or hostname lookup? don't support for now
+            if (_log.shouldWarn())
+                _log.warn("Unsupported BlindingInfo type: " + message);
+            return;
+        }
         SigningPublicKey spk = bd.getUnblindedPubKey();
-        if (spk == null || bd == null) {
+        if (spk == null) {
             // hash or hostname lookup? don't support for now
             if (_log.shouldWarn())
                 _log.warn("Unsupported BlindingInfo type: " + message);

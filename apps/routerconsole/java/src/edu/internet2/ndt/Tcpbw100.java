@@ -339,12 +339,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			System.exit(0);
 		}
 		final Tcpbw100 applet = new Tcpbw100(useSSL);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				applet.destroy();
-				System.exit(0);
-			}
-		});
 		applet._bIsApplication = true;
 		if (args.length > 1) {
 				applet._sClient = args[1];
@@ -933,14 +927,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		// Add "Options" button
 		_buttonOptions = new JButton(_resBundDisplayMsgs.getString("options")
 				+ "...");
-		_buttonOptions.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				_buttonOptions.setEnabled(false);
-				// call the Options-window create code
-				createOptionsWindow();
-				_buttonOptions.setEnabled(true);
-			}
-		});
 		// If disableOptions is not set, then add button
 		if (getParameter("disableOptions") == null) {
 			buttonsPanel.add(_buttonOptions);
@@ -1126,14 +1112,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_frameOptions.getContentPane().add("South", buttonsPanel);
 
 			JButton okButton = new JButton(_resBundDisplayMsgs.getString("ok"));
-			okButton.addActionListener(new ActionListener() {
-
-				public void actionPerformed(ActionEvent e) {
-					_frameOptions.toBack();
-					_frameOptions.dispose();
-				}
-
-			});
 
 			// place buttons
 			buttonsPanel.add("West", okButton);
@@ -3354,11 +3332,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					// buffering (older "todo" left as is)
 					JLabel info = new JLabel(
 							_resBundDisplayMsgs.getString("information"));
-					info.addMouseListener(new MouseAdapter() {
-						public void mouseClicked(MouseEvent e) {
-							showBufferedBytesInfo();
-						}
-					});
 					info.setForeground(Color.BLUE);
 					info.setCursor(new Cursor(Cursor.HAND_CURSOR));
 					info.setAlignmentY((float) 0.8);
@@ -3375,12 +3348,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					// buffering (older "todo" left as is)
 					JLabel info = new JLabel(
 							_resBundDisplayMsgs.getString("information"));
-					info.addMouseListener(new MouseAdapter() {
-						public void mouseClicked(MouseEvent e) {
-							showBufferedBytesInfo();
-						}
-
-					});
 					info.setForeground(Color.BLUE);
 					info.setCursor(new Cursor(Cursor.HAND_CURSOR));
 					info.setAlignmentY((float) 0.8);

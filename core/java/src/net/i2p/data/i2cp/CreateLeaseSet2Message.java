@@ -160,8 +160,10 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
 
     @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
+        if (_leaseSet == null)
+            throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         int type = _leaseSet.getType();
-        if (_sessionId == null || _leaseSet == null ||
+        if (_sessionId == null ||
             (type != DatabaseEntry.KEY_TYPE_META_LS2 && _privateKey == null))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         int size = 4 // sessionId

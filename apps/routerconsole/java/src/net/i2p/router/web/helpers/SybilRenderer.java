@@ -692,11 +692,9 @@ public class SybilRenderer {
             int i0 = i >> 8;
             int i1 = i & 0xff;
             String sip = i0 + "." + i1 + ".0.0/16";
-            if (buf != null) {
-                buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
-                   .append(sip).append("&amp;sybil\">").append(sip)
-                   .append("</a></b></p>");
-            }
+            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
+               .append(sip).append("&amp;sybil\">").append(sip)
+               .append("</a></b></p>");
             for (RouterInfo info : ris) {
                 found = true;
                 renderRouterInfo(buf, info, null, false, false);

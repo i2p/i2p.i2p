@@ -164,7 +164,8 @@ public class OsfwWorker implements Runnable {
 
 		// finalize and close connections
 		try {
-			socketObj.close();
+			if (socketObj != null)
+				socketObj.close();
 			_srvSocket.close();
 		} catch (IOException e) {
 			System.err.println("OsfwWorker: Exception trying to close sockets"

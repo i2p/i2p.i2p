@@ -232,7 +232,7 @@ public class TunnelControllerGroup implements ClientApp {
                 _log.info("Configuring tunnels from " + configFile);
             loadControllers(configFile);
         } catch (IllegalArgumentException iae) {
-            if (DEFAULT_CONFIG_FILE.equals(configFile) && !_context.isRouterContext()) {
+            if (DEFAULT_CONFIG_FILE.equals(configFile.getName()) && !_context.isRouterContext()) {
                 // for i2ptunnel command line
                 synchronized (this) {
                     _controllersLoaded = true;
