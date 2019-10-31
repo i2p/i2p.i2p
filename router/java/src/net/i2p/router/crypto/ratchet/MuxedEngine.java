@@ -6,6 +6,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
 import net.i2p.router.RouterContext;
+import net.i2p.router.message.CloveSet;
 import net.i2p.util.Log;
 
 /**
@@ -28,11 +29,11 @@ public final class MuxedEngine {
      *
      * @return decrypted data or null on failure
      */
-    public byte[] decrypt(byte data[], PrivateKey elgKey, PrivateKey ecKey, MuxedSKM keyManager) throws DataFormatException {
+    public CloveSet decrypt(byte data[], PrivateKey elgKey, PrivateKey ecKey, MuxedSKM keyManager) throws DataFormatException {
         if (elgKey.getType() != EncType.ELGAMAL_2048 ||
             ecKey.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
-        byte[] rv = null;
+        CloveSet rv = null;
         boolean tryElg = false;
         // See proposal 144
         if (data.length >= 128) {
@@ -41,10 +42,20 @@ public final class MuxedEngine {
                 tryElg = true;
         }
         // Always try ElG first, for now
-        if (tryElg)
-            rv = _context.elGamalAESEngine().decrypt(data, elgKey, keyManager.getElgSKM());
-        if (rv == null)
-            rv = _context.eciesEngine().decrypt(data, ecKey, keyManager.getECSKM());
+        if (tryElg) {
+            byte[] dec = _context.elGamalAESEngine().decrypt(data, elgKey, keyManager.getElgSKM());
+            if (dec != null) {
+                try {
+                    rv = _context.garlicMessageParser().readCloveSet(dec, 0);
+                } catch (DataFormatException dfe) {
+                    if (_log.shouldWarn())
+                        _log.warn("ElG decrypt failed, trying ECIES", dfe);
+                }
+            }
+        }
+        if (rv == null) {
+            rv  = _context.eciesEngine().decrypt(data, ecKey, keyManager.getECSKM());
+        }
         return rv;
     }
 }

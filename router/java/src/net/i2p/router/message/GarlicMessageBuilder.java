@@ -16,6 +16,7 @@ import java.util.Set;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -261,7 +262,7 @@ public class GarlicMessageBuilder {
             throw new IllegalArgumentException();
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         GarlicMessage msg = new GarlicMessage(ctx);
-        byte cloveSet[] = buildCloveSet(ctx, config);
+        CloveSet cloveSet = buildECIESCloveSet(ctx, config);
         LeaseSetKeys lsk = ctx.keyManager().getKeys(from);
         if (lsk == null) {
             if (log.shouldWarn())
@@ -285,7 +286,7 @@ public class GarlicMessageBuilder {
                 log.warn("No SKM for " + from.toBase32());
             return null;
         }
-        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, config.getExpiration());
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm);
         if (encData == null) {
             if (log.shouldWarn())
                 log.warn("Encrypt fail for " + from.toBase32());
@@ -300,8 +301,8 @@ public class GarlicMessageBuilder {
             return null;
         }
         if (log.shouldDebug())
-            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId() + " is " + cloveSet.length
-                     + " bytes and encrypted message data is " + encData.length + " bytes");
+            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId()
+                     + " encrypted message data is " + encData.length + " bytes");
         return msg;
     }
     
@@ -366,7 +367,7 @@ public class GarlicMessageBuilder {
         return baos.toByteArray();
     }
     
-    private static byte[] buildClove(RouterContext ctx, PayloadGarlicConfig config) throws DataFormatException, IOException {
+    private static byte[] buildClove(RouterContext ctx, PayloadGarlicConfig config) {
         GarlicClove clove = new GarlicClove(ctx);
         clove.setData(config.getPayload());
         return buildCommonClove(clove, config);
@@ -397,17 +398,52 @@ public class GarlicMessageBuilder {
         return buildCommonClove(clove, config);
     }
     
-    private static byte[] buildCommonClove(GarlicClove clove, GarlicConfig config) throws DataFormatException, IOException {
+    private static byte[] buildCommonClove(GarlicClove clove, GarlicConfig config) {
         clove.setCertificate(config.getCertificate());
         clove.setCloveId(config.getId());
         clove.setExpiration(new Date(config.getExpiration()));
         clove.setInstructions(config.getDeliveryInstructions());
         return clove.toByteArray();
-        /*
-        int size = clove.estimateSize();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
-        clove.writeBytes(baos);
-        return baos.toByteArray();
-         */
+    }
+    
+    /**
+     * Build the unencrypted GarlicMessage specified by the config.
+     * It contains the number of cloves, followed by each clove,
+     * followed by a certificate, ID, and expiration date.
+     *
+     * @throws IllegalArgumentException on error
+     * @since 0.9.44
+     */
+    private static CloveSet buildECIESCloveSet(RouterContext ctx, GarlicConfig config) {
+        GarlicClove[] arr;
+        if (config instanceof PayloadGarlicConfig) {
+            GarlicClove clove = buildECIESClove(ctx, (PayloadGarlicConfig)config);
+            arr = new GarlicClove[1];
+            arr[0] = clove;
+        } else {
+            int cnt = config.getCloveCount();
+            arr = new GarlicClove[cnt];
+            for (int i = 0; i < cnt; i++) {
+                GarlicConfig c = config.getClove(i);
+                if (c instanceof PayloadGarlicConfig) {
+                    arr[i] = buildECIESClove(ctx, (PayloadGarlicConfig)c);
+                } else {
+                    throw new IllegalArgumentException("Subclove IS NOT a payload garlic clove");
+                }
+            }
+        }
+        // GarlicConfig cert, ID, and expiration all ignored here
+        CloveSet rv = new CloveSet(arr, Certificate.NULL_CERT, config.getId(), config.getExpiration());
+        return rv;
+    }
+    
+    private static GarlicClove buildECIESClove(RouterContext ctx, PayloadGarlicConfig config) {
+        GarlicClove clove = new GarlicClove(ctx);
+        clove.setData(config.getPayload());
+        clove.setCertificate(config.getCertificate());
+        clove.setCloveId(config.getId());
+        clove.setExpiration(new Date(config.getExpiration()));
+        clove.setInstructions(config.getDeliveryInstructions());
+        return clove;
     }
 }

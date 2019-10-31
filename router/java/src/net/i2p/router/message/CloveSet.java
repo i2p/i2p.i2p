@@ -14,8 +14,9 @@ import net.i2p.data.i2np.GarlicClove;
 /**
  * Wrap up the data contained in a GarlicMessage after being decrypted
  *
+ * @since public since 0.9.44, was package private
  */
-class CloveSet {
+public class CloveSet {
     private final GarlicClove[] _cloves;
     private final Certificate _cert;
     private final long _msgId;

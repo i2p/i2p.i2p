@@ -8,6 +8,7 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
@@ -26,13 +27,13 @@ class RatchetPayload {
 
     private static final int BLOCK_DATETIME = 0;
     private static final int BLOCK_SESSIONID = 1;
-    private static final int BLOCK_GARLIC = 3;
     private static final int BLOCK_TERMINATION = 4;
     private static final int BLOCK_OPTIONS = 5;
     private static final int BLOCK_MSGNUM = 6;
     private static final int BLOCK_NEXTKEY = 7;
     private static final int BLOCK_ACKKEY = 8;
     private static final int BLOCK_REPLYDI = 9;
+    private static final int BLOCK_GARLIC = 11;
     private static final int BLOCK_PADDING = 254;
 
     /**
@@ -43,7 +44,7 @@ class RatchetPayload {
     public interface PayloadCallback {
         public void gotDateTime(long time) throws DataFormatException;
 
-        public void gotGarlic(byte[] data, int off, int len) throws DataFormatException;
+        public void gotGarlic(GarlicClove clove);
 
         /**
          *  @param isHandshake true only for message 3 part 2
@@ -111,7 +112,9 @@ class RatchetPayload {
                     break;
 
                 case BLOCK_GARLIC:
-                    cb.gotGarlic(payload, i, len);
+                    GarlicClove clove = new GarlicClove(ctx);
+                    clove.readBytesRatchet(payload, i, len);
+                    cb.gotGarlic(clove);
                     break;
 
                 case BLOCK_TERMINATION:
@@ -200,20 +203,19 @@ class RatchetPayload {
     }
 
     public static class GarlicBlock extends Block {
-        private byte[] d;
+        private final GarlicClove c;
 
-        public GarlicBlock(byte[] data) {
+        public GarlicBlock(GarlicClove clove) {
             super(BLOCK_GARLIC);
-            d = data;
+            c = clove;
         }
 
         public int getDataLength() {
-            return d.length;
+            return c.getSizeRatchet();
         }
 
         public int writeData(byte[] tgt, int off) {
-            System.arraycopy(d, 0, tgt, off, d.length);
-            return off + d.length;
+            return c.writeBytesRatchet(tgt, off);
         }
     }
 

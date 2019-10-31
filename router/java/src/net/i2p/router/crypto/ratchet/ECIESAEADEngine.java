@@ -19,6 +19,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Base64;
+import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -26,7 +27,9 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.data.i2np.GarlicClove;
 import static net.i2p.router.crypto.ratchet.RatchetPayload.*;
+import net.i2p.router.message.CloveSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 
@@ -122,7 +125,7 @@ public final class ECIESAEADEngine {
      *
      * @return decrypted data or null on failure
      */
-    public byte[] decrypt(byte data[], PrivateKey targetPrivateKey, RatchetSKM keyManager) throws DataFormatException {
+    public CloveSet decrypt(byte data[], PrivateKey targetPrivateKey, RatchetSKM keyManager) throws DataFormatException {
         if (targetPrivateKey.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         if (data == null) {
@@ -139,7 +142,7 @@ public final class ECIESAEADEngine {
         System.arraycopy(data, 0, tag, 0, TAGLEN);
         RatchetSessionTag st = new RatchetSessionTag(tag);
         SessionKeyAndNonce key = keyManager.consumeTag(st);
-        byte decrypted[];
+        CloveSet decrypted;
         final boolean shouldDebug = _log.shouldDebug();
         if (key != null) {
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Key is known for tag " + st);
@@ -150,6 +153,7 @@ public final class ECIESAEADEngine {
             if (state != null) {
                 decrypted = decryptExistingSession(tag, data, key, targetPrivateKey);
             } else if (data.length >= MIN_NSR_SIZE) {
+              /**  TODO find the state
                 try {
                     state = state.clone();
                 } catch (CloneNotSupportedException e) {
@@ -158,6 +162,8 @@ public final class ECIESAEADEngine {
                     return null;
                 }
                 decrypted = decryptNewSessionReply(tag, data, state);
+               **/
+                decrypted = null;
             } else {
                 decrypted = null;
                 if (_log.shouldWarn())
@@ -210,7 +216,7 @@ public final class ECIESAEADEngine {
      * @param data 96 bytes minimum
      * @return null if decryption fails
      */
-    private byte[] decryptNewSession(byte data[], PrivateKey targetPrivateKey)
+    private CloveSet decryptNewSession(byte data[], PrivateKey targetPrivateKey)
                                      throws DataFormatException {
         HandshakeState state;
         try {
@@ -271,11 +277,16 @@ public final class ECIESAEADEngine {
         } catch (Exception e) {
             throw new DataFormatException("Msg 1 payload error", e);
         }
-        if (pc.cloveSet == null) {
+        if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in NS payload");
         }
-        return pc.cloveSet;
+        int num = pc.cloveSet.size();
+        // return non-null even if zero cloves
+        GarlicClove[] arr = new GarlicClove[num];
+        // msg id and expiration not checked in GarlicMessageReceiver
+        CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
+        return rv;
     }
 
     /**
@@ -298,7 +309,7 @@ public final class ECIESAEADEngine {
      * @param state must have already been cloned
      * @return null if decryption fails
      */
-    private byte[] decryptNewSessionReply(byte[] tag, byte[] data, HandshakeState state)
+    private CloveSet decryptNewSessionReply(byte[] tag, byte[] data, HandshakeState state)
                                           throws DataFormatException {
         // part 1 - handshake
         byte[] yy = new byte[KEYLEN];
@@ -361,11 +372,16 @@ public final class ECIESAEADEngine {
         }
         RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, new SessionKey(ck), new SessionKey(k_ab), 0, 0);
         RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, null, new SessionKey(ck), new SessionKey(k_ba), 0, 0, 5, 5);
-        if (pc.cloveSet == null) {
+        if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in NSR payload");
         }
-        return pc.cloveSet;
+        int num = pc.cloveSet.size();
+        // return non-null even if zero cloves
+        GarlicClove[] arr = new GarlicClove[num];
+        // msg id and expiration not checked in GarlicMessageReceiver
+        CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
+        return rv;
     }
 
     /**
@@ -385,7 +401,7 @@ public final class ECIESAEADEngine {
      * @return decrypted data or null on failure
      *
      */
-    private byte[] decryptExistingSession(byte[] tag, byte[] data, SessionKeyAndNonce key, PrivateKey targetPrivateKey)
+    private CloveSet decryptExistingSession(byte[] tag, byte[] data, SessionKeyAndNonce key, PrivateKey targetPrivateKey)
                                           throws DataFormatException {
 // TODO decrypt in place?
         byte decrypted[] = decryptAEADBlock(tag, data, TAGLEN, data.length - TAGLEN, key, key.getNonce());
@@ -409,11 +425,16 @@ public final class ECIESAEADEngine {
         } catch (Exception e) {
             throw new DataFormatException("ES payload error", e);
         }
-        if (pc.cloveSet == null) {
+        if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in ES payload");
         }
-        return pc.cloveSet;
+        int num = pc.cloveSet.size();
+        // return non-null even if zero cloves
+        GarlicClove[] arr = new GarlicClove[num];
+        // msg id and expiration not checked in GarlicMessageReceiver
+        CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
+        return rv;
     }
 
     /**
@@ -476,12 +497,11 @@ public final class ECIESAEADEngine {
      *
      * @param target public key to which the data should be encrypted. 
      * @param priv local private key to encrypt with, from the leaseset
-     * @param expiration only used for new session messages
      * @return encrypted data or null on failure
      *
      */
-    public byte[] encrypt(byte data[], PublicKey target, PrivateKey priv,
-                          RatchetSKM keyManager, long expiration) {
+    public byte[] encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
+                          RatchetSKM keyManager) {
         if (target.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         if (Arrays.equals(target.getData(), NULLPK)) {
@@ -494,7 +514,7 @@ public final class ECIESAEADEngine {
         if (re == null) {
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NS to " + target);
-            return encryptNewSession(data, target, priv, keyManager, expiration);
+            return encryptNewSession(cloves, target, priv, keyManager);
         }
 ////
         byte[] tagsetkey = new byte[32];
@@ -513,9 +533,9 @@ public final class ECIESAEADEngine {
                 return null;
             }
 // register state with skm
-            return encryptNewSessionReply(data, state, re.tag);
+            return encryptNewSessionReply(cloves, state, re.tag);
         }
-        byte rv[] = encryptExistingSession(data, target, re.key, re.tag);
+        byte rv[] = encryptExistingSession(cloves, target, re.key, re.tag);
         return rv;
     }
 
@@ -536,8 +556,8 @@ public final class ECIESAEADEngine {
      *
      * @return encrypted data or null on failure
      */
-    private byte[] encryptNewSession(byte data[], PublicKey target, PrivateKey priv,
-                                     RatchetSKM keyManager, long expiration) {
+    private byte[] encryptNewSession(CloveSet cloves, PublicKey target, PrivateKey priv,
+                                     RatchetSKM keyManager) {
         HandshakeState state;
         try {
             state = new HandshakeState(HandshakeState.PATTERN_ID_IK, HandshakeState.INITIATOR, _edhThread);
@@ -549,22 +569,11 @@ public final class ECIESAEADEngine {
         state.getLocalKeyPair().setPrivateKey(priv.getData(), 0);
         state.start();
 
-        int padlen = 1 + _context.random().nextInt(MAXPAD);
-        byte[] payload = new byte[BHLEN + padlen + BHLEN + 4 + BHLEN + data.length];
-        List<Block> blocks = new ArrayList<Block>(4);
-        Block block = new DateTimeBlock(expiration);
-        blocks.add(block);
-        block = new GarlicBlock(data);
-        blocks.add(block);
-        block = new PaddingBlock(_context, padlen);
-        blocks.add(block);
-        int payloadlen = createPayload(payload, 0, blocks);
-        if (payloadlen != payload.length)
-            throw new IllegalStateException("payload size mismatch");
+        byte[] payload = createPayload(cloves, cloves.getExpiration());
 
-        byte[] enc = new byte[KEYLEN + KEYLEN + MACLEN + payloadlen + MACLEN];
+        byte[] enc = new byte[KEYLEN + KEYLEN + MACLEN + payload.length + MACLEN];
         try {
-            state.writeMessage(enc, 0, payload, 0, payloadlen);
+            state.writeMessage(enc, 0, payload, 0, payload.length);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Encrypt fail NS", gse);
@@ -607,23 +616,14 @@ public final class ECIESAEADEngine {
      * @param state must have already been cloned
      * @return encrypted data or null on failure
      */
-    private byte[] encryptNewSessionReply(byte data[], HandshakeState state, RatchetSessionTag currentTag) {
+    private byte[] encryptNewSessionReply(CloveSet cloves, HandshakeState state, RatchetSessionTag currentTag) {
         byte[] tag = currentTag.getData();
         state.mixHash(tag, 0, TAGLEN);
 
-        int padlen = 1 + _context.random().nextInt(MAXPAD);
-        byte[] payload = new byte[BHLEN + padlen + BHLEN + data.length];
-        List<Block> blocks = new ArrayList<Block>(2);
-        Block block = new GarlicBlock(data);
-        blocks.add(block);
-        block = new PaddingBlock(_context, padlen);
-        blocks.add(block);
-        int payloadlen = createPayload(payload, 0, blocks);
-        if (payloadlen != payload.length)
-            throw new IllegalStateException("payload size mismatch");
+        byte[] payload = createPayload(cloves, 0);
 
         // part 1 - tag and empty payload
-        byte[] enc = new byte[TAGLEN + KEYLEN + MACLEN + payloadlen + MACLEN];
+        byte[] enc = new byte[TAGLEN + KEYLEN + MACLEN + payload.length + MACLEN];
         System.arraycopy(tag, 0, enc, 0, TAGLEN);
         try {
             state.writeMessage(enc, TAGLEN, ZEROLEN, 0, 0);
@@ -685,19 +685,10 @@ public final class ECIESAEADEngine {
      * @param target unused, this is AEAD encrypt only using the session key and tag
      * @return encrypted data or null on failure
      */
-    private byte[] encryptExistingSession(byte data[], PublicKey target, SessionKeyAndNonce key,
+    private byte[] encryptExistingSession(CloveSet cloves, PublicKey target, SessionKeyAndNonce key,
                                           RatchetSessionTag currentTag) {
         byte rawTag[] = currentTag.getData();
-        int padlen = 1 + _context.random().nextInt(MAXPAD);
-        byte[] payload = new byte[BHLEN + padlen + BHLEN + data.length];
-        List<Block> blocks = new ArrayList<Block>(2);
-        Block block = new GarlicBlock(data);
-        blocks.add(block);
-        block = new PaddingBlock(_context, padlen);
-        blocks.add(block);
-        int payloadlen = createPayload(payload, 0, blocks);
-        if (payloadlen != payload.length)
-            throw new IllegalStateException("payload size mismatch");
+        byte[] payload = createPayload(cloves, 0);
         byte encr[] = encryptAEADBlock(rawTag, payload, key, key.getNonce());
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         return encr;
@@ -741,11 +732,8 @@ public final class ECIESAEADEngine {
     // payload stuff
     /////////////////////////////////////////////////////////
 
-    private void processPayload(byte[] payload, int length, boolean isHandshake) throws Exception {
-    }
-
     private class PLCallback implements RatchetPayload.PayloadCallback {
-        public byte[] cloveSet;
+        public final List<GarlicClove> cloveSet = new ArrayList<GarlicClove>(3);
         public long datetime;
 
         public void gotDateTime(long time) {
@@ -761,13 +749,10 @@ public final class ECIESAEADEngine {
                 _log.debug("Got OPTIONS block length " + options.length);
         }
 
-        public void gotGarlic(byte[] data, int off, int len) {
+        public void gotGarlic(GarlicClove clove) {
             if (_log.shouldDebug())
-                _log.debug("Got GARLIC block length " + len);
-            if (cloveSet != null)
-                throw new IllegalArgumentException("Multiple GARLIC blocks");
-            cloveSet = new byte[len];
-            System.arraycopy(data, off, cloveSet, 0, len);
+                _log.debug("Got GARLIC block");
+            cloveSet.add(clove);
         }
 
         public void gotTermination(int reason, long count) {
@@ -784,6 +769,38 @@ public final class ECIESAEADEngine {
             if (_log.shouldDebug())
                 _log.debug("Got PADDING block, len: " + paddingLength + " in frame len: " + frameLength);
         }
+    }
+
+    /**
+     *  @param expiration if greater than zero, add a DateTime block
+     */
+    private byte[] createPayload(CloveSet cloves, long expiration) {
+        int count = cloves.getCloveCount();
+        int numblocks = count + 1;
+        if (expiration > 0)
+            numblocks++;
+        int len = 0;
+        List<Block> blocks = new ArrayList<Block>(numblocks);
+        if (expiration > 0) {
+            Block block = new DateTimeBlock(expiration);
+            blocks.add(block);
+            len += block.getTotalLength();
+        }
+        for (int i = 0; i < count; i++) {
+            GarlicClove clove = cloves.getClove(i);
+            Block block = new GarlicBlock(clove);
+            blocks.add(block);
+            len += block.getTotalLength();
+        }
+        int padlen = 1 + _context.random().nextInt(MAXPAD);
+        Block block = new PaddingBlock(_context, padlen);
+        blocks.add(block);
+        len += block.getTotalLength();
+        byte[] payload = new byte[len];
+        int payloadlen = createPayload(payload, 0, blocks);
+        if (payloadlen != len)
+            throw new IllegalStateException("payload size mismatch");
+        return payload;
     }
 
     /**

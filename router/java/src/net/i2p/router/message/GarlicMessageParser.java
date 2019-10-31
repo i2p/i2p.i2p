@@ -70,13 +70,15 @@ public class GarlicMessageParser {
                         _log.warn("No SKM to decrypt ECIES");
                     return null;
                 }
-                decrData = _context.eciesEngine().decrypt(encData, encryptionKey, rskm);
-                if (decrData != null) {
+                CloveSet rv = _context.eciesEngine().decrypt(encData, encryptionKey, rskm);
+                if (rv != null) {
                     if (_log.shouldWarn())
-                        _log.warn("ECIES decrypt success, length: " + decrData.length);
+                        _log.warn("ECIES decrypt success, cloves: " + rv.getCloveCount());
+                    return rv;
                 } else {
                     if (_log.shouldWarn())
                         _log.warn("ECIES decrypt fail");
+                    return null;
                 }
             } else {
                 if (_log.shouldWarn())
@@ -108,10 +110,13 @@ public class GarlicMessageParser {
     }
     
     /**
+     *  ElGamal only
+     *
      *  @param offset where in data to start
      *  @return non-null, throws on all errors
+     *  @since public since 0.9.44
      */
-    private CloveSet readCloveSet(byte data[], int offset) throws DataFormatException {
+    public CloveSet readCloveSet(byte data[], int offset) throws DataFormatException {
         int numCloves = data[offset] & 0xff;
         offset++;
         //if (_log.shouldLog(Log.DEBUG))
