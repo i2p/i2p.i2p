@@ -349,6 +349,7 @@ public final class ECIESAEADEngine {
         // part 2 - payload
         byte[] encpayloadkey = new byte[32];
         _hkdf.calculate(k_ba, ZEROLEN, INFO_6, encpayloadkey);
+        rcvr.initializeKey(encpayloadkey, 0);
         byte[] payload = new byte[data.length - (TAGLEN + KEYLEN + MACLEN + MACLEN)];
         try {
             rcvr.decryptWithAd(hash, data, TAGLEN + KEYLEN + MACLEN, payload, 0, payload.length + MACLEN);
@@ -659,8 +660,9 @@ public final class ECIESAEADEngine {
         // part 2 - payload
         byte[] encpayloadkey = new byte[32];
         _hkdf.calculate(k_ba, ZEROLEN, INFO_6, encpayloadkey);
+        sender.initializeKey(encpayloadkey, 0);
         try {
-            sender.encryptWithAd(tag, payload, 0, enc, TAGLEN + KEYLEN + MACLEN, payload.length);
+            sender.encryptWithAd(hash, payload, 0, enc, TAGLEN + KEYLEN + MACLEN, payload.length);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Encrypt fail NSR part 2", gse);

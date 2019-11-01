@@ -427,12 +427,17 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             return null;
         }
         HandshakeState state = tagSet.getHandshakeState();
+        synchronized(tagSet) {
+            key = tagSet.consume(tag);
+        }
+        if (key == null) {
+            if (_log.shouldDebug())
+                _log.debug("tag " + tag + " not found in tagset!!! " + tagSet);
+        }
         if (state != null) {
-            key = new SessionKeyAndNonce(state);
             if (_log.shouldDebug())
                 _log.debug("IB NSR Tag consumed: " + tag + " from: " + tagSet);
         } else {
-            key = tagSet.consume(tag);
             if (_log.shouldDebug())
                 _log.debug("IB ES Tag consumed: " + tag + " from: " + tagSet);
         }

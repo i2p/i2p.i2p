@@ -223,6 +223,13 @@ class RatchetTagSet implements TagSetHandle {
         int tagnum = _sessionTags.keyAt(idx);
         _sessionTags.removeAt(idx);
 
+        // NSR
+        if (_state != null) {
+            addTags(tagnum);
+            return new SessionKeyAndNonce(_state);
+        }
+
+        // ES
         // now get the key
         int kidx = _sessionKeys.indexOfKey(tagnum);
         if (kidx >= 0) {
