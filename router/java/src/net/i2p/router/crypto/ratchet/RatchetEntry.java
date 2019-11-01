@@ -15,4 +15,9 @@ class RatchetEntry {
         this.tag = tag;
         this.key = key;
     }
+
+    @Override
+    public String toString() {
+        return "RatchetEntry[" + tag + ' ' + key + ']';
+    }
 }

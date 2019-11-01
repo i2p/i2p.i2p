@@ -60,7 +60,17 @@ class RatchetTagSet implements TagSetHandle {
     private static final int TAGLEN = 8;
 
     /**
-     *  Outbound Tagset
+     *  Outbound NSR Tagset
+     *
+     *  @param date For outbound: creation time
+     */
+    public RatchetTagSet(HKDF hkdf, HandshakeState state, SessionKey rootKey, SessionKey data,
+                         long date, int id) {
+        this(hkdf, null, state, rootKey, data, date, id, false, 0, 0);
+    }
+
+    /**
+     *  Outbound ES Tagset
      *
      *  @param date For outbound: creation time
      */
@@ -125,8 +135,6 @@ class RatchetTagSet implements TagSetHandle {
             _sessionTags = null;
             _sessionKeys = null;
         }
-        System.out.println("DH INIT, rootKey = " + rootKey.toBase64() +
-                           " data = " + data.toBase64());
     }
 
     public void clear() {
@@ -296,6 +304,10 @@ class RatchetTagSet implements TagSetHandle {
      *  @return a key and nonce, non-null
      */
     public SessionKeyAndNonce consumeNextKey() {
+        // NSR
+        if (_state != null)
+            return new SessionKeyAndNonce(_state);
+        // ES
         byte[] key = new byte[32];
         hkdf.calculate(_symmkey_ck, _symmkey_constant, INFO_5, _symmkey_ck, key, 0);
         _lastKey++;
@@ -325,15 +337,19 @@ class RatchetTagSet implements TagSetHandle {
         buf.append(" Size: ").append(sz);
         buf.append('/').append(getOriginalSize());
         buf.append(" Acked? ").append(_acked);
-        for (int i = 0; i < sz; i++) {
-            int n = _sessionTags.keyAt(i);
-            RatchetSessionTag tag = _sessionTags.valueAt(i);
-            byte[] key = _sessionKeys.get(n);
-            buf.append("\n  " + n + '\t' + Base64.encode(tag.getData()));
-            if (key != null)
-                buf.append('\t' + Base64.encode(key));
-            else
-                buf.append("\tdeferred");
+        if (_sessionTags != null) {
+            for (int i = 0; i < sz; i++) {
+                int n = _sessionTags.keyAt(i);
+                RatchetSessionTag tag = _sessionTags.valueAt(i);
+                buf.append("\n  " + n + '\t' + Base64.encode(tag.getData()));
+                if (_sessionKeys != null) {
+                    byte[] key = _sessionKeys.get(n);
+                    if (key != null)
+                        buf.append('\t' + Base64.encode(key));
+                    else
+                        buf.append("\tdeferred");
+                }
+            }
         }
         return buf.toString();
     }

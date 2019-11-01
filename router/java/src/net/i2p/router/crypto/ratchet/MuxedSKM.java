@@ -32,44 +32,48 @@ public class MuxedSKM extends SessionKeyManager {
 
     public RatchetSKM getECSKM() { return _ec; }
 
+    /**
+     *  ElG only
+     */
     @Override
     public SessionKey getCurrentKey(PublicKey target) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             return _elg.getCurrentKey(target);
-        if (type == EncType.ECIES_X25519)
-            return _ec.getCurrentKey(target);
         return null;
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public SessionKey getCurrentOrNewKey(PublicKey target) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             return _elg.getCurrentOrNewKey(target);
-        if (type == EncType.ECIES_X25519)
-            return _ec.getCurrentOrNewKey(target);
         return null;
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public void createSession(PublicKey target, SessionKey key) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             _elg.createSession(target, key);
-        else if (type == EncType.ECIES_X25519)
-            _ec.createSession(target, key);
         else
             throw new IllegalArgumentException();
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public SessionKey createSession(PublicKey target) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             return _elg.createSession(target);
-        if (type == EncType.ECIES_X25519)
-            return _ec.createSession(target);
         return null;
     }
 

@@ -41,7 +41,7 @@ import net.i2p.util.SimpleTimer;
 public class RatchetSKM extends SessionKeyManager implements SessionTagListener {
     private final Log _log;
     /** Map allowing us to go from the targeted PublicKey to the OutboundSession used */
-    private final Map<PublicKey, OutboundSession> _outboundSessions;
+    private final ConcurrentHashMap<PublicKey, OutboundSession> _outboundSessions;
     /** Map allowing us to go from a SessionTag to the containing RatchetTagSet */
     private final ConcurrentHashMap<RatchetSessionTag, RatchetTagSet> _inboundTagSets;
     protected final I2PAppContext _context;
@@ -74,6 +74,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private static final int MIN_RCV_WINDOW = 20;
     private static final int MAX_RCV_WINDOW = 50;
 
+    private static final byte[] ZEROLEN = new byte[0];
+    private static final String INFO_0 = "SessionReplyTags";
 
 
     /**
@@ -86,7 +88,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         super(context);
         _log = context.logManager().getLog(RatchetSKM.class);
         _context = context;
-        _outboundSessions = new HashMap<PublicKey, OutboundSession>(64);
+        _outboundSessions = new ConcurrentHashMap<PublicKey, OutboundSession>(64);
         _inboundTagSets = new ConcurrentHashMap<RatchetSessionTag, RatchetTagSet>(128);
         _hkdf = new HKDF(context);
         // start the precalc of Elg2 keys if it wasn't already started
@@ -99,9 +101,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     public void shutdown() {
          _alive = false;
         _inboundTagSets.clear();
-        synchronized (_outboundSessions) {
-            _outboundSessions.clear();
-        }
+        _outboundSessions.clear();
     }
 
     private class CleanupEvent implements SimpleTimer.TimedEvent {
@@ -123,84 +123,63 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
     /** OutboundSession - used only by HTML */
     private Set<OutboundSession> getOutboundSessions() {
-        synchronized (_outboundSessions) {
-            return new HashSet<OutboundSession>(_outboundSessions.values());
-        }
+        return new HashSet<OutboundSession>(_outboundSessions.values());
     }
 
     /**
-     * Retrieve the session key currently associated with encryption to the target,
-     * or null if a new session key should be generated.
-     *
-     * Warning - don't generate a new session if this returns null, it's racy, use getCurrentOrNewKey()
+     * @throws UnsupportedOperationException always
      */
     @Override
     public SessionKey getCurrentKey(PublicKey target) {
-        OutboundSession sess = getSession(target);
-        if (sess == null) return null;
-        long now = _context.clock().now();
-        if (sess.getLastUsedDate() < now - SESSION_LIFETIME_MAX_MS) {
-            if (_log.shouldInfo())
-                _log.info("Expiring old session key established on " 
-                          + new Date(sess.getEstablishedDate())
-                          + " but not used for "
-                          + (now-sess.getLastUsedDate())
-                          + "ms with target " + toString(target));
-            return null;
-        }
-        return sess.getCurrentKey();
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Retrieve the session key currently associated with encryption to the target.
-     * Generates a new session and session key if not previously exising.
-     *
-     * @return non-null
+     * @throws UnsupportedOperationException always
      */
     @Override
     public SessionKey getCurrentOrNewKey(PublicKey target) {
-        synchronized (_outboundSessions) {
-            OutboundSession sess = _outboundSessions.get(target);
-            if (sess != null) {
-                long now = _context.clock().now();
-                if (sess.getLastUsedDate() < now - SESSION_LIFETIME_MAX_MS)
-                    sess = null;
-            }
-            if (sess == null) {
-                SessionKey key = _context.keyGenerator().generateSessionKey();
-                createAndReturnSession(target, key);
-                return key;
-            }
-            return sess.getCurrentKey();
-        }
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Associate a new session key with the specified target.  Metrics to determine
-     * when to expire that key begin with this call.
-     *
-     * Racy if called after getCurrentKey() to check for a current session;
-     * use getCurrentOrNewKey() in that case.
+     * @throws UnsupportedOperationException always
      */
     @Override
     public void createSession(PublicKey target, SessionKey key) {
-        createAndReturnSession(target, key);
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Same as above but for internal use, returns OutboundSession so we don't have
-     * to do a subsequent getSession()
+     * Inbound or outbound. Checks state.getRole() to determine.
+     * For outbound (NS sent), adds to list of pending inbound sessions and returns true.
+     * For inbound (NS rcvd), if no other pending outbound sessions, creates one
+     * and returns true, or false if one already exists.
      *
      */
-    private OutboundSession createAndReturnSession(PublicKey target, SessionKey key) {
+    boolean createSession(PublicKey target, HandshakeState state) {
         EncType type = target.getType();
         if (type != EncType.ECIES_X25519)
             throw new IllegalArgumentException("Bad public key type " + type);
-        if (_log.shouldInfo())
-            _log.info("New OB session, sesskey: " + key + " target: " + toString(target));
-        OutboundSession sess = new OutboundSession(_context, _log, target, key);
-        addSession(sess);
-        return sess;
+        boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
+        if (isInbound) {
+            // we are Bob, NS received
+            OutboundSession sess = new OutboundSession(target, null, state);
+            boolean rv = addSession(sess);
+            if (_log.shouldInfo()) {
+                if (rv)
+                    _log.info("New OB session as Bob. Alice: " + toString(target));
+                else
+                    _log.info("Dup OB session as Bob. Alice: " + toString(target));
+            }
+            return rv;
+        } else {
+            // we are Alice, NS sent
+            OutboundSession sess = new OutboundSession(target, null, state);
+            if (_log.shouldInfo())
+                _log.info("New OB session as Alice. Bob: " + toString(target));
+            return true;
+        }
     }
 
     /**
@@ -232,7 +211,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 _log.debug("No OB session to " + toString(target));
             return null;
         }
-        return sess.consumeNext();
+        RatchetEntry rv = sess.consumeNext();
+        if (_log.shouldDebug()) {
+            if (rv != null)
+                _log.debug("Using next key/tag " + rv + " to " + toString(target));
+            else
+                _log.debug("No more tags in OB session to " + toString(target));
+        }
+        return rv;
     }
 
     /**
@@ -314,7 +300,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         if (sess == null) {
             if (_log.shouldWarn())
                 _log.warn("No session for delivered RatchetTagSet to target: " + toString(target));
-            sess = createAndReturnSession(target, key);
+///////////
+            createSession(target, key);
         } else {
             sess.setCurrentKey(key);
         }
@@ -419,6 +406,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     }
 
     /**
+     * Inbound.
+     *
      * Determine if we have received a session key associated with the given session tag,
      * and if so, discard it and return the decryption
      * key it was received with (via tagsReceived(...)).  returns null if no session key
@@ -451,23 +440,21 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     }
 
     private OutboundSession getSession(PublicKey target) {
-        synchronized (_outboundSessions) {
-            return _outboundSessions.get(target);
-        }
+        return _outboundSessions.get(target);
     }
 
-    private void addSession(OutboundSession sess) {
-        synchronized (_outboundSessions) {
-            _outboundSessions.put(sess.getTarget(), sess);
-        }
+    /**
+     *
+     * @return true if added
+     */
+    private boolean addSession(OutboundSession sess) {
+        OutboundSession old = _outboundSessions.putIfAbsent(sess.getTarget(), sess);
+        return old == null;
     }
 
     private void removeSession(PublicKey target) {
         if (target == null) return;
-        OutboundSession session = null;
-        synchronized (_outboundSessions) {
-            session = _outboundSessions.remove(target);
-        }
+        OutboundSession session = _outboundSessions.remove(target);
         if ( (session != null) && (_log.shouldWarn()) )
             _log.warn("Removing session tags with " + session.availableTags() + " available for "
                        + (session.getLastExpirationDate()-_context.clock().now())
@@ -572,8 +559,11 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             buf.append("<tr class=\"debug_outboundtarget\"><td><div class=\"debug_targetinfo\"><b>Target public key:</b> ").append(toString(sess.getTarget())).append("<br>" +
                        "<b>Established:</b> ").append(DataHelper.formatDuration2(now - sess.getEstablishedDate())).append(" ago<br>" +
                        "<b>Ack Received?</b> ").append(sess.getAckReceived()).append("<br>" +
-                       "<b>Last Used:</b> ").append(DataHelper.formatDuration2(now - sess.getLastUsedDate())).append(" ago<br>" +
-                       "<b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</div></td>" +
+                       "<b>Last Used:</b> ").append(DataHelper.formatDuration2(now - sess.getLastUsedDate())).append(" ago<br>");
+            SessionKey sk = sess.getCurrentKey();
+            if (sk != null)
+                buf.append("<b>Session key:</b> ").append(sk.toBase64());
+            buf.append("</div></td>" +
                        "<td><b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>" +
                        "<tr><td colspan=\"2\"><ul>");
             for (Iterator<RatchetTagSet> siter = sets.iterator(); siter.hasNext();) {
@@ -621,9 +611,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     /**
      *  The state for a crypto session to a single public key
      */
-    private static class OutboundSession {
-        private final I2PAppContext _context;
-        private final Log _log;
+    private class OutboundSession {
         private final PublicKey _target;
         private SessionKey _currentKey;
         private final long _established;
@@ -657,15 +645,37 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         private static final int MAX_FAILS = 2;
 
-        public OutboundSession(I2PAppContext ctx, Log log, PublicKey target, SessionKey key) {
-            _context = ctx;
-            _log = log;
+        public OutboundSession(PublicKey target, SessionKey key, HandshakeState state) {
             _target = target;
             _currentKey = key;
-            _established = ctx.clock().now();
+            _established = _context.clock().now();
             _lastUsed = _established;
             _unackedTagSets = new HashSet<RatchetTagSet>(4);
             _tagSets = new ArrayList<RatchetTagSet>(6);
+            // generate expected tagset
+            byte[] ck = state.getChainingKey();
+            byte[] tagsetkey = new byte[32];
+            _hkdf.calculate(ck, ZEROLEN, INFO_0, tagsetkey);
+            boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
+            SessionKey rk = new SessionKey(ck);
+            SessionKey tk = new SessionKey(tagsetkey);
+            if (isInbound) {
+                // This is an INBOUND NS, we make an OUTBOUND tagset for the NSR
+                RatchetTagSet tagset = new RatchetTagSet(_hkdf, state,
+                                                         rk, tk,
+                                                         _established, 0);
+                _tagSets.add(tagset);
+                if (_log.shouldDebug())
+                    _log.debug("New OB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
+            } else {
+                // This is an OUTBOUND NS, we make an INBOUND tagset for the NSR
+                RatchetTagSet tagset = new RatchetTagSet(_hkdf, RatchetSKM.this, state,
+                                                         rk, tk,
+                                                         _established, 0, 5, 5);
+                _unackedTagSets.add(tagset);
+                if (_log.shouldDebug())
+                    _log.debug("New IB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
+            }
         }
 
         /**

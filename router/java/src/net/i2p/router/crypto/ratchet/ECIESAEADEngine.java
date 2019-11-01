@@ -150,10 +150,9 @@ public final class ECIESAEADEngine {
                 _log.debug("Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes " /* + Base64.encode(data, 0, 64) */ );
             
             HandshakeState state = key.getHandshakeState();
-            if (state != null) {
+            if (state == null) {
                 decrypted = decryptExistingSession(tag, data, key, targetPrivateKey);
             } else if (data.length >= MIN_NSR_SIZE) {
-              /**  TODO find the state
                 try {
                     state = state.clone();
                 } catch (CloneNotSupportedException e) {
@@ -161,9 +160,7 @@ public final class ECIESAEADEngine {
                         _log.warn("ECIES decrypt fail: clone()", e);
                     return null;
                 }
-                decrypted = decryptNewSessionReply(tag, data, state);
-               **/
-                decrypted = null;
+                decrypted = decryptNewSessionReply(tag, data, state, keyManager);
             } else {
                 decrypted = null;
                 if (_log.shouldWarn())
@@ -180,7 +177,7 @@ public final class ECIESAEADEngine {
             }
         } else if (data.length >= MIN_NS_SIZE) {
             if (shouldDebug) _log.debug("IB Tag " + st + " not found, trying NS decrypt");
-            decrypted = decryptNewSession(data, targetPrivateKey);
+            decrypted = decryptNewSession(data, targetPrivateKey, keyManager);
             if (decrypted != null) {
                 if (shouldDebug) _log.debug("NS decrypt success");
                 _context.statManager().updateFrequency("crypto.eciesAEAD.decryptNewSession");
@@ -216,7 +213,7 @@ public final class ECIESAEADEngine {
      * @param data 96 bytes minimum
      * @return null if decryption fails
      */
-    private CloveSet decryptNewSession(byte data[], PrivateKey targetPrivateKey)
+    private CloveSet decryptNewSession(byte data[], PrivateKey targetPrivateKey, RatchetSKM keyManager)
                                      throws DataFormatException {
         HandshakeState state;
         try {
@@ -277,6 +274,11 @@ public final class ECIESAEADEngine {
         } catch (Exception e) {
             throw new DataFormatException("Msg 1 payload error", e);
         }
+
+        // tell the SKM
+        PublicKey bob = new PublicKey(EncType.ECIES_X25519, bobPK);
+        keyManager.createSession(bob, state);
+
         if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in NS payload");
@@ -309,7 +311,7 @@ public final class ECIESAEADEngine {
      * @param state must have already been cloned
      * @return null if decryption fails
      */
-    private CloveSet decryptNewSessionReply(byte[] tag, byte[] data, HandshakeState state)
+    private CloveSet decryptNewSessionReply(byte[] tag, byte[] data, HandshakeState state, RatchetSKM keyManager)
                                           throws DataFormatException {
         // part 1 - handshake
         byte[] yy = new byte[KEYLEN];
@@ -370,8 +372,10 @@ public final class ECIESAEADEngine {
         } catch (Exception e) {
             throw new DataFormatException("NSR payload error", e);
         }
-        RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, new SessionKey(ck), new SessionKey(k_ab), 0, 0);
-        RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, null, new SessionKey(ck), new SessionKey(k_ba), 0, 0, 5, 5);
+        long now = _context.clock().now();
+        RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, new SessionKey(ck), new SessionKey(k_ab), now, 0);
+        RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, keyManager, new SessionKey(ck), new SessionKey(k_ba), now, 0, 5, 5);
+        // tell the SKM
         if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in NSR payload");
@@ -516,13 +520,7 @@ public final class ECIESAEADEngine {
                 _log.debug("Encrypting as NS to " + target);
             return encryptNewSession(cloves, target, priv, keyManager);
         }
-////
-        byte[] tagsetkey = new byte[32];
-/*
-        byte[] ck = state.getChainingKey();
-        _hkdf.calculate(ck, ZEROLEN, INFO_0, tagsetkey);
-        RatchetTagSet tagset = new RatchetTagSet(_context, new SessionKey(ck), new SessionKey(tagsetkey), 0, 0);
-*/
+
         HandshakeState state = re.key.getHandshakeState();
         if (state != null) {
             try {
@@ -533,8 +531,12 @@ public final class ECIESAEADEngine {
                 return null;
             }
 // register state with skm
-            return encryptNewSessionReply(cloves, state, re.tag);
+            if (_log.shouldDebug())
+                _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag);
+            return encryptNewSessionReply(cloves, state, re.tag, keyManager);
         }
+        if (_log.shouldDebug())
+            _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag);
         byte rv[] = encryptExistingSession(cloves, target, re.key, re.tag);
         return rv;
     }
@@ -589,11 +591,8 @@ public final class ECIESAEADEngine {
         }
         eph.getEncodedPublicKey(enc, 0);
 
-        // save for tagset HKDF
-        byte[] ck = state.getChainingKey();
-        // register state with skm
-        // keyManager.tagsDelivered(state);
-// todo
+        // tell the SKM
+        keyManager.createSession(target, state);
         return enc;
     }
 
@@ -616,7 +615,8 @@ public final class ECIESAEADEngine {
      * @param state must have already been cloned
      * @return encrypted data or null on failure
      */
-    private byte[] encryptNewSessionReply(CloveSet cloves, HandshakeState state, RatchetSessionTag currentTag) {
+    private byte[] encryptNewSessionReply(CloveSet cloves, HandshakeState state,
+                                          RatchetSessionTag currentTag, RatchetSKM keyManager) {
         byte[] tag = currentTag.getData();
         state.mixHash(tag, 0, TAGLEN);
 
@@ -666,9 +666,10 @@ public final class ECIESAEADEngine {
                 _log.warn("Encrypt fail NSR part 2", gse);
             return null;
         }
-        RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, new SessionKey(ck), new SessionKey(k_ab), 0, 0);
-/// lsnr
-        RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, null, new SessionKey(ck), new SessionKey(k_ba), 0, 0, 5, 5);
+        long now = _context.clock().now();
+        RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, new SessionKey(ck), new SessionKey(k_ab), now, 0);
+        RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, keyManager, new SessionKey(ck), new SessionKey(k_ba), now, 0, 5, 5);
+        // tell the SKM
 
         return enc;
     }
@@ -751,7 +752,7 @@ public final class ECIESAEADEngine {
 
         public void gotGarlic(GarlicClove clove) {
             if (_log.shouldDebug())
-                _log.debug("Got GARLIC block");
+                _log.debug("Got GARLIC block: " + clove);
             cloveSet.add(clove);
         }
 
