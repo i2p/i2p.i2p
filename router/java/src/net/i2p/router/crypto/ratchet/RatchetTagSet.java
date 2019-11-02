@@ -153,7 +153,7 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  For inbound NSR only, else null.
+     *  For inbound/outbound NSR only, else null.
      *  MUST be cloned before processing NSR.
      */
     public HandshakeState getHandshakeState() {
@@ -339,12 +339,17 @@ class RatchetTagSet implements TagSetHandle {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
+        if (_state != null)
+            buf.append("NSR ");
+        else
+            buf.append("ES ");
         buf.append("TagSet #").append(_id).append(" created: ").append(new Date(_date));
         int sz = size();
         buf.append(" Size: ").append(sz);
         buf.append('/').append(getOriginalSize());
         buf.append(" Acked? ").append(_acked);
         if (_sessionTags != null) {
+            buf.append(" Inbound");
             for (int i = 0; i < sz; i++) {
                 int n = _sessionTags.keyAt(i);
                 RatchetSessionTag tag = _sessionTags.valueAt(i);
@@ -357,6 +362,8 @@ class RatchetTagSet implements TagSetHandle {
                         buf.append("\tdeferred");
                 }
             }
+        } else {
+            buf.append(" Outbound");
         }
         return buf.toString();
     }

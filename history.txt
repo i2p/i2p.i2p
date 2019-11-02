@@ -1,3 +1,15 @@
+2019-11-02 zzz
+ * Router: NSR/ES fixes for proposal 144
+
+2019-10-31 zzz
+ * Router: Updates for proposal 144
+
+2019-10-27 zzz
+ * NetDB: Don't send encrypted lookup reply to ratchet dest
+ * OCMOSJ:
+   - Bundle unwrapped ack with LS for ratchet dest
+   - Keep bundling LS until acked
+
 2019-10-25 zzz
  * Router (proposal 144):
    - Set client SKM based on configured encryption

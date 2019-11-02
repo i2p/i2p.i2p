@@ -24,6 +24,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TagSetHandle;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -42,6 +43,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private final Log _log;
     /** Map allowing us to go from the targeted PublicKey to the OutboundSession used */
     private final ConcurrentHashMap<PublicKey, OutboundSession> _outboundSessions;
+    private final HashMap<PublicKey, List<OutboundSession>> _pendingOutboundSessions;
     /** Map allowing us to go from a SessionTag to the containing RatchetTagSet */
     private final ConcurrentHashMap<RatchetSessionTag, RatchetTagSet> _inboundTagSets;
     protected final I2PAppContext _context;
@@ -89,6 +91,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         _log = context.logManager().getLog(RatchetSKM.class);
         _context = context;
         _outboundSessions = new ConcurrentHashMap<PublicKey, OutboundSession>(64);
+        _pendingOutboundSessions = new HashMap<PublicKey, List<OutboundSession>>(64);
         _inboundTagSets = new ConcurrentHashMap<RatchetSessionTag, RatchetTagSet>(128);
         _hkdf = new HKDF(context);
         // start the precalc of Elg2 keys if it wasn't already started
@@ -176,10 +179,98 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         } else {
             // we are Alice, NS sent
             OutboundSession sess = new OutboundSession(target, null, state);
-            if (_log.shouldInfo())
-                _log.info("New OB session as Alice. Bob: " + toString(target));
+            synchronized (_pendingOutboundSessions) {
+                List<OutboundSession> pending = _pendingOutboundSessions.get(target);
+                if (pending != null) {
+                    pending.add(sess);
+                    if (_log.shouldInfo())
+                        _log.info("Another new OB session as Alice, total now: " + pending.size() +
+                                  ". Bob: " + toString(target));
+                } else {
+                    pending = new ArrayList<OutboundSession>(4);
+                    pending.add(sess);
+                    _pendingOutboundSessions.put(target, pending);
+                    if (_log.shouldInfo())
+                        _log.info("First new OB session as Alice. Bob: " + toString(target));
+                }
+            }
             return true;
         }
+    }
+
+    /**
+     * Inbound or outbound. Checks state.getRole() to determine.
+     * For outbound (NSR rcvd by Alice), sets session to transition to ES mode outbound.
+     * For inbound (NSR sent by Bob), sets up inbound ES tagset.
+     *
+     * @param oldState null for inbound, pre-clone for outbound
+     *
+     */
+    boolean updateSession(PublicKey target, HandshakeState oldState, HandshakeState state) {
+        EncType type = target.getType();
+        if (type != EncType.ECIES_X25519)
+            throw new IllegalArgumentException("Bad public key type " + type);
+        boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
+        if (isInbound) {
+            // we are Bob, NSR sent
+            OutboundSession sess = getSession(target);
+            if (sess == null) {
+                if (_log.shouldDebug())
+                    _log.debug("Update session but no session found for "  + target);
+                // TODO can we recover?
+                return false;
+            }
+            sess.updateSession(state);
+            if (_log.shouldInfo())
+                _log.info("Session update as Bob. Alice: " + toString(target));
+        } else {
+            // we are Alice, NSR received
+            synchronized (_pendingOutboundSessions) {
+                List<OutboundSession> pending = _pendingOutboundSessions.get(target);
+                if (pending == null) {
+                    if (_log.shouldDebug())
+                        _log.debug("Update session but no sessions found for "  + target);
+                    // TODO can we recover?
+                    return false;
+                }
+                boolean found = false;
+                for (OutboundSession sess : pending) {
+                    for (RatchetTagSet ts : sess.getTagSets()) {
+                        if (ts.getHandshakeState().equals(oldState)) {
+                            if (!found) {
+                                found = true;
+                                sess.updateSession(state);
+                                boolean ok = addSession(sess);
+                                if (_log.shouldDebug()) {
+                                    if (ok)
+                                        _log.debug("Update session from NSR to ES for "  + target);
+                                    else
+                                        _log.debug("Session already updated from NSR to ES for "  + target);
+                                }
+                            } else {
+                                if (_log.shouldDebug())
+                                    _log.debug("Dup tagset " + ts + " for "  + target);
+                            }
+                        } else {
+                            // TODO
+                            // remove old tags
+                            if (_log.shouldDebug())
+                                _log.debug("Remove tagset " + ts + " for "  + target);
+                        }
+                    }
+                }
+                _pendingOutboundSessions.remove(target);
+                if (!found) {
+                    if (_log.shouldDebug())
+                        _log.debug("Update session but no session found (out of " + pending.size() + ") for "  + target);
+                    // TODO can we recover?
+                    return false;
+                }
+            }
+            if (_log.shouldInfo())
+                _log.info("Session update as Alice. Bob: " + toString(target));
+        }
+        return true;
     }
 
     /**
@@ -665,22 +756,67 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             SessionKey rk = new SessionKey(ck);
             SessionKey tk = new SessionKey(tagsetkey);
             if (isInbound) {
+                // We are Bob
                 // This is an INBOUND NS, we make an OUTBOUND tagset for the NSR
                 RatchetTagSet tagset = new RatchetTagSet(_hkdf, state,
                                                          rk, tk,
-                                                         _established, 0);
+                                                         _established, _sentTagSetID.getAndIncrement());
                 _tagSets.add(tagset);
                 if (_log.shouldDebug())
                     _log.debug("New OB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
             } else {
+                // We are Alice
                 // This is an OUTBOUND NS, we make an INBOUND tagset for the NSR
                 RatchetTagSet tagset = new RatchetTagSet(_hkdf, RatchetSKM.this, state,
                                                          rk, tk,
-                                                         _established, 0, 5, 5);
+                                                         _established, _rcvTagSetID.getAndIncrement(), 5, 5);
                 _unackedTagSets.add(tagset);
                 if (_log.shouldDebug())
                     _log.debug("New IB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
             }
+        }
+
+        void updateSession(HandshakeState state) {
+            byte[] ck = state.getChainingKey();
+            byte[] k_ab = new byte[32];
+            byte[] k_ba = new byte[32];
+            _hkdf.calculate(ck, ZEROLEN, k_ab, k_ba, 0);
+            SessionKey rk = new SessionKey(ck);
+            long now = _context.clock().now();
+            boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
+            if (isInbound) {
+                // We are Bob
+                // This is an OUTBOUND NSR, we make an INBOUND tagset for ES
+                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, RatchetSKM.this, rk, new SessionKey(k_ab),
+                                                            now, _rcvTagSetID.getAndIncrement(), 5, 5);
+                // and a pending outbound one
+                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ba),
+                                                            now, _sentTagSetID.getAndIncrement());
+                if (_log.shouldDebug()) {
+                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset: " + tagset_ab);
+                    _log.debug("Pending OB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset: " + tagset_ba);
+                }
+                synchronized (_tagSets) {
+                    _unackedTagSets.add(tagset_ba);
+                }
+            } else {
+                // We are Alice
+                // This is an INBOUND NSR, we make an OUTBOUND tagset for ES
+                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ab),
+                                                            now, _sentTagSetID.getAndIncrement());
+                // and an inbound one
+                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, RatchetSKM.this, rk, new SessionKey(k_ba),
+                                                            now, _rcvTagSetID.getAndIncrement(), 5, 5);
+                if (_log.shouldDebug()) {
+                    _log.debug("Update OB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset: " + tagset_ab);
+                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset: " + tagset_ba);
+                }
+                synchronized (_tagSets) {
+                    _tagSets.add(tagset_ab);
+                    _unackedTagSets.clear();
+                }
+            }
+            //state.destroy();
         }
 
         /**

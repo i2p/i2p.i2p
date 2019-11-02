@@ -44,6 +44,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	private int action;
 	private final int requirements;
 	private int patternIndex;
+	private boolean wasCloned;
 
 	/**
 	 * Enumerated value that indicates that the handshake object
@@ -230,13 +231,32 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 * @since 0.9.44
 	 */
 	protected HandshakeState(HandshakeState o) throws CloneNotSupportedException {
-		// everything is shallow copied except for symmetric state
+		// everything is shallow copied except for symmetric state and keys
+		// so destroy() doesn't zero them out later
 		symmetric = o.symmetric.clone();
 		isInitiator = o.isInitiator;
-		localKeyPair = o.localKeyPair;
-		localEphemeral = o.localEphemeral;
-		remotePublicKey = o.remotePublicKey;
-		remoteEphemeral = o.remoteEphemeral;
+		if (o.localKeyPair != null)
+		    localKeyPair = o.localKeyPair.clone();
+		if (o.localEphemeral != null) {
+			if (isInitiator) {
+				// always save Alice's local keys
+				localEphemeral = o.localEphemeral.clone();
+			} else {
+				if (o.wasCloned) {
+					// new keys after first time for Bob
+					localEphemeral = o.localEphemeral.clone();
+					localEphemeral.generateKeyPair();
+				} else {
+					// first time for Bob, use the eph. keys previously generated
+					localEphemeral = o.localEphemeral;
+					o.wasCloned = true;
+				}
+			}
+		}
+		if (o.remotePublicKey != null)
+			remotePublicKey = o.remotePublicKey.clone();
+		if (o.remoteEphemeral != null)
+			remoteEphemeral = o.remoteEphemeral.clone();
 		action = o.action;
 		if (action == SPLIT || action == COMPLETE)
 			throw new CloneNotSupportedException("clone after NSR");

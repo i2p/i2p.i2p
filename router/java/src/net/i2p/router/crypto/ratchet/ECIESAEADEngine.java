@@ -145,21 +145,14 @@ public final class ECIESAEADEngine {
         CloveSet decrypted;
         final boolean shouldDebug = _log.shouldDebug();
         if (key != null) {
-            //if (_log.shouldLog(Log.DEBUG)) _log.debug("Key is known for tag " + st);
-            if (shouldDebug)
-                _log.debug("Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes " /* + Base64.encode(data, 0, 64) */ );
-            
             HandshakeState state = key.getHandshakeState();
             if (state == null) {
+                if (shouldDebug)
+                    _log.debug("Decrypting ES with tag: " + st + ": key: " + key.toBase64() + ": " + data.length + " bytes");
                 decrypted = decryptExistingSession(tag, data, key, targetPrivateKey);
             } else if (data.length >= MIN_NSR_SIZE) {
-                try {
-                    state = state.clone();
-                } catch (CloneNotSupportedException e) {
-                    if (_log.shouldWarn())
-                        _log.warn("ECIES decrypt fail: clone()", e);
-                    return null;
-                }
+                if (shouldDebug)
+                    _log.debug("Decrypting NSR with tag: " + st + ": key: " + key.toBase64() + ": " + data.length + " bytes");
                 decrypted = decryptNewSessionReply(tag, data, state, keyManager);
             } else {
                 decrypted = null;
@@ -179,7 +172,6 @@ public final class ECIESAEADEngine {
             if (shouldDebug) _log.debug("IB Tag " + st + " not found, trying NS decrypt");
             decrypted = decryptNewSession(data, targetPrivateKey, keyManager);
             if (decrypted != null) {
-                if (shouldDebug) _log.debug("NS decrypt success");
                 _context.statManager().updateFrequency("crypto.eciesAEAD.decryptNewSession");
             } else {
                 _context.statManager().updateFrequency("crypto.eciesAEAD.decryptFailed");
@@ -248,14 +240,13 @@ public final class ECIESAEADEngine {
 
         byte[] bobPK = new byte[KEYLEN];
         state.getRemotePublicKey().getPublicKey(bobPK, 0);
+        if (_log.shouldDebug())
+            _log.debug("NS decrypt success from PK " + Base64.encode(bobPK));
         if (Arrays.equals(bobPK, NULLPK)) {
             // TODO
             if (_log.shouldWarn())
                 _log.warn("Zero static key in IB NS");
             return null;
-        } else {
-            if (_log.shouldDebug())
-                _log.debug("Received NS from PK " + Base64.encode(bobPK));
         }
 
         // payload
@@ -308,11 +299,20 @@ public final class ECIESAEADEngine {
      *
      * @param tag 8 bytes, same as first 8 bytes of data
      * @param data 56 bytes minimum
-     * @param state must have already been cloned
+     * @param state will be cloned here
      * @return null if decryption fails
      */
-    private CloveSet decryptNewSessionReply(byte[] tag, byte[] data, HandshakeState state, RatchetSKM keyManager)
+    private CloveSet decryptNewSessionReply(byte[] tag, byte[] data, HandshakeState oldState, RatchetSKM keyManager)
                                           throws DataFormatException {
+        HandshakeState state;
+        try {
+            state = oldState.clone();
+        } catch (CloneNotSupportedException e) {
+            if (_log.shouldWarn())
+                _log.warn("ECIES decrypt fail: clone()", e);
+            return null;
+        }
+
         // part 1 - handshake
         byte[] yy = new byte[KEYLEN];
         System.arraycopy(data, TAGLEN, yy, 0, KEYLEN);
@@ -337,13 +337,8 @@ public final class ECIESAEADEngine {
         byte[] k_ab = new byte[32];
         byte[] k_ba = new byte[32];
         _hkdf.calculate(ck, ZEROLEN, k_ab, k_ba, 0);
-        SessionKey tk = new SessionKey(ck);
-        byte[] temp_key = doHMAC(tk, ZEROLEN);
-// unused
-        tk = new SessionKey(temp_key);
         CipherStatePair ckp = state.split();
         CipherState rcvr = ckp.getReceiver();
-        CipherState sender = ckp.getSender();
         byte[] hash = state.getHandshakeHash();
 
         // part 2 - payload
@@ -373,10 +368,22 @@ public final class ECIESAEADEngine {
         } catch (Exception e) {
             throw new DataFormatException("NSR payload error", e);
         }
-        long now = _context.clock().now();
-        RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, new SessionKey(ck), new SessionKey(k_ab), now, 0);
-        RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, keyManager, new SessionKey(ck), new SessionKey(k_ba), now, 0, 5, 5);
+
+        byte[] bobPK = new byte[KEYLEN];
+        state.getRemotePublicKey().getPublicKey(bobPK, 0);
+        if (_log.shouldDebug())
+            _log.debug("NSR decrypt success from PK " + Base64.encode(bobPK));
+        if (Arrays.equals(bobPK, NULLPK)) {
+            // TODO
+            if (_log.shouldWarn())
+                _log.warn("NSR reply to zero static key NS");
+            return null;
+        }
+
         // tell the SKM
+        PublicKey bob = new PublicKey(EncType.ECIES_X25519, bobPK);
+        keyManager.updateSession(bob, oldState, state);
+
         if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in NSR payload");
@@ -531,10 +538,9 @@ public final class ECIESAEADEngine {
                     _log.warn("ECIES encrypt fail: clone()", e);
                 return null;
             }
-// register state with skm
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag);
-            return encryptNewSessionReply(cloves, state, re.tag, keyManager);
+            return encryptNewSessionReply(cloves, target, state, re.tag, keyManager);
         }
         if (_log.shouldDebug())
             _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag);
@@ -616,7 +622,7 @@ public final class ECIESAEADEngine {
      * @param state must have already been cloned
      * @return encrypted data or null on failure
      */
-    private byte[] encryptNewSessionReply(CloveSet cloves, HandshakeState state,
+    private byte[] encryptNewSessionReply(CloveSet cloves, PublicKey target, HandshakeState state,
                                           RatchetSessionTag currentTag, RatchetSKM keyManager) {
         byte[] tag = currentTag.getData();
         state.mixHash(tag, 0, TAGLEN);
@@ -648,12 +654,7 @@ public final class ECIESAEADEngine {
         byte[] k_ab = new byte[32];
         byte[] k_ba = new byte[32];
         _hkdf.calculate(ck, ZEROLEN, k_ab, k_ba, 0);
-        SessionKey tk = new SessionKey(ck);
-        byte[] temp_key = doHMAC(tk, ZEROLEN);
-// unused
-        tk = new SessionKey(temp_key);
         CipherStatePair ckp = state.split();
-        CipherState rcvr = ckp.getReceiver();
         CipherState sender = ckp.getSender();
         byte[] hash = state.getHandshakeHash();
 
@@ -668,10 +669,8 @@ public final class ECIESAEADEngine {
                 _log.warn("Encrypt fail NSR part 2", gse);
             return null;
         }
-        long now = _context.clock().now();
-        RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, new SessionKey(ck), new SessionKey(k_ab), now, 0);
-        RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, keyManager, new SessionKey(ck), new SessionKey(k_ba), now, 0, 5, 5);
         // tell the SKM
+        keyManager.updateSession(target, null, state);
 
         return enc;
     }
