@@ -2,7 +2,6 @@ package net.i2p.router.crypto.ratchet;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +13,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 
 /**
@@ -38,7 +38,8 @@ class RatchetTagSet implements TagSetHandle {
     // We use byte[] for key to save space, because we don't need indexOfValueByValue()
     private final SparseArray<byte[]> _sessionKeys;
     private final HKDF hkdf;
-    private final long _date;
+    private final long _created;
+    private long _date;
     private final int _id;
     private final int _originalSize;
     private final int _maxSize;
@@ -57,7 +58,8 @@ class RatchetTagSet implements TagSetHandle {
     private static final String INFO_4 = "SessionTagKeyGen";
     private static final String INFO_5 = "SymmetricRatchet";
     private static final byte[] ZEROLEN = new byte[0];
-    private static final int TAGLEN = 8;
+    private static final int TAGLEN = RatchetSessionTag.LENGTH;
+    private static final int MAX = 65535;
 
     /**
      *  Outbound NSR Tagset
@@ -82,7 +84,7 @@ class RatchetTagSet implements TagSetHandle {
     /**
      *  Inbound NSR Tagset
      *
-     *  @param date For inbound: when the TagSet will expire
+     *  @param date For inbound: creation time
      */
     public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state, SessionKey rootKey, SessionKey data,
                          long date, int id, int minSize, int maxSize) {
@@ -92,7 +94,7 @@ class RatchetTagSet implements TagSetHandle {
     /**
      *  Inbound ES Tagset
      *
-     *  @param date For inbound: when the TagSet will expire
+     *  @param date For inbound: creation time
      */
     public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, SessionKey rootKey, SessionKey data,
                          long date, int id, int minSize, int maxSize) {
@@ -101,13 +103,14 @@ class RatchetTagSet implements TagSetHandle {
 
 
     /**
-     *  @param date For inbound: when the TagSet will expire; for outbound: creation time
+     *  @param date For inbound and outbound: creation time
      */
     private RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state, SessionKey rootKey, SessionKey data,
                           long date, int id, boolean isInbound, int minSize, int maxSize) {
         _lsnr = lsnr;
         _state = state;
         _key = rootKey;
+        _created = date;
         _date = date;
         _id = id;
         _originalSize = minSize;
@@ -161,19 +164,56 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  For inbound: when the TagSet will expire; for outbound: creation time
+     *  For inbound and outbound: last used time
      */
     public long getDate() {
         return _date;
     }
 
-    /** for debugging */
-    public int getOriginalSize() {
-        return 0;
+    /**
+     *  For inbound and outbound: last used time
+     */
+    public void setDate(long when) {
+        _date = when;
     }
 
+    /**
+     *  For inbound and outbound: creation time
+     */
+    public long getCreated() {
+        return _created;
+    }
+
+    /** for debugging */
+    public int getOriginalSize() {
+        return _originalSize;
+    }
+
+    /**
+     *  unused tags generated
+     *  @return 0 for outbound
+     */
     public int size() {
         return _sessionTags != null ? _sessionTags.size() : 0;
+    }
+
+    /**
+     *  tags remaining
+     *  @return 0 - 65535
+     */
+    public int remaining() {
+        int nextKey;
+        if (_sessionTags != null) {
+            // IB
+            if (_sessionTags.size() <= 0)
+                nextKey = 0;
+            else
+                nextKey = _sessionTags.keyAt(0);
+        } else {
+            // OB
+            nextKey = _lastTag + 1;
+        }
+        return MAX - nextKey;
     }
 
     /**
@@ -181,7 +221,7 @@ class RatchetTagSet implements TagSetHandle {
      *  inbound only
      *  testing only
      */
-    public List<RatchetSessionTag> getTags() {
+    private List<RatchetSessionTag> getTags() {
         if (_sessionTags == null)
             return Collections.emptyList();
         int sz = _sessionTags.size();
@@ -197,7 +237,7 @@ class RatchetTagSet implements TagSetHandle {
      *  inbound only
      *  testing only
      */
-    public RatchetSessionTag getFirstTag() {
+    private RatchetSessionTag getFirstTag() {
         if (_sessionTags == null)
             throw new IllegalStateException("Outbound tagset");
         if (_sessionTags.size() <= 0)
@@ -343,10 +383,14 @@ class RatchetTagSet implements TagSetHandle {
             buf.append("NSR ");
         else
             buf.append("ES ");
-        buf.append("TagSet #").append(_id).append(" created: ").append(new Date(_date));
+        buf.append("TagSet #").append(_id)
+           .append(" created: ").append(DataHelper.formatTime(_created))
+           .append(" last use: ").append(DataHelper.formatTime(_date));
         int sz = size();
-        buf.append(" Size: ").append(sz);
-        buf.append('/').append(getOriginalSize());
+        buf.append(" Size: ").append(sz)
+           .append(" Orig: ").append(_originalSize)
+           .append(" Max: ").append(_maxSize)
+           .append(" Remaining: ").append(remaining());
         buf.append(" Acked? ").append(_acked);
         if (_sessionTags != null) {
             buf.append(" Inbound");

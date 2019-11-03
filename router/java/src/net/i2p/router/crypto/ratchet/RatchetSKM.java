@@ -31,7 +31,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  *
@@ -97,7 +97,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         // start the precalc of Elg2 keys if it wasn't already started
         context.eciesEngine().startup();
          _alive = true;
-        _context.simpleTimer2().addEvent(new CleanupEvent(), 60*1000);
+        new CleanupEvent();
     }
 
     @Override
@@ -107,12 +107,17 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         _outboundSessions.clear();
     }
 
-    private class CleanupEvent implements SimpleTimer.TimedEvent {
+    private class CleanupEvent extends SimpleTimer2.TimedEvent {
+        public CleanupEvent() {
+            // wait until outbound expiration time to start
+            super(_context.simpleTimer2(), SESSION_TAG_DURATION_MS);
+        }
+
         public void timeReached() {
             if (!_alive)
                 return;
-            // TODO
-            _context.simpleTimer2().addEvent(this, 60*1000);
+            aggressiveExpire();
+            schedule(60*1000);
         }
     }
 
@@ -520,6 +525,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         HandshakeState state = tagSet.getHandshakeState();
         synchronized(tagSet) {
             key = tagSet.consume(tag);
+            if (key != null)
+                tagSet.setDate(_context.clock().now());
         }
         if (key == null) {
             if (_log.shouldDebug())
@@ -563,7 +570,35 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * @return number of tag sets expired (bogus as it overcounts inbound)
      */
     private int aggressiveExpire() {
-        return 0;
+        long now = _context.clock().now();
+        long exp = now - SESSION_LIFETIME_MAX_MS;
+
+        // inbound
+        int removed = 0;
+        for (Iterator<RatchetTagSet> iter = _inboundTagSets.values().iterator(); iter.hasNext();) {
+            RatchetTagSet ts = iter.next();
+            if (ts.getDate() < exp) {
+                iter.remove();
+                removed++;
+            }
+        }
+        if (removed > 0 && _log.shouldInfo())
+            _log.info("Expired inbound: " + removed);
+
+        // outbound
+        int oremoved = 0;
+        exp = now - (SESSION_LIFETIME_MAX_MS / 2);
+        for (Iterator<OutboundSession> iter = _outboundSessions.values().iterator(); iter.hasNext();) {
+            OutboundSession sess = iter.next();
+            oremoved += sess.expireTags();
+            if (sess.getLastUsedDate() < exp) {
+                iter.remove();
+                oremoved++;
+            }
+        }
+        if (oremoved > 0 && _log.shouldInfo())
+            _log.info("Expired outbound: " + oremoved);
+        return removed + oremoved;
     }
 
     /// begin SessionTagListener ///
@@ -607,12 +642,15 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     @Override
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
+
+        // inbound
         buf.append("<h3 class=\"debug_inboundsessions\">Ratchet Inbound sessions</h3>" +
                    "<table>");
         Map<SessionKey, Set<RatchetTagSet>> inboundSets = getRatchetTagSetsBySessionKey();
         int total = 0;
         int totalSets = 0;
         long now = _context.clock().now();
+        long exp = now + SESSION_LIFETIME_MAX_MS;
         Set<RatchetTagSet> sets = new TreeSet<RatchetTagSet>(new RatchetTagSetComparator());
         for (Map.Entry<SessionKey, Set<RatchetTagSet>> e : inboundSets.entrySet()) {
             SessionKey skey = e.getKey();
@@ -623,15 +661,16 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                        "<td><b>Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr class=\"expiry\"><td colspan=\"2\"><ul>");
             for (RatchetTagSet ts : sets) {
-                int size = ts.getTags().size();
+                int size = ts.size();
                 total += size;
                 buf.append("<li><b>ID: ").append(ts.getID());
-                long expires = ts.getDate() - now;
+                buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()));
+                long expires = exp - ts.getDate();
                 if (expires > 0)
-                    buf.append(" expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
+                    buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                 else
-                    buf.append(" expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
-                buf.append(size).append('/').append(ts.getOriginalSize()).append(" tags remaining</li>");
+                    buf.append(" <b>expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
+                buf.append(size).append('/').append(ts.remaining()).append(" tags remaining</li>");
             }
             buf.append("</ul></td></tr>\n");
             out.write(buf.toString());
@@ -644,11 +683,12 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                    "</table>" +
                    "<h3 class=\"debug_outboundsessions\">Ratchet Outbound sessions</h3>" +
                    "<table>");
-        total = 0;
+
+        // outbound
         totalSets = 0;
+        exp = now + SESSION_TAG_DURATION_MS;
         Set<OutboundSession> outbound = getOutboundSessions();
-        for (Iterator<OutboundSession> iter = outbound.iterator(); iter.hasNext();) {
-            OutboundSession sess = iter.next();
+        for (OutboundSession sess : outbound) {
             sets.clear();
             sets.addAll(sess.getTagSets());
             totalSets += sets.size();
@@ -662,20 +702,22 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             buf.append("</div></td>" +
                        "<td><b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>" +
                        "<tr><td colspan=\"2\"><ul>");
-            for (Iterator<RatchetTagSet> siter = sets.iterator(); siter.hasNext();) {
-                RatchetTagSet ts = siter.next();
-                int size = ts.getTags().size();
-                total += size;
+            for (RatchetTagSet ts : sets) {
+                int size = ts.remaining();
                 buf.append("<li><b>ID: ").append(ts.getID())
-                   .append(" Sent:</b> ").append(DataHelper.formatDuration2(now - ts.getDate())).append(" ago with ");
-                buf.append(size).append('/').append(ts.getOriginalSize()).append(" tags remaining; acked? ").append(ts.getAcked()).append("</li>");
+                   .append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()));
+                long expires = exp - ts.getDate();
+                if (expires > 0)
+                    buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
+                else
+                    buf.append(" <b>expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
+                buf.append(size).append(" tags remaining; acked? ").append(ts.getAcked()).append("</li>");
             }
             buf.append("</ul></td></tr>\n");
             out.write(buf.toString());
             buf.setLength(0);
         }
-        buf.append("<tr><th colspan=\"2\">Total outbound tags: ").append(total).append(" (")
-           .append(DataHelper.formatSize2(32*total)).append("B); sets: ").append(totalSets)
+        buf.append("<tr><th colspan=\"2\">Total sets: ").append(totalSets)
            .append("; sessions: ").append(outbound.size())
            .append("</th></tr>\n</table>");
 
@@ -697,10 +739,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     private static class RatchetTagSetComparator implements Comparator<RatchetTagSet>, Serializable {
          public int compare(RatchetTagSet l, RatchetTagSet r) {
-             int rv = (int) (l.getDate() - r.getDate());
-             if (rv != 0)
-                 return rv;
-             return l.hashCode() - r.hashCode();
+             return l.getID() - r.getID();
         }
     }
 
@@ -884,7 +923,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                         if (_log.shouldWarn()) {
                             int dropped = 0;
                             for (RatchetTagSet set : _tagSets) {
-                                dropped += set.getTags().size();
+                                dropped += set.remaining();
                             }
                             _log.warn("Rekeyed from " + _currentKey + " to " + key 
                                       + ": dropping " + dropped + " session tags", new Exception());
@@ -944,6 +983,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                         if (set.getDate() + SESSION_TAG_DURATION_MS > now) {
                             RatchetSessionTag tag = set.consumeNext();
                             if (tag != null) {
+                                set.setDate(now);
                                 SessionKeyAndNonce skn = set.consumeNextKey();
                                 return new RatchetEntry(tag, skn);
                             } else if (_log.shouldInfo()) {
@@ -970,8 +1010,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     if (!set.getAcked())
                         continue;
                     if (set.getDate() + SESSION_TAG_DURATION_MS > now) {
-/////////// just add fixed number?
-                        int sz = set.getTags().size();
+                        // or just add fixed number?
+                        int sz = set.remaining();
                         tags += sz;
                     }
                 }
@@ -988,7 +1028,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             long last = 0;
             synchronized (_tagSets) {
                 for (RatchetTagSet set : _tagSets) {
-                    if ( (set.getDate() > last) && (!set.getTags().isEmpty()) ) 
+                    if (set.getDate() > last && set.remaining() > 0) 
                         last = set.getDate();
                 }
             }

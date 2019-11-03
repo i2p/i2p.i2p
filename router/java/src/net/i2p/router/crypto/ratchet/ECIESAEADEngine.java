@@ -125,7 +125,20 @@ public final class ECIESAEADEngine {
      *
      * @return decrypted data or null on failure
      */
-    public CloveSet decrypt(byte data[], PrivateKey targetPrivateKey, RatchetSKM keyManager) throws DataFormatException {
+    public CloveSet decrypt(byte data[], PrivateKey targetPrivateKey,
+                            RatchetSKM keyManager) throws DataFormatException {
+        try {
+            return x_decrypt(data, targetPrivateKey, keyManager);
+        } catch (DataFormatException dfe) {
+            throw dfe;
+        } catch (Exception e) {
+            _log.error("ECIES decrypt error", e);
+            return null;
+        }
+    }
+
+    private CloveSet x_decrypt(byte data[], PrivateKey targetPrivateKey,
+                               RatchetSKM keyManager) throws DataFormatException {
         if (targetPrivateKey.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         if (data == null) {
@@ -514,6 +527,16 @@ public final class ECIESAEADEngine {
      */
     public byte[] encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
                           RatchetSKM keyManager) {
+        try {
+            return x_encrypt(cloves, target, priv, keyManager);
+        } catch (Exception e) {
+            _log.error("ECIES encrypt error", e);
+            return null;
+        }
+    }
+
+    private byte[] x_encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
+                             RatchetSKM keyManager) {
         if (target.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         if (Arrays.equals(target.getData(), NULLPK)) {
