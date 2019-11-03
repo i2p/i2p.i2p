@@ -650,7 +650,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         int total = 0;
         int totalSets = 0;
         long now = _context.clock().now();
-        long exp = now + SESSION_LIFETIME_MAX_MS;
+        long exp = now - SESSION_LIFETIME_MAX_MS;
         Set<RatchetTagSet> sets = new TreeSet<RatchetTagSet>(new RatchetTagSetComparator());
         for (Map.Entry<SessionKey, Set<RatchetTagSet>> e : inboundSets.entrySet()) {
             SessionKey skey = e.getKey();
@@ -665,7 +665,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 total += size;
                 buf.append("<li><b>ID: ").append(ts.getID());
                 buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()));
-                long expires = exp - ts.getDate();
+                long expires = ts.getDate() - exp;
                 if (expires > 0)
                     buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                 else
@@ -686,7 +686,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         // outbound
         totalSets = 0;
-        exp = now + SESSION_TAG_DURATION_MS;
+        exp = now - SESSION_TAG_DURATION_MS;
         Set<OutboundSession> outbound = getOutboundSessions();
         for (OutboundSession sess : outbound) {
             sets.clear();
@@ -706,7 +706,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 int size = ts.remaining();
                 buf.append("<li><b>ID: ").append(ts.getID())
                    .append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()));
-                long expires = exp - ts.getDate();
+                long expires = ts.getDate() - exp;
                 if (expires > 0)
                     buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                 else
