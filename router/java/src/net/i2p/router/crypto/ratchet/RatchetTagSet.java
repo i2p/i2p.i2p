@@ -15,6 +15,7 @@ import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
+import net.i2p.util.Log;
 
 /**
  *  A tagset class for one direction, either inbound or outbound.
@@ -256,10 +257,13 @@ class RatchetTagSet implements TagSetHandle {
         // == not equals
         int idx = _sessionTags.indexOfValueByValue(tag);
         if (idx < 0) {
-            System.out.println("Tag not found " + Base64.encode(tag.getData()));
-            System.out.println("Remaining tags: " + getTags());
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(RatchetTagSet.class);
+            if (log.shouldWarn())
+                log.warn("Tag not found " + Base64.encode(tag.getData()) +
+                         " Remaining tags: " + getTags(), new Exception());
             return null;
         }
+        _acked = true;
         int tagnum = _sessionTags.keyAt(idx);
         _sessionTags.removeAt(idx);
 
@@ -289,8 +293,10 @@ class RatchetTagSet implements TagSetHandle {
             return rv;
         } else {
             // dup or some other error
-            System.out.println("No key found for tag " + Base64.encode(tag.getData()) + " at index " + idx +
-                               " tagnum = " + tagnum + " lastkey = " + _lastKey);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(RatchetTagSet.class);
+            if (log.shouldWarn())
+                log.warn("No key found for tag " + Base64.encode(tag.getData()) + " at index " + idx +
+                         " tagnum = " + tagnum + " lastkey = " + _lastKey, new Exception());
             return null;
         }
     }
@@ -309,7 +315,7 @@ class RatchetTagSet implements TagSetHandle {
         // trim if too big
         int toTrim = _sessionTags.size() - _maxSize;
         if (toTrim > 0) {
-            System.out.println("Trimming tags by " + toTrim);
+            //System.out.println("Trimming tags by " + toTrim);
             for (int i = 0; i < toTrim; i++) {
                 int tagnum = _sessionTags.keyAt(i);
                 int kidx = _sessionKeys.indexOfKey(tagnum);
@@ -362,12 +368,13 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  For outbound only.
+     *  For outbound only, call when we can use it.
      */
     public void setAcked() { _acked = true; }
 
     /**
-     *  For outbound only.
+     *  For inbound, returns true after first consume() call.
+     *  For outbound, returns true after set.
      */
     public boolean getAcked() { return _acked; }
 

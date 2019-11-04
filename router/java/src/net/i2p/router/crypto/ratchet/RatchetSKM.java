@@ -68,6 +68,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     private final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 3 * 60 * 1000;
 
+    private final static long SESSION_PENDING_DURATION_MS = 5 * 60 * 1000;
+
     /**
      * Time to send more if we are this close to expiration
      */
@@ -522,22 +524,29 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 _log.debug("IB tag not found: " + tag.toBase64());
             return null;
         }
-        HandshakeState state = tagSet.getHandshakeState();
+        boolean firstInbound;
         synchronized(tagSet) {
+            firstInbound = !tagSet.getAcked();
             key = tagSet.consume(tag);
             if (key != null)
                 tagSet.setDate(_context.clock().now());
         }
-        if (key == null) {
-            if (_log.shouldDebug())
-                _log.debug("tag " + tag + " not found in tagset!!! " + tagSet);
-        }
-        if (state != null) {
-            if (_log.shouldDebug())
-                _log.debug("IB NSR Tag consumed: " + tag + " from: " + tagSet);
+        if (key != null) {
+            HandshakeState state = tagSet.getHandshakeState();
+            if (firstInbound) {
+                if (state == null) {
+                    // TODO
+                }
+            }
+            if (_log.shouldDebug()) {
+                if (state != null)
+                    _log.debug("IB NSR Tag consumed: " + tag + " from: " + tagSet);
+                else
+                    _log.debug("IB ES Tag consumed: " + tag + " from: " + tagSet);
+            }
         } else {
-            if (_log.shouldDebug())
-                _log.debug("IB ES Tag consumed: " + tag + " from: " + tagSet);
+            if (_log.shouldWarn())
+                _log.warn("tag " + tag + " not found in tagset!!! " + tagSet);
         }
         return key;
     }
@@ -598,7 +607,27 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         }
         if (oremoved > 0 && _log.shouldInfo())
             _log.info("Expired outbound: " + oremoved);
-        return removed + oremoved;
+
+        int premoved = 0;
+        exp = now - SESSION_PENDING_DURATION_MS;
+        synchronized (_pendingOutboundSessions) {
+            for (Iterator<List<OutboundSession>> iter = _pendingOutboundSessions.values().iterator(); iter.hasNext();) {
+                List<OutboundSession> pending = iter.next();
+                for (Iterator<OutboundSession> liter = pending.iterator(); liter.hasNext();) {
+                    OutboundSession sess = liter.next();
+                    if (sess.getEstablishedDate() < exp) {
+                        liter.remove();
+                        premoved++;
+                    }
+                }
+                if (pending.isEmpty())
+                    iter.remove();
+            }
+        }
+        if (premoved > 0 && _log.shouldInfo())
+            _log.info("Expired pending: " + premoved);
+
+        return removed + oremoved + premoved;
     }
 
     /// begin SessionTagListener ///
