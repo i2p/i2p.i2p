@@ -21,10 +21,11 @@ public class MessageValidator {
     public MessageValidator(RouterContext context) {
         _log = context.logManager().getLog(MessageValidator.class);
         _context = context;
+        long[] rates = new long[] { 60*60*1000, 24*60*60*1000 };
         context.statManager().createRateStat("router.duplicateMessageId", "Note that a duplicate messageId was received", "Router", 
-                                             new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                             rates);
         context.statManager().createRateStat("router.invalidMessageTime", "Note that a message outside the valid range was received", "Router", 
-                                             new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                             rates);
     }
     
     
@@ -41,12 +42,12 @@ public class MessageValidator {
         boolean isDuplicate = noteReception(messageId, expiration);
         if (isDuplicate) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Rejecting message " + messageId + " because it is a duplicate", new Exception("Duplicate origin"));
+                _log.info("Rejecting message " + messageId + " duplicate", new Exception("Duplicate origin"));
             _context.statManager().addRateData("router.duplicateMessageId", 1);
             return "duplicate";
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Accepting message " + messageId + " because it is NOT a duplicate", new Exception("Original origin"));
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Accepting message " + messageId + " because it is NOT a duplicate", new Exception("Original origin"));
             return null;
         }
     }
@@ -58,12 +59,12 @@ public class MessageValidator {
         long now = _context.clock().now();
         if (now - (Router.CLOCK_FUDGE_FACTOR * 3 / 2) >= expiration) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Rejecting message because it expired " + (now-expiration) + "ms ago");
+                _log.info("Rejecting message expired " + (now-expiration) + "ms ago");
             _context.statManager().addRateData("router.invalidMessageTime", (now-expiration));
             return "expired " + (now-expiration) + "ms ago";
         } else if (now + 4*Router.CLOCK_FUDGE_FACTOR < expiration) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Rejecting message because it will expire too far in the future (" + (expiration-now) + "ms)");
+                _log.info("Rejecting message expiring too far in the future (" + (expiration-now) + "ms)");
             _context.statManager().addRateData("router.invalidMessageTime", (now-expiration));
             return "expire too far in the future (" + (expiration-now) + "ms)";
         }
