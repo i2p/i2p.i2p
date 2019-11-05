@@ -177,7 +177,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         if (isInbound) {
             // we are Bob, NS received
             OutboundSession sess = new OutboundSession(target, null, state);
-            boolean rv = addSession(sess);
+            boolean rv = addSession(sess, true);
             if (_log.shouldInfo()) {
                 if (rv)
                     _log.info("New OB session " + state.hashCode() + " as Bob. Alice: " + toString(target));
@@ -213,7 +213,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * For inbound (NSR sent by Bob), sets up inbound ES tagset.
      *
      * @param oldState null for inbound, pre-clone for outbound
-     *
+     * @return true if this was the first NSR received
      */
     boolean updateSession(PublicKey target, HandshakeState oldState, HandshakeState state) {
         EncType type = target.getType();
@@ -241,35 +241,43 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 if (pending == null) {
                     if (_log.shouldDebug())
                         _log.debug("Update Alice session but no pending sessions for "  + target);
-                    // TODO can we recover?
+                    // Normal case for multiple NSRs, was already removed
                     return false;
                 }
                 boolean found = false;
-                for (OutboundSession sess : pending) {
-                    if (oldState.equals(sess.getHandshakeState())) {
+                for (Iterator<OutboundSession> iter = pending.iterator(); iter.hasNext(); ) {
+                    OutboundSession sess = iter.next();
+                    HandshakeState pstate = sess.getHandshakeState();
+                    if (oldState.equals(pstate)) {
                         if (!found) {
                             found = true;
                             sess.updateSession(state);
-                            boolean ok = addSession(sess);
+                            boolean ok = addSession(sess, false);
                             if (_log.shouldDebug()) {
                                 if (ok)
                                     _log.debug("Update Alice session from NSR to ES for "  + target);
                                 else
                                     _log.debug("Session already updated from NSR to ES for "  + target);
                             }
+                            iter.remove();
                         } else {
+                            // won't happen
                             if (_log.shouldDebug())
-                                _log.debug("Other pending session " + sess + " for "  + target);
+                                _log.debug("Dup pending session " + sess + " for "  + target);
                         }
                     } else {
-                        // TODO
-                        // remove old tags
                         if (_log.shouldDebug())
                             _log.debug("Other pending session " + sess + " for "  + target);
                     }
                 }
                 if (found) {
                     _pendingOutboundSessions.remove(target);
+                    if (!pending.isEmpty()) {
+                        for (OutboundSession sess : pending) {
+                            //sess.getHandshakeState().destroy();
+                            // TODO remove its inbound tags?
+                        }
+                    }
                 } else {
                     if (_log.shouldDebug())
                         _log.debug("Update Alice session but no session found (out of " + pending.size() + ") for "  + target);
@@ -565,12 +573,29 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     }
 
     /**
+     * For inbound, we are Bob, NS received, replace if very old
+     * For outbound, we are Alice, NSR received, never replace
      *
+     * @param isInbound Bob if true
      * @return true if added
      */
-    private boolean addSession(OutboundSession sess) {
-        OutboundSession old = _outboundSessions.putIfAbsent(sess.getTarget(), sess);
-        return old == null;
+    private boolean addSession(OutboundSession sess, boolean isInbound) {
+        synchronized (_outboundSessions) {
+            OutboundSession old = _outboundSessions.putIfAbsent(sess.getTarget(), sess);
+            boolean rv = old == null;
+            if (!rv) {
+                if (isInbound && old.getLastUsedDate() < _context.clock().now() - SESSION_TAG_DURATION_MS - (60*1000)) {
+                    _outboundSessions.put(sess.getTarget(), sess);
+                    rv = true;
+                    if (_log.shouldDebug())
+                        _log.debug("Replaced old session about to expire for " + sess.getTarget());
+                } else {
+                    if (_log.shouldDebug())
+                        _log.debug("Not replacing existing session for " + sess.getTarget());
+                }
+            }
+            return rv;
+        }
     }
 
     private void removeSession(PublicKey target) {
@@ -905,7 +930,10 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     _tagSets.add(tagset_ab);
                     _unackedTagSets.clear();
                 }
+                // We can't destroy the original state, as more NSRs may come in
+                //_state.destroy();
             }
+            // kills the keys for future NSRs
             //state.destroy();
         }
 

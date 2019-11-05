@@ -246,8 +246,11 @@ public final class ECIESAEADEngine {
         try {
             state.readMessage(data, 0, data.length, payload, 0);
         } catch (GeneralSecurityException gse) {
-            if (_log.shouldWarn())
+            if (_log.shouldWarn()) {
                 _log.warn("Decrypt fail NS", gse);
+                if (_log.shouldDebug())
+                    _log.debug("State at failure: " + state);
+            }
             return null;
         }
 
@@ -340,8 +343,11 @@ public final class ECIESAEADEngine {
         try {
             state.readMessage(data, 8, 48, ZEROLEN, 0);
         } catch (GeneralSecurityException gse) {
-            if (_log.shouldWarn())
+            if (_log.shouldWarn()) {
                 _log.warn("Decrypt fail NSR part 1", gse);
+                if (_log.shouldDebug())
+                    _log.debug("State at failure: " + state);
+            }
             return null;
         }
 
@@ -362,8 +368,11 @@ public final class ECIESAEADEngine {
         try {
             rcvr.decryptWithAd(hash, data, TAGLEN + KEYLEN + MACLEN, payload, 0, payload.length + MACLEN);
         } catch (GeneralSecurityException gse) {
-            if (_log.shouldWarn())
+            if (_log.shouldWarn()) {
                 _log.warn("Decrypt fail NSR part 2", gse);
+                if (_log.shouldDebug())
+                    _log.debug("State at failure: " + state);
+            }
             return null;
         }
         if (payload.length == 0) {
