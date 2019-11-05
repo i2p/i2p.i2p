@@ -161,11 +161,11 @@ public final class ECIESAEADEngine {
             HandshakeState state = key.getHandshakeState();
             if (state == null) {
                 if (shouldDebug)
-                    _log.debug("Decrypting ES with tag: " + st + ": key: " + key.toBase64() + ": " + data.length + " bytes");
+                    _log.debug("Decrypting ES with tag: " + st.toBase64() + ": key: " + key.toBase64() + ": " + data.length + " bytes");
                 decrypted = decryptExistingSession(tag, data, key, targetPrivateKey);
             } else if (data.length >= MIN_NSR_SIZE) {
                 if (shouldDebug)
-                    _log.debug("Decrypting NSR with tag: " + st + ": key: " + key.toBase64() + ": " + data.length + " bytes");
+                    _log.debug("Decrypting NSR with tag: " + st.toBase64() + ": key: " + key.toBase64() + ": " + data.length + " bytes");
                 decrypted = decryptNewSessionReply(tag, data, state, keyManager);
             } else {
                 decrypted = null;
@@ -562,11 +562,11 @@ public final class ECIESAEADEngine {
                 return null;
             }
             if (_log.shouldDebug())
-                _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag);
+                _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag.toBase64());
             return encryptNewSessionReply(cloves, target, state, re.tag, keyManager);
         }
         if (_log.shouldDebug())
-            _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag);
+            _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64());
         byte rv[] = encryptExistingSession(cloves, target, re.key, re.tag);
         return rv;
     }
@@ -722,7 +722,7 @@ public final class ECIESAEADEngine {
     /**
      * No ad
      */
-    final byte[] encryptAEADBlock(byte data[], SessionKey key, long n) {
+    private final byte[] encryptAEADBlock(byte data[], SessionKey key, long n) {
         return encryptAEADBlock(null, data, key, n);
     }
 

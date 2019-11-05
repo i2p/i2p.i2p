@@ -176,8 +176,7 @@ public class MuxedSKM extends SessionKeyManager {
     public SessionKey consumeTag(SessionTag tag) {
         SessionKey rv = _elg.consumeTag(tag);
         if (rv == null) {
-            byte[] stag = new byte[8];
-            System.arraycopy(tag.getData(), 0, stag, 0, 8);
+            long stag = RatchetPayload.fromLong8(tag.getData(), 0);
             RatchetSessionTag rstag = new RatchetSessionTag(stag);
             rv = _ec.consumeTag(rstag);
         }

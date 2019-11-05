@@ -178,9 +178,9 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             boolean rv = addSession(sess);
             if (_log.shouldInfo()) {
                 if (rv)
-                    _log.info("New OB session as Bob. Alice: " + toString(target));
+                    _log.info("New OB session " + state.hashCode() + " as Bob. Alice: " + toString(target));
                 else
-                    _log.info("Dup OB session as Bob. Alice: " + toString(target));
+                    _log.info("Dup OB session " + state.hashCode() + " as Bob. Alice: " + toString(target));
             }
             return rv;
         } else {
@@ -191,14 +191,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 if (pending != null) {
                     pending.add(sess);
                     if (_log.shouldInfo())
-                        _log.info("Another new OB session as Alice, total now: " + pending.size() +
+                        _log.info("Another new OB session " + state.hashCode() + " as Alice, total now: " + pending.size() +
                                   ". Bob: " + toString(target));
                 } else {
                     pending = new ArrayList<OutboundSession>(4);
                     pending.add(sess);
                     _pendingOutboundSessions.put(target, pending);
                     if (_log.shouldInfo())
-                        _log.info("First new OB session as Alice. Bob: " + toString(target));
+                        _log.info("First new OB session " + state.hashCode() + " as Alice. Bob: " + toString(target));
                 }
             }
             return true;
@@ -220,23 +220,25 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
         if (isInbound) {
             // we are Bob, NSR sent
+            if (_log.shouldInfo())
+                _log.info("Session " + state.hashCode() + " update as Bob. Alice: " + toString(target));
             OutboundSession sess = getSession(target);
             if (sess == null) {
                 if (_log.shouldDebug())
-                    _log.debug("Update session but no session found for "  + target);
+                    _log.debug("Update Bob session but no session found for "  + target);
                 // TODO can we recover?
                 return false;
             }
             sess.updateSession(state);
-            if (_log.shouldInfo())
-                _log.info("Session update as Bob. Alice: " + toString(target));
         } else {
             // we are Alice, NSR received
+            if (_log.shouldInfo())
+                _log.info("Session " + oldState.hashCode() + " to " + state.hashCode() + " update as Alice. Bob: " + toString(target));
             synchronized (_pendingOutboundSessions) {
                 List<OutboundSession> pending = _pendingOutboundSessions.get(target);
                 if (pending == null) {
                     if (_log.shouldDebug())
-                        _log.debug("Update session but no sessions found for "  + target);
+                        _log.debug("Update Alice session but no pending sessions for "  + target);
                     // TODO can we recover?
                     return false;
                 }
@@ -250,7 +252,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                 boolean ok = addSession(sess);
                                 if (_log.shouldDebug()) {
                                     if (ok)
-                                        _log.debug("Update session from NSR to ES for "  + target);
+                                        _log.debug("Update Alice session from NSR to ES for "  + target);
                                     else
                                         _log.debug("Session already updated from NSR to ES for "  + target);
                                 }
@@ -266,16 +268,15 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                         }
                     }
                 }
-                _pendingOutboundSessions.remove(target);
-                if (!found) {
+                if (found) {
+                    _pendingOutboundSessions.remove(target);
+                } else {
                     if (_log.shouldDebug())
-                        _log.debug("Update session but no session found (out of " + pending.size() + ") for "  + target);
+                        _log.debug("Update Alice session but no session found (out of " + pending.size() + ") for "  + target);
                     // TODO can we recover?
                     return false;
                 }
             }
-            if (_log.shouldInfo())
-                _log.info("Session update as Alice. Bob: " + toString(target));
         }
         return true;
     }
@@ -520,8 +521,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         SessionKeyAndNonce key;
         tagSet = _inboundTagSets.remove(tag);
         if (tagSet == null) {
-            if (_log.shouldDebug())
-                _log.debug("IB tag not found: " + tag.toBase64());
+            //if (_log.shouldDebug())
+            //    _log.debug("IB tag not found: " + tag.toBase64());
             return null;
         }
         boolean firstInbound;
@@ -535,14 +536,22 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             HandshakeState state = tagSet.getHandshakeState();
             if (firstInbound) {
                 if (state == null) {
-                    // TODO
+                    // TODO this should really be after decrypt...
+                    PublicKey pk = tagSet.getRemoteKey();
+                    OutboundSession sess = getSession(pk);
+                    if (sess != null) {
+                        sess.firstTagConsumed(tagSet);
+                    } else {
+                        if (_log.shouldDebug())
+                            _log.debug("First tag consumed but session is gone");
+                    }
                 }
             }
             if (_log.shouldDebug()) {
                 if (state != null)
-                    _log.debug("IB NSR Tag consumed: " + tag + " from: " + tagSet);
+                    _log.debug("IB NSR Tag consumed: " + tag.toBase64() + " from: " + tagSet);
                 else
-                    _log.debug("IB ES Tag consumed: " + tag + " from: " + tagSet);
+                    _log.debug("IB ES Tag consumed: " + tag.toBase64() + " from: " + tagSet);
             }
         } else {
             if (_log.shouldWarn())
@@ -838,12 +847,21 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 RatchetTagSet tagset = new RatchetTagSet(_hkdf, RatchetSKM.this, state,
                                                          rk, tk,
                                                          _established, _rcvTagSetID.getAndIncrement(), 5, 5);
+                // store the IB tagset as OB so we can lookup the state
+                // TODO just store the state
                 _unackedTagSets.add(tagset);
                 if (_log.shouldDebug())
                     _log.debug("New IB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
             }
         }
 
+        /**
+         * Inbound or outbound. Checks state.getRole() to determine.
+         * For outbound (NSR rcvd by Alice), sets session to transition to ES mode outbound.
+         * For inbound (NSR sent by Bob), sets up inbound ES tagset.
+         *
+         * @param state current state
+         */
         void updateSession(HandshakeState state) {
             byte[] ck = state.getChainingKey();
             byte[] k_ab = new byte[32];
@@ -855,7 +873,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             if (isInbound) {
                 // We are Bob
                 // This is an OUTBOUND NSR, we make an INBOUND tagset for ES
-                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, RatchetSKM.this, rk, new SessionKey(k_ab),
+                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ab),
                                                             now, _rcvTagSetID.getAndIncrement(), 5, 5);
                 // and a pending outbound one
                 RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ba),
@@ -873,7 +891,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ab),
                                                             now, _sentTagSetID.getAndIncrement());
                 // and an inbound one
-                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, RatchetSKM.this, rk, new SessionKey(k_ba),
+                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ba),
                                                             now, _rcvTagSetID.getAndIncrement(), 5, 5);
                 if (_log.shouldDebug()) {
                     _log.debug("Update OB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset: " + tagset_ab);
@@ -888,9 +906,37 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         }
 
         /**
-         *  @return list of RatchetTagSet objects
+         * First tag was received for this inbound (ES) tagset.
+         * Find the corresponding outbound (ES) tagset in _unackedTagSets,
+         * move it to _tagSets, and remove all others.
+         *
+         * @param set the inbound tagset
+         */
+        void firstTagConsumed(RatchetTagSet set) {
+            SessionKey sk = set.getAssociatedKey();
+            synchronized (_tagSets) {
+                for (RatchetTagSet obSet : _unackedTagSets) {
+                    if (obSet.getAssociatedKey().equals(sk)) {
+                        if (_log.shouldDebug())
+                            _log.debug("First tag received from IB ES " + set +
+                                       ", promoting OB ES " + obSet);
+                        _unackedTagSets.clear();
+                        _tagSets.clear();
+                        _tagSets.add(obSet);
+                        return;
+                    }
+                }
+                if (_log.shouldDebug())
+                    _log.debug("First tag received from IB ES " + set +
+                               " but no corresponding OB ES set found, unacked size: " + _unackedTagSets.size() +
+                               " acked size: " + _tagSets.size());
+            }
+        }
+
+        /**
          *  This is used only by renderStatusHTML().
          *  It includes both acked and unacked RatchetTagSets.
+         *  @return list of RatchetTagSet objects
          */
         List<RatchetTagSet> getTagSets() {
             List<RatchetTagSet> rv;

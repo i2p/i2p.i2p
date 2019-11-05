@@ -15,6 +15,10 @@ public class RatchetSessionTag {
 
     private final long _data;
 
+    public RatchetSessionTag(long val) {
+        _data = val;
+    }
+
     public RatchetSessionTag(byte val[]) {
         if (val.length != LENGTH)
             throw new IllegalArgumentException();

@@ -7,13 +7,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.southernstorm.noise.protocol.DHState;
 import com.southernstorm.noise.protocol.HandshakeState;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 
@@ -32,6 +35,7 @@ import net.i2p.util.Log;
  */
 class RatchetTagSet implements TagSetHandle {
     private final SessionTagListener _lsnr;
+    private final PublicKey _remoteKey;
     private final SessionKey _key;
     private final HandshakeState _state;
     // We use object for tags because we must do indexOfValueByValue()
@@ -69,7 +73,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     public RatchetTagSet(HKDF hkdf, HandshakeState state, SessionKey rootKey, SessionKey data,
                          long date, int id) {
-        this(hkdf, null, state, rootKey, data, date, id, false, 0, 0);
+        this(hkdf, null, state, null, rootKey, data, date, id, false, 0, 0);
     }
 
     /**
@@ -79,7 +83,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     public RatchetTagSet(HKDF hkdf, SessionKey rootKey, SessionKey data,
                          long date, int id) {
-        this(hkdf, null, null, rootKey, data, date, id, false, 0, 0);
+        this(hkdf, null, null, null, rootKey, data, date, id, false, 0, 0);
     }
 
     /**
@@ -89,7 +93,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state, SessionKey rootKey, SessionKey data,
                          long date, int id, int minSize, int maxSize) {
-        this(hkdf, lsnr, state, rootKey, data, date, id, true, minSize, maxSize);
+        this(hkdf, lsnr, state, null, rootKey, data, date, id, true, minSize, maxSize);
     }
 
     /**
@@ -97,19 +101,22 @@ class RatchetTagSet implements TagSetHandle {
      *
      *  @param date For inbound: creation time
      */
-    public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, SessionKey rootKey, SessionKey data,
+    public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr,
+                         PublicKey remoteKey, SessionKey rootKey, SessionKey data,
                          long date, int id, int minSize, int maxSize) {
-        this(hkdf, lsnr, null, rootKey, data, date, id, true, minSize, maxSize);
+        this(hkdf, lsnr, null, remoteKey, rootKey, data, date, id, true, minSize, maxSize);
     }
 
 
     /**
      *  @param date For inbound and outbound: creation time
      */
-    private RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state, SessionKey rootKey, SessionKey data,
+    private RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state,
+                          PublicKey remoteKey, SessionKey rootKey, SessionKey data,
                           long date, int id, boolean isInbound, int minSize, int maxSize) {
         _lsnr = lsnr;
         _state = state;
+        _remoteKey = remoteKey;
         _key = rootKey;
         _created = date;
         _date = date;
@@ -149,7 +156,24 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  The identifier for the session..
+     *  The far-end's public key.
+     *  Valid for NSR and inbound ES tagsets.
+     *  Returns null for outbound ES tagsets.
+     */
+    public PublicKey getRemoteKey() {
+        if (_state != null) {
+            DHState kp = _state.getRemotePublicKey();
+            if (kp != null) {
+                byte[] rv = new byte[32];
+                kp.getPublicKey(rv, 0);
+                return new PublicKey(EncType.ECIES_X25519, rv);
+            }
+        }
+        return _remoteKey;
+    }
+
+    /**
+     *  The identifier for the session.
      *  Not used for cryptographic operations after setup.
      */
     public SessionKey getAssociatedKey() {
@@ -386,21 +410,28 @@ class RatchetTagSet implements TagSetHandle {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
+        if (_sessionTags != null)
+            buf.append("Inbound ");
+        else
+            buf.append("Outbound ");
         if (_state != null)
-            buf.append("NSR ");
+            buf.append("NSR ").append(_state.hashCode()).append(' ');
         else
             buf.append("ES ");
         buf.append("TagSet #").append(_id)
-           .append(" created: ").append(DataHelper.formatTime(_created))
-           .append(" last use: ").append(DataHelper.formatTime(_date));
+           .append("\nCreated:  ").append(DataHelper.formatTime(_created))
+           .append("\nLast use: ").append(DataHelper.formatTime(_date));
+        PublicKey pk = getRemoteKey();
+        if (pk != null)
+            buf.append("\nRemote Public Key: ").append(pk.toBase64());
+        buf.append("\nRoot Symmetr. Key: ").append(_key.toBase64());
         int sz = size();
-        buf.append(" Size: ").append(sz)
+        buf.append("\nSize: ").append(sz)
            .append(" Orig: ").append(_originalSize)
            .append(" Max: ").append(_maxSize)
            .append(" Remaining: ").append(remaining());
         buf.append(" Acked? ").append(_acked);
         if (_sessionTags != null) {
-            buf.append(" Inbound");
             for (int i = 0; i < sz; i++) {
                 int n = _sessionTags.keyAt(i);
                 RatchetSessionTag tag = _sessionTags.valueAt(i);
@@ -413,8 +444,6 @@ class RatchetTagSet implements TagSetHandle {
                         buf.append("\tdeferred");
                 }
             }
-        } else {
-            buf.append(" Outbound");
         }
         return buf.toString();
     }
