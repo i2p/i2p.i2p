@@ -244,28 +244,26 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 }
                 boolean found = false;
                 for (OutboundSession sess : pending) {
-                    for (RatchetTagSet ts : sess.getTagSets()) {
-                        if (ts.getHandshakeState().equals(oldState)) {
-                            if (!found) {
-                                found = true;
-                                sess.updateSession(state);
-                                boolean ok = addSession(sess);
-                                if (_log.shouldDebug()) {
-                                    if (ok)
-                                        _log.debug("Update Alice session from NSR to ES for "  + target);
-                                    else
-                                        _log.debug("Session already updated from NSR to ES for "  + target);
-                                }
-                            } else {
-                                if (_log.shouldDebug())
-                                    _log.debug("Dup tagset " + ts + " for "  + target);
+                    if (oldState.equals(sess.getHandshakeState())) {
+                        if (!found) {
+                            found = true;
+                            sess.updateSession(state);
+                            boolean ok = addSession(sess);
+                            if (_log.shouldDebug()) {
+                                if (ok)
+                                    _log.debug("Update Alice session from NSR to ES for "  + target);
+                                else
+                                    _log.debug("Session already updated from NSR to ES for "  + target);
                             }
                         } else {
-                            // TODO
-                            // remove old tags
                             if (_log.shouldDebug())
-                                _log.debug("Remove tagset " + ts + " for "  + target);
+                                _log.debug("Other pending session " + sess + " for "  + target);
                         }
+                    } else {
+                        // TODO
+                        // remove old tags
+                        if (_log.shouldDebug())
+                            _log.debug("Other pending session " + sess + " for "  + target);
                     }
                 }
                 if (found) {
@@ -786,6 +784,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     private class OutboundSession {
         private final PublicKey _target;
+        private final HandshakeState _state;
         private SessionKey _currentKey;
         private final long _established;
         private long _lastUsed;
@@ -839,6 +838,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                                          rk, tk,
                                                          _established, _sentTagSetID.getAndIncrement());
                 _tagSets.add(tagset);
+                _state = null;
                 if (_log.shouldDebug())
                     _log.debug("New OB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
             } else {
@@ -847,9 +847,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 RatchetTagSet tagset = new RatchetTagSet(_hkdf, RatchetSKM.this, state,
                                                          rk, tk,
                                                          _established, _rcvTagSetID.getAndIncrement(), 5, 5);
-                // store the IB tagset as OB so we can lookup the state
-                // TODO just store the state
-                _unackedTagSets.add(tagset);
+-               // store the state so we can find the right session when we receive the NSR
+                _state = state;
                 if (_log.shouldDebug())
                     _log.debug("New IB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
             }
@@ -984,6 +983,13 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         public PublicKey getTarget() {
             return _target;
+        }
+
+        /**
+         *  Original outbound state, null for inbound.
+         */
+        public HandshakeState getHandshakeState() {
+            return _state;
         }
 
         public SessionKey getCurrentKey() {
