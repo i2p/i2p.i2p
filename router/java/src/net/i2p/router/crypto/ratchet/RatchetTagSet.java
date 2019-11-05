@@ -354,6 +354,8 @@ class RatchetTagSet implements TagSetHandle {
 
     private void storeNextTag() {
         RatchetSessionTag tag = consumeNext();
+        if (tag == null)
+            return;
         _sessionTags.put(_lastTag, tag);
         if (_lsnr != null)
             _lsnr.addTag(tag, this);
@@ -363,9 +365,11 @@ class RatchetTagSet implements TagSetHandle {
      *  For outbound only.
      *  Call before consumeNextKey();
      *
-     *  @return a tag or null
+     *  @return a tag or null if we ran out
      */
     public RatchetSessionTag consumeNext() {
+        if (_lastTag >= MAX)
+            return null;
         byte[] tmp = new byte[32];
         hkdf.calculate(_sesstag_ck, _sesstag_constant, INFO_4, _sesstag_ck, tmp, 0);
         byte[] tag = new byte[TAGLEN];

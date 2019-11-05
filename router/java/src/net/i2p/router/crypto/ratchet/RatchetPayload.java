@@ -57,6 +57,11 @@ class RatchetPayload {
         public void gotTermination(int reason, long lastReceived);
 
         /**
+         *  @param nextKey the next one
+         */
+        public void gotNextKey(NextSessionKey nextKey);
+
+        /**
          *  For stats.
          *  @param paddingLength the number of padding bytes, not including the 3-byte block header
          *  @param frameLength the total size of the frame, including all blocks and block headers
@@ -115,6 +120,16 @@ class RatchetPayload {
                     GarlicClove clove = new GarlicClove(ctx);
                     clove.readBytesRatchet(payload, i, len);
                     cb.gotGarlic(clove);
+                    break;
+
+                case BLOCK_NEXTKEY:
+                    if (len != 34)
+                        throw new IOException("Bad length for NEXTKEY: " + len);
+                    int id = (int) DataHelper.fromLong(payload, i, 2);
+                    byte[] data = new byte[32];
+                    System.arraycopy(payload, i + 2, data, 0, 32);
+                    NextSessionKey nsk = new NextSessionKey(data, id);
+                    cb.gotNextKey(nsk);
                     break;
 
                 case BLOCK_TERMINATION:
@@ -281,6 +296,25 @@ class RatchetPayload {
         public int writeData(byte[] tgt, int off) {
             System.arraycopy(opts, 0, tgt, off, opts.length);
             return off + opts.length;
+        }
+    }
+
+    public static class NextKeyBlock extends Block {
+        private final NextSessionKey next;
+
+        public NextKeyBlock(NextSessionKey nextKey) {
+            super(BLOCK_NEXTKEY);
+            next = nextKey;
+        }
+
+        public int getDataLength() {
+            return 34;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            DataHelper.toLong(tgt, off, 2, next.getID());
+            System.arraycopy(next.getData(), 0, tgt, off + 2, 32);
+            return off + 34;
         }
     }
 

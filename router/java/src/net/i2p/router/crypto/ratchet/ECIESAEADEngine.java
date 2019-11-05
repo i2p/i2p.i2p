@@ -760,6 +760,7 @@ public final class ECIESAEADEngine {
     private class PLCallback implements RatchetPayload.PayloadCallback {
         public final List<GarlicClove> cloveSet = new ArrayList<GarlicClove>(3);
         public long datetime;
+        public NextSessionKey nextKey;
 
         public void gotDateTime(long time) {
             if (_log.shouldDebug())
@@ -778,6 +779,12 @@ public final class ECIESAEADEngine {
             if (_log.shouldDebug())
                 _log.debug("Got GARLIC block: " + clove);
             cloveSet.add(clove);
+        }
+
+        public void gotNextKey(NextSessionKey next) {
+            if (_log.shouldDebug())
+                _log.debug("Got NEXTKEY block: " + next);
+            nextKey = next;
         }
 
         public void gotTermination(int reason, long count) {
