@@ -75,8 +75,10 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     private static final long SESSION_TAG_EXPIRATION_WINDOW = 90 * 1000;
 
-    private static final int MIN_RCV_WINDOW = 20;
-    private static final int MAX_RCV_WINDOW = 50;
+    private static final int MIN_RCV_WINDOW_NSR = 12;
+    private static final int MAX_RCV_WINDOW_NSR = 24;
+    private static final int MIN_RCV_WINDOW_ES = 32;
+    private static final int MAX_RCV_WINDOW_ES = 96;
 
     private static final byte[] ZEROLEN = new byte[0];
     private static final String INFO_0 = "SessionReplyTags";
@@ -846,8 +848,9 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // This is an OUTBOUND NS, we make an INBOUND tagset for the NSR
                 RatchetTagSet tagset = new RatchetTagSet(_hkdf, RatchetSKM.this, state,
                                                          rk, tk,
-                                                         _established, _rcvTagSetID.getAndIncrement(), 5, 5);
--               // store the state so we can find the right session when we receive the NSR
+                                                         _established, _rcvTagSetID.getAndIncrement(),
+                                                         MIN_RCV_WINDOW_NSR, MAX_RCV_WINDOW_NSR);
+                // store the state so we can find the right session when we receive the NSR
                 _state = state;
                 if (_log.shouldDebug())
                     _log.debug("New IB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
@@ -873,7 +876,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // We are Bob
                 // This is an OUTBOUND NSR, we make an INBOUND tagset for ES
                 RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ab),
-                                                            now, _rcvTagSetID.getAndIncrement(), 5, 5);
+                                                            now, _rcvTagSetID.getAndIncrement(),
+                                                            MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                 // and a pending outbound one
                 RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ba),
                                                             now, _sentTagSetID.getAndIncrement());
@@ -891,7 +895,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                                             now, _sentTagSetID.getAndIncrement());
                 // and an inbound one
                 RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ba),
-                                                            now, _rcvTagSetID.getAndIncrement(), 5, 5);
+                                                            now, _rcvTagSetID.getAndIncrement(),
+                                                            MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                 if (_log.shouldDebug()) {
                     _log.debug("Update OB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset: " + tagset_ab);
                     _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset: " + tagset_ba);
