@@ -941,6 +941,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         msg.setData(d);
         long expires = OVERALL_TIMEOUT_MS_DEFAULT + getContext().clock().now();
         msg.setMessageExpiration(expires);
+        // need random CloveSet ID as it's checked in receiver GMR.isValid() MessageValidator pre-0.9.44
+        // See GarlicMessageReceiver
         PayloadGarlicConfig clove = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                             getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE), 
                                                             expires,

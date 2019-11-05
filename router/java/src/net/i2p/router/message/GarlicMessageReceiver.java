@@ -120,8 +120,17 @@ public class GarlicMessageReceiver {
     }
     
     private boolean isValid(GarlicClove clove) {
-        String invalidReason = _context.messageValidator().validateMessage(clove.getCloveId(), 
-                                                                          clove.getExpiration().getTime());
+        // As of 0.9.44, no longer check the clove ID in the Bloom filter, just check the expiration.
+        // The Clove ID is just another random number, and the message ID in the clove
+        // will be checked in the Bloom filter; that is sufficient.
+        // Checking the clove ID as well just doubles the number of entries in the Bloom filter,
+        // doubling the number of false positives over what is expected.
+        // For ECIES-Ratchet, the clove ID is set to the message ID after decryption, as there
+        // is no longer a separate field for the clove ID in the transmission format.
+        //String invalidReason = _context.messageValidator().validateMessage(clove.getCloveId(), 
+        //                                                                   clove.getExpiration().getTime());
+        String invalidReason = _context.messageValidator().validateMessage(clove.getExpiration().getTime());
+
         boolean rv = invalidReason == null;
         if (!rv) {
             String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());

@@ -153,6 +153,8 @@ class OutboundClientMessageJobHelper {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         if (replyToken >= 0 && log.shouldLog(Log.DEBUG))
             log.debug("Reply token: " + replyToken);
+        // need random CloveSet ID as it's checked in receiver MessageValidator pre-0.9.44
+        // See GarlicMessageReceiver
         GarlicConfig config = new GarlicConfig(Certificate.NULL_CERT,
                                                ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                expiration, DeliveryInstructions.LOCAL);
@@ -233,6 +235,8 @@ class OutboundClientMessageJobHelper {
         } else {
             msg = dsm;
         }
+        // need random CloveSet ID as it's checked in receiver GMR.isValid() MessageValidator pre-0.9.44
+        // See GarlicMessageReceiver
         PayloadGarlicConfig ackClove = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                                ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                                expiration, ackInstructions, msg);
@@ -295,6 +299,8 @@ class OutboundClientMessageJobHelper {
         
         DataMessage msg = new DataMessage(ctx);
         msg.setData(data.getEncryptedData());
+        // need random CloveSet ID as it's checked in receiver GMR.isValid() MessageValidator pre-0.9.44
+        // See GarlicMessageReceiver
         PayloadGarlicConfig clove = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                             ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                             expiration, instructions, msg);
@@ -313,6 +319,8 @@ class OutboundClientMessageJobHelper {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(ctx);
         msg.setEntry(replyLeaseSet);
         msg.setMessageExpiration(expiration);
+        // need random CloveSet ID as it's checked in receiver GMR.isValid() MessageValidator pre-0.9.44
+        // See GarlicMessageReceiver
         PayloadGarlicConfig clove = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                             ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                             expiration, DeliveryInstructions.LOCAL, msg);

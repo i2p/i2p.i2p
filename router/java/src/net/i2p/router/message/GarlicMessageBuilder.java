@@ -407,9 +407,10 @@ public class GarlicMessageBuilder {
     }
     
     /**
-     * Build the unencrypted GarlicMessage specified by the config.
-     * It contains the number of cloves, followed by each clove,
-     * followed by a certificate, ID, and expiration date.
+     * Build the unencrypted CloveSet specified by the config.
+     * Unlike for Elgamal, the cloves do not contain a unique
+     * ID and expiration, and the CloveSet does not contain
+     * a unique certificate, ID, or expiration date.
      *
      * @throws IllegalArgumentException on error
      * @since 0.9.44
@@ -440,8 +441,8 @@ public class GarlicMessageBuilder {
     private static GarlicClove buildECIESClove(RouterContext ctx, PayloadGarlicConfig config) {
         GarlicClove clove = new GarlicClove(ctx);
         clove.setData(config.getPayload());
-        clove.setCertificate(config.getCertificate());
-        clove.setCloveId(config.getId());
+        clove.setCertificate(Certificate.NULL_CERT);
+        clove.setCloveId(0);
         clove.setExpiration(new Date(config.getExpiration()));
         clove.setInstructions(config.getDeliveryInstructions());
         return clove;
