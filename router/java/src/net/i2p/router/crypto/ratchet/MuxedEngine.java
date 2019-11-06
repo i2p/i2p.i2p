@@ -1,7 +1,5 @@
 package net.i2p.router.crypto.ratchet;
 
-import java.util.List;
-
 import net.i2p.crypto.EncType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
@@ -15,7 +13,7 @@ import net.i2p.util.Log;
  *
  * @since 0.9.44
  */
-public final class MuxedEngine {
+final class MuxedEngine {
     private final RouterContext _context;
     private final Log _log;
 
@@ -27,6 +25,8 @@ public final class MuxedEngine {
     /**
      * Decrypt the message with the given private keys
      *
+     * @param elgKey must be ElG, non-null
+     * @param ecKey must be EC, non-null
      * @return decrypted data or null on failure
      */
     public CloveSet decrypt(byte data[], PrivateKey elgKey, PrivateKey ecKey, MuxedSKM keyManager) throws DataFormatException {
@@ -51,10 +51,13 @@ public final class MuxedEngine {
                     if (_log.shouldWarn())
                         _log.warn("ElG decrypt failed, trying ECIES", dfe);
                 }
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("ElG decrypt failed, trying ECIES");
             }
         }
         if (rv == null) {
-            rv  = _context.eciesEngine().decrypt(data, ecKey, keyManager.getECSKM());
+            rv = _context.eciesEngine().decrypt(data, ecKey, keyManager.getECSKM());
         }
         return rv;
     }

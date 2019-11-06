@@ -31,7 +31,7 @@ import net.i2p.util.Log;
 public class GarlicMessageParser {
     private final Log _log;
     private final RouterContext _context;
-    
+
     /**
      *  Huge limit just to reduce chance of trouble. Typ. usage is 3.
      *  As of 0.9.12. Was 255.
@@ -42,11 +42,11 @@ public class GarlicMessageParser {
         _context = context;
         _log = _context.logManager().getLog(GarlicMessageParser.class);
     }
-    
+
     /**
      *  Supports both ELGAMAL_2048 and ECIES_X25519.
      *
-     *  @param encryptionKey either type TODO need both for muxed
+     *  @param encryptionKey either type
      *  @param skm use tags from this session key manager
      *  @return null on error
      */
@@ -108,7 +108,46 @@ public class GarlicMessageParser {
             }
         }
     }
-    
+
+    /**
+     *  Supports both ELGAMAL_2048 and ECIES_X25519.
+     *
+     *  @param elgKey must be ElG, non-null
+     *  @param ecKey must be EC, non-null
+     *  @param skm use tags from this session key manager
+     *  @return null on error
+     *  @since 0.9.44
+     */
+    CloveSet getGarlicCloves(GarlicMessage message, PrivateKey elgKey, PrivateKey ecKey, SessionKeyManager skm) {
+        byte encData[] = message.getData();
+        CloveSet rv;
+        try {
+            if (skm instanceof MuxedSKM) {
+                MuxedSKM mskm = (MuxedSKM) skm;
+                rv = _context.eciesEngine().decrypt(encData, elgKey, ecKey, mskm);
+            } else if (skm instanceof RatchetSKM) {
+                // unlikely, if we have two keys we should have a MuxedSKM
+                RatchetSKM rskm = (RatchetSKM) skm;
+                rv = _context.eciesEngine().decrypt(encData, ecKey, rskm);
+            } else {
+                // unlikely, if we have two keys we should have a MuxedSKM
+                byte[] decrData = _context.elGamalAESEngine().decrypt(encData, elgKey, skm);
+                if (decrData != null) {
+                    rv = readCloveSet(decrData, 0); 
+                } else {
+                    rv = null; 
+                }
+            }
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Muxed decrypt fail", dfe);
+            rv = null;
+        }
+        if (rv == null &&_log.shouldWarn())
+            _log.warn("Muxed decrypt fail");
+        return rv;
+    }
+
     /**
      *  ElGamal only
      *

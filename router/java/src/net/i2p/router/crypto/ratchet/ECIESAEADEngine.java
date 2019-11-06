@@ -14,7 +14,6 @@ import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.DHState;
 import com.southernstorm.noise.protocol.HandshakeState;
 
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.SessionKeyManager;
@@ -29,6 +28,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.GarlicClove;
 import static net.i2p.router.crypto.ratchet.RatchetPayload.*;
+import net.i2p.router.RouterContext;
 import net.i2p.router.message.CloveSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
@@ -42,8 +42,9 @@ import net.i2p.util.SimpleByteCache;
  * @since 0.9.44
  */
 public final class ECIESAEADEngine {
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     private final Log _log;
+    private final MuxedEngine _muxedEngine;
     private final HKDF _hkdf;
     private final Elg2KeyFactory _edhThread;
     private boolean _isRunning;
@@ -70,9 +71,10 @@ public final class ECIESAEADEngine {
      *
      *  startup() is called from RatchetSKM constructor so it's deferred until we need it.
      */
-    public ECIESAEADEngine(I2PAppContext ctx) {
+    public ECIESAEADEngine(RouterContext ctx) {
         _context = ctx;
         _log = _context.logManager().getLog(ECIESAEADEngine.class);
+        _muxedEngine = new MuxedEngine(ctx);
         _hkdf = new HKDF(ctx);
         _edhThread = new Elg2KeyFactory(ctx);
         
@@ -112,6 +114,17 @@ public final class ECIESAEADEngine {
     }
 
     //// start decrypt ////
+
+    /**
+     * Try to decrypt the message with one or both of the given private keys
+     *
+     * @param elgKey must be ElG, non-null
+     * @param ecKey must be EC, non-null
+     * @return decrypted data or null on failure
+     */
+    public CloveSet decrypt(byte data[], PrivateKey elgKey, PrivateKey ecKey, MuxedSKM keyManager) throws DataFormatException {
+        return _muxedEngine.decrypt(data, elgKey, ecKey, keyManager);
+    }
 
     /**
      * Decrypt the message using the given private key

@@ -57,6 +57,7 @@ public class GarlicMessageReceiver {
     
     public void receive(GarlicMessage message) {
         PrivateKey decryptionKey;
+        PrivateKey decryptionKey2 = null;
         SessionKeyManager skm;
         if (_clientDestination != null) {
             LeaseSetKeys keys = _context.keyManager().getKeys(_clientDestination);
@@ -64,13 +65,16 @@ public class GarlicMessageReceiver {
             if (keys != null && skm != null) {
                 // TODO need to pass both keys if available for muxed decrypt
                 decryptionKey = keys.getDecryptionKey();
+                decryptionKey2 = keys.getDecryptionKey(EncType.ECIES_X25519);
+                if (decryptionKey == null && decryptionKey2 == null) {
+                    if (_log.shouldWarn())
+                        _log.warn("No key to decrypt for " + _clientDestination.toBase32());
+                    return;
+                }
                 if (decryptionKey == null) {
-                    decryptionKey = keys.getDecryptionKey(EncType.ECIES_X25519);
-                    if (decryptionKey == null) {
-                        if (_log.shouldWarn())
-                            _log.warn("No key to decrypt for " + _clientDestination.toBase32());
-                        return;
-                    }
+                    // swap
+                    decryptionKey = decryptionKey2;
+                    decryptionKey2 = null;
                 }
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -82,8 +86,12 @@ public class GarlicMessageReceiver {
             skm = _context.sessionKeyManager();
         }
         
-        // TODO need to pass both keys if available for muxed decrypt
-        CloveSet set = _context.garlicMessageParser().getGarlicCloves(message, decryptionKey, skm);
+        // Pass both keys if available for muxed decrypt
+        CloveSet set;
+        if (decryptionKey2 != null)
+            set = _context.garlicMessageParser().getGarlicCloves(message, decryptionKey, decryptionKey2, skm);
+        else
+            set = _context.garlicMessageParser().getGarlicCloves(message, decryptionKey, skm);
         if (set != null) {
             for (int i = 0; i < set.getCloveCount(); i++) {
                 GarlicClove clove = set.getClove(i);
