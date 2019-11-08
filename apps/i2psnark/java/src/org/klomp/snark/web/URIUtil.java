@@ -87,6 +87,7 @@ class URIUtil
                     case ':':
                     case '[':
                     case ']':
+                    case '&':
                         buf=new StringBuilder(path.length()*2);
                         break loop;
                     default:
@@ -151,6 +152,10 @@ class URIUtil
                       case ']':
                           buf.append("%5D");
                           continue;
+                      // not strictly required but this is probably HTML output
+                      case '&':
+                          buf.append("%26");
+                          continue;
                       default:
                           if (c <= 0x1f) // includes negative
                               toHex(c,buf);
@@ -203,6 +208,9 @@ class URIUtil
                             continue;
                         case ']':
                             buf.append("%5D");
+                            continue;
+                        case '&':
+                            buf.append("%26");
                             continue;
                         default:
                             if (c <= 0x1f || (c >= 0x7f && c <= 0x9f) || Character.isSpaceChar(c))
