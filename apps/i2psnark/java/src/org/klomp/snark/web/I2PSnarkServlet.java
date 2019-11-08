@@ -3504,17 +3504,32 @@ public class I2PSnarkServlet extends BasicServlet {
             if (mime == null)
                 mime = "";
 
+            boolean isAudio = false;
+            boolean isVideo = false;
             buf.append("<td class=\"snarkFileIcon\">");
             if (complete) {
+                isAudio = mime.startsWith("audio/") || mime.equals("application/ogg");
+                isVideo = mime.startsWith("video/");
+                if (isAudio || isVideo) {
+                    // HTML5
+                    if (isAudio)
+                        buf.append("<audio controls>");
+                    else
+                        buf.append("<video controls>");
+                    buf.append("<source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
+                }
                 buf.append("<a href=\"").append(path).append("\">");
-                // thumbnail ?
-                String plc = item.toString().toLowerCase(Locale.US);
                 if (mime.startsWith("image/")) {
+                    // thumbnail
                     buf.append("<img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
                        .append(path).append("\"></a>");
                 } else {
                     buf.append(toImg(icon, _t("Open"))).append("</a>");
                 }
+                if (isAudio)
+                    buf.append("</audio>");
+                else if (isVideo)
+                    buf.append("</video>");
             } else {
                 buf.append(toImg(icon));
             }
@@ -3522,11 +3537,9 @@ public class I2PSnarkServlet extends BasicServlet {
             if (complete) {
                 buf.append("<a href=\"").append(path);
                 // send browser-viewable files to new tab to avoid potential display in iframe
-                if (mime.startsWith("text/") ||
-                    mime.startsWith("image/") ||
-                    mime.startsWith("audio/") ||
-                    mime.startsWith("video/") ||
-                    mime.equals("application/ogg"))
+                if (isAudio || isVideo ||
+                    mime.startsWith("text/") ||
+                    mime.startsWith("image/"))
                     buf.append("\" target=\"_blank");
                 buf.append("\">");
             }
