@@ -87,13 +87,17 @@
 %>
   <div class="ag2">
     <h4 class="app2"><%=intl._t("Hidden Services of Interest")%></h4>
-    <jsp:getProperty name="homehelper" property="favorites" /><br>
+    <div class="homesites">
+      <jsp:getProperty name="homehelper" property="favorites" /><br>
     <div class="clearer">&nbsp;</div>
+    </div>
   </div>
   <div class="ag2">
     <h4 class="app"><%=intl._t("Applications and Configuration")%></h4>
-    <jsp:getProperty name="homehelper" property="services" /><br>
+    <div class="homeapps">
+      <jsp:getProperty name="homehelper" property="services" /><br>
     <div class="clearer">&nbsp;</div>
+    </div>
   </div>
 </div>
 </div>

@@ -19,7 +19,7 @@ import net.i2p.util.SystemVersion;
  * Get a working directory for i2p.
  *
  * For the location, first try the system property i2p.dir.config
- * Next try $HOME/.i2p on linux or %APPDATA%\I2P on Windows.
+ * Next try $HOME/.i2p on linux or %LOCALAPPDATA%\I2P on Windows.
  *
  * If the dir exists, return it.
  * Otherwise, attempt to create it, and copy files from the base directory.
@@ -80,14 +80,14 @@ public class WorkingDir {
         } else {
             String home = System.getProperty("user.home");
             if (isWindows) {
-                String appdata = System.getenv("APPDATA");
+                String appdata = System.getenv("LOCALAPPDATA");
                 if (appdata != null)
                     home = appdata;
                 dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
             } else if (SystemVersion.isMac()) {
                 String appdata = "/Library/Application Support/";
 		File old = new File(home,WORKING_DIR_DEFAULT);
-		if (old.exists() && old.isDirectory()) 
+		if (old.exists() && old.isDirectory())
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
                 else {
                     home = home+appdata;
@@ -418,7 +418,7 @@ public class WorkingDir {
 
     /**
      * Recursive copy a file or dir to a dir
-     * 
+     *
      * @param src file or directory, need not exist
      * @param targetDir the directory to copy to, will be created if it doesn't exist
      * @return true for success OR if src does not exist
@@ -456,7 +456,7 @@ public class WorkingDir {
         }
         return rv;
     }
-    
+
     /**
      * @param src not a directory, must exist
      * @param dst not a directory, will be overwritten if existing, will be mode 600
@@ -487,7 +487,7 @@ public class WorkingDir {
 
     /**
      * Recursive touch all files in a dir to a given time
-     * 
+     *
      * @param target the directory or file to touch, must exist
      * @param time the timestamp
      * @since 0.8.13
@@ -508,5 +508,5 @@ public class WorkingDir {
             touchRecursive(children[i], time);
         }
     }
-    
+
 }

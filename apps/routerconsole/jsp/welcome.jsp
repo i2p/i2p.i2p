@@ -92,7 +92,6 @@
 <%
     }
 %>
-<!--<h2><%=intl._t("New Install Wizard")%> <%=ipg%>/<%=LAST_PAGE%></h2>-->
 <div id="wizard" class="overlay">
 
 <jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="request" />

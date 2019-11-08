@@ -184,7 +184,6 @@ public class ConfigUIHelper extends HelperBase {
                 current = "en";
         }
         StringBuilder buf = new StringBuilder(512);
-        //buf.append("<fieldset>\n");
         buf.append("  <select name=\"lang\" id=\"langsettings\">\n");
         for (int i = 0; i < langs.length; i++) {
             String lang = langs[i][0];
@@ -197,10 +196,8 @@ public class ConfigUIHelper extends HelperBase {
 
             buf.append(" value=\"").append(lang).append("\"");
             buf.append(" id=\"").append(lang).append("\"").append(">");
-            //buf.append(" style=\"").append("background-image:url(/flags.jsp?s=48&amp;c=").append(langs[i][1]).append("\">\n");
             int under = lang.indexOf('_');
             String slang = (under > 0) ? lang.substring(0, under) : lang;
-            //buf.append("        ");
             buf.append(langs[i][2]);
             String name = langs[i][3];
             if (name != null) {
@@ -211,7 +208,6 @@ public class ConfigUIHelper extends HelperBase {
             buf.append("</option>\n");
         }
         buf.append("  </select>\n");
-        //buf.append("</fieldset>\n");
         return buf.toString();
     }
 

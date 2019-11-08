@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <!-- This configuration supports Jetty 9. Do not remove this line. -->
@@ -32,7 +32,7 @@
 <!-- Note that the XML encoding for this file is UTF-8.                        -->
 <!--                                                                           -->
 <!-- If you have a 'split' directory installation, with configuration          -->
-<!-- files in ~/.i2p (Linux), %APPDATA%\I2P (Windows),                         -->
+<!-- files in ~/.i2p (Linux), %LOCALAPPDATA%\I2P (Windows),                         -->
 <!-- or /Users/(user)/Library/Application Support/i2p (Mac), be sure to        -->
 <!-- edit the file in the configuration directory, NOT the install directory.  -->
 <!-- When running as a Linux daemon, the configuration directory is            -->
@@ -103,7 +103,7 @@
          SocketConnector below.
          Do not use for gij or JamVM - comment this out, and uncomment the
          SocketConnector below.
-    -->    
+    -->
     <Call name="addConnector">
       <Arg>
           <New class="org.eclipse.jetty.server.ServerConnector">
@@ -152,7 +152,7 @@
     -->
 
     <!-- =========================================================== -->
-    <!-- Set handler Collection Structure                            --> 
+    <!-- Set handler Collection Structure                            -->
     <!-- =========================================================== -->
     <Set name="handler">
       <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">

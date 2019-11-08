@@ -14,7 +14,7 @@ import java.io.PrintStream;
 /**
  * <p>This class is used by the installer in Windows to process the <code>wrapper.config</code> file. It
  * <ul>
- * <li>rewrites the applicable wrapper config options to point to <code>%APPDATA%\I2P</code></li>
+ * <li>rewrites the applicable wrapper config options to point to <code>%LOCALAPPDATA%\I2P</code></li>
  * <li>corrects the paths, rewriting <code>/</code> to <code>\</code></li>
  * </ul>
  * <p>
