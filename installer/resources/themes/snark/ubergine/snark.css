@@ -925,8 +925,8 @@ _:-ms-lang(x), .snarkDirInfo img, .snarkTorrents img {
 
 .snarkTorrentDownloaded {
      text-align: right !important;
-     width: 120px;
-     max-width: 120px;
+     width: 130px;
+     max-width: 130px;
      color: #76a !important;
      white-space: nowrap;
 }
@@ -983,7 +983,7 @@ tr:hover .percentBarInner {
 }
 
 .percentBarText, .percentBarOuter {
-     width: 120px;
+     width: 130px;
      text-align: center;
      vertical-align: middle;
 }
@@ -2803,7 +2803,7 @@ td.snarkGraphicStatus img {
 }
 
 .percentBarOuter, .percentBarText {
-     width: 120px;
+     width: 130px;
 }
 
 .snarkDirInfo .percentBarText, .snarkDirInfo .percentBarOuter {

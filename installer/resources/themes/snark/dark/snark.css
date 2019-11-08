@@ -1007,7 +1007,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
 }
 
 .percentBarText, .percentBarOuter {
-     width: 120px;
+     width: 130px;
      text-align: center;
      vertical-align: middle;
 }
@@ -2741,7 +2741,7 @@ td#bwHelp a {
 }
 
 .percentBarText, .percentBarOuter, .snarkTorrentDownloaded {
-     width: 120px;
+     width: 130px;
 }
 
 .snarkFileStatus img[src*="clock"] {
@@ -2811,7 +2811,7 @@ body, .snarkTorrents td, .snarkAddInfo, th, td,  code, textarea, input, input[ty
 .snarkTorrentDownloaded {
      white-space: nowrap;
      padding: 0 8px;
-     width: 120px;
+     width: 130px;
      text-align: center;
 }
 
