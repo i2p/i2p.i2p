@@ -15,7 +15,7 @@ If you're having trouble, check the
 website at https://geti2p.net/, or get on irc://irc.freenode.net/#i2p
 
 I2P will create and store files and configuration data in the user directory
-~/.i2p/ on Linux and %APPDATA%\I2P\ on Windows. This directory is created
+~/.i2p/ on Linux and %LOCALAPPDATA%\I2P\ on Windows. This directory is created
 when I2P is run for the first time. It also creates files in the system
 temporary directory specified by the Java Virtual Machine.
 To change the location of these directories, or to configure I2P to

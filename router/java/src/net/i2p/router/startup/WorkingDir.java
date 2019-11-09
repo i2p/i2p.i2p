@@ -83,6 +83,15 @@ public class WorkingDir {
                 String appdata = System.getenv("LOCALAPPDATA");
                 if (appdata != null)
                     home = appdata;
+                // Don't mess with existing Roaming Application Data installs,
+                // in case somebody is using roaming appdata for a reason
+                // already. In new installs, use local appdata by default. -idk
+                String oldappdata = System.getenv("APPDATA");
+                if (oldappdata != null) {
+                    File checkOld = new File(oldappdata, WORKING_DIR_DEFAULT_WINDOWS);
+                    if (checkOld.exists() && checkOld.isDirectory())
+                        home = appdata;
+                }
                 dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
             } else if (SystemVersion.isMac()) {
                 String appdata = "/Library/Application Support/";

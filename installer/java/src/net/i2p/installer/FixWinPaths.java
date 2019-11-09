@@ -50,11 +50,11 @@ public class FixWinPaths{
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("wrapper.logfile="))
-                    line = "wrapper.logfile=%appdata%\\i2p\\wrapper.log";
+                    line = "wrapper.logfile=%localappdata%\\i2p\\wrapper.log";
                 else if (line.startsWith("#wrapper.java.pidfile="))
-                    line = "#wrapper.java.pidfile=%appdata%\\i2p\\routerjvm.pid";
+                    line = "#wrapper.java.pidfile=%localappdata%\\i2p\\routerjvm.pid";
                 else if (line.startsWith("#wrapper.pidfile="))
-                    line = "#wrapper.pidfile=%appdata%\\i2p\\i2p.pid";
+                    line = "#wrapper.pidfile=%localappdata%\\i2p\\i2p.pid";
                 if (line.contains("\\i2p/"))
                     line = line.replace("\\i2p/", "\\i2p\\");
                 if (line.contains("lib/"))
