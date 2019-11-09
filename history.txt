@@ -1,3 +1,7 @@
+2019-11-06 idk
+ * Router:
+  - Use Local Application Data(%LOCALAPPDATA%) instead of Roaming for config
+
 2019-11-02 zzz
  * Router: NSR/ES fixes for proposal 144
 
@@ -516,7 +520,7 @@
  * Fix Debian builds with Jetty 9.4.15 (ticket #2457)
 
 2019-03-11 zab
- * Startup: make negative client app delay value mean waiting 
+ * Startup: make negative client app delay value mean waiting
    for router to be RUNNING (ticket #2377)
  * I2PTunnel: make I2PTunnel default to negative startup delay value
    (ticket #2377)

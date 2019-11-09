@@ -86,9 +86,9 @@ public class WorkingDir {
                 // Don't mess with existing Roaming Application Data installs,
                 // in case somebody is using roaming appdata for a reason
                 // already. In new installs, use local appdata by default. -idk
-                String oldappdata = System.getenv("APPDATA");
-                if (oldappdata != null) {
-                    File checkOld = new File(oldappdata, WORKING_DIR_DEFAULT_WINDOWS);
+                appdata = System.getenv("APPDATA");
+                if (appdata != null) {
+                    File checkOld = new File(appdata, WORKING_DIR_DEFAULT_WINDOWS);
                     if (checkOld.exists() && checkOld.isDirectory())
                         home = appdata;
                 }
