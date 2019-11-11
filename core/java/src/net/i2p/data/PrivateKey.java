@@ -123,6 +123,7 @@ public class PrivateKey extends SimpleDataStructure implements Destroyable {
             Arrays.fill(data, (byte) 0);
             SimpleByteCache.release(data);
         }
+        _pubKey = null;
     }
 
     /**

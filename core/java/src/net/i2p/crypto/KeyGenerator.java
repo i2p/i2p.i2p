@@ -159,15 +159,16 @@ public final class KeyGenerator {
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
 
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
-        keys[0] = new PublicKey();
-        keys[1] = new PrivateKey();
 
         // bigInteger.toByteArray returns SIGNED integers, but since they'return positive,
         // signed two's complement is the same as unsigned
 
         try {
-            keys[0].setData(SigUtil.rectify(aalpha, PublicKey.KEYSIZE_BYTES));
-            keys[1].setData(SigUtil.rectify(a, PrivateKey.KEYSIZE_BYTES));
+            PublicKey pub = new PublicKey(SigUtil.rectify(aalpha, PublicKey.KEYSIZE_BYTES));
+            keys[0] = pub;
+            keys[1] = new PrivateKey(EncType.ELGAMAL_2048,
+                                     SigUtil.rectify(a, PrivateKey.KEYSIZE_BYTES),
+                                     pub);
         } catch (InvalidKeyException ike) {
             throw new IllegalArgumentException(ike);
         }
@@ -199,7 +200,7 @@ public final class KeyGenerator {
             byte[] bpub = new byte[32];
             Curve25519.eval(bpub, 0, bpriv, null);
             pub = new PublicKey(type, bpub);
-            priv = new PrivateKey(type, bpriv);
+            priv = new PrivateKey(type, bpriv, pub);
             break;
 
           default:
