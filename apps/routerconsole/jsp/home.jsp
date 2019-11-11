@@ -86,16 +86,30 @@
    }  // shouldShowSearch()
 %>
   <div class="ag2">
-    <h4 class="app2"><%=intl._t("Hidden Services of Interest")%></h4>
+    <h4 class="app"><%=intl._t("Applications")%></h4>
+    <div class="homeapps">
+      <jsp:getProperty name="homehelper" property="services" /><br>
+    <div class="clearer">&nbsp;</div>
+    </div>
+  </div>
+  <div class="ag2">
+    <h4 class="app2"><%=intl._t("Blogs, Forums, and Web Sites")%></h4>
     <div class="homesites">
       <jsp:getProperty name="homehelper" property="favorites" /><br>
     <div class="clearer">&nbsp;</div>
     </div>
   </div>
   <div class="ag2">
-    <h4 class="app"><%=intl._t("Applications and Configuration")%></h4>
-    <div class="homeapps">
-      <jsp:getProperty name="homehelper" property="services" /><br>
+    <h4 class="app"><%=intl._t("Configuration")%></h4>
+    <div class="homeconfig">
+      <jsp:getProperty name="homehelper" property="config" /><br>
+    <div class="clearer">&nbsp;</div>
+    </div>
+  </div>
+  <div class="ag2">
+    <h4 class="app"><%=intl._t("Monitoring")%></h4>
+    <div class="homedevs">
+      <jsp:getProperty name="homehelper" property="monitoring" /><br>
     <div class="clearer">&nbsp;</div>
     </div>
   </div>

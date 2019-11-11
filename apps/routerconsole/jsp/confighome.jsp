@@ -62,7 +62,7 @@ input.default {
 <%
    }  // shouldShowSearch()
 %>
-<h3 class="tabletitle"><%=intl._t("Hidden Services of Interest")%></h3>
+<h3 class="tabletitle"><%=intl._t("Blogs, Forums, and Web Sites")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="1">
@@ -76,12 +76,40 @@ input.default {
  </div>
 </form>
 
-<h3 class="tabletitle"><%=intl._t("Applications and Configuration")%></h3>
+<h3 class="tabletitle"><%=intl._t("Applications")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="2">
  <jsp:getProperty name="homehelper" property="configServices" />
  <div class="formaction" id="homeapps">
+  <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
+ </div>
+</form>
+
+<h3 class="tabletitle"><%=intl._t("Configuration")%></h3>
+<form action="" method="POST">
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+ <input type="hidden" name="group" value="4">
+ <jsp:getProperty name="homehelper" property="configConfig" />
+ <div class="formaction" id="homeconfig">
+  <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
+ </div>
+</form>
+
+<h3 class="tabletitle"><%=intl._t("Monitoring")%></h3>
+<form action="" method="POST">
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+ <input type="hidden" name="group" value="5">
+ <jsp:getProperty name="homehelper" property="configMonitoring" />
+ <div class="formaction" id="homemonitor">
   <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
   <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >

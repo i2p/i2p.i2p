@@ -30,23 +30,30 @@ public class HomeHelper extends HelperBase {
     private static final String I = "/themes/console/images/";
     static final String PROP_SERVICES = "routerconsole.services";
     static final String PROP_FAVORITES = "routerconsole.favorites";
+    static final String PROP_CONFIG = "routerconsole.configopts";
+    static final String PROP_MONITORING = "routerconsole.monitoring";
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
     private static final String PROP_SEARCH = "routerconsole.showSearch";
 
     // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
+        _x("Email") + S + _x("Anonymous webmail client") + S + "/webmail" + S + I + "email.png" + S +
+        _x("I2P Tunnel") + S + _x("Port-Forwarding to and from I2P") + S + "/i2ptunnelmgr" + S + I + "itoopie_xsm.png" + S +
+        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/torrents" + S + I + "i2psnark.png" + S +
+        _x("Web Server") + S + _x("Local web server for hosting your own content on I2P") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
+        "";
+
+    static final String DEFAULT_CONFIG =
+        _x("Configure Homepage") + S + _x("Configure the contents of this page") + S + "/confighome" + S + I + "info/home.png" + S +
         _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "info/bandwidth.png" + S +
         // FIXME wasn't escaped
         //_x("Configure UI") + S + _x("Select console theme & language & set optional console password").replace("&", "&amp;") + S + "/configui" + S + I + "info/ui.png" + S +
         //_x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "home_page.png" + S +
         //_x("Customize Sidebar") + S + _x("Customize the sidebar by adding or removing or repositioning elements") + S + "/configsidebar" + S + I + "info/sidebar.png" + S +
-        _x("Email") + S + _x("Anonymous webmail client") + S + "/webmail" + S + I + "email.png" + S +
         _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "support.png" + S +
         _x("Manage Plugins") + S + _x("Install and configure I2P plugins") + S + "/configplugins" + S + I + "plugin.png" + S +
         _x("Router Console") + S + _x("I2P Router Console") + S + "/console" + S + I + "info/console.png" + S +
-        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/torrents" + S + I + "i2psnark.png" + S +
-        _x("Web Server") + S + _x("Local web server for hosting your own content on I2P") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
         "";
 
     // No commas allowed in text strings!
@@ -87,6 +94,14 @@ public class HomeHelper extends HelperBase {
         //"sponge.i2p" + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
         "";
 
+    // No commas allowed in text strings!
+    static final String DEFAULT_MONITORING =
+        _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "billiard_marker.png" + S +
+        _x("Router Stats") + S + _x("View router stats") + S + "/stats" + S + I + "info/bandwidth.png" + S +
+        _x("Charts and Graphs") + S + _x("Visualize information about the router") + S + "/graphs" + S + I + "chart_line.png" + S +
+        _x("Network Database") + S + _x("View the NetDB") + S + "/netdb" + S + I + "support.png" + S +
+        _x("Peers") + S + _x("View your known peers") + S + "/peers" + S + I + "group.png" + S +
+        "";
 
     public boolean shouldShowWelcome() {
         return _context.getProperty(Messages.PROP_LANG) == null;
@@ -101,12 +116,28 @@ public class HomeHelper extends HelperBase {
         return homeTable(PROP_SERVICES, DEFAULT_SERVICES, plugins);
     }
 
+    public String getConfig(){
+        return homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
+    }
+
+    public String getMonitoring(){
+        return homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
+    }
+
     public String getFavorites() {
         return homeTable(PROP_FAVORITES, DEFAULT_FAVORITES, null);
     }
 
     public String getConfigServices() {
         return configTable(PROP_SERVICES, DEFAULT_SERVICES);
+    }
+
+    public String getConfigConfig() {
+        return configTable(PROP_CONFIG, DEFAULT_CONFIG);
+    }
+
+    public String getConfigMonitoring() {
+        return configTable(PROP_MONITORING, DEFAULT_MONITORING);
     }
 
     public String getConfigFavorites() {
@@ -211,6 +242,9 @@ public class HomeHelper extends HelperBase {
                         continue;
                 } else if (url.equals("/torrents")) {
                     if (!pm.isRegistered("i2psnark"))
+                        continue;
+                } else if (url.equals("/i2ptunnelmgr")) {
+                    if (!pm.isRegistered("i2ptunnel"))
                         continue;
                 } else if (url.equals("/configplugins")) {
                     if (!PluginStarter.pluginsEnabled(_context))

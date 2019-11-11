@@ -41,6 +41,12 @@ public class ConfigHomeHandler extends FormHandler {
             } else if ("3".equals(group)) {
                 prop = SearchHelper.PROP_ENGINES;
                 dflt = SearchHelper.ENGINES_DEFAULT;
+            } else if ("4".equals(group)) {
+                prop = HomeHelper.PROP_CONFIG;
+                dflt = HomeHelper.DEFAULT_CONFIG;
+            } else if ("5".equals(group)) {
+                prop = HomeHelper.PROP_MONITORING;
+                dflt = HomeHelper.DEFAULT_MONITORING;
             } else {
                 addFormError("Bad group");
                 return;
