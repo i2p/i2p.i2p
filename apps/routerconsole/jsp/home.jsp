@@ -93,7 +93,7 @@
     </div>
   </div>
   <div class="ag2">
-    <h4 class="app2"><%=intl._t("Blogs, Forums, and Web Sites")%></h4>
+    <h4 class="app2"><%=intl._t("Websites")%></h4>
     <div class="homesites">
       <jsp:getProperty name="homehelper" property="favorites" /><br>
     <div class="clearer">&nbsp;</div>

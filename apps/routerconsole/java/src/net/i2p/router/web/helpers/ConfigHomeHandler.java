@@ -85,8 +85,12 @@ public class ConfigHomeHandler extends FormHandler {
                     app = new App(name, "", url, "/themes/console/images/eepsite.png");
                 else if ("2".equals(group))
                     app = new App(name, "", url, "/themes/console/images/title_window.png");
-                else
+                else if ("3".equals(group))
                     app = new App(name, "", url, "/themes/console/images/question.png");
+                else if ("4".equals(group))
+                    app = new App(name, "", url, "/themes/console/images/server.png");
+                else if ("5".equals(group))
+                    app = new App(name, "", url, "/themes/console/images/chart_line.png");
                 apps.add(app);
                 addFormNotice(_t("Added") + ": " + app.name);
             } else {

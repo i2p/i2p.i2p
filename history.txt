@@ -1,6 +1,8 @@
 2019-11-06 idk
  * Router:
   - Use Local Application Data(%LOCALAPPDATA%) instead of Roaming for config
+ * Console:
+  - Change home page organization, headlines, to expose more information
 
 2019-11-02 zzz
  * Router: NSR/ES fixes for proposal 144

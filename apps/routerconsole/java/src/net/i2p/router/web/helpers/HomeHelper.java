@@ -38,7 +38,7 @@ public class HomeHelper extends HelperBase {
     // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
         _x("Email") + S + _x("Anonymous webmail client") + S + "/webmail" + S + I + "email.png" + S +
-        _x("I2P Tunnel") + S + _x("Port-Forwarding to and from I2P") + S + "/i2ptunnelmgr" + S + I + "itoopie_xsm.png" + S +
+        _x("Hidden Services Manager") + S + _x("Control your client and server tunnels") + S + "/i2ptunnelmgr" + S + I + "server_32x32.png" + S +
         _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/torrents" + S + I + "i2psnark.png" + S +
         _x("Web Server") + S + _x("Local web server for hosting your own content on I2P") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
@@ -97,10 +97,7 @@ public class HomeHelper extends HelperBase {
     // No commas allowed in text strings!
     static final String DEFAULT_MONITORING =
         _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "billiard_marker.png" + S +
-        _x("Router Stats") + S + _x("View router stats") + S + "/stats" + S + I + "info/bandwidth.png" + S +
-        _x("Charts and Graphs") + S + _x("Visualize information about the router") + S + "/graphs" + S + I + "chart_line.png" + S +
-        _x("Network Database") + S + _x("View the NetDB") + S + "/netdb" + S + I + "support.png" + S +
-        _x("Peers") + S + _x("View your known peers") + S + "/peers" + S + I + "group.png" + S +
+        _x("Graphs") + S + _x("Visualize information about the router") + S + "/graphs" + S + I + "chart_line.png" + S +
         "";
 
     public boolean shouldShowWelcome() {
