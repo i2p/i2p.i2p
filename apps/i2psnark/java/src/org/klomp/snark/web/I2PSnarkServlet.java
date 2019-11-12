@@ -3194,7 +3194,7 @@ public class I2PSnarkServlet extends BasicServlet {
             //buf.append("<tr><td>").append(_t("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
 
-            buf.append("<tr id=\"torrentInfoStats\"><td><span>");
+            buf.append("<tr id=\"torrentInfoStats\"><td>");
             toThemeImg(buf, "head_rx");
             buf.append("</td><td><b>");
             int pieces = snark.getPieces();
@@ -3349,7 +3349,9 @@ public class I2PSnarkServlet extends BasicServlet {
             if (storage != null && storage.complete()) {
                 String mime = getMimeType(r.getName());
                 boolean isAudio = mime != null && (mime.startsWith("audio/") || mime.equals("application/ogg"));
-                boolean isVideo = mime != null && mime.startsWith("video/");
+                boolean isVideo = mime != null && mime.startsWith("video/") &&
+                                  !mime.equals("video/x-msvideo") && !mime.equals("video/x-matroska") &&
+                                  !mime.equals("video/quicktime");
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
@@ -3551,7 +3553,9 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<td class=\"snarkFileIcon\">");
             if (complete) {
                 isAudio = mime.startsWith("audio/") || mime.equals("application/ogg");
-                isVideo = mime.startsWith("video/");
+                isVideo = mime.startsWith("video/") &&
+                          !mime.equals("video/x-msvideo") && !mime.equals("video/x-matroska") &&
+                          !mime.equals("video/quicktime");
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
