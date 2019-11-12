@@ -272,8 +272,8 @@ Index: b/installer/resources/wrapper.config
 +wrapper.java.library.path.2=/usr/share/java/lib
  
  # Java Bits.  On applicable platforms, tells the JVM to run in 32 or 64-bit mode.
- wrapper.java.additional.auto_bits=TRUE
-@@ -74,7 +66,7 @@ wrapper.java.additional.auto_bits=TRUE
+ wrapper.java.additional.auto_bits=FALSE
+@@ -74,7 +66,7 @@ wrapper.java.additional.auto_bits=FALSE
  # Java Additional Parameters
  # Numbers must be consecutive (except for stripquotes)
  wrapper.java.additional.1=-DloggerFilenameOverride=logs/log-router-@.txt
