@@ -26,7 +26,6 @@ package net.i2p.router.transport.udp;
  *
  */
 
-//import org.bouncycastle.crypto.CipherParameters;
 import java.security.DigestException;
 import java.security.MessageDigest;
 import java.util.Arrays;

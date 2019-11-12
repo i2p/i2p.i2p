@@ -9,8 +9,6 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 
-//import org.bouncycastle.oldcrypto.digests.MD5Digest;
-
 /**
  *  Manage both plaintext and salted/hashed password storage in
  *  router.config.
