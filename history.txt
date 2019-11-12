@@ -1,8 +1,21 @@
+2019-11-12 zzz
+ * i2psnark: Audio playlist support
+
+2019-11-11 zzz
+ * KeyGenerator: Use new PrivateKey constructor
+ * Router: Set default sig type to EdDSA for Android (ticket #2643)
+
+2019-11-08 zzz
+ * i2psnark: Add HTML5 players on details page
+
 2019-11-06 idk
  * Router:
   - Use Local Application Data(%LOCALAPPDATA%) instead of Roaming for config
  * Console:
   - Change home page organization, headlines, to expose more information
+
+2019-11-05 zzz
+ * Router: No longer check the clove ID in the Bloom filter
 
 2019-11-02 zzz
  * Router: NSR/ES fixes for proposal 144

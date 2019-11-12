@@ -235,6 +235,18 @@ public class I2PSnarkServlet extends BasicServlet {
                 File resource = getResource(pathInContext);
                 if (resource == null) {
                     resp.sendError(404);
+                } else if (req.getParameter("playlist") != null) {
+                    String base = addPaths(req.getRequestURI(), "/");
+                    String listing = getPlaylist(req.getRequestURL().toString(), base, req.getParameter("sort"));
+                    if (listing != null) {
+                        setHTMLHeaders(resp);
+                        // TODO custom name
+                        resp.setContentType("audio/mpegurl; charset=UTF-8; name=\"playlist.m3u\"");
+                        resp.addHeader("Content-Disposition", "attachment; filename=\"playlist.m3u\"");
+                        resp.getWriter().write(listing);
+                    } else {
+                        resp.sendError(404);
+                    }
                 } else {
                     String base = addPaths(req.getRequestURI(), "/");
                     String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null,
@@ -3333,6 +3345,26 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (ls == null) {
             // We are only showing the torrent info section
+            // unless audio or video...
+            if (storage != null && storage.complete()) {
+                String mime = getMimeType(r.getName());
+                boolean isAudio = mime != null && (mime.startsWith("audio/") || mime.equals("application/ogg"));
+                boolean isVideo = mime != null && mime.startsWith("video/");
+                if (isAudio || isVideo) {
+                    // HTML5
+                    if (isAudio)
+                        buf.append("<audio controls>");
+                    else
+                        buf.append("<video controls>");
+                    // strip trailing slash
+                    String path = base.substring(0, base.length() - 1);
+                    buf.append("<source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
+                    if (isAudio)
+                        buf.append("</audio>");
+                    else
+                        buf.append("</video>");
+                }
+            }
             if (er || ec)
                 displayComments(snark, er, ec, esc, buf);
             if (includeForm)
@@ -3356,7 +3388,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     sort = Integer.parseInt(sortParam);
                 } catch (NumberFormatException nfe) {}
             }
-            Collections.sort(fileList, Sorters.getFileComparator(sort, this));
+            DataHelper.sort(fileList, Sorters.getFileComparator(sort, this));
         }
 
         // second table - dir info
@@ -3436,6 +3468,16 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_t("Up to higher level directory"))
            .append("</A></td></tr>\n");
 
+        // playlist button
+        if (hasCompleteAudio(fileList, storage, remainingArray)) {
+            buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\">" +
+                       "<a href=\"").append(base).append("?playlist");
+            if (sortParam != null && !"0".equals(sortParam) && !"1".equals(sortParam))
+                buf.append("&amp;sort=").append(sortParam);
+            buf.append("\">");
+            buf.append(toImg("music"));
+            buf.append(' ').append(_t("Audio Playlist")).append("</a></td></tr>\n");
+        }
 
         boolean showSaveButton = false;
         boolean rowEven = true;
@@ -3607,6 +3649,146 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("</div></div></body></html>");
 
         return buf.toString();
+    }
+
+    /**
+     * Is there at least one complete audio file in this directory or below?
+     * Recursive.
+     *
+     * @since 0.9.44
+     */
+    private boolean hasCompleteAudio(List<Sorters.FileAndIndex> fileList,
+                                     Storage storage, long[] remainingArray) {
+        for (Sorters.FileAndIndex fai : fileList) {
+            if (fai.isDirectory) {
+                // recurse
+                File[] ls = fai.file.listFiles();
+                if (ls != null && ls.length > 0) {
+                    List<Sorters.FileAndIndex> fl2 = new ArrayList<Sorters.FileAndIndex>(ls.length);
+                    for (int i = 0; i < ls.length; i++) {
+                         fl2.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray));
+                    }
+                    if (hasCompleteAudio(fl2, storage, remainingArray))
+                        return true;
+                }
+                continue;
+            }
+            if (fai.remaining != 0)
+                continue;
+            String name = fai.file.getName();
+            String mime = getMimeType(name);
+            if (mime != null && (mime.startsWith("audio/") || mime.equals("application/ogg")))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get the audio files in the resource list as a m3u playlist.
+     * https://en.wikipedia.org/wiki/M3U
+     *
+     * @param base The encoded base URL
+     * @param sortParam may be null
+     * @return String of HTML or null if no files or on error
+     * @since 0.9.44
+     */
+    private String getPlaylist(String reqURL, String base, String sortParam) throws IOException {
+        String decodedBase = decodePath(base);
+        String title = decodedBase;
+        String cpath = _contextPath + '/';
+        if (title.startsWith(cpath))
+            title = title.substring(cpath.length());
+
+        // Get the snark associated with this directory
+        String torrentName;
+        String pathInTorrent;
+        int slash = title.indexOf('/');
+        if (slash > 0) {
+            torrentName = title.substring(0, slash);
+            pathInTorrent = title.substring(slash);
+        } else {
+            torrentName = title;
+            pathInTorrent = "/";
+        }
+        Snark snark = _manager.getTorrentByBaseName(torrentName);
+        if (snark == null)
+            return null;
+        Storage storage = snark.getStorage();
+        if (storage == null)
+            return null;
+        File sbase = storage.getBase();
+        File r;
+        if (pathInTorrent.equals("/"))
+            r = sbase;
+        else
+            r = new File(sbase, pathInTorrent);
+        if (!r.isDirectory())
+            return null;
+        File[] ls = r.listFiles();
+        if (ls == null)
+            return null;
+        List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
+        // precompute remaining for all files for efficiency
+        long[] remainingArray = (storage != null) ? storage.remaining() : null;
+        for (int i = 0; i < ls.length; i++) {
+            fileList.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray));
+        }
+
+        boolean showSort = fileList.size() > 1;
+        int sort = 0;
+        if (showSort) {
+            if (sortParam != null) {
+                try {
+                    sort = Integer.parseInt(sortParam);
+                } catch (NumberFormatException nfe) {}
+            }
+            DataHelper.sort(fileList, Sorters.getFileComparator(sort, this));
+        }
+        StringBuilder buf = new StringBuilder(512);
+        getPlaylist(buf, fileList, reqURL, sort, storage, remainingArray);
+        String rv = buf.toString();
+        if (rv.length() <= 0)
+            return null;
+        return rv;
+    }
+
+    /**
+     * Append playlist entries in m3u format to buf.
+     * Recursive.
+     *
+     * @param buf out parameter
+     * @param reqURL encoded, WITH trailing slash
+     * @since 0.9.44
+     */
+    private void getPlaylist(StringBuilder buf, List<Sorters.FileAndIndex> fileList,
+                             String reqURL, int sort,
+                             Storage storage, long[] remainingArray) {
+        for (Sorters.FileAndIndex fai : fileList) {
+            if (fai.isDirectory) {
+                // recurse
+                File[] ls = fai.file.listFiles();
+                if (ls != null && ls.length > 0) {
+                    List<Sorters.FileAndIndex> fl2 = new ArrayList<Sorters.FileAndIndex>(ls.length);
+                    for (int i = 0; i < ls.length; i++) {
+                         fl2.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray));
+                    }
+                    if (ls.length > 1)
+                        DataHelper.sort(fl2, Sorters.getFileComparator(sort, this));
+                    String name = fai.file.getName();
+                    String url2 = reqURL + encodePath(name) + '/';
+                    getPlaylist(buf, fl2, url2, sort, storage, remainingArray);
+                }
+                continue;
+            }
+            if (fai.remaining != 0)
+                continue;
+            String name = fai.file.getName();
+            String mime = getMimeType(name);
+            if (mime != null && (mime.startsWith("audio/") || mime.equals("application/ogg"))) {
+                // TODO Extended M3U
+                buf.append(reqURL).append(encodePath(name)).append('\n');
+            }
+        }
     }
 
     /**
