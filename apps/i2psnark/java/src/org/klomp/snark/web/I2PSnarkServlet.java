@@ -3348,10 +3348,8 @@ public class I2PSnarkServlet extends BasicServlet {
             // unless audio or video...
             if (storage != null && storage.complete()) {
                 String mime = getMimeType(r.getName());
-                boolean isAudio = mime != null && (mime.startsWith("audio/") || mime.equals("application/ogg"));
-                boolean isVideo = mime != null && mime.startsWith("video/") &&
-                                  !mime.equals("video/x-msvideo") && !mime.equals("video/x-matroska") &&
-                                  !mime.equals("video/quicktime");
+                boolean isAudio = mime != null && isAudio(mime);
+                boolean isVideo = mime != null && isVideo(mime);
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
@@ -3552,10 +3550,8 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean isVideo = false;
             buf.append("<td class=\"snarkFileIcon\">");
             if (complete) {
-                isAudio = mime.startsWith("audio/") || mime.equals("application/ogg");
-                isVideo = mime.startsWith("video/") &&
-                          !mime.equals("video/x-msvideo") && !mime.equals("video/x-matroska") &&
-                          !mime.equals("video/quicktime");
+                isAudio = isAudio(mime);
+                isVideo = isVideo(mime);
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
@@ -3653,6 +3649,31 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("</div></div></body></html>");
 
         return buf.toString();
+    }
+
+    /**
+     * @param mime non-null
+     * @since 0.9.44
+     */
+    private static boolean isAudio(String mime) {
+        // don't include playlist files as the browser doesn't support them
+        // in the HTML5 player,
+        // and if it did and prefetched, that could be a security issue
+        return (mime.startsWith("audio/") &&
+                !mime.equals("audio/mpegurl") &&
+                !mime.equals("audio/x-scpls")) ||
+               mime.equals("application/ogg");
+    }
+
+    /**
+     * @param mime non-null
+     * @since 0.9.44
+     */
+    private static boolean isVideo(String mime) {
+        return mime.startsWith("video/") &&
+               !mime.equals("video/x-msvideo") &&
+               !mime.equals("video/x-matroska") &&
+               !mime.equals("video/quicktime");
     }
 
     /**
