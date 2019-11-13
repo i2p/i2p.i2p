@@ -211,11 +211,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(CACHE_MAX_SIZE);
     private static final String MIN_HOST_LOOKUP_VERSION = "0.9.11";
 
-    /** SSL interface (only) @since 0.8.3 */
-    protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
-    protected static final String PROP_USER = "i2cp.username";
-    protected static final String PROP_PW = "i2cp.password";
-
     /**
      * Use Unix domain socket (or similar) to connect to a router
      * @since 0.9.14
@@ -431,12 +426,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         // auto-add auth if required, not set in the options, and we are not in the same JVM
         if ((!_context.isRouterContext()) &&
             _context.getBooleanProperty("i2cp.auth") &&
-            ((!opts.containsKey(PROP_USER)) || (!opts.containsKey(PROP_PW)))) {
-            String configUser = _context.getProperty(PROP_USER);
-            String configPW = _context.getProperty(PROP_PW);
+            ((!opts.containsKey(I2PClient.PROP_USER)) || (!opts.containsKey(I2PClient.PROP_PW)))) {
+            String configUser = _context.getProperty(I2PClient.PROP_USER);
+            String configPW = _context.getProperty(I2PClient.PROP_PW);
             if (configUser != null && configPW != null) {
-                options.setProperty(PROP_USER, configUser);
-                options.setProperty(PROP_PW, configPW);
+                options.setProperty(I2PClient.PROP_USER, configUser);
+                options.setProperty(I2PClient.PROP_PW, configPW);
             }
         }
         if (options.getProperty(I2PClient.PROP_FAST_RECEIVE) == null)
@@ -748,7 +743,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                         } catch (InvocationTargetException e) {
                             throw new I2PSessionException("Cannot load DomainSocketFactory", e);
                         }
-                    } else if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL))) {
+                    } else if (Boolean.parseBoolean(_options.getProperty(I2PClient.PROP_ENABLE_SSL))) {
                         try {
                             I2PSSLSocketFactory fact = new I2PSSLSocketFactory(_context, false, "certificates/i2cp");
                             _socket = fact.createSocket(_hostname, _portNum);
@@ -776,12 +771,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
             Properties auth = null;
-            if ((!_context.isRouterContext()) && _options.containsKey(PROP_USER) && _options.containsKey(PROP_PW)) {
+            if ((!_context.isRouterContext()) && _options.containsKey(I2PClient.PROP_USER) && _options.containsKey(I2PClient.PROP_PW)) {
                 // Only supported by routers 0.9.11 or higher, but we don't know the version yet.	
                 // Auth will also be sent in the SessionConfig.
                 auth = new OrderedProperties();
-                auth.setProperty(PROP_USER, _options.getProperty(PROP_USER));
-                auth.setProperty(PROP_PW, _options.getProperty(PROP_PW));
+                auth.setProperty(I2PClient.PROP_USER, _options.getProperty(I2PClient.PROP_USER));
+                auth.setProperty(I2PClient.PROP_PW, _options.getProperty(I2PClient.PROP_PW));
             }
             sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION, auth));
             waitForDate();

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
+import net.i2p.client.I2PClient;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -384,8 +385,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             String user = null;
             String pw = null;
             if (props != null) {
-                user = props.getProperty("i2cp.username");
-                pw = props.getProperty("i2cp.password");
+                user = props.getProperty(I2PClient.PROP_USER);
+                pw = props.getProperty(I2PClient.PROP_PW);
             }
             if (user == null || user.length() == 0 || pw == null || pw.length() == 0) {
                 _log.logAlways(Log.WARN, "I2CP authentication failed");

@@ -1376,8 +1376,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     private void runAuth(String args[], Logging l) {
         if (args.length == 2) {
-            _clientOptions.setProperty("i2cp.username", args[0]);
-            _clientOptions.setProperty("i2cp.password", args[1]);
+            _clientOptions.setProperty(I2PClient.PROP_USER, args[0]);
+            _clientOptions.setProperty(I2PClient.PROP_PW, args[1]);
         } else {
             l.log("Usage:\n" +
                   "  auth <username> <password>\n" +
@@ -1655,9 +1655,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             notifyEvent("lookupResult", "invalidUsage");
         } else {
             try {
-                boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty("i2cp.SSL"));
-                String user = _clientOptions.getProperty("i2cp.username");
-                String pw = _clientOptions.getProperty("i2cp.password");
+                boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty(I2PClient.PROP_ENABLE_SSL));
+                String user = _clientOptions.getProperty(I2PClient.PROP_USER);
+                String pw = _clientOptions.getProperty(I2PClient.PROP_PW);
                 Destination dest = destFromName(args[0], host, port, ssl, user, pw);
                 if (dest == null) {
                     l.log("Unknown host: " + args[0]);
@@ -1777,18 +1777,18 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             System.out.println("Invalid b32 " + name + " - " + iae);
             return;
         }
-        boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty("i2cp.SSL"));
-        String user = _clientOptions.getProperty("i2cp.username");
-        String ipw = _clientOptions.getProperty("i2cp.password");
+        boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty(I2PClient.PROP_ENABLE_SSL));
+        String user = _clientOptions.getProperty(I2PClient.PROP_USER);
+        String ipw = _clientOptions.getProperty(I2PClient.PROP_PW);
         I2PClient client = new I2PSimpleClient();
         Properties opts = new Properties();
         opts.put(I2PClient.PROP_TCP_HOST, host);
         opts.put(I2PClient.PROP_TCP_PORT, port);
-        opts.put("i2cp.SSL", Boolean.toString(ssl));
+        opts.put(I2PClient.PROP_ENABLE_SSL, Boolean.toString(ssl));
         if (user != null)
-            opts.put("i2cp.username", user);
+            opts.put(I2PClient.PROP_USER, user);
         if (ipw != null)
-            opts.put("i2cp.password", ipw);
+            opts.put(I2PClient.PROP_PW, ipw);
         I2PSession session = null;
         try {
             session = client.createSession(null, opts);
@@ -2029,11 +2029,11 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 opts.put(I2PClient.PROP_TCP_HOST, i2cpHost);
             if (i2cpPort != null)
                 opts.put(I2PClient.PROP_TCP_PORT, i2cpPort);
-            opts.put("i2cp.SSL", Boolean.toString(isSSL));
+            opts.put(I2PClient.PROP_ENABLE_SSL, Boolean.toString(isSSL));
             if (user != null)
-                opts.put("i2cp.username", user);
+                opts.put(I2PClient.PROP_USER, user);
             if (pw != null)
-                opts.put("i2cp.password", pw);
+                opts.put(I2PClient.PROP_PW, pw);
             I2PSession session = null;
             try {
                 session = client.createSession(null, opts);

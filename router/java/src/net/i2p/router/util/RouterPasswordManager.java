@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.client.I2PClient;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
@@ -23,8 +24,8 @@ public class RouterPasswordManager extends PasswordManager {
 
     private static final String PROP_MIGRATED = "router.passwordManager.migrated";
     // migrate these to hash
-    private static final String PROP_I2CP_OLD_PW = "i2cp.password";
-    private static final String PROP_I2CP_OLD_USER = "i2cp.username";
+    private static final String PROP_I2CP_OLD_PW = I2PClient.PROP_PW;
+    private static final String PROP_I2CP_OLD_USER = I2PClient.PROP_USER;
     private static final String PROP_I2CP_NEW = "i2cp.auth";
 /****
     // migrate these to b64

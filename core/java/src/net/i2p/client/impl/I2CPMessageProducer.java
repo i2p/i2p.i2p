@@ -66,7 +66,7 @@ class I2CPMessageProducer {
         "i2cp.closeIdleTime", "i2cp.closeOnIdle", "i2cp.encryptLeaseSet",
         "i2cp.gzip", "i2cp.leaseSetKey", "i2cp.leaseSetPrivateKey",
         "i2cp.leaseSetSigningPrivateKey", "i2cp.reduceIdleTime", "i2cp.reduceOnIdle",
-        I2PSessionImpl.PROP_ENABLE_SSL, I2PClient.PROP_TCP_HOST, I2PClient.PROP_TCP_PORT,
+        I2PClient.PROP_ENABLE_SSL, I2PClient.PROP_TCP_HOST, I2PClient.PROP_TCP_PORT,
         // long and shouldn't be passed through
         "i2p.reseedURL"
     };
