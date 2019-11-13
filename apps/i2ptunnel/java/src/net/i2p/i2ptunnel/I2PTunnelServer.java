@@ -634,9 +634,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 break;
             } catch (ConnectException ce) {
+                if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
+                if (!open)
+                    break;
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error accepting", ce);
-                if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 try {
                     Thread.sleep(2*60*1000);
                 } catch (InterruptedException ie) {}
