@@ -37,9 +37,15 @@ public class ConfigKeyringHelper extends HelperBase {
     private void renderStatusHTML(StringWriter out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<h3>").append(_t("Local encrypted destinations")).append("</h3>");
-        render(buf, true);
+        boolean rv1 = render(buf, true);
         buf.append("<h3>").append(_t("Remote encrypted destinations")).append("</h3>");
-        render(buf, false);
+        boolean rv2 = render(buf, false);
+        if (rv1 || rv2) {
+            buf.append("\n<table id=\"addkeyring\"><tr><td align=\"right\">" +
+                       "<input type=\"reset\" class=\"cancel\" value=\"").append(_t("Cancel")).append("\">" +
+                       "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"").append(_t("Delete key")).append("\">" +
+                       "</td></tr></table>");
+        }
         out.write(buf.toString());
         out.flush();
     }
@@ -47,8 +53,10 @@ public class ConfigKeyringHelper extends HelperBase {
     /**
      *  @since 0.9.33 moved from PersistentKeyRing
      *  @param local true for local (Enc. LS1 only), false for remote (all types)
+     *  @return true if there were any entries
      */
-    private void render(StringBuilder buf, boolean local) {
+    private boolean render(StringBuilder buf, boolean local) {
+        boolean rv = false;
         buf.append("\n<table class=\"configtable\"><tr>");
         if (!local)
             buf.append("<th align=\"left\">").append(_t("Delete"));
@@ -92,6 +100,7 @@ public class ConfigKeyringHelper extends HelperBase {
             if (!local)
                 buf.append("</td><td></td><td></td><td>");
             buf.append("</td></tr>\n");
+            rv = true;
         }
         // LS2
         if (!local) {
@@ -153,9 +162,15 @@ public class ConfigKeyringHelper extends HelperBase {
                 if (t > 0)
                     buf.append(DataHelper.formatDate(t));
                 buf.append("</td></tr>");
+                rv = true;
             }
         }
+        if (!rv) {
+            buf.append("<tr><td align=\"center\" colspan=\"").append(local ? '3' : '8').append("\"><i>")
+               .append(_t("none")).append("</i></td></tr>");
+        }
         buf.append("</table>\n");
+        return rv;
     }
 
     /** @since 0.9.41 */

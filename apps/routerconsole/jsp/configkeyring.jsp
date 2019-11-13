@@ -24,10 +24,6 @@
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="keyringhelper" property="summary" />
- <table id="addkeyring"><tr><td align="right">
- <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
- <input type="submit" name="action" class="delete" value="<%=intl._t("Delete key")%>" >
- </td></tr></table>
  <h3 class="tabletitle"><%=intl._t("Manual Keyring Addition")%></h3>
  <table id="addkeyring">
         <tr>
