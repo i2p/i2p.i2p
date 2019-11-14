@@ -989,7 +989,7 @@ public class PeerState {
                         iter.remove();
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Expired ack " + rack.id + " sent " + (cutoff + RESEND_ACK_TIMEOUT - rack.time) +
-                                      " ago, now " + i + " resend acks");
+                                      " ago, now " + _currentACKsResend.size()  + " resend acks");
                     }
                 }
                 if (i > 1)
