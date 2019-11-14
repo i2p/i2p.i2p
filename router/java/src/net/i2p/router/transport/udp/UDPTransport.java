@@ -960,7 +960,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return;
         }
 
-        RouterAddress addr = getCurrentExternalAddress(false);
+        RouterAddress addr = getCurrentExternalAddress(ourIP.length == 16);
         if (inboundRecent && addr != null && addr.getPort() > 0 && addr.getHost() != null) {
             // use OS clock since its an ordering thing, not a time thing
             // Note that this fails us if we switch from one IP to a second, then back to the first,
@@ -1067,10 +1067,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                 if (oldIP != null) {
                                     _context.router().eventLog().addEvent(EventLog.CHANGE_IP, newIP);
                                 }
+                                // save the external address but don't publish it
+                                OrderedProperties localOpts = new OrderedProperties(); 
+                                localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(ourPort));
+                                localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
+                                RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
+                                replaceCurrentExternalAddress(local, true);
+                                if (_log.shouldWarn())
+                                    _log.warn("New IPv6 address, assuming still firewalled [" +
+                                              newIP + "]:" + ourPort, new Exception());
+                            } else {
+                                if (_log.shouldInfo())
+                                    _log.info("Same IPv6 address, assuming still firewalled [" +
+                                              newIP + "]:" + ourPort);
+                                return false;
                             }
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("New IPv6 address, assuming still firewalled " +
-                                          Addresses.toString(ourIP, ourPort));
                             rebuild = false;
                             fireTest = true;
                         }
