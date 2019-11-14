@@ -80,8 +80,6 @@ public class PeerState {
     private long _clockSkew;
     private final Object _clockSkewLock = new Object();
 
-    /** what is the current receive second, for congestion control? */
-    private long _currentReceiveSecond;
     /** when did we last send them a packet? */
     private long _lastSendTime;
     /** when did we last send them a message that was ACKed */
@@ -352,7 +350,6 @@ public class PeerState {
         _transport = transport;
         long now = ctx.clock().now();
         _keyEstablishedTime = now;
-        _currentReceiveSecond = now - (now % 1000);
         _lastSendTime = now;
         _lastReceiveTime = now;
         _currentACKs = new ConcurrentHashSet<Long>();
@@ -459,8 +456,6 @@ public class PeerState {
      */
     public long getClockSkew() { return _clockSkew ; }
 
-    /** what is the current receive second, for congestion control? */
-    public long getCurrentReceiveSecond() { return _currentReceiveSecond; }
     /** when did we last send them a packet? */
     public long getLastSendTime() { return _lastSendTime; }
     /** when did we last send them a message that was ACKed? */
@@ -634,8 +629,6 @@ public class PeerState {
         }
     }
 
-    /** what is the current receive second, for congestion control? */
-    public void setCurrentReceiveSecond(long sec) { _currentReceiveSecond = sec; }
     /** when did we last send them a packet? */
     public void setLastSendTime(long when) { _lastSendTime = when; }
     /** when did we last receive a packet from them? */
