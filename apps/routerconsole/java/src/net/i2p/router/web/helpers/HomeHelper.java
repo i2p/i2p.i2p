@@ -254,7 +254,7 @@ public class HomeHelper extends HelperBase {
                        "<a href=\"").append(url).append("\" tabindex=\"-1\">" +
                        "<img alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon)
                // version the icons because they may change
-               .append('?').append(CoreVersion.VERSION).append("\"></a>" +
+               .append(app.icon.contains("?") ? "&amp;" : "?").append(CoreVersion.VERSION).append("\"></a>" +
                        "</div>\n" +
                        "<table><tr><td>" +
                        "<div class=\"applabel\">" +
