@@ -235,10 +235,6 @@ public class PeerState {
         This counts full messages, NOT fragments (UDP packets)
      */
     private int _concurrentMessagesAllowed = INIT_CONCURRENT_MSGS;
-    /** 
-     * how many outbound messages are currently being transmitted.  Not thread safe, as we're not strict
-     */
-    private int _concurrentMessagesActive;
     /** how many concurrency rejections have we had in a row */
     private int _consecutiveRejections;
     /** is it inbound? **/
@@ -662,10 +658,6 @@ public class PeerState {
 
     int incrementConsecutiveFailedSends() { 
         synchronized(_outboundMessages) {
-            _concurrentMessagesActive--;
-            if (_concurrentMessagesActive < 0)
-                _concurrentMessagesActive = 0;
-            
             //long now = _context.clock().now()/(10*1000);
             //if (_lastFailedSendPeriod >= now) {
             //    // ignore... too fast
@@ -734,15 +726,14 @@ public class PeerState {
         if (size <= _sendWindowBytesRemaining ||
             (size > _sendWindowBytes && _sendWindowBytesRemaining >= _sendWindowBytes)) {
             // move this check to getSendWindowBytesRemaining() ?
-            if ( (messagePushCount == 0) && (_concurrentMessagesActive > _concurrentMessagesAllowed) ) {
+            if (messagePushCount == 0 && _outboundMessages.size() > _concurrentMessagesAllowed) {
                 _consecutiveRejections++;
-                _context.statManager().addRateData("udp.rejectConcurrentActive", _concurrentMessagesActive, _consecutiveRejections);
+                _context.statManager().addRateData("udp.rejectConcurrentActive", _outboundMessages.size(), _consecutiveRejections);
                 return false;
             } else if (messagePushCount == 0) {
-                _context.statManager().addRateData("udp.allowConcurrentActive", _concurrentMessagesActive, _concurrentMessagesAllowed);
-                _concurrentMessagesActive++;
+                _context.statManager().addRateData("udp.allowConcurrentActive", _outboundMessages.size(), _concurrentMessagesAllowed);
                 if (_consecutiveRejections > 0) 
-                    _context.statManager().addRateData("udp.rejectConcurrentSequence", _consecutiveRejections, _concurrentMessagesActive);
+                    _context.statManager().addRateData("udp.rejectConcurrentSequence", _consecutiveRejections, _outboundMessages.size());
                 _consecutiveRejections = 0;
             }
             _sendWindowBytesRemaining -= size; 
@@ -796,7 +787,7 @@ public class PeerState {
      */
     public int getConcurrentSends() {
         synchronized(_outboundMessages) {
-            return _concurrentMessagesActive;
+            return _outboundMessages.size();
         }
     }
 
@@ -1196,10 +1187,6 @@ public class PeerState {
      *  Caller should synch on this
      */
     private void locked_messageACKed(int bytesACKed, long lifetime, int numSends) {
-        _concurrentMessagesActive--;
-        if (_concurrentMessagesActive < 0)
-            _concurrentMessagesActive = 0;
-        
         _consecutiveFailedSends = 0;
         // _lastFailedSendPeriod = -1;
         if (numSends < 2) {
