@@ -189,22 +189,26 @@ public class SnarkManager implements CompleteListener, ClientApp {
 //       , "Galen", "http://5jpwQMI5FT303YwKa5Rd38PYSX04pbIKgTaKQsWbqoWjIfoancFdWCShXHLI5G5ofOb0Xu11vl2VEMyPsg1jUFYSVnu4-VfMe3y4TKTR6DTpetWrnmEK6m2UXh91J5DZJAKlgmO7UdsFlBkQfR2rY853-DfbJtQIFl91tbsmjcA5CGQi4VxMFyIkBzv-pCsuLQiZqOwWasTlnzey8GcDAPG1LDcvfflGV~6F5no9mnuisZPteZKlrv~~TDoXTj74QjByWc4EOYlwqK8sbU9aOvz~s31XzErbPTfwiawiaZ0RUI-IDrKgyvmj0neuFTWgjRGVTH8bz7cBZIc3viy6ioD-eMQOrXaQL0TCWZUelRwHRvgdPiQrxdYQs7ixkajeHzxi-Pq0EMm5Vbh3j3Q9kfUFW3JjFDA-MLB4g6XnjCbM5J1rC0oOBDCIEfhQkszru5cyLjHiZ5yeA0VThgu~c7xKHybv~OMXION7V8pBKOgET7ZgAkw1xgYe3Kkyq5syAAAA.i2p/tr/announce.php=http://galen.i2p/tr/"
        "Postman", "http://tracker2.postman.i2p/announce.php=http://tracker2.postman.i2p/"
 //       ,"Welterde", "http://tracker.welterde.i2p/a=http://tracker.welterde.i2p/stats?mode=top5"
-       ,"Diftracker", "http://diftracker.i2p/announce.php=http://diftracker.i2p/"
+//last up Aug. 18 2019
+//       ,"Diftracker", "http://diftracker.i2p/announce.php=http://diftracker.i2p/"
 //       , "CRSTRACK", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
 //       ,"Exotrack", "http://blbgywsjubw3d2zih2giokakhe3o2cko7jtte4risb3hohbcoyva.b32.i2p/announce.php=http://exotrack.i2p/"
        ,"DgTrack", "http://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p/a=http://opentracker.dg2.i2p/"
        // The following is ECDSA_SHA256_P256
-       ,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
-       ,"psi's open tracker", "http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/announce=http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/"
-       ,"C.Tracker", "http://ri5a27ioqd4vkik72fawbcryglkmwyy4726uu5j3eg6zqh2jswfq.b32.i2p/announce=http://tracker.crypthost.i2p/tracker/index.jsp",
+//last up Sep. 8 2019
+//       ,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
+//down, may or may not return
+//     ,"psi's open tracker", "http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/announce=http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/"
+//last up May 21 2019
+//     ,"C.Tracker", "http://ri5a27ioqd4vkik72fawbcryglkmwyy4726uu5j3eg6zqh2jswfq.b32.i2p/announce=http://tracker.crypthost.i2p/tracker/index.jsp",
     };
     
     /** URL. This is our equivalent to router.utorrent.com for bootstrap */
     public static final String DEFAULT_BACKUP_TRACKER = "http://opentracker.dg2.i2p/a";
 
     /** URLs, comma-separated. Used for "announce to open trackers also" */
-    private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER +
-                                                       (SigType.ECDSA_SHA256_P256.isAvailable() ? ",http://tracker.thebland.i2p/a" : "");
+    private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER;
+                                                       // + (SigType.ECDSA_SHA256_P256.isAvailable() ? ",http://tracker.thebland.i2p/a" : "");
 
     public static final Set<String> DEFAULT_TRACKER_ANNOUNCES;
 
@@ -1557,15 +1561,6 @@ public class SnarkManager implements CompleteListener, ClientApp {
      *  @since 0.9.17
      */
     private boolean addTorrent(String filename, File baseFile, boolean dontAutoStart, File dataDir) {
-        if ((!dontAutoStart) && !_util.connected()) {
-            addMessage(_t("Connecting to I2P"));
-            boolean ok = _util.connect();
-            if (!ok) {
-                addMessage(_t("Error connecting to I2P - check your I2CP settings!"));
-                // this would rename the torrent to .BAD
-                //return false;
-            }
-        }
         File sfile = new File(filename);
         try {
             filename = sfile.getCanonicalPath();
@@ -1691,6 +1686,15 @@ public class SnarkManager implements CompleteListener, ClientApp {
         // Were we running last time?
         String link = linkify(torrent);
         if (!dontAutoStart && shouldAutoStart() && running) {
+            if (!_util.connected()) {
+                addMessage(_t("Connecting to I2P"));
+                boolean ok = _util.connect();
+                if (!ok) {
+                    addMessage(_t("Error connecting to I2P - check your I2CP settings!"));
+                    // this would rename the torrent to .BAD
+                    //return false;
+                }
+            }
             torrent.startTorrent();
             addMessageNoEscape(_t("Torrent added and started: {0}", link));
         } else {
@@ -2714,8 +2718,9 @@ public class SnarkManager implements CompleteListener, ClientApp {
             if (existingNames.contains(name)) {
                 // already known.  noop
             } else {
-                if (shouldStart && !_util.connect())
-                    addMessage(_t("Unable to connect to I2P!"));
+                // Will call connect() in addTorrent() if enabled
+                //if (shouldStart && !_util.connect())
+                //    addMessage(_t("Unable to connect to I2P!"));
                 try {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop

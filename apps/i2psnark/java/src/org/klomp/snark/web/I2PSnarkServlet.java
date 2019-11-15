@@ -3673,7 +3673,8 @@ public class I2PSnarkServlet extends BasicServlet {
         return mime.startsWith("video/") &&
                !mime.equals("video/x-msvideo") &&
                !mime.equals("video/x-matroska") &&
-               !mime.equals("video/quicktime");
+               !mime.equals("video/quicktime") &&
+               !mime.equals("video/x-flv");
     }
 
     /**
