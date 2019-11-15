@@ -1964,10 +1964,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (pref != null) && "always".equals(pref);
     }
     
-    // We used to have MAX_IDLE_TIME = 5m, but this causes us to drop peers
-    // and lose the old introducer tags, causing introduction fails,
-    // so we keep the max time long to give the introducer keepalive code
-    // in the IntroductionManager a chance to work.
+    /**
+     * We used to have MAX_IDLE_TIME = 5m, but this causes us to drop peers
+     * and lose the old introducer tags, causing introduction fails,
+     * so we keep the max time long to give the introducer keepalive code
+     * in the IntroductionManager a chance to work.
+     */
     public static final int EXPIRE_TIMEOUT = 20*60*1000;
     private static final int MAX_IDLE_TIME = EXPIRE_TIMEOUT;
     public static final int MIN_EXPIRE_TIMEOUT = 165*1000;
@@ -2648,7 +2650,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.info("Consecutive failure #" + consecutive 
                           + " on " + msg.toString()
                           + " to " + msg.getPeer());
-            if ( (_context.clock().now() - msg.getPeer().getLastSendFullyTime() <= 60*1000) || (consecutive < MAX_CONSECUTIVE_FAILED) ) {
+            if (consecutive < MAX_CONSECUTIVE_FAILED ||
+                _context.clock().now() - msg.getPeer().getLastSendFullyTime() <= 60*1000) {
                 // ok, a few conseutive failures, but we /are/ getting through to them
             } else {
                 _context.statManager().addRateData("udp.dropPeerConsecutiveFailures", consecutive, msg.getPeer().getInactivityTime());
