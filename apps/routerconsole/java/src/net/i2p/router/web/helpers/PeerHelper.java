@@ -523,35 +523,37 @@ public class PeerHelper extends HelperBase {
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td><td class=\"cells\" nowrap align=\"left\">");
             if (peer.isInbound())
-                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound")).append("\">");
+                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound"));
             else
-                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound")).append("\">");
+                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound"));
+            buf.append("\">");
             if (peer.getWeRelayToThemAs() > 0)
                 buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/outbound.png\" height=\"8\" width=\"12\" alt=\"^\" title=\"").append(_t("We offered to introduce them")).append("\">");
             if (peer.getTheyRelayToUsAs() > 0)
                 buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/inbound.png\" height=\"8\" width=\"12\" alt=\"V\" title=\"").append(_t("They offered to introduce us")).append("\">");
 
-            boolean appended = false;
-            //if (_activeThrottle.isChoked(peer.getRemotePeer())) {
-            //    buf.append("<br><i>").append(_t("Choked")).append("</i>");
-            //    appended = true;
-            //}
-            int cfs = peer.getConsecutiveFailedSends();
-            if (cfs > 0) {
-                if (!appended) buf.append("<br>");
-                buf.append(" <i>");
-                buf.append(ngettext("{0} fail", "{0} fails", cfs));
-                buf.append("</i>");
-                appended = true;
+            if (isAdvanced) {
+                boolean appended = false;
+                //if (_activeThrottle.isChoked(peer.getRemotePeer())) {
+                //    buf.append("<br><i>").append(_t("Choked")).append("</i>");
+                //    appended = true;
+                //}
+                int cfs = peer.getConsecutiveFailedSends();
+                if (cfs > 0) {
+                    if (!appended) buf.append("<br>");
+                    buf.append(" <i>");
+                    buf.append(ngettext("{0} fail", "{0} fails", cfs));
+                    buf.append("</i>");
+                    appended = true;
+                }
+                if (_context.banlist().isBanlisted(peer.getRemotePeer(), "SSU")) {
+                    if (!appended) buf.append("<br>");
+                    buf.append(" <i>").append(_t("Banned")).append("</i>");
+                }
+                //byte[] ip = getIP(peer.getRemotePeer());
+                //if (ip != null)
+                //    buf.append(' ').append(_context.blocklist().toStr(ip));
             }
-            if (_context.banlist().isBanlisted(peer.getRemotePeer(), "SSU")) {
-                if (!appended) buf.append("<br>");
-                buf.append(" <i>").append(_t("Banned")).append("</i>");
-                appended = true;
-            }
-            //byte[] ip = getIP(peer.getRemotePeer());
-            //if (ip != null)
-            //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td>");
 
             buf.append("<td class=\"cells peeripv6\" align=\"center\">");
