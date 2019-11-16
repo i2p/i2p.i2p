@@ -68,6 +68,9 @@ public abstract class TransportImpl implements Transport {
     private static final long UNREACHABLE_PERIOD = 5*60*1000;
     private static final long WAS_UNREACHABLE_PERIOD = 30*60*1000;
 
+    /** @since 0.9.44 */
+    protected static final String PROP_IPV6_FIREWALLED = "i2np.lastIPv6Firewalled";
+
     static {
         long maxMemory = SystemVersion.getMaxMemory();
         long min = 512;

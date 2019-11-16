@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -169,7 +170,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_IP_CHANGE = "i2np.lastIPChange";
     public static final String PROP_LAPTOP_MODE = "i2np.laptopMode";
     /** @since 0.9.43 */
-    public static final String PROP_IPV6= "i2np.lastIPv6";
+    public static final String PROP_IPV6 = "i2np.lastIPv6";
 
     /** do we require introducers, regardless of our status? */
     public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
@@ -234,6 +235,42 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  IPv6 Peer Testing supported
      */
     private static final String MIN_V6_PEER_TEST_VERSION = "0.9.27";
+
+    // various state bitmaps
+
+    private static final Set<Status> STATUS_IPV4_FW =    EnumSet.of(Status.DIFFERENT,
+                                                                    Status.REJECT_UNSOLICITED,
+                                                                    Status.IPV4_FIREWALLED_IPV6_OK,
+                                                                    Status.IPV4_SNAT_IPV6_OK,
+                                                                    Status.IPV4_OK_IPV6_FIREWALLED);
+
+    private static final Set<Status> STATUS_IPV6_FW =    EnumSet.of(Status.IPV4_OK_IPV6_FIREWALLED,
+                                                                    Status.IPV4_UNKNOWN_IPV6_FIREWALLED,
+                                                                    Status.IPV4_DISABLED_IPV6_FIREWALLED);
+
+    private static final Set<Status> STATUS_IPV6_FW_2 =  EnumSet.of(Status.IPV4_OK_IPV6_FIREWALLED,
+                                                                    Status.IPV4_UNKNOWN_IPV6_FIREWALLED,
+                                                                    Status.IPV4_DISABLED_IPV6_FIREWALLED,
+                                                                    Status.DIFFERENT,
+                                                                    Status.REJECT_UNSOLICITED);
+
+    private static final Set<Status> STATUS_IPV6_OK =    EnumSet.of(Status.OK,
+                                                                    Status.IPV4_UNKNOWN_IPV6_OK,
+                                                                    Status.IPV4_FIREWALLED_IPV6_OK,
+                                                                    Status.IPV4_DISABLED_IPV6_OK,
+                                                                    Status.IPV4_SNAT_IPV6_OK);
+
+    private static final Set<Status> STATUS_NO_RETEST =  EnumSet.of(Status.OK,
+                                                                    Status.IPV4_OK_IPV6_UNKNOWN,
+                                                                    Status.IPV4_OK_IPV6_FIREWALLED,
+                                                                    Status.IPV4_DISABLED_IPV6_OK,
+                                                                    Status.IPV4_DISABLED_IPV6_UNKNOWN,
+                                                                    Status.IPV4_DISABLED_IPV6_FIREWALLED,
+                                                                    Status.DISCONNECTED);
+
+    private static final Set<Status> STATUS_NEED_INTRO = EnumSet.of(Status.REJECT_UNSOLICITED,
+                                                                    Status.IPV4_FIREWALLED_IPV6_OK,
+                                                                    Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
 
 
     public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
@@ -555,17 +592,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     if (hasv6)
                         continue;
                     hasv6 = true;
-                    // FIXME we need to check and time out after an hour of no inbound ipv6,
-                    // change to firewalled maybe? but we don't have any test to restore
-                    // a v6 address after it's removed.
-                    _lastInboundIPv6 = _context.clock().now();
-                    if (!isIPv6Firewalled())
+                    if (isIPv6Firewalled() || _context.getBooleanProperty(PROP_IPV6_FIREWALLED)) {
+                        setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_FIREWALLED, true);
+                    } else {
+                        _lastInboundIPv6 = _context.clock().now();
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
+                        rebuildExternalAddress(ia.getHostAddress(), newPort, false);
+                    }
                 } else {
                     if (!isIPv4Firewalled())
                         setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+                    rebuildExternalAddress(ia.getHostAddress(), newPort, false);
                 }
-                rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
         } else if (newPort > 0 && !bindToAddrs.isEmpty()) {
             for (InetAddress ia : bindToAddrs) {
@@ -595,6 +633,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public synchronized void shutdown() {
+        if (_haveIPv6Address) {
+            boolean fwOld = _context.getBooleanProperty(PROP_IPV6_FIREWALLED);
+            boolean fwNew = STATUS_IPV6_FW.contains(_reachabilityStatus);
+            if (fwOld != fwNew)
+                _context.router().saveConfig(PROP_IPV6_FIREWALLED, Boolean.toString(fwNew));
+        }
         destroyAll();
         for (UDPEndpoint endpoint : _endpoints) {
             endpoint.shutdown();
@@ -1051,11 +1095,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                 _log.info("New IPv6 address received but not one of our local addresses: " + ipstr, new Exception());
                             return false;
                         }
-                        if (_reachabilityStatus == Status.IPV4_OK_IPV6_FIREWALLED ||
-                            _reachabilityStatus == Status.IPV4_UNKNOWN_IPV6_FIREWALLED ||
-                            _reachabilityStatus == Status.IPV4_DISABLED_IPV6_FIREWALLED ||
-                            _reachabilityStatus == Status.DIFFERENT ||
-                            _reachabilityStatus == Status.REJECT_UNSOLICITED) {
+                        if (STATUS_IPV6_FW_2.contains(_reachabilityStatus)) {
                             // If we were firewalled before, let's assume we're still firewalled.
                             // Save the new IP and fire a test
                             String oldIP = _context.getProperty(PROP_IPV6);
@@ -1217,9 +1257,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (prop != null)
             return Boolean.parseBoolean(prop);
         Status status = getReachabilityStatus();
-        return status != Status.REJECT_UNSOLICITED &&
-               status != Status.IPV4_FIREWALLED_IPV6_OK &&
-               status != Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
+        return !STATUS_NEED_INTRO.contains(status);
     }
 
     /** 
@@ -1450,13 +1488,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized(_rebuildLock) {
             rebuildIfNecessary();
             Status status = getReachabilityStatus();
-            if (status != Status.OK &&
-                status != Status.IPV4_OK_IPV6_UNKNOWN &&
-                status != Status.IPV4_OK_IPV6_FIREWALLED &&
-                status != Status.IPV4_DISABLED_IPV6_OK &&
-                status != Status.IPV4_DISABLED_IPV6_UNKNOWN &&
-                status != Status.IPV4_DISABLED_IPV6_FIREWALLED &&
-                status != Status.DISCONNECTED &&
+            if (!STATUS_NO_RETEST.contains(status) &&
                 _reachabilityStatusUnchanged < 7) {
                 _testEvent.forceRunSoon(peer.isIPv6());
             }
@@ -3063,16 +3095,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (status != old) {
                 // for the following transitions ONLY, require two in a row
                 // to prevent thrashing
-                if ((old == Status.OK && (status == Status.DIFFERENT ||
-                                          status == Status.REJECT_UNSOLICITED ||
-                                          status == Status.IPV4_FIREWALLED_IPV6_OK ||
-                                          status == Status.IPV4_SNAT_IPV6_OK ||
-                                          status == Status.IPV4_OK_IPV6_FIREWALLED)) ||
-                    (status == Status.OK && (old == Status.DIFFERENT ||
-                                             old == Status.REJECT_UNSOLICITED ||
-                                             old == Status.IPV4_FIREWALLED_IPV6_OK ||
-                                             old == Status.IPV4_SNAT_IPV6_OK ||
-                                             old == Status.IPV4_OK_IPV6_FIREWALLED))) {
+                if ((old == Status.OK && STATUS_IPV4_FW.contains(status)) ||
+                    (status == Status.OK && STATUS_IPV4_FW.contains(old))) {
                     if (status != _reachabilityStatusPending) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Old status: " + old + " status pending confirmation: " + status +
@@ -3103,18 +3127,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.
             if (isIPv6) {
-                if (status == Status.IPV4_OK_IPV6_FIREWALLED ||
-                    status == Status.IPV4_UNKNOWN_IPV6_FIREWALLED ||
-                    status == Status.IPV4_DISABLED_IPV6_FIREWALLED) {
+                if (STATUS_IPV6_FW.contains(status)) {
                     removeExternalAddress(true, true);
-                } else if ((old == Status.IPV4_OK_IPV6_FIREWALLED ||
-                            old == Status.IPV4_UNKNOWN_IPV6_FIREWALLED ||
-                            old == Status.IPV4_DISABLED_IPV6_FIREWALLED) &&
-                           (status == Status.OK ||
-                            status == Status.IPV4_UNKNOWN_IPV6_OK ||
-                            status == Status.IPV4_FIREWALLED_IPV6_OK ||
-                            status == Status.IPV4_DISABLED_IPV6_OK ||
-                            status == Status.IPV4_SNAT_IPV6_OK) &&
+                } else if (STATUS_IPV6_FW.contains(old) &&
+                           STATUS_IPV6_OK.contains(status) &&
                            _lastOurIPv6 != null &&
                            !explicitAddressSpecified()){
                      String addr = Addresses.toString(_lastOurIPv6);

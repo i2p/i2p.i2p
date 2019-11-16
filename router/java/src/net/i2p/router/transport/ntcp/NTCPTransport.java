@@ -872,9 +872,12 @@ public class NTCPTransport extends TransportImpl {
                     props.setProperty(RouterAddress.PROP_HOST, ia.getHostAddress());
                     props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
                     addNTCP2Options(props);
-                    int cost = getDefaultCost(ia instanceof Inet6Address);
-                    myAddress = new RouterAddress(getPublishStyle(), props, cost);
-                    replaceAddress(myAddress);
+                    boolean ipv6 = ia instanceof Inet6Address;
+                    if (!ipv6 || !_context.getBooleanProperty(PROP_IPV6_FIREWALLED)) {
+                        int cost = getDefaultCost(ipv6);
+                        myAddress = new RouterAddress(getPublishStyle(), props, cost);
+                        replaceAddress(myAddress);
+                    }
                 }
             } else if (_enableNTCP2) {
                 setOutboundNTCP2Address();
