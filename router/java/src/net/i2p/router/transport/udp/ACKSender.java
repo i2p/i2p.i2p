@@ -199,8 +199,8 @@ class ACKSender implements Runnable {
                         // still full packets left to be ACKed, since wanted time
                         // is reset by retrieveACKBitfields when all of the IDs are
                         // removed
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Rerequesting ACK for peer " + peer);
+                        if (_log.shouldInfo())
+                            _log.info("Precautionary rerequest ACK for peer " + peer);
                         ackPeer(peer);
                     }
                 } else {
