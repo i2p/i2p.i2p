@@ -454,7 +454,27 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("handleSendMessage called");
         long beforeDistribute = _context.clock().now();
-        MessageId id = _runner.distributeMessage(message);
+        MessageId id;
+        try {
+            // ClientMessagePool runs OCMOSJ inline
+            // don't let bugs there kill the whole session
+            id = _runner.distributeMessage(message);
+        } catch (Exception e) {
+            _log.error("Error sending message", e);
+            MessageStatusMessage status = new MessageStatusMessage();
+            status.setMessageId(_runner.getNextMessageId());
+            status.setSessionId(sid.getSessionId());
+            status.setSize(0);
+            status.setNonce(message.getNonce()); 
+            status.setStatus(MessageStatusMessage.STATUS_SEND_FAILURE_ROUTER);
+            try {
+                _runner.doSend(status);
+            } catch (I2CPMessageException ime) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error writing out the message status message", ime);
+            }
+            return;
+        }
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         // TODO validate session id
         _runner.ackSendMessage(sid, id, message.getNonce());
