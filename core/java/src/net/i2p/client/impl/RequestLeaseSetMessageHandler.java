@@ -73,6 +73,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     private static final String PROP_DH = "i2cp.leaseSetClient.dh.";
     private static final String PROP_PSK = "i2cp.leaseSetClient.psk.";
 
+    private static final boolean PREFER_NEW_ENC = false;
+
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
         this(context, RequestLeaseSetMessage.MESSAGE_TYPE);
     }
@@ -239,6 +241,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                 List<EncType> types = new ArrayList<EncType>(2);
                 String senc = session.getOptions().getProperty(PROP_LS_ENCTYPE);
                 if (senc != null) {
+                    if (!PREFER_NEW_ENC && senc.equals("4,0"))
+                        senc = "0,4";
                     String[] senca = DataHelper.split(senc, ",");
                     for (String sencaa : senca) {
                         EncType newtype = EncType.parseEncType(sencaa);
@@ -483,7 +487,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
          *  @param types must be available
          */
         public LeaseInfo(Destination dest, List<EncType> types) {
-            if (types.size() > 1) {
+            if (types.size() > 1 && PREFER_NEW_ENC) {
                 Collections.sort(types, Collections.reverseOrder());
             }
             _privKeys = new ArrayList<PrivateKey>(types.size());

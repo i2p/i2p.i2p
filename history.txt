@@ -1,5 +1,35 @@
+2019-11-20 zzz
+ * I2CP:
+   - Prevent an uncaught OCMOSJ exception from killing the session
+   - Don't put ECIES first in LS2
+
+2019-11-17 zzz
+ * SSU: Lower ACKSender log level (ticket #2651)
+
+2019-11-16 zzz
+ * Transport: Save IPv6 firewalled state across restarts (ticket #2175)
+
+2019-11-15 zzz
+ * Console: Fix plugin icon-code images
+ * i2psnark: Don't start tunnels when autostart enabled but no
+   torrents set to autostart (ticket #2662)
+ * SSU: Remove redundant field (ticket #2659)
+
+2019-11-14 zzz
+ * Transport:
+   - Fixes for IPv6 firewalled logic (ticket #2175)
+   - Fix SSU log value (ticket #2652)
+   - Remove unused currentReceiveSecond (ticket #2661)
+
+2019-11-13 zzz
+ * Console: Hide buttons on /configkeyring if no entries
+ * i2ptunnel: Don't delay after ConnectException if stopped
+   (fixes zzzot stop delay)
+
 2019-11-12 zzz
- * i2psnark: Audio playlist support
+ * i2psnark:
+   - Audio playlist support
+   - Restrict mime types for HTML5 players
 
 2019-11-11 zzz
  * KeyGenerator: Use new PrivateKey constructor
