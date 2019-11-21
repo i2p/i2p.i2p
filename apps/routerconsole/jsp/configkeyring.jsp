@@ -37,7 +37,7 @@
 <%  }  %>
           </td>
         </tr><tr>
-          <td align="right"><b><%=intl._t("Full destination, name, base 32, or hash")%>:</b></td>
+          <td align="right"><b><%=intl._t("Full destination, name, Base32, or hash")%>:</b></td>
           <td><input type="text" name="peer" size="55"></td>
         </tr><tr>
           <td align="right"><b><%=intl._t("Type")%>:</b></td>

@@ -92,7 +92,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                          "\r\n";
     // ESR version of Firefox, same as Tor Browser
     private static final String UA_CLEARNET = "User-Agent: " +
-                                              "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0" +
+                                              "Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0" +
                                               "\r\n";
     // overrides
     private static final String PROP_UA_I2P = "httpclient.userAgent.i2p";
@@ -1221,7 +1221,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     // 8-59 or 61-63 chars, this won't work
                     String header = getErrorPage("b32", ERR_DESTINATION_UNKNOWN);
                     try {
-                        writeErrorMessage(header, _t("Corrupt b32 address"), out, targetRequest, false, destination);
+                        writeErrorMessage(header, _t("Corrupt Base32 address"), out, targetRequest, false, destination);
                     } catch (IOException ioe) {}
                     return;
                 }
@@ -1271,7 +1271,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 // form to supply missing data
                                 writeB32SaveForm(out, destination, code, targetRequest);
                                 return;
-
                             }
                             // fall through to standard destination unreachable error page
                         }
@@ -1439,7 +1438,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 "</td><td>" + destination + "</td></tr>\n");
         try {
             String b32 = Base32.encode(SHA256Generator.getInstance().calculateHash(Base64.decode(ahelperKey)).getData());
-            out.write("<tr><td align=\"right\">" + _t("Base 32") + "</td>" +
+            out.write("<tr><td align=\"right\">" + _t("Base32") + "</td>" +
                     "<td><a href=\"http://" + b32 + ".b32.i2p/\">" + b32 + ".b32.i2p</a></td></tr>");
         } catch(Exception e) {
         }
@@ -1500,18 +1499,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         String header = getErrorPage("b32-auth", ERR_DESTINATION_UNKNOWN);
         out.write(header);
         out.write("<table id=\"proxyNewHost\">\n" +
-                  "<tr><td align=\"right\">" + _t("Base 32") + "</td>" +
+                  "<tr><td align=\"right\">" + _t("Base32") + "</td>" +
                   "<td>" + destination + "</td></tr>" +
                   "\n</table>\n" + "<hr>");
         String msg;
         if (code == LookupResult.RESULT_SECRET_REQUIRED)
-            msg = _t("Base 32 address requires lookup password");
+            msg = _t("Base32 address requires lookup password");
         else if (code == LookupResult.RESULT_KEY_REQUIRED)
-            msg = _t("Base 32 address requires encryption key");
+            msg = _t("Base32 address requires encryption key");
         else if (code == LookupResult.RESULT_SECRET_AND_KEY_REQUIRED)
-            msg = _t("Base 32 address requires encryption key and lookup password");
+            msg = _t("Base32 address requires encryption key and lookup password");
         else if (code == LookupResult.RESULT_DECRYPTION_FAILURE)
-            msg = _t("Base 32 address decryption failure, check encryption key");
+            msg = _t("Base32 address decryption failure, check encryption key");
         else
             msg = "lookup failure code " + code;
         out.write("<p><b>" + msg + "</b></p>");

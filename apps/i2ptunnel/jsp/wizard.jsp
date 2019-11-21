@@ -285,7 +285,7 @@
         <td>
             <p>
                 <%=intl._t("Type in the I2P destination of the service that this client tunnel should connect to.")%>
-                <%=intl._t("This could be the full base 64 destination key, or an I2P URL from your address book.")%>
+                <%=intl._t("This could be the full Base64 destination key, or an I2P URL from your address book.")%>
             </p>
         </td>
     </tr>

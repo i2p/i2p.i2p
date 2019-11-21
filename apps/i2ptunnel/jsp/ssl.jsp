@@ -520,11 +520,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        } else {
            valid = true;
 %>
-<tr><td colspan="4"><b><%=intl._t("Base 32")%>:</b> <%=b32%></td></tr>
+<tr><td colspan="4"><b><%=intl._t("Base32")%>:</b> <%=b32%></td></tr>
 <%
     if (altb32 != null && altb32.length() > 0) {
 %>
-        <tr><td><b><%=intl._t("Alt Base 32")%>:</b> <%=altb32%></td></tr>
+        <tr><td><b><%=intl._t("Alt Base32")%>:</b> <%=altb32%></td></tr>
 <%
     }  // altb32
     final String CHECK = "&nbsp;&nbsp;&#x2714;";

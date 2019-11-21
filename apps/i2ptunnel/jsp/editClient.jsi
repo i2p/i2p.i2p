@@ -453,7 +453,7 @@
             </td>
         </tr><tr>
             <td colspan="2">
-                <b><%=intl._t("Local Base 32")%>:</b>&nbsp;
+                <b><%=intl._t("Local Base32")%>:</b>&nbsp;
                 <%=editBean.getDestHashBase32(curTunnel)%>
             </td>
         </tr>
