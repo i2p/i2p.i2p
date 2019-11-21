@@ -150,15 +150,16 @@ class AccessFilter implements StatefulConnectionFilter {
                 }
             }
 
+            boolean newBreaches = false;
             synchronized(unknownDests) {
                 for (DestTracker tracker : unknownDests.values()) {
                     if (!tracker.getCounter().isBreached(threshold, now))
                         continue;
-                    breached.add(tracker.getHash().toBase32());
+                    newBreaches |= breached.add(tracker.getHash().toBase32());
                 }
             }
 
-            if (breached.isEmpty())
+            if (breached.isEmpty() || !newBreaches)
                 continue;
 
             BufferedWriter writer = null; 
