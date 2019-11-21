@@ -18,6 +18,7 @@ import net.i2p.data.Hash;
 class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     private final File file;
+    private volatile long lastLoading;
 
     /**
      * @param file file to read the remote destinations from
@@ -30,8 +31,9 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     @Override
     public void update(Map<Hash, DestTracker> map) throws IOException {
-        if (!(file.exists() && file.isFile()))
+        if (!(file.exists() && file.isFile() && file.lastModified() > lastLoading))
             return;
+        lastLoading = System.currentTimeMillis();
         BufferedReader reader = null; 
         try {
             reader = new BufferedReader(new FileReader(file)); 
