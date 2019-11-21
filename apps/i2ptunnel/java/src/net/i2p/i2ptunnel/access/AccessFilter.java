@@ -32,9 +32,11 @@ import net.i2p.client.streaming.StatefulConnectionFilter;
  * lists and unknown ones - those who are not defined in such lists but have
  * recently attempted to connect to us.
  *
- * Every SYNC_INTERVAL seconds the access lists are reloaded from disk which
+ * Every SYNC_INTERVAL seconds the access lists are reloaded from disk if they
+ * have changed according to file modification time.  This
  * allows the user to edit them.  Also, if any recorders are defined in the
- * access rules, they will write to disk at such interval.
+ * access rules, they will write to disk at such interval if there have been
+ * any new breaches.
  *
  * @since 0.9.40
  */
