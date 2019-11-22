@@ -111,7 +111,6 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
-        "https://reseed.i2p.net.in/"          + ',' +   // reseedi2pnetin_at_mail.i2p.crt  // CA                   // Java 8+ only, TLS 1.2 only
         "https://i2p.novg.net/"               + ',' +   // igor_at_novg.net.crt      // CA                         // Java 8+ only
         "https://i2pseed.creativecowpat.net:8443/" + ',' + // creativecowpat_at_mail.i2p.crt // i2pseed.creativecowpat.net.crt // Java 7+
         "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // reseed.onion.im.crt        // Java 8+ only
