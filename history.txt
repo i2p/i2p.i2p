@@ -1,3 +1,10 @@
+2019-11-23 zzz
+ * Router:
+   - Don't count zero-hop tunnels as part of the pool when building
+   - Don't build more than one zero-hop tunnel in a pool
+   - Assume high build failure rate for new installs
+   - Reduce threshold for tunnel length override
+
 2019-11-20 zzz
  * I2CP:
    - Prevent an uncaught OCMOSJ exception from killing the session

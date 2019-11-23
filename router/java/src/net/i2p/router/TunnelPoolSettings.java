@@ -111,10 +111,7 @@ public class TunnelPoolSettings {
             _lengthVariance = _isExploratory ? DEFAULT_OB_EXPL_LENGTH_VARIANCE : DEFAULT_LENGTH_VARIANCE;
         }
         _lengthOverride = -1;
-        if (_isExploratory)
-            _allowZeroHop = true;
-        else
-            _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
+        _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
         _IPRestriction = DEFAULT_IP_RESTRICTION;
         _unknownOptions = new Properties();
         _randomKey = generateRandomKey();
@@ -162,7 +159,7 @@ public class TunnelPoolSettings {
     /**
      * If there are no tunnels to build with, will this pool allow 0 hop tunnels?
      *
-     * Always true for exploratory.
+     * As of 0.9.44, same goes for exploratory:
      * Prior to 0.9.35, generally true for client.
      * As of 0.9.35, generally false for client, but true if
      * getLength() + Math.min(getLengthVariance(), 0) &lt;= 0,

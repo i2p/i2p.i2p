@@ -586,11 +586,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
 
     private static class BootstrapPool extends JobImpl {
-        private TunnelPool _pool;
+        private final TunnelPool _pool;
         public BootstrapPool(RouterContext ctx, TunnelPool pool) {
             super(ctx);
             _pool = pool;
-            getTiming().setStartAfter(ctx.clock().now() + 30*1000);
+            getTiming().setStartAfter(ctx.clock().now() + 5*1000);
         }
         public String getName() { return "Bootstrap tunnel pool"; }
         public void runJob() {
