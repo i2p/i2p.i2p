@@ -77,7 +77,7 @@ input.default {
  </div>
 </form>
 
-<h3 class="tabletitle"><%=intl._t("Websites")%></h3>
+<h3 class="tabletitle"><%=intl._t("Websites Inside I2P")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="1">
@@ -105,7 +105,7 @@ input.default {
  </div>
 </form>
 
-<h3 class="tabletitle"><%=intl._t("Monitoring")%></h3>
+<h3 class="tabletitle"><%=intl._t("Developer Information")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="5">

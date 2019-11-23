@@ -93,7 +93,7 @@
     </div>
   </div>
   <div class="ag2">
-    <h4 class="app2"><%=intl._t("Websites")%></h4>
+    <h4 class="app2"><%=intl._t("Websites Inside I2P")%></h4>
     <div class="homesites">
       <jsp:getProperty name="homehelper" property="favorites" /><br>
     <div class="clearer">&nbsp;</div>
@@ -107,7 +107,7 @@
     </div>
   </div>
   <div class="ag2">
-    <h4 class="app"><%=intl._t("Monitoring")%></h4>
+    <h4 class="app"><%=intl._t("Developer Information")%></h4>
     <div class="homedevs">
       <jsp:getProperty name="homehelper" property="monitoring" /><br>
     <div class="clearer">&nbsp;</div>
