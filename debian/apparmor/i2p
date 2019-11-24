@@ -34,6 +34,8 @@
 
   /etc/java-*-openjdk/**                                  r,
   # Allow any JRE or JDK
+  /usr/lib/jvm/*/bin/java                                 rix,
+  /usr/lib/jvm/*/bin/keytool                              rix,
   /usr/lib/jvm/*/jre/bin/java                             rix,
   /usr/lib/jvm/*/jre/bin/keytool                          rix,
 
