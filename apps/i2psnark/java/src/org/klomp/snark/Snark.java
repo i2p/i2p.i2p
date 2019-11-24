@@ -467,7 +467,7 @@ public class Snark
             try { storage.close(); } catch (IOException ioee) {
                 ioee.printStackTrace();
             }
-            fatal("Could not check or create storage", ioe);
+            fatal("Could not check or create storage for " + getBaseName(), ioe);
           }
       }
 
@@ -609,7 +609,7 @@ public class Snark
                  try { storage.close(); } catch (IOException ioee) {
                      ioee.printStackTrace();
                  }
-                 fatal("Could not reopen storage", ioe);
+                 fatal("Could not reopen storage for " + getBaseName(), ioe);
              }
         }
         trackerclient.start();
@@ -655,7 +655,8 @@ public class Snark
         try { 
             storage.close(); 
         } catch (IOException ioe) {
-            System.out.println("Error closing " + torrent);
+            if (_log.shouldWarn())
+                _log.warn("Error closing " + torrent);
             ioe.printStackTrace();
         }
         savedUploaded = nowUploaded;
@@ -1255,7 +1256,7 @@ public class Snark
           }
           // TODO we're still in an inconsistent state, won't work if restarted
           // (PeerState "disconnecting seed that connects to seeds"
-          fatal("Could not create data files", ioe);
+          fatal("Could not create data files for " + getBaseName(), ioe);
       }
   }
 
