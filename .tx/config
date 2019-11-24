@@ -426,9 +426,11 @@ trans.ca = apps/ministreaming/locale/messages_ca.po
 trans.cs = apps/ministreaming/locale/messages_cs.po
 trans.de = apps/ministreaming/locale/messages_de.po
 trans.es = apps/ministreaming/locale/messages_es.po
+trans.fa = apps/ministreaming/locale/messages_fa.po
 trans.fi = apps/ministreaming/locale/messages_fi.po
 trans.fr = apps/ministreaming/locale/messages_fr.po
 trans.gl = apps/ministreaming/locale/messages_gl.po
+trans.hu = apps/ministreaming/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/ministreaming/locale/messages_in.po
 trans.it = apps/ministreaming/locale/messages_it.po
@@ -512,6 +514,7 @@ source_file = installer/resources/readme/readme.html
 source_lang = en
 trans.ar = installer/resources/readme/readme_ar.html
 trans.de = installer/resources/readme/readme_de.html
+trans.fr = installer/resources/readme/readme_fr.html
 ;; Java converts id to in
 trans.id = installer/resources/readme/readme_in.html
 trans.it = installer/resources/readme/readme_it.html
