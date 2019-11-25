@@ -206,8 +206,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String DEFAULT_BACKUP_TRACKER = "http://opentracker.dg2.i2p/a";
 
     /** URLs, comma-separated. Used for "announce to open trackers also" */
-    private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER;
-                                                       // + (SigType.ECDSA_SHA256_P256.isAvailable() ? ",http://tracker.thebland.i2p/a" : "");
+    private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER +
+                                                       (SigType.ECDSA_SHA256_P256.isAvailable() ? ",http://tracker.thebland.i2p/a" : "");
 
     public static final Set<String> DEFAULT_TRACKER_ANNOUNCES;
 
