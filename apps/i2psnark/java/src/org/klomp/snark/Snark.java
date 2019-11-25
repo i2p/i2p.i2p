@@ -467,7 +467,7 @@ public class Snark
             try { storage.close(); } catch (IOException ioee) {
                 ioee.printStackTrace();
             }
-            fatal("Could not check or create storage for " + getBaseName(), ioe);
+            fatal("Could not check or create files for " + getBaseInfo(), ioe);
           }
       }
 
@@ -609,7 +609,7 @@ public class Snark
                  try { storage.close(); } catch (IOException ioee) {
                      ioee.printStackTrace();
                  }
-                 fatal("Could not reopen storage for " + getBaseName(), ioe);
+                 fatal("Could not open file for " + getBaseInfo(), ioe);
              }
         }
         trackerclient.start();
@@ -707,6 +707,19 @@ public class Snark
     public String getBaseName() {
         if (storage != null)
             return storage.getBaseName();
+        return torrent;
+    }
+
+    /**
+     *  @return base name for torrent [filtered version of getMetaInfo.getName()],
+     *          or a fake name if in magnet mode, followed by path info and error message,
+     *          for error logging only
+     *  @since 0.9.44
+     */
+    private String getBaseInfo() {
+        if (storage != null)
+            return storage.getBaseName() + " at " +
+                   storage.getBase() + " - check that device is present and writable";
         return torrent;
     }
 
@@ -1256,7 +1269,7 @@ public class Snark
           }
           // TODO we're still in an inconsistent state, won't work if restarted
           // (PeerState "disconnecting seed that connects to seeds"
-          fatal("Could not create data files for " + getBaseName(), ioe);
+          fatal("Could not create file for " + getBaseInfo(), ioe);
       }
   }
 
