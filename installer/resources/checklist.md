@@ -31,7 +31,8 @@
 - Trial Debian build: Build and test a preliminary Debian build
   with 'ant debian' and fix any issues
 
-- Javadoc test: 'ant javadoc' and 'ant mavenCentral' with an Oracle JDK, fix any issues
+- Javadoc test: 'ant javadoc' and 'ant mavenCentral.deps'
+  with a recent Oracle JDK (12+), and fix any issues.
   Oracle JDK will error on things that OpenJDK does not!
 
 
