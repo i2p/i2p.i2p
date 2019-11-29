@@ -1,0 +1,66 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# NoProfile, 2016
+# magnifico, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2019-07-01 23:39+0000\n"
+"Last-Translator: magnifico\n"
+"Language-Team: Persian (http://www.transifex.com/otf/I2P/language/fa/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "تبریک بابت نصب I2P!"
+
+msgid "Welcome to I2P!"
+msgstr "به I2P خوش آمدید!"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr ""
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr ""
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr ""
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr ""
+
+msgid "Do not use SOCKS for this."
+msgstr "از ساکس برای این استفاده نکن."
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr ""
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr ""
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr ""
