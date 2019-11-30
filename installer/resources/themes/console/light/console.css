@@ -3748,7 +3748,7 @@ div[lang="de"] .links li {
      height: 6%;
      height: 1.5rem;
      max-height: 1.5rem;
-     margin-top: 1rem !important;
+     margin-top: .1rem !important;
 }
 
 .langbox img:hover, .langbox a:focus img {
