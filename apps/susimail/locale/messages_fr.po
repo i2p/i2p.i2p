@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-10-11 15:25+0000\n"
+"PO-Revision-Date: 2019-10-28 16:56+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/MailPart.java:321
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
-msgstr "Aucun encodeur n’a été trouvé pour encoder « {0} »."
+msgstr "Aucun encodeur n’a été trouvé pour encoder « {0} »."
 
 #. tagged in WebMail
 #: src/src/i2p/susi/webmail/Sorters.java:90
@@ -77,7 +77,7 @@ msgstr "inconnu"
 #: src/src/i2p/susi/webmail/WebMail.java:583
 #, java-format
 msgid "Charset \\''{0}\\'' not supported."
-msgstr "Le jeu de caractères « {0} » n’est pas pris en charge."
+msgstr "Le jeu de caractères « {0} » n’est pas pris en charge."
 
 #: src/src/i2p/susi/webmail/WebMail.java:587
 #, java-format
@@ -317,7 +317,7 @@ msgstr "Aucune adresse d’expéditeur valide n’a été trouvée."
 #: src/src/i2p/susi/webmail/WebMail.java:2763
 #, java-format
 msgid "Found no valid address in \\''{0}\\''."
-msgstr "Aucune adresse valide n’a été trouvée dans « {0} »."
+msgstr "Aucune adresse valide n’a été trouvée dans « {0} »."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2777
 msgid "No recipients found."

@@ -5,13 +5,14 @@
 # 
 # Translators:
 # cacapo <handelsehorisont@gmail.com>, 2015
+# Jonatan Nyberg, 2019
 # Jonatan Nyberg, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2017-09-20 06:14+0000\n"
+"PO-Revision-Date: 2019-11-10 19:04+0000\n"
 "Last-Translator: Jonatan Nyberg\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -67,7 +68,7 @@ msgstr "Inga lokala tunnlar"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
 msgid "Unsupported encryption options"
-msgstr "Krypteringsalternativ stöds ej"
+msgstr "Krypteringsalternativ som inte stöds"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
 msgid "Invalid destination"

@@ -108,7 +108,7 @@ msgstr "B<-c>"
 #: man/eepget.1:25
 #, no-wrap
 msgid "Clearnet. Do not use a proxy. Same as B<-p> :0 ."
-msgstr "Réseau visible. N’utilise aucun mandataire. Identique à B<-p> :0 ."
+msgstr "Réseau visible. N’utilise aucun mandataire. Identique à B<-p> :0 ."
 
 #. type: Plain text
 #: man/eepget.1:31
@@ -208,7 +208,7 @@ msgid ""
 msgstr ""
 "Spécifier un serveur mandataire d’I2P (eepproxy) à utiliser. Si le port "
 "n’est pas indiqué, eepget utilisera 4444. Si cette option n’est pas "
-"indiquée, eepget utilisera 127.0.0.1:444. Indiquer B<-c> ou B<-p> :0 pour "
+"indiquée, eepget utilisera 127.0.0.1:4444. Indiquer B<-c> ou B<-p> :0 pour "
 "désactiver le mandataire eeproxy."
 
 #. type: Plain text

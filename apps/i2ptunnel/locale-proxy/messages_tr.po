@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-12 14:14+0000\n"
-"PO-Revision-Date: 2019-10-12 14:15+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2019-11-24 13:14+0000\n"
+"PO-Revision-Date: 2019-11-25 06:04+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -214,8 +214,8 @@ msgid "Warning: Invalid Destination"
 msgstr "Uyarı: Hedef Geçersiz"
 
 #: ../java/build/Proxy.java:49
-msgid "The b32 address is invalid."
-msgstr "b32 adresi geçersiz."
+msgid "The Base32 address is invalid."
+msgstr "Base32 adresi geçersiz"
 
 #: ../java/build/Proxy.java:58
 msgid "The website was not reachable, because its lease set was not found."
@@ -501,135 +501,135 @@ msgid "Conflicting address helper destination"
 msgstr "Çakışan adres yardımcısı hedefi"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
-msgid "Corrupt b32 address"
-msgstr "b32 adresi hatalı"
+msgid "Corrupt Base32 address"
+msgstr "Base32 adresi hatalı"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1305
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
 msgstr "Hedef kiralama kümesi bulunamadı"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1438
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1437
 msgid "Host"
 msgstr "Sunucu"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1442
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1503
-msgid "Base 32"
-msgstr "Base 32"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
+msgid "Base32"
+msgstr "Base32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1446
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
 msgid "Destination"
 msgstr "Hedef"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Kaydetmeden {0} sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
 msgstr "Adres defterine kaydetmeden sitede gezinebilirsiniz. I2P yönelticinizi yeniden başlattığınızda adres hatırlanır."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1454
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
 msgid "Continue without saving"
 msgstr "Kaydetmeden devam et"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr "Yöneltici adres defterine kaydederek {0} web sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1462
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
 msgstr "Bu adres yönelticinizin abonelik temelli adresleri kaydettiği adres defterine kaydedilecek."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1464
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Master or Private address book instead."
 msgstr "El ile eklediğiniz siteleri izlemek istiyorsanız Ana ya da Kişisel adres defterinize ekleyin."
 
 #. FIXME wasn't escaped
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1467
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1549
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
 msgid "Save & continue"
 msgstr "Kaydedip devam et"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr "Ana adres defterine kaydederek {0} web sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1475
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
 msgid ""
 "This address will be saved to your Master address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
 msgstr "Bu adres Ana adres defterine kaydedilecek. Bu seçeneği Ana adres defterinden ayrı tutmak istediğiniz adresler için bu seçeneği işaretleyin, yayın durumuyla ilgilenilmez."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr "Kişisel adres defterine kaydederek {0} web sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1480
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
 msgstr "Bu adres Kişisel adres defterinize kaydedilecek ve hiç bir zaman yayınlanmayacak."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1508
-msgid "Base 32 address requires lookup password"
-msgstr "Base 32 adresi için tarama parolası gerekiyor"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
+msgid "Base32 address requires lookup password"
+msgstr "Base32 adresi için tarama parolası gerekiyor"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1510
-msgid "Base 32 address requires encryption key"
-msgstr "Base 32 adresi için şifreleme anahtarı gerekiyor"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
+msgid "Base32 address requires encryption key"
+msgstr "Base32 adresi için şifreleme anahtarı gerekiyor"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1512
-msgid "Base 32 address requires encryption key and lookup password"
-msgstr "Base 32 adresi için şifreleme anahtarı ve tarama parolası gerekiyor"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
+msgid "Base32 address requires encryption key and lookup password"
+msgstr "Base32 adresi için şifreleme anahtarı ve tarama parolası gerekiyor"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1514
-msgid "Base 32 address decryption failure, check encryption key"
-msgstr "Base 32 adresinin şifresi çözülemedi. Şifreleme anahtarını denetleyin"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
+msgid "Base32 address decryption failure, check encryption key"
+msgstr "Base32 adresinin şifresi çözülemedi. Şifreleme anahtarını denetleyin"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
 msgid "Generate"
 msgstr "Üret"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
 msgid "Encryption key"
 msgstr "Şifreleme anahtarı"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
 msgstr "Sunucu işletmesi tarafından sağlanan bir PSK şifreleme anahtarı yazmalı ya da bir DH şifreleme anahtarı üreterek sunucu işletmecisine göndermelisiniz."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1528
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
 msgstr "Yardım almak için sunucu işletmecisine sorun."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1531
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
 msgid "Enter PSK encryption key"
 msgstr "PSK şifreleme anahtarını yazın"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1534
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
 msgstr "Yeni bir DH şifreleme anahtarı üretin"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"
 msgstr "Tarama parolası"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1543
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
 msgid "You must enter the password provided by the server operator."
 msgstr "Sunucu işletmecisi tarafından sağlanan parolayı yazın."
 
@@ -657,7 +657,7 @@ msgstr "Özel anahtar geçersiz"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:288
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
 msgid "Your new encryption key"
-msgstr ""
+msgstr "Yeni şifreleme anahtarınız"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:312
 msgid "Copy the key and send it to the server operator."

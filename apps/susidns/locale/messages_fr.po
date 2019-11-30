@@ -22,7 +22,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-08-21 14:27+0000\n"
+"PO-Revision-Date: 2019-10-28 16:56+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -34,25 +34,25 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:132
 #, java-format
 msgid "Host name \"{0}\" contains illegal character {1}"
-msgstr "Le nom d’hôte « {0} » contient le caractère illicite {1}"
+msgstr "Le nom d’hôte « {0} » contient le caractère illicite {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:145
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:147
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:154
 #, java-format
 msgid "Host name cannot start with \"{0}\""
-msgstr "Le nom d’hôte ne peut pas commencer par « {0} »"
+msgstr "Le nom d’hôte ne peut pas commencer par « {0} »"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:149
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:151
 #, java-format
 msgid "Host name cannot end with \"{0}\""
-msgstr "Le nom d’hôte ne peut pas finir par « {0} »"
+msgstr "Le nom d’hôte ne peut pas finir par « {0} »"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:156
 #, java-format
 msgid "Host name cannot contain \"{0}\""
-msgstr "Le nom d’hôte ne peut pas contenir « {0} »"
+msgstr "Le nom d’hôte ne peut pas contenir « {0} »"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:159
 #, java-format
@@ -169,7 +169,7 @@ msgstr "La destination a été modifiée pour {0}."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:276
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:289
 msgid "Warning - host name does not end with \".i2p\""
-msgstr "Avertissement : Le nom d’hôte ne finit pas par « .i2p »"
+msgstr "Avertissement : Le nom d’hôte ne finit pas par « .i2p »"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:281
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:297
@@ -180,7 +180,7 @@ msgstr "La destination Base64 est invalide."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
 #, java-format
 msgid "Invalid host name \"{0}\"."
-msgstr "Le nom d’hôte « {0} » est invalide."
+msgstr "Le nom d’hôte « {0} » est invalide."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:290
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:306
@@ -250,7 +250,7 @@ msgstr "ERREUR : Impossible d’écrire dans le fichier du carnet d’adresses.
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
-msgstr "L’envoi du formulaire est invalide, car vous avez probablement utilisé le bouton « Retour » ou « Recharger » de votre navigateur. Veuillez le renvoyer."
+msgstr "L’envoi du formulaire est invalide, car vous avez probablement utilisé le bouton « Retour » ou « Recharger » de votre navigateur. Veuillez le renvoyer."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:334
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
@@ -737,7 +737,7 @@ msgstr "L’application de carnet d’adresses fait partie de votre installation
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
-msgstr "Actualise régulièrement votre fichier hosts.txt à partir de sources distribuées ou « abonnements »."
+msgstr "Actualise régulièrement votre fichier hosts.txt à partir de sources distribuées ou « abonnements »."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:202
 #, java-format
@@ -771,14 +771,14 @@ msgstr "L’application carnet d’adresses interroge régulièrement vos abonne
 msgid ""
 "Then it merges your \"master\" address book into the router address book as "
 "well."
-msgstr "Puis elle fusionne aussi votre carnet d’adresses « maître » dans le carnet d’adresses du routeur. "
+msgstr "Puis elle fusionne aussi votre carnet d’adresses « maître » dans le carnet d’adresses du routeur. "
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:214
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an "
 "eepsite."
-msgstr "Si configuré ainsi, le carnet d’adresses du routeur est alors écrit vers le carnet d’adresses « publié » qui sera proposé publiquement si vous faites tourner un site eep."
+msgstr "Si configuré ainsi, le carnet d’adresses du routeur est alors écrit vers le carnet d’adresses « publié » qui sera proposé publiquement si vous faites tourner un site eep."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
