@@ -51,11 +51,11 @@
 <body>
 <div class="page">
 <div id="logo">
-<img src="<%=base.getTheme()%>images/logo.png" alt="susidns logo" border="0">
+<img style="display=none;" src="<%=base.getTheme()%>../images/logo.png" alt="susidns logo" border="0">
 </div>
 <hr>
 <div id="navi">
-<a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
+<a id="overview" class="active" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
 <a class="abook" href="addressbook?book=master&amp;filter=none"><%=intl._t("Master")%></a>&nbsp;
 <a class="abook" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;

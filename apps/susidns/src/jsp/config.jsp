@@ -53,7 +53,7 @@
 <body>
 <div class="page">
 <div id="logo">
-<a href="index"><img src="<%=base.getTheme()%>images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
+<a href="index"><img style="display=none;" src="<%=base.getTheme()%>../images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
 </div>
 <hr>
 <div id="navi">
@@ -63,7 +63,7 @@
 <a class="abook" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;
 <a class="abook" href="addressbook?book=published&amp;filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
-<a id="config" href="config"><%=intl._t("Configuration")%></a>
+<a id="config" class="active" href="config"><%=intl._t("Configuration")%></a>
 </div>
 <hr>
 <div class="headline" id="configure">
