@@ -1,3 +1,19 @@
+2019-11-30 zzz
+ * Pull translations
+
+2019-11-30 sadie
+ * Console, SusiDNS: CSS updates
+
+2019-11-29 zzz
+ * Console, proxy, SusiDNS: Add partial Persian translations
+
+2019-11-27 zzz
+ * GeoIP update
+
+2019-11-24 zzz
+ * Debian: Add apparmor support for Java 11 (Github PR #19)
+ * i2psnark: File system error message improvements
+
 2019-11-23 zzz
  * Router:
    - Don't count zero-hop tunnels as part of the pool when building
@@ -46,10 +62,9 @@
  * i2psnark: Add HTML5 players on details page
 
 2019-11-06 idk
- * Router:
-  - Use Local Application Data(%LOCALAPPDATA%) instead of Roaming for config
- * Console:
-  - Change home page organization, headlines, to expose more information
+ * Router: Use Local Application Data(%LOCALAPPDATA%)
+   instead of Roaming for config (ticket #1258)
+ * Console: Change home page organization and headers
 
 2019-11-05 zzz
  * Router: No longer check the clove ID in the Bloom filter
