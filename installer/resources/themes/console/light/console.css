@@ -3746,7 +3746,9 @@ div[lang="de"] .links li {
      filter: none;
      border-radius: 1px;
      height: 6%;
-     height: 1.8rem;
+     height: 1.5rem;
+     max-height: 1.5rem;
+     margin-top: 1rem !important;
 }
 
 .langbox img:hover, .langbox a:focus img {
@@ -4889,7 +4891,7 @@ div#themesettings {
 select#langsettings {
      padding: 4px 5px 0;
      font-size: large;
-     height: 3rem;
+     height: 2rem;
      width: 15rem;
 }
 

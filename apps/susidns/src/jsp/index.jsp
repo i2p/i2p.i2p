@@ -50,9 +50,6 @@
 </head>
 <body>
 <div class="page">
-<div id="logo">
-<img style="display=none;" src="<%=base.getTheme()%>../images/logo.png" alt="susidns logo" border="0">
-</div>
 <hr>
 <div id="navi">
 <a id="overview" class="active" href="index"><%=intl._t("Overview")%></a>&nbsp;

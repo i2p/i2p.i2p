@@ -51,9 +51,7 @@
 </head>
 <body>
 <div class="page">
-<div id="logo">
-<a href="index"><img style="display=none;" src="<%=subs.getTheme()%>../images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
-</div><hr>
+<hr>
 <div id="navi">
 <a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
