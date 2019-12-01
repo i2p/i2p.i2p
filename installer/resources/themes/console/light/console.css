@@ -2669,7 +2669,7 @@ td {
 
 h4.app, h4.app2 {
      margin: 0 auto 3px;
-     padding: 7px 10px 6px 32px;
+     padding: 7px 10px 6px;
      border: 1px solid #dee2e6;
      font-size: 12pt;
      text-transform: capitalize;
