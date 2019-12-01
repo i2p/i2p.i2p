@@ -1,3 +1,9 @@
+i2p (0.9.44-1ubuntu1) bionic; urgency=medium
+
+  * New upstream version 0.9.44
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Sun, 01 Dec 2019 12:12:12 +0000
+
 i2p (0.9.43-1ubuntu1) bionic; urgency=medium
 
   * New upstream version 0.9.43
