@@ -1147,13 +1147,13 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         return rv;
     }
 
-    ///////// End UpdateManager interface
-
     /**
      *  Adds to installed, removes from downloaded and available
+     *  @param id subtype for plugins, or ""
      *  @param version null to remove from installed
+     *  @since public since 0.9.45
      */
-    private void notifyInstalled(UpdateType type, String id, String version) {
+    public void notifyInstalled(UpdateType type, String id, String version) {
         UpdateItem ui = new UpdateItem(type, id);
         if (version == null) {
             _installed.remove(ui);
@@ -1172,6 +1172,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (old != null && old.compareTo(ver) <= 0)
             _available.remove(ui);
     }
+
+    ///////// End UpdateManager interface
 
     /**
      *  Adds to downloaded, removes from available

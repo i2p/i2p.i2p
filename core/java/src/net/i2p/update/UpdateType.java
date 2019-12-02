@@ -12,7 +12,6 @@ public enum UpdateType {
     ROUTER_SIGNED,
     ROUTER_UNSIGNED,
     PLUGIN,
-    /** unused */
     GEOIP,
     BLOCKLIST,
     /** unused */

@@ -231,6 +231,15 @@ public interface UpdateManager {
     public String getStatus();
 
     /**
+     *  Tell the UpdateManager that a version is already installed.
+     *
+     *  @param id subtype for plugins, or ""
+     *  @param version null to remove from installed
+     *  @since 0.9.45
+     */
+    public void notifyInstalled(UpdateType type, String id, String version);
+
+    /**
      *  For debugging
      */
     public void renderStatusHTML(Writer out) throws IOException;

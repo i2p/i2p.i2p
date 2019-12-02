@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip2.DatabaseReader;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -29,6 +31,8 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.update.UpdateManager;
+import net.i2p.update.UpdateType;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -185,6 +189,9 @@ public class GeoIP {
                         LookupService ls = null;
                         try {
                             ls = new LookupService(f, LookupService.GEOIP_STANDARD);
+                            Date date = ls.getDatabaseInfo().getDate();
+                            if (date != null)
+                                notifyVersion("GeoIPv4", date.getTime());
                             for (int i = 0; i < search.length; i++) {
                                 Long ipl = search[i];
                                 long ip = ipl.longValue();
@@ -251,6 +258,9 @@ public class GeoIP {
                         LookupService ls = null;
                         try {
                             ls = new LookupService(f, LookupService.GEOIP_STANDARD);
+                            Date date = ls.getDatabaseInfo().getDate();
+                            if (date != null)
+                                notifyVersion("GeoIPv6", date.getTime());
                             for (int i = 0; i < search.length; i++) {
                                 Long ipl = search[i];
                                 long ip = ipl.longValue();
@@ -347,6 +357,8 @@ public class GeoIP {
         DatabaseReader rv = b.build();
         if (_log.shouldDebug())
             _log.debug("Opened GeoIP2 Database, Metadata: " + rv.getMetadata());
+        long time = rv.getMetadata().getBuildDate().getTime();
+        notifyVersion("GeoIP2", time);
         return rv;
     }
 
@@ -447,6 +459,7 @@ public class GeoIP {
             String buf = null;
             br = new BufferedReader(new InputStreamReader(
                     new FileInputStream(geoFile), "ISO-8859-1"));
+            notifyVersion("Torv4", geoFile.lastModified());
             while ((buf = br.readLine()) != null && idx < search.length) {
                 try {
                     if (buf.charAt(0) == '#') {
@@ -478,6 +491,31 @@ public class GeoIP {
         }
 
         return rv;
+    }
+
+    /**
+     *  Tell the update manager.
+     *
+     *  @since 0.9.45
+     */
+    private void notifyVersion(String subtype, long version) {
+        notifyVersion(_context, subtype, version);
+    }
+
+    /**
+     *  Tell the update manager.
+     *
+     *  @since 0.9.45
+     */
+    static void notifyVersion(I2PAppContext ctx, String subtype, long version) {
+        if (version <= 0)
+            return;
+        ClientAppManager cmgr = ctx.clientAppManager();
+        if (cmgr != null) {
+            UpdateManager umgr = (UpdateManager) cmgr.getRegisteredApp(UpdateManager.APP_NAME);
+            if (umgr != null)
+                umgr.notifyInstalled(UpdateType.GEOIP, subtype, Long.toString(version));
+        }
     }
 
     /**

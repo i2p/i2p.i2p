@@ -65,7 +65,7 @@ public class GeoIPv6 {
                 log.warn("GeoIP file not found: " + geoFile.getAbsolutePath());
             return new String[0];
         }
-        return readGeoIPFile(geoFile, search, codeCache, log);
+        return readGeoIPFile(context, geoFile, search, codeCache, log);
     }
 
     /**
@@ -77,13 +77,14 @@ public class GeoIPv6 {
      *         or a zero-length array on total failure.
      *         Individual array elements will be null for lookup failure of that item.
      */
-    private static String[] readGeoIPFile(File geoFile, Long[] search, Map<String, String> codeCache, Log log) {
+    private static String[] readGeoIPFile(I2PAppContext context, File geoFile, Long[] search, Map<String, String> codeCache, Log log) {
         String[] rv = new String[search.length];
         int idx = 0;
         long start = System.currentTimeMillis();
         InputStream in = null;
         try {
             in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(geoFile)));
+            GeoIP.notifyVersion(context, "I2Pv6", geoFile.lastModified());
             byte[] magic = new byte[MAGIC.length()];
             DataHelper.read(in, magic);
             if (!DataHelper.eq(magic, DataHelper.getASCII(MAGIC)))
@@ -368,6 +369,7 @@ public class GeoIPv6 {
             System.exit(1);
         }
         // readback for testing
-        readGeoIPFile(outfile, new Long[] { Long.MAX_VALUE }, Collections.<String, String> emptyMap(), new Log(GeoIPv6.class));
+        readGeoIPFile(I2PAppContext.getGlobalContext(), outfile, new Long[] { Long.MAX_VALUE },
+                      Collections.<String, String> emptyMap(), new Log(GeoIPv6.class));
     }
 }
