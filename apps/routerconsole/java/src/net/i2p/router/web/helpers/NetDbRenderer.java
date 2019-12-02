@@ -732,10 +732,11 @@ class NetDbRenderer {
             }
             buf.append("</div>");
         }
-        long end = System.currentTimeMillis();
-        if (log.shouldWarn())
+        if (log.shouldWarn()) {
+            long end = System.currentTimeMillis();
             log.warn("part 1 took " + (end - start));
-        start = end;
+            start = end;
+        }
 
      //
      // don't bother to reindent
@@ -763,10 +764,11 @@ class NetDbRenderer {
         buf.append("</td><td style=\"vertical-align: top;\">");
         out.write(buf.toString());
         buf.setLength(0);
-        end = System.currentTimeMillis();
-        if (log.shouldWarn())
+        if (log.shouldWarn()) {
+            long end = System.currentTimeMillis();
             log.warn("part 2 took " + (end - start));
-        start = end;
+            start = end;
+        }
 
         // transports table
         boolean showTransports = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
@@ -784,10 +786,11 @@ class NetDbRenderer {
             buf.append("</td><td style=\"vertical-align: top;\">");
             out.write(buf.toString());
             buf.setLength(0);
-            end = System.currentTimeMillis();
-            if (log.shouldWarn())
+            if (log.shouldWarn()) {
+                long end = System.currentTimeMillis();
                 log.warn("part 3 took " + (end - start));
-            start = end;
+                start = end;
+            }
         }
 
         // country table
@@ -808,10 +811,10 @@ class NetDbRenderer {
         }
 
         buf.append("</td></tr></table>");
-        end = System.currentTimeMillis();
-        if (log.shouldWarn())
+        if (log.shouldWarn()) {
+            long end = System.currentTimeMillis();
             log.warn("part 4 took " + (end - start));
-        start = end;
+        }
 
      //
      // don't bother to reindent
