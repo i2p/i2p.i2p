@@ -29,6 +29,8 @@ public class JSONUtils {
 	public static String getValueFromJsonObj(String jsonTxt, String key) {
 		JSONValue jsonParser = new JSONValue();
 		Map json = (Map)jsonParser.parse(new String(jsonTxt));
+		if (json == null)
+			return null;
 		Iterator iter = json.entrySet().iterator();
 		while(iter.hasNext()){
 			Map.Entry entry = (Map.Entry)iter.next();
