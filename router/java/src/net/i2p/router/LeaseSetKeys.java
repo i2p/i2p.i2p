@@ -62,10 +62,12 @@ public class LeaseSetKeys {
      *
      *  @param dest unused
      *  @param revocationKey unused, may be null
-     *  @param decryptionKeys non-null
+     *  @param decryptionKeys non-null, non-empty
      *  @since 0.9.44
      */
     public LeaseSetKeys(Destination dest, SigningPrivateKey revocationKey, List<PrivateKey> decryptionKeys) {
+        if (decryptionKeys.isEmpty())
+            throw new IllegalArgumentException("no keys");
         _revocationKey = revocationKey;
         PrivateKey elg = null;
         PrivateKey ec = null;

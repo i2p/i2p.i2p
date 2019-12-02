@@ -131,7 +131,7 @@
 
 ### Build and test
 
-1. `ant release`
+1. `ant release` or `ant releaseWithGeoIP` or `ant releaseWithJbigi`
 
   - Copy i2pinstall_${release.number}_windows.exe,
     console.ico, ../lib/izpack/rh.bat, and ../lib/izpack/VersionInfo_template.rc

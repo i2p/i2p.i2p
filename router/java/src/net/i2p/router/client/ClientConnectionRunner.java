@@ -602,12 +602,12 @@ class ClientConnectionRunner {
                 hasElg = true;
             }
             if (hasElg) {
+                TransientSessionKeyManager tskm = new TransientSessionKeyManager(_context, tags, thresh);
                 if (hasEC) {
-                    TransientSessionKeyManager tskm = new TransientSessionKeyManager(_context, tags, thresh);
                     RatchetSKM rskm = new RatchetSKM(_context);
                     _sessionKeyManager = new MuxedSKM(tskm, rskm);
                 } else {
-                    _sessionKeyManager = new TransientSessionKeyManager(_context, tags, thresh);
+                    _sessionKeyManager = tskm;
                 }
             } else {
                 if (hasEC) {

@@ -40,19 +40,13 @@ public class RatchetSessionTag {
     }
 
     /**
-     * We assume the data has enough randomness in it, so use the first 4 bytes for speed.
-     * If this is not the case, override in the extending class.
+     * We assume the data has enough randomness in it, so use 4 bytes for speed.
      */
     @Override
     public int hashCode() {
         return (int) _data;
     }
 
-    /**
-     * Warning - this returns true for two different classes with the same size
-     * and same data, e.g. SessionKey and SessionTag, but you wouldn't
-     * put them in the same Set, would you?
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
