@@ -3349,16 +3349,16 @@ public class I2PSnarkServlet extends BasicServlet {
             if (storage != null && storage.complete()) {
                 String mime = getMimeType(r.getName());
                 boolean isAudio = mime != null && isAudio(mime);
-                boolean isVideo = mime != null && isVideo(mime);
+                boolean isVideo = !isAudio && mime != null && isVideo(mime);
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
-                        buf.append("<audio controls>");
+                        buf.append("<audio");
                     else
-                        buf.append("<video controls>");
+                        buf.append("<video");
                     // strip trailing slash
                     String path = base.substring(0, base.length() - 1);
-                    buf.append("<source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
+                    buf.append(" controls><source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
                     if (isAudio)
                         buf.append("</audio>");
                     else
@@ -3551,14 +3551,14 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<td class=\"snarkFileIcon\">");
             if (complete) {
                 isAudio = isAudio(mime);
-                isVideo = isVideo(mime);
+                isVideo = !isAudio && isVideo(mime);
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
-                        buf.append("<audio controls>");
+                        buf.append("<audio");
                     else
-                        buf.append("<video controls>");
-                    buf.append("<source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
+                        buf.append("<video");
+                    buf.append(" controls><source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
                 }
                 buf.append("<a href=\"").append(path).append("\">");
                 if (mime.startsWith("image/")) {
@@ -3703,7 +3703,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 continue;
             String name = fai.file.getName();
             String mime = getMimeType(name);
-            if (mime != null && (mime.startsWith("audio/") || mime.equals("application/ogg")))
+            if (mime != null && isAudio(mime))
                 return true;
         }
         return false;
@@ -3810,7 +3810,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 continue;
             String name = fai.file.getName();
             String mime = getMimeType(name);
-            if (mime != null && (mime.startsWith("audio/") || mime.equals("application/ogg"))) {
+            if (mime != null && isAudio(mime)) {
                 // TODO Extended M3U
                 buf.append(reqURL).append(encodePath(name)).append('\n');
             }
