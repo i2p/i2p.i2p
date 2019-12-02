@@ -59,9 +59,9 @@ public class SummaryHelper extends HelperBase {
         "I2PInternals" + S +
         "HelpAndFAQ" + S +
         "Peers" + S +
+        "RestartStatus" + S +
         "Tunnels" + S +
         "TunnelStatus" + S +
-        "RestartStatus" + S +
         "Destinations" + S +
         "";
 
@@ -76,10 +76,10 @@ public class SummaryHelper extends HelperBase {
         "I2PInternals" + S +
         "Advanced" + S +
         "Peers" + S +
+        "RestartStatus" + S +
         "Tunnels" + S +
         "TunnelStatus" + S +
         "Congestion" + S +
-        "RestartStatus" + S +
         "Destinations" + S +
         "";
 

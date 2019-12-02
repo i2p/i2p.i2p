@@ -77,17 +77,13 @@ class SummaryBarRenderer {
         String requestURI = _helper.getRequestURI();
         String page = requestURI.replace("/", "").replace(".jsp", "");
         List<String> sections = _helper.getSummaryBarSections(page);
-        StringBuilder buf = new StringBuilder(8*1024);
+
+        // regardless of section order, we want to process the restart buttons first,
+        // so other sections reflect the current restart state
+        String restartStatus = sections.contains("RestartStatus") ? renderRestartStatusHTML() : null;
+
+        StringBuilder buf = new StringBuilder(1024);
         for (String section : sections) {
-            // Commented out because broken. Replaced by if-elseif blob below.
-            /*try {
-                String section = (String)ALL_SECTIONS.get(sections[i]).invoke(this);
-                if (section != null && section != "") {
-                    out.write("<hr>" + i + "<hr>\n" + section);
-                }
-            } catch (Exception e) {
-                out.write("<hr>" +i + " - Exception<hr>\n" + e);
-            }*/
             buf.setLength(0);
 
             buf.append("<hr>\n");
@@ -112,7 +108,7 @@ class SummaryBarRenderer {
             else if ("UpdateStatus".equals(section))
                 buf.append(renderUpdateStatusHTML());
             else if ("RestartStatus".equals(section))
-                buf.append(renderRestartStatusHTML());
+                buf.append(restartStatus); // prerendered above
             else if ("Peers".equals(section))
                 buf.append(renderPeersHTML());
             else if ("PeersAdvanced".equals(section))
