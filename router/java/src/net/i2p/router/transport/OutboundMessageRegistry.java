@@ -293,14 +293,14 @@ public class OutboundMessageRegistry {
                 for (MessageSelector sel : removing) {
                     OutNetMessage msg = null;
                     List<OutNetMessage> msgs = null;
+                    Object o;
                     synchronized (_selectorToMessage) {
-                        Object o = _selectorToMessage.remove(sel);
-                        if (o instanceof OutNetMessage) {
-                            msg = (OutNetMessage)o;
-                        } else if (o instanceof List) {
-                            //msgs = new ArrayList((List)o);
-                            msgs = (List<OutNetMessage>)o;
-                        }
+                        o = _selectorToMessage.remove(sel);
+                    }
+                    if (o instanceof OutNetMessage) {
+                        msg = (OutNetMessage)o;
+                    } else if (o instanceof List) {
+                        msgs = (List<OutNetMessage>)o;
                     }
                     if (msg != null) {
                         _activeMessages.remove(msg);
