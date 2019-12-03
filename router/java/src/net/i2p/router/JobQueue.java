@@ -240,8 +240,10 @@ public class JobQueue {
     
     public void removeJob(Job job) {
         synchronized (_jobLock) {
-            _readyJobs.remove(job);
-            _timedJobs.remove(job);
+            boolean removed = _timedJobs.remove(job);
+            // linear search, do this last
+            if (!removed)
+                _readyJobs.remove(job);
         }
     }
     

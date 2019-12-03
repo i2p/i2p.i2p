@@ -685,8 +685,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                     if (skm != null)
                         tsh = skm.tagsDelivered(_encryptionKey, sessKey, tags);
             }
-            onReply = new SendSuccessJob(getContext(), sessKey, tsh, replyLeaseSet);
             onFail = new SendTimeoutJob(getContext(), sessKey, tsh);
+            onReply = new SendSuccessJob(getContext(), sessKey, tsh, replyLeaseSet, onFail);
             long expiration = Math.max(_overallExpiration, _start + REPLY_TIMEOUT_MS_MIN);
             selector = new ReplySelector(token, expiration);
         }
@@ -747,8 +747,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 } else {
                     // We put our own timeout on the job queue before the selector expires,
                     // so we can keep waiting for the reply and restore the tags (success-after-failure)
-                    // The timeout job will always fire, even after success.
-                    // We don't bother cancelling the timeout job as JobQueue.removeJob() is a linear search
+                    // We cancel the timeout job in the success job
                     getContext().messageRegistry().registerPending(_selector, _replyFound, null);
                     _replyTimeout.getTiming().setStartAfter(_overallExpiration);
                     getContext().jobQueue().addJob(_replyTimeout);
@@ -1004,6 +1003,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         private final SessionKey _key;
         private final TagSetHandle _tags;
         private final LeaseSet _deliveredLS;
+        private final SendTimeoutJob _replyTimeout;
         
         /**
          * Create a new success job that will be fired when the message encrypted with
@@ -1013,12 +1013,15 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
          * @param key may be null
          * @param tags may be null
          * @param ls the delivered leaseset or null
+         * @param timeout will be cancelled when this is run
          */
-        public SendSuccessJob(RouterContext enclosingContext, SessionKey key, TagSetHandle tags, LeaseSet ls) {
+        public SendSuccessJob(RouterContext enclosingContext, SessionKey key,
+                              TagSetHandle tags, LeaseSet ls, SendTimeoutJob timeout) {
             super(enclosingContext);
             _key = key;
             _tags = tags;
             _deliveredLS = ls;
+            _replyTimeout = timeout;
         }
         
         public String getName() { return "Outbound client message send success"; }
@@ -1060,6 +1063,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                         skm.tagsAcked(_encryptionKey, _key, _tags);
                 }
             }
+            getContext().jobQueue().removeJob(_replyTimeout);
 
             long sendTime = getContext().clock().now() - _start;
             if (old == Result.FAIL) {
