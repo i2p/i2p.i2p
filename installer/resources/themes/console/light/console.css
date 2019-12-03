@@ -682,78 +682,26 @@ p:empty + .sb_notice {
 }
 
 #sb_services td {
-     padding-top: 4px;
-     padding-bottom: 4px;
+     text-align: left !important;
+}
+
+#sb_services td:first-child {
+     width: 16px;
+     padding: 1px 2px;
 }
 
 #sb_services a:link, #sb_services a:visited {
-     display: inline-block;
-     width: 100%;
-     padding: 4px 2px 4px 24px;
+     padding: 4px 2px 4px 3px;
      text-align: left;
-     border-bottom: 1px;
-     background: #f8f8ff url(/themes/console/images/plugin.png) 3px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(/themes/console/images/plugin.png) 3px center no-repeat;
-     background-size: 16px 16px !important;
 }
 
 #sb_services a:link:last-child {
      border-bottom: none;
 }
 
-#sb_services a {
-     background-blend-mode: luminosity;
-     vertical-align: sub !important;
-}
-
 #sb_services a:hover {
      background-blend-mode: normal;
      background-color: #e9ecef;
-}
-
-#sb_services a[href="/susimail/susimail"], #sb_services a[href="/webmail"] {
-     background: #f8f8ff url(images/inbox.png) 3px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/inbox.png) 3px center no-repeat;
-}
-
-#sb_services a[href="/susimail/susimail"]:hover, #sb_services a[href="/webmail"]:hover {
-     background: #e9ecef url(images/inbox.png) 3px center no-repeat;
-}
-
-#sb_services a[href="/i2psnark/"], #sb_services a[href="/torrents"] {
-     background: #f8f8ff url(/themes/console/images/i2psnark.png) 3px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(/themes/console/images/i2psnark.png) 3px center no-repeat;
-}
-
-#sb_services a[href="/i2psnark/"]:hover, #sb_services a[href="/torrents"]:hover {
-     background: #e9ecef url(/themes/console/images/i2psnark.png) 3px center no-repeat;
-}
-
-#sb_services a[href="http://127.0.0.1:7658/"] {
-     background: #f8f8ff url(images/server.png) 3px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/server.png) 3px center no-repeat;
-}
-
-#sb_services a[href="http://127.0.0.1:7658/"]:hover {
-     background: #e9ecef url(images/server.png) 3px center no-repeat;
-}
-
-#sb_services a[href="/orchid/"] {
-     background: #f8f8ff url(images/flower.png) 3px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/flower.png) 3px center no-repeat;
-}
-
-#sb_services a[href="/orchid/"]:hover {
-     background: #e9ecef url(images/flower.png) 3px center no-repeat;
-}
-
-#sb_services a[href*="bote"] {
-     background: #f8f8ff url(images/mail_black.png) 3px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/mail_black.png) 3px center no-repeat;
-}
-
-#sb_services a[href*="bote"]:hover {
-     background: #e9ecef url(images/mail_black.png) 3px center no-repeat;
 }
 
 /* end webapp navigation */

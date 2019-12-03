@@ -20,6 +20,7 @@ public class NavHelper {
      * console's nav bar, it should be registered with this singleton. 
      *
      * @param name pretty name the app will be called in the link
+     *             warning, this is the display name aka ConsoleLinkName, not the plugin name
      * @param path full path pointing to the application's root 
      *             (e.g. /i2ptunnel/index.jsp), non-null
      * @param tooltip HTML escaped text or null
@@ -66,27 +67,49 @@ public class NavHelper {
 
     /**
      *  Translated string is loaded by PluginStarter
-     *  @param ctx unused
+     *  @param buf appended to
      */
-    public static String getClientAppLinks(I2PAppContext ctx) {
+    public static void getClientAppLinks(StringBuilder buf) {
         if (_apps.isEmpty())
-            return "";
-        StringBuilder buf = new StringBuilder(256); 
+            return;
         List<String> l = new ArrayList<String>(_apps.keySet());
         Collections.sort(l);
         for (String name : l) {
             String path = _apps.get(name);
             if (path == null)
                 continue;
-            buf.append(" <a target=\"_blank\" href=\"").append(path).append("\" ");
+            buf.append("<tr><td>");
+            getClientAppImg(buf, name);
+            buf.append("</td><td align=\"left\"><a target=\"_blank\" href=\"").append(path).append("\" ");
             String tip = _tooltips.get(name);
             if (tip != null)
                 buf.append("title=\"").append(tip).append("\" ");
-            buf.append('>').append(name.replace(" ", "&nbsp;")).append("</a>");
+            buf.append('>').append(name.replace(" ", "&nbsp;")).append("</a></td></tr>\n");
         }
-        return buf.toString();
     }
     
+    /**
+     *  Get icon img and append to buf
+     *  @param name warning this is the display name aka ConsoleLinkName, not the plugin name
+     *  @since 0.9.45
+     */
+    static void getClientAppImg(StringBuilder buf, String name) {
+        if (_binary.containsKey(name)) {
+            buf.append("<img src=\"/Plugins/pluginicon?plugin=").append(name).append("\" height=\"16\" width=\"16\" alt=\"\">");
+        } else {
+            String iconpath = _icons.get(name);
+            if (iconpath != null) {
+                buf.append("<img src=\"").append(iconpath).append("\" height=\"16\" width=\"16\" alt=\"\">");
+            } else if (name.equals("Orchid")) {
+                buf.append("<img src=\"/themes/console/light/images/flower.png\" alt=\"\">");
+            } else if (name.equals("i2pbote")) {
+                buf.append("<img src=\"/themes/console/light/images/mail_black.png\" alt=\"\">");
+            } else {
+                buf.append("<img src=\"/themes/console/images/plugin.png\" height=\"16\" width=\"16\" alt=\"\">");
+            }
+        }
+    }
+
     /**
      *  For HomeHelper
      *  @param ctx unused

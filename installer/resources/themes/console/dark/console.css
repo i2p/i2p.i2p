@@ -483,7 +483,7 @@ div.warning {
      margin-top: -4px !important;
 }
 
-#sb_internals a, #sb_services a, #sb_advanced a, #sb_help a {
+#sb_internals a, #sb_advanced a, #sb_help a {
      padding: 1px 3px;
      display: inline-block;
      vertical-align: middle;
@@ -505,6 +505,11 @@ div.warning {
      white-space: nowrap;
      text-overflow: ellipsis;
      line-height: 140%;
+}
+
+#sb_services td:first-child {
+     width: 16px;
+     padding: 1px 2px;
 }
 
 #sb_peersadvanced a {
@@ -582,87 +587,6 @@ div.refresh {
 .routersummary a:hover {
      color: #f60;
 }
-
-/* "experimental" custom sidebar links for apps */
-/*
-#sb_services {
-     width: 192px !important;
-     margin: 0 !important;
-     margin: -7px -10px -9px !important;
-     border-collapse: collapse;
-     background: url(images/camotile.png) repeat fixed left top;
-}
-
-#sb_services tr {
-     padding: 0;
-}
-
-#sb_services td {
-     padding: 0;
-}
-
-#sb_services a, #sb_services a:hover, #sb_services a:active {
-     border-bottom: 1px solid #151 !important;
-     outline: none !important;
-     display: inline-block;
-     width: calc(100% - 32px) !important;
-}
-
-#sb_services a:hover {
-     background: #020;
-}
-
-#sb_services a:last-child {
-     border-bottom: 1px solid transparent !important;
-}
-
-#sb_services a[href*="mail"], #sb_services a[href*="snark"], #sb_services a[href*="7658"], #sb_services a[href*="bote"] {
-     padding: 5px 5px 5px 26px !important;
-     border: 1px outset transparent;
-     margin: 0 !important;
-     float: left;
-     text-align: left;
-     text-decoration: none;
-     text-transform: uppercase;
-     letter-spacing: 0.1em;
-     white-space: nowrap;
-     text-overflow: ellipsis;
-     overflow: hidden;
-     clear: both;
-}
-
-#sb_services a[href*="mail"] {
-     background: #000 url(images/mail.png) 5px center no-repeat;
-}
-#sb_services a[href*="mail"]:hover {
-     background: #020 url(images/mail.png) 5px center no-repeat;
-}
-
-#sb_services a[href*="bote"] {
-     background: #000 url(images/webmail.png) 5px center no-repeat;
-}
-
-#sb_services a[href*="bote"]:hover {
-     background: #020 url(images/webmail.png) 5px center no-repeat;
-}
-
-#sb_services a[href*="snark"] {
-     background: #000 url(images/magnet.png) 5px center no-repeat;
-}
-
-#sb_services a[href*="snark"]:hover {
-     background: #020 url(images/magnet.png) 5px center no-repeat;
-}
-
-#sb_services a[href*="7658"] {
-     background: #000 url(images/webserver.png) 5px center no-repeat;
-}
-
-#sb_services a[href*="7658"]:hover {
-     background: #020 url(images/webserver.png) 5px center no-repeat;
-}
-*/
-/* end custom sidebar links */
 
 .routersummary td {
      padding: 0 2px 0 2px;
