@@ -53,7 +53,8 @@ public class MLabRunner {
     // use ndt_ssl for test over ssl
     private static final String NS_URL_SSL_SSL = "https://mlab-ns.appspot.com/ndt_ssl?format=json";
     private static final String PROP_SSL = "routerconsole.bwtest.useSSL";
-    private static final boolean DEFAULT_USE_SSL = true;
+    // SSL hangs far too often
+    private static final boolean DEFAULT_USE_SSL = false;
     private static final long NS_TIMEOUT = 20*1000;
     private final I2PAppContext _context;
     private final Log _log;

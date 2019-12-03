@@ -84,6 +84,29 @@ public class Protocol {
 
 	/**
 	 * Send protocol messages given their type and data byte array
+	 *
+	 * @param bParamType
+	 *            Control Message Type
+	 * @param bParamToSend
+	 *            Data value array to send
+	 * @throws IOException
+	 *             If data cannot be successfully written to the Output Stream
+	 *
+	 * @since 0.9.45
+	 * */
+	public void send_json_login_msg(byte bParamType, byte[] bParamToSend)
+			throws IOException {
+		if (jsonSupport) {
+			byte[] ver = new byte[bParamToSend.length - 1];
+			System.arraycopy(bParamToSend, 1, ver, 0, ver.length);
+			send_msg(bParamType, JSONUtils.createJsonLoginObj(bParamToSend, bParamToSend[0]));
+		} else {
+			send_msg(bParamType, bParamToSend);
+		}
+	}
+
+	/**
+	 * Send protocol messages given their type and data byte array
 	 * 
 	 * @param bParamType
 	 *            Control Message Type

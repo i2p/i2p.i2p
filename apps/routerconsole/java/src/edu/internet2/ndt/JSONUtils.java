@@ -68,4 +68,18 @@ public class JSONUtils {
 
 		return obj.toJSONString().getBytes();
 	}
+
+	/**
+	 * Function that return json object represented by jsontext and included
+	 * single message assigned to "msg" key
+	 * @param msg {byte[]} message which should be assigned to json object
+	 * @return {byte[]} json object represented by jsontext and encodes into a sequence of bytes
+	 * @since 0.9.45
+	 */
+	public static byte[] createJsonLoginObj(byte[] msg, byte tests) {
+		JSONObject obj = new JSONObject();
+		obj.put("msg", new String(msg));
+		obj.put("tests", Integer.toString(tests & 0xff));
+		return obj.toJSONString().getBytes();
+	}
 }
