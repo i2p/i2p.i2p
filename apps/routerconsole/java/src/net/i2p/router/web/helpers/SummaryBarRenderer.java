@@ -308,67 +308,99 @@ class SummaryBarRenderer {
 
                    "<table id=\"sb_internals\"><tr><td>\n");
 
+        // Store all items in map so they are sorted by translated name, add the plugins, then output
+        Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
+        StringBuilder rbuf = new StringBuilder(128);
         PortMapper pm = _context.portMapper();
         if (pm.isRegistered(PortMapper.SVC_SUSIDNS)) {
-           buf.append("<a href=\"/dns\" target=\"_top\" title=\"")
-           .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
-           .append("\">")
-           .append(nbsp(_t("Addressbook")))
-           .append("</a>\n");
+            String tx = _t("Addressbook");
+            rbuf.append("<a href=\"/dns\" target=\"_top\" title=\"")
+                .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
+                .append("\">")
+                .append(nbsp(tx))
+                .append("</a>\n");
+            svcs.put(tx, rbuf.toString());
         }
 
         if (!StatSummarizer.isDisabled(_context)) {
-            buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
-               .append(_t("Graph router performance"))
-               .append("\">")
-               .append(nbsp(_t("Graphs")))
-               .append("</a>\n");
+            String tx = _t("Graphs");
+            rbuf.setLength(0);
+            rbuf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
+                .append(_t("Graph router performance"))
+                .append("\">")
+                .append(nbsp(tx))
+                .append("</a>\n");
+            svcs.put(tx, rbuf.toString());
         }
 
-        buf.append("<a href=\"/help\" target=\"_top\" title=\"")
+        String tx = _t("Help");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/help\" target=\"_top\" title=\"")
            .append(_t("Router Help and FAQ"))
            .append("\">")
-           .append(nbsp(_t("Help")))
+           .append(nbsp(tx))
            .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
         if (pm.isRegistered(PortMapper.SVC_I2PTUNNEL)) {
-           buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
-           .append(_t("Local Tunnels"))
-           .append("\">")
-           .append(nbsp(_t("Hidden Services Manager")))
-           .append("</a>\n");
+            tx = _t("Hidden Services Manager");
+            rbuf.setLength(0);
+            rbuf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+                .append(_t("Local Tunnels"))
+                .append("\">")
+                .append(nbsp(tx))
+                .append("</a>\n");
+            svcs.put(tx, rbuf.toString());
         }
 
-        buf.append("<a href=\"/logs\" target=\"_top\" title=\"")
-           .append(_t("Health Report"))
-           .append("\">")
-           .append(nbsp(_t("Logs")))
-           .append("</a>\n" +
+        tx = _t("Logs");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/logs\" target=\"_top\" title=\"")
+            .append(_t("Health Report"))
+            .append("\">")
+            .append(nbsp(tx))
+            .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/netdb\" target=\"_top\" title=\"")
-           .append(_t("Show list of all known I2P routers"))
-           .append("\">")
-           .append(nbsp(_t("NetDB")))
-           .append("</a>\n" +
+        tx = _t("NetDB");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/netdb\" target=\"_top\" title=\"")
+            .append(_t("Show list of all known I2P routers"))
+            .append("\">")
+            .append(nbsp(tx))
+            .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/peers\" target=\"_top\" title=\"")
-           .append(_t("Show all current peer connections"))
-           .append("\">")
-           .append(nbsp(_t("Peers")))
-           .append("</a>\n" +
+        tx = _t("Peers");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/peers\" target=\"_top\" title=\"")
+            .append(_t("Show all current peer connections"))
+            .append("\">")
+            .append(nbsp(tx))
+            .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/profiles\" target=\"_top\" title=\"")
-           .append(_t("Show recent peer performance profiles"))
-           .append("\">")
-           .append(nbsp(_t("Profiles")))
-           .append("</a>\n" +
+        tx = _t("Profiles");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/profiles\" target=\"_top\" title=\"")
+            .append(_t("Show recent peer performance profiles"))
+            .append("\">")
+            .append(nbsp(tx))
+            .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/tunnels\" target=\"_top\" title=\"")
-           .append(_t("View existing tunnels and tunnel build status"))
-           .append("\">")
-           .append(nbsp(_t("Tunnels")))
-           .append("</a>\n");
+        tx = _t("Tunnels");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/tunnels\" target=\"_top\" title=\"")
+            .append(_t("View existing tunnels and tunnel build status"))
+            .append("\">")
+            .append(nbsp(tx))
+            .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
+        for (String row : svcs.values()) {
+             buf.append(row);
+        }
         buf.append("</td></tr></table>\n");
         return buf.toString();
     }
