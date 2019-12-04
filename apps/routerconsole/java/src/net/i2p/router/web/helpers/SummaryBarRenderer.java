@@ -3,8 +3,10 @@ package net.i2p.router.web.helpers;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.Collator;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 
@@ -201,47 +203,66 @@ class SummaryBarRenderer {
            .append("</a></h3>\n" +
                    "<hr class=\"b\"><table id=\"sb_services\">");
 
+        // Store all items in map so they are sorted by translated name, add the plugins, then output
+        Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
+        StringBuilder rbuf = new StringBuilder(128);
         PortMapper pm = _context.portMapper();
         if (pm.isRegistered(PortMapper.SVC_SUSIMAIL)) {
-           buf.append("<tr><td><img src=\"/themes/console/light/images/inbox.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">");
-           buf.append("<a href=\"/webmail\" target=\"_top\" title=\"")
-           .append(_t("Anonymous webmail client"))
-           .append("\">")
-           .append(nbsp(_t("Email")))
-           .append("</a></td></tr>\n");
+            String tx = _t("Email");
+            rbuf.append("<tr><td><img src=\"/themes/console/light/images/inbox.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">" +
+                        "<a href=\"/webmail\" target=\"_top\" title=\"")
+                .append(_t("Anonymous webmail client"))
+                .append("\">")
+                .append(nbsp(tx))
+                .append("</a></td></tr>\n");
+            svcs.put(tx, rbuf.toString());
         }
 
         if (pm.isRegistered(PortMapper.SVC_JSONRPC)) {
-           buf.append("<tr><td><img src=\"/themes/console/images/plugin.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">");
-           buf.append("<a href=\"/jsonrpc/\" target=\"_top\" title=\"")
-           .append(_t("RPC Service"))
-           .append("\">")
-           .append(nbsp(_t("I2PControl")))
-           .append("</a></td></tr>\n");
+            String tx = _t("I2PControl");
+            rbuf.setLength(0);
+            rbuf.append("<tr><td><img src=\"/themes/console/images/plugin.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">" +
+                        "<a href=\"/jsonrpc/\" target=\"_top\" title=\"")
+                .append(_t("RPC Service"))
+                .append("\">")
+                .append(nbsp(tx))
+                .append("</a></td></tr>\n");
+            svcs.put(tx, rbuf.toString());
         }
 
         if (pm.isRegistered(PortMapper.SVC_I2PSNARK)) {
-           buf.append("<tr><td><img src=\"/themes/console/images/i2psnark.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">");
-           buf.append("<a href=\"/torrents\" target=\"_top\" title=\"")
-           .append(_t("Built-in anonymous BitTorrent Client"))
-           .append("\">")
-           .append(nbsp(_t("Torrents")))
-           .append("</a></td></tr>\n");
+            String tx = _t("Torrents");
+            rbuf.setLength(0);
+            rbuf.append("<tr><td><img src=\"/themes/console/images/i2psnark.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">" +
+                        "<a href=\"/torrents\" target=\"_top\" title=\"")
+                .append(_t("Built-in anonymous BitTorrent Client"))
+                .append("\">")
+                .append(nbsp(tx))
+                .append("</a></td></tr>\n");
+            svcs.put(tx, rbuf.toString());
         }
 
         String url = getEepsiteURL(pm);
         if (url != null) {
-            buf.append("<tr><td><img src=\"/themes/console/images/server.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">");
-            buf.append("<a href=\"")
-               .append(url)
-               .append("\" target=\"_blank\" title=\"")
-               .append(_t("Local web server"))
-               .append("\">")
-               .append(nbsp(_t("Web Server")))
-               .append("</a></td></tr>\n");
+            String tx = _t("Web Server");
+            rbuf.setLength(0);
+            rbuf.append("<tr><td><img src=\"/themes/console/images/server.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">" +
+                        "<a href=\"")
+                .append(url)
+                .append("\" target=\"_blank\" title=\"")
+                .append(_t("Local web server"))
+               . append("\">")
+                .append(nbsp(tx))
+                .append("</a></td></tr>\n");
+            svcs.put(tx, rbuf.toString());
         }
 
-        NavHelper.getClientAppLinks(buf);
+        Map<String, String> apps = NavHelper.getClientAppLinks();
+        if (apps != null)
+            svcs.putAll(apps);
+        for (String row : svcs.values()) {
+             buf.append(row);
+        }
         buf.append("</table>\n");
         return buf.toString();
     }
