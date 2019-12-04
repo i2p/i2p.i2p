@@ -439,83 +439,125 @@ class SummaryBarRenderer {
            .append("\" href=\"/configadvanced\" target=\"_top\">")
            .append(_t("Advanced"))
            .append("</a></h3>\n")
+           .append("<hr class=\"b\"><table id=\"sb_advanced\"><tr><td>");
 
-           .append("<hr class=\"b\"><table id=\"sb_advanced\"><tr><td>")
+        // Store all items in map so they are sorted by translated name, then output
+        Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
+        StringBuilder rbuf = new StringBuilder(128);
 
-           .append("<a target=\"_top\" title=\"")
+        String tx = _t("Certs");
+        rbuf.append("<a target=\"_top\" title=\"")
            .append(_t("Review active encryption certificates used in console"))
            .append("\" href=\"/certs\">")
-           .append(nbsp(_t("Certs")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a title=\"")
+        tx = _t("Changelog");
+        rbuf.setLength(0);
+        rbuf.append("<a title=\"")
            .append(_t("View full changelog"))
            .append("\" href=\"/viewhistory\" target=\"_blank\">")
-           .append(nbsp(_t("Changelog")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a title=\"")
+        tx = _t("Debug");
+        rbuf.setLength(0);
+        rbuf.append("<a title=\"")
            .append(_t("View router debug information"))
            .append("\" href=\"/debug\" target=\"_top\">")
-           .append(nbsp(_t("Debug")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
            // 7 days
-           .append("<a href=\"/events?from=604800000\" target=\"_top\" title=\"")
+        tx = _t("Events");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/events?from=604800000\" target=\"_top\" title=\"")
            .append(_t("View historical log of router events"))
            .append("\">")
-           .append(nbsp(_t("Events")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a title=\"")
+        tx = _t("Jars");
+        rbuf.setLength(0);
+        rbuf.append("<a title=\"")
            .append(_t("Review extended info about installed .jar and .war files"))
            .append("\" href=\"/jars\" target=\"_top\">")
-           .append(nbsp(_t("Jars")))
+           .append(nbsp(tx))
            .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
         File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
-        if (javadoc.exists())
-            buf.append("<a title=\"")
+        if (javadoc.exists()) {
+            tx = "Javadoc";
+            rbuf.setLength(0);
+            rbuf.append("<a title=\"")
                .append(_t("Documentation for the I2P API"))
                .append("\" href=\"/javadoc/index.html\" target=\"_blank\">Javadoc</a>\n");
+            svcs.put(tx, rbuf.toString());
+        }
 
-        buf.append("<a href=\"/jobs\" target=\"_top\" title=\"")
+        tx = _t("Jobs");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/jobs\" target=\"_top\" title=\"")
            .append(_t("Show the router's workload, and how it's performing"))
            .append("\">")
-           .append(nbsp(_t("Jobs")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a title=\"")
+        tx = _t("LeaseSets");
+        rbuf.setLength(0);
+        rbuf.append("<a title=\"")
            .append(_t("View active leasesets (debug mode)"))
            .append("\" href=\"/netdb?l=2\" target=\"_top\">")
-           .append(nbsp(_t("LeaseSets")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a title=\"")
+        tx = _t("NetDB Search");
+        rbuf.setLength(0);
+        rbuf.append("<a title=\"")
            .append(_t("Network database search tool"))
            .append("\" href=\"/netdb?f=4\" target=\"_top\">")
-           .append(nbsp(_t("NetDB Search")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a title=\"")
+        tx = _t("Proof");
+        rbuf.setLength(0);
+        rbuf.append("<a title=\"")
            .append(_t("Signed proof of ownership of this router"))
            .append("\" href=\"/proof\" target=\"_top\">")
-           .append(nbsp(_t("Proof")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a href=\"/stats\" target=\"_top\" title=\"")
+        tx = _t("Stats");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/stats\" target=\"_top\" title=\"")
            .append(_t("Textual router performance statistics"))
            .append("\">")
-           .append(nbsp(_t("Stats")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("<a title=\"")
+        tx = _t("Sybils");
+        rbuf.setLength(0);
+        rbuf.append("<a title=\"")
            .append(_t("Review possible sybils in network database"))
            .append("\" href=\"/netdb?f=3\" target=\"_top\">")
-           .append(nbsp(_t("Sybils")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("</td></tr></table>");
+        for (String row : svcs.values()) {
+             buf.append(row);
+        }
+        buf.append("</td></tr></table>");
         return buf.toString();
     }
 
