@@ -145,52 +145,78 @@ class SummaryBarRenderer {
            .append("\">")
            .append(_t("Help &amp; FAQ"))
            .append("</a></h3><hr class=\"b\">\n" +
+                   "<table id=\"sb_help\"><tr><td>");
 
-                   "<table id=\"sb_help\"><tr><td>" +
+        // Store all items in map so they are sorted by translated name, then output
+        Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
+        StringBuilder rbuf = new StringBuilder(128);
 
-                   "<a href=\"/viewhistory\" target=\"_top\" title=\"")
+        String tx = _t("Changelog");
+        rbuf.append("<a href=\"/viewhistory\" target=\"_top\" title=\"")
            .append(_t("Recent development changes to the router"))
            .append("\">")
-           .append(nbsp(_t("Changelog")))
-           .append("</a>\n" +
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/help#faq\" target=\"_top\" title=\"")
+        tx = _t("FAQ");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/help#faq\" target=\"_top\" title=\"")
            .append(_t("A shortened version of the official Frequently Asked Questions"))
            .append("\">")
-           .append(nbsp(_t("FAQ")))
-           .append("</a>\n" +
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/viewlicense\" target=\"_top\" title=\"")
+        tx = _t("Legal");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/viewlicense\" target=\"_top\" title=\"")
            .append(_t("Information regarding software and licenses used by I2P"))
            .append("\">")
-           .append(nbsp(_t("Legal")))
-           .append("</a>\n" +
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/help#reachability\" target=\"_top\" title=\"")
+        tx = _t("Reachability");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/help#reachability\" target=\"_top\" title=\"")
            .append(_t("A short guide to the sidebar's network reachability notification"))
            .append("\">")
-           .append(nbsp(_t("Reachability")))
-           .append("</a>\n" +
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/welcome\" target=\"_top\" title=\"")
+        tx = _t("Setup");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/welcome\" target=\"_top\" title=\"")
            .append(_t("New Install Wizard"))
            .append("\">")
-           .append(nbsp(_t("Setup")))
-           .append("</a>\n" +
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/help#sidebarhelp\" target=\"_top\" title=\"")
+        tx = _t("Sidebar");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/help#sidebarhelp\" target=\"_top\" title=\"")
            .append(_t("An introduction to the router sidebar"))
            .append("\">")
-           .append(nbsp(_t("Sidebar")))
-           .append("</a>\n" +
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-                   "<a href=\"/console#trouble\" target=\"_top\" title=\"")
+        tx = _t("Troubleshoot");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/console#trouble\" target=\"_top\" title=\"")
            .append(_t("Troubleshooting &amp; Further Assistance"))
            .append("\">")
-           .append(nbsp(_t("Troubleshoot")))
-           .append("</a>\n")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
 
-           .append("</td></tr></table>\n");
+        for (String row : svcs.values()) {
+             buf.append(row);
+        }
+        buf.append("</td></tr></table>\n");
         return buf.toString();
     }
 
@@ -308,7 +334,7 @@ class SummaryBarRenderer {
 
                    "<table id=\"sb_internals\"><tr><td>\n");
 
-        // Store all items in map so they are sorted by translated name, add the plugins, then output
+        // Store all items in map so they are sorted by translated name, then output
         Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
         StringBuilder rbuf = new StringBuilder(128);
         PortMapper pm = _context.portMapper();
