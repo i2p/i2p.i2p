@@ -532,7 +532,7 @@ public class PluginStarter implements Runnable {
             String tip = stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
             if (tip == null)
                 tip = stripHTML(props, "consoleLinkTooltip");
-            NavHelper.registerApp(name, url, tip, iconfile);
+            NavHelper.registerApp(appName, name, url, tip, iconfile);
         }
 
         return true;
@@ -603,12 +603,7 @@ public class PluginStarter implements Runnable {
         //}
 
         // remove summary bar link
-        Properties props = pluginProperties(ctx, appName);
-        String name = stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
-        if (name == null)
-            name = stripHTML(props, "consoleLinkName");
-        if (name != null && name.length() > 0)
-            NavHelper.unregisterApp(name);
+        NavHelper.unregisterApp(appName);
 
         return true;
     }
