@@ -129,7 +129,7 @@ class Elligator2 {
         negative_multiply3_u_x_plus_x_A = negative_multiply3_u_x_plus_x_A.mod(p);
 
         // If -ux(x + A) is not a square modulo p
-        if (legendre(negative_multiply3_u_x_plus_x_A, p) == -1) {
+        if (legendre(negative_multiply3_u_x_plus_x_A) == -1) {
             return null;
         }
 
@@ -161,7 +161,7 @@ class Elligator2 {
      * Returns an array with the point and the second argument of the corresponding call to the `encode` function.
      * It's also able to return null if the representative is invalid (there are only 10 invalid representatives).
      *
-     * @param representative the encoded data, 32 bytes
+     * @param representative the encoded data, little endian, 32 bytes
      * @return x or null on failure
      */
     public static PublicKey decode(byte[] representative) {
@@ -175,11 +175,11 @@ class Elligator2 {
      * It's also able to return null if the representative is invalid (there are only 10 invalid representatives).
      *
      * @param alternative out parameter, or null if you don't care
-     * @param representative the encoded data, 32 bytes
+     * @param representative the encoded data, little endian, 32 bytes
      * @return x or null on failure
      */
     public static PublicKey decode(AtomicBoolean alternative, byte[] representative) {
-        if (representative.length != 32)
+        if (representative.length != REPRESENTATIVE_LENGTH)
             throw new IllegalArgumentException("must be 32 bytes");
         if (DISABLE)
             return new PublicKey(EncType.ECIES_X25519, representative);
@@ -213,7 +213,7 @@ class Elligator2 {
         t = t.mod(p);
 
         // e = Legendre symbol (t / p)
-        int e = legendre(t, p);
+        int e = legendre(t);
 
         BigInteger x;
         if (e == 1) {
@@ -261,15 +261,16 @@ class Elligator2 {
      * https://gmplib.org/manual/Number-Theoretic-Functions.html
      * https://en.wikipedia.org/wiki/Legendre_symbol
      *
+     * @param a must already be mod(p)
+     *
      * @return -1/0/1
      */
-    private static int legendre(BigInteger a, BigInteger p) {
-        if (a.mod(p).signum() == 0)
+    private static int legendre(BigInteger a) {
+        if (a.signum() == 0)
             return 0;
         if (!(a instanceof NativeBigInteger))
             a = new NativeBigInteger(a);
-        BigInteger pm1d2 = p.subtract(BigInteger.ONE).divide(TWO);
-        BigInteger mp = a.modPow(pm1d2, p);
+        BigInteger mp = a.modPow(divide_minus_p_1_2, p);
         // mp is either 1 or (p - 1) (0x7ffff...fffec)
         //System.out.println("Legendre value: " + mp.toString(16));
         int cmp = mp.compareTo(BigInteger.ONE);
