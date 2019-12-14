@@ -89,6 +89,16 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         return _manager.getPeersByCapability(capability); 
     }
 
+    /**
+     *  @param capability case-insensitive
+     *  @return how many
+     *  @since 0.9.45
+     */
+    public int countPeersByCapability(char capability) { 
+        if (_manager == null) return 0;
+        return _manager.countPeersByCapability(capability); 
+    }
+
     /** @deprecated moved to routerconsole */
     @Deprecated
     public void renderStatusHTML(Writer out) throws IOException { 

@@ -27,6 +27,7 @@ public class DummyPeerManagerFacade implements PeerManagerFacade {
     public void restart() {}
     public void renderStatusHTML(Writer out) { }    
     public Set<Hash> getPeersByCapability(char capability) { return null; }
+    public int countPeersByCapability(char capability) { return 0; }
     public void setCapabilities(Hash peer, String caps) {}
     public void removeCapabilities(Hash peer) {}
     public Hash selectRandomByCapability(char capability) { return null; }

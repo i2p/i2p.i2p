@@ -354,4 +354,16 @@ class PeerManager {
                 return Collections.unmodifiableSet(peers);
             return Collections.emptySet();
     }
+
+    /**
+     *  @param capability case-insensitive
+     *  @return how many
+     *  @since 0.9.45
+     */
+    public int countPeersByCapability(char capability) { 
+            Set<Hash> peers = locked_getPeers(capability);
+            if (peers != null)
+                return peers.size();
+            return 0;
+    }
 }

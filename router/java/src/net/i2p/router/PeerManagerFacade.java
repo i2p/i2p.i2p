@@ -21,6 +21,7 @@ import net.i2p.data.Hash;
  */
 public interface PeerManagerFacade extends Service {
     public Set<Hash> getPeersByCapability(char capability);
+    public int countPeersByCapability(char capability);
     public void setCapabilities(Hash peer, String caps);
     public void removeCapabilities(Hash peer);
     public Hash selectRandomByCapability(char capability);
