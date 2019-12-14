@@ -44,10 +44,12 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
       if ("xml".equals(format)) {
         if (!fakeBw) {
           response.setContentType("text/xml");
+          response.setHeader("Content-Disposition", "inline; filename=\"" + stat + ".xml\"");
           rendered = ss.getXML(rate, cout);
         }
       } else {
         response.setContentType("image/png");
+        response.setHeader("Content-Disposition", "inline; filename=\"" + stat + ".png\"");
         // very brief 45 sec expire
         response.setDateHeader("Expires", ctx.clock().now() + (45*1000));
         response.setHeader("Accept-Ranges", "none");
