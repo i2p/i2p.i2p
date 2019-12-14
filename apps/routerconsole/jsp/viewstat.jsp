@@ -44,7 +44,7 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
       if ("xml".equals(format)) {
         if (!fakeBw) {
           response.setContentType("text/xml");
-          response.setHeader("Content-Disposition", "inline; filename=\"" + stat + ".xml\"");
+          response.setHeader("Content-Disposition", "attachment; filename=\"" + stat + ".xml\"");
           rendered = ss.getXML(rate, cout);
         }
       } else {
