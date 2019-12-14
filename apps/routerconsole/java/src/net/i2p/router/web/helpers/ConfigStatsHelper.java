@@ -3,6 +3,7 @@ package net.i2p.router.web.helpers;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -158,8 +159,16 @@ public class ConfigStatsHelper extends HelperBase {
             return false;
         }
     }
-    /** What group is the current stat in */
+    /**
+     *  What group is the current stat in, untranslated, not for display
+     *  @return single word, no spaces
+     */
     public String getCurrentGroupName() { return _currentGroup; }
+    /**
+     *  What group is the current stat in, display name, translated
+     *  @since 0.9.45
+     */
+    public String getTranslatedGroupName() { return translateGroup(_currentGroup); }
     public String getCurrentStatName() { return _currentStatName; }
     public String getCurrentGraphName() { return _currentGraphName; }
     public String getCurrentStatDescription() { return _currentStatDescription; }
@@ -178,9 +187,19 @@ public class ConfigStatsHelper extends HelperBase {
      */
     private class AlphaComparator implements Comparator<String> {
         public int compare(String lhs, String rhs) {
-            String lname = _t(lhs);
-            String rname = _t(rhs);
+            String lname = translateGroup(lhs);
+            String rname = translateGroup(rhs);
             return Collator.getInstance().compare(lname, rname);
         }
+    }
+
+    /**
+     *  @since 0.9.45
+     */
+    private String translateGroup(String group) {
+         String disp = StatsGenerator.groupNames.get(group);
+         if (disp != null)
+             group = disp;
+         return _t(group);
     }
 }

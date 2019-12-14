@@ -55,23 +55,14 @@ class Dummy {
         _t("midnight");        
 
         // stat groups for stats.jsp
+        // See StatsGenerator for groups mapped to a display name
         _t("Bandwidth");
-        _t("BandwidthLimiter");
-        _t("ClientMessages");
         _t("Encryption");
-        _t("i2cp");
-        _t("I2PTunnel");
-        _t("InNetPool");
-        _t("JobQueue");
-        _t("NetworkDatabase");
-        _t("ntcp");
         _t("Peers");
         _t("Router");
         _t("Stream");
-        _t("Throttle");
         _t("Transport");
         _t("Tunnels");
-        _t("udp");
 
         // parameters in transport addresses (netdb.jsp)
         // may or may not be worth translating

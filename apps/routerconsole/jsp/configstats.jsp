@@ -98,7 +98,7 @@ Warning - Log with care, stat file grows without limit.<br>
       while (statshelper.groupRequired()) { %>
  <tr>
      <th align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
-     <b><%=intl._t(statshelper.getCurrentGroupName())%></b>
+     <b><%=statshelper.getTranslatedGroupName()%></b>
      <a class="script" title="<%=intl._t("Toggle section graphing options")%>" href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">[<%=intl._t("toggle all")%>]</a>
      </th></tr>
  <tr class="tablefooter">

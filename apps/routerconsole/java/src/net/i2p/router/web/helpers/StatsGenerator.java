@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -24,6 +25,32 @@ import net.i2p.stat.RateStat;
  */
 public class StatsGenerator {
     private final RouterContext _context;
+
+    /**
+     * Map of group name to untranslated nice display name.
+     * If not present, just use the name.
+     * non-mapped names are tagged in Strings.java
+     * pkg private for ConfigStatsHelper
+     */
+    static final Map<String, String> groupNames;
+    static {
+        String[] groups = {
+            "BandwidthLimiter", _x("Bandwidth Limiter"),
+            "ClientMessages", _x("Client Messages"),
+            "i2cp", _x("I2CP"),
+            "I2PTunnel", _x("Hidden Services Manager"),
+            "InNetPool", _x("Inbound Messages"),
+            "JobQueue", _x("Job Queue"),
+            "NetworkDatabase", _x("Network Database"),
+            "ntcp", _x("NTCP"),
+            "Throttle", _x("Router Limiter"),
+            "udp", _x("UDP")
+        };
+        groupNames = new HashMap<String, String>(groups.length / 2);
+        for (int i = 0; i < groups.length; i += 2) {
+            groupNames.put(groups[i], groups[i+1]);
+        }
+    }
 
     public StatsGenerator(RouterContext context) {
         _context = context;
@@ -51,7 +78,7 @@ public class StatsGenerator {
         groups.putAll(unsorted);
         for (String group : groups.keySet()) {
             buf.append("<option value=\"#").append(group).append("\">");
-            buf.append(_t(group)).append("</option>\n");
+            buf.append(translateGroup(group)).append("</option>\n");
             // let's just do the groups
             //Set stats = (Set)entry.getValue();
             //for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
@@ -77,7 +104,7 @@ public class StatsGenerator {
             buf.append("<h3 class=\"stats\"><a name=\"");
             buf.append(group);
             buf.append("\">");
-            buf.append(_t(group));
+            buf.append(translateGroup(group));
             buf.append("</a></h3>");
             buf.append("<ul class=\"statlist\">");
             out.write(buf.toString());
@@ -259,14 +286,24 @@ public class StatsGenerator {
     private final static String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
 
     /**
+     *  @since 0.9.45
+     */
+    private String translateGroup(String group) {
+         String disp = groupNames.get(group);
+         if (disp != null)
+             group = disp;
+         return _t(group);
+    }
+
+    /**
      *  Translated sort
      *  Inner class, can't be Serializable
      *  @since 0.9.3
      */
     private class AlphaComparator implements Comparator<String> {
         public int compare(String lhs, String rhs) {
-            String lname = _t(lhs);
-            String rname = _t(rhs);
+            String lname = translateGroup(lhs);
+            String rname = translateGroup(rhs);
             return Collator.getInstance().compare(lname, rname);
         }
     }
@@ -284,5 +321,15 @@ public class StatsGenerator {
     /** translate a string */
     private String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p, _context);
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static String _x(String s) {
+        return s;
     }
 }
