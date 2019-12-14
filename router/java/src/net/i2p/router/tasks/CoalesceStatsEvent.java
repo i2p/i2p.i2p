@@ -11,8 +11,10 @@ package net.i2p.router.tasks;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.stat.StatManager;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -26,76 +28,79 @@ public class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
     private static final long LOW_MEMORY_THRESHOLD = 5 * 1024 * 1024;
 
     public CoalesceStatsEvent(RouterContext ctx) { 
-        _ctx = ctx; 
+        _ctx = ctx;
+        StatManager sm = ctx.statManager();
         // NOTE TO TRANSLATORS - each of these phrases is a description for a statistic
         // to be displayed on /stats.jsp and in the graphs on /graphs.jsp.
         // Please keep relatively short so it will fit on the graphs.
-        ctx.statManager().createRequiredRateStat("bw.receiveBps", _x("Message receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRequiredRateStat("bw.sendBps", _x("Message send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRequiredRateStat("bw.sendRate", _x("Low-level send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
-        ctx.statManager().createRequiredRateStat("bw.recvRate", _x("Low-level receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
-        ctx.statManager().createRequiredRateStat("router.activePeers", _x("How many peers we are actively talking with"), "Throttle", new long[] { 60*1000 });
-        ctx.statManager().createRequiredRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 60*1000 });
-        ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000 });
-        ctx.statManager().createRequiredRateStat("router.fastPeers", _x("Known fast peers"), "Throttle", new long[] { 60*1000 });
-        ctx.statManager().createRateStat("router.integratedPeers", _x("Known integrated (floodfill) peers"), "Throttle", new long[] { 60*1000 });
-        ctx.statManager().createRequiredRateStat("router.tunnelBacklog", _x("Size of tunnel acceptor backlog"), "Tunnels", new long[] { 60*60*1000 });
+        sm.createRequiredRateStat("bw.receiveBps", _x("Message receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        sm.createRequiredRateStat("bw.sendBps", _x("Message send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        sm.createRequiredRateStat("bw.sendRate", _x("Low-level send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
+        sm.createRequiredRateStat("bw.recvRate", _x("Low-level receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
+        sm.createRequiredRateStat("router.activePeers", _x("How many peers we are actively talking with"), "Throttle", new long[] { 60*1000 });
+        sm.createRequiredRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 60*1000 });
+        sm.createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000 });
+        sm.createRequiredRateStat("router.fastPeers", _x("Known fast peers"), "Throttle", new long[] { 60*1000 });
+        sm.createRateStat("router.integratedPeers", "Known integrated (floodfill) peers", "NetworkDatabase", new long[] { 60*1000 });
+        sm.createRateStat("router.knownPeers", "Known peers", "NetworkDatabase", new long[] { 60*1000 });
+        sm.createRequiredRateStat("router.tunnelBacklog", _x("Size of tunnel acceptor backlog"), "Tunnels", new long[] { 60*60*1000 });
         _maxMemory = Runtime.getRuntime().maxMemory();
         String legend = "(Bytes)";
         if (_maxMemory < Long.MAX_VALUE)
             legend += " Max is " + DataHelper.formatSize(_maxMemory) + 'B';
         // router.memoryUsed currently has the max size in the description so it can't be tagged
-        ctx.statManager().createRequiredRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
+        sm.createRequiredRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
     }
 
-    private RouterContext getContext() { return _ctx; }
-
     public void timeReached() {
-        int active = getContext().commSystem().countActivePeers();
-        getContext().statManager().addRateData("router.activePeers", active, 60*1000);
+        StatManager sm = _ctx.statManager();
+        int active = _ctx.commSystem().countActivePeers();
+        sm.addRateData("router.activePeers", active);
 
-        int activeSend = getContext().commSystem().countActiveSendPeers();
-        getContext().statManager().addRateData("router.activeSendPeers", activeSend, 60*1000);
+        int activeSend = _ctx.commSystem().countActiveSendPeers();
+        sm.addRateData("router.activeSendPeers", activeSend);
 
-        int fast = getContext().profileOrganizer().countFastPeers();
-        getContext().statManager().addRateData("router.fastPeers", fast, 60*1000);
+        int fast = _ctx.profileOrganizer().countFastPeers();
+        sm.addRateData("router.fastPeers", fast);
 
-        int highCap = getContext().profileOrganizer().countHighCapacityPeers();
-        getContext().statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
+        int highCap = _ctx.profileOrganizer().countHighCapacityPeers();
+        sm.addRateData("router.highCapacityPeers", highCap);
 
-        int integrated = getContext().peerManager().getPeersByCapability('f').size();
-        getContext().statManager().addRateData("router.integratedPeers", integrated, 60*1000);
+        int integrated = _ctx.peerManager().countPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
+        sm.addRateData("router.integratedPeers", integrated);
 
-        getContext().statManager().addRateData("bw.sendRate", (long)getContext().bandwidthLimiter().getSendBps());
-        getContext().statManager().addRateData("bw.recvRate", (long)getContext().bandwidthLimiter().getReceiveBps());
+        sm.addRateData("router.knownPeers", _ctx.netDb().getKnownRouters());
+
+        sm.addRateData("bw.sendRate", (long)_ctx.bandwidthLimiter().getSendBps());
+        sm.addRateData("bw.recvRate", (long)_ctx.bandwidthLimiter().getReceiveBps());
         
-        getContext().statManager().addRateData("router.tunnelBacklog", getContext().tunnelManager().getInboundBuildQueueSize(), 60*1000);
+        sm.addRateData("router.tunnelBacklog", _ctx.tunnelManager().getInboundBuildQueueSize());
         long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        getContext().statManager().addRateData("router.memoryUsed", used);
+        sm.addRateData("router.memoryUsed", used);
         if (_maxMemory - used < LOW_MEMORY_THRESHOLD)
             Router.clearCaches();
 
-        getContext().tunnelDispatcher().updateParticipatingStats(Router.COALESCE_TIME);
+        _ctx.tunnelDispatcher().updateParticipatingStats(Router.COALESCE_TIME);
 
-        getContext().statManager().coalesceStats();
+        sm.coalesceStats();
 
-        RateStat receiveRate = getContext().statManager().getRate("transport.receiveMessageSize");
+        RateStat receiveRate = sm.getRate("transport.receiveMessageSize");
         if (receiveRate != null) {
             Rate rate = receiveRate.getRate(60*1000);
             if (rate != null) { 
                 double bytes = rate.getLastTotalValue();
                 double bps = (bytes*1000.0d)/rate.getPeriod(); 
-                getContext().statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
+                sm.addRateData("bw.receiveBps", (long)bps, 60*1000);
             }
         }
 
-        RateStat sendRate = getContext().statManager().getRate("transport.sendMessageSize");
+        RateStat sendRate = sm.getRate("transport.sendMessageSize");
         if (sendRate != null) {
             Rate rate = sendRate.getRate(60*1000);
             if (rate != null) {
                 double bytes = rate.getLastTotalValue();
                 double bps = (bytes*1000.0d)/rate.getPeriod(); 
-                getContext().statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
+                sm.addRateData("bw.sendBps", (long)bps, 60*1000);
             }
         }
     }
