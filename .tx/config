@@ -1,3 +1,6 @@
+;; warning - conversions for all Java bundles:
+;; id->in, he->iw, iy, yi->ji
+
 [I2P.i2ptunnel]
 source_file = apps/i2ptunnel/locale/messages_en.po
 source_lang = en
@@ -108,7 +111,8 @@ trans.fa = apps/routerconsole/locale-news/messages_fa.po
 trans.fi = apps/routerconsole/locale-news/messages_fi.po
 trans.fr = apps/routerconsole/locale-news/messages_fr.po
 trans.gl = apps/routerconsole/locale-news/messages_gl.po
-trans.he = apps/routerconsole/locale-news/messages_he.po
+;; Java converts he to iw
+trans.he = apps/routerconsole/locale-news/messages_iw.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale-news/messages_in.po
 trans.it = apps/routerconsole/locale-news/messages_it.po
@@ -149,6 +153,8 @@ trans.fr = apps/routerconsole/locale-countries/messages_fr.po
 trans.gl = apps/routerconsole/locale-countries/messages_gl.po
 trans.hr = apps/routerconsole/locale-countries/messages_hr.po
 trans.hu = apps/routerconsole/locale-countries/messages_hu.po
+;; Java converts he to iw
+trans.he = apps/routerconsole/locale-countries/messages_iw.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale-countries/messages_in.po
 trans.it = apps/routerconsole/locale-countries/messages_it.po
@@ -290,6 +296,8 @@ trans.fi = apps/susimail/locale/messages_fi.po
 trans.fr = apps/susimail/locale/messages_fr.po
 trans.gl = apps/susimail/locale/messages_gl.po
 trans.hu = apps/susimail/locale/messages_hu.po
+;; Java converts he to iw
+trans.he = apps/susimail/locale/messages_iw.po
 ;; Java converts id to in
 trans.id = apps/susimail/locale/messages_in.po
 trans.it = apps/susimail/locale/messages_it.po
