@@ -221,14 +221,6 @@ class SummaryBarRenderer {
     }
 
     public String renderI2PServicesHTML() {
-        StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/configclients\" target=\"_top\" title=\"")
-           .append(_t("Configure startup of clients and webapps (services); manually start dormant services"))
-           .append("\">")
-           .append(_t("I2P Services"))
-           .append("</a></h3>\n" +
-                   "<hr class=\"b\"><table id=\"sb_services\">");
-
         // Store all items in map so they are sorted by translated name, add the plugins, then output
         Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
         StringBuilder rbuf = new StringBuilder(128);
@@ -286,11 +278,22 @@ class SummaryBarRenderer {
         Map<String, String> apps = NavHelper.getClientAppLinks();
         if (apps != null)
             svcs.putAll(apps);
-        for (String row : svcs.values()) {
-             buf.append(row);
+        if (!svcs.isEmpty()) {
+            StringBuilder buf = new StringBuilder(128 * svcs.size());
+            buf.append("<h3><a href=\"/configclients\" target=\"_top\" title=\"")
+               .append(_t("Configure startup of clients and webapps (services); manually start dormant services"))
+               .append("\">")
+               .append(_t("I2P Services"))
+               .append("</a></h3>\n" +
+                       "<hr class=\"b\"><table id=\"sb_services\">");
+            for (String row : svcs.values()) {
+                 buf.append(row);
+            }
+            buf.append("</table>\n");
+            return buf.toString();
+        } else {
+            return "";
         }
-        buf.append("</table>\n");
-        return buf.toString();
     }
 
     /**

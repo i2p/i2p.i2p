@@ -163,7 +163,7 @@ public class ConfigKeyringHandler extends FormHandler {
                             addFormNotice(_t("Send key to server opererator.") + ' ' + pk.toPublic().toBase64());
                         }
                     } catch (IllegalArgumentException iae) {
-                        addFormError(_t("Invalid destination") + ": " + iae.getMessage());
+                        addFormError(_t("Invalid destination") + ": " + iae.getLocalizedMessage());
                     }
                 }
 

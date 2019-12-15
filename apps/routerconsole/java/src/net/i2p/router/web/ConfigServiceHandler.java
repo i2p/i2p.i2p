@@ -269,7 +269,7 @@ public class ConfigServiceHandler extends FormHandler {
             try {
                 WrapperManager.requestThreadDump();
             } catch (Throwable t) {
-                addFormError("Warning: unable to contact the service manager - " + t.getMessage());
+                addFormError("Warning: unable to contact the service manager - " + t.getLocalizedMessage());
             }
             File wlog = wrapperLogFile(_context);
             addFormNotice(_t("Threads dumped to {0}", wlog.getAbsolutePath()));
@@ -327,7 +327,7 @@ public class ConfigServiceHandler extends FormHandler {
             Runtime.getRuntime().exec("install_i2p_service_winnt.bat");
             addFormNotice(_t("Service installed"));
         } catch (IOException ioe) {
-            addFormError(_t("Warning: unable to install the service") + " - " + ioe.getMessage());
+            addFormError(_t("Warning: unable to install the service") + " - " + ioe.getLocalizedMessage());
         }
     }
 
@@ -336,7 +336,7 @@ public class ConfigServiceHandler extends FormHandler {
             Runtime.getRuntime().exec("uninstall_i2p_service_winnt.bat");
             addFormNotice(_t("Service removed"));
         } catch (IOException ioe) {
-            addFormError(_t("Warning: unable to remove the service") + " - " + ioe.getMessage());
+            addFormError(_t("Warning: unable to remove the service") + " - " + ioe.getLocalizedMessage());
         }
     }
 

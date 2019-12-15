@@ -72,7 +72,7 @@ public class ConfigReseedHandler extends FormHandler {
                     }
                 }
             } catch (IllegalArgumentException iae) {
-                addFormError(_t("Bad URL {0}", val) + " - " + iae.getMessage());
+                addFormError(_t("Bad URL {0}", val) + " - " + iae.getLocalizedMessage());
             }
         } else if (_action.equals(_t("Reseed from file"))) {
             // inline

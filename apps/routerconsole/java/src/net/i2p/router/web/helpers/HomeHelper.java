@@ -44,6 +44,7 @@ public class HomeHelper extends HelperBase {
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
         "";
 
+    /** @since 0.9.44 */
     static final String DEFAULT_CONFIG =
         _x("Configure Homepage") + S + _x("Configure the contents of this page") + S + "/confighome" + S + I + "info/home.png" + S +
         _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "info/bandwidth.png" + S +
@@ -92,6 +93,7 @@ public class HomeHelper extends HelperBase {
         "";
 
     // No commas allowed in text strings!
+    /** @since 0.9.44 */
     static final String DEFAULT_MONITORING =
         _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "billiard_marker.png" + S +
         _x("Graphs") + S + _x("Visualize information about the router") + S + "/graphs" + S + I + "chart_line.png" + S +
@@ -113,10 +115,12 @@ public class HomeHelper extends HelperBase {
         return homeTable(PROP_SERVICES, DEFAULT_SERVICES, plugins);
     }
 
+    /** @since 0.9.44 */
     public String getConfig(){
         return homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
     }
 
+    /** @since 0.9.44 */
     public String getMonitoring(){
         return homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
     }
@@ -129,10 +133,12 @@ public class HomeHelper extends HelperBase {
         return configTable(PROP_SERVICES, DEFAULT_SERVICES);
     }
 
+    /** @since 0.9.44 */
     public String getConfigConfig() {
         return configTable(PROP_CONFIG, DEFAULT_CONFIG);
     }
 
+    /** @since 0.9.44 */
     public String getConfigMonitoring() {
         return configTable(PROP_MONITORING, DEFAULT_MONITORING);
     }

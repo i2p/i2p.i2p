@@ -90,7 +90,7 @@ class SummaryRenderer {
             ImageIO.write(img, "png", ios);
         } catch (RrdException re) {
             //_log.error("Error rendering " + filename, re);
-            throw new IOException("Error plotting: " + re.getMessage());
+            throw new IOException("Error plotting: " + re.getLocalizedMessage());
         } catch (IOException ioe) {
             //_log.error("Error rendering " + filename, ioe);
             throw ioe;
@@ -307,7 +307,7 @@ class SummaryRenderer {
             //                   ); // + ", data written to " + t.getAbsolutePath());
         } catch (RrdException re) {
             _log.error("Error rendering", re);
-            throw new IOException("Error plotting: " + re.getMessage());
+            throw new IOException("Error plotting: " + re.getLocalizedMessage());
         } catch (IOException ioe) {
             // typically org.mortbay.jetty.EofException extends java.io.EOFException
             if (_log.shouldLog(Log.WARN))
@@ -315,7 +315,7 @@ class SummaryRenderer {
             throw ioe;
         } catch (OutOfMemoryError oom) {
             _log.error("Error rendering", oom);
-            throw new IOException("Error plotting: " + oom.getMessage());
+            throw new IOException("Error plotting: " + oom.getLocalizedMessage());
         } finally {
             // this does not close the underlying stream
             if (ios != null) try {ios.close();} catch (IOException ioe) {}

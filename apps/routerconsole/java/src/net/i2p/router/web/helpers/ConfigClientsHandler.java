@@ -501,7 +501,7 @@ public class ConfigClientsHandler extends FormHandler {
              if (status != null && status.length() > 0)
                  addFormNoticeNoEscape(status);
         } catch (IOException ioe) {
-            addFormError(_t("Install from file failed") + " - " + ioe.getMessage());
+            addFormError(_t("Install from file failed") + " - " + ioe.getLocalizedMessage());
         } finally {
             // it's really a ByteArrayInputStream but we'll play along...
             if (in != null)
