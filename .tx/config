@@ -69,6 +69,7 @@ trans.zh_CN = apps/i2ptunnel/locale-proxy/messages_zh.po
 source_file = apps/routerconsole/locale/messages_en.po
 source_lang = en
 trans.ar = apps/routerconsole/locale/messages_ar.po
+trans.az = apps/routerconsole/locale/messages_az.po
 trans.cs = apps/routerconsole/locale/messages_cs.po
 trans.da = apps/routerconsole/locale/messages_da.po
 trans.de = apps/routerconsole/locale/messages_de.po
