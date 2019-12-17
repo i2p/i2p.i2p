@@ -29,11 +29,12 @@ import net.i2p.util.Log;
  *
  */
 class ExploreJob extends SearchJob {
-    private FloodfillPeerSelector _peerSelector;
+    private final FloodfillPeerSelector _peerSelector;
+    private final boolean _isRealExplore;
     
     /** how long each exploration should run for
      *  The exploration won't "succeed" so we make it long so we query several peers */
-    private static final long MAX_EXPLORE_TIME = 15*1000;
+    private static final long MAX_EXPLORE_TIME = 30*1000;
     
     /** how many peers to explore through concurrently */
     private static final int EXPLORE_BREDTH = 1;
@@ -50,13 +51,16 @@ class ExploreJob extends SearchJob {
     /**
      * Create a new search for the routingKey specified
      *
+     * @param isRealExplore if true, a standard exploration (no floodfills will be returned)
+     *                      if false, a standard lookup (floodfills will be returned, use if low on floodfills)
      */
-    public ExploreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key) {
+    public ExploreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, boolean isRealExplore) {
         // note that we're treating the last param (isLease) as *false* since we're just exploring.
         // if this collides with an actual leaseSet's key, neat, but that wouldn't imply we're actually
         // attempting to send that lease a message!
         super(context, facade, key, null, null, MAX_EXPLORE_TIME, false, false);
         _peerSelector = (FloodfillPeerSelector) (_facade.getPeerSelector());
+        _isRealExplore = isRealExplore;
     }
     
     /**
@@ -93,15 +97,19 @@ class ExploreJob extends SearchJob {
             msg.setReplyTunnel(replyTunnelId);
         
         int available = MAX_CLOSEST - dontIncludePeers.size();
-        if (available > 0) {
-            // Add a flag to say this is an exploration and we don't want floodfills in the responses.
-            // Doing it this way is of course backwards-compatible.
-            // Supported as of 0.7.9
-            if (dontIncludePeers.add(Hash.FAKE_HASH))
-                available--;
+        if (_isRealExplore) {
+            if (available > 0) {
+                // Add a flag to say this is an exploration and we don't want floodfills in the responses.
+                // Doing it this way is of course backwards-compatible.
+                // Supported as of 0.7.9
+                if (dontIncludePeers.add(Hash.FAKE_HASH))
+                    available--;
+            }
+            // supported as of 0.9.16. TODO remove fake hash above
+            msg.setSearchType(DatabaseLookupMessage.Type.EXPL);
+        } else {
+            msg.setSearchType(DatabaseLookupMessage.Type.RI);
         }
-        // supported as of 0.9.16. TODO remove fake hash above
-        msg.setSearchType(DatabaseLookupMessage.Type.EXPL);
 
         KBucketSet<Hash> ks = _facade.getKBuckets();
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(getState().getTarget());

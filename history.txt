@@ -1,3 +1,20 @@
+2019-12-17 zzz
+ * NetDB: Fixes for hidden routers losing peers (ticket #2673)
+
+2019-12-16 zzz
+ * Console: Partial az translation
+
+2019-12-15 zzz
+ * Console:
+   - Hide services sidebar section if empty
+   - Fix Hebrew translation
+
+2019-12-14 zzz
+ * Console:
+   - Add Content-Disposition header to graphs
+   - Stat group display names
+ * Router: Add new known peers stat
+
 2019-12-03 zzz
  * NDT: Numerous fixes (ticket #2672)
  * OCMOSJ: Cancel timeout job on reply

@@ -1939,7 +1939,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                  // (especially when we have an IPv6 address and the increased minimums),
                  // and if UDP is completely blocked we'll still have some connectivity.
                  // TODO After some time, decide that UDP is blocked/broken and return TRANSIENT_FAIL_BID?
-                if (_context.random().nextInt(4) == 0)
+
+                // Even more if hidden.
+                // We'll have very low connection counts, and we don't need peer testing
+                int ratio = _context.router().isHidden() ? 2 : 4;
+                if (_context.random().nextInt(ratio) == 0)
                     return _cachedBid[SLOWEST_BID];
                 else
                     return _cachedBid[SLOW_PREFERRED_BID];

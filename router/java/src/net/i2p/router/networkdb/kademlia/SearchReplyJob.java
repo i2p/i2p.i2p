@@ -17,8 +17,8 @@ import net.i2p.util.Log;
  */
 
 class SearchReplyJob extends JobImpl {
-    private DatabaseSearchReplyMessage _msg;
-    private Log _log;
+    private final DatabaseSearchReplyMessage _msg;
+    private final Log _log;
     /** 
      * Peer who we think sent us the reply.  Note: could be spoofed!  If the
      * attacker knew we were searching for a particular key from a 
@@ -28,51 +28,46 @@ class SearchReplyJob extends JobImpl {
      * nonce in the search + searchReply (and check for it in the selector).
      *
      */
-    private Hash _peer;
-    private int _curIndex;
-    private int _invalidPeers;
+    private final Hash _peer;
     private int _seenPeers;
     private int _newPeers;
     private int _duplicatePeers;
-    private int _repliesPendingVerification;
-    private long _duration;
-    private SearchJob _searchJob;
+    private final long _duration;
+    private final SearchJob _searchJob;
+
     public SearchReplyJob(RouterContext enclosingContext, SearchJob job, DatabaseSearchReplyMessage message, Hash peer, long duration) {
         super(enclosingContext);
         _log = enclosingContext.logManager().getLog(getClass());
         _searchJob = job;
         _msg = message;
         _peer = peer;
-        _curIndex = 0;
-        _invalidPeers = 0;
-        _seenPeers = 0;
-        _newPeers = 0;
-        _duplicatePeers = 0;
-        _repliesPendingVerification = 0;
         if (duration > 0)
             _duration = duration;
         else
             _duration = 0;
     }
+
     public String getName() { return "Process Reply for Kademlia Search"; }
+
     public void runJob() {
-        if (_curIndex >= _msg.getNumReplies()) {
-            if (_log.shouldLog(Log.DEBUG) && _msg.getNumReplies() == 0)
-                _log.debug(getJobId() + ": dbSearchReply received with no routers referenced");
-            if (_repliesPendingVerification > 0) {
-                // we received new references from the peer, but still 
-                // haven't verified all of them, so lets give it more time
-                requeue(_searchJob.timeoutMs());
-            } else {
-                // either they didn't tell us anything new or we have verified
-                // (or failed to verify) all of them.  we're done
-                getContext().profileManager().dbLookupReply(_peer, _newPeers, _seenPeers, 
-                                                           _invalidPeers, _duplicatePeers, _duration);
-                if (_newPeers > 0)
-                    _searchJob.newPeersFound(_newPeers);
-            }
-        } else {
-            Hash peer = _msg.getReply(_curIndex);
+        int count = _msg.getNumReplies();
+        for (int i = 0; i < count; i++) {
+            processPeer(i);
+        }
+
+        if (count == 0 && _log.shouldDebug())
+            _log.debug(getJobId() + ": dbSearchReply received with no routers referenced");
+
+        // either they didn't tell us anything new or we have verified
+        // (or failed to verify) all of them.  we're done
+        getContext().profileManager().dbLookupReply(_peer, _newPeers, _seenPeers, 
+                                                    0, _duplicatePeers, _duration);
+        if (_newPeers > 0)
+            _searchJob.newPeersFound(_newPeers);
+    }
+
+    private void processPeer(int curIndex) {
+            Hash peer = _msg.getReply(curIndex);
 
             boolean shouldAdd = false;
 
@@ -116,53 +111,5 @@ class SearchReplyJob extends JobImpl {
                 else
                     _seenPeers++;
             }
-
-            _curIndex++;
-            requeue(0);
-        }
-    }
-    void replyVerified() {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Peer reply from " + _peer.toBase64());
-        _repliesPendingVerification--;
-        getContext().statManager().addRateData("netDb.searchReplyValidated", 1);
-    }
-    void replyNotVerified() {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Peer reply from " + _peer.toBase64());
-        _repliesPendingVerification--;
-        _invalidPeers++;
-        getContext().statManager().addRateData("netDb.searchReplyNotValidated", 1);
     }
 }
-
-/** the peer gave us a reference to a new router, and we were able to fetch it */
-/***
-class ReplyVerifiedJob extends JobImpl {
-    private Hash _key;
-    private SearchReplyJob _replyJob;
-    public ReplyVerifiedJob(RouterContext enclosingContext, SearchReplyJob srj, Hash key) {
-        super(enclosingContext);
-        _replyJob = srj;
-        _key = key;
-    }
-    public String getName() { return "Search reply value verified"; }
-    public void runJob() { _replyJob.replyVerified(); }
-}
-***/
-
-/** the peer gave us a reference to a new router, and we were NOT able to fetch it */
-/***
-class ReplyNotVerifiedJob extends JobImpl {
-    private Hash _key;
-    private SearchReplyJob _replyJob;
-    public ReplyNotVerifiedJob(RouterContext enclosingContext, SearchReplyJob srj, Hash key) {
-        super(enclosingContext);
-        _key = key;
-        _replyJob = srj;
-    }
-    public String getName() { return "Search reply value NOT verified"; }
-    public void runJob() { _replyJob.replyNotVerified(); }
-}
-***/
-
