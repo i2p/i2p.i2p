@@ -133,3 +133,28 @@ msgid "{0} similar message omitted"
 msgid_plural "{0} similar messages omitted"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:153
+msgid "CRIT"
+msgstr "CRIT"
+
+#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
+msgid "DEBUG"
+msgstr "DEBUG"
+
+#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:155
+msgid "ERROR"
+msgstr "ERRO"
+
+#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:160
+msgid "INFO"
+msgstr "INFO."
+
+#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:157
+msgid "WARN"
+msgstr "WARN"
+

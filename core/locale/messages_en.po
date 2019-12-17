@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:54+0000\n"
+"POT-Creation-Date: 2019-12-17 18:42+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -100,6 +100,26 @@ msgid "{0,number,####} μs"
 msgid_plural "{0,number,###} μs"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "CRIT"
+msgstr ""
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "DEBUG"
+msgstr ""
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "ERROR"
+msgstr ""
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "INFO"
+msgstr ""
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "WARN"
+msgstr ""
 
 #: ../java/src/net/i2p/util/LogWriter.java:161
 #, java-format
