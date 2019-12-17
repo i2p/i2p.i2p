@@ -1380,25 +1380,25 @@ public class DataHelper {
             // {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
             // If you want the digit separator in your locale, translate as {0}.
             // alternates: msec, msecs
-            t = ngettext("1 ms", "{0,number,####} ms", (int) ms);
+            t = ngettext("{0,number,####} ms", "{0,number,####} ms", (int) ms);
         } else if (ams < 2 * 60 * 1000) {
             // seconds
             // alternates: secs, sec. 'seconds' is probably too long.
-            t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
+            t = ngettext("{0} sec", "{0} sec", (int) (ms / 1000));
         } else if (ams < 120 * 60 * 1000) {
             // minutes
             // alternates: mins, min. 'minutes' is probably too long.
-            t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
+            t = ngettext("{0} min", "{0} min", (int) (ms / (60 * 1000)));
         } else if (ams < 2 * 24 * 60 * 60 * 1000) {
             // hours
             // alternates: hrs, hr., hrs.
-            t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
+            t = ngettext("{0} hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
         } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
             // days
-            t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+            t = ngettext("{0} day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
         } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
             // years
-            t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
+            t = ngettext("{0} year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
         } else {
             return _t("n/a");
         }
@@ -1429,23 +1429,23 @@ public class DataHelper {
         if (adms < 0.000000001d) {
             return "0";
         } else if (adms < 0.001d) {
-            t = ngettext("1 ns", "{0,number,###} ns", (int) Math.round(ms * 1000000d));
+            t = ngettext("{0,number,####} ns", "{0,number,###} ns", (int) Math.round(ms * 1000000d));
         } else if (adms < 1.0d) {
-            t = ngettext("1 μs", "{0,number,###} μs", (int) Math.round(ms * 1000d));
+            t = ngettext("{0,number,####} μs", "{0,number,###} μs", (int) Math.round(ms * 1000d));
         } else if (ams < 3 * 1000) {
-            t = ngettext("1 ms", "{0,number,####} ms", (int) Math.round(ms));
+            t = ngettext("{0,number,####} ms", "{0,number,####} ms", (int) Math.round(ms));
         } else if (ams < 2 * 60 * 1000) {
-            t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
+            t = ngettext("{0} sec", "{0} sec", (int) (ms / 1000));
         } else if (ams < 120 * 60 * 1000) {
-            t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
+            t = ngettext("{0} min", "{0} min", (int) (ms / (60 * 1000)));
         } else if (ams < 2 * 24 * 60 * 60 * 1000) {
-            t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
+            t = ngettext("{0} hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
         } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
             // days
-            t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+            t = ngettext("{0} day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
         } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
             // years
-            t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
+            t = ngettext("{0} year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
         } else {
             return _t("n/a");
         }

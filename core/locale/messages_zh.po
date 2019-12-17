@@ -50,7 +50,7 @@ msgstr ""
 #: ../java/src/net/i2p/data/DataHelper.java:1383
 #: ../java/src/net/i2p/data/DataHelper.java:1436
 #, java-format
-msgid "1 ms"
+msgid "{0,number,####} ms"
 msgid_plural "{0,number,####} ms"
 msgstr[0] "{0,number,####} 毫秒"
 
@@ -59,7 +59,7 @@ msgstr[0] "{0,number,####} 毫秒"
 #: ../java/src/net/i2p/data/DataHelper.java:1387
 #: ../java/src/net/i2p/data/DataHelper.java:1438
 #, java-format
-msgid "1 sec"
+msgid "{0} sec"
 msgid_plural "{0} sec"
 msgstr[0] "{0} 秒"
 
@@ -68,7 +68,7 @@ msgstr[0] "{0} 秒"
 #: ../java/src/net/i2p/data/DataHelper.java:1391
 #: ../java/src/net/i2p/data/DataHelper.java:1440
 #, java-format
-msgid "1 min"
+msgid "{0} min"
 msgid_plural "{0} min"
 msgstr[0] "{0} 分"
 
@@ -77,7 +77,7 @@ msgstr[0] "{0} 分"
 #: ../java/src/net/i2p/data/DataHelper.java:1395
 #: ../java/src/net/i2p/data/DataHelper.java:1442
 #, java-format
-msgid "1 hour"
+msgid "{0} hour"
 msgid_plural "{0} hours"
 msgstr[0] "{0} 小时"
 
@@ -85,7 +85,7 @@ msgstr[0] "{0} 小时"
 #: ../java/src/net/i2p/data/DataHelper.java:1398
 #: ../java/src/net/i2p/data/DataHelper.java:1445
 #, java-format
-msgid "1 day"
+msgid "{0} day"
 msgid_plural "{0} days"
 msgstr[0] "{0} 天"
 
@@ -93,7 +93,7 @@ msgstr[0] "{0} 天"
 #: ../java/src/net/i2p/data/DataHelper.java:1401
 #: ../java/src/net/i2p/data/DataHelper.java:1448
 #, java-format
-msgid "1 year"
+msgid "{0} year"
 msgid_plural "{0} years"
 msgstr[0] "{0} 年"
 
@@ -104,13 +104,13 @@ msgstr "n/a"
 
 #: ../java/src/net/i2p/data/DataHelper.java:1432
 #, java-format
-msgid "1 ns"
+msgid "{0,number,####} ns"
 msgid_plural "{0,number,###} ns"
 msgstr[0] "{0,number,###} 纳秒"
 
 #: ../java/src/net/i2p/data/DataHelper.java:1434
 #, java-format
-msgid "1 μs"
+msgid "{0,number,####} μs"
 msgid_plural "{0,number,###} μs"
 msgstr[0] "{0,number,###} 微秒"
 

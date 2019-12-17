@@ -48,9 +48,9 @@ msgstr ""
 #: ../java/src/net/i2p/data/DataHelper.java:1383
 #: ../java/src/net/i2p/data/DataHelper.java:1436
 #, java-format
-msgid "1 ms"
+msgid "{0,number,####} ms"
 msgid_plural "{0,number,####} ms"
-msgstr[0] "1 ms"
+msgstr[0] "{0,number,####} ms"
 msgstr[1] "{0,number,####} ms"
 msgstr[2] "{0,number,####} ms"
 msgstr[3] "{0,number,####} msconfigure ui"
@@ -60,9 +60,9 @@ msgstr[3] "{0,number,####} msconfigure ui"
 #: ../java/src/net/i2p/data/DataHelper.java:1387
 #: ../java/src/net/i2p/data/DataHelper.java:1438
 #, java-format
-msgid "1 sec"
+msgid "{0} sec"
 msgid_plural "{0} sec"
-msgstr[0] "1 sek"
+msgstr[0] "{0} sek"
 msgstr[1] "{0} sek"
 msgstr[2] "{0} sek"
 msgstr[3] "{0} sek"
@@ -72,9 +72,9 @@ msgstr[3] "{0} sek"
 #: ../java/src/net/i2p/data/DataHelper.java:1391
 #: ../java/src/net/i2p/data/DataHelper.java:1440
 #, java-format
-msgid "1 min"
+msgid "{0} min"
 msgid_plural "{0} min"
-msgstr[0] "1 min"
+msgstr[0] "{0} min"
 msgstr[1] "{0} min"
 msgstr[2] "{0} min"
 msgstr[3] "{0} min"
@@ -84,9 +84,9 @@ msgstr[3] "{0} min"
 #: ../java/src/net/i2p/data/DataHelper.java:1395
 #: ../java/src/net/i2p/data/DataHelper.java:1442
 #, java-format
-msgid "1 hour"
+msgid "{0} hour"
 msgid_plural "{0} hours"
-msgstr[0] "1 godz"
+msgstr[0] "{0} godz"
 msgstr[1] "{0} godz"
 msgstr[2] "{0} godz"
 msgstr[3] "{0} godz"
@@ -95,9 +95,9 @@ msgstr[3] "{0} godz"
 #: ../java/src/net/i2p/data/DataHelper.java:1398
 #: ../java/src/net/i2p/data/DataHelper.java:1445
 #, java-format
-msgid "1 day"
+msgid "{0} day"
 msgid_plural "{0} days"
-msgstr[0] "1 dzień"
+msgstr[0] "{0} dzień"
 msgstr[1] "{0} dni"
 msgstr[2] "{0} dni"
 msgstr[3] "{0} dni"
@@ -106,9 +106,9 @@ msgstr[3] "{0} dni"
 #: ../java/src/net/i2p/data/DataHelper.java:1401
 #: ../java/src/net/i2p/data/DataHelper.java:1448
 #, java-format
-msgid "1 year"
+msgid "{0} year"
 msgid_plural "{0} years"
-msgstr[0] "1 rok"
+msgstr[0] "{0} rok"
 msgstr[1] "{0} lata"
 msgstr[2] "{0} lat"
 msgstr[3] "{0} lat"
@@ -120,18 +120,18 @@ msgstr "n/d"
 
 #: ../java/src/net/i2p/data/DataHelper.java:1432
 #, java-format
-msgid "1 ns"
+msgid "{0,number,####} ns"
 msgid_plural "{0,number,###} ns"
-msgstr[0] "1 ns"
+msgstr[0] "{0,number,####} ns"
 msgstr[1] "{0,number,###} ns"
 msgstr[2] "{0,number,###} ns"
 msgstr[3] "{0,number,###} ns"
 
 #: ../java/src/net/i2p/data/DataHelper.java:1434
 #, java-format
-msgid "1 μs"
+msgid "{0,number,####} μs"
 msgid_plural "{0,number,###} μs"
-msgstr[0] "1 μs"
+msgstr[0] "{0,number,####} μs"
 msgstr[1] "{0,number,###} μs"
 msgstr[2] "{0,number,###} μs"
 msgstr[3] "{0,number,###} μs"
