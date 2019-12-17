@@ -158,7 +158,7 @@ abstract class LogWriter implements Runnable {
         String arrows = reverse ? (nohtml ? "vvv" : "&darr;&darr;&darr;")
                                 : (nohtml ? "^^^" : "&uarr;&uarr;&uarr;");
         return LogRecordFormatter.getWhen(_manager, lastRecord) + ' ' + arrows + ' ' +
-               ngettext("1 similar message omitted", "{0} similar messages omitted", dupCount) + ' ' + arrows +
+               ngettext("{0} similar message omitted", "{0} similar messages omitted", dupCount) + ' ' + arrows +
                LogRecordFormatter.NL;
     }
     

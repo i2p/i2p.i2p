@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 16:51+0000\n"
+"POT-Creation-Date: 2019-12-17 17:31+0000\n"
 "PO-Revision-Date: 2019-11-28 13:22+0000\n"
 "Last-Translator: Ondrej Führer <transifex@fuhrer.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
@@ -123,7 +123,7 @@ msgstr[3] ""
 
 #: ../java/src/net/i2p/util/LogWriter.java:161
 #, java-format
-msgid "1 similar message omitted"
+msgid "{0} similar message omitted"
 msgid_plural "{0} similar messages omitted"
 msgstr[0] ""
 msgstr[1] ""
