@@ -10,7 +10,7 @@
 #
 # zzz - public domain
 #
-CLASS=net.i2p.router.web.messages
+CLASS=net.i2p.util.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC
 RC=0
@@ -32,30 +32,9 @@ fi
 # Fast mode - update ondemond
 # set LG2 to the language you need in environment variables to enable this
 
-
-# list specific files in router/ here, so we don't scan the whole tree
-# core/ now has its own bundle
-ROUTERFILES="\
-   ../../../router/java/src/net/i2p/router/Blocklist.java \
-   ../../../router/java/src/net/i2p/router/CommSystemFacade.java \
-   ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
-   ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java \
-   ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
-   ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java \
-   ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
-   ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnP.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnPManager.java \
-   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
-   ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java \
-   ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java \
-   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
-   ../../../core/java/src/net/i2p/util/LogWriter.java \
-"
-
 # add ../java/ so the refs will work in the po file
-# do not scan 3rd-party code in java/src/com or java/src/edu
-JPATHS="../java/src/net ../jsp/WEB-INF ../java/strings $ROUTERFILES"
+# do not scan 3rd-party code
+JPATHS="../java/src/net/i2p"
 for i in ../locale/messages_*.po
 do
 	# get language
@@ -73,8 +52,8 @@ do
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
 
-	if [ -s build/obj/net/i2p/router/web/messages_$LG.class -a \
-	     build/obj/net/i2p/router/web/messages_$LG.class -nt $i -a \
+	if [ -s build/obj/net/i2p/util/messages_$LG.class -a \
+	     build/obj/net/i2p/util/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
 	then
 		continue
@@ -89,17 +68,12 @@ do
 		# _x("foo")
 		# intl._t("foo")
 		# intl.title("foo")
-		# handler._t("foo")
-		# formhandler._t("foo")
-		# net.i2p.router.web.Messages.getString("foo")
 		# In a jsp, you must use a helper or handler that has the context set.
 		# To start a new translation, copy the header from an old translation to the new .po file,
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
 	                 --keyword=_t --keyword=_x --keyword=intl._ --keyword=intl.title \
-	                 --keyword=handler._ --keyword=formhandler._ \
-	                 --keyword=net.i2p.router.web.Messages.getString \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then
@@ -144,9 +118,9 @@ do
             # fast way
             # convert to java files in build/messages-src
             TD=build/messages-src-tmp
-            TDX=$TD/net/i2p/router/web
+            TDX=$TD/net/i2p/util
             TD2=build/messages-src
-            TDY=$TD2/net/i2p/router/web
+            TDY=$TD2/net/i2p/util
             rm -rf $TD
             mkdir -p $TD $TDY
             msgfmt --java --statistics --source -r $CLASS -l $LG -d $TD $i

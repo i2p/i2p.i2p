@@ -1,0 +1,168 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+# Aleksey Orekhov <opexob@yandex.ru>, 2013
+# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
+# Alexey Solomin <a.rainman@gmail.com>, 2013
+# Allclear <sypermario@icloud.com>, 2019
+# Andrey Lukyanenko <operru32@yandex.ru>, 2013
+# brianhopes <voganc-12@live.ru>, 2015
+# dimi <zhopa@mita.pp.ru>, 2013
+# ducki2p <ducki2p@gmail.com>, 2011
+# Eugene, 2013
+# Eugene, 2013
+# foo <foo@bar>, 2009
+# Foster Snowhill, 2013,2015
+# Foster Snowhill, 2015
+# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
+# gmind, 2012-2013
+# gmind, 2013
+# gmind, 2012
+# Aleksey Orekhov <opexob@yandex.ru>, 2013
+# dimi <zhopa@mita.pp.ru>, 2013
+# Maxym Mykhalchuk, 2015
+# Maxym Mykhalchuk, 2015
+# Nikolay Parukhin <parukhin@gmail.com>, 2014,2019
+# Petr Polyakov, 2014
+# Petr Polyakov, 2014
+# R4SAS, 2019
+# rineri, 2014
+# Foster Snowhill, 2013
+# Foster Snowhill, 2013
+# ValdikSS <iam@valdikss.org.ru>, 2017-2019
+# varnav, 2013
+# vertnis, 2015-2016
+# brianhopes <voganc-12@live.ru>, 2015
+# Foster Snowhill, 2013
+# yume, 2014-2015
+# yume, 2017-2019
+# Andrey Lukyanenko <operru32@yandex.ru>, 2013
+# Василий Суматохин <basilbasilbasil@gmail.com>, 2019
+# Foster Snowhill, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-17 16:51+0000\n"
+"PO-Revision-Date: 2019-11-24 19:23+0000\n"
+"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/"
+"ru_RU/)\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+#. a lot of tables.
+#. milliseconds
+#. Note to translators, may be negative or zero, 2999 maximum.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+#. If you want the digit separator in your locale, translate as {0}.
+#. alternates: msec, msecs
+#: ../java/src/net/i2p/data/DataHelper.java:1383
+#: ../java/src/net/i2p/data/DataHelper.java:1436
+#, java-format
+msgid "1 ms"
+msgid_plural "{0,number,####} ms"
+msgstr[0] "{0,number,####} мс"
+msgstr[1] "{0,number,####} мс"
+msgstr[2] "{0,number,####} мс"
+msgstr[3] "{0,number,####} мс"
+
+#. seconds
+#. alternates: secs, sec. 'seconds' is probably too long.
+#: ../java/src/net/i2p/data/DataHelper.java:1387
+#: ../java/src/net/i2p/data/DataHelper.java:1438
+#, java-format
+msgid "1 sec"
+msgid_plural "{0} sec"
+msgstr[0] "{0} с."
+msgstr[1] "{0} с."
+msgstr[2] "{0} с"
+msgstr[3] "{0} с"
+
+#. minutes
+#. alternates: mins, min. 'minutes' is probably too long.
+#: ../java/src/net/i2p/data/DataHelper.java:1391
+#: ../java/src/net/i2p/data/DataHelper.java:1440
+#, java-format
+msgid "1 min"
+msgid_plural "{0} min"
+msgstr[0] "{0} мин."
+msgstr[1] "{0} мин."
+msgstr[2] "{0} мин."
+msgstr[3] "{0} мин."
+
+#. hours
+#. alternates: hrs, hr., hrs.
+#: ../java/src/net/i2p/data/DataHelper.java:1395
+#: ../java/src/net/i2p/data/DataHelper.java:1442
+#, java-format
+msgid "1 hour"
+msgid_plural "{0} hours"
+msgstr[0] "{0} час"
+msgstr[1] "{0} часа"
+msgstr[2] "{0} часов"
+msgstr[3] "{0} часов"
+
+#. days
+#: ../java/src/net/i2p/data/DataHelper.java:1398
+#: ../java/src/net/i2p/data/DataHelper.java:1445
+#, java-format
+msgid "1 day"
+msgid_plural "{0} days"
+msgstr[0] "{0} день"
+msgstr[1] "{0} дня"
+msgstr[2] "{0} дней"
+msgstr[3] "{0} дней"
+
+#. years
+#: ../java/src/net/i2p/data/DataHelper.java:1401
+#: ../java/src/net/i2p/data/DataHelper.java:1448
+#, java-format
+msgid "1 year"
+msgid_plural "{0} years"
+msgstr[0] "{0} год"
+msgstr[1] "{0} года"
+msgstr[2] "{0} лет"
+msgstr[3] "{0} лет"
+
+#: ../java/src/net/i2p/data/DataHelper.java:1403
+#: ../java/src/net/i2p/data/DataHelper.java:1450
+msgid "n/a"
+msgstr "н/д"
+
+#: ../java/src/net/i2p/data/DataHelper.java:1432
+#, java-format
+msgid "1 ns"
+msgid_plural "{0,number,###} ns"
+msgstr[0] "{0,number,##} нс"
+msgstr[1] "{0,number,###} нс"
+msgstr[2] "{0,number,###} нс"
+msgstr[3] "{0,number,###} нс"
+
+#: ../java/src/net/i2p/data/DataHelper.java:1434
+#, java-format
+msgid "1 μs"
+msgid_plural "{0,number,###} μs"
+msgstr[0] "{0,number,##} мкс"
+msgstr[1] "{0,number,###} мкс"
+msgstr[2] "{0,number,###} мкс"
+msgstr[3] "{0,number,###} мкс"
+
+#: ../java/src/net/i2p/util/LogWriter.java:161
+#, java-format
+msgid "1 similar message omitted"
+msgid_plural "{0} similar messages omitted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""

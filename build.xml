@@ -782,6 +782,7 @@
         <echo message=" will restrict language update to the language you specified, leaving other language untact." />
         <!-- set if unset -->
         <property name="lg2" value="" />
+        <ant dir="core/java/" target="poupdate" />
         <ant dir="apps/routerconsole/java/" >
             <target name="poupdate" />
             <target name="poupdate-news" />

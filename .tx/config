@@ -65,6 +65,41 @@ trans.uk_UA = apps/i2ptunnel/locale-proxy/messages_uk.po
 trans.vi = apps/i2ptunnel/locale-proxy/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale-proxy/messages_zh.po
 
+[I2P.core]
+type = PO
+source_file = core/locale/messages_en.po
+source_lang = en
+trans.ar = core/locale/messages_ar.po
+trans.az = core/locale/messages_az.po
+trans.cs = core/locale/messages_cs.po
+trans.da = core/locale/messages_da.po
+trans.de = core/locale/messages_de.po
+trans.el = core/locale/messages_el.po
+trans.es = core/locale/messages_es.po
+trans.et_EE = core/locale/messages_et.po
+trans.fa = core/locale/messages_fa.po
+trans.fi = core/locale/messages_fi.po
+trans.fr = core/locale/messages_fr.po
+trans.hu = core/locale/messages_hu.po
+;; Java converts id to in
+trans.id = core/locale/messages_in.po
+trans.it = core/locale/messages_it.po
+trans.ja = core/locale/messages_ja.po
+trans.ko = core/locale/messages_ko.po
+trans.nb = core/locale/messages_nb.po
+trans.nl = core/locale/messages_nl.po
+trans.pl = core/locale/messages_pl.po
+trans.pt = core/locale/messages_pt.po
+trans.pt_BR = core/locale/messages_pt_BR.po
+trans.ro = core/locale/messages_ro.po
+trans.ru_RU = core/locale/messages_ru.po
+trans.sv_SE = core/locale/messages_sv.po
+trans.tr_TR = core/locale/messages_tr.po
+trans.uk_UA = core/locale/messages_uk.po
+trans.vi = core/locale/messages_vi.po
+trans.zh_CN = core/locale/messages_zh.po
+trans.zh_TW = core/locale/messages_zh_TW.po
+
 [I2P.routerconsole]
 source_file = apps/routerconsole/locale/messages_en.po
 source_lang = en

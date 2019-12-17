@@ -1,0 +1,128 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+# alamir <christianm@libero.it>, 2014
+# Bad Cluster <badcluster@i2pmail.org>, 2012
+# Bad Cluster <badcluster@i2pmail.org>, 2012
+# Leelium <bovas85@gmail.com>, 2012
+# alamir <christianm@libero.it>, 2014
+# ColomboI2P <inactive+ColomboI2P@transifex.com>, 2012
+# ColomboI2P <inactive+ColomboI2P@transifex.com>, 2012
+# coso <coso@i2pmail.org>, 2013
+# danimoth <kronat@tiscali.it>, 2011
+# ironbishop <ironbishop@fsfe.org>, 2011
+# ironbishop <ironbishop@fsfe.org>, 2011
+# mkkid <jokjok@hotmail.it>, 2011
+# danimoth <kronat@tiscali.it>, 2011
+# Leelium <bovas85@gmail.com>, 2012
+# mkkid <jokjok@hotmail.it>, 2011
+# OlatusRooc <sebastiano.pistore.info@aol.com>, 2016
+# SebastianoPistore <SebastianoPistore.info@protonmail.ch>, 2016-2017
+# spawned76 <fswitch20@hotmail.com>, 2012
+# spawned76 <fswitch20@hotmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-17 16:51+0000\n"
+"PO-Revision-Date: 2019-11-24 13:40+0000\n"
+"Last-Translator: Dominik Schürmann <dominik@schuermann.eu>\n"
+"Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+#. a lot of tables.
+#. milliseconds
+#. Note to translators, may be negative or zero, 2999 maximum.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+#. If you want the digit separator in your locale, translate as {0}.
+#. alternates: msec, msecs
+#: ../java/src/net/i2p/data/DataHelper.java:1383
+#: ../java/src/net/i2p/data/DataHelper.java:1436
+#, java-format
+msgid "1 ms"
+msgid_plural "{0,number,####} ms"
+msgstr[0] "1 ms"
+msgstr[1] "{0,number,####} ms"
+
+#. seconds
+#. alternates: secs, sec. 'seconds' is probably too long.
+#: ../java/src/net/i2p/data/DataHelper.java:1387
+#: ../java/src/net/i2p/data/DataHelper.java:1438
+#, java-format
+msgid "1 sec"
+msgid_plural "{0} sec"
+msgstr[0] "1 sec"
+msgstr[1] "{0} sec"
+
+#. minutes
+#. alternates: mins, min. 'minutes' is probably too long.
+#: ../java/src/net/i2p/data/DataHelper.java:1391
+#: ../java/src/net/i2p/data/DataHelper.java:1440
+#, java-format
+msgid "1 min"
+msgid_plural "{0} min"
+msgstr[0] "1 min"
+msgstr[1] "{0} min"
+
+#. hours
+#. alternates: hrs, hr., hrs.
+#: ../java/src/net/i2p/data/DataHelper.java:1395
+#: ../java/src/net/i2p/data/DataHelper.java:1442
+#, java-format
+msgid "1 hour"
+msgid_plural "{0} hours"
+msgstr[0] "1 ora"
+msgstr[1] "{0} ore"
+
+#. days
+#: ../java/src/net/i2p/data/DataHelper.java:1398
+#: ../java/src/net/i2p/data/DataHelper.java:1445
+#, java-format
+msgid "1 day"
+msgid_plural "{0} days"
+msgstr[0] "1 giorno"
+msgstr[1] "{0} giorni"
+
+#. years
+#: ../java/src/net/i2p/data/DataHelper.java:1401
+#: ../java/src/net/i2p/data/DataHelper.java:1448
+#, java-format
+msgid "1 year"
+msgid_plural "{0} years"
+msgstr[0] "1 anno"
+msgstr[1] "{0} anni"
+
+#: ../java/src/net/i2p/data/DataHelper.java:1403
+#: ../java/src/net/i2p/data/DataHelper.java:1450
+msgid "n/a"
+msgstr "n/a"
+
+#: ../java/src/net/i2p/data/DataHelper.java:1432
+#, java-format
+msgid "1 ns"
+msgid_plural "{0,number,###} ns"
+msgstr[0] "1 ns"
+msgstr[1] "{0,number,###} ns"
+
+#: ../java/src/net/i2p/data/DataHelper.java:1434
+#, java-format
+msgid "1 μs"
+msgid_plural "{0,number,###} μs"
+msgstr[0] "1 μs"
+msgstr[1] "{0,number,###} μs"
+
+#: ../java/src/net/i2p/util/LogWriter.java:161
+#, java-format
+msgid "1 similar message omitted"
+msgid_plural "{0} similar messages omitted"
+msgstr[0] ""
+msgstr[1] ""

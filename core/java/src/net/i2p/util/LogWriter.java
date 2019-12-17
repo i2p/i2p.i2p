@@ -158,17 +158,17 @@ abstract class LogWriter implements Runnable {
         String arrows = reverse ? (nohtml ? "vvv" : "&darr;&darr;&darr;")
                                 : (nohtml ? "^^^" : "&uarr;&uarr;&uarr;");
         return LogRecordFormatter.getWhen(_manager, lastRecord) + ' ' + arrows + ' ' +
-               _t(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows +
+               ngettext("1 similar message omitted", "{0} similar messages omitted", dupCount) + ' ' + arrows +
                LogRecordFormatter.NL;
     }
     
-    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+    private static final String BUNDLE_NAME = "net.i2p.util.messages";
 
     /**
      *  gettext
      *  @since 0.9.3
      */
-    private String _t(int a, String b, String c) {
+    private String ngettext(String b, String c, int a) {
         return Translate.getString(a, b, c, _manager.getContext(), BUNDLE_NAME);
     }
 

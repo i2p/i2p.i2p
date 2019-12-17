@@ -1454,7 +1454,7 @@ public class DataHelper {
         return t.replace(" ", "&nbsp;");
     }
     
-    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+    private static final String BUNDLE_NAME = "net.i2p.util.messages";
 
     private static String _t(String key) {
         return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
