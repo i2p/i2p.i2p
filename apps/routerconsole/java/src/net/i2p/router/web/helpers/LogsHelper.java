@@ -16,6 +16,7 @@ import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.RouterConsoleRunner;
 import net.i2p.util.FileUtil;
+import net.i2p.util.Translate;
 
 public class LogsHelper extends HelperBase {
 
@@ -150,14 +151,14 @@ public class LogsHelper extends HelperBase {
                 // Homeland Security Advisory System
                 // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
                 // but pink instead of yellow for WARN
-                if (msg.contains(_t("CRIT")))
+                if (msg.contains(_c("CRIT")))
                     color = "#cc0000";
-                else if (msg.contains(_t("ERROR")))
+                else if (msg.contains(_c("ERROR")))
                     color = "#ff3300";
-                else if (msg.contains(_t("WARN")))
+                else if (msg.contains(_c("WARN")))
                    // color = "#ff00cc"; poor legibility on light backgrounds
                     color = "#bf00df";
-                else if (msg.contains(_t("INFO")))
+                else if (msg.contains(_c("INFO")))
                     color = "#000099";
                 else
                     color = "#006600";
@@ -212,5 +213,15 @@ public class LogsHelper extends HelperBase {
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
+    }
+
+    private static final String CORE_BUNDLE_NAME = "net.i2p.util.messages";
+
+    /**
+     *  translate a string from the core bundle
+     *  @since 0.9.45
+     */
+    private String _c(String s) {
+        return Translate.getString(s, _context, CORE_BUNDLE_NAME);
     }
 }

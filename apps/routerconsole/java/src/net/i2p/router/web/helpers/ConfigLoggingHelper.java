@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.util.Log;
+import net.i2p.util.Translate;
 
 public class ConfigLoggingHelper extends HelperBase {
     public ConfigLoggingHelper() {}
@@ -67,7 +68,8 @@ public class ConfigLoggingHelper extends HelperBase {
         return buf.toString();
     }
 
-    private static String[] levels = { _x("CRIT"), _x("ERROR"), _x("WARN"), _x("INFO"), _x("DEBUG") };
+    /** these are translated in the core bundle */
+    private static final String[] levels = { "CRIT", "ERROR", "WARN", "INFO", "DEBUG" };
 
     public String getDefaultLogLevelBox() {
         String cur = _context.logManager().getDefaultLimit();
@@ -83,7 +85,7 @@ public class ConfigLoggingHelper extends HelperBase {
             buf.append("<option value=\"").append(l).append('\"');
             if (l.equals(cur))
                 buf.append(SELECTED);
-            buf.append('>').append(_t(l)).append("</option>\n");
+            buf.append('>').append(_c(l)).append("</option>\n");
         }        
         
         if (showRemove)
@@ -135,5 +137,15 @@ public class ConfigLoggingHelper extends HelperBase {
         buf.append("</select>\n");
         buf.append(getLogLevelBox("newloglevel", "WARN", false));
         return buf.toString();
+    }
+
+    private static final String CORE_BUNDLE_NAME = "net.i2p.util.messages";
+
+    /**
+     *  translate a string from the core bundle
+     *  @since 0.9.45
+     */
+    private String _c(String s) {
+        return Translate.getString(s, _context, CORE_BUNDLE_NAME);
     }
 }
