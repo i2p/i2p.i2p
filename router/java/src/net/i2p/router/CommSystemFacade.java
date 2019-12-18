@@ -16,11 +16,13 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.util.Translate;
 
 /**
  * Manages the communication subsystem between peers, including connections, 
@@ -28,6 +30,10 @@ import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
  *
  */ 
 public abstract class CommSystemFacade implements Service {
+
+    /** @since 0.9.45 */
+    protected static final String ROUTER_BUNDLE_NAME = "net.i2p.router.util.messages";
+
     public abstract void processMessage(OutNetMessage msg);
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { }
@@ -82,6 +88,14 @@ public abstract class CommSystemFacade implements Service {
      * @since 0.9.20
      */
     public Status getStatus() { return Status.OK; }
+
+    /**
+     * getStatus().toStatusString(), translated if available.
+     * @since 0.9.45
+     */
+    public String getLocalizedStatusString() {
+        return getStatus().toStatusString();
+    }
 
     /**
      * @deprecated unused
@@ -635,6 +649,14 @@ public abstract class CommSystemFacade implements Service {
          */
         public String toStatusString() {
             return status;
+        }
+
+        /**
+         * toStatusString(), translated if available.
+         * @since 0.9.45
+         */
+        public String toLocalizedStatusString(I2PAppContext ctx) {
+            return Translate.getString(status, ctx, ROUTER_BUNDLE_NAME);
         }
 
         @Override

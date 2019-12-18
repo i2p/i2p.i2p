@@ -9,6 +9,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.Translate;
 
 /**
  * Simple throttle that basically stops accepting messages or nontrivial 
@@ -527,6 +528,14 @@ public class RouterThrottleImpl implements RouterThrottle {
     
     public String getTunnelStatus() {
         return _tunnelStatus;
+    }
+
+    /**
+     * getTunnelStatus(), translated if available.
+     * @since 0.9.45
+     */
+    public String getLocalizedTunnelStatus() {
+        return Translate.getString(_tunnelStatus, _context, CommSystemFacade.ROUTER_BUNDLE_NAME);
     }
 
     private void setTunnelStatus() {

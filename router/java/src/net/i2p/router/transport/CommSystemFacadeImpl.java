@@ -48,6 +48,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  @since IPv6
      */
     private static final String PROP_DISABLED = "i2np.disable";
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+    private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
@@ -221,6 +224,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         if (rv != Status.HOSED && _context.router().isHidden())
             return Status.OK;
         return rv; 
+    }
+
+    /**
+     * getStatus().toStatusString(), translated if available.
+     * @since 0.9.45
+     */
+    @Override
+    public String getLocalizedStatusString() {
+        return Translate.getString(getStatus().toStatusString(), _context, ROUTER_BUNDLE_NAME);
     }
 
     /**
@@ -552,9 +564,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             return c;
         return n;
     }
-
-    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
-    private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
 
     /** Provide a consistent "look" for displaying router IDs in the console */
     @Override

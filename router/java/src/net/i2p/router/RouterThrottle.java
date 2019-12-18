@@ -48,6 +48,12 @@ public interface RouterThrottle {
     public String getTunnelStatus();
     public void setTunnelStatus(String msg);
 
+    /**
+     * getTunnelStatus(), translated if available.
+     * @since 0.9.45
+     */
+    public String getLocalizedTunnelStatus();
+
     /** @since 0.8.12 */
     public void setShutdownStatus();
 
