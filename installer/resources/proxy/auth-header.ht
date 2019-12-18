@@ -16,7 +16,7 @@ Proxy-Connection: close
 <h3>_("I2P HTTP Proxy Authorization Required")</h3>
 <p>
 _("This proxy is configured to require a username and password for access.")
-_("Please enter your username and password, or check your {0}router configuration{1} or {2}I2PTunnel configuration{3}.", "<a href=\"http://127.0.0.1:7657/advancedconfig.jsp\">", "/a>", "<a href=\"http://127.0.0.1:7657/i2ptunnel/index.jsp\">", "</a>")
+_("Please enter your username and password, or check your {0}router configuration{1} or {2}I2PTunnel configuration{3}.", "<a href=\"http://127.0.0.1:7657/advancedconfig\">", "/a>", "<a href=\"http://127.0.0.1:7657/i2ptunnelmgr\">", "</a>")
 _("To disable authorization, remove the configuration {0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy tunnel.", "<code>", "</code>"))
 </p>
 </div>
