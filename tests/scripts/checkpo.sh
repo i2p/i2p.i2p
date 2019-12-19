@@ -11,6 +11,7 @@ cd `dirname $0`/../..
 
 DIRS="\
   core/locale \
+  router/locale \
   apps/routerconsole/locale \
   apps/routerconsole/locale-news \
   apps/routerconsole/locale-countries \

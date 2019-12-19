@@ -1,0 +1,200 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+# bassmax, 2014-2015
+# AO <ao@localizationlab.org>, 2018-2019
+# aylham <aylham@gmail.com>, 2011
+# aylham <aylham@gmail.com>, 2011
+# bassmax, 2014
+# Boxoa590, 2012-2013
+# ducki2p <ducki2p@gmail.com>, 2011
+# fo0 <foonikens@gmail.com>, 2011
+# foo <foo@bar>, 2009
+# fo0 <foonikens@gmail.com>, 2011
+# AO <ao@localizationlab.org>, 2017-2018
+# AO <ao@localizationlab.org>, 2017
+# jackjack <root@waka.site40.net>, 2011
+# Boxoa590, 2013
+# Boxoa590, 2012
+# jackjack <root@waka.site40.net>, 2011
+# syl_, 2015
+# syl_, 2015-2016
+# Towinet, 2013-2016
+# zzzi2p, 2016-2017
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-18 13:32+0000\n"
+"PO-Revision-Date: 2019-11-25 16:23+0000\n"
+"Last-Translator: AO <ao@localizationlab.org>\n"
+"Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. * IPv4 OK, IPv6 OK or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:370
+msgid "OK"
+msgstr "Correct"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:371
+msgid "IPv4: OK; IPv6: Testing"
+msgstr "IPv4 : Correct ; IPv6 : en test"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:372
+msgid "IPv4: OK; IPv6: Firewalled"
+msgstr "IPv4 : Correct ; IPv6 : derrière un pare-feu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:373
+msgid "IPv4: Testing; IPv6: OK"
+msgstr "IPv4 : en test ; IPv6 : Correct"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:374
+msgid "IPv4: Firewalled; IPv6: OK"
+msgstr "IPv4 : derrière un pare-feu ; IPv6 : Correct"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:375
+msgid "IPv4: Disabled; IPv6: OK"
+msgstr "IPv4 : désactivé ; IPv6 : Correct"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:376
+msgid "IPv4: Symmetric NAT; IPv6: OK"
+msgstr "IPv4 : traduction d’adresses réseau symétrique ; IPv6 : Correct"
+
+#. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:378
+msgid "Symmetric NAT"
+msgstr "Traduction d’adresses réseau symétrique"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:379
+msgid "IPv4: Symmetric NAT; IPv6: Testing"
+msgstr "IPv4 : traduction d’adresses réseau symétrique ; IPv6 : en test"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:380
+msgid "IPv4: Firewalled; IPv6: Testing"
+msgstr "IPv4 : derrière un pare-feu ; IPv6 : en test"
+
+#. * IPv4 firewalled, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:382
+msgid "Firewalled"
+msgstr "Derrière un pare-feu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:383
+msgid "IPv4: Testing; IPv6: Firewalled"
+msgstr "IPv4 : en test ; IPv6 : derrière un pare-feu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:384
+msgid "IPv4: Disabled; IPv6: Testing"
+msgstr "IPv4 : désactivé ; IPv6 : en test"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:385
+msgid "IPv4: Disabled; IPv6: Firewalled"
+msgstr "IPv4 : désactivé ; IPv6 : derrière un pare-feu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:386
+msgid "Disconnected"
+msgstr "Déconnecté"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:387
+msgid "Port Conflict"
+msgstr "Conflit de ports"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:388
+msgid "Testing"
+msgstr "En test"
+
+#. NPE, too early
+#. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. else
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
+msgid "Rejecting tunnels: Starting up"
+msgstr "Refus de tunnels : démarrage"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
+msgid "Rejecting tunnels: High message delay"
+msgstr "Refus de tunnels : grand retard des messages"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
+msgid "Rejecting tunnels: Limit reached"
+msgstr "Refus de tunnels : limite atteinte"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
+msgid "Rejecting most tunnels: High number of requests"
+msgstr "Refus de la plupart des tunnels : nombre de requêtes élevé"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
+msgid "Accepting most tunnels"
+msgstr "Acceptation de la plupart des tunnels"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:245
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:426
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:561
+msgid "Accepting tunnels"
+msgstr "Acceptation des tunnels"
+
+#. .067KBps
+#. * also limited to 90% - see below
+#. always leave at least 4KBps free when allowing
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
+msgid "Rejecting tunnels: Bandwidth limit"
+msgstr "Refus de tunnels : limite de bande passante"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
+msgid "Rejecting most tunnels: Bandwidth limit"
+msgstr "Refus de la plupart des tunnels : limite de bande passante"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
+msgid "Rejecting tunnels: Shutting down"
+msgstr "Refus de tunnels : fermeture"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
+msgid "Rejecting tunnels"
+msgstr "Refus de tunnels"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
+msgid "Dropping tunnel requests: Too slow"
+msgstr "Abandon des requêtes des tunnels : trop lent"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
+msgid "Dropping tunnel requests: High job lag"
+msgstr "Abandon des requêtes des tunnels : décalage important des travaux"
+
+#. don't even bother, since we are so overloaded locally
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
+msgid "Dropping tunnel requests: Overloaded"
+msgstr "Abandon des requêtes des tunnels : surchargé"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
+msgid "Rejecting tunnels: Hidden mode"
+msgstr "Refus de tunnels : mode caché"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
+msgid "Rejecting tunnels: Request overload"
+msgstr "Refus de tunnels : surcharge de requêtes"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
+msgid "Rejecting tunnels: Connection limit"
+msgstr "Refus de tunnels : limite de connexions"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
+msgid "Dropping tunnel requests: High load"
+msgstr "Abandon des requêtes des tunnels : forte charge"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
+msgid "Dropping tunnel requests: Queue time"
+msgstr "Abandon des requêtes des tunnels : temps d’attente"

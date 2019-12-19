@@ -1,0 +1,190 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+# kami <b52c55627324b29125cbcfb101258463_228943>, 2015
+# g3600303 <g3600303@trbvm.com>, 2015
+# タカハシ <indexial@outlook.jp>, 2013-2014
+# タカハシ <indexial@outlook.jp>, 2015
+# luixxiul, 2013
+# Masayuki Hatta <mhatta@mhatta.org>, 2018
+# rafe <rafe.kun@gmail.com>, 2015
+# rafe <rafe.kun@gmail.com>, 2015
+# Suguru Hirahara, 2013
+# Suguru Hirahara, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-18 13:32+0000\n"
+"PO-Revision-Date: 2019-11-24 13:40+0000\n"
+"Last-Translator: abbbb bbbb <a1678991@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. * IPv4 OK, IPv6 OK or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:370
+msgid "OK"
+msgstr "OK"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:371
+msgid "IPv4: OK; IPv6: Testing"
+msgstr "IPv4: OK; IPv6: テスト中"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:372
+msgid "IPv4: OK; IPv6: Firewalled"
+msgstr "IPv4: OK; IPv6: ファイアウォール有効"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:373
+msgid "IPv4: Testing; IPv6: OK"
+msgstr "IPv4: テスト中; IPv6: OK"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:374
+msgid "IPv4: Firewalled; IPv6: OK"
+msgstr "IPv4: ファイアウォール有効; IPv6: OK"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:375
+msgid "IPv4: Disabled; IPv6: OK"
+msgstr "IPv4: 無効; IPv6: OK"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:376
+msgid "IPv4: Symmetric NAT; IPv6: OK"
+msgstr "IPv4: 対称型NAT; IPv6: OK"
+
+#. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:378
+msgid "Symmetric NAT"
+msgstr "対称型NAT"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:379
+msgid "IPv4: Symmetric NAT; IPv6: Testing"
+msgstr "IPv4: 対称型NAT; IPv6: テスト中"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:380
+msgid "IPv4: Firewalled; IPv6: Testing"
+msgstr "IPv4: ファイアウォール有効; IPv6: テスト中"
+
+#. * IPv4 firewalled, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:382
+msgid "Firewalled"
+msgstr "ファイアウォール有効"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:383
+msgid "IPv4: Testing; IPv6: Firewalled"
+msgstr "IPv4: テスト中; IPv6: ファイアウォール有効"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:384
+msgid "IPv4: Disabled; IPv6: Testing"
+msgstr "IPv4: 無効; IPv6: テスト中"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:385
+msgid "IPv4: Disabled; IPv6: Firewalled"
+msgstr "IPv4: 無効; IPv6: ファイアウォール有効"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:386
+msgid "Disconnected"
+msgstr "切断"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:387
+msgid "Port Conflict"
+msgstr "ポート競合"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:388
+msgid "Testing"
+msgstr "テスト中"
+
+#. NPE, too early
+#. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. else
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
+msgid "Rejecting tunnels: Starting up"
+msgstr "トンネルを拒否中: 起動中"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
+msgid "Rejecting tunnels: High message delay"
+msgstr "トンネルを拒否中: メッセージ遅延大"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
+msgid "Rejecting tunnels: Limit reached"
+msgstr "トンネルを拒否中: 制限に到達"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
+msgid "Rejecting most tunnels: High number of requests"
+msgstr "大部分のトンネルを拒否中: リクエスト数過多"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
+msgid "Accepting most tunnels"
+msgstr "ほとんどのトンネルを承認中"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:245
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:426
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:561
+msgid "Accepting tunnels"
+msgstr "トンネルを承認中"
+
+#. .067KBps
+#. * also limited to 90% - see below
+#. always leave at least 4KBps free when allowing
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
+msgid "Rejecting tunnels: Bandwidth limit"
+msgstr "トンネルを拒否中: 帯域幅制限"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
+msgid "Rejecting most tunnels: Bandwidth limit"
+msgstr "ほとんどのトンネルを拒否中: 帯域幅制限"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
+msgid "Rejecting tunnels: Shutting down"
+msgstr "トンネルを拒否中: シャットダウン中"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
+msgid "Rejecting tunnels"
+msgstr "トンネルを拒否中"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
+msgid "Dropping tunnel requests: Too slow"
+msgstr "トンネル要求をドロップ: 遅すぎます"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
+msgid "Dropping tunnel requests: High job lag"
+msgstr "トンネルリクエストを中断: 高いジョブラグ"
+
+#. don't even bother, since we are so overloaded locally
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
+msgid "Dropping tunnel requests: Overloaded"
+msgstr "トンネル要求ドロップ: 過負荷"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
+msgid "Rejecting tunnels: Hidden mode"
+msgstr "トンネルを拒否: Hidden モード"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
+msgid "Rejecting tunnels: Request overload"
+msgstr "トンネルを拒否中: リクエスト過負荷"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
+msgid "Rejecting tunnels: Connection limit"
+msgstr "トンネルを拒否中: 接続制限"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
+msgid "Dropping tunnel requests: High load"
+msgstr "トンネル要求をドロップ: 高い負荷"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
+msgid "Dropping tunnel requests: Queue time"
+msgstr "トンネル要求をドロップ: キュー時間"

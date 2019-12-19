@@ -100,6 +100,41 @@ trans.vi = core/locale/messages_vi.po
 trans.zh_CN = core/locale/messages_zh.po
 trans.zh_TW = core/locale/messages_zh_TW.po
 
+[I2P.router]
+type = PO
+source_file = router/locale/messages_en.po
+source_lang = en
+trans.ar = router/locale/messages_ar.po
+trans.az = router/locale/messages_az.po
+trans.cs = router/locale/messages_cs.po
+trans.da = router/locale/messages_da.po
+trans.de = router/locale/messages_de.po
+trans.el = router/locale/messages_el.po
+trans.es = router/locale/messages_es.po
+trans.et_EE = router/locale/messages_et.po
+trans.fa = router/locale/messages_fa.po
+trans.fi = router/locale/messages_fi.po
+trans.fr = router/locale/messages_fr.po
+trans.hu = router/locale/messages_hu.po
+;; Java converts id to in
+trans.id = router/locale/messages_in.po
+trans.it = router/locale/messages_it.po
+trans.ja = router/locale/messages_ja.po
+trans.ko = router/locale/messages_ko.po
+trans.nb = router/locale/messages_nb.po
+trans.nl = router/locale/messages_nl.po
+trans.pl = router/locale/messages_pl.po
+trans.pt = router/locale/messages_pt.po
+trans.pt_BR = router/locale/messages_pt_BR.po
+trans.ro = router/locale/messages_ro.po
+trans.ru_RU = router/locale/messages_ru.po
+trans.sv_SE = router/locale/messages_sv.po
+trans.tr_TR = router/locale/messages_tr.po
+trans.uk_UA = router/locale/messages_uk.po
+trans.vi = router/locale/messages_vi.po
+trans.zh_CN = router/locale/messages_zh.po
+trans.zh_TW = router/locale/messages_zh_TW.po
+
 [I2P.routerconsole]
 source_file = apps/routerconsole/locale/messages_en.po
 source_lang = en

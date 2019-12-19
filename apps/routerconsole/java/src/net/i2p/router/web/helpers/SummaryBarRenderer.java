@@ -1079,7 +1079,7 @@ class SummaryBarRenderer {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(50);
         buf.append("<h4><span class=\"tunnelBuildStatus\">")
-           .append(_t(_helper.getTunnelStatus()))
+           .append(_helper.getTunnelStatus())
            .append("</span></h4>\n");
         return buf.toString();
     }

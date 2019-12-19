@@ -783,6 +783,7 @@
         <!-- set if unset -->
         <property name="lg2" value="" />
         <ant dir="core/java/" target="poupdate" />
+        <ant dir="router/java/" target="poupdate" />
         <ant dir="apps/routerconsole/java/" >
             <target name="poupdate" />
             <target name="poupdate-news" />

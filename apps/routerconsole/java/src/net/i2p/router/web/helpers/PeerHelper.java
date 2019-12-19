@@ -105,7 +105,7 @@ public class PeerHelper extends HelperBase {
             out.write("<p id=\"upnpstatus\"><b>");
             out.write(_t("Status"));
             out.write(": ");
-            out.write(_t(_context.commSystem().getStatus().toStatusString()));
+            out.write(_context.commSystem().getLocalizedStatusString());
             out.write("</b></p>");
         }
 
@@ -293,7 +293,7 @@ public class PeerHelper extends HelperBase {
         buf.append(". ").append(_t("Limit")).append(": ").append(nt.getMaxConnections());
         //buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
         if (isAdvanced()) {
-            buf.append(". ").append(_t("Status")).append(": ").append(_t(nt.getReachabilityStatus().toStatusString()));
+            buf.append(". ").append(_t("Status")).append(": ").append(nt.getReachabilityStatus().toLocalizedStatusString(_context));
         }
         buf.append(".</h3>\n" +
                    "<div class=\"widescroll\"><table id=\"ntcpconnections\">\n" +
@@ -457,7 +457,7 @@ public class PeerHelper extends HelperBase {
         //buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
         final boolean isAdvanced = isAdvanced();
         if (isAdvanced) {
-            buf.append(". ").append(_t("Status")).append(": ").append(_t(ut.getReachabilityStatus().toStatusString()));
+            buf.append(". ").append(_t("Status")).append(": ").append(ut.getReachabilityStatus().toLocalizedStatusString(_context));
         }
         buf.append(".</h3>\n");
         buf.append("<div class=\"widescroll\"><table id=\"udpconnections\">\n");

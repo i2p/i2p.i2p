@@ -239,6 +239,7 @@ public class SummaryHelper extends HelperBase {
             return new NetworkStateMessage(NetworkState.TESTING, _t("Testing"));
 
         Status status = _context.commSystem().getStatus();
+        String txstatus = _context.commSystem().getLocalizedStatusString();
         NetworkState state = NetworkState.RUNNING;
         switch (status) {
             case OK:
@@ -249,7 +250,7 @@ public class SummaryHelper extends HelperBase {
             case IPV4_SNAT_IPV6_OK:
                 List<RouterAddress> ras = routerInfo.getTargetAddresses("NTCP", "NTCP2");
                 if (ras.isEmpty())
-                    return new NetworkStateMessage(NetworkState.RUNNING, _t(status.toStatusString()));
+                    return new NetworkStateMessage(NetworkState.RUNNING, txstatus);
                 byte[] ip = null;
                 for (RouterAddress ra : ras) {
                     ip = ra.getIP();
@@ -260,7 +261,7 @@ public class SummaryHelper extends HelperBase {
                     return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Unresolved TCP Address"));
                 // TODO set IPv6 arg based on configuration?
                 if (TransportUtil.isPubliclyRoutable(ip, true))
-                    return new NetworkStateMessage(NetworkState.RUNNING, _t(status.toStatusString()));
+                    return new NetworkStateMessage(NetworkState.RUNNING, txstatus);
                 return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Private TCP Address"));
 
             case IPV4_SNAT_IPV6_UNKNOWN:
@@ -279,7 +280,7 @@ public class SummaryHelper extends HelperBase {
                     return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Floodfill"));
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 //    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Fast"));
-                return new NetworkStateMessage(state, _t(status.toStatusString()));
+                return new NetworkStateMessage(state, txstatus);
 
             case DISCONNECTED:
                 return new NetworkStateMessage(NetworkState.TESTING, _t("Disconnected - check network connection"));
@@ -302,7 +303,7 @@ public class SummaryHelper extends HelperBase {
                     else
                         return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled with UDP Disabled"));
                 }
-                return new NetworkStateMessage(state, _t(status.toStatusString()));
+                return new NetworkStateMessage(state, txstatus);
         }
     }
 
@@ -765,7 +766,7 @@ public class SummaryHelper extends HelperBase {
     public String getTunnelStatus() {
         if (_context == null)
             return "";
-        return _context.throttle().getTunnelStatus();
+        return _context.throttle().getLocalizedTunnelStatus();
     }
 
     public String getInboundBacklog() {
