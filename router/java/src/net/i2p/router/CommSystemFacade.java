@@ -424,8 +424,6 @@ public abstract class CommSystemFacade implements Service {
 
                         case DIFFERENT:
                         case REJECT_UNSOLICITED:
-                            return newStatus;
-
                         case IPV4_DISABLED_IPV6_FIREWALLED:
                             return IPV4_OK_IPV6_FIREWALLED;
 
