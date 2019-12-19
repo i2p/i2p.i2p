@@ -42,6 +42,7 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
+            encoding="UTF-8"
             includeAntRuntime="false" >
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
@@ -164,6 +165,7 @@
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
             <compilerarg line="${javac.compilerargs}" />
         </javac>

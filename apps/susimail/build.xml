@@ -40,6 +40,7 @@
             srcdir="./src/src"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./src/WEB-INF/classes">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
@@ -136,6 +137,7 @@
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                srcdir="build/messages-src" destdir="src/WEB-INF/classes">
             <compilerarg line="${javac.compilerargs}" />
         </javac>

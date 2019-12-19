@@ -59,6 +59,7 @@
             srcdir="./java" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./build/obj" 
             classpath="${cp}">
             <compilerarg line="${javac.compilerargs}" />
@@ -77,6 +78,7 @@
             srcdir="./java" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./build/obj" 
             classpath="${cpSocket}">
             <compilerarg line="${javac.compilerargs}" />

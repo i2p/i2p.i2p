@@ -48,6 +48,7 @@
 		<mkdir dir="${bin}" />
 		<javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
 			includeAntRuntime="false"
+			encoding="UTF-8"
  			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" >
 			<compilerarg line="${javac.compilerargs}" />
 		</javac>
@@ -89,6 +90,7 @@
         </java>
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                destdir="${bin}" srcdir="${tmp}" includes="**/*.java" classpathref="cp">
 		<compilerarg line="${javac.compilerargs}" />
          </javac>
@@ -183,6 +185,7 @@
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                srcdir="build/messages-src" destdir="${bin}">
             <compilerarg line="${javac.compilerargs}" />
         </javac>

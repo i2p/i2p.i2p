@@ -36,6 +36,7 @@
         <mkdir dir="./build/WEB-INF/classes" />
         <javac srcdir="./webapp/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="false"
+               encoding="UTF-8"
  	       classpathref="cp"
                destdir="./build/WEB-INF/classes" >
             <compilerarg line="${javac.compilerargs}" />

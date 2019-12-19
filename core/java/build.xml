@@ -79,6 +79,7 @@
         <javac sourcepath="" srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
+               encoding="UTF-8"
                destdir="./build/obj" classpath="${javac.classpath.mod}" >
             <compilerarg line="${javac.compilerargs}" />
             <include name="**/*.java" />
@@ -149,6 +150,7 @@
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -268,6 +270,7 @@
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="true"
+               encoding="UTF-8"
                excludes="${source.exclude}"
                destdir="./build/obj" >
             <classpath>
@@ -488,6 +491,7 @@
         <javac srcdir="./bench" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
+               encoding="UTF-8"
                destdir="./build/obj_bench" >
             <classpath>
                 <pathelement location="${jmh.home}/jmh-core.jar" />

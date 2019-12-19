@@ -35,6 +35,7 @@
             target="${javac.version}"
             destdir="./build/obj"
             includeAntRuntime="false"
+            encoding="UTF-8"
             includes="**/*.java" >
             <compilerarg line="${javac.compilerargs}" />
             <classpath>

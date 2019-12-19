@@ -25,11 +25,13 @@
         <mkdir dir="./build/obj" />
         <javac srcdir="./core/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="false"
+               encoding="UTF-8"
                destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs7}" />
         </javac>
         <javac srcdir="./javase/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="false"
+               encoding="UTF-8"
                destdir="./build/obj" classpath="./build/obj" >
             <compilerarg line="${javac.compilerargs7}" />
         </javac>
@@ -42,6 +44,7 @@
             srcdir="./test/junit"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./buildTest/obj"
             classpath="./build/zxing.jar" >
             <compilerarg line="${javac.compilerargs7}" />

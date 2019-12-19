@@ -32,6 +32,7 @@
             srcdir="./src"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./build/obj"
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
@@ -60,6 +61,7 @@
             srcdir="./test/junit"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./build/obj" >
             <classpath>
                 <pathelement path="${javac.classpath}" />

@@ -35,6 +35,7 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs7}" />
@@ -46,6 +47,7 @@
             srcdir="./test" 
             debug="true" deprecation="on" source="1.7" target="1.7" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs7}" />

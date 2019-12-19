@@ -36,6 +36,7 @@
         <!-- half of this is deprecated classes so turn deprecation off -->
         <javac srcdir="./src" debug="true" deprecation="off" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="false"
+               encoding="UTF-8"
                destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -48,6 +49,7 @@
             srcdir="./demo"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./buildDemo/obj"
             classpath="../../../core/java/build/i2p.jar:./build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
@@ -122,6 +124,7 @@
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -214,6 +217,7 @@
             srcdir="./test/junit"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
+            encoding="UTF-8"
             destdir="./build/obj" >
             <classpath>
                 <pathelement path="${javac.classpath}" />

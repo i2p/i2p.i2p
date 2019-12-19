@@ -387,6 +387,7 @@
             srcdir="./java/src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
+            encoding="UTF-8"
             includeAntRuntime="false" >
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
@@ -470,6 +471,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/objPatches" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             classpath="" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>

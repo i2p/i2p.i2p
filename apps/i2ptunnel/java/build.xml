@@ -42,6 +42,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -57,6 +58,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
+            encoding="UTF-8"
             classpath="../../../core/java/build/i2p.jar:build/i2ptunnel.jar:../../jetty/jettylib/jetty-i2p.jar:../../jetty/jettylib/jetty-util.jar:../../jetty/jettylib/jetty-xml.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -166,6 +168,7 @@
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                srcdir="build/messages-src" destdir="../jsp/WEB-INF/classes">
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -210,6 +213,7 @@
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                srcdir="build/messages-proxy-src" destdir="build/obj">
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -347,6 +351,7 @@
         </java>
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
+               encoding="UTF-8"
                destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
@@ -411,6 +416,7 @@
         <!-- We need the ant runtime, as it includes junit -->
         <javac srcdir="./src:./test/junit" debug="true" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="true"
+               encoding="UTF-8"
                deprecation="on" destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs}" />
             <classpath>

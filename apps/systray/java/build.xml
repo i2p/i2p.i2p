@@ -34,6 +34,7 @@
             target="${javac.version}"
             destdir="./build/obj"
             includeAntRuntime="false"
+            encoding="UTF-8"
             includes="**/*.java"
             classpath="../../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
