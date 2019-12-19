@@ -48,7 +48,6 @@ ROUTERFILES="\
    ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
    ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java \
    ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java \
-   ../../../core/java/src/net/i2p/util/LogWriter.java \
 "
 
 # add ../java/ so the refs will work in the po file
