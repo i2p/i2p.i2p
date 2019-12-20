@@ -550,11 +550,14 @@ class PacketBuilder {
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         
+        // FIXME ticket #2675
         // the packet could have been built before the current mtu got lowered, so
         // compare to LARGE_MTU
-        int maxMTU = peer.isIPv6() ? PeerState.MAX_IPV6_MTU : PeerState.LARGE_MTU;
-        if (off + (ipHeaderSize + UDP_HEADER_SIZE) > maxMTU) {
-            _log.error("Size is " + off + " for " + packet +
+        // Also happens on switch between IPv4 and IPv6
+        if (_log.shouldWarn()) {
+            int maxMTU = peer.isIPv6() ? PeerState.MAX_IPV6_MTU : PeerState.LARGE_MTU;
+            if (off + (ipHeaderSize + UDP_HEADER_SIZE) > maxMTU) {
+                _log.warn("Size is " + off + " for " + packet +
                        " data size " + dataSize +
                        " pkt size " + (off + (ipHeaderSize + UDP_HEADER_SIZE)) +
                        " MTU " + currentMTU +
@@ -563,6 +566,7 @@ class PacketBuilder {
                        explicitToSend + " full acks included, " +
                        partialAcksToSend + " partial acks included, " +
                        " Fragments: " + DataHelper.toString(fragments), new Exception());
+            }
         }
         
         return packet;
