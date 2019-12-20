@@ -40,7 +40,7 @@ class RefreshRoutersJob extends JobImpl {
     /** rerun fairly often. 1000 routers in 50 minutes
      *  Don't go faster as this overloads the expl. OBEP / IBGW
      */
-    private final static long RERUN_DELAY_MS = 3*1000;
+    private final static long RERUN_DELAY_MS = 2500;
     private final static long EXPIRE = 2*60*60*1000;
     private final static long NEW_LOOP_DELAY = 37*60*1000;
     private static final int ENOUGH_FFS = 3 * StartExplorersJob.LOW_FFS;
@@ -104,6 +104,6 @@ class RefreshRoutersJob extends JobImpl {
                 }
             }
         }
-        requeue(RERUN_DELAY_MS);
+        requeue(RERUN_DELAY_MS + getContext().random().nextInt(1024));
     }
 }

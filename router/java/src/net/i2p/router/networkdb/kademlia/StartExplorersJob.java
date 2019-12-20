@@ -99,7 +99,7 @@ class StartExplorersJob extends JobImpl {
                     j.getTiming().setStartAfter(getContext().clock().now() + delay);
                 getContext().jobQueue().addJob(j);
                 // spread them out
-                delay += 1250;
+                delay += 1000 + getContext().random().nextInt(512);
             }
         }
         long delay = getNextRunDelay();
