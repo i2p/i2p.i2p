@@ -462,10 +462,10 @@ class OutboundMessageFragments {
                               " data bytes to " + peer);
                 _context.statManager().addRateData("udp.sendFragmentsPerPacket", sendNext.size());
             }
-            sendNext.clear();
             if (pkt == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.info("Build packet FAIL for " + DataHelper.toString(sendNext) + " to " + peer);
+                sendNext.clear();
                 continue;
             }
             rv.add(pkt);
@@ -492,6 +492,7 @@ class OutboundMessageFragments {
             // following for debugging and stats
             pkt.setFragmentCount(sendNext.size());
             pkt.setMessageType(msgType);  //type of first fragment
+            sendNext.clear();
         }
 
 
