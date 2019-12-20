@@ -72,7 +72,7 @@ class ClientManager {
     private final Set<Hash> _metaHashes;
     protected final RouterContext _ctx;
     protected final int _port;
-    protected volatile boolean _isStarted;
+    protected volatile boolean _isStarted, _wasStarted;
     private final SimpleTimer2.TimedEvent _clientTimestamper;
 
     /** Disable external interface, allow internal clients only @since 0.8.3 */
@@ -169,6 +169,9 @@ class ClientManager {
             _clientTimestamper.schedule(ClientTimestamper.LOOP_TIME);
         }
         _isStarted = true;
+        _wasStarted = true;
+        if (_log.shouldInfo())
+            _log.info("Started the ClientManager");
     }
     
     public synchronized void restart() {
@@ -214,8 +217,23 @@ class ClientManager {
      *  @since 0.8.3
      */
     public I2CPMessageQueue internalConnect() throws I2PSessionException {
-        if (!_isStarted)
-            throw new I2PSessionException("Router client manager is shut down");
+        if (!_isStarted) {
+            if (_wasStarted)
+                throw new I2PSessionException("Router client manager is shut down");
+            // don't throw the early birds out
+            // ClientManager starts shortly after the console, should be less than a second
+            // Wait up to 60 secs before giving up
+            int i = 0;
+            do {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ie) {
+                    throw new I2PSessionException("Router client manager interrupted", ie);
+                }
+            } while (!_isStarted && i++ < 300);
+            if (!_isStarted)
+                throw new I2PSessionException("Router client manager failed to start");
+        }
         LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue<I2CPMessage>(INTERNAL_QUEUE_SIZE);
         LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue<I2CPMessage>(INTERNAL_QUEUE_SIZE);
         I2CPMessageQueue myQueue = new I2CPMessageQueueImpl(in, out);
@@ -225,13 +243,15 @@ class ClientManager {
         return hisQueue;
     }
 
+    /**
+     *  As of 0.9.45, this returns true iff the ClientManager is running.
+     *  Prior to that, it also required all external I2CP listeners
+     *  that were registered to be running.
+     *  Since most of our connections are in-JVM, we now return true even
+     *  if we have I2CP port conflicts.
+     */
     public synchronized boolean isAlive() {
-        boolean listening = true;
-        if (!_listeners.isEmpty()) {
-            for (ClientListenerRunner listener : _listeners)
-                listening = listening && listener.isListening();
-        }
-        return _isStarted && (_listeners.isEmpty() || listening);
+        return _isStarted;
     }
 
     public void registerConnection(ClientConnectionRunner runner) {
