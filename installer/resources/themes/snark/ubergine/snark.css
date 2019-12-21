@@ -80,12 +80,6 @@ body {
 .snarknavbar {
      margin: -10px 0 10px 0 !important;
      padding: 15px 10px 14px;
-     border: 1px solid #101;
-     border-radius: 0 0 4px 4px;
-     box-shadow: inset 0 0 0 1px #3f173f, inset 0 0 3px 1px #212;
-     filter: drop-shadow(0 1px 4px #101);
-     background: #101 url(images/snarktopnav.png) repeat-x scroll center center;
-     background: linear-gradient(to bottom, #522852, #4a2449 11%, #321831 33%, #281428 51%, #1c0e1c 52%, #101 54%);
      min-width: 600px;
      width: 70%;
      text-align: center;

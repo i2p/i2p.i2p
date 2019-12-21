@@ -728,7 +728,6 @@ td.subHeaderPriority, td.priority {
 td.subHeaderPriority {
      background: #020;
      font-weight: bold;
-     background: url(images/snarktopnav.png) repeat-x scroll center center #110011;
      background-image: linear-gradient(to bottom, #030 0%, #020 50%, #000 51%);
      text-align: center !important;
      padding: 0 1px !important;

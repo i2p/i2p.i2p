@@ -552,6 +552,8 @@ public class Snark
    * @throws RuntimeException via fatal()
    */
   public synchronized void startTorrent() {
+      if (!stopped)
+          return;
       starting = true;
       try {
           x_startTorrent();

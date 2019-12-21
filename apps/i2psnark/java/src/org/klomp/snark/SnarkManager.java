@@ -1590,7 +1590,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                     fis = new FileInputStream(sfile);
                 } catch (IOException ioe) {
                     // catch this here so we don't try do delete it below
-                    addMessage(_t("Cannot open \"{0}\"", sfile.getName()) + ": " + ioe.getMessage());
+                    addMessage(_t("Cannot open \"{0}\"", sfile.getName()) + ": " + ioe.getLocalizedMessage());
                     return false;
                 }
 
@@ -1654,13 +1654,13 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 } catch (IOException ioe) {
                     // close before rename/delete for windows
                     if (fis != null) try { fis.close(); fis = null; } catch (IOException ioe2) {}
-                    String err = _t("Torrent in \"{0}\" is invalid", sfile.toString()) + ": " + ioe.getMessage();
+                    String err = _t("Torrent in \"{0}\" is invalid", sfile.toString()) + ": " + ioe.getLocalizedMessage();
                     addMessage(err);
                     _log.error(err, ioe);
                     disableTorrentFile(filename);
                     return false;
                 } catch (OutOfMemoryError oom) {
-                    addMessage(_t("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getMessage());
+                    addMessage(_t("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getLocalizedMessage());
                     return false;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
@@ -2232,13 +2232,17 @@ public class SnarkManager implements CompleteListener, ClientApp {
      */
     private void locked_saveTorrentStatus(byte[] ih, Properties config) {
         File conf = configFile(_configDir, ih);
+        if (shouldAutoStart() && !conf.exists()) {
+            // force on for new torrents
+            config.setProperty(PROP_META_RUNNING, "true");
+        }
         File subdir = conf.getParentFile();
         if (!subdir.exists())
             subdir.mkdirs();
         try {
             DataHelper.storeProps(config, conf);
             if (_log.shouldInfo())
-                _log.info("Saved config to " + conf);
+                _log.info("Saved config to " + conf /* , new Exception() */ );
         } catch (IOException ioe) {
             _log.error("Unable to save the config to " + conf);
         }
@@ -2391,12 +2395,13 @@ public class SnarkManager implements CompleteListener, ClientApp {
         } else if (info.getTotalLength() <= 0) {
             return _t("Torrent \"{0}\" has no data!", info.getName());
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
+/*
             System.out.println("torrent info: " + info.toString());
             List<Long> lengths = info.getLengths();
             if (lengths != null)
                 for (int i = 0; i < lengths.size(); i++)
                     System.out.println("File " + i + " is " + lengths.get(i) + " long.");
-            
+*/          
             return _t("Torrents larger than {0}B are not supported yet \"{1}\"!", Storage.MAX_TOTAL_SIZE, info.getName());
         } else {
             // ok
@@ -2414,7 +2419,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
             filename = sfile.getCanonicalPath();
         } catch (IOException ioe) {
             _log.error("Unable to remove the torrent " + filename, ioe);
-            addMessage(_t("Error: Could not remove the torrent {0}", filename) + ": " + ioe.getMessage());
+            addMessage(_t("Error: Could not remove the torrent {0}", filename) + ": " + ioe.getLocalizedMessage());
             return null;
         }
         int remaining = 0;
@@ -2709,8 +2714,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         
         Set<String> existingNames = listTorrentFiles();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("DirMon found: " + DataHelper.toString(foundNames) + " existing: " + DataHelper.toString(existingNames));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("DirMon found: " + DataHelper.toString(foundNames) + " existing: " + DataHelper.toString(existingNames));
         // lets find new ones first...
         boolean shouldStart = shouldAutoStart();
         for (String name : foundNames) {
@@ -3086,14 +3091,15 @@ public class SnarkManager implements CompleteListener, ClientApp {
             }
         }
     }
-    
+
     /**
      *  ignore case, current locale
      *  @since 0.9
      */
     private static class IgnoreCaseComparator implements Comparator<Tracker>, Serializable {
+        private final Collator coll = Collator.getInstance();
         public int compare(Tracker l, Tracker r) {
-            return l.name.toLowerCase().compareTo(r.name.toLowerCase());
+            return coll.compare(l.name, r.name);
         }
     }
 }
