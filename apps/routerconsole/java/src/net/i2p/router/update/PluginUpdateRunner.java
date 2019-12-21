@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.IllegalArgumentException;
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -50,6 +51,7 @@ import net.i2p.util.VersionComparator;
 class PluginUpdateRunner extends UpdateRunner {
 
     private String _appName;
+    private final String _appDisplayName;
     private final String _oldVersion;
     private final URI _uri;
     private final String _xpi2pURL;
@@ -70,6 +72,27 @@ class PluginUpdateRunner extends UpdateRunner {
             _uri = uris.get(0);
         _xpi2pURL = _uri.toString();
         _appName = appName;
+        // For new plugin installs, ConsoleUpdateManager gives us a fake appName
+        // which is a random long. See installPlugin() for why.
+        // If that's the case, create a better name from the URI.
+        String appDisplayName = appName;
+        try {
+            Long.parseLong(appName);
+            String s = _uri.getPath();
+            if (s != null) {
+                int p = s.lastIndexOf('/');
+                if (p >= 0)
+                    s = s.substring(p + 1);
+                String slc = s.toLowerCase(Locale.US);
+                if (slc.endsWith(".su3"))
+                    s = s.substring(0, s.length() - 4);
+                else if (slc.endsWith(".xpi2p"))
+                    s = s.substring(0, s.length() - 6);
+                if (s.length() > 0)
+                    appDisplayName = s;
+            }
+        } catch (NumberFormatException nfe) {}
+        _appDisplayName = appDisplayName;
         _oldVersion = oldVersion;
     }
 
@@ -143,14 +166,14 @@ class PluginUpdateRunner extends UpdateRunner {
     @Override
     public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
         long d = currentWrite + bytesTransferred;
-        String status = "<b>" + _t("Downloading plugin") + ": " + _appName + "</b>";
+        String status = "<b>" + _t("Downloading plugin") + ": " + _appDisplayName + "</b>";
         _mgr.notifyProgress(this, status, d, d + bytesRemaining);
     }
 
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             if (!(_xpi2pURL.startsWith("file:") || _method == UpdateMethod.FILE))
-                updateStatus("<b>" + _t("Plugin downloaded") + "</b>");
+                updateStatus("<b>" + _t("Plugin downloaded") + ": " + _appDisplayName + "</b>");
             File f = new File(_updateFile);
             File appDir = new SecureDirectory(_context.getConfigDir(), PLUGIN_DIR);
             if ((!appDir.exists()) && (!appDir.mkdir())) {
