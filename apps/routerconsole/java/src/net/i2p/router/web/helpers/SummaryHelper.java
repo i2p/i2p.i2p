@@ -259,8 +259,12 @@ public class SummaryHelper extends HelperBase {
                     if (ip != null)
                         break;
                 }
-                if (ip == null)
-                    return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Unresolved TCP Address"));
+                if (ip == null) {
+                    // Usually a transient issue during state transitions, possibly with hidden mod, don't show this
+                    // NTCP2 addresses may not have an IP
+                    //return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Unresolved TCP Address"));
+                    return new NetworkStateMessage(NetworkState.RUNNING, txstatus);
+                }
                 // TODO set IPv6 arg based on configuration?
                 if (TransportUtil.isPubliclyRoutable(ip, true))
                     return new NetworkStateMessage(NetworkState.RUNNING, txstatus);
