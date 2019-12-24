@@ -56,10 +56,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     public static final String OPT_REJECT_USER_AGENTS = "rejectUserAgents";
     public static final String OPT_USER_AGENTS = "userAgentRejectList";
     public static final int DEFAULT_POST_WINDOW = 5*60;
-    public static final int DEFAULT_POST_BAN_TIME = 30*60;
+    public static final int DEFAULT_POST_BAN_TIME = 20*60;
     public static final int DEFAULT_POST_TOTAL_BAN_TIME = 10*60;
-    public static final int DEFAULT_POST_MAX = 3;
-    public static final int DEFAULT_POST_TOTAL_MAX = 10;
+    public static final int DEFAULT_POST_MAX = 6;
+    public static final int DEFAULT_POST_TOTAL_MAX = 20;
 
     /** what Host: should we seem to be to the webserver? */
     private String _spoofHost;
