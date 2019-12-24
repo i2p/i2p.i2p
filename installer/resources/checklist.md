@@ -52,7 +52,7 @@
   - Checkout i2p.www branch
   - Write draft release announcement - see i2p2www/blog/README for instructions
     - Top content should be the same as the news entry
-  - `tx push -s`
+  - `tx push -s -r I2P.website_blog`
   - `mtn ci`
 
 3. Make announcement on Transifex asking for news translation
@@ -259,4 +259,8 @@
 
 8. Notify downstream Debian maintainer
 
-9. (if we get back into Tails) Notify Tails that new Debian builds are available
+9. Pull announcement translations:
+  - `tx pull -r I2P.website_blog`
+  Do NOT forget this step!
+  - `./update-existing-po.sh`
+  - `mtn ci i2p2www/translations/ -m "Updated translations"`
