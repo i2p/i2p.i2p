@@ -768,10 +768,22 @@ public class Blocklist {
      * is a sorted array of longs.
      * The array is sorted in signed order, but we don't care.
      * Each long is ((from << 32) | to)
-     **/ 
+     */ 
     private boolean isBlocklisted(int ip) {
         if (isOnSingleList(ip))
             return true;
+        return isPermanentlyBlocklisted(ip);
+    }
+
+    /**
+     * Do a binary search through the in-memory range list which
+     * is a sorted array of longs.
+     * The array is sorted in signed order, but we don't care.
+     * Each long is ((from << 32) | to)
+     *
+     * @since 0.9.45 split out from above
+     */ 
+    private boolean isPermanentlyBlocklisted(int ip) {
         int hi = _blocklistSize - 1;
         if (hi <= 0)
             return false;
@@ -1031,6 +1043,9 @@ public class Blocklist {
                  int ip = ii.intValue();
                  if (ip < 0)
                      continue;
+                 // don't display if on the permanent blocklist also
+                 if (isPermanentlyBlocklisted(ip))
+                     continue;
                  out.write("<tr><td align=\"center\">");
                  out.write(toStr(ip));
                  out.write("</td></tr>\n");
@@ -1040,6 +1055,9 @@ public class Blocklist {
                  int ip = ii.intValue();
                  if (ip >= 0)
                      break;
+                 // don't display if on the permanent blocklist also
+                 if (isPermanentlyBlocklisted(ip))
+                     continue;
                  out.write("<tr><td align=\"center\">");
                  out.write(toStr(ip));
                  out.write("</td></tr>\n");
