@@ -690,6 +690,10 @@ p:empty + .sb_notice {
      padding: 1px 2px;
 }
 
+#sb_services td:first-child img {
+     margin: 0 0 2px !important;
+}
+
 #sb_services a:link, #sb_services a:visited {
      padding: 4px 2px 4px 3px;
      text-align: left;
@@ -5900,7 +5904,7 @@ ul#banlist {
      border: 1px solid #dee2e6;
      border-radius: 2px;
      background: #fafaff;
-     text-align: center;
+     text-align: left;
      -moz-columns: auto;
      -webkit-columns: auto;
      columns: auto;
@@ -5916,7 +5920,7 @@ ul#banlist {
 
 #banlist li {
      display: inline-block;
-     min-width: 300px;
+     min-width: 400px;
      line-height: 120%;
      margin: 3px 0 3px 5px !important;
      padding: 8px 10px 0 35px;
