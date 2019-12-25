@@ -1,13 +1,4 @@
-<%
-    // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
-
-    response.setHeader("X-Frame-Options", "SAMEORIGIN");
-    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'");
-    response.setHeader("X-XSS-Protection", "1; mode=block");
-    response.setHeader("X-Content-Type-Options", "nosniff");
-    response.setHeader("Referrer-Policy", "no-referrer");
-    response.setHeader("Accept-Ranges", "none");
-
+<%@include file="headers.jsi"
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="java.io.File,java.io.IOException,net.i2p.crypto.KeyStoreUtil,net.i2p.data.DataHelper,net.i2p.jetty.JettyXmlConfigurationParser"
 %><%@page

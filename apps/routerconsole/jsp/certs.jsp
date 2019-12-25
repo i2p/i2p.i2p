@@ -5,9 +5,8 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("Certificates")%>
-<script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-</head><body onload="initAjax()">
+</head><body>
 <%@include file="summary.jsi" %><h1><%=intl._t("Certificates")%></h1>
 <div class="main" id="certs">
 <jsp:useBean class="net.i2p.router.web.helpers.CertHelper" id="certhelper" scope="request" />

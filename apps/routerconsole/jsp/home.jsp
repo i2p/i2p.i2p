@@ -4,9 +4,8 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("home")%>
-<script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-</head><body onload="initAjax()">
+</head><body>
 <%
     String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
 %>

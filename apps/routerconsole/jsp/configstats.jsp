@@ -2,14 +2,13 @@
 <%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <html><head>
 <%@include file="css.jsi" %>
+<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("config stats")%>
 <noscript><style type="text/css">.script {display: none;}</style></noscript>
-<script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-<script type="text/javascript">
+<script nonce="<%=cspNonce%>" type="text/javascript">
 function init()
 {
 	checkAll = false;

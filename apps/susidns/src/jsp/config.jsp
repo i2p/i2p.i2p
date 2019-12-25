@@ -22,19 +22,8 @@
  *
  * $Revision: 1.1 $
  */
-
-    // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
-    if (request.getCharacterEncoding() == null)
-        request.setCharacterEncoding("UTF-8");
-
-    response.setHeader("X-Frame-Options", "SAMEORIGIN");
-    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'");
-    response.setHeader("X-XSS-Protection", "1; mode=block");
-    response.setHeader("X-Content-Type-Options", "nosniff");
-    response.setHeader("Referrer-Policy", "no-referrer");
-    response.setHeader("Accept-Ranges", "none");
-
 %>
+<%@include file="headers.jsi" %>
 <%@page pageEncoding="UTF-8"%>
 <%@ page contentType="text/html" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

@@ -1,5 +1,7 @@
-<script type="text/javascript">
+<script src="/js/ajax.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
   var failMessage = "<hr><b><%=intl._t("Router is down")%><\/b>";
   function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
   function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
+  initAjax();
 </script>

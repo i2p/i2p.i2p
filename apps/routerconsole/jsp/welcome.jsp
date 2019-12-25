@@ -66,8 +66,8 @@
     wizhelper.setContextId(i2pcontextId);
     if (ipg == 4) {
 %>
-<script src="/js/welcomeajax.js" type="text/javascript"></script>
-<script type="text/javascript">
+<script src="/js/welcomeajax.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
   var failMessage = "<b><%=intl._t("Router is down")%><\/b>";
   var progressMessage = "<b><%=intl._t("Bandwidth test in progress...")%><\/b>";
   var doneMessage = "<b><%=intl._t("Bandwidth test is complete, click Next")%><\/b>";
@@ -76,22 +76,12 @@
      document.getElementById("xhr").innerHTML = progressMessage;
      setTimeout(requestAjax1, "1000");
   }
+  initAjax();
 </script>
 <%
-    }
+    }  // ipg == 4
 %>
-</head>
-<%
-    if (ipg == 4) {
-%>
-<body onload="initAjax()">
-<%
-    } else {
-%>
-<body>
-<%
-    }
-%>
+</head><body>
 <div id="wizard" class="overlay">
 
 <jsp:useBean class="net.i2p.router.web.helpers.WizardHandler" id="formhandler" scope="request" />

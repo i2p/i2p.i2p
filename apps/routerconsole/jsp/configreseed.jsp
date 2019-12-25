@@ -1,16 +1,12 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config reseeding")%>
-<script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-</head><body onload="initAjax()">
-
+</head><body>
 <%@include file="summary.jsi" %>
-
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigReseedHelper" id="reseedHelper" scope="request" />
 <jsp:setProperty name="reseedHelper" property="contextId" value="<%=i2pcontextId%>" />
 <h1><%=intl._t("I2P Reseeding Configuration")%></h1>

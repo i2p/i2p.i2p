@@ -21,24 +21,21 @@
     } else {
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <html><head>
 <%@include file="css.jsi" %>
+<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("addressbook")%>
-<script src="/js/ajax.js" type="text/javascript"></script>
-<script src="/js/iframed.js" type="text/javascript"></script>
+<script src="/js/iframed.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-<script type="text/javascript">
+<script nonce="<%=cspNonce%>" type="text/javascript">
   function setupFrame() {
       f = document.getElementById("susidnsframe");
       injectClass(f);
       resizeFrame(f);
   }
 </script>
-</head><body onload="initAjax()">
-
+</head><body>
 <%@include file="summary.jsi" %>
-
 <h1><%=intl._t("I2P Addressbook")%> <span class="newtab"><a href="/susidns/index" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="dns">
 <iframe src="/susidns/index" width="100%" height="100%" frameborder="0" border="0" name="susidnsframe" id="susidnsframe" onload="setupFrame()" allowtransparency="true">

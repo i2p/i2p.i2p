@@ -27,9 +27,8 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("Page Not Found")%>
-<script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-</head><body onload="initAjax()">
+</head><body>
 <%@include file="summary.jsi" %>
 <h1><%=ERROR_CODE%>&nbsp;<%=ERROR_MESSAGE%></h1>
 <div class="sorry" id="warning">

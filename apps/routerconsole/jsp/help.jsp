@@ -5,9 +5,8 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("help")%>
-<script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-</head><body onload="initAjax()">
+</head><body>
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Router Help and Support")%></h1>
 <div class="main" id="help">

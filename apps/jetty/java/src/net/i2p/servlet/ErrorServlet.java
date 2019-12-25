@@ -90,7 +90,7 @@ public class ErrorServlet extends HttpServlet {
         resp.setDateHeader("Expires", 0);
         resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
         resp.setHeader("Pragma", "no-cache");
-        resp.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'none'");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'none'; form-action 'none'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
         Integer ERROR_CODE = (Integer) req.getAttribute("javax.servlet.error.status_code");
         String ERROR_URI = (String) req.getAttribute("javax.servlet.error.request_uri");
         String ERROR_MESSAGE = (String) req.getAttribute("javax.servlet.error.message");
@@ -114,6 +114,7 @@ public class ErrorServlet extends HttpServlet {
              ERROR_URI.endsWith(".ico") ||
              ERROR_URI.endsWith(".svg") ||
              ERROR_URI.endsWith(".txt") ||
+             ERROR_URI.endsWith(".js") ||
              ERROR_URI.endsWith(".css"))) {
             // keep it simple
             resp.setContentType("text/plain");

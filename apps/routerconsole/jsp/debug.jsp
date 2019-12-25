@@ -9,9 +9,8 @@
 %>
 <html><head><title>I2P Router Console - Debug</title>
 <%@include file="css.jsi" %>
-<script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-</head><body onload="initAjax()">
+</head><body>
 <%@include file="summary.jsi" %>
 <h1>Router Debug</h1>
 <div class="main" id="debug">

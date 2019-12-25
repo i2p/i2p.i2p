@@ -21,14 +21,13 @@
     } else {
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <html><head>
 <%@include file="css.jsi" %>
+<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("Hidden Services Manager")%>
-<script src="/js/ajax.js" type="text/javascript"></script>
-<script src="/js/iframed.js" type="text/javascript"></script>
+<script src="/js/iframed.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
-<script type="text/javascript">
+<script nonce="<%=cspNonce%>" type="text/javascript">
   function injectClassSpecific(f) {
       var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
       if (doc.getElementsByClassName == undefined) {
@@ -57,7 +56,7 @@
       resizeFrame(f);
   }
 </script>
-</head><body onload="initAjax()">
+</head><body>
 
 <%@include file="summary.jsi" %>
 
