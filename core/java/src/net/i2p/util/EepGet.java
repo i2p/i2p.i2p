@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
@@ -184,6 +183,7 @@ public class EepGet {
     /**
      * EepGet [-p 127.0.0.1:4444] [-n #retries] [-e etag] [-o outputFile] [-m markSize lineLen] url
      *
+     * As of 0.9.45, supports https and redirect to https
      */
     public static void main(String args[]) {
         String proxyHost = "127.0.0.1";
@@ -295,7 +295,20 @@ public class EepGet {
         if (saveAs == null)
             saveAs = suggestName(url);
 
-        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true, proxyHost, proxyPort, numRetries, saveAs, url, true, etag);
+        EepGet get;
+        if (url.startsWith("https://")) {
+            if (etag != null) {
+                System.err.println("Etag option unsupported with https");
+                System.exit(1);
+            }
+            boolean shouldProxy = proxyHost != null && proxyHost.length() > 0 && proxyPort > 0;
+            if (shouldProxy)
+                get = new SSLEepGet(I2PAppContext.getGlobalContext(), SSLEepGet.ProxyType.HTTP, proxyHost, proxyPort, saveAs, url);
+            else
+                get = new SSLEepGet(I2PAppContext.getGlobalContext(), saveAs, url);
+        } else {
+            get = new EepGet(I2PAppContext.getGlobalContext(), true, proxyHost, proxyPort, numRetries, saveAs, url, true, etag);
+        }
         if (extra != null) {
             for (int i = 0; i < extra.size(); i += 2) {
                 get.addHeader(extra.get(i), extra.get(i + 1));
@@ -460,7 +473,6 @@ public class EepGet {
         private long _lastComplete;
         private boolean _firstTime;
         private final DecimalFormat _pct = new DecimalFormat("00.0%");
-        private final DecimalFormat _kbps = new DecimalFormat("###,000.00");
         public CLIStatusListener() { 
             this(1024, 40);
         }
@@ -530,7 +542,7 @@ public class EepGet {
             else
                 transferred = alreadyTransferred - _previousWritten;
             System.out.println();
-            System.out.println("== " + new Date());
+            //System.out.println("== " + new Date());
             if (notModified) {
                 System.out.println("== Source not modified since last download");
             } else {
@@ -543,27 +555,31 @@ public class EepGet {
                             + " bytes transferred" +
                             (_discarded > 0 ? (" and " + _discarded + " bytes discarded") : ""));
                 }
-                if (transferred > 0)
-                    System.out.println("== Output saved to " + outputFile + " (" + alreadyTransferred + " bytes)");
+                if (transferred > 0) {
+                    long sz = (new File(outputFile)).length();
+                    if (sz <= 0)
+                        sz = alreadyTransferred;
+                    System.out.println("== Output saved to " + outputFile + " (" + sz + " bytes)");
+                }
             }
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
             if (_etag != null)
                 System.out.println("== ETag: " + _etag);            
             if (transferred > 0) {
-                StringBuilder buf = new StringBuilder(50);
+                StringBuilder buf = new StringBuilder(64);
                 buf.append("== Transfer rate: ");
-                double kbps = (1000.0d*(transferred)/(timeToSend*1024.0d));
-                synchronized (_kbps) {
-                    buf.append(_kbps.format(kbps));
-                }
-                buf.append("KBps");
+                if (timeToSend <= 0)
+                    timeToSend = 1;
+                long kbps = (long) (1000.0d * transferred / timeToSend);
+                buf.append(DataHelper.formatSize2Decimal(kbps, false));
+                buf.append("Bps");
                 System.out.println(buf.toString());
             }
         }
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
             System.out.println();
-            System.out.println("** " + new Date());
+            //System.out.println("** " + new Date());
             System.out.println("** Attempt " + currentAttempt + " of " + url + " failed");
             System.out.println("** Transfered " + bytesTransferred
                                + " with " + (bytesRemaining < 0 ? "unknown" : Long.toString(bytesRemaining)) + " remaining");
@@ -572,19 +588,19 @@ public class EepGet {
             _written = 0;
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
-            System.out.println("== " + new Date());
+            //System.out.println("== " + new Date());
             System.out.println("== Transfer of " + url + " failed after " + currentAttempt + " attempts");
             System.out.println("== Transfer size: " + bytesTransferred + " with "
                                + (bytesRemaining < 0 ? "unknown" : Long.toString(bytesRemaining)) + " remaining");
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
-            double kbps = (timeToSend > 0 ? (1000.0d*(bytesTransferred)/(timeToSend*1024.0d)) : 0);
-            StringBuilder buf = new StringBuilder(50);
+            if (timeToSend <= 0)
+                timeToSend = 1;
+            long kbps = (long) (1000.0d * bytesTransferred / timeToSend);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("== Transfer rate: ");
-            synchronized (_kbps) {
-                buf.append(_kbps.format(kbps));
-            }
-            buf.append("KBps");
+            buf.append(DataHelper.formatSize2Decimal(kbps, false));
+            buf.append("Bps");
             System.out.println(buf.toString());
         }
         public void attempting(String url) {}
@@ -738,7 +754,65 @@ public class EepGet {
                 if (_redirectLocation.startsWith("http://")) {
                     _actualURL = _redirectLocation;
                 } else if (_redirectLocation.startsWith("https://")) {
-                    throw new IOException("Redirect to https unsupported");
+                    // _proxy is the socket. It is null when extended by I2PSocketEepGet
+                    if (_proxy == null)
+                        throw new IOException("Redirect to https unsupported");
+                    if (_postData != null)
+                        throw new IOException("Redirect to https unsupported");
+                    try { 
+                        _proxy.close(); 
+                        _proxy = null;
+                    } catch (IOException ioe) {}
+                    if (timeout != null)
+                        timeout.cancel();
+                    EepGet get;
+                    if (_shouldProxy) {
+                        if (_authState != null)
+                            throw new IOException("Redirect to https with proxy auth unsupported");
+                        if (_outputStream != null)
+                            get = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _proxyHost, _proxyPort, _outputStream, _redirectLocation);
+                        else
+                            get = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _proxyHost, _proxyPort, _outputFile, _redirectLocation);
+                    } else {
+                        if (_outputStream != null)
+                            get = new SSLEepGet(_context, _outputStream, _redirectLocation);
+                        else
+                            get = new SSLEepGet(_context, _outputFile, _redirectLocation);
+                    }
+                    if (_shouldWriteErrorToOutput)
+                        get.setWriteErrorToOutput();
+                    if (_extraHeaders != null) {
+                        for (String s : _extraHeaders) {
+                            String[] kv = DataHelper.split(s, ":", 2);
+                            if (kv.length == 2)
+                                get.addHeader(kv[0].trim(), kv[1].trim());
+                        }
+                    }
+                    synchronized (_listeners) {
+                        for (StatusListener sl : _listeners) {
+                            get.addStatusListener(sl);
+                        }
+                    }
+                    _actualURL = _redirectLocation;
+                    // reset some important variables, we don't want to save the values from the redirect
+                    _bytesRemaining = -1;
+                    _redirectLocation = null;
+                    _etag = _etagOrig;
+                    _lastModified = _lastModifiedOrig;
+                    _contentType = null;
+                    _encodingChunked = false;
+                    // TODO auth?
+                    // minSize/maxSize/maxRetries discarded
+                    _transferFailed = !get.fetch(_fetchHeaderTimeout, -1, _fetchInactivityTimeout);
+                    _keepFetching = false;
+                    // fixup the getters
+                    _responseCode = get.getStatusCode();
+                    _responseText = get.getStatusText();
+                    _contentType = get.getContentType();
+                    _etag = get.getETag();
+                    _lastModified = get.getLastModified();
+                    _notModified = get.getNotModified();
+                    return;
                 } else { 
                     // the Location: field has been required to be an absolute URI at least since
                     // RFC 1945 (HTTP/1.0 1996), so it isn't clear what the point of this is.
@@ -795,7 +869,7 @@ public class EepGet {
         }
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Headers read completely, reading " + _bytesRemaining);
+            _log.debug("Headers read completely");
         
         boolean strictSize = (_bytesRemaining >= 0);
 
@@ -1174,8 +1248,8 @@ public class EepGet {
         String len = buf.toString().trim();
         try {
             long bytes = Long.parseLong(len, 16);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Chunked length: " + bytes);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Chunked length: " + bytes);
             return bytes;
         } catch (NumberFormatException nfe) {
             throw new IOException("Invalid chunk length [" + len + "]");
@@ -1439,7 +1513,7 @@ public class EepGet {
         if (post)
             buf.append(_postData);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Request: [" + buf.toString() + "]");
+            _log.debug("Request:\n" + buf.toString().trim());
         return buf.toString();
     }
 

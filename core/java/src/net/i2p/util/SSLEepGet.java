@@ -76,7 +76,7 @@ import net.i2p.socks.SOCKS5Client;
 
 /**
  * HTTPS only, no retries, no min and max size options, no timeout option
- * Fails on 301 or 302 (doesn't follow redirect)
+ * As of 0.9.45, supports redirect to https (redirect to http will still fail).
  * Fails on bad certs (must have a valid cert chain)
  * Self-signed certs or CAs not in the JVM key store must be loaded to be trusted.
  *
@@ -334,6 +334,9 @@ public class SSLEepGet extends EepGet {
                     proxyPort = 8080;
                 else
                     proxyPort = 1080;
+            } else if (proxyPort == 4444 && ptype != ProxyType.INTERNAL) {
+                if (proxyHost.equals("localhost") || proxyHost.equals("127.0.0.1") || proxyHost.equals("::1"))
+                    ptype = ProxyType.INTERNAL;
             }
             get = new SSLEepGet(I2PAppContext.getGlobalContext(), ptype, proxyHost, proxyPort, saveAs, url);
         } else {
@@ -567,7 +570,27 @@ public class SSLEepGet extends EepGet {
             _proxy.setSoTimeout(INACTIVITY_TIMEOUT);
 
         if (_redirectLocation != null) {
-            throw new IOException("Server redirect to " + _redirectLocation + " not allowed");
+            if (!_redirectLocation.startsWith("https://"))
+                throw new IOException("Server redirect to " + _redirectLocation + " not allowed");
+            _redirects++;
+            if (_redirects > 5)
+                throw new IOException("Too many redirects: to " + _redirectLocation);
+            if (_log.shouldInfo())
+                _log.info("Redirecting to " + _redirectLocation);
+            _actualURL = _redirectLocation;
+            AuthState as = _authState;
+            if (as != null)
+                as.authSent = false;
+            // reset some important variables, we don't want to save the values from the redirect
+            _bytesRemaining = -1;
+            _redirectLocation = null;
+            _etag = _etagOrig;
+            _lastModified = _lastModifiedOrig;
+            _contentType = null;
+            _encodingChunked = false;
+            sendRequest(timeout);
+            doFetch(timeout);
+            return;
         }
         
         if (_log.shouldLog(Log.DEBUG))
