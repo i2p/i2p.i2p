@@ -2289,8 +2289,7 @@ table#wrapperlogs {
      white-space: pre-wrap !important;
      word-wrap: break-word !important;
      width: calc(100% - 5px);
-     max-height: 600px;
-     overflow: auto;
+     overflow: visible;
 }
 
 #logs ul {
@@ -6461,7 +6460,6 @@ h3#ntcpcon, h3#udpcon {
 
 #wrapperlogs pre {
      background-size: 100% 100%, auto 120px, 100% 100% !important;
-     height: 400px;
      resize: vertical;
 }
 

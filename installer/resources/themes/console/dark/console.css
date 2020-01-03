@@ -4586,7 +4586,6 @@ table[id$="logs"] ul {
      width: 99%;
      width: calc(100% - 5px);
      resize: none;
-     max-height: 600px;
      padding: 0 0 0 5px !important;
 }
 
@@ -7805,7 +7804,6 @@ th.options, table#externali2cp th {
 }
 
 #wrapperlogs pre {
-     height: 300px;
      resize: vertical;
 }
 
