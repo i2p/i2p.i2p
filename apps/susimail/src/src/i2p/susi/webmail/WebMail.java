@@ -1,8 +1,8 @@
 /*
  * Created on 04.11.2004
- * 
+ *
  *  This file is part of susimail project, see http://susi.i2p/
- *  
+ *
  *  Copyright (C) 2004-2005  <susi23@mail.i2p>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ *
  * $Revision: 1.2 $
  */
 package i2p.susi.webmail;
@@ -102,16 +102,16 @@ public class WebMail extends HttpServlet
 
 	private static final long serialVersionUID = 1L;
 	private static final String LOGIN_NONCE = Long.toString(I2PAppContext.getGlobalContext().random().nextLong());
-	
+
 	private static final String DEFAULT_HOST = "127.0.0.1";
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
-	
+
 	private enum State { AUTH, LOADING, LIST, SHOW, NEW, CONFIG }
-	
+
 	// TODO generate from servlet name to allow for renaming or multiple instances
 	private static final String myself = "/susimail/";
-	
+
 	/*
 	 * form keys on login page
 	 */
@@ -122,7 +122,7 @@ public class WebMail extends HttpServlet
 	private static final String HOST = "host";
 	private static final String POP3 = "pop3";
 	private static final String SMTP = "smtp";
-	
+
 	/*
 	 * GET params
 	 */
@@ -166,23 +166,23 @@ public class WebMail extends HttpServlet
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
 	private static final String RAW_ATTACHMENT = "att";
-	
+
 	private static final String MARKALL = "markall";
 	private static final String CLEAR = "clearselection";
 	private static final String INVERT = "invertselection";
-	
+
 	private static final String PREVPAGE = "prevpage";
 	private static final String NEXTPAGE = "nextpage";
 	private static final String FIRSTPAGE = "firstpage";
 	private static final String LASTPAGE = "lastpage";
 	private static final String PAGESIZE = "pagesize";
 	private static final String SETPAGESIZE = "setpagesize";
-	
+
 	private static final String SEND = "send";
 	private static final String SAVE_AS_DRAFT = "saveasdraft";
 	private static final String CANCEL = "cancel";
 	private static final String DELETE_ATTACHMENT = "delete_attachment";
-	
+
 	private static final String NEW_FROM = "new_from";
 	private static final String NEW_SUBJECT = "new_subject";
 	private static final String NEW_TO = "new_to";
@@ -191,7 +191,7 @@ public class WebMail extends HttpServlet
 	private static final String NEW_TEXT = "new_text";
 	private static final String NEW_FILENAME = "new_filename";
 	private static final String NEW_UPLOAD = "new_upload";
-	
+
 	private static final String LIST = "list";
 	private static final String PREV = "prev";
 	private static final String NEXT = "next";
@@ -224,7 +224,7 @@ public class WebMail extends HttpServlet
 
 	private static final boolean SHOW_HTML = true;
 	private static final boolean TEXT_ONLY = false;
-	
+
 	/*
 	 * name of configuration properties
 	 */
@@ -237,7 +237,7 @@ public class WebMail extends HttpServlet
 	private static final String CONFIG_SENDER_FIXED = "sender.fixed";
 	private static final String CONFIG_SENDER_DOMAIN = "sender.domain";
 	private static final String CONFIG_SENDER_NAME = "sender.name";
-	
+
 	private static final String CONFIG_COMPOSER_COLS = "composer.cols";
 	private static final String CONFIG_COMPOSER_ROWS = "composer.rows";
 
@@ -260,12 +260,12 @@ public class WebMail extends HttpServlet
 	private static final String spacer = ""; /* this is best done with css */
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
 	private static final String CONSOLE_BUNDLE_NAME = "net.i2p.router.web.messages";
-	
+
 	static {
 		Config.setPrefix( "susimail" );
 	}
 
-	
+
 	/**
 	 * data structure to hold any persistent data (to store them in session dictionary)
 	 * @author susi
@@ -292,7 +292,7 @@ public class WebMail extends HttpServlet
 		private final List<String> nonces;
 		private static final int MAX_NONCES = 15;
 		public final Log log;
-		
+
 		SessionObject(Log log)
 		{
 			nonces = new ArrayList<String>(MAX_NONCES + 1);
@@ -383,7 +383,7 @@ public class WebMail extends HttpServlet
 
 	/**
 	 * returns html string of a form button with name and label
-	 * 
+	 *
 	 * @param name
 	 * @param label
 	 * @return html string
@@ -407,7 +407,7 @@ public class WebMail extends HttpServlet
 
 	/**
 	 * returns html string of a disabled form button with name and label
-	 * 
+	 *
 	 * @param name
 	 * @param label
 	 * @return html string
@@ -420,7 +420,7 @@ public class WebMail extends HttpServlet
 	/**
 	 * returns a html string of the label and two imaged links using the parameter name
 	 * (used for sorting buttons in folder view)
-	 * 
+	 *
 	 * @param name
 	 * @param label
 	 * @return the string
@@ -453,7 +453,7 @@ public class WebMail extends HttpServlet
 
 	/**
 	 * check, if a given button "was pressed" in the received http request
-	 * 
+	 *
 	 * @param request
 	 * @param key
 	 * @return true if pressed
@@ -465,12 +465,12 @@ public class WebMail extends HttpServlet
 	}
 	/**
 	 * recursively render all mail body parts
-	 * 
+	 *
 	 * 1. if type is multipart/alternative, look for text/plain section and ignore others
 	 * 2. if type is multipart/*, recursively call all these parts
 	 * 3. if type is text/plain (or mail is not mime), print out
 	 * 4. in all other cases print out message, that part is not displayed
-	 * 
+	 *
 	 * @param out
 	 * @param mailPart
 	 * @param level is increased by recursively calling sub parts
@@ -486,10 +486,10 @@ public class WebMail extends HttpServlet
 			for( int i = 0; i < mailPart.headerLines.length; i++ ) {
 				// fix Content-Type: multipart/alternative; boundary="----------8CDE39ECAF2633"
 				out.println( mailPart.headerLines[i].replace("--", "&#45;&#45;") );
-			}	
+			}
 			out.println( "-->" );
 		}
-		
+
 		if( mailPart.multipart ) {
 			if( mailPart.type.equals("multipart/alternative")) {
 				MailPart chosen = null;
@@ -509,7 +509,7 @@ public class WebMail extends HttpServlet
 							out.println( "Debug: Mail Part headers follow");
 							for( int i = 0; i < subPart.headerLines.length; i++ ) {
 								out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
-							}	
+							}
 							out.println( "-->" );
 						}
 					}
@@ -529,13 +529,13 @@ public class WebMail extends HttpServlet
 			boolean showBody = false;
 			boolean prepareAttachment = false;
 			String reason = "";
-			
+
 			String ident = quoteHTML(
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
 					( mailPart.filename != null ? mailPart.filename + ", " : "" ) +
 					( mailPart.name != null ? mailPart.name + ", " : "" ) +
 					( mailPart.type != null ? '(' + mailPart.type + ')' : _t("unknown") ) );
-			
+
 			if( level == 0 && mailPart.version == null ) {
 				/*
 				 * not a MIME mail, so simply print it literally
@@ -559,7 +559,7 @@ public class WebMail extends HttpServlet
 			}
 			if( html )
 				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
-			if( showBody ) {			
+			if( showBody ) {
 				if( html )
 					out.println( "<p class=\"mailbody\"><br>" );
 				String charset = mailPart.charset;
@@ -662,9 +662,9 @@ public class WebMail extends HttpServlet
 	}
 	/**
 	 * prepare line for presentation between html tags
-	 * 
+	 *
 	 * Escapes html tags
-	 * 
+	 *
 	 * @param line null OK
 	 * @return escaped string or "" for null input
 	 */
@@ -680,7 +680,7 @@ public class WebMail extends HttpServlet
 	//// Start state change and button processing here ////
 
 	/**
-	 * 
+	 *
 	 * @param sessionObject
 	 * @param request
 	 * @return new state, or null if unknown
@@ -706,7 +706,7 @@ public class WebMail extends HttpServlet
 			 */
 			boolean offline = buttonPressed(request, OFFLINE);
 			if (buttonPressed(request, LOGIN) || offline) {
-				
+
 				if( user == null || user.length() == 0 ) {
 					sessionObject.error += _t("Need username for authentication.") + '\n';
 					doContinue = false;
@@ -951,7 +951,7 @@ public class WebMail extends HttpServlet
 
 
 	/**
-	 * 
+	 *
 	 * @param sessionObject
 	 * @param request
 	 * @return new state, or null if unknown
@@ -992,7 +992,7 @@ public class WebMail extends HttpServlet
 	/**
 	 * Process all buttons, which possibly change internal state.
 	 * Also processes ?show=x for a GET
-	 * 
+	 *
 	 * @param sessionObject
 	 * @param request
 	 * @param isPOST disallow button pushes if false
@@ -1118,11 +1118,11 @@ public class WebMail extends HttpServlet
 			if( isPOST && buttonPressed( request, NEW ) ) {
 				state = State.NEW;
 			}
-			
+
 			boolean reply = false;
 			boolean replyAll = false;
 			boolean forward = false;
-			
+
 			if (buttonPressed(request, REPLY)) {
 				reply = true;
 			} else if (buttonPressed(request, REPLYALL)) {
@@ -1148,7 +1148,7 @@ public class WebMail extends HttpServlet
 				} else {
 					uidl = Base64.decodeToString(request.getParameter(B64UIDL));
 				}
-				
+
 				if( uidl != null ) {
 					MailCache mc = getCurrentMailCache(sessionObject, request);
 					Mail mail = (mc != null) ? mc.getMail(uidl, MailCache.FetchMode.ALL) : null;
@@ -1259,7 +1259,7 @@ public class WebMail extends HttpServlet
 								sender = Mail.getAddress( mail.reply );
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
 								sender = Mail.getAddress( mail.sender );
-							
+
 							PrintWriter pw = new PrintWriter( text );
 							pw.println();
 							pw.println();
@@ -1489,7 +1489,7 @@ public class WebMail extends HttpServlet
 						}
 					}
 				} catch (NumberFormatException nfe) {}
-			}			
+			}
 			// Save the draft or else the attachment comes back
 			if (deleted) {
 				String uidl = Base64.decodeToString(request.getParameter(NEW_UIDL));
@@ -1522,7 +1522,7 @@ public class WebMail extends HttpServlet
 			String uidl = Base64.decodeToString(b64UIDL);
 			return uidl;
 		}
-		
+
 		if (buttonPressed(request, DELETE)) {
 			MailCache mc = getCurrentMailCache(sessionObject, request);
 			if (mc != null && mc.getFolderName().equals(DIR_TRASH)) {
@@ -1562,7 +1562,7 @@ public class WebMail extends HttpServlet
 			sessionObject.error += "Failed move to " + to + '\n';
 		}
 		return showUIDL;
-	}		
+	}
 
 	/**
 	 * process download link in message view
@@ -1578,7 +1578,7 @@ public class WebMail extends HttpServlet
 		if (str == null) {
 			str = request.getParameter(RAW_ATTACHMENT);
 			isRaw = true;
-		}       	
+		}
 		if( str != null ) {
 			try {
 				int id = Integer.parseInt( str );
@@ -1637,10 +1637,10 @@ public class WebMail extends HttpServlet
 	{
 		if( part == null )
 			return null;
-		
+
 		if (part.getID() == id)
 			return part;
-		
+
 		if( part.multipart || part.message ) {
 			for( MailPart p : part.parts ) {
 				MailPart subPart = getMailPartFromID(p, id);
@@ -1742,7 +1742,7 @@ public class WebMail extends HttpServlet
 		} else if (buttonPressed(request, CLEAR)) {
 			sessionObject.reallyDelete = false;
 		}
-		
+
 		sessionObject.markAll = buttonPressed( request, MARKALL );
 		sessionObject.clear = buttonPressed( request, CLEAR );
 		sessionObject.invert = buttonPressed( request, INVERT );
@@ -1963,7 +1963,7 @@ public class WebMail extends HttpServlet
 
 	/**
 	 * The entry point for all web page loads
-	 * 
+	 *
 	 * @param httpRequest
 	 * @param response
 	 * @param isPOST disallow button pushes if false
@@ -2014,22 +2014,22 @@ public class WebMail extends HttpServlet
 		response.setHeader("Referrer-Policy", "no-referrer");
 		response.setHeader("Accept-Ranges", "none");
 		RequestWrapper request = new RequestWrapper( httpRequest );
-		
+
 		SessionObject sessionObject = null;
-		
+
 		String subtitle = "";
-		
+
 		HttpSession httpSession = request.getSession( true );
-		
+
 		sessionObject = getSessionObject( httpSession );
 
 		synchronized( sessionObject ) {
-			
+
 			sessionObject.pageChanged = false;
 			sessionObject.themePath = "/themes/susimail/" + theme + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			sessionObject.isMobile = isMobile;
-			
+
 			if (isPOST) {
 				// TODO not perfect, but only clear on POST so they survive a P-R-G
 				sessionObject.error = "";
@@ -2064,7 +2064,7 @@ public class WebMail extends HttpServlet
 				// This must be called to add the attachment before
 				// processStateChangeButtons() sends the message
 				state = processComposeButtons(sessionObject, request);
-			}		
+			}
 			state = processStateChangeButtons(sessionObject, request, isPOST, state);
 			state = processConfigButtons(sessionObject, request, isPOST, state);
 			if (_log.shouldDebug()) _log.debug("Prelim. state is " + state);
@@ -2102,12 +2102,12 @@ public class WebMail extends HttpServlet
 			//	int newIdle = httpSession.getMaxInactiveInterval();
 			//	if (_log.shouldDebug()) _log.debug("Changed idle from " + oldIdle + " to " + newIdle);
 			//}
-			
+
 			if( state != State.AUTH ) {
 				if (isPOST)
 				       state = processGenericButtons(sessionObject, request, state);
 			}
-			
+
 			if( state == State.LIST ) {
 				if (isPOST) {
 					int page = 1;
@@ -2287,7 +2287,7 @@ public class WebMail extends HttpServlet
 			//// Begin output
 
 				PrintWriter out = response.getWriter();
-				
+
 				/*
 				 * build subtitle
 				 */
@@ -2439,20 +2439,20 @@ public class WebMail extends HttpServlet
 
 				else if (state == State.LOADING)
 					showLoading(out, sessionObject, request);
-				
+
 				else if( state == State.LIST )
 					showFolder( out, sessionObject, mc, request );
-				
+
 				else if( state == State.SHOW )
 					showMessage(out, sessionObject, mc, showUIDL, buttonPressed(request, DELETE));
-				
+
 				else if( state == State.NEW )
 					showCompose( out, sessionObject, request );
-				
+
 				else if( state == State.CONFIG )
 					showConfig(out, folder);
-				
-				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
+
+				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");
 				out.println( "</form><div class=\"footer\"><p class=\"footer\">susimail &copy; 2004-2005 susi</p></div></div></body>\n</html>");
 				out.flush();
 		}  // synch sessionObject
@@ -2641,12 +2641,12 @@ public class WebMail extends HttpServlet
 		ArrayList<String> toList = new ArrayList<String>();
 		ArrayList<String> ccList = new ArrayList<String>();
 		ArrayList<String> bccList = new ArrayList<String>();
-		
+
 		// no validation
 		Mail.getRecipientsFromList( toList, to, ok );
 		Mail.getRecipientsFromList( ccList, cc, ok );
 		Mail.getRecipientsFromList( bccList, bcc, ok );
-		
+
 		Encoding qp = EncodingFactory.getEncoding( "quoted-printable" );
 		Encoding hl = EncodingFactory.getEncoding( "HEADERLINE" );
 
@@ -2691,9 +2691,9 @@ public class WebMail extends HttpServlet
 				sessionObject.error += e.getMessage() + '\n';
 				if (log.shouldDebug()) log.debug("Draft body", e);
 			}
-		}			
-		return ok ? body : null;	
-	}			
+		}
+		return ok ? body : null;
+	}
 
 	/**
 	 * Write out the draft.
@@ -2740,7 +2740,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static boolean sendMail(SessionObject sessionObject, Draft draft) {
 		boolean ok = true;
-		
+
 		String from = draft.sender;
 		String[] to = draft.to;
 		String[] cc = draft.cc;
@@ -2752,9 +2752,9 @@ public class WebMail extends HttpServlet
 		ArrayList<String> ccList = new ArrayList<String>();
 		ArrayList<String> bccList = new ArrayList<String>();
 		ArrayList<String> recipients = new ArrayList<String>();
-		
+
 		String sender = null;
-		
+
 		if( from == null || !Mail.validateAddress( from ) ) {
 			ok = false;
 			sessionObject.error += _t("Found no valid sender address.") + '\n';
@@ -2766,7 +2766,7 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _t("Found no valid address in \\''{0}\\''.", quoteHTML( from )) + '\n';
 			}
 		}
-		
+
 		ok = Mail.getRecipientsFromList( toList, to, ok );
 		ok = Mail.getRecipientsFromList( ccList, cc, ok );
 		ok = Mail.getRecipientsFromList( bccList, bcc, ok );
@@ -2774,7 +2774,7 @@ public class WebMail extends HttpServlet
 		recipients.addAll( toList );
 		recipients.addAll( ccList );
 		recipients.addAll( bccList );
-		
+
 		if( toList.isEmpty() ) {
 			ok = false;
 			sessionObject.error += _t("No recipients found.") + '\n';
@@ -2921,17 +2921,17 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	public void doGet( HttpServletRequest request, HttpServletResponse response )
 	throws IOException, ServletException
 	{
-		processRequest( request, response, false );		
+		processRequest( request, response, false );
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	public void doPost( HttpServletRequest request, HttpServletResponse response )
@@ -2957,7 +2957,7 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
-	 * 
+	 *
 	 * @param out
 	 * @param sessionObject
 	 * @param request
@@ -3029,7 +3029,7 @@ public class WebMail extends HttpServlet
 			}
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
-		
+
 		if (from.length() <= 0 || !fixed) {
 			String user = sessionObject.user;
 			String name = Config.getProperty(CONFIG_SENDER_NAME);
@@ -3051,7 +3051,7 @@ public class WebMail extends HttpServlet
 				from += '<' + user + '@' + domain + '>';
 			}
 		}
-		
+
 		out.println( "<div id=\"composemail\"><table id=\"newmail\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("From") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + quoteHTML(from) + "\" " + ( fixed ? "disabled" : "" ) +"></td></tr>\n" +
@@ -3062,7 +3062,7 @@ public class WebMail extends HttpServlet
 				"<tr><td></td><td align=\"left\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea></td></tr>" +
 				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr class=\"bottombuttons\"><td align=\"right\">" + _t("Add Attachment") + ":</td><td id=\"addattach\" align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\">&nbsp;" + button(NEW_UPLOAD, _t("Add Attachment")) + "</td></tr>");
-		
+
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
 			for( Attachment attachment : sessionObject.attachments ) {
@@ -3083,7 +3083,7 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
-	 * 
+	 *
 	 * @param out
 	 */
 	private static void showLogin( PrintWriter out )
@@ -3092,19 +3092,12 @@ public class WebMail extends HttpServlet
 		String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
 		String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
 		String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
-		
+
 		out.println( "<div id=\"dologin\"><h1>" + _t("Email Login") + "</h1><table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
 			"<tr><td align=\"right\" width=\"30%\">" + _t("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
 		// which is better?
-		//if (!fixed) {
-		if (true) {
-		    out.println(
-			"<tr><td align=\"right\" width=\"30%\">" + _t("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + quoteHTML(host) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _t("POP3 Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + POP3 +"\" value=\"" + quoteHTML(pop3) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _t("SMTP Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + SMTP +"\" value=\"" + quoteHTML(smtp) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
-		}
 		out.println(
 			"<tr><td colspan=\"2\"><hr></td></tr>\n" +
 			"<tr><td colspan=\"2\" align=\"center\">" + button( LOGIN, _t("Login") ) + spacer +
@@ -3114,7 +3107,7 @@ public class WebMail extends HttpServlet
 			 spacer +
 			 button(CONFIGURE, _t("Settings")) +
 			"</td></tr>\n" +
-			"<tr><td align=\"center\" colspan=\"2\"><hr><a href=\"http://hq.postman.i2p/?page_id=14\" target=\"_blank\">" + _t("Learn about I2P mail") + "</a> | <a href=\"http://hq.postman.i2p/?page_id=16\" target=\"_blank\">" + _t("Create Account") + "</a></td></tr>\n" +
+			"<tr><td align=\"center\" colspan=\"2\"><hr><a class=\"mailhelp\" href=\"http://hq.postman.i2p/?page_id=14\" target=\"_blank\">" + _t("Learn about I2P mail") + "</a> | <a class=\"mailcreate\" href=\"http://hq.postman.i2p/?page_id=16\" target=\"_blank\">" + _t("Create Account") + "</a></td></tr>\n" +
 			"</table></div>");
 	}
 
@@ -3131,7 +3124,7 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
-	 * 
+	 *
 	 * @param out
 	 * @param sessionObject
 	 * @param request
@@ -3206,13 +3199,13 @@ public class WebMail extends HttpServlet
 			String loc = myself + '?' + (folderName.equals(DIR_DRAFTS) ? NEW_UIDL : SHOW) + '=' + b64UIDL + floc;
 			String link = "<a href=\"" + loc + "\" class=\"" + type + "\">";
 			String jslink = " onclick=\"document.location='" + loc + "';\" ";
-			
+
 			boolean idChecked = false;
 			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + b64UIDL );
-			
+
 			if( checkId != null && checkId.equals("1"))
 				idChecked = true;
-			
+
 			if( sessionObject.markAll )
 				idChecked = true;
 			if( sessionObject.invert )
@@ -3228,7 +3221,7 @@ public class WebMail extends HttpServlet
 			if (subj.length() <= 0)
 				subj = "<i>" + _t("no subject") + "</i>";
 			out.println( "<tr class=\"list" + bg + "\">" +
-					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" + 
+					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" +
 					" onclick=\"deleteboxclicked();\" " +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
 					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _t("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">");
@@ -3289,7 +3282,7 @@ public class WebMail extends HttpServlet
 					button( MARKALL, _t("Mark All") ) +
 					"&nbsp;" +
 					button( CLEAR, _t("Clear All") ));
-					//"<br>" + 
+					//"<br>" +
 					//button( INVERT, _t("Invert Selection") ) +
 					//"<br>");
 			}
@@ -3374,7 +3367,7 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
-	 * 
+	 *
 	 * @param out
 	 * @param sessionObject
 	 * @param reallyDelete was the delete button pushed, if so, show the really delete? message
@@ -3532,7 +3525,7 @@ public class WebMail extends HttpServlet
 		out.println(
 			_t("Folder Page Size") + ":</b>&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE +
 			"\" size=\"4\" value=\"" +  sz + "\">" +
-			"&nbsp;" + 
+			"&nbsp;" +
 			button( SETPAGESIZE, _t("Set") ) );
 		out.println("</div>");
 		out.println("<h3 id=\"config\">");
@@ -3572,7 +3565,7 @@ public class WebMail extends HttpServlet
 	private static String _t(String s, Object o, Object o2) {
 		return Messages.getString(s, o, o2);
 	}
-	
+
 	/** translate */
     private static String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p);

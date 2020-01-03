@@ -254,8 +254,14 @@ public class HomeHelper extends HelperBase {
                         continue;
                 }
             }
-            buf.append("\n<div class=\"app\">\n" +
-                       "<div class=\"appimg\">" +
+            // If an image isn't in a /themes or /images directory, it comes from a plugin.
+            // tag it thus.
+            String plugin = "";
+            if (!app.icon.startsWith("/themes") && !app.icon.startsWith("/images")) {
+                plugin = " plugin";
+            }
+            buf.append("\n<div class=\"app" + plugin + "\">\n" +
+                       "<div class=\"appimg" + plugin + "\">" +
                        // usability: add tabindex -1 so we avoid 2 tabs per app
                        "<a href=\"").append(url).append("\" tabindex=\"-1\">" +
                        "<img alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon)

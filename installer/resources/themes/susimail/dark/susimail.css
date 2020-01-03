@@ -7,8 +7,7 @@ html {
 }
 
 body {
-     background: url(/themes/console/dark/images/camotile2.png) top left fixed #000;
-     background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(/themes/console/dark/images/camotile2.png) top left scroll #000;
+     background: #1F1A24;
      background-size: 100% 100%, 175px 175px !important;
      color: #ee9;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
@@ -24,7 +23,6 @@ body {
 }
 
 body.iframed {
-     background: transparent !important;
      margin: 0;
      padding-top: 0;
 }
@@ -143,19 +141,11 @@ p.mailbody, textarea {
 div.topbuttons {
      padding: 8px 0 !important;
      font-weight: bold;
-     border: 1px solid #494;
-     border-bottom: 0 solid;
      border-radius: 2px 2px 0 0;
      margin-bottom: -4px;
      margin-top: -1px;
      margin: -1px -1px -4px -1px;
      border-bottom: 1px solid #494;
-     box-shadow: inset 0 0 0 1px #000;
-     background: #000;
-     background: linear-gradient(to bottom, #002000 0%, #000 100%);
-     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #002000, #000 75%) !important;
-     background: repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.5) 2px, rgba(0,64,0,0.5) 4px), linear-gradient(to bottom, rgba(0,32,0,0.5), rgba(0,0,0,0.8)), url(/themes/console/dark/images/camotile2.png) top left !important;
-     box-shadow: inset 0 0 0 2px #000;
 }
 
 .iframed .topbuttons {
@@ -201,7 +191,7 @@ table#mailbox {
 }
 
 #mailbox tr:nth-child(2) {
-     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%) !important;
+     /*background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%) !important;*/
 }
 
 #mailbox th {
@@ -244,21 +234,13 @@ table#mailbox td[colspan="5"], table#mailbox td[colspan="4"] {
 table#mailbox td[colspan="5"] {
      border-bottom: none;
      padding: 9px 6px 6px !important;
+     background: #1F1A24;
 }
 
 table#mailbox td[colspan="4"] {
      padding: 9px 6px 6px !important;
      border-bottom: none;
      background: none;
-}
-
-.bottombuttons, #prefsave {
-     box-shadow: inset 0 0 0 2px #000 !important;
-     background: repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, rgba(0,24,0,0.4), #000 75%), url(/themes/console/dark/images/camotile2.png) !important;
-}
-
-.iframed .bottombuttons {
-     background: linear-gradient(to bottom, rgba(0,24,0,0.4) 25%, #000), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), url(/themes/console/dark/images/camotile2.png) !important;
 }
 
 #composemail .bottombuttons {
@@ -325,7 +307,7 @@ tr.bottombuttons:last-child td {
 }
 
 a:link {
-     color: #5a5;
+     color: #e6e6e7;
      text-decoration: none;
      font-weight: bold;
 }
@@ -344,7 +326,7 @@ a:active, a:visited:active, tr:hover td[onclick]:active a {
 }
 
 td {
-     color: #ee9;
+     color: #e6e6e7;
      margin: 0 5px;
      font-size: 9pt;
      padding: 2px;
@@ -457,6 +439,7 @@ table.noborder {
 
 td:first-child {
      font-weight: bold;
+     background: #332940;
 }
 
 pre {
@@ -466,7 +449,7 @@ pre {
 }
 
 .page {
-     color: #ee9;
+     color: #e6e6e7;
      margin: 0;
      padding: 0;
      font-size: 9pt !important;
@@ -497,8 +480,6 @@ form {
      line-height: 160%;
      border-radius: 2px;
      padding-bottom: 0;
-     border: 1px solid #494;
-     background: #000;
 }
 
 
@@ -627,9 +608,9 @@ input[type=submit], input.cancel {
 }
 
 input[type=submit]:hover, input.cancel:hover, input[type=submit]:focus, input.cancel:focus {
-     color: #f60;
-     background: #000;
-     border: 1px solid #f60;
+     color: #e6e6e7;
+     background: #332940;
+     border: 1px solid #da736b;
      box-shadow: inset 0 1px 1px 0 #ee9 ;
 }
 
@@ -714,11 +695,10 @@ input.delete {
 
 
 input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix for oversaturated colors */
-     border: 1px solid #8b8;
-     border-bottom: 1px solid #171;
-     border-right: 1px solid #171;
-     background: linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%);
-     color: #494;
+     border: 1px solid #292929;
+     background: #1F1A24;
+     color: #e6e6e7;
+     border-radius: 12px;
 }
 
 .page td[colspan="2"] {
@@ -738,16 +718,13 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
 }
 
 #dologin {
-     border: 1px solid #494;
      margin: 20px auto;
      width: 600px;
      padding: 0 0 10px;
-     border-radius: 2px;
-     box-shadow: inset 0 0 0 1px #000, inset 0 0 2px 1px #020;
      background: #001000;
      background: linear-gradient(to bottom, #000 0%, #010 50%);
      background: repeating-linear-gradient(135deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), linear-gradient(to bottom, #030 0%, #020);
-     background: linear-gradient(to bottom, #000 0%, #001000 90%);
+     background: #1F1A24;
      background-blend-mode: normal, darken, darken, normal;
      background-blend-mode: difference, normal;
 
@@ -758,7 +735,6 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
 }
 
 #dologin h1 {
-     border: 1px solid #494;
      padding: 10px 10px 10px 48px;
      margin: -1px -1px 15px -1px;
      border-radius: 2px 2px 0 0;
@@ -766,11 +742,9 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      font-size: 14pt;
      letter-spacing:0.08em;
      word-spacing: 0.1em;
-     text-align:left;
-     background: #002000 url(images/mail.png) 8px center no-repeat;
-     background: url(images/mail.png) 8px center no-repeat, linear-gradient(to bottom, rgba(0,48,0,0.5) 50%, rgba(0,0,0,0.7) 50%), url(/themes/console/dark/images/camotile2.png);
+     text-align: center;
+     background: url(images/mail.png) 8px center no-repeat, #1F1A24;
      text-shadow: 0 1px 1px #000;
-     box-shadow: inset 0 0 0 1px #000;
 }
 
 #dologin table {
@@ -778,6 +752,7 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      margin-bottom: -9px;
      border-collapse: collapse;
      border-spacing: 0 !important;
+     background: #1F1A24;
 }
 
 #dologin td {
@@ -792,6 +767,7 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
 #dologin td:last-child {
      width: 71%;
      white-space: nowrap;
+     background: #1F1A24;
 }
 
 #dologin td[colspan="2"] {
@@ -821,13 +797,15 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      padding: 3px 10px;
      border: 1px solid #010;
      border-radius: 25px;
-     background: #020;
+     background: #1F1A24;
      box-shadow: 0 0 1px rgba(0,0,0,0);
+     background: url(images/help.png) 8px center no-repeat, #1F1A24 !important;
+     padding-left: 30px !important;
 }
 
 #dologin tr:last-child a:hover {
-     background: #030;
-     background: linear-gradient(to bottom, #030 50%, #000 50%) #000;
+     background: #332940;
+     /*background: linear-gradient(to bottom, #030 50%, #000 50%) #000;*/
      box-shadow: 0 0 1px #000;
      transition: ease all 0.2s;
 }
@@ -959,8 +937,9 @@ table#pagenav td {
      word-spacing: 0.1em;
      padding: 5px;
      text-align: center;
-     color: #bb7;
+     color: #e6e6e7;
      text-shadow: 0 1px 1px #000;
+     background: #1F1A24;
 }
 
 table#pagenav td:first-child {
@@ -1139,6 +1118,31 @@ input.switchto:focus {
      background: #000 url(/themes/susimail/images/folder-open.png) center center no-repeat !important;
      background-size: 12px 12px !important;
      border: 1px solid #f60;
+}
+
+input.login {
+    background: url(images/login.png) 8px center no-repeat, #1F1A24 !important;
+    padding-left: 18px !important;
+}
+
+input.offline {
+    background: url(images/offline.png) 8px center no-repeat, #1F1A24 !important;
+    padding-left: 30px !important;
+}
+
+input.configure {
+    background: url(images/settings.png) 8px center no-repeat, #1F1A24 !important;
+    padding-left: 30px !important;
+}
+
+a.mailhelp {
+    background: url(images/help.png) 8px center no-repeat, #1F1A24 !important;
+    padding-left: 30px !important;
+}
+
+a.mailcreate {
+    background: url(images/account.png) 8px center no-repeat, #1F1A24 !important;
+    padding-left: 30px !important;
 }
 
 select {

@@ -4,9 +4,9 @@
 body {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
      line-height: 120%;
-     background: #000;
-     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.45)), url(/themes/console/dark/images/camotile2.png) top left fixed;
-     color: #ee9;
+     background: #1F1A24;
+     /*background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.45)), url(/themes/console/dark/images/camotile2.png) top left fixed;*/
+     color: #e6e6e7;
      padding-top: 5px;
      margin: 0 10px;
      min-width: 650px;
@@ -15,7 +15,6 @@ body {
 body.iframed {
 /*     background: transparent !important;*/
      margin: 0;
-     background: transparent !important;
 }
 
 ::selection {
@@ -38,7 +37,7 @@ body.iframed {
 }
 
 .page {
-     color:#ee9;
+     color:#e6e6e7;
      margin: 10px 0;
      padding: 0 5px;
      font-size: 9pt !important;
@@ -67,11 +66,12 @@ body.iframed {
      top: -1px;
      z-index: 999;
      text-align: center;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      border-radius: 0 1px 2px 2px;
      box-shadow: inset 0 0 0 1px #000, 0 2px 2px 2px rgba(0,0,0,0.7);
-     background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center !important;
-     background: repeating-linear-gradient(135deg, #000 1px, #000 2px, #010 2px, #010 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, #010 2px, #010 4px), linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;
+     background: #1F1A24 !important;
+     /*url(/themes/console/dark/images/header.png) repeat-x scroll center center !important;*/
+     /*background: repeating-linear-gradient(135deg, #000 1px, #000 2px, #010 2px, #010 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, #010 2px, #010 4px), linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;*/
      background-blend-mode: exclusion, exclusion, normal, normal;
 }
 
@@ -84,7 +84,8 @@ body.iframed {
      border-left: none;
      border-radius: 0;
      box-shadow: inset 0 0 0 1px #000;
-     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;
+     /*background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;*/
+     background: #1F1A24;
      background-blend-mode: exclusion, normal;
 }
 
@@ -92,17 +93,9 @@ body.iframed {
      text-transform: capitalize;
 }
 
-#navi a:first-child {
-     border-radius: 4px 0 0 4px;
-}
-
-#navi a:last-child {
-     border-radius: 0 4px 4px 0;
-}
-
 #navi a, #navi a:visited {
      color: #494 !important;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      display: inline-block;
      margin: 1px -2px;
      box-shadow: inset 0 0 0 1px #000, 0 0 0 1px #000;
@@ -110,52 +103,53 @@ body.iframed {
      padding: 2px 6px 3px 24px;
      position: relative;
      text-shadow: 0 1px 1px #000;
+     border-radius: 12px;
 }
 
 #navi a:hover, #navi a:focus  {
-    border: 1px solid #f60;
-    color: #f60 !important;
+    border: 1px solid #da736b;
+    color: #da736b !important;
     background: #000;
     z-index: 10;
 }
 
 #navi a:active {
-    border: 1px solid #f60;
+    border: 1px solid #da736b;
     box-shadow: inset 3px 3px 3px #000;
     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000;
-    color: #ee9 !important;
+    color: #e6e6e7 !important;
     background-blend-mode: luminosity;
 }
 
 #navi a.abook {
-     background: #000 url(/themes/susidns/images/abook.png) 5px center no-repeat;
-     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
+     background: #332940 url(/themes/susidns/images/abook.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, #332940;
 }
 
 #navi a.abook:hover, #navi a.abook:focus {
-     background: #000 url(/themes/susidns/images/abook.png) 5px center no-repeat !important;
+     background: #332940 url(/themes/susidns/images/abook.png) 5px center no-repeat !important;
 }
 
 #navi a.abook:active {
-     background: #f60 url(/themes/susidns/images/abook.png) 5px center no-repeat !important;
+     background: #da736b url(/themes/susidns/images/abook.png) 5px center no-repeat !important;
 }
 
 #navi a#subs {
-     background: #000 url(/themes/susidns/images/subs.png) 5px center no-repeat;
-     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
+     background: #332940 url(/themes/susidns/images/subs.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, #1F1A24;
 }
 
 #navi a#subs:hover, #navi a#subs:focus {
-     background: #000 url(/themes/susidns/images/subs.png) 5px center no-repeat !important;
+     background: #332940 url(/themes/susidns/images/subs.png) 5px center no-repeat !important;
 }
 
 #navi a#subs:active {
-     background: #f60 url(/themes/susidns/images/subs.png) 5px center no-repeat !important;
+     background: #da736b url(/themes/susidns/images/subs.png) 5px center no-repeat !important;
 }
 
 #navi a#config {
      background: #000 url(/themes/console/images/buttons/configure.png) 5px center no-repeat;
-     background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
+     background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, #1F1A24;
 }
 
 #navi a#config:hover, #navi a#config:focus {
@@ -163,20 +157,20 @@ body.iframed {
 }
 
 #navi a#config:active {
-     background: #f60 url(/themes/console/images/buttons/configure.png) 5px center no-repeat !important;
+     background: #da736b url(/themes/console/images/buttons/configure.png) 5px center no-repeat !important;
 }
 
 #navi a#overview {
-     background: #000 url(/themes/susidns/images/overview.png) 5px center no-repeat;
-     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
+     background: #1F1A24 url(/themes/susidns/images/overview.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, #1F1A24;
 }
 
 #navi a#overview:hover, #navi a#overview:focus {
-     background: #000 url(/themes/susidns/images/overview.png) 5px center no-repeat !important;
+     background: #1F1A24 url(/themes/susidns/images/overview.png) 5px center no-repeat !important;
 }
 
 #navi a#overview:active {
-     background: #f60 url(/themes/susidns/images/overview.png) 5px center no-repeat !important;
+     background: #1F1A24 url(/themes/susidns/images/overview.png) 5px center no-repeat !important;
 }
 
 /* end topnav */
@@ -193,14 +187,14 @@ hr {
 }
 
 div#filter {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 0 5px 15px;
      text-align: center;
-     background: #001000;
+     background: #332940;
 }
 
 div#filter + div#search {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      margin: -1px 0 14px !important;
 }
 
@@ -243,13 +237,13 @@ div#filter + div#search > form {
 }
 
 #filter a {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      margin: 1px 0 3px;
      padding: 1px 8px;
      min-width: 12px;
      border-radius: 2px;
-     background: #000;
-     background: linear-gradient(to bottom, #010 0%, #000 100%);
+     background: #1F1A24;
+     /*background: linear-gradient(to bottom, #010 0%, #000 100%);*/
      font-size: 10pt;
      text-transform: uppercase;
      white-space: nowrap;
@@ -259,8 +253,8 @@ div#filter + div#search > form {
 
 #filter a:hover {
      text-decoration: none;
-     color: #f60;
-     border: 1px solid #f60;
+     color: #da736b;
+     border: 1px solid #da736b;
      border-radius: 2px;
      background: #020;
 }
@@ -271,7 +265,7 @@ div#filter + div#search > form {
 
 #filter span {
      display: inline-block;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      min-width: 300px;
      white-space: nowrap;
      margin-top: -1px;
@@ -279,7 +273,7 @@ div#filter + div#search > form {
      font-size: 10pt;
      font-weight: bold;
      text-transform: capitalize;
-     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background-image: linear-gradient(to bottom, #1F1A24 0%, #332940 50%, #332940 51%, #332940 100%) !important;
 }
 
 #filter span a, #filter span a:hover {
@@ -300,7 +294,7 @@ div#filter + div#search > form {
 }
 
 p {
-     color:#ee9;
+     color:#e6e6e7;
      margin: 0 0 4px;
      font-size: 9pt;
      text-align: justify;
@@ -311,14 +305,15 @@ span.addrhlpr {
 }
 
 h3 {
-     color: #ee9;
+     color: #e6e6e7;
      font-size: 10pt;
      font-weight: bold;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 7px 10px;
-     background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center;
+     /*background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center;
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
-     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
+     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);*/
+     background: #1F1A24;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      text-shadow: 0 0 2px #001100;
@@ -369,7 +364,7 @@ div#messages {
      margin: -16px 0 25px !important;
      background: #020;
      z-index: 999;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      box-shadow: inset 0 0 0 1px #000;
      line-height: 120%;
 }
@@ -377,14 +372,14 @@ div#messages {
 #messages p {
      padding: 15px 15px 15px 40px !important;
      background: url(/themes/console/dark/images/infohelp.png) 6px center no-repeat;
-     color: #ee9;
+     color: #e6e6e7;
      padding: 5px 5px 10px;
      margin: 0;
      border-radius: 0;
 }
 
 #messages + p, p.book {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      background: #000 url(/themes/susidns/images/addressbook.png) 10px center no-repeat;
      padding: 20px 20px 20px 50px !important;
 }
@@ -426,14 +421,18 @@ h4 {
      font-size: 9pt;
      margin-top: -15px;
      word-spacing: 0.1em;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 8px 10px 8px 35px;
      margin-bottom: 30px !important;
-     background: url(/themes/susidns/images/drive.png) 9px center no-repeat #000 !important;
+     background: url(/themes/susidns/images/drive.png) 9px center no-repeat #332940 !important;
+}
+
+a {
+    color: e6e6e7;
 }
 
 a:link, #filter a:visited {
-     color: #494;
+     color: #e6e6e7;
      text-decoration: none;
      font-weight: bold;
      outline: none;
@@ -441,7 +440,7 @@ a:link, #filter a:visited {
 
 a:hover, a:focus {
      text-decoration: none;
-     color: #f60 !important;
+     color: #da736b !important;
 }
 
 a:visited {
@@ -450,18 +449,18 @@ a:visited {
 }
 
 a:active {
-     color: #f90 !important;
+     color: #da736b !important;
 }
 
 th {
-     color: #ee9;
+     color: #e6e6e7;
      font-size: 9pt;
      padding: 5px 10px;
      text-align: left;
 }
 
 td {
-     color: #ee9;
+     color: #e6e6e7;
      padding: 5px;
      font-size: 9pt;
      vertical-align: middle;
@@ -480,7 +479,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
-     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #f60);
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #da736b);
 }
 
 .iframed #visualid {
@@ -497,7 +496,7 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
 
 #visualid table {
      width: 100%;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      border-collapse: collapse;
      background: #000900;
 }
@@ -516,7 +515,7 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
 
 #visualid td[colspan="2"] {
      padding: 15px 3px;
-     border-top: 1px solid #2a5f29;
+     border-top: 1px solid #292929;
 }
 
 #visualid tr:last-child {
@@ -531,7 +530,7 @@ td > img[width="320"], td > img[src^="/imagegen"] {
      border-radius: 4px;
      width: 240px;
      height: 240px;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 5px;
      margin: 10px 3px;
      background: #000;
@@ -547,7 +546,7 @@ ol, ul {
 }
 
 li {
-     color: #ee9;
+     color: #e6e6e7;
      margin: 0;
      font-size: 9pt;
      list-style: square;
@@ -555,15 +554,15 @@ li {
 }
 
 tr.list1 {
-     background-color: #000900;
+     background-color: #332940;
 }
 
 tr.list0 {
-     background-color: #001000;
+     background-color: #1F1A24;
 }
 
 .help {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 20px 30px;
 }
 
@@ -581,7 +580,7 @@ tr.list0 {
 
 #helpsubs {
      padding: 0 0 0 40px;
-     background: #000 url(/themes/console/dark/images/infohelp.png) 15px center no-repeat !important;
+     background: #332940 url(/themes/console/dark/images/infohelp.png) 15px center no-repeat !important;
 }
 
 #helpsubs p {
@@ -591,7 +590,7 @@ tr.list0 {
 }
 
 #helpconfig {
-     background: #000;
+     background: #332940;
 }
 
 #helpconfig ul {
@@ -635,14 +634,14 @@ p.buttons, #buttons {
 }
 
 div#book + div#buttons {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 0 0 10px;
      margin-top: 3px;
-     background: #000;
+     background: #1F1A24;
 }
 
 form[action="export"] > div#buttons {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 0 0 10px;
      margin-top: 15px;
      background: #000;
@@ -660,11 +659,11 @@ textarea[name="config"] {
 }
 
 div#config + div#buttons, div#content + div#buttons {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      margin-top: -3px;
      padding: 5px;
      margin-bottom: 15px;
-     background: #000;
+     background: #1F1A24;
 }
 
 div#content + div#buttons {
@@ -680,8 +679,8 @@ div#content + div#buttons {
      border: 1px solid #fff;
      font-size: 10pt;
      box-shadow: inset 0px 0px 1px 0px #020;
-     background: #fff;
-     background: rgba(255,255,255,0.3);
+     /*background: #1F1A24;*/
+     /*background: rgba(255,255,255,0.3);*/
      opacity: 0.8;
      filter: invert(1) sepia(100%) hue-rotate(30deg);
 }
@@ -708,24 +707,24 @@ div#book, #emptybook {
 
 #book table {
      width: 100%;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      border-collapse: separate;
 }
 
 #book tr.head {
-     background: url(/themes/console/dark/images/header.png) repeat-x scroll center center #000;
-     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #002000, #000 75%) !important;
+     background: #1F1A24;
+     /*background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #002000, #000 75%) !important;*/
 }
 
 #book table th {
      padding: 10px 0;
-     border-bottom: 1px solid #2a5f29;
+     border-bottom: 1px solid #292929;
 }
 
 
 #book th:last-child {
-     background: url(/themes/console/dark/images/header.png) repeat-x scroll center center #000;
-     background: url(images/bin.png) center center no-repeat !important;
+     background: #1F1A24;
+     background: url(images/bin.png) center center no-repeat #1F1A24 !important;
 }
 
 
@@ -735,17 +734,18 @@ div#book, #emptybook {
 }
 
 #book table tr:hover td {
-     background: #001a00;
-     border-bottom: 1px solid #2a5f29;
-     border-top: 1px solid #2a5f29;
+     background: #7778bf;
+     border-bottom: 1px solid #292929;
+     border-top: 1px solid #292929;
 }
 
 #book table tr:nth-child(2):hover td {
      border-top: 1px solid transparent;
+     background: #7778bf;
 }
 
 #book table tr:hover td textarea {
-     color: #ee9;
+     color: #e6e6e7;
 }
 
 #book input[type="checkbox"] {
@@ -753,10 +753,10 @@ div#book, #emptybook {
 }
 
 div#add, div#import {
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 0 0 10px;
      margin-top: 23px;
-     background: #000;
+     background: #332940;
 }
 
 #add h3, #import h3 {
@@ -785,15 +785,16 @@ div#add, div#import {
 
 #add p.buttons, #import p.buttons {
      margin-top: 5px;
-     border-top: 1px solid #2a5f29;
+     border-top: 1px solid #292929;
      padding-top: 5px;
+     background: #1F1A24;
 }
 
 input[type="submit"]:hover, input[type="reset"]:hover, input[type="submit"]:focus, input[type="reset"]:focus, .fakebutton:hover, #fakebutton:focus {
      background: #000;
-     color: #f60;
-     border: 1px solid #f60;
-     box-shadow: inset 0 1px 1px 0 #ee9;
+     color: #da736b;
+     border: 1px solid #da736b;
+     box-shadow: inset 0 1px 1px 0 #e6e6e7;
 }
 
 .fakebutton, .fakebutton:visited {
@@ -801,7 +802,7 @@ input[type="submit"]:hover, input[type="reset"]:hover, input[type="submit"]:focu
 }
 
 .fakebutton:hover, .fakebutton:focus {
-     color: #f60;
+     color: #da736b;
 }
 
 input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
@@ -815,16 +816,17 @@ input {
      text-align: left;
      padding: 5px !important;
      border-radius: 2px;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      background: #000 none !important;
      color: #494;
      margin: 2px 4px 2px 0;
      font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
      min-width: 64px !important;
+     border-radius: 12px;
 }
 
 input[type="submit"], input[type="reset"], .fakebutton {
-     color: #494;
+     color: #e6e6e7;
      background: #000;
      border: 1px outset #191;
      border-radius: 2px;
@@ -838,19 +840,20 @@ input[type="submit"], input[type="reset"], .fakebutton {
 }
 
 input[type=submit]:active, input[type=reset]:active, .fakebutton:active {
-     background: #f60 !important;
-     color: #ee9 !important;
-     border: 1px solid #f60;
+     background: #da736b !important;
+     color: #e6e6e7 !important;
+     border: 1px solid #da736b;
      filter: none;
      box-shadow: inset 3px 3px 3px #000;
      box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000;
 }
 
 input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix for oversaturated colors */
-     border: 1px solid #8b8;
-     border-bottom: 1px solid #171;
-     border-right: 1px solid #171;
-     background: linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%) !important;
+     border: 1px groove #332940;
+     border-bottom: 1px groove #292929;
+     border-right: 1px groove #292929;
+     background: #1F1A24 !important;
+     border-radius: 12px;
 }
 
 input[type="text"] {
@@ -859,14 +862,15 @@ input[type="text"] {
 
 input[type="text"], textarea {
      background: #000;
-     background: linear-gradient(to bottom, #000 0%, #010 100%) !important;
+     /*background: linear-gradient(to bottom, #000 0%, #010 100%) !important;*/
      box-shadow: inset 0 0 3px 3px #000;
      color: #bb7;
+     border-radius: 2px;
 }
 
 textarea {
      color: #bb7;
-     border: 1px solid #2a5f29;
+     border: 1px solid #292929;
      padding: 3px 5px;
      font: bold 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      border-radius: 2px;
@@ -882,7 +886,7 @@ textarea[cols="70"] {
 }
 
 input:focus, textarea:focus {
-     color: #ee9;
+     color: #e6e6e7;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s;
@@ -895,7 +899,7 @@ textarea:focus {
 }
 
 input[name="search"] {
-     background: url(/themes/console/images/buttons/search.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%) !important;
+     background: url(/themes/console/images/buttons/search.png) 5px center no-repeat, #000 !important;
      padding: 5px 5px 5px 25px !important;
 }
 
@@ -908,8 +912,7 @@ input[name="search"]:focus {
 
 .headline h3 {
      padding: 10px 5px 10px 35px;
-     background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
-     background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
+     background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat, #1F1A24;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -917,13 +920,17 @@ input[name="search"]:focus {
 }
 
 .headline#subscriptions h3 {
-     background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
-     background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
+     background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat;
+     /*linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);*/
+     background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat;
+     /*linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);*/
 }
 
 .headline#configure h3 {
-     background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
-     background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
+     background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat ;
+     /*, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);*/
+     background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat;
+     /*, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);*/
 }
 
 /* export hosts button adjustments */
@@ -951,8 +958,8 @@ p.book {
 }
 
 #messages + p, p.book {
-     border: 1px solid #2a5f29;
-     background: #000 url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
+     border: 1px solid #292929;
+     background: #332940 url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
 }
 
 /* hide export button on published addressbook if empty */
@@ -1010,7 +1017,7 @@ p.book {
 }
 
 .names img:hover, .names a:focus img {
-     border: 1px solid #f60;
+     border: 1px solid #da736b;
 }
 
 .names a:active img, .names a:focus img {
@@ -1102,7 +1109,7 @@ p.book {
 
 #host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
 #host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
-     filter: drop-shadow(0 0 1px #f60);
+     filter: drop-shadow(0 0 1px #da736b);
 }
 
 .destaddress:focus {
@@ -1160,7 +1167,7 @@ _:-ms-lang(x), * {
 }
 
 #navi a.abook:active, #navi a#overview:active, #navi a#subs:active, #navi a#config:active {
-     background: #f60 !important;
+     background: #da736b !important;
 }
 }
 
@@ -1213,7 +1220,7 @@ h3, #filter a, #filter span {
 }
 
 div#filter {
-     background: linear-gradient(to right, #000, #001000 10%, #001000 90%, #000);
+     background: #332940;
 }
 
 form[action="addressbook"] > p.buttons {
