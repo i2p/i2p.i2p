@@ -74,7 +74,7 @@ public class ConfigRestartBean {
             buf.append(_t("Shutdown in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
             int tuns = ctx.tunnelManager().getParticipatingCount();
             if (tuns > 0) {
-                buf.append("<br>").append(ngettext("Please wait for routing commitment to expire for {0} tunnel",
+                buf.append("&hellip;<br>").append(ngettext("Please wait for routing commitment to expire for {0} tunnel",
                                                 "Please wait for routing commitments to expire for {0} tunnels",
                                                 tuns, ctx));
             }
@@ -85,7 +85,7 @@ public class ConfigRestartBean {
             buf.append(_t("Restart in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
             int tuns = ctx.tunnelManager().getParticipatingCount();
             if (tuns > 0) {
-                buf.append("<br>").append(ngettext("Please wait for routing commitment to expire for {0} tunnel",
+                buf.append("&hellip;<br>").append(ngettext("Please wait for routing commitment to expire for {0} tunnel",
                                                 "Please wait for routing commitments to expire for {0} tunnels",
                                                 tuns, ctx));
             }
