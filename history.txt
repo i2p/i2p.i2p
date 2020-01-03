@@ -1,3 +1,8 @@
+2020-01-02 idk
+ * Dark Theme: Colors, borders, icons were simplified across the board
+ * Images: Checked in icons from Feather icons, which are under the MIT License
+  - https://github.com/feathericons/feather/blob/master/LICENSE
+
 2019-12-17 zzz
  * NetDB: Fixes for hidden routers losing peers (ticket #2673)
 
