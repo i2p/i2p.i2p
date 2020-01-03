@@ -4,62 +4,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <%@include file="css.jsi" %>
-<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("config stats")%>
 <noscript><style type="text/css">.script {display: none;}</style></noscript>
 <%@include file="summaryajax.jsi" %>
-<script nonce="<%=cspNonce%>" type="text/javascript">
-function init()
-{
-	checkAll = false;
-	initAjax();
-}
-function toggleAll(category)
-{
-	var inputs = document.getElementsByTagName("input");
-	for(index = 0; index < inputs.length; index++)
-	{
-		var classes = inputs[index].className.split(' ');
-		for (var idx = 0; idx < classes.length; idx++)
-		{
-			if(classes[idx] == category)
-			{
-				if(inputs[index].checked == 0)
-				{
-					inputs[index].checked = 1;
-				}
-				else if(inputs[index].checked == 1)
-				{
-					inputs[index].checked = 0;
-				}
-			}
-		}
-		if(category == '*')
-		{
-			if (checkAll == false)
-			{
-				inputs[index].checked = 1;
-			}
-			else if (checkAll == true)
-			{
-				inputs[index].checked = 0;
-			}
-		}
-	}
-	if(category == '*')
-	{
-		if (checkAll == false)
-		{
-			checkAll = true;
-		}
-		else if (checkAll == true)
-		{
-			checkAll = false;
-		}
-	}
-}
-</script>
-</head><body onLoad="init();">
+<script src="/js/configstats.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+</head><body>
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Stats Configuration")%></h1>
 <div class="main" id="config_stats">
@@ -73,9 +22,9 @@ function toggleAll(category)
  <form id="statsForm" name="statsForm" action="" method="POST">
  <input type="hidden" name="action" value="foo" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- <h3 class="ptitle"><%=intl._t("Configure I2P Stat Collection")%>&nbsp;<a class="script" title="<%=intl._t("Toggle full stat collection and all graphing options")%>" href="javascript:void(null);" onclick="toggleAll('*')">[<%=intl._t("toggle all")%>]</a></h3>
+ <h3 class="ptitle"><%=intl._t("Configure I2P Stat Collection")%>&nbsp;<a class="script" id="toggle-*" title="<%=intl._t("Toggle full stat collection and all graphing options")%>" href="#">[<%=intl._t("toggle all")%>]</a></h3>
  <p id="enablefullstats"><label><b><%=intl._t("Enable full stats?")%></b>
- <input type="checkbox" class="optbox" name="isFull" value="true" <%
+ <input type="checkbox" class="optbox" id="enableFull" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
  (<%=intl._t("change requires restart to take effect")%>)</label><br>
 <%
@@ -98,7 +47,7 @@ Warning - Log with care, stat file grows without limit.<br>
  <tr>
      <th align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
      <b><%=statshelper.getTranslatedGroupName()%></b>
-     <a class="script" title="<%=intl._t("Toggle section graphing options")%>" href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">[<%=intl._t("toggle all")%>]</a>
+     <a class="script" id="toggle-<%=statshelper.getCurrentGroupName()%>" title="<%=intl._t("Toggle section graphing options")%>" href="#">[<%=intl._t("toggle all")%>]</a>
      </th></tr>
  <tr class="tablefooter">
 <%
