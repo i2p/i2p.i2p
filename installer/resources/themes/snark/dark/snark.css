@@ -531,7 +531,7 @@ th.snarkTorrentStatus {
 
 .snarkTorrentETA, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp {
      width: 5%;
-     min-width: 40px;
+     min-width: 70px;
      white-space: nowrap;
 }
 

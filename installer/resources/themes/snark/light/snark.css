@@ -348,8 +348,8 @@ a:link {
 }
 
 a:visited {
-     color: #2c4e8f;
-     color: rgba(44, 78, 143, 0.9);
+     color: #3b6bbf;
+     color: rgba(59, 107, 191, .85);
      text-decoration: none;
 }
 
@@ -2382,7 +2382,7 @@ _:-ms-lang(x), *, *:hover, *:focus, input, input:hover, input:focus, a:hover, a:
 }
 
 .snarkTorrentETA, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp {
-     min-width: 0;
+     min-width: 70;
 }
 
 .snarkTorrents thead img {
