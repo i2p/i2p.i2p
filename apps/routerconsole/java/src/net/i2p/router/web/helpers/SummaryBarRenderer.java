@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.CoreVersion;
 import net.i2p.app.ClientAppManager;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -960,16 +961,28 @@ class SummaryBarRenderer {
     /** @since 0.9.32 */
     public String renderBandwidthGraphHTML() {
         if (_helper == null) return "";
+        if (StatSummarizer.isDisabled(_context))
+            return "";
         StringBuilder buf = new StringBuilder(512);
-        if (!StatSummarizer.isDisabled(_context)) {
-            buf.append("<div id=\"sb_graphcontainer\"><a href=\"/graphs\"><table id=\"sb_bandwidthgraph\">" +
+        buf.append("<div id=\"sb_graphcontainer\"");
+        // 15 sec js refresh
+        // only do this if the summary bar refresh is slower, otherwise it looks terrible
+        String r = _context.getProperty(CSSHelper.PROP_REFRESH, CSSHelper.DEFAULT_REFRESH);
+        int refr = 60;
+        try {
+            refr = Integer.parseInt(r);
+        } catch (NumberFormatException nfe) {}
+        if (refr >= 25) {
+            buf.append("><script src=\"/js/refreshGraph.js?").append(CoreVersion.VERSION).append("\" type=\"text/javascript\" id=\"refreshGraph\" async></script>");
+        } else {
+            buf.append(" style=\"background-image: url(/viewstat.jsp?stat=bw.combined&amp;periodCount=20&amp;width=220&amp;height=50&amp;hideLegend=true&amp;hideGrid=true&amp;time=").append(_context.clock().now() / 1000).append("\">");
+        }
+        buf.append("<a href=\"/graphs\"><table id=\"sb_bandwidthgraph\">" +
                        "<tr title=\"")
                .append(_t("Our inbound &amp; outbound traffic for the last 20 minutes"))
                .append("\"><td><span id=\"sb_graphstats\">")
                .append(_helper.getSecondKBps())
                .append("Bps</span></td></tr></table></a></div>\n");
-        }
-        buf.append("<script src=\"/js/refreshGraph.js\" type=\"text/javascript\" id=\"refreshGraph\" async></script>");
         return buf.toString();
     }
 
