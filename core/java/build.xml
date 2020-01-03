@@ -410,7 +410,6 @@
                 <fileset dir="./test/junit/">
                     <include name="**/*Test.java" />
                     <include name="**/*IT.java" if="runIntegrationTests" />
-                    <exclude name="**/ElGamalAESEngineTest.java" />
                     <exclude name="**/StructureTest.java" />
                     <exclude name="**/AbstractFieldElementTest.java" />
                     <!-- DataHelperTest is *very* slow with cobertura -->
