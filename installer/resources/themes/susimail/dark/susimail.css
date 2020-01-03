@@ -799,13 +799,11 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      border-radius: 25px;
      background: #1F1A24;
      box-shadow: 0 0 1px rgba(0,0,0,0);
-     background: url(images/help.png) 8px center no-repeat, #1F1A24 !important;
      padding-left: 30px !important;
 }
 
 #dologin tr:last-child a:hover {
      background: #332940;
-     /*background: linear-gradient(to bottom, #030 50%, #000 50%) #000;*/
      box-shadow: 0 0 1px #000;
      transition: ease all 0.2s;
 }
