@@ -907,16 +907,19 @@ div#emptymailbox {
 /* pagenav */
 
 table#pagenav {
-     width: 100%;
+     width: 30%;
      margin: 7px auto -3px;
      border-collapse: collapse;
-     border-top: 1px solid #494;
+     /*border-top: 1px solid #494;*/
      background: #000;
      background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
      background: repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,64,0,0.5) 2px, rgba(0,64,0,0.5) 4px), url(/themes/console/dark/images/camotile2.png), linear-gradient(to bottom, #001000, #000 75%) !important;
      background: none !important;
      background-blend-mode: normal, exclusion, normal;
-     filter: drop-shadow(0 -1px 2px #000);
+     /*filter: drop-shadow(0 -1px 2px #000);*/
+     position: absolute;
+     top: -5px;
+     left: 70%;
 }
 
 #pagenav tr {
@@ -1106,14 +1109,14 @@ div#prefsave {
 }
 
 input.switchto {
-     background: #000 url(/themes/susimail/images/folder.png) center center no-repeat !important;
+     background: #292929 url(images/folder.png) center center no-repeat !important;
      background-size: 12px 12px !important;
      margin: -34px 3px 5px 3px !important;
 }
 
 input.switchto:hover,
 input.switchto:focus {
-     background: #000 url(/themes/susimail/images/folder-open.png) center center no-repeat !important;
+     background: #292929 url(images/folder.png) center center no-repeat !important;
      background-size: 12px 12px !important;
      border: 1px solid #f60;
 }
@@ -1131,6 +1134,21 @@ input.offline {
 input.configure {
     background: url(images/settings.png) 8px center no-repeat, #1F1A24 !important;
     padding-left: 30px !important;
+}
+
+input.new {
+   background: url(images/edit.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.logout {
+   background: url(images/logout.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.refresh {
+   background: url(images/refresh.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
 }
 
 a.mailhelp {
