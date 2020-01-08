@@ -514,7 +514,7 @@ input[type="submit"], input[type="reset"] {
      padding: 4px 5px;
      text-decoration: none;
      text-shadow: 0 1px 1px #fff;
-     border-radius: 2px;
+     border-radius: 15px;
      opacity: 1;
      background-size: 14px auto, 100% 100% !important;
      filter: drop-shadow(0 0 1px rgba(180, 180, 255, 0.6));
@@ -678,14 +678,12 @@ input.show:hover {
 }
 
 input.markall {
-     background: #eee url(/themes/susimail/images/all.png) no-repeat 6px center;
-     background: url(/themes/susimail/images/all.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
+     background: #eee url(images/book.png) no-repeat 6px center;
      padding: 5px 7px 5px 24px;
 }
 
 input.markall:hover {
-     background: #fff url(/themes/susimail/images/all.png) no-repeat 6px center;
-     background: url(/themes/susimail/images/all.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
+     background: #fff url(images/book.png) no-repeat 6px center;
 }
 
 input.new {
