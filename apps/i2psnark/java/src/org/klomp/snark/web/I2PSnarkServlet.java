@@ -3375,9 +3375,11 @@ public class I2PSnarkServlet extends BasicServlet {
 
         List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
         // precompute remaining for all files for efficiency
-        long[] remainingArray = (storage != null) ? storage.remaining() : null;
+        long[][] arrays = (storage != null) ? storage.remaining() : null;
+        long[] remainingArray = (arrays != null) ? arrays[0] : null;
+        long[] previewArray = (arrays != null) ? arrays[1] : null;
         for (int i = 0; i < ls.length; i++) {
-            fileList.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray));
+            fileList.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray, previewArray));
         }
 
         boolean showSort = fileList.size() > 1;
@@ -3546,25 +3548,30 @@ public class I2PSnarkServlet extends BasicServlet {
             if (mime == null)
                 mime = "";
 
-            boolean isAudio = false;
-            boolean isVideo = false;
+            boolean isAudio = isAudio(mime);
+            boolean isVideo = !isAudio && isVideo(mime);
             buf.append("<td class=\"snarkFileIcon\">");
-            if (complete) {
-                isAudio = isAudio(mime);
-                isVideo = !isAudio && isVideo(mime);
+            String preview = null;
+            if (complete || (isAudio && fai.preview > 1024*100) || (isVideo && fai.preview > 1024*1024)) {
+                String ppath = complete ? path : path + "?limit=" + fai.preview;
+                if (!complete) {
+                    double pct = fai.preview / (double) fai.length;
+                    preview = "<br>" + _t("Preview") + ": " +
+                              (new DecimalFormat("0.00%")).format(pct);
+                }
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
                         buf.append("<audio");
                     else
                         buf.append("<video");
-                    buf.append(" controls><source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
+                    buf.append(" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
                 }
-                buf.append("<a href=\"").append(path).append("\">");
+                buf.append("<a href=\"").append(ppath).append("\">");
                 if (mime.startsWith("image/")) {
                     // thumbnail
                     buf.append("<img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
-                       .append(path).append("\"></a>");
+                       .append(ppath).append("\"></a>");
                 } else {
                     buf.append(toImg(icon, _t("Open"))).append("</a>");
                 }
@@ -3588,6 +3595,8 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append(DataHelper.escapeHTML(item.getName()));
             if (complete)
                 buf.append("</a>");
+            if (preview != null)
+                buf.append(preview);
             buf.append("</td><td align=right class=\"snarkFileSize\">");
             if (!item.isDirectory())
                 buf.append(formatSize(length));
@@ -3755,7 +3764,7 @@ public class I2PSnarkServlet extends BasicServlet {
             return null;
         List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
         // precompute remaining for all files for efficiency
-        long[] remainingArray = (storage != null) ? storage.remaining() : null;
+        long[] remainingArray = (storage != null) ? storage.remaining()[0] : null;
         for (int i = 0; i < ls.length; i++) {
             fileList.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray));
         }

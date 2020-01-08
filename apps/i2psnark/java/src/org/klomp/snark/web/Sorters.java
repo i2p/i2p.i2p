@@ -374,6 +374,7 @@ class Sorters {
         public final boolean isDirectory;
         public final long length;
         public final long remaining;
+        public final long preview;
         public final int priority;
         public final int index;
 
@@ -382,15 +383,25 @@ class Sorters {
          *  @param remainingArray precomputed, non-null iff storage is non-null
          */
         public FileAndIndex(File file, Storage storage, long[] remainingArray) {
+            this(file, storage, remainingArray, null);
+        }
+
+        /**
+         *  @param storage may be null
+         *  @param remainingArray precomputed, non-null iff storage is non-null
+         */
+        public FileAndIndex(File file, Storage storage, long[] remainingArray, long[] previewArray) {
             this.file = file;
             index = storage != null ? storage.indexOf(file) : -1;
             if (index >= 0) {
                 isDirectory = false;
                 remaining = remainingArray[index];
+                preview = previewArray != null ? previewArray[index] : 0;
                 priority = storage.getPriority(index);
             } else {
                 isDirectory = file.isDirectory();
                 remaining = -1;
+                preview = 0;
                 priority = -999;
             }
             length = isDirectory ? 0 : file.length();

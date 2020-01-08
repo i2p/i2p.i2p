@@ -427,15 +427,18 @@ public class Storage implements Closeable
 ****/
 
   /**
-   *  For efficiency, calculate remaining bytes for all files at once
+   *  For efficiency, calculate remaining bytes for all files at once.
+   *  Remaining bytes is rv[0]. Preview bytes is rv[1].
    *
-   *  @return number of bytes remaining for each file, use indexOf() to get index for a file
+   *  @return number of bytes remaining and number of bytes available for a preview for each file, use indexOf() to get index for a file
    *  @since 0.9.23
    */
-  public long[] remaining() {
+  public long[][] remaining() {
       long[] rv = new long[_torrentFiles.size()];
+      long[] pv = new long[_torrentFiles.size()];
+      long[][] rva = new long[][] { rv, pv };
       if (complete())
-          return rv;
+          return rva;
       long bytes = 0;
       for (int i = 0; i < _torrentFiles.size(); i++) {
           TorrentFile tf = _torrentFiles.get(i);
@@ -443,10 +446,23 @@ public class Storage implements Closeable
           long end = start + tf.length;
           int pc = (int) (bytes / piece_size);
           long rvi = 0;
-          if (!bitfield.get(pc))
-              rvi = Math.min(piece_size - (start % piece_size), tf.length);
+          long pvi = 0;
+          long first = Math.min(piece_size - (start % piece_size), tf.length);
+          if (bitfield.get(pc))
+              pvi = first;
+          else
+              rvi = first;
+          boolean preview = true;
           for (int j = pc + 1; (((long)j) * piece_size) < end && j < pieces; j++) {
-              if (!bitfield.get(j)) {
+              if (bitfield.get(j)) {
+                  if (preview) {
+                      if (((long)(j+1))*piece_size < end)
+                          pvi += piece_size;
+                      else
+                          pvi += end - (((long)j) * piece_size);
+                  }
+              } else {
+                  preview = false;
                   if (((long)(j+1))*piece_size < end)
                       rvi += piece_size;
                   else
@@ -454,9 +470,10 @@ public class Storage implements Closeable
               }
           }
           rv[i] = rvi;
+          pv[i] = pvi;
           bytes += tf.length;
       }
-      return rv;
+      return rva;
   }
 
   /**

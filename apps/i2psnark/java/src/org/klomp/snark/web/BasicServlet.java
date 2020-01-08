@@ -179,7 +179,7 @@ class BasicServlet extends HttpServlet
      * @param pathInContext The path to find a resource for.
      * @return The resource to serve or null. Returns null for directories
      */
-    public HttpContent getContent(String pathInContext)
+    public HttpContent getContent(String pathInContext, long limit)
     {
         HttpContent r = null;
         if (_warBase != null && pathInContext.startsWith(_warBase)) {
@@ -187,8 +187,12 @@ class BasicServlet extends HttpServlet
         } else {
             File f = getResource(pathInContext);
             // exists && !directory
-            if (f != null && f.isFile())
-                r = new FileContent(f);
+            if (f != null && f.isFile()) {
+                if (limit > 0)
+                    r = new LimitFileContent(f, limit);
+                else
+                    r = new FileContent(f);
+            }
         }
         return r;
     }
@@ -202,10 +206,17 @@ class BasicServlet extends HttpServlet
         String pathInfo=request.getPathInfo();
         // ??? right??
         String pathInContext = addPaths(servletpath, pathInfo);        
+        long limit = 0;
+        String slimit = request.getParameter("limit");
+        if (slimit != null) {
+            try {
+                limit = Long.parseLong(slimit);
+            } catch (NumberFormatException nfe) {}
+        }
 
         // Find the resource and content
         try {
-            HttpContent content = getContent(pathInContext);
+            HttpContent content = getContent(pathInContext, limit);
             
             // Handle resource
             if (content == null) {
@@ -466,6 +477,29 @@ class BasicServlet extends HttpServlet
 
         @Override
         public String toString() { return "File \"" + _file + '"'; }
+    }
+
+    /**
+     *  @since 0.9.45
+     */
+    private class LimitFileContent extends FileContent
+    {
+        private final long _limit;
+
+        /**
+         *  @param limit must be less than file length
+         */
+        public LimitFileContent(File file, long limit)
+        {
+            super(file);
+            _limit = Math.min(limit, file.length());
+        }
+
+        @Override
+        public long getContentLength()
+        {
+            return _limit;
+        }
     }
 
     private class JarContent implements HttpContent
