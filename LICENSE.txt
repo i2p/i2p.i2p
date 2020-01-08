@@ -257,7 +257,7 @@ Applications:
      Zxing 3.3.0:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 9.2.25.v20180606 (jetty-*.jar, org.mortbay.*.jar):
+   Jetty 9.2.29.v20191105 (jetty-*.jar, org.mortbay.*.jar):
    (not included in most distribution packages, except for jetty-i2p.jar)
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
@@ -332,7 +332,7 @@ Applications:
    Systray (systray.jar):
    Public domain.
 
-   Tomcat 8.5.46 (jasper-runtime.jar):
+   Tomcat 8.5.50 (jasper-runtime.jar):
    (not included in most distribution packages)
    Copyright 1999-2019 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt

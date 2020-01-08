@@ -1,9 +1,53 @@
+2020-01-08 zzz
+ * Jetty 9.2.29.v20191105
+ * Tomcat 8.5.50
+
+2020-01-03 zzz
+ * Console:
+   - Don't refresh bw graph unless enclosing sidebar refresh\is longer
+   - Remove scroll-in-scroll for wrapper logs
+   - Refactor the configstats js
+ * i2psnark:
+   - CSS tweaks so the refresh isn't as glitchy
+   - Reduce default refresh to 15 sec
+ * Tests: Drop empty unit test files
+
 2020-01-02 idk
  * Dark Theme: Colors, borders, icons were simplified across the board
  * Images: Checked in icons from Feather icons, which are under the MIT License
   - https://github.com/feathericons/feather/blob/master/LICENSE
 
+2020-01-02 zzz
+ * Util:
+   - Add https redirect support to EepGet and SSLEepGet
+   - Add https support to EepGet CLI
+
+2019-12-25 zzz
+ * Console, webapps: CSP improvements
+ * Console: Remove onload and use nonce for inline scripts where able
+
+2019-12-24 zzz
+ * Console: Don't show a temporary IP ban if it's permanently banned also
+ * i2ptunnel: Double default conn. and POST limits
+
+2019-12-21 zzz
+ * Console:
+   - Don't show 'Unresolved TCP address' error
+   - Fix displayed name when installing new plugin
+ * i2psnark: Fix autostart for torrent files copied into the dir
+
+2019-12-20 zzz
+ * I2CP: Don't throw exception on early internalConnect()
+ * SSU:
+   - Reduce log level on packet size error (ticket #2675)
+   - Move statement affecting debug stats (ticket #2676)
+
+2019-12-18 zzz
+ * Proxy: Clean up links in error pages
+ * Router: Prep for a new router bundle
+
 2019-12-17 zzz
+ * Util: Move some from console to new core bundle
  * NetDB: Fixes for hidden routers losing peers (ticket #2673)
 
 2019-12-16 zzz
