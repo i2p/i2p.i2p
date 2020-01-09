@@ -7659,12 +7659,12 @@ body {
 
 #profiles .tab:first-child, #profiles .tab2:first-child, #help .tab:first-child, #help .tab2:first-child,
 #netdb .tab:first-child, #netdb .tab2:first-child, #debug .tab:first-child, #debug .tab2:first-child {
-     border-radius: 2px 0 0 2px;
+     border-radius: 15px;
 }
 
 #profiles .tab:last-child, #profiles .tab2:last-child, #help .tab:last-child, #help .tab2:last-child,
 #netdb .tab:last-child, #netdb .tab2:last-child, #debug .tab:last-child, #debug .tab2:last-child {
-     border-radius: 0 2px 2px 0;
+     border-radius: 15px;
 }
 }
 
