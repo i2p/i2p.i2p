@@ -1870,7 +1870,8 @@ public class PeerState {
                 if (state.push())
                     _messagesSent++;
             
-                state.setNextSendTime(now + rto);
+                // messages with multiple fragments need more time
+                state.setNextSendTime(now + rto + ((state.getFragmentCount() - 1) * ACKSender.ACK_FREQUENCY));
 
                 //if (peer.getSendWindowBytesRemaining() > 0)
                 //    _throttle.unchoke(peer.getRemotePeer());
