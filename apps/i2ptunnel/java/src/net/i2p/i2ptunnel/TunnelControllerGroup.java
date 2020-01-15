@@ -426,7 +426,7 @@ public class TunnelControllerGroup implements ClientApp {
                             _log.error("Error loading the client app properties from " + f + ' '+ ioe);
                     }
                 }
-            } else {
+            } else if (props != null) {
                 // use what we got from i2ptunnel.config
                 for (Properties cfg : props) {
                     String type = cfg.getProperty("type");
