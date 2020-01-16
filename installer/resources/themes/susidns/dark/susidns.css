@@ -79,7 +79,6 @@ body.iframed {
      margin: -6px -15px 30px;
      padding: 5px 0;
      position: static;
-     border: 1px solid #494;
      border-right: none;
      border-left: none;
      border-radius: 0;
@@ -148,12 +147,11 @@ body.iframed {
 }
 
 #navi a#config {
-     background: #000 url(/themes/console/images/buttons/configure.png) 5px center no-repeat;
      background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, #1F1A24;
 }
 
 #navi a#config:hover, #navi a#config:focus {
-     background: #000 url(/themes/console/images/buttons/configure.png) 5px center no-repeat !important;
+     background: #1F1A24 url(/themes/console/images/buttons/configure.png) 5px center no-repeat !important;
 }
 
 #navi a#config:active {
@@ -256,7 +254,7 @@ div#filter + div#search > form {
      color: #da736b;
      border: 1px solid #da736b;
      border-radius: 2px;
-     background: #020;
+     background: #332940;
 }
 
 #filter a:active {
@@ -362,7 +360,6 @@ h3 {
 
 div#messages {
      margin: -16px 0 25px !important;
-     background: #020;
      z-index: 999;
      border: 1px solid #292929;
      box-shadow: inset 0 0 0 1px #000;
@@ -678,7 +675,7 @@ div#content + div#buttons {
      border-radius: 4px;
      border: 1px solid #fff;
      font-size: 10pt;
-     box-shadow: inset 0px 0px 1px 0px #020;
+     box-shadow: inset 0px 0px 1px 0px #332940;
      /*background: #1F1A24;*/
      /*background: rgba(255,255,255,0.3);*/
      opacity: 0.8;
@@ -817,7 +814,6 @@ input {
      padding: 5px !important;
      border-radius: 2px;
      border: 1px solid #292929;
-     background: #000 none !important;
      color: #494;
      margin: 2px 4px 2px 0;
      font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
@@ -1156,7 +1152,7 @@ _:-ms-lang(x), * {
 
 @media screen and (max-width: 710px) {
 #navi a {
-     background: linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%) !important;
+     background: linear-gradient(to bottom, #332940 0%, #332940 50%, #000 50%, #000 100%) !important;
      padding: 2px 8px !important;
 }
 
