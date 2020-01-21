@@ -733,8 +733,16 @@ public class SU3File {
             String versionString = file.getVersionString();
             if (versionString.equals(""))
                 System.out.println("No version string found in file '" + signedFile + "'");
-            else
-                System.out.println("Version:  " + versionString);
+            else {
+                long ver = 0;
+                try {
+                    ver = Long.parseLong(versionString);
+                } catch (NumberFormatException nfe) {}
+                if (ver > 1000000000L)
+                    System.out.println("Version:  " + versionString + " (" + DataHelper.formatTime(ver * 1000) + ')');
+                else
+                    System.out.println("Version:  " + versionString);
+            }
             String signerString = file.getSignerString();
             if (signerString.equals(""))
                 System.out.println("No signer string found in file '" + signedFile + "'");

@@ -1,4 +1,14 @@
+2020-01-21 zzz
+ * Ratchet: Randomize two high bits of Elligator2 encoding
+
+2020-01-15 zzz
+ * i2ptunnel: Fix NPE if no config file
+
+2020-01-11 zzz
+ * SSU: Extend timeout for msgs with multiple fragments (ticket #2640)
+
 2020-01-08 zzz
+ * i2psnark: Support "preview" HTML5 play for partial files
  * Jetty 9.2.29.v20191105
  * Tomcat 8.5.50
 
