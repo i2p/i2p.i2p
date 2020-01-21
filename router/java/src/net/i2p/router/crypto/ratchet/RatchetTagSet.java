@@ -439,6 +439,8 @@ class RatchetTagSet implements TagSetHandle {
             for (int i = 0; i < sz; i++) {
                 int n = _sessionTags.keyAt(i);
                 RatchetSessionTag tag = _sessionTags.valueAt(i);
+                if (tag == null)
+                    continue;
                 buf.append("\n  " + n + '\t' + Base64.encode(tag.getData()));
                 if (_sessionKeys != null) {
                     byte[] key = _sessionKeys.get(n);

@@ -242,6 +242,8 @@ public final class ECIESAEADEngine {
         state.getLocalKeyPair().setPublicKey(targetPrivateKey.toPublic().getData(), 0);
         state.getLocalKeyPair().setPrivateKey(targetPrivateKey.getData(), 0);
         state.start();
+        if (_log.shouldDebug())
+            _log.debug("State before decrypt new session: " + state);
 
         // Elg2
         byte[] tmp = new byte[KEYLEN];
@@ -269,8 +271,10 @@ public final class ECIESAEADEngine {
 
         byte[] bobPK = new byte[KEYLEN];
         state.getRemotePublicKey().getPublicKey(bobPK, 0);
-        if (_log.shouldDebug())
+        if (_log.shouldDebug()) {
             _log.debug("NS decrypt success from PK " + Base64.encode(bobPK));
+            _log.debug("State after decrypt new session: " + state);
+        }
         if (Arrays.equals(bobPK, NULLPK)) {
             // TODO
             if (_log.shouldWarn())
@@ -351,8 +355,12 @@ public final class ECIESAEADEngine {
                 _log.warn("Elg2 decode fail NSR");
             return null;
         }
+        if (_log.shouldDebug())
+            _log.debug("State before decrypt new session reply: " + state);
         System.arraycopy(k.getData(), 0, data, TAGLEN, KEYLEN);
         state.mixHash(tag, 0, TAGLEN);
+        if (_log.shouldDebug())
+            _log.debug("State after mixhash tag before decrypt new session reply: " + state);
         try {
             state.readMessage(data, 8, 48, ZEROLEN, 0);
         } catch (GeneralSecurityException gse) {
@@ -363,6 +371,8 @@ public final class ECIESAEADEngine {
             }
             return null;
         }
+        if (_log.shouldDebug())
+            _log.debug("State after decrypt new session reply: " + state);
 
         // split()
         byte[] ck = state.getChainingKey();
@@ -622,6 +632,8 @@ public final class ECIESAEADEngine {
         state.getLocalKeyPair().setPublicKey(priv.toPublic().getData(), 0);
         state.getLocalKeyPair().setPrivateKey(priv.getData(), 0);
         state.start();
+        if (_log.shouldDebug())
+            _log.debug("State before encrypt new session: " + state);
 
         byte[] payload = createPayload(cloves, cloves.getExpiration());
 
@@ -633,6 +645,8 @@ public final class ECIESAEADEngine {
                 _log.warn("Encrypt fail NS", gse);
             return null;
         }
+        if (_log.shouldDebug())
+            _log.debug("State after encrypt new session: " + state);
 
         // overwrite eph. key with encoded key
         DHState eph = state.getLocalEphemeralKeyPair();
@@ -642,6 +656,8 @@ public final class ECIESAEADEngine {
             return null;
         }
         eph.getEncodedPublicKey(enc, 0);
+        if (_log.shouldDebug())
+            _log.debug("Elligator2 encoded eph. key: " + Base64.encode(enc, 0, 32));
 
         // tell the SKM
         keyManager.createSession(target, state);
@@ -669,8 +685,12 @@ public final class ECIESAEADEngine {
      */
     private byte[] encryptNewSessionReply(CloveSet cloves, PublicKey target, HandshakeState state,
                                           RatchetSessionTag currentTag, RatchetSKM keyManager) {
+        if (_log.shouldDebug())
+            _log.debug("State before encrypt new session reply: " + state);
         byte[] tag = currentTag.getData();
         state.mixHash(tag, 0, TAGLEN);
+        if (_log.shouldDebug())
+            _log.debug("State after mixhash tag before encrypt new session reply: " + state);
 
         byte[] payload = createPayload(cloves, 0);
 
@@ -684,6 +704,8 @@ public final class ECIESAEADEngine {
                 _log.warn("Encrypt fail NSR part 1", gse);
             return null;
         }
+        if (_log.shouldDebug())
+            _log.debug("State after encrypt new session reply: " + state);
 
         // overwrite eph. key with encoded key
         DHState eph = state.getLocalEphemeralKeyPair();
@@ -847,7 +869,10 @@ public final class ECIESAEADEngine {
             len += block.getTotalLength();
         }
         int padlen = 1 + _context.random().nextInt(MAXPAD);
-        Block block = new PaddingBlock(_context, padlen);
+        // random data
+        //Block block = new PaddingBlock(_context, padlen);
+        // zeros
+        Block block = new PaddingBlock(padlen);
         blocks.add(block);
         len += block.getTotalLength();
         byte[] payload = new byte[len];

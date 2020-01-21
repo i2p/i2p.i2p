@@ -82,21 +82,25 @@ class Elligator2 {
     }
 
     /**
-     * From javascript version documentation:
-     *
-     * The algorithm can return two different values for a single x coordinate if it's not 0.
-     * Which one to return is determined by y coordinate.
-     * Since Curve25519 doesn't use y due to optimizations, you should specify a Boolean value
-     * as the second argument of the function.
-     * It should be unpredictable, because it's recoverable from the representative.
+     * Use for on-the-wire. Don't use for unit tests as output will be randomized
+     * based on the 'alternative' and the high bits.
+     * There are eight possible encodings for any point.
+     * Output will look like 256 random bits.
      *
      * @return "representative", little endian or null on failure
      */
     public byte[] encode(PublicKey point) {
-        return encode(point, _context.random().nextBoolean());
+        byte[] random = new byte[1];
+        _context.random().nextBytes(random);
+        byte rand = random[0];
+        return encode(point, (rand & 0x01) == 0, rand);
     }
 
     /**
+     * Use for unit tests. Don't use for on-the-wire; use one-arg version.
+     * Output will look like 254 random bits.
+     * High two bits of rv[31] will be zero.
+     *
      * From javascript version documentation:
      *
      * The algorithm can return two different values for a single x coordinate if it's not 0.
@@ -107,7 +111,26 @@ class Elligator2 {
      *
      * @return "representative", little endian or null on failure
      */
-    public static byte[] encode(PublicKey point, boolean alternative) {
+    protected static byte[] encode(PublicKey point, boolean alternative) {
+        return encode(point, alternative, (byte) 0);
+    }
+
+    /**
+     * Output will look like 254 random bits. High two bits of highBits will be ORed in.
+     *
+     * From javascript version documentation:
+     *
+     * The algorithm can return two different values for a single x coordinate if it's not 0.
+     * Which one to return is determined by y coordinate.
+     * Since Curve25519 doesn't use y due to optimizations, you should specify a Boolean value
+     * as the second argument of the function.
+     * It should be unpredictable, because it's recoverable from the representative.
+     *
+     * @param highBits High two bits will be ORed into rv[31]
+     * @return "representative", little endian or null on failure
+     * @since 0.9.45 to add highBits arg
+     */
+    private static byte[] encode(PublicKey point, boolean alternative, byte highBits) {
         if (DISABLE)
             return point.getData();
 
@@ -152,6 +175,8 @@ class Elligator2 {
 
         // little endian
         byte[] rv = ENCODING.encode(r);
+        // randomize two high bits
+        rv[REPRESENTATIVE_LENGTH - 1] |= highBits & (byte) 0xc0;
         return rv;
     }
 
@@ -162,6 +187,7 @@ class Elligator2 {
      * It's also able to return null if the representative is invalid (there are only 10 invalid representatives).
      *
      * @param representative the encoded data, little endian, 32 bytes
+     *                       WILL BE MODIFIED by masking byte 31
      * @return x or null on failure
      */
     public static PublicKey decode(byte[] representative) {
@@ -175,7 +201,8 @@ class Elligator2 {
      * It's also able to return null if the representative is invalid (there are only 10 invalid representatives).
      *
      * @param alternative out parameter, or null if you don't care
-     * @param representative the encoded data, little endian, 32 bytes
+     * @param representative the encoded data, little endian, 32 bytes;
+     *                       WILL BE MODIFIED by masking byte 31
      * @return x or null on failure
      */
     public static PublicKey decode(AtomicBoolean alternative, byte[] representative) {
@@ -185,6 +212,8 @@ class Elligator2 {
             return new PublicKey(EncType.ECIES_X25519, representative);
 
         // r
+        // Mask out two high bits, to get valid 254 bits.
+        representative[REPRESENTATIVE_LENGTH - 1] &= (byte) 0x3f;
         BigInteger r = ENCODING.toBigInteger(representative);
 
         // If r >= (p - 1) / 2
@@ -313,6 +342,7 @@ class Elligator2 {
         //00000010  d8 fa ec 68 e5 e6 7e f4  5e bb 82 ee ba 52 60 4f  |...h..~.^....R`O|
 
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        Elligator2 elg2 = new Elligator2(ctx);
         X25519KeyFactory xkf = new X25519KeyFactory(ctx);
         for (int i = 0; i < 10; i++) {
             PublicKey pub;
@@ -322,9 +352,10 @@ class Elligator2 {
                 System.out.println("Trying encode " + ++j);
                 KeyPair kp = xkf.getKeys();
                 pub = kp.getPublic();
-                enc = encode(pub, ctx.random().nextBoolean());
+                enc = elg2.encode(pub);
             } while (enc == null);
-            PublicKey pub2 = decode(null, enc);
+            System.out.println("Encoded:\n" + HexDump.dump(enc));
+            PublicKey pub2 = decode(enc);
             if (pub2 == null) {
                 System.out.println("Decode FAIL");
                 continue;
@@ -336,6 +367,20 @@ class Elligator2 {
                 System.out.println("calc: " + pub2.toBase64());
             }
         }
+
+        System.out.println("Random decode test");
+        byte[] enc = new byte[32];
+        int fails = 0;
+        for (int i = 0; i < 1000; i++) {
+            ctx.random().nextBytes(enc);
+            pk = decode(enc);
+            if (pk == null)
+                fails++;
+        }
+        if (fails > 0)
+            System.out.println("FAIL decode " + fails + " / 1000");
+        else
+            System.out.println("PASS");
     }
 ****/
 }
