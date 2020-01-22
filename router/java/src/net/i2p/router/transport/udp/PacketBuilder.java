@@ -1214,9 +1214,12 @@ class PacketBuilder {
     
     /**
      *  build intro packets for each of the published introducers
+     *
+     *  @param emgr only to call emgr.isValid()
      *  @return empty list on failure
      */
-    public List<UDPPacket> buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
+    public List<UDPPacket> buildRelayRequest(UDPTransport transport, EstablishmentManager emgr,
+                                             OutboundEstablishState state, SessionKey ourIntroKey) {
         UDPAddress addr = state.getRemoteAddress();
         int count = addr.getIntroducerCount();
         List<UDPPacket> rv = new ArrayList<UDPPacket>(count);
@@ -1228,16 +1231,17 @@ class PacketBuilder {
             long tag = addr.getIntroducerTag(i);
             long exp = addr.getIntroducerExpiration(i);
             // let's not use an introducer on a privileged port, sounds like trouble
-            if (ikey == null || !TransportUtil.isValidPort(iport) ||
+            if (ikey == null ||
                 iaddr == null || tag <= 0 ||
-                // must be IPv4 for now as we don't send Alice IP/port, see below
-                iaddr.getAddress().length != 4 ||
-                (!_transport.isValid(iaddr.getAddress())) ||
+                // we must use the same isValid() as EstablishmentManager.receiveRelayResponse().
+                // If an introducer isn't valid, we shouldn't send to it
+                !emgr.isValid(iaddr.getAddress(), iport) ||
                 (exp > 0 && exp < cutoff) ||
+                // FIXME this will have already failed in isValid() above, right?
                 (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()
-                               + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
+                    _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
+                               + ", as the introducer address is invalid: " + iaddr + ':' + iport);
                 // TODO implement some sort of introducer banlist
                 continue;
             }

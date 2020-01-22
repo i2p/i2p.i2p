@@ -206,7 +206,7 @@ class IntroductionManager {
                 _context.banlist().isBanlisted(cur.getRemotePeer()) ||
                 _transport.wasUnreachable(cur.getRemotePeer())) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Peer is failing, shistlisted or was unreachable: " + cur);
+                    _log.info("Peer is failing, blocklisted or was unreachable: " + cur);
                 continue;
             }
             // Try to pick active peers...

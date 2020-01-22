@@ -941,7 +941,7 @@ class EstablishmentManager {
             state.setIntroNonce(nonce);
         }
         _context.statManager().addRateData("udp.sendIntroRelayRequest", 1);
-        List<UDPPacket> requests = _builder.buildRelayRequest(_transport, state, _transport.getIntroKey());
+        List<UDPPacket> requests = _builder.buildRelayRequest(_transport, this, state, _transport.getIntroKey());
         if (requests.isEmpty()) {
             // FIXME need a failed OB state
             if (_log.shouldLog(Log.WARN))
@@ -1045,9 +1045,9 @@ class EstablishmentManager {
      *  Are IP and port valid? This is only for checking the relay response.
      *  Reject all IPv6, for now, even if we are configured for it.
      *  Refuse anybody in the same /16
-     *  @since 0.9.3
+     *  @since 0.9.3, pkg private since 0.9.45 for PacketBuider
      */
-    private boolean isValid(byte[] ip, int port) {
+    boolean isValid(byte[] ip, int port) {
         return TransportUtil.isValidPort(port) &&
                ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
