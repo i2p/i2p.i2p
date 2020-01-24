@@ -84,8 +84,6 @@ div.routersummary table,
 
 .routersummary tr:nth-child(odd) td {
      padding: 3px;
-     background: #020;
-     background: rgba(0,34,0,.5);
 }
 
 .routersummary tr:nth-child(even) td {
