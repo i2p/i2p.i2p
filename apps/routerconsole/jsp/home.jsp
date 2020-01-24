@@ -21,7 +21,7 @@
 
 <div class="routersummaryouter">
  <div class="routersummary">
-  <div style="height: 36px;">
+  <div>
    <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._t("I2P Router Console")%>" title="<%=intl._t("I2P Router Console")%>"></a>
   </div>
 <%

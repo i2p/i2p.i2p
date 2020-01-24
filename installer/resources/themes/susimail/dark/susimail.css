@@ -106,7 +106,7 @@ p.info, p.error {
 
 p.error {
      color: #f00;
-     background: url(/themes/console/images/info/errortriangle.png) no-repeat scroll 10px center #000;
+     background: url(/themes/console/images/info/errortriangle.png) no-repeat scroll 10px center;
      border: 1px solid #f00;
      border-radius: 2px;
      font-weight: bold;
@@ -667,7 +667,6 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
 }
 
 input[name="user"] {
-     background: url(/themes/console/images/buttons/user.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%) !important;
      padding: 5px 5px 5px 25px !important;
 }
 
@@ -676,7 +675,6 @@ input[name="user"]:focus {
 }
 
 input[name="pass"] {
-     background: url(/themes/console/images/buttons/password.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%) !important;
      padding: 5px 5px 5px 25px !important;
 }
 

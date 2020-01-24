@@ -495,7 +495,7 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
      width: 100%;
      border: 1px solid #292929;
      border-collapse: collapse;
-     background: #000900;
+     background: #332940;
 }
 
 #visualid tr:first-child td {
@@ -516,7 +516,7 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
 }
 
 #visualid tr:last-child {
-     background: #000;
+     background: #1F1A24;
 }
 
 form[action="addressbook"] > p.buttons {
@@ -530,7 +530,7 @@ td > img[width="320"], td > img[src^="/imagegen"] {
      border: 1px solid #292929;
      padding: 5px;
      margin: 10px 3px;
-     background: #000;
+     background: #292929;
 }
 
 img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
@@ -788,7 +788,7 @@ div#add, div#import {
 }
 
 input[type="submit"]:hover, input[type="reset"]:hover, input[type="submit"]:focus, input[type="reset"]:focus, .fakebutton:hover, #fakebutton:focus {
-     background: #000;
+     background: #332940;
      color: #da736b;
      border: 1px solid #da736b;
      box-shadow: inset 0 1px 1px 0 #e6e6e7;
@@ -823,9 +823,8 @@ input {
 
 input[type="submit"], input[type="reset"], .fakebutton {
      color: #e6e6e7;
-     background: #000;
-     border: 1px outset #191;
-     border-radius: 2px;
+     border: 1px outset #332940;
+     border-radius: 12px;
      margin: 5px;
      padding: 5px !important;
      font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
@@ -883,7 +882,6 @@ textarea[cols="70"] {
 
 input:focus, textarea:focus {
      color: #e6e6e7;
-     background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s;
      outline: none;

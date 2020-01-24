@@ -393,7 +393,7 @@ tfoot th {
 }
 
 .ParentDir {
-     background: #000;
+     background: #1F1A24;
      font-size: 8pt;
      border: 1px solid #050 !important;
      border-left: 0 !important;
@@ -904,7 +904,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
 }
 
 .snarkTorrentOdd, .snarkTorrentOdd:nth-child(odd) {
-     background: #000800 !important;
+     background: #1F1A24 !important;
 }
 
 .snarkTorrentOdd:nth-child(even) {
@@ -1192,8 +1192,6 @@ to {
      margin: -1px -1px -14px !important;
      display: block;
      text-align: left;
-     background: #000 repeat-x scroll center center !important;
-     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
      border-top: 1px solid #433e47;
      padding: 8px;
      text-transform: uppercase;
@@ -1487,12 +1485,11 @@ input[size="85"] {
 }
 
 select {
-     background: #000 url(images/dropdown.png) right center no-repeat !important;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%) !important;
+     background: #332940 url(images/dropdown.png) right center no-repeat !important;
      -moz-appearance: none;
      -webkit-appearance: none;
      appearance: none;
-     color: #433e47;
+     color: #e6e6e7;
      font-size: 8pt;
      font-weight: bold;
      padding: 4px 16px 4px 4px;
@@ -1727,7 +1724,7 @@ _:-ms-lang(x), #trackerselect tr:last-child {
 }
 
 .trackerconfig th:first-child {
-     background: url(images/delete.png) center right 8px no-repeat, linear-gradient(to bottom, #010, #000);
+     background: url(images/delete.png) center right 8px no-repeat, #1F1A24;
 }
 
 .trackerselect tr:first-child td, .addtorrentsection tr:first-child td {
@@ -1739,7 +1736,7 @@ _:-ms-lang(x), #trackerselect tr:last-child {
 }
 
 .trackerconfig tr:nth-child(odd), .snarkConfig tr:nth-child(odd) {
-     background: #000900;
+     background: #1F1A24;
 }
 
 .trackerconfig tr:last-child {
@@ -1771,7 +1768,7 @@ _:-ms-lang(x), #trackerselect tr:last-child {
 }
 
 .trackerconfig tr:nth-child(even), .snarkConfig tr:nth-child(even) {
-     background: #010;
+     background: #332940;
 }
 
 .trackerconfig input {
@@ -3247,7 +3244,7 @@ th a img {
      text-overflow: ellipsis;
      color: #bbf;
      box-shadow: 0 0 0 1px #121;
-     background: #010 url(images/button_tracker.png) left 3px center no-repeat;
+     background: #332940 url(images/button_tracker.png) left 3px center no-repeat;
      background-size: 14px auto;
 }
 
@@ -3257,7 +3254,7 @@ th a img {
 
 .info_tracker:hover {
      box-shadow: 0 0 0 1px #343;
-     background: url(images/button_tracker_hover.png) left 3px center no-repeat, linear-gradient(to bottom, #000 50%, #020 50%) !important;
+     background: url(images/button_tracker_hover.png) left 3px center no-repeat, linear-gradient(to bottom, #332940 50%, #1F1A24 50%) !important;
      background-size: 14px auto, 100% 100% !important;
 }
 

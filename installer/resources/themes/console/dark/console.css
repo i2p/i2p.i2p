@@ -353,7 +353,7 @@ div.warning {
 }
 
 .routersummary h3:hover {
-     background: #010 !important;
+     background: #332940 !important;
      box-shadow: inset 0 0 2px 2px #000;
 }
 
@@ -461,7 +461,7 @@ div.warning {
 #sb_warning { /* check connection/firewall */
      padding: 4px 4px 4px 26px;
      background: #000;
-     background: url(images/warning24x24.png) 4px center no-repeat, linear-gradient(to right, #001900, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900);
+     background: url(images/warning24x24.png) 4px center no-repeat;
      background-size: 22px 22px, 100% 100%;
      text-align: center;
      line-height: 120%;
@@ -527,7 +527,7 @@ div.warning {
 }
 
 .sb_notice {
-     background: #010;
+     background: #332940;
      border: 1px solid #262;
      border-radius: 2px;
      box-shadow: inset 0 0 0 1px #000;
@@ -851,7 +851,7 @@ a:active img[src="/themes/console/images/i2plogo.png"] {
      min-width: 610px;
      margin-top: -14px;
      margin-bottom: 5px;
-     background: #010;
+     background: #332940;
      padding: 10px 20px 5px;
 }
 
@@ -2020,7 +2020,6 @@ input:active {
 
 input[type="text"], input[type="password"] {
      background: #000;
-     background: linear-gradient(to bottom, #000 0%, #010 100%);
      color: #e6e6e7;
      margin: 5px 10px;
      padding: 5px;
@@ -3284,7 +3283,6 @@ table#consolepass input[type="password"] {
 
 #consolepass input[name="name"], #externali2cp input[name="user"] {
      background: #000 url(/themes/console/images/buttons/user.png) 5px center no-repeat;
-     background: url(/themes/console/images/buttons/user.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%);
      padding: 4px 5px 4px 26px !important;
      background-size: 16px 16px, 100% 100% !important;
 }
@@ -3295,7 +3293,6 @@ table#consolepass input[type="password"] {
 
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"] {
      background: #000 url(/themes/console/images/buttons/password.png) 3px center no-repeat;
-     background: url(/themes/console/images/buttons/password.png) 3px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%);
      padding: 4px 5px 4px 22px !important;
      background-size: 16px 16px, 100% 100% !important;
 }
@@ -3890,7 +3887,7 @@ table#sidebarconf {
 }
 
 #sidebarconf tr:hover, .homelinkedit tr:hover {
-     background: #002000;
+     background: #332940;
 }
 
 #sidebarconf + .formaction {
@@ -4530,7 +4527,7 @@ img.unknownflag {
 }
 
 #enviro:hover td {
-     background: #010;
+     background: #332940;
      border-top: 1px inset transparent;
      border-bottom: 1px inset transparent;
      color: #ff0;
@@ -4556,10 +4553,6 @@ img.unknownflag {
 
 table#criticallogs tr:first-child {
      display: none;
-}
-
-table[id$="logs"] tr:nth-child(odd){
-     background: #010;
 }
 
 table[id$="logs"] tr:nth-child(even){

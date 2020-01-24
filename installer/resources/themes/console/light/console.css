@@ -3779,7 +3779,7 @@ input, input:visited, button, button:visited {
      font-size: 9pt;
      padding: 4px 5px;
      text-decoration: none;
-     border-radius: 2px;
+     border-radius: 12px;
      opacity: 1;
      background-size: 14px auto, 100% 100% !important;
      filter: drop-shadow(0 0 1px #ccf);
@@ -5440,8 +5440,8 @@ a.viewfullentry:hover {
      font-size: 11pt !important;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
-     background:  #f6f6ff url(/themes/console/images/info/globe.png) 8px center no-repeat !important;
-     background:  url(/themes/console/images/info/globe.png) 8px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to right, #fcfcff 5%, rgba(231, 231, 255, 0.8) 25%) !important;
+     background:  #f6f6ff url(/themes/console/images/info/launch_browser.png) 8px center no-repeat !important;
+     background:  url(/themes/console/images/info/launch_browser.png) 8px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to right, #fcfcff 5%, rgba(231, 231, 255, 0.8) 25%) !important;
      background-size: 18px 18px, 100% 100%, 100% 100% !important;
      padding: 8px 5px 8px 32px;
 }
