@@ -118,6 +118,8 @@ public class Reseeder {
         "https://i2p.mooo.com/netDb/"         + ',' +   // bugme_at_mail.i2p.crt     // i2p.mooo.com.crt
         "https://download.xxlspeed.com/"      + ',' +   // backup_at_mail.i2p.crt    // CA                         // Java 8+
         "https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
+        "https://reseed.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
+        "https://reseed2.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
         "https://reseed.i2p-projekt.de/";               // echelon_at_mail.i2p.crt   // echelon.reseed2017.crt     // Java 8+
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
