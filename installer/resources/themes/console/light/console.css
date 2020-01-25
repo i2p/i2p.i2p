@@ -2143,9 +2143,9 @@ h3#graphdisplay {
      list-style: none;
      background: url(images/warning.png) left center no-repeat;
      margin: 0 10px 0 0 !important;
-     padding: 0 0 0 24px !important;
+     padding: 0 0 0 30px !important;
      border: 0 !important;
-     line-height: 135%;
+     line-height: 220%;
 }
 
 .notice li {
@@ -2852,7 +2852,6 @@ tt::-moz-selection {
      text-align: left;
      margin: 2px 20px 0 40px;
      padding: 1px 10px 1px 10px;
-     line-height: 150%;
      word-wrap: break-word;
 }
 
@@ -4840,9 +4839,6 @@ div#themesettings {
 }
 
 select#langsettings {
-     padding: 4px 5px 0;
-     font-size: large;
-     height: 2rem;
      width: 15rem;
 }
 

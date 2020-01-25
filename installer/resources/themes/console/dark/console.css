@@ -932,7 +932,9 @@ a:active img[src="/themes/console/images/i2plogo.png"] {
 }
 
 .main#news {
-     background: #000 url(images/news.png) no-repeat scroll bottom right !important;
+     background-blend-mode: exclusion;
+     background: linear-gradient(to bottom,
+     rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(images/news.png) no-repeat scroll right bottom, #332940 !important;
 }
 
 /* end main */
@@ -1167,7 +1169,7 @@ div.messages {
      margin: 10px 0 15px 0;
      border: 1px solid #292929;
      background: #1F1A24;
-     background: url(images/infohelp.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
+     background: url(images/confirmed.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
      background-size: 28px 28px, auto 90%;
      font-weight: bold;
      font-size: 9.5pt;
@@ -2620,7 +2622,7 @@ tr.tablefooter, .tablefooter td {
 .formaction {
      text-align: right;
      margin-bottom: -5px;
-     border: 1px solid #524b5e;
+     /*border: 1px solid #524b5e;*/
 }
 
 h3[id$="con"] { /* peers h3 + tables */
@@ -2891,7 +2893,7 @@ tr#addnew, tr#addnew:hover {
 
 #themeoptions {
      clear: both;
-     border: 1px solid #524b5e;
+     border-top: 1px solid #524b5e;
      margin: 0 -7px 5px;
      position: relative;
      top: 8px;
@@ -3194,12 +3196,9 @@ h3#langheading {
 
 select#langsettings {
      border: 1px solid #292929;
-     padding: 8px 7px 12px;
-     background: url(images/dropdown.png) right center no-repeat, #332940;
-     font-size: large;
-     height: 3rem;
      width: 15rem;
      color: #e6e6e7;
+     height: 1.5rem;
 }
 
 div#langsettings {
@@ -5790,6 +5789,7 @@ textarea#advancedsettings {
      white-space: normal !important;
      font-weight: normal !important;
      background-size: 28px 28px !important;
+     background: #1F1A24 url(images/infohelp.png) 12px center no-repeat !important;
 }
 
 table.logtable, #enviro {
