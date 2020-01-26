@@ -10,11 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.EncType;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
@@ -560,8 +562,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting") ||
              _context.router().isHidden() ||
              _context.router().getRouterInfo().getAddressCount() <= 0)) {
-            TunnelPool pool = cfg.getTunnelPool();
-            _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
+            Hash client = cfg.getDestination();
+            LeaseSetKeys lsk = client != null ? _context.keyManager().getKeys(client) : null;
+            if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
+                TunnelPool pool = cfg.getTunnelPool();
+                _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
+            }
+            // else we don't yet have any way to request/get a ECIES-tagged reply,
         }
     }
 
