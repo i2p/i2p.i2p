@@ -485,6 +485,10 @@ a:active #sb_bandwidthgraph {
      border: 1px solid #f30;
 }
 
+#sb_bandwidthgraph {
+     background-color: transparent !important;
+}
+
 #sb_bandwidthgraph td {
      background: linear-gradient(to top, #f3f3ff 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 89%, #f3f3ff 93%), linear-gradient(to right, #f3f3ff, rgba(255,255,255,0.0) 2%, rgba(255,255,255,0.0) 98%, #f3f3ff), repeating-linear-gradient(to right, rgba(255,255,255,0.0) 10px, rgba(120,120,255,0.8) 11px, rgba(255,255,255,0.0) 11px, rgba(255,255,255,0.0) 20px), repeating-linear-gradient(to top, rgba(255,255,255,0.0) 1px, rgba(120,120,255,0.8) 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 10px) !important;
      padding: 0 1px;
@@ -2460,12 +2464,12 @@ tr {
      vertical-align: middle !important;
 }
 
-tr:nth-child(even), pre#transports {
+.main tr:nth-child(even), pre#transports {
      background: #efefff;
      background: repeating-linear-gradient(135deg, rgba(252,252,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fafaff 5px) #fafaff;
 }
 
-tr:nth-child(odd) {
+.main tr:nth-child(odd) {
      background: #f7f8ff;
      background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(200, 200, 255, 0.3) 3px, #fafaff 5px), #fafaff;
 }
