@@ -18,7 +18,7 @@ public class NavHelper {
      * To register a new client application so that it shows up on the router
      * console's nav bar, it should be registered with this singleton. 
      *
-     * @param name standard name for the app (plugin)
+     * @param appName standard name for the app (plugin)
      * @param displayName translated name the app will be called in the link
      *             warning, this is the display name aka ConsoleLinkName, not the plugin name
      * @param path full path pointing to the application's root 
