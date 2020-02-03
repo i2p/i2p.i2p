@@ -23,7 +23,7 @@
         response.setStatus(307);
         response.setHeader("Location", "/graphs");
         // force commitment
-        response.getOutputStream().close();
+        response.getWriter().close();
         return;
     }
 %>
