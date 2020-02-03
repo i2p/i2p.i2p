@@ -1,5 +1,14 @@
-2020-01-26
+2020-02-03 zzz
+ * Graphs: Clean up font setting, fix bugs (ticket #2684)
+
+2020-01-26 idk
  * changed many icons on both light and dark themes out for Feather equivalents.
+
+2020-01-26 zzz
+ * Tunnels: Don't test ECIES-only tunnels
+
+2020-01-21 zzz
+ * SSU: Use same valid IP criteria for relay request and response
 
 2020-01-21 zzz
  * Ratchet: Randomize two high bits of Elligator2 encoding
@@ -17,7 +26,7 @@
 
 2020-01-03 zzz
  * Console:
-   - Don't refresh bw graph unless enclosing sidebar refresh\is longer
+   - Don't refresh bw graph unless enclosing sidebar refresh is longer
    - Remove scroll-in-scroll for wrapper logs
    - Refactor the configstats js
  * i2psnark:
