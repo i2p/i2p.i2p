@@ -57,11 +57,13 @@ class SummaryRenderer {
     private static final int SIZE_MONO = 10;
     private static final int SIZE_LEGEND = 10;
     private static final int SIZE_TITLE = 13;
+    private static final long[] RATES = new long[] { 60*60*1000 };
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
         _listener = lsnr;
         _context = ctx;
+        ctx.statManager().createRateStat("graph.renderTime", "", "Router", RATES);
     }
     
     /**
@@ -132,15 +134,15 @@ class SummaryRenderer {
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
                        boolean hideTitle, boolean showEvents, int periodCount,
                        int endp, boolean showCredit, SummaryListener lsnr2, String titleOverride) throws IOException {
+        long begin = System.currentTimeMillis();
         // prevent NaNs if we are skewed ahead of system time
-        long end = Math.min(_listener.now(), System.currentTimeMillis()) - 75*1000;
+        long end = Math.min(_listener.now(), begin - 75*1000);
         long period = _listener.getRate().getPeriod();
         if (endp > 0)
             end -= period * endp;
         if (periodCount <= 0 || periodCount > _listener.getRows())
             periodCount = _listener.getRows();
         long start = end - (period * periodCount);
-        //long begin = System.currentTimeMillis();
         ImageOutputStream ios = null;
         try {
             RrdGraphDef def = new RrdGraphDef();
@@ -311,12 +313,8 @@ class SummaryRenderer {
             graph.render(gfx);
             ios = new MemoryCacheImageOutputStream(out);
             ImageIO.write(img, "png", ios);
-            //System.out.println("Graph created");
 
-            //File t = File.createTempFile("jrobinData", ".xml");
-            //_listener.getData().dumpXml(new FileOutputStream(t));
-            //System.out.println("plotted: " + (data != null ? data.length : 0) + " bytes in " + timeToPlot
-            //                   ); // + ", data written to " + t.getAbsolutePath());
+            _context.statManager().addRateData("graph.renderTime", System.currentTimeMillis() - begin);
         } catch (RrdException re) {
             _log.error("Error rendering", re);
             throw new IOException("Error plotting: " + re.getLocalizedMessage());
