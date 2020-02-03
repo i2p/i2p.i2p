@@ -36,6 +36,7 @@ Environment="I2P_ARGS=/etc/i2p/wrapper.config \
  wrapper.java.pidfile=/run/i2p/routerjvm.pid \
  wrapper.daemonize=TRUE" TZ=UTC
 User=i2psvc
+Group=i2psvc
 PermissionsStartOnly=true
 AppArmorProfile=system_i2p
 ExecStartPre=/bin/mkdir -p /tmp/i2p-daemon
