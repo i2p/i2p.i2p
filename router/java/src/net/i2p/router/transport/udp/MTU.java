@@ -58,6 +58,16 @@ public class MTU {
         if (ifcs != null) {
             while (ifcs.hasMoreElements()) {
                 NetworkInterface ifc = ifcs.nextElement();
+                try {
+                    if (!ifc.isUp()) {
+                        // This is super-important on Windows which has 40+ down interfaces
+                        // and will also deliver IP addresses for down interfaces,
+                        // for example recently disconnected wifi.
+                        continue;
+                    }
+                } catch (SocketException e) {
+                    continue;
+                }
                 for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                     InetAddress addr = addrs.nextElement();
                     if (ia.equals(addr)) {
@@ -66,8 +76,12 @@ public class MTU {
                             //return ifc.getMTU();
                             boolean isIPv6 = addr instanceof Inet6Address;
                             int mtu = ifc.getMTU();
-                            if ((isIPv6 && mtu < PeerState.MIN_IPV6_MTU) ||
-                                (!isIPv6 && mtu < PeerState.MIN_MTU)) {
+                            // can be -1 on Windows
+                            if (mtu < 0)
+                                mtu = isIPv6 ? PeerState.MIN_IPV6_MTU : 1500;
+                            if (mtu > 0 &&
+                                ((isIPv6 && mtu < PeerState.MIN_IPV6_MTU) ||
+                                 (!isIPv6 && mtu < PeerState.MIN_MTU))) {
                                 Log log = I2PAppContext.getGlobalContext().logManager().getLog(MTU.class);
                                 log.logAlways(Log.WARN, "Unusually low MTU " + mtu + " for interface " + ia +
                                                         ", consider disabling");
@@ -122,11 +136,23 @@ public class MTU {
         try {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
             if (ifcs != null) {
+                // this is O(n**2) through the interfaces and very slow on windows
                 while (ifcs.hasMoreElements()) {
                     NetworkInterface ifc = ifcs.nextElement();
+                    try {
+                        if (!ifc.isUp()) {
+                            // This is super-important on Windows which has 40+ down interfaces
+                            // and will also deliver IP addresses for down interfaces,
+                            // for example recently disconnected wifi.
+                            continue;
+                        }
+                    } catch (SocketException e) {
+                        continue;
+                    }
                     for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                         InetAddress addr = addrs.nextElement();
-                        System.out.println("I2P MTU for " + addr.getHostAddress() + " is " + getMTU(addr));
+                        System.out.println("MTU for " + addr.getHostAddress() + " is " + ifc.getMTU() +
+                                           " I2P MTU is " + getMTU(addr));
                     }
                 }
             }
