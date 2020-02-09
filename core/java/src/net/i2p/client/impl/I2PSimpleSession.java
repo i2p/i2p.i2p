@@ -168,11 +168,9 @@ public class I2PSimpleSession extends I2PSessionImpl2 {
      */
     private static class SimpleMessageHandlerMap extends I2PClientMessageHandlerMap {
         public SimpleMessageHandlerMap(I2PAppContext context) {
-            int highest = Math.max(DestReplyMessage.MESSAGE_TYPE, BandwidthLimitsMessage.MESSAGE_TYPE);
-            highest = Math.max(highest, DisconnectMessage.MESSAGE_TYPE);
-            highest = Math.max(highest, HostReplyMessage.MESSAGE_TYPE);
-            highest = Math.max(highest, SetDateMessage.MESSAGE_TYPE);
-            _handlers = new I2CPMessageHandler[highest+1];
+            // 39 = highest type expected from router
+            // http://i2p-projekt.i2p/spec/i2cp#message-types
+            super(HostReplyMessage.MESSAGE_TYPE);
             _handlers[DestReplyMessage.MESSAGE_TYPE] = new DestReplyMessageHandler(context);
             _handlers[BandwidthLimitsMessage.MESSAGE_TYPE] = new BWLimitsMessageHandler(context);
             _handlers[DisconnectMessage.MESSAGE_TYPE] = new DisconnectMessageHandler(context);

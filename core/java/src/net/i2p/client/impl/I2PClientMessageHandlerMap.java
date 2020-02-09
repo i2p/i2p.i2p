@@ -28,24 +28,18 @@ import net.i2p.data.i2cp.SetDateMessage;
  */
 class I2PClientMessageHandlerMap {
     /** map of message type id --&gt; I2CPMessageHandler */
-    protected I2CPMessageHandler _handlers[];
+    protected final I2CPMessageHandler _handlers[];
 
     /** for extension */
-    public I2PClientMessageHandlerMap() {}
+    protected I2PClientMessageHandlerMap(int highest) {
+        _handlers = new I2CPMessageHandler[highest+1];
+    }
 
     public I2PClientMessageHandlerMap(I2PAppContext context) {
-        int highest = DisconnectMessage.MESSAGE_TYPE;
-        highest = Math.max(highest, SessionStatusMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, RequestLeaseSetMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, MessagePayloadMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, MessageStatusMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, SetDateMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, DestReplyMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, HostReplyMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, BandwidthLimitsMessage.MESSAGE_TYPE);
-        highest = Math.max(highest, RequestVariableLeaseSetMessage.MESSAGE_TYPE);
+        // 39 = highest type expected from router
+        // http://i2p-projekt.i2p/spec/i2cp#message-types
+        this(HostReplyMessage.MESSAGE_TYPE);
         
-        _handlers = new I2CPMessageHandler[highest+1];
         _handlers[DisconnectMessage.MESSAGE_TYPE] = new DisconnectMessageHandler(context);
         _handlers[SessionStatusMessage.MESSAGE_TYPE] = new SessionStatusMessageHandler(context);
         _handlers[RequestLeaseSetMessage.MESSAGE_TYPE] = new RequestLeaseSetMessageHandler(context);
