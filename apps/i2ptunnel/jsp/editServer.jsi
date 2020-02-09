@@ -858,7 +858,7 @@
                 </span>
                 <span class="multiOption">
                     <label><input value="0,4" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Both")%> (<%=intl._t("Experts only!")%>)</label>
+                    <%=intl._t("Both encryption types")%> (<%=intl._t("Experts only!")%>)</label>
                 </span>
             </td>
         </tr>
