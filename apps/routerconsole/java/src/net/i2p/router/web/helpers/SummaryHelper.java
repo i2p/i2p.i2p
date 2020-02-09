@@ -607,11 +607,10 @@ public class SummaryHelper extends HelperBase {
                 buf.append("</a></b></td>\n");
                 LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
-                    long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
-                    if (timeToExpire < 0) {
-                        // red or yellow light
-                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_t("Rebuilding")).append("&hellip;\" title=\"").append(_t("Leases expired")).append(" ").append(DataHelper.formatDuration2(0-timeToExpire));
-                        buf.append(" ").append(_t("ago")).append(". ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");
+                    if (!ls.isCurrent(0)) {
+                        // yellow light
+                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_t("Rebuilding")).append("&hellip;\" title=\"").append(_t("Leases expired"));
+                        buf.append(", ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");
                     } else {
                         // green light
                         buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_t("Ready")).append("\"></td></tr>\n");
