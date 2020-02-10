@@ -203,17 +203,23 @@ public abstract class TransportUtil {
                         if (addr[2] == 0x0d && (addr[3] & 0xff) == 0xb8)
                             return false;
                     }
+                } else if ((addr[0] & 0xfe) == 0xfc) {
+                    // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
+                    // not recognized as local by InetAddress
+                    return false;
+                } else if (addr[0] == 0x26) {
+                    // Hamachi IPv6
+                    if (addr[1] == 0x20 && addr[2] == 0x00 && (addr[3] & 0xff) == 0x9b)
+                        return false;
+                } else if (addr[0] == 0x3f) {
+                    // 6bone RFC 2471
+                    if ((addr[1] & 0xff) == 0xfe)
+                        return false;
+                } else if ((addr[0] & 0xfe) == 0x02) {
+                    // Yggdrasil 0200:/7
+                    // https://yggdrasil-network.github.io/faq.html
+                    return false;
                 }
-                // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
-                // not recognized as local by InetAddress
-                if ((addr[0] & 0xfe) == 0xfc)
-                    return false;
-                // Hamachi IPv6
-                if (addr[0] == 0x26 && addr[1] == 0x20 && addr[2] == 0x00 && (addr[3] & 0xff) == 0x9b)
-                    return false;
-                // 6bone RFC 2471
-                if (addr[0] == 0x3f && (addr[1] & 0xff) == 0xfe)
-                    return false;
                 try {
                     InetAddress ia = InetAddress.getByAddress(addr);
                     return
