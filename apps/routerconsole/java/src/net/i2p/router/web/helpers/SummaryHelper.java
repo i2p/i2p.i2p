@@ -781,30 +781,6 @@ public class SummaryHelper extends HelperBase {
         return String.valueOf(_context.tunnelManager().getInboundBuildQueueSize());
     }
 
-/*******
-    public String getPRNGStatus() {
-        Rate r = _context.statManager().getRate("prng.bufferWaitTime").getRate(60*1000);
-        int use = (int) r.getLastEventCount();
-        int i = (int) (r.getAverageValue() + 0.5);
-        if (i <= 0) {
-            r = _context.statManager().getRate("prng.bufferWaitTime").getRate(10*60*1000);
-            i = (int) (r.getAverageValue() + 0.5);
-        }
-        String rv = i + "/";
-        r = _context.statManager().getRate("prng.bufferFillTime").getRate(60*1000);
-        i = (int) (r.getAverageValue() + 0.5);
-        if (i <= 0) {
-            r = _context.statManager().getRate("prng.bufferFillTime").getRate(10*60*1000);
-            i = (int) (r.getAverageValue() + 0.5);
-        }
-        rv = rv + i + "ms";
-        // margin == fill time / use time
-        if (use > 0 && i > 0)
-            rv = rv + ' ' + (60*1000 / (use * i)) + 'x';
-        return rv;
-    }
-********/
-
     private static boolean updateAvailable() {
         return NewsHelper.isUpdateAvailable();
     }

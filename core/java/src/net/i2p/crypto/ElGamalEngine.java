@@ -70,10 +70,10 @@ public final class ElGamalEngine {
      *
      */
     public ElGamalEngine(I2PAppContext context) {
-        context.statManager().createRequiredRateStat("crypto.elGamal.encrypt",
+        context.statManager().createRateStat("crypto.elGamal.encrypt",
                                              "Time for ElGamal encryption (ms)", "Encryption",
                                              new long[] { 60 * 60 * 1000});
-        context.statManager().createRequiredRateStat("crypto.elGamal.decrypt",
+        context.statManager().createRateStat("crypto.elGamal.decrypt",
                                              "Time for ElGamal decryption (ms)", "Encryption",
                                              new long[] { 60 * 60 * 1000});
         _context = context;
