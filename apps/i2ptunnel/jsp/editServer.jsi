@@ -857,7 +857,7 @@
                     ECIES-X25519 (<%=intl._t("Experts only!")%>)</label>
                 </span>
                 <span class="multiOption">
-                    <label><input value="0,4" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Both encryption types")%> (<%=intl._t("Experts only!")%>)</label>
                 </span>
             </td>
