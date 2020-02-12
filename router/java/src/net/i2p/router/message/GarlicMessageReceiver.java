@@ -63,7 +63,6 @@ public class GarlicMessageReceiver {
             LeaseSetKeys keys = _context.keyManager().getKeys(_clientDestination);
             skm = _context.clientManager().getClientSessionKeyManager(_clientDestination);
             if (keys != null && skm != null) {
-                // TODO need to pass both keys if available for muxed decrypt
                 decryptionKey = keys.getDecryptionKey();
                 decryptionKey2 = keys.getDecryptionKey(EncType.ECIES_X25519);
                 if (decryptionKey == null && decryptionKey2 == null) {
