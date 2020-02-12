@@ -698,7 +698,7 @@ public class GeneralHelper {
                 TunnelController.TYPE_SOCKS.equals(ttype) ||
                 TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
                 TunnelController.TYPE_STD_CLIENT.equals(ttype) ||
-                (TunnelController.TYPE_HTTP_CLIENT.equals(ttype) && isShared))
+                TunnelController.TYPE_HTTP_CLIENT.equals(ttype))
                 type = TunnelController.PREFERRED_SIGTYPE;
             else
                 type = SigType.DSA_SHA1;
