@@ -48,6 +48,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
     private static final int MIN_KBPS_TWO_HANDLERS = 512;
     private static final int MIN_KBPS_THREE_HANDLERS = 1024;
+    private static final double MAX_SHARE_RATIO = 10000d;
     
     public TunnelPoolManager(RouterContext ctx) {
         _context = ctx;
@@ -314,7 +315,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
     /**
      *  @return (number of part. tunnels) / (estimated total number of hops in our expl.+client tunnels)
-     *  100 max.
      *  We just use length setting, not variance, for speed
      *  @since 0.7.10
      */
@@ -330,8 +330,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             count += pool.size() * pool.getSettings().getLength();
         }
         if (count <= 0)
-            return 100d;
-        return Math.min(part / (double) count, 100d);
+            return MAX_SHARE_RATIO;
+        return Math.min(part / (double) count, MAX_SHARE_RATIO);
     }
 
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel) {
