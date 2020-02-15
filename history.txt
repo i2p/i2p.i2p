@@ -1,3 +1,20 @@
+2020-02-15 zzz
+ * NTCP: Remove closed connections from write queue (ticket #2686)
+
+2020-02-12 zzz
+ * I2CP: Place ECIES first in LS2
+ * i2ptunnel: Change default sig type to Ed for non-shared HTTP client
+
+2020-02-10 zzz
+ * Transport: Mark yggdrasil IPv6 prefix as not routable
+
+2020-02-09 zzz
+ * Console: Show local tunnel status as green if any leases are valid
+ * I2CP: I2CPMessageHandlerMap cleanup
+
+2020-02-05 zzz
+ * SSU: Skip down interfaces when looking for MTU
+
 2020-02-03 zzz
  * Graphs: Clean up font setting, fix bugs (ticket #2684)
 
