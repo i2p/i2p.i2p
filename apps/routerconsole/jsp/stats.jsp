@@ -4,6 +4,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <%@include file="css.jsi" %>
+<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("statistics")%>
 <%@include file="summaryajax.jsi" %>
 </head><body>
