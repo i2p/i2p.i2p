@@ -3375,7 +3375,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
         // precompute remaining for all files for efficiency
-        long[][] arrays = (storage != null) ? storage.remaining() : null;
+        long[][] arrays = (storage != null) ? storage.remaining2() : null;
         long[] remainingArray = (arrays != null) ? arrays[0] : null;
         long[] previewArray = (arrays != null) ? arrays[1] : null;
         for (int i = 0; i < ls.length; i++) {
@@ -3764,7 +3764,7 @@ public class I2PSnarkServlet extends BasicServlet {
             return null;
         List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
         // precompute remaining for all files for efficiency
-        long[] remainingArray = (storage != null) ? storage.remaining()[0] : null;
+        long[] remainingArray = (storage != null) ? storage.remaining() : null;
         for (int i = 0; i < ls.length; i++) {
             fileList.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray));
         }

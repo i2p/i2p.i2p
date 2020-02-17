@@ -427,13 +427,23 @@ public class Storage implements Closeable
 ****/
 
   /**
+   *  For efficiency, calculate remaining bytes for all files at once
+   *
+   *  @return number of bytes remaining for each file, use indexOf() to get index for a file
+   *  @since 0.9.23
+   */
+  public long[] remaining() {
+      return remaining2()[0];
+  }
+
+  /**
    *  For efficiency, calculate remaining bytes for all files at once.
    *  Remaining bytes is rv[0]. Preview bytes is rv[1].
    *
    *  @return number of bytes remaining and number of bytes available for a preview for each file, use indexOf() to get index for a file
-   *  @since 0.9.23
+   *  @since 0.9.45
    */
-  public long[][] remaining() {
+  public long[][] remaining2() {
       long[] rv = new long[_torrentFiles.size()];
       long[] pv = new long[_torrentFiles.size()];
       long[][] rva = new long[][] { rv, pv };

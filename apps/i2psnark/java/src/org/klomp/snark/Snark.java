@@ -490,6 +490,21 @@ public class Snark
   }
 
   /**
+   *  multitorrent, magnet, Used by snark-rpc plugin
+   *
+   *  Will not start itself. Caller must call startTorrent() if desired.
+   *
+   *  @param ignored used to be autostart
+   *  @throws RuntimeException via fatal()
+   *  @since 0.8.4, removed in 0.9.36, restored in 0.9.45 with boolean param now ignored
+   */
+  protected Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
+        CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
+        ConnectionAcceptor connectionAcceptor, boolean ignored, String rootDir) {
+      this(util, torrent, ih, trackerURL, complistener, peerCoordinatorSet, connectionAcceptor, rootDir);
+  }
+
+  /**
    *  multitorrent, magnet
    *
    *  Will not start itself. Caller must call startTorrent() if desired.
