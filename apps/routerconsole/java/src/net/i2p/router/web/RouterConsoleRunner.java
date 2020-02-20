@@ -345,8 +345,9 @@ public class RouterConsoleRunner implements RouterApp {
     /** @since 0.9.17 */
     private void checkJavaVersion() {
         boolean noJava8 = !SystemVersion.isJava8();
-        boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
-                            !FileUtil.isPack200Supported();
+        //boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
+        //                    !FileUtil.isPack200Supported();
+        boolean noPack200 = false;
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
         boolean isZero = SystemVersion.isZeroVM();
         boolean isJava11 = false; // SystemVersion.isJava11();

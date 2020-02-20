@@ -85,6 +85,8 @@ public class ConfigUpdateHandler extends FormHandler {
      *  Changed as of release 0.8 to support both .sud and .su2
      *  Some JVMs (IcedTea) don't have pack200
      *  Update hosts must maintain both
+     *
+     *  These versions have not been released since 0.9.22, 2015.
      */
     private static final String PACK200_URLS =
     "http://echelon.i2p/i2p/i2pupdate.su2\r\n" +
@@ -121,13 +123,13 @@ public class ConfigUpdateHandler extends FormHandler {
     private static final String SU3_CERT_DIR = "certificates/router";
 
     /**
-     *  Only enabled if we have pack200 and trusted public key certificates installed
+     *  Only enabled if we have trusted public key certificates installed
      *  @since 0.9.9
      */
     public static final boolean USE_SU3_UPDATE;
     static {
         String[] files = (new File(I2PAppContext.getGlobalContext().getBaseDir(), SU3_CERT_DIR)).list();
-        USE_SU3_UPDATE = FileUtil.isPack200Supported() && files != null && files.length > 0;
+        USE_SU3_UPDATE = files != null && files.length > 0;
     }
 
     private static final String DEFAULT_SU3_UPDATE_URLS =

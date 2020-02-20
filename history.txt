@@ -1,4 +1,22 @@
+2020-02-20 zzz
+ * Build: Add non-pack200 release targets (ticket #2693)
+ * GeoIP (ticket #2692):
+   - Add unknown and Kosovo country codes for db-ip.com
+   - Change GeoIP update script to use db-ip.com
+   - Prefer more recent of mmdb or Debian files if we have both
+ * Update: Don't require pack200 for in-net update (ticket #2693)
+
+2020-02-18 zzz
+ * Util: Improve LookupDest CLI, add to CommandLine
+
+2020-02-17 zzz
+ * Debian: Remove GzipFilter in base-context.xml,
+   does nothing with Jetty 9.4 (ticket #2599)
+ * Install: Remove commented-out GzipFilter in cgi-context.xml
+ * i2psnark: Revert API changes that broke i2psnark-rpc plugin
+
 2020-02-15 zzz
+ * Console: Fix jump-to-section on /stats
  * NTCP: Remove closed connections from write queue (ticket #2686)
 
 2020-02-12 zzz

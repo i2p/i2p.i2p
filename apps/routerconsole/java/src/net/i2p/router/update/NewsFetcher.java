@@ -240,12 +240,14 @@ class NewsFetcher extends UpdateRunner {
                                 _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                 return;
                             }
+/*
                             if (!FileUtil.isPack200Supported()) {
                                 String msg = _mgr._t("No Pack200 support in Java runtime.");
                                 _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                 _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                 return;
                             }
+*/
                             if (!ConfigUpdateHandler.USE_SU3_UPDATE) {
                                 String msg = _mgr._t("No update certificates installed.");
                                 _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
