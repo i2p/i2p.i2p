@@ -84,6 +84,8 @@ public class GeoIP {
     private static final boolean ENABLE_DEBIAN = !DISABLE_DEBIAN && !(SystemVersion.isWindows() || SystemVersion.isAndroid());
     /** maxmind API */
     private static final String UNKNOWN_COUNTRY_CODE = "--";
+    /** db-ip.com https://db-ip.com/faq.php */
+    private static final String UNKNOWN_COUNTRY_CODE2 = "ZZ";
 
     /**
      *  @param context RouterContext in production, I2PAppContext for testing only
@@ -223,7 +225,7 @@ public class GeoIP {
                                 String ipv4 = toV4(ipl);
                                 // returns upper case or null
                                 String uc = dbr.country(ipv4);
-                                if (uc != null) {
+                                if (uc != null && !uc.equals(UNKNOWN_COUNTRY_CODE2)) {
                                     String lc = uc.toLowerCase(Locale.US);
                                     String cached = _codeCache.get(lc);
                                     if (cached == null)
@@ -294,7 +296,7 @@ public class GeoIP {
                                 String ipv6 = toV6(ipl);
                                 // returns upper case or null
                                 String uc = dbr.country(ipv6);
-                                if (uc != null) {
+                                if (uc != null && !uc.equals(UNKNOWN_COUNTRY_CODE2)) {
                                     String lc = uc.toLowerCase(Locale.US);
                                     String cached = _codeCache.get(lc);
                                     if (cached == null)
