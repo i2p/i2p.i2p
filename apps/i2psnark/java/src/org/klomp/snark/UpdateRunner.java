@@ -33,9 +33,9 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     private URI _currentURI;
     private Snark _snark;
 
-    private static final long MAX_LENGTH = 30*1024*1024;
-    private static final long METAINFO_TIMEOUT = 30*60*1000;
-    private static final long COMPLETE_TIMEOUT = 3*60*60*1000;
+    private static final long MAX_LENGTH = 128*1024*1024;
+    private static final long METAINFO_TIMEOUT = 60*60*1000;
+    private static final long COMPLETE_TIMEOUT = 12*60*60*1000;
     private static final long CHECK_INTERVAL = 3*60*1000;
 
     public UpdateRunner(I2PAppContext ctx, UpdateManager umgr, SnarkManager smgr,
