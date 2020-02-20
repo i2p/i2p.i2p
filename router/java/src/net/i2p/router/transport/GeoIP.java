@@ -186,7 +186,11 @@ public class GeoIP {
                 if (search.length > 0) {
                     Arrays.sort(search);
                     File f = new File(_context.getProperty(PROP_DEBIAN_GEOIP, DEBIAN_GEOIP_FILE));
-                    if (ENABLE_DEBIAN && f.exists()) {
+                    // if we have both, prefer the most recent.
+                    // The Debian data can be pretty old.
+                    // For now, we use the file date, we don't open it up to get the metadata.
+                    if (ENABLE_DEBIAN && f.exists() &&
+                        (geoip2 == null || f.lastModified() > geoip2.lastModified())) {
                         // Maxmind v1 database
                         LookupService ls = null;
                         try {
@@ -255,7 +259,8 @@ public class GeoIP {
                 if (search.length > 0) {
                     Arrays.sort(search);
                     File f = new File(_context.getProperty(PROP_DEBIAN_GEOIPV6, DEBIAN_GEOIPV6_FILE));
-                    if (ENABLE_DEBIAN && f.exists()) {
+                    if (ENABLE_DEBIAN && f.exists() &&
+                        (geoip2 == null || f.lastModified() > geoip2.lastModified())) {
                         // Maxmind v1 database
                         LookupService ls = null;
                         try {
