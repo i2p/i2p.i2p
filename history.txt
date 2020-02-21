@@ -1,3 +1,6 @@
+2020-02-21 zzz
+ * Update translations
+
 2020-02-20 zzz
  * Build: Add non-pack200 release targets (ticket #2693)
  * GeoIP (ticket #2692):
