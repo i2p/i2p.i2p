@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-24 13:14+0000\n"
-"PO-Revision-Date: 2019-11-24 13:41+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2020-02-12 17:07+0000\n"
+"PO-Revision-Date: 2020-02-12 17:20+0000\n"
+"Last-Translator: SEPT____ <xpressengine3@mail.beo.kr>\n"
 "Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,19 +24,19 @@ msgid "No more torrents running."
 msgstr "작동중인 토렌트가 없습니다."
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:77
-#: ../java/src/org/klomp/snark/SnarkManager.java:3025
-#: ../java/src/org/klomp/snark/SnarkManager.java:3036
+#: ../java/src/org/klomp/snark/SnarkManager.java:3028
+#: ../java/src/org/klomp/snark/SnarkManager.java:3039
 msgid "I2P tunnel closed."
 msgstr "I2P 터널이 닫혔습니다."
 
 #: ../java/src/org/klomp/snark/MagnetURI.java:42
 #: ../java/src/org/klomp/snark/MagnetURI.java:52
-#: ../java/src/org/klomp/snark/SnarkManager.java:2676
+#: ../java/src/org/klomp/snark/SnarkManager.java:2679
 msgid "Magnet"
 msgstr "마그넷"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:967
-#: ../java/src/org/klomp/snark/SnarkManager.java:1121
+#: ../java/src/org/klomp/snark/SnarkManager.java:965
+#: ../java/src/org/klomp/snark/SnarkManager.java:1119
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:733
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1065
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1135
@@ -45,276 +45,276 @@ msgstr "마그넷"
 msgid "No write permissions for data directory"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:970
-#: ../java/src/org/klomp/snark/SnarkManager.java:1114
+#: ../java/src/org/klomp/snark/SnarkManager.java:968
+#: ../java/src/org/klomp/snark/SnarkManager.java:1112
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:727
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1046
 msgid "Data directory cannot be created"
 msgstr "데이터 디렉토리를 만들 수 없습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1032
+#: ../java/src/org/klomp/snark/SnarkManager.java:1030
 #, java-format
 msgid "Total uploaders limit changed to {0}"
 msgstr "전역 업로더 숫자가 {0}으로 변경되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1034
+#: ../java/src/org/klomp/snark/SnarkManager.java:1032
 #, java-format
 msgid "Minimum total uploaders limit is {0}"
 msgstr "최소 전역 업로더 숫자는 {0}입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1046
+#: ../java/src/org/klomp/snark/SnarkManager.java:1044
 #, java-format
 msgid "Up BW limit changed to {0}KBps"
 msgstr "최대 속도가 {0}KBps로 변경되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1048
+#: ../java/src/org/klomp/snark/SnarkManager.java:1046
 #, java-format
 msgid "Minimum up bandwidth limit is {0}KBps"
 msgstr "최소 속도는 {0}KBps입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1060
+#: ../java/src/org/klomp/snark/SnarkManager.java:1058
 #, java-format
 msgid "Startup delay changed to {0}"
 msgstr "시작 딜레이가 {0}으로 설정되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1071
+#: ../java/src/org/klomp/snark/SnarkManager.java:1069
 #, java-format
 msgid "Refresh time changed to {0}"
 msgstr "갱신 시간이 {0}으로 설정되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1073
+#: ../java/src/org/klomp/snark/SnarkManager.java:1071
 msgid "Refresh disabled"
 msgstr "갱신 비활성화"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1089
+#: ../java/src/org/klomp/snark/SnarkManager.java:1087
 #, java-format
 msgid "Page size changed to {0}"
 msgstr "페이지 사이즈가 {0}으로 변경되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1099
+#: ../java/src/org/klomp/snark/SnarkManager.java:1097
 msgid "New files will be publicly readable"
 msgstr "새 파일들이 공개적으로 읽기가능 설정될 것입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1101
+#: ../java/src/org/klomp/snark/SnarkManager.java:1099
 msgid "New files will not be publicly readable"
 msgstr "새 파일들이 공개적으로 읽기가능 설정되지 않습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1109
+#: ../java/src/org/klomp/snark/SnarkManager.java:1107
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1042
 msgid "Data directory must be an absolute path"
 msgstr "데이터 디렉토리는 반드시 절대경로로 설정되어야 합니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1113
+#: ../java/src/org/klomp/snark/SnarkManager.java:1111
 msgid "Data directory does not exist"
 msgstr "데이터 디렉토리가 존재하지 않습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1116
+#: ../java/src/org/klomp/snark/SnarkManager.java:1114
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:729
 msgid "Not a directory"
 msgstr "디렉토리가 아닙니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1118
+#: ../java/src/org/klomp/snark/SnarkManager.java:1116
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:731
 msgid "Unreadable"
 msgstr "읽을수 없습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1125
+#: ../java/src/org/klomp/snark/SnarkManager.java:1123
 #, java-format
 msgid "Data directory changed to {0}"
 msgstr "데이터 디렉토리가 {0}으로 변경되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1206
+#: ../java/src/org/klomp/snark/SnarkManager.java:1204
 msgid "I2CP and tunnel changes will take effect after stopping all torrents"
 msgstr "I2CP와 터널 변경사항은 모든 토렌트가 재시작된 이후 적용됩니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1210
+#: ../java/src/org/klomp/snark/SnarkManager.java:1208
 #, java-format
 msgid "I2CP options changed to {0}"
 msgstr "I2CP 옵션이 {0}으로 변경되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1216
+#: ../java/src/org/klomp/snark/SnarkManager.java:1214
 msgid "Disconnecting old I2CP destination"
 msgstr "오래된 i2CP 목적지와의 연결을 끊는 중입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1218
+#: ../java/src/org/klomp/snark/SnarkManager.java:1216
 #, java-format
 msgid "I2CP settings changed to {0}"
 msgstr "I2P 세팅이 {0}으로 변경되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1223
+#: ../java/src/org/klomp/snark/SnarkManager.java:1221
 msgid ""
 "Unable to connect with the new settings, reverting to the old I2CP settings"
 msgstr "새 세팅값으로는 연결할 수 없습니다. 전 I2CP 세팅으로 되돌립니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1227
+#: ../java/src/org/klomp/snark/SnarkManager.java:1225
 msgid "Unable to reconnect with the old settings!"
 msgstr "전 세팅값으로 연결할 수 없습니다!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1229
+#: ../java/src/org/klomp/snark/SnarkManager.java:1227
 msgid "Reconnected on the new I2CP destination"
 msgstr "새 I2CP 목적지와 연결되었습니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1236
+#: ../java/src/org/klomp/snark/SnarkManager.java:1234
 #, java-format
 msgid "I2CP listener restarted for \"{0}\""
 msgstr "\"{0}\"를 위해 I2CP 리스터를 재시작합니"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1249
+#: ../java/src/org/klomp/snark/SnarkManager.java:1247
 msgid "Enabled autostart"
 msgstr "자동시작 켜기"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1251
+#: ../java/src/org/klomp/snark/SnarkManager.java:1249
 msgid "Disabled autostart"
 msgstr "자동시작 끄기"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1258
+#: ../java/src/org/klomp/snark/SnarkManager.java:1256
 msgid "Enabled smart sort"
 msgstr "스마트 정렬 켜기"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1260
+#: ../java/src/org/klomp/snark/SnarkManager.java:1258
 msgid "Disabled smart sort"
 msgstr "스마트 정렬 끄기"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1267
+#: ../java/src/org/klomp/snark/SnarkManager.java:1265
 msgid "Enabled open trackers - torrent restart required to take effect."
 msgstr "오픈 트래커 활성화 - 토렌트를 재시작해야 적용됩니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1269
+#: ../java/src/org/klomp/snark/SnarkManager.java:1267
 msgid "Disabled open trackers - torrent restart required to take effect."
 msgstr "오픈 트래커 비활성화 - 토렌트를 재시작해야 적용됩니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1276
+#: ../java/src/org/klomp/snark/SnarkManager.java:1274
 msgid "Enabled DHT."
 msgstr "DHT 켜기."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1278
+#: ../java/src/org/klomp/snark/SnarkManager.java:1276
 msgid "Disabled DHT."
 msgstr "DHT 끄기."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1280
+#: ../java/src/org/klomp/snark/SnarkManager.java:1278
 msgid "DHT change requires tunnel shutdown and reopen"
 msgstr "DHT 변경은 터널을 끈 후 재시작해야 적용됩니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1287
+#: ../java/src/org/klomp/snark/SnarkManager.java:1285
 msgid "Enabled Ratings."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1289
+#: ../java/src/org/klomp/snark/SnarkManager.java:1287
 msgid "Disabled Ratings."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1296
+#: ../java/src/org/klomp/snark/SnarkManager.java:1294
 msgid "Enabled Comments."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1298
+#: ../java/src/org/klomp/snark/SnarkManager.java:1296
 msgid "Disabled Comments."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1311
+#: ../java/src/org/klomp/snark/SnarkManager.java:1309
 #, java-format
 msgid "Comments name set to {0}."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1318
+#: ../java/src/org/klomp/snark/SnarkManager.java:1316
 #, java-format
 msgid "{0} theme loaded."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1325
+#: ../java/src/org/klomp/snark/SnarkManager.java:1323
 msgid "Collapsible panels enabled."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1327
+#: ../java/src/org/klomp/snark/SnarkManager.java:1325
 msgid "Collapsible panels disabled."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1337
+#: ../java/src/org/klomp/snark/SnarkManager.java:1335
 msgid "Configuration unchanged."
 msgstr "설정이 바뀌지 않았습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1369
+#: ../java/src/org/klomp/snark/SnarkManager.java:1367
 msgid "Open Tracker list changed - torrent restart required to take effect."
 msgstr "오픈 트래커 리스트가 변경되었습니다 - 토렌트를 재시작해야 적용됩니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1379
+#: ../java/src/org/klomp/snark/SnarkManager.java:1377
 msgid "Private tracker list changed - affects newly created torrents only."
 msgstr "사설 트래커 리스트가 변경디었습니다 - 새로 만들어진 토렌트에게만 적용됩니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1425
+#: ../java/src/org/klomp/snark/SnarkManager.java:1423
 #, java-format
 msgid "Unable to save the config to {0}"
 msgstr "{0}에 설정을 저장하는것을 실패했습니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1532
+#: ../java/src/org/klomp/snark/SnarkManager.java:1530
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1132
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1167
 #, java-format
 msgid "Torrent file deleted: {0}"
 msgstr "토렌트 파일이 삭제되었습니다: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1535
+#: ../java/src/org/klomp/snark/SnarkManager.java:1533
 #, java-format
 msgid "Torrent file moved from {0} to {1}"
 msgstr "토렌트 파일이 {0}에서 {1}로 이동되었습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1569
-#: ../java/src/org/klomp/snark/SnarkManager.java:2729
-#: ../java/src/org/klomp/snark/SnarkManager.java:2735
+#: ../java/src/org/klomp/snark/SnarkManager.java:1567
+#: ../java/src/org/klomp/snark/SnarkManager.java:2732
+#: ../java/src/org/klomp/snark/SnarkManager.java:2738
 #, java-format
 msgid "Error: Could not add the torrent {0}"
 msgstr "에러: {0} 토렌트를 추가할 수 없습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1584
-#: ../java/src/org/klomp/snark/SnarkManager.java:1671
-#: ../java/src/org/klomp/snark/SnarkManager.java:2893
+#: ../java/src/org/klomp/snark/SnarkManager.java:1582
+#: ../java/src/org/klomp/snark/SnarkManager.java:1669
+#: ../java/src/org/klomp/snark/SnarkManager.java:2896
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:178
 #, java-format
 msgid "Torrent already running: {0}"
 msgstr "이미 작동중입니다: {0}"
 
 #. catch this here so we don't try do delete it below
-#: ../java/src/org/klomp/snark/SnarkManager.java:1594
+#: ../java/src/org/klomp/snark/SnarkManager.java:1592
 #, java-format
 msgid "Cannot open \"{0}\""
 msgstr "\"{0}\" - 열 수 없습니다."
 
 #. TODO - if the existing one is a magnet, delete it and add the metainfo
 #. instead?
-#: ../java/src/org/klomp/snark/SnarkManager.java:1613
-#: ../java/src/org/klomp/snark/SnarkManager.java:1767
-#: ../java/src/org/klomp/snark/SnarkManager.java:1856
+#: ../java/src/org/klomp/snark/SnarkManager.java:1611
+#: ../java/src/org/klomp/snark/SnarkManager.java:1765
+#: ../java/src/org/klomp/snark/SnarkManager.java:1854
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:166
 #, java-format
 msgid "Torrent with this info hash is already running: {0}"
 msgstr "해당 정보해시를 가진 토렌트가 이미 작동중입니다: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1619
-#: ../java/src/org/klomp/snark/SnarkManager.java:1862
+#: ../java/src/org/klomp/snark/SnarkManager.java:1617
+#: ../java/src/org/klomp/snark/SnarkManager.java:1860
 #, java-format
 msgid "Torrent with the same data location is already running: {0}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1625
+#: ../java/src/org/klomp/snark/SnarkManager.java:1623
 #, java-format
 msgid "ERROR - No I2P trackers in private torrent \"{0}\""
 msgstr "오류 - Private 토렌트 \"{0}\"에 I2P 트래커가 없습니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1627
+#: ../java/src/org/klomp/snark/SnarkManager.java:1625
 #, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and"
 " DHT only."
 msgstr "경고- \"{0}\"에 I2P 트래커가 없습니다. I2P 오픈 트래커와 DHT에게만 전달할 것입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1630
+#: ../java/src/org/klomp/snark/SnarkManager.java:1628
 #, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will "
 "announce to DHT only."
 msgstr "경고- \"{0}\"에 I2P 트래커가 없습니다, 오픈트래커 역시 비활성화 되었으며, DHT에게만 전달합니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1632
+#: ../java/src/org/klomp/snark/SnarkManager.java:1630
 #, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and DHT and open trackers are "
@@ -322,42 +322,42 @@ msgid ""
 "torrent."
 msgstr "경고- \"{0}\"에 I2P 트래커가 없습니다, 오픈트래커와 DHT도 비활성화 되었으며, 토렌트를 시작하려면 이를 활성화해야 합니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1658
+#: ../java/src/org/klomp/snark/SnarkManager.java:1656
 #, java-format
 msgid "Torrent in \"{0}\" is invalid"
 msgstr "토렌트 \"{0}\"가 올바르지 않습니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1664
+#: ../java/src/org/klomp/snark/SnarkManager.java:1662
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:195
 #, java-format
 msgid "ERROR - Out of memory, cannot create torrent from {0}"
 msgstr "에러 - 메모리 부족. {0}에서 토렌트를 만들 수 없습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1690
+#: ../java/src/org/klomp/snark/SnarkManager.java:1688
 msgid "Connecting to I2P"
 msgstr "I2P에 연결중"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1693
+#: ../java/src/org/klomp/snark/SnarkManager.java:1691
 msgid "Error connecting to I2P - check your I2CP settings!"
 msgstr "에러: I2P에 연결할 수 없습니다. I2CP 설정을 확인하세요."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1699
+#: ../java/src/org/klomp/snark/SnarkManager.java:1697
 #, java-format
 msgid "Torrent added and started: {0}"
 msgstr "토렌트를 추가 및 시작합니다: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1701
+#: ../java/src/org/klomp/snark/SnarkManager.java:1699
 #, java-format
 msgid "Torrent added: {0}"
 msgstr "토렌트 추가됨: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1779
+#: ../java/src/org/klomp/snark/SnarkManager.java:1777
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:93
 #, java-format
 msgid "Fetching {0}"
 msgstr "정보를 가져오는 중 {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1785
+#: ../java/src/org/klomp/snark/SnarkManager.java:1783
 #, java-format
 msgid ""
 "Open trackers are disabled and we have no DHT peers. Fetch of {0} may not "
@@ -365,135 +365,140 @@ msgid ""
 "DHT."
 msgstr "오픈 트래커가 비활성 되었습니다. 또한 DHT 피어도 없습니다. 다른 토렌트를 시작하거나, 해당 설정들을 활성화하지 않으면 {0}의 정보를 가져오지 못할 수 있습니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1789
+#: ../java/src/org/klomp/snark/SnarkManager.java:1787
 #, java-format
 msgid "Adding {0}"
 msgstr "{0} 추가중"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1822
+#: ../java/src/org/klomp/snark/SnarkManager.java:1820
 #, java-format
 msgid "Download already running: {0}"
 msgstr "이미 다운로드 중입니다: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1872
-#: ../java/src/org/klomp/snark/SnarkManager.java:1882
-#: ../java/src/org/klomp/snark/SnarkManager.java:1908
-#: ../java/src/org/klomp/snark/SnarkManager.java:2605
+#: ../java/src/org/klomp/snark/SnarkManager.java:1870
+#: ../java/src/org/klomp/snark/SnarkManager.java:1880
+#: ../java/src/org/klomp/snark/SnarkManager.java:1906
+#: ../java/src/org/klomp/snark/SnarkManager.java:2608
 #, java-format
 msgid "Failed to copy torrent file to {0}"
 msgstr "{0}에 토렌트 파일 복사 실패."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2382
+#: ../java/src/org/klomp/snark/SnarkManager.java:2384
 #, java-format
 msgid "Too many files in \"{0}\" ({1})!"
 msgstr "너무 많은 파일: \"{0}\" ({1})!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2384
+#: ../java/src/org/klomp/snark/SnarkManager.java:2386
 #, java-format
 msgid "Torrent file \"{0}\" cannot end in \".torrent\"!"
 msgstr "토렌트 파일 \"{0}\" 은 \".torrent\"로 끝날 수 없습니다!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2386
+#: ../java/src/org/klomp/snark/SnarkManager.java:2388
 #, java-format
 msgid "No pieces in \"{0}\"!"
 msgstr "\"{0}\"에 조각이 없습니다!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2388
+#: ../java/src/org/klomp/snark/SnarkManager.java:2390
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}!"
 msgstr "\"{0}\"에 너무 많은 조각! 한계는 {1} 입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2390
+#: ../java/src/org/klomp/snark/SnarkManager.java:2392
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B)!"
 msgstr "\"{0}\"의 조각들이 너무 큽니다. ({1}B)!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2391
+#: ../java/src/org/klomp/snark/SnarkManager.java:2393
 #, java-format
 msgid "Limit is {0}B"
 msgstr "제한값은 {0}B 입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2393
+#: ../java/src/org/klomp/snark/SnarkManager.java:2395
 #, java-format
 msgid "Torrent \"{0}\" has no data!"
 msgstr "토렌트 \"{0}\"에 데이터가 없습니다!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2401
+#. System.out.println("torrent info: " + info.toString());
+#. List<Long> lengths = info.getLengths();
+#. if (lengths != null)
+#. for (int i = 0; i < lengths.size(); i++)
+#. System.out.println("File " + i + " is " + lengths.get(i) + " long.");
+#: ../java/src/org/klomp/snark/SnarkManager.java:2404
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet \"{1}\"!"
 msgstr "{0}B 보다 큰 토렌트는 아직 지원되지 않습니다. \"{1}\"!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2418
+#: ../java/src/org/klomp/snark/SnarkManager.java:2421
 #, java-format
 msgid "Error: Could not remove the torrent {0}"
 msgstr "오류: 토렌트 {0}을 삭제할 수 없습니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2441
-#: ../java/src/org/klomp/snark/SnarkManager.java:2460
+#: ../java/src/org/klomp/snark/SnarkManager.java:2444
+#: ../java/src/org/klomp/snark/SnarkManager.java:2463
 #, java-format
 msgid "Torrent stopped: {0}"
 msgstr "토렌트 정지: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2480
+#: ../java/src/org/klomp/snark/SnarkManager.java:2483
 #, java-format
 msgid "Torrent removed: \"{0}\""
 msgstr "토렌트 제거됨: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2488
+#: ../java/src/org/klomp/snark/SnarkManager.java:2491
 #, java-format
 msgid "Adding torrents in {0}"
 msgstr "{0}에 토렌트 추가중"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2521
+#: ../java/src/org/klomp/snark/SnarkManager.java:2524
 #, java-format
 msgid "Up bandwidth limit is {0} KBps"
 msgstr "최대 속도제한은 {0}Kbps입니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2546
+#: ../java/src/org/klomp/snark/SnarkManager.java:2549
 #, java-format
 msgid "Download finished: {0}"
 msgstr "다운로드 완료: {0}"
 
 #. addMessage(_t("Metainfo received for {0}", snark.getName()));
-#: ../java/src/org/klomp/snark/SnarkManager.java:2602
-#: ../java/src/org/klomp/snark/SnarkManager.java:2899
+#: ../java/src/org/klomp/snark/SnarkManager.java:2605
+#: ../java/src/org/klomp/snark/SnarkManager.java:2902
 #, java-format
 msgid "Starting up torrent {0}"
 msgstr "토렌트 {0} 시작중"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2617
+#: ../java/src/org/klomp/snark/SnarkManager.java:2620
 #, java-format
 msgid "Error on torrent {0}"
 msgstr "{0} 토렌트에서 에러"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2898
+#: ../java/src/org/klomp/snark/SnarkManager.java:2901
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:130
 msgid "Opening the I2P tunnel"
 msgstr "I2P 터널 여는중"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2918
+#: ../java/src/org/klomp/snark/SnarkManager.java:2921
 msgid "Opening the I2P tunnel and starting all torrents."
 msgstr "I2P 터널을 열고 모든 토렌트를 시작하는 중"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2983
+#: ../java/src/org/klomp/snark/SnarkManager.java:2986
 msgid "Stopping all torrents and closing the I2P tunnel."
 msgstr "모든 토렌트를 종료하고 I2P 터널을 닫는 중입니다."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:3010
+#: ../java/src/org/klomp/snark/SnarkManager.java:3013
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "트래커에게 알린 후 I2P 터널을 닫는 중입니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:3080
+#: ../java/src/org/klomp/snark/SnarkManager.java:3083
 #, java-format
 msgid "Finished recheck of torrent {0}, now {1} complete"
 msgstr "토렌트 {0}를 재확인하는것을 마쳤습니다, {1}가 완료되었습니다"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:3082
+#: ../java/src/org/klomp/snark/SnarkManager.java:3085
 #, java-format
 msgid "Finished recheck of torrent {0}, unchanged"
 msgstr "토렌트 {0}를 재확인하는것을 마쳤습니다, 변경사항 없음"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:3086
+#: ../java/src/org/klomp/snark/SnarkManager.java:3089
 #, java-format
 msgid "Error checking the torrent {0}"
 msgstr "토렌트 {0}를 확인하는데 오류가 있습니다"
@@ -591,10 +596,10 @@ msgstr "상태"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:626
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:641
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:656
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3418
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3434
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3446
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3458
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3420
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3436
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3448
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3460
 #, java-format
 msgid "Sort by {0}"
 msgstr "{0}로 정렬"
@@ -616,7 +621,7 @@ msgid "Torrent"
 msgstr "토렌트"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:551
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3418
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3420
 msgid "File type"
 msgstr "파일 타입"
 
@@ -642,7 +647,7 @@ msgstr "완료된 다운로드"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:595
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3210
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3432
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3434
 msgid "Size"
 msgstr "크기"
 
@@ -959,7 +964,7 @@ msgstr[0] ""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1675
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1676
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3207
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3520
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3522
 msgid "Complete"
 msgstr "완료"
 
@@ -1017,7 +1022,7 @@ msgid "Torrent details"
 msgstr "토렌트 세부정보"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1767
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3849
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3858
 msgid "Comments"
 msgstr "코멘트"
 
@@ -1034,7 +1039,7 @@ msgid "complete"
 msgstr "완료"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1811
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3533
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3535
 msgid "remaining"
 msgstr "남은"
 
@@ -1217,7 +1222,7 @@ msgstr "표준"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2316
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2659
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3569
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3576
 msgid "Open"
 msgstr "열기"
 
@@ -1298,7 +1303,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2438
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2538
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3838
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3847
 msgid "Configure"
 msgstr "구성"
 
@@ -1437,7 +1442,7 @@ msgid "Select trackers for removal from I2PSnark's known list"
 msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2653
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3418
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3420
 msgid "Name"
 msgstr "이름"
 
@@ -1528,7 +1533,7 @@ msgid "Completion"
 msgstr "완료"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3236
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3446
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3448
 msgid "Remaining"
 msgstr "남은"
 
@@ -1573,7 +1578,7 @@ msgid "Download pieces in order"
 msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3312
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3860
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3869
 msgid "Save Preference"
 msgstr ""
 
@@ -1595,129 +1600,133 @@ msgstr ""
 msgid "Resource Does Not Exist"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3398
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3400
 msgid "Directory"
 msgstr "디렉토리"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3444
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3446
 msgid "Download Status"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3456
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3458
 msgid "Download Priority"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3468
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3470
 msgid "Up to higher level directory"
 msgstr "상위 디렉토리로 이동"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3479
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3481
 msgid "Audio Playlist"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3511
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3513
 msgid "Torrent not found?"
 msgstr "토렌트 발견안됨"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3517
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3519
 msgid "File not found in torrent?"
 msgstr "토렌트에 파일 없음"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3601
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3559
+msgid "Preview"
+msgstr "미리보기"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3610
 msgid "Download file at high priority"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3606
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3615
 msgid "High"
 msgstr "높음"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3609
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3618
 msgid "Download file at normal priority"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3614
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3623
 msgid "Normal"
 msgstr "보통"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3616
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3625
 msgid "Do not download this file"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3621
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3630
 msgid "Skip"
 msgstr "스킵"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3633
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3642
 msgid "Set all high"
 msgstr "모두 높음으로"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3636
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3645
 msgid "Set all normal"
 msgstr "모두 보통으로"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3638
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3647
 msgid "Skip all"
 msgstr "모두 스킵"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3639
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3648
 msgid "Save priorities"
 msgstr "우선순위 저장"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3833
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3842
 msgid "Ratings and Comments"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3836
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3845
 msgid "Author name required to rate or comment"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3842
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3851
 msgid "Your author name for published comments and ratings"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3856
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3865
 msgid "Enable viewing and posting comments for this torrent"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3879
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3888
 #, java-format
 msgid "1 star"
 msgid_plural "{0} stars"
 msgstr[0] ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3881
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3890
 msgid "No rating"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3896
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3905
 msgid "Rate and Comment"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3898
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3907
 msgid "Rate Torrent"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3900
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3909
 msgid "Add Comment"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3912
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3921
 msgid "My Rating"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3925
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3929
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3934
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3938
 msgid "Average Rating"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3930
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3939
 msgid "No community ratings currently available"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3978
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3987
 msgid "Mark for deletion"
 msgstr "삭제표시"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3991
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4000
 msgid "Delete Selected"
 msgstr "선택된 것 삭제"

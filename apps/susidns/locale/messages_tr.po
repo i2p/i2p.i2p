@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-08-17 13:01+0000\n"
+"PO-Revision-Date: 2019-12-20 07:31+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -599,7 +599,7 @@ msgstr "Asla yayınlanmayacak kişisel adres defteriniz"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:252
 msgid "Port for your eepProxy (no need to change)"
-msgstr "eepProxy kapınız (değiştirilmesine gerek yok)"
+msgstr "eepProxy kapı numaranız (değiştirilmesine gerek yok)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:254
 msgid "Hostname for your eepProxy (no need to change)"

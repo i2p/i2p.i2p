@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-10-02 08:58+0000\n"
-"Last-Translator: oorestisime <oorestisime@gmail.com>\n"
+"PO-Revision-Date: 2020-02-16 18:40+0000\n"
+"Last-Translator: anvo <fragos.george@hotmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -248,7 +248,7 @@ msgstr "Άκυρη αποστολή φόρμας, πιθανότατα γιατ�
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr ""
+msgstr "Αν το πρόβλημα επιμένει, βεβαιωθείτε ότι ο περιηγητής ιστού σας αποδέχεται τα cookies."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:135
@@ -303,7 +303,7 @@ msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:516
 msgid "You must enter a file"
-msgstr ""
+msgstr "Πρέπει να εισάγετε αρχείο"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:532
 msgid "No entries found in file"
@@ -409,7 +409,7 @@ msgstr "Δημοσιεύτηκε"
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:196
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:200 build/HowSVG.java:15
 msgid "Subscriptions"
-msgstr ""
+msgstr "Συνδρομές"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:231
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:207

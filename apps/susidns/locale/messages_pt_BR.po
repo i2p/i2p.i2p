@@ -6,15 +6,15 @@
 # Translators:
 # Gabriel Rodrigues de Moura <gabriel.all@yandex.com>, 2017
 # blueboy, 2013
-# blueboy, 2015
+# blueboy, 2015,2020
 # blueboy, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-10-02 08:58+0000\n"
-"Last-Translator: Diego Santos <diegospsi@opmbx.org>\n"
+"PO-Revision-Date: 2020-02-11 01:56+0000\n"
+"Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -228,11 +228,11 @@ msgstr "Adicionar Alternativo"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:324
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:352
 msgid "Address book saved."
-msgstr "Livro de endereços salvo."
+msgstr "Catálogo de endereços salvo."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:327
 msgid "ERROR: Could not write addressbook file."
-msgstr "ERRO: não foi possível escrever no arquivo do livro de endereços."
+msgstr "ERRO: não foi possível escrever no arquivo do catálogo de endereços."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:332
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
@@ -277,7 +277,7 @@ msgstr "Configuração recarregada."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:113
 #, java-format
 msgid "{0} address book in {1} database"
-msgstr ""
+msgstr "{0} catálogo de endereço em {1} banco de dados"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:254
 #, java-format
@@ -301,7 +301,7 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:373
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:363
 msgid "Save Notes"
-msgstr ""
+msgstr "Salvar Notas"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:516
 msgid "You must enter a file"
@@ -309,23 +309,23 @@ msgstr "Você deve adicionar um arquivo"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:532
 msgid "No entries found in file"
-msgstr ""
+msgstr "Nenhuma entrada encontrada no arquivo"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:542
 #, java-format
 msgid "Imported from file {0}"
-msgstr ""
+msgstr "Importado do arquivo {0}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:544
 msgid "Imported from file"
-msgstr ""
+msgstr "Importado de arquivo"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:556
 #, java-format
 msgid "Loaded {0} entry from file"
 msgid_plural "Loaded {0} entries from file"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Carregada {0} entrada do arquivo"
+msgstr[1] "Carregadas {0} entradas do arquivo"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:560
 #, java-format
@@ -336,7 +336,7 @@ msgstr[1] ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:566
 msgid "Import from file failed"
-msgstr ""
+msgstr "A importação via arquivo falhou"
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
@@ -345,11 +345,11 @@ msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions saved."
-msgstr "Subscrições salvas"
+msgstr "Inscrições salvas"
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:157
 msgid "Subscriptions reloaded."
-msgstr "Subscrições recarregadas."
+msgstr "Inscrições recarregadas."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:194
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:664
@@ -411,7 +411,7 @@ msgstr "Publicado"
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:196
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:200 build/HowSVG.java:15
 msgid "Subscriptions"
-msgstr "Subscrições"
+msgstr "Inscrições"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:231
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:207
@@ -520,7 +520,7 @@ msgstr "Adicionar novo destino"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:658
 msgid "Import from hosts.txt file"
-msgstr ""
+msgstr "Importar do arquivo hosts.txt"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:660
 msgid "File"
@@ -590,15 +590,15 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:246
 msgid "Your hosts.txt (don't change)"
-msgstr ""
+msgstr "Seu hosts.txt (não alterar)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:248
 msgid "Your personal addressbook, these hosts will be published"
-msgstr ""
+msgstr "Seu catálogo de endereços, esses hosts serão publicados"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:250
 msgid "Your private addressbook, it is never published"
-msgstr "O seu livro de endereços privado nunca é publicado"
+msgstr "O seu catálogo de endereços privado nunca é publicado"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:252
 msgid "Port for your eepProxy (no need to change)"
@@ -606,7 +606,7 @@ msgstr "Porta do seu eepProxy (não precisa ser mudada)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:254
 msgid "Hostname for your eepProxy (no need to change)"
-msgstr ""
+msgstr "Nome do host para o seu eepProxy (não há necessidade alguma de mudar)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:256
 msgid "Whether to update the published addressbook"
@@ -630,11 +630,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:264
 msgid "Name of the theme to use (defaults to 'light')"
-msgstr ""
+msgstr "Nome do tema a ser usado (se não for definido será usado o tema 'light')"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:177
 msgid "addressbook"
-msgstr "livro de endereços"
+msgstr "catálogo de endereços"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:269
 msgid "Encoded Name"
@@ -650,7 +650,7 @@ msgstr "Hash de base 64"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:297
 msgid "Address Helper"
-msgstr ""
+msgstr "Auxiliar de endereço"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:303
 msgid "link"
@@ -666,7 +666,7 @@ msgstr "ElGamal 2048 bit"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:313
 msgid "Signing Key"
-msgstr ""
+msgstr "Chave de assinatura"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:319
 msgid "Certificate"
@@ -674,7 +674,7 @@ msgstr "Certificado"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:325
 msgid "Validated"
-msgstr ""
+msgstr "Validado"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:327
 msgid "no"
@@ -702,11 +702,11 @@ msgstr "Notas"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:388
 msgid "Visual Identification for"
-msgstr ""
+msgstr "Identificação Visual para"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:400
 msgid "Create your own identification images"
-msgstr ""
+msgstr "Criar as suas próprias imagens de identificação"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:402
 msgid "Launch Image Generator"
@@ -718,11 +718,11 @@ msgstr "Introdução"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:196
 msgid "What is the addressbook?"
-msgstr "O que é o livro de endereços?"
+msgstr "O que é o catálogo de endereços?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:198
 msgid "The addressbook application is part of your I2P installation."
-msgstr "O aplicativo livro de endereços é parte da sua instalação da I2P."
+msgstr "O aplicativo catálogo de endereços é parte da sua instalação da I2P."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:200
 msgid ""
@@ -750,7 +750,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:208
 msgid "How does the addressbook application work?"
-msgstr "Como funciona o aplicativo livro de endereços?"
+msgstr "Como funciona o aplicativo catálogo de endereços?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:210
 msgid ""
@@ -791,11 +791,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:176
 msgid "subscriptions"
-msgstr "subscrições"
+msgstr "inscrições"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:217
 msgid "The subscription file contains a list of i2p URLs."
-msgstr "O arquivo de subscrições contém uma lista de URLs para sites i2p."
+msgstr "O arquivo de inscrições contém uma lista de URLs para sites i2p."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:219
 msgid ""
@@ -884,7 +884,7 @@ msgstr ""
 
 #: build/HowSVG.java:17
 msgid "Configure Subscriptions"
-msgstr ""
+msgstr "Configurar inscrições"
 
 #: build/HowSVG.java:18
 msgid ""
@@ -894,15 +894,15 @@ msgstr ""
 
 #: build/HowSVG.java:19
 msgid "Master Addressbook"
-msgstr ""
+msgstr "Catálogo de endereços mestre"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
-msgstr ""
+msgstr "Pesquisável por"
 
 #: build/HowSVG.java:21
 msgid "I2P applications"
-msgstr ""
+msgstr "Aplicações I2P"
 
 #: build/HowSVG.java:22
 msgid ""
@@ -912,11 +912,11 @@ msgstr ""
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "Opcional,"
 
 #: build/HowSVG.java:24
 msgid "for websites"
-msgstr ""
+msgstr "para sites web"
 
 #: build/HowSVG.java:25
 msgid ""

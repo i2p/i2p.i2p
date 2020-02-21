@@ -4,6 +4,8 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Beta Ba <linsui555@gmail.com>, 2020
+# 4a565b9cc59922eb8fd6171eaeaaa503, 2019
 # ducki2p <ducki2p@gmail.com>, 2011
 # K <daleks@foxmail.com>, 2017
 # nobody <oiiu19@yahoo.com>, 2013-2014
@@ -16,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-12 14:14+0000\n"
-"PO-Revision-Date: 2019-10-12 14:15+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2019-11-24 13:14+0000\n"
+"PO-Revision-Date: 2020-01-14 14:28+0000\n"
+"Last-Translator: Beta Ba <linsui555@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -160,7 +162,7 @@ msgstr "出口代理可能已下线，但也可能是由于网络拥堵。"
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr "您可以{0}重试{1}，程序将从您在 {2}此处{3} 定义的出口代理列表中随机选择一个进行连接（如果您设置了多项代理）。"
+msgstr "您可能想要{0}重试{1}因为这将从您在{2}此处{3}定义的出口代理列表中随机选择一个进行连接（如果您设置了多个出口代理）。"
 
 #: ../java/build/Proxy.java:27 ../java/build/Proxy.java:175
 #: ../java/build/Proxy.java:201 ../java/build/Proxy.java:223
@@ -168,7 +170,7 @@ msgstr "您可以{0}重试{1}，程序将从您在 {2}此处{3} 定义的出口�
 msgid ""
 "You may want to retry as this will randomly reselect an outproxy from the "
 "pool you have defined {0}here{1} (if you have more than one configured)."
-msgstr "您可以重试，程序将从您在{0}此处{1}定义的出口代理列表中随机选择一个进行连接（如果您设置了多项代理）。"
+msgstr "您可能想要重试因为这将从您在{0}此处{1}定义的出口代理列表中随机选择一个进行连接（如果您设置了多个出口代理）。"
 
 #: ../java/build/Proxy.java:28 ../java/build/Proxy.java:176
 #: ../java/build/Proxy.java:202 ../java/build/Proxy.java:224
@@ -219,12 +221,12 @@ msgid "Warning: Invalid Destination"
 msgstr "警告：无效目标"
 
 #: ../java/build/Proxy.java:49
-msgid "The b32 address is invalid."
-msgstr ""
+msgid "The Base32 address is invalid."
+msgstr "Base32 地址无效。"
 
 #: ../java/build/Proxy.java:58
 msgid "The website was not reachable, because its lease set was not found."
-msgstr "该网站不可达，因为找不到其租契。"
+msgstr "该网站不可达，因为找不到其租契集。"
 
 #: ../java/build/Proxy.java:59
 msgid ""
@@ -324,7 +326,7 @@ msgstr "网站暂时不可用、太忙或者被屏蔽。"
 
 #: ../java/build/Proxy.java:121
 msgid "Warning: Authorization Required"
-msgstr ""
+msgstr "警告：需要授权"
 
 #: ../java/build/Proxy.java:130
 msgid ""
@@ -414,7 +416,7 @@ msgstr "警告：请求被拒绝"
 
 #: ../java/build/Proxy.java:185
 msgid "You attempted to connect to a non-I2P website or location."
-msgstr "您尝试连接的网站非I2P站点或位置。"
+msgstr "您尝试连接的网站非 I2P 站点或位置。"
 
 #: ../java/build/Proxy.java:186
 msgid "Proxy Authorization Required"
@@ -464,7 +466,7 @@ msgstr "请求使用了无效协议。"
 
 #: ../java/build/Proxy.java:212
 msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
-msgstr "I2P HTTP 代理只支持HTTP和HTTPS请求。"
+msgstr "I2P HTTP 代理只支持 HTTP 和 HTTPS 请求。"
 
 #: ../java/build/Proxy.java:213
 msgid "Other protocols such as FTP are not allowed."
@@ -486,7 +488,7 @@ msgstr "目标似乎无效："
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:693
 msgid "i2paddresshelper cannot help you with a destination like that!"
-msgstr "i2paddresshelper 对您输入的目标无能为力！"
+msgstr "i2p 地址助手对您输入的目标无能为力！"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:765
 #, java-format
@@ -506,137 +508,137 @@ msgid "Conflicting address helper destination"
 msgstr "确认地址助手目标"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
-msgid "Corrupt b32 address"
-msgstr ""
+msgid "Corrupt Base32 address"
+msgstr "损坏的 Base32 地址"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1305
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
 msgstr "找不到目标租赁"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1438
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1437
 msgid "Host"
 msgstr "主机"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1442
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1503
-msgid "Base 32"
-msgstr "Base 32"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
+msgid "Base32"
+msgstr "Base32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1446
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
 msgid "Destination"
 msgstr "目标"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "继续{0}，而不保存"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
 msgstr "您可以不将站点添加到地址簿而进行浏览。地址会被记录直到您重启您的I2P路由器。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1454
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
 msgid "Continue without saving"
 msgstr "继续，而不保存"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr "保存 {0} 到路由器地址簿并继续访问网站"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1462
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
 msgstr "本地址会被存储在您的路由器地址簿，您基于订阅的地址所存储的地方。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1464
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Master or Private address book instead."
 msgstr "如果您希望追踪您手动添加的站点，请将其加入私有地址簿或主地址簿。"
 
 #. FIXME wasn't escaped
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1467
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1549
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
 msgid "Save & continue"
 msgstr "保存并继续"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr "保存 {0} 到主地址簿并继续访问网站"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1475
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
 msgid ""
 "This address will be saved to your Master address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
 msgstr "本地址会被存储到您的主要地址簿。如果您希望与主要的路由器地址簿分开存储，而不介意发布的话，请选择此选项。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr "保存 {0} 到私有地址簿并继续访问网站"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1480
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
 msgstr "本地址会被存储到您的私有地址簿，以保证其永不被发布。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1508
-msgid "Base 32 address requires lookup password"
-msgstr ""
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
+msgid "Base32 address requires lookup password"
+msgstr "Base32地址需要查找密码"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1510
-msgid "Base 32 address requires encryption key"
-msgstr ""
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
+msgid "Base32 address requires encryption key"
+msgstr "Base32地址需要加密密钥"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1512
-msgid "Base 32 address requires encryption key and lookup password"
-msgstr ""
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
+msgid "Base32 address requires encryption key and lookup password"
+msgstr "Base32 地址需要加密密钥和查找密码"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1514
-msgid "Base 32 address decryption failure, check encryption key"
-msgstr ""
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
+msgid "Base32 address decryption failure, check encryption key"
+msgstr "Base32 地址解密失败，检查加密密钥"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
 msgid "Generate"
 msgstr "生成"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
 msgid "Encryption key"
 msgstr "加密密钥"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
-msgstr ""
+msgstr "您必须输入一个服务器操作员提供的 PSK 加密密钥或生成一个 DH 加密密钥并发送到服务器操作员。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1528
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
-msgstr ""
+msgstr "向服务器操作者寻求帮助"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1531
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
 msgid "Enter PSK encryption key"
-msgstr ""
+msgstr "输入 PSK 加密密钥"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1534
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
-msgstr ""
+msgstr "生成新的加密密钥"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
+msgid "Lookup password"
+msgstr "查找密码"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
-msgid "Lookup password"
-msgstr ""
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1543
 msgid "You must enter the password provided by the server operator."
-msgstr ""
+msgstr "您需要输入服务器操作者提供的密码。"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
 #, java-format
@@ -649,32 +651,32 @@ msgstr "已通过地址助手添加"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:236
 msgid "Missing lookup password"
-msgstr ""
+msgstr "查找密码不存在"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:250
 msgid "Missing private key"
-msgstr ""
+msgstr "私有密钥不存在"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:255
 msgid "Invalid private key"
-msgstr ""
+msgstr "私有密钥无效"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:288
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
 msgid "Your new encryption key"
-msgstr ""
+msgstr "您的新加密密钥"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:312
 msgid "Copy the key and send it to the server operator."
-msgstr ""
+msgstr "复制密钥，并发送给服务器操作者"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:314
 msgid "After you are granted permission, you may proceed to the website."
-msgstr ""
+msgstr "被授予权限后，您才可以访问这个网站"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:335
 msgid "Go back and fix the error"
-msgstr ""
+msgstr "返回并修复错误"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:346
 msgid "router"
@@ -692,7 +694,7 @@ msgstr "私有"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:397
 #, java-format
 msgid "Redirecting to {0}"
-msgstr "正在重定向至{0}"
+msgstr "正在重定向至 {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
 #, java-format
@@ -712,4 +714,4 @@ msgstr "如果未能自动转到，请点击这里。"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:410
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
-msgstr ""
+msgstr "已保存 {0} 的凭据，正在重定向。"

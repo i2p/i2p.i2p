@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-12 14:14+0000\n"
-"PO-Revision-Date: 2019-10-12 14:15+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2019-11-24 13:14+0000\n"
+"PO-Revision-Date: 2019-12-17 08:00+0000\n"
+"Last-Translator: polearnik <polearnik@mail.ru>\n"
 "Language-Team: Romanian (http://www.transifex.com/otf/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -212,8 +212,8 @@ msgid "Warning: Invalid Destination"
 msgstr "Atenție: Destinație incorecta"
 
 #: ../java/build/Proxy.java:49
-msgid "The b32 address is invalid."
-msgstr "Adresa b32 nu este validă."
+msgid "The Base32 address is invalid."
+msgstr "Adresa Base32 nu este validă."
 
 #: ../java/build/Proxy.java:58
 msgid "The website was not reachable, because its lease set was not found."
@@ -499,135 +499,135 @@ msgid "Conflicting address helper destination"
 msgstr "Destinație de ajutor a adresei în conflict"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
-msgid "Corrupt b32 address"
-msgstr "Adresa b32 coruptă"
+msgid "Corrupt Base32 address"
+msgstr "Adresa Base32 coruptă"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1305
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
 msgstr "Set de închiriere de destinație nu a fost găsit"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1438
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1437
 msgid "Host"
 msgstr "Gazdă"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1442
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1503
-msgid "Base 32"
-msgstr "Base 32"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
+msgid "Base32"
+msgstr "Base32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1446
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
 msgid "Destination"
 msgstr "Destinație"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Continuați {0} fără salvare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
 msgstr "Puteți naviga pe site fără a-l salva în agenda de adrese. Adresa va fi amintită până când reporniți routerul I2P."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1454
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
 msgid "Continue without saving"
 msgstr "Continuati fara a salva"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr "Salvați {0} în agenda de adrese de router și continuați pe site-ul web"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1462
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
 msgstr "Această adresă va fi salvată în agenda dvs. de adrese ale routerului în care sunt stocate adresele pe bază de abonament."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1464
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Master or Private address book instead."
 msgstr "Dacă doriți să urmăriți site-urile pe care le-ați adăugat manual, adăugați în registrul dvs. de adrese Master sau Private."
 
 #. FIXME wasn't escaped
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1467
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1549
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
 msgid "Save & continue"
 msgstr "Salvați și continuați"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr "Salvați {0} în agenda de adrese și continuați pe site-ul web"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1475
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
 msgid ""
 "This address will be saved to your Master address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
 msgstr "Această adresă va fi salvată în agenda dvs. de adrese. Selectați această opțiune pentru adresele pe care doriți să le păstrați separate de agenda principală a routerului, dar nu vă deranjează publicarea."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr "Salvați {0} în agenda de adrese private și continuați pe site-ul web"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1480
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
 msgstr "Această adresă va fi salvată în agenda dvs. de adrese private, asigurându-se că nu este publicată niciodată."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1508
-msgid "Base 32 address requires lookup password"
-msgstr "Adresa de bază 32 necesită parola de căutare"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
+msgid "Base32 address requires lookup password"
+msgstr "Adresa Base32 necesită parola de căutare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1510
-msgid "Base 32 address requires encryption key"
-msgstr "Adresa de bază 32 necesită cheie de criptare"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
+msgid "Base32 address requires encryption key"
+msgstr "Adresa Base32 necesită cheie de criptare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1512
-msgid "Base 32 address requires encryption key and lookup password"
-msgstr "Adresa de bază 32 necesită cheie de criptare și parolă de căutare"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
+msgid "Base32 address requires encryption key and lookup password"
+msgstr "Adresa Base32 necesită cheia de criptare și parola de căutare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1514
-msgid "Base 32 address decryption failure, check encryption key"
-msgstr "Eșec de decriptare a adresei de bază 32, verificați cheia de criptare"
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
+msgid "Base32 address decryption failure, check encryption key"
+msgstr "Eșec de decriptare a adresei Base32, verificați cheia de criptare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
 msgid "Generate"
 msgstr "Generează"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
 msgid "Encryption key"
 msgstr "Cheia de criptare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
 msgstr "Trebuie să introduceți o cheie de criptare PSK furnizată de operatorul serverului, sau să generați o cheie de criptare DH și să o trimiteți operatorului de server."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1528
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
 msgstr "Solicitați ajutor operatorului de server."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1531
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
 msgid "Enter PSK encryption key"
 msgstr "Introduceți cheia de criptare PSK"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1534
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
 msgstr "Generați o nouă cheie de criptare DH"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"
 msgstr "Parola de căutare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1543
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
 msgid "You must enter the password provided by the server operator."
 msgstr "Trebuie să introduceți parola furnizată de operatorul serverului."
 
@@ -655,7 +655,7 @@ msgstr "Cheie privată nevalidă"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:288
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
 msgid "Your new encryption key"
-msgstr ""
+msgstr "Noua ta cheie de criptare"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:312
 msgid "Copy the key and send it to the server operator."

@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Beta Ba <linsui555@gmail.com>, 2019
 # ducki2p <ducki2p@gmail.com>, 2011
 # K <daleks@foxmail.com>, 2017
 # xkimo_daeee <michael_ies@yahoo.com>, 2014
@@ -16,8 +17,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 14:13+0000\n"
-"PO-Revision-Date: 2019-10-02 08:58+0000\n"
-"Last-Translator: Chi-Hsun Tsai\n"
+"PO-Revision-Date: 2019-12-12 08:03+0000\n"
+"Last-Translator: Beta Ba <linsui555@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -382,7 +383,7 @@ msgstr "私有"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:186
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:190
 msgid "Master"
-msgstr ""
+msgstr "主要"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:225
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:201
@@ -390,7 +391,7 @@ msgstr ""
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:188
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:192
 msgid "Router"
-msgstr "路由器"
+msgstr "路由"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:227
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:203
@@ -464,7 +465,7 @@ msgstr "主机名"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "Link (b32)"
-msgstr ""
+msgstr "链接 (b32)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:636
@@ -482,7 +483,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:474
 msgid "Base 32 address"
-msgstr "Base32 地址"
+msgstr "Base 32 地址"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:480
 msgid "Helper link to share host address with option to add to addressbook"
@@ -516,7 +517,7 @@ msgstr "添加新目标"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:658
 msgid "Import from hosts.txt file"
-msgstr ""
+msgstr "从 hosts.txt 文件导入"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:660
 msgid "File"
@@ -598,11 +599,11 @@ msgstr "您的私有地址簿，其中的地址不会被发布。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:252
 msgid "Port for your eepProxy (no need to change)"
-msgstr "您的I2P代理端口(无需修改)"
+msgstr "您的 eep 代理端口(无需修改)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:254
 msgid "Hostname for your eepProxy (no need to change)"
-msgstr "您的I2P代理主机名(无需修改)"
+msgstr "您的 eep 代理主机名(无需修改)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:256
 msgid "Whether to update the published addressbook"
@@ -714,17 +715,17 @@ msgstr "介绍"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:196
 msgid "What is the addressbook?"
-msgstr "什么是地址簿"
+msgstr "什么是地址簿？"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:198
 msgid "The addressbook application is part of your I2P installation."
-msgstr "地址簿程序是I2P软件的一部分。"
+msgstr "地址簿应用是 I2P 安装的一部分。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:200
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
-msgstr "它定期从分散的来源或称地址簿“订阅”(概念类似RSS)更新您的地址簿文件 hosts.txt。"
+msgstr "它定期从分布式来源或“订阅”更新您的 hosts.txt 文件。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:202
 #, java-format
@@ -736,54 +737,54 @@ msgstr "在默认配置中，地址簿只订阅 {0}。"
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
 "href=\"subscriptions\">subscriptions</a> file."
-msgstr "要订阅其他站点很容易，只需将他们加入您的<a href=\"subscriptions\">订阅</a> 文件。"
+msgstr "要订阅其他站点很容易，只需将它们加入您的<a href=\"subscriptions\">订阅</a>文件。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:206
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
-msgstr ""
+msgstr "更多关于 I2P 中命名的信息，请参见<a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">概述</a>。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:208
 msgid "How does the addressbook application work?"
-msgstr "地址簿程序如何工作?"
+msgstr "地址簿应用如何工作？"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:210
 msgid ""
 "The addressbook application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
-msgstr "地址簿程序会定期下载订阅的地址簿并将他们的内容合并至“路由器地址簿\"。"
+msgstr "地址簿应用会定期下载订阅的地址簿并将它们的内容合并至“路由器”地址簿。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:212
 msgid ""
 "Then it merges your \"master\" address book into the router address book as "
 "well."
-msgstr "然后您的“主地址簿\"中的内容也会并入\"路由器地址簿\"中。"
+msgstr "然后您的“主”地址簿中的内容也会并入“路由器”地址簿中。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:214
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an "
 "eepsite."
-msgstr "如果配置中指定，“路由器地址簿”还会被写入“已发布地址簿”中，如果您运行有匿名网站，此地址簿可以被公开订阅。"
+msgstr "如果配置中指定，“路由器”地址簿还会被写入“已发布”地址簿中，如果您运行有匿名网站，此地址簿可以被公开订阅。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
-msgstr ""
+msgstr "路由也使用私有地址簿，既不合并也不发布。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
 msgid ""
 "Hosts in the private address book can be accessed by you but their addresses"
 " are never distributed to others."
-msgstr "您可以访问“私有地址簿”中的主机名，但他们的实际地址不会发布给其他人。"
+msgstr "您可以访问“私有”地址簿中的主机名，但它们的实际地址不会发布给其他人。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
 msgid ""
 "The private address book can also be used for aliases of hosts in your other"
 " address books."
-msgstr "“私有地址簿”也可以用于为其他地址簿中的主机名添加别名。"
+msgstr "“私有”地址簿也可以用于为其他地址簿中的主机名添加别名。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:176
 msgid "subscriptions"
@@ -791,16 +792,16 @@ msgstr "订阅"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:217
 msgid "The subscription file contains a list of i2p URLs."
-msgstr "订阅文件是一个I2P链接列表。"
+msgstr "订阅文件包含一个 I2P URL 列表。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:219
 msgid ""
 "The addressbook application regularly checks this list for new eepsites."
-msgstr "地址簿程序定期通过这些链接检查是否有新的I2P匿名网站。"
+msgstr "地址簿应用定期通过此列表检查是否有新的 I2P 匿名网站。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:221
 msgid "Those URLs refer to published hosts.txt files."
-msgstr "这些URL指向公开发布的 hosts.txt 文件。"
+msgstr "这些 URL 指向公开发布的 hosts.txt 文件。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:223
 #, java-format
@@ -817,7 +818,7 @@ msgstr "所以订阅一些网站的最新地址簿是个不错的主意。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:227
 msgid "See the FAQ for a list of subscription URLs."
-msgstr "其他来源的订阅链接参见I2P站点的 <a href=\"http://www.i2p2.i2p/faq_zh.html\">FAQ</a>"
+msgstr "其他来源的订阅 URL 参见 I2P 站点的 <a href=\"http://www.i2p2.i2p/faq_zh.html\">FAQ</a>。"
 
 #: build/HowSVG.java:5
 msgid ""

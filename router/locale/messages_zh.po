@@ -2,41 +2,26 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Beta Ba <linsui555@gmail.com>, 2019
-# ducki2p <ducki2p@gmail.com>, 2011
-# K <daleks@foxmail.com>, 2017
-# nobody <oiiu19@yahoo.com>, 2013-2014
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# SF W, 2019
-# Tommy Lmath <l5h5t7@qq.com>, 2016
-# uzmintid Xun <1109673069@qq.com>, 2017
-# walking <walking@i2pmail.org>, 2011
-# walking <walking@i2pmail.org>, 2011
-# walking <waling@mail.i2p>, 2013
-# walking <walking@i2pmail.org>, 2011
-# wwj402 <wwj402@gmail.com>, 2013
-# wwj402 <wwj402@gmail.com>, 2013
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# YFdyh000 <yfdyh000@gmail.com>, 2016
-# YFdyh000 <yfdyh000@gmail.com>, 2014-2017
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# xtoaster <zhazhenzhong@gmail.com>, 2012
+# YFdyh000 <yfdyh000@gmail.com>, 2019
+# erinm, 2019
 # zzzi2p, 2019
+# Beta Ba <linsui555@gmail.com>, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 14:55+0000\n"
-"Last-Translator: Beta Ba <linsui555@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/"
-"zh_CN/)\n"
-"Language: zh_CN\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: Beta Ba <linsui555@gmail.com>, 2019\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/otf/teams/12694/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
@@ -50,7 +35,7 @@ msgstr "IPv4: 正常; IPv6: 测试中"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr "IPv4: 正常; IPv6: 防火墙限制"
+msgstr "IPv4: 正常; IPv6: 受到防火墙限制"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
@@ -58,7 +43,7 @@ msgstr "IPv4: 测试中; IPv6: 正常"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:374
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr "IPv4: 防火墙限制; IPv6: 正常"
+msgstr "IPv4: 受到防火墙限制; IPv6: 正常"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
@@ -79,16 +64,16 @@ msgstr "IPv4: 对称 NAT; IPv6: 测试中"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr "IPv4: 防火墙限制; IPv6: 测试中"
+msgstr "IPv4: 受到防火墙限制; IPv6: 测试中"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr "防火墙限制"
+msgstr "受到防火墙限制"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr "IPv4: 测试中; IPv6: 防火墙限制"
+msgstr "IPv4: 测试中; IPv6: 受到防火墙限制"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
@@ -96,7 +81,7 @@ msgstr "IPv4: 已禁用; IPv6: 测试中"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: 已禁用; IPv6: 防火墙限制"
+msgstr "IPv4: 已禁用; IPv6: 受到防火墙限制"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"
@@ -112,7 +97,8 @@ msgstr "测试中"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -133,7 +119,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "拒绝最大共享隧道：高请求量"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -153,7 +140,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "拒绝共享隧道：带宽限额"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "收紧最大共享隧道：带宽限额"

@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2019-09-26 05:28+0000\n"
+"PO-Revision-Date: 2019-12-26 08:48+0000\n"
 "Last-Translator: Jonatan Nyberg\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -57,13 +57,13 @@ msgstr "Använd inte SOCKS för detta."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "Mer information finner du på {0}inställningssidan för I2P webbläsarproxy{1}."
+msgstr "Mer information finner du på {0}inställningssidan för I2P-webbläsarproxy{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr "När du har fått en \"delade klienter\" destination listad till vänster, vänligen {0}kika på{1} våra {2}Vanliga frågor{3}."
+msgstr "När du har fått en \"delade klienter\" destination listad till vänster, vänligen {0}läs{1} våra {2}Vanliga frågor{3}."
 
 #, java-format
 msgid ""
