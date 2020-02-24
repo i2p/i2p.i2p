@@ -1,3 +1,27 @@
+i2p (0.9.45-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.45
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 24 Feb 2020 12:12:12 +0000
+
+i2p (0.9.44-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.44
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Sun, 01 Dec 2019 12:12:12 +0000
+
+i2p (0.9.43-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.43
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 22 Oct 2019 12:12:12 +0000
+
+[1;5A0.9.42-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.42
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 28 Aug 2019 12:12:12 +0000
+
 i2p (0.9.41-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.41
