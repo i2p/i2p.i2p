@@ -1,3 +1,5 @@
+* 2020-02-25 0.9.45 released
+
 2020-02-21 zzz
  * Update translations
 
