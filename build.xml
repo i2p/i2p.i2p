@@ -1049,6 +1049,7 @@
                     <arg value="-l" />
                     <arg value="history.txt" />
                     <arg value="installer/install.xml" />
+                    <arg value="installer/install5.xml" />
                     <arg value="core/java/src/net/i2p/CoreVersion.java" />
                     <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
             </exec>
