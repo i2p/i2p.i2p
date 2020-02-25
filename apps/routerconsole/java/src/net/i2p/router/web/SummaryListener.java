@@ -13,14 +13,16 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 
-import org.jrobin.core.Archive;
-import org.jrobin.core.RrdBackendFactory;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDef;
-import org.jrobin.core.RrdException;
-import org.jrobin.core.RrdMemoryBackendFactory;
-import org.jrobin.core.RrdNioBackendFactory;
-import org.jrobin.core.Sample;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.DsType;
+import org.rrd4j.core.Archive;
+import org.rrd4j.core.RrdBackendFactory;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDef;
+import org.rrd4j.core.RrdException;
+import org.rrd4j.core.RrdMemoryBackendFactory;
+import org.rrd4j.core.RrdNioBackendFactory;
+import org.rrd4j.core.Sample;
 
 /**
  *  Creates and updates the in-memory or on-disk RRD database,
@@ -35,7 +37,8 @@ public class SummaryListener implements RateSummaryListener {
     static final String RRD_DIR = "rrd";
     private static final String RRD_PREFIX = "rrd-";
     private static final String RRD_SUFFIX = ".jrb";
-    static final String CF = "AVERAGE";
+    static final ConsolFun CF = ConsolFun.AVERAGE;
+    static final DsType DS = DsType.GAUGE;
     private static final double XFF = 0.9d;
     private static final int STEPS = 1;
 
@@ -88,14 +91,14 @@ public class SummaryListener implements RateSummaryListener {
                 stopListening();
                 if (path != null)
                     (new File(path)).delete();
-            } catch (IOException ioe) {
-                _log.error("Error adding", ioe);
-                stopListening();
             } catch (RrdException re) {
                 // this can happen after the time slews backwards, so don't make it an error
                 // org.jrobin.core.RrdException: Bad sample timestamp 1264343107. Last update time was 1264343172, at least one second step is required
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error adding", re);
+            } catch (IOException ioe) {
+                _log.error("Error adding", ioe);
+                stopListening();
             }
         }
     }
@@ -149,8 +152,8 @@ public class SummaryListener implements RateSummaryListener {
                 // for info on the heartbeat, xff, steps, etc, see the rrdcreate man page, aka
                 // http://www.jrobin.org/support/man/rrdcreate.html
                 long heartbeat = period*10/1000;
-                def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
-                def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
+                def.addDatasource(_name, DS, heartbeat, Double.NaN, Double.NaN);
+                def.addDatasource(_eventName, DS, heartbeat, 0, Double.NaN);
                 if (_isPersistent) {
                     _rows = (int) Math.max(MIN_ROWS, Math.min(MAX_ROWS, THREE_MONTHS / period));
                 } else {
@@ -187,6 +190,7 @@ public class SummaryListener implements RateSummaryListener {
                        "\nContact packager.";
             _log.log(Log.CRIT, s);
             System.out.println(s);
+            StatSummarizer.setDisabled(_context);
         } catch (Throwable t) {
             _log.error("Error starting RRD for stat " + baseName, t);
         }
@@ -203,9 +207,7 @@ public class SummaryListener implements RateSummaryListener {
         _rate.setSummaryListener(null);
         if (!_isPersistent) {
             // close() does not release resources for memory backend
-            try {
-                ((RrdMemoryBackendFactory)RrdBackendFactory.getFactory(RrdMemoryBackendFactory.NAME)).delete(_db.getPath());
-            } catch (RrdException re) {}
+            ((RrdMemoryBackendFactory)RrdBackendFactory.getFactory("MEMORY")).delete(_db.getPath());
         }
         _db = null;
     }
@@ -254,7 +256,7 @@ public class SummaryListener implements RateSummaryListener {
     
     /** @since 0.8.7 */
     String getBackendName() {
-        return _isPersistent ? RrdNioBackendFactory.NAME : RrdMemoryBackendFactory.NAME;
+        return _isPersistent ? "NIO" : "MEMORY";
     }
 
     /** @since 0.8.7 */
