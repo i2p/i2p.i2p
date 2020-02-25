@@ -1,5 +1,6 @@
 2020-02-25 zzz
- * Replace jrobin with rrd4j 3.5 (ticket #2684)
+ * Graphs: Replace jrobin with rrd4j 3.5 (ticket #2684)
+ * NetDB: Don't send 'fake hash' for exploration any more
 
 * 2020-02-25 0.9.45 released
 
