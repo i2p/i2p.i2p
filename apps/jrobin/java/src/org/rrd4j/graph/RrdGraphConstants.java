@@ -277,6 +277,7 @@ public interface RrdGraphConstants {
          * @return a new {@link java.awt.Font} instance
          */
         public static Font getFont(int type, int size) {
+/*
             String fontPath;
             if (type == Font.BOLD)
                 fontPath = "/DejaVuSansMono-Bold.ttf";
@@ -288,6 +289,8 @@ public interface RrdGraphConstants {
             } catch (FontFormatException | IOException e) {
                 throw new RuntimeException(e);
             }
+*/
+            return new Font("Monospaced", type, size);
         }
     }
 
