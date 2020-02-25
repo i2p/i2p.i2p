@@ -154,6 +154,25 @@ public abstract class Translate {
     }
 
     /**
+     *  Are we configured for a right-to-left language?
+     *  @return true for supported RTL languages
+     *  @since 0.9.46
+     */
+    public static boolean isRTL(I2PAppContext ctx) {
+        return isRTL(getLanguage(ctx));
+    }
+
+    /**
+     *  Is this a right-to-left language?
+     *  @param lang Two- or three-letter lower case
+     *  @return true for supported RTL languages
+     *  @since 0.9.46
+     */
+    public static boolean isRTL(String lang) {
+        return lang.equals("ar") || lang.equals("fa") || lang.equals("iw");
+    }
+
+    /**
      *  Two-letter upper case or ""
      *  @return country in routerconsole.country property, else current locale
      *  @since 0.9.10

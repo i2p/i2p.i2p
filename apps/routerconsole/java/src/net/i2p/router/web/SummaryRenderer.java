@@ -242,7 +242,7 @@ class SummaryRenderer {
                     if (started > start && started < end) {
                         // String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\l";
                         String legend;
-                        if ("ar".equals(lang) || "fa".equals(lang) || "iw".equals(lang)) {
+                        if (Messages.isRTL(lang)) {
                             // RTL languages
                             legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " - " + event.getValue() + "\\l";
                         } else {
