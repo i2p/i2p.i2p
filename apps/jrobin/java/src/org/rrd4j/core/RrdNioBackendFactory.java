@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Factory class which creates actual {@link org.rrd4j.core.RrdNioBackend} objects. This is the default factory since
  * 1.4.0 version.
- * <h3>Managing the thread pool</h3>
+ * <h2>Managing the thread pool</h2>
  * <p>Each RrdNioBackendFactory is optionally backed by a {@link org.rrd4j.core.RrdSyncThreadPool}, which it uses to sync the memory-mapped files to
  * disk. In order to avoid having these threads live longer than they should, it is recommended that clients create and
  * destroy thread pools at the appropriate time in their application's life time. Failure to manage thread pools

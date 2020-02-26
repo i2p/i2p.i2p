@@ -13,7 +13,7 @@ import org.rrd4j.core.InvalidRrdException;
 /**
  * This class is used read information from an RRD file. Writing
  * to RRD files is not currently supported. It uses NIO's RandomAccessFile to read the file
- * <p/>
+ *
  * Currently this can read RRD files that were generated on Solaris (Sparc)
  * and Linux (x86).
  *

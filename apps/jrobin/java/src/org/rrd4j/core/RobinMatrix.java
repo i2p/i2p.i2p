@@ -8,7 +8,7 @@ import java.io.IOException;
  * fixed length array of double values. Each double value reperesents consolidated, archived
  * value for the specific timestamp. When the underlying array of double values gets completely
  * filled, new values will replace the oldest ones.<p>
- * <p/>
+ *
  * Robin object does not hold values in memory - such object could be quite large.
  * Instead of it, Robin reads them from the backend I/O only when necessary.
  *

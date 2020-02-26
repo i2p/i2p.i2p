@@ -128,7 +128,7 @@ public class RrdSyncThreadPool
      * If there is a SecurityManager, it uses the group of System.getSecurityManager(), else the group
      * of the thread instantiating this DaemonThreadFactory. Each new thread is created as a daemon thread
      * with priority Thread.NORM_PRIORITY. New threads have names accessible via Thread.getName()
-     * of "<pool-name> Pool [Thread-M]", where M is the sequence number of the thread created by this factory.
+     * of "&lt;pool-name&gt; Pool [Thread-M]", where M is the sequence number of the thread created by this factory.
      */
     static class DaemonThreadFactory implements ThreadFactory
     {

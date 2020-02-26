@@ -51,12 +51,6 @@ import java.util.regex.Pattern;
  * {@link org.rrd4j.core.RrdMemoryBackendFactory} class. This backend stores all data in memory. Once
  * JVM exits, all data gets lost. The backend is extremely fast and memory hungry.
  * 
- * <li>{@link org.rrd4j.core.RrdBerkeleyDbBackend}: objects of this class are created from the 
- * {@link org.rrd4j.core.RrdBerkeleyDbBackendFactory} class. It stores RRD data to ordinary disk files 
- * using <a href="http://www.oracle.com/technetwork/database/berkeleydb/overview/index-093405.html">Oracle Berkeley DB</a> Java Edition.
- * 
- * <li>{@link org.rrd4j.core.RrdMongoDBBackend}: objects of this class are created from the {@link org.rrd4j.core.RrdMongoDBBackendFactory} class.
- * It stores data in a {@link com.mongodb.DBCollection} from <a href="http://www.mongodb.org/">MongoDB</a>.
  * </ul>
  * <p>
  * Each backend factory used to be identified by its {@link #getName() name}. Constructors

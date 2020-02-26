@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 /**
  * This class is used to read a unival from a file
  * unival is a rrdtool type, defined in rrd_format.h
- * @author Fabrice Bacchella <fbacchella@spamcop.net>
+ * @author Fabrice Bacchella fbacchella@spamcop.net
  *
  */
 class UnivalArray {
