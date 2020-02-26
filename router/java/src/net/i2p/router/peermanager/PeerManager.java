@@ -151,6 +151,9 @@ class PeerManager {
     }
     
     void storeProfiles() {
+        // Don't overwrite disk profiles when testing
+        if (_context.commSystem().isDummy())
+            return;
         // lock in case shutdown bumps into periodic store
         if (!_storeLock.compareAndSet(false, true))
             return;

@@ -58,7 +58,6 @@ public class PeerProfile {
     private float _speedValue;
     private float _capacityValue;
     private float _integrationValue;
-    private boolean _isFailing;
     // new calculation values, to be updated
     // floats to save some space
     private float _speedValueNew;
@@ -86,9 +85,8 @@ public class PeerProfile {
     private final float _peakTunnelThroughput[] = new float[THROUGHPUT_COUNT];
     /** total number of bytes pushed through a single tunnel in a 1 minute period */
     private final float _peakTunnel1mThroughput[] = new float[THROUGHPUT_COUNT];
-    /** once a day, on average, cut the measured throughtput values in half */
-    /** let's try once an hour times 3/4 */
-    private static final int DROP_PERIOD_MINUTES = 60;
+    /** periodically cut the measured throughput values */
+    private static final int DROP_PERIOD_MINUTES = 120;
     private static final float DEGRADE_FACTOR = 0.75f;
     private long _lastCoalesceDate = System.currentTimeMillis();
     
@@ -336,7 +334,7 @@ public class PeerProfile {
      * is this peer actively failing (aka not worth touching)?
      * deprecated - unused - always false
      */
-    public boolean getIsFailing() { return _isFailing; }
+    public boolean getIsFailing() { return false; }
 
     public float getTunnelTestTimeAverage() { return _tunnelTestResponseTimeAvg; }
     void setTunnelTestTimeAverage(float avg) { _tunnelTestResponseTimeAvg = avg; }
@@ -363,11 +361,18 @@ public class PeerProfile {
         rv /= (60 * 1024 * THROUGHPUT_COUNT);
         return rv;
     }
-    public void setPeakThroughputKBps(float kBps) {
-        _peakThroughput[0] = kBps*60*1024;
-        //for (int i = 0; i < THROUGHPUT_COUNT; i++)
-        //    _peakThroughput[i] = kBps*60;
+
+    /**
+     *  Only for restoration from persisted profile.
+     */
+    void setPeakThroughputKBps(float kBps) {
+        // Set all so the average remains the same
+        float speed = kBps * (60 * 1024);
+        for (int i = 0; i < THROUGHPUT_COUNT; i++) {
+            _peakThroughput[i] = speed;
+        }
     }
+
     void dataPushed(int size) { _peakThroughputCurrentTotal += size; }
     
     /** the tunnel pushed that much data in its lifetime */
@@ -393,8 +398,16 @@ public class PeerProfile {
         rv /= (10 * 60 * 1024 * THROUGHPUT_COUNT);
         return rv;
     }
-    public void setPeakTunnelThroughputKBps(float kBps) {
-        _peakTunnelThroughput[0] = kBps * (60 * 10 * 1024);
+
+    /**
+     *  Only for restoration from persisted profile.
+     */
+    void setPeakTunnelThroughputKBps(float kBps) {
+        // Set all so the average remains the same
+        float speed = kBps * (60 * 10 * 1024);
+        for (int i = 0; i < THROUGHPUT_COUNT; i++) {
+            _peakTunnelThroughput[i] = speed;
+        }
     }
     
     /** the tunnel pushed that much data in a 1 minute period */
@@ -422,10 +435,11 @@ public class PeerProfile {
             }
         }
     }
+
     /**
      * @return the average of the three fastest one-minute data transfers, on a per-tunnel basis,
      *         through this peer. Ever. Except that the peak values are cut in half
-     *         once a day by coalesceThroughput(). This seems way too seldom.
+     *         periodically by coalesceThroughput().
      */
     public float getPeakTunnel1mThroughputKBps() { 
         float rv = 0;
@@ -434,8 +448,16 @@ public class PeerProfile {
         rv /= (60 * 1024 * THROUGHPUT_COUNT);
         return rv;
     }
-    public void setPeakTunnel1mThroughputKBps(float kBps) {
-        _peakTunnel1mThroughput[0] = kBps*60*1024;
+
+    /**
+     *  Only for restoration from persisted profile.
+     */
+    void setPeakTunnel1mThroughputKBps(float kBps) {
+        // Set all so the average remains the same
+        float speed = kBps * (60 * 1024);
+        for (int i = 0; i < THROUGHPUT_COUNT; i++) {
+            _peakTunnel1mThroughput[i] = speed;
+        }
     }
     
     /**
@@ -517,7 +539,7 @@ public class PeerProfile {
                     }
                 }
             } else {
-                if (_context.random().nextInt(DROP_PERIOD_MINUTES*2) <= 0) {
+                if (_context.random().nextInt(DROP_PERIOD_MINUTES) <= 0) {
                     for (int i = 0; i < THROUGHPUT_COUNT; i++)
                         _peakThroughput[i] *= DEGRADE_FACTOR;
                 }
@@ -525,7 +547,7 @@ public class PeerProfile {
             
             // we degrade the tunnel throughput here too, regardless of the current
             // activity
-            if (_context.random().nextInt(DROP_PERIOD_MINUTES*2) <= 0) {
+            if (_context.random().nextInt(DROP_PERIOD_MINUTES) <= 0) {
                 for (int i = 0; i < THROUGHPUT_COUNT; i++) {
                     _peakTunnelThroughput[i] *= DEGRADE_FACTOR;
                     _peakTunnel1mThroughput[i] *= DEGRADE_FACTOR;
@@ -544,7 +566,7 @@ public class PeerProfile {
         updateValues();
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Coalesced: speed [" + _speedValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
+            _log.debug("Coalesced: speed [" + _speedValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + ']');
     }
     
     /**
@@ -574,7 +596,6 @@ public class PeerProfile {
         // (in fact aren't really used at all), so we can
         // update them directly
     	_integrationValue = calculateIntegration();
-    	_isFailing = calculateIsFailing();
     }
     
     /**
@@ -594,9 +615,7 @@ public class PeerProfile {
     private float calculateCapacity() { return (float) CapacityCalculator.calc(this); }
     private float calculateIntegration() { return (float) IntegrationCalculator.calc(this); }
     /** deprecated - unused - always false */
-    private boolean calculateIsFailing() { return false; }
-    /** deprecated - unused - always false */
-    void setIsFailing(boolean val) { _isFailing = val; }
+    void setIsFailing(boolean val) {}
     
     /**
      *  Helper for calculators
