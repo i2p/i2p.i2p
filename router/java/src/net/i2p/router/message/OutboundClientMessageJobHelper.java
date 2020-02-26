@@ -286,6 +286,7 @@ class OutboundClientMessageJobHelper {
     /**
      * Build a clove that sends the payload to the destination
      */
+/****
     private static PayloadGarlicConfig buildDataClove(RouterContext ctx, Payload data, Destination dest, long expiration) {
         
         DeliveryInstructions instructions = new DeliveryInstructions();
@@ -310,6 +311,7 @@ class OutboundClientMessageJobHelper {
         
         return clove;
     }
+****/
     
     
     /**

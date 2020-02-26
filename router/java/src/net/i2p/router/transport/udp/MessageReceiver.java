@@ -238,7 +238,7 @@ class MessageReceiver {
                     _transport.sendDestroy(ps);
                     _transport.dropPeer(ps, true, "Corrupt DSM");
                     _context.banlist().banlistRouterForever(state.getFrom(),
-                                                            _x("Sent corrupt DSM"));
+                                                            "Sent corrupt message");  // don't bother translating
                 }
             }
             _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "error: " + ime.toString() + ": " + state.toString());
@@ -252,16 +252,5 @@ class MessageReceiver {
         } finally {
             state.releaseResources();
         }
-    }
-
-    /**
-     *  Mark a string for extraction by xgettext and translation.
-     *  Use this only in static initializers.
-     *  It does not translate!
-     *  @return s
-     *  @since 0.9.20
-     */
-    private static final String _x(String s) {
-        return s;
     }
 }

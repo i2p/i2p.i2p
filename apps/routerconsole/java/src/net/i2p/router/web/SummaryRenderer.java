@@ -1,8 +1,10 @@
 package net.i2p.router.web;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,9 +24,11 @@ import static net.i2p.router.web.GraphConstants.*;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
 
-import org.jrobin.core.RrdException;
-import org.jrobin.graph.RrdGraph;
-import org.jrobin.graph.RrdGraphDef;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.RrdException;
+import org.rrd4j.graph.ElementsNames;
+import org.rrd4j.graph.RrdGraph;
+import org.rrd4j.graph.RrdGraphDef;
 
 /**
  *  Generate the RRD graph png images,
@@ -46,6 +50,8 @@ class SummaryRenderer {
     private static final Color AREA_COLOR = new Color(100, 160, 200, 200);
     private static final Color LINE_COLOR = new Color(0, 30, 110, 255);
     private static final Color RESTART_BAR_COLOR = new Color(223, 13, 13, 255);
+    // hide the arrow, full transparent
+    private static final Color ARROW_COLOR = new Color(0, 0, 0, 0);
     private static final boolean IS_WIN = SystemVersion.isWindows();
     private static final String DEFAULT_FONT_NAME = IS_WIN ?
             "Lucida Console" : "Monospaced";
@@ -58,6 +64,8 @@ class SummaryRenderer {
     private static final int SIZE_LEGEND = 10;
     private static final int SIZE_TITLE = 13;
     private static final long[] RATES = new long[] { 60*60*1000 };
+    // dotted line
+    private static final Stroke GRID_STROKE = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] {1, 1}, 0);
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
@@ -78,35 +86,6 @@ class SummaryRenderer {
     @Deprecated
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
         throw new UnsupportedOperationException();
-/*****
-        long end = ctx.clock().now() - 60*1000;
-        long start = end - 60*1000*SummaryListener.PERIODS;
-        try {
-            RrdGraphDefTemplate template = new RrdGraphDefTemplate(filename);
-            RrdGraphDef def = template.getRrdGraphDef();
-            def.setTimeSpan(start/1000, end/1000); // ignore the periods in the template
-            // FIXME not clear how to get the height and width from the template
-            int width = DEFAULT_X;
-            int height = DEFAULT_Y;
-            def.setWidth(width);
-            def.setHeight(height);
-
-            RrdGraph graph = new RrdGraph(def);
-            int totalWidth = graph.getRrdGraphInfo().getWidth();
-            int totalHeight = graph.getRrdGraphInfo().getHeight();
-            BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
-            Graphics gfx = img.getGraphics();
-            graph.render(gfx);
-            ImageOutputStream ios = new MemoryCacheImageOutputStream(out);
-            ImageIO.write(img, "png", ios);
-        } catch (RrdException re) {
-            //_log.error("Error rendering " + filename, re);
-            throw new IOException("Error plotting: " + re.getLocalizedMessage());
-        } catch (IOException ioe) {
-            //_log.error("Error rendering " + filename, ioe);
-            throw ioe;
-        }
-*****/
     }
 
     public void render(OutputStream out) throws IOException { render(out, DEFAULT_X, DEFAULT_Y,
@@ -148,13 +127,14 @@ class SummaryRenderer {
             RrdGraphDef def = new RrdGraphDef();
 
             // Override defaults
-            def.setColor(RrdGraphDef.COLOR_BACK,   BACK_COLOR);
-            def.setColor(RrdGraphDef.COLOR_SHADEA, SHADEA_COLOR);
-            def.setColor(RrdGraphDef.COLOR_SHADEB, SHADEB_COLOR);
-            def.setColor(RrdGraphDef.COLOR_GRID,   GRID_COLOR);
-            def.setColor(RrdGraphDef.COLOR_MGRID,  MGRID_COLOR);
-            def.setColor(RrdGraphDef.COLOR_FONT,   FONT_COLOR);
-            def.setColor(RrdGraphDef.COLOR_FRAME,  FRAME_COLOR);
+            def.setColor(ElementsNames.back,   BACK_COLOR);
+            def.setColor(ElementsNames.shadea, SHADEA_COLOR);
+            def.setColor(ElementsNames.shadeb, SHADEB_COLOR);
+            def.setColor(ElementsNames.grid,   GRID_COLOR);
+            def.setColor(ElementsNames.mgrid,  MGRID_COLOR);
+            def.setColor(ElementsNames.font,   FONT_COLOR);
+            def.setColor(ElementsNames.frame,  FRAME_COLOR);
+            def.setColor(ElementsNames.arrow,  ARROW_COLOR);
 
             // improve text legibility
             String lang = Messages.getLanguage(_context);
@@ -176,6 +156,7 @@ class SummaryRenderer {
             def.setFont(RrdGraphDef.FONTTAG_DEFAULT, small);
             // AXIS is unused, we do not set any axis labels
             def.setFont(RrdGraphDef.FONTTAG_AXIS, small);
+            // rrd4j sets UNIT = AXIS in RrdGraphConstants, may be bug, maybe not, no use setting them different here
             def.setFont(RrdGraphDef.FONTTAG_UNIT, small);
             def.setFont(RrdGraphDef.FONTTAG_LEGEND, legnd);
             def.setFont(RrdGraphDef.FONTTAG_TITLE, large);
@@ -234,8 +215,8 @@ class SummaryRenderer {
             }
             if (!hideLegend) {
                 def.gprint(plotName, SummaryListener.CF, "   " + _t("Avg") + ": %.2f%s");
-                def.gprint(plotName, "MAX", ' ' + _t("Max") + ": %.2f%S");
-                def.gprint(plotName, "LAST", ' ' + _t("Now") + ": %.2f%S\\l");
+                def.gprint(plotName, ConsolFun.MAX, ' ' + _t("Max") + ": %.2f%S");
+                def.gprint(plotName, ConsolFun.LAST, ' ' + _t("Now") + ": %.2f%S\\l");
             }
             String plotName2 = null;
             if (lsnr2 != null) {
@@ -247,8 +228,8 @@ class SummaryRenderer {
                 def.line(plotName2, LINE_COLOR, descr2 + "\\l", 2);
                 if (!hideLegend) {
                     def.gprint(plotName2, SummaryListener.CF, "   " + _t("Avg") + ": %.2f%s");
-                    def.gprint(plotName2, "MAX", ' ' + _t("Max") + ": %.2f%S");
-                    def.gprint(plotName2, "LAST", ' ' + _t("Now") + ": %.2f%S\\l");
+                    def.gprint(plotName2, ConsolFun.MAX, ' ' + _t("Max") + ": %.2f%S");
+                    def.gprint(plotName2, ConsolFun.LAST, ' ' + _t("Now") + ": %.2f%S\\l");
                 }
             }
             if (!hideLegend) {
@@ -261,7 +242,7 @@ class SummaryRenderer {
                     if (started > start && started < end) {
                         // String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\l";
                         String legend;
-                        if ("ar".equals(lang) || "fa".equals(lang) || "iw".equals(lang)) {
+                        if (Messages.isRTL(lang)) {
                             // RTL languages
                             legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " - " + event.getValue() + "\\l";
                         } else {
@@ -290,6 +271,8 @@ class SummaryRenderer {
             }
             //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
             def.setAntiAliasing(false);
+            def.setTextAntiAliasing(true);
+            def.setGridStroke(GRID_STROKE);
             //System.out.println("Rendering: \n" + def.exportXmlTemplate());
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
             def.setWidth(width);

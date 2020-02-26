@@ -984,6 +984,12 @@ public class HandshakeState implements Destroyable, Cloneable {
 		if (dh != null && dh.hasPublicKey()) {
 			dh.getPublicKey(tmp, 0);
 			buf.append(net.i2p.data.Base64.encode(tmp));
+			if (dh.hasEncodedPublicKey()) {
+				buf.append('\n');
+				buf.append("Local eph. pub key ELG2 encoded:   ");
+				dh.getEncodedPublicKey(tmp, 0);
+				buf.append(net.i2p.data.Base64.encode(tmp));
+			}
 		} else {
 			buf.append("null");
 		}

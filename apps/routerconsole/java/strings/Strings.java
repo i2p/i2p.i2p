@@ -39,20 +39,13 @@ class Dummy {
         _t("eepsite");
         _t("I2P webserver");
         _t("HTTP Proxy");        
-        // older names for pre-0.7.4 installs
-        _t("eepProxy");
-        _t("ircProxy");
         // hardcoded in i2psnark
         _t("I2PSnark");
-        // hardcoded in iMule?
-        _t("iMule");
 
 
         // standard themes for ConfigUIHelper
-        _t("classic");
         _t("dark");
         _t("light");
-        _t("midnight");        
 
         // stat groups for stats.jsp
         // See StatsGenerator for groups mapped to a display name

@@ -98,14 +98,7 @@ class ExploreJob extends SearchJob {
         
         int available = MAX_CLOSEST - dontIncludePeers.size();
         if (_isRealExplore) {
-            if (available > 0) {
-                // Add a flag to say this is an exploration and we don't want floodfills in the responses.
-                // Doing it this way is of course backwards-compatible.
-                // Supported as of 0.7.9
-                if (dontIncludePeers.add(Hash.FAKE_HASH))
-                    available--;
-            }
-            // supported as of 0.9.16. TODO remove fake hash above
+            // supported as of 0.9.16. We don't add "fake hash" any more.
             msg.setSearchType(DatabaseLookupMessage.Type.EXPL);
         } else {
             msg.setSearchType(DatabaseLookupMessage.Type.RI);

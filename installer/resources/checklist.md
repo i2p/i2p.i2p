@@ -15,7 +15,7 @@
 - Push to Transifex: `tx push -s`
 - Make announcement on Transifex with checkin deadline
 
-- GeoIP: Maxmind update is usually first Tuesday of the month, time accordingly
+- GeoIP: db-ip.com update is usually first of the month, time accordingly
 - installer/resources/makegeoip.sh
 - mtn ci installer/resources/GeoLite2-Country.mmdb.gz
 
@@ -131,7 +131,10 @@
 
 ### Build and test
 
-1. `ant release` or `ant releaseWithGeoIP` or `ant releaseWithJbigi`
+0. Make sure you're using the right JDK
+   `echo $JAVA_HOME` and `java -version`
+
+1. `ant releaseRepack` or `ant releaseWithGeoIPRepack` or `ant releaseWithJbigiRepack`
 
   - Copy i2pinstall_${release.number}_windows.exe,
     console.ico, ../lib/izpack/rh.bat, and ../lib/izpack/VersionInfo_template.rc

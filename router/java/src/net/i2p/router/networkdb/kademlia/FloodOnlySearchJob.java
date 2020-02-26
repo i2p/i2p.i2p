@@ -65,6 +65,8 @@ abstract class FloodOnlySearchJob extends FloodSearchJob {
 
     @Override
     public void runJob() {
+        throw new UnsupportedOperationException("use override");
+/****
         // pick some floodfill peers and send out the searches
         // old
         //List<Hash> floodfillPeers = _facade.getFloodfillPeers();
@@ -105,7 +107,6 @@ abstract class FloodOnlySearchJob extends FloodSearchJob {
         // so we can register a reply selector.
         _out = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout);
 
-/********
         // We need to randomize our ff selection, else we stay with the same ones since
         // getFloodfillPeers() is sorted by closest distance. Always using the same
         // ones didn't help reliability.
@@ -140,7 +141,6 @@ abstract class FloodOnlySearchJob extends FloodSearchJob {
         } else {
             _shouldProcessDSRM = true;
         }
-********/
 
         int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
         for (int i = 0; _lookupsRemaining.get() < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
@@ -172,6 +172,7 @@ abstract class FloodOnlySearchJob extends FloodSearchJob {
             dlm.setMessageExpiration(getContext().clock().now() + SINGLE_SEARCH_MSG_TIME);
             dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
             dlm.setSearchKey(_key);
+            dlm.setSearchType(_isLease ? DatabaseLookupMessage.Type.LS : DatabaseLookupMessage.Type.RI);
             
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Floodfill search for " + _key + " to " + peer);
@@ -186,6 +187,7 @@ abstract class FloodOnlySearchJob extends FloodSearchJob {
             // no floodfill peers, fail
             failed();
         }
+****/
     }
 
     @Override

@@ -13,9 +13,6 @@
             cache="../../../build"
             srcdir="./src"
             destdir="./build/obj" >
-            <classpath>
-                <pathelement location="../../../core/java/build/i2p.jar" />
-            </classpath>
         </depend>
     </target>
 
@@ -38,9 +35,6 @@
             encoding="UTF-8"
             includes="**/*.java" >
             <compilerarg line="${javac.compilerargs}" />
-            <classpath>
-                <pathelement location="../../../core/java/build/i2p.jar" />
-            </classpath>
         </javac>
     </target>
 
@@ -63,8 +57,7 @@
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/jrobin.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
-                <attribute name="${manifest.classpath.name}" value="i2p.jar" />
-                <attribute name="Implementation-Version" value="1.6.0-1" />
+                <attribute name="Implementation-Version" value="3.5" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
