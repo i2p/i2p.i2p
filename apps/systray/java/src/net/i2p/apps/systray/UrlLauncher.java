@@ -57,6 +57,7 @@ public class UrlLauncher implements ClientApp {
     private static final int MAX_TRIES = 99;
     private static final String REGISTERED_NAME = "UrlLauncher";
     private static final String PROP_BROWSER = "routerconsole.browser";
+    private static final boolean IS_SERVICE = SystemVersion.isService();
 
     /**
      *  Browsers to try IN-ORDER
@@ -177,6 +178,8 @@ public class UrlLauncher implements ClientApp {
      * unsuccessful, an attempt is made to launch the URL using the most common
      * browsers.
      * 
+     * As of 0.9.46, fails immediately if JVM is a Windows or Linux Service.
+     * 
      * BLOCKING. This repeatedly probes the server port at the given url
      * until it is apparently ready.
      * 
@@ -187,6 +190,8 @@ public class UrlLauncher implements ClientApp {
      * @throws IOException
      */ 
     public boolean openUrl(String url) throws IOException {
+        if (IS_SERVICE)
+            return false;
         if (_log.shouldDebug()) _log.debug("Waiting for server");
         waitForServer(url);
         if (_log.shouldDebug()) _log.debug("Done waiting for server");
@@ -278,6 +283,8 @@ public class UrlLauncher implements ClientApp {
      * they contain spaces or tabs.
      * There is no mechanism to escape quotes or other chars with backslashes.
      * 
+     * As of 0.9.46, fails immediately if JVM is a Windows or Linux Service.
+     * 
      * BLOCKING. However, this does NOT probe the server port to see if it is ready.
      * 
      * @param  url     The URL to open.
@@ -288,6 +295,8 @@ public class UrlLauncher implements ClientApp {
      * @throws IOException
      */
     public boolean openUrl(String url, String browser) throws IOException {
+        if (IS_SERVICE)
+            return false;
         waitForServer(url);
         if (validateUrlFormat(url)) {
             String[] args = parseArgs(browser, url);
@@ -383,9 +392,16 @@ public class UrlLauncher implements ClientApp {
 
     /**
      *  ClientApp interface
+     *  As of 0.9.46, stops immediately if JVM is a Windows or Linux Service.
+     * 
      *  @since 0.9.18
      */
     public void startup() {
+        if (IS_SERVICE) {
+            // not START_FAILED so manager doesn't log CRIT
+            changeState(STOPPED);
+            return;
+        }
         String url = _args[0];
         if (!validateUrlFormat(url)) {
             changeState(START_FAILED, new MalformedURLException("Bad url: " + url));

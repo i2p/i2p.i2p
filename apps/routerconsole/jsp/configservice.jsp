@@ -52,7 +52,7 @@
  </div>
 <%
    }  
-   if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) {
+   if (net.i2p.util.SystemVersion.isWindows()) {
 %>
  <h3 class="ptitle" id="runonstartup"><%=intl._t("Run on startup")%></h3>
  <p class="infohelp">
@@ -60,13 +60,24 @@
     <%=intl._t("If you prefer the command line, you can also run the ")%> <code>install_i2p_service_winnt.bat</code> (<%=intl._t("or")%>
  <code>uninstall_i2p_service_winnt.bat</code>).</p>
  <hr><div class="formaction" id="runonstart">
+<%
+     if (net.i2p.util.SystemVersion.isWindowsService()) {
+%>
+ <input type="submit" name="action" class="cancel" value="<%=intl._t("Don't run I2P on startup")%>" >
+<%   } else { %>
  <input type="submit" name="action" class="accept" value="<%=intl._t("Run I2P on startup")%>" >
- <input type="submit" name="action" class="cancel" value="<%=intl._t("Don't run I2P on startup")%>" ></div>
+<%   } %>
+  </div>
+<%
+     if (net.i2p.util.SystemVersion.isWindowsService()) {
+%>
  <p class="infohelp" id="winfoservice"><b>
     <%=intl._t("Note")%>:</b> <%=intl._t("If you are running I2P as service right now, removing it will shut down your router immediately.")%>
     <%=intl._t("You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat.")%></p>
- <% } %>
-
+<%
+     }
+   }
+%>
  <h3 class="ptitle" id="servicedebug"><%=intl._t("Debugging")%>&nbsp;<a href="/jobs">[<%=intl._t("View the job queue")%>]</a></h3>
  <p class="infohelp">
 <% if (net.i2p.util.SystemVersion.hasWrapper()) { %>
@@ -83,6 +94,7 @@
 <% } %>
  </div>
 
+<% if (!net.i2p.util.SystemVersion.isService()) { %>
  <h3 class="ptitle" id="browseronstart"><%=intl._t("Launch browser on router startup?")%></h3>
  <p class="infohelp">
     <% String consoleURL = formhandler.getConsoleURL(); %>
@@ -91,4 +103,6 @@
  <hr><div class="formaction" id="browserstart">
  <input type="submit" class="check" name="action" value="<%=intl._t("View console on startup")%>" >
  <input type="submit" class="delete" name="action" value="<%=intl._t("Do not view console on startup")%>" >
-</div></form></div></body></html>
+ </div>
+<% } %>
+</form></div></body></html>

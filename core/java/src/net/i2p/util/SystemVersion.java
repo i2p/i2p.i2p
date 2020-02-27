@@ -43,6 +43,9 @@ public abstract class SystemVersion {
     private static final boolean _is64;
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
     private static final boolean _isLinuxService;
+    // found in Tanuki WrapperManager source so we don't need the WrapperManager class here
+    private static final boolean _isWindowsService = _isWin && _hasWrapper && Boolean.valueOf(System.getProperty("wrapper.service"));
+    private static final boolean _isService;
     private static final boolean _isSlow;
 
     private static final boolean _oneDotSix;
@@ -76,6 +79,7 @@ public abstract class SystemVersion {
         _isLinuxService = !_isWin && !_isMac && !_isAndroid &&
                           (DAEMON_USER.equals(System.getProperty("user.name")) ||
                            (_isGentoo && GENTOO_USER.equals(System.getProperty("user.name"))));
+        _isService = _isLinuxService || _isWindowsService;
         _isSlow = _isAndroid || _isApache || _isArm || _isGNU || _isZero || getMaxMemory() < 48*1024*1024L;
 
         int sdk = 0;
@@ -298,6 +302,20 @@ public abstract class SystemVersion {
         return _isLinuxService;
     }
 
+    /*
+     *  @since 0.9.46
+     */
+    public static boolean isWindowsService() {
+        return _isWindowsService;
+    }
+
+    /*
+     *  @since 0.9.46
+     */
+    public static boolean isService() {
+        return _isService;
+    }
+
     /**
      *  Identical to android.os.Build.VERSION.SDK_INT.
      *  For use outside of Android code.
@@ -376,7 +394,9 @@ public abstract class SystemVersion {
         System.out.println("Java 9   : " + isJava9());
         System.out.println("Java 10  : " + isJava10());
         System.out.println("Java 11  : " + isJava11());
-        System.out.println("Java 12  : " + isJava(12));
+        for (int i = 12; i <= 15; i++) {
+            System.out.println("Java " + i + "  : " + isJava(i));
+        }
         System.out.println("Android  : " + isAndroid());
         if (isAndroid())
             System.out.println("  Version: " + getAndroidVersion());
@@ -391,6 +411,7 @@ public abstract class SystemVersion {
         System.out.println("OpenJDK  : " + isOpenJDK());
         System.out.println("Slow     : " + isSlow());
         System.out.println("Windows  : " + isWindows());
+        System.out.println("Win. Svc : " + isWindowsService());
         System.out.println("Wrapper  : " + hasWrapper());
         System.out.println("x86      : " + isX86());
         System.out.println("Zero JVM : " + isZeroVM());
