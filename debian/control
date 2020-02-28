@@ -90,7 +90,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  sensible-utils
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
-Recommends: libjbigi-jni, fonts-dejavu
+Recommends: libjbigi-jni
 Suggests: apparmor
  ,privoxy
  ,syndie
@@ -99,6 +99,3 @@ Description: Invisible Internet Project (I2P) - Router
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
  trusted parties.
- .
- TrueType fonts (such as those provided in the package fonts-dejavu) are required
- in order to generate graphs.
