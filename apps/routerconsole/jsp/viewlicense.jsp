@@ -13,12 +13,31 @@ response.setDateHeader("Expires", 0);
 response.addHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
 response.addHeader("Pragma", "no-cache");
 java.io.File base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir();
-java.io.File file = new java.io.File(base, "LICENSE.txt");
+String name = "LICENSE.txt";
+java.io.File file = new java.io.File(base, name);
+if (!file.exists()) {
+    if (!net.i2p.util.SystemVersion.isWindows() && !net.i2p.util.SystemVersion.isMac()) {
+        // Debian package?
+        java.io.File b = new java.io.File("/usr/share/doc/i2p-router");
+        java.io.File f = new java.io.File(b, "copyright");
+        if (f.exists()) {
+            name = "copyright";
+            base = b;
+            file = f;
+        } else {
+            response.sendError(404, "Not Found");
+            return;
+        }
+    } else {
+        response.sendError(404, "Not Found");
+        return;
+    }
+}
 long length = file.length();
 if (length > 0)
     response.setHeader("Content-Length", Long.toString(length));
 try {
-    net.i2p.util.FileUtil.readFile("LICENSE.txt", base.getAbsolutePath(), response.getOutputStream());
+    net.i2p.util.FileUtil.readFile(name, base.getAbsolutePath(), response.getOutputStream());
 } catch (java.io.IOException ioe) {
     // prevent 'Committed' IllegalStateException from Jetty
     if (!response.isCommitted()) {
