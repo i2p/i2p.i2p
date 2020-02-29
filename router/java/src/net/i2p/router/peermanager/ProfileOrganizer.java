@@ -378,8 +378,8 @@ public class ProfileOrganizer {
                 _log.info("selectFastPeers("+howMany+"), not enough fast (" + matches.size() + ") going on to highCap");
             selectHighCapacityPeers(howMany, exclude, matches, mask);
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
+            if (_log.shouldDebug())
+                _log.debug("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
         }
         return;
     }
@@ -446,8 +446,8 @@ public class ProfileOrganizer {
                 _log.info("selectFastPeers("+howMany+"), not enough fast (" + matches.size() + ") going on to highCap");
             selectHighCapacityPeers(howMany, exclude, matches, 2);
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
+            if (_log.shouldDebug())
+                _log.debug("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
         }
         return;
     }
@@ -483,8 +483,8 @@ public class ProfileOrganizer {
                 _log.info("selectHighCap("+howMany+"), not enough highcap (" + matches.size() + ") going on to ANFP2");
             selectActiveNotFailingPeers2(howMany, exclude, matches, mask);
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
+            if (_log.shouldDebug())
+                _log.debug("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
         }
         return;
     }
@@ -517,8 +517,8 @@ public class ProfileOrganizer {
                 _log.info("selectWellIntegrated("+howMany+"), not enough integrated (" + matches.size() + ") going on to notFailing");
             selectNotFailingPeers(howMany, exclude, matches, mask);
         } else {            
-            if (_log.shouldLog(Log.INFO))
-                _log.info("selectWellIntegrated("+howMany+"), found enough well integrated (" + matches.size() + ")");
+            if (_log.shouldDebug())
+                _log.debug("selectWellIntegrated("+howMany+"), found enough well integrated (" + matches.size() + ")");
         }
         
         return;
@@ -620,8 +620,8 @@ public class ProfileOrganizer {
                 _log.info("selectANFP2("+howMany+"), not enough ANFP (" + matches.size() + ") going on to notFailing");
             selectNotFailingPeers(howMany, exclude, matches, mask);
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("selectANFP2("+howMany+"), found enough ANFP (" + matches.size() + ")");
+            if (_log.shouldDebug())
+                _log.debug("selectANFP2("+howMany+"), found enough ANFP (" + matches.size() + ")");
         }
     }
 
