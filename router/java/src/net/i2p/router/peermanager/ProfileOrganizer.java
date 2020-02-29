@@ -782,9 +782,9 @@ public class ProfileOrganizer {
      * this method, but the averages are recalculated.
      *
      */
-    public void reorganize() { reorganize(false); }
+    void reorganize() { reorganize(false); }
 
-    public void reorganize(boolean shouldCoalesce) {
+    void reorganize(boolean shouldCoalesce) {
         long sortTime = 0;
         int coalesceTime = 0;
         long thresholdTime = 0;
@@ -1145,7 +1145,7 @@ public class ProfileOrganizer {
     }
     
     /**
-     * Update the _thresholdSpeedValue by calculating the median speed of all
+     * Update the _thresholdSpeedValue by calculating the average speed of all
      * high capacity peers. 
      *
      * @param reordered ordered set of PeerProfile objects, ordered by capacity
@@ -1186,11 +1186,14 @@ public class ProfileOrganizer {
     private void locked_calculateSpeedThresholdMean(Set<PeerProfile> reordered) {
         double total = 0;
         int count = 0;
+        int maxHighCapPeers = getMaximumHighCapPeers();
         for (PeerProfile profile : reordered) {
             if (profile.getCapacityValue() >= _thresholdCapacityValue) {
                 // duplicates being clobbered is fine by us
                 total += profile.getSpeedValue();
                 count++;
+                if (count >= maxHighCapPeers)
+                    break;
             } else {
                 // its ordered
                 break;
