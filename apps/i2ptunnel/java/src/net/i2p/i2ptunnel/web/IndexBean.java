@@ -420,13 +420,23 @@ public class IndexBean {
                        ": " + port + "</font>";
             // dup check, O(n**2)
             List<TunnelController> controllers = _group.getControllers();
+            String ifc = tun.getListenOnInterface();
             for (int i = 0; i < controllers.size(); i++) {
                 if (i == tunnel)
                     continue;
-                if (port.equals(controllers.get(i).getListenPort()))
-                    return "<font color=\"red\">" +
-                           _t("Warning - duplicate port") +
-                           ": " + port + "</font>";
+                TunnelController tc = controllers.get(i);
+                if (port.equals(tc.getListenPort())) {
+                    String ifc2 = tc.getListenOnInterface();
+                    if (DataHelper.eq(ifc, ifc2) ||
+                        "0.0.0.0".equals(ifc) ||
+                        "0.0.0.0".equals(ifc2) ||
+                        "0:0:0:0:0:0:0:0".equals(ifc) ||
+                        "0:0:0:0:0:0:0:0".equals(ifc2)) {
+                        return "<font color=\"red\">" +
+                               _t("Warning - duplicate port") +
+                               ": " + port + "</font>";
+                    }
+                }
             }
             return port;
         }
