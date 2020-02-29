@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -255,8 +257,37 @@ public class NamingServiceBean extends AddressbookBean
 							} else if (oldDest != null && action.equals(_t("Add"))) {
 								message = _t("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
+								boolean wasB32 = false;
 								try {
-									Destination dest = new Destination(destination);
+									Destination dest;
+									if (destination.length() >= 516) {
+										dest = new Destination(destination);
+									} else if (destination.contains(".b32.i2p")) {
+										wasB32 = true;
+										if (destination.startsWith("http://") ||
+										    destination.startsWith("https://")) {
+											// do them a favor, pull b32 out of pasted URL
+											try {
+												URI uri = new URI(destination);
+												String b32 = uri.getHost();
+												if (b32 == null || !b32.endsWith(".b32.i2p") || b32.length() < 60)
+													throw new DataFormatException("");
+												dest = _context.namingService().lookup(b32);
+												if (dest == null)
+													throw new DataFormatException(_t("Unable to resolve Base 32 address"));
+											} catch(URISyntaxException use) {
+												throw new DataFormatException("");
+											}
+										} else if (destination.endsWith(".b32.i2p") && destination.length() >= 60) {
+											dest = _context.namingService().lookup(destination);
+											if (dest == null)
+												throw new DataFormatException(_t("Unable to resolve Base 32 address"));
+										} else {
+											throw new DataFormatException("");
+										}
+									} else {
+										throw new DataFormatException("");
+									}
 									if (oldDest != null) {
 										nsOptions.putAll(outProperties);
 							                        String now = Long.toString(_context.clock().now());
@@ -294,7 +325,13 @@ public class NamingServiceBean extends AddressbookBean
 										message = _t("Failed to add Destination for {0} to naming service {1}", displayHost, getNamingService().getName()) + "<br>";
 									}
 								} catch (DataFormatException dfe) {
-									message = _t("Invalid Base 64 destination.");
+									String msg = dfe.getMessage();
+									if (msg != null && msg.length() > 0)
+										message = msg;
+									else if (wasB32)
+										message = _t("Invalid Base 32 host name.");
+									else
+										message = _t("Invalid Base 64 destination.");
 								}
 							}
 						} catch (IllegalArgumentException iae) {

@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -259,11 +261,44 @@ public class AddressbookBean extends BaseBean
 								message = _t("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
 								boolean valid = true;
+								boolean wasB32 = false;
 								try {
-									// just to check validity
-									new Destination(destination);
+									if (destination.length() >= 516) {
+										// just to check validity
+										new Destination(destination);
+									} else if (destination.contains(".b32.i2p")) {
+										wasB32 = true;
+										Destination dest;
+										if (destination.startsWith("http://") ||
+										    destination.startsWith("https://")) {
+											// do them a favor, pull b32 out of pasted URL
+											try {
+												URI uri = new URI(destination);
+												String b32 = uri.getHost();
+												if (b32 == null || !b32.endsWith(".b32.i2p") || b32.length() < 60)
+													throw new DataFormatException("");
+												dest = _context.namingService().lookup(b32);
+												if (dest == null)
+													throw new DataFormatException(_t("Unable to resolve Base 32 address"));
+											} catch(URISyntaxException use) {
+												throw new DataFormatException("");
+											}
+										} else if (destination.endsWith(".b32.i2p") && destination.length() >= 60) {
+											dest = _context.namingService().lookup(destination);
+											if (dest == null)
+												throw new DataFormatException(_t("Unable to resolve Base 32 address"));
+										} else {
+											throw new DataFormatException("");
+										}
+										destination = dest.toBase64();
+									} else {
+										throw new DataFormatException("");
+									}
 								} catch (DataFormatException dfe) {
 									valid = false;
+									String msg = dfe.getMessage();
+									if (msg != null)
+										message = msg;
 								}
 								if (valid) {
 									addressbook.put( host, destination );
@@ -278,7 +313,12 @@ public class AddressbookBean extends BaseBean
 									hostname = null;
 									destination = null;
 								} else {
-									message = _t("Invalid Base 64 destination.");
+									if (message.length() <= 0) {
+										if (wasB32)
+											message = _t("Invalid Base 32 host name.");
+										else
+											message = _t("Invalid Base 64 destination.");
+									}
 								}
 							}
 						} catch (IllegalArgumentException iae) {
