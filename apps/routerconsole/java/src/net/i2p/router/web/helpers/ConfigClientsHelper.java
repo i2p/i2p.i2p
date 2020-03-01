@@ -22,6 +22,7 @@ import net.i2p.router.web.PluginStarter;
 import net.i2p.router.web.RouterConsoleRunner;
 import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.Addresses;
+import net.i2p.util.SystemVersion;
 
 public class ConfigClientsHelper extends HelperBase {
     private String _edit;
@@ -136,6 +137,7 @@ public class ConfigClientsHelper extends HelperBase {
             ClientAppConfig ca = cac.config;
             int cur = cac.index;
             boolean isConsole = ca.className.equals("net.i2p.router.web.RouterConsoleRunner");
+            boolean isDisabledBrowser = SystemVersion.isService() && ca.className.equals("net.i2p.apps.systray.UrlLauncher");
             boolean showStart;
             boolean showStop;
             boolean showEdit;
@@ -143,6 +145,10 @@ public class ConfigClientsHelper extends HelperBase {
                 showStart = false;
                 showStop = false;
                 showEdit = true;
+            } else if (isDisabledBrowser) {
+                showStart = false;
+                showStop = false;
+                showEdit = false;
             } else {
                 ClientApp clientApp = _context.routerAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
                 showStart = clientApp == null;
@@ -152,11 +158,10 @@ public class ConfigClientsHelper extends HelperBase {
             String scur = Integer.toString(cur);
             renderForm(buf, scur, ca.clientName,
                        // urlify, enabled
-                       false, !ca.disabled,
+                       false, !ca.disabled && !isDisabledBrowser,
                        // read only, preventDisable
                        // dangerous, but allow editing the console args too
-                       //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
-                       false, RouterConsoleRunner.class.getName().equals(ca.className),
+                       isDisabledBrowser, isConsole || isDisabledBrowser,
                        // description
                        DataHelper.escapeHTML(ca.className + ((ca.args != null) ? " " + ca.args : "")),
                        // edit
@@ -234,10 +239,11 @@ public class ConfigClientsHelper extends HelperBase {
                     desc = _t("Email");
                 else
                     desc = DataHelper.escapeHTML(app) + ".war";
+                boolean isConsole = RouterConsoleRunner.ROUTERCONSOLE.equals(app);
                 renderForm(buf, app, app,
-                           RouterConsoleRunner.ROUTERCONSOLE.equals(app) || (isRunning && !"addressbook".equals(app)),
-                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app),
-                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), desc,
+                           isConsole || (isRunning && !"addressbook".equals(app)),
+                           "true".equals(val), isConsole,
+                           isConsole, desc,
                            false, false, false, isRunning, false, !isRunning);
             }
         }
@@ -371,9 +377,9 @@ public class ConfigClientsHelper extends HelperBase {
         buf.append("</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" id=\"").append(index).append("\" name=\"").append(index).append(".enabled\"");
         if (enabled) {
             buf.append(CHECKED);
-            if (ro || preventDisable)
-                buf.append("disabled=\"disabled\" ");
         }
+        if (ro || preventDisable)
+            buf.append("disabled=\"disabled\" ");
         buf.append("></td><td align=\"center\">");
 
         if (showStartButton && (!ro) && !edit) {
