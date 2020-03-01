@@ -151,6 +151,30 @@ public abstract class Addresses {
     public static SortedSet<String> getAddresses(boolean includeSiteLocal,
                                                  boolean includeLoopbackAndWildcard,
                                                  boolean includeIPv6) {
+        return getAddresses(includeSiteLocal, includeLoopbackAndWildcard, includeIPv6, includeIPv6);
+    }
+
+    /**
+     *  Warning: When includeSiteLocal and includeLoopbackAndWildcard are false,
+     *  all returned addresses should be routable, but they are not necessarily
+     *  appropriate for external use. For example, Teredo and 6to4 addresses
+     *  are included with IPv6 results. Additional validation is recommended.
+     *  See e.g. TransportUtil.isPubliclyRoutable().
+     *
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *
+     *  @return a sorted set of all addresses
+     *  @param includeSiteLocal whether to include private like 192.168.x.x
+     *  @param includeLoopbackAndWildcard whether to include 127.x.x.x and 0.0.0.0
+     *  @param includeIPv6 whether to include IPV6
+     *  @param includeIPv6Temporary whether to include IPV6 temporary addresses
+     *  @return a Set of all addresses
+     *  @since 0.9.46
+     */
+    public static SortedSet<String> getAddresses(boolean includeSiteLocal,
+                                                 boolean includeLoopbackAndWildcard,
+                                                 boolean includeIPv6,
+                                                 boolean includeIPv6Temporary) {
         boolean haveIPv4 = false;
         boolean haveIPv6 = false;
         SortedSet<String> rv = new TreeSet<String>();
@@ -165,10 +189,6 @@ public abstract class Addresses {
                         haveIPv4 = true;
                     else
                         haveIPv6 = true;
-                    if (omitDeprecated && !isv4) {
-                        if (isDeprecated((Inet6Address) allMyIps[i]))
-                            continue;
-                    }
                     if (shouldInclude(allMyIps[i], includeSiteLocal,
                                       includeLoopbackAndWildcard, includeIPv6)) {
                         rv.add(stripScope(allMyIps[i].getHostAddress()));
@@ -205,6 +225,10 @@ public abstract class Addresses {
                             haveIPv6 = true;
                         if (omitDeprecated && !isv4) {
                             if (isDeprecated((Inet6Address) addr))
+                                continue;
+                        }
+                        if (!includeIPv6Temporary && !isv4) {
+                            if (isTemporary((Inet6Address) addr))
                                 continue;
                         }
                         if (shouldInclude(addr, includeSiteLocal,

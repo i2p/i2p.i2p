@@ -82,7 +82,8 @@ public class ConfigClientsHelper extends HelperBase {
 
     /** @since 0.8.3 */
     public String[] intfcAddresses() {
-        ArrayList<String> al = new ArrayList<String>(Addresses.getAllAddresses());
+        // Exclude IPv6 temporary
+        ArrayList<String> al = new ArrayList<String>(Addresses.getAddresses(true, true, true, false));
         return al.toArray(new String[al.size()]);
     }
 

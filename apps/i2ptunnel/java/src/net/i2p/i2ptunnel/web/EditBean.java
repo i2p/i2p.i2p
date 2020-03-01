@@ -462,7 +462,8 @@ public class EditBean extends IndexBean {
 
     /** @since 0.8.3 */
     public Set<String> interfaceSet() {
-        return Addresses.getAllAddresses();
+        // exclude IPv6 temporary
+        return Addresses.getAddresses(true, true, true, false);
     }
 
     /** @since 0.9.12 */
