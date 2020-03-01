@@ -1,3 +1,26 @@
+2020-03-01 zzz
+ * Console:
+   - Disable browser launch on /configclients when a service
+   - Hide temporary IPv6 addresses from bind options
+   - Add security headers to XHR targets
+   - Fix wizard XHR initialization
+
+2020-02-29 zzz
+ * i2ptunnel: Check for same interface before warning of dup port
+ * Profiles: Limit average speed calculation to max high cap peers
+ * SusiDNS: Support adding b32's (ticket #2101)
+
+2020-02-28 zzz
+ * Console: Fix /viewlicense for Debian packages
+ * Debian: Remove fonts-dejavu as package recommendation
+
+2020-02-27 zzz
+ * Systray: Don't attempt to launch browser when running as a service
+
+2020-02-26 zzz
+ * Profiles: Fix bug causing persisted speed values to be
+   reduced when read back in
+
 2020-02-25 zzz
  * Graphs: Replace jrobin with rrd4j 3.5 (ticket #2684)
  * NetDB: Don't send 'fake hash' for exploration any more

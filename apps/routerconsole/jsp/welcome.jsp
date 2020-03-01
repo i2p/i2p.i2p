@@ -76,7 +76,9 @@
      document.getElementById("xhr").innerHTML = progressMessage;
      setTimeout(requestAjax1, "1000");
   }
-  initAjax();
+  document.addEventListener("DOMContentLoaded", function() {
+      initAjax();
+  }, true);
 </script>
 <%
     }  // ipg == 4
