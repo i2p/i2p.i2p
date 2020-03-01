@@ -7,6 +7,11 @@
                 i2pcontextId = (String) session.getAttribute("i2p.contextId");
             }
         } catch (IllegalStateException ise) {}
+        // Browser should not load this directly
+        response.setHeader("X-Frame-Options", "DENY");
+        response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'none'; script-src 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; media-src 'none'");
+        response.setHeader("X-XSS-Protection", "1; mode=block");
+        response.setHeader("X-Content-Type-Options", "nosniff");
         wizhelper.setContextId(i2pcontextId);
         // output 1 for complete, 0 + status string for in progress
         if (wizhelper.isNDTComplete()) {
