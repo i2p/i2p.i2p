@@ -24,6 +24,7 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -251,12 +252,14 @@ public class GarlicMessageBuilder {
      * @param config how/what to wrap
      * @param target public key of the location being garlic routed to (may be null if we 
      *               know the encryptKey and encryptTag)
+     * @param replyDI non-null to request an ack, or null
      * @return null if expired or on other errors
      * @throws IllegalArgumentException on error
      * @since 0.9.44
      */
     static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config,
-                                           PublicKey target, Hash from, SessionKeyManager skm) {
+                                           PublicKey target, Hash from, SessionKeyManager skm,
+                                           DeliveryInstructions replyDI) {
         PublicKey key = config.getRecipientPublicKey();
         if (key.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
@@ -286,7 +289,7 @@ public class GarlicMessageBuilder {
                 log.warn("No SKM for " + from.toBase32());
             return null;
         }
-        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, replyDI);
         if (encData == null) {
             if (log.shouldWarn())
                 log.warn("Encrypt fail for " + from.toBase32());
@@ -438,6 +441,11 @@ public class GarlicMessageBuilder {
         return rv;
     }
     
+    /**
+     * Build a single clove
+     *
+     * @since 0.9.44
+     */
     private static GarlicClove buildECIESClove(RouterContext ctx, PayloadGarlicConfig config) {
         GarlicClove clove = new GarlicClove(ctx);
         clove.setData(config.getPayload());

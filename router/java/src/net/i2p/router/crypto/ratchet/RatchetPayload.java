@@ -8,6 +8,7 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -60,6 +61,16 @@ class RatchetPayload {
          *  @param nextKey the next one
          */
         public void gotNextKey(NextSessionKey nextKey);
+
+        /**
+         *  @since 0.9.46
+         */
+        public void gotAck(int id, int n);
+
+        /**
+         *  @since 0.9.46
+         */
+        public void gotAckRequest(int id, DeliveryInstructions di);
 
         /**
          *  For stats.
@@ -123,6 +134,7 @@ class RatchetPayload {
                     break;
 
                 case BLOCK_NEXTKEY:
+                  {
                     if (len != 34)
                         throw new IOException("Bad length for NEXTKEY: " + len);
                     int id = (int) DataHelper.fromLong(payload, i, 2);
@@ -130,6 +142,30 @@ class RatchetPayload {
                     System.arraycopy(payload, i + 2, data, 0, 32);
                     NextSessionKey nsk = new NextSessionKey(data, id);
                     cb.gotNextKey(nsk);
+                  }
+                    break;
+
+                case BLOCK_ACKKEY:
+                  {
+                    if (len < 4 || (len % 4) != 0)
+                        throw new IOException("Bad length for REPLYDI: " + len);
+                    for (int j = i; j < i + len; j += 4) {
+                        int id = (int) DataHelper.fromLong(payload, j, 2);
+                        int n = (int) DataHelper.fromLong(payload, j + 2, 2);
+                        cb.gotAck(id, n);
+                    }
+                  }
+                    break;
+
+                case BLOCK_REPLYDI:
+                  {
+                    if (len < 6)
+                        throw new IOException("Bad length for REPLYDI: " + len);
+                    int id = (int) DataHelper.fromLong(payload, i, 4);
+                    DeliveryInstructions di = new DeliveryInstructions();
+                    di.readBytes(payload, i + 5);
+                    cb.gotAckRequest(id, di);
+                  }
                     break;
 
                 case BLOCK_TERMINATION:
@@ -315,6 +351,53 @@ class RatchetPayload {
             DataHelper.toLong(tgt, off, 2, next.getID());
             System.arraycopy(next.getData(), 0, tgt, off + 2, 32);
             return off + 34;
+        }
+    }
+
+    /**
+     *  @since 0.9.46
+     */
+    public static class AckBlock extends Block {
+        private final byte[] data;
+
+        public AckBlock(int keyID, int n) {
+            super(BLOCK_ACKKEY);
+            data = new byte[4];
+            DataHelper.toLong(data, 0, 2, keyID);
+            DataHelper.toLong(data, 2, 2, n);
+        }
+
+        public int getDataLength() {
+            return 4;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(data, 0, tgt, off, data.length);
+            return off + data.length;
+        }
+    }
+
+    /**
+     *  @since 0.9.46
+     */
+    public static class AckRequestBlock extends Block {
+        private final byte[] data;
+
+        public AckRequestBlock(int sessionID, DeliveryInstructions di) {
+            super(BLOCK_REPLYDI);
+            data = new byte[5 + di.getSize()];
+            DataHelper.toLong(data, 0, 4, sessionID);
+            // flag is zero
+            di.writeBytes(data, 5);
+        }
+
+        public int getDataLength() {
+            return data.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(data, 0, tgt, off, data.length);
+            return off + data.length;
         }
     }
 

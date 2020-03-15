@@ -26,6 +26,7 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import static net.i2p.router.crypto.ratchet.RatchetPayload.*;
 import net.i2p.router.RouterContext;
@@ -554,13 +555,14 @@ public final class ECIESAEADEngine {
      *
      * @param target public key to which the data should be encrypted. 
      * @param priv local private key to encrypt with, from the leaseset
+     * @param replyDI non-null to request an ack, or null
      * @return encrypted data or null on failure
      *
      */
     public byte[] encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
-                          RatchetSKM keyManager) {
+                          RatchetSKM keyManager, DeliveryInstructions replyDI) {
         try {
-            return x_encrypt(cloves, target, priv, keyManager);
+            return x_encrypt(cloves, target, priv, keyManager, replyDI);
         } catch (Exception e) {
             _log.error("ECIES encrypt error", e);
             return null;
@@ -568,7 +570,7 @@ public final class ECIESAEADEngine {
     }
 
     private byte[] x_encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
-                             RatchetSKM keyManager) {
+                             RatchetSKM keyManager, DeliveryInstructions replyDI) {
         if (target.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         if (Arrays.equals(target.getData(), NULLPK)) {
@@ -581,7 +583,7 @@ public final class ECIESAEADEngine {
         if (re == null) {
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NS to " + target);
-            return encryptNewSession(cloves, target, priv, keyManager);
+            return encryptNewSession(cloves, target, priv, keyManager, replyDI);
         }
 
         HandshakeState state = re.key.getHandshakeState();
@@ -595,11 +597,11 @@ public final class ECIESAEADEngine {
             }
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag.toBase64());
-            return encryptNewSessionReply(cloves, target, state, re.tag, keyManager);
+            return encryptNewSessionReply(cloves, target, state, re.tag, keyManager, replyDI);
         }
         if (_log.shouldDebug())
             _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64());
-        byte rv[] = encryptExistingSession(cloves, target, re.key, re.tag);
+        byte rv[] = encryptExistingSession(cloves, target, re.key, re.tag, replyDI);
         return rv;
     }
 
@@ -618,10 +620,11 @@ public final class ECIESAEADEngine {
      *  - 16 byte MAC
      * </pre>
      *
+     * @param replyDI non-null to request an ack, or null
      * @return encrypted data or null on failure
      */
     private byte[] encryptNewSession(CloveSet cloves, PublicKey target, PrivateKey priv,
-                                     RatchetSKM keyManager) {
+                                     RatchetSKM keyManager, DeliveryInstructions replyDI) {
         HandshakeState state;
         try {
             state = new HandshakeState(HandshakeState.PATTERN_ID_IK, HandshakeState.INITIATOR, _edhThread);
@@ -635,7 +638,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session: " + state);
 
-        byte[] payload = createPayload(cloves, cloves.getExpiration());
+        byte[] payload = createPayload(cloves, cloves.getExpiration(), replyDI);
 
         byte[] enc = new byte[KEYLEN + KEYLEN + MACLEN + payload.length + MACLEN];
         try {
@@ -681,10 +684,12 @@ public final class ECIESAEADEngine {
      * </pre>
      *
      * @param state must have already been cloned
+     * @param replyDI non-null to request an ack, or null
      * @return encrypted data or null on failure
      */
     private byte[] encryptNewSessionReply(CloveSet cloves, PublicKey target, HandshakeState state,
-                                          RatchetSessionTag currentTag, RatchetSKM keyManager) {
+                                          RatchetSessionTag currentTag, RatchetSKM keyManager,
+                                          DeliveryInstructions replyDI) {
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session reply: " + state);
         byte[] tag = currentTag.getData();
@@ -692,7 +697,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State after mixhash tag before encrypt new session reply: " + state);
 
-        byte[] payload = createPayload(cloves, 0);
+        byte[] payload = createPayload(cloves, 0, replyDI);
 
         // part 1 - tag and empty payload
         byte[] enc = new byte[TAGLEN + KEYLEN + MACLEN + payload.length + MACLEN];
@@ -752,12 +757,14 @@ public final class ECIESAEADEngine {
      * </pre>
      *
      * @param target unused, this is AEAD encrypt only using the session key and tag
+     * @param replyDI non-null to request an ack, or null
      * @return encrypted data or null on failure
      */
     private byte[] encryptExistingSession(CloveSet cloves, PublicKey target, SessionKeyAndNonce key,
-                                          RatchetSessionTag currentTag) {
+                                          RatchetSessionTag currentTag, 
+                                          DeliveryInstructions replyDI) {
         byte rawTag[] = currentTag.getData();
-        byte[] payload = createPayload(cloves, 0);
+        byte[] payload = createPayload(cloves, 0, replyDI);
         byte encr[] = encryptAEADBlock(rawTag, payload, key, key.getNonce());
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         return encr;
@@ -831,6 +838,16 @@ public final class ECIESAEADEngine {
             nextKey = next;
         }
 
+        public void gotAck(int id, int n) {
+            if (_log.shouldDebug())
+                _log.debug("Got ACK block: " + n);
+        }
+
+        public void gotAckRequest(int id, DeliveryInstructions di) {
+            if (_log.shouldDebug())
+                _log.debug("Got ACK REQUEST block: " + di);
+        }
+
         public void gotTermination(int reason, long count) {
             if (_log.shouldDebug())
                 _log.debug("Got TERMINATION block, reason: " + reason + " count: " + count);
@@ -849,11 +866,14 @@ public final class ECIESAEADEngine {
 
     /**
      *  @param expiration if greater than zero, add a DateTime block
+     *  @param replyDI non-null to request an ack, or null
      */
-    private byte[] createPayload(CloveSet cloves, long expiration) {
+    private byte[] createPayload(CloveSet cloves, long expiration, DeliveryInstructions replyDI) {
         int count = cloves.getCloveCount();
         int numblocks = count + 1;
         if (expiration > 0)
+            numblocks++;
+        if (replyDI != null)
             numblocks++;
         int len = 0;
         List<Block> blocks = new ArrayList<Block>(numblocks);
@@ -865,6 +885,12 @@ public final class ECIESAEADEngine {
         for (int i = 0; i < count; i++) {
             GarlicClove clove = cloves.getClove(i);
             Block block = new GarlicBlock(clove);
+            blocks.add(block);
+            len += block.getTotalLength();
+        }
+        if (replyDI != null) {
+            // put after the cloves so recipient has any LS garlic
+            Block block = new AckRequestBlock(0, replyDI);
             blocks.add(block);
             len += block.getTotalLength();
         }

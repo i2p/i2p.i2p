@@ -118,13 +118,36 @@ class OutboundClientMessageJobHelper {
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
         if (skm == null)
             return null;
+        boolean isECIES = recipientPK.getType() == EncType.ECIES_X25519;
+        // force ack off if ECIES
+        boolean ackInGarlic = isECIES ? false : requireAck;
         GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove,
-                                                 from, dest, replyTunnel, requireAck, bundledReplyLeaseSet, skm);
+                                                 from, dest, replyTunnel, ackInGarlic, bundledReplyLeaseSet, skm);
         if (config == null)
             return null;
         GarlicMessage msg;
-        if (recipientPK.getType() == EncType.ECIES_X25519) {
-            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm);
+        if (isECIES) {
+            DeliveryInstructions di;
+            if (requireAck) {
+                // setup reply DI
+                di = new DeliveryInstructions();
+                if (bundledReplyLeaseSet != null) {
+                    di.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
+                    di.setDestination(from);
+                } else if (replyTunnel != null) {
+                    di.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
+                    TunnelId replyToTunnelId = replyTunnel.getReceiveTunnelId(0);
+                    Hash replyToTunnelRouter = replyTunnel.getPeer(0);
+                    di.setRouter(replyToTunnelRouter);
+                    di.setTunnelId(replyToTunnelId);
+                } else {
+                    // shouldn't happen
+                    di = null;
+                }
+            } else {
+                di = null;
+            }
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm, di);
         } else {
             // no use sending tags unless we have a reply token set up already
             int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
