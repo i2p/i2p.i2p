@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -3070,6 +3072,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (announce == null)
                     announce = snark.getTrackerURL();
                 if (announce != null) {
+                    // strip non-i2p trackers
+                    if (!isI2PTracker(announce))
+                        announce = null;
+                }
+                if (announce != null) {
                     announce = DataHelper.stripHTML(announce);
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
@@ -3078,21 +3085,29 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("</span></td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
+                List<String> annlist = new ArrayList<String>();
                 if (alist != null && !alist.isEmpty()) {
+                    // strip non-i2p trackers
+                    for (List<String> alist2 : alist) {
+                        for (String s : alist2) {
+                            if (isI2PTracker(s))
+                                annlist.add(s);
+                        }
+                    }
+                }
+                if (!annlist.isEmpty()) {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
                        .append(_t("Tracker List")).append("</b></td><td>");
-                    for (List<String> alist2 : alist) {
+                    boolean more = false;
+                    for (String s : annlist) {
                         buf.append("<span class=\"info_tracker\">");
-                        boolean more = false;
-                        for (String s : alist2) {
-                            if (more)
-                                buf.append(' ');
-                            else
-                                more = true;
-                            buf.append(getShortTrackerLink(DataHelper.stripHTML(s), snark.getInfoHash()));
-                        }
+                        if (more)
+                            buf.append(' ');
+                        else
+                            more = true;
+                        buf.append(getShortTrackerLink(DataHelper.stripHTML(s), snark.getInfoHash()));
                         buf.append("</span> ");
                     }
                     buf.append("</td></tr>\n");
@@ -3658,6 +3673,26 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("</div></div></body></html>");
 
         return buf.toString();
+    }
+
+    /**
+     * Basic checks only, not as comprehensive as what TrackerClient does.
+     * Just to hide non-i2p trackers from the details page.
+     * @since 0.9.46
+     */
+    private static boolean isI2PTracker(String url) {
+        try {
+            URI uri = new URI(url);
+            String method = uri.getScheme();
+            if (!"http".equals(method) && !"https".equals(method))
+                return false;
+            String host = uri.getHost();
+            if (host == null || !host.endsWith(".i2p"))
+                return false;
+        } catch (URISyntaxException use) {
+            return false;
+        }
+        return true;
     }
 
     /**
