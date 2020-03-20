@@ -2,6 +2,7 @@ package net.i2p.router.tunnel;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -95,8 +96,8 @@ class FragmentHandler {
     protected final Log _log;
     private final Map<Long, FragmentedMessage> _fragmentedMessages;
     private final DefragmentedReceiver _receiver;
-    private int _completed;
-    private int _failed;
+    private final AtomicInteger _completed = new AtomicInteger();
+    private final AtomicInteger _failed = new AtomicInteger();
     
     /** don't wait more than 60s to defragment the partial message */
     static long MAX_DEFRAGMENT_TIME = 60*1000;
@@ -187,8 +188,8 @@ class FragmentHandler {
         }
     }
     
-    public int getCompleteCount() { return _completed; }
-    public int getFailedCount() { return _failed; }
+    public int getCompleteCount() { return _completed.get(); }
+    public int getFailedCount() { return _failed.get(); }
     
     private static final ByteCache _validateCache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
     
@@ -468,7 +469,7 @@ class FragmentHandler {
     private void receiveComplete(FragmentedMessage msg) {
         if (msg == null)
             return;
-        _completed++;
+        _completed.incrementAndGet();
         String stringified = null;
         if (_log.shouldLog(Log.DEBUG))
             stringified = msg.toString();
@@ -490,8 +491,9 @@ class FragmentHandler {
             // The unencrypted messages at the OBEP are (V)TBMs
             // and perhaps an occasional DatabaseLookupMessage
             I2NPMessage m = new I2NPMessageHandler(_context).readMessage(data);
-            noteReception(m.getUniqueId(), fragmentCount-1, "complete: ");// + msg.toString());
-            noteCompletion(m.getUniqueId());
+            long id = m.getUniqueId();
+            noteReception(id, fragmentCount-1, "complete");
+            noteCompletion(id);
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (I2NPMessageException ime) {
             if (stringified == null) stringified = msg.toString();
@@ -508,7 +510,7 @@ class FragmentHandler {
      *  @since 0.9
      */
     private void receiveComplete(byte[] data, int offset, int len, Hash router, TunnelId tunnelId) {
-        _completed++;
+        _completed.incrementAndGet();
         try {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("RECV unfrag(" + len + ')');
@@ -522,8 +524,9 @@ class FragmentHandler {
             I2NPMessageHandler h = new I2NPMessageHandler(_context);
             h.readMessage(data, offset, len);
             I2NPMessage m = h.lastRead();
-            noteReception(m.getUniqueId(), 0, "complete: ");// + msg.toString());
-            noteCompletion(m.getUniqueId());
+            long id = m.getUniqueId();
+            noteReception(id, 0, "complete");
+            noteCompletion(id);
             _receiver.receiveComplete(m, router, tunnelId);
         } catch (I2NPMessageException ime) {
             if (_log.shouldLog(Log.WARN)) {
@@ -565,13 +568,13 @@ class FragmentHandler {
         }
 
         public void timeReached() {
-            boolean removed = false;
+            boolean removed;
             synchronized (_fragmentedMessages) {
                 removed = (null != _fragmentedMessages.remove(Long.valueOf(_msg.getMessageId())));
             }
             synchronized (_msg) {
                 if (removed && !_msg.getReleased()) {
-                    _failed++;
+                    _failed.incrementAndGet();
                     noteFailure(_msg.getMessageId(), _msg.toString());
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropped incomplete fragmented message: " + _msg);
