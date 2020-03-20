@@ -68,6 +68,7 @@ class RatchetPayload {
         public void gotAck(int id, int n);
 
         /**
+         *  @param di may be null
          *  @since 0.9.46
          */
         public void gotAckRequest(int id, DeliveryInstructions di);
@@ -148,7 +149,7 @@ class RatchetPayload {
                 case BLOCK_ACKKEY:
                   {
                     if (len < 4 || (len % 4) != 0)
-                        throw new IOException("Bad length for REPLYDI: " + len);
+                        throw new IOException("Bad length for ACKKEY: " + len);
                     for (int j = i; j < i + len; j += 4) {
                         int id = (int) DataHelper.fromLong(payload, j, 2);
                         int n = (int) DataHelper.fromLong(payload, j + 2, 2);
@@ -159,11 +160,16 @@ class RatchetPayload {
 
                 case BLOCK_REPLYDI:
                   {
-                    if (len < 6)
+                    if (len < 3)
                         throw new IOException("Bad length for REPLYDI: " + len);
-                    int id = (int) DataHelper.fromLong(payload, i, 4);
-                    DeliveryInstructions di = new DeliveryInstructions();
-                    di.readBytes(payload, i + 5);
+                    int id = (int) DataHelper.fromLong(payload, i, 2);
+                    DeliveryInstructions di;
+                    if ((payload[2] & 0x01) != 0) {
+                        di = new DeliveryInstructions();
+                        di.readBytes(payload, i + 3);
+                    } else {
+                        di = null;
+                    }
                     cb.gotAckRequest(id, di);
                   }
                     break;
@@ -383,12 +389,22 @@ class RatchetPayload {
     public static class AckRequestBlock extends Block {
         private final byte[] data;
 
+        /**
+         *  @param sessionID 0 - 65535
+         *  @param di may be null
+         */
         public AckRequestBlock(int sessionID, DeliveryInstructions di) {
             super(BLOCK_REPLYDI);
-            data = new byte[5 + di.getSize()];
-            DataHelper.toLong(data, 0, 4, sessionID);
-            // flag is zero
-            di.writeBytes(data, 5);
+            int len = 3;
+            if (di != null)
+                len += di.getSize();
+            data = new byte[len];
+            DataHelper.toLong(data, 0, 2, sessionID);
+            if (di != null) {
+                data[2] = 0x01;
+                di.writeBytes(data, 3);
+            }
+            // else flag is zero
         }
 
         public int getDataLength() {

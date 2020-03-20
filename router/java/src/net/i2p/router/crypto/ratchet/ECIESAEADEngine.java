@@ -583,7 +583,8 @@ public final class ECIESAEADEngine {
         if (re == null) {
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NS to " + target);
-            return encryptNewSession(cloves, target, priv, keyManager, replyDI);
+            // no ack in NS
+            return encryptNewSession(cloves, target, priv, keyManager, null);
         }
 
         HandshakeState state = re.key.getHandshakeState();
@@ -597,7 +598,8 @@ public final class ECIESAEADEngine {
             }
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag.toBase64());
-            return encryptNewSessionReply(cloves, target, state, re.tag, keyManager, replyDI);
+            // no ack in NSR
+            return encryptNewSessionReply(cloves, target, state, re.tag, keyManager, null);
         }
         if (_log.shouldDebug())
             _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64());
@@ -812,6 +814,7 @@ public final class ECIESAEADEngine {
         public final List<GarlicClove> cloveSet = new ArrayList<GarlicClove>(3);
         public long datetime;
         public NextSessionKey nextKey;
+        public boolean ackRequested;
 
         public void gotDateTime(long time) {
             if (_log.shouldDebug())
@@ -846,6 +849,7 @@ public final class ECIESAEADEngine {
         public void gotAckRequest(int id, DeliveryInstructions di) {
             if (_log.shouldDebug())
                 _log.debug("Got ACK REQUEST block: " + di);
+            ackRequested = true;
         }
 
         public void gotTermination(int reason, long count) {
@@ -890,7 +894,8 @@ public final class ECIESAEADEngine {
         }
         if (replyDI != null) {
             // put after the cloves so recipient has any LS garlic
-            Block block = new AckRequestBlock(0, replyDI);
+            // ignore actual DI
+            Block block = new AckRequestBlock(0, null);
             blocks.add(block);
             len += block.getTotalLength();
         }
