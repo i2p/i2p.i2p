@@ -8,8 +8,6 @@ package net.i2p.router.peermanager;
  *
  */
 
-import java.util.Properties;
-
 import net.i2p.data.Hash;
 import net.i2p.router.ProfileManager;
 import net.i2p.router.RouterContext;
@@ -352,58 +350,4 @@ public class ProfileManagerImpl implements ProfileManager {
     private PeerProfile getProfileNonblocking(Hash peer) {
         return _context.profileOrganizer().getProfileNonblocking(peer);
     }
-    
-    /**
-     *  provide a simple summary of a number of peers, suitable for publication in the netDb
-     *  @deprecated unused
-     */
-    @Deprecated
-    public Properties summarizePeers(int numPeers) {
-/****
-        Set peers = new HashSet(numPeers);
-        // lets get the fastest ones we've got (this fails over to include just plain reliable,
-        // or even notFailing peers if there aren't enough fast ones)
-        _context.profileOrganizer().selectFastPeers(numPeers, null, peers);
-****/
-        Properties props = new Properties();
-/****
-        for (Iterator iter  = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
-            PeerProfile prof = getProfile(peer);
-            if (prof == null) continue;
-            
-            StringBuilder buf = new StringBuilder(64);
-            
-            buf.append("status: ");
-            if (_context.profileOrganizer().isFast(peer)) {
-                buf.append("fast");
-            } else if (_context.profileOrganizer().isHighCapacity(peer)) {
-                buf.append("highCapacity");
-            } else if (_context.profileOrganizer().isFailing(peer)) {
-                buf.append("failing");
-            } else {
-                buf.append("notFailing");
-            }
-            
-            if (_context.profileOrganizer().isWellIntegrated(peer))
-                buf.append("Integrated ");
-            else
-                buf.append(" ");
-            
-            buf.append("capacity: ").append(num(prof.getCapacityValue())).append(" ");
-            buf.append("speed: ").append(num(prof.getSpeedValue())).append(" ");
-            buf.append("integration: ").append(num(prof.getIntegrationValue()));
-            
-            props.setProperty("profile." + peer.toBase64().replace('=', '_'), buf.toString());
-        }
-****/
-        return props;
-    }
-    
-/****
-    private final static DecimalFormat _fmt = new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
-    private final static String num(double val) {
-        synchronized (_fmt) { return _fmt.format(val); }
-    }
-****/
 }

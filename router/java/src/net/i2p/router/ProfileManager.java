@@ -8,8 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.util.Properties;
-
 import net.i2p.data.Hash;
 
 public interface ProfileManager {    
@@ -165,7 +163,4 @@ public interface ProfileManager {
      *
      */
     void messageReceived(Hash peer, String style, long msToReceive, int bytesRead);
-    
-    /** provide a simple summary of a number of peers, suitable for publication in the netDb */
-    Properties summarizePeers(int numPeers);
 }
