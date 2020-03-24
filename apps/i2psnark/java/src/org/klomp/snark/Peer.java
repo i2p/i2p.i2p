@@ -713,6 +713,7 @@ public class Peer implements Comparable<Peer>
 
   /**
    * Return how much the peer has
+   * @return number of completed pieces (not bytes)
    */
   public int completed()
   {
