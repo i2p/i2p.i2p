@@ -138,9 +138,11 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String VERSION = "4";
 
     private static final String PROP_ADDED = "a";
-    private static final String PROP_MODDED = "m";
+    // See susidns
+    //private static final String PROP_MODDED = "m";
     private static final String PROP_SOURCE = "s";
-    private static final String PROP_VALIDATED = "v";
+    // See susidns
+    //private static final String PROP_VALIDATED = "v";
     
     private static final String DUMMY = "";
     private static final int NEGATIVE_CACHE_SIZE = 32;
@@ -1395,6 +1397,11 @@ public class BlockfileNamingService extends DummyNamingService {
                             p = de.propsList.get(i);
                             d = de.destList.get(i);
                         }
+                        out.write("# ");
+                        out.write(key);
+                        out.write(": ");
+                        out.write(d.toBase32());
+                        out.write(nl);
                         out.write(key);
                         out.write('=');
                         out.write(d.toBase64());
