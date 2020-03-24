@@ -1,3 +1,15 @@
+2020-03-24 zzz
+ * Tunnels: Make new tunnel selection round-robin
+
+2020-03-20 zzz
+ * Tunnels: FragmentHandler cleanup (ticket #2699)
+
+2020-03-17 zzz
+ * i2psnark: Hide non-i2p trackers on details page
+
+2020-03-15 zzz
+ * Ratchet: Stub out ack and ack request blocks
+
 2020-03-01 zzz
  * Console:
    - Disable browser launch on /configclients when a service
