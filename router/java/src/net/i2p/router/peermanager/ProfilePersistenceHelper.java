@@ -458,6 +458,8 @@ class ProfilePersistenceHelper {
     }
 
     private Hash getHash(String name) {
+        if (name.length() < PREFIX.length() + 44)
+            return null;
         String key = name.substring(PREFIX.length());
         key = key.substring(0, 44);
         //Hash h = new Hash();

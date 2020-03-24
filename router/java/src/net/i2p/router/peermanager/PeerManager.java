@@ -55,6 +55,8 @@ class PeerManager {
      *  Rate contained in the profile, as the Rates must be coalesced.
      */
     private static final long REORGANIZE_TIME_LONG = 351*1000;
+    /** After first two hours of uptime ~= 246 */
+    static final int REORGANIZES_PER_DAY = (int) (24*60*60*1000L / REORGANIZE_TIME_LONG);
     private static final long STORE_TIME = 19*60*60*1000;
     private static final long EXPIRE_AGE = 3*24*60*60*1000;
     
@@ -119,8 +121,10 @@ class PeerManager {
 
         public void run() {
             long start = System.currentTimeMillis();
+            long uptime = _context.router().getUptime();
+            boolean shouldDecay = uptime > 90*60*1000;
             try {
-                _organizer.reorganize(true);
+                _organizer.reorganize(true, shouldDecay);
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error evaluating profiles", t);
             }
@@ -138,7 +142,6 @@ class PeerManager {
                     _log.log(Log.CRIT, "Error storing profiles", t);
                 }
             }
-            long uptime = _context.router().getUptime();
             long delay;
             if (orgtime > 1000 || uptime > 2*60*60*1000)
                 delay = REORGANIZE_TIME_LONG;
