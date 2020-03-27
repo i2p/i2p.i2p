@@ -136,12 +136,14 @@ class RatchetPayload {
 
                 case BLOCK_NEXTKEY:
                   {
-                    if (len != 34)
+                    if (len != 35)
                         throw new IOException("Bad length for NEXTKEY: " + len);
-                    int id = (int) DataHelper.fromLong(payload, i, 2);
+                    boolean isReverse = (payload[i] & 0x01) != 0;
+                    boolean isRequest = (payload[i] & 0x02) != 0;
+                    int id = (int) DataHelper.fromLong(payload, i + 1, 2);
                     byte[] data = new byte[32];
-                    System.arraycopy(payload, i + 2, data, 0, 32);
-                    NextSessionKey nsk = new NextSessionKey(data, id);
+                    System.arraycopy(payload, i + 3, data, 0, 32);
+                    NextSessionKey nsk = new NextSessionKey(data, id, isReverse, isRequest);
                     cb.gotNextKey(nsk);
                   }
                     break;
@@ -350,13 +352,17 @@ class RatchetPayload {
         }
 
         public int getDataLength() {
-            return 34;
+            return 35;
         }
 
         public int writeData(byte[] tgt, int off) {
-            DataHelper.toLong(tgt, off, 2, next.getID());
-            System.arraycopy(next.getData(), 0, tgt, off + 2, 32);
-            return off + 34;
+            if (next.isReverse())
+                tgt[off] = 0x01;
+            if (next.isRequest())
+                tgt[off] |= 0x02;
+            DataHelper.toLong(tgt, off + 1, 2, next.getID());
+            System.arraycopy(next.getData(), 0, tgt, off + 3, 32);
+            return off + 35;
         }
     }
 

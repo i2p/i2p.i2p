@@ -62,6 +62,8 @@ public final class ECIESAEADEngine {
     private static final int MIN_ENCRYPTED_SIZE = MIN_ES_SIZE;
     private static final byte[] NULLPK = new byte[KEYLEN];
     private static final int MAXPAD = 16;
+    // debug, send ACKREQ in every ES
+    private static final boolean ACKREQ_IN_ES = false;
 
     private static final String INFO_0 = "SessionReplyTags";
     private static final String INFO_6 = "AttachPayloadKDF";
@@ -603,7 +605,7 @@ public final class ECIESAEADEngine {
         }
         if (_log.shouldDebug())
             _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64());
-        byte rv[] = encryptExistingSession(cloves, target, re.key, re.tag, replyDI);
+        byte rv[] = encryptExistingSession(cloves, target, re, replyDI);
         return rv;
     }
 
@@ -640,7 +642,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session: " + state);
 
-        byte[] payload = createPayload(cloves, cloves.getExpiration(), replyDI);
+        byte[] payload = createPayload(cloves, cloves.getExpiration(), replyDI, null);
 
         byte[] enc = new byte[KEYLEN + KEYLEN + MACLEN + payload.length + MACLEN];
         try {
@@ -699,7 +701,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State after mixhash tag before encrypt new session reply: " + state);
 
-        byte[] payload = createPayload(cloves, 0, replyDI);
+        byte[] payload = createPayload(cloves, 0, replyDI, null);
 
         // part 1 - tag and empty payload
         byte[] enc = new byte[TAGLEN + KEYLEN + MACLEN + payload.length + MACLEN];
@@ -762,11 +764,14 @@ public final class ECIESAEADEngine {
      * @param replyDI non-null to request an ack, or null
      * @return encrypted data or null on failure
      */
-    private byte[] encryptExistingSession(CloveSet cloves, PublicKey target, SessionKeyAndNonce key,
-                                          RatchetSessionTag currentTag, 
+    private byte[] encryptExistingSession(CloveSet cloves, PublicKey target, RatchetEntry re,
                                           DeliveryInstructions replyDI) {
-        byte rawTag[] = currentTag.getData();
-        byte[] payload = createPayload(cloves, 0, replyDI);
+        //
+        if (ACKREQ_IN_ES && replyDI == null)
+            replyDI = new DeliveryInstructions();
+        byte rawTag[] = re.tag.getData();
+        byte[] payload = createPayload(cloves, 0, replyDI, re.nextKey);
+        SessionKeyAndNonce key = re.key;
         byte encr[] = encryptAEADBlock(rawTag, payload, key, key.getNonce());
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         return encr;
@@ -843,12 +848,12 @@ public final class ECIESAEADEngine {
 
         public void gotAck(int id, int n) {
             if (_log.shouldDebug())
-                _log.debug("Got ACK block: " + n);
+                _log.debug("Got ACK block: " + id + " / " + n);
         }
 
         public void gotAckRequest(int id, DeliveryInstructions di) {
             if (_log.shouldDebug())
-                _log.debug("Got ACK REQUEST block: " + di);
+                _log.debug("Got ACK REQUEST block: " + id + " / " + di);
             ackRequested = true;
         }
 
@@ -872,17 +877,25 @@ public final class ECIESAEADEngine {
      *  @param expiration if greater than zero, add a DateTime block
      *  @param replyDI non-null to request an ack, or null
      */
-    private byte[] createPayload(CloveSet cloves, long expiration, DeliveryInstructions replyDI) {
+    private byte[] createPayload(CloveSet cloves, long expiration,
+                                 DeliveryInstructions replyDI, NextSessionKey nextKey) {
         int count = cloves.getCloveCount();
         int numblocks = count + 1;
         if (expiration > 0)
             numblocks++;
         if (replyDI != null)
             numblocks++;
+        if (nextKey != null)
+            numblocks++;
         int len = 0;
         List<Block> blocks = new ArrayList<Block>(numblocks);
         if (expiration > 0) {
             Block block = new DateTimeBlock(expiration);
+            blocks.add(block);
+            len += block.getTotalLength();
+        }
+        if (nextKey != null) {
+            Block block = new NextKeyBlock(nextKey);
             blocks.add(block);
             len += block.getTotalLength();
         }

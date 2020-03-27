@@ -1100,6 +1100,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                 set.setDate(now);
                                 SessionKeyAndNonce skn = set.consumeNextKey();
                                 // TODO key ID and PN
+                                // TODO next key
                                 return new RatchetEntry(tag, skn, 0, 0);
                             } else if (_log.shouldInfo()) {
                                 _log.info("Removing empty " + set);

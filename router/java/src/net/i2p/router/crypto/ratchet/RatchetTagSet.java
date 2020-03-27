@@ -13,6 +13,7 @@ import com.southernstorm.noise.protocol.HandshakeState;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
+import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -56,6 +57,9 @@ class RatchetTagSet implements TagSetHandle {
     private final byte[] _symmkey_constant;
     private int _lastTag = -1;
     private int _lastKey = -1;
+    private KeyPair _nextKeys;
+    private NextSessionKey _nextKey;
+    private boolean _nextKeyAcked;
 
     private static final String INFO_1 = "KDFDHRatchetStep";
     private static final String INFO_2 = "TagAndKeyGenKeys";
@@ -65,6 +69,7 @@ class RatchetTagSet implements TagSetHandle {
     private static final byte[] ZEROLEN = new byte[0];
     private static final int TAGLEN = RatchetSessionTag.LENGTH;
     private static final int MAX = 65535;
+    private static final int LOW = 50;
 
     /**
      *  Outbound NSR Tagset
@@ -239,6 +244,27 @@ class RatchetTagSet implements TagSetHandle {
             nextKey = _lastTag + 1;
         }
         return MAX - nextKey;
+    }
+
+    /**
+     *  Next Key if applicable
+     *  null if remaining is sufficient
+     *
+     *  @return key or null
+     *  @since 0.9.46
+     */
+    public NextSessionKey getNextKey() {
+        if (remaining() > LOW)
+            return null;
+        if (_nextKeyAcked)  // maybe not needed, keep sending until unused
+            return null;
+        if (_nextKeys == null) {
+            _nextKeys = I2PAppContext.getGlobalContext().keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+            boolean isIB = _sessionTags != null;
+            // TODO request only needed every other time
+            _nextKey = new NextSessionKey(_nextKeys.getPublic().getData(), 0, isIB, !isIB);
+        }
+        return _nextKey;
     }
 
     /**
