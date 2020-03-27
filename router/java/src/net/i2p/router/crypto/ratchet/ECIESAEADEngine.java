@@ -304,7 +304,7 @@ public final class ECIESAEADEngine {
 
         // tell the SKM
         PublicKey bob = new PublicKey(EncType.ECIES_X25519, bobPK);
-        keyManager.createSession(bob, state);
+        keyManager.createSession(bob, state, null);
 
         if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
@@ -430,7 +430,7 @@ public final class ECIESAEADEngine {
 
         // tell the SKM
         PublicKey bob = new PublicKey(EncType.ECIES_X25519, bobPK);
-        keyManager.updateSession(bob, oldState, state);
+        keyManager.updateSession(bob, oldState, state, null);
 
         if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
@@ -558,13 +558,15 @@ public final class ECIESAEADEngine {
      * @param target public key to which the data should be encrypted. 
      * @param priv local private key to encrypt with, from the leaseset
      * @param replyDI non-null to request an ack, or null
+     * @param callback may be null
      * @return encrypted data or null on failure
      *
      */
     public byte[] encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
-                          RatchetSKM keyManager, DeliveryInstructions replyDI) {
+                          RatchetSKM keyManager, DeliveryInstructions replyDI,
+                          ReplyCallback callback) {
         try {
-            return x_encrypt(cloves, target, priv, keyManager, replyDI);
+            return x_encrypt(cloves, target, priv, keyManager, replyDI, callback);
         } catch (Exception e) {
             _log.error("ECIES encrypt error", e);
             return null;
@@ -572,7 +574,8 @@ public final class ECIESAEADEngine {
     }
 
     private byte[] x_encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
-                             RatchetSKM keyManager, DeliveryInstructions replyDI) {
+                             RatchetSKM keyManager, DeliveryInstructions replyDI,
+                             ReplyCallback callback) {
         if (target.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         if (Arrays.equals(target.getData(), NULLPK)) {
@@ -586,7 +589,7 @@ public final class ECIESAEADEngine {
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NS to " + target);
             // no ack in NS
-            return encryptNewSession(cloves, target, priv, keyManager, null);
+            return encryptNewSession(cloves, target, priv, keyManager, null, callback);
         }
 
         HandshakeState state = re.key.getHandshakeState();
@@ -601,11 +604,11 @@ public final class ECIESAEADEngine {
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag.toBase64());
             // no ack in NSR
-            return encryptNewSessionReply(cloves, target, state, re.tag, keyManager, null);
+            return encryptNewSessionReply(cloves, target, state, re.tag, keyManager, null, callback);
         }
         if (_log.shouldDebug())
             _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64());
-        byte rv[] = encryptExistingSession(cloves, target, re, replyDI);
+        byte rv[] = encryptExistingSession(cloves, target, re, replyDI, callback);
         return rv;
     }
 
@@ -625,10 +628,12 @@ public final class ECIESAEADEngine {
      * </pre>
      *
      * @param replyDI non-null to request an ack, or null
+     * @param callback may be null
      * @return encrypted data or null on failure
      */
     private byte[] encryptNewSession(CloveSet cloves, PublicKey target, PrivateKey priv,
-                                     RatchetSKM keyManager, DeliveryInstructions replyDI) {
+                                     RatchetSKM keyManager, DeliveryInstructions replyDI,
+                                     ReplyCallback callback) {
         HandshakeState state;
         try {
             state = new HandshakeState(HandshakeState.PATTERN_ID_IK, HandshakeState.INITIATOR, _edhThread);
@@ -667,7 +672,7 @@ public final class ECIESAEADEngine {
             _log.debug("Elligator2 encoded eph. key: " + Base64.encode(enc, 0, 32));
 
         // tell the SKM
-        keyManager.createSession(target, state);
+        keyManager.createSession(target, state, callback);
         return enc;
     }
 
@@ -689,11 +694,12 @@ public final class ECIESAEADEngine {
      *
      * @param state must have already been cloned
      * @param replyDI non-null to request an ack, or null
+     * @param callback may be null
      * @return encrypted data or null on failure
      */
     private byte[] encryptNewSessionReply(CloveSet cloves, PublicKey target, HandshakeState state,
                                           RatchetSessionTag currentTag, RatchetSKM keyManager,
-                                          DeliveryInstructions replyDI) {
+                                          DeliveryInstructions replyDI, ReplyCallback callback) {
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session reply: " + state);
         byte[] tag = currentTag.getData();
@@ -746,7 +752,7 @@ public final class ECIESAEADEngine {
             return null;
         }
         // tell the SKM
-        keyManager.updateSession(target, null, state);
+        keyManager.updateSession(target, null, state, callback);
 
         return enc;
     }
@@ -765,7 +771,7 @@ public final class ECIESAEADEngine {
      * @return encrypted data or null on failure
      */
     private byte[] encryptExistingSession(CloveSet cloves, PublicKey target, RatchetEntry re,
-                                          DeliveryInstructions replyDI) {
+                                          DeliveryInstructions replyDI, ReplyCallback callback) {
         //
         if (ACKREQ_IN_ES && replyDI == null)
             replyDI = new DeliveryInstructions();
@@ -774,6 +780,9 @@ public final class ECIESAEADEngine {
         SessionKeyAndNonce key = re.key;
         byte encr[] = encryptAEADBlock(rawTag, payload, key, key.getNonce());
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
+        if (callback != null) {
+            // TODO
+        }
         return encr;
     }
 

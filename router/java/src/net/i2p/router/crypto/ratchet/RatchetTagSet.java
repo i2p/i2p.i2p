@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.southernstorm.noise.protocol.DHState;
 import com.southernstorm.noise.protocol.HandshakeState;
@@ -60,6 +61,9 @@ class RatchetTagSet implements TagSetHandle {
     private KeyPair _nextKeys;
     private NextSessionKey _nextKey;
     private boolean _nextKeyAcked;
+    /** for debugging */
+    private static final AtomicInteger __tagSetID = new AtomicInteger();
+    private final int _tagSetID = __tagSetID.incrementAndGet();
 
     private static final String INFO_1 = "KDFDHRatchetStep";
     private static final String INFO_2 = "TagAndKeyGenKeys";
@@ -432,7 +436,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     public boolean getAcked() { return _acked; }
 
-    /** for debugging */
+    /** the Key ID */
     public int getID() {
         return _id;
     }
@@ -448,7 +452,8 @@ class RatchetTagSet implements TagSetHandle {
             buf.append("NSR ").append(_state.hashCode()).append(' ');
         else
             buf.append("ES ");
-        buf.append("TagSet #").append(_id)
+        buf.append("TagSet #").append(_tagSetID)
+           .append(" keyID #").append(_id)
            .append("\nCreated:  ").append(DataHelper.formatTime(_created))
            .append("\nLast use: ").append(DataHelper.formatTime(_date));
         PublicKey pk = getRemoteKey();

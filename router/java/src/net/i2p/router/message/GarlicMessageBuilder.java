@@ -32,6 +32,7 @@ import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
+import net.i2p.router.crypto.ratchet.ReplyCallback;
 import net.i2p.util.Log;
 
 /**
@@ -246,20 +247,21 @@ public class GarlicMessageBuilder {
     
     /**
      * ECIES_X25519 only.
-     * Called by GarlicMessageBuilder only.
+     * Called by OCMJH only.
      *
      * @param ctx scope
      * @param config how/what to wrap
      * @param target public key of the location being garlic routed to (may be null if we 
      *               know the encryptKey and encryptTag)
      * @param replyDI non-null to request an ack, or null
+     * @param callback may be null
      * @return null if expired or on other errors
      * @throws IllegalArgumentException on error
      * @since 0.9.44
      */
     static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config,
                                            PublicKey target, Hash from, SessionKeyManager skm,
-                                           DeliveryInstructions replyDI) {
+                                           DeliveryInstructions replyDI, ReplyCallback callback) {
         PublicKey key = config.getRecipientPublicKey();
         if (key.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
@@ -289,7 +291,7 @@ public class GarlicMessageBuilder {
                 log.warn("No SKM for " + from.toBase32());
             return null;
         }
-        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, replyDI);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, replyDI, callback);
         if (encData == null) {
             if (log.shouldWarn())
                 log.warn("Encrypt fail for " + from.toBase32());

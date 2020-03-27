@@ -30,6 +30,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.crypto.ratchet.ReplyCallback;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
 import net.i2p.util.Log;
 
@@ -108,12 +109,14 @@ class OutboundClientMessageJobHelper {
      * @param replyTunnel non-null if requireAck is true or bundledReplyLeaseSet is non-null
      * @param requireAck if true, bundle replyToken in an ack clove
      * @param bundledReplyLeaseSet may be null; if non-null, put it in a clove
+     * @param callback only for ECIES, may be null
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
                                              PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel,
                                              int tagsToSendOverride, int lowTagsOverride, SessionKey wrappedKey, 
-                                             Set<SessionTag> wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
+                                             Set<SessionTag> wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet,
+                                             ReplyCallback callback) {
 
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
         if (skm == null)
@@ -147,7 +150,7 @@ class OutboundClientMessageJobHelper {
             } else {
                 di = null;
             }
-            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm, di);
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm, di, callback);
         } else {
             // no use sending tags unless we have a reply token set up already
             int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
