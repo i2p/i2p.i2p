@@ -40,8 +40,10 @@ class RatchetTagSet implements TagSetHandle {
     private final PublicKey _remoteKey;
     private final SessionKey _key;
     private final HandshakeState _state;
+    // inbound only, else null
     // We use object for tags because we must do indexOfValueByValue()
     private final SparseArray<RatchetSessionTag> _sessionTags;
+    // inbound ES only, else null
     // We use byte[] for key to save space, because we don't need indexOfValueByValue()
     private final SparseArray<byte[]> _sessionKeys;
     private final HKDF hkdf;
@@ -335,7 +337,7 @@ class RatchetTagSet implements TagSetHandle {
             byte[] rv = _sessionKeys.valueAt(kidx);
             _sessionKeys.removeAt(kidx);
             addTags(tagnum);
-            return new SessionKeyAndNonce(rv, tagnum);
+            return new SessionKeyAndNonce(rv, _id, tagnum, _remoteKey);
         } else if (tagnum > _lastKey) {
             // if there's any gaps, catch up and store
             for (int i = _lastKey + 1; i < tagnum; i++) {
@@ -409,8 +411,8 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  For outbound only.
-     *  Call after consumeNextTag();
+     *  For outbound, call after consumeNextTag().
+     *  Also called by consume() to catch up for inbound.
      *
      *  @return a key and nonce, non-null
      */
@@ -422,7 +424,8 @@ class RatchetTagSet implements TagSetHandle {
         byte[] key = new byte[32];
         hkdf.calculate(_symmkey_ck, _symmkey_constant, INFO_5, _symmkey_ck, key, 0);
         _lastKey++;
-        return new SessionKeyAndNonce(key, _lastKey);
+        // fill in ID and remoteKey as this may be for inbound
+        return new SessionKeyAndNonce(key, _id, _lastKey, _remoteKey);
     }
 
     /**
@@ -442,7 +445,7 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     @Override
-    public String toString() {
+    public synchronized String toString() {
         StringBuilder buf = new StringBuilder(256);
         if (_sessionTags != null)
             buf.append("Inbound ");

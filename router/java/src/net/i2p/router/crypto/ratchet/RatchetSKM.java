@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.southernstorm.noise.protocol.HandshakeState;
 
@@ -621,23 +622,22 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 removed++;
             }
         }
-        if (removed > 0 && _log.shouldInfo())
-            _log.info("Expired inbound: " + removed);
 
         // outbound
         int oremoved = 0;
+        int cremoved = 0;
         exp = now - (SESSION_LIFETIME_MAX_MS / 2);
         for (Iterator<OutboundSession> iter = _outboundSessions.values().iterator(); iter.hasNext();) {
             OutboundSession sess = iter.next();
-            oremoved += sess.expireTags();
+            oremoved += sess.expireTags(now);
+            cremoved += sess.expireCallbacks(now);
             if (sess.getLastUsedDate() < exp) {
                 iter.remove();
                 oremoved++;
             }
         }
-        if (oremoved > 0 && _log.shouldInfo())
-            _log.info("Expired outbound: " + oremoved);
 
+        // pending outbound
         int premoved = 0;
         exp = now - SESSION_PENDING_DURATION_MS;
         synchronized (_pendingOutboundSessions) {
@@ -645,6 +645,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 List<OutboundSession> pending = iter.next();
                 for (Iterator<OutboundSession> liter = pending.iterator(); liter.hasNext();) {
                     OutboundSession sess = liter.next();
+                    cremoved += sess.expireCallbacks(now);
                     if (sess.getEstablishedDate() < exp) {
                         liter.remove();
                         premoved++;
@@ -654,8 +655,9 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     iter.remove();
             }
         }
-        if (premoved > 0 && _log.shouldInfo())
-            _log.info("Expired pending: " + premoved);
+        if ((removed > 0 || oremoved > 0 || premoved > 0 || cremoved > 0) && _log.shouldInfo())
+            _log.info("Expired inbound: " + removed + ", outbound: " + oremoved +
+                      ", pending: " + premoved + ", callbacks: " + cremoved);
 
         return removed + oremoved + premoved;
     }
@@ -679,6 +681,48 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     }
 
     /// end SessionTagListener ///
+
+    /// ACKS ///
+
+    /**
+     *  @since 0.9.46
+     */
+    void registerCallback(PublicKey target, int id, int n, ReplyCallback callback) {
+        if (_log.shouldInfo())
+            _log.info("Register callback tgt " + target + " id=" + id + " n=" + n + " callback " + callback);
+        OutboundSession sess = getSession(target);
+        if (sess != null)
+            sess.registerCallback(id, n, callback);
+        else if (_log.shouldWarn())
+            _log.warn("no session found for register callback");
+    }
+
+    /**
+     *  @since 0.9.46
+     */
+    void receivedACK(PublicKey target, int id, int n) {
+        OutboundSession sess = getSession(target);
+        if (sess != null)
+            sess.receivedACK(id, n);
+        else if (_log.shouldWarn())
+            _log.warn("no session found for received ack");
+    }
+
+    /**
+     *  @since 0.9.46
+     */
+    void ackRequested(PublicKey target, int id, int n) {
+        if (_log.shouldInfo())
+            _log.info("rcvd ACK REQUEST id=" + id + " n=" + n);
+        OutboundSession sess = getSession(target);
+        if (sess != null)
+            sess.ackRequested(id, n);
+        else if (_log.shouldWarn())
+            _log.warn("no session found for ack req");
+    }
+
+
+    /// end ACKS ///
 
     /**
      *  Return a map of session key to a set of inbound RatchetTagSets for that SessionKey
@@ -827,6 +871,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
          *  In order, earliest first.
          */
         private final List<RatchetTagSet> _tagSets;
+        private final ConcurrentHashMap<Integer, ReplyCallback> _callbacks;
+        private final LinkedBlockingQueue<Integer> _acksToSend;
         /**
          *  Set to true after first tagset is acked.
          *  Upon repeated failures, we may revert back to false.
@@ -841,6 +887,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         private int _consecutiveFailures;
 
         private static final int MAX_FAILS = 2;
+        private static final int MAX_SEND_ACKS = 8;
         private static final int DEBUG_OB_NSR = 0x10001;
         private static final int DEBUG_IB_NSR = 0x10002;
 
@@ -856,6 +903,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             _lastUsed = _established;
             _unackedTagSets = new HashSet<RatchetTagSet>(4);
             _tagSets = new ArrayList<RatchetTagSet>(6);
+            _callbacks = new ConcurrentHashMap<Integer, ReplyCallback>();
+            _acksToSend = new LinkedBlockingQueue<Integer>();
             // generate expected tagset
             byte[] ck = state.getChainingKey();
             byte[] tagsetkey = new byte[32];
@@ -1076,8 +1125,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         /**
          * Expire old tags, returning the number of tag sets removed
          */
-        public int expireTags() {
-            long now = _context.clock().now();
+        public int expireTags(long now) {
             int removed = 0;
             synchronized (_tagSets) {
                 for (Iterator<RatchetTagSet> iter = _tagSets.iterator(); iter.hasNext(); ) {
@@ -1113,9 +1161,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                             if (tag != null) {
                                 set.setDate(now);
                                 SessionKeyAndNonce skn = set.consumeNextKey();
-                                // TODO key ID and PN
-                                // TODO next key
-                                return new RatchetEntry(tag, skn, 0, 0);
+                                // TODO PN
+                                return new RatchetEntry(tag, skn, set.getID(), 0, set.getNextKey(), getAcksToSend());
                             } else if (_log.shouldInfo()) {
                                 _log.info("Removing empty " + set);
                             }
@@ -1179,6 +1226,78 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         public boolean getAckReceived() {
             return _acked;
+        }
+
+        /**
+         *  @since 0.9.46
+         */
+        public void registerCallback(int id, int n, ReplyCallback callback) {
+            Integer key = Integer.valueOf((id << 16) | n);
+            ReplyCallback old = _callbacks.putIfAbsent(key, callback);
+            if (old != null) {
+                if (old.getExpiration() < _context.clock().now())
+                    _callbacks.put(key, callback);
+                else if (_log.shouldWarn())
+                    _log.warn("Not replacing callback: " + old);
+            }
+        }
+
+        /**
+         *  @since 0.9.46
+         */
+        public void receivedACK(int id, int n) {
+            Integer key = Integer.valueOf((id << 16) | n);
+            ReplyCallback callback = _callbacks.remove(key);
+            if (callback != null) {
+                if (_log.shouldInfo())
+                    _log.info("ACK rcvd ID " + id + " n=" + n + " callback " + callback);
+                callback.onReply();
+            } else {
+                if (_log.shouldInfo())
+                    _log.info("ACK rcvd ID " + id + " n=" + n + ", no callback");
+            }
+        }
+
+        /**
+         *  @since 0.9.46
+         */
+        public void ackRequested(int id, int n) {
+            Integer key = Integer.valueOf((id << 16) | n);
+            _acksToSend.offer(key);
+        }
+
+        /**
+         *  @return the acks to send, non empty, or null
+         *  @since 0.9.46
+         */
+        private List<Integer> getAcksToSend() {
+            if (_acksToSend == null)
+                return null;
+            int sz = _acksToSend.size();
+            if (sz == 0)
+                return null;
+            List<Integer> rv = new ArrayList<Integer>(Math.min(sz, MAX_SEND_ACKS));
+            _acksToSend.drainTo(rv, MAX_SEND_ACKS);
+            if (rv.isEmpty())
+                return null;
+            return rv;
+        }
+
+        /**
+         *  @since 0.9.46
+         */
+        public int expireCallbacks(long now) {
+            if (_callbacks.isEmpty())
+                return 0;
+            int rv = 0;
+            for (Iterator<ReplyCallback> iter = _callbacks.values().iterator(); iter.hasNext();) {
+                ReplyCallback cb = iter.next();
+                if (cb.getExpiration() < now) {
+                    iter.remove();
+                    rv++;
+                }
+            }
+            return rv;
         }
     }
 }

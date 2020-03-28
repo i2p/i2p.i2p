@@ -379,8 +379,21 @@ class RatchetPayload {
             DataHelper.toLong(data, 2, 2, n);
         }
 
+        /**
+         *  @param acks each is id &lt;&lt; 16 | n
+         */
+        public AckBlock(List<Integer> acks) {
+            super(BLOCK_ACKKEY);
+            data = new byte[4 * acks.size()];
+            int i = 0;
+            for (Integer a : acks) {
+                toInt4(data, i, a.intValue());
+                i += 4;
+            }
+        }
+
         public int getDataLength() {
-            return 4;
+            return data.length;
         }
 
         public int writeData(byte[] tgt, int off) {
@@ -468,6 +481,20 @@ class RatchetPayload {
      */
     static void toLong8(byte target[], int offset, long value) {
         for (int i = offset + 7; i >= offset; i--) {
+            target[i] = (byte) value;
+            value >>= 8;
+        }
+    }
+    
+    /**
+     * Big endian.
+     * Same as DataHelper.toLong(target, offset, 4, value) but allows negative value
+     *
+     * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.46
+     */
+    private static void toInt4(byte target[], int offset, int value) {
+        for (int i = offset + 3; i >= offset; i--) {
             target[i] = (byte) value;
             value >>= 8;
         }

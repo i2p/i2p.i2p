@@ -178,7 +178,7 @@ public final class ECIESAEADEngine {
             if (state == null) {
                 if (shouldDebug)
                     _log.debug("Decrypting ES with tag: " + st.toBase64() + ": key: " + key.toBase64() + ": " + data.length + " bytes");
-                decrypted = decryptExistingSession(tag, data, key, targetPrivateKey);
+                decrypted = decryptExistingSession(tag, data, key, targetPrivateKey, keyManager);
             } else if (data.length >= MIN_NSR_SIZE) {
                 if (shouldDebug)
                     _log.debug("Decrypting NSR with tag: " + st.toBase64() + ": key: " + key.toBase64() + ": " + data.length + " bytes");
@@ -457,14 +457,16 @@ public final class ECIESAEADEngine {
      *
      * @param tag 8 bytes for ad, same as first 8 bytes of data
      * @param data 24 bytes minimum, first 8 bytes will be skipped
-     *
+     * @param keyManager for ack callbacks
      * @return decrypted data or null on failure
      *
      */
-    private CloveSet decryptExistingSession(byte[] tag, byte[] data, SessionKeyAndNonce key, PrivateKey targetPrivateKey)
+    private CloveSet decryptExistingSession(byte[] tag, byte[] data, SessionKeyAndNonce key,
+                                            PrivateKey targetPrivateKey, RatchetSKM keyManager)
                                           throws DataFormatException {
 // TODO decrypt in place?
-        byte decrypted[] = decryptAEADBlock(tag, data, TAGLEN, data.length - TAGLEN, key, key.getNonce());
+        int nonce = key.getNonce();
+        byte decrypted[] = decryptAEADBlock(tag, data, TAGLEN, data.length - TAGLEN, key, nonce);
         if (decrypted == null) {
             if (_log.shouldWarn())
                 _log.warn("Decrypt of ES failed");
@@ -475,7 +477,8 @@ public final class ECIESAEADEngine {
                 _log.warn("Zero length payload in ES");
             return null;
         }
-        PLCallback pc = new PLCallback();
+        PublicKey remote = key.getRemoteKey();
+        PLCallback pc = new PLCallback(keyManager, remote);
         try {
             int blocks = RatchetPayload.processPayload(_context, pc, decrypted, 0, decrypted.length, false);
             if (_log.shouldDebug())
@@ -488,6 +491,9 @@ public final class ECIESAEADEngine {
         if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in ES payload");
+        }
+        if (pc.ackRequested) {
+            keyManager.ackRequested(remote, key.getID(), nonce);
         }
         int num = pc.cloveSet.size();
         // return non-null even if zero cloves
@@ -608,7 +614,7 @@ public final class ECIESAEADEngine {
         }
         if (_log.shouldDebug())
             _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64());
-        byte rv[] = encryptExistingSession(cloves, target, re, replyDI, callback);
+        byte rv[] = encryptExistingSession(cloves, target, re, replyDI, callback, keyManager);
         return rv;
     }
 
@@ -647,7 +653,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session: " + state);
 
-        byte[] payload = createPayload(cloves, cloves.getExpiration(), replyDI, null);
+        byte[] payload = createPayload(cloves, cloves.getExpiration(), replyDI, null, null);
 
         byte[] enc = new byte[KEYLEN + KEYLEN + MACLEN + payload.length + MACLEN];
         try {
@@ -707,7 +713,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State after mixhash tag before encrypt new session reply: " + state);
 
-        byte[] payload = createPayload(cloves, 0, replyDI, null);
+        byte[] payload = createPayload(cloves, 0, replyDI, null, null);
 
         // part 1 - tag and empty payload
         byte[] enc = new byte[TAGLEN + KEYLEN + MACLEN + payload.length + MACLEN];
@@ -771,17 +777,19 @@ public final class ECIESAEADEngine {
      * @return encrypted data or null on failure
      */
     private byte[] encryptExistingSession(CloveSet cloves, PublicKey target, RatchetEntry re,
-                                          DeliveryInstructions replyDI, ReplyCallback callback) {
+                                          DeliveryInstructions replyDI, ReplyCallback callback,
+                                          RatchetSKM keyManager) {
         //
         if (ACKREQ_IN_ES && replyDI == null)
             replyDI = new DeliveryInstructions();
         byte rawTag[] = re.tag.getData();
-        byte[] payload = createPayload(cloves, 0, replyDI, re.nextKey);
+        byte[] payload = createPayload(cloves, 0, replyDI, re.nextKey, re.acksToSend);
         SessionKeyAndNonce key = re.key;
-        byte encr[] = encryptAEADBlock(rawTag, payload, key, key.getNonce());
+        int nonce = key.getNonce();
+        byte encr[] = encryptAEADBlock(rawTag, payload, key, nonce);
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         if (callback != null) {
-            // TODO
+            keyManager.registerCallback(target, re.keyID, nonce, callback);
         }
         return encr;
     }
@@ -826,9 +834,29 @@ public final class ECIESAEADEngine {
 
     private class PLCallback implements RatchetPayload.PayloadCallback {
         public final List<GarlicClove> cloveSet = new ArrayList<GarlicClove>(3);
+        private final RatchetSKM skm;
+        private final PublicKey remote;
         public long datetime;
         public NextSessionKey nextKey;
         public boolean ackRequested;
+
+        /**
+         * NS/NSR
+         */
+        public PLCallback() {
+            this(null, null);
+        }
+
+        /**
+         * ES
+         * @param keyManager only for ES, otherwise null
+         * @param remoteKey only for ES, otherwise null
+         * @since 0.9.46
+         */
+        public PLCallback(RatchetSKM keyManager, PublicKey remoteKey) {
+            skm = keyManager;
+            remote = remoteKey;
+        }
 
         public void gotDateTime(long time) {
             if (_log.shouldDebug())
@@ -858,6 +886,10 @@ public final class ECIESAEADEngine {
         public void gotAck(int id, int n) {
             if (_log.shouldDebug())
                 _log.debug("Got ACK block: " + id + " / " + n);
+            if (skm != null)
+                skm.receivedACK(remote, id, n);
+            else if (_log.shouldWarn())
+                _log.warn("ACK in NS/NSR?");
         }
 
         public void gotAckRequest(int id, DeliveryInstructions di) {
@@ -885,9 +917,11 @@ public final class ECIESAEADEngine {
     /**
      *  @param expiration if greater than zero, add a DateTime block
      *  @param replyDI non-null to request an ack, or null
+     *  @param acksTOSend may be null
      */
     private byte[] createPayload(CloveSet cloves, long expiration,
-                                 DeliveryInstructions replyDI, NextSessionKey nextKey) {
+                                 DeliveryInstructions replyDI, NextSessionKey nextKey,
+                                 List<Integer> acksToSend) {
         int count = cloves.getCloveCount();
         int numblocks = count + 1;
         if (expiration > 0)
@@ -895,6 +929,8 @@ public final class ECIESAEADEngine {
         if (replyDI != null)
             numblocks++;
         if (nextKey != null)
+            numblocks++;
+        if (acksToSend != null)
             numblocks++;
         int len = 0;
         List<Block> blocks = new ArrayList<Block>(numblocks);
@@ -918,6 +954,11 @@ public final class ECIESAEADEngine {
             // put after the cloves so recipient has any LS garlic
             // ignore actual DI
             Block block = new AckRequestBlock(0, null);
+            blocks.add(block);
+            len += block.getTotalLength();
+        }
+        if (acksToSend != null) {
+            Block block = new AckBlock(acksToSend);
             blocks.add(block);
             len += block.getTotalLength();
         }
