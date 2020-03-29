@@ -657,9 +657,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // Per-message flag > 0 overrides per-session option
         int tagsToSend = SendMessageOptions.getTagsToSend(sendFlags);
         ReplyCallback callback;
+        SendTimeoutJob eciesTimeout;
         if (wantACK && _encryptionKey.getType() == EncType.ECIES_X25519) {
-            callback = new ECIESReplyCallback(replyLeaseSet);
+            eciesTimeout = new SendTimeoutJob(null, null);
+            callback = new ECIESReplyCallback(replyLeaseSet, eciesTimeout);
         } else {
+            eciesTimeout = null;
             callback = null;
         }
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
@@ -697,6 +700,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             onReply = new SendSuccessJob(sessKey, tsh, replyLeaseSet, onFail);
             long expiration = Math.max(_overallExpiration, _start + REPLY_TIMEOUT_MS_MIN);
             selector = new ReplySelector(token, expiration);
+        } else if (wantACK && _encryptionKey.getType() == EncType.ECIES_X25519) {
+            // Timeout only. ECIESReplyCallback handles the reply (and will cancel the timeout)
+            onReply = null;
+            onFail = eciesTimeout;
+            selector = null;
         } else {
             onReply = null;
             onFail = null;
@@ -769,6 +777,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                                   DataHelper.formatDuration(_selector.getExpiration() - _overallExpiration) +
                                   " after message, queueing separate timeout job");
                 }
+            } else if (_replyTimeout != null) {
+                // ECIES
+                long expiration = Math.max(_overallExpiration, _start + REPLY_TIMEOUT_MS_MIN);
+                _replyTimeout.getTiming().setStartAfter(expiration);
+                getContext().jobQueue().addJob(_replyTimeout);
             }
             if (_log.shouldLog(Log.INFO))
                 _log.info(OutboundClientMessageOneShotJob.this.getJobId() +
@@ -1129,8 +1142,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * @since 0.9.46
      */
     private class ECIESReplyCallback extends SendSuccessJob implements ReplyCallback {
-        public ECIESReplyCallback(LeaseSet ls) {
-            super(null, null, ls, null);
+        public ECIESReplyCallback(LeaseSet ls, SendTimeoutJob timeout) {
+            super(null, null, ls, timeout);
         }
 
         public long getExpiration() {
