@@ -368,6 +368,23 @@ class RatchetTagSet implements TagSetHandle {
             }
         }
 
+        // trim any too far behind
+        {
+            int tooOld = usedTagNumber - _maxSize;
+            int toTrim = 0;
+            int tagnum;
+            while ((tagnum = _sessionTags.keyAt(toTrim)) < tooOld) {
+                int kidx = _sessionKeys.indexOfKey(tagnum);
+                if (kidx >= 0)
+                    _sessionKeys.removeAt(kidx);
+                if (_lsnr != null)
+                    _lsnr.expireTag(_sessionTags.valueAt(toTrim), this);
+                toTrim++;
+            }
+            if (toTrim > 0)
+                _sessionTags.removeAtRange(0, toTrim);
+        }
+
         // trim if too big
         int toTrim = _sessionTags.size() - _maxSize;
         if (toTrim > 0) {
@@ -394,7 +411,7 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  For outbound only.
+     *  Public for outbound only. Used internally for inbound.
      *  Call before consumeNextKey();
      *
      *  @return a tag or null if we ran out
@@ -504,7 +521,7 @@ class RatchetTagSet implements TagSetHandle {
         System.out.println("Size now: " + rts.size());
         System.out.println("");
         System.out.println("Receive test in-order");
-        rts = new RatchetTagSet(hkdf, null, k1, k2, 0, 0, 10, 50);
+        rts = new RatchetTagSet(hkdf, null, (PublicKey) null, k1, k2, 0, 0, 10, 50);
         System.out.println("Size now: " + rts.size());
         List<RatchetSessionTag> tags = rts.getTags();
         int j = 0;
@@ -527,7 +544,7 @@ class RatchetTagSet implements TagSetHandle {
         System.out.println("Size now: " + rts.size());
         System.out.println("");
         System.out.println("Receive test out of order");
-        rts = new RatchetTagSet(hkdf, null, k1, k2, 0, 0, 10, 50);
+        rts = new RatchetTagSet(hkdf, null, (PublicKey) null, k1, k2, 0, 0, 10, 50);
         System.out.println("Size now: " + rts.size());
         tags = rts.getTags();
         List<RatchetSessionTag> origtags = new ArrayList<RatchetSessionTag>(tags);
