@@ -140,6 +140,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     /** component ordering in the new style request */
     public List<Integer> getReplyOrder() { return _order; }
     public void setReplyOrder(List<Integer> order) { _order = order; }
+
     /** new style reply message id */
     public long getReplyMessageId() { return _replyMessageId; }
     public void setReplyMessageId(long id) { _replyMessageId = id; }
@@ -158,7 +159,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         long timeSince = now - _peakThroughputLastCoallesce;
         if (timeSince >= 60*1000) {
             long tot = _peakThroughputCurrentTotal;
-            double normalized = tot * 60d*1000d / timeSince;
+            int normalized = (int) (tot * 60d*1000d / timeSince);
             _peakThroughputLastCoallesce = now;
             _peakThroughputCurrentTotal = 0;
             if (_context != null) {
@@ -166,7 +167,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
                 int start = _isInbound ? 0 : 1;
                 int end = _isInbound ? _peers.length - 1 : _peers.length;
                 for (int i = start; i < end; i++) {
-                    _context.profileManager().tunnelDataPushed1m(_peers[i], (int)normalized);
+                    _context.profileManager().tunnelDataPushed1m(_peers[i], normalized);
                 }
             }
         }
@@ -202,6 +203,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
             return true;
         }
     }
+
     public boolean getTunnelFailed() { return _failed; }
     public int getTunnelFailures() { return _failures; }
     
