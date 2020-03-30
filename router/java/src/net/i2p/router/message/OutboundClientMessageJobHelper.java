@@ -130,27 +130,7 @@ class OutboundClientMessageJobHelper {
             return null;
         GarlicMessage msg;
         if (isECIES) {
-            DeliveryInstructions di;
-            if (requireAck) {
-                // setup reply DI
-                di = new DeliveryInstructions();
-                if (bundledReplyLeaseSet != null) {
-                    di.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
-                    di.setDestination(from);
-                } else if (replyTunnel != null) {
-                    di.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
-                    TunnelId replyToTunnelId = replyTunnel.getReceiveTunnelId(0);
-                    Hash replyToTunnelRouter = replyTunnel.getPeer(0);
-                    di.setRouter(replyToTunnelRouter);
-                    di.setTunnelId(replyToTunnelId);
-                } else {
-                    // shouldn't happen
-                    di = null;
-                }
-            } else {
-                di = null;
-            }
-            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm, di, callback);
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm, callback);
         } else {
             // no use sending tags unless we have a reply token set up already
             int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;

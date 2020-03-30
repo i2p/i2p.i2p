@@ -277,7 +277,6 @@ public class GarlicMessageBuilder {
      * @param config how/what to wrap
      * @param target public key of the location being garlic routed to (may be null if we 
      *               know the encryptKey and encryptTag)
-     * @param replyDI non-null to request an ack, or null
      * @param callback may be null
      * @return null if expired or on other errors
      * @throws IllegalArgumentException on error
@@ -285,7 +284,7 @@ public class GarlicMessageBuilder {
      */
     static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config,
                                            PublicKey target, Hash from, SessionKeyManager skm,
-                                           DeliveryInstructions replyDI, ReplyCallback callback) {
+                                           ReplyCallback callback) {
         PublicKey key = config.getRecipientPublicKey();
         if (key.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
@@ -315,7 +314,7 @@ public class GarlicMessageBuilder {
                 log.warn("No SKM for " + from.toBase32());
             return null;
         }
-        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, replyDI, callback);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, callback);
         if (encData == null) {
             if (log.shouldWarn())
                 log.warn("Encrypt fail for " + from.toBase32());

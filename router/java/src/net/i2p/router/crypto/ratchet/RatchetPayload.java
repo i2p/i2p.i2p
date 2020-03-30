@@ -8,7 +8,6 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -32,8 +31,8 @@ class RatchetPayload {
     private static final int BLOCK_OPTIONS = 5;
     private static final int BLOCK_MSGNUM = 6;
     private static final int BLOCK_NEXTKEY = 7;
-    private static final int BLOCK_ACKKEY = 8;
-    private static final int BLOCK_REPLYDI = 9;
+    private static final int BLOCK_ACK = 8;
+    private static final int BLOCK_ACKREQ = 9;
     private static final int BLOCK_GARLIC = 11;
     private static final int BLOCK_PADDING = 254;
 
@@ -71,7 +70,7 @@ class RatchetPayload {
          *  @param di may be null
          *  @since 0.9.46
          */
-        public void gotAckRequest(int id, DeliveryInstructions di);
+        public void gotAckRequest();
 
         /**
          *  For stats.
@@ -154,10 +153,10 @@ class RatchetPayload {
                   }
                     break;
 
-                case BLOCK_ACKKEY:
+                case BLOCK_ACK:
                   {
                     if (len < 4 || (len % 4) != 0)
-                        throw new IOException("Bad length for ACKKEY: " + len);
+                        throw new IOException("Bad length for ACK: " + len);
                     for (int j = i; j < i + len; j += 4) {
                         int id = (int) DataHelper.fromLong(payload, j, 2);
                         int n = (int) DataHelper.fromLong(payload, j + 2, 2);
@@ -166,20 +165,10 @@ class RatchetPayload {
                   }
                     break;
 
-                case BLOCK_REPLYDI:
-                  {
-                    if (len < 3)
-                        throw new IOException("Bad length for REPLYDI: " + len);
-                    int id = (int) DataHelper.fromLong(payload, i, 2);
-                    DeliveryInstructions di;
-                    if ((payload[2] & 0x01) != 0) {
-                        di = new DeliveryInstructions();
-                        di.readBytes(payload, i + 3);
-                    } else {
-                        di = null;
-                    }
-                    cb.gotAckRequest(id, di);
-                  }
+                case BLOCK_ACKREQ:
+                    if (len < 1)
+                        throw new IOException("Bad length for ACKREQ: " + len);
+                    cb.gotAckRequest();
                     break;
 
                 case BLOCK_TERMINATION:
@@ -384,7 +373,7 @@ class RatchetPayload {
         private final byte[] data;
 
         public AckBlock(int keyID, int n) {
-            super(BLOCK_ACKKEY);
+            super(BLOCK_ACK);
             data = new byte[4];
             DataHelper.toLong(data, 0, 2, keyID);
             DataHelper.toLong(data, 2, 2, n);
@@ -394,7 +383,7 @@ class RatchetPayload {
          *  @param acks each is id &lt;&lt; 16 | n
          */
         public AckBlock(List<Integer> acks) {
-            super(BLOCK_ACKKEY);
+            super(BLOCK_ACK);
             data = new byte[4 * acks.size()];
             int i = 0;
             for (Integer a : acks) {
@@ -417,33 +406,19 @@ class RatchetPayload {
      *  @since 0.9.46
      */
     public static class AckRequestBlock extends Block {
-        private final byte[] data;
 
-        /**
-         *  @param sessionID 0 - 65535
-         *  @param di may be null
-         */
-        public AckRequestBlock(int sessionID, DeliveryInstructions di) {
-            super(BLOCK_REPLYDI);
-            int len = 3;
-            if (di != null)
-                len += di.getSize();
-            data = new byte[len];
-            DataHelper.toLong(data, 0, 2, sessionID);
-            if (di != null) {
-                data[2] = 0x01;
-                di.writeBytes(data, 3);
-            }
-            // else flag is zero
+        public AckRequestBlock() {
+            super(BLOCK_ACKREQ);
+            // flag is zero
         }
 
         public int getDataLength() {
-            return data.length;
+            return 1;
         }
 
         public int writeData(byte[] tgt, int off) {
-            System.arraycopy(data, 0, tgt, off, data.length);
-            return off + data.length;
+            tgt[off] = 0;
+            return off + 1;
         }
     }
 
