@@ -12,6 +12,9 @@ class NextSessionKey extends PublicKey {
     private final int _id;
     private final boolean _isReverse, _isRequest;
 
+    /**
+     *  @param data may be null
+     */
     public NextSessionKey(byte[] data, int id, boolean isReverse, boolean isRequest) {
         super(EncType.ECIES_X25519, data);
         _id = id;

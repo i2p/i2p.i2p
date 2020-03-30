@@ -48,12 +48,12 @@ final class MuxedEngine {
                 try {
                     rv = _context.garlicMessageParser().readCloveSet(dec, 0);
                 } catch (DataFormatException dfe) {
-                    if (_log.shouldWarn())
-                        _log.warn("ElG decrypt failed, trying ECIES", dfe);
+                    if (_log.shouldInfo())
+                        _log.info("ElG decrypt failed, trying ECIES", dfe);
                 }
             } else {
-                if (_log.shouldWarn())
-                    _log.warn("ElG decrypt failed, trying ECIES");
+                //if (_log.shouldDebug())
+                //    _log.debug("ElG decrypt failed, trying ECIES");
             }
         }
         if (rv == null) {

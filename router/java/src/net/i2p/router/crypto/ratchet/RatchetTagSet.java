@@ -38,7 +38,7 @@ import net.i2p.util.Log;
 class RatchetTagSet implements TagSetHandle {
     private final SessionTagListener _lsnr;
     private final PublicKey _remoteKey;
-    private final SessionKey _key;
+    protected final SessionKey _key;
     private final HandshakeState _state;
     // inbound only, else null
     // We use object for tags because we must do indexOfValueByValue()
@@ -48,6 +48,7 @@ class RatchetTagSet implements TagSetHandle {
     private final SparseArray<byte[]> _sessionKeys;
     private final HKDF hkdf;
     private final long _created;
+    private final long _timeout;
     private long _date;
     private final int _id;
     private final int _originalSize;
@@ -84,7 +85,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     public RatchetTagSet(HKDF hkdf, HandshakeState state, SessionKey rootKey, SessionKey data,
                          long date, int id) {
-        this(hkdf, null, state, null, rootKey, data, date, id, false, 0, 0);
+        this(hkdf, null, state, null, rootKey, data, date, RatchetSKM.SESSION_PENDING_DURATION_MS, id, false, 0, 0);
     }
 
     /**
@@ -94,7 +95,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     public RatchetTagSet(HKDF hkdf, SessionKey rootKey, SessionKey data,
                          long date, int id) {
-        this(hkdf, null, null, null, rootKey, data, date, id, false, 0, 0);
+        this(hkdf, null, null, null, rootKey, data, date, RatchetSKM.SESSION_TAG_DURATION_MS, id, false, 0, 0);
     }
 
     /**
@@ -104,7 +105,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state, SessionKey rootKey, SessionKey data,
                          long date, int id, int minSize, int maxSize) {
-        this(hkdf, lsnr, state, null, rootKey, data, date, id, true, minSize, maxSize);
+        this(hkdf, lsnr, state, null, rootKey, data, date, RatchetSKM.SESSION_PENDING_DURATION_MS, id, true, minSize, maxSize);
     }
 
     /**
@@ -115,7 +116,7 @@ class RatchetTagSet implements TagSetHandle {
     public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr,
                          PublicKey remoteKey, SessionKey rootKey, SessionKey data,
                          long date, int id, int minSize, int maxSize) {
-        this(hkdf, lsnr, null, remoteKey, rootKey, data, date, id, true, minSize, maxSize);
+        this(hkdf, lsnr, null, remoteKey, rootKey, data, date, RatchetSKM.SESSION_LIFETIME_MAX_MS, id, true, minSize, maxSize);
     }
 
 
@@ -124,12 +125,13 @@ class RatchetTagSet implements TagSetHandle {
      */
     private RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state,
                           PublicKey remoteKey, SessionKey rootKey, SessionKey data,
-                          long date, int id, boolean isInbound, int minSize, int maxSize) {
+                          long date, long timeout, int id, boolean isInbound, int minSize, int maxSize) {
         _lsnr = lsnr;
         _state = state;
         _remoteKey = remoteKey;
         _key = rootKey;
         _created = date;
+        _timeout = timeout;
         _date = date;
         _id = id;
         _originalSize = minSize;
@@ -157,6 +159,31 @@ class RatchetTagSet implements TagSetHandle {
             _sessionTags = null;
             _sessionKeys = null;
         }
+    }
+
+    /**
+     *  For SingleTagSet
+     *  @since 0.9.46
+     */
+    protected RatchetTagSet(SessionTagListener lsnr, SessionKey rootKey, long date, long timeout) {
+        _lsnr = lsnr;
+        _state = null;
+        _remoteKey = null;
+        _key = rootKey;
+        _created = date;
+        _timeout = timeout;
+        _date = date;
+        _id = 0x10003;
+        _originalSize = 1;
+        _maxSize = 1;
+        _nextRootKey = null;
+        _sesstag_ck = null;
+        _sesstag_constant = null;
+        _symmkey_ck = null;
+        _symmkey_constant = null;
+        hkdf = null;
+        _sessionTags = null;
+        _sessionKeys = null;
     }
 
     public void clear() {
@@ -201,6 +228,7 @@ class RatchetTagSet implements TagSetHandle {
 
     /**
      *  For inbound and outbound: last used time
+     *  Expiration is getDate() + getTimeout().
      */
     public long getDate() {
         return _date;
@@ -214,10 +242,28 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  For inbound and outbound: creation time
+     *  For inbound and outbound: creation time, for debugging only
      */
     public long getCreated() {
         return _created;
+    }
+
+    /**
+     *  For inbound and outbound: Idle timeout interval.
+     *  Expiration is getDate() + getTimeout().
+     *  @since 0.9.46
+     */
+    public long getTimeout() {
+        return _timeout;
+    }
+
+    /**
+     *  For inbound and outbound: Expiration.
+     *  Expiration is getDate() + getTimeout().
+     *  @since 0.9.46
+     */
+    public synchronized long getExpiration() {
+        return _date + _timeout;
     }
 
     /** for debugging */

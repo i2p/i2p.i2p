@@ -772,14 +772,14 @@ public final class ECIESAEADEngine {
      *  - 16 byte MAC
      * </pre>
      *
-     * @param target unused, this is AEAD encrypt only using the session key and tag
+     * @param target only used if callback is non-null to register it
      * @param replyDI non-null to request an ack, or null
      * @return encrypted data or null on failure
      */
     private byte[] encryptExistingSession(CloveSet cloves, PublicKey target, RatchetEntry re,
                                           DeliveryInstructions replyDI, ReplyCallback callback,
                                           RatchetSKM keyManager) {
-        //
+        // TODO remove DI, just make it a boolean
         if (ACKREQ_IN_ES && replyDI == null)
             replyDI = new DeliveryInstructions();
         byte rawTag[] = re.tag.getData();
@@ -791,6 +791,31 @@ public final class ECIESAEADEngine {
         if (callback != null) {
             keyManager.registerCallback(target, re.keyID, nonce, callback);
         }
+        return encr;
+    }
+
+    /**
+     * Create an Existing Session Message to an anonymous target
+     * using the given session key and tag, for netdb DSM/DSRM replies.
+     * Called from MessageWrapper.
+     *
+     * No datetime, no next key, no acks, no ack requests.
+     * n=0, ad=null.
+     *
+     * <pre>
+     *  - 8 byte SessionTag
+     *  - payload
+     *  - 16 byte MAC
+     * </pre>
+     *
+     * @return encrypted data or null on failure
+     * @since 0.9.46
+     */
+    public byte[] encrypt(CloveSet cloves, SessionKey key, RatchetSessionTag tag) {
+        byte rawTag[] = tag.getData();
+        byte[] payload = createPayload(cloves, 0, null, null, null);
+        byte encr[] = encryptAEADBlock(rawTag, payload, key, 0);
+        System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         return encr;
     }
 

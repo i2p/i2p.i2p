@@ -136,13 +136,19 @@ class RatchetPayload {
 
                 case BLOCK_NEXTKEY:
                   {
-                    if (len != 35)
+                    if (len != 3 && len != 35)
                         throw new IOException("Bad length for NEXTKEY: " + len);
-                    boolean isReverse = (payload[i] & 0x01) != 0;
-                    boolean isRequest = (payload[i] & 0x02) != 0;
+                    boolean hasKey = (payload[i] & 0x01) != 0;
+                    boolean isReverse = (payload[i] & 0x02) != 0;
+                    boolean isRequest = (payload[i] & 0x04) != 0;
                     int id = (int) DataHelper.fromLong(payload, i + 1, 2);
-                    byte[] data = new byte[32];
-                    System.arraycopy(payload, i + 3, data, 0, 32);
+                    byte[] data;
+                    if (hasKey) {
+                        data = new byte[32];
+                        System.arraycopy(payload, i + 3, data, 0, 32);
+                    } else {
+                        data = null;
+                    }
                     NextSessionKey nsk = new NextSessionKey(data, id, isReverse, isRequest);
                     cb.gotNextKey(nsk);
                   }
@@ -352,17 +358,22 @@ class RatchetPayload {
         }
 
         public int getDataLength() {
-            return 35;
+            return next.getData() != null ? 35 : 3;
         }
 
         public int writeData(byte[] tgt, int off) {
-            if (next.isReverse())
+            if (next.getData() != null)
                 tgt[off] = 0x01;
-            if (next.isRequest())
+            if (next.isReverse())
                 tgt[off] |= 0x02;
+            if (next.isRequest())
+                tgt[off] |= 0x04;
             DataHelper.toLong(tgt, off + 1, 2, next.getID());
-            System.arraycopy(next.getData(), 0, tgt, off + 3, 32);
-            return off + 35;
+            if (next.getData() != null) {
+                System.arraycopy(next.getData(), 0, tgt, off + 3, 32);
+                return off + 35;
+            }
+            return off + 3;
         }
     }
 
