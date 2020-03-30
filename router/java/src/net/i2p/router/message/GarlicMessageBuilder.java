@@ -32,6 +32,7 @@ import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
+import net.i2p.router.crypto.ratchet.RatchetSessionTag;
 import net.i2p.router.crypto.ratchet.ReplyCallback;
 import net.i2p.util.Log;
 
@@ -196,7 +197,7 @@ public class GarlicMessageBuilder {
     /**
      *  ELGAMAL_2048 only.
      *  Used by TestJob, and directly above,
-     *  and by MessageWrapper for encrypting DatabaseLookupMessages
+     *  and by MessageWrapper for encrypting DatabaseLookupMessages and DSM/DSRM replies.
      *
      * @param ctx scope
      * @param config how/what to wrap
@@ -242,6 +243,29 @@ public class GarlicMessageBuilder {
             log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId() + " is " + cloveSet.length
                      + " bytes and encrypted message data is " + encData.length + " bytes");
         
+        return msg;
+    }
+    
+    /**
+     *  Ratchet only.
+     *  Used by TestJob,
+     *  and by MessageWrapper for encrypting DatabaseLookupMessages and DSM/DSRM replies.
+     *
+     * @param ctx scope
+     * @param config how/what to wrap
+     * @param encryptKey sessionKey used to encrypt the current message, non-null
+     * @param encryptTag sessionTag used to encrypt the current message, non-null
+     * @since 0.9.46
+     */
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config,
+                                             SessionKey encryptKey, RatchetSessionTag encryptTag) {
+        GarlicMessage msg = new GarlicMessage(ctx);
+        CloveSet cloveSet = buildECIESCloveSet(ctx, config);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, encryptKey, encryptTag);
+        if (encData == null)
+            return null;
+        msg.setData(encData);
+        msg.setMessageExpiration(config.getExpiration());
         return msg;
     }
     
