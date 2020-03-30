@@ -101,10 +101,13 @@ public class DataMessage extends FastI2NPMessageImpl {
         StringBuilder buf = new StringBuilder();
         buf.append("[DataMessage: ");
         buf.append("\n\tData: ");
-        if (_data != null)
-            buf.append(_data.length).append(" bytes: ").append(Base64.encode(_data));
-        else
+        if (_data != null) {
+            buf.append(_data.length).append(" bytes");
+            if (_data.length <= 64)
+                buf.append(" : ").append(Base64.encode(_data));
+        } else {
             buf.append("null");
+        }
         buf.append("]");
         return buf.toString();
     }
