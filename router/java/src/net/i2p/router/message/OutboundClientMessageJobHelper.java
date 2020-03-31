@@ -232,7 +232,7 @@ class OutboundClientMessageJobHelper {
         LeaseSetKeys lsk = ctx.keyManager().getKeys(from);
         I2NPMessage msg;
         if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
-            msg = wrapDSM(ctx, skm, dsm);
+            msg = wrapDSM(ctx, skm, dsm, expiration);
             if (msg == null) {
                 if (log.shouldLog(Log.WARN))
                     log.warn("Failed to wrap ack clove");
@@ -279,12 +279,14 @@ class OutboundClientMessageJobHelper {
      *  @return null on error
      *  @since 0.9.12
      */
-    private static GarlicMessage wrapDSM(RouterContext ctx, SessionKeyManager skm, DeliveryStatusMessage dsm) {
+    private static GarlicMessage wrapDSM(RouterContext ctx, SessionKeyManager skm,
+                                         DeliveryStatusMessage dsm, long expiration) {
         // garlic route that DeliveryStatusMessage to ourselves so the endpoints and gateways
         // can't tell its a test.  to simplify this, we encrypt it with a random key and tag,
         // remembering that key+tag so that we can decrypt it later.  this means we can do the
         // garlic encryption without any ElGamal (yay)
-        MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(ctx, skm);
+        long fromNow = expiration - ctx.clock().now();
+        MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(ctx, skm, fromNow, true);
         GarlicMessage msg = MessageWrapper.wrap(ctx, dsm, sess);
         return msg;
     }

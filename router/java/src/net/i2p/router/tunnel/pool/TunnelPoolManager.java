@@ -563,12 +563,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
              _context.router().isHidden() ||
              _context.router().getRouterInfo().getAddressCount() <= 0)) {
             Hash client = cfg.getDestination();
-            LeaseSetKeys lsk = client != null ? _context.keyManager().getKeys(client) : null;
-            if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
-                TunnelPool pool = cfg.getTunnelPool();
-                _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
-            }
-            // else we don't yet have any way to request/get a ECIES-tagged reply,
+            TunnelPool pool = cfg.getTunnelPool();
+            _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
         }
     }
 

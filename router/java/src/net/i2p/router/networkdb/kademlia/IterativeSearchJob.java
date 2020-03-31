@@ -336,19 +336,27 @@ public class IterativeSearchJob extends FloodSearchJob {
             TunnelInfo replyTunnel;
             boolean isClientReplyTunnel;
             boolean isDirect;
+            boolean supportsRatchet = false;
+            boolean supportsElGamal = true;
             if (_fromLocalDest != null) {
                 outTunnel = tm.selectOutboundTunnel(_fromLocalDest, peer);
                 if (outTunnel == null)
                     outTunnel = tm.selectOutboundExploratoryTunnel(peer);
                 LeaseSetKeys lsk = getContext().keyManager().getKeys(_fromLocalDest);
-                if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
+                supportsRatchet = lsk != null &&
+                                  lsk.isSupported(EncType.ECIES_X25519) &&
+                                  DatabaseLookupMessage.supportsRatchetReplies(ri);
+                supportsElGamal = !supportsRatchet &&
+                                  lsk != null &&
+                                  lsk.isSupported(EncType.ELGAMAL_2048);
+                if (supportsElGamal || supportsRatchet) {
                     // garlic encrypt to dest SKM
                     replyTunnel = tm.selectInboundTunnel(_fromLocalDest, peer);
                     isClientReplyTunnel = replyTunnel != null;
                     if (!isClientReplyTunnel)
                         replyTunnel = tm.selectInboundExploratoryTunnel(peer);
                 } else {
-                    // We don't yet have any way to request/get a ECIES-tagged reply,
+                    // We don't have a way to request/get a ECIES-tagged reply,
                     // so send it to the router SKM
                     isClientReplyTunnel = false;
                     replyTunnel = tm.selectInboundExploratoryTunnel(peer);
@@ -443,18 +451,24 @@ public class IterativeSearchJob extends FloodSearchJob {
                             _log.warn(getJobId() + ": Can't do encrypted lookup to " + peer + " with EncType " + type);
                         return;
                     }
-                    if (true) {
-                        MessageWrapper.OneTimeSession sess;
-                        if (isClientReplyTunnel)
-                            sess = MessageWrapper.generateSession(getContext(), _fromLocalDest);
-                        else
-                            sess = MessageWrapper.generateSession(getContext());
-                        if (sess != null) {
-                            if (_log.shouldLog(Log.INFO))
-                                _log.info(getJobId() + ": Requesting encrypted reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
+
+                    MessageWrapper.OneTimeSession sess;
+                    if (isClientReplyTunnel)
+                        sess = MessageWrapper.generateSession(getContext(), _fromLocalDest, SINGLE_SEARCH_MSG_TIME, !supportsRatchet);
+                    else
+                        sess = MessageWrapper.generateSession(getContext(), SINGLE_SEARCH_MSG_TIME);
+                    if (sess != null) {
+                        if (sess.tag != null) {
+                            if (_log.shouldInfo())
+                                _log.info(getJobId() + ": Requesting AES reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
                             dlm.setReplySession(sess.key, sess.tag);
-                        } // else client went away, but send it anyway
-                    }
+                        } else {
+                            if (_log.shouldInfo())
+                                _log.info(getJobId() + ": Requesting AEAD reply from " + peer + ' ' + sess.key + ' ' + sess.rtag);
+                            dlm.setReplySession(sess.key, sess.rtag);
+                        }
+                    } // else client went away, but send it anyway
+
                     outMsg = MessageWrapper.wrap(getContext(), dlm, ri);
                     // ElG can take a while so do a final check before we send it,
                     // a response may have come in.

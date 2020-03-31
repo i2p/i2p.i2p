@@ -1,4 +1,25 @@
+2020-03-31 zzz
+ * NetDB:
+   - Add support for ratchet replies (proposal 154)
+   - Add support for ElG lookups and stores from ECIES-only destinations
+   - Variable timeout for MessageWrapper-generated tags
+ * Ratchet:
+   - Variable timeout for tagsets
+   - Expire tags too far behind current one
+   - Remove ID and DI from ACKREQ block
+   - Add timeout job in OCMOSJ
+   - Prep for next key support
+   - Add support for acks and callbacks
+ * Tunnels:
+   - Refactor TestJob to use MessageWrapper
+   - Add support for ratchet
+
 2020-03-24 zzz
+ * Blockfile: Add b32 to export output
+ * Graphs: Fix rrd4j deprecation warnings
+ * Profiles:
+   - Don't decay during first 90 minutes of uptime
+   - Change decay from .75 twice a day to .84 four times a day
  * Tunnels: Make new tunnel selection round-robin
 
 2020-03-20 zzz

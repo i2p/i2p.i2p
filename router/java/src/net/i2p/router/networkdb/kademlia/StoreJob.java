@@ -14,6 +14,7 @@ import java.util.Set;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
@@ -297,7 +298,8 @@ abstract class StoreJob extends JobImpl {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         KBucketSet<Hash> ks = _facade.getKBuckets();
         if (ks == null) return new ArrayList<Hash>();
-        return ((FloodfillPeerSelector)_peerSelector).selectFloodfillParticipants(rkey, numClosest, alreadyChecked, ks);
+        List<Hash> rv = ((FloodfillPeerSelector)_peerSelector).selectFloodfillParticipants(rkey, numClosest, alreadyChecked, ks);
+        return rv;
     }
 
     /** limit expiration for direct sends */
@@ -496,9 +498,19 @@ abstract class StoreJob extends JobImpl {
                 }
                 sent = wm.getMessage();
                 _state.addPending(to, wm);
+            } else if (lsk.isSupported(EncType.ECIES_X25519)) {
+                // force full ElG for ECIES-only
+                sent = MessageWrapper.wrap(getContext(), msg, peer);
+                if (sent == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Fail garlic encrypting from: " + client);
+                    fail();
+                    return;
+                }
+                _state.addPending(to);
             } else {
-                // We don't yet have any way to request/get a ECIES-tagged reply,
-                // so send it unencrypted.
+                // Above are the only two enc types for now, won't get here.
+                // Send it unencrypted.
                 sent = msg;
                 _state.addPending(to);
             }

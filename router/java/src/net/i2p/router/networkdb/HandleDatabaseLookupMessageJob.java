@@ -18,6 +18,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -29,6 +30,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.ratchet.RatchetSessionTag;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
@@ -313,11 +315,19 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 SessionKey replyKey = _message.getReplyKey();
                 if (replyKey != null) {
                     // encrypt the reply
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Sending encrypted reply to " + toPeer + ' ' + replyKey + ' ' + _message.getReplyTag());
-                    message = MessageWrapper.wrap(getContext(), message, replyKey, _message.getReplyTag());
+                    SessionTag tag = _message.getReplyTag();
+                    if (tag != null) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Sending AES reply to " + toPeer + ' ' + replyKey + ' ' + tag);
+                        message = MessageWrapper.wrap(getContext(), message, replyKey, tag);
+                    } else {
+                        RatchetSessionTag rtag = _message.getRatchetReplyTag();
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Sending AEAD reply to " + toPeer + ' ' + replyKey + ' ' + rtag);
+                        message = MessageWrapper.wrap(getContext(), message, replyKey, rtag);
+                    }
                     if (message == null) {
-                        _log.error("Encryption error");
+                        _log.error("DLM reply encryption error");
                         return;
                     }
                     _replyKeyConsumed = true;

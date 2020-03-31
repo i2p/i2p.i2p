@@ -141,7 +141,7 @@ class ExploreJob extends SearchJob {
             // request encrypted reply?
             if (DatabaseLookupMessage.supportsEncryptedReplies(peer)) {
                 MessageWrapper.OneTimeSession sess;
-                sess = MessageWrapper.generateSession(getContext());
+                sess = MessageWrapper.generateSession(getContext(), MAX_EXPLORE_TIME);
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": Requesting encrypted reply from " + peer.getIdentity().calculateHash() +
                               ' ' + sess.key + ' ' + sess.tag);
