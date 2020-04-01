@@ -40,7 +40,7 @@ class NextSessionKey extends PublicKey {
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
         buf.append("[NextSessionKey: ");
-        buf.append(toBase64());
+        buf.append(super.toString());
         buf.append(" ID: ").append(_id);
         buf.append(" reverse? ").append(_isReverse);
         buf.append(" request? ").append(_isRequest);

@@ -510,6 +510,11 @@ public final class ECIESAEADEngine {
             if (_log.shouldWarn())
                 _log.warn("No garlic block in ES payload");
         }
+        if (pc.nextKeys != null) {
+            for (NextSessionKey nextKey : pc.nextKeys) {
+                keyManager.nextKeyReceived(remote, nextKey);
+            }
+        }
         if (pc.ackRequested) {
             keyManager.ackRequested(remote, key.getID(), nonce);
         }
@@ -667,7 +672,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session: " + state);
 
-        byte[] payload = createPayload(cloves, cloves.getExpiration(), false, null, null);
+        byte[] payload = createPayload(cloves, cloves.getExpiration());
 
         byte[] enc = new byte[KEYLEN + KEYLEN + MACLEN + payload.length + MACLEN];
         try {
@@ -726,7 +731,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State after mixhash tag before encrypt new session reply: " + state);
 
-        byte[] payload = createPayload(cloves, 0, false, null, null);
+        byte[] payload = createPayload(cloves, 0);
 
         // part 1 - tag and empty payload
         byte[] enc = new byte[TAGLEN + KEYLEN + MACLEN + payload.length + MACLEN];
@@ -793,7 +798,7 @@ public final class ECIESAEADEngine {
                                           RatchetSKM keyManager) {
         boolean ackreq = callback != null || ACKREQ_IN_ES;
         byte rawTag[] = re.tag.getData();
-        byte[] payload = createPayload(cloves, 0, ackreq, re.nextKey, re.acksToSend);
+        byte[] payload = createPayload(cloves, 0, ackreq, re.nextForwardKey, re.nextReverseKey, re.acksToSend);
         SessionKeyAndNonce key = re.key;
         int nonce = key.getNonce();
         byte encr[] = encryptAEADBlock(rawTag, payload, key, nonce);
@@ -823,7 +828,7 @@ public final class ECIESAEADEngine {
      */
     public byte[] encrypt(CloveSet cloves, SessionKey key, RatchetSessionTag tag) {
         byte rawTag[] = tag.getData();
-        byte[] payload = createPayload(cloves, 0, false, null, null);
+        byte[] payload = createPayload(cloves, 0);
         byte encr[] = encryptAEADBlock(rawTag, payload, key, 0);
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         return encr;
@@ -857,7 +862,7 @@ public final class ECIESAEADEngine {
         return enc;
     }
 
-    private static final PrivateKey doDH(PrivateKey privkey, PublicKey pubkey) {
+    static final PrivateKey doDH(PrivateKey privkey, PublicKey pubkey) {
         byte[] dh = new byte[KEYLEN];
         Curve25519.eval(dh, 0, privkey.getData(), pubkey.getData());
         return new PrivateKey(EncType.ECIES_X25519, dh);
@@ -868,11 +873,13 @@ public final class ECIESAEADEngine {
     /////////////////////////////////////////////////////////
 
     private class PLCallback implements RatchetPayload.PayloadCallback {
+        /** non null, may be empty */
         public final List<GarlicClove> cloveSet = new ArrayList<GarlicClove>(3);
         private final RatchetSKM skm;
         private final PublicKey remote;
         public long datetime;
-        public NextSessionKey nextKey;
+        /** null or non-empty */
+        public List<NextSessionKey> nextKeys;
         public boolean ackRequested;
 
         /**
@@ -920,7 +927,11 @@ public final class ECIESAEADEngine {
         public void gotNextKey(NextSessionKey next) {
             if (_log.shouldDebug())
                 _log.debug("Got NEXTKEY block: " + next);
-            nextKey = next;
+            // could have both a forward and reverse.
+            // shouldn't have two forwards or two reverses
+            if (nextKeys == null)
+                nextKeys = new ArrayList<NextSessionKey>(2);
+            nextKeys.add(next);
         }
 
         public void gotAck(int id, int n) {
@@ -956,19 +967,31 @@ public final class ECIESAEADEngine {
 
     /**
      *  @param expiration if greater than zero, add a DateTime block
+     *  @since 0.9.46
+     */
+    private byte[] createPayload(CloveSet cloves, long expiration) {
+        return createPayload(cloves, expiration, false, null, null, null);
+    }
+
+    /**
+     *  @param expiration if greater than zero, add a DateTime block
      *  @param ackreq to request an ack, must be false for NS/NSR
+     *  @param nextKey1 may be null
+     *  @param nextKey2 may be null
      *  @param acksTOSend may be null
      */
     private byte[] createPayload(CloveSet cloves, long expiration,
-                                 boolean ackreq, NextSessionKey nextKey,
-                                 List<Integer> acksToSend) {
+                                 boolean ackreq, NextSessionKey nextKey1,
+                                 NextSessionKey nextKey2, List<Integer> acksToSend) {
         int count = cloves.getCloveCount();
         int numblocks = count + 1;
         if (expiration > 0)
             numblocks++;
         if (ackreq)
             numblocks++;
-        if (nextKey != null)
+        if (nextKey1 != null)
+            numblocks++;
+        if (nextKey2 != null)
             numblocks++;
         if (acksToSend != null)
             numblocks++;
@@ -979,8 +1002,13 @@ public final class ECIESAEADEngine {
             blocks.add(block);
             len += block.getTotalLength();
         }
-        if (nextKey != null) {
-            Block block = new NextKeyBlock(nextKey);
+        if (nextKey1 != null) {
+            Block block = new NextKeyBlock(nextKey1);
+            blocks.add(block);
+            len += block.getTotalLength();
+        }
+        if (nextKey2 != null) {
+            Block block = new NextKeyBlock(nextKey2);
             blocks.add(block);
             len += block.getTotalLength();
         }

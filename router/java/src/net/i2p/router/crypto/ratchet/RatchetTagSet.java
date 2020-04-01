@@ -263,6 +263,7 @@ class RatchetTagSet implements TagSetHandle {
      *  @since 0.9.46
      */
     public synchronized long getExpiration() {
+        // TODO return shorter if not acked?
         return _date + _timeout;
     }
 
@@ -299,16 +300,15 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  Next Key if applicable
-     *  null if remaining is sufficient
+     *  Next Forward Key if applicable (we're running low).
+     *  Null if remaining is sufficient.
+     *  Once non-null, will be constant for the remaining life of the tagset.
      *
      *  @return key or null
      *  @since 0.9.46
      */
     public NextSessionKey getNextKey() {
         if (remaining() > LOW)
-            return null;
-        if (_nextKeyAcked)  // maybe not needed, keep sending until unused
             return null;
         if (_nextKeys == null) {
             _nextKeys = I2PAppContext.getGlobalContext().keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
@@ -317,6 +317,18 @@ class RatchetTagSet implements TagSetHandle {
             _nextKey = new NextSessionKey(_nextKeys.getPublic().getData(), 0, isIB, !isIB);
         }
         return _nextKey;
+    }
+
+    /**
+     *  Next Forward KeyPair if applicable (we're running low).
+     *  Null if remaining is sufficient.
+     *  Once non-null, will be constant for the remaining life of the tagset.
+     *
+     *  @return keys or null
+     *  @since 0.9.46
+     */
+    public KeyPair getNextKeys() {
+        return _nextKeys;
     }
 
     /**
@@ -502,9 +514,19 @@ class RatchetTagSet implements TagSetHandle {
      */
     public boolean getAcked() { return _acked; }
 
-    /** the Key ID */
+    /**
+     * The TagSet ID, starting at 0.
+     * After that = 1 + my key id + his key id
+     */
     public int getID() {
         return _id;
+    }
+
+    /**
+     * A unique ID for debugging only
+     */
+    public int getDebugID() {
+        return _tagSetID;
     }
 
     @Override
