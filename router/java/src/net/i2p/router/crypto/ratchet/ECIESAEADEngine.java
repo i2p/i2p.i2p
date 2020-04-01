@@ -61,6 +61,8 @@ public final class ECIESAEADEngine {
     private static final int MIN_ENCRYPTED_SIZE = MIN_ES_SIZE;
     private static final byte[] NULLPK = new byte[KEYLEN];
     private static final int MAXPAD = 16;
+    static final long MAX_NS_AGE = 5*60*1000;
+    private static final long MAX_NS_FUTURE = 2*60*1000;
     // debug, send ACKREQ in every ES
     private static final boolean ACKREQ_IN_ES = false;
 
@@ -145,6 +147,8 @@ public final class ECIESAEADEngine {
         try {
             return x_decrypt(data, targetPrivateKey, keyManager);
         } catch (DataFormatException dfe) {
+            if (_log.shouldWarn())
+                _log.warn("ECIES decrypt error", dfe);
             throw dfe;
         } catch (Exception e) {
             _log.error("ECIES decrypt error", e);
@@ -176,11 +180,11 @@ public final class ECIESAEADEngine {
             HandshakeState state = key.getHandshakeState();
             if (state == null) {
                 if (shouldDebug)
-                    _log.debug("Decrypting ES with tag: " + st.toBase64() + ": key: " + key.toBase64() + ": " + data.length + " bytes");
+                    _log.debug("Decrypting ES with tag: " + st.toBase64() + " key: " + key.toBase64() + ": " + data.length + " bytes");
                 decrypted = decryptExistingSession(tag, data, key, targetPrivateKey, keyManager);
             } else if (data.length >= MIN_NSR_SIZE) {
                 if (shouldDebug)
-                    _log.debug("Decrypting NSR with tag: " + st.toBase64() + ": key: " + key.toBase64() + ": " + data.length + " bytes");
+                    _log.debug("Decrypting NSR with tag: " + st.toBase64() + " key: " + key.toBase64() + ": " + data.length + " bytes");
                 decrypted = decryptNewSessionReply(tag, data, state, keyManager);
             } else {
                 decrypted = null;
@@ -270,6 +274,15 @@ public final class ECIESAEADEngine {
             }
             return null;
         }
+        // bloom filter here based on ephemeral key
+        // or should we do it based on apparent elg2-encoded key
+        // at the very top, to prevent excess DH resource usage?
+        // But that would put everything in the bloom filter.
+        if (keyManager.isDuplicate(pk)) {
+            if (_log.shouldWarn())
+                _log.warn("Dup eph. key in IB NS: " + pk);
+            return null;
+        }
 
         byte[] bobPK = new byte[KEYLEN];
         state.getRemotePublicKey().getPublicKey(bobPK, 0);
@@ -298,7 +311,13 @@ public final class ECIESAEADEngine {
         } catch (DataFormatException e) {
             throw e;
         } catch (Exception e) {
-            throw new DataFormatException("Msg 1 payload error", e);
+            throw new DataFormatException("NS payload error", e);
+        }
+
+        if (pc.datetime == 0) {
+            if (_log.shouldWarn())
+                _log.warn("No datetime block in IB NS");
+            return null;
         }
 
         // tell the SKM
@@ -862,7 +881,7 @@ public final class ECIESAEADEngine {
         public PLCallback() {
             this(null, null);
         }
-
+ 
         /**
          * ES
          * @param keyManager only for ES, otherwise null
@@ -874,12 +893,17 @@ public final class ECIESAEADEngine {
             remote = remoteKey;
         }
 
-        public void gotDateTime(long time) {
+        public void gotDateTime(long time) throws DataFormatException {
             if (_log.shouldDebug())
                 _log.debug("Got DATE block: " + DataHelper.formatTime(time));
             if (datetime != 0)
-                throw new IllegalArgumentException("Multiple DATETIME blocks");
+                throw new DataFormatException("Multiple DATETIME blocks");
             datetime = time;
+            long now = _context.clock().now();
+            if (time < now - MAX_NS_AGE ||
+                time > now + MAX_NS_FUTURE) {
+                throw new DataFormatException("Excess clock skew in IB NS: " + DataHelper.formatTime(time));
+            }
         }
 
         public void gotOptions(byte[] options, boolean isHandshake) {

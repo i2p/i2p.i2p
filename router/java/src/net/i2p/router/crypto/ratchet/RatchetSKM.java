@@ -30,6 +30,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -49,6 +50,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     protected final I2PAppContext _context;
     private volatile boolean _alive;
     private final HKDF _hkdf;
+    private final DecayingHashSet _replayFilter;
 
     /**
      * Let outbound session tags sit around for this long before expiring them.
@@ -95,17 +97,25 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         _pendingOutboundSessions = new HashMap<PublicKey, List<OutboundSession>>(64);
         _inboundTagSets = new ConcurrentHashMap<RatchetSessionTag, RatchetTagSet>(128);
         _hkdf = new HKDF(context);
+        _replayFilter = new DecayingHashSet(context, (int) ECIESAEADEngine.MAX_NS_AGE, 32, "Ratchet-NS");
         // start the precalc of Elg2 keys if it wasn't already started
         context.eciesEngine().startup();
          _alive = true;
         new CleanupEvent();
     }
 
+    /**
+     *  Cannot be restarted
+     */
     @Override
     public void shutdown() {
          _alive = false;
         _inboundTagSets.clear();
         _outboundSessions.clear();
+        synchronized (_pendingOutboundSessions) {
+            _pendingOutboundSessions.clear();
+        }
+        _replayFilter.stopDecaying();
     }
 
     private class CleanupEvent extends SimpleTimer2.TimedEvent {
@@ -157,6 +167,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     @Override
     public void createSession(PublicKey target, SessionKey key) {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     *  @return true if a dup
+     *  @since 0.9.46
+     */
+    boolean isDuplicate(PublicKey pk) {
+        return _replayFilter.add(pk.getData(), 0, 32);
     }
 
     /**
@@ -591,6 +609,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             OutboundSession old = _outboundSessions.putIfAbsent(sess.getTarget(), sess);
             boolean rv = old == null;
             if (!rv) {
+                // TODO fix
                 if (isInbound && old.getLastUsedDate() < _context.clock().now() - SESSION_TAG_DURATION_MS - (60*1000)) {
                     _outboundSessions.put(sess.getTarget(), sess);
                     rv = true;
