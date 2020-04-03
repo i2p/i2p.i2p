@@ -98,10 +98,13 @@ public class PrivateKeyFile {
         String ttype = null;
         String hostname = null;
         String offline = null;
+        String signer = null;
+        String signername = null;
+        String signaction = null;
         int days = 365;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:p:");
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:p:b:y:z:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -134,6 +137,18 @@ public class PrivateKeyFile {
                     mode = c;
                 else
                     error = true;
+                break;
+
+            case 'b':
+                signername = g.getOptarg();
+                break;
+
+            case 'y':
+                signer = g.getOptarg();
+                break;
+
+            case 'z':
+                signaction = g.getOptarg();
                 break;
 
             case 'o':
@@ -178,6 +193,9 @@ public class PrivateKeyFile {
             String orig = offline != null ? offline : filearg;
             File f = new File(orig);
             boolean exists = f.exists();
+            if (mode == 'a' && !exists) {
+                throw new I2PException("File for authentication does not exist: " + orig);
+            }
             PrivateKeyFile pkf = new PrivateKeyFile(f, client);
             Destination d;
             if (etype != null && !exists) {
@@ -261,8 +279,25 @@ public class PrivateKeyFile {
                 // addressbook auth
                 OrderedProperties props = new OrderedProperties();
                 HostTxtEntry he = new HostTxtEntry(hostname, d.toBase64(), props);
+                if (signer != null && signername != null && signaction != null) {
+                    File fsigner = new File(signer);
+                    if (!fsigner.exists())
+                        throw new I2PException("Signing file does not exist: " + signer);
+                    if (!signaction.equals(HostTxtEntry.ACTION_ADDSUBDOMAIN))
+                        throw new I2PException("Unsupported action: " + signaction);
+                    if (!hostname.endsWith('.' + signername))
+                        throw new I2PException(hostname + " is not a subdomain of " + signername);
+                    PrivateKeyFile pkf2 = new PrivateKeyFile(fsigner);
+                    props.setProperty(HostTxtEntry.PROP_ACTION, signaction);
+                    props.setProperty(HostTxtEntry.PROP_OLDNAME, signername);
+                    props.setProperty(HostTxtEntry.PROP_OLDDEST, pkf2.getDestination().toBase64());
+                    he.signInner(pkf2.getSigningPrivKey());
+                } else if (signer != null || signername != null || signaction != null) {
+                    usage();
+                    return;
+                }
                 he.sign(pkf.getSigningPrivKey());
-                System.out.println("Addressbook Authentication String:");
+                System.out.println("\nAddressbook Authentication String:");
                 OutputStreamWriter out = new OutputStreamWriter(System.out);
                 he.write(out); 
                 out.flush();
@@ -342,6 +377,7 @@ public class PrivateKeyFile {
                            "      -x                   (changes to hidden cert)\n" +
                            "\nother options:\n" +
                            "      -a example.i2p       (generate addressbook authentication string)\n" +
+                           "      -b example.i2p       (hostname of the 2LD dest for signing)\n" +
                            "      -c sigtype           (specify sig type of destination)\n" +
                            "      -d days              (specify expiration in days of offline sig, default 365)\n" +
                            "      -e effort            (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
@@ -349,6 +385,8 @@ public class PrivateKeyFile {
                            "      -p enctype           (specify enc type of destination)\n" +
                            "      -r sigtype           (specify sig type of transient key, default Ed25519)\n" +
                            "      -t sigtype           (changes to KeyCertificate of the given sig type)\n" +
+                           "      -y 2lddestfile       (sign the authentication string with the 2LD key file specified)\n" +
+                           "      -z signaction        (authentication string command, must be \"addsubdomain\"\n" +
                            "");
         StringBuilder buf = new StringBuilder(256);
         buf.append("Available signature types:\n");
