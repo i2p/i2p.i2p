@@ -146,13 +146,14 @@ public class MuxedSKM extends SessionKeyManager {
         return 0;
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public TagSetHandle tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             return _elg.tagsDelivered(target, key, sessionTags);
-        if (type == EncType.ECIES_X25519)
-            return _ec.tagsDelivered(target, key, sessionTags);
          return null;
     }
 
@@ -195,21 +196,23 @@ public class MuxedSKM extends SessionKeyManager {
         _ec.renderStatusHTML(out);
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public void failTags(PublicKey target, SessionKey key, TagSetHandle ts) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             _elg.failTags(target, key, ts);
-        else if (type == EncType.ECIES_X25519)
-            _ec.failTags(target, key, ts);
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public void tagsAcked(PublicKey target, SessionKey key, TagSetHandle ts) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             _elg.tagsAcked(target, key, ts);
-        else if (type == EncType.ECIES_X25519)
-            _ec.tagsAcked(target, key, ts);
     }
 }

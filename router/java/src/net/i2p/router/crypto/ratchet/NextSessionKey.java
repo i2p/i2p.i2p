@@ -36,6 +36,23 @@ class NextSessionKey extends PublicKey {
         return _isRequest;
     }
 
+    /**
+     *  @since 0.9.46
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
+     *  Equals if keys are equal
+     *  @since 0.9.46
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);

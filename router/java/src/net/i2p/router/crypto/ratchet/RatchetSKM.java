@@ -413,42 +413,11 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     }
 
     /**
-     * Take note of the fact that the given sessionTags associated with the key for
-     * encryption to the target have been sent. Whether to use the tags immediately
-     * (i.e. assume they will be received) or to wait until an ack, is implementation dependent.
-     *
-     *
-     * @param sessionTags ignored, must be null
-     * @return the TagSetHandle. Caller MUST subsequently call failTags() or tagsAcked()
-     *         with this handle. May be null.
+     * @throws UnsupportedOperationException always
      */
     @Override
     public TagSetHandle tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) {
-        // TODO
-        if (!(key instanceof SessionKeyAndNonce)) {
-            if (_log.shouldWarn())
-                _log.warn("Bad SK type");
-            //TODO
-            return null;
-        }
-        SessionKeyAndNonce sk = (SessionKeyAndNonce) key;
-        // if this is ever null, this is racy and needs synch
-        OutboundSession sess = getSession(target);
-        if (sess == null) {
-            if (_log.shouldWarn())
-                _log.warn("No session for delivered RatchetTagSet to target: " + toString(target));
-            // TODO
-            createSession(target, key);
-        } else {
-            sess.setCurrentKey(key);
-        }
-        // TODO
-        RatchetTagSet set = new RatchetTagSet(_hkdf, key, key, _context.clock().now(), 0);
-        sess.addTags(set);
-        if (_log.shouldDebug())
-            _log.debug("Tags delivered: " + set +
-                       " target: " + toString(target) /** + ": " + sessionTags */ );
-        return set;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -457,55 +426,28 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * from corrupted tag sets and crashes
      *
      * @deprecated unused and rather drastic
+     * @throws UnsupportedOperationException always
      */
     @Override
     @Deprecated
     public void failTags(PublicKey target) {
-        removeSession(target);
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Mark these tags as invalid, since the peer
-     * has failed to ack them in time.
+     * @throws UnsupportedOperationException always
      */
     @Override
     public void failTags(PublicKey target, SessionKey key, TagSetHandle ts) {
-        OutboundSession sess = getSession(target);
-        if (sess == null) {
-            if (_log.shouldWarn())
-                _log.warn("No session for failed RatchetTagSet: " + ts);
-            return;
-        }
-        if(!key.equals(sess.getCurrentKey())) {
-            if (_log.shouldWarn())
-                _log.warn("Wrong session key (wanted " + sess.getCurrentKey() + ") for failed RatchetTagSet: " + ts);
-            return;
-        }
-        if (_log.shouldWarn())
-            _log.warn("TagSet failed: " + ts);
-        sess.failTags((RatchetTagSet)ts);
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Mark these tags as acked, start to use them (if we haven't already)
-     * If the set was previously failed, it will be added back in.
+     * @throws UnsupportedOperationException always
      */
     @Override
     public void tagsAcked(PublicKey target, SessionKey key, TagSetHandle ts) {
-        OutboundSession sess = getSession(target);
-        if (sess == null) {
-            if (_log.shouldWarn())
-                _log.warn("No session for acked RatchetTagSet: " + ts);
-            return;
-        }
-        if(!key.equals(sess.getCurrentKey())) {
-            if (_log.shouldWarn())
-                _log.warn("Wrong session key (wanted " + sess.getCurrentKey() + ") for acked RatchetTagSet: " + ts);
-            return;
-        }
-        if (_log.shouldDebug())
-            _log.debug("TagSet acked: " + ts);
-        sess.ackTags((RatchetTagSet)ts);
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -597,9 +539,9 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             }
             if (_log.shouldDebug()) {
                 if (state != null)
-                    _log.debug("IB NSR Tag consumed: " + tag.toBase64() + " from: " + tagSet);
+                    _log.debug("IB NSR Tag " + key.getNonce() + " consumed: " + tag.toBase64() + " from\n" + tagSet);
                 else
-                    _log.debug("IB ES Tag consumed: " + tag.toBase64() + " from: " + tagSet);
+                    _log.debug("IB ES Tag " + key.getNonce() + " consumed: " + tag.toBase64() + " from\n" + tagSet);
             }
         } else {
             if (_log.shouldWarn())
@@ -840,7 +782,6 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             totalSets += sets.size();
             buf.append("<tr class=\"debug_outboundtarget\"><td><div class=\"debug_targetinfo\"><b>Target public key:</b> ").append(toString(sess.getTarget())).append("<br>" +
                        "<b>Established:</b> ").append(DataHelper.formatDuration2(now - sess.getEstablishedDate())).append(" ago<br>" +
-                       "<b>Ack Received?</b> ").append(sess.getAckReceived()).append("<br>" +
                        "<b>Last Used:</b> ").append(DataHelper.formatDuration2(now - sess.getLastUsedDate())).append(" ago<br>");
             SessionKey sk = sess.getCurrentKey();
             if (sk != null)
@@ -938,11 +879,17 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         private int _myIBKeyID = -1;
         private int _hisIBKeyID = -1;
         private int _currentIBTagSetID;
+        private int _myIBKeySendCount;
+        private KeyPair _myIBKeys;
+        private NextSessionKey _myIBKey;
+        private SessionKey _nextIBRootKey;
+        private static final String INFO_7 = "XDHRatchetTagSet";
 
         private static final int MAX_FAILS = 2;
         private static final int MAX_SEND_ACKS = 8;
         private static final int DEBUG_OB_NSR = 0x10001;
         private static final int DEBUG_IB_NSR = 0x10002;
+        private static final int MAX_SEND_REVERSE_KEY = 25;
 
         /**
          * @param key may be null
@@ -974,7 +921,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 _tagSets.add(tagset);
                 _state = null;
                 if (_log.shouldDebug())
-                    _log.debug("New OB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
+                    _log.debug("New OB Session, rk = " + rk + " tk = " + tk + " 1st tagset:\n" + tagset);
             } else {
                 // We are Alice
                 // This is an OUTBOUND NS, we make an INBOUND tagset for the NSR
@@ -985,7 +932,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // store the state so we can find the right session when we receive the NSR
                 _state = state;
                 if (_log.shouldDebug())
-                    _log.debug("New IB Session, rk = " + rk + " tk = " + tk + " 1st tagset: " + tagset);
+                    _log.debug("New IB Session, rk = " + rk + " tk = " + tk + " 1st tagset:\n" + tagset);
             }
         }
 
@@ -1015,8 +962,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ba),
                                                             now, 0);
                 if (_log.shouldDebug()) {
-                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset: " + tagset_ab);
-                    _log.debug("Pending OB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset: " + tagset_ba);
+                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset:\n" + tagset_ab);
+                    _log.debug("Pending OB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset:\n" + tagset_ba);
                 }
                 synchronized (_tagSets) {
                     _unackedTagSets.add(tagset_ba);
@@ -1032,8 +979,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                                             now, 0,
                                                             MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                 if (_log.shouldDebug()) {
-                    _log.debug("Update OB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset: " + tagset_ab);
-                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset: " + tagset_ba);
+                    _log.debug("Update OB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset:\n" + tagset_ab);
+                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset:\n" + tagset_ba);
                 }
                 synchronized (_tagSets) {
                     _tagSets.add(tagset_ab);
@@ -1062,27 +1009,58 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     // this is about my outbound tag set,
                     // and is an ack of new key sent
                     if (_hisIBKeyID != id) {
-                        if (_log.shouldWarn())
-                            _log.warn("Got new key id, ratchet OB " + id);
-                        if (_hisIBKeyID != id + 1) {
+                        if (_hisIBKeyID != id - 1) {
                             if (_log.shouldWarn())
-                                _log.warn("Got bad new key id OB? " + id);
+                                _log.warn("Got nextkey id OB: " + id + " expected " + (_hisIBKeyID + 1));
+                            return;
                         }
-                        if (hasKey) {
-                            KeyPair nextKeys = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
-                            PublicKey pub = nextKeys.getPublic();
-                            PrivateKey priv = nextKeys.getPrivate();
-                            PrivateKey sharedSecret = ECIESAEADEngine.doDH(priv, key);
-                            // create new OB TS
-                            // find current OB TS, and delete it
-                        } else {
+                        if (!hasKey) {
                             // TODO get it from above
                             if (_log.shouldWarn())
-                                _log.warn("Got nextkey w/o key but we don't have it " + id);
+                                _log.warn("Got nextkey OB w/o key but we don't have it " + id);
+                            return;
                         }
+                        int oldtsID = 1 + _myIBKeyID + id;
+                        RatchetTagSet oldts = null;
+                        for (RatchetTagSet ts : _tagSets) {
+                            if (ts.getID() == oldtsID) {
+                                oldts = ts;
+                                break;
+                            }
+                        }
+                        if (oldts == null) {
+                            if (_log.shouldWarn())
+                                _log.warn("Got nextkey id OB " + id + " but can't find existing OB tagset " + oldtsID);
+                            return;
+                        }
+                        KeyPair nextKeys = oldts.getNextKeys();
+                        if (nextKeys == null) {
+                            if (_log.shouldWarn())
+                                _log.warn("Got nextkey id OB " + id + " but didn't send OB keys " + oldtsID);
+                            return;
+                        }
+                        // create new OB TS, delete old one
+                        int newtsID = oldtsID + 1;
+                        if (_log.shouldWarn())
+                            _log.warn("Got nextkey id, ratchet OB: " + id);
+                        PublicKey pub = nextKeys.getPublic();
+                        PrivateKey priv = nextKeys.getPrivate();
+                        PrivateKey sharedSecret = ECIESAEADEngine.doDH(priv, key);
+                        byte[] sk = new byte[32];
+                        _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
+                        SessionKey ssk = new SessionKey(sk);
+                        RatchetTagSet ts = new RatchetTagSet(_hkdf, oldts.getNextRootKey(), ssk,
+                                                             _context.clock().now(), newtsID);
+                        _tagSets.add(ts);
+                        _tagSets.remove(oldts);
+                        _myOBKeyID++;
+                        _hisIBKeyID = id;
+                        _currentOBTagSetID = newtsID;
+                        if (_log.shouldWarn())
+                            _log.warn("Got nextkey id " + id + " ratchet to new OB ES TS:\n" + ts);
                     } else {
                         if (_log.shouldWarn())
-                            _log.warn("Got dup new key id for OB " + id);
+                            _log.warn("Got dup nextkey id for OB " + id);
                     }
                     if (isRequest) {
                         if (_log.shouldWarn())
@@ -1092,21 +1070,44 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 } else {
                     // this is about my inbound tag set
                     if (_hisOBKeyID != id) {
-                        if (_log.shouldWarn())
-                            _log.warn("Got new key id, ratchet IB " + id);
-                        if (_hisOBKeyID != id + 1) {
+                        if (_hisOBKeyID != id - 1) {
                             if (_log.shouldWarn())
-                                _log.warn("Got bad new key id IB? " + id);
+                                _log.warn("Got nextkey id IB: " + id + " expected " + (_hisOBKeyID + 1));
+                            return;
                         }
                         if (!hasKey) {
                             if (_log.shouldWarn())
-                                _log.warn("Got nextkey w/o key but we don't have it " + id);
+                                _log.warn("Got nextkey IB w/o key but we don't have it " + id);
+                            return;
                         }
-                        // find current OB TS, tell him to send ack
+                        if (_nextIBRootKey == null) {
+                            if (_log.shouldWarn())
+                                _log.warn("Got nextkey IB but we don't have next root key " + id);
+                            return;
+                        }
+                        // TODO new key only needed every other time
+                        _myIBKeys = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+                        PrivateKey sharedSecret = ECIESAEADEngine.doDH(_myIBKeys.getPrivate(), key);
+                        // store next key for sending via getReverseSendKey()
+                        _myIBKeyID++;
+                        _hisOBKeyID = id;
+                        int newtsID = 1 + _myIBKeyID + id;
+                        _currentOBTagSetID = newtsID;
+                        _myIBKeySendCount = 0;
+                        _myIBKey = new NextSessionKey(_myIBKeys.getPublic().getData(), _myIBKeyID, true, false);
                         // create new IB TS
+                        byte[] sk = new byte[32];
+                        _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
+                        SessionKey ssk = new SessionKey(sk);
+                        RatchetTagSet ts = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, _nextIBRootKey, ssk,
+                                                             _context.clock().now(), newtsID,
+                                                             MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
+                        _nextIBRootKey = ts.getNextRootKey();
+                        if (_log.shouldWarn())
+                            _log.warn("Got nextkey id " + id + " ratchet to new IB ES TS:\n" + ts);
                     } else {
                         if (_log.shouldWarn())
-                            _log.warn("Got dup new key id for IB " + id);
+                            _log.warn("Got dup nextkey id for IB " + id);
                         // find current OB TS, tell him to send ack if nec.
                         // create new IB TS if nec.
                     }
@@ -1120,6 +1121,19 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         }
 
         /**
+         *  Reverse key to send, or null
+         *  @since 0.9.46
+         */
+        private NextSessionKey getReverseSendKey() {
+            if (_myIBKey == null)
+                return null;
+            if (_myIBKeySendCount > MAX_SEND_REVERSE_KEY)
+                return null;
+            _myIBKeySendCount++;
+            return _myIBKey;
+        }
+
+        /**
          * First tag was received for this inbound (ES) tagset.
          * Find the corresponding outbound (ES) tagset in _unackedTagSets,
          * move it to _tagSets, and remove all others.
@@ -1129,6 +1143,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         void firstTagConsumed(RatchetTagSet set) {
             SessionKey sk = set.getAssociatedKey();
             synchronized (_tagSets) {
+                // save next root key
+                _nextIBRootKey = set.getNextRootKey();
                 for (RatchetTagSet obSet : _unackedTagSets) {
                     if (obSet.getAssociatedKey().equals(sk)) {
                         if (_log.shouldDebug())
@@ -1165,33 +1181,6 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             return rv;
         }
 
-        /**
-         *  got an ack for these tags
-         *  For tagsets delivered after the session was acked, this is a nop
-         *  because the tagset was originally placed directly on the acked list.
-         *  If the set was previously failed, it will be added back in.
-         */
-        void ackTags(RatchetTagSet set) {
-            synchronized (_tagSets) {
-                if (_unackedTagSets.remove(set)) {
-                    // we could perhaps use it even if not previuosly in unacked,
-                    // i.e. it was expired already, but _tagSets is a list not a set...
-                    _tagSets.add(set);
-                } else if (!_tagSets.contains(set)) {
-                    // add back (sucess after fail)
-                    _tagSets.add(set);
-                    if (_log.shouldWarn())
-                        _log.warn("Ack of unknown (previously failed?) tagset: " + set);
-                } else if (set.getAcked()) {
-                    if (_log.shouldWarn())
-                        _log.warn("Dup ack of tagset: " + set);
-                }
-                _acked = true;
-                _consecutiveFailures = 0;
-            }
-            set.setAcked();
-        }
-
         /** didn't get an ack for these tags */
         void failTags(RatchetTagSet set) {
             synchronized (_tagSets) {
@@ -1213,28 +1202,6 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         public SessionKey getCurrentKey() {
             return _currentKey;
-        }
-
-        public void setCurrentKey(SessionKey key) {
-            _lastUsed = _context.clock().now();
-            if (_currentKey != null) {
-                if (!_currentKey.equals(key)) {
-                    synchronized (_tagSets) {
-                        if (_log.shouldWarn()) {
-                            int dropped = 0;
-                            for (RatchetTagSet set : _tagSets) {
-                                dropped += set.remaining();
-                            }
-                            _log.warn("Rekeyed from " + _currentKey + " to " + key 
-                                      + ": dropping " + dropped + " session tags", new Exception());
-                        }
-                        _acked = false;
-                        _tagSets.clear();
-                    }
-                }
-            }
-            _currentKey = key;
-
         }
 
         public long getEstablishedDate() {
@@ -1285,8 +1252,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                 set.setDate(now);
                                 SessionKeyAndNonce skn = set.consumeNextKey();
                                 // TODO PN
-                                // TODO reverse next key
-                                return new RatchetEntry(tag, skn, set.getID(), 0, set.getNextKey(), null, getAcksToSend());
+                                return new RatchetEntry(tag, skn, set.getID(), 0, set.getNextKey(),
+                                                        getReverseSendKey(), getAcksToSend());
                             } else if (_log.shouldInfo()) {
                                 _log.info("Removing empty " + set);
                             }

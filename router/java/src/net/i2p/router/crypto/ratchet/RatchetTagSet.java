@@ -39,6 +39,9 @@ class RatchetTagSet implements TagSetHandle {
     private final SessionTagListener _lsnr;
     private final PublicKey _remoteKey;
     protected final SessionKey _key;
+    // debug only, to be removed
+    private final SessionKey _tagsetKey;
+    // NSR only, else null
     private final HandshakeState _state;
     // inbound only, else null
     // We use object for tags because we must do indexOfValueByValue()
@@ -130,6 +133,7 @@ class RatchetTagSet implements TagSetHandle {
         _state = state;
         _remoteKey = remoteKey;
         _key = rootKey;
+        _tagsetKey = data;
         _created = date;
         _timeout = timeout;
         _date = date;
@@ -170,6 +174,7 @@ class RatchetTagSet implements TagSetHandle {
         _state = null;
         _remoteKey = null;
         _key = rootKey;
+        _tagsetKey = null;
         _created = date;
         _timeout = timeout;
         _date = date;
@@ -300,15 +305,15 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  Next Forward Key if applicable (we're running low).
-     *  Null if remaining is sufficient.
+     *  Next Forward Key if applicable (outbound ES and we're running low).
+     *  Null if NSR or inbound or remaining is sufficient.
      *  Once non-null, will be constant for the remaining life of the tagset.
      *
      *  @return key or null
      *  @since 0.9.46
      */
     public NextSessionKey getNextKey() {
-        if (remaining() > LOW)
+        if (_sessionTags != null || _state != null || remaining() > LOW)
             return null;
         if (_nextKeys == null) {
             _nextKeys = I2PAppContext.getGlobalContext().keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
@@ -329,6 +334,17 @@ class RatchetTagSet implements TagSetHandle {
      */
     public KeyPair getNextKeys() {
         return _nextKeys;
+    }
+
+    /**
+     *  Root key for the next DH ratchet.
+     *  Should only be needed for ES, but valid for NSR also.
+     *
+     *  @return key
+     *  @since 0.9.46
+     */
+    public SessionKey getNextRootKey() {
+        return new SessionKey(_nextRootKey);
     }
 
     /**
@@ -541,13 +557,17 @@ class RatchetTagSet implements TagSetHandle {
         else
             buf.append("ES ");
         buf.append("TagSet #").append(_tagSetID)
-           .append(" keyID #").append(_id)
+           .append(" ID #").append(_id)
            .append("\nCreated:  ").append(DataHelper.formatTime(_created))
            .append("\nLast use: ").append(DataHelper.formatTime(_date));
         PublicKey pk = getRemoteKey();
         if (pk != null)
             buf.append("\nRemote Public Key: ").append(pk.toBase64());
-        buf.append("\nRoot Symmetr. Key: ").append(_key.toBase64());
+        buf.append("\nRoot Key: ").append(_key.toBase64());
+        if (_tagsetKey != null)
+            buf.append("\nTagset Key: ").append(_tagsetKey.toBase64());
+        if (_nextKey != null)
+            buf.append("\nNext Key: ").append(_nextKey);
         int sz = size();
         buf.append("\nSize: ").append(sz)
            .append(" Orig: ").append(_originalSize)
