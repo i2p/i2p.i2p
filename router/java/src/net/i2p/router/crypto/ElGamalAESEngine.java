@@ -94,8 +94,8 @@ public final class ElGamalAESEngine {
             if (_log.shouldLog(Log.ERROR)) _log.error("Null data being decrypted?");
             return null;
         } else if (data.length < MIN_ENCRYPTED_SIZE) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
+            if (_log.shouldWarn())
+                _log.warn("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
             return null;
         }
         if (targetPrivateKey.getType() != EncType.ELGAMAL_2048)
@@ -663,9 +663,9 @@ public final class ElGamalAESEngine {
                                         long paddedSize, int prefixBytes) {
         //_log.debug("iv for encryption: " + DataHelper.toString(iv, 16));
         //_log.debug("Encrypting AES");
-        if (tagsForDelivery == null) tagsForDelivery = Collections.emptySet();
+        int tagCount = (tagsForDelivery != null) ? tagsForDelivery.size() : 0;
         int size = 2 // sizeof(tags)
-                 + SessionTag.BYTE_LENGTH*tagsForDelivery.size()
+                 + SessionTag.BYTE_LENGTH * tagCount
                  + 4 // payload length
                  + Hash.HASH_LENGTH
                  + (newKey == null ? 1 : 1 + SessionKey.KEYSIZE_BYTES)
@@ -675,11 +675,13 @@ public final class ElGamalAESEngine {
         byte aesData[] = new byte[totalSize + prefixBytes];
 
         int cur = prefixBytes;
-        DataHelper.toLong(aesData, cur, 2, tagsForDelivery.size());
+        DataHelper.toLong(aesData, cur, 2, tagCount);
         cur += 2;
-        for (SessionTag tag : tagsForDelivery) {
-            System.arraycopy(tag.getData(), 0, aesData, cur, SessionTag.BYTE_LENGTH);
-            cur += SessionTag.BYTE_LENGTH;
+        if (tagsForDelivery != null && !tagsForDelivery.isEmpty()) {
+            for (SessionTag tag : tagsForDelivery) {
+                System.arraycopy(tag.getData(), 0, aesData, cur, SessionTag.BYTE_LENGTH);
+                cur += SessionTag.BYTE_LENGTH;
+            }
         }
         //_log.debug("# tags created, registered, and written: " + tagsForDelivery.size());
         DataHelper.toLong(aesData, cur, 4, data.length);

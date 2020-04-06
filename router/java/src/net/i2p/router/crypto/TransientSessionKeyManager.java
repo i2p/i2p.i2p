@@ -779,7 +779,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     @Override
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<h3 class=\"debug_inboundsessions\">Inbound sessions</h3>" +
+        buf.append("<h3 class=\"debug_inboundsessions\">ElGamal Inbound Sessions</h3>" +
                    "<table>");
         Map<SessionKey, Set<TagSet>> inboundSets = getInboundTagSetsBySessionKey();
         int total = 0;
@@ -814,7 +814,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
            .append("; sessions: ").append(inboundSets.size())
            .append("</th></tr>\n" +
                    "</table>" +
-                   "<h3 class=\"debug_outboundsessions\">Outbound sessions</h3>" +
+                   "<h3 class=\"debug_outboundsessions\">ElGamal Outbound Sessions</h3>" +
                    "<table>");
         total = 0;
         totalSets = 0;

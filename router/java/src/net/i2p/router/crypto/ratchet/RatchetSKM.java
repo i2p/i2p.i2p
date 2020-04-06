@@ -710,17 +710,19 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     /// end ACKS ///
 
     /**
-     *  Return a map of session key to a set of inbound RatchetTagSets for that SessionKey
+     *  Return a map of PublicKey to a set of inbound RatchetTagSets for that key.
+     *  Only for renderStatusHTML() below.
      */
-    private Map<SessionKey, Set<RatchetTagSet>> getRatchetTagSetsBySessionKey() {
+    private Map<PublicKey, Set<RatchetTagSet>> getRatchetTagSetsByPublicKey() {
         Set<RatchetTagSet> inbound = getRatchetTagSets();
-        Map<SessionKey, Set<RatchetTagSet>> inboundSets = new HashMap<SessionKey, Set<RatchetTagSet>>(inbound.size());
-        // Build a map of the inbound tag sets, grouped by SessionKey
+        Map<PublicKey, Set<RatchetTagSet>> inboundSets = new HashMap<PublicKey, Set<RatchetTagSet>>(inbound.size());
+        // Build a map of the inbound tag sets, grouped by PublicKey
         for (RatchetTagSet ts : inbound) {
-            Set<RatchetTagSet> sets = inboundSets.get(ts.getAssociatedKey());
+            PublicKey pk = ts.getRemoteKey();
+            Set<RatchetTagSet> sets = inboundSets.get(pk);
             if (sets == null) {
                 sets = new HashSet<RatchetTagSet>(4);
-                inboundSets.put(ts.getAssociatedKey(), sets);
+                inboundSets.put(pk, sets);
             }
             sets.add(ts);
         }
@@ -734,31 +736,32 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         // inbound
         buf.append("<h3 class=\"debug_inboundsessions\">Ratchet Inbound sessions</h3>" +
                    "<table>");
-        Map<SessionKey, Set<RatchetTagSet>> inboundSets = getRatchetTagSetsBySessionKey();
+        Map<PublicKey, Set<RatchetTagSet>> inboundSets = getRatchetTagSetsByPublicKey();
         int total = 0;
         int totalSets = 0;
         long now = _context.clock().now();
         Set<RatchetTagSet> sets = new TreeSet<RatchetTagSet>(new RatchetTagSetComparator());
-        for (Map.Entry<SessionKey, Set<RatchetTagSet>> e : inboundSets.entrySet()) {
-            SessionKey skey = e.getKey();
+        for (Map.Entry<PublicKey, Set<RatchetTagSet>> e : inboundSets.entrySet()) {
+            PublicKey skey = e.getKey();
             sets.clear();
             sets.addAll(e.getValue());
             totalSets += sets.size();
-            buf.append("<tr><td><b>Session key:</b> ").append(skey.toBase64()).append("</td>" +
+            buf.append("<tr><td><b>Public key:</b> ").append(skey.toBase64()).append("</td>" +
                        "<td><b>Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr class=\"expiry\"><td colspan=\"2\"><ul>");
             for (RatchetTagSet ts : sets) {
                 int size = ts.size();
                 total += size;
                 buf.append("<li><b>ID: ").append(ts.getID())
-                   .append(" / ").append(ts.getDebugID());
-                buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
-                   .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
+                   .append('/').append(ts.getDebugID());
+                // inbound sets are multi-column, keep it short
+                //buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
+                //   .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
                 long expires = ts.getExpiration() - now;
                 if (expires > 0)
-                    buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
+                    buf.append(" expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                 else
-                    buf.append(" <b>expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
+                    buf.append(" expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
                 buf.append(size).append('/').append(ts.remaining()).append(" tags remaining</li>");
             }
             buf.append("</ul></td></tr>\n");
@@ -792,7 +795,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             for (RatchetTagSet ts : sets) {
                 int size = ts.remaining();
                 buf.append("<li><b>ID: ").append(ts.getID())
-                   .append(" / ").append(ts.getDebugID())
+                   .append('/').append(ts.getDebugID())
                    .append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
                    .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
                 long expires = ts.getExpiration() - now;
