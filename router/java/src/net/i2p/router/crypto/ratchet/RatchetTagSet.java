@@ -494,7 +494,7 @@ class RatchetTagSet implements TagSetHandle {
         RatchetSessionTag tag = consumeNext();
         if (tag == null)
             return;
-        _sessionTags.put(_lastTag, tag);
+        _sessionTags.append(_lastTag, tag);
         if (_lsnr != null)
             _lsnr.addTag(tag, this);
     }
