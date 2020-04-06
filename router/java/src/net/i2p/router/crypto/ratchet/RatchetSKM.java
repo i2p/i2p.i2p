@@ -737,11 +737,13 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         int total = 0;
         int totalSets = 0;
         long now = _context.clock().now();
-        Set<RatchetTagSet> sets = new TreeSet<RatchetTagSet>(new RatchetTagSetComparator());
+        Comparator<RatchetTagSet> comp = new RatchetTagSetComparator();
+        List<RatchetTagSet> sets = new ArrayList<RatchetTagSet>();
         for (Map.Entry<PublicKey, Set<RatchetTagSet>> e : inboundSets.entrySet()) {
             PublicKey skey = e.getKey();
             sets.clear();
             sets.addAll(e.getValue());
+            Collections.sort(sets, comp);
             totalSets += sets.size();
             buf.append("<tr><td><b>Public key:</b> ").append(skey.toBase64()).append("</td>" +
                        "<td><b>Sets:</b> ").append(sets.size()).append("</td></tr>" +
@@ -779,6 +781,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         for (OutboundSession sess : outbound) {
             sets.clear();
             sets.addAll(sess.getTagSets());
+            Collections.sort(sets, comp);
             totalSets += sets.size();
             buf.append("<tr class=\"debug_outboundtarget\"><td><div class=\"debug_targetinfo\"><b>Target public key:</b> ").append(toString(sess.getTarget())).append("<br>" +
                        "<b>Established:</b> ").append(DataHelper.formatDuration2(now - sess.getEstablishedDate())).append(" ago<br>" +
@@ -828,7 +831,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     private static class RatchetTagSetComparator implements Comparator<RatchetTagSet>, Serializable {
          public int compare(RatchetTagSet l, RatchetTagSet r) {
-             return l.getID() - r.getID();
+             return l.getDebugID() - r.getDebugID();
         }
     }
 
