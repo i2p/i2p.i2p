@@ -72,8 +72,8 @@ public class GarlicMessageParser {
                 }
                 CloveSet rv = _context.eciesEngine().decrypt(encData, encryptionKey, rskm);
                 if (rv != null) {
-                    if (_log.shouldWarn())
-                        _log.warn("ECIES decrypt success, cloves: " + rv.getCloveCount());
+                    if (_log.shouldDebug())
+                        _log.debug("ECIES decrypt success, cloves: " + rv.getCloveCount());
                     return rv;
                 } else {
                     if (_log.shouldWarn())
