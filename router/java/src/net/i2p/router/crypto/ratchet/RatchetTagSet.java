@@ -431,7 +431,7 @@ class RatchetTagSet implements TagSetHandle {
             // if there's any gaps, catch up and store
             for (int i = _lastKey + 1; i < tagnum; i++) {
                 //System.out.println("Fill in key gap at " + i);
-                _sessionKeys.put(i, consumeNextKey().getData());
+                _sessionKeys.append(i, consumeNextKey().getData());
             }
             SessionKeyAndNonce rv = consumeNextKey();
             addTags(tagnum);
