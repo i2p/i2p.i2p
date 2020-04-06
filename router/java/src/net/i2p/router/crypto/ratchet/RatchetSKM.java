@@ -874,21 +874,24 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         // next key
         private int _myOBKeyID = -1;
-        private int _hisOBKeyID = -1;
         private int _currentOBTagSetID;
         private int _myIBKeyID = -1;
-        private int _hisIBKeyID = -1;
         private int _currentIBTagSetID;
         private int _myIBKeySendCount;
         private KeyPair _myIBKeys;
+        private KeyPair _myOBKeys;
         private NextSessionKey _myIBKey;
+        // last received, may not have data, for dup check
+        private NextSessionKey _hisIBKey;
+        private NextSessionKey _hisOBKey;
+        // last received, with data
+        private NextSessionKey _hisIBKeyWithData;
+        private NextSessionKey _hisOBKeyWithData;
         private SessionKey _nextIBRootKey;
-        private static final String INFO_7 = "XDHRatchetTagSet";
 
+        private static final String INFO_7 = "XDHRatchetTagSet";
         private static final int MAX_FAILS = 2;
         private static final int MAX_SEND_ACKS = 8;
-        private static final int DEBUG_OB_NSR = 0x10001;
-        private static final int DEBUG_IB_NSR = 0x10002;
         private static final int MAX_SEND_REVERSE_KEY = 25;
 
         /**
@@ -917,7 +920,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // This is an INBOUND NS, we make an OUTBOUND tagset for the NSR
                 RatchetTagSet tagset = new RatchetTagSet(_hkdf, state,
                                                          rk, tk,
-                                                         _established, DEBUG_OB_NSR);
+                                                         _established);
                 _tagSets.add(tagset);
                 _state = null;
                 if (_log.shouldDebug())
@@ -927,7 +930,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // This is an OUTBOUND NS, we make an INBOUND tagset for the NSR
                 RatchetTagSet tagset = new RatchetTagSet(_hkdf, RatchetSKM.this, state,
                                                          rk, tk,
-                                                         _established, DEBUG_IB_NSR,
+                                                         _established,
                                                          MIN_RCV_WINDOW_NSR, MAX_RCV_WINDOW_NSR);
                 // store the state so we can find the right session when we receive the NSR
                 _state = state;
@@ -956,11 +959,11 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // We are Bob
                 // This is an OUTBOUND NSR, we make an INBOUND tagset for ES
                 RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ab),
-                                                            now, 0,
+                                                            now, 0, -1,
                                                             MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                 // and a pending outbound one
                 RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ba),
-                                                            now, 0);
+                                                            now, 0, -1);
                 if (_log.shouldDebug()) {
                     _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset:\n" + tagset_ab);
                     _log.debug("Pending OB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset:\n" + tagset_ba);
@@ -973,16 +976,24 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // We are Alice
                 // This is an INBOUND NSR, we make an OUTBOUND tagset for ES
                 RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ab),
-                                                            now, 0);
+                                                            now, 0, -1);
                 // and an inbound one
                 RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ba),
-                                                            now, 0,
+                                                            now, 0, -1,
                                                             MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                 if (_log.shouldDebug()) {
                     _log.debug("Update OB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset:\n" + tagset_ab);
                     _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset:\n" + tagset_ba);
                 }
                 synchronized (_tagSets) {
+                    for (Iterator<RatchetTagSet> iter = _tagSets.iterator(); iter.hasNext(); ) {
+                        RatchetTagSet set = iter.next();
+                        if (set.getID() == RatchetTagSet.DEBUG_OB_NSR) {
+                            iter.remove();
+                            if (_log.shouldDebug())
+                                _log.debug("Removed OB NSR tagset:\n" + set);
+                        }
+                    }
                     _tagSets.add(tagset_ab);
                     _unackedTagSets.clear();
                 }
@@ -1008,114 +1019,187 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 if (isReverse) {
                     // this is about my outbound tag set,
                     // and is an ack of new key sent
-                    if (_hisIBKeyID != id) {
-                        if (_hisIBKeyID != id - 1) {
-                            if (_log.shouldWarn())
-                                _log.warn("Got nextkey id OB: " + id + " expected " + (_hisIBKeyID + 1));
-                            return;
-                        }
-                        if (!hasKey) {
-                            // TODO get it from above
-                            if (_log.shouldWarn())
-                                _log.warn("Got nextkey OB w/o key but we don't have it " + id);
-                            return;
-                        }
-                        int oldtsID = 1 + _myIBKeyID + id;
-                        RatchetTagSet oldts = null;
-                        for (RatchetTagSet ts : _tagSets) {
-                            if (ts.getID() == oldtsID) {
-                                oldts = ts;
-                                break;
-                            }
-                        }
-                        if (oldts == null) {
-                            if (_log.shouldWarn())
-                                _log.warn("Got nextkey id OB " + id + " but can't find existing OB tagset " + oldtsID);
-                            return;
-                        }
-                        KeyPair nextKeys = oldts.getNextKeys();
-                        if (nextKeys == null) {
-                            if (_log.shouldWarn())
-                                _log.warn("Got nextkey id OB " + id + " but didn't send OB keys " + oldtsID);
-                            return;
-                        }
-                        // create new OB TS, delete old one
-                        int newtsID = oldtsID + 1;
-                        if (_log.shouldWarn())
-                            _log.warn("Got nextkey id, ratchet OB: " + id);
-                        PublicKey pub = nextKeys.getPublic();
-                        PrivateKey priv = nextKeys.getPrivate();
-                        PrivateKey sharedSecret = ECIESAEADEngine.doDH(priv, key);
-                        byte[] sk = new byte[32];
-                        _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
-                        SessionKey ssk = new SessionKey(sk);
-                        RatchetTagSet ts = new RatchetTagSet(_hkdf, oldts.getNextRootKey(), ssk,
-                                                             _context.clock().now(), newtsID);
-                        _tagSets.add(ts);
-                        _tagSets.remove(oldts);
-                        _myOBKeyID++;
-                        _hisIBKeyID = id;
-                        _currentOBTagSetID = newtsID;
-                        if (_log.shouldWarn())
-                            _log.warn("Got nextkey id " + id + " ratchet to new OB ES TS:\n" + ts);
-                    } else {
-                        if (_log.shouldWarn())
-                            _log.warn("Got dup nextkey id for OB " + id);
-                    }
                     if (isRequest) {
                         if (_log.shouldWarn())
-                            _log.warn("invalid req+rev in nextkey");
-                        // ignore
+                            _log.warn("invalid req+rev in nextkey " + key);
+                        return;
                     }
-                } else {
-                    // this is about my inbound tag set
-                    if (_hisOBKeyID != id) {
-                        if (_hisOBKeyID != id - 1) {
+                    if (key.equals(_hisIBKey)) {
+                        if (_log.shouldDebug())
+                            _log.debug("Got dup nextkey for OB " + key);
+                        return;
+                    }
+                    int hisLastIBKeyID;
+                    if (_hisIBKey == null)
+                        hisLastIBKeyID = -1;
+                    else
+                        hisLastIBKeyID = _hisIBKey.getID();
+                    _hisIBKey = key;
+                    if (hisLastIBKeyID != id) {
+                        // got a new key, use it
+                        if (hisLastIBKeyID != id - 1) {
                             if (_log.shouldWarn())
-                                _log.warn("Got nextkey id IB: " + id + " expected " + (_hisOBKeyID + 1));
+                                _log.warn("Got nextkey for OB: " + key + " expected " + (hisLastIBKeyID + 1));
                             return;
                         }
                         if (!hasKey) {
                             if (_log.shouldWarn())
-                                _log.warn("Got nextkey IB w/o key but we don't have it " + id);
+                                _log.warn("Got nextkey for OB w/o key but we don't have it " + key);
                             return;
                         }
-                        if (_nextIBRootKey == null) {
-                            if (_log.shouldWarn())
-                                _log.warn("Got nextkey IB but we don't have next root key " + id);
-                            return;
-                        }
-                        // TODO new key only needed every other time
-                        _myIBKeys = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
-                        PrivateKey sharedSecret = ECIESAEADEngine.doDH(_myIBKeys.getPrivate(), key);
-                        // store next key for sending via getReverseSendKey()
-                        _myIBKeyID++;
-                        _hisOBKeyID = id;
-                        int newtsID = 1 + _myIBKeyID + id;
-                        _currentOBTagSetID = newtsID;
-                        _myIBKeySendCount = 0;
-                        _myIBKey = new NextSessionKey(_myIBKeys.getPublic().getData(), _myIBKeyID, true, false);
-                        // create new IB TS
-                        byte[] sk = new byte[32];
-                        _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
-                        SessionKey ssk = new SessionKey(sk);
-                        RatchetTagSet ts = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, _nextIBRootKey, ssk,
-                                                             _context.clock().now(), newtsID,
-                                                             MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
-                        _nextIBRootKey = ts.getNextRootKey();
-                        if (_log.shouldWarn())
-                            _log.warn("Got nextkey id " + id + " ratchet to new IB ES TS:\n" + ts);
+                        // save the new key with data
+                        _hisIBKeyWithData = key;
                     } else {
-                        if (_log.shouldWarn())
-                            _log.warn("Got dup nextkey id for IB " + id);
-                        // find current OB TS, tell him to send ack if nec.
-                        // create new IB TS if nec.
+                        if (hasKey) {
+                            // got a old key id but new data?
+                            if (_hisIBKeyWithData != null && _log.shouldWarn())
+                                _log.warn("Got nextkey for OB with data, didn't match previous " + key);
+                        } else {
+                            if (_hisIBKeyWithData == null ||
+                                _hisIBKeyWithData.getID() != key.getID()) {
+                                if (_log.shouldWarn())
+                                    _log.warn("Got nextkey for OB w/o key but we don't have it " + key);
+                                return;
+                            }
+                            // got a old key, use it
+                            key = _hisIBKeyWithData;
+                        }
                     }
-                    if (!isRequest) {
-                        if (_log.shouldWarn())
-                            _log.warn("invalid fwd w/o req in nextkey");
-                        // ignore
+
+                    int oldtsID;
+                    if (_myOBKeyID == -1 && hisLastIBKeyID == -1)
+                        oldtsID = 0;
+                    else
+                        oldtsID = 1 + _myOBKeyID + hisLastIBKeyID;
+                    RatchetTagSet oldts = null;
+                    for (RatchetTagSet ts : _tagSets) {
+                        if (ts.getID() == oldtsID) {
+                            oldts = ts;
+                            break;
+                        }
                     }
+                    if (oldts == null) {
+                        if (_log.shouldWarn())
+                            _log.warn("Got nextkey for OB " + key + " but can't find existing OB tagset " + oldtsID);
+                        return;
+                    }
+                    KeyPair nextKeys = oldts.getNextKeys();
+                    if (nextKeys == null) {
+                        if (oldtsID == 0 || (oldtsID & 0x01) != 0 || _myOBKeys == null) {
+                            if (_log.shouldWarn())
+                                _log.warn("Got nextkey for OB " + key + " but we didn't send OB keys " + oldtsID);
+                            return;
+                        }
+                        // reuse last keys for tsIDs 2,4,6,...
+                        nextKeys = _myOBKeys;
+                    } else {
+                        // new keys for tsIDs 0,1,3,5...
+                        _myOBKeys = nextKeys;
+                        _myOBKeyID++;
+                    }
+                    // create new OB TS, delete old one
+                    PublicKey pub = nextKeys.getPublic();
+                    PrivateKey priv = nextKeys.getPrivate();
+                    PrivateKey sharedSecret = ECIESAEADEngine.doDH(priv, key);
+                    byte[] sk = new byte[32];
+                    _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
+                    SessionKey ssk = new SessionKey(sk);
+                    int newtsID = oldtsID + 1;
+                    RatchetTagSet ts = new RatchetTagSet(_hkdf, oldts.getNextRootKey(), ssk,
+                                                         _context.clock().now(), newtsID, _myOBKeyID);
+                    _tagSets.add(ts);
+                    _tagSets.remove(oldts);
+                    _currentOBTagSetID = newtsID;
+                    if (_log.shouldWarn())
+                        _log.warn("Got nextkey " + key + " ratchet to new OB ES TS:\n" + ts);
+                } else {
+                    // this is about my inbound tag set
+                    if (key.equals(_hisOBKey)) {
+                        if (_log.shouldDebug())
+                            _log.debug("Got dup nextkey for IB " + key);
+                        return;
+                    }
+                    int hisLastOBKeyID;
+                    if (_hisOBKey == null)
+                        hisLastOBKeyID = -1;
+                    else
+                        hisLastOBKeyID = _hisOBKey.getID();
+                    _hisOBKey = key;
+                    if (hisLastOBKeyID != id) {
+                        // got a new key, use it
+                        if (hisLastOBKeyID != id - 1) {
+                            if (_log.shouldWarn())
+                                _log.warn("Got nextkey for IB: " + key + " expected " + (hisLastOBKeyID + 1));
+                            return;
+                        }
+                        if (!hasKey) {
+                            if (_log.shouldWarn())
+                                _log.warn("Got nextkey for IB w/o key but we don't have it " + key);
+                            return;
+                        }
+                        // save the new key with data
+                        _hisOBKeyWithData = key;
+                    } else {
+                        if (hasKey) {
+                            // got a old key id but new data?
+                            if (_hisOBKeyWithData != null && _log.shouldWarn())
+                                _log.warn("Got nextkey for IB with data, didn't match previous " + key);
+                        } else {
+                            if (_hisOBKeyWithData == null ||
+                                _hisOBKeyWithData.getID() != key.getID()) {
+                                if (_log.shouldWarn())
+                                    _log.warn("Got nextkey for IB w/o key but we don't have it " + key);
+                                return;
+                            }
+                            // got a old key, use it
+                            key = _hisOBKeyWithData;
+                        }
+                    }
+                    if (_nextIBRootKey == null) {
+                        // first IB ES tagset never used?
+                        if (_log.shouldWarn())
+                            _log.warn("Got nextkey for IB but we don't have next root key " + key);
+                        return;
+                    }
+                    int oldtsID;
+                    if (_myIBKeyID == -1 && hisLastOBKeyID == -1)
+                        oldtsID = 0;
+                    else
+                        oldtsID = 1 + _myIBKeyID + hisLastOBKeyID;
+                    // generate or reuse reverse key
+                    // store next key for sending via getReverseSendKey()
+                    if ((oldtsID & 0x01) == 0) {
+                        // new keys for 0,2,4,...
+                        if (!isRequest && _log.shouldWarn())
+                            _log.warn("Got reverse w/o request, generating new key anyway " + key);
+                        _myIBKeys = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+                        _myIBKeyID++;
+                        _myIBKey = new NextSessionKey(_myIBKeys.getPublic().getData(), _myIBKeyID, true, false);
+                    } else {
+                        // reuse keys for 1,3,5...
+                        if (_myIBKeys == null) {
+                            if (_log.shouldWarn())
+                                _log.warn("Got nextkey IB but we don't have old keys " + key);
+                            return;
+                        }
+                        if (isRequest && _log.shouldWarn())
+                            _log.warn("Got reverse with request, using old key anyway " + key);
+                        _myIBKey = new NextSessionKey(_myIBKeyID, true, false);
+                    }
+                    PrivateKey sharedSecret = ECIESAEADEngine.doDH(_myIBKeys.getPrivate(), key);
+                    int newtsID = oldtsID + 1;
+                    _currentIBTagSetID = newtsID;
+                    _myIBKeySendCount = 0;
+                    // create new IB TS
+                    byte[] sk = new byte[32];
+                    _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
+                    SessionKey ssk = new SessionKey(sk);
+                    RatchetTagSet ts = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, _nextIBRootKey, ssk,
+                                                         _context.clock().now(), newtsID, _myIBKeyID,
+                                                         MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
+                    _nextIBRootKey = ts.getNextRootKey();
+                    if (_log.shouldWarn())
+                        _log.warn("Got nextkey " + key + " ratchet to new IB ES TS:\n" + ts);
                 }
             }
         }
@@ -1148,8 +1232,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 for (RatchetTagSet obSet : _unackedTagSets) {
                     if (obSet.getAssociatedKey().equals(sk)) {
                         if (_log.shouldDebug())
-                            _log.debug("First tag received from IB ES " + set +
-                                       ", promoting OB ES " + obSet);
+                            _log.debug("First tag received from IB ES\n" + set +
+                                       "\npromoting OB ES " + obSet);
                         _unackedTagSets.clear();
                         _tagSets.clear();
                         _tagSets.add(obSet);
@@ -1161,7 +1245,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     }
                 }
                 if (_log.shouldDebug())
-                    _log.debug("First tag received from IB ES " + set +
+                    _log.debug("First tag received from IB ES\n" + set +
                                " but no corresponding OB ES set found, unacked size: " + _unackedTagSets.size() +
                                " acked size: " + _tagSets.size());
             }

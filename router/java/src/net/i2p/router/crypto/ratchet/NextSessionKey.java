@@ -13,10 +13,23 @@ class NextSessionKey extends PublicKey {
     private final boolean _isReverse, _isRequest;
 
     /**
-     *  @param data may be null
+     *  @param data non-null
      */
     public NextSessionKey(byte[] data, int id, boolean isReverse, boolean isRequest) {
         super(EncType.ECIES_X25519, data);
+        _id = id;
+        _isReverse = isReverse;
+        _isRequest = isRequest;
+    }
+
+    /**
+     *  Null data, for acks/requests only.
+     *  Type will be ElG but doesn't matter.
+     *  Don't call setData().
+     *  @since 0.9.46
+     */
+    public NextSessionKey(int id, boolean isReverse, boolean isRequest) {
+        super();
         _id = id;
         _isReverse = isReverse;
         _isRequest = isRequest;
@@ -41,16 +54,28 @@ class NextSessionKey extends PublicKey {
      */
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int rv = super.hashCode() ^ _id;
+        if (_isReverse)
+            rv ^= 1 << 31;
+        if (_isRequest)
+            rv ^= 1 << 30;
+        return rv;
     }
 
     /**
-     *  Equals if keys are equal
      *  @since 0.9.46
      */
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        if (obj == null)
+            return false;
+        if (!(obj instanceof NextSessionKey))
+            return false;
+        NextSessionKey o = (NextSessionKey) obj;
+        return _id == o._id &&
+               _isReverse == o._isReverse &&
+               _isRequest == o._isRequest &&
+               super.equals(o);
     }
 
     @Override

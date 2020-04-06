@@ -141,14 +141,14 @@ class RatchetPayload {
                     boolean isReverse = (payload[i] & 0x02) != 0;
                     boolean isRequest = (payload[i] & 0x04) != 0;
                     int id = (int) DataHelper.fromLong(payload, i + 1, 2);
-                    byte[] data;
+                    NextSessionKey nsk;
                     if (hasKey) {
-                        data = new byte[32];
+                        byte[] data = new byte[32];
                         System.arraycopy(payload, i + 3, data, 0, 32);
+                        nsk = new NextSessionKey(data, id, isReverse, isRequest);
                     } else {
-                        data = null;
+                        nsk = new NextSessionKey(id, isReverse, isRequest);
                     }
-                    NextSessionKey nsk = new NextSessionKey(data, id, isReverse, isRequest);
                     cb.gotNextKey(nsk);
                   }
                     break;

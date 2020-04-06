@@ -54,6 +54,7 @@ class RatchetTagSet implements TagSetHandle {
     private final long _timeout;
     private long _date;
     private final int _id;
+    private final int _keyid;
     private final int _originalSize;
     private final int _maxSize;
     private boolean _acked;
@@ -79,7 +80,12 @@ class RatchetTagSet implements TagSetHandle {
     private static final byte[] ZEROLEN = new byte[0];
     private static final int TAGLEN = RatchetSessionTag.LENGTH;
     private static final int MAX = 65535;
-    private static final int LOW = 50;
+    private static final boolean TEST_RATCHET = false;
+    // 2 * max streaming window
+    private static final int LOW = TEST_RATCHET ? (MAX - 100) : 256;
+    static final int DEBUG_OB_NSR = 0x10001;
+    static final int DEBUG_IB_NSR = 0x10002;
+    static final int DEBUG_SINGLE_ES = 0x10003;
 
     /**
      *  Outbound NSR Tagset
@@ -87,8 +93,8 @@ class RatchetTagSet implements TagSetHandle {
      *  @param date For outbound: creation time
      */
     public RatchetTagSet(HKDF hkdf, HandshakeState state, SessionKey rootKey, SessionKey data,
-                         long date, int id) {
-        this(hkdf, null, state, null, rootKey, data, date, RatchetSKM.SESSION_PENDING_DURATION_MS, id, false, 0, 0);
+                         long date) {
+        this(hkdf, null, state, null, rootKey, data, date, RatchetSKM.SESSION_PENDING_DURATION_MS, DEBUG_OB_NSR, -2, false, 0, 0);
     }
 
     /**
@@ -97,8 +103,8 @@ class RatchetTagSet implements TagSetHandle {
      *  @param date For outbound: creation time
      */
     public RatchetTagSet(HKDF hkdf, SessionKey rootKey, SessionKey data,
-                         long date, int id) {
-        this(hkdf, null, null, null, rootKey, data, date, RatchetSKM.SESSION_TAG_DURATION_MS, id, false, 0, 0);
+                         long date, int tagsetid, int keyid) {
+        this(hkdf, null, null, null, rootKey, data, date, RatchetSKM.SESSION_TAG_DURATION_MS, tagsetid, keyid, false, 0, 0);
     }
 
     /**
@@ -107,8 +113,8 @@ class RatchetTagSet implements TagSetHandle {
      *  @param date For inbound: creation time
      */
     public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state, SessionKey rootKey, SessionKey data,
-                         long date, int id, int minSize, int maxSize) {
-        this(hkdf, lsnr, state, null, rootKey, data, date, RatchetSKM.SESSION_PENDING_DURATION_MS, id, true, minSize, maxSize);
+                         long date, int minSize, int maxSize) {
+        this(hkdf, lsnr, state, null, rootKey, data, date, RatchetSKM.SESSION_PENDING_DURATION_MS, DEBUG_IB_NSR, -2, true, minSize, maxSize);
     }
 
     /**
@@ -118,8 +124,8 @@ class RatchetTagSet implements TagSetHandle {
      */
     public RatchetTagSet(HKDF hkdf, SessionTagListener lsnr,
                          PublicKey remoteKey, SessionKey rootKey, SessionKey data,
-                         long date, int id, int minSize, int maxSize) {
-        this(hkdf, lsnr, null, remoteKey, rootKey, data, date, RatchetSKM.SESSION_LIFETIME_MAX_MS, id, true, minSize, maxSize);
+                         long date, int tagsetid, int keyid, int minSize, int maxSize) {
+        this(hkdf, lsnr, null, remoteKey, rootKey, data, date, RatchetSKM.SESSION_LIFETIME_MAX_MS, tagsetid, keyid, true, minSize, maxSize);
     }
 
 
@@ -128,7 +134,7 @@ class RatchetTagSet implements TagSetHandle {
      */
     private RatchetTagSet(HKDF hkdf, SessionTagListener lsnr, HandshakeState state,
                           PublicKey remoteKey, SessionKey rootKey, SessionKey data,
-                          long date, long timeout, int id, boolean isInbound, int minSize, int maxSize) {
+                          long date, long timeout, int tagsetid, int keyid, boolean isInbound, int minSize, int maxSize) {
         _lsnr = lsnr;
         _state = state;
         _remoteKey = remoteKey;
@@ -137,7 +143,8 @@ class RatchetTagSet implements TagSetHandle {
         _created = date;
         _timeout = timeout;
         _date = date;
-        _id = id;
+        _id = tagsetid;
+        _keyid = keyid;
         _originalSize = minSize;
         _maxSize = maxSize;
         _nextRootKey = new byte[32];
@@ -178,7 +185,8 @@ class RatchetTagSet implements TagSetHandle {
         _created = date;
         _timeout = timeout;
         _date = date;
-        _id = 0x10003;
+        _id = DEBUG_SINGLE_ES;
+        _keyid = -3;
         _originalSize = 1;
         _maxSize = 1;
         _nextRootKey = null;
@@ -315,11 +323,16 @@ class RatchetTagSet implements TagSetHandle {
     public NextSessionKey getNextKey() {
         if (_sessionTags != null || _state != null || remaining() > LOW)
             return null;
-        if (_nextKeys == null) {
-            _nextKeys = I2PAppContext.getGlobalContext().keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
-            boolean isIB = _sessionTags != null;
-            // TODO request only needed every other time
-            _nextKey = new NextSessionKey(_nextKeys.getPublic().getData(), 0, isIB, !isIB);
+        if (_nextKey == null) {
+            boolean isFirst = _id == 0;
+            if (isFirst || (_id & 0x01) != 0) {
+                // new keys only needed first time and odd times
+                _nextKeys = I2PAppContext.getGlobalContext().keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+                _nextKey = new NextSessionKey(_nextKeys.getPublic().getData(), _keyid + 1, false, isFirst);
+            } else {
+                // even times, just send old ID
+                _nextKey = new NextSessionKey(_keyid, false, true);
+            }
         }
         return _nextKey;
     }
@@ -553,7 +566,7 @@ class RatchetTagSet implements TagSetHandle {
         else
             buf.append("Outbound ");
         if (_state != null)
-            buf.append("NSR ").append(_state.hashCode()).append(' ');
+            buf.append("NSR ");
         else
             buf.append("ES ");
         buf.append("TagSet #").append(_tagSetID)
