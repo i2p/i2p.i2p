@@ -482,15 +482,15 @@ public final class ECIESAEADEngine {
     private CloveSet decryptExistingSession(byte[] tag, byte[] data, SessionKeyAndNonce key,
                                             PrivateKey targetPrivateKey, RatchetSKM keyManager)
                                           throws DataFormatException {
-// TODO decrypt in place?
         int nonce = key.getNonce();
-        byte decrypted[] = decryptAEADBlock(tag, data, TAGLEN, data.length - TAGLEN, key, nonce);
-        if (decrypted == null) {
+        // this decrypts in-place
+        boolean ok = decryptAEADBlock(tag, data, TAGLEN, data.length - TAGLEN, key, nonce);
+        if (!ok) {
             if (_log.shouldWarn())
                 _log.warn("Decrypt of ES failed");
             return null;
         }
-        if (decrypted.length == 0) {
+        if (data.length == TAGLEN + MACLEN) {
             if (_log.shouldWarn())
                 _log.warn("Zero length payload in ES");
             return null;
@@ -498,7 +498,7 @@ public final class ECIESAEADEngine {
         PublicKey remote = key.getRemoteKey();
         PLCallback pc = new PLCallback(keyManager, remote);
         try {
-            int blocks = RatchetPayload.processPayload(_context, pc, decrypted, 0, decrypted.length, false);
+            int blocks = RatchetPayload.processPayload(_context, pc, data, TAGLEN, data.length - (TAGLEN + MACLEN), false);
             if (_log.shouldDebug())
                 _log.debug("Processed " + blocks + " blocks in IB ES");
         } catch (DataFormatException e) {
@@ -526,39 +526,27 @@ public final class ECIESAEADEngine {
         return rv;
     }
 
-    /**
-     * No AD
-     *
-     * @return decrypted data or null on failure
-     */
-    private byte[] decryptAEADBlock(byte encrypted[], int offset, int len, SessionKey key,
-                                    long n) throws DataFormatException {
-// TODO decrypt in place?
-        return decryptAEADBlock(null, encrypted, offset, len, key, n);
-    }
-
     /*
-     * With optional AD
+     * With optional AD.
+     * Decrypts IN PLACE. Decrypted data will be at encrypted[offset:offset + len - 16].
      *
      * @param ad may be null
-     * @return decrypted data or null on failure
+     * @return success
      */
-    private byte[] decryptAEADBlock(byte[] ad, byte encrypted[], int offset, int encryptedLen, SessionKey key,
+    private boolean decryptAEADBlock(byte[] ad, byte encrypted[], int offset, int encryptedLen, SessionKey key,
                                     long n) throws DataFormatException {
-// TODO decrypt in place?
-        byte decrypted[] = new byte[encryptedLen - MACLEN];
         ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
         chacha.initializeKey(key.getData(), 0);
         chacha.setNonce(n);
         try {
-            chacha.decryptWithAd(ad, encrypted, offset, decrypted, 0, encryptedLen);
+            // this is safe to do in-place, it checks the mac before starting decryption
+            chacha.decryptWithAd(ad, encrypted, offset, encrypted, offset, encryptedLen);
         } catch (GeneralSecurityException e) {
             if (_log.shouldWarn())
                 _log.warn("Unable to decrypt AEAD block", e);
-            return null;
+            return false;
         }
-////
-        return decrypted;
+        return true;
     }
 
     //// end decrypt, start encrypt ////
