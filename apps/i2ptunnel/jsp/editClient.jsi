@@ -529,7 +529,6 @@
             </td>
         </tr>
 <%
-            if (editBean.isAdvanced()) {
                 boolean has0 = editBean.hasEncType(curTunnel, 0);
                 boolean has4 = editBean.hasEncType(curTunnel, 4);
 %>
@@ -554,8 +553,6 @@
             </td>
         </tr>
 <%
-            } // isAdvanced
-
             if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
 %>
         <tr>

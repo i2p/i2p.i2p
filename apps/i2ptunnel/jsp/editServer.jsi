@@ -838,7 +838,6 @@
             </td>
         </tr>
 <%
-            if (editBean.isAdvanced()) {
                 boolean has0 = editBean.hasEncType(curTunnel, 0);
                 boolean has4 = editBean.hasEncType(curTunnel, 4);
 %>
@@ -863,8 +862,6 @@
             </td>
         </tr>
 <%
-            } // isAdvanced
-
             /* alternate dest, only if current dest is set and is DSA_SHA1 */
 
             if (currentSigType == 0 && !"".equals(b64) && !"streamrserver".equals(tunnelType)) {
