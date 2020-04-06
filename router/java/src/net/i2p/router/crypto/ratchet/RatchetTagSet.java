@@ -86,6 +86,8 @@ class RatchetTagSet implements TagSetHandle {
     static final int DEBUG_OB_NSR = 0x10001;
     static final int DEBUG_IB_NSR = 0x10002;
     static final int DEBUG_SINGLE_ES = 0x10003;
+    // Start empty (no allocations), we only use storage for gaps
+    private static final int INITIAL_KEY_CAPACITY = 0;
 
     /**
      *  Outbound NSR Tagset
@@ -160,7 +162,7 @@ class RatchetTagSet implements TagSetHandle {
         if (isInbound) {
             _sessionTags = new SparseArray<RatchetSessionTag>(minSize);
             if (state == null)
-                _sessionKeys = new SparseArray<byte[]>(minSize);
+                _sessionKeys = new SparseArray<byte[]>(INITIAL_KEY_CAPACITY);
             else
                 _sessionKeys = null;
             for (int i = 0; i < minSize; i++) {
