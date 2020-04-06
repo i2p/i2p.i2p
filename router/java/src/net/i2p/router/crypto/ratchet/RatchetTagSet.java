@@ -272,12 +272,14 @@ class RatchetTagSet implements TagSetHandle {
 
     /**
      *  For inbound and outbound: Expiration.
-     *  Expiration is getDate() + getTimeout().
+     *  Expiration is getDate() + getTimeout() if acked.
+     *  May be shorter if not acked.
      *  @since 0.9.46
      */
     public synchronized long getExpiration() {
-        // TODO return shorter if not acked?
-        return _date + _timeout;
+        if (_acked)
+            return _date + _timeout;
+        return _created + Math.min(_timeout, RatchetSKM.SESSION_PENDING_DURATION_MS);
     }
 
     /** for debugging */
@@ -528,6 +530,9 @@ class RatchetTagSet implements TagSetHandle {
         byte[] key = new byte[32];
         hkdf.calculate(_symmkey_ck, _symmkey_constant, INFO_5, _symmkey_ck, key, 0);
         _lastKey++;
+        // for outbound, set acked
+        if (_sessionTags == null && _lastKey == 0)
+            _acked = true;
         // fill in ID and remoteKey as this may be for inbound
         return new SessionKeyAndNonce(key, _id, _lastKey, _remoteKey);
     }

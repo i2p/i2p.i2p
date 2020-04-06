@@ -1,3 +1,17 @@
+2020-04-06 zzz
+ * Ratchet:
+   - Finish Next Key impl.
+   - Performance improvements and cleanups
+   - Debug page fixes
+
+2020-04-03 zzz
+ * PrivateKeyFile: Add support for addsubdomain authentication strings
+
+2020-04-01 zzz
+ * Ratchet:
+   - Next Key WIP
+   - Validate NS datetime block; add NS key bloom filter
+
 2020-03-31 zzz
  * NetDB:
    - Add support for ratchet replies (proposal 154)
