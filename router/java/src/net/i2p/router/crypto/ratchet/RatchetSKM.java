@@ -70,11 +70,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 3 * 60 * 1000;
 
     final static long SESSION_PENDING_DURATION_MS = 5 * 60 * 1000;
-
-    /**
-     * Time to send more if we are this close to expiration
-     */
-    private static final long SESSION_TAG_EXPIRATION_WINDOW = 90 * 1000;
+    // replace an old session created before this if we get a new NS
+    private static final long SESSION_REPLACE_AGE = 3*60*1000;
 
     private static final int MIN_RCV_WINDOW_NSR = 12;
     private static final int MAX_RCV_WINDOW_NSR = 24;
@@ -506,7 +503,6 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     public SessionKeyAndNonce consumeTag(RatchetSessionTag tag) {
         RatchetTagSet tagSet;
-        SessionKeyAndNonce key;
         tagSet = _inboundTagSets.remove(tag);
         if (tagSet == null) {
             //if (_log.shouldDebug())
@@ -514,6 +510,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             return null;
         }
         boolean firstInbound;
+        SessionKeyAndNonce key;
         synchronized(tagSet) {
             firstInbound = !tagSet.getAcked();
             key = tagSet.consume(tag);
@@ -566,12 +563,12 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             OutboundSession old = _outboundSessions.putIfAbsent(sess.getTarget(), sess);
             boolean rv = old == null;
             if (!rv) {
-                // TODO fix
-                if (isInbound && old.getLastUsedDate() < _context.clock().now() - SESSION_TAG_DURATION_MS - (60*1000)) {
+                if (isInbound && old.getEstablishedDate() < _context.clock().now() - SESSION_REPLACE_AGE) {
+                    // He restarted with same key, or something went wrong. Start over.
                     _outboundSessions.put(sess.getTarget(), sess);
                     rv = true;
-                    if (_log.shouldDebug())
-                        _log.debug("Replaced old session about to expire for " + sess.getTarget());
+                    if (_log.shouldWarn())
+                        _log.warn("Replaced old session, got new NS for " + sess.getTarget());
                 } else {
                     if (_log.shouldDebug())
                         _log.debug("Not replacing existing session for " + sess.getTarget());
@@ -769,7 +766,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             buf.setLength(0);
         }
         buf.append("<tr><th colspan=\"2\">Total inbound tags: ").append(total).append(" (")
-           .append(DataHelper.formatSize2(32*total)).append("B); sets: ").append(totalSets)
+           .append(DataHelper.formatSize2(8 * total)).append("B); sets: ").append(totalSets)
            .append("; sessions: ").append(inboundSets.size())
            .append("</th></tr>\n" +
                    "</table>" +
@@ -957,6 +954,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             _hkdf.calculate(ck, ZEROLEN, k_ab, k_ba, 0);
             SessionKey rk = new SessionKey(ck);
             long now = _context.clock().now();
+            _lastUsed = now;
             boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
             if (isInbound) {
                 // We are Bob
@@ -1244,6 +1242,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                             _NSRcallback.onReply();
                             _NSRcallback = null;
                         }
+                        _lastUsed = _context.clock().now();
                         return;
                     }
                 }
@@ -1295,6 +1294,9 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             return _established;
         }
 
+        /**
+         *  NOT updated for inbound except for NSR and first ES tag used
+         */
         public long getLastUsedDate() {
             return _lastUsed;
         }
@@ -1328,7 +1330,6 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         public RatchetEntry consumeNext() {
             long now = _context.clock().now();
-            _lastUsed = now;
             synchronized (_tagSets) {
                 while (!_tagSets.isEmpty()) {
                     RatchetTagSet set = _tagSets.get(0);
@@ -1336,6 +1337,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                         if (set.getExpiration() > now) {
                             RatchetSessionTag tag = set.consumeNext();
                             if (tag != null) {
+                                _lastUsed = now;
                                 set.setDate(now);
                                 SessionKeyAndNonce skn = set.consumeNextKey();
                                 // TODO PN
