@@ -20,6 +20,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
@@ -331,7 +332,7 @@ class RatchetTagSet implements TagSetHandle {
             boolean isFirst = _id == 0;
             if (isFirst || (_id & 0x01) != 0) {
                 // new keys only needed first time and odd times
-                _nextKeys = I2PAppContext.getGlobalContext().keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+                _nextKeys = ((RouterContext) I2PAppContext.getGlobalContext()).commSystem().getXDHFactory().getKeys();
                 _nextKey = new NextSessionKey(_nextKeys.getPublic().getData(), _keyid + 1, false, isFirst);
             } else {
                 // even times, just send old ID

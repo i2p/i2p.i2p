@@ -25,6 +25,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
@@ -365,6 +366,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Override
     public DHSessionKeyBuilder.Factory getDHFactory() {
         return _manager.getDHFactory();
+    }
+
+    /**
+     *  Factory for making X25519 key pairs.
+     *  @since 0.9.46
+     */
+    @Override
+    public X25519KeyFactory getXDHFactory() {
+        return _manager.getXDHFactory();
     }
     
     /*

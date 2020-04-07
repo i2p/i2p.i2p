@@ -19,7 +19,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.southernstorm.noise.protocol.HandshakeState;
 
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.KeyPair;
@@ -49,7 +48,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private final HashMap<PublicKey, List<OutboundSession>> _pendingOutboundSessions;
     /** Map allowing us to go from a SessionTag to the containing RatchetTagSet */
     private final ConcurrentHashMap<RatchetSessionTag, RatchetTagSet> _inboundTagSets;
-    protected final I2PAppContext _context;
+    protected final RouterContext _context;
     private volatile boolean _alive;
     private final HKDF _hkdf;
     private final DecayingHashSet _replayFilter;
@@ -1165,7 +1164,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                         // new keys for 0,2,4,...
                         if (!isRequest && _log.shouldWarn())
                             _log.warn("Got reverse w/o request, generating new key anyway " + key);
-                        _myIBKeys = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+                        _myIBKeys = _context.commSystem().getXDHFactory().getKeys();
                         _myIBKeyID++;
                         _myIBKey = new NextSessionKey(_myIBKeys.getPublic().getData(), _myIBKeyID, true, false);
                     } else {

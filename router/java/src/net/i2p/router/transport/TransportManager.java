@@ -116,7 +116,8 @@ public class TransportManager implements TransportEventListener {
         boolean enableNTCP2 = isNTCPEnabled(context) &&
                               context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
         _dhThread = (_enableUDP || enableNTCP2) ? new DHSessionKeyBuilder.PrecalcRunner(context) : null;
-        _xdhThread = enableNTCP2 ? new X25519KeyFactory(context) : null;
+        // always created, even if NTCP2 is not enabled, because ratchet needs it
+        _xdhThread = new X25519KeyFactory(context);
     }
 
     /**
@@ -166,6 +167,14 @@ public class TransportManager implements TransportEventListener {
     DHSessionKeyBuilder.Factory getDHFactory() {
         return _dhThread;
     }
+
+    /**
+     *  Factory for making X25519 key pairs.
+     *  @since 0.9.46
+     */
+    X25519KeyFactory getXDHFactory() {
+        return _xdhThread;
+    }
     
     private void addTransport(Transport transport) {
         if (transport == null) return;
@@ -192,7 +201,9 @@ public class TransportManager implements TransportEventListener {
         }
         if (isNTCPEnabled(_context)) {
             DHSessionKeyBuilder.PrecalcRunner dh = _enableNTCP1 ? _dhThread : null;
-            Transport ntcp = new NTCPTransport(_context, dh, _xdhThread);
+            boolean enableNTCP2 = _context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
+            X25519KeyFactory xdh = enableNTCP2 ? _xdhThread : null;
+            Transport ntcp = new NTCPTransport(_context, dh, xdh);
             addTransport(ntcp);
             initializeAddress(ntcp);
             if (udp != null) {
@@ -213,7 +224,9 @@ public class TransportManager implements TransportEventListener {
     }
     
     public static boolean isNTCPEnabled(RouterContext ctx) {
-        return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP);
+        return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP) &&
+               (ctx.getProperty(PROP_NTCP1_ENABLE, DEFAULT_NTCP1_ENABLE) ||
+                ctx.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE));
     }
     
     /**

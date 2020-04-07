@@ -15,7 +15,7 @@ import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
-import net.i2p.router.transport.crypto.X25519KeyFactory;
+//import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.util.HexDump;
 import net.i2p.util.NativeBigInteger;
 
