@@ -364,7 +364,7 @@ public class PeerHelper extends HelperBase {
             buf.append("</td><td class=\"cells\" align=\"center\">").append(outQueue);
             buf.append("</td><td class=\"cells\" align=\"center\">");
             if (con.isBacklogged())
-                buf.append("<span class=\"backlogged\">&#x2714;</span>");
+                buf.append("<span class=\"backlogged\">&#x2713;</span>");
             else
                 buf.append("&nbsp;");
             //long readTime = con.getReadTime();
