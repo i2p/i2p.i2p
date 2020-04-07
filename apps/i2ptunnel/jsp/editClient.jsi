@@ -248,6 +248,8 @@
 <%
             } // !streamrclient
 %>
+    </table>
+    <table class="tunnelConfig" id="lengthOption">
         <tr>
             <th colspan="2">
                 <%=intl._t("Tunnel Options")%>
@@ -291,7 +293,10 @@
                 <% }
               %></select>
             </td>
-        </tr><tr>
+        </tr>
+    </table>
+    <table class="tunnelConfig" id="quantityOptions">
+        <tr>
             <td>
                 <b><%=intl._t("Count")%></b>
             </td><td>
@@ -318,6 +323,8 @@
               %></select>
             </td>
         </tr>
+    </table>
+    <table class="tunnelConfig" id="timedOptions">
 <%
             if ("client".equals(tunnelType)) {
 %>
@@ -344,6 +351,8 @@
 
             if (!editBean.isRouterContext()) {
 %>
+    </table>
+    <table class="tunnelConfig">
         <tr>
             <th colspan="2">
                 <%=intl._t("Router I2CP Address")%>
@@ -463,6 +472,7 @@
 
             if ("httpclient".equals(tunnelType)) {
 %>
+    <table class="tunnelConfig" id="filterOptions">
         <tr>
             <th colspan="2">
                 <%=intl._t("HTTP Filtering")%>
@@ -484,6 +494,8 @@
                 <%=intl._t("Allow SSL to I2P addresses")%></label>
             </td>
         </tr>
+    </table>
+    <table class="tunnelConfig" id="cryptoOptions">
 <%
             } // if httpclient
 
@@ -555,6 +567,7 @@
 <%
             if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
 %>
+    <table class="tunnelConfig" id="authOptions">
         <tr>
             <th colspan="2">
                 <%=intl._t("Local Authorization")%>
@@ -593,11 +606,13 @@
                 <input type="password" name="nofilter_outproxyPassword" title="<%=intl._t("Enter password required by outproxy")%>" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext password" />
             </td>
         </tr>
+    </table>
 <%
             } // httpclient || connect || socks || socksirc
 
             if ("httpclient".equals(tunnelType)) {
 %>
+    <table class="tunnelConfig" id="jumpOptions">
         <tr>
             <th colspan="2">
                 <%=intl._t("Jump URL List")%>
@@ -607,9 +622,11 @@
                 <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="<%=intl._t("List of helper URLs providing jump links when a host is not found in your addressbook")%>" wrap="off" spellcheck="false"><%=editBean.getJumpList(curTunnel)%></textarea>
             </td>
         </tr>
+    </table>
 <%
             } // httpclient
 %>
+    <table class="tunnelConfig" id="advancedOptions">
         <tr>
             <th colspan="2">
                 <%=intl._t("Custom options")%>
