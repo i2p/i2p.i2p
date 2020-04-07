@@ -11,6 +11,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
+import org.rrd4j.core.RrdBackendFactory;
+import org.rrd4j.core.RrdNioBackendFactory;
+
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppState;
@@ -83,15 +86,27 @@ public class StatSummarizer implements Runnable, ClientApp {
         }
         _isRunning = true;
         boolean isPersistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
-        if (!isPersistent)
+        int syncThreads;
+        if (isPersistent) {
+            String spec = _context.getProperty("stat.summaries", DEFAULT_DATABASES);
+            String[] rates = DataHelper.split(spec, ",");
+            syncThreads = Math.min(rates.length / 2, 4);
+        } else {
+            syncThreads = 0;
             deleteOldRRDs();
+        }
+        RrdNioBackendFactory.setSyncPoolSize(syncThreads);
         _thread = Thread.currentThread();
         _context.clientAppManager().register(this);
         String specs = "";
         try {
             while (_isRunning && _context.router().isAlive()) {
                 specs = adjustDatabases(specs);
-                try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
+                try {
+                    Thread.sleep(60*1000);
+                } catch (InterruptedException ie) {
+                    break;
+                }
             }
         } finally {
             _isRunning = false;
@@ -463,6 +478,11 @@ public class StatSummarizer implements Runnable, ClientApp {
                 lsnr.stopListening();
             }
             _listeners.clear();
+            // stops the sync thread pool in NIO; noop if not persistent,
+            // we set num threads to zero in run() above
+            try {
+                RrdBackendFactory.getDefaultFactory().close();
+            } catch (IOException ioe) {}
         }
     }
 }
