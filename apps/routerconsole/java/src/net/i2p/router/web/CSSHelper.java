@@ -24,7 +24,7 @@ public class CSSHelper extends HelperBase {
     public static final String BASE_THEME_PATH = "/themes/console/";
     private static final String FORCE = "classic";
     public static final String PROP_REFRESH = "routerconsole.summaryRefresh";
-    public static final String DEFAULT_REFRESH = "60";
+    public static final String DEFAULT_REFRESH = "15";
     public static final int MIN_REFRESH = 3;
     public static final String PROP_DISABLE_REFRESH = "routerconsole.summaryDisableRefresh";
     private static final String PROP_XFRAME = "routerconsole.disableXFrame";
