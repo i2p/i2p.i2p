@@ -140,9 +140,8 @@ class FloodfillMonitorJob extends JobImpl {
         if (ri == null)
             return false;
         char bw = ri.getBandwidthTier().charAt(0);
-        // Only if class M, N, O, P, X
-        if (bw != Router.CAPABILITY_BW64 &&
-            bw != Router.CAPABILITY_BW128 && bw != Router.CAPABILITY_BW256 &&
+        // Only if class N, O, P, X
+        if (bw != Router.CAPABILITY_BW128 && bw != Router.CAPABILITY_BW256 &&
             bw != Router.CAPABILITY_BW512 && bw != Router.CAPABILITY_BW_UNLIMITED)
             return false;
 
