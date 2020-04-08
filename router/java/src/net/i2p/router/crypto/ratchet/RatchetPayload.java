@@ -67,7 +67,6 @@ class RatchetPayload {
         public void gotAck(int id, int n);
 
         /**
-         *  @param di may be null
          *  @since 0.9.46
          */
         public void gotAckRequest();

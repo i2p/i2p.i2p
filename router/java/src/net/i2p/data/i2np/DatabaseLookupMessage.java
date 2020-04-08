@@ -304,8 +304,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
      *  Preliminary, not fully supported, see proposal 154.
      *
      *  @throws IllegalStateException if key or tag previously set, to protect saved checksum
-     *  @param encryptKey non-null
-     *  @param encryptTag non-null
+     *  @param pubKey non-null
      *  @since 0.9.46
      */
     public void setReplySession(PublicKey pubKey) {
