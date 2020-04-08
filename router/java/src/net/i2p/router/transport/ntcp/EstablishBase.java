@@ -1,6 +1,8 @@
 package net.i2p.router.transport.ntcp;
 
 import java.nio.ByteBuffer;
+import java.util.EnumSet;
+import java.util.Set;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -173,6 +175,8 @@ abstract class EstablishBase implements EstablishState {
         CORRUPT
     }
 
+    protected static final Set<State> STATES_DONE = EnumSet.of(State.VERIFIED, State.CORRUPT);
+
     private EstablishBase() {
         _context = null;
         _log = null;
@@ -228,7 +232,7 @@ abstract class EstablishBase implements EstablishState {
      */
     public synchronized void receive(ByteBuffer src) {
         synchronized(_stateLock) {    
-            if (_state == State.VERIFIED || _state == State.CORRUPT)
+            if (STATES_DONE.contains(_state))
                 throw new IllegalStateException(prefix() + "received unexpected data on " + _con);
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -287,7 +291,7 @@ abstract class EstablishBase implements EstablishState {
     /** Caller must synch. */
     protected void fail(String reason, Exception e, boolean bySkew) {
         synchronized(_stateLock) {    
-            if (_state == State.CORRUPT || _state == State.VERIFIED)
+            if (STATES_DONE.contains(_state))
                 return;
             changeState(State.CORRUPT);
         }

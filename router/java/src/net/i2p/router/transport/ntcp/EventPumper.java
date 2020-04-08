@@ -16,6 +16,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.UnresolvedAddressException;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
@@ -111,6 +112,9 @@ class EventPumper implements Runnable {
     }
     
     private static final TryCache<ByteBuffer> _bufferCache = new TryCache<>(new BufferFactory(), MIN_BUFS);
+
+    private static final Set<Status> STATUS_OK =
+        EnumSet.of(Status.OK, Status.IPV4_OK_IPV6_UNKNOWN, Status.IPV4_OK_IPV6_FIREWALLED);
 
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
         _context = ctx;
@@ -576,11 +580,7 @@ class EventPumper implements Runnable {
         if (chan.socket().getInetAddress() instanceof Inet6Address)
             return false;
         Status status = _context.commSystem().getStatus();
-        if (status == Status.OK ||
-            status == Status.IPV4_OK_IPV6_UNKNOWN ||
-            status == Status.IPV4_OK_IPV6_FIREWALLED)
-            return false;
-        return true;
+        return !STATUS_OK.contains(status);
     }
 
     /**
