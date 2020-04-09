@@ -1,6 +1,20 @@
+2020-04-08 zzz
+ * i2psnark: Give peers preference to get first pieces (ticket #2473)
+ * NetDB: Remove class M from auto-floodfill
+ * NTCP: Retain pending messages when replacing connection
+ * Ratchet: TagSet cleanups
+
+2020-04-07 zzz
+ * Console: Fix disabling sidebar refresh
+ * Graphs:
+   - Reduce rrd4j sync thread pool size
+   - Disable pool if not persisting
+   - Stop pool on shutdown
+
 2020-04-06 zzz
  * Ratchet:
    - Finish Next Key impl.
+   - Simplify OB Session
    - Performance improvements and cleanups
    - Debug page fixes
 
