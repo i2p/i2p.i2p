@@ -1349,6 +1349,9 @@
         <copy todir="pkg-temp/eepsite/" >
             <fileset dir="installer/resources/eepsite/" excludes="**/.placeholder" />
         </copy>
+        <copy todir="pkg-temp/eepsite-jetty9.3" >
+            <fileset dir="installer/resources/eepsite-jetty9.3" />
+        </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
     </target>
 
@@ -1757,6 +1760,9 @@
           -->
         <copy todir="pkg-temp/eepsite-jetty9" >
             <fileset dir="installer/resources/eepsite" includes="*.xml contexts/* etc/*" />
+        </copy>
+        <copy todir="pkg-temp/eepsite-jetty9.3" >
+            <fileset dir="installer/resources/eepsite-jetty9.3" />
         </copy>
     </target>
 
