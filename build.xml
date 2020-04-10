@@ -2538,6 +2538,20 @@
         <property name="Extended.Version" value="${full.version}" />
     </target>
 
+    <target name="debcheckpatch">
+        <exec executable="patch" failonerror="true" input="debian/patches/0001-path-substitution.patch" >
+            <arg value="--dry-run" />
+            <arg value="-F0" />
+            <arg value="-p1" />
+        </exec>
+        <exec executable="patch" failonerror="true" input="debian/patches/0002-jetty-compatibility.patch" >
+            <arg value="--dry-run" />
+            <arg value="-F0" />
+            <arg value="-p1" />
+        </exec>
+    </target>
+
+
     <target name="debchange" depends="getExtendedVersion" unless="noAutoDebchange">
         <echo message= "Debian version is ${Extended.Version}-1" />
         <exec executable="dch" failonerror="true">
