@@ -421,8 +421,6 @@ class Connection {
             }
             
             long timeout = _options.getRTO();
-            if (timeout > MAX_RESEND_DELAY)
-                timeout = MAX_RESEND_DELAY;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Resend in " + timeout + " for " + packet);
 
@@ -1579,9 +1577,7 @@ class Connection {
                 } else {
                     //long timeout = _options.getResendDelay() << numSends;
                     long rto = _options.getRTO();
-                    if (rto < MIN_RESEND_DELAY)
-                        rto = MIN_RESEND_DELAY;
-                    long timeout = rto << (numSends-1);
+                    long timeout = rto << (numSends-2);
                     if ( (timeout > MAX_RESEND_DELAY) || (timeout <= 0) )
                         timeout = MAX_RESEND_DELAY;
                     // set this before enqueue() as it passes it on to the router

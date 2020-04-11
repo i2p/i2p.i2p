@@ -599,6 +599,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         }
     }
 
+    /**
+     *  @return Connection.MIN_RESEND_DELAY to Connection.MAX_RESEND_DELAY
+     */
     public synchronized int getRTO() { return _rto; }
 
     /** used in TCB @since 0.9.8 */
@@ -642,13 +645,15 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * Double the RTO (after congestion).
      * See RFC 6298 section 5 item 5.5
      *
+     * @return new value, Connection.MIN_RESEND_DELAY to Connection.MAX_RESEND_DELAY
      * @since 0.9.33
      */
-    synchronized void doubleRTO() {
+    synchronized int doubleRTO() {
         // we don't need to switch on _initState, _rto is set in constructor
         _rto *= 2;
         if (_rto > Connection.MAX_RESEND_DELAY)
             _rto = (int)Connection.MAX_RESEND_DELAY;
+        return _rto;
     }
     
     /**
@@ -707,8 +712,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return ACK delay in ms
      */
     public int getSendAckDelay() { return _sendAckDelay; }
+
     /**
-     *  Unused except here, so expect the default initial delay of 2000 ms unless set by the user
+     *  Unused except here, so expect the default initial delay of DEFAULT_INITIAL_ACK_DELAY unless set by the user
      *  to remain constant.
      */
     public void setSendAckDelay(int delayMs) { _sendAckDelay = delayMs; }

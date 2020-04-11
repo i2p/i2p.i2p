@@ -1,3 +1,9 @@
+2020-04-10 zzz
+ * Streaming: Fix retransmission time (ticket #2709)
+
+2020-04-10 zzz
+ * Jetty: Add GzipHandler for eepsites on Jetty 9.3/9.4 (ticket #2599)
+
 2020-04-08 zzz
  * i2psnark: Give peers preference to get first pieces (ticket #2473)
  * NetDB: Remove class M from auto-floodfill
