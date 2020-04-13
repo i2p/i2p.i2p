@@ -1620,6 +1620,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF-8"));
                 String line;
                 while ((line = br.readLine()) != null) {
+                    if (line.startsWith("#"))
+                        continue;
                     runCommand(line, l);
                 }
                 br.close();
@@ -1661,7 +1663,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 Destination dest = destFromName(args[0], host, port, ssl, user, pw);
                 if (dest == null) {
                     l.log("Unknown host: " + args[0]);
-                    notifyEvent("lookupResult", "unkown host");
+                    notifyEvent("lookupResult", "unknown host");
                 } else {
                     l.log(dest.toBase64());
                     notifyEvent("lookupResult", dest.toBase64());
