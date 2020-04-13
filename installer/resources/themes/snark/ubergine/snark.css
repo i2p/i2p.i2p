@@ -2257,10 +2257,6 @@ input#toggle_debug:not(checked) + label {
 }
 }
 
-.buckets {
-     animation: fade-in 0.3s linear;
-}
-
 .dhtDebug th b:first-of-type, .dhtDebug th b:first-of-type + br + hr.debug {
      display: none;
 }
@@ -2911,7 +2907,7 @@ td.snarkTorrentStatus, td.snarkTorrentStatus a {
 
 @media screen and (max-width: 1500px) {
 .snarknavbar {
-     padding: 14px 10px 13px;
+     padding: 14px 10px 0px;
 }
 
 _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
@@ -3034,7 +3030,7 @@ code {
 }
 
 .snarknavbar {
-     padding: 17px 10px 16px;
+     padding: 14px 10px 0px;
 }
 
 .snarknavbar img {
