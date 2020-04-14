@@ -86,6 +86,7 @@ class SessionKeyAndNonce extends SessionKey {
         StringBuilder buf = new StringBuilder(64);
         buf.append("[SessionKeyAndNonce: ");
         buf.append(toBase64());
+        buf.append(_state != null ? " NSR" : " ES");
         buf.append(" nonce: ").append(_nonce);
         buf.append(']');
         return buf.toString();

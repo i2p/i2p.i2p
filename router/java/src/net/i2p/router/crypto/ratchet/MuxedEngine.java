@@ -34,30 +34,53 @@ final class MuxedEngine {
             ecKey.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         CloveSet rv = null;
-        boolean tryElg = false;
-        // See proposal 144
-        if (data.length >= 128) {
-            int mod = data.length % 16;
-            if (mod == 0 || mod == 2)
-                tryElg = true;
-        }
-        // Always try ElG first, for now
-        if (tryElg) {
-            byte[] dec = _context.elGamalAESEngine().decrypt(data, elgKey, keyManager.getElgSKM());
+        // Try in-order from fastest to slowest
+        // Ratchet Tag
+        rv = _context.eciesEngine().decryptFast(data, ecKey, keyManager.getECSKM());
+        if (rv != null)
+            return rv;
+        if (_log.shouldDebug())
+            _log.debug("Ratchet tag not found");
+        // AES Tag
+        if (data.length >= 128 && (data.length & 0x0f) == 0) {
+            byte[] dec = _context.elGamalAESEngine().decryptFast(data, elgKey, keyManager.getElgSKM());
             if (dec != null) {
                 try {
                     rv = _context.garlicMessageParser().readCloveSet(dec, 0);
+                    if (rv == null && _log.shouldInfo())
+                        _log.info("AES cloveset error");
                 } catch (DataFormatException dfe) {
                     if (_log.shouldInfo())
-                        _log.info("ElG decrypt failed, trying ECIES", dfe);
+                        _log.info("AES cloveset error", dfe);
                 }
+                return rv;
             } else {
-                //if (_log.shouldDebug())
-                //    _log.debug("ElG decrypt failed, trying ECIES");
+                if (_log.shouldDebug())
+                    _log.debug("AES tag not found");
             }
         }
-        if (rv == null) {
-            rv = _context.eciesEngine().decrypt(data, ecKey, keyManager.getECSKM());
+        // Ratchet DH
+        rv = _context.eciesEngine().decryptSlow(data, ecKey, keyManager.getECSKM());
+        if (rv != null)
+            return rv;
+        if (_log.shouldDebug())
+            _log.debug("Ratchet NS decrypt failed");
+        // ElG DH
+        if (data.length >= 514 && (data.length & 0x0f) == 2) {
+            byte[] dec = _context.elGamalAESEngine().decryptSlow(data, elgKey, keyManager.getElgSKM());
+            if (dec != null) {
+                try {
+                    rv = _context.garlicMessageParser().readCloveSet(dec, 0);
+                    if (rv == null && _log.shouldInfo())
+                        _log.info("ElG cloveset error");
+                } catch (DataFormatException dfe) {
+                    if (_log.shouldInfo())
+                        _log.info("ElG cloveset error", dfe);
+                }
+            } else {
+                if (_log.shouldInfo())
+                    _log.info("ElG decrypt failed");
+            }
         }
         return rv;
     }

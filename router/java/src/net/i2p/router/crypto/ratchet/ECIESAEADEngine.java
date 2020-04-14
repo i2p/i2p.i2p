@@ -65,6 +65,10 @@ public final class ECIESAEADEngine {
     private static final long MAX_NS_FUTURE = 2*60*1000;
     // debug, send ACKREQ in every ES
     private static final boolean ACKREQ_IN_ES = false;
+    // return value for a payload failure after a successful decrypt,
+    // so we don't continue with ElG
+    private static final GarlicClove[] NO_GARLIC = new GarlicClove[] {};
+    private static final CloveSet NO_CLOVES = new CloveSet(NO_GARLIC, Certificate.NULL_CERT, 0, 0);
 
     private static final String INFO_0 = "SessionReplyTags";
     private static final String INFO_6 = "AttachPayloadKDF";
@@ -149,10 +153,10 @@ public final class ECIESAEADEngine {
         } catch (DataFormatException dfe) {
             if (_log.shouldWarn())
                 _log.warn("ECIES decrypt error", dfe);
-            throw dfe;
+            return NO_CLOVES;
         } catch (Exception e) {
             _log.error("ECIES decrypt error", e);
-            return null;
+            return NO_CLOVES;
         }
     }
 
@@ -165,8 +169,8 @@ public final class ECIESAEADEngine {
             return null;
         }
         if (data.length < MIN_ENCRYPTED_SIZE) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
+            if (_log.shouldWarn())
+                _log.warn("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
             return null;
         }
 
@@ -177,31 +181,128 @@ public final class ECIESAEADEngine {
         CloveSet decrypted;
         final boolean shouldDebug = _log.shouldDebug();
         if (key != null) {
-            HandshakeState state = key.getHandshakeState();
-            if (state == null) {
-                if (shouldDebug)
-                    _log.debug("Decrypting ES with tag: " + st.toBase64() + " key: " + key.toBase64() + ": " + data.length + " bytes");
-                decrypted = decryptExistingSession(tag, data, key, targetPrivateKey, keyManager);
-            } else if (data.length >= MIN_NSR_SIZE) {
-                if (shouldDebug)
-                    _log.debug("Decrypting NSR with tag: " + st.toBase64() + " key: " + key.toBase64() + ": " + data.length + " bytes");
-                decrypted = decryptNewSessionReply(tag, data, state, keyManager);
-            } else {
-                decrypted = null;
-                if (_log.shouldWarn())
-                    _log.warn("ECIES decrypt fail, tag found but no state and too small for NSR: " + data.length + " bytes");
+            decrypted = xx_decryptFast(tag, st, key, data, targetPrivateKey, keyManager);
+            // we do NOT retry as NS
+        } else {
+            decrypted = x_decryptSlow(data, targetPrivateKey, keyManager);
+        }
+        return decrypted;
+    }
+
+    /**
+     * NSR/ES only. For MuxedEngine use only.
+     *
+     * @return decrypted data or null on failure
+     * @since 0.9.46
+     */
+    CloveSet decryptFast(byte data[], PrivateKey targetPrivateKey,
+                         RatchetSKM keyManager) throws DataFormatException {
+        try {
+            return x_decryptFast(data, targetPrivateKey, keyManager);
+        } catch (DataFormatException dfe) {
+            if (_log.shouldWarn())
+                _log.warn("ECIES decrypt error", dfe);
+            return NO_CLOVES;
+        } catch (Exception e) {
+            _log.error("ECIES decrypt error", e);
+            return NO_CLOVES;
+        }
+    }
+
+    /**
+     * NSR/ES only.
+     *
+     * @return decrypted data or null on failure
+     * @since 0.9.46
+     */
+    private CloveSet x_decryptFast(byte data[], PrivateKey targetPrivateKey,
+                                   RatchetSKM keyManager) throws DataFormatException {
+        if (data.length < MIN_ENCRYPTED_SIZE) {
+            if (_log.shouldWarn())
+                _log.warn("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
+            return null;
+        }
+        byte tag[] = new byte[TAGLEN];
+        System.arraycopy(data, 0, tag, 0, TAGLEN);
+        RatchetSessionTag st = new RatchetSessionTag(tag);
+        SessionKeyAndNonce key = keyManager.consumeTag(st);
+        CloveSet decrypted;
+        if (key != null) {
+            decrypted = xx_decryptFast(tag, st, key, data, targetPrivateKey, keyManager);
+        } else {
+            decrypted = null;
+        }
+        return decrypted;
+    }
+
+    /**
+     * NSR/ES only.
+     *
+     * @param key non-null
+     * @param data non-null
+     * @return decrypted data or null on failure
+     * @since 0.9.46
+     */
+    private CloveSet xx_decryptFast(byte[] tag, RatchetSessionTag st, SessionKeyAndNonce key,
+                                    byte data[], PrivateKey targetPrivateKey,
+                                    RatchetSKM keyManager) throws DataFormatException {
+        CloveSet decrypted;
+        final boolean shouldDebug = _log.shouldDebug();
+        HandshakeState state = key.getHandshakeState();
+        if (state == null) {
+            if (shouldDebug)
+                _log.debug("Decrypting ES with tag: " + st.toBase64() + " key: " + key + ": " + data.length + " bytes");
+            decrypted = decryptExistingSession(tag, data, key, targetPrivateKey, keyManager);
+        } else if (data.length >= MIN_NSR_SIZE) {
+            if (shouldDebug)
+                _log.debug("Decrypting NSR with tag: " + st.toBase64() + " key: " + key + ": " + data.length + " bytes");
+            decrypted = decryptNewSessionReply(tag, data, state, keyManager);
+        } else {
+            decrypted = null;
+            if (_log.shouldWarn())
+                _log.warn("ECIES decrypt fail, tag found but no state and too small for NSR: " + data.length + " bytes");
+        }
+        if (decrypted != null) {
+            _context.statManager().updateFrequency("crypto.eciesAEAD.decryptExistingSession");
+        } else {
+            _context.statManager().updateFrequency("crypto.eciesAEAD.decryptFailed");
+            if (_log.shouldWarn()) {
+                _log.warn("ECIES decrypt fail: known tag [" + st + "], failed decrypt with key " + key);
             }
-            if (decrypted != null) {
-///
-                _context.statManager().updateFrequency("crypto.eciesAEAD.decryptExistingSession");
-            } else {
-                _context.statManager().updateFrequency("crypto.eciesAEAD.decryptFailed");
-                if (_log.shouldWarn()) {
-                    _log.warn("ECIES decrypt fail: known tag [" + st + "], failed decrypt");
-                }
-            }
-        } else if (data.length >= MIN_NS_SIZE) {
-            if (shouldDebug) _log.debug("IB Tag " + st + " not found, trying NS decrypt");
+        }
+        return decrypted;
+    }
+
+    /**
+     * NS only. For MuxedEngine use only.
+     *
+     * @return decrypted data or null on failure
+     * @since 0.9.46
+     */
+    CloveSet decryptSlow(byte data[], PrivateKey targetPrivateKey,
+                            RatchetSKM keyManager) throws DataFormatException {
+        try {
+            return x_decryptSlow(data, targetPrivateKey, keyManager);
+        } catch (DataFormatException dfe) {
+            if (_log.shouldWarn())
+                _log.warn("ECIES decrypt error", dfe);
+            return NO_CLOVES;
+        } catch (Exception e) {
+            _log.error("ECIES decrypt error", e);
+            return NO_CLOVES;
+        }
+    }
+
+    /**
+     * NS only.
+     *
+     * @return decrypted data or null on failure
+     * @since 0.9.46
+     */
+    private CloveSet x_decryptSlow(byte data[], PrivateKey targetPrivateKey,
+                                   RatchetSKM keyManager) throws DataFormatException {
+        CloveSet decrypted;
+        if (data.length >= MIN_NS_SIZE) {
             decrypted = decryptNewSession(data, targetPrivateKey, keyManager);
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.eciesAEAD.decryptNewSession");
@@ -213,9 +314,8 @@ public final class ECIESAEADEngine {
         } else {
             decrypted = null;
             if (_log.shouldWarn())
-                _log.warn("ECIES decrypt fail, tag not found and too small for NS: " + data.length + " bytes");
+                _log.warn("ECIES decrypt fail, too small for NS: " + data.length + " bytes");
         }
-
         return decrypted;
     }
 
@@ -260,6 +360,7 @@ public final class ECIESAEADEngine {
                 _log.warn("Elg2 decode fail NS");
             return null;
         }
+        // rewrite in place, must restore below on failure
         System.arraycopy(pk.getData(), 0, data, 0, KEYLEN);
 
         int payloadlen = data.length - (KEYLEN + KEYLEN + MACLEN + MACLEN);
@@ -272,6 +373,8 @@ public final class ECIESAEADEngine {
                 if (_log.shouldDebug())
                     _log.debug("State at failure: " + state);
             }
+            // restore original data for subsequent ElG attempt
+            System.arraycopy(tmp, 0, data, 0, KEYLEN);
             return null;
         }
         // bloom filter here based on ephemeral key
@@ -281,7 +384,7 @@ public final class ECIESAEADEngine {
         if (keyManager.isDuplicate(pk)) {
             if (_log.shouldWarn())
                 _log.warn("Dup eph. key in IB NS: " + pk);
-            return null;
+            return NO_CLOVES;
         }
 
         byte[] bobPK = new byte[KEYLEN];
@@ -294,14 +397,14 @@ public final class ECIESAEADEngine {
             // TODO
             if (_log.shouldWarn())
                 _log.warn("Zero static key in IB NS");
-            return null;
+            return NO_CLOVES;
         }
 
         // payload
         if (payloadlen == 0) {
             if (_log.shouldWarn())
                 _log.warn("Zero length payload in NS");
-            return null;
+            return NO_CLOVES;
         }
         PLCallback pc = new PLCallback();
         try {
@@ -317,7 +420,7 @@ public final class ECIESAEADEngine {
         if (pc.datetime == 0) {
             if (_log.shouldWarn())
                 _log.warn("No datetime block in IB NS");
-            return null;
+            return NO_CLOVES;
         }
 
         // tell the SKM
@@ -378,6 +481,7 @@ public final class ECIESAEADEngine {
         }
         if (_log.shouldDebug())
             _log.debug("State before decrypt new session reply: " + state);
+        // rewrite in place, must restore below on failure
         System.arraycopy(k.getData(), 0, data, TAGLEN, KEYLEN);
         state.mixHash(tag, 0, TAGLEN);
         if (_log.shouldDebug())
@@ -390,6 +494,9 @@ public final class ECIESAEADEngine {
                 if (_log.shouldDebug())
                     _log.debug("State at failure: " + state);
             }
+            // restore original data for subsequent ElG attempt
+            // unlikely since we already matched the tag
+            System.arraycopy(yy, 0, data, TAGLEN, KEYLEN);
             return null;
         }
         if (_log.shouldDebug())
@@ -417,12 +524,12 @@ public final class ECIESAEADEngine {
                 if (_log.shouldDebug())
                     _log.debug("State at failure: " + state);
             }
-            return null;
+            return NO_CLOVES;
         }
         if (payload.length == 0) {
             if (_log.shouldWarn())
                 _log.warn("Zero length payload in NSR");
-            return null;
+            return NO_CLOVES;
         }
         PLCallback pc = new PLCallback();
         try {
@@ -443,7 +550,7 @@ public final class ECIESAEADEngine {
             // TODO
             if (_log.shouldWarn())
                 _log.warn("NSR reply to zero static key NS");
-            return null;
+            return NO_CLOVES;
         }
 
         // tell the SKM
