@@ -13,7 +13,6 @@ import net.i2p.data.SessionTag;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer2;
 
 /**
  * This is the class used for outbound packets.
@@ -36,7 +35,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private long _cancelledOn;
     private final AtomicInteger _nackCount = new AtomicInteger();
     private volatile boolean _retransmitted;
-    private volatile SimpleTimer2.TimedEvent _resendEvent;
+    private volatile Connection.ResendPacketEvent _resendEvent;
     
     /** not bound to a connection */
     public PacketLocal(I2PAppContext ctx, Destination to, I2PSession session) {
@@ -133,13 +132,14 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     
     public long getCreatedOn() { return _createdOn; }
     public long getLifetime() { return _context.clock().now() - _createdOn; }
+
     public void incrementSends() { 
         _numSends.incrementAndGet();
         _lastSend = _context.clock().now();
     }
     
     private void cancelResend() {
-        SimpleTimer2.TimedEvent ev = _resendEvent;
+        Connection.ResendPacketEvent ev = _resendEvent;
         if (ev != null) 
             ev.cancel();
     }
@@ -166,7 +166,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
     }
 
-    public SimpleTimer2.TimedEvent getResendEvent() { return _resendEvent; }
+    public Connection.ResendPacketEvent getResendEvent() { return _resendEvent; }
     
     /** how long after packet creation was it acked?
      * @return how long after packet creation the packet was ACKed in ms
@@ -177,6 +177,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         else
             return (int)(_ackOn - _createdOn);
     }
+
     public int getNumSends() { return _numSends.get(); }
     public long getLastSend() { return _lastSend; }
 
@@ -189,11 +190,11 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
      */
     public void incrementNACKs() { 
         final int cnt = _nackCount.incrementAndGet();
-        SimpleTimer2.TimedEvent evt = _resendEvent;
+        Connection.ResendPacketEvent evt = _resendEvent;
         if (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD && evt != null && (!_retransmitted) &&
             (_numSends.get() == 1 || _lastSend < _context.clock().now() - 4*1000)) {  // Don't fast retx if we recently resent it
             _retransmitted = true;
-            evt.reschedule(0);
+            evt.fastRetransmit();
             // the predicate used to be '+', changing to '-' --zab
             
             if (_log.shouldLog(Log.DEBUG)) {
@@ -209,9 +210,10 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
                     _log.debug(log);
         }
     }
+
     public int getNACKs() { return _nackCount.get(); }
     
-    public void setResendPacketEvent(SimpleTimer2.TimedEvent evt) { _resendEvent = evt; }
+    public void setResendPacketEvent(Connection.ResendPacketEvent evt) { _resendEvent = evt; }
 
     /**
      * Sign and write the packet to the buffer (starting at the offset) and return

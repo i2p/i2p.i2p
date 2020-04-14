@@ -204,9 +204,11 @@ class ConnectionPacketHandler {
                 // see tickets 1939 and 2584
                 con.setNextSendTime(_context.clock().now() + IMMEDIATE_ACK_DELAY);
             } else {
-                int delay = con.getOptions().getSendAckDelay();
+                int delay;
                 if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) // delayed ACK requested
                     delay = packet.getOptionalDelay();
+                else
+                    delay = con.getOptions().getSendAckDelay();
                 con.setNextSendTime(delay + _context.clock().now());
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Scheduling ack in " + delay + "ms for received packet " + packet);
@@ -432,8 +434,8 @@ class ConnectionPacketHandler {
             _context.statManager().addRateData("stream.trend", trend, newWindowSize);
             
             if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
-                if (newWindowSize < con.getLastCongestionSeenAt() / 2) {
-                    // Don't make this <= LastCongestion/2 or we'll jump right back to where we were
+                int ssthresh = con.getSSThresh();
+                if (newWindowSize < ssthresh) {
                     // slow start - exponential growth
                     // grow acked/N times (where N = the slow start factor)
                     // always grow at least 1
@@ -446,7 +448,7 @@ class ConnectionPacketHandler {
                         if (newWindowSize >= MAX_SLOW_START_WINDOW)
                             newWindowSize++;
                         else
-                            newWindowSize = Math.min(MAX_SLOW_START_WINDOW, newWindowSize + acked);
+                            newWindowSize = Math.min(ssthresh, newWindowSize + acked);
                     } else if (acked < factor)
                         newWindowSize++;
                     else
@@ -483,8 +485,8 @@ class ConnectionPacketHandler {
             con.setCongestionWindowEnd(newWindowSize + lowest);
                                 
             if (_log.shouldLog(Log.INFO))
-                _log.info("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize() + " congestionSeenAt: "
-                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
+                _log.info("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize()
+                           + " (#resends: " + numResends 
                            + ") for " + con);
         } else {
             if (_log.shouldLog(Log.DEBUG))

@@ -1,3 +1,12 @@
+2020-04-14 zzz
+ * Ratchet: Improve muxed decrypt
+ * Streaming:
+   - Fix slow start (ticket #2708)
+   - Reset retransmission timer after ack (ticket #2710)
+
+2020-04-13 zzz
+ * i2ptunnel: Allow comments in CLI command files
+
 2020-04-10 zzz
  * Streaming: Fix retransmission time (ticket #2709)
 

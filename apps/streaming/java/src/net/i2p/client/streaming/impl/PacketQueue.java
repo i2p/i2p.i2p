@@ -117,7 +117,7 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             // this should not block!
             begin = _context.clock().now();
             long expires = 0;
-            Connection.ResendPacketEvent rpe = (Connection.ResendPacketEvent) packet.getResendEvent();
+            Connection.ResendPacketEvent rpe = packet.getResendEvent();
             if (rpe != null) {
                 // we want the router to expire it a little before we do,
                 // so if we retransmit it will use a new tunnel/lease combo

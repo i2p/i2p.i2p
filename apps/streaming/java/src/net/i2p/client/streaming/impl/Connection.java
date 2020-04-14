@@ -53,6 +53,7 @@ class Connection {
     private final AtomicInteger _unackedPacketsReceived = new AtomicInteger();
     private long _congestionWindowEnd;
     private volatile long _highestAckedThrough;
+    private volatile int _ssthresh;
     private final boolean _isInbound;
     private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
@@ -67,10 +68,9 @@ class Connection {
     private final AtomicLong _disconnectScheduledOn = new AtomicLong();
     private long _lastReceivedOn;
     private final ActivityTimer _activityTimer;
-    /** window size when we last saw congestion */
-    private int _lastCongestionSeenAt;
     private long _lastCongestionTime;
     private volatile long _lastCongestionHighestUnacked;
+    private volatile long _nextRetransmitTime;
     /** has the other side choked us? */
     private volatile boolean _isChoked;
     /** are we choking the other side? */
@@ -156,7 +156,7 @@ class Connection {
         _createdOn = _context.clock().now();
         _congestionWindowEnd = _options.getWindowSize()-1;
         _highestAckedThrough = -1;
-        _lastCongestionSeenAt = MAX_WINDOW_SIZE*2; // lets allow it to grow
+        _ssthresh = _options.getMaxWindowSize();
         _lastCongestionTime = -1;
         _lastCongestionHighestUnacked = -1;
         _lastReceivedOn = -1;
@@ -169,6 +169,13 @@ class Connection {
         // all createRateStats in ConnectionManager
         if (_log.shouldLog(Log.INFO))
             _log.info("New connection created with options: " + _options);
+    }
+
+    /**
+     * @since 0.9.46
+     */
+    int getSSThresh() {
+        return _ssthresh;
     }
     
     public long getNextOutboundPacketNum() { 
@@ -557,8 +564,10 @@ class Connection {
             }
             _outboundPackets.notifyAll();
         }
-        if ((acked != null) && (!acked.isEmpty()) )
+        if ((acked != null) && (!acked.isEmpty()) ) {
             _ackSinceCongestion.set(true);
+            _nextRetransmitTime = _context.clock().now() + getOptions().getRTO();
+        }
         return acked;
     }
 
@@ -1137,13 +1146,10 @@ class Connection {
         return (_lastSendTime > _lastReceivedOn ? _lastSendTime : _lastReceivedOn);
     }
     
-    public int getLastCongestionSeenAt() { return _lastCongestionSeenAt; }
-
     private void congestionOccurred() {
         // if we hit congestion and e.g. 5 packets are resent,
         // dont set the size to (winSize >> 4).  only set the
         if (_ackSinceCongestion.compareAndSet(true,false)) {
-            _lastCongestionSeenAt = _options.getWindowSize();
             _lastCongestionTime = _context.clock().now();
             _lastCongestionHighestUnacked = _lastSendId.get();
         }
@@ -1383,7 +1389,7 @@ class Connection {
         buf.append(" sent: ").append(1 + _lastSendId.get());
         buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
         buf.append(" ackThru ").append(_highestAckedThrough);
-        
+        buf.append(" ssThresh ").append(_ssthresh); 
         buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
         buf.append(" MTU ").append(getOptions().getMaxMessageSize());
         
@@ -1420,6 +1426,7 @@ class Connection {
     class ResendPacketEvent extends SimpleTimer2.TimedEvent {
         private final PacketLocal _packet;
         private long _nextSend;
+        private boolean _fastRetransmit;
 
         public ResendPacketEvent(PacketLocal packet, long delay) {
             super(_timer);
@@ -1432,6 +1439,14 @@ class Connection {
         public long getNextSendTime() { return _nextSend; }
 
         public void timeReached() { retransmit(); }
+
+        /**
+         * @since 0.9.46
+         */
+        void fastRetransmit() {
+            _fastRetransmit = true;
+            reschedule(0);
+        }
 
         /**
          * Retransmit the packet if we need to.  
@@ -1452,6 +1467,16 @@ class Connection {
                 _packet.cancelled();
                 return false;
             }
+
+            long now = _context.clock().now();
+            long nextRetransmitTime = _nextRetransmitTime;
+            if (nextRetransmitTime > now  && !_fastRetransmit) {
+                long delay = nextRetransmitTime - now;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Resend time reached but will be delayed " + delay + " for packet " + _packet);
+                forceReschedule(delay);
+                return false;
+            }
             
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Resend period reached for " + _packet);
@@ -1469,8 +1494,7 @@ class Connection {
                     resend = true;
             }
             if ( (resend) && (_packet.getAckTime() <= 0) ) {
-                boolean fastRetransmit = ( (_packet.getNACKs() >= FAST_RETRANSMIT_THRESHOLD) && (_packet.getNumSends() == 1));
-                if ( (!isLowest) && (!fastRetransmit) ) {
+                if ( (!isLowest) && (!_fastRetransmit) ) {
                     // we want to resend this packet, but there are already active
                     // resends in the air and we dont want to make a bad situation 
                     // worse.  wait another second
@@ -1487,7 +1511,7 @@ class Connection {
                 
                 // It's the lowest, or it's fast retransmit time. Resend the packet.
 
-                if (fastRetransmit)
+                if (_fastRetransmit)
                     _context.statManager().addRateData("stream.fastRetransmit", _packet.getLifetime(), _packet.getLifetime());
                 
                 // revamp various fields, in case we need to ack more, etc
@@ -1535,6 +1559,11 @@ class Connection {
                         // never updating the RTT or RTO.
                         getOptions().doubleRTO();
                         getOptions().setWindowSize(newWindowSize);
+
+                        if (_packet.getNumSends() == 1) {
+                            int flightSize = getUnackedPacketsSent();
+                            _ssthresh = Math.max( flightSize / 2, 2 );
+                        }
 
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Congestion, resending packet " + _packet.getSequenceNum() + " (new windowSize " + newWindowSize 
@@ -1589,7 +1618,7 @@ class Connection {
                             _activeResends.incrementAndGet();
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Resent packet " +
-                                  (fastRetransmit ? "(fast) " : "(timeout) ") +
+                                  (_fastRetransmit ? "(fast) " : "(timeout) ") +
                                   _packet +
                                   " next resend in " + timeout + "ms" +
                                   " activeResends: " + _activeResends + 
@@ -1598,6 +1627,7 @@ class Connection {
                                   + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
                         _unackedPacketsReceived.set(0);
                         _lastSendTime = _context.clock().now();
+                        _fastRetransmit = false;
                         // timer reset added 0.9.1
                         resetActivityTimer();
                     }
