@@ -352,9 +352,11 @@ public final class ECIESAEADEngine {
             _log.debug("State before decrypt new session: " + state);
 
         // Elg2
-        byte[] tmp = new byte[KEYLEN];
-        System.arraycopy(data, 0, tmp, 0, KEYLEN);
-        PublicKey pk = Elligator2.decode(tmp);
+        byte[] xx = new byte[KEYLEN];
+        System.arraycopy(data, 0, xx, 0, KEYLEN);
+        // decode corrupts last byte, save for restore below
+        byte xx31 = xx[KEYLEN - 1];
+        PublicKey pk = Elligator2.decode(xx);
         if (pk == null) {
             if (_log.shouldWarn())
                 _log.warn("Elg2 decode fail NS");
@@ -374,7 +376,8 @@ public final class ECIESAEADEngine {
                     _log.debug("State at failure: " + state);
             }
             // restore original data for subsequent ElG attempt
-            System.arraycopy(tmp, 0, data, 0, KEYLEN);
+            System.arraycopy(xx, 0, data, 0, KEYLEN - 1);
+            data[KEYLEN - 1] = xx31;
             return null;
         }
         // bloom filter here based on ephemeral key
@@ -473,6 +476,8 @@ public final class ECIESAEADEngine {
         // part 1 - handshake
         byte[] yy = new byte[KEYLEN];
         System.arraycopy(data, TAGLEN, yy, 0, KEYLEN);
+        // decode corrupts last byte, save for restore below
+        byte yy31 = yy[KEYLEN - 1];
         PublicKey k = Elligator2.decode(yy);
         if (k == null) {
             if (_log.shouldWarn())
@@ -496,7 +501,8 @@ public final class ECIESAEADEngine {
             }
             // restore original data for subsequent ElG attempt
             // unlikely since we already matched the tag
-            System.arraycopy(yy, 0, data, TAGLEN, KEYLEN);
+            System.arraycopy(yy, 0, data, TAGLEN, KEYLEN - 1);
+            data[TAGLEN + KEYLEN - 1] = yy31;
             return null;
         }
         if (_log.shouldDebug())
