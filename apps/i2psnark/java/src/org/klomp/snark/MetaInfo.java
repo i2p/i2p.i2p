@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA1;
 import net.i2p.data.DataHelper;
@@ -701,20 +703,71 @@ public class MetaInfo
 
   /** @since 0.8.5 */
   public static void main(String[] args) {
-      if (args.length <= 0) {
-          System.err.println("Usage: MetaInfo files...");
-          return;
+      boolean error = false;
+      String created_by = null;
+      String announce = null;
+      Getopt g = new Getopt("Storage", args, "a:c:");
+      try {
+          int c;
+          while ((c = g.getopt()) != -1) {
+            switch (c) {
+              case 'a':
+                  announce = g.getOptarg();
+                  break;
+
+              case 'c':
+                  created_by = g.getOptarg();
+                  break;
+
+              case '?':
+              case ':':
+              default:
+                  error = true;
+                  break;
+            }  // switch
+          } // while
+      } catch (RuntimeException e) {
+          e.printStackTrace();
+          error = true;
       }
-      for (int i = 0; i < args.length; i++) {
+      if (error || args.length - g.getOptind() <= 0) {
+          System.err.println("Usage: MetaInfo [-a announceURL] [-c created-by] file.torrent [file2.torrent...]");
+      }
+      for (int i = g.getOptind(); i < args.length; i++) {
           InputStream in = null;
+          java.io.OutputStream out = null;
           try {
               in = new FileInputStream(args[i]);
               MetaInfo meta = new MetaInfo(in);
-              System.out.println(args[i] + " InfoHash: " + I2PSnarkUtil.toHex(meta.getInfoHash()));
+              System.out.println(args[i] + "\nInfoHash: " + I2PSnarkUtil.toHex(meta.getInfoHash()) +
+                                 "\nAnnounce: " + meta.getAnnounce() +
+                                 "\nCreated By: " + meta.getCreatedBy());
+              if (created_by != null || announce != null) {
+                  String cb = created_by != null ? created_by : meta.getCreatedBy();
+                  String an = announce != null ? announce : meta.getAnnounce();
+                  // changes/adds creation date, loses comment
+                  MetaInfo meta2 = new MetaInfo(an, meta.getName(), null, meta.getFiles(), meta.getLengths(),
+                                                meta.getPieceLength(0), meta.getPieceHashes(), meta.getTotalLength(), meta.isPrivate(),
+                                                meta.getAnnounceList(), cb);
+                  java.io.File from = new java.io.File(args[i]);
+                  java.io.File to = new java.io.File(args[i] + ".bak");
+                  if (net.i2p.util.FileUtil.copy(from, to, true, false)) {
+                      out = new java.io.FileOutputStream(from);
+                      out.write(meta2.getTorrentData());
+                      out.close();
+                      System.out.println("Modified " + from + " and backed up old file to " + to);
+                      System.out.println(args[i] + "\nInfoHash: " + I2PSnarkUtil.toHex(meta2.getInfoHash()) +
+                                         "\nAnnounce: " + meta2.getAnnounce() +
+                                         "\nCreated By: " + meta2.getCreatedBy());
+                  } else {
+                      System.out.println("Failed backup of " + from + " to " + to);
+                  }
+              }
           } catch (IOException ioe) {
               System.err.println("Error in file " + args[i] + ": " + ioe);
           } finally {
               try { if (in != null) in.close(); } catch (IOException ioe) {}
+              try { if (out != null) out.close(); } catch (IOException ioe) {}
           }
       }
   }
