@@ -120,7 +120,7 @@ public final class ElGamalAESEngine {
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptExistingSession");
                 if (!foundTags.isEmpty() && shouldDebug)
-                    _log.debug("ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
+                    _log.debug("ElG/AES decrypt success with " + st + ": found tags: " + foundTags.size());
                 wasExisting = true;
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
@@ -133,7 +133,7 @@ public final class ElGamalAESEngine {
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptNewSession");
                 if (!foundTags.isEmpty() && shouldDebug)
-                    _log.debug("ElG decrypt success: found tags: " + foundTags);
+                    _log.debug("ElG decrypt success: found tags: " + foundTags.size());
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
                 if (_log.shouldLog(Log.WARN))
@@ -189,15 +189,15 @@ public final class ElGamalAESEngine {
         if (decrypted != null) {
             _context.statManager().updateFrequency("crypto.elGamalAES.decryptExistingSession");
             if (!foundTags.isEmpty() && shouldDebug)
-                _log.debug("ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
+                _log.debug("ElG/AES decrypt success with " + st + ": found tags: " + foundTags.size());
             if (!foundTags.isEmpty()) {
                 if (foundKey.getData() != null) {
                     if (shouldDebug) 
-                        _log.debug("Found key: " + foundKey.toBase64() + " tags: " + foundTags + " in existing session");
+                        _log.debug("Found key: " + foundKey.toBase64() + " in existing session");
                     keyManager.tagsReceived(foundKey, foundTags);
                 } else if (usedKey.getData() != null) {
                     if (shouldDebug) 
-                        _log.debug("Used key: " + usedKey.toBase64() + " tags: " + foundTags + " in existing session");
+                        _log.debug("Used key: " + usedKey.toBase64() + " in existing session");
                     keyManager.tagsReceived(usedKey, foundTags);
                 }
             }
@@ -236,14 +236,14 @@ public final class ElGamalAESEngine {
         }
         if (!foundTags.isEmpty()) {
             if (shouldDebug)
-                _log.debug("ElG decrypt success: found tags: " + foundTags);
+                _log.debug("ElG decrypt success: found tags: " + foundTags.size());
             if (foundKey.getData() != null) {
                 if (shouldDebug) 
-                    _log.debug("Found key: " + foundKey.toBase64() + " tags: " + foundTags + " in new session");
+                    _log.debug("Found key: " + foundKey.toBase64() + " in new session");
                 keyManager.tagsReceived(foundKey, foundTags);
             } else if (usedKey.getData() != null) {
                 if (shouldDebug) 
-                    _log.debug("Used key: " + usedKey.toBase64() + " tags: " + foundTags + " in new session");
+                    _log.debug("Used key: " + usedKey.toBase64() + " in new session");
                 keyManager.tagsReceived(usedKey, foundTags);
             }
         }
