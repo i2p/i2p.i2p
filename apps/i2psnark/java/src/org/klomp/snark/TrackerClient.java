@@ -134,8 +134,8 @@ public class TrackerClient implements Runnable {
   {
     super();
     // Set unique name.
-    String id = urlencode(snark.getID());
-    _threadName = "TrackerClient " + id.substring(id.length() - 12);
+    byte[] hash = snark.getInfoHash();
+    _threadName = "TrackerClient " + I2PSnarkUtil.toHex(hash);
     _util = util;
     _log = util.getContext().logManager().getLog(TrackerClient.class);
     this.meta = meta;
@@ -144,7 +144,7 @@ public class TrackerClient implements Runnable {
     this.snark = snark;
 
     this.port = PORT; //(port == -1) ? 9 : port;
-    this.infoHash = urlencode(snark.getInfoHash());
+    this.infoHash = urlencode(hash);
     this.peerID = urlencode(snark.getID());
     this.trackers = new ArrayList<TCTracker>(2);
     this.backupTrackers = new ArrayList<TCTracker>(2);
