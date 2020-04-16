@@ -26,7 +26,6 @@
 <%@include file="headers.jsi" %>
 <%@page pageEncoding="UTF-8"%>
 <%@ page contentType="text/html"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
 <jsp:useBean id="subs" class="i2p.susi.dns.SubscriptionsBean" scope="session" />
 <jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
