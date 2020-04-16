@@ -814,7 +814,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                            + (connected - startConnect)
                            + "ms - ready to participate in the network!");
             }
-            Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
+            Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getName(), true);
             notifier.start();
             startIdleMonitor();
             startVerifyUsage();
@@ -1475,6 +1475,25 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected String getPrefix() {
         StringBuilder buf = new StringBuilder();
         buf.append('[');
+        getName(buf);
+        buf.append('(').append(_state.toString()).append(')');
+        buf.append("]: ");
+        return buf.toString();
+    }
+
+    /**
+     * @since 0.9.46
+     */
+    protected String getName() {
+        StringBuilder buf = new StringBuilder();
+        getName(buf);
+        return buf.toString();
+    }
+
+    /**
+     * @since 0.9.46
+     */
+    private void getName(StringBuilder buf) {
         String s = _options.getProperty("inbound.nickname");
         if (s != null)
             buf.append(s);
@@ -1483,9 +1502,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SessionId id = _sessionId;
         if (id != null)
             buf.append(" #").append(id.getSessionId());
-        buf.append('(').append(_state.toString()).append(')');
-        buf.append("]: ");
-        return buf.toString();
     }
 
     /**
