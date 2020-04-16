@@ -88,6 +88,9 @@
             <arg value="-webapp" />
             <arg value="./jsp" />
         </java>
+        <replace file="tmp/i2p/susi/dns/jsp/addressbook_jsp.java">
+            <replacefilter token="${user.dir}/apps/susidns/src/" value="" />
+        </replace>
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
                encoding="UTF-8"
