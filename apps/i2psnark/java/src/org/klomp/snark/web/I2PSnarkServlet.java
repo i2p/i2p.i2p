@@ -301,13 +301,15 @@ public class I2PSnarkServlet extends BasicServlet {
         else
             out.write(_contextName);
         out.write(" - ");
-        if (isConfigure)
+        if (isConfigure) {
             out.write(_t("Configuration"));
-        else
-            out.write(_t("Anonymous BitTorrent Client"));
-        String peerParam = req.getParameter("p");
-        if ("2".equals(peerParam))
-            out.write(" | Debug Mode");
+        } else {
+            String peerParam = req.getParameter("p");
+            if ("2".equals(peerParam))
+                out.write("Debug Mode");
+            else
+                out.write(_t("Anonymous BitTorrent Client"));
+        }
         out.write("</title>\n");
 
         // we want it to go to the base URI so we don't refresh with some funky action= value
@@ -1942,10 +1944,10 @@ public class I2PSnarkServlet extends BasicServlet {
                 String client;
                 if ("AwMD".equals(ch))
                     client = _t("I2PSnark");
-                else if ("LUFa".equals(ch))
-                    client = "Vuze" + getAzVersion(pid.getID());
                 else if ("LUJJ".equals(ch))
                     client = "BiglyBT" + getAzVersion(pid.getID());
+                else if ("LUFa".equals(ch))
+                    client = "Vuze" + getAzVersion(pid.getID());
                 else if ("LVhE".equals(ch))
                     client = "XD" + getAzVersion(pid.getID());
                 else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
@@ -1965,8 +1967,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(client + "&nbsp;<tt title=\"");
                 out.write(_t("Destination (identity) of peer"));
                 out.write("\">" + peer.toString().substring(5, 9)+ "</tt>");
-                if (showDebug)
-                    out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
+                if (showDebug) {
+                    long t = peer.getInactiveTime();
+                    if (t >= 5000)
+                        out.write(" inactive " + (t / 1000) + "s");
+                }
                 out.write("</td>\n\t" +
                           "<td class=\"snarkTorrentETA\">" +
                           "</td>\n\t" +
