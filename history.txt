@@ -1,3 +1,10 @@
+2020-04-17 zzz
+ * Crypto: Disable speculative AES tagset usage
+ * Streaming: Slow start fix
+
+2020-04-16 zzz
+ * Build: Reproducible build fix (ticket #2279)
+
 2020-04-14 zzz
  * Ratchet: Improve muxed decrypt
  * Streaming:

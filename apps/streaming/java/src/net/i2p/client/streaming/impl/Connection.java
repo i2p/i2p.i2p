@@ -156,7 +156,7 @@ class Connection {
         _createdOn = _context.clock().now();
         _congestionWindowEnd = _options.getWindowSize()-1;
         _highestAckedThrough = -1;
-        _ssthresh = _options.getMaxWindowSize();
+        _ssthresh = ConnectionPacketHandler.MAX_SLOW_START_WINDOW;
         _lastCongestionTime = -1;
         _lastCongestionHighestUnacked = -1;
         _lastReceivedOn = -1;
@@ -1562,7 +1562,7 @@ class Connection {
 
                         if (_packet.getNumSends() == 1) {
                             int flightSize = getUnackedPacketsSent();
-                            _ssthresh = Math.max( flightSize / 2, 2 );
+                            _ssthresh = Math.min(ConnectionPacketHandler.MAX_SLOW_START_WINDOW, Math.max( flightSize / 2, 2 ));
                         }
 
                         if (_log.shouldLog(Log.INFO))
