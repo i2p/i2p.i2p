@@ -491,13 +491,51 @@ td.infohelp {
      display: inline-block;
 }
 
-.tunnelConfigExpanded {
-    background: url(images/dropdown_active.png) left center no-repeat #f8f8ff !important;
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th{
+    background: url(images/dropdown.png) #f8f8ff;
+    background-repeat: no-repeat !important;
+    background-position: 1%, 15% !important;
+    padding-left: 30px;
 }
 
-table.tunnelConfig th {
-     background: url(images/dropdown.png) left center no-repeat #f8f8ff;
-     padding-left: 18px;
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th:hover {
+    background: url(images/dropdown_hover.png) #f8f8ff;
+    background-repeat: no-repeat !important;
+    background-position: 1%, 15% !important;
+    padding-left: 30px;
+}
+
+table.tunnelConfig th,
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'],
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'] {
+    background: url(images/dropdown.png) #f8f8ff;
+    background-repeat: no-repeat !important;
+    background-position: .5%, 15% !important;
+    padding-left: 30px;
+}
+
+table.tunnelConfig th:hover,
+html body#tunnelEditPage form div.panel table#clientTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover,
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover {
+    background: url(images/dropdown_hover.png) #f8f8ff;
+    background-repeat: no-repeat !important;
+    background-position: .5%, 15% !important;
+    padding-left: 30px;
+}
+
+.tunnelConfigExpanded {
+    background: url(images/dropdown_active.png) #f8f8ff !important;
+    padding-left: 30px;
+}
+
+.tunnelConfigContracted {
+    background: url(images/dropdown.png) #f8f8ff !important;
+    padding-left: 30px;
+}
+
+.excludeBackgroundImage {
+    background-image: none !important;
+    padding-left: 30px;
 }
 
 .tunnelProperties {

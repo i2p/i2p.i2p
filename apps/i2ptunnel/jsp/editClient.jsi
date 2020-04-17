@@ -39,7 +39,7 @@
         <tr>
             <th>
                 <%=intl._t("Name")%>
-            </th><th>
+            </th><th class="excludeBackgroundImage">
                 <%=intl._t("Type")%>
             </th>
         </tr><tr>
@@ -51,7 +51,7 @@
         </tr><tr>
             <th>
                 <%=intl._t("Description")%>
-            </th><th>
+            </th><th class="excludeBackgroundImage">
                 <%=intl._t("Auto Start Tunnel")%>
             </th>
         </tr><tr>

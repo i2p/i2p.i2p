@@ -38,7 +38,7 @@
         <tr>
             <th>
                 <%=intl._t("Name")%>
-            </th><th>
+            </th><th class="excludeBackgroundImage">
                 <%=intl._t("Type")%>
             </th>
         </tr><tr>
@@ -50,7 +50,7 @@
         </tr><tr>
             <th>
                 <%=intl._t("Description")%>
-            </th><th>
+            </th><th class="excludeBackgroundImage">
                 <%=intl._t("Auto Start Tunnel")%>
             </th>
         </tr><tr>
@@ -138,7 +138,7 @@
             <th>
                 <%=intl._t("Website Hostname")%>
             </th>
-            <th></th>
+            <th class="excludeBackgroundImage"></th>
         </tr><tr>
             <td colspan="2">
                 <input type="text" size="20" id="websiteName" name="spoofedHost" title="<%=intl._t("Website Hostname e.g. mysite.i2p")%>" value="<%=editBean.getSpoofedHost(curTunnel)%>" class="freetext" />
@@ -150,7 +150,7 @@
         <tr>
             <th>
                 <%=intl._t("Local destination")%>
-            </th><th>
+            </th><th class="excludeBackgroundImage">
                 <%=intl._t("Private key file")%>
             </th>
         </tr><tr>
