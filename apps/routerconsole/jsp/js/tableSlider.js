@@ -3,7 +3,11 @@ var hideableTables = document.querySelectorAll("table.tunnelConfig th");
 hideableTables.forEach(function(configTable) {
     configTable.onclick = function() {
         function lookupTableRow() {
-            for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
+            for (
+                var i = 0, row;
+                (row = configTable.offsetParent.rows[i]);
+                i++
+            ) {
                 if (configTable.parentNode == row) {
                     return i;
                 }
@@ -29,7 +33,9 @@ hideableTables.forEach(function(configTable) {
                         ) {
                             row.style.visibility = "collapse";
                             collapseme = true;
-                            configTable.classList.remove("tunnelConfigExpanded");
+                            configTable.classList.remove(
+                                "tunnelConfigExpanded"
+                            );
                         }
                     }
                 } else {
