@@ -155,6 +155,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     public static final int DEFAULT_TAGS = 40;
     /** ditto */
     public static final int LOW_THRESHOLD = 30;
+    private static final boolean USE_UNACKED_TAGS = false;
 
     /**
      * The session key manager should only be constructed and accessed through the 
@@ -1133,7 +1134,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         public void addTags(TagSet set) {
             _lastUsed = _context.clock().now();
             synchronized (_tagSets) {
-                if (_acked)
+                if (USE_UNACKED_TAGS && _acked)
                     _tagSets.add(set);
                 else
                     _unackedTagSets.add(set);
