@@ -72,5 +72,6 @@ if (__invalid) {
     }  // isInitialized()
 }
 %>
+<script src="/js/tableSlider.js" type="text/javascript"></script>
 </body>
 </html>

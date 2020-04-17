@@ -237,13 +237,12 @@
 
     <h3><%=intl._t("Advanced networking options")%></h3>
 
-    <table id="#advancedServerTunnelOptions" class="tunnelConfig">
+    <table class="tunnelConfig" id="lengthOption">
         <tr>
-            <th colspan="2">
-                <%=intl._t("Tunnel Options")%>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Length Options")%>
             </th>
         </tr>
-
 <%     if (editBean.isAdvanced()) {
       %><tr>
             <th colspan="2">
@@ -289,41 +288,8 @@
 <%                 }
               %></select>
             </td>
-        </tr><tr>
-            <td>
-                <b><%=intl._t("Count")%></b>
-            </td><td>
-                <b><%=intl._t("Backup Count")%></b>
-            </td>
-        </tr><tr>
-            <td>
-                <select id="tunnelQuantity" name="tunnelQuantity" title="<%=intl._t("Number of Tunnels in Group")%>" class="selectbox">
-                    <%=editBean.getQuantityOptions(curTunnel, editBean.isAdvanced() ? 1 : 0)%>
-                </select>
-            </td><td>
-                <select id="tunnelBackupQuantity" name="tunnelBackupQuantity" title="<%=intl._t("Number of Reserve Tunnels")%>" class="selectbox">
-<%                 int tunnelBackupQuantity = editBean.getTunnelBackupQuantity(curTunnel, 0);
-                   if (editBean.isAdvanced()) {
-                       // TODO ngettext
-                  %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>>0 <%=intl._t("backup tunnels")%></option>
-                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>>1 <%=intl._t("backup tunnels")%></option>
-                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>>2 <%=intl._t("backup tunnels")%></option>
-                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>>3 <%=intl._t("backup tunnels")%></option>
-<%
-                   } else {
-                  %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 backup tunnels (0 redundancy, no added resource usage)")%></option>
-                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 backup tunnel each direction (low redundancy, low resource usage)")%></option>
-                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>><%=intl._t("2 backup tunnels each direction (medium redundancy, medium resource usage)")%></option>
-                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>><%=intl._t("3 backup tunnels each direction (high redundancy, high resource usage)")%></option>
-<%                 } // isAdvanced()
-                   if (tunnelBackupQuantity > 3) {
-                %>    <option value="<%=tunnelBackupQuantity%>" selected="selected"><%=tunnelBackupQuantity%> <%=intl._t("backup tunnels")%></option>
-<%                 }
-              %></select>
-            </td>
         </tr>
-
-<%     if (editBean.isAdvanced()) {
+        <%     if (editBean.isAdvanced()) {
        // repeat four options above for outbound
       %><tr>
             <th colspan="2">
@@ -361,6 +327,56 @@
 <%                 }
               %></select>
             </td>
+        </tr>
+    </table>
+    <table class="tunnelConfig" id="quantityOptions">
+        <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Quantity Options")%>
+            </th>
+        </tr>
+        <tr>
+            <th colspan="2">
+                <%=intl._t("Inbound")%>
+            </th>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("Count")%></b>
+            </td><td>
+                <b><%=intl._t("Backup Count")%></b>
+            </td>
+        </tr><tr>
+            <td>
+                <select id="tunnelQuantity" name="tunnelQuantity" title="<%=intl._t("Number of Tunnels in Group")%>" class="selectbox">
+                    <%=editBean.getQuantityOptions(curTunnel, editBean.isAdvanced() ? 1 : 0)%>
+                </select>
+            </td><td>
+                <select id="tunnelBackupQuantity" name="tunnelBackupQuantity" title="<%=intl._t("Number of Reserve Tunnels")%>" class="selectbox">
+<%                 int tunnelBackupQuantity = editBean.getTunnelBackupQuantity(curTunnel, 0);
+                   if (editBean.isAdvanced()) {
+                       // TODO ngettext
+                  %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>>0 <%=intl._t("backup tunnels")%></option>
+                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>>1 <%=intl._t("backup tunnels")%></option>
+                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>>2 <%=intl._t("backup tunnels")%></option>
+                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>>3 <%=intl._t("backup tunnels")%></option>
+<%
+                   } else {
+                  %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 backup tunnels (0 redundancy, no added resource usage)")%></option>
+                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 backup tunnel each direction (low redundancy, low resource usage)")%></option>
+                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>><%=intl._t("2 backup tunnels each direction (medium redundancy, medium resource usage)")%></option>
+                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>><%=intl._t("3 backup tunnels each direction (high redundancy, high resource usage)")%></option>
+<%                 } // isAdvanced()
+                   if (tunnelBackupQuantity > 3) {
+                %>    <option value="<%=tunnelBackupQuantity%>" selected="selected"><%=tunnelBackupQuantity%> <%=intl._t("backup tunnels")%></option>
+<%                 }
+              %></select>
+            </td>
+        </tr>
+
+        <tr>
+            <th colspan="2">
+                <%=intl._t("Outbound")%>
+            </th>
         </tr><tr>
             <td>
                 <b><%=intl._t("Count")%></b>
@@ -388,47 +404,18 @@
         </tr>
 <%
       }  // isAdvanced() End outbound config section
-
-            if (!"streamrserver".equals(tunnelType)) {
 %>
-        <tr>
-            <th colspan="2">
-                <%=intl._t("Profile")%>
-            </th>
-        </tr><tr>
-            <td colspan="2">
-                <select id="profile" name="profile" title="<%=intl._t("Connection Profile")%>" class="selectbox">
-                    <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
-                  %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._t("interactive connection")%> </option>
-                    <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._t("bulk connection (downloads/websites/BT)")%> </option>
-                </select>
-            </td>
-        </tr>
 <%
-            } /* !streamrserver */
-
-            if (!editBean.isRouterContext()) {
-%>
-        <tr>
-            <th colspan="2">
-                <%=intl._t("Router I2CP Address")%>
-            </th>
-        </tr><tr>
-            <td>
-                <b><%=intl._t("Host")%>:</b>
-                <input type="text" id="clientHost" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" />
-            </td><td>
-                <b><%=intl._t("Port")%>:</b>
-                <input type="text" id="clientPort" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />
-            </td>
-        </tr>
-<%
-            } // !isRouterContext
-
             // TODO, encrypted + offline is unimplemented
             if (!editBean.getIsOfflineKeys(curTunnel)) {
 %>
+    </table>
+    <table class="tunnelConfig" id="cryptoOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Cryptography Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("Encrypt Leaseset")%>
             </th>
@@ -577,184 +564,6 @@
                 } // allowBlinding
             } // !isOffline
 %>
-        <tr>
-            <th colspan="2">
-                <%=intl._t("Restricted Access List")%>
-            </th>
-        </tr><tr>
-            <td colspan="2">
-                <span class="multiOption"><label title="<%=intl._t("Allow all clients to connect to this service")%>"><input value="0" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Disable")%></label></span>
-                <span class="multiOption"><label title="<%=intl._t("Prevent listed clients from connecting to this service")%>"><input value="2" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blacklist")%></label></span>
-                <span class="multiOption"><label title="<%=intl._t("Only allow listed clients to connect to this service")%>"><input value="1" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Whitelist")%></label></span>
-            </td>
-        </tr><tr>
-            <td colspan="2">
-                <b><%=intl._t("Access List Description")%></b> (<%=intl._t("Specify clients, 1 per line")%>)
-            </td>
-        </tr><tr>
-            <td colspan="2">
-                <textarea rows="2" style="height: 8em;" cols="60" name="accessList" title="<%=intl._t("Control access to this service")%>" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>
-            </td>
-        </tr><tr>
-            <td colspan="2">
-                <b><%=intl._t("Filter Definition File")%></b>
-            </td>
-        </tr><tr>
-            <td colspan="2">
-                <%=intl._t("You can define an advanced filter for this tunnel.")%> (<a href="http://i2p-projekt.i2p/spec/filter-format" target="_blank"><%=intl._t("Format Specification")%></a>)  
-            </td>
-        </tr><tr>
-            <td colspan="2">
-                <label for="filterDefinition"><%=intl._t("Absolute path to file containing filter definition")%></label>
-                <input type="text" id="filterDefinition" name="filterDefinition" value="<%=editBean.getFilterDefinition(curTunnel)%>" size="80"/>
-            </td>
-        </tr><tr>
-            <th colspan="2">
-                <%=intl._t("Server Access Options")%>
-            </th>
-        </tr>
-<%
-               if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
-%>
-        <tr>
-            <td>
-                <label title="<%=intl._t("Prevent clients from accessing this service via an inproxy")%>"><input value="1" type="checkbox" name="rejectInproxy"<%=(editBean.isRejectInproxy(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Block Access via Inproxies")%></label>
-            </td><td>
-                <label><input value="1" type="checkbox" name="rejectReferer"<%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Block Accesses containing Referers")%></label>
-            </td>
-        </tr><tr>
-            <td>
-                <label title="<%=intl._t("Deny User-Agents matching these strings (probably from inproxies)")%>"><input value="1" type="checkbox" name="rejectUserAgents"<%=(editBean.isRejectUserAgents(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Block these User-Agents")%></label>
-            </td><td>
-                <input type="text" id="userAgents" name="userAgents" size="20" title="<%=intl._t("comma separated, e.g. Mozilla,Opera (case-sensitive)")%>" value="<%=editBean.getUserAgents(curTunnel)%>" class="freetext" />
-            </td>
-        </tr>
-<%             } // httpserver
-%>
-        <tr>
-            <td>
-                <label title="<%=intl._t("Use unique IP addresses for each connecting client (local non-SSL servers only)")%>"><input value="1" type="checkbox" name="uniqueLocal"<%=(editBean.getUniqueLocal(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Unique Local Address per Client")%></label>
-            </td><td>
-                <label title="<%=intl._t("Only enable if you are hosting this service on multiple routers")%>"><input value="1" type="checkbox" name="multihome"<%=(editBean.getMultihome(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Optimize for Multihoming")%></label>
-            </td>
-        </tr><tr>
-            <th colspan="2">
-                <%=intl._t("Server Throttling")%>
-            </th>
-        </tr><tr>
-            <td id="throttle" colspan="4">
-                <table id="throttler">
-                    <tr>
-                        <th colspan="5">
-                            <%=intl._t("Inbound connection limits (0=unlimited)")%>
-                        </th>
-                    </tr><tr>
-                        <td></td>
-                        <td><b><%=intl._t("Per Minute")%></b></td>
-                        <td><b><%=intl._t("Per Hour")%></b></td>
-                        <td><b><%=intl._t("Per Day")%></b></td>
-                        <td class="blankColumn"></td>
-                    </tr><tr>
-                        <td><b><%=intl._t("Per Client")%></b></td>
-                        <td>
-                            <input type="text" name="limitMinute" title="<%=intl._t("Maximum number of web page requests per minute for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitMinute(curTunnel)%>" class="freetext" />
-                        </td><td>
-                            <input type="text" name="limitHour" title="<%=intl._t("Maximum number of web page requests per hour for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitHour(curTunnel)%>" class="freetext" />
-                        </td><td>
-                            <input type="text" name="limitDay" title="<%=intl._t("Maximum number of web page requests per day for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitDay(curTunnel)%>" class="freetext" />
-                        </td><td class="blankColumn"></td>
-                    </tr><tr>
-                        <td><b><%=intl._t("Total")%></b></td>
-                        <td>
-                            <input type="text" name="totalMinute" title="<%=intl._t("Total number of web page requests per minute before access to the server is blocked")%>" value="<%=editBean.getTotalMinute(curTunnel)%>" class="freetext" />
-                        </td><td>
-                            <input type="text" name="totalHour" title="<%=intl._t("Total number of web page requests per hour before access to the server is blocked")%>" value="<%=editBean.getTotalHour(curTunnel)%>" class="freetext" />
-                        </td><td>
-                            <input type="text" name="totalDay" title="<%=intl._t("Total number of web page requests per day before access to the server is blocked")%>" value="<%=editBean.getTotalDay(curTunnel)%>" class="freetext" />
-                        </td><td class="blankColumn"></td>
-                    </tr><tr>
-                        <th colspan="5"><%=intl._t("Max concurrent connections (0=unlimited)")%></th>
-                    </tr><tr>
-                        <td></td><td>
-                            <input type="text" name="maxStreams" title="<%=intl._t("Maximum number of simultaneous client connections")%>" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />
-                        </td><td></td><td></td><td class="blankColumn"></td>
-                    </tr>
-<%
-               if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
-%>
-                    <tr>
-                        <th colspan="5">
-                            <%=intl._t("POST limits (0=unlimited)")%>
-                        </th>
-                    </tr><tr>
-                        <td></td><td>
-                            <b><%=intl._t("Per Period")%></b>
-                        </td><td>
-                            <b><%=intl._t("Ban Duration")%></b>
-                        </td><td></td><td class="blankColumn"></td>
-                    </tr><tr>
-                        <td>
-                            <b><%=intl._t("Per Client")%>
-                            </b>
-                        </td><td>
-                            <input type="text" name="postMax" title="<%=intl._t("Maximum number of post requests permitted for a unique client for the configured timespan")%>" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext quantity"/>
-                        </td><td colspan="2">
-                            <input type="text" name="postBanTime" title="<%=intl._t("If a client exceeds the maximum number of post requests per allocated period, enforce a ban for this number of minutes")%>" value="<%=editBean.getPostBanTime(curTunnel)%>" class="freetext period"/>
-                            <%=intl._t("minutes")%>
-                        </td><td class="blankColumn"></td>
-                    </tr><tr>
-                        <td>
-                            <b><%=intl._t("Total")%>
-                            </b>
-                        </td><td>
-                            <input type="text" name="postTotalMax" title="<%=intl._t("Total number of post requests permitted for the configured timespan")%>" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext quantity"/>
-                        </td><td colspan="2">
-                            <input type="text" name="postTotalBanTime" title="<%=intl._t("If the maximum number of post requests per allocated period is exceeded, enforce a global access ban for this number of minutes")%>" value="<%=editBean.getPostTotalBanTime(curTunnel)%>" class="freetext period"/>
-                            <%=intl._t("minutes")%>
-                        </td><td class="blankColumn"></td>
-                    </tr><tr>
-                        <td>
-                            <b><%=intl._t("POST limit period")%>
-                            </b>
-                        </td><td colspan="2">
-                            <input type="text" name="postCheckTime" title="<%=intl._t("Timespan for the maximum number of post requests to be reached before a ban is triggered")%>" value="<%=editBean.getPostCheckTime(curTunnel)%>" class="freetext period"/>
-                            <%=intl._t("minutes")%>
-                        </td><td></td><td class="blankColumn"></td>
-                    </tr>
-<%             } // httpserver
-%>
-
-                </table>
-            </td>
-        </tr><tr>
-            <th colspan="2">
-                <%=intl._t("Reduce tunnel quantity when idle")%>
-            </th>
-        </tr><tr>
-            <td colspan="2">
-                <label><input value="1" type="checkbox" id="startOnLoad" name="reduce" <%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Reduce tunnel quantity when idle to conserve resources")%></label>
-            </td>
-        </tr><tr>
-            <td>
-                <b><%=intl._t("Reduced tunnel count")%>:</b>
-                <input type="text" id="reduceCount" name="reduceCount" size="1" maxlength="1" title="<%=intl._t("Number of tunnels to keep open to maintain availability of service")%>" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext quantity" />
-            </td>
-
-            <td>
-                <b><%=intl._t("Idle period")%>:</b>
-                <input type="text" id="reduceTime" name="reduceTime" size="4" maxlength="4" title="<%=intl._t("Period of inactivity before tunnel number is reduced")%>" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext period" />
-                <%=intl._t("minutes")%>
-            </td>
-        </tr>
 <% /***************** %>
         <tr>
             <th colspan="2">
@@ -925,6 +734,239 @@
               }  // ab64
            } // currentSigType
 %>
+    </table>
+    <table class="tunnelConfig" id="accessOptions">
+        <tr>
+            <th colspan="8" class="tableTop">
+                <%=intl._t("Tunnel Access Control Options")%>
+            </th>
+        </tr><tr>
+            <th colspan="8">
+                <%=intl._t("Restricted Access List")%>
+            </th>
+        </tr><tr>
+            <td colspan="8">
+                <span class="multiOption"><label title="<%=intl._t("Allow all clients to connect to this service")%>"><input value="0" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Disable")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Prevent listed clients from connecting to this service")%>"><input value="2" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blacklist")%></label></span>
+                <span class="multiOption"><label title="<%=intl._t("Only allow listed clients to connect to this service")%>"><input value="1" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Whitelist")%></label></span>
+            </td>
+        </tr><tr>
+            <td colspan="8">
+                <b><%=intl._t("Access List Description")%></b> (<%=intl._t("Specify clients, 1 per line")%>)
+            </td>
+        </tr><tr>
+            <td colspan="8">
+                <textarea rows="2" style="height: 8em;" cols="60" name="accessList" title="<%=intl._t("Control access to this service")%>" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>
+            </td>
+        </tr><tr>
+            <td colspan="8">
+                <b><%=intl._t("Filter Definition File")%></b>
+            </td>
+        </tr><tr>
+            <td colspan="8">
+                <%=intl._t("You can define an advanced filter for this tunnel.")%> (<a href="http://i2p-projekt.i2p/spec/filter-format" target="_blank"><%=intl._t("Format Specification")%></a>)  
+            </td>
+        </tr><tr>
+            <td colspan="8">
+                <label for="filterDefinition"><%=intl._t("Absolute path to file containing filter definition")%></label>
+                <input type="text" id="filterDefinition" name="filterDefinition" value="<%=editBean.getFilterDefinition(curTunnel)%>" size="80"/>
+            </td>
+        </tr><tr>
+            <th colspan="8">
+                <%=intl._t("Server Access Options")%>
+            </th>
+        </tr>
+        <%
+               if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+%>
+        <tr>
+            <td>
+                <label title="<%=intl._t("Prevent clients from accessing this service via an inproxy")%>"><input value="1" type="checkbox" name="rejectInproxy"<%=(editBean.isRejectInproxy(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Block Access via Inproxies")%></label>
+            </td><td colspan="7">
+                <label><input value="1" type="checkbox" name="rejectReferer"<%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Block Accesses containing Referers")%></label>
+            </td>
+        </tr><tr>
+            <td>
+                <label title="<%=intl._t("Deny User-Agents matching these strings (probably from inproxies)")%>"><input value="1" type="checkbox" name="rejectUserAgents"<%=(editBean.isRejectUserAgents(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Block these User-Agents")%></label>
+            </td><td colspan="7">
+                <input type="text" id="userAgents" name="userAgents" size="20" title="<%=intl._t("comma separated, e.g. Mozilla,Opera (case-sensitive)")%>" value="<%=editBean.getUserAgents(curTunnel)%>" class="freetext" />
+            </td>
+        </tr>
+<%             } // httpserver
+%>
+        <tr>
+            <td>
+                <label title="<%=intl._t("Use unique IP addresses for each connecting client (local non-SSL servers only)")%>"><input value="1" type="checkbox" name="uniqueLocal"<%=(editBean.getUniqueLocal(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Unique Local Address per Client")%></label>
+            </td><td colspan="7">
+                <label title="<%=intl._t("Only enable if you are hosting this service on multiple routers")%>"><input value="1" type="checkbox" name="multihome"<%=(editBean.getMultihome(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Optimize for Multihoming")%></label>
+            </td>
+        </tr>
+    </table>
+    <table class="tunnelConfig" id="performanceOptions">
+        <tr>
+            <th colspan="5" class="tableTop">
+            <%=intl._t("Tunnel Performance Options")%>
+            </th>
+        </tr>
+<%
+            if (!"streamrserver".equals(tunnelType)) {
+%>
+        <tr>
+            <th colspan="5">
+                <%=intl._t("Profile")%>
+            </th>
+        </tr><tr>
+            <td colspan="5">
+                <select id="profile" name="profile" title="<%=intl._t("Connection Profile")%>" class="selectbox">
+                    <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
+                  %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._t("interactive connection")%> </option>
+                    <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._t("bulk connection (downloads/websites/BT)")%> </option>
+                </select>
+            </td>
+        </tr>
+<%
+            } /* !streamrserver */
+%>
+        <tr>
+            <th colspan="5">
+                <%=intl._t("Reduce tunnel quantity when idle")%>
+            </th>
+        </tr><tr>
+            <td colspan="5">
+                <label><input value="1" type="checkbox" id="startOnLoad" name="reduce" <%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Reduce tunnel quantity when idle to conserve resources")%></label>
+            </td>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("Reduced tunnel count")%>:</b>
+                <input type="text" id="reduceCount" name="reduceCount" size="1" maxlength="1" title="<%=intl._t("Number of tunnels to keep open to maintain availability of service")%>" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext quantity" />
+            </td>
+
+            <td colspan="4">
+                <b><%=intl._t("Idle period")%>:</b>
+                <input type="text" id="reduceTime" name="reduceTime" size="4" maxlength="4" title="<%=intl._t("Period of inactivity before tunnel number is reduced")%>" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext period" />
+                <%=intl._t("minutes")%>
+            </td>
+        </tr>
+<%
+               if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+%>
+        <tr>
+            <th colspan="8">
+                <%=intl._t("Server Throttling")%>
+            </th>
+        </tr><tr>
+            <td id="throttle" colspan="8">
+                <table id="throttler">
+                    <tr>
+                        <th colspan="5">
+                            <%=intl._t("Inbound connection limits (0=unlimited)")%>
+                        </th>
+                    </tr><tr>
+                        <td></td>
+                        <td><b><%=intl._t("Per Minute")%></b></td>
+                        <td><b><%=intl._t("Per Hour")%></b></td>
+                        <td><b><%=intl._t("Per Day")%></b></td>
+                        <td class="blankColumn"></td>
+                    </tr><tr>
+                        <td><b><%=intl._t("Per Client")%></b></td>
+                        <td>
+                            <input type="text" name="limitMinute" title="<%=intl._t("Maximum number of web page requests per minute for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitMinute(curTunnel)%>" class="freetext" />
+                        </td><td>
+                            <input type="text" name="limitHour" title="<%=intl._t("Maximum number of web page requests per hour for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitHour(curTunnel)%>" class="freetext" />
+                        </td><td>
+                            <input type="text" name="limitDay" title="<%=intl._t("Maximum number of web page requests per day for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitDay(curTunnel)%>" class="freetext" />
+                        </td><td class="blankColumn"></td>
+                    </tr><tr>
+                        <td><b><%=intl._t("Total")%></b></td>
+                        <td>
+                            <input type="text" name="totalMinute" title="<%=intl._t("Total number of web page requests per minute before access to the server is blocked")%>" value="<%=editBean.getTotalMinute(curTunnel)%>" class="freetext" />
+                        </td><td>
+                            <input type="text" name="totalHour" title="<%=intl._t("Total number of web page requests per hour before access to the server is blocked")%>" value="<%=editBean.getTotalHour(curTunnel)%>" class="freetext" />
+                        </td><td>
+                            <input type="text" name="totalDay" title="<%=intl._t("Total number of web page requests per day before access to the server is blocked")%>" value="<%=editBean.getTotalDay(curTunnel)%>" class="freetext" />
+                        </td><td class="blankColumn"></td>
+                    </tr><tr>
+                        <th colspan="5"><%=intl._t("Max concurrent connections (0=unlimited)")%></th>
+                    </tr><tr>
+                        <td></td><td>
+                            <input type="text" name="maxStreams" title="<%=intl._t("Maximum number of simultaneous client connections")%>" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />
+                        </td><td></td><td></td><td class="blankColumn"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr><tr>
+            <th colspan="5">
+                <%=intl._t("POST limits (0=unlimited)")%>
+            </th>
+        </tr><tr>
+            <td></td><td>
+                <b><%=intl._t("Per Period")%></b>
+            </td><td>
+                <b><%=intl._t("Ban Duration")%></b>
+            </td><td></td><td class="blankColumn"></td>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("Per Client")%>
+                </b>
+            </td><td>
+                <input type="text" name="postMax" title="<%=intl._t("Maximum number of post requests permitted for a unique client for the configured timespan")%>" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext quantity"/>
+            </td><td colspan="2">
+                <input type="text" name="postBanTime" title="<%=intl._t("If a client exceeds the maximum number of post requests per allocated period, enforce a ban for this number of minutes")%>" value="<%=editBean.getPostBanTime(curTunnel)%>" class="freetext period"/>
+                <%=intl._t("minutes")%>
+            </td><td class="blankColumn"></td>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("Total")%>
+                </b>
+            </td><td>
+                <input type="text" name="postTotalMax" title="<%=intl._t("Total number of post requests permitted for the configured timespan")%>" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext quantity"/>
+            </td><td colspan="2">
+                <input type="text" name="postTotalBanTime" title="<%=intl._t("If the maximum number of post requests per allocated period is exceeded, enforce a global access ban for this number of minutes")%>" value="<%=editBean.getPostTotalBanTime(curTunnel)%>" class="freetext period"/>
+                <%=intl._t("minutes")%>
+            </td><td class="blankColumn"></td>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("POST limit period")%>
+                </b>
+            </td><td colspan="2">
+                <input type="text" name="postCheckTime" title="<%=intl._t("Timespan for the maximum number of post requests to be reached before a ban is triggered")%>" value="<%=editBean.getPostCheckTime(curTunnel)%>" class="freetext period"/>
+                <%=intl._t("minutes")%>
+            </td><td></td><td class="blankColumn"></td>
+        </tr>
+<%             } // httpserver
+%>
+<%
+            if (!editBean.isRouterContext()) {
+%>
+    </table>
+    <table class="tunnelConfig">
+        <tr>
+            <th colspan="2">
+                <%=intl._t("Router I2CP Address")%>
+            </th>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("Host")%>:</b>
+                <input type="text" id="clientHost" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" />
+            </td><td>
+                <b><%=intl._t("Port")%>:</b>
+                <input type="text" id="clientPort" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />
+            </td>
+        </tr>
+<%
+            } // !isRouterContext
+%>
+    </table>
+    <table class="tunnelConfig" id="customOptions">
         <tr>
             <th colspan="2">
                 <%=intl._t("Custom options")%>
@@ -941,4 +983,4 @@
                     <button id="controlSave" class="control" type="submit" name="action" value="Save changes"><%=intl._t("Save")%></button>
             </td>
         </tr>
-</table>
+    </table>

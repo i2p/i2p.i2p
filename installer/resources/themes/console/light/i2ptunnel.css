@@ -413,9 +413,17 @@ h2, h3 {
      background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fff;
 }
 
+.panel .tunnelConfig {
+    margin-top: 15px;
+}
+
+th.tableTop {
+    font-size: 115%;
+}
+
 th {
-     background: #eef url(images/header.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) !important;
+     /*background: #eef url(images/header.png) center center repeat-x;*/
+     background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%);
      padding: 6px 5px;
      text-align: left;
      border-top: 1px solid #7778bf;
@@ -481,6 +489,15 @@ td.infohelp {
      margin: 2px 0 2px 5px;
      min-width: 30px;
      display: inline-block;
+}
+
+.tunnelConfigExpanded {
+    background: url(images/dropdown_active.png) left center no-repeat #f8f8ff !important;
+}
+
+table.tunnelConfig th {
+     background: url(images/dropdown.png) left center no-repeat #f8f8ff;
+     padding-left: 18px;
 }
 
 .tunnelProperties {
@@ -894,8 +911,12 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
 
 /* more space */
 
-.freetext, .tunnelConfig textarea, #customOptions, #userAgents, #hostField  {
+.freetext, .tunnelConfig textarea, #userAgents, #hostField  {
      margin: 5px !important;
+}
+
+#customOptions {
+    margin-top: 15px !important;
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
@@ -919,7 +940,7 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
      height: 30px !important;
 }
 
-#customOptions, #userAgents, #leasesetKey {
+#userAgents, #leasesetKey {
      width: calc(100% - 20px) !important;
 }
 

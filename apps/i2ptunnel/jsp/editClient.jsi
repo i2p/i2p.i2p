@@ -251,8 +251,8 @@
     </table>
     <table class="tunnelConfig" id="lengthOption">
         <tr>
-            <th colspan="2">
-                <%=intl._t("Tunnel Options")%>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Length Options")%>
             </th>
         </tr><tr>
             <td>
@@ -297,6 +297,10 @@
     </table>
     <table class="tunnelConfig" id="quantityOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Quantity Options")%>
+            </th>
+        </tr><tr>
             <td>
                 <b><%=intl._t("Count")%></b>
             </td><td>
@@ -325,6 +329,11 @@
         </tr>
     </table>
     <table class="tunnelConfig" id="timedOptions">
+        <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Time-Management Options")%>
+            </th>
+        </tr>
 <%
             if ("client".equals(tunnelType)) {
 %>
@@ -348,27 +357,8 @@
         </tr>
 <%
             } // client
-
-            if (!editBean.isRouterContext()) {
 %>
-    </table>
-    <table class="tunnelConfig">
-        <tr>
-            <th colspan="2">
-                <%=intl._t("Router I2CP Address")%>
-            </th>
-        </tr><tr>
-            <td>
-                <b><%=intl._t("Host")%>:</b>
-                <input type="text" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext host" />
-            </td><td>
-                <b><%=intl._t("Port")%>:</b>
-                <input type="text" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext port" />
-            </td>
-        </tr>
 <%
-            } // !isRouterContext
-
             if (!"streamrclient".equals(tunnelType)) {
                 // streamr client sends pings so it will never be idle
 %>
@@ -472,8 +462,13 @@
 
             if ("httpclient".equals(tunnelType)) {
 %>
+    </table>
     <table class="tunnelConfig" id="filterOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Filtering Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("HTTP Filtering")%>
             </th>
@@ -494,15 +489,19 @@
                 <%=intl._t("Allow SSL to I2P addresses")%></label>
             </td>
         </tr>
-    </table>
-    <table class="tunnelConfig" id="cryptoOptions">
 <%
             } // if httpclient
 
             int currentSigType = editBean.getSigType(curTunnel, tunnelType);
             String disabled = editBean.canChangeSigType(curTunnel) ? "" : " disabled=\"disabled\" ";
 %>
+    </table>
+    <table class="tunnelConfig" id="cryptoOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Cryptography Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("Signature type")%>
             </th>
@@ -567,8 +566,13 @@
 <%
             if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
 %>
+    </table>
     <table class="tunnelConfig" id="authOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Authentication Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("Local Authorization")%>
             </th>
@@ -606,14 +610,18 @@
                 <input type="password" name="nofilter_outproxyPassword" title="<%=intl._t("Enter password required by outproxy")%>" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext password" />
             </td>
         </tr>
-    </table>
 <%
             } // httpclient || connect || socks || socksirc
 
             if ("httpclient".equals(tunnelType)) {
 %>
+    </table>
     <table class="tunnelConfig" id="jumpOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Address-Service Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("Jump URL List")%>
             </th>
@@ -622,13 +630,34 @@
                 <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="<%=intl._t("List of helper URLs providing jump links when a host is not found in your addressbook")%>" wrap="off" spellcheck="false"><%=editBean.getJumpList(curTunnel)%></textarea>
             </td>
         </tr>
-    </table>
 <%
             } // httpclient
 %>
+    </table>
+<%
+            if (!editBean.isRouterContext()) {
+%>
+    <table class="tunnelConfig">
+        <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Router I2CP Address")%>
+            </th>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("Host")%>:</b>
+                <input type="text" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext host" />
+            </td><td>
+                <b><%=intl._t("Port")%>:</b>
+                <input type="text" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext port" />
+            </td>
+        </tr>
+    </table>
+<%
+            } // !isRouterContext
+%>
     <table class="tunnelConfig" id="advancedOptions">
         <tr>
-            <th colspan="2">
+            <th colspan="2" class="tableTop">
                 <%=intl._t("Custom options")%>
             </th>
         </tr><tr>
