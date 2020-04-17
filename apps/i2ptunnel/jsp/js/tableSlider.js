@@ -1,3 +1,5 @@
+function initTables() {
+
 var hideableTables = document.querySelectorAll("table.tunnelConfig th");
 
 hideableTables.forEach(function(configTable) {
@@ -57,3 +59,9 @@ hideableTables.forEach(function(configTable) {
         row.style.visibility = "visible";
     }
 });
+
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    initTables();
+}, true);

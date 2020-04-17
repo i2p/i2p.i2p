@@ -46,7 +46,8 @@ if (tun != null) {
 <style type='text/css'>
 input.default { width: 1px; height: 1px; visibility: hidden; }
 </style>
-<script src="/js/resetScroll.js" type="text/javascript"></script>
+<script src="/js/resetScroll.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<script src="js/tableSlider.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head>
 <body id="tunnelEditPage">
 <%
@@ -72,6 +73,5 @@ if (__invalid) {
     }  // isInitialized()
 }
 %>
-<script src="/js/tableSlider.js" type="text/javascript"></script>
 </body>
 </html>
