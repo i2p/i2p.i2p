@@ -4968,8 +4968,8 @@ ul#banlist + hr {
 }
 
 #ipv4, #ipv6, #permabanned tr:nth-child(2) {
-     background: #000 url(images/header.png) center center repeat-x;
-     background: linear-gradient(to bottom, #002000, #000 75%) !important;
+     background: #1f1a24 url(images/header.png) center center repeat-x;
+     background: linear-gradient(to bottom, #1f1a24, #000 75%) !important;
      border-top: 1px solid #524b5e;
      border-bottom: 1px solid #524b5e;
 }

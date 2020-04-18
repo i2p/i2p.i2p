@@ -19,13 +19,28 @@ body.iframed {
      overflow: hidden;
 }
 
+input::selection {
+     background: #433e47 !important;
+}
+
+input::-moz-selection {
+     background: #433e47 !important;
+}
+
+.displayText::selection {
+     background: #433e47 !important;
+}
+
+.displayText::-moz-selection {
+     background: #433e47 !important;
+}
+
+
 ::selection {
-     /*background: #030 !important;*/
      color: white;
 }
 
 ::-moz-selection {
-     /*background: #030 !important;*/
      color: white;
 }
 
@@ -304,13 +319,51 @@ td.infohelp {
      border-right: 1px solid #433e47;
 }
 
-.tunnelConfigExpanded {
-    background: url(images/dropdown_active.png) left center no-repeat #1f1a24 !important;
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th{
+    background: url(images/dropdown.png) #433e47;
+    background-repeat: no-repeat !important;
+    background-position: 1%, 15% !important;
+    padding-left: 30px;
 }
 
-table.tunnelConfig th {
-     background: url(images/dropdown.png) left center no-repeat #1f1a24;
-     padding-left: 18px;
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th:hover {
+    background: url(images/dropdown_hover.png) #433e47;
+    background-repeat: no-repeat !important;
+    background-position: 1%, 15% !important;
+    padding-left: 30px;
+}
+
+table.tunnelConfig th,
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'],
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'] {
+    background: url(images/dropdown.png) #433e47;
+    background-repeat: no-repeat !important;
+    background-position: .5%, 15% !important;
+    padding-left: 30px;
+}
+
+table.tunnelConfig th:hover,
+html body#tunnelEditPage form div.panel table#clientTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover,
+html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover {
+    background: url(images/dropdown_hover.png) #433e47;
+    background-repeat: no-repeat !important;
+    background-position: .5%, 15% !important;
+    padding-left: 30px;
+}
+
+.tunnelConfigExpanded {
+    background: url(images/dropdown_active.png) #433e47 !important;
+    padding-left: 30px;
+}
+
+.tunnelConfigContracted {
+    background: url(images/dropdown.png) #433e47 !important;
+    padding-left: 30px;
+}
+
+.excludeBackgroundImage {
+    background-image: none !important;
+    padding-left: 30px;
 }
 
 #clientTunnels tr, #serverTunnels tr, .tunnelConfig tr {
