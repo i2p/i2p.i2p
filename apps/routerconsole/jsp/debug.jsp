@@ -19,7 +19,8 @@
 <span class="tab"><a href="#debug_portmapper">Port Mapper</a></span>
 <span class="tab"><a href="#appmanager">App Manager</a></span>
 <span class="tab"><a href="#updatemanager">Update Manager</a></span>
-<span class="tab"><a href="#skm">Session Key Manager</a></span>
+<span class="tab"><a href="#skm">Router Session Key Manager</a></span>
+<span class="tab"><a href="#cskm0">Client Session Key Managers</a></span>
 <span class="tab"><a href="#dht">Router DHT</a></span>
 </div>
 
@@ -70,11 +71,12 @@
     ctx.sessionKeyManager().renderStatusHTML(out);
     java.util.Set<net.i2p.data.Destination> clients = ctx.clientManager().listClients();
     out.print("</div>");
+    int i = 0;
     for (net.i2p.data.Destination dest : clients) {
         net.i2p.data.Hash h = dest.calculateHash();
         net.i2p.crypto.SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(h);
         if (skm != null) {
-            out.print("<div class=\"debug_section\">");
+            out.print("<div class=\"debug_section\" id=\"cskm" + (i++) + "\">");
             out.print("<h2><font size=\"-2\">" + dest.toBase32() + "</font> Session Key Manager</h2>");
             skm.renderStatusHTML(out);
             out.print("</div>");
