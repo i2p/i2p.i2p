@@ -82,8 +82,8 @@ class RatchetTagSet implements TagSetHandle {
     private static final int TAGLEN = RatchetSessionTag.LENGTH;
     private static final int MAX = 65535;
     private static final boolean TEST_RATCHET = false;
-    // 2 * max streaming window
-    private static final int LOW = TEST_RATCHET ? (MAX - 100) : 256;
+    // 4 * max streaming window
+    private static final int LOW = TEST_RATCHET ? (MAX - 100) : 512;
     static final int DEBUG_OB_NSR = 0x10001;
     static final int DEBUG_IB_NSR = 0x10002;
     static final int DEBUG_SINGLE_ES = 0x10003;
@@ -291,27 +291,23 @@ class RatchetTagSet implements TagSetHandle {
      *  unused tags generated
      *  @return 0 for outbound
      */
-    public int size() {
+    public synchronized int size() {
         return _sessionTags != null ? _sessionTags.size() : 0;
     }
 
     /**
      *  tags remaining
-     *  @return 0 - 65535
+     *  @return 0 - 65536
      */
-    public int remaining() {
-        int nextKey;
+    public synchronized int remaining() {
+        int nextKey = _lastTag + 1;
         if (_sessionTags != null) {
             // IB
-            if (_sessionTags.size() <= 0)
-                nextKey = 0;
-            else
-                nextKey = _sessionTags.keyAt(0);
+            nextKey -= _sessionTags.size();
         } else {
             // OB
-            nextKey = _lastTag + 1;
         }
-        return MAX - nextKey;
+        return MAX + 1 - nextKey;
     }
 
     /**
@@ -363,19 +359,6 @@ class RatchetTagSet implements TagSetHandle {
     }
 
     /**
-     *  first tag still available, or null
-     *  inbound only
-     *  testing only
-     */
-    private RatchetSessionTag getFirstTag() {
-        if (_sessionTags == null)
-            throw new IllegalStateException("Outbound tagset");
-        if (_sessionTags.size() <= 0)
-            return null;
-        return _sessionTags.valueAt(0);
-    }
-
-    /**
      *  inbound only
      *  @return associated SessionKey or null if not found.
      */
@@ -383,7 +366,6 @@ class RatchetTagSet implements TagSetHandle {
         if (_sessionTags == null)
             throw new IllegalStateException("Outbound tagset");
         // linear search for tag
-        // == not equals
         int idx = _sessionTags.indexOfValueByValue(tag);
         if (idx < 0) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(RatchetTagSet.class);
@@ -430,6 +412,9 @@ class RatchetTagSet implements TagSetHandle {
         }
     }
 
+    /**
+     *  inbound only
+     */
     private void addTags(int usedTagNumber) {
         // add as many as we need to maintain minSize from the tag used
         int remaining = _lastTag - usedTagNumber;
@@ -474,6 +459,9 @@ class RatchetTagSet implements TagSetHandle {
         }
     }
 
+    /**
+     *  inbound only
+     */
     private void storeNextTag() {
         RatchetSessionTag tag = consumeNext();
         if (tag == null)
@@ -494,10 +482,8 @@ class RatchetTagSet implements TagSetHandle {
             return null;
         byte[] tmp = new byte[32];
         hkdf.calculate(_sesstag_ck, _sesstag_constant, INFO_4, _sesstag_ck, tmp, 0);
-        byte[] tag = new byte[TAGLEN];
-        System.arraycopy(tmp, 0, tag, 0, TAGLEN);
         _lastTag++;
-        return new RatchetSessionTag(tag);
+        return new RatchetSessionTag(tmp);
     }
 
     /**
@@ -589,6 +575,21 @@ class RatchetTagSet implements TagSetHandle {
         }
         return buf.toString();
     }
+
+    /**
+     *  first tag still available, or null
+     *  inbound only
+     *  testing only
+     */
+/****
+    private RatchetSessionTag getFirstTag() {
+        if (_sessionTags == null)
+            throw new IllegalStateException("Outbound tagset");
+        if (_sessionTags.size() <= 0)
+            return null;
+        return _sessionTags.valueAt(0);
+    }
+****/
 
      /**
      *  tags still available

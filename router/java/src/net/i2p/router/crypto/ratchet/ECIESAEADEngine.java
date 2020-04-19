@@ -670,21 +670,6 @@ public final class ECIESAEADEngine {
      * No new session key
      * This is the one called from GarlicMessageBuilder and is the primary entry point.
      *
-     * Re: padded size: The AEAD block adds at least 39 bytes of overhead to the data, and
-     * that is included in the minimum size calculation.
-     *
-     * In the router, we always use garlic messages. A garlic message with a single
-     * clove and zero data is about 84 bytes, so that's 123 bytes minimum. So any paddingSize
-     * &lt;= 128 is a no-op as every message will be at least 128 bytes
-     * (Streaming, if used, adds more overhead).
-     *
-     * Outside the router, with a client using its own message format, the minimum size
-     * is 48, so any paddingSize &lt;= 48 is a no-op.
-     *
-     * Not included in the minimum is a 32-byte session tag for an existing session,
-     * or a 514-byte ECIES block and several 32-byte session tags for a new session.
-     * So the returned encrypted data will be at least 32 bytes larger than paddedSize.
-     *
      * @param target public key to which the data should be encrypted. 
      * @param priv local private key to encrypt with, from the leaseset
      * @param callback may be null, if non-null an ack will be requested (except NS/NSR)

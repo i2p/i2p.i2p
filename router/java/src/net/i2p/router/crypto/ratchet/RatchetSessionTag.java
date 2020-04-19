@@ -17,8 +17,11 @@ public class RatchetSessionTag {
         _data = val;
     }
 
+    /**
+     *  @param val will copy the first 8 bytes. Reference will not be kept.
+     */
     public RatchetSessionTag(byte val[]) {
-        if (val.length != LENGTH)
+        if (val.length < LENGTH)
             throw new IllegalArgumentException();
         _data = RatchetPayload.fromLong8(val, 0);
     }

@@ -75,7 +75,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private static final int MIN_RCV_WINDOW_NSR = 12;
     private static final int MAX_RCV_WINDOW_NSR = 24;
     private static final int MIN_RCV_WINDOW_ES = 32;
-    private static final int MAX_RCV_WINDOW_ES = 96;
+    private static final int MAX_RCV_WINDOW_ES = 160;
 
     private static final byte[] ZEROLEN = new byte[0];
     private static final String INFO_0 = "SessionReplyTags";
@@ -744,14 +744,21 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             sets.addAll(e.getValue());
             Collections.sort(sets, comp);
             totalSets += sets.size();
-            buf.append("<tr><td><b>Public key:</b> ").append(skey.toBase64()).append("</td>" +
+            buf.append("<tr><td><b>From public key:</b> ").append(toString(skey)).append("</td>" +
                        "<td><b>Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr class=\"expiry\"><td colspan=\"2\"><ul>");
             for (RatchetTagSet ts : sets) {
                 int size = ts.size();
                 total += size;
-                buf.append("<li><b>ID: ").append(ts.getID())
-                   .append('/').append(ts.getDebugID());
+                buf.append("<li><b>ID: ");
+                int id = ts.getID();
+                if (id == RatchetTagSet.DEBUG_IB_NSR)
+                    buf.append("NSR");
+                else if (id == RatchetTagSet.DEBUG_SINGLE_ES)
+                    buf.append("ES");
+                else
+                    buf.append(id);
+                buf.append('/').append(ts.getDebugID());
                 // inbound sets are multi-column, keep it short
                 //buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
                 //   .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
@@ -760,7 +767,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     buf.append(" expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                 else
                     buf.append(" expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
-                buf.append(size).append('/').append(ts.remaining()).append(" tags remaining</li>");
+                buf.append(size).append('+').append(ts.remaining() - size).append(" tags remaining</li>");
             }
             buf.append("</ul></td></tr>\n");
             out.write(buf.toString());
@@ -782,19 +789,24 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             sets.addAll(sess.getTagSets());
             Collections.sort(sets, comp);
             totalSets += sets.size();
-            buf.append("<tr class=\"debug_outboundtarget\"><td><div class=\"debug_targetinfo\"><b>Target public key:</b> ").append(toString(sess.getTarget())).append("<br>" +
+            buf.append("<tr class=\"debug_outboundtarget\"><td><div class=\"debug_targetinfo\"><b>To public key:</b> ").append(toString(sess.getTarget())).append("<br>" +
                        "<b>Established:</b> ").append(DataHelper.formatDuration2(now - sess.getEstablishedDate())).append(" ago<br>" +
                        "<b>Last Used:</b> ").append(DataHelper.formatDuration2(now - sess.getLastUsedDate())).append(" ago<br>");
             SessionKey sk = sess.getCurrentKey();
             if (sk != null)
                 buf.append("<b>Session key:</b> ").append(sk.toBase64());
             buf.append("</div></td>" +
-                       "<td><b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>" +
+                       "<td><b>Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr><td colspan=\"2\"><ul>");
             for (RatchetTagSet ts : sets) {
                 int size = ts.remaining();
-                buf.append("<li><b>ID: ").append(ts.getID())
-                   .append('/').append(ts.getDebugID())
+                buf.append("<li><b>ID: ");
+                int id = ts.getID();
+                if (id == RatchetTagSet.DEBUG_OB_NSR)
+                    buf.append("NSR");
+                else
+                    buf.append(id);
+                buf.append('/').append(ts.getDebugID())
                    .append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
                    .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
                 long expires = ts.getExpiration() - now;
