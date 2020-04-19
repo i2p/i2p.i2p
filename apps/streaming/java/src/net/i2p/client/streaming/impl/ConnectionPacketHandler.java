@@ -433,7 +433,7 @@ class ConnectionPacketHandler {
 
             _context.statManager().addRateData("stream.trend", trend, newWindowSize);
             
-            if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
+            if ( (!congested) && (acked > 0) ) {
                 int ssthresh = con.getSSThresh();
                 if (newWindowSize < ssthresh) {
                     // slow start - exponential growth

@@ -117,15 +117,15 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             // this should not block!
             begin = _context.clock().now();
             long expires = 0;
-            Connection.ResendPacketEvent rpe = packet.getResendEvent();
-            if (rpe != null) {
+            int pktTimeout = packet.getTimeout();
+            if (pktTimeout > 0) {
                 // we want the router to expire it a little before we do,
                 // so if we retransmit it will use a new tunnel/lease combo
                 // If we are really close to the timeout already,
                 // give this packet a chance to be sent,
                 // but it's likely to be dropped on the router side if we're
                 // running this far behind.
-                expires = Math.max(rpe.getNextSendTime() - I2CP_EXPIRATION_ADJUST, begin + 25);
+                expires = Math.max(begin + pktTimeout - I2CP_EXPIRATION_ADJUST, begin + 25);
             }
             SendMessageOptions options = new SendMessageOptions();
             if (expires > 0)

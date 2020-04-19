@@ -35,7 +35,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private long _cancelledOn;
     private final AtomicInteger _nackCount = new AtomicInteger();
     private volatile boolean _retransmitted;
-    private volatile Connection.ResendPacketEvent _resendEvent;
+    private volatile int _timeout;
     
     /** not bound to a connection */
     public PacketLocal(I2PAppContext ctx, Destination to, I2PSession session) {
@@ -139,9 +139,8 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     }
     
     private void cancelResend() {
-        Connection.ResendPacketEvent ev = _resendEvent;
-        if (ev != null) 
-            ev.cancel();
+        // fast restransmits are sent immediately and we don't keep a reference,
+        // can't be cancelled.
     }
     
     public void ackReceived() {
@@ -166,8 +165,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
     }
 
-    public Connection.ResendPacketEvent getResendEvent() { return _resendEvent; }
-    
     /** how long after packet creation was it acked?
      * @return how long after packet creation the packet was ACKed in ms
      */
@@ -190,10 +187,10 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
      */
     public void incrementNACKs() { 
         final int cnt = _nackCount.incrementAndGet();
-        Connection.ResendPacketEvent evt = _resendEvent;
-        if (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD && evt != null && (!_retransmitted) &&
+        if (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD && (!_retransmitted) &&
             (_numSends.get() == 1 || _lastSend < _context.clock().now() - 4*1000)) {  // Don't fast retx if we recently resent it
             _retransmitted = true;
+            Connection.ResendPacketEvent evt = _connection.newResendPacketEvent(this);
             evt.fastRetransmit();
             // the predicate used to be '+', changing to '-' --zab
             
@@ -213,7 +210,19 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
 
     public int getNACKs() { return _nackCount.get(); }
     
-    public void setResendPacketEvent(Connection.ResendPacketEvent evt) { _resendEvent = evt; }
+    /**
+     * Used by PacketQueue to feed an expiration to the router.
+     *
+     * @return time from now, not absolute time. May be zero if unset.
+     * @since 0.9.46
+     */
+    public int getTimeout() { return _timeout; }
+
+    /**
+     * @param timeout time from now, not absolute time
+     * @since 0.9.46
+     */
+    public void setTimeout(int timeout) { _timeout = timeout; }
 
     /**
      * Sign and write the packet to the buffer (starting at the offset) and return

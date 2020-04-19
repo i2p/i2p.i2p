@@ -134,7 +134,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     
     
     private static final int TREND_COUNT = 3;
-    static final int INITIAL_WINDOW_SIZE = 6;
+    /** RFC 5681 sec. 3.1 */
+    static final int INITIAL_WINDOW_SIZE = 3;
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
     private static final int MAX_RTT = 60*1000;    
@@ -636,9 +637,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         }
         
         if (_rto < Connection.MIN_RESEND_DELAY) 
-            _rto = (int)Connection.MIN_RESEND_DELAY;
+            _rto = Connection.MIN_RESEND_DELAY;
         else if (_rto > Connection.MAX_RESEND_DELAY)
-            _rto = (int)Connection.MAX_RESEND_DELAY;
+            _rto = Connection.MAX_RESEND_DELAY;
     }
     
     /** 
@@ -652,7 +653,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         // we don't need to switch on _initState, _rto is set in constructor
         _rto *= 2;
         if (_rto > Connection.MAX_RESEND_DELAY)
-            _rto = (int)Connection.MAX_RESEND_DELAY;
+            _rto = Connection.MAX_RESEND_DELAY;
         return _rto;
     }
     
