@@ -990,10 +990,6 @@ tr:hover .percentBarInner {
      float: left;
 }
 
-.peerinfo .snarkTorrentDownloaded {
-     text-align: right !important;
-}
-
 .percentBarText {
      text-align: center;
      font-weight: bold;
@@ -1024,6 +1020,7 @@ tr:hover .percentBarInner {
 
 .peerinfo .snarkTorrentDownloaded {
      text-align: center !important;
+     font-weight: normal;
 }
 
 /* end download bars */
