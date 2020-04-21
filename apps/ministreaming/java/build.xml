@@ -187,11 +187,33 @@
     <target name="javadocJar" depends="javadoc">
         <jar jarfile="./build/mstreaming-${release.number}-javadoc.jar">
             <fileset dir="./build/javadoc" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Streaming API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Streaming API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
     <target name="sourcesJar">
         <jar jarfile="./build/mstreaming-${release.number}-sources.jar">
             <fileset dir="./src" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Streaming API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Streaming API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
 
