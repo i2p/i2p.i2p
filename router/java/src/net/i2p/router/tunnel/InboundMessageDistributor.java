@@ -266,7 +266,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                     // ... and inject it.
                                     ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
                                     if (_log.shouldLog(Log.INFO))
-                                        _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: " + _client.toBase32());
+                                        _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: " +
+                                                  (_client != null ? _client.toBase32() : "router"));
                                     _context.inNetMessagePool().add(dsm, null, null);
                             } else {                                        
                                 if (_client != null) {
