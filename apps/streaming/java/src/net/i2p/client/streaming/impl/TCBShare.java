@@ -29,7 +29,9 @@ class TCBShare {
     private final CleanEvent _cleaner;
     private final double _rttDampening, _wdwDampening, _rttDevDampening;
 
-    private static final long EXPIRE_TIME = 15*60*1000;
+    // Must be less than SessionKeyManager outbound timeout (12 minutes)
+    // to avoid large number of DH operations
+    private static final long EXPIRE_TIME = 10*60*1000;
     private static final long CLEAN_TIME = 5*60*1000;
     ///// constants defined in rfc 2140
     ///// do not change unless you know what you're doing
