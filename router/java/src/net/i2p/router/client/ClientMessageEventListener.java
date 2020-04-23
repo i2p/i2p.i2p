@@ -226,6 +226,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     private void handleCreateSession(CreateSessionMessage message) {
         SessionConfig in = message.getSessionConfig();
         Destination dest = in.getDestination();
+        if (dest.getEncType() != EncType.ELGAMAL_2048) {
+            // Enc type in key cert, proposal 145, unsupported
+            _runner.disconnectClient("Destinations with key certs unsupported");
+            return;
+        }
         if (in.verifySignature()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Signature verified correctly on create session message");

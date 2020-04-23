@@ -272,6 +272,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     public String getName() { return "Outbound client message"; }
     
     public void runJob() {
+        if (_to.getEncType() != EncType.ELGAMAL_2048) {
+            // Enc type in key cert, proposal 145, unsupported
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION);
+            return;
+        }
         long now = getContext().clock().now();
         if (now >= _overallExpiration) {
             dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED);
