@@ -228,7 +228,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         Destination dest = in.getDestination();
         if (dest.getEncType() != EncType.ELGAMAL_2048) {
             // Enc type in key cert, proposal 145, unsupported
-            _runner.disconnectClient("Destinations with key certs unsupported");
+            _runner.disconnectClient("Non-ElGamal encryption type in key certificate unsupported");
             return;
         }
         if (in.verifySignature()) {
