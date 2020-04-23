@@ -238,11 +238,8 @@ public class GarlicMessageBuilder {
                 log.debug("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
             return null;
         }
-        
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId() + " is " + cloveSet.length
-                     + " bytes and encrypted message data is " + encData.length + " bytes");
-        
+        if (log.shouldDebug())
+            log.debug("Built ElG CloveSet (" + config.getCloveCount() + " cloves " + cloveSet.length + " bytes) in " + msg);
         return msg;
     }
     
@@ -266,6 +263,9 @@ public class GarlicMessageBuilder {
             return null;
         msg.setData(encData);
         msg.setMessageExpiration(config.getExpiration());
+        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        if (log.shouldDebug())
+            log.debug("Built ECIES CloveSet (" + config.getCloveCount() + " cloves) in " + msg);
         return msg;
     }
     
@@ -329,8 +329,7 @@ public class GarlicMessageBuilder {
             return null;
         }
         if (log.shouldDebug())
-            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId()
-                     + " encrypted message data is " + encData.length + " bytes");
+            log.debug("Built ECIES CloveSet (" + config.getCloveCount() + " cloves) in " + msg);
         return msg;
     }
     

@@ -81,9 +81,10 @@ public class GarlicMessage extends FastI2NPMessageImpl {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("[GarlicMessage: ");
-        buf.append("Data length: ").append(getData().length).append(" bytes");
-        buf.append("]");
+        buf.append("[GarlicMessage " +
+                   "ID: ").append(getUniqueId())
+           .append(" Data: ").append(_data.length).append(" bytes" +
+                   "]");
         return buf.toString();
     }
 }
