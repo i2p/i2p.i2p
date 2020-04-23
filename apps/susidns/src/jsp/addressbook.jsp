@@ -246,7 +246,7 @@ ${book.loadBookMessages}
 </tr>
 <tr>
 <td><b><%=intl._t("Destination or Base 32 Address")%></b></td>
-<td><input type="text" name="destination" value="${book.destination} size="70"></td>
+<td><input type="text" name="destination" value="${book.destination}" size="70"></td>
 </tr>
 </table>
 <p class="buttons">
