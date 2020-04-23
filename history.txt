@@ -1,3 +1,10 @@
+2020-04-23 zzz
+ * Ratchet: Fixes and parameter adjustments
+ * Streaming: Reduce TCB cache time
+
+2020-04-21 zzz
+ * Router: Fix logging NPE (thx zlatinb)
+
 2020-04-19 zzz
  * Ratchet: Adaptive order of muxed decrypt based on previous traffic
  * Streaming: Single retransmit timer per connection (ticket #2715)

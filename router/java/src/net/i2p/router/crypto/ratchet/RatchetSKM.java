@@ -68,7 +68,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 3 * 60 * 1000;
 
-    final static long SESSION_PENDING_DURATION_MS = 5 * 60 * 1000;
+    final static long SESSION_PENDING_DURATION_MS = 3 * 60 * 1000;
     // replace an old session created before this if we get a new NS
     private static final long SESSION_REPLACE_AGE = 3*60*1000;
 
@@ -518,20 +518,21 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         }
         if (key != null) {
             HandshakeState state = tagSet.getHandshakeState();
-            if (firstInbound) {
-                if (state == null) {
-                    // TODO this should really be after decrypt...
-                    PublicKey pk = tagSet.getRemoteKey();
-                    if (pk != null) {
-                        OutboundSession sess = getSession(pk);
-                        if (sess != null) {
+            if (state == null) {
+                // TODO this should really be after decrypt...
+                PublicKey pk = tagSet.getRemoteKey();
+                if (pk != null) {
+                    OutboundSession sess = getSession(pk);
+                    if (sess != null) {
+                        if (firstInbound)
                             sess.firstTagConsumed(tagSet);
-                        } else {
-                            if (_log.shouldDebug())
-                                _log.debug("First tag consumed but session is gone");
-                        }
-                    } // else null for SingleTagSets
-                }
+                        else
+                            sess.tagConsumed(tagSet);
+                    } else {
+                        if (_log.shouldDebug())
+                            _log.debug("Tag consumed but session is gone");
+                    }
+                } // else null for SingleTagSets
             }
             if (_log.shouldDebug()) {
                 if (state != null)
@@ -607,12 +608,12 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         // outbound
         int oremoved = 0;
         int cremoved = 0;
-        long exp = now - (SESSION_LIFETIME_MAX_MS / 2);
+        long exp = now - SESSION_TAG_DURATION_MS;
         for (Iterator<OutboundSession> iter = _outboundSessions.values().iterator(); iter.hasNext();) {
             OutboundSession sess = iter.next();
             oremoved += sess.expireTags(now);
             cremoved += sess.expireCallbacks(now);
-            if (sess.getLastUsedDate() < exp) {
+            if (sess.getLastUsedDate() < exp || sess.getLastReceivedDate() < exp) {
                 iter.remove();
                 oremoved++;
             }
@@ -748,26 +749,28 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                        "<td><b>Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr class=\"expiry\"><td colspan=\"2\"><ul>");
             for (RatchetTagSet ts : sets) {
-                int size = ts.size();
-                total += size;
-                buf.append("<li><b>ID: ");
-                int id = ts.getID();
-                if (id == RatchetTagSet.DEBUG_IB_NSR)
-                    buf.append("NSR");
-                else if (id == RatchetTagSet.DEBUG_SINGLE_ES)
-                    buf.append("ES");
-                else
-                    buf.append(id);
-                buf.append('/').append(ts.getDebugID());
-                // inbound sets are multi-column, keep it short
-                //buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
-                //   .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
-                long expires = ts.getExpiration() - now;
-                if (expires > 0)
-                    buf.append(" expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
-                else
-                    buf.append(" expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
-                buf.append(size).append('+').append(ts.remaining() - size).append(" tags remaining</li>");
+                synchronized(ts) {
+                    int size = ts.size();
+                    total += size;
+                    buf.append("<li><b>ID: ");
+                    int id = ts.getID();
+                    if (id == RatchetTagSet.DEBUG_IB_NSR)
+                        buf.append("NSR");
+                    else if (id == RatchetTagSet.DEBUG_SINGLE_ES)
+                        buf.append("ES");
+                    else
+                        buf.append(id);
+                    buf.append('/').append(ts.getDebugID());
+                    // inbound sets are multi-column, keep it short
+                    //buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
+                    //   .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
+                    long expires = ts.getExpiration() - now;
+                    if (expires > 0)
+                        buf.append(" expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
+                    else
+                        buf.append(" expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
+                    buf.append(size).append('+').append(ts.remaining() - size).append(" tags remaining</li>");
+                }
             }
             buf.append("</ul></td></tr>\n");
             out.write(buf.toString());
@@ -791,7 +794,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             totalSets += sets.size();
             buf.append("<tr class=\"debug_outboundtarget\"><td><div class=\"debug_targetinfo\"><b>To public key:</b> ").append(toString(sess.getTarget())).append("<br>" +
                        "<b>Established:</b> ").append(DataHelper.formatDuration2(now - sess.getEstablishedDate())).append(" ago<br>" +
-                       "<b>Last Used:</b> ").append(DataHelper.formatDuration2(now - sess.getLastUsedDate())).append(" ago<br>");
+                       "<b>Last Used:</b> ").append(DataHelper.formatDuration2(now - sess.getLastUsedDate())).append(" ago<br>" +
+                       "<b>Last Rcvd:</b> ").append(DataHelper.formatDuration2(now - sess.getLastReceivedDate())).append(" ago<br>");
             SessionKey sk = sess.getCurrentKey();
             if (sk != null)
                 buf.append("<b>Session key:</b> ").append(sk.toBase64());
@@ -799,22 +803,29 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                        "<td><b>Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr><td colspan=\"2\"><ul>");
             for (RatchetTagSet ts : sets) {
-                int size = ts.remaining();
-                buf.append("<li><b>ID: ");
-                int id = ts.getID();
-                if (id == RatchetTagSet.DEBUG_OB_NSR)
-                    buf.append("NSR");
-                else
-                    buf.append(id);
-                buf.append('/').append(ts.getDebugID())
-                   .append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
-                   .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
-                long expires = ts.getExpiration() - now;
-                if (expires > 0)
-                    buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
-                else
-                    buf.append(" <b>expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
-                buf.append(size).append(" tags remaining; acked? ").append(ts.getAcked()).append("</li>");
+                synchronized(ts) {
+                    int size = ts.remaining();
+                    buf.append("<li><b>ID: ");
+                    int id = ts.getID();
+                    if (id == RatchetTagSet.DEBUG_OB_NSR)
+                        buf.append("NSR");
+                    else
+                        buf.append(id);
+                    buf.append('/').append(ts.getDebugID());
+                    if (ts.getAcked())
+                        buf.append(" acked");
+                    buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
+                       .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
+                    long expires = ts.getExpiration() - now;
+                    if (expires > 0)
+                        buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
+                    else
+                        buf.append(" <b>expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
+                    buf.append(size).append(" tags remaining");
+                    if (ts.getNextKey() != null)
+                        buf.append(" <b>NK sent</b>");
+                }
+                buf.append("</li>");
             }
             buf.append("</ul></td></tr>\n");
             out.write(buf.toString());
@@ -852,11 +863,12 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private class OutboundSession {
         private final PublicKey _target;
         private final HandshakeState _state;
-        private final ReplyCallback _NScallback;
+        private ReplyCallback _NScallback;
         private ReplyCallback _NSRcallback;
         private SessionKey _currentKey;
         private final long _established;
         private long _lastUsed;
+        private long _lastReceived;
         /**
          *  Before the first ack, all tagsets go here. These are never expired, we rely
          *  on the callers to call failTags() or ackTags() to remove them from this list.
@@ -898,9 +910,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         private SessionKey _nextIBRootKey;
 
         private static final String INFO_7 = "XDHRatchetTagSet";
-        private static final int MAX_FAILS = 2;
-        private static final int MAX_SEND_ACKS = 8;
-        private static final int MAX_SEND_REVERSE_KEY = 25;
+        private static final int MAX_SEND_ACKS = 16;
+        private static final int MAX_SEND_REVERSE_KEY = 64;
 
         /**
          * @param key may be null
@@ -912,6 +923,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             _NScallback = callback;
             _established = _context.clock().now();
             _lastUsed = _established;
+            _lastReceived = _established;
             _unackedTagSets = new HashSet<RatchetTagSet>(4);
             _callbacks = new ConcurrentHashMap<Integer, ReplyCallback>();
             _acksToSend = new LinkedBlockingQueue<Integer>();
@@ -962,6 +974,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             SessionKey rk = new SessionKey(ck);
             long now = _context.clock().now();
             _lastUsed = now;
+            _lastReceived = now;
             boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
             if (isInbound) {
                 // We are Bob
@@ -996,12 +1009,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 synchronized (_unackedTagSets) {
                     _tagSet = tagset_ab;
                     _unackedTagSets.clear();
+                    // Bob received the NS, call the callback
+                    if (_NScallback != null) {
+                        _NScallback.onReply();
+                        _NScallback = null;
+                    }
                 }
                 // We can't destroy the original state, as more NSRs may come in
                 //_state.destroy();
-                // Bob received the NS, call the callback
-                if (_NScallback != null)
-                    _NScallback.onReply();
             }
             // kills the keys for future NSRs
             //state.destroy();
@@ -1226,6 +1241,16 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         }
 
         /**
+         *  A tag was received for this inbound (ES) tagset.
+         *
+         *  @param set the inbound tagset
+         *  @since 0.9.46
+         */
+        void tagConsumed(RatchetTagSet set) {
+            _lastReceived = set.getDate();
+        }
+
+        /**
          * First tag was received for this inbound (ES) tagset.
          * Find the corresponding outbound (ES) tagset in _unackedTagSets,
          * move it to _tagSets, and remove all others.
@@ -1233,6 +1258,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
          * @param set the inbound tagset
          */
         void firstTagConsumed(RatchetTagSet set) {
+            tagConsumed(set);
             SessionKey sk = set.getAssociatedKey();
             synchronized (_unackedTagSets) {
                 // save next root key
@@ -1301,6 +1327,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         }
 
         /**
+         *  ONLY updated for inbound NS/NSR/ES tag used
+         *  @since 0.9.46
+         */
+        public long getLastReceivedDate() {
+            return _lastReceived;
+        }
+
+        /**
          * Expire old tags, returning the number of tag sets removed
          */
         public int expireTags(long now) {
@@ -1325,6 +1359,11 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
         public RatchetEntry consumeNext() {
             long now = _context.clock().now();
+            if (_lastReceived + SESSION_TAG_DURATION_MS < now) {
+                if (_log.shouldInfo())
+                    _log.info("Expired OB session because IB TS expired");
+                return null;
+            }
             synchronized (_unackedTagSets) {
                 if (_tagSet != null) {
                     synchronized(_tagSet) {
