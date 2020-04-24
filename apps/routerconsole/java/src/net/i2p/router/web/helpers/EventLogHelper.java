@@ -51,7 +51,8 @@ public class EventLogHelper extends FormHandler {
         EventLog.UPDATED, _x("Updated router"),
         EventLog.WATCHDOG, _x("Watchdog warning")
     };
-    private static final long DAY = 24*60*60*1000L;
+    // in seconds
+    private static final long DAY = 24*60*60L;
     private static final long[] _times = { 0, DAY, 7*DAY, 30*DAY, 90*DAY, 365*DAY };
 
     public EventLogHelper() {
@@ -74,7 +75,7 @@ public class EventLogHelper extends FormHandler {
         try {
             _age = Long.parseLong(s);
             if (_age > 0)
-                _from = _context.clock().now() - _age;
+                _from = _context.clock().now() - (_age * 1000);
             else
                 _from = 0;
         } catch (NumberFormatException nfe) {
@@ -135,6 +136,9 @@ public class EventLogHelper extends FormHandler {
          _out.write("</option>\n");
     }
 
+    /**
+     * @param age seconds
+     */
     private void writeOption(long age) throws IOException {
          _out.write("<option value=\"");
          _out.write(Long.toString(age));
@@ -145,7 +149,7 @@ public class EventLogHelper extends FormHandler {
          if (age == 0)
              _out.write(_t("All events"));
          else
-             _out.write(DataHelper.formatDuration2(age));
+             _out.write(DataHelper.formatDuration2(age * 1000));
          _out.write("</option>\n");
     }
 

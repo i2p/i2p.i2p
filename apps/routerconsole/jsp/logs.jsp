@@ -71,7 +71,7 @@
 <h3 class="tabletitle"><%=intl._t("Event Logs")%></h3>
 <table id="eventlogs" class="logtable"><tbody>
 <tr><td>
- <!-- 90 days --><p><a href="events?from=7776000000"><%=intl._t("View event logs")%></a></p>
+ <!-- 90 days --><p><a href="events?from=7776000"><%=intl._t("View event logs")%></a></p>
 </td></tr>
 </tbody></table>
 
