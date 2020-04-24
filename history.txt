@@ -1,6 +1,16 @@
+2020-04-24 zzz
+ * i2psnark: Don't mark torrent BAD on I2CP errors (ticket #2725)
+ * Logging: Log to wrapper log after log manager shutdown (ticket #2725)
+ * Router:
+   - Allow more time to send disconnect messages at shutdown (ticket #2725)
+   - Don't delete router context at shutdown, to prevent a late
+     creation of a new app context (ticket #2725)
+
 2020-04-23 zzz
  * Ratchet: Fixes and parameter adjustments
+ * Router: Check for key certs in dests (proposal 145)
  * Streaming: Reduce TCB cache time
+ * SusiDNS: Fix typo that broke the add form
 
 2020-04-21 zzz
  * Router: Fix logging NPE (thx zlatinb)

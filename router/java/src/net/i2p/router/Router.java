@@ -188,6 +188,9 @@ public class Router implements RouterClock.ClockShiftListener {
      *  You must call runRouter() after any constructor to start things up.
      *
      *  Config file name is "router.config" unless router.configLocation set in system properties.
+     *
+     *  See two-arg constructor for more information.
+     *
      *  @throws IllegalStateException since 0.9.19 if another router with this config is running
      */
     public Router() { this(null, null); }
@@ -199,6 +202,8 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  Config file name is "router.config" unless router.configLocation set in envProps or system properties.
      *
+     *  See two-arg constructor for more information.
+     *
      *  @param envProps may be null
      *  @throws IllegalStateException since 0.9.19 if another router with this config is running
      */
@@ -208,6 +213,8 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Instantiation only. Starts no threads. Does not install updates.
      *  RouterContext is created but not initialized.
      *  You must call runRouter() after any constructor to start things up.
+     *
+     *  See two-arg constructor for more information.
      *
      *  @param configFilename may be null
      *  @throws IllegalStateException since 0.9.19 if another router with this config is running
@@ -237,7 +244,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  in this constructor.
      *  If files in an existing config dir indicate that another router is already running
      *  with this directory, the constructor will delay for several seconds to be sure,
-     *  and then call System.exit(-1).
+     *  and then throw an IllegalStateException.
      *
      *  @param configFilename may be null
      *  @param envProps may be null
@@ -1476,7 +1483,23 @@ public class Router implements RouterClock.ClockShiftListener {
         }
 
         _context.removeShutdownTasks();
+
+        // All in-JVM clients should be gone by now,
+        // unless they are stuck waiting for tunnels.
+        // If we have any of those, or external clients,
+        // we will wait below for the I2CP disconnect messages to get to them.
+        boolean waitForClients = _killVMOnEnd && !_context.clientManager().listClients().isEmpty();
+        if (_log.shouldWarn())
+            _log.warn("Stopping ClientManager");
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the client manager", t); }
+        if (waitForClients) {
+            // Give time for the disconnect messages to get to them
+            // so they can shut down correctly before the JVM goes away
+            try { Thread.sleep(1500); } catch (InterruptedException ie) {}
+            if (_log.shouldWarn())
+                _log.warn("Done waiting for clients to disconnect");
+        }
+
         try { _context.namingService().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the naming service", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the job queue", t); }
         try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel manager", t); }
@@ -1541,9 +1564,16 @@ public class Router implements RouterClock.ClockShiftListener {
                 killKeys();
         }
 
-        File f = getPingFile();
-        f.delete();
-        if (RouterContext.getContexts().isEmpty())
+        if (!SystemVersion.isAndroid()) {
+            File f = getPingFile();
+            f.delete();
+        }
+
+        // Only do this on Android. On desktop, rogue threads
+        // may create a new I2PAppContext before the JVM stops
+        // if we delete this one.
+        //if (RouterContext.getContexts().isEmpty())
+        if (SystemVersion.isAndroid())
             RouterContext.killGlobalContext();
 
         // Since 0.8.8, for Android and the wrapper
