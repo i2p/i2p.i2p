@@ -3572,7 +3572,9 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean isVideo = !isAudio && isVideo(mime);
             buf.append("<td class=\"snarkFileIcon\">");
             String preview = null;
-            if (complete || (isAudio && fai.preview > 1024*100) || (isVideo && fai.preview > 1024*1024)) {
+            if (complete ||
+                (isAudio && fai.preview > 100*1024) ||
+                (isVideo && fai.preview > 5*1024*1024 && fai.preview / (double) fai.length >= 0.01d)) {
                 String ppath = complete ? path : path + "?limit=" + fai.preview;
                 if (!complete) {
                     double pct = fai.preview / (double) fai.length;

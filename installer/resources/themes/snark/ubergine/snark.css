@@ -740,7 +740,7 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
 
 .snarkFileIcon {
      width: 16px;
-     text-align: center;
+     text-align: left !important;
      padding: 4px !important;
 }
 

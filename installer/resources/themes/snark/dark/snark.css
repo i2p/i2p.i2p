@@ -773,6 +773,7 @@ th.headerdownloaded {
 .snarkFileIcon {
      width: 16px;
      padding: 0;
+     text-align: left !important;
 }
 
 .snarkFileStatusIcon {

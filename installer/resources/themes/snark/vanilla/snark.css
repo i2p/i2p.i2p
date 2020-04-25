@@ -818,6 +818,7 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
 
 .snarkFileIcon {
      width: 16px;
+     text-align: left !important;
 }
 
 .snarkFileIcon img, .snarkFileIcon img:hover {
