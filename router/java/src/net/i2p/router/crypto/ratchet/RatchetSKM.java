@@ -73,8 +73,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private static final long SESSION_REPLACE_AGE = 3*60*1000;
 
     private static final int MIN_RCV_WINDOW_NSR = 12;
-    private static final int MAX_RCV_WINDOW_NSR = 24;
-    private static final int MIN_RCV_WINDOW_ES = 32;
+    private static final int MAX_RCV_WINDOW_NSR = 12;
+    private static final int MIN_RCV_WINDOW_ES = 24;
     private static final int MAX_RCV_WINDOW_ES = 160;
 
     private static final byte[] ZEROLEN = new byte[0];
@@ -1179,6 +1179,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                             _log.warn("Got nextkey for IB but we don't have next root key " + key);
                         return;
                     }
+                    // TODO find old IB TS, check usage
 
                     int oldtsID;
                     if (_myIBKeyID == -1 && hisLastOBKeyID == -1)
@@ -1215,9 +1216,10 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     byte[] sk = new byte[32];
                     _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
                     SessionKey ssk = new SessionKey(sk);
+                    // max size from the beginning
                     RatchetTagSet ts = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, _nextIBRootKey, ssk,
                                                          _context.clock().now(), newtsID, _myIBKeyID,
-                                                         MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
+                                                         MAX_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                     _nextIBRootKey = ts.getNextRootKey();
                     if (_log.shouldWarn())
                         _log.warn("Got nextkey " + key + " ratchet to new IB ES TS:\n" + ts);

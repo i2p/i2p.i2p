@@ -83,7 +83,7 @@ class RatchetTagSet implements TagSetHandle {
     private static final int MAX = 65535;
     private static final boolean TEST_RATCHET = false;
     // 4 * max streaming window
-    private static final int LOW = TEST_RATCHET ? (MAX - 100) : 512;
+    private static final int LOW = TEST_RATCHET ? (MAX - 512) : 512;
     static final int DEBUG_OB_NSR = 0x10001;
     static final int DEBUG_IB_NSR = 0x10002;
     static final int DEBUG_SINGLE_ES = 0x10003;
@@ -416,9 +416,22 @@ class RatchetTagSet implements TagSetHandle {
      *  inbound only
      */
     private void addTags(int usedTagNumber) {
+        int lookAhead, trimBehind;
+        if (_maxSize > _originalSize) {
+            // grow from originalSize at N = 0 to
+            // maxSize at N = 4 * (maxSize - originalSize)
+            // for typical loss rates, this keeps us at about maxSize,
+            // but worst case maxSize * 3/2
+            lookAhead = Math.min(_maxSize, _originalSize + (usedTagNumber / 4));
+            trimBehind = lookAhead / 2;
+        } else {
+            lookAhead = _originalSize;
+            trimBehind = _originalSize / 2;
+        }
+
         // add as many as we need to maintain minSize from the tag used
         int remaining = _lastTag - usedTagNumber;
-        int toAdd = _originalSize - remaining;
+        int toAdd = lookAhead - remaining;
         if (toAdd > 0) {
             //System.out.println("Extending tags by " + toAdd);
             for (int i = 0; i < toAdd; i++) {
@@ -427,8 +440,8 @@ class RatchetTagSet implements TagSetHandle {
         }
 
         // trim any too far behind
-        {
-            int tooOld = usedTagNumber - _maxSize;
+        int tooOld = usedTagNumber - trimBehind;
+        if (tooOld > 0) {
             int toTrim = 0;
             int tagnum;
             while ((tagnum = _sessionTags.keyAt(toTrim)) < tooOld) {
@@ -441,21 +454,6 @@ class RatchetTagSet implements TagSetHandle {
             }
             if (toTrim > 0)
                 _sessionTags.removeAtRange(0, toTrim);
-        }
-
-        // trim if too big
-        int toTrim = _sessionTags.size() - _maxSize;
-        if (toTrim > 0) {
-            //System.out.println("Trimming tags by " + toTrim);
-            for (int i = 0; i < toTrim; i++) {
-                int tagnum = _sessionTags.keyAt(i);
-                int kidx = _sessionKeys.indexOfKey(tagnum);
-                if (kidx >= 0)
-                    _sessionKeys.removeAt(kidx);
-                if (_lsnr != null)
-                    _lsnr.expireTag(_sessionTags.valueAt(i), this);
-            }
-            _sessionTags.removeAtRange(0, toTrim);
         }
     }
 
