@@ -577,7 +577,9 @@ class ClientConnectionRunner {
             int thresh = TransientSessionKeyManager.LOW_THRESHOLD;
             boolean hasElg = false;
             boolean hasEC = false;
-            if (opts != null) {
+            // router may be null in unit tests, avoid NPEs in ratchet
+            // we won't actually be using any SKM anyway
+            if (opts != null && _context.router() != null) {
                 String ptags = opts.getProperty(PROP_TAGS);
                 if (ptags != null) {
                     try { tags = Integer.parseInt(ptags); } catch (NumberFormatException nfe) {}
