@@ -478,7 +478,7 @@ class SummaryBarRenderer {
            // 7 days
         tx = _t("Events");
         rbuf.setLength(0);
-        rbuf.append("<a href=\"/events?from=604800000\" target=\"_top\" title=\"")
+        rbuf.append("<a href=\"/events?from=604800\" target=\"_top\" title=\"")
            .append(_t("View historical log of router events"))
            .append("\">")
            .append(nbsp(tx))
