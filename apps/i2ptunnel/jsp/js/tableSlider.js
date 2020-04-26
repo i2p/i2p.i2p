@@ -15,34 +15,27 @@ hideableTables.forEach(function(configTable) {
         var collapseme = false;
         for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
             var l = lookupTableRow();
-            if (i > l) {
-                if (collapseme) {
-                    if (row.firstElementChild.localName != "th") {
-                        if (
-                            !row.firstElementChild.classList.contains("buttons")
-                        ) {
-                            row.style.visibility = "collapse";
-                        }
-                    }
-                } else if (row.style.visibility == "visible") {
-                    if (row.firstElementChild.localName != "th") {
-                        if (
-                            !row.firstElementChild.classList.contains("buttons")
-                        ) {
-                            row.style.visibility = "collapse";
-                            collapseme = true;
-                        }
-                    }
+            if (i >= l) {
+                if (row.classList.contains("tunnelConfigExpanded")) {
+                    row.style.visibility = "collapse";
                     row.querySelectorAll("th").forEach(function(configRow) {
-                        configRow.classList.toggle('tunnelConfigExpanded');
+                        configRow.classList.remove('tunnelConfigExpanded');
+                        configRow.parentElement.style.visiblity = "visible"
+                    });
+                    row.querySelectorAll(".buttons").forEach(function(configRow) {
+                        configRow.classList.remove('tunnelConfigExpanded');
+                        configRow.parentElement.style.visiblity = "visible"
                     });
                     configTable.classList.remove('tunnelConfigExpanded');
+                    row.classList.remove('tunnelConfigExpanded');
                 } else {
                     row.style.visibility = "visible";
                     row.querySelectorAll("th").forEach(function(configRow) {
                         configRow.classList.add('tunnelConfigExpanded');
                     });
                     configTable.classList.add('tunnelConfigExpanded');
+                    row.classList.add('tunnelConfigExpanded')
+                    row.classList.add('excludeBackgroundImage')
                 }
             }
         }
@@ -52,6 +45,16 @@ hideableTables.forEach(function(configTable) {
         if (row.firstElementChild.localName != "th") {
             if (!row.firstElementChild.classList.contains("buttons")) {
                 row.style.visibility = "collapse";
+                row.querySelectorAll("th").forEach(function(configRow) {
+                    configRow.classList.remove('tunnelConfigExpanded');
+                    configRow.parentElement.style.visiblity = "visible"
+                });
+                row.querySelectorAll(".buttons").forEach(function(configRow) {
+                    configRow.classList.remove('tunnelConfigExpanded');
+                    configRow.parentElement.style.visiblity = "visible"
+                });
+                configTable.classList.remove('tunnelConfigExpanded');
+                row.classList.remove('tunnelConfigExpanded');
             }
         }
     }
