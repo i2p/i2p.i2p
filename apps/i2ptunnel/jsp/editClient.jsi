@@ -37,7 +37,7 @@
                 <input type="submit" class="default" name="action" value="Save changes" />
     <table id="clientTunnelEdit" class="tunnelConfig">
         <tr>
-            <th class="tunnelName excludeBackgroundImage">
+            <th class="tunnelNameLabel excludeBackgroundImage">
                 <%=intl._t("Name")%>
             </th><th class="excludeBackgroundImage">
                 <%=intl._t("Type")%>
