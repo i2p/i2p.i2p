@@ -23,8 +23,6 @@ hideableTables.forEach(function(configTable) {
                         ) {
                             row.style.visibility = "collapse";
                         }
-                    } else {
-                        row.firstElementChild.classList.remove('tunnelConfigExpanded');
                     }
                 } else if (row.style.visibility == "visible") {
                     if (row.firstElementChild.localName != "th") {
@@ -34,14 +32,17 @@ hideableTables.forEach(function(configTable) {
                             row.style.visibility = "collapse";
                             collapseme = true;
                         }
-                    } else {
-                        row.firstElementChild.classList.remove('tunnelConfigExpanded');
                     }
+                    row.querySelectorAll("th").forEach(function(configRow) {
+                        configRow.classList.toggle('tunnelConfigExpanded');
+                    });
+                    configTable.classList.remove('tunnelConfigExpanded');
                 } else {
                     row.style.visibility = "visible";
-                    if (row.firstElementChild.localName == 'th') {
-                        row.firstElementChild.classList.add('tunnelConfigExpanded');
-                    }
+                    row.querySelectorAll("th").forEach(function(configRow) {
+                        configRow.classList.add('tunnelConfigExpanded');
+                    });
+                    configTable.classList.add('tunnelConfigExpanded');
                 }
             }
         }
@@ -56,9 +57,9 @@ hideableTables.forEach(function(configTable) {
     }
     for (var i = 0, row; (row = hideableTables[0].offsetParent.rows[i]); i++) {
         row.style.visibility = "visible";
-        if (row.firstElementChild.localName == 'th') {
-            row.firstElementChild.classList.add('tunnelConfigExpanded');
-        }
+        row.querySelectorAll("th").forEach(function(configRow) {
+            configRow.classList.add('tunnelConfigExpanded');
+        });
     }
 });
 

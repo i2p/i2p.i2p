@@ -538,6 +538,10 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
     padding-left: 0px !important;
 }
 
+.tunnelName {
+    padding-left: 30px !important;
+}
+
 .tunnelProperties {
      background: #fafaff !important;
 }
