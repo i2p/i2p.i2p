@@ -680,7 +680,7 @@ td[colspan="2"] > select#profile {
      width: calc(50% - 15px) !important;
 }
 
-#customOptions, #userAgents {
+#userAgents {
      width: calc(100% - 10px) !important;
 }
 

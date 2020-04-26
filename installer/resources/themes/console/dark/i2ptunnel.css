@@ -1117,7 +1117,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 .freetext, .tunnelConfig textarea, #customOptions, #userAgents, #hostField  {
-     margin: 5px !important;
+     margin-top: 15px !important;
      cursor: text;
 }
 
@@ -1141,7 +1141,7 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
      margin: 5px !important;
 }
 
-#customOptions, #userAgents, #leasesetKey {
+#userAgents, #leasesetKey {
      width: calc(100% - 10px) !important;
 }
 
