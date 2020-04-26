@@ -535,7 +535,7 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 
 .excludeBackgroundImage {
     background-image: none !important;
-    padding-left: 30px;
+    padding-left: 0px !important;
 }
 
 .tunnelProperties {

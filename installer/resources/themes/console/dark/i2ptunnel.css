@@ -353,7 +353,7 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 
 .tunnelConfigExpanded {
     background: url(images/dropdown_active.png) #433e47 !important;
-    padding-left: 30px;
+    padding-left: 0px !important;
 }
 
 .tunnelConfigContracted {

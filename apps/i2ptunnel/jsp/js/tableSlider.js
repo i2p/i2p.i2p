@@ -3,19 +3,15 @@ function initTables() {
 var hideableTables = document.querySelectorAll("table.tunnelConfig th");
 
 hideableTables.forEach(function(configTable) {
-    configTable.onclick = function() {
-        function lookupTableRow() {
-            for (
-                var i = 0, row;
-                (row = configTable.offsetParent.rows[i]);
-                i++
-            ) {
-                if (configTable.parentNode == row) {
-                    return i;
-                }
+    function lookupTableRow() {
+        for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
+            if (configTable.parentNode == row) {
+                return i;
             }
-            return -1;
         }
+        return -1;
+    }
+    configTable.onclick = function() {
         var collapseme = false;
         for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
             var l = lookupTableRow();
@@ -27,6 +23,8 @@ hideableTables.forEach(function(configTable) {
                         ) {
                             row.style.visibility = "collapse";
                         }
+                    } else {
+                        row.firstElementChild.classList.remove('tunnelConfigExpanded');
                     }
                 } else if (row.style.visibility == "visible") {
                     if (row.firstElementChild.localName != "th") {
@@ -35,14 +33,15 @@ hideableTables.forEach(function(configTable) {
                         ) {
                             row.style.visibility = "collapse";
                             collapseme = true;
-                            configTable.classList.remove(
-                                "tunnelConfigExpanded"
-                            );
                         }
+                    } else {
+                        row.firstElementChild.classList.remove('tunnelConfigExpanded');
                     }
                 } else {
                     row.style.visibility = "visible";
-                    configTable.classList.add("tunnelConfigExpanded");
+                    if (row.firstElementChild.localName == 'th') {
+                        row.firstElementChild.classList.add('tunnelConfigExpanded');
+                    }
                 }
             }
         }
@@ -57,6 +56,9 @@ hideableTables.forEach(function(configTable) {
     }
     for (var i = 0, row; (row = hideableTables[0].offsetParent.rows[i]); i++) {
         row.style.visibility = "visible";
+        if (row.firstElementChild.localName == 'th') {
+            row.firstElementChild.classList.add('tunnelConfigExpanded');
+        }
     }
 });
 
