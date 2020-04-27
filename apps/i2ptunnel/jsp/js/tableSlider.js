@@ -37,7 +37,6 @@ hideableTables.forEach(function(configTable) {
                     hideRow(row)
                     configTable.classList.remove('tunnelConfigExpanded');
                     row.classList.remove('tunnelConfigExpanded');
-                    console.log("hiding", row)
                 } else {
                     row.style.visibility = "visible";
                     row.querySelectorAll("th").forEach(function(configRow) {
@@ -46,7 +45,6 @@ hideableTables.forEach(function(configTable) {
                     configTable.classList.add('tunnelConfigExpanded');
                     row.classList.add('tunnelConfigExpanded')
                     row.classList.add('excludeBackgroundImage')
-                    console.log("unhiding", row)
                 }
             }
         }
