@@ -670,6 +670,9 @@ class PeerCoordinator implements PeerListener
    */
   void unchokePeer()
   {
+    if (storage == null || storage.getBitField().size() == 0)
+        return;
+
     // linked list will contain all interested peers that we choke.
     // At the start are the peers that have us unchoked at the end the
     // other peer that are interested, but are choking us.
@@ -1139,6 +1142,10 @@ class PeerCoordinator implements PeerListener
   {
     if (interest)
       {
+            if (storage == null || storage.getBitField().size() == 0) {
+                // XD bug #80
+                return;
+            }
             if (uploaders.get() < allowedUploaders())
               {
                 if(peer.isChoking())
@@ -1237,12 +1244,12 @@ class PeerCoordinator implements PeerListener
                   }
                   int max = getMaxConnections();
                   if (partialPieces.size() > max) {
-                      // sorts by remaining bytes, least first
+                      // sorts by preference, highest first
                       Collections.sort(partialPieces);
-                      PartialPiece gone = partialPieces.remove(max);
+                      PartialPiece gone = partialPieces.remove(partialPieces.size() - 1);
                       gone.release();
                       if (_log.shouldLog(Log.INFO))
-                          _log.info("Discarding orphaned partial piece (list full)" + gone);
+                          _log.info("Discarding orphaned partial piece (list full) " + gone);
                   }
               } else {
                   // drop the empty partial piece
@@ -1269,7 +1276,7 @@ class PeerCoordinator implements PeerListener
       if (storage != null && storage.isChecking())
           return null;
       synchronized(wantedPieces) {
-          // sorts by remaining bytes, least first
+          // sorts by preference, highest first
           Collections.sort(partialPieces);
           for (Iterator<PartialPiece> iter = partialPieces.iterator(); iter.hasNext(); ) {
               PartialPiece pp = iter.next();
@@ -1277,6 +1284,7 @@ class PeerCoordinator implements PeerListener
               if (havePieces.get(savedPiece)) {
                  // this is just a double-check, it should be in there
                  boolean skipped = false;
+                 outer:
                  for(Piece piece : wantedPieces) {
                      if (piece.getId() == savedPiece) {
                          if (peer.isCompleted() && piece.getPeerCount() > 1 &&
@@ -1285,19 +1293,23 @@ class PeerCoordinator implements PeerListener
                              // by not requesting a partial piece that at least two non-seeders also have
                              // from a seeder
                              int nonSeeds = 0;
+                             int seeds = 0;
                              for (Peer pr : peers) {
-                                 PeerState state = pr.state;
-                                 if (state == null) continue;
-                                 BitField bf = state.bitfield;
-                                 if (bf == null) continue;
-                                 if (bf.get(savedPiece) && !pr.isCompleted()) {
-                                     if (++nonSeeds > 1)
+                                 if (pr.isCompleted()) {
+                                     if (++seeds >= 4)
                                          break;
+                                 } else {
+                                     PeerState state = pr.state;
+                                     if (state == null) continue;
+                                     BitField bf = state.bitfield;
+                                     if (bf == null) continue;
+                                     if (bf.get(savedPiece)) {
+                                         if (++nonSeeds > 1) {
+                                             skipped = true;
+                                             break outer;
+                                         }
+                                     }
                                  }
-                             }
-                             if (nonSeeds > 1) {
-                                 skipped = true;
-                                 break;
                              }
                          }
                          iter.remove();
