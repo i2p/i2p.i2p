@@ -1002,6 +1002,7 @@ public final class ECIESAEADEngine {
         public void gotOptions(byte[] options, boolean isHandshake) {
             if (_log.shouldDebug())
                 _log.debug("Got OPTIONS block length " + options.length);
+            // TODO
         }
 
         public void gotGarlic(GarlicClove clove) {
@@ -1035,9 +1036,16 @@ public final class ECIESAEADEngine {
             ackRequested = true;
         }
 
-        public void gotTermination(int reason, long count) {
+        public void gotTermination(int reason) {
             if (_log.shouldDebug())
-                _log.debug("Got TERMINATION block, reason: " + reason + " count: " + count);
+                _log.debug("Got TERMINATION block, reason: " + reason);
+            // TODO
+        }
+
+        public void gotPN(int pn) {
+            if (_log.shouldDebug())
+                _log.debug("Got PN block, pn: " + pn);
+            // TODO
         }
 
         public void gotUnknown(int type, int len) {

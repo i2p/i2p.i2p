@@ -52,9 +52,14 @@ class RatchetPayload {
         public void gotOptions(byte[] options, boolean isHandshake) throws DataFormatException;
 
         /**
-         *  @param lastReceived in theory could wrap around to negative, but very unlikely
+         *  @param reason 0-255
          */
-        public void gotTermination(int reason, long lastReceived);
+        public void gotTermination(int reason);
+
+        /**
+         *  @param pn 0-65535
+         */
+        public void gotPN(int pn);
 
         /**
          *  @param nextKey the next one
@@ -173,12 +178,20 @@ class RatchetPayload {
                 case BLOCK_TERMINATION:
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len < 9)
+                    if (len < 1)
                         throw new IOException("Bad length for TERMINATION: " + len);
-                    long last = fromLong8(payload, i);
-                    int rsn = payload[i + 8] & 0xff;
-                    cb.gotTermination(rsn, last);
+                    int rsn = payload[i] & 0xff;
+                    cb.gotTermination(rsn);
                     gotTermination = true;
+                    break;
+
+                case BLOCK_MSGNUM:
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    if (len < 2)
+                        throw new IOException("Bad length for PN: " + len);
+                    int pn = (int) DataHelper.fromLong(payload, i, 2);
+                    cb.gotPN(pn);
                     break;
 
                 case BLOCK_PADDING:
@@ -424,22 +437,40 @@ class RatchetPayload {
 
     public static class TerminationBlock extends Block {
         private final byte rsn;
-        private final long rcvd;
 
-        public TerminationBlock(int reason, long lastReceived) {
+        public TerminationBlock(int reason) {
             super(BLOCK_TERMINATION);
             rsn = (byte) reason;
-            rcvd = lastReceived;
         }
 
         public int getDataLength() {
-            return 9;
+            return 1;
         }
 
         public int writeData(byte[] tgt, int off) {
-            toLong8(tgt, off, rcvd);
-            tgt[off + 8] = rsn;
-            return off + 9;
+            tgt[off] = rsn;
+            return off + 1;
+        }
+    }
+
+    /**
+     *  @since 0.9.46
+     */
+    public static class PNBlock extends Block {
+        private final int pn;
+
+        public PNBlock(int pn) {
+            super(BLOCK_MSGNUM);
+            this.pn = pn;
+        }
+
+        public int getDataLength() {
+            return 2;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            DataHelper.toLong(tgt, off, 2, pn);
+            return off + 2;
         }
     }
 
