@@ -57,7 +57,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * Let outbound session tags sit around for this long before expiring them.
      * Inbound tag expiration is set by SESSION_LIFETIME_MAX_MS
      */
-    final static long SESSION_TAG_DURATION_MS = 12 * 60 * 1000;
+    final static long SESSION_TAG_DURATION_MS = 8 * 60 * 1000;
 
     /**
      * Keep unused inbound session tags around for this long (a few minutes longer than
@@ -66,19 +66,13 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      *
      * This is also the max idle time for an outbound session.
      */
-    final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 3 * 60 * 1000;
+    final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 2 * 60 * 1000;
 
     final static long SESSION_PENDING_DURATION_MS = 3 * 60 * 1000;
     // replace an old session created before this if we get a new NS
     private static final long SESSION_REPLACE_AGE = 3*60*1000;
 
-    private static final int MIN_RCV_WINDOW_NSR = 12;
-    private static final int MAX_RCV_WINDOW_NSR = 12;
-    private static final int MIN_RCV_WINDOW_ES = 24;
-    private static final int MAX_RCV_WINDOW_ES = 160;
-
     private static final byte[] ZEROLEN = new byte[0];
-    private static final String INFO_0 = "SessionReplyTags";
 
 
     /**
@@ -909,6 +903,12 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         private NextSessionKey _hisOBKeyWithData;
         private SessionKey _nextIBRootKey;
 
+        private static final int MIN_RCV_WINDOW_NSR = 12;
+        private static final int MAX_RCV_WINDOW_NSR = 12;
+        private static final int MIN_RCV_WINDOW_ES = 24;
+        private static final int MAX_RCV_WINDOW_ES = 160;
+
+        private static final String INFO_0 = "SessionReplyTags";
         private static final String INFO_7 = "XDHRatchetTagSet";
         private static final int MAX_SEND_ACKS = 16;
         private static final int MAX_SEND_REVERSE_KEY = 64;
@@ -1126,8 +1126,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                                          _context.clock().now(), newtsID, _myOBKeyID);
                     _tagSet = ts;
                     _currentOBTagSetID = newtsID;
-                    if (_log.shouldWarn())
-                        _log.warn("Got nextkey " + key + " ratchet to new OB ES TS:\n" + ts);
+                    if (_log.shouldDebug())
+                        _log.debug("Got nextkey " + key + "\nratchet to new OB ES TS:\n" + ts);
                 } else {
                     // this is about my inbound tag set
                     if (key.equals(_hisOBKey)) {
@@ -1221,8 +1221,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                                          _context.clock().now(), newtsID, _myIBKeyID,
                                                          MAX_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                     _nextIBRootKey = ts.getNextRootKey();
-                    if (_log.shouldWarn())
-                        _log.warn("Got nextkey " + key + " ratchet to new IB ES TS:\n" + ts);
+                    if (_log.shouldDebug())
+                        _log.debug("Got nextkey " + key + "\nratchet to new IB ES TS:\n" + ts);
                 }
             }
         }

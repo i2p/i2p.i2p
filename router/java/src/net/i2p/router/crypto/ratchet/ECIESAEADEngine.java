@@ -1115,9 +1115,7 @@ public final class ECIESAEADEngine {
             blocks.add(block);
             len += block.getTotalLength();
         }
-        int padlen = 1 + _context.random().nextInt(MAXPAD);
-        // random data
-        //Block block = new PaddingBlock(_context, padlen);
+        int padlen = _context.random().nextInt(MAXPAD);
         // zeros
         Block block = new PaddingBlock(padlen);
         blocks.add(block);

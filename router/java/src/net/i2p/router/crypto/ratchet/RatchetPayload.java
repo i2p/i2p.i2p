@@ -282,6 +282,7 @@ class RatchetPayload {
         }
 
         /** with random data */
+        @Deprecated
         public PaddingBlock(I2PAppContext context, int size) {
             super(BLOCK_PADDING);
             sz = size;
