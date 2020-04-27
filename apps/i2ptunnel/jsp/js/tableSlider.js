@@ -11,23 +11,33 @@ hideableTables.forEach(function(configTable) {
         }
         return -1;
     }
-    configTable.onclick = function() {
-        var collapseme = false;
+    function hideRow(row) {
+        if (Object.keys(row.querySelectorAll(".buttons")).length < 1 ) {
+            if (Object.keys(row.querySelectorAll("th")).length < 1 ) {
+                row.style.visibility = "collapse";
+            }
+        } else if (Object.keys(row.querySelectorAll("th")).length < 1 ) {
+            if (Object.keys(row.querySelectorAll(".buttons")).length < 1 ) {
+                row.style.visibility = "collapse";
+            }
+        } else {
+            configTable.style.visibility = "visible"
+        }
+    }
+    function showAllControls() {
         for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
-            var l = lookupTableRow();
-            if (i >= l) {
+            hideRow(row)
+        }
+    }
+    configTable.onclick = function() {
+        var minRow = lookupTableRow();
+        for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
+            if (i >= minRow) {
                 if (row.classList.contains("tunnelConfigExpanded")) {
-                    row.style.visibility = "collapse";
-                    row.querySelectorAll("th").forEach(function(configRow) {
-                        configRow.classList.remove('tunnelConfigExpanded');
-                        configRow.parentElement.style.visiblity = "visible"
-                    });
-                    row.querySelectorAll(".buttons").forEach(function(configRow) {
-                        configRow.classList.remove('tunnelConfigExpanded');
-                        configRow.parentElement.style.visiblity = "visible"
-                    });
+                    hideRow(row)
                     configTable.classList.remove('tunnelConfigExpanded');
                     row.classList.remove('tunnelConfigExpanded');
+                    console.log("hiding", row)
                 } else {
                     row.style.visibility = "visible";
                     row.querySelectorAll("th").forEach(function(configRow) {
@@ -36,28 +46,13 @@ hideableTables.forEach(function(configTable) {
                     configTable.classList.add('tunnelConfigExpanded');
                     row.classList.add('tunnelConfigExpanded')
                     row.classList.add('excludeBackgroundImage')
+                    console.log("unhiding", row)
                 }
             }
         }
         configTable.parentNode.style.visibility = "visible";
     };
-    for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
-        if (row.firstElementChild.localName != "th") {
-            if (!row.firstElementChild.classList.contains("buttons")) {
-                row.style.visibility = "collapse";
-                row.querySelectorAll("th").forEach(function(configRow) {
-                    configRow.classList.remove('tunnelConfigExpanded');
-                    configRow.parentElement.style.visiblity = "visible"
-                });
-                row.querySelectorAll(".buttons").forEach(function(configRow) {
-                    configRow.classList.remove('tunnelConfigExpanded');
-                    configRow.parentElement.style.visiblity = "visible"
-                });
-                configTable.classList.remove('tunnelConfigExpanded');
-                row.classList.remove('tunnelConfigExpanded');
-            }
-        }
-    }
+    showAllControls()
     for (var i = 0, row; (row = hideableTables[0].offsetParent.rows[i]); i++) {
         row.style.visibility = "visible";
         row.querySelectorAll("th").forEach(function(configRow) {
