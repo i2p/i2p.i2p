@@ -52,7 +52,7 @@ public enum EncType {
     EC_P521(3, 132, 66, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P521_SPEC, "0.9.38"),
 
     /**
-     *  Proposal 144. Not yet supported by anybody.
+     *  Proposal 144.
      *  Pubkey 32 bytes; privkey 32 bytes
      *  @since 0.9.38
      */
