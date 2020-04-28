@@ -73,9 +73,9 @@ public class EventLogHelper extends FormHandler {
     
     public void setFrom(String s) { 
         try {
-            _age = Long.parseLong(s);
+            _age = Long.parseLong(s) * 1000;
             if (_age > 0)
-                _from = _context.clock().now() - (_age * 1000);
+                _from = _context.clock().now() - _age;
             else
                 _from = 0;
         } catch (NumberFormatException nfe) {
@@ -143,7 +143,7 @@ public class EventLogHelper extends FormHandler {
          _out.write("<option value=\"");
          _out.write(Long.toString(age));
          _out.write("\"");
-         if (age == _age)
+         if (age == _age / 1000)
              _out.write(HelperBase.SELECTED);
          _out.write(">");
          if (age == 0)
