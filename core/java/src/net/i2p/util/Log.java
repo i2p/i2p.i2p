@@ -15,12 +15,8 @@ import net.i2p.I2PAppContext;
 
 /**
  * Wrapper class for whatever logging system I2P uses.  This class should be 
- * instantiated and kept as a variable for each class it is used by, ala:
+ * instantiated and kept as a variable for each class it is used by, e.g.
  *  <code>private final Log _log = context.logManager().getLog(MyClassName.class);</code>
- *
- * If there is anything in here that doesn't make sense, turn off your computer
- * and go fly a kite.
- *
  *
  * @author jrandom
  */
@@ -104,8 +100,6 @@ public class Log {
         _name = name;
         _minPriority = DEBUG;
         _scope = new LogScope(name, cls);
-        //_manager.addRecord(new LogRecord(Log.class, null, Thread.currentThread().getName(), Log.DEBUG, 
-        //                                 "Log created with manager " + manager + " for class " + cls, null));
     }
 
     public void log(int priority, String msg) {
@@ -117,9 +111,6 @@ public class Log {
     }
 
     public void log(int priority, String msg, Throwable t) {
-        // Boost the priority of NPE and friends so they get seen and reported
-        //if (t != null && t instanceof RuntimeException && !(t instanceof IllegalArgumentException))
-        //    priority = CRIT;
         if (priority >= _minPriority) {
             _manager.addRecord(new LogRecord(_class, _name, 
                                              Thread.currentThread().getName(), priority,
@@ -176,9 +167,6 @@ public class Log {
 
     public void setMinimumPriority(int priority) {
         _minPriority = priority;
-        //_manager.addRecord(new LogRecord(Log.class, null, Thread.currentThread().getName(), Log.DEBUG, 
-        //                                 "Log with manager " + _manager + " for class " + _class 
-        //                                 + " new priority " + toLevelString(priority), null));
     }
 
     public boolean shouldLog(int priority) {
