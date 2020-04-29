@@ -509,17 +509,15 @@ public final class ECIESAEADEngine {
             _log.debug("State after decrypt new session reply: " + state);
 
         // split()
-        byte[] ck = state.getChainingKey();
-        byte[] k_ab = new byte[32];
-        byte[] k_ba = new byte[32];
-        _hkdf.calculate(ck, ZEROLEN, k_ab, k_ba, 0);
+        // Noise does it too but it trashes the keys
+        SplitKeys split = new SplitKeys(state, _hkdf);
         CipherStatePair ckp = state.split();
         CipherState rcvr = ckp.getReceiver();
         byte[] hash = state.getHandshakeHash();
 
         // part 2 - payload
         byte[] encpayloadkey = new byte[32];
-        _hkdf.calculate(k_ba, ZEROLEN, INFO_6, encpayloadkey);
+        _hkdf.calculate(split.k_ba.getData(), ZEROLEN, INFO_6, encpayloadkey);
         rcvr.initializeKey(encpayloadkey, 0);
         byte[] payload = new byte[data.length - (TAGLEN + KEYLEN + MACLEN + MACLEN)];
         try {
@@ -561,7 +559,7 @@ public final class ECIESAEADEngine {
 
         // tell the SKM
         PublicKey bob = new PublicKey(EncType.ECIES_X25519, bobPK);
-        keyManager.updateSession(bob, oldState, state, null);
+        keyManager.updateSession(bob, oldState, state, null, split);
 
         if (pc.cloveSet.isEmpty()) {
             if (_log.shouldWarn())
@@ -842,17 +840,15 @@ public final class ECIESAEADEngine {
         eph.getEncodedPublicKey(enc, TAGLEN);
 
         // split()
-        byte[] ck = state.getChainingKey();
-        byte[] k_ab = new byte[32];
-        byte[] k_ba = new byte[32];
-        _hkdf.calculate(ck, ZEROLEN, k_ab, k_ba, 0);
+        // Noise does it too but it trashes the keys
+        SplitKeys split = new SplitKeys(state, _hkdf);
         CipherStatePair ckp = state.split();
         CipherState sender = ckp.getSender();
         byte[] hash = state.getHandshakeHash();
 
         // part 2 - payload
         byte[] encpayloadkey = new byte[32];
-        _hkdf.calculate(k_ba, ZEROLEN, INFO_6, encpayloadkey);
+        _hkdf.calculate(split.k_ba.getData(), ZEROLEN, INFO_6, encpayloadkey);
         sender.initializeKey(encpayloadkey, 0);
         try {
             sender.encryptWithAd(hash, payload, 0, enc, TAGLEN + KEYLEN + MACLEN, payload.length);
@@ -862,7 +858,7 @@ public final class ECIESAEADEngine {
             return null;
         }
         // tell the SKM
-        keyManager.updateSession(target, null, state, callback);
+        keyManager.updateSession(target, null, state, callback, split);
 
         return enc;
     }

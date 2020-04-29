@@ -222,7 +222,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * @param oldState null for inbound, pre-clone for outbound
      * @return true if this was the first NSR received
      */
-    boolean updateSession(PublicKey target, HandshakeState oldState, HandshakeState state, ReplyCallback callback) {
+    boolean updateSession(PublicKey target, HandshakeState oldState, HandshakeState state,
+                          ReplyCallback callback, SplitKeys split) {
         EncType type = target.getType();
         if (type != EncType.ECIES_X25519)
             throw new IllegalArgumentException("Bad public key type " + type);
@@ -238,7 +239,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 // TODO can we recover?
                 return false;
             }
-            sess.updateSession(state, callback);
+            sess.updateSession(state, callback, split);
         } else {
             // we are Alice, NSR received
             if (_log.shouldInfo())
@@ -258,7 +259,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     if (oldState.equals(pstate)) {
                         if (!found) {
                             found = true;
-                            sess.updateSession(state, null);
+                            sess.updateSession(state, null, split);
                             boolean ok = addSession(sess, false);
                             if (_log.shouldDebug()) {
                                 if (ok)
@@ -966,12 +967,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
          * @param state current state
          * @param callback only for inbound (NSR sent by Bob), may be null
          */
-        void updateSession(HandshakeState state, ReplyCallback callback) {
-            byte[] ck = state.getChainingKey();
-            byte[] k_ab = new byte[32];
-            byte[] k_ba = new byte[32];
-            _hkdf.calculate(ck, ZEROLEN, k_ab, k_ba, 0);
-            SessionKey rk = new SessionKey(ck);
+        void updateSession(HandshakeState state, ReplyCallback callback, SplitKeys split) {
+            SessionKey rk = split.ck;
             long now = _context.clock().now();
             _lastUsed = now;
             _lastReceived = now;
@@ -979,15 +976,17 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             if (isInbound) {
                 // We are Bob
                 // This is an OUTBOUND NSR, we make an INBOUND tagset for ES
-                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ab),
+                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, split.k_ab,
                                                             now, 0, -1,
                                                             MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                 // and a pending outbound one
-                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ba),
+                // TODO - We could just save rk and k_ba, and defer
+                // creation of the OB ES tagset to firstTagConsumed() below
+                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, rk, split.k_ba,
                                                             now, 0, -1);
                 if (_log.shouldDebug()) {
-                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset:\n" + tagset_ab);
-                    _log.debug("Pending OB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset:\n" + tagset_ba);
+                    _log.debug("Update IB Session, rk = " + rk + " tk = " + split.k_ab + " ES tagset:\n" + tagset_ab);
+                    _log.debug("Pending OB Session, rk = " + rk + " tk = " + split.k_ba + " ES tagset:\n" + tagset_ba);
                 }
                 synchronized (_unackedTagSets) {
                     _unackedTagSets.add(tagset_ba);
@@ -996,15 +995,15 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             } else {
                 // We are Alice
                 // This is an INBOUND NSR, we make an OUTBOUND tagset for ES
-                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, rk, new SessionKey(k_ab),
+                RatchetTagSet tagset_ab = new RatchetTagSet(_hkdf, rk, split.k_ab,
                                                             now, 0, -1);
                 // and an inbound one
-                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, new SessionKey(k_ba),
+                RatchetTagSet tagset_ba = new RatchetTagSet(_hkdf, RatchetSKM.this, _target, rk, split.k_ba,
                                                             now, 0, -1,
                                                             MIN_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                 if (_log.shouldDebug()) {
-                    _log.debug("Update OB Session, rk = " + rk + " tk = " + Base64.encode(k_ab) + " ES tagset:\n" + tagset_ab);
-                    _log.debug("Update IB Session, rk = " + rk + " tk = " + Base64.encode(k_ba) + " ES tagset:\n" + tagset_ba);
+                    _log.debug("Update OB Session, rk = " + rk + " tk = " + split.k_ab + " ES tagset:\n" + tagset_ab);
+                    _log.debug("Update IB Session, rk = " + rk + " tk = " + split.k_ba + " ES tagset:\n" + tagset_ba);
                 }
                 synchronized (_unackedTagSets) {
                     _tagSet = tagset_ab;

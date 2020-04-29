@@ -173,6 +173,9 @@ class RatchetTagSet implements TagSetHandle {
             _sessionTags = null;
             _sessionKeys = null;
         }
+        // prevent adjusted expiration and search for matching OB ts
+        if (tagsetid > 0 && tagsetid <= 65535)
+            _acked = true;
     }
 
     /**
@@ -200,6 +203,8 @@ class RatchetTagSet implements TagSetHandle {
         hkdf = null;
         _sessionTags = null;
         _sessionKeys = null;
+        // prevent adjusted expiration and search for matching OB ts
+        _acked = true;
     }
 
     public void clear() {

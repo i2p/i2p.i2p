@@ -147,6 +147,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private final static long LS_LOOKUP_TIMEOUT = 15*1000;
     private final static long OVERALL_TIMEOUT_NOLS_MIN = OVERALL_TIMEOUT_MS_MIN + LS_LOOKUP_TIMEOUT;
     private final static long REPLY_TIMEOUT_MS_MIN = OVERALL_TIMEOUT_MS_DEFAULT - 5*1000;
+    // callback timeout. Longer so we can have success-after-failure
+    private final static long RATCHET_REPLY_TIMEOUT_MS_MIN = 30*1000;
     
     /**
      * NOTE: Changed as of 0.9.2.
@@ -1152,8 +1154,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
 
         public long getExpiration() {
-            // same as SendTimeoutJob
-            return Math.max(_overallExpiration, _start + REPLY_TIMEOUT_MS_MIN);
+            // longer timeout so we can have success-after-failure via ratchet
+            return Math.max(_overallExpiration, _start + RATCHET_REPLY_TIMEOUT_MS_MIN);
         }
 
         public void onReply() {
