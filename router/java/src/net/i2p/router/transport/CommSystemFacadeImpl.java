@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.Vector;
 
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -114,11 +113,11 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *
      * A positive number means our clock is ahead of theirs.
      *
-     * Todo: change Vectors to milliseconds
+     * Todo: change List to milliseconds
      */
     @Override
     public long getFramedAveragePeerClockSkew(int percentToInclude) {
-        Vector<Long> skews = _manager.getClockSkews();
+        List<Long> skews = _manager.getClockSkews();
         if (skews == null ||
             skews.isEmpty() ||
             (skews.size() < 5 && _context.clock().getUpdatedSuccessfully())) {

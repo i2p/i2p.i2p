@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.EncType;
@@ -787,12 +786,12 @@ public class NTCPTransport extends TransportImpl {
 
     /**
      * Return our peer clock skews on this transport.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * A positive number means our clock is ahead of theirs.
      */
     @Override
-    public Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector<Long>();
+    public List<Long> getClockSkews() {
+        List<Long> skews = new ArrayList<Long>(_conByIdent.size());
         // Omit ones established too long ago,
         // since the skew is only set at startup (or after a meta message)
         // and won't include effects of later offset adjustments
@@ -801,13 +800,13 @@ public class NTCPTransport extends TransportImpl {
         for (NTCPConnection con : _conByIdent.values()) {
             // TODO skip isEstablished() check?
             if (con.isEstablished() && con.getCreated() > tooOld)
-                skews.addElement(Long.valueOf(con.getClockSkew()));
+                skews.add(Long.valueOf(con.getClockSkew()));
         }
 
         // If we don't have many peers, maybe it is because of a bad clock, so
         // return the last bad skew we got
         if (skews.size() < 5 && _lastBadSkew != 0)
-            skews.addElement(Long.valueOf(_lastBadSkew));
+            skews.add(Long.valueOf(_lastBadSkew));
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");

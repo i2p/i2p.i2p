@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SigType;
@@ -538,14 +537,14 @@ public class TransportManager implements TransportEventListener {
     
     /**
      * Return our peer clock skews on all transports.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * A positive number means our clock is ahead of theirs.
      * Note: this method returns them in whimsical order.
      */
-    Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector<Long>();
+    List<Long> getClockSkews() {
+        List<Long> skews = new ArrayList<Long>();
         for (Transport t : _transports.values()) {
-            Vector<Long> tempSkews = t.getClockSkews();
+            List<Long> tempSkews = t.getClockSkews();
             if ((tempSkews == null) || (tempSkews.isEmpty())) continue;
             skews.addAll(tempSkews);
         }

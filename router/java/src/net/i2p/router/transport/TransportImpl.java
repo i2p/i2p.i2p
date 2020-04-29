@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -199,10 +198,10 @@ public abstract class TransportImpl implements Transport {
 
     /**
      * Return our peer clock skews on a transport.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * Dummy version. Transports override it.
      */
-    public Vector<Long> getClockSkews() { return new Vector<Long>(); }
+    public List<Long> getClockSkews() { return Collections.emptyList(); }
 
     public List<String> getMostRecentErrorMessages() { return Collections.emptyList(); }
 

@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -2845,12 +2844,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /**
      * Return our peer clock skews on this transport.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * A positive number means our clock is ahead of theirs.
      */
     @Override
-    public Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector<Long>();
+    public List<Long> getClockSkews() {
+        List<Long> skews = new ArrayList<Long>(_peersByIdent.size());
 
         // If our clock is way off, we may not have many (or any) successful connections,
         // so try hard in that case to return good data
@@ -2861,7 +2860,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 continue; // skip old peers
             if (peer.getRTT() > 1250)
                 continue; // Big RTT makes for a poor calculation
-            skews.addElement(Long.valueOf(peer.getClockSkew() / 1000));
+            skews.add(Long.valueOf(peer.getClockSkew() / 1000));
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UDP transport returning " + skews.size() + " peer clock skews.");
