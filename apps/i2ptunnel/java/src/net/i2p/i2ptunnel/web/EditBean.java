@@ -259,6 +259,13 @@ public class EditBean extends IndexBean {
         return getTunnelStatus(tunnel) == GeneralHelper.NOT_RUNNING;
     }
 
+    /** @since 0.9.46 */
+    public boolean canChangeEncType(int tunnel) {
+        if (tunnel < 0)
+            return true;
+        return getTunnelStatus(tunnel) == GeneralHelper.NOT_RUNNING;
+    }
+
     /**
      *  @param encType code
      *  @since 0.9.44
@@ -508,8 +515,7 @@ public class EditBean extends IndexBean {
     public String getQuantityOptions(int tunnel, int mode) {
         int tunnelQuantity = mode == 2 ? getTunnelQuantityOut(tunnel, DFLT_QUANTITY)
                                        : getTunnelQuantity(tunnel, DFLT_QUANTITY);
-        boolean advanced = _context.getBooleanProperty(PROP_ADVANCED);
-        int maxQuantity = advanced ? MAX_ADVANCED_QUANTITY :
+        int maxQuantity = isAdvanced() ? MAX_ADVANCED_QUANTITY :
                                      (isClient(tunnel) ? MAX_CLIENT_QUANTITY : MAX_SERVER_QUANTITY);
         if (tunnelQuantity > maxQuantity)
             maxQuantity = tunnelQuantity;

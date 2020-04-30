@@ -542,6 +542,7 @@
 <%
                 boolean has0 = editBean.hasEncType(curTunnel, 0);
                 boolean has4 = editBean.hasEncType(curTunnel, 4);
+                String edisabled = editBean.canChangeEncType(curTunnel) ? "" : " disabled=\"disabled\" ";
 %>
         <tr>
             <th colspan="2">
@@ -550,15 +551,15 @@
         </tr><tr>
             <td colspan="2">
                 <span class="multiOption">
-                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=(has0 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=(has0 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ElGamal-2048</label>
                 </span>
                 <span class="multiOption">
-                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=(has4 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=(has4 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ECIES-X25519 (<%=intl._t("Experts only!")%>)</label>
                 </span>
                 <span class="multiOption">
-                    <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     <%=intl._t("Both encryption types")%> (<%=intl._t("Experts only!")%>)</label>
                 </span>
             </td>
