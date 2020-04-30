@@ -358,8 +358,10 @@ public final class ECIESAEADEngine {
         byte xx31 = xx[KEYLEN - 1];
         PublicKey pk = Elligator2.decode(xx);
         if (pk == null) {
-            if (_log.shouldWarn())
-                _log.warn("Elg2 decode fail NS");
+            // very unlikely
+            if (_log.shouldDebug())
+                _log.debug("Elg2 decode fail NS");
+            data[KEYLEN - 1] = xx31;
             return null;
         }
         // rewrite in place, must restore below on failure
@@ -370,8 +372,9 @@ public final class ECIESAEADEngine {
         try {
             state.readMessage(data, 0, data.length, payload, 0);
         } catch (GeneralSecurityException gse) {
-            if (_log.shouldWarn()) {
-                _log.warn("Decrypt fail NS", gse);
+            // we'll get this a lot on muxed SKM
+            if (_log.shouldInfo()) {
+                _log.info("Decrypt fail NS", gse);
                 if (_log.shouldDebug())
                     _log.debug("State at failure: " + state);
             }
@@ -405,6 +408,7 @@ public final class ECIESAEADEngine {
 
         // payload
         if (payloadlen == 0) {
+            // disallowed, datetime block required
             if (_log.shouldWarn())
                 _log.warn("Zero length payload in NS");
             return NO_CLOVES;
@@ -421,6 +425,7 @@ public final class ECIESAEADEngine {
         }
 
         if (pc.datetime == 0) {
+            // disallowed, datetime block required
             if (_log.shouldWarn())
                 _log.warn("No datetime block in IB NS");
             return NO_CLOVES;
@@ -431,11 +436,12 @@ public final class ECIESAEADEngine {
         keyManager.createSession(bob, state, null);
 
         if (pc.cloveSet.isEmpty()) {
-            if (_log.shouldWarn())
-                _log.warn("No garlic block in NS payload");
+            // this is legal
+            if (_log.shouldDebug())
+                _log.debug("No garlic block in NS payload");
+            return NO_CLOVES;
         }
         int num = pc.cloveSet.size();
-        // return non-null even if zero cloves
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
@@ -480,8 +486,10 @@ public final class ECIESAEADEngine {
         byte yy31 = yy[KEYLEN - 1];
         PublicKey k = Elligator2.decode(yy);
         if (k == null) {
-            if (_log.shouldWarn())
-                _log.warn("Elg2 decode fail NSR");
+            // very unlikely
+            if (_log.shouldDebug())
+                _log.debug("Elg2 decode fail NSR");
+            data[TAGLEN + KEYLEN - 1] = yy31;
             return null;
         }
         if (_log.shouldDebug())
@@ -530,20 +538,24 @@ public final class ECIESAEADEngine {
             }
             return NO_CLOVES;
         }
+
+        PLCallback pc;
         if (payload.length == 0) {
-            if (_log.shouldWarn())
-                _log.warn("Zero length payload in NSR");
-            return NO_CLOVES;
-        }
-        PLCallback pc = new PLCallback();
-        try {
-            int blocks = RatchetPayload.processPayload(_context, pc, payload, 0, payload.length, false);
+            // this is legal
+            pc = null;
             if (_log.shouldDebug())
-                _log.debug("Processed " + blocks + " blocks in IB NSR");
-        } catch (DataFormatException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new DataFormatException("NSR payload error", e);
+                _log.debug("Zero length payload in IB NSR");
+        } else {
+            pc = new PLCallback();
+            try {
+                int blocks = RatchetPayload.processPayload(_context, pc, payload, 0, payload.length, false);
+                if (_log.shouldDebug())
+                    _log.debug("Processed " + blocks + " blocks in IB NSR");
+            } catch (DataFormatException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new DataFormatException("NSR payload error", e);
+            }
         }
 
         byte[] bobPK = new byte[KEYLEN];
@@ -561,12 +573,15 @@ public final class ECIESAEADEngine {
         PublicKey bob = new PublicKey(EncType.ECIES_X25519, bobPK);
         keyManager.updateSession(bob, oldState, state, null, split);
 
+        if (pc == null)
+            return NO_CLOVES;
         if (pc.cloveSet.isEmpty()) {
-            if (_log.shouldWarn())
-                _log.warn("No garlic block in NSR payload");
+            // this is legal
+            if (_log.shouldDebug())
+                _log.debug("No garlic block in NSR payload");
+            return NO_CLOVES;
         }
         int num = pc.cloveSet.size();
-        // return non-null even if zero cloves
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
@@ -602,9 +617,10 @@ public final class ECIESAEADEngine {
             return null;
         }
         if (data.length == TAGLEN + MACLEN) {
+            // legal?
             if (_log.shouldWarn())
                 _log.warn("Zero length payload in ES");
-            return null;
+            return NO_CLOVES;
         }
         PublicKey remote = key.getRemoteKey();
         PLCallback pc = new PLCallback(keyManager, remote);
@@ -617,10 +633,6 @@ public final class ECIESAEADEngine {
         } catch (Exception e) {
             throw new DataFormatException("ES payload error", e);
         }
-        if (pc.cloveSet.isEmpty()) {
-            if (_log.shouldWarn())
-                _log.warn("No garlic block in ES payload");
-        }
         if (pc.nextKeys != null) {
             for (NextSessionKey nextKey : pc.nextKeys) {
                 keyManager.nextKeyReceived(remote, nextKey);
@@ -629,8 +641,13 @@ public final class ECIESAEADEngine {
         if (pc.ackRequested) {
             keyManager.ackRequested(remote, key.getID(), nonce);
         }
+        if (pc.cloveSet.isEmpty()) {
+            // this is legal
+            if (_log.shouldDebug())
+                _log.debug("No garlic block in ES payload");
+            return NO_CLOVES;
+        }
         int num = pc.cloveSet.size();
-        // return non-null even if zero cloves
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);

@@ -33,6 +33,7 @@ final class MuxedEngine {
         if (elgKey.getType() != EncType.ELGAMAL_2048 ||
             ecKey.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
+        final boolean debug = _log.shouldDebug();
         CloveSet rv = null;
         // Try in-order from fastest to slowest
         boolean preferRatchet = keyManager.preferRatchet();
@@ -41,7 +42,7 @@ final class MuxedEngine {
             rv = _context.eciesEngine().decryptFast(data, ecKey, keyManager.getECSKM());
             if (rv != null)
                 return rv;
-            if (_log.shouldDebug())
+            if (debug)
                 _log.debug("Ratchet tag not found before AES");
         }
         // AES Tag
@@ -58,7 +59,7 @@ final class MuxedEngine {
                 }
                 return rv;
             } else {
-                if (_log.shouldDebug())
+                if (debug)
                     _log.debug("AES tag not found after ratchet? " + preferRatchet);
             }
         }
@@ -67,7 +68,7 @@ final class MuxedEngine {
             rv = _context.eciesEngine().decryptFast(data, ecKey, keyManager.getECSKM());
             if (rv != null)
                 return rv;
-            if (_log.shouldDebug())
+            if (debug)
                 _log.debug("Ratchet tag not found after AES");
         }
 
@@ -78,7 +79,7 @@ final class MuxedEngine {
             keyManager.reportDecryptResult(true, ok);
             if (ok)
                 return rv;
-            if (_log.shouldDebug())
+            if (debug)
                 _log.debug("Ratchet NS decrypt failed before ElG");
         }
         // ElG DH
@@ -108,7 +109,7 @@ final class MuxedEngine {
             rv = _context.eciesEngine().decryptSlow(data, ecKey, keyManager.getECSKM());
             boolean ok = rv != null;
             keyManager.reportDecryptResult(true, ok);
-            if (!ok && _log.shouldDebug())
+            if (!ok && debug)
                 _log.debug("Ratchet NS decrypt failed after ElG");
         }
         return rv;

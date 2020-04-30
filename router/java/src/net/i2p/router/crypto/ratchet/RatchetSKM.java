@@ -335,14 +335,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     public RatchetEntry consumeNextAvailableTag(PublicKey target) {
         OutboundSession sess = getSession(target);
         if (sess == null) {
-            if (_log.shouldDebug())
-                _log.debug("No OB session to " + toString(target));
+            //if (_log.shouldDebug())
+            //    _log.debug("No OB session to " + toString(target));
             return null;
         }
         RatchetEntry rv = sess.consumeNext();
         if (_log.shouldDebug()) {
             if (rv != null)
-                _log.debug("Using next key/tag " + rv + " to " + toString(target));
+                _log.debug("Using tag " + rv + " to " + toString(target));
             else
                 _log.debug("No more tags in OB session to " + toString(target));
         }
