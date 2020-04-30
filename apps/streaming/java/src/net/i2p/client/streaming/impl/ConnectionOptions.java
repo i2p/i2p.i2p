@@ -28,6 +28,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _receiveWindow;
     private int _profile;
     private int _rtt;
+    private int _minRtt = Integer.MAX_VALUE;
     private int _rttDev;
     private int _rto = INITIAL_RTO;
     private int _resendDelay;
@@ -83,9 +84,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * These values are specified in RFC 6298
      * Do not change unless you know what you're doing
      */
-    private static final double TCP_ALPHA = 1.0/8;
-    private static final double TCP_BETA = 1.0/4; 
-    private static final double TCP_KAPPA = 4;
+    private static final float TCP_ALPHA = 1.0f/8;
+    private static final float TCP_BETA = 1.0f/4; 
+    private static final float TCP_KAPPA = 4;
     
     private static final String PROP_INITIAL_RTO = "i2p.streaming.initialRTO";
     private static final int INITIAL_RTO = 9000; 
@@ -579,6 +580,13 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public synchronized int getRTT() { return _rtt; }
 
     /**
+     * @return minimum RTT observed over the life of the connection, greater than zero
+     * @since 0.9.46
+     */
+    public synchronized int getMinRTT() {return _minRtt; }
+
+
+    /**
      *  not public, use updateRTT()
      */
     private void setRTT(int ms) { 
@@ -677,6 +685,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  @param measuredValue must be positive
      */
     public synchronized void updateRTT(int measuredValue) {
+        _minRtt = Math.min(_minRtt, measuredValue);
         switch(_initState) {
         case INIT:
             _initState = AckInit.FIRST;

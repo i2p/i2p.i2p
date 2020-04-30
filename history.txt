@@ -1,3 +1,21 @@
+2020-04-30 zzz
+ * Ratchet: Error handling fixes
+ * Streaming: Westwood+ congestion control (ticket #2719)
+
+2020-04-29 zzz
+ * Ratchet: Increase callback timeout
+ * Router: Replace old data structure classes
+
+2020-04-27 zzz
+ * Crypto: Reduce max ElG tagset expiration at receiver
+ * i2psnark:
+   - Don't unchoke when we don't have pieces
+   - Don't avoid partial pieces if there are several seeds
+
+2020-04-25 zzz
+ * i2psnark: Increase min size for video preview
+ * Ratchet: Variable tagset lookahead/trim limits
+
 2020-04-24 zzz
  * i2psnark: Don't mark torrent BAD on I2CP errors (ticket #2725)
  * Logging: Log to wrapper log after log manager shutdown (ticket #2725)

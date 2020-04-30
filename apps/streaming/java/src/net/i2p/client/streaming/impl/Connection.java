@@ -89,6 +89,7 @@ class Connection {
     private final int _localPort;
     private final int _remotePort;
     private final SimpleTimer2 _timer;
+    private final BandwidthEstimator _bwEstimator;
     
     private final AtomicLong _lifetimeBytesSent = new AtomicLong();
     /** TBD for tcpdump-compatible ack output */
@@ -114,7 +115,7 @@ class Connection {
 
     /** Maximum number of packets to retransmit when the timer hits */
     private static final int MAX_RTX = 16;
-    
+
 /****
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
                       PacketQueue queue, ConnectionPacketHandler handler) {
@@ -170,6 +171,7 @@ class Connection {
         _nextSendLock = new Object();
         _connectionEvent = new ConEvent();
         _retransmitEvent = new RetransmitEvent();
+        _bwEstimator = new SimpleBandwidthEstimator(ctx, _options);
         _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
         // all createRateStats in ConnectionManager
         if (_log.shouldLog(Log.INFO))
@@ -579,6 +581,7 @@ class Connection {
         }
         if ((acked != null) && (!acked.isEmpty()) ) {
             _ackSinceCongestion.set(true);
+            _bwEstimator.addSample(acked.size());
             if (anyLeft) {
                 // RFC 6298 section 5.3
                 int rto = getOptions().getRTO();
@@ -1417,6 +1420,7 @@ class Connection {
         buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
         buf.append(" ackThru ").append(_highestAckedThrough);
         buf.append(" ssThresh ").append(_ssthresh); 
+        buf.append(" minRTT ").append(getOptions().getMinRTT()); 
         buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
         buf.append(" MTU ").append(getOptions().getMaxMessageSize());
         
@@ -1477,7 +1481,7 @@ class Connection {
             final long now = _context.clock().now();
             pushBackRTO(getOptions().doubleRTO());
 
-            // 2. cut ssthresh in half the outstanding size (RFC 5681, equation 4)
+            // 2. cut ssthresh to bandwidth estimate, window to 1
             List<PacketLocal> toResend = null;
             synchronized(_outboundPackets) {
                 if (_outboundPackets.isEmpty()) {
@@ -1490,8 +1494,8 @@ class Connection {
                 if (oldest.getNumSends() == 1) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(Connection.this + " cutting ssthresh and window");
-                    int flightSize = _outboundPackets.size();
-                    _ssthresh = Math.min(ConnectionPacketHandler.MAX_SLOW_START_WINDOW, Math.max( flightSize / 2, 2 ));
+                    _ssthresh = Math.max( (int)(_bwEstimator.getBandwidthEstimate() * getOptions().getMinRTT()), 2 );
+                    _ssthresh = Math.min(ConnectionPacketHandler.MAX_SLOW_START_WINDOW, _ssthresh);
                     getOptions().setWindowSize(1);
                 } else if (_log.shouldLog(Log.DEBUG))
                     _log.debug(Connection.this + " not cutting ssthresh and window");
@@ -1693,11 +1697,12 @@ class Connection {
                         // This prevents being stuck at a window size of 1, retransmitting every packet,
                         // never updating the RTT or RTO.
                         getOptions().doubleRTO();
-                        getOptions().setWindowSize(1);
 
                         if (_packet.getNumSends() == 1) {
-                            int flightSize = getUnackedPacketsSent();
-                            _ssthresh = Math.min(ConnectionPacketHandler.MAX_SLOW_START_WINDOW, Math.max( flightSize / 2, 2 ));
+                            _ssthresh = Math.max( (int)(_bwEstimator.getBandwidthEstimate() * getOptions().getMinRTT()), 2 );
+                            _ssthresh = Math.min(ConnectionPacketHandler.MAX_SLOW_START_WINDOW, _ssthresh);
+                            int wsize = getOptions().getWindowSize();
+                            getOptions().setWindowSize(Math.min(_ssthresh, wsize));
                         }
 
                         if (_log.shouldLog(Log.INFO))

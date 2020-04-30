@@ -28,7 +28,7 @@ class ConnectionPacketHandler {
     private final Log _log;
     private final ByteCache _cache = ByteCache.getInstance(32, 4*1024);
 
-    public static final int MAX_SLOW_START_WINDOW = 24;
+    public static final int MAX_SLOW_START_WINDOW = 64;
     
     // see tickets 1939 and 2584
     private static final int IMMEDIATE_ACK_DELAY = 150;
