@@ -252,18 +252,26 @@ public class EditBean extends IndexBean {
 
     /** @since 0.9.33 */
     public boolean canChangeSigType(int tunnel) {
-        if (tunnel < 0)
-            return true;
-        if (getDestination(tunnel) != null)
+        if (!canChangeEncType(tunnel))
             return false;
-        return getTunnelStatus(tunnel) == GeneralHelper.NOT_RUNNING;
+        return getDestination(tunnel) == null;
     }
 
     /** @since 0.9.46 */
     public boolean canChangeEncType(int tunnel) {
         if (tunnel < 0)
             return true;
-        return getTunnelStatus(tunnel) == GeneralHelper.NOT_RUNNING;
+        if (getTunnelStatus(tunnel) != GeneralHelper.NOT_RUNNING)
+            return false;
+        if (isInitialized() && isSharedClient(tunnel)) {
+            for (TunnelController tc : _group.getControllers()) {
+                if (tc.isClient() &&
+                    Boolean.parseBoolean(tc.getSharedClient()) &&
+                    (tc.getIsRunning() || tc.getIsStarting()))
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
