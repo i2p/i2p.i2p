@@ -177,17 +177,33 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  1003 Tunnel Payload
      *  - 39 Unfragmented instructions (see router/tunnel/TrivialPreprocessor.java)
      * -----
-     *   964 Unfragmented I2NP Message
-     *  - 20 ??
+     *   964 Garlic Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
-     *   944 Garlic Message padded to 16 bytes
-     *  -  0 Pad to 16 bytes (why?)
+     *   944 Garlic Message AES payload padded to 16 bytes
+     *  -  0 Pad to 16 bytes
      * -----
      *   944 Garlic Message (assumes no bundled leaseSet or keys)
-     *  - 71 Garlic overhead
+     *  - 32 session tag
+     *  -  2 tag count
+     *  -  4 payload size
+     *  - 32 payload hash
+     *  -  1 flags
+     *  -  1 clove count
+     *  - 33 clove delivery instructions
+     *       (Tunnel Data Message goes here)
+     *  -  4 clove ID
+     *  -  8 clove expiration
+     *  -  3 clove cert
+     *  -  3 garlic cert
+     *  -  4 garlic ID
+     *  -  8 garlic expiration
+     * - 135 total overhead
      * -----
-     *   873 Tunnel Data Message
-     *  - 84 ??
+     *   809 Data Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
      *   789 Gzipped I2NP message
      *  - 23 Gzip 10 byte header, 5 byte block header, 8 byte trailer (yes we always use gzip, but it
@@ -196,7 +212,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *       (see client/I2PSessionImpl2.java, util/ReusableGZipOutputStream.java, and the gzip and deflate specs)
      * -----
      *   766
-     *  - 28 Streaming header (24 min, but leave room for a nack or other optional things) (See Packet.java)
+     *  - 28 Streaming header (22 min) and 6 bytes of options or nacks
      * -----
      *   738 Streaming message size
      *
@@ -209,24 +225,40 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  2006 Tunnel Payload
      *  - 50 Fragmented instructions (43 for first + 7 for second)
      * -----
-     *  1956 Unfragmented I2NP Message
-     *  - 20 ??
+     *  1956 Garlic Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
-     *  1936 Garlic Message padded to 16 bytes
+     *  1936 Garlic Message AES payload padded to 16 bytes
      *  1936
      *  -  0 Pad to 16 bytes
      * -----
      *  1936 Garlic Message
-     *  - 71 Garlic overhead
+     *  - 32 session tag
+     *  -  2 tag count
+     *  -  4 payload size
+     *  - 32 payload hash
+     *  -  1 flags
+     *  -  1 clove count
+     *  - 33 clove delivery instructions
+     *       (Tunnel Data Message goes here)
+     *  -  4 clove ID
+     *  -  8 clove expiration
+     *  -  3 clove cert
+     *  -  3 garlic cert
+     *  -  4 garlic ID
+     *  -  8 garlic expiration
+     * - 135 total overhead
      * -----
-     *  1865 Tunnel Data Message
-     *  - 84 ??
+     *  1801 Data Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
      *  1781 Gzipped I2NP message
      *  - 23 Gzip header
      * -----
      *  1758
-     *  - 28 Streaming header
+     *  - 28 Streaming header (22 min) and 6 bytes of options or nacks
      * -----
      *  1730 Streaming message size to fit in 2 tunnel messages
      *
