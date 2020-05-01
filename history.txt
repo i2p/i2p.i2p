@@ -1,4 +1,8 @@
+2020-05-01 zzz
+ * Ratchet: Fix NPE ratcheting IB NSR tagset
+
 2020-04-30 zzz
+ * i2ptunnel: Prevent changing enc type on running tunnel
  * Ratchet: Error handling fixes
  * Streaming: Westwood+ congestion control (ticket #2719)
 

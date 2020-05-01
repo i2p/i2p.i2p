@@ -450,9 +450,12 @@ class RatchetTagSet implements TagSetHandle {
             int toTrim = 0;
             int tagnum;
             while ((tagnum = _sessionTags.keyAt(toTrim)) < tooOld) {
-                int kidx = _sessionKeys.indexOfKey(tagnum);
-                if (kidx >= 0)
-                    _sessionKeys.removeAt(kidx);
+                if (_sessionKeys != null) {
+                    // only for ES tagsets
+                    int kidx = _sessionKeys.indexOfKey(tagnum);
+                    if (kidx >= 0)
+                        _sessionKeys.removeAt(kidx);
+                }
                 if (_lsnr != null)
                     _lsnr.expireTag(_sessionTags.valueAt(toTrim), this);
                 toTrim++;
