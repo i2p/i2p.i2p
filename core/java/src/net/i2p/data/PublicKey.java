@@ -38,6 +38,7 @@ public class PublicKey extends SimpleDataStructure {
 
     /**
      * Pull from cache or return new.
+     * ELGAMAL_2048 only!
      * Deprecated - used only by deprecated Destination.readBytes(data, off)
      *
      * @throws ArrayIndexOutOfBoundsException if not enough bytes, FIXME should throw DataFormatException
@@ -48,7 +49,8 @@ public class PublicKey extends SimpleDataStructure {
     }
 
     /**
-     * Pull from cache or return new
+     * Pull from cache or return new.
+     * ELGAMAL_2048 only!
      * @since 0.8.3
      */
     public static PublicKey create(InputStream in) throws IOException {
