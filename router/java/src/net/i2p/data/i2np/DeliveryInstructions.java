@@ -445,25 +445,28 @@ public class DeliveryInstructions extends DataStructureImpl {
         buf.append("\n\tDelivery mode: ");
         switch (getDeliveryMode()) {
             case DELIVERY_MODE_LOCAL:
-                buf.append("local");
+                buf.append("Local");
                 break;
             case DELIVERY_MODE_DESTINATION:
-                buf.append("destination");
+                buf.append("Destination");
                 break;
             case DELIVERY_MODE_ROUTER:
-                buf.append("router");
+                buf.append("Router");
                 break;
             case DELIVERY_MODE_TUNNEL:
-                buf.append("tunnel");
+                buf.append("Tunnel");
                 break;
         }
-        buf.append("\n\tDelay requested: ").append(getDelayRequested());
-        buf.append("\n\tDelay seconds: ").append(getDelaySeconds());
-        buf.append("\n\tDestination: ").append(getDestination());
+        if (_delayRequested)
+            buf.append("\n\tDelay seconds: ").append(_delaySeconds);
+        if (_destinationHash != null)
+            buf.append("\n\tDestination: ").append(_destinationHash.toBase32());
         //buf.append("\n\tEncrypted: ").append(getEncrypted());
-        buf.append("\n\tEncryption key: ").append(getEncryptionKey());
-        buf.append("\n\tRouter: ").append(getRouter());
-        buf.append("\n\tTunnelId: ").append(getTunnelId());
+        //buf.append("\n\tEncryption key: ").append(getEncryptionKey());
+        if (_routerHash != null)
+            buf.append("\n\tRouter: ").append(_routerHash.toBase64());
+        if (_tunnelId != null)
+            buf.append("\n\tTunnelId: ").append(_tunnelId);
         
         return buf.toString();
     }

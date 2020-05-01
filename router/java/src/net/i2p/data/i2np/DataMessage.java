@@ -99,8 +99,7 @@ public class DataMessage extends FastI2NPMessageImpl {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("[DataMessage: ");
-        buf.append("\n\tData: ");
+        buf.append("[DataMessage: data ");
         if (_data != null) {
             buf.append(_data.length).append(" bytes");
             if (_data.length <= 64)
@@ -108,7 +107,7 @@ public class DataMessage extends FastI2NPMessageImpl {
         } else {
             buf.append("null");
         }
-        buf.append("]");
+        buf.append(']');
         return buf.toString();
     }
 }
