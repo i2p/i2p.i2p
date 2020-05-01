@@ -730,6 +730,8 @@ td#throttle {
 
 #throttler th:last-child, #throttler td:last-child {
      border-right: none;
+     padding-left: 30px;
+     border-bottom: none;
 }
 
 #throttler th {
@@ -748,6 +750,7 @@ td#throttle {
 
 #throttler tr:first-child th {
      border-top: none;
+     padding-left: 30px;
 }
 
 td.blankColumn {
