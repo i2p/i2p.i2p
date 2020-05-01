@@ -35,6 +35,9 @@ hideableTables.forEach(function(configTable) {
             if (i >= minRow) {
                 if (row.classList.contains("tunnelConfigExpanded")) {
                     hideRow(row)
+                    row.querySelectorAll("th").forEach(function(configRow) {
+                        configRow.classList.remove('tunnelConfigExpanded');
+                    });
                     configTable.classList.remove('tunnelConfigExpanded');
                     row.classList.remove('tunnelConfigExpanded');
                 } else {
