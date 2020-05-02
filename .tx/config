@@ -576,7 +576,9 @@ trans.zh_CN = installer/resources/locale-man/man_zh.po
 type = HTML
 source_file = installer/resources/eepsite/docroot/help/index.html
 source_lang = en
-trans.ar = installer/resources/eepsite/docroot/help/index_ar.html
+;; File contains local changes to fix RTL issues.
+;; Merge locally or make changes on TX side before re-enabling
+;;trans.ar = installer/resources/eepsite/docroot/help/index_ar.html
 trans.az = installer/resources/eepsite/docroot/help/index_az.html
 trans.de = installer/resources/eepsite/docroot/help/index_de.html
 ;; not yet translated on TX, use old page

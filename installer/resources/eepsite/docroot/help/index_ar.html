@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html dir="rtl" lang="ar">
 <head>
 <title>I2P خادم الويب المجهول</title>
 <link rel="shortcut icon" href="favicon.ico">
@@ -33,12 +33,12 @@
     <ul>
 <li>
 <b> لينكس </b><br>
-        تثبيت عادي: <code>~/.i2p/eepsite/docroot/ </code><br>
-       تثبيت الحزمة، وتشغيلها كخدمة: <code>/var/lib/i2p/i2p-config/eepsite/docroot/ </code> </li>
+        تثبيت عادي: <code dir="ltr">~/.i2p/eepsite/docroot/ </code><br>
+       تثبيت الحزمة، وتشغيلها كخدمة: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/ </code> </li>
       <li>
-<b> ويندوز </b><br><code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code> </li>        
+<b> ويندوز </b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code> </li>        
       <li>
-<b> ماك </b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+<b> ماك </b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
 <p>في I2P ، يتم تناول الخدمات المخفية باستخدام عنوان Base32 ينتهي بـ ".b32.i2p" ، أو وجهة يتم تمثيلها كسلسلة Base64 طويلة.
@@ -117,13 +117,13 @@
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
 <p>إذا كنت في عجلة من أمرك ولا يمكنك الانتظار لبضع ساعات ، فيمكنك إخبار الأشخاص باستخدام خدمة "القفزة"  لإعادة توجيه عنوان المساعد.
         سيعمل هذا في غضون بضع دقائق من تسجيل اسم مضيفك على نفس الموقع.
-        اختبر هذا أولا بنفسك عن طريق إدخال <code> http: //stats.i2p/cgi-bin/jump.cgi؟ a=<i>something</i>.i2p </code>في متصفحك.
+        اختبر هذا أولا بنفسك عن طريق إدخال <code dir="ltr"> http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p </code>  في متصفحك.
         بمجرد أن تعمل، يمكنك إخبار الآخرين باستخدامها.</p>
 
     <p>يقوم بعض الأشخاص بالتحقق من قوائم مواقع الويب مثل <a href="http://identiguy.i2p/" target="_blank"> قائمة الحالة Identiguy الخاصة بـ eepsite </a>أو <a href="http://no.i2p/browse/" target="_blank"> قائمة المضيف النشط no.i2p </a> لـ eepites الجديدة ، وبالتالي قد يبدأ موقعك في الحصول على بعض الزيارات.
@@ -154,7 +154,7 @@
         هناك الكثير من الأدلة اﻹرشادية عبر الإنترنت، على سبيل المثال إذا بحث عن "دليل nginx الإرشادي لتقوية الأمان " فستجد عددًا من الأدلة اﻹرشادية التي تحتوي على توصيات جيدة.</p> 
 
         <p>هناك مشكلة واحدة مهمة مع خادم ويب أباتشي.
-         تمكين Apache للوحدات النمطية <code> mod_status</code> و <code>mod_info</code> افتراضيًا في بعض أنظمة التشغيل.
+         تمكين Apache للوحدات النمطية <code dir="ltr"> mod_status</code> و <code dir="ltr">mod_info</code> افتراضيًا في بعض أنظمة التشغيل.
         تفضح هذه الوحدات البيانات الداخلية التي يمكن أن تؤدي إلى تنازل خطير عن إخفاء الهوية عند استخدامها على شبكة مجهولة.
         تعد إزالة هذه الأسطر في ملف التهيئة حيث يتم تحميلها في الوحدات النمطية أسهل طريقة لمنع حدوث هذه المشكلات.</p>
 
