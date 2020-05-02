@@ -70,6 +70,8 @@ public interface I2PClient {
     public static final String PROP_USER = "i2cp.username";
     /** @since 0.9.44, was protected in I2PSessionImpl */
     public static final String PROP_PW = "i2cp.password";
+    /** @since 0.9.46 */
+    public static final String PROP_GZIP = "i2cp.gzip";
 
     /**
      *  7654

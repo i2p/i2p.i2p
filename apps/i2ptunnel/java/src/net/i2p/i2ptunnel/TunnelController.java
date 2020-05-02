@@ -89,6 +89,8 @@ public class TunnelController implements Logging {
     public static final String PROP_FILTER = "filterDefinition";
     /** @since 0.9.42 */
     public static final String PROP_CONFIG_FILE = "configFile";
+    /** @since 0.9.46 */
+    public static final String PROP_TUN_GZIP = "i2ptunnel.gzip";
 
     /**
      * all of these are @since 0.9.33 (moved from TunnelConfig)
@@ -139,6 +141,7 @@ public class TunnelController implements Logging {
 
     /** @since 0.9.34 */
     private static final String OPT_LIMIT_ACTION = PFX_OPTION + PROP_LIMIT_ACTION;
+    private static final String OPT_I2CP_GZIP = PFX_OPTION + I2PClient.PROP_GZIP;
 
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
@@ -834,6 +837,15 @@ public class TunnelController implements Logging {
             if (type.equals(TYPE_HTTP_SERVER)) {
                 if (!_config.containsKey(OPT_LIMIT_ACTION))
                     _config.setProperty(OPT_LIMIT_ACTION, "http");
+                String tgzip = _config.getProperty(PROP_TUN_GZIP);
+                if (tgzip == null || Boolean.valueOf(tgzip)) {
+                    // Web server will gzip
+                    // If web server doesn't gzip, I2PTunnelHTTPServer will.
+                    // Streaming will force gzip on first packet for header compression,
+                    // regardless of this setting
+                    if (!_config.containsKey(OPT_I2CP_GZIP))
+                        _config.setProperty(OPT_I2CP_GZIP, "false");
+                }
             }
             if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))

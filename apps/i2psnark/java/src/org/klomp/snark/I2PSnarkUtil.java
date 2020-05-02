@@ -295,6 +295,9 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.answerPings", "false");
             if (opts.getProperty(I2PClient.PROP_SIGTYPE) == null)
                 opts.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
+            // assume compressed content
+            if (opts.getProperty(I2PClient.PROP_GZIP) == null)
+                opts.setProperty(I2PClient.PROP_GZIP, "false");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
             if (_manager != null)
                 _startedTime = _context.clock().now();

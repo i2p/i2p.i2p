@@ -547,7 +547,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // server, reads the response headers, rewriting to include Content-Encoding: x-i2p-gzip
             // if it was one of the Accept-Encoding: values, and gzip the payload       
             boolean allowGZIP = true;
-            String val = opts.getProperty("i2ptunnel.gzip");
+            String val = opts.getProperty(TunnelController.PROP_TUN_GZIP);
             if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
                 allowGZIP = false;
             if (_log.shouldLog(Log.INFO))

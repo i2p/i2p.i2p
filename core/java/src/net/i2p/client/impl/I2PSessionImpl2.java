@@ -188,7 +188,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     protected boolean shouldCompress(int size) {
          if (size <= DONT_COMPRESS_SIZE)
              return false;
-         String p = getOptions().getProperty("i2cp.gzip");
+         String p = getOptions().getProperty(I2PClient.PROP_GZIP);
          if (p != null)
              return Boolean.parseBoolean(p);
          return SHOULD_COMPRESS;
