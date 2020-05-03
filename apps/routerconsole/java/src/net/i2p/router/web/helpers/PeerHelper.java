@@ -328,7 +328,7 @@ public class PeerHelper extends HelperBase {
                 buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound")).append("\"/>");
             buf.append("</td><td class=\"cells peeripv6\" align=\"center\">");
             if (con.isIPv6())
-                buf.append("<span class=\"backlogged\">&#x2714;</span>");
+                buf.append("<span class=\"backlogged\">&#x2713;</span>");
             else
                 buf.append("");
             buf.append("</td><td class=\"cells peeripv6\" align=\"center\">").append(con.getVersion());
