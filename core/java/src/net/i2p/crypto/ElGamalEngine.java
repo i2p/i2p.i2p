@@ -40,6 +40,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.SimpleByteCache;
+import net.i2p.util.SystemVersion;
 
 /** 
  * Wrapper for ElGamal encryption/signature schemes.
@@ -48,6 +49,8 @@ import net.i2p.util.SimpleByteCache;
  * encrypted is first prepended with a random nonzero byte, then the 32 bytes
  * making up the SHA256 of the data, then the data itself.  The random byte and 
  * the SHA256 hash is stripped on decrypt so the original data is returned.
+ *
+ * Not recommended for new applications.
  *
  * @author thecrypto, jrandom
  */
@@ -68,6 +71,7 @@ public final class ElGamalEngine {
      * application context.  This constructor should only be used by the 
      * appropriate application context itself.
      *
+     * Starts the YK precalc thread if context is RouterContext or Android.
      */
     public ElGamalEngine(I2PAppContext context) {
         context.statManager().createRateStat("crypto.elGamal.encrypt",
@@ -79,7 +83,12 @@ public final class ElGamalEngine {
         _context = context;
         _log = context.logManager().getLog(ElGamalEngine.class);
         _ykgen = new YKGenerator(context);
-        _ykgen.start();
+        // Don't start the precalc thread for external applications,
+        // benchmarks, or unit tests.
+        // YKgen still works, it just won't precalc.
+        // Known external users are Bote and Syndie.
+        if (context.isRouterContext() || SystemVersion.isAndroid())
+            _ykgen.start();
     }
 
     /**
