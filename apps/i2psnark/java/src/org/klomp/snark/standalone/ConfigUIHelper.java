@@ -27,7 +27,7 @@ public class ConfigUIHelper {
      *  Country flag unused.
      */
     private static final String langs[][] = {
-        { "ar", "lang_ar", "Arabic ﻉﺮﺒﻳﺓ", null },
+        { "ar", "lang_ar", "Arabic عربية", null },
         { "az", "az", "Azerbaijani", null },
         { "cs", "cz", "Čeština", null },
         { "zh", "cn", "Chinese 中文", null },
