@@ -184,12 +184,7 @@ public class GeneralHelper {
                 // Only modify this non-current tunnel
                 // if it belongs to a shared destination, and is of supported type
                 if (Boolean.parseBoolean(c.getSharedClient()) && TunnelController.isClient(c.getType())) {
-                    Properties cOpt = c.getConfig("");
-                    config.updateTunnelQuantities(cOpt);
-                    cOpt.setProperty("option.inbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
-                    cOpt.setProperty("option.outbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
-
-                    c.setConfig(cOpt, "");
+                    copySharedOptions(config, props, c);
                     try {
                         tcg.saveConfig(c);
                     } catch (IOException ioe) {
@@ -201,6 +196,48 @@ public class GeneralHelper {
         }
 
         return msgs;
+    }
+
+    /**
+     *  I2CP/Dest/LS options affecting shared client tunnels.
+     *  Streaming options should not be here, each client gets its own SocketManger.
+     *  All must be prefixed with "option."
+     *  @since 0.9.46
+     */
+    private static final String[] SHARED_OPTIONS = {
+        // I2CP
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume",
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
+        // dest / LS
+        I2PClient.PROP_SIGTYPE, "i2cp.leaseSetEncType", "i2cp.leaseSetType",
+        "persistentClientKey",
+        // following are mostly server but could also be persistent client
+        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey"
+    };
+
+    /**
+     *  Copy relevant options over
+     *  @since 0.9.46 pulled out of updateTunnelConfig
+     */
+    private static void copySharedOptions(TunnelConfig fromConfig, Properties from,
+                                          TunnelController to) {
+        Properties cOpt = to.getConfig("");
+        fromConfig.updateTunnelQuantities(cOpt);
+        cOpt.setProperty("option.inbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
+        cOpt.setProperty("option.outbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
+        for (String p : SHARED_OPTIONS) {
+            String k = TunnelController.PFX_OPTION + p;
+            String v = from.getProperty(k);
+            if (v != null)
+                cOpt.setProperty(k, v);
+            else
+                cOpt.remove(k);
+        }
+        // persistent client key, not prefixed with "option."
+        String v = from.getProperty(TunnelController.PROP_FILE);
+        if (v != null)
+            cOpt.setProperty(TunnelController.PROP_FILE, v);
+        to.setConfig(cOpt, "");
     }
 
     protected static List<String> saveConfig(
@@ -673,22 +710,22 @@ public class GeneralHelper {
     public int getSigType(int tunnel, String newTunnelType) {
         SigType type;
         String ttype;
-        boolean isShared;
         if (tunnel >= 0) {
-            Destination d = getDestination(tunnel);
-            if (d != null) {
-                type = d.getSigType();
-                if (type != null)
-                    return type.getCode();
+            ttype = getTunnelType(tunnel);
+            if (!TunnelController.isClient(ttype) ||
+                getBooleanProperty(tunnel, "persistentClientKey")) {
+                Destination d = getDestination(tunnel);
+                if (d != null) {
+                    type = d.getSigType();
+                    if (type != null)
+                        return type.getCode();
+                }
             }
             String stype = getProperty(tunnel, I2PClient.PROP_SIGTYPE, null);
             type = stype != null ? SigType.parseSigType(stype) : null;
-            ttype = getTunnelType(tunnel);
-            isShared = isSharedClient(tunnel);
         } else {
             type = null;
             ttype = newTunnelType;
-            isShared = false;
         }
         if (type == null) {
             // same default logic as in TunnelController.setConfig()
@@ -1014,6 +1051,7 @@ public class GeneralHelper {
     private boolean getBooleanProperty(int tunnel, String prop) {
         return getBooleanProperty(tunnel, prop, false);
     }
+
     private boolean getBooleanProperty(int tunnel, String prop, boolean def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
