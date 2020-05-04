@@ -6,12 +6,13 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.jar.Attributes;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DataHelper;
 import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.HelperBase;
@@ -23,6 +24,10 @@ import net.i2p.util.UIMessages;
 public class LogsHelper extends HelperBase {
 
     private static final String _jstlVersion = jstlVersion();
+
+    private static final int MAX_WRAPPER_LINES = 250;
+    private static final String PROP_LAST_WRAPPER = "routerconsole.lastWrapperLogEntry";
+
 
     /** @since 0.8.12 */
     public String getJettyVersion() {
@@ -72,7 +77,8 @@ public class LogsHelper extends HelperBase {
      */
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
-        return "<p>" + _t("File location") + ": <a href=\"/router.log\" target=\"_blank\">" + _context.logManager().currentFile() + "</a></p>" + str;
+        return "<p>" + _t("File location") + ": <a href=\"/router.log\" target=\"_blank\">" +
+               DataHelper.escapeHTML(_context.logManager().currentFile()) + "</a></p>" + str;
     }
     
     /**
@@ -116,31 +122,82 @@ public class LogsHelper extends HelperBase {
      *  @param consoleNonce must match
      *  @since 0.9.46
      */
-    public void clearThrough(int n, int crit, String consoleNonce) {
+    public void clearThrough(int n, int crit, long wn, long wts, String wf, String consoleNonce) {
         if (!CSSHelper.getNonce().equals(consoleNonce))
             return;
         if (n >= 0)
             _context.logManager().getBuffer().getUIMessages().clearThrough(n);
         if (crit >= 0)
             _context.logManager().getBuffer().getCriticalUIMessages().clearThrough(crit);
+        if (wn >= 0 && wts > 0 && wf != null) {
+            // timestamp, last line number, filename
+            String val = wts + "," + wn + "," + wf;
+            if (!val.equals(_context.getProperty(PROP_LAST_WRAPPER)))
+                _context.router().saveConfig(PROP_LAST_WRAPPER, val);
+        }
     }
 
-    public String getServiceLogs() {
+    /**
+     *  last line number -1 on error
+     *  @param buf out parameter
+     *  @return Long timestamp, Long last line number, String filename (escaped)
+     */
+    public Object[] getServiceLogs(StringBuilder obuf) {
         File f = ConfigServiceHandler.wrapperLogFile(_context);
         String str;
-        if (_context.hasWrapper()) {
+        long flastMod = f.lastModified();
+        long lastMod = 0;
+        long toSkip = 0;
+        // timestamp, last line number, filename
+        String prop = _context.getProperty(PROP_LAST_WRAPPER);
+        if (prop != null) {
+            String[] vals = DataHelper.split(prop, ",", 3);
+            if (vals.length == 3) {
+                if (vals[2].equals(f.getName())) {
+                    try { lastMod = Long.parseLong(vals[0]); } catch (NumberFormatException nfe) {}
+                    try { toSkip = Long.parseLong(vals[1]); } catch (NumberFormatException nfe) {}
+                } else {
+                    // file rotated
+                    lastMod = 0;
+                }
+            }
+        }
+        if (lastMod > 0 && flastMod <= lastMod) {
+            str = "";
+            toSkip = -1;
+        } else if (_context.hasWrapper()) {
             // platform encoding
-            str = readTextFile(f, 250);
+            StringBuilder buf = new StringBuilder(MAX_WRAPPER_LINES * 80);
+            toSkip = readTextFile(f, MAX_WRAPPER_LINES, toSkip, buf);
+            if (toSkip >= 0)
+                str = buf.toString();
+            else
+                str = null;
         } else {
             // UTF-8
-            str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
+            // no skipping
+            str = FileUtil.readTextFile(f.getAbsolutePath(), MAX_WRAPPER_LINES, false);
+            toSkip = 0;
         }
+        String loc = DataHelper.escapeHTML(f.getAbsolutePath());
         if (str == null) {
-            return "<p>" + _t("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
+            obuf.append("<p>").append(_t("File not found")).append(": <b><code>").append(loc).append("</code></b></p>");
+            toSkip = -1;
         } else {
-            str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            return "<p>" + _t("File location") + ": <a href=\"/wrapper.log\" target=\"_blank\">" + f.getAbsolutePath() + "</a></p></td></tr>\n<tr><td><pre id=\"servicelogs\">" + str + "</pre>";
+            obuf.append("<p>").append(_t("File location")).append(": <a href=\"/wrapper.log\" target=\"_blank\">")
+                .append(loc).append("</a></p></td></tr>\n<tr><td>");
+            if (str.length() > 0) {
+                str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+                obuf.append("<pre id=\"servicelogs\">").append(str).append("</pre>");
+            } else {
+                obuf.append("<p><i>").append(_t("No log messages")).append("</i></p></td></tr><td><tr>");
+            }
         }
+        Object[] rv = new Object[3];
+        rv[0] = Long.valueOf(flastMod);
+        rv[1] = Long.valueOf(toSkip);
+        rv[2] = DataHelper.escapeHTML(f.getName()).replace(" ", "%20");
+        return rv;
     }
    
     /**
@@ -232,28 +289,33 @@ public class LogsHelper extends HelperBase {
      * Warning - converts \r\n to \n
      *
      * @param maxNumLines max number of lines (greater than zero)
-     * @return string or null; does not throw IOException.
+     * @param skipLines number of lines to skip, or zero
+     * @param buf out parameter
+     * @return -1 on failure, or number of lines in the file. Does not throw IOException.
      * @since 0.9.11 modded from FileUtil.readTextFile()
      */
-    private static String readTextFile(File f, int maxNumLines) {
-        if (!f.exists()) return null;
+    private static long readTextFile(File f, int maxNumLines, long skipLines, StringBuilder buf) {
+        if (!f.exists())
+            return -1;
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-            List<String> lines = new ArrayList<String>(maxNumLines);
+            LinkedList<String> lines = new LinkedList<String>();
+            long i = 0;
             String line = null;
             while ( (line = in.readLine()) != null) {
+                if (i++ < skipLines)
+                    continue;
                 lines.add(line);
                 if (lines.size() >= maxNumLines)
-                    lines.remove(0);
+                    lines.removeFirst();
             }
-            StringBuilder buf = new StringBuilder(lines.size() * 80);
-            for (int i = 0; i < lines.size(); i++) {
-                buf.append(lines.get(i)).append('\n');
+            for (String ln : lines) {
+                buf.append(ln).append('\n');
             }
-            return buf.toString();
+            return i;
         } catch (IOException ioe) {
-            return null;
+            return -1;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
         }

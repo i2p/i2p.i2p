@@ -3994,7 +3994,7 @@ h3#servicedebug a, h3#graphinfo a {
      float: right;
 }
 
-.main#tunnels h3 a:not(old), #criticallogs + h3.tabletitle a:not(old) {
+.main#tunnels h3 a:not(old), #logs h3.tabletitle a.configure:not(old), #logs h3.tabletitle a.delete:not(old) {
      font-size: 0;
 }
 
