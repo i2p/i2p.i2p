@@ -12,8 +12,8 @@ import net.i2p.I2PAppContext;
  */
 public class LogConsoleBuffer {
     private final int lim;
-    private final LinkedBlockingQueue<String> _buffer;
-    private final LinkedBlockingQueue<String> _critBuffer;
+    private final UIMessages _buffer;
+    private final UIMessages _critBuffer;
 
     /**
      *  Uses default limit from LogManager.
@@ -36,14 +36,12 @@ public class LogConsoleBuffer {
         lim = Math.max(limit, 4);
         // Add some extra room to minimize the chance of losing a message,
         // since we are doing offer() below.
-        _buffer = new LinkedBlockingQueue<String>(lim + 4);
-        _critBuffer = new LinkedBlockingQueue<String>(lim + 4);
+        _buffer = new UIMessages(lim + 4);
+        _critBuffer = new UIMessages(lim + 4);
     }
 
     void add(String msg) {
-            while (_buffer.size() >= lim)
-                _buffer.poll();
-            _buffer.offer(msg);
+        _buffer.addMessageNoEscape(msg);
     }
 
     /**
@@ -51,9 +49,7 @@ public class LogConsoleBuffer {
      *
      */
     void addCritical(String msg) {
-            while (_critBuffer.size() >= lim)
-                _critBuffer.poll();
-            _critBuffer.offer(msg);
+        _critBuffer.addMessageNoEscape(msg);
     }
 
     /**
@@ -64,7 +60,7 @@ public class LogConsoleBuffer {
      * @return oldest first
      */
     public List<String> getMostRecentMessages() {
-            return new ArrayList<String>(_buffer);
+        return _buffer.getMessageStrings();
     }
 
     /**
@@ -75,7 +71,31 @@ public class LogConsoleBuffer {
      * @return oldest first
      */
     public List<String> getMostRecentCriticalMessages() {
-            return new ArrayList<String>(_critBuffer);
+        return _critBuffer.getMessageStrings();
+    }
+
+    /**
+     * Retrieve the currently buffered messages, earlier values were generated...
+     * earlier.  All values are strings with no formatting (as they are written
+     * in the logs)
+     *
+     * @return oldest first
+     * @since 0.9.46
+     */
+    public UIMessages getUIMessages() {
+        return _buffer;
+    }
+
+    /**
+     * Retrieve the currently buffered critical messages, earlier values were generated...
+     * earlier.  All values are strings with no formatting (as they are written
+     * in the logs)
+     *
+     * @return oldest first
+     * @since 0.9.46
+     */
+    public UIMessages getCriticalUIMessages() {
+        return _critBuffer;
     }
 
     /**

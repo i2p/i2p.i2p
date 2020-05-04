@@ -69,9 +69,24 @@ public class UIMessages {
      * @return a copy
      */
     public synchronized List<Message> getMessages() {
-        if (_messages.isEmpty())
+        if (_messages.peekLast() == null)
             return Collections.emptyList();
         return new ArrayList<Message>(_messages);
+    }
+    
+    /**
+     * Newest last, or empty list.
+     * @return a copy
+     * @since 0.9.46
+     */
+    public synchronized List<String> getMessageStrings() {
+        if (_messages.peekLast() == null)
+            return Collections.emptyList();
+        List<String> rv = new ArrayList<String>(_messages.size());
+        for (Message m : _messages) {
+            rv.add(m.message);
+        }
+        return rv;
     }
     
     /** clear all */
@@ -95,6 +110,13 @@ public class UIMessages {
                 iter.remove();
             }
         }
+    }
+    
+    /**
+     * @since 0.9.46
+     */
+    public synchronized boolean isEmpty() {
+        return _messages.peekLast() == null;
     }
 
     public static class Message {
