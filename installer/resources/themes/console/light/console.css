@@ -1804,14 +1804,21 @@ h3#exploratorytunnels {
      font-size: 0;
 }
 
-#tunnels h3 a[href^="/configtunnels#"]::after, #criticallogs + h3.tabletitle a::after {
+#tunnels h3 a[href^="/configtunnels#"]::after, a.configure::after {
      content: url(/themes/console/images/buttons/configure.png);
      float: right;
-     padding: 0;
+     padding: 0 0 0 8px;
      filter: drop-shadow(0 0 1px #999daf);
 }
 
-#tunnels h3 a[href^="/configtunnels#"]:hover, #criticallogs + h3.tabletitle a:hover {
+a.delete::after {
+     content: url(/themes/console/images/buttons/delete.png);
+     float: right;
+     padding: 0 0 0 8px;
+     filter: drop-shadow(0 0 1px #999daf);
+}
+
+#tunnels h3 a[href^="/configtunnels#"]:hover, a.configure:hover, a.delete:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 

@@ -54,14 +54,36 @@
 <tr><td><b>Charset:</b></td><td><%=java.nio.charset.Charset.defaultCharset().name()%></td></tr>
 <tr><td><b>Built By:</b></td><td><jsp:getProperty name="logsHelper" property="builtBy" /></tbody></table>
 
-<h3 class="tabletitle"><%=intl._t("Critical Logs")%></h3>
+<h3 class="tabletitle"><%=intl._t("Critical Logs")%><%
+    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
+    String ct1 = request.getParameter("clear");
+    String ct2 = request.getParameter("crit");
+    String ctn = request.getParameter("consoleNonce");
+    if ((ct1 != null || ct2 != null) && ctn != null) {
+        int ict1 = -1, ict2 = -1;
+        try { ict1 = Integer.parseInt(ct1); } catch (NumberFormatException nfe) {}
+        try { ict2 = Integer.parseInt(ct2); } catch (NumberFormatException nfe) {}
+        logsHelper.clearThrough(ict1, ict2, ctn);
+    }
+    int last = logsHelper.getLastCriticalMessageNumber();
+    if (last >= 0) {
+%>&nbsp;<a class="delete" title="<%=intl._t("Clear logs")%>" href="logs?crit=<%=last%>&amp;consoleNonce=<%=consoleNonce%>">[<%=intl._t("Clear logs")%>]</a><%
+    }
+%></h3>
 <table id="criticallogs" class="logtable"><tbody>
 <tr><td>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
 </td></tr>
 </tbody></table>
 
-<h3 class="tabletitle"><%=intl._t("Router Logs")%>&nbsp;<a title="<%=intl._t("Configure router logging options")%>" href="configlogging">[<%=intl._t("Configure")%>]</a></h3>
+<h3 class="tabletitle"><%=intl._t("Router Logs")%><%
+    // both links float right, so first one goes last
+    last = logsHelper.getLastMessageNumber();
+    if (last >= 0) {
+%>&nbsp;<a class="delete" title="<%=intl._t("Clear logs")%>" href="logs?clear=<%=last%>&amp;consoleNonce=<%=consoleNonce%>">[<%=intl._t("Clear logs")%>]</a><%
+    }
+%>&nbsp;<a class="configure" title="<%=intl._t("Configure router logging options")%>" href="configlogging">[<%=intl._t("Configure")%>]</a>
+</h3>
 <table id="routerlogs" class="logtable"><tbody>
 <tr><td>
  <jsp:getProperty name="logsHelper" property="logs" />

@@ -3998,10 +3998,16 @@ h3#servicedebug a, h3#graphinfo a {
      font-size: 0;
 }
 
-.main#tunnels h3 a[href^="/configtunnels#"]::after, #criticallogs + h3.tabletitle a::after {
+.main#tunnels h3 a[href^="/configtunnels#"]::after, a.configure::after {
      content: url(/themes/console/images/buttons/configure.png);
      float: right;
-     padding: 0;
+     padding: 0 0 0 8px;
+}
+
+a.delete::after {
+     content: url(/themes/console/images/buttons/delete.png);
+     float: right;
+     padding: 0 0 0 8px;
 }
 
 .main#tunnels h3 a[href^="/configtunnels#"]:hover, h3.tabletitle a:hover::after,

@@ -13,10 +13,12 @@ import java.util.jar.Attributes;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SigType;
 import net.i2p.router.web.ConfigServiceHandler;
+import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.RouterConsoleRunner;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Translate;
+import net.i2p.util.UIMessages;
 
 public class LogsHelper extends HelperBase {
 
@@ -74,11 +76,53 @@ public class LogsHelper extends HelperBase {
     }
     
     /**
-     *  Side effect - calls logManager.flush()
+     *
      */
     public String getCriticalLogs() {
-        _context.logManager().flush();
         return formatMessages(_context.logManager().getBuffer().getMostRecentCriticalMessages());
+    }
+
+    /**
+     *  Call before getLogs()
+     *
+     *  @return -1 if none
+     *  @since 0.9.46
+     */
+    public int getLastMessageNumber() {
+        UIMessages msgs = _context.logManager().getBuffer().getUIMessages();
+        if (msgs.isEmpty())
+            return -1;
+        return msgs.getLastMessageID();
+    }
+
+    /**
+     *  Call before getLogs(), getCriticalLogs(), or getLastMessageNumber()
+     *  Side effect - calls logManager.flush()
+     *
+     *  @return -1 if none
+     *  @since 0.9.46
+     */
+    public int getLastCriticalMessageNumber() {
+        _context.logManager().flush();
+        UIMessages msgs = _context.logManager().getBuffer().getCriticalUIMessages();
+        if (msgs.isEmpty())
+            return -1;
+        return msgs.getLastMessageID();
+    }
+
+    /**
+     *  @param n -1 for none
+     *  @param crit -1 for none
+     *  @param consoleNonce must match
+     *  @since 0.9.46
+     */
+    public void clearThrough(int n, int crit, String consoleNonce) {
+        if (!CSSHelper.getNonce().equals(consoleNonce))
+            return;
+        if (n >= 0)
+            _context.logManager().getBuffer().getUIMessages().clearThrough(n);
+        if (crit >= 0)
+            _context.logManager().getBuffer().getCriticalUIMessages().clearThrough(crit);
     }
 
     public String getServiceLogs() {
