@@ -6,8 +6,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.jar.Attributes;
 
 import net.i2p.I2PAppContext;
@@ -17,7 +18,6 @@ import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.RouterConsoleRunner;
-import net.i2p.util.FileUtil;
 import net.i2p.util.Translate;
 import net.i2p.util.UIMessages;
 
@@ -165,19 +165,15 @@ public class LogsHelper extends HelperBase {
         if (lastMod > 0 && flastMod <= lastMod) {
             str = "";
             toSkip = -1;
-        } else if (_context.hasWrapper()) {
-            // platform encoding
+        } else {
+            // platform encoding or UTF8
+            boolean utf8 = !_context.hasWrapper();
             StringBuilder buf = new StringBuilder(MAX_WRAPPER_LINES * 80);
-            toSkip = readTextFile(f, MAX_WRAPPER_LINES, toSkip, buf);
+            toSkip = readTextFile(f, utf8, MAX_WRAPPER_LINES, toSkip, buf);
             if (toSkip >= 0)
                 str = buf.toString();
             else
                 str = null;
-        } else {
-            // UTF-8
-            // no skipping
-            str = FileUtil.readTextFile(f.getAbsolutePath(), MAX_WRAPPER_LINES, false);
-            toSkip = 0;
         }
         String loc = DataHelper.escapeHTML(f.getAbsolutePath());
         if (str == null) {
@@ -288,30 +284,36 @@ public class LogsHelper extends HelperBase {
      *           so don't make it too big.
      * Warning - converts \r\n to \n
      *
+     * @param utf8 true for utf-8, false for system locale
      * @param maxNumLines max number of lines (greater than zero)
      * @param skipLines number of lines to skip, or zero
      * @param buf out parameter
      * @return -1 on failure, or number of lines in the file. Does not throw IOException.
      * @since 0.9.11 modded from FileUtil.readTextFile()
      */
-    private static long readTextFile(File f, int maxNumLines, long skipLines, StringBuilder buf) {
+    private static long readTextFile(File f, boolean utf8, int maxNumLines, long skipLines, StringBuilder buf) {
         if (!f.exists())
             return -1;
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-            LinkedList<String> lines = new LinkedList<String>();
+            if (utf8)
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
+            else
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+            Queue<String> lines = new ArrayBlockingQueue<String>(maxNumLines);
             long i = 0;
-            String line = null;
-            while ( (line = in.readLine()) != null) {
-                if (i++ < skipLines)
-                    continue;
-                lines.add(line);
-                if (lines.size() >= maxNumLines)
-                    lines.removeFirst();
-            }
-            for (String ln : lines) {
-                buf.append(ln).append('\n');
+            synchronized(lines) {
+                String line = null;
+                while ( (line = in.readLine()) != null) {
+                    if (i++ < skipLines)
+                        continue;
+                    if (lines.size() >= maxNumLines)
+                        lines.poll();
+                    lines.offer(line);
+                }
+                for (String ln : lines) {
+                    buf.append(ln).append('\n');
+                }
             }
             return i;
         } catch (IOException ioe) {
