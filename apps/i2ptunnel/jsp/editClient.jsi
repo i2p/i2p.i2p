@@ -331,7 +331,7 @@
     <table class="tunnelConfig" id="timedOptions">
         <tr>
             <th colspan="2" class="tableTop">
-                <%=intl._t("Tunnel Time-Management Options")%>
+                <%=intl._t("Tunnel Management Options")%>
             </th>
         </tr>
 <%
@@ -560,7 +560,7 @@
                 </span>
                 <span class="multiOption">
                     <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
-                    <%=intl._t("Both encryption types")%> (<%=intl._t("Experts only!")%>)</label>
+                    <%=intl._t("Both encryption types")%></label>
                 </span>
             </td>
         </tr>
@@ -620,7 +620,7 @@
     <table class="tunnelConfig" id="jumpOptions">
         <tr>
             <th colspan="2" class="tableTop">
-                <%=intl._t("Tunnel Address-Service Options")%>
+                <%=intl._t("Tunnel Address Lookup Options")%>
             </th>
         </tr><tr>
             <th colspan="2">
