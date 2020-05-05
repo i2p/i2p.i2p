@@ -169,11 +169,22 @@ public class LogsHelper extends HelperBase {
             // platform encoding or UTF8
             boolean utf8 = !_context.hasWrapper();
             StringBuilder buf = new StringBuilder(MAX_WRAPPER_LINES * 80);
-            toSkip = readTextFile(f, utf8, MAX_WRAPPER_LINES, toSkip, buf);
-            if (toSkip >= 0)
+            long ntoSkip = readTextFile(f, utf8, MAX_WRAPPER_LINES, toSkip, buf);
+            if (ntoSkip < toSkip) {
+                if (ntoSkip < 0) {
+                    // error
+                    str = null;
+                } else {
+                    // truncated?
+                    str = "";
+                }
+                // remove old setting
+                if (prop != null)
+                    _context.router().saveConfig(PROP_LAST_WRAPPER, null);
+            } else {
                 str = buf.toString();
-            else
-                str = null;
+            }
+            toSkip = ntoSkip;
         }
         String loc = DataHelper.escapeHTML(f.getAbsolutePath());
         if (str == null) {
@@ -300,13 +311,22 @@ public class LogsHelper extends HelperBase {
                 in = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
             else
                 in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-            Queue<String> lines = new ArrayBlockingQueue<String>(maxNumLines);
             long i = 0;
+            while (i < skipLines) {
+                // skip without readLine() to avoid object churn
+                int c;
+                do {
+                    c = in.read();
+                    if (c < 0)
+                        return i;  // truncated
+                } while (c != '\n');
+                i++;
+            }
+            Queue<String> lines = new ArrayBlockingQueue<String>(maxNumLines);
             synchronized(lines) {
                 String line = null;
                 while ( (line = in.readLine()) != null) {
-                    if (i++ < skipLines)
-                        continue;
+                    i++;
                     if (lines.size() >= maxNumLines)
                         lines.poll();
                     lines.offer(line);
