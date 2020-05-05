@@ -55,9 +55,12 @@ public final class ECIESAEADEngine {
     private static final int KEYLEN = 32;
     private static final int BHLEN = RatchetPayload.BLOCK_HEADER_SIZE;  // 3
     private static final int DATETIME_SIZE = BHLEN + 4; // 7
-    private static final int MIN_NS_SIZE = KEYLEN + KEYLEN + MACLEN + DATETIME_SIZE + MACLEN; // 103
-    private static final int MIN_NSR_SIZE = TAGLEN + KEYLEN + MACLEN; // 56
-    private static final int MIN_ES_SIZE = TAGLEN + MACLEN; // 24
+    private static final int NS_OVERHEAD = KEYLEN + KEYLEN + MACLEN + MACLEN; // 96
+    private static final int NSR_OVERHEAD = TAGLEN + KEYLEN + MACLEN + MACLEN; // 72
+    private static final int ES_OVERHEAD = TAGLEN + MACLEN; // 24
+    private static final int MIN_NS_SIZE = NS_OVERHEAD + DATETIME_SIZE; // 103
+    private static final int MIN_NSR_SIZE = NSR_OVERHEAD; // 72
+    private static final int MIN_ES_SIZE = ES_OVERHEAD; // 24
     private static final int MIN_ENCRYPTED_SIZE = MIN_ES_SIZE;
     private static final byte[] NULLPK = new byte[KEYLEN];
     private static final int MAXPAD = 16;
@@ -218,8 +221,8 @@ public final class ECIESAEADEngine {
     private CloveSet x_decryptFast(byte data[], PrivateKey targetPrivateKey,
                                    RatchetSKM keyManager) throws DataFormatException {
         if (data.length < MIN_ENCRYPTED_SIZE) {
-            if (_log.shouldWarn())
-                _log.warn("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
+            if (_log.shouldDebug())
+                _log.debug("Data is less than the minimum size (" + data.length + " < " + MIN_ENCRYPTED_SIZE + ")");
             return null;
         }
         byte tag[] = new byte[TAGLEN];
@@ -308,13 +311,14 @@ public final class ECIESAEADEngine {
                 _context.statManager().updateFrequency("crypto.eciesAEAD.decryptNewSession");
             } else {
                 _context.statManager().updateFrequency("crypto.eciesAEAD.decryptFailed");
-                if (_log.shouldWarn())
-                    _log.warn("ECIES decrypt fail as new session");
+                // we'll get this a lot on muxed SKM
+                if (_log.shouldInfo())
+                    _log.info("Decrypt fail NS");
             }
         } else {
             decrypted = null;
-            if (_log.shouldWarn())
-                _log.warn("ECIES decrypt fail, too small for NS: " + data.length + " bytes");
+            if (_log.shouldDebug())
+                _log.debug("ECIES decrypt fail, too small for NS: " + data.length + " bytes");
         }
         return decrypted;
     }
@@ -373,11 +377,9 @@ public final class ECIESAEADEngine {
             state.readMessage(data, 0, data.length, payload, 0);
         } catch (GeneralSecurityException gse) {
             // we'll get this a lot on muxed SKM
-            if (_log.shouldInfo()) {
-                _log.info("Decrypt fail NS", gse);
-                if (_log.shouldDebug())
-                    _log.debug("State at failure: " + state);
-            }
+            // logged at INFO in caller
+            if (_log.shouldDebug())
+                _log.debug("Decrypt fail NS, state at failure: " + state, gse);
             // restore original data for subsequent ElG attempt
             System.arraycopy(xx, 0, data, 0, KEYLEN - 1);
             data[KEYLEN - 1] = xx31;
@@ -773,7 +775,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session: " + state);
 
-        byte[] payload = createPayload(cloves, cloves.getExpiration());
+        byte[] payload = createPayload(cloves, cloves.getExpiration(), NS_OVERHEAD);
 
         byte[] enc = new byte[KEYLEN + KEYLEN + MACLEN + payload.length + MACLEN];
         try {
@@ -784,7 +786,7 @@ public final class ECIESAEADEngine {
             return null;
         }
         if (_log.shouldDebug())
-            _log.debug("State after encrypt new session: " + state);
+            _log.debug("Encrypted NS: " + enc.length + " bytes, state: " + state);
 
         // overwrite eph. key with encoded key
         DHState eph = state.getLocalEphemeralKeyPair();
@@ -832,7 +834,7 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("State after mixhash tag before encrypt new session reply: " + state);
 
-        byte[] payload = createPayload(cloves, 0);
+        byte[] payload = createPayload(cloves, 0, NSR_OVERHEAD);
 
         // part 1 - tag and empty payload
         byte[] enc = new byte[TAGLEN + KEYLEN + MACLEN + payload.length + MACLEN];
@@ -845,7 +847,7 @@ public final class ECIESAEADEngine {
             return null;
         }
         if (_log.shouldDebug())
-            _log.debug("State after encrypt new session reply: " + state);
+            _log.debug("Encrypted NSR: " + enc.length + " bytes, state: " + state);
 
         // overwrite eph. key with encoded key
         DHState eph = state.getLocalEphemeralKeyPair();
@@ -897,7 +899,7 @@ public final class ECIESAEADEngine {
                                           RatchetSKM keyManager) {
         boolean ackreq = callback != null || ACKREQ_IN_ES;
         byte rawTag[] = re.tag.getData();
-        byte[] payload = createPayload(cloves, 0, ackreq, re.nextForwardKey, re.nextReverseKey, re.acksToSend);
+        byte[] payload = createPayload(cloves, 0, ackreq, re.nextForwardKey, re.nextReverseKey, re.acksToSend, ES_OVERHEAD);
         SessionKeyAndNonce key = re.key;
         int nonce = key.getNonce();
         byte encr[] = encryptAEADBlock(rawTag, payload, key, nonce);
@@ -905,6 +907,7 @@ public final class ECIESAEADEngine {
         if (callback != null) {
             keyManager.registerCallback(target, re.keyID, nonce, callback);
         }
+            _log.debug("Encrypted ES: " + encr.length + " bytes");
         return encr;
     }
 
@@ -927,7 +930,7 @@ public final class ECIESAEADEngine {
      */
     public byte[] encrypt(CloveSet cloves, SessionKey key, RatchetSessionTag tag) {
         byte rawTag[] = tag.getData();
-        byte[] payload = createPayload(cloves, 0);
+        byte[] payload = createPayload(cloves, 0, ES_OVERHEAD);
         byte encr[] = encryptAEADBlock(rawTag, payload, key, 0);
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         return encr;
@@ -1074,11 +1077,17 @@ public final class ECIESAEADEngine {
 
     /**
      *  @param expiration if greater than zero, add a DateTime block
+     *  @param overhead bytes to be added later, to assist in padding calculation
      *  @since 0.9.46
      */
-    private byte[] createPayload(CloveSet cloves, long expiration) {
-        return createPayload(cloves, expiration, false, null, null, null);
+    private byte[] createPayload(CloveSet cloves, long expiration, int overhead) {
+        return createPayload(cloves, expiration, false, null, null, null, overhead);
     }
+
+    // see below
+    private static final int B1 = 944;
+    private static final int B2 = 1936;
+    private static final int B3 = 2932;
 
     /**
      *  @param expiration if greater than zero, add a DateTime block
@@ -1086,10 +1095,12 @@ public final class ECIESAEADEngine {
      *  @param nextKey1 may be null
      *  @param nextKey2 may be null
      *  @param acksTOSend may be null
+     *  @param overhead bytes to be added later, to assist in padding calculation
      */
     private byte[] createPayload(CloveSet cloves, long expiration,
                                  boolean ackreq, NextSessionKey nextKey1,
-                                 NextSessionKey nextKey2, List<Integer> acksToSend) {
+                                 NextSessionKey nextKey2, List<Integer> acksToSend,
+                                 int overhead) {
         int count = cloves.getCloveCount();
         int numblocks = count + 1;
         if (expiration > 0)
@@ -1136,29 +1147,64 @@ public final class ECIESAEADEngine {
             blocks.add(block);
             len += block.getTotalLength();
         }
-        int padlen = _context.random().nextInt(MAXPAD);
-        // zeros
-        Block block = new PaddingBlock(padlen);
-        blocks.add(block);
-        len += block.getTotalLength();
+
+        // Padding
+        // Key lengths we're trying to not exceed:
+        // 944 for one tunnel message
+        // 1936 for two tunnel messages
+        // 2932 for three tunnel messages
+        // See streaming ConnectionOptions for the math
+        int fixedpad;
+        int randompad;
+        int totlen = len + overhead;
+        if ((totlen > B1 - BHLEN && totlen <= B1) ||
+            (totlen > B2 - BHLEN && totlen <= B2) ||
+            (totlen > B3 - BHLEN && totlen <= B3)) {
+            // no room for block
+            fixedpad = 0;
+            randompad = 0;
+        } else if (totlen > B1 - BHLEN - MAXPAD && totlen <= B1 - BHLEN) {
+            // fill it up
+            fixedpad = B1 - BHLEN - totlen;
+            randompad = 0;
+        } else if (totlen > B2 - BHLEN - MAXPAD && totlen <= B2 - BHLEN) {
+            // fill it up
+            fixedpad = B2 - BHLEN - totlen;
+            randompad = 0;
+        } else if (totlen > B3 - BHLEN - MAXPAD && totlen <= B3 - BHLEN) {
+            // fill it up
+            fixedpad = B3 - BHLEN - totlen;
+            randompad = 0;
+        } else {
+            // we're not close to a boundary, just do random
+            fixedpad = 0;
+            randompad = MAXPAD;
+        }
+        if (fixedpad > 0 || randompad > 0) {
+            int padlen;
+            if (fixedpad > 0) {
+                padlen = fixedpad;
+            } else {
+                padlen = _context.random().nextInt(randompad);
+                if (overhead == NS_OVERHEAD &&
+                    ((totlen + BHLEN + padlen) & 0x0f) == 2) {
+                    // do a favor for muxed decrypt
+                    if (padlen > 0)
+                        padlen--;
+                    else
+                        padlen++;
+                }
+            }
+            // zeros
+            Block block = new PaddingBlock(padlen);
+            blocks.add(block);
+            len += block.getTotalLength();
+        }
         byte[] payload = new byte[len];
-        int payloadlen = createPayload(payload, 0, blocks);
+        int payloadlen = RatchetPayload.writePayload(payload, 0, blocks);
         if (payloadlen != len)
             throw new IllegalStateException("payload size mismatch");
         return payload;
-    }
-
-    /**
-     *  @return the new offset
-     */
-    private int createPayload(byte[] payload, int off, List<Block> blocks) {
-        return RatchetPayload.writePayload(payload, off, blocks);
-    }
-
-    private byte[] doHMAC(SessionKey key, byte data[]) {
-        byte[] rv = new byte[32];
-        _context.hmac256().calculate(key, data, 0, data.length, rv, 0);
-        return rv;
     }
 
 
