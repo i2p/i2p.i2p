@@ -19,6 +19,11 @@
 2020-05-01 zzz
  * Ratchet: Fix NPE ratcheting IB NSR tagset
 
+2020-05-01 idk
+ * i2ptunnel: Collapse/Expand UI elements for advanced features, organize
+  advanced features by category. Replace nested tables.
+ * SusiMail: Fix missing icon from dark theme (ticket #2726)
+
 2020-04-30 zzz
  * i2ptunnel: Prevent changing enc type on running tunnel
  * Ratchet: Error handling fixes
