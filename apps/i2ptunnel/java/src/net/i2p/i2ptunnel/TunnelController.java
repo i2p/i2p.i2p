@@ -1056,8 +1056,14 @@ public class TunnelController implements Logging {
     public String getListenPort() { return _config.getProperty(PROP_LISTEN_PORT); }
     public String getTargetDestination() { return _config.getProperty(PROP_DEST); }
     public String getProxyList() { return _config.getProperty(PROP_PROXIES); }
-    /** default true */
-    public String getSharedClient() { return _config.getProperty(PROP_SHARED, "true"); }
+
+    /** default true for clients, always false for servers */
+    public String getSharedClient() {
+         if (!isClient())
+             return "false";
+         return _config.getProperty(PROP_SHARED, "true");
+    }
+
     /** default true */
     public boolean getStartOnLoad() { return Boolean.parseBoolean(_config.getProperty(PROP_START, "true")); }
     public boolean getPersistentClientKey() { return Boolean.parseBoolean(_config.getProperty(OPT_PERSISTENT)); }

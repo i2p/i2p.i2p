@@ -15,7 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -847,12 +849,32 @@ public class TunnelConfig {
                     SigType type = _dest.getSigType();
                     SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
                     config.setProperty(p, type.name() + ':' + keys[1].toBase64());
-                    p = OPT + "i2cp.leaseSetPrivateKey";
-                    keys = KeyGenerator.getInstance().generatePKIKeys();
-                    config.setProperty(p, "ELGAMAL_2048:" + keys[1].toBase64());
-                    // TODO ECIES key
                 } catch (GeneralSecurityException gse) {
                     // so much for that
+                }
+            }
+            // persistent LS encryption keys
+            // multiple types as of 0.9.46, add missing ones
+            p = OPT + "i2cp.leaseSetPrivateKey";
+            String skeys = config.getProperty(p);
+            // normalize it first to make the code below easier
+            if (skeys != null && skeys.length() > 0 && !skeys.contains(":"))
+                config.setProperty(p, "ELGAMAL_2048:" + skeys);
+            String senc = config.getProperty(OPT + "i2cp.leaseSetEncType", "0");
+            String[] senca = DataHelper.split(senc, ",");
+            // for each configured enc type, generate a key if we don't have it
+            for (int i = 0; i < senca.length; i++) {
+                EncType type = EncType.parseEncType(senca[i]);
+                if (type != null && type.isAvailable()) {
+                    String stype = type.toString();
+                    skeys = config.getProperty(p, "");
+                    if (!skeys.contains(stype + ':')) {
+                        KeyPair keys = KeyGenerator.getInstance().generatePKIKeys(type);
+                        if (skeys.length() > 0)
+                            config.setProperty(p, skeys + ',' + stype + ':' + keys.getPrivate().toBase64());
+                        else
+                            config.setProperty(p, stype + ':' + keys.getPrivate().toBase64());
+                    }
                 }
             }
         }

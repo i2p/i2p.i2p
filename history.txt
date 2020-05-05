@@ -1,3 +1,21 @@
+2020-05-05 zzz
+ * Build: Use --java2 for msgfmt
+ * i2ptunnel:
+   - Add ECIES persistent key support
+   - Fix changing enc type on servers
+   - Remove experts label from dual-key option
+ * Ratchet: Add padding based on optimal message size
+
+2020-05-04 zzz
+ * Console: Add log clear buttons (ticket #2449)
+ * i2ptunnel: Copy over all relevant options to other shared clients
+   when saving, not just tunnel quantity and length (ticket #1545)
+
+2020-05-02 zzz
+ * eepsite: Fix RTL issues on Arabic help page (ticket #2731)
+ * i2ptunnel: Disable I2CP gzip for HTTP server tunnels
+ * i2psnark: Disable I2CP gzip
+
 2020-05-01 zzz
  * Ratchet: Fix NPE ratcheting IB NSR tagset
 
