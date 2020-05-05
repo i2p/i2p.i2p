@@ -102,7 +102,7 @@ do
         then
             # slow way
             # convert to class files in jsp/WEB-INF/classes
-            msgfmt --java --statistics -r $CLASS -l $LG -d ../jsp/WEB-INF/classes $i
+            msgfmt --java2 --statistics -r $CLASS -l $LG -d ../jsp/WEB-INF/classes $i
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"
@@ -120,7 +120,7 @@ do
             TDY=$TD2/net/i2p/i2ptunnel/web
             rm -rf $TD
             mkdir -p $TD $TDY
-            msgfmt --java --statistics --source -r $CLASS -l $LG -d $TD $i
+            msgfmt --java2 --statistics --source -r $CLASS -l $LG -d $TD $i
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"
