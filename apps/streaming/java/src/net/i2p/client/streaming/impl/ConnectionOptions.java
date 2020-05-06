@@ -140,7 +140,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
     private static final int MAX_RTT = 60*1000;    
-    private static final int DEFAULT_INITIAL_ACK_DELAY = 750;  
+    /**
+     *  Ref: RFC 5681 sec. 4.3, RFC 1122 sec. 4.2.3.3, ticket #2706
+     */
+    private static final int DEFAULT_INITIAL_ACK_DELAY = 500;  
     static final int MIN_WINDOW_SIZE = 1;
     private static final boolean DEFAULT_ANSWER_PINGS = true;
     private static final int DEFAULT_INACTIVITY_TIMEOUT = 90*1000;
@@ -255,7 +258,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  -  4 length
      * -----
      *  1781 Gzipped I2NP message
-     *  - 23 Gzip header
+     *  - 23 Gzip 10 byte header, 5 byte block header, 8 byte trailer
      * -----
      *  1758
      *  - 28 Streaming header (22 min) and 6 bytes of options or nacks
@@ -751,6 +754,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * (_lastSendTime+_sendAckDelay), send an ACK of what
      * we have received so far.
      *
+     * Ref: RFC 5681 sec. 4.3, RFC 1122 sec. 4.2.3.3, ticket #2706
+     *
      * @return ACK delay in ms
      */
     public int getSendAckDelay() { return _sendAckDelay; }
@@ -758,6 +763,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     /**
      *  Unused except here, so expect the default initial delay of DEFAULT_INITIAL_ACK_DELAY unless set by the user
      *  to remain constant.
+     *
+     *  Changing the default is not recommended.
+     *  Ref: RFC 5681 sec. 4.3, RFC 1122 sec. 4.2.3.3, ticket #2706
+     *
      */
     public void setSendAckDelay(int delayMs) { _sendAckDelay = delayMs; }
     
