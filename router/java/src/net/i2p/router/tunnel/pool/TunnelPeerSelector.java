@@ -416,15 +416,15 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         if (known != null) {
             for (int i = 0; i < known.size(); i++) {
                 RouterInfo peer = known.get(i);
-                // we can skip this check now, uncomment if we have some breaking change
-                //String v = peer.getVersion();
-                // RI sigtypes added in 0.9.16
-                // SSU inbound connection bug fixed in 0.9.17, but it won't bid, so NTCP only,
-                // no need to check
-                //if (VersionComparator.comp(v, "0.9.16") < 0)
-                //    rv.add(peer.getIdentity().calculateHash());
-
                 Hash h = peer.getIdentity().calculateHash();
+
+                // Uncomment if stricter than in shouldExclude() below
+                //String v = peer.getVersion();
+                //if (VersionComparator.comp(v, "0.9.16") < 0) {
+                //    rv.add(h);
+                //    continue;
+                //}
+
                 if (connected.contains(h))
                     continue;
                 boolean canConnect = isInbound ? canConnect(peer, ourMask) : canConnect(ourMask, peer);
@@ -451,9 +451,10 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         }
     }
     
-    /** 0.7.8 and earlier had major message corruption bugs */
-    //private static final String MIN_VERSION = "0.7.9";
+    /** NTCP2 */
+    private static final String MIN_VERSION = "0.9.36";
 
+    /** warning, this is also called by ProfileOrganizer.isSelectable() */
     private static boolean shouldExclude(RouterInfo peer, char excl[]) {
         String cap = peer.getCapabilities();
         for (int j = 0; j < excl.length; j++) {
@@ -477,10 +478,9 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         // so don't exclude it based on published capacity
 
         // minimum version check
-        // we can skip this check now
-        //String v = peer.getVersion();
-        //if (VersionComparator.comp(v, MIN_VERSION) < 0)
-        //    return true;
+        String v = peer.getVersion();
+        if (VersionComparator.comp(v, MIN_VERSION) < 0)
+            return true;
 
         // uptime is always spoofed to 90m, so just remove all this
       /******

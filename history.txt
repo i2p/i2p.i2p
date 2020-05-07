@@ -1,3 +1,11 @@
+2020-05-07 zzz
+ * Router:
+   - Fix INMP NPE on non-default config (ticket #2688)
+   - Min version for tunnel peers
+
+2020-05-06 zzz
+ * Streaming: Reduce default ack delay (ticket #2706)
+
 2020-05-05 zzz
  * Build: Use --java2 for msgfmt
  * i2ptunnel:
@@ -21,7 +29,7 @@
 
 2020-05-01 idk
  * i2ptunnel: Collapse/Expand UI elements for advanced features, organize
-  advanced features by category. Replace nested tables.
+   advanced features by category. Replace nested tables.
  * SusiMail: Fix missing icon from dark theme (ticket #2726)
 
 2020-04-30 zzz
