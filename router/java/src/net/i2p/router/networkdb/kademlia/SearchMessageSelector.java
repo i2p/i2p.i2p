@@ -65,10 +65,6 @@ class SearchMessageSelector implements MessageSelector {
     public long getExpiration() { return _exp; }
 
     public boolean isMatch(I2NPMessage message) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("[" + _id + "] isMatch("+message.getClass().getName() 
-                       + ") [want dbStore or dbSearchReply from " + _peer 
-                       + " for " + _state.getTarget() + "]");
         int type = message.getType();
         if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
@@ -79,10 +75,6 @@ class SearchMessageSelector implements MessageSelector {
                                + "but DBStore doesn't include that info");
                 _found = true;
                 return true;
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("[" + _id + "] DBStore of a key we're not looking for");
-                return false;
             }
         } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
             DatabaseSearchReplyMessage msg = (DatabaseSearchReplyMessage)message;
@@ -93,21 +85,9 @@ class SearchMessageSelector implements MessageSelector {
                                    + "checking with for a key we're looking for");
                     _found = true;
                     return true;
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("[" + _id + "] Was a DBSearchReply from who we're checking "
-                                   + "with but NOT for the key we're looking for");
-                    return false;
                 }
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("[" + _id + "] DBSearchReply from someone we are not checking with [" 
-                               + msg.getFromHash() + ", not " + _state.getTarget() + "]");
-                return false;
             }
-        } else {
-            //_log.debug("Not a DbStore or DbSearchReply");
-            return false;
         }
+        return false;
     }
 }
