@@ -62,7 +62,16 @@
                 <%=intl._t("Automatically start tunnel when router starts")%></label>
             </td>
         </tr><tr>
-            <th colspan="2">
+<%
+            String aStopFirst = intl._t("Tunnel and all other shared client tunnels must be stopped to change this configuration");
+            String bStopFirst = intl._t("Tunnel must be stopped to change this configuration");
+            String stopFirst = editBean.isSharedClient(curTunnel) ? aStopFirst : bStopFirst;
+            boolean canChangePort = editBean.canChangePort(curTunnel);
+            String tastopFirst = " title=\"" + aStopFirst + "\" ";
+            String tbstopFirst = " title=\"" + bStopFirst + "\" ";
+            String phdisabled = canChangePort ? "" : tbstopFirst;
+%>
+            <th colspan="2" <%=phdisabled%>>
 <%          if ("streamrclient".equals(tunnelType)) { %>
                 <%=intl._t("Target")%>
 <%          } else { %>
@@ -79,8 +88,11 @@
                            out.write(intl._t("required"));
                            out.write(")</font></span>");
                        }
+                      String phelp = intl._t("Specify the local port this service should be accessible from");
+                      String ptext = canChangePort ? phelp : bStopFirst;
+                      String pdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
 %>
-                <input type="text" size="6" maxlength="5" name="port" title="<%=intl._t("Specify the local port this service should be accessible from")%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" />
+                <input type="text" size="6" maxlength="5" name="port" title="<%=ptext%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
             </td>
 <%
             if ("streamrclient".equals(tunnelType)) {
@@ -99,10 +111,12 @@
             </td>
 <%
             } else {
+                      String ihelp = intl._t("Local interface (ip address) the client tunnel will be reachable from");
+                      String itext = canChangePort ? ihelp : bStopFirst;
 %>
             <td>
                 <b><%=intl._t("Reachable by")%>:</b>
-                <select id="reachableBy" name="reachableBy" title="<%=intl._t("Local interface (ip address) the client tunnel will be reachable from")%>" class="selectbox">
+                <select id="reachableBy" name="reachableBy" title="<%=itext%>" class="selectbox" <%=pdisabled%>>
 <%
                     String clientInterface = editBean.getClientInterface(curTunnel);
                     for (String ifc : editBean.interfaceSet()) {
@@ -494,9 +508,6 @@
 
             int currentSigType = editBean.getSigType(curTunnel, tunnelType);
             boolean canChangeSigType = editBean.canChangeSigType(curTunnel);
-            String stopFirst = editBean.isSharedClient(curTunnel) ?
-                               intl._t("Tunnel and all other shared client tunnels must be stopped to change this configuration") :
-                               intl._t("Tunnel must be stopped to change this configuration");
             String tstopFirst = " title=\"" + stopFirst + "\" ";
             String shdisabled = canChangeSigType ? "" : tstopFirst;
             String disabled = canChangeSigType ? "" : " disabled=\"disabled\" ";

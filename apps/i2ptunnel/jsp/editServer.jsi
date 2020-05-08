@@ -61,15 +61,27 @@
                 <%=intl._t("Automatically start tunnel when router starts")%></label>
             </td>
         </tr><tr>
-            <th colspan="2">
-         <% if ("streamrserver".equals(tunnelType)) { %>
+<%
+            String stopFirst = intl._t("Tunnel must be stopped to change this configuration");
+            String tstopFirst = " title=\"" + stopFirst + "\" ";
+            boolean canChangeDest = editBean.canChangePort(curTunnel);
+            boolean isStreamrServer = "streamrserver".equals(tunnelType);
+            boolean isBidirServer = "httpbidirserver".equals(tunnelType);
+            boolean canChangePort = canChangeDest || !(isStreamrServer || isBidirServer);
+            String phdisabled = canChangePort ? "" : tstopFirst;
+%>
+            <th colspan="2" <%=phdisabled%>>
+<%
+            if (isStreamrServer) { %>
                 <%=intl._t("Access Point")%>
          <% } else { %>
                 <%=intl._t("Target")%>
          <% } %>
             </th>
         </tr><tr>
-         <% if (!"streamrserver".equals(tunnelType)) { %>
+<%
+            if (!isStreamrServer) {
+%>
             <td>
                 <b><%=intl._t("Host")%>:</b>
                 <input type="text" size="20" name="targetHost" title="<%=intl._t("Hostname or IP address of the target server")%>" value="<%=editBean.getTargetHost(curTunnel)%>" class="freetext host" />
@@ -83,16 +95,20 @@
                            out.write(intl._t("required"));
                            out.write(")</font></span>");
                        }
+                       String asphelp = intl._t("Specify the local port this service should be accessible from");
+                       String bsphelp = intl._t("Specify the port the server is running on");
+                       String ptext = canChangePort ? (isStreamrServer ? asphelp : bsphelp) : stopFirst;
+                       String pdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
 %>
-                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=intl._t("Specify the port the server is running on")%>" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext port" placeholder="required" />
-<%          if (!"streamrserver".equals(tunnelType)) { %>
+                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=ptext%>" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
+<%          if (!isStreamrServer) { %>
                 <label title="<%=intl._t("To avoid traffic sniffing if connecting to a remote server, you can enable an SSL connection. Note that the target server must be configured to accept SSL connections.")%>"><input value="1" type="checkbox" name="useSSL"<%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Use SSL to connect to target")%></label>
 <%          } /* !streamrserver */ %>
             </td>
-<%          if ("httpbidirserver".equals(tunnelType)) { %>
+<%          if (isBidirServer) { %>
         </tr><tr>
-            <th colspan="2">
+            <th colspan="2" <%=phdisabled%>>
                 <%=intl._t("Access Point")%>
             </th>
         </tr><tr>
@@ -105,16 +121,21 @@
            	            out.write(intl._t("required"));
            	            out.write(")</font></span>");
            	        }
+                       String csphelp = intl._t("Port required to access service (this can be a different port to the port the service is hosted on)");
+                       String dsphelp = canChangePort ? csphelp : stopFirst;
 %>
-                 <input type="text" size="6" maxlength="5" name="port" title="<%=intl._t("Port required to access service (this can be a different port to the port the service is hosted on)")%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" />
+                 <input type="text" size="6" maxlength="5" name="port" title="<%=dsphelp%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
             </td>
 <%          } /* httpbidirserver */
-            if ("httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) {
+            if (isBidirServer || isStreamrServer) {
 %>
             <td>
                 <b><%=intl._t("Reachable by")%>:</b>
-
-                <select id="reachableBy" name="reachableBy" title="<%=intl._t("Listening interface (IP address) for client access (normally 127.0.0.1)")%>" class="selectbox">
+<%
+                       String esphelp = intl._t("Listening interface (IP address) for client access (normally 127.0.0.1)");
+                       String fsphelp = canChangePort ? esphelp : stopFirst;
+%>
+                <select id="reachableBy" name="reachableBy" title="<%=fsphelp%>" class="selectbox" <%=pdisabled%>>
 <%
                     String clientInterface = editBean.getClientInterface(curTunnel);
                     for (String ifc : editBean.interfaceSet()) {
@@ -132,7 +153,7 @@
             </td>
          <% } /* httpbidirserver || streamrserver */ %>
         </tr>
-<%          if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+<%          if ("httpserver".equals(tunnelType) || isBidirServer) {
 %>
         <tr>
             <th>
@@ -150,26 +171,33 @@
         <tr>
             <th>
                 <%=intl._t("Local destination")%>
-            </th><th class="excludeBackgroundImage">
+<%
+                       String dhdisable = canChangeDest ? "" : tstopFirst;
+%>
+            </th><th class="excludeBackgroundImage" <%=dhdisable%>>
                 <%=intl._t("Private key file")%>
             </th>
         </tr><tr>
             <td>
                 <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=editBean.getDestinationBase64(curTunnel)%></div>
             </td><td>
-                    <% String value3 = editBean.getPrivateKeyFile(curTunnel);
+<%
+                       String value3 = editBean.getPrivateKeyFile(curTunnel);
                        if (value3 == null || "".equals(value3.trim())) {
                            out.write(" <span class=\"required\"><font color=\"red\">(");
                            out.write(intl._t("required"));
                            out.write(")</font></span>");
                        }
-                     %>
-                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=intl._t("Path to Private Key File")%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" placeholder="required" />
+                       String htext = intl._t("Path to Private Key File");
+                       String dtext = canChangeDest ? htext : stopFirst;
+                       String ddisabled = canChangeDest ? "" : " disabled=\"disabled\" ";
+%>
+                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=dtext%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" placeholder="required" <%=ddisabled%>/>
             </td>
         </tr>
 <%
   /******
-               if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+               if ("httpserver".equals(tunnelType) || isBidirServer) {
                    String sig = editBean.getNameSignature(curTunnel);
                    if (sig.length() > 0) {
           %><div id="sigField" class="rowItem">
@@ -212,7 +240,7 @@
 %>
               <a class="control" title="<%=intl._t("Register, unregister or change details for hostname")%>" href="register?tunnel=<%=curTunnel%>"><%=intl._t("Registration Authentication")%></a>
 <%
-                    if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+                    if ("httpserver".equals(tunnelType) || isBidirServer) {
 %>
               <a class="control" title="<%=intl._t("HTTPS configuration")%>" href="ssl?tunnel=<%=curTunnel%>"><%=intl._t("SSL Wizard")%></a>
 <%
@@ -407,8 +435,6 @@
 %>
 <%
             boolean canChangeEncType = editBean.canChangeEncType(curTunnel);
-            String stopFirst = intl._t("Tunnel must be stopped to change this configuration");
-            String tstopFirst = " title=\"" + stopFirst + "\" ";
             String ehdisabled = canChangeEncType ? "" : tstopFirst;
 
             // TODO, encrypted + offline is unimplemented
@@ -499,8 +525,10 @@
             <td>
 <%
                 if (allowBlinding /* && editBean.isAdvanced() */) {
-                    String pwTitle = "title=\"" + intl._t("Set password required to access this service") +
-                                     (canChangeEncType ? "" : (" - " + stopFirst)) + '"';
+                    String pwTitle = "title=\"" +
+                                     (canChangeEncType ?
+                                      intl._t("Set password required to access this service") :
+                                      stopFirst) + '"';
 %>
                 <input type="password" name="nofilter_blindedPassword" <%=pwTitle%> value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" <%=bdisabled%>/>
 <%
@@ -687,7 +715,7 @@
 <%
             /* alternate dest, only if current dest is set and is DSA_SHA1 */
 
-            if (currentSigType == 0 && !"".equals(b64) && !"streamrserver".equals(tunnelType)) {
+            if (currentSigType == 0 && !"".equals(b64) && !isStreamrServer) {
 %>
         <tr>
             <th colspan="2">
@@ -794,7 +822,7 @@
             </th>
         </tr>
         <%
-               if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+               if ("httpserver".equals(tunnelType) || isBidirServer) {
 %>
         <tr>
             <td>
@@ -831,7 +859,7 @@
             </th>
         </tr>
 <%
-            if (!"streamrserver".equals(tunnelType)) {
+            if (!isStreamrServer) {
 %>
         <tr>
             <th colspan="5">
@@ -871,7 +899,7 @@
             </td>
         </tr>
 <%
-               if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+               if ("httpserver".equals(tunnelType) || isBidirServer) {
 %>
         <tr>
             <th colspan="8">
