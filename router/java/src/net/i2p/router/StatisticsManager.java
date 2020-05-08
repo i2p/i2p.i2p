@@ -70,38 +70,10 @@ public class StatisticsManager {
      */
     public Properties publishStatistics(Hash h) { 
         Properties stats = new Properties();
-        stats.setProperty("router.version", RouterVersion.VERSION);
-        // never used
-        //stats.setProperty("coreVersion", CoreVersion.VERSION);
+        stats.setProperty("router.version", CoreVersion.PUBLISHED_VERSION);
         stats.setProperty(RouterInfo.PROP_NETWORK_ID, _networkID);
         stats.setProperty(RouterInfo.PROP_CAPABILITIES, _context.router().getCapabilities());
 
-        // No longer expose, to make build tracking more expensive
-        // stats.setProperty("router.id", RouterVersion.ID);
-        // stats.setProperty("core.id", CoreVersion.ID);
-
-/***
-        int newlines = 0;
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(Router.IDENTLOG);
-            int c = -1;
-            // perhaps later filter this to only include ident changes this
-            // day/week/month
-            while ( (c = in.read()) != -1) {
-                if (c == '\n')
-                    newlines++;
-            }
-        } catch (IOException ioe) {
-            // ignore
-        } finally {
-            if (in != null)
-                try { in.close(); } catch (IOException ioe) {}
-        }
-        if (newlines > 0)
-            stats.setProperty("stat_identities", newlines+"");
-***/
-        
         if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS) &&
             _context.random().nextInt(RANDOM_INCLUDE_STATS) == 0) {
             //long publishedUptime = _context.router().getUptime();
