@@ -486,7 +486,7 @@
     </target>
 
     <target name="failIfNoMtn" depends="checkForMtn">
-        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
+        <fail message="This target cannot be used without Monotone!">
             <condition>
                 <not>
                     <isset property="mtn.available" />
@@ -502,15 +502,7 @@
         </exec>
     </target>
 
-    <target name="trimRev" depends="getMtnRev, getGitRev">
-        <exec executable="cut" inputstring="${workspace.version}" outputproperty="shortHash" errorproperty="cut.error1" failifexecutionfails="true" >
-            <arg value="-c" />
-            <arg value="1-8" />
-        </exec>
-        <echo message="Short version is: ${shortHash}" />
-    </target>
-
-    <target name="checkIfBumped">
+    <target name="checkIfBumpedMtn" depends="checkForMtn" if="mtn.available" >
         <exec executable="mtn" outputproperty="bumped" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="ls" />
             <arg value="ch" />
@@ -523,18 +515,7 @@
         </condition>
     </target>
 
-    <target name="bump" depends="bumpBuild" />
-    <target name="bumpBuild" depends="checkIfBumped, getBuildNumber" unless="bumped.already">
-        <exec executable="dc" outputproperty="new.i2p.build.number" errorproperty="dc.error" failifexecutionfails="true" >
-            <arg value="-e" />
-            <arg value="${i2p.build.number} 1 + n" />
-        </exec>
-        <echo message="Build number is now: ${new.i2p.build.number}${build.extra}" />
-        <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
-            match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
-    </target>
-
-    <target name="revisions" depends="getReleaseNumber, getBuildNumber">
+    <target name="revisions" depends="getReleaseNumber, getBuildNumber, failIfNoMtn">
         <!-- mtn log __brief __no-graph __to t:i2p-0.9.xx | cut -d ' ' -f 2 | sort | uniq -c | sort -rn -->
         <exec executable="mtn" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
             <arg value="log" />
@@ -576,7 +557,60 @@
         </exec>
     </target>
 
+    <target name="checkIfBumpedGit" depends="checkForGit" if="git.available" >
+        <exec executable="git" outputproperty="bumped" errorproperty="git.error2" failifexecutionfails="false" >
+            <arg value="status" />
+            <arg value="-s" />
+            <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+        </exec>
+        <condition property="bumped.already">
+            <not>
+                <equals arg1="${bumped}" arg2=""/>
+            </not>
+        </condition>
+    </target>
+
+
     <!-- end git targets -->
+
+    <!-- combined mtn/git targets -->
+
+    <target name="failIfNoVCS" depends="checkForMtn, checkForGit">
+        <fail message="This target cannot be used without Monotone or Git!">
+            <condition>
+                <not>
+                    <or>
+                        <isset property="mtn.available" />
+                        <isset property="git.available" />
+                    </or>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="trimRev" depends="getMtnRev, getGitRev">
+        <exec executable="cut" inputstring="${workspace.version}" outputproperty="shortHash" errorproperty="cut.error1" failifexecutionfails="true" >
+            <arg value="-c" />
+            <arg value="1-8" />
+        </exec>
+        <echo message="Short version is: ${shortHash}" />
+    </target>
+
+    <target name="checkIfBumped" depends="failIfNoVCS, checkIfBumpedMtn, checkIfBumpedGit" />
+
+    <target name="bump" depends="bumpBuild" />
+
+    <target name="bumpBuild" depends="checkIfBumped, getBuildNumber" unless="bumped.already">
+        <exec executable="dc" outputproperty="new.i2p.build.number" errorproperty="dc.error" failifexecutionfails="true" >
+            <arg value="-e" />
+            <arg value="${i2p.build.number} 1 + n" />
+        </exec>
+        <echo message="Build number is now: ${new.i2p.build.number}${build.extra}" />
+        <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
+            match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
+    </target>
+
+    <!-- end combined mtn/git targets -->
 
     <!-- launch4j targets -->
 
@@ -1058,7 +1092,7 @@
             </fail>
     </target>
 
-    <target name="-pre-release" depends="-pre-sign, failIfNoMtn">
+    <target name="-pre-release" depends="-pre-sign, failIfNoVCS">
             <echo message="================================================================" />
             <echo message="Did you update these files?" />
             <exec executable="ls" failonerror="true">
@@ -2605,7 +2639,7 @@
     </target>
 
     <!-- buster, sid, bionic+ -->
-    <target name="debian-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="debian-tarball" depends="getExtendedVersion, failIfNoVCS">
         <!-- this will use the monotonerc file in the current workspace -->
         <property name="debian.tarball.name" value="i2p_${Extended.Version}.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
@@ -2688,7 +2722,7 @@
       -  We add a 'p' to the release name and tarball since the source package is different;
       -  Launchpad does not allow different source packages with the same name.
       -->
-    <target name="precise-release-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="precise-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}p.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
         <delete dir="../i2p-${Extended.Version}" />
@@ -2775,7 +2809,7 @@
       -  We add a 'x' to the release name and tarball since the source package is different;
       -  Launchpad does not allow different source packages with the same name.
       -->
-    <target name="xenial-release-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="xenial-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}x.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
         <delete dir="../i2p-${Extended.Version}" />
@@ -2850,7 +2884,7 @@
 
     <!-- buster, sid, bionic+ -->
     <!-- same as debian-tarball but with a release tar.bz2 file name and tar prefix -->
-    <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
         <delete dir="../i2p-${Extended.Version}" />
