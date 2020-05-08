@@ -835,6 +835,7 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
 
 .password {
      background: url(/themes/console/images/buttons/password.png) 3px center no-repeat #fafaff;
+     padding: 4px 5px 4px 26px !important;
 }
 
 .username:focus, .password:focus {
