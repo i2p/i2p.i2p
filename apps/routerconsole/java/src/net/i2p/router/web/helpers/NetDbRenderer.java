@@ -882,12 +882,14 @@ class NetDbRenderer {
 
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<table class=\"netdbentry\">")
-           .append("<tr><th colspan=\"2\"><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
+        buf.append("<table class=\"netdbentry\">" +
+                   "<tr id=\"").append(hash.substring(0, 6)).append("\"><th colspan=\"2\"");
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
+            buf.append(" id=\"our-info\"><b>").append(_t("Our Router Identity")).append(":</b> <code>")
+               .append(hash).append("</code></th><th>");
         } else {
-            buf.append("<b>" + _t("Peer info for") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
+            buf.append("><b>").append(_t("Router")).append(":</b> <code>")
+               .append(hash).append("</code></th><th>");
             String country = _context.commSystem().getCountry(info.getIdentity().getHash());
             if (country != null) {
                 buf.append("<a href=\"/netdb?c=").append(country).append("\">");
@@ -907,19 +909,21 @@ class NetDbRenderer {
             buf.append("<td><b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b></td>")
                .append("<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
-               .append("</span>&nbsp;&nbsp;");
+               .append("</span>");
         } else if (age > 0) {
             buf.append("<td><b>").append(_t("Published")).append(":</b></td>")
                .append("<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
-               .append("</span>&nbsp;&nbsp;");
+               .append("</span>");
         } else {
             // shouldnt happen
             buf.append("<td><b>").append(_t("Published")).append("</td><td colspan=\"2\">:</b> in ")
-               .append(DataHelper.formatDuration2(0-age)).append("<span class=\"netdb_info\">???</span>&nbsp;&nbsp;");
+               .append(DataHelper.formatDuration2(0-age)).append("<span class=\"netdb_info\">???</span>");
         }
-        buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
-           .append(info.getIdentity().getSigningPublicKey().getType().toString());
+        if (full) {
+            buf.append("</td></tr><tr><td><b>").append(_t("Signing Key")).append(":</b></td><td colspan=\"2\">")
+               .append(info.getIdentity().getSigningPublicKey().getType().toString());
+        }
         buf.append("</td></tr>\n<tr>")
            .append("<td><b>").append(_t("Addresses")).append(":</b></td><td colspan=\"2\"");
         Collection<RouterAddress> addrs = info.getAddresses();
