@@ -921,12 +921,12 @@ class NetDbRenderer {
         buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
            .append(info.getIdentity().getSigningPublicKey().getType().toString());
         buf.append("</td></tr>\n<tr>")
-           .append("<td><b>" + _t("Addresses") + ":</b></td>")
-           .append("<td colspan=\"2\" class=\"netdb_addresses\">");
+           .append("<td><b>").append(_t("Addresses")).append(":</b></td><td colspan=\"2\"");
         Collection<RouterAddress> addrs = info.getAddresses();
         if (addrs.isEmpty()) {
-            buf.append(_t("none"));
+            buf.append('>').append(_t("none"));
         } else {
+            buf.append(" class=\"netdb_addresses\">");
             if (addrs.size() > 1) {
                 // addrs is unmodifiable
                 List<RouterAddress> laddrs = new ArrayList<RouterAddress>(addrs);
