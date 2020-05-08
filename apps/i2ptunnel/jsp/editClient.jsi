@@ -493,7 +493,13 @@
             } // if httpclient
 
             int currentSigType = editBean.getSigType(curTunnel, tunnelType);
-            String disabled = editBean.canChangeSigType(curTunnel) ? "" : " disabled=\"disabled\" ";
+            boolean canChangeSigType = editBean.canChangeSigType(curTunnel);
+            String stopFirst = editBean.isSharedClient(curTunnel) ?
+                               intl._t("Tunnel and all other shared client tunnels must be stopped to change this configuration") :
+                               intl._t("Tunnel must be stopped to change this configuration");
+            String tstopFirst = " title=\"" + stopFirst + "\" ";
+            String shdisabled = canChangeSigType ? "" : tstopFirst;
+            String disabled = canChangeSigType ? "" : " disabled=\"disabled\" ";
 %>
     </table>
     <table class="tunnelConfig" id="cryptoOptions">
@@ -502,12 +508,12 @@
                 <%=intl._t("Tunnel Cryptography Options")%>
             </th>
         </tr><tr>
-            <th colspan="2">
+            <th colspan="2" <%=shdisabled%>>
                 <%=intl._t("Signature type")%>
             </th>
         </tr><tr>
             <td colspan="2">
-                <select id="sigType" name="sigType" class="selectbox">
+                <select id="sigType" name="sigType" class="selectbox" <%=shdisabled%>>
                     <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="0" <%=(currentSigType==0 ? " selected=\"selected\"" : disabled)%> >
                     DSA-SHA1</option>
 <%
@@ -542,23 +548,25 @@
 <%
                 boolean has0 = editBean.hasEncType(curTunnel, 0);
                 boolean has4 = editBean.hasEncType(curTunnel, 4);
-                String edisabled = editBean.canChangeEncType(curTunnel) ? "" : " disabled=\"disabled\" ";
+                boolean canChangeEncType = editBean.canChangeEncType(curTunnel);
+                String ehdisabled = canChangeEncType ? "" : tstopFirst;
+                String edisabled = canChangeEncType ? "" : " disabled=\"disabled\" ";
 %>
         <tr>
-            <th colspan="2">
+            <th colspan="2" <%=ehdisabled%>>
                 <%=intl._t("Encryption types")%>
             </th>
         </tr><tr>
             <td colspan="2">
-                <span class="multiOption">
+                <span class="multiOption" <%=ehdisabled%>>
                     <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=(has0 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ElGamal-2048</label>
                 </span>
-                <span class="multiOption">
+                <span class="multiOption" <%=ehdisabled%>>
                     <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=(has4 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ECIES-X25519 (<%=intl._t("Experts only!")%>)</label>
                 </span>
-                <span class="multiOption">
+                <span class="multiOption" <%=ehdisabled%>>
                     <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     <%=intl._t("Both encryption types")%></label>
                 </span>
