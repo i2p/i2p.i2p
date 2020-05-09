@@ -95,8 +95,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
@@ -122,6 +120,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 
 /*
  * Naming convention used: Hungarian, with the following details
@@ -1911,14 +1910,14 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				}
 			}.start();
 
-			Timer c2sspdUpdateTimer = new Timer();
-			c2sspdUpdateTimer.scheduleAtFixedRate(new TimerTask() {
+			PeriodicTimer c2sspdUpdateTimer = new PeriodicTimer() {
 				@Override
-				public void run() {
+				public void timeReached() {
 					pub_c2sspd = ((NDTConstants.EIGHT * _iPkts * _yabuff2Write.length) / NDTConstants.KILO)
 							/ (System.currentTimeMillis() - _dTime);
+					schedule(_c2sspdUpdateTime);
 				}
-			}, 100, _c2sspdUpdateTime);
+			};
 
 			// While the 10 s timer ticks, write buffer data into server socket
 			while (true) {
@@ -2139,14 +2138,14 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_dTime = System.currentTimeMillis();
 			pub_time = _dTime;
 
-			Timer s2cspdUpdateTimer = new Timer();
-			s2cspdUpdateTimer.scheduleAtFixedRate(new TimerTask() {
+			PeriodicTimer s2cspdUpdateTimer = new PeriodicTimer() {
 				@Override
-				public void run() {
+				public void timeReached() {
 					pub_s2cspd = ((NDTConstants.EIGHT * pub_bytes) / NDTConstants.KILO)
 							/ (System.currentTimeMillis() - _dTime);
+					schedule(_s2cspdUpdateTime);
 				}
-			}, 100, _s2cspdUpdateTime);
+			};
 
 			// read data sent by server
 			try {
@@ -4607,6 +4606,15 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		t.setDaemon( true );
 		t.start();
 		//sem.reserve();
+	}
+
+	/**
+	 *  @since 0.9.46 to replace Java Timer and TimerTask
+	 */
+	private abstract class PeriodicTimer extends SimpleTimer2.TimedEvent {
+	    public PeriodicTimer() {
+	        super(_context.simpleTimer2(), 100);
+	    }
 	}
 
 } // class: Tcpbw100
