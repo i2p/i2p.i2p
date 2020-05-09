@@ -718,9 +718,13 @@ public class GeoIP {
         return _codeToName.get(code);
     }
 
-/***
     public static void main(String args[]) {
+        if (args.length <= 0) {
+            System.out.println("Usage: GeoIP ip...");
+            System.exit(1);
+        }
         GeoIP g = new GeoIP(I2PAppContext.getGlobalContext());
+/***
         String tests[] = {"0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.255", "1.0.0.0",
                                         "94.3.3.3", "77.1.2.3", "127.0.0.0", "127.127.127.127", "128.0.0.0",
                                         "89.8.9.3", "72.5.6.8", "217.4.9.7", "175.107.027.107", "135.6.5.2",
@@ -730,12 +734,17 @@ public class GeoIP {
                           };
         for (int i = 0; i < tests.length; i++)
             g.add(tests[i]);
+***/
+        for (int i = 0; i < args.length; i++)
+            g.add(args[i]);
         long start = System.currentTimeMillis();
         g.blockingLookup();
         System.out.println("Lookup took " + (System.currentTimeMillis() - start));
+/***
         for (int i = 0; i < tests.length; i++)
             System.out.println(tests[i] + " : " + g.get(tests[i]));
-
-    }
 ***/
+        for (int i = 0; i < args.length; i++)
+            System.out.println(args[i] + " : " + g.get(args[i]));
+    }
 }
