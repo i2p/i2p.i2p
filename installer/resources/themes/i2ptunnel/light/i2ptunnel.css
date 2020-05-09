@@ -125,17 +125,17 @@ br {
 
 .statusNotRunning {
      color: #d00;
-     background: url(images/console_status_stopped.png) 0 0 no-repeat;
+     background: url(/themes/console/light/images/console_status_stopped.png) 0 0 no-repeat;
 }
 
 .statusRunning {
      color: #0b0;
-     background: url(images/console_status_running.png) 0 0 no-repeat;
+     background: url(/themes/console/light/images/console_status_running.png) 0 0 no-repeat;
 }
 
 .statusStarting {
      color: #ff3;
-     background: url(images/console_status_starting.png) 0 0 no-repeat;
+     background: url(/themes/console/light/images/console_status_starting.png) 0 0 no-repeat;
 }
 
 .statusNotRunning, .statusRunning, .statusStarting {
@@ -285,7 +285,7 @@ select {
      padding: 4px 16px 4px 4px !important;
      min-width: 140px;
      background: #fff;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #efefff);
+     background: url(/themes/console/light/images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #efefff);
      background-blend-mode: hard-light, normal;
      color: #33333f;
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
@@ -306,7 +306,7 @@ select:hover {
 }
 
 select:hover, select:active, select:focus {
-     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
+     background: url(/themes/console/light/images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
 }
 
 select:focus {
@@ -422,7 +422,7 @@ th.tableTop {
 }
 
 th {
-     /*background: #eef url(images/header.png) center center repeat-x;*/
+     /*background: #eef url(/themes/console/light/images/header.png) center center repeat-x;*/
      background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%);
      padding: 6px 5px;
      text-align: left;
@@ -492,14 +492,14 @@ td.infohelp {
 }
 
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th{
-    background: url(images/dropdown.png) #f8f8ff;
+    background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
     background-repeat: no-repeat !important;
     background-position: 1%, 15% !important;
     padding-left: 30px;
 }
 
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th:hover {
-    background: url(images/dropdown_hover.png) #f8f8ff;
+    background: url(/themes/console/light/images/dropdown_hover.png) #f8f8ff;
     background-repeat: no-repeat !important;
     background-position: 1%, 15% !important;
     padding-left: 30px;
@@ -508,7 +508,7 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 table.tunnelConfig th,
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'],
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'] {
-    background: url(images/dropdown.png) #f8f8ff;
+    background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
     background-repeat: no-repeat !important;
     background-position: .5%, 15% !important;
     padding-left: 30px;
@@ -517,19 +517,19 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 table.tunnelConfig th:hover,
 html body#tunnelEditPage form div.panel table#clientTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover,
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover {
-    background: url(images/dropdown_hover.png) #f8f8ff;
+    background: url(/themes/console/light/images/dropdown_hover.png) #f8f8ff;
     background-repeat: no-repeat !important;
     background-position: .5%, 15% !important;
     padding-left: 30px;
 }
 
 .tunnelConfigExpanded {
-    background: url(images/dropdown_active.png) #f8f8ff !important;
+    background: url(/themes/console/light/images/dropdown_active.png) #f8f8ff !important;
     padding-left: 30px;
 }
 
 .tunnelConfigContracted {
-    background: url(images/dropdown.png) #f8f8ff !important;
+    background: url(/themes/console/light/images/dropdown.png) #f8f8ff !important;
     padding-left: 30px;
 }
 

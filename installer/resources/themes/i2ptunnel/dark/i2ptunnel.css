@@ -6,7 +6,6 @@ body {
      padding: 0;
      text-align: center;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
-     /*background: #010 url(images/camotile.png) center bottom;*/
      background: #1F1A24;
      color: #e6e6e7;
      font-size: 9pt;
@@ -92,21 +91,21 @@ div.statusNotRunning {
      height: 16px;
      overflow: hidden;
      color: #d00;
-     background: url(images/console_status_stopped.png) center center no-repeat;
+     background: url(/themes/console/dark/images/console_status_stopped.png) center center no-repeat;
 }
 
 div.statusRunning {
      height: 16px;
      overflow: hidden;
      color: #0b0;
-     background: url(images/console_status_running.png) center center no-repeat;
+     background: url(/themes/console/dark/images/console_status_running.png) center center no-repeat;
 }
 
 div.statusStarting {
      height: 16px;
      overflow: hidden;
      color: #393;
-     background: url(images/console_status_starting.png) center center no-repeat;
+     background: url(/themes/console/dark/images/console_status_starting.png) center center no-repeat;
 }
 
 div[class^="status"] {
@@ -191,8 +190,6 @@ h2, h3 {
      word-spacing: 0.1em;
      text-shadow: 0 1px 1px #000;
      box-shadow: inset 0 0 0 1px #000;
-     /*background: linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
-     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%), url(/themes/console/dark/images/camotile2.png) top left !important;*/
 }
 
 /* title images */
@@ -302,7 +299,7 @@ td > b {
 }
 
 td.infohelp {
-     background: url(images/infohelp.png) 10px center no-repeat;
+     background: url(/themes/console/dark/images/infohelp.png) 10px center no-repeat;
      background-size: 20px 20px;
      padding: 10px 10px 10px 38px !important;
 }
@@ -320,14 +317,14 @@ td.infohelp {
 }
 
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th{
-    background: url(images/dropdown.png) #433e47;
+    background: url(/themes/console/dark/images/dropdown.png) #433e47;
     background-repeat: no-repeat !important;
     background-position: 1%, 15% !important;
     padding-left: 30px;
 }
 
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th:hover {
-    background: url(images/dropdown_hover.png) #433e47;
+    background: url(/themes/console/dark/images/dropdown_hover.png) #433e47;
     background-repeat: no-repeat !important;
     background-position: 1%, 15% !important;
     padding-left: 30px;
@@ -336,7 +333,7 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 table.tunnelConfig th,
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'],
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2'] {
-    background: url(images/dropdown.png) #433e47;
+    background: url(/themes/console/dark/images/dropdown.png) #433e47;
     background-repeat: no-repeat !important;
     background-position: .5%, 15% !important;
     padding-left: 30px;
@@ -345,19 +342,19 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 table.tunnelConfig th:hover,
 html body#tunnelEditPage form div.panel table#clientTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover,
 html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbody tr th[colspan='2']:hover {
-    background: url(images/dropdown_hover.png) #433e47;
+    background: url(/themes/console/dark/images/dropdown_hover.png) #433e47;
     background-repeat: no-repeat !important;
     background-position: .5%, 15% !important;
     padding-left: 30px;
 }
 
 .tunnelConfigExpanded {
-    background: url(images/dropdown_active.png) #433e47 !important;
+    background: url(/themes/console/dark/images/dropdown_active.png) #433e47 !important;
     padding-left: 30px;
 }
 
 .tunnelConfigContracted {
-    background: url(images/dropdown.png) #433e47 !important;
+    background: url(/themes/console/dark/images/dropdown.png) #433e47 !important;
     padding-left: 30px;
 }
 
@@ -704,7 +701,7 @@ select {
      -moz-appearance: none;
      -webkit-appearance: none;
      appearance: none;
-     background: #332940 url(images/dropdown.png) right center no-repeat !important;
+     background: #332940 url(/themes/console/dark/images/dropdown.png) right center no-repeat !important;
      border-radius: 2px;
      cursor: pointer;
      filter: drop-shadow(0 0 1px #000);
@@ -733,7 +730,7 @@ select:hover {
 }
 
 select:hover, select:focus, select:active {
-     background: #332940 url(images/dropdown_hover.png) right center no-repeat !important;
+     background: #332940 url(/themes/console/dark/images/dropdown_hover.png) right center no-repeat !important;
 }
 
 select::-ms-expand {
@@ -913,11 +910,6 @@ td.blankColumn {
 
 #throttler input[type="text"] {
      width: 80px;
-}
-
-table {
-     /*background: #000 url(images/camotile2.png);
-     background: linear-gradient(to bottom, rgba(0,0,0,0.5),rgba(0,0,0,0.7)), url(images/camotile2.png);*/
 }
 
 #tunnelMessages {

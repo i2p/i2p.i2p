@@ -63,8 +63,8 @@
             </td>
         </tr><tr>
 <%
-            String aStopFirst = intl._t("Tunnel and all other shared client tunnels must be stopped to change this configuration");
-            String bStopFirst = intl._t("Tunnel must be stopped to change this configuration");
+            String aStopFirst = intl._t("The client tunnel and all other shared client tunnels must be stopped to change this setting");
+            String bStopFirst = intl._t("The client tunnel must be stopped to change this setting");
             String stopFirst = editBean.isSharedClient(curTunnel) ? aStopFirst : bStopFirst;
             boolean canChangePort = editBean.canChangePort(curTunnel);
             String tastopFirst = " title=\"" + aStopFirst + "\" ";
@@ -688,7 +688,7 @@
             <td class="buttons" colspan="2">
                     <input type="hidden" value="true" name="removeConfirm" />
                     <button id="controlCancel" class="control" type="submit" name="action" value=""><%=intl._t("Cancel")%></button>
-                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>class="control" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>"><%=intl._t("Delete")%></button>
+                    <button id="controlDelete" onclick="if (!confirm('Are you sure you want to delete?')) { return false; }" class="control" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>"><%=intl._t("Delete")%></button>
                     <button id="controlSave" class="control" type="submit" name="action" value="Save changes"><%=intl._t("Save")%></button>
             </td>
         </tr>

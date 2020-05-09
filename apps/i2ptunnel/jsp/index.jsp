@@ -10,15 +10,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title><%=intl._t("Hidden Services Manager")%></title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
-
-    <% if (indexBean.allowCSS()) {
-  %><link rel="icon" href="<%=indexBean.getTheme()%>images/favicon.ico" />
+    <link rel="icon" href="<%=indexBean.getTheme()%>images/favicon.ico" />
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
-    <% }
-  %>
 </head><body id="tunnelListPage">
 <div class="panel" id="overview"><h2><%=intl._t("Hidden Services Manager")%></h2><p>
 <%=intl._t("These are the local services provided by your router.")%>
