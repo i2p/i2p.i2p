@@ -134,8 +134,12 @@
 0. Make sure you're using the right JDK
    `echo $JAVA_HOME` and `java -version`
 
-1. `ant releaseRepack` or `ant releaseWithGeoIPRepack` or `ant releaseWithJbigiRepack`
-
+1.  Build the release.
+  - Decide if you want to include GeoIP or not.
+    If it's been a few months since it was last included,
+    use releaseWithGeoIPRepack. Otherwise, use releaseRepack.
+    Use releaseWithJbigiRepack only if jbigi binaries were updated.
+  - `ant releaseRepack` or `ant releaseWithGeoIPRepack` or `ant releaseWithJbigiRepack`
   - Copy i2pinstall_${release.number}_windows.exe,
     console.ico, ../lib/izpack/rh.bat, and ../lib/izpack/VersionInfo_template.rc
     to Windows machine
