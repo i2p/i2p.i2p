@@ -162,6 +162,8 @@ public class GeoIP {
         public void run() {
             if (_lock.getAndSet(true))
                 return;
+            int toSearch = 0;
+            int found = 0;
             File geoip2 = getGeoIP2();
             DatabaseReader dbr = null;
             long start = _context.clock().now();
@@ -184,6 +186,7 @@ public class GeoIP {
                 Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
                 _pendingSearch.clear();
                 if (search.length > 0) {
+                    toSearch += search.length;
                     Arrays.sort(search);
                     File f = new File(_context.getProperty(PROP_DEBIAN_GEOIP, DEBIAN_GEOIP_FILE));
                     // if we have both, prefer the most recent.
@@ -209,6 +212,7 @@ public class GeoIP {
                                     if (cached == null)
                                         cached = lc;
                                     _IPToCountry.put(ipl, cached);
+                                    found++;
                                 } else {
                                     _notFound.add(ipl);
                                 }
@@ -235,6 +239,7 @@ public class GeoIP {
                                     if (cached == null)
                                         cached = lc;
                                     _IPToCountry.put(ipl, cached);
+                                    found++;
                                 } else {
                                     _notFound.add(ipl);
                                 }
@@ -246,10 +251,12 @@ public class GeoIP {
                         // Tor-style database
                         String[] countries = readGeoIPFile(search);
                         for (int i = 0; i < countries.length; i++) {
-                            if (countries[i] != null)
+                            if (countries[i] != null) {
                                 _IPToCountry.put(search[i], countries[i]);
-                            else
+                                found++;
+                            } else {
                                 _notFound.add(search[i]);
+                            }
                         }
                     }
                 }
@@ -257,6 +264,7 @@ public class GeoIP {
                 search = _pendingIPv6Search.toArray(new Long[_pendingIPv6Search.size()]);
                 _pendingIPv6Search.clear();
                 if (search.length > 0) {
+                    toSearch += search.length;
                     Arrays.sort(search);
                     File f = new File(_context.getProperty(PROP_DEBIAN_GEOIPV6, DEBIAN_GEOIPV6_FILE));
                     if (ENABLE_DEBIAN && f.exists() &&
@@ -280,6 +288,7 @@ public class GeoIP {
                                     if (cached == null)
                                         cached = lc;
                                     _IPToCountry.put(ipl, cached);
+                                    found++;
                                 } else {
                                     _notFound.add(ipl);
                                 }
@@ -307,6 +316,7 @@ public class GeoIP {
                                     if (cached == null)
                                         cached = lc;
                                     _IPToCountry.put(ipl, cached);
+                                    found++;
                                 } else {
                                     _notFound.add(ipl);
                                 }
@@ -318,10 +328,12 @@ public class GeoIP {
                         // I2P format IPv6 database
                         String[] countries = GeoIPv6.readGeoIPFile(_context, search, _codeCache);
                         for (int i = 0; i < countries.length; i++) {
-                            if (countries[i] != null)
+                            if (countries[i] != null) {
                                 _IPToCountry.put(search[i], countries[i]);
-                            else
+                                found++;
+                            } else {
                                 _notFound.add(search[i]);
+                            }
                         }
                     }
                 }
@@ -330,7 +342,8 @@ public class GeoIP {
                 _lock.set(false);
             }
             if (_log.shouldInfo())
-                _log.info("GeoIP processing finished, time: " + (_context.clock().now() - start));
+                _log.info("GeoIP processing finished, looked up: " + toSearch + " found: " + found +
+                          " time: " + (_context.clock().now() - start));
         }
     }
 
