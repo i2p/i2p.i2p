@@ -1,5 +1,12 @@
+2020-05-10 zzz
+ * i2psnark: Support file paths in add form
+
 2020-05-10 idk
-  * SusiDNS: Fix trac #2419
+ * SusiDNS: Fix trac #2419
+
+2020-05-08 zzz
+ * Build: Use git revisions when available
+ * Router: FloodfillPeerSelector cleanup (ticket #2694)
 
 2020-05-07 zzz
  * Router:

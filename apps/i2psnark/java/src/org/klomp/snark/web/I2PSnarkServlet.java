@@ -1,6 +1,7 @@
 package org.klomp.snark.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -1088,8 +1089,61 @@ public class I2PSnarkServlet extends BasicServlet {
                     newURL = newURL.toUpperCase(Locale.US);
                     addMagnet(MagnetURI.MAGNET_FULL + newURL, dir);
                 } else {
-                    _manager.addMessage(_t("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"",
-                                          MagnetURI.MAGNET, MagnetURI.MAGGOT));
+                    // try as file path, hopefully we're on the same box
+                    if (newURL.startsWith("file://"))
+                        newURL = newURL.substring(7);
+                    File file = new File(newURL);
+                    if (file.isAbsolute() && file.exists()) {
+                        if (!newURL.endsWith(".torrent")) {
+                            _manager.addMessageNoEscape(_t("Torrent at {0} was not valid", DataHelper.escapeHTML(newURL)));
+                            return;
+                        }
+                        FileInputStream in = null;
+                        try {
+                            // This is all copied from FetchAndAdd
+                            // test that it's a valid torrent file, and get the hash to check for dups
+                            in = new FileInputStream(file);
+                            byte[] fileInfoHash = new byte[20];
+                            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+                            try { in.close(); } catch (IOException ioe) {}
+                            Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
+                            if (snark != null) {
+                                _manager.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                                return;
+                            }
+
+                            // check for dup file name
+                            String originalName = Storage.filterName(name);
+                            name = originalName + ".torrent";
+                            File torrentFile = new File(dd, name);
+                            String canonical = torrentFile.getCanonicalPath();
+                            if (torrentFile.exists()) {
+                                if (_manager.getTorrent(canonical) != null)
+                                    _manager.addMessage(_t("Torrent already running: {0}", name));
+                                else
+                                    _manager.addMessage(_t("Torrent already in the queue: {0}", name));
+                            } else {
+                                // This may take a LONG time to create the storage.
+                                boolean ok = _manager.copyAndAddTorrent(file, canonical, dd);
+                                if (!ok)
+                                    throw new IOException("Unknown error - check logs");
+                                snark = _manager.getTorrentByBaseName(originalName);
+                                if (snark != null)
+                                    snark.startTorrent();
+                                else
+                                    throw new IOException("Unknown error - check logs");
+                            }
+                        } catch (IOException ioe) {
+                            _manager.addMessageNoEscape(_t("Torrent at {0} was not valid", DataHelper.escapeHTML(newURL)) + ": " + DataHelper.stripHTML(ioe.getMessage()));
+                        } catch (OutOfMemoryError oom) {
+                            _manager.addMessageNoEscape(_t("ERROR - Out of memory, cannot create torrent from {0}", DataHelper.escapeHTML(newURL)) + ": " + DataHelper.stripHTML(oom.getMessage()));
+                        } finally {
+                            try { if (in != null) in.close(); } catch (IOException ioe) {}
+                        }
+                    } else {
+                        _manager.addMessage(_t("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"",
+                                               MagnetURI.MAGNET, MagnetURI.MAGGOT));
+                    }
                 }
             } else {
                 // no file or URL specified
