@@ -2229,7 +2229,7 @@ public class I2PSnarkServlet extends BasicServlet {
         //String newFile = req.getParameter("newFile");
         //if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
 
-        out.write("<div class=\"snarkNewTorrent\">\n" +
+        out.write("<div id=\"add\" class=\"snarkNewTorrent\">\n" +
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
                   "<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Add");
@@ -2273,7 +2273,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
-        out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n" +
+        out.write("<div id=\"new\" class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n" +
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
                   "<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Create");
