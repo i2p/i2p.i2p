@@ -28,7 +28,7 @@
         request.setCharacterEncoding("UTF-8");
 
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
-    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'none'; form-action 'self'; frame-ancestors 'self'; media-src 'none'");
+    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; media-src 'none'");
     response.setHeader("X-XSS-Protection", "1; mode=block");
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
@@ -46,6 +46,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><%=intl._t("Introduction")%> - SusiDNS</title>
 <link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css?<%=net.i2p.CoreVersion.VERSION%>">
+<script src="js/messages.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head>
 <body>
 <div class="page">

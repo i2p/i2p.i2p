@@ -144,6 +144,7 @@
         	<fileset dir=".">
         		<include name="WEB-INF/**/*.class"/>
         		<include name="svg/*"/>
+                <include name="js/*"/>
         	</fileset>
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -159,7 +160,7 @@
 
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="${project}.war">
-            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class svg/*" />
+            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class js/* svg/*" />
         </uptodate>
         <condition property="shouldListChanges" >
             <and>
