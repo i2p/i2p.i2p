@@ -1069,9 +1069,14 @@ public class I2PSnarkServlet extends BasicServlet {
                     _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
                     return;
                 }
-                if (newURL.startsWith("http://")) {
-                    FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL, dir);
-                    _manager.addDownloader(fetch);
+                if (newURL.startsWith("http://") || newURL.startsWith("https://")) {
+                    if (isI2PTracker(newURL)) {
+                        FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL, dir);
+                        _manager.addDownloader(fetch);
+                    } else {
+                        // TODO
+                        _manager.addMessageNoEscape(_t("Download from non-I2P location {0} is not supported", urlify(newURL)));
+                    }
                 } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
                     addMagnet(newURL, dir);
                 } else if (newURL.length() == 40 && newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
