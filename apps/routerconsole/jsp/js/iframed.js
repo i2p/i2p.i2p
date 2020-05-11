@@ -36,3 +36,6 @@ function resizeFrame(f) {
     f.style.height = totalHeight + "px";
 }
 
+document.addEventListener("DOMContentLoaded", function() {
+    setupFrame();
+}, true);

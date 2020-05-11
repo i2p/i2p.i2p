@@ -23,7 +23,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <%@include file="css.jsi" %>
-<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("Hidden Services Manager")%>
 <script src="/js/iframed.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
@@ -51,9 +50,11 @@
   }
   function setupFrame() {
       f = document.getElementById("i2ptunnelframe");
-      injectClass(f);
-      injectClassSpecific(f);
-      resizeFrame(f);
+      f.addEventListener("load", function() {
+          injectClass(f);
+          injectClassSpecific(f);
+          resizeFrame(f);
+      }, true);
   }
 </script>
 </head><body>
@@ -62,7 +63,7 @@
 
 <h1><%=intl._t("Hidden Services Manager")%> <span class="newtab"><a href="/i2ptunnel/" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="tunnelmgr">
-<iframe src="/i2ptunnel/" width="100%" height="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" onload="setupFrame()" allowtransparency="true">
+<iframe src="/i2ptunnel/" width="100%" height="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" allowtransparency="true">
 <%=intl._t("Your browser does not support iFrames.")%>
 &nbsp;<a href="/i2ptunnel/"><%=intl._t("Click here to continue.")%></a>
 </iframe>
