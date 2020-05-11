@@ -3686,7 +3686,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if ((!complete) && (!item.isDirectory())) {
                     if (!inOrder) {
                         buf.append("<label class=\"priorityHigh\" title=\"").append(_t("Download file at high priority")).append("\">" +
-                                   "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
+                                   "\n<input type=\"radio\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
                         if (priority > 0)
                             buf.append("checked=\"checked\"");
                         buf.append('>')
@@ -3694,14 +3694,14 @@ public class I2PSnarkServlet extends BasicServlet {
                     }
 
                     buf.append("<label class=\"priorityNormal\" title=\"").append(_t("Download file at normal priority")).append("\">" +
-                               "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
+                               "\n<input type=\"radio\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority == 0 || (inOrder && priority >= 0))
                         buf.append("checked=\"checked\"");
                     buf.append('>')
                        .append(_t("Normal")).append("</label>");
 
                     buf.append("<label class=\"prioritySkip\" title=\"").append(_t("Do not download this file")).append("\">" +
-                               "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"priskip\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
+                               "\n<input type=\"radio\" class=\"priskip\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority < 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>')
@@ -3716,12 +3716,12 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<thead><tr id=\"setPriority\"><th class=\"headerpriority\" colspan=\"5\">" +
                        "<span class=\"script\">");
             if (!inOrder) {
-                buf.append("<a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">")
+                buf.append("<a class=\"control\" id=\"setallhigh\" href=\"#\">")
                    .append(toImg("clock_red")).append(_t("Set all high")).append("</a>\n");
             }
-            buf.append("<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">")
+            buf.append("<a class=\"control\" id=\"setallnorm\" href=\"#\">")
                .append(toImg("clock")).append(_t("Set all normal")).append("</a>\n" +
-                       "<a class=\"control\" id=\"setallskip\" href=\"javascript:void(null);\" onclick=\"setallskip();\">")
+                       "<a class=\"control\" id=\"setallskip\" href=\"#\">")
                .append(toImg("cancel")).append(_t("Skip all")).append("</a></span>\n" +
                        "<input type=\"submit\" class=\"accept\" value=\"").append(_t("Save priorities"))
                .append("\" name=\"savepri\" >\n" +
