@@ -322,13 +322,18 @@ public class I2PSnarkServlet extends BasicServlet {
                 String downMsg = _context.isRouterContext() ? _t("Router is down") : _t("I2PSnark has stopped");
                 // fallback to metarefresh when javascript is disabled
                 out.write("<noscript><meta http-equiv=\"refresh\" content=\"" + delay + ";" + _contextPath + "/" + peerString + "\"></noscript>\n" +
-                          "<script src=\"" + jsPfx + "/js/ajax.js\" type=\"text/javascript\"></script>\n" +
+                          "<script src=\"" + jsPfx + "/js/ajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
                           "var ajaxDelay = " + (delay * 1000) + ";\n" +
                           "</script>\n" +
-                          "<script src=\".resources/js/initajax.js\" type=\"text/javascript\"></script>\n");
+                          "<script src=\".resources/js/initajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
             }
+            out.write("<script type=\"text/javascript\">\n"  +
+                      "var deleteMessage1 = \"" + _t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?") + "\";\n" +
+                      "var deleteMessage2 = \"" + _t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?") + "\";\n" +
+                      "</script>\n" +
+                      "<script src=\".resources/js/delete.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         }
         out.write(HEADER_A + _themePath + HEADER_B);
 
@@ -1940,16 +1945,11 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce +
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
-                    out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
+                    out.write("<input class=\"delete1\" type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_t("Remove the torrent from the active list, deleting the .torrent file"));
-                out.write("\" onclick=\"if (!confirm('");
-                // Can't figure out how to escape double quotes inside the onclick string.
-                // Single quotes in translate strings with parameters must be doubled.
-                // Then the remaining single quote must be escaped
-                out.write(_t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?",
-                            escapeJSString(snark.getName())));
-                out.write("')) { return false; }\"");
-                out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
+                out.write("\" client=\"");
+                out.write(escapeJSString(snark.getName()));
+                out.write("\" src=\"" + _imgPath + "remove.png\" alt=\"");
                 out.write(_t("Remove"));
                 out.write("\">");
                 if (isDegraded)
@@ -1964,16 +1964,11 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce +
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
-                    out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
+                    out.write("<input class=\"delete2\" type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_t("Delete the .torrent file and the associated data files"));
-                out.write("\" onclick=\"if (!confirm('");
-                // Can't figure out how to escape double quotes inside the onclick string.
-                // Single quotes in translate strings with parameters must be doubled.
-                // Then the remaining single quote must be escaped
-                out.write(_t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?",
-                            escapeJSString(fullBasename)));
-                out.write("')) { return false; }\"" +
-                          " src=\"" + _imgPath + "delete.png\" alt=\"");
+                out.write("\" client=\"");
+                out.write(escapeJSString(snark.getName()));
+                out.write("\" src=\"" + _imgPath + "delete.png\" alt=\"");
                 out.write(_t("Delete"));
                 out.write("\">");
                 if (isDegraded)
@@ -3065,7 +3060,7 @@ public class I2PSnarkServlet extends BasicServlet {
            .append("<noscript><style type=\"text/css\">.script {display: none;}</style></noscript>" +
                    "<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
-            buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");
+            buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         buf.append("</head><body>\n" +
                    "<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"" +
                    " class=\"snarkNav nav_main\">");
