@@ -325,11 +325,9 @@ public class I2PSnarkServlet extends BasicServlet {
                           "<script src=\"" + jsPfx + "/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
-                          "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" +
-                          peerString.replace("&amp;", "&") +  // don't html escape in js
-                          "\", \"mainsection\", " + (delay*1000) + "); }\n" +
-                          "function initAjax() { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
-                          "</script>\n");
+                          "var ajaxDelay = " + (delay * 1000) + ";\n" +
+                          "</script>\n" +
+                          "<script src=\".resources/js/initajax.js\" type=\"text/javascript\"></script>\n");
             }
         }
         out.write(HEADER_A + _themePath + HEADER_B);
@@ -338,13 +336,9 @@ public class I2PSnarkServlet extends BasicServlet {
         if (noCollapse || !collapsePanels) {
             out.write(HEADER_A + _themePath + HEADER_C);
         }
-        out.write("</head>\n");
-
-        if (isConfigure || delay <= 0)
-            out.write("<body>");
-        else
-            out.write("<body onload=\"initAjax()\">");
-        out.write("<center>");
+        out.write("</head>\n" +
+                  "<body>" +
+                  "<center>");
         List<Tracker> sortedTrackers = null;
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
@@ -3072,10 +3066,8 @@ public class I2PSnarkServlet extends BasicServlet {
                    "<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
             buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");
-        buf.append("</head><body");
-        if (showPriority)
-            buf.append(" onload=\"setupbuttons()\"");
-        buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"" +
+        buf.append("</head><body>\n" +
+                   "<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"" +
                    " class=\"snarkNav nav_main\">");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_t("I2PSnark"));

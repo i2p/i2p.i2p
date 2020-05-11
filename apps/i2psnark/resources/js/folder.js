@@ -61,3 +61,7 @@ const setallskip=()=>{
 	form.savepri.disabled = false;
 	form.savepri.className = 'accept';
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    setupbuttons();
+}, true);
