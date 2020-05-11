@@ -62,4 +62,7 @@ function toggleAll(category)
 		}
 	}
 }
-window.addEventListener("load", init);
+
+document.addEventListener("DOMContentLoaded", function() {
+    init();
+}, true);
