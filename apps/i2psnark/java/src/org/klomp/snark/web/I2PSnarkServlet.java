@@ -211,9 +211,10 @@ public class I2PSnarkServlet extends BasicServlet {
         String pOverride = _manager.util().connected() ? null : "";
         String peerString = getQueryString(req, pOverride, null, null);
 
+        String cspNonce = Integer.toHexString(_context.random().nextInt());
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
-            setHTMLHeaders(resp);
+            setHTMLHeaders(resp, cspNonce, false);
             PrintWriter out = resp.getWriter();
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
@@ -242,7 +243,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     String base = addPaths(req.getRequestURI(), "/");
                     String listing = getPlaylist(req.getRequestURL().toString(), base, req.getParameter("sort"));
                     if (listing != null) {
-                        setHTMLHeaders(resp);
+                        setHTMLHeaders(resp, cspNonce, false);
                         // TODO custom name
                         resp.setContentType("audio/mpegurl; charset=UTF-8; name=\"playlist.m3u\"");
                         resp.addHeader("Content-Disposition", "attachment; filename=\"playlist.m3u\"");
@@ -258,7 +259,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         // P-R-G
                         sendRedirect(req, resp, "");
                     } else if (listing != null) {
-                        setHTMLHeaders(resp);
+                        setHTMLHeaders(resp, cspNonce, true);
                         resp.getWriter().write(listing);
                     } else { // shouldn't happen
                         resp.sendError(404);
@@ -292,7 +293,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean noCollapse = noCollapsePanels(req);
         boolean collapsePanels = _manager.util().collapsePanels();
 
-        setHTMLHeaders(resp);
+        setHTMLHeaders(resp, cspNonce, false);
         PrintWriter out = resp.getWriter();
         out.write(DOCTYPE + "<html>\n" +
                   "<head><link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n" +
@@ -323,13 +324,13 @@ public class I2PSnarkServlet extends BasicServlet {
                 // fallback to metarefresh when javascript is disabled
                 out.write("<noscript><meta http-equiv=\"refresh\" content=\"" + delay + ";" + _contextPath + "/" + peerString + "\"></noscript>\n" +
                           "<script src=\"" + jsPfx + "/js/ajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
-                          "<script type=\"text/javascript\">\n"  +
+                          "<script nonce=\"" + cspNonce + "\" type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
                           "var ajaxDelay = " + (delay * 1000) + ";\n" +
                           "</script>\n" +
                           "<script src=\".resources/js/initajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
             }
-            out.write("<script type=\"text/javascript\">\n"  +
+            out.write("<script nonce=\"" + cspNonce + "\" type=\"text/javascript\">\n"  +
                       "var deleteMessage1 = \"" + _t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?") + "\";\n" +
                       "var deleteMessage2 = \"" + _t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?") + "\";\n" +
                       "</script>\n" +
@@ -413,12 +414,12 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      *  @since 0.9.16 moved from doGetAndPost()
      */
-    private static void setHTMLHeaders(HttpServletResponse resp) {
+    private static void setHTMLHeaders(HttpServletResponse resp, String cspNonce, boolean allowMedia) {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
         // "no-store, max-age=0" forces all our images to be reloaded on ajax refresh
         resp.setHeader("Cache-Control", "max-age=86400, no-cache, must-revalidate");
-        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'self'; object-src 'none'");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'nonce-" + cspNonce + "'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src '" + (allowMedia ? "self" : "none") + "'");
         resp.setDateHeader("Expires", 86400);
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
