@@ -40,7 +40,7 @@ function addClickHandler2(elem)
 		var form = document.forms[0];
 		form.delete.disabled = false;
 		form.markall.disabled = true;
-		form.clearselection.disabled = true;
+		form.clearselection.disabled = false;
 		var buttons = document.getElementsByClassName("delete1");
 		for(index = 0; index < buttons.length; index++)
 		{
@@ -57,7 +57,7 @@ function addClickHandler3(elem)
 		var form = document.forms[0];
 		form.delete.disabled = true;
 		form.markall.disabled = false;
-		form.clearselection.disabled = false;
+		form.clearselection.disabled = true;
 		var buttons = document.getElementsByClassName("delete1");
 		for(index = 0; index < buttons.length; index++)
 		{
