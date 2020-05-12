@@ -222,13 +222,28 @@
             if (!"streamrclient".equals(tunnelType)) {
 %>
         <tr>
-            <th colspan="2">
+            <th colspan="2" <%=phdisabled%>>
                 <%=intl._t("Shared Client")%>
             </th>
         </tr><tr>
             <td colspan="2">
-                <label title="<%=intl._t("Traffic from all clients with this feature enabled will be routed over the same set of tunnels. This will make profiling the tunnels by an adversary more difficult, but will link the clients together.")%>"><input value="true" type="checkbox" name="shared"<%=(editBean.isSharedClient(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Share tunnels with other clients and irc/httpclients? (Change requires restart of client proxy tunnel)")%></label>
+<%
+                String shtitle = canChangePort ?
+                                 intl._t("Traffic from all clients with this feature enabled will be routed over the same set of tunnels. This will make profiling the tunnels by an adversary more difficult, but will link the clients together.") :
+                                 bStopFirst;
+                boolean isShared = editBean.isSharedClient(curTunnel);
+                String shdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
+%>
+                <label title="<%=shtitle%>">
+                <input value="true" type="checkbox" name="shared" <%=(isShared ? " checked=\"checked\"" : "")%> class="tickbox" <%=shdisabled%>/>
+                <%=intl._t("Share tunnels with other clients?")%></label>
+<%
+                if (isShared && !canChangePort) {
+                    // disabled checkbox won't come back in the form, stuff it in here
+                    // https://stackoverflow.com/questions/155291/can-html-checkboxes-be-set-to-readonly
+                    %><input value="true" type="hidden" name="shared"/><%
+                }
+%>
             </td>
         </tr>
 <%
