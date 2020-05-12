@@ -4,9 +4,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <%@include file="css.jsi" %>
-<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("statistics")%>
 <%@include file="summaryajax.jsi" %>
+<script src="/js/stats.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head><body>
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.OldConsoleHelper" id="oldhelper" scope="request" />

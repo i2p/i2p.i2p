@@ -69,7 +69,7 @@ public class StatsGenerator {
         buf.append("</p>");
 
         buf.append("<form action=\"\"><b>");
-        buf.append(_t("Jump to section")).append(":</b> <select name=\"go\" onChange='location.href=this.value'>");
+        buf.append(_t("Jump to section")).append(":</b> <select class=\"onchange\">");
         out.write(buf.toString());
         buf.setLength(0);
 
@@ -92,6 +92,7 @@ public class StatsGenerator {
             //out.write(buf.toString());
             //buf.setLength(0);
         }
+        // TODO this is broken for non-js
         buf.append("</select> <input type=\"submit\" value=\"").append(_t("GO")).append("\" />");
         buf.append("</form>");
 
