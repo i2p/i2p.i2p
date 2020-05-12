@@ -294,19 +294,23 @@ public class EditBean extends IndexBean {
      *  @since 0.9.18
      */
     public String getKey1(int tunnel) {
-        return _helper.getInboundRandomKey(tunnel);
+        String v = _helper.getInboundRandomKey(tunnel);
+        return encrypt(tunnel, "inbound.randomKey", v);
     }
 
     public String getKey2(int tunnel) {
-        return _helper.getOutboundRandomKey(tunnel);
+        String v = _helper.getOutboundRandomKey(tunnel);
+        return encrypt(tunnel, "outbound.randomKey", v);
     }
 
     public String getKey3(int tunnel) {
-        return _helper.getLeaseSetSigningPrivateKey(tunnel);
+        String v = _helper.getLeaseSetSigningPrivateKey(tunnel);
+        return encrypt(tunnel, "i2cp.leaseSetSigningPrivateKey", v);
     }
 
     public String getKey4(int tunnel) {
-        return _helper.getLeaseSetPrivateKey(tunnel);
+        String v = _helper.getLeaseSetPrivateKey(tunnel);
+        return encrypt(tunnel, "i2cp.leaseSetPrivateKey", v);
     }
 
     /** @since 0.8.9 */
