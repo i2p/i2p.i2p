@@ -391,12 +391,15 @@ public class WebMail extends HttpServlet
 	private static String button( String name, String label )
 	{
 		StringBuilder buf = new StringBuilder(128);
-		buf.append("<input type=\"submit\" class=\"").append(name).append("\" name=\"")
+		buf.append("<input type=\"submit\" name=\"")
 		   .append(name).append("\" value=\"").append(label).append('"');
+		buf.append(" class=\"").append(name);
 		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT) ||
 		    name.equals(NEW_UPLOAD) || name.equals(SAVE_AS_DRAFT) ||  // compose page
 		    name.equals(SETPAGESIZE) || name.equals(SAVE))  // config page
-			buf.append(" onclick=\"beforePopup=false;\"");
+			buf.append(" beforePopup\"");
+		else
+			buf.append('"');
 		// These are icons only now, via the CSS, so add a tooltip
 		if (name.equals(FIRSTPAGE) || name.equals(PREVPAGE) || name.equals(NEXTPAGE) || name.equals(LASTPAGE) ||
 		    name.equals(PREV) || name.equals(LIST) || name.equals(NEXT))
@@ -2348,7 +2351,8 @@ public class WebMail extends HttpServlet
 			                out.println("<meta http-equiv=\"refresh\" content=\"5;url=" + myself + "\">");
 					// TODO we don't need the form below
 				}
-				out.print("</head>\n<body" + (state == State.LIST ? " onload=\"deleteboxclicked()\">" : ">"));
+				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+				out.print("</head>\n<body>");
 				String nonce = state == State.AUTH ? LOGIN_NONCE :
 				                                                   Long.toString(ctx.random().nextLong());
 				sessionObject.addNonce(nonce);
@@ -2414,7 +2418,7 @@ public class WebMail extends HttpServlet
 					}
 				}
 				if (showRefresh || sessionObject.error.length() > 0 || sessionObject.info.length() > 0) {
-					out.println("<div class=\"notifications\" onclick=\"this.remove()\">");
+					out.println("<div class=\"notifications\">");
 					if (sessionObject.error.length() > 0)
 						out.println("<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>");
 					if (sessionObject.info.length() > 0 || showRefresh) {
@@ -3221,8 +3225,7 @@ public class WebMail extends HttpServlet
 			if (subj.length() <= 0)
 				subj = "<i>" + _t("no subject") + "</i>";
 			out.println( "<tr class=\"list" + bg + "\">" +
-					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" +
-					" onclick=\"deleteboxclicked();\" " +
+					"<td><input type=\"checkbox\" class=\"optbox delete1\" name=\"check" + b64UIDL + "\" value=\"1\"" +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
 					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _t("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">");
 			// mail.shortSender and mail.shortSubject already html encoded
@@ -3271,6 +3274,7 @@ public class WebMail extends HttpServlet
 		}
 		out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
 		if (i > 0) {
+			// TODO do this in js
 			if( sessionObject.reallyDelete ) {
 				// TODO ngettext
 				out.println("<p class=\"error\">" + _t("Really delete the marked messages?") +
