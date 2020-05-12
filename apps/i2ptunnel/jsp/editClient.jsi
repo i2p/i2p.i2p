@@ -70,6 +70,7 @@
             String tastopFirst = " title=\"" + aStopFirst + "\" ";
             String tbstopFirst = " title=\"" + bStopFirst + "\" ";
             String phdisabled = canChangePort ? "" : tbstopFirst;
+            boolean isShared = editBean.isSharedClient(curTunnel);
 %>
             <th colspan="2" <%=phdisabled%>>
 <%          if ("streamrclient".equals(tunnelType)) { %>
@@ -231,7 +232,6 @@
                 String shtitle = canChangePort ?
                                  intl._t("Traffic from all clients with this feature enabled will be routed over the same set of tunnels. This will make profiling the tunnels by an adversary more difficult, but will link the clients together.") :
                                  bStopFirst;
-                boolean isShared = editBean.isSharedClient(curTunnel);
                 String shdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
 %>
                 <label title="<%=shtitle%>">
@@ -266,20 +266,21 @@
 %>
     </table>
     <h3><%=intl._t("Advanced networking options")%></h3>
-    <table class="tunnelConfig">
 <%
-            if (!"streamrclient".equals(tunnelType)) {
+            if (!"streamrclient".equals(tunnelType) && (canChangePort || isShared)) {
                // no shared client tunnels for streamr
+               // If running and not shared, this doesn't apply.
 %>
+    <table class="tunnelConfig">
         <tr>
             <td class="infohelp" colspan="2">
                 <%=intl._t("Note: When this client proxy is configured to share tunnels, then these options are for all the shared proxy clients!")%>
             </td>
         </tr>
+    </table>
 <%
             } // !streamrclient
 %>
-    </table>
     <table class="tunnelConfig" id="lengthOption">
         <tr>
             <th colspan="2" class="tableTop">
