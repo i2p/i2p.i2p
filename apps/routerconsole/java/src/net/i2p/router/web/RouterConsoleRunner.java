@@ -129,8 +129,8 @@ public class RouterConsoleRunner implements RouterApp {
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
     public static final String ENABLED = ".startOnLoad";
-    private static final String PROP_KEYSTORE_PASSWORD = "routerconsole.keystorePassword";
-    private static final String PROP_KEY_PASSWORD = "routerconsole.keyPassword";
+    public static final String PROP_KEYSTORE_PASSWORD = "routerconsole.keystorePassword";
+    public static final String PROP_KEY_PASSWORD = "routerconsole.keyPassword";
     public static final int DEFAULT_LISTEN_PORT = PortMapper.DEFAULT_CONSOLE_PORT;
     private static final String DEFAULT_WEBAPPS_DIR = "./webapps/";
     private static final String USAGE = "Bad RouterConsoleRunner arguments, check clientApp.0.args in your clients.config file! " +
