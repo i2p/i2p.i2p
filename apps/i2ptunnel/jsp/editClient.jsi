@@ -63,14 +63,15 @@
             </td>
         </tr><tr>
 <%
+            boolean isShared = editBean.isSharedClient(curTunnel);
             String aStopFirst = intl._t("The client tunnel and all other shared client tunnels must be stopped to change this setting");
             String bStopFirst = intl._t("The client tunnel must be stopped to change this setting");
-            String stopFirst = editBean.isSharedClient(curTunnel) ? aStopFirst : bStopFirst;
+            String stopFirst = isShared ? aStopFirst : bStopFirst;
             boolean canChangePort = editBean.canChangePort(curTunnel);
             String tastopFirst = " title=\"" + aStopFirst + "\" ";
             String tbstopFirst = " title=\"" + bStopFirst + "\" ";
-            String phdisabled = canChangePort ? "" : tbstopFirst;
-            boolean isShared = editBean.isSharedClient(curTunnel);
+            // we don't actually disable the fields for a new tunnel, but we provide a warning
+            String phdisabled = (canChangePort && isShared) ? "" : (isShared ? tbstopFirst : tastopFirst);
 %>
             <th colspan="2" <%=phdisabled%>>
 <%          if ("streamrclient".equals(tunnelType)) { %>
@@ -206,7 +207,7 @@
                        }
 %>
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the tunnel here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext destination" placeholder="required" />
-                (<%=intl._t("name, name:port, or destination")%>
+                <%=intl._t("name, name:port, or destination")%>
 <%
                         if ("streamrclient".equals(tunnelType)) {
                             /* deferred resolution unimplemented in streamr client */
@@ -214,7 +215,7 @@
                          - <%=intl._t("b32 not recommended")%>
 <%
                         }
-%> )
+%>
             </td>
         </tr>
 <%
@@ -229,9 +230,10 @@
         </tr><tr>
             <td colspan="2">
 <%
-                String shtitle = canChangePort ?
+                // we don't actually disable the field for a new tunnel, but we provide a warning
+                String shtitle = (canChangePort && isShared) ?
                                  intl._t("Traffic from all clients with this feature enabled will be routed over the same set of tunnels. This will make profiling the tunnels by an adversary more difficult, but will link the clients together.") :
-                                 bStopFirst;
+                                 (isShared ? bStopFirst : aStopFirst);               
                 String shdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
 %>
                 <label title="<%=shtitle%>">
