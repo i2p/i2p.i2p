@@ -3202,7 +3202,7 @@ public class WebMail extends HttpServlet
 			String b64UIDL = Base64.encode(uidl);
 			String loc = myself + '?' + (folderName.equals(DIR_DRAFTS) ? NEW_UIDL : SHOW) + '=' + b64UIDL + floc;
 			String link = "<a href=\"" + loc + "\" class=\"" + type + "\">";
-			String jslink = " onclick=\"document.location='" + loc + "';\" ";
+			String jslink = " class=\"tdclick\" onclickloc=\"" + loc + "\" ";
 
 			boolean idChecked = false;
 			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + b64UIDL );

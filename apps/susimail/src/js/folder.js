@@ -18,6 +18,13 @@ function initButtons() {
 		addClickHandler3(button);
 	}
 	// TODO delete button, to show really-delete section or popup
+
+	buttons = document.getElementsByClassName("tdclick");
+	for(index = 0; index < buttons.length; index++)
+	{
+		var button = buttons[index];
+		addClickHandler4(button);
+	}
 }
 
 function addClickHandler1(elem)
@@ -58,6 +65,13 @@ function addClickHandler3(elem)
 			button.checked = false;
 		}
 		event.preventDefault();
+	});
+}
+
+function addClickHandler4(elem)
+{
+	elem.addEventListener("click", function() {
+		document.location = elem.getAttribute("onclickloc");
 	});
 }
 
