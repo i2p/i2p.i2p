@@ -1,3 +1,12 @@
+2020-05-12 zzz
+ * i2ptunnel:
+   - Fix data loss in forms
+   - Encrypt keys in forms
+
+2020-05-11 zzz
+ * Console: Fix delete confirmation dialog on /configplugins
+ * Console, i2psnark, i2ptunnel: Refactor js, stricter CSP
+
 2020-05-10 zzz
  * i2psnark: Support file paths in add form
 
@@ -6,6 +15,7 @@
 
 2020-05-08 zzz
  * Build: Use git revisions when available
+ * i2ptunnel: Disable changing some options while running
  * Router: FloodfillPeerSelector cleanup (ticket #2694)
 
 2020-05-07 zzz

@@ -98,7 +98,7 @@
                        String asphelp = intl._t("Specify the local port this service should be accessible from");
                        String bsphelp = intl._t("Specify the port the server is running on");
                        String ptext = canChangePort ? (isStreamrServer ? asphelp : bsphelp) : stopFirst;
-                       String pdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
+                       String pdisabled = canChangePort ? "" : " readonly=\"readonly\" ";
 %>
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=ptext%>" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
 <%          if (!isStreamrServer) { %>
@@ -135,7 +135,7 @@
                        String esphelp = intl._t("Listening interface (IP address) for client access (normally 127.0.0.1)");
                        String fsphelp = canChangePort ? esphelp : stopFirst;
 %>
-                <select id="reachableBy" name="reachableBy" title="<%=fsphelp%>" class="selectbox" <%=pdisabled%>>
+                <select id="reachableBy" name="reachableBy" title="<%=fsphelp%>" class="selectbox">
 <%
                     String clientInterface = editBean.getClientInterface(curTunnel);
                     for (String ifc : editBean.interfaceSet()) {
@@ -144,6 +144,8 @@
                         out.write('\"');
                         if (ifc.equals(clientInterface))
                             out.write(" selected=\"selected\"");
+                        else if (!canChangePort)
+                            out.write(" disabled=\"disabled\"");
                         out.write('>');
                         out.write(ifc);
                         out.write("</option>\n");
@@ -190,7 +192,7 @@
                        }
                        String htext = intl._t("Path to Private Key File");
                        String dtext = canChangeDest ? htext : stopFirst;
-                       String ddisabled = canChangeDest ? "" : " disabled=\"disabled\" ";
+                       String ddisabled = canChangeDest ? "" : " readonly=\"readonly\" ";
 %>
                 <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=dtext%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" placeholder="required" <%=ddisabled%>/>
             </td>
@@ -473,6 +475,7 @@
                 int curSigType = editBean.getSigType(curTunnel, tunnelType);
                 boolean allowBlinding = (curSigType == 7 || curSigType == 11);
                 String bdisabled = (allowBlinding && canChangeEncType) ? "" : " disabled=\"disabled\" ";
+                String bidisabled = (allowBlinding && canChangeEncType) ? "" : " readonly=\"readonly\" ";
                 if (allowBlinding) {
 %>
                 <option title="<%=intl._t("Prevents server discovery by floodfills")%>" value="2" <%=(curEncryptMode.equals("2") ? " selected=\"selected\"" : bdisabled)%> >
@@ -530,7 +533,7 @@
                                       intl._t("Set password required to access this service") :
                                       stopFirst) + '"';
 %>
-                <input type="password" name="nofilter_blindedPassword" <%=pwTitle%> value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" <%=bdisabled%>/>
+                <input type="password" name="nofilter_blindedPassword" <%=pwTitle%> value="<%=editBean.getBlindedPassword(curTunnel)%>" class="freetext password" <%=bidisabled%>/>
 <%
                 } // allowBlinding
 %>

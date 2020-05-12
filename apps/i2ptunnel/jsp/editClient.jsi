@@ -90,7 +90,7 @@
                        }
                       String phelp = intl._t("Specify the local port this service should be accessible from");
                       String ptext = canChangePort ? phelp : bStopFirst;
-                      String pdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
+                      String pdisabled = canChangePort ? "" : " readonly=\"readonly\" ";
 %>
                 <input type="text" size="6" maxlength="5" name="port" title="<%=ptext%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
             </td>
@@ -125,6 +125,8 @@
                         out.write('\"');
                         if (ifc.equals(clientInterface))
                             out.write(" selected=\"selected\"");
+                        else if (!canChangePort)
+                            out.write(" disabled=\"disabled\"");
                         out.write('>');
                         out.write(ifc);
                         out.write("</option>\n");
