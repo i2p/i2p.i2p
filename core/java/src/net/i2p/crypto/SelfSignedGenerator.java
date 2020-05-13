@@ -158,6 +158,23 @@ public final class SelfSignedGenerator {
     }
 
     /**
+     *  Create a self-signed certificate for the existing private key.
+     *
+     *  @param cname the common name, non-null. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @return self-signed certificate
+     *  @since 0.9.46
+     */
+    public static X509Certificate generate(SigningPrivateKey priv, String cname,
+                                            int validDays) throws GeneralSecurityException {
+        SigningPublicKey pub = priv.toPublic();
+        PublicKey jpub = SigUtil.toJavaKey(pub);
+        PrivateKey jpriv = SigUtil.toJavaKey(priv);
+        SigType type = priv.getType();
+        Object[] o = generate(jpub, jpriv, priv, type, cname, null, null, null, null, null, null, validDays);
+        return (X509Certificate) o[2];
+    }
+
+    /**
      *  @param cname the common name, non-null. Must be a hostname or email address. IP addresses will not be correctly encoded.
      *  @param altNames the Subject Alternative Names. May be null. May contain hostnames and/or IP addresses.
      *                  cname, localhost, 127.0.0.1, and ::1 will be automatically added.
