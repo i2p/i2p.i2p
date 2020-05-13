@@ -1,14 +1,24 @@
+2020-05-13 zzz
+ * Console:
+   - Fix option text on /confignet (ticket #2738)
+   - Changes to support handlers on /configplugins and /configreseed
+   - HTML fixes on /configplugins
+
 2020-05-12 zzz
+ * Console: Hide sensitive properties on /configadvanced
+ * Console, susimail: Refactor js, stricter CSP
  * i2ptunnel:
    - Fix data loss in forms
    - Encrypt keys in forms
+   - Disable more options when running
+   - Hide shared client warning when it doesn't apply
 
 2020-05-11 zzz
  * Console: Fix delete confirmation dialog on /configplugins
  * Console, i2psnark, i2ptunnel: Refactor js, stricter CSP
 
 2020-05-10 zzz
- * i2psnark: Support file paths in add form
+ * i2psnark: Support file paths in add form (ticket #2100)
 
 2020-05-10 idk
  * SusiDNS: Fix trac #2419
