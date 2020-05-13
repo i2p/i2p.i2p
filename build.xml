@@ -561,6 +561,7 @@
         <exec executable="git" outputproperty="bumped" errorproperty="git.error2" failifexecutionfails="false" >
             <arg value="status" />
             <arg value="-s" />
+            <arg value="--porcelain" />
             <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>
         <condition property="bumped.already">
@@ -575,7 +576,9 @@
 
     <!-- combined mtn/git targets -->
 
-    <target name="failIfNoVCS" depends="checkForMtn, checkForGit">
+    <target name="checkForVCS" depends="checkForMtn, checkForGit" />
+
+    <target name="failIfNoVCS" depends="checkForVCS">
         <fail message="This target cannot be used without Monotone or Git!">
             <condition>
                 <not>
