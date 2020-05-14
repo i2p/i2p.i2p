@@ -1458,7 +1458,8 @@ class Connection {
 
         public synchronized void pushBackRTO(int rto) {
             if (!_scheduled) {
-                _log.log(Log.ERROR, Connection.this + " timer was not scheduled", new Exception());
+                if (_log.shouldWarn())
+                    _log.warn(Connection.this + " timer was not scheduled", new Exception());
             }
             reschedule(rto, false);
         }

@@ -1,3 +1,6 @@
+2020-05-14 zzz
+ * Streaming: Change pushBackRTO() log error to warn (ticket #2739)
+
 2020-05-13 zzz
  * Console:
    - Fix option text on /confignet (ticket #2738)
