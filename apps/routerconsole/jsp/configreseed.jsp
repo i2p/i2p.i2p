@@ -91,7 +91,7 @@
 <b><%=intl._t("Select zip or su3 file")%>:</b>
 <%
    String file = request.getParameter("file");
-   if (file != null) {
+   if (file != null && file.length() > 0) {
 %>
 <input type="text" size="60" name="file" value="<%=file%>">
 <%

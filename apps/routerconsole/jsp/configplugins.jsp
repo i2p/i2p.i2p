@@ -82,7 +82,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <b><%=intl._t("Select xpi2p or su3 file")%>:</b>
 <%
    String file = request.getParameter("pluginFile");
-   if (file != null) {
+   if (file != null && file.length() > 0) {
 %>
 <input type="text" size="60" name="pluginFile" value="<%=file%>">
 <%
