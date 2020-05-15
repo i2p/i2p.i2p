@@ -132,10 +132,6 @@ public class EditBean extends IndexBean {
         return _helper.shouldStartAutomatically(tunnel);
     }
     
-    public boolean isSharedClient(int tunnel) {
-        return _helper.isSharedClient(tunnel);
-    }
-    
     public boolean shouldDelay(int tunnel) {
         return _helper.shouldDelayConnect(tunnel);
     }

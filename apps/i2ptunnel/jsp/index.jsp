@@ -179,8 +179,18 @@
 %>
     <tr>
         <td class="tunnelDescription" colspan="6">
+<%
+            String descr = indexBean.getTunnelDescription(curServer);
+            if (descr != null && descr.length() > 0) {
+%>
             <span class="tunnelDestinationLabel"><b><%=intl._t("Description")%>:</b></span>
-            <%=indexBean.getTunnelDescription(curServer)%>
+            <%=descr%>
+<%
+            } else {
+                // needed to make the spacing look right
+                %>&nbsp;<%
+            } // descr
+%>
         </td>
     </tr>
 <%
@@ -299,12 +309,32 @@
 <% /* TODO SSL outproxy for httpclient if plugin not present */ %>
     <tr>
         <td class="tunnelDescription" colspan="6">
-            <span class="tunnelDescriptionLabel"><b><%=intl._t("Description")%>:</b></span>
-            <%=indexBean.getTunnelDescription(curClient)%>
+<%
+            boolean isShared = indexBean.isSharedClient(curClient);
+            String descr = indexBean.getTunnelDescription(curClient);
+            if (isShared || (descr != null && descr.length() > 0)) {
+%>
+            <span class="tunnelDescriptionLabel">
+<%
+                if (isShared) {
+                     %><b><%=intl._t("Shared Client")%><%
+                } else {
+                     %><b><%=intl._t("Description")%><%
+                }
+                if (descr != null && descr.length() > 0) {
+                     %>:</b></span> <%=descr%><%
+                } else {
+                     %></b></span><%
+                }
+            } else {
+                // needed to make the spacing look right
+                %>&nbsp;<%
+            } // descr
+%>
         </td>
     </tr>
 <%
-        }
+        } // for loop
 %>
     <tr>
         <td class="newTunnel" colspan="6">
