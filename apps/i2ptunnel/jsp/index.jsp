@@ -115,9 +115,6 @@
 %>
             <a class="control" title="<%=intl._t("Test HTTP server through I2P")%>" href="http://<%=indexBean.getDestHashBase32(curServer)%>" target="_top"><%=intl._t("Preview")%></a>
 <%
-            } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
-          %><%=intl._t("Base32 Address")%>:<%=indexBean.getDestHashBase32(curServer)%>
-<%
             } else {
           %><%=intl._t("No Preview")%>
 <%
