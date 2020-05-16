@@ -98,8 +98,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 
 	private Device _router;
 	private Service _service;
-	// UDN -> friendly name
-	private final Map<String, String> _otherUDNs;
+	// UDN -> device
+	private final Map<String, Device> _otherUDNs;
 	private final Map<String, String> _eventVars;
 	private volatile boolean _serviceLacksAPM;
 	private volatile boolean _permanentLeasesOnly;
@@ -125,7 +125,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		_log = _context.logManager().getLog(UPnP.class);
 		portsToForward = new HashSet<ForwardPort>();
 		portsForwarded = new HashSet<ForwardPort>();
-		_otherUDNs = new HashMap<String, String>(4);
+		_otherUDNs = new HashMap<String, Device>(4);
 		_eventVars = new HashMap<String, String>(4);
 	}
 	
@@ -242,7 +242,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (_log.shouldInfo())
 				_log.info("UP&P non-IGD device found, ignoring " + name + ' ' + dev.getDeviceType());
 			synchronized (lock) {
-				_otherUDNs.put(udn, name);
+				_otherUDNs.put(udn, dev);
 			}
 			return; // ignore non-IGD devices
 		}
@@ -296,7 +296,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					// subscribe to it, in case it becomes connected.
 					boolean ok = subscribe(service);
 					if (ok) {
-						ignore = true;
+						// we can't trust that events will work even if the subscription succeeded.
+						//ignore = true;
 						if (_log.shouldWarn())
 							_log.warn("UPnP subscribed but ignoring disconnected device " + name + " UDN: " + udn);
 					} else {
@@ -314,7 +315,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 
 		synchronized(lock) {
 			if (ignore) {
-				_otherUDNs.put(udn, name);
+				_otherUDNs.put(udn, dev);
 				return;
 			}
 			if (_router != null && _service != null) {
@@ -341,7 +342,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					// subscribe to it, in case ours goes away
 					if (_log.shouldWarn())
 						_log.warn("UPnP ignoring additional device " + name + " UDN: " + udn);
-					_otherUDNs.put(udn, name);
+					_otherUDNs.put(udn, dev);
 					if (!subscriptionFailed) {
 						boolean ok = subscribe(service);
 						if (_log.shouldInfo()) {
@@ -354,21 +355,23 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					}
 				} else {
 			                String oldudn = _router.getUDN();
-					String oldname = _router.getFriendlyName();
-					if (oldname == null)
-						oldname = "";
-					oldname += " IGD";
-					String oldip = getIP(_router);
-					if (oldip != null)
-						oldname += ' ' + oldip;
-					if (_log.shouldWarn())
+					if (_log.shouldWarn()) {
+						String oldname = _router.getFriendlyName();
+						if (oldname == null)
+							oldname = "";
+						oldname += " IGD";
+						String oldip = getIP(_router);
+						if (oldip != null)
+							oldname += ' ' + oldip;
 						_log.warn("Replacing device " + oldname + " (external IP " + curIP + ") with new device " + name + " UDN: " + udn + " external IP: " + extIP);
-					_otherUDNs.put(oldudn, oldname);
+					}
+					_otherUDNs.put(oldudn, _router);
 				}
 			}
 
 			// We have found the device we need
 			_otherUDNs.remove(udn);
+			_eventVars.clear();
 			_router = dev;
 			_service = service;
 			_permanentLeasesOnly = false;
@@ -888,17 +891,36 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (!_otherUDNs.isEmpty()) {
 				sb.append("<b>");
 				sb.append(_t("Disabled UPnP Devices"));
-				sb.append(":</b><ul>");
-				List<Map.Entry<String, String>> other = new ArrayList<Map.Entry<String, String>>(_otherUDNs.entrySet());
+				sb.append(":</b>");
+				List<Map.Entry<String, Device>> other = new ArrayList<Map.Entry<String, Device>>(_otherUDNs.entrySet());
 				Collections.sort(other, new UDNComparator());
-				for (Map.Entry<String, String> e : other) {
+				boolean found = false;
+				for (Map.Entry<String, Device> e : other) {
 					String udn = e.getKey();
-					String name = e.getValue();
+					Device dev = e.getValue();
+			                String name = dev.getFriendlyName();
+					if (name == null)
+						name = udn;
+					String type = dev.getDeviceType();
+					boolean isIGD = (ROUTER_DEVICE.equals(type) || ROUTER_DEVICE_2.equals(type)) && dev.isRootDevice();
+					if (!isIGD && !_context.getBooleanProperty(PROP_ADVANCED))
+						continue;
+					if (!found) {
+						found = true;
+						sb.append("<ul>");
+					}
+					name += isIGD ? " IGD" : (' ' + type);
+					String ip = getIP(dev);
+					if (ip != null)
+						name += ' ' + ip;
 					sb.append("<li>").append(DataHelper.escapeHTML(name));
 					sb.append("<br>UDN: ").append(DataHelper.escapeHTML(udn))
 					  .append("</li>");
 				}
-				sb.append("</ul>");
+				if (found)
+					sb.append("</ul>");
+				else
+					sb.append(" none");
 			}
 			if (!isNATPresent()) {
 				sb.append("<p>");
@@ -939,12 +961,20 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	}
 
 	/**
-	 *  Compare based on name, which is the entry value
+	 *  Compare based on friendly name of the device
 	 *  @since 0.9.46
 	 */
-	private static class UDNComparator implements Comparator<Map.Entry<String, String>>, Serializable {
-		public int compare(Map.Entry<String, String> l, Map.Entry<String, String> r) {
-			return Collator.getInstance().compare(l.getValue(), r.getValue());
+	private static class UDNComparator implements Comparator<Map.Entry<String, Device>>, Serializable {
+		public int compare(Map.Entry<String, Device> l, Map.Entry<String, Device> r) {
+			Device ld = l.getValue();
+			Device rd = r.getValue();
+                        String ls = ld.getFriendlyName();
+			if (ls == null)
+				ls = ld.getUDN();
+                        String rs = rd.getFriendlyName();
+			if (rs == null)
+				rs = rd.getUDN();
+			return Collator.getInstance().compare(ls, rs);
 		}
 	}
 	
