@@ -70,8 +70,9 @@
             boolean canChangePort = editBean.canChangePort(curTunnel);
             String tastopFirst = " title=\"" + aStopFirst + "\" ";
             String tbstopFirst = " title=\"" + bStopFirst + "\" ";
+            String tstopFirst = isShared ? tastopFirst : tbstopFirst;
             // we don't actually disable the fields for a new tunnel, but we provide a warning
-            String phdisabled = (canChangePort && isShared) ? "" : (isShared ? tbstopFirst : tastopFirst);
+            String phdisabled = (canChangePort && isShared) ? "" : tstopFirst;
 %>
             <th colspan="2" <%=phdisabled%>>
 <%          if ("streamrclient".equals(tunnelType)) { %>
@@ -441,39 +442,60 @@
                 minutes
             </td>
         </tr><tr>
-            <td colspan="2">
+<%
+            boolean canChangeEncType = editBean.canChangeEncType(curTunnel);
+            boolean isPersistent = editBean.getPersistentClientKey(curTunnel);
+            boolean canChangeRadio = canChangeEncType || !isPersistent;
+            String nhdisabled = canChangeRadio ? "" : tstopFirst;
+            String ndisabled = canChangeRadio ? "" : " disabled=\"disabled\" ";
+            String n1help = intl._t("Change tunnel identity (destination) when tunnels reopen");
+            String n1text = canChangeRadio ? n1help : stopFirst;
+            String n2help = intl._t("Retain tunnel identity (destination) when tunnels reopen");
+            String n2text = canChangeRadio ? n2help : stopFirst;
+%>
+            <td colspan="2" <%=nhdisabled%>>
                 <b><%=intl._t("New Keys on Reopen")%>:</b>
                 <span class="multiOption">
-                    <label title="<%=intl._t("Change tunnel identity (destination) when tunnels reopen")%>"><input value="1" type="radio" name="newDest"
-                        <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label title="<%=n1text%>"><input value="1" type="radio" name="newDest"
+                        <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : ndisabled)%> class="tickbox" />
                     <%=intl._t("Enable")%></label>
                 </span>
                 <span class="multiOption">
-                    <label title="<%=intl._t("Retain tunnel identity (destination) when tunnels reopen")%>"><input value="0" type="radio" name="newDest"
-                        <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />
+                    <label title="<%=n2text%>"><input value="0" type="radio" name="newDest"
+                        <%=(editBean.getNewDest(curTunnel) || isPersistent ? ndisabled : " checked=\"checked\"")%> class="tickbox" />
                     <%=intl._t("Disable")%></label>
                 </span>
             </td>
         </tr>
 <%
+            String ehdisabled = canChangeEncType ? "" : tstopFirst;
+            String edisabled = canChangeEncType ? "" : " disabled=\"disabled\" ";
+            String destb64 = editBean.getDestinationBase64(curTunnel);
+
             if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "socksirctunnel".equals(tunnelType) || "sockstunnel".equals(tunnelType)) {
 %>
         <tr>
-            <th colspan="2">
+            <th colspan="2" <%=ehdisabled%>>
                 <%=intl._t("Persistent private key")%>
             </th>
         </tr><tr>
+<%
+                      String p1help = intl._t("Enabling this feature will ensure your tunnel identity (destination) remains static, for services offering features based on destination e.g. IRC user authentication");
+                      String p1text = canChangeEncType ? p1help : stopFirst;
+                      String p2help = intl._t("Path to Private Key File");
+                      String p2text = canChangeEncType ? p2help : stopFirst;
+                      String p2disabled = canChangeEncType ? "" : " readonly=\"readonly\" ";
+%>
             <td>
-                <label title="<%=intl._t("Enabling this feature will ensure your tunnel identity (destination) remains static, for services offering features based on destination e.g. IRC user authentication")%>"><input value="2" type="radio" name="newDest"
-                     <%=(editBean.getPersistentClientKey(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=p1text%>"><input value="2" type="radio" name="newDest"
+                     <%=(editBean.getPersistentClientKey(curTunnel) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                 <%=intl._t("Generate key to enable persistent client tunnel identity")%></label>
             </td><td>
                 <b><%=intl._t("File")%>:</b>
-                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=intl._t("Path to Private Key File")%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />
+                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=p2text%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" <%=p2disabled%>/>
             </td>
         </tr>
 <%
-            String destb64 = editBean.getDestinationBase64(curTunnel);
             if (destb64.length() > 0) {
 %>
         <tr>
@@ -527,9 +549,10 @@
             } // if httpclient
 
             int currentSigType = editBean.getSigType(curTunnel, tunnelType);
-            boolean canChangeSigType = editBean.canChangeSigType(curTunnel);
-            String tstopFirst = " title=\"" + stopFirst + "\" ";
-            String shdisabled = canChangeSigType ? "" : tstopFirst;
+            boolean isCreated = isPersistent && destb64.length() > 0;
+            boolean canChangeSigType = editBean.canChangeSigType(curTunnel) && !isCreated;
+            String tooLate = "title=\"" + intl._t("Configuration cannot be changed after destination is created") + '"';
+            String shdisabled = canChangeSigType ? "" : (isCreated ? tooLate : tstopFirst);
             String disabled = canChangeSigType ? "" : " disabled=\"disabled\" ";
 %>
     </table>
@@ -579,9 +602,6 @@
 <%
                 boolean has0 = editBean.hasEncType(curTunnel, 0);
                 boolean has4 = editBean.hasEncType(curTunnel, 4);
-                boolean canChangeEncType = editBean.canChangeEncType(curTunnel);
-                String ehdisabled = canChangeEncType ? "" : tstopFirst;
-                String edisabled = canChangeEncType ? "" : " disabled=\"disabled\" ";
 %>
         <tr>
             <th colspan="2" <%=ehdisabled%>>
