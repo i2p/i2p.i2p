@@ -5,7 +5,10 @@ package net.i2p.router.transport;
  */
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,7 +76,18 @@ class UPnPManager {
         org.cybergarage.upnp.UPnP.setEnable(org.cybergarage.upnp.UPnP.USE_ONLY_IPV4_ADDR);
         // set up logging in the UPnP package
         Debug.initialize(context);
-        _upnp = new UPnP(context);
+        int ssdpPort = _context.getProperty(PROP_SSDP_PORT, DEFAULT_SSDP_PORT);
+        int httpPort = _context.getProperty(PROP_HTTP_PORT, DEFAULT_HTTP_PORT);
+        Set<String> addrs = UPnP.getLocalAddresses();
+        List<InetAddress> ias = new ArrayList<InetAddress>(addrs.size());
+        for (String addr : addrs) {
+            try {
+                InetAddress ia = InetAddress.getByName(addr);
+                ias.add(ia);
+            } catch (UnknownHostException uhe) {}
+        }
+        InetAddress[] binds = ias.toArray(new InetAddress[ias.size()]);
+        _upnp = new UPnP(context, ssdpPort, httpPort, binds);
         _upnpCallback = new UPnPCallback();
         _scannerCallback = _context.router().getUPnPScannerCallback();
         _delayedCallback = (_scannerCallback != null) ? new DelayedCallback() : null;

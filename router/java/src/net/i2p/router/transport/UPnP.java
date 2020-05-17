@@ -124,8 +124,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	/** set to true to talk to UPnP on the same host as us, probably for testing */
 	private static final boolean ALLOW_SAME_HOST = false;
 	
-	public UPnP(I2PAppContext context) {
-		super();
+	public UPnP(I2PAppContext context, int ssdpPort, int httpPort, InetAddress[] binds) {
+		super(ssdpPort, httpPort, binds);
 		_context = context;
 		_log = _context.logManager().getLog(UPnP.class);
 		portsToForward = new HashSet<ForwardPort>();
@@ -568,7 +568,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (_service == null || !uuid.equals(_service.getSID())) {
 				if (varName.equals("ConnectionStatus") && value.equals("Connected")) {
 					newdev = SIDtoDevice(uuid);
-					if (_log.shouldInfo())
+					if (newdev == null && _log.shouldInfo())
 						_log.debug("Can't map event SID " + uuid + " to device");
 				}
 				if (newdev == null) {
@@ -647,13 +647,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	}
 
 	/**
-	 * Update the SSDPSearchResponseSocketList,
-	 * SSDPNotifySocketList, and HTTPServerList every time.
-	 * Otherwise, we are just listening on the interfaces that were present when started.
+	 * Get the addresses we want to bind to
 	 *
 	 * @since 0.9.46
 	 */
-	private void updateInterfaces() {
+	static Set<String> getLocalAddresses() {
 		Set<String> addrs = Addresses.getAddresses(true, false, false);
 		// remove public addresses
 		// see TransportManager.startListening()
@@ -663,6 +661,18 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (ip == null || TransportUtil.isPubliclyRoutable(ip, false))
 				iter.remove();
 		}
+		return addrs;
+	}
+
+	/**
+	 * Update the SSDPSearchResponseSocketList,
+	 * SSDPNotifySocketList, and HTTPServerList every time.
+	 * Otherwise, we are just listening on the interfaces that were present when started.
+	 *
+	 * @since 0.9.46
+	 */
+	private void updateInterfaces() {
+		Set<String> addrs = getLocalAddresses();
 		Set<String> oldaddrs = new HashSet<String>(addrs.size());
 
 		// protect against list mod in super.stop()
@@ -1581,7 +1591,16 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		Properties props = new Properties();
                 props.setProperty(PROP_ADVANCED, "true");
 		I2PAppContext ctx = new I2PAppContext(props);
-		UPnP cp = new UPnP(ctx);
+		Set<String> addrs = UPnP.getLocalAddresses();
+		List<InetAddress> ias = new ArrayList<InetAddress>(addrs.size());
+		for (String addr : addrs) {
+			    try {
+				InetAddress ia = InetAddress.getByName(addr);
+				ias.add(ia);
+			    } catch (UnknownHostException uhe) {}
+		}
+		InetAddress[] binds = ias.toArray(new InetAddress[ias.size()]);
+		UPnP cp = new UPnP(ctx, 8008, 8058, binds);
 		org.cybergarage.upnp.UPnP.setEnable(org.cybergarage.upnp.UPnP.USE_ONLY_IPV4_ADDR);
 		Debug.initialize(ctx);
 		cp.setHTTPPort(49152 + ctx.random().nextInt(5000));
