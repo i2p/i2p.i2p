@@ -73,7 +73,6 @@ import org.freenetproject.ForwardPortStatus;
  */
 
 /* 
- * TODO: Support multiple IGDs ?
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
  *
@@ -313,12 +312,16 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			}
 		}
 
+		ForwardPortCallback fpc = null;
+		Map<ForwardPort, ForwardPortStatus> removeMap = null;
 		synchronized(lock) {
 			if (ignore) {
 				_otherUDNs.put(udn, dev);
 				return;
 			}
 			if (_router != null && _service != null) {
+				if (udn.equals(_router.getUDN())) // oops
+					return;
 				ignore = true;
 				String curIP = null;
 				if (extIP != null) {
@@ -367,6 +370,17 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					}
 					_otherUDNs.put(oldudn, _router);
 				}
+				if (!portsForwarded.isEmpty()) {
+					fpc = forwardCallback;
+					removeMap = new HashMap<ForwardPort, ForwardPortStatus>(portsForwarded.size());
+					for (ForwardPort port : portsForwarded) {
+						ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
+						                                              "UPnP device changed",
+						                                              port.portNumber);
+						removeMap.put(port, fps);
+					}
+				}
+				portsForwarded.clear();
 			}
 
 			// We have found the device we need
@@ -376,6 +390,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			_service = service;
 			_permanentLeasesOnly = false;
 		}
+		if (fpc != null)
+			fpc.portForwardStatus(removeMap);
+
 		if (_log.shouldLog(Log.WARN))
 			_log.warn("UP&P IGD found : " + name + " UDN: " + udn + " lease time: " + dev.getLeaseTime());
 		
@@ -510,6 +527,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 						ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
                                                                       "UPnP device removed",
                                                                       port.portNumber);
+						removeMap.put(port, fps);
 					}
 				}
 				portsForwarded.clear();
@@ -518,8 +536,10 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		if (fpc != null) {
 			fpc.portForwardStatus(removeMap);
 		}
-		if (runSearch)
+		if (runSearch) {
+			retryOtherDevices();
 			search();
+		}
 	}
 	
 	/**
@@ -532,15 +552,35 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		if (varName.length() > 128 || value.length() > 128)
 			return;
 		String old = null;
+		Device newdev = null;
 		synchronized(lock) {
-			if (_service == null || !uuid.equals(_service.getSID()) ||
-			    (_eventVars.size() >= 20 && !_eventVars.containsKey(varName))) {
+			if(_eventVars.size() >= 20 && !_eventVars.containsKey(varName)) {
 				if (_log.shouldDebug())
 					_log.debug("Ignoring event from " + uuid + ": " + varName + " changed to " + value);
 				return;
 			}
-			old = _eventVars.put(varName, value);
+			if (_service == null || !uuid.equals(_service.getSID())) {
+				if (varName.equals("ConnectionStatus") && value.equals("Connected")) {
+					newdev = SIDtoDevice(uuid);
+					if (_log.shouldInfo())
+						_log.debug("Can't map event SID " + uuid + " to device");
+				}
+				if (newdev == null) {
+					if (_log.shouldDebug())
+						_log.debug("Ignoring event from " + uuid + ": " + varName + " changed to " + value);
+					return;
+				}
+			}
+			if (newdev == null)
+				old = _eventVars.put(varName, value);
 		}
+		if (newdev != null) {
+			if (_log.shouldWarn())
+				_log.warn("Possibly promoting device on connected event: " + newdev.getUDN());
+			deviceAdded(newdev);
+			return;
+		}
+
 		// The following four variables are "evented":
 		// PossibleConnectionTypes: {Unconfigured IP_Routed IP_Bridged}
 		// ConnectionStatus: {Unconfigured Connecting Connected PendingDisconnect Disconnecting Disconnected}
@@ -549,8 +589,55 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		if (!value.equals(old)) {
 			if (_log.shouldDebug())
 				_log.debug("Event: " + varName + " changed from " + old + " to " + value);
+			if (varName.equals("ConnectionStatus") && "Connected".equals(old)) {
+				if (_log.shouldWarn())
+					_log.warn("Device connection change to: " + value + ", starting search");
+				retryOtherDevices();
+				search();
+			}
 		}
 		// call callback...
+	}
+
+	/**
+	 * @param sid non-null
+	 * @return device or null
+	 * @since 0.9.46
+	 */
+	private Device SIDtoDevice(String sid) {
+		synchronized (lock) {
+			for (Device dev : _otherUDNs.values()) {
+				String type = dev.getDeviceType();
+				boolean isIGD = (ROUTER_DEVICE.equals(type) || ROUTER_DEVICE_2.equals(type)) && dev.isRootDevice();
+				if (!isIGD)
+					continue;
+				Service service = discoverService(dev);
+				if (service == null)
+					continue;
+				if (sid.equals(service.getSID()))
+					return dev;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Go through the other devices, try re-adding them
+	 * @since 0.9.46
+	 */
+	private void retryOtherDevices() {
+		int sz = _otherUDNs.size();
+		if (sz <= 0)
+			return;
+		if (_log.shouldWarn())
+			_log.warn("Device change, retrying " + sz + " other devices");
+                List<Device> others = new ArrayList<Device>(sz);
+		synchronized (lock) {
+			others.addAll(_otherUDNs.values());
+		}
+		for (Device dev : others) {
+			deviceAdded(dev);
+		}
 	}
 
 	/** compare two strings, either of which could be null */
