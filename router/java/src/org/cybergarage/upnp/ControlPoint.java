@@ -111,12 +111,14 @@ public class ControlPoint implements HTTPRequestListener
 	private SSDPNotifySocketList ssdpNotifySocketList;
 	private SSDPSearchResponseSocketList ssdpSearchResponseSocketList;
 
-	private SSDPNotifySocketList getSSDPNotifySocketList()
+	/** I2P was private */
+	protected SSDPNotifySocketList getSSDPNotifySocketList()
 	{
 		return ssdpNotifySocketList;
 	}
 	
-	private SSDPSearchResponseSocketList getSSDPSearchResponseSocketList()
+	/** I2P was private */
+	protected SSDPSearchResponseSocketList getSSDPSearchResponseSocketList()
 	{
 		return ssdpSearchResponseSocketList;
 	}
@@ -574,7 +576,8 @@ public class ControlPoint implements HTTPRequestListener
 
 	private HTTPServerList httpServerList = new HTTPServerList();
 	
-	private HTTPServerList getHTTPServerList()
+	/** I2P was private */
+	protected HTTPServerList getHTTPServerList()
 	{
 		return httpServerList;
 	}

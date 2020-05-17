@@ -28,6 +28,8 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
+import org.cybergarage.http.HTTPServer;
+import org.cybergarage.http.HTTPServerList;
 import org.cybergarage.upnp.Action;
 import org.cybergarage.upnp.ActionList;
 import org.cybergarage.upnp.Argument;
@@ -42,7 +44,11 @@ import org.cybergarage.upnp.StateVariable;
 import org.cybergarage.upnp.UPnPStatus;
 import org.cybergarage.upnp.device.DeviceChangeListener;
 import org.cybergarage.upnp.event.EventListener;
+import org.cybergarage.upnp.ssdp.SSDPNotifySocket;
+import org.cybergarage.upnp.ssdp.SSDPNotifySocketList;
 import org.cybergarage.upnp.ssdp.SSDPPacket;
+import org.cybergarage.upnp.ssdp.SSDPSearchResponseSocket;
+import org.cybergarage.upnp.ssdp.SSDPSearchResponseSocketList;
 import org.cybergarage.util.Debug;
 import org.freenetproject.DetectedIP;
 import org.freenetproject.ForwardPort;
@@ -638,6 +644,133 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		for (Device dev : others) {
 			deviceAdded(dev);
 		}
+	}
+
+	/**
+	 * Update the SSDPSearchResponseSocketList,
+	 * SSDPNotifySocketList, and HTTPServerList every time.
+	 * Otherwise, we are just listening on the interfaces that were present when started.
+	 *
+	 * @since 0.9.46
+	 */
+	private void updateInterfaces() {
+		Set<String> addrs = Addresses.getAddresses(true, false, false);
+		// remove public addresses
+		// see TransportManager.startListening()
+		for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
+			String addr = iter.next();
+			byte[] ip = Addresses.getIP(addr);
+			if (ip == null || TransportUtil.isPubliclyRoutable(ip, false))
+				iter.remove();
+		}
+		Set<String> oldaddrs = new HashSet<String>(addrs.size());
+
+		// protect against list mod in super.stop()
+		synchronized(this) {
+			// we do this one first because we can detect failure before adding
+			HTTPServerList hlist = getHTTPServerList();
+			for (Iterator<HTTPServer> iter = hlist.iterator(); iter.hasNext(); ) {
+				HTTPServer skt = iter.next();
+				String addr = skt.getBindAddress();
+				int slash = addr.indexOf('/');
+				if (slash >= 0)
+					addr = addr.substring(slash + 1);
+				if (!addrs.contains(addr)) {
+					iter.remove();
+					skt.close();
+					skt.stop();
+					if (_log.shouldWarn())
+						_log.warn("Closed HTTP server socket: " + addr);
+				}
+				oldaddrs.add(addr);
+			}
+			for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
+				String addr = iter.next();
+				if (!oldaddrs.contains(addr)) {
+					HTTPServer socket = new HTTPServer();
+					boolean ok = socket.open(addr, getHTTPPort());
+					if (ok) {
+						socket.addRequestListener(this);
+						socket.start();
+						hlist.add(socket);
+						if (_log.shouldWarn())
+							_log.warn("Added HTTP server socket: " + addr);
+					} else {
+						// so we don't attempt to add to the other lists below
+						iter.remove();
+						if (_log.shouldWarn())
+							_log.warn("open() failed on new HTTP server socket: " + addr);
+					}
+				}
+			}
+
+			oldaddrs.clear();
+			SSDPSearchResponseSocketList list = getSSDPSearchResponseSocketList();
+			for (Iterator<SSDPSearchResponseSocket> iter = list.iterator(); iter.hasNext(); ) {
+				SSDPSearchResponseSocket skt = iter.next();
+				String addr = skt.getLocalAddress();
+				if (!addrs.contains(addr)) {
+					iter.remove();
+					skt.setControlPoint(null);
+					skt.close();
+					skt.stop();
+					if (_log.shouldWarn())
+						_log.warn("Closed SSDP search response socket: " + addr);
+				}
+				oldaddrs.add(addr);
+			}
+			for (String addr : addrs) {
+				if (!oldaddrs.contains(addr)) {
+					// TODO this calls open() in constructor, fails silently
+					SSDPSearchResponseSocket socket = new SSDPSearchResponseSocket(addr, getSSDPPort());
+					socket.setControlPoint(this);
+					socket.start();
+					list.add(socket);
+					if (_log.shouldWarn())
+						_log.warn("Added SSDP search response socket: " + addr);
+				}
+			}
+
+			oldaddrs.clear();
+			SSDPNotifySocketList nlist = getSSDPNotifySocketList();
+			for (Iterator<SSDPNotifySocket> iter = nlist.iterator(); iter.hasNext(); ) {
+				SSDPNotifySocket skt = iter.next();
+				String addr = skt.getLocalAddress();
+				if (!addrs.contains(addr)) {
+					iter.remove();
+					skt.setControlPoint(null);
+					skt.close();
+					skt.stop();
+					if (_log.shouldWarn())
+						_log.warn("Closed SSDP notify socket: " + addr);
+				}
+				oldaddrs.add(addr);
+			}
+			for (String addr : addrs) {
+				if (!oldaddrs.contains(addr)) {
+					// TODO this calls open() in constructor, fails silently
+					SSDPNotifySocket socket = new SSDPNotifySocket(addr);
+					socket.setControlPoint(this);
+					socket.start();
+					nlist.add(socket);
+					if (_log.shouldWarn())
+						_log.warn("Added SSDP notify socket: " + addr);
+				}
+			}
+		}
+	}
+
+	/**
+	 * We override search() to update the SSDPSearchResponseSocketList,
+	 * SSDPNotifySocketList, and HTTPServerList every time.
+	 * Otherwise, we are just listening on the interfaces that were present when started.
+	 *
+	 * @since 0.9.46
+	 */
+	@Override
+	public void search() {
+		updateInterfaces();
+		super.search();
 	}
 
 	/** compare two strings, either of which could be null */
