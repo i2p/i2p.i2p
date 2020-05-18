@@ -606,14 +606,14 @@ class ClientConnectionRunner {
             if (hasElg) {
                 TransientSessionKeyManager tskm = new TransientSessionKeyManager(_context, tags, thresh);
                 if (hasEC) {
-                    RatchetSKM rskm = new RatchetSKM(_context);
+                    RatchetSKM rskm = new RatchetSKM(_context, dest);
                     _sessionKeyManager = new MuxedSKM(tskm, rskm);
                 } else {
                     _sessionKeyManager = tskm;
                 }
             } else {
                 if (hasEC) {
-                    _sessionKeyManager = new RatchetSKM(_context);
+                    _sessionKeyManager = new RatchetSKM(_context, dest);
                 } else {
                     _log.error("No supported encryption types in i2cp.leaseSetEncType for " + dest.toBase32());
                     return SessionStatusMessage.STATUS_INVALID;

@@ -26,6 +26,7 @@ import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -52,6 +53,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private volatile boolean _alive;
     private final HKDF _hkdf;
     private final DecayingHashSet _replayFilter;
+    private final Destination _destination;
 
     /**
      * Let outbound session tags sit around for this long before expiring them.
@@ -81,10 +83,11 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * appropriate application context itself.
      *
      */
-    public RatchetSKM(RouterContext context) {
+    public RatchetSKM(RouterContext context, Destination dest) {
         super(context);
         _log = context.logManager().getLog(RatchetSKM.class);
         _context = context;
+        _destination = dest;
         _outboundSessions = new ConcurrentHashMap<PublicKey, OutboundSession>(64);
         _pendingOutboundSessions = new HashMap<PublicKey, List<OutboundSession>>(64);
         _inboundTagSets = new ConcurrentHashMap<RatchetSessionTag, RatchetTagSet>(128);
@@ -124,6 +127,12 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         }
     }
 
+    /**
+     *  @since 0.9.46
+     */
+    public Destination getDestination() {
+        return _destination;
+    }
 
     /** RatchetTagSet */
     private Set<RatchetTagSet> getRatchetTagSets() {

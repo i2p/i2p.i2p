@@ -32,7 +32,7 @@ public class LeaseSetKeys {
      * @since 0.9.44
      */
     public static final Set<EncType> SET_ELG = Collections.unmodifiableSet(EnumSet.of(EncType.ELGAMAL_2048));
-    private static final Set<EncType> SET_EC = Collections.unmodifiableSet(EnumSet.of(EncType.ECIES_X25519));
+    public static final Set<EncType> SET_EC = Collections.unmodifiableSet(EnumSet.of(EncType.ECIES_X25519));
     private static final Set<EncType> SET_BOTH = Collections.unmodifiableSet(EnumSet.of(EncType.ELGAMAL_2048, EncType.ECIES_X25519));
     private static final Set<EncType> SET_NONE = Collections.unmodifiableSet(EnumSet.noneOf(EncType.class));
 

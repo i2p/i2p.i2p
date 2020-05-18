@@ -19,15 +19,23 @@ import net.i2p.crypto.HKDF;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.GarlicClove;
+import net.i2p.data.i2np.I2NPMessage;
 import static net.i2p.router.crypto.ratchet.RatchetPayload.*;
+import net.i2p.router.LeaseSetKeys;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.message.CloveSet;
 import net.i2p.util.Log;
@@ -395,13 +403,13 @@ public final class ECIESAEADEngine {
             return NO_CLOVES;
         }
 
-        byte[] bobPK = new byte[KEYLEN];
-        state.getRemotePublicKey().getPublicKey(bobPK, 0);
+        byte[] alicePK = new byte[KEYLEN];
+        state.getRemotePublicKey().getPublicKey(alicePK, 0);
         if (_log.shouldDebug()) {
-            _log.debug("NS decrypt success from PK " + Base64.encode(bobPK));
+            _log.debug("NS decrypt success from PK " + Base64.encode(alicePK));
             _log.debug("State after decrypt new session: " + state);
         }
-        if (Arrays.equals(bobPK, NULLPK)) {
+        if (Arrays.equals(alicePK, NULLPK)) {
             // TODO
             if (_log.shouldWarn())
                 _log.warn("Zero static key in IB NS");
@@ -434,8 +442,8 @@ public final class ECIESAEADEngine {
         }
 
         // tell the SKM
-        PublicKey bob = new PublicKey(EncType.ECIES_X25519, bobPK);
-        keyManager.createSession(bob, state, null);
+        PublicKey alice = new PublicKey(EncType.ECIES_X25519, alicePK);
+        keyManager.createSession(alice, state, null);
 
         if (pc.cloveSet.isEmpty()) {
             // this is legal
@@ -447,6 +455,8 @@ public final class ECIESAEADEngine {
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
+        // TODO
+        //setResponseTimer(alice, pc.cloveSet, keyManager);
         return rv;
     }
 
@@ -587,6 +597,8 @@ public final class ECIESAEADEngine {
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
+        // TODO
+        //setResponseTimer(bob, pc.cloveSet, keyManager);
         return rv;
     }
 
@@ -678,6 +690,7 @@ public final class ECIESAEADEngine {
         }
         return true;
     }
+
 
     //// end decrypt, start encrypt ////
 
@@ -1205,6 +1218,39 @@ public final class ECIESAEADEngine {
         if (payloadlen != len)
             throw new IllegalStateException("payload size mismatch");
         return payload;
+    }
+
+    /*
+     * Set a timer for a ratchet-layer reply if the application does not respond.
+     *
+     * @since 0.9.46
+     */
+    private void setResponseTimer(PublicKey from, List<GarlicClove> cloveSet, RatchetSKM skm) {
+        for (GarlicClove clove : cloveSet) {
+            I2NPMessage msg = clove.getData();
+            if (msg.getType() != DatabaseStoreMessage.MESSAGE_TYPE)
+                continue;
+            DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
+            DatabaseEntry entry = dsm.getEntry();
+            if (entry.getType() != DatabaseEntry.KEY_TYPE_LS2)
+                continue;
+            LeaseSet2 ls2 = (LeaseSet2) entry;
+            if (!ls2.isCurrent(Router.CLOCK_FUDGE_FACTOR))
+                continue;
+            PublicKey pk = ls2.getEncryptionKey(LeaseSetKeys.SET_EC);
+            if (!from.equals(pk))
+                continue;
+            if (!ls2.verifySignature())
+                continue;
+            // OK, we have a valid place to send the reply
+            Destination d = ls2.getDestination();
+            if (_log.shouldInfo())
+                _log.info("Validated NS sender: " + d.toBase32());
+            // TODO
+            return;
+        }
+        if (_log.shouldInfo())
+            _log.info("Unvalidated NS sender: " + from);
     }
 
 
