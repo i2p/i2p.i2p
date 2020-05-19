@@ -42,6 +42,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
@@ -1760,6 +1761,8 @@ public class DataHelper {
      */
     public static byte[] compress(byte orig[], int offset, int size, int level) {
         if (orig == null) return orig;
+        if (level == NO_COMPRESSION && size <= 32767)
+            return zeroCompress(orig, offset, size);
         if (size > MAX_UNCOMPRESSED) 
             throw new IllegalArgumentException("tell jrandom size=" + size);
         ReusableGZIPOutputStream out = ReusableGZIPOutputStream.acquire();
@@ -1794,7 +1797,41 @@ public class DataHelper {
         }
         
     }
-    
+
+    /**
+     *  Fast NO_COMPRESSION.
+     *  135x faster for 23 bytes, 15x faster for 1752 bytes.
+     *
+     *  Ref: RFC 1951, RFC 1952, ResettableGzipOutputStream
+     *
+     *  @param len 32767 max
+     *  @return 23 bytes longer
+     *  @since 0.9.46
+     */
+    private static byte[] zeroCompress(byte[] in, int off, int len) {
+        if (len > 32767)
+            throw new IllegalArgumentException();
+        byte[] rv = new byte[len + 23];
+        rv[0] = 0x1F;
+        rv[1] = (byte) 0x8B;
+        rv[2] = 0x08;
+        rv[8] = 0x02;         // XFL max compression slowest algorithm
+        rv[9] = (byte) 0xFF;  // unknown OS
+        rv[10] = 0x01;        // BFINAL, BTYPE = 0 (no compression)
+        rv[11] = (byte) (len & 0xff);
+        rv[12] = (byte) ((len >> 8) & 0xff);
+        rv[13] = (byte) ~ rv[11];
+        rv[14] = (byte) ~ rv[12];
+        System.arraycopy(in, off, rv, 15, len);
+        CRC32 crc = new CRC32();
+        crc.update(in, off, len);
+        long val = crc.getValue();
+        toLongLE(rv, rv.length - 8, 4, val);
+        rv[rv.length - 4] = rv[11];
+        rv[rv.length - 3] = rv[12];
+        return rv;
+    }
+
     /**
      *  Decompress the GZIP compressed data (returning null on error).
      *  @throws IOException if uncompressed is over 40 KB,

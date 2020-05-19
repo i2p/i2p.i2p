@@ -1,4 +1,13 @@
+2020-05-19 zzz
+ * Util: Speed up zero compression
+
+2020-05-18 zzz
+ * NetDB: Reseed update
+ * Proxy: Fix error code for incompatible encryption
+ * Ratchet: Prep for ratchet-layer acks (WIP)
+
 2020-05-17 zzz
+ * Streamr: Add expiration timer
  * UPnP:
    - Fixes for multiple devices
    - Fixes for device and interface changes
