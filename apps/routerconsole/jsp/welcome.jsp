@@ -254,11 +254,7 @@
 <img class="wizardimg" src="/themes/console/images/wizard/undraw_startup_life.png">
 <div class="wizardtext"><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
-<%=intl._t("We currently provide an I2P Browser which configures itself automatically")%>
-<a href="https://geti2p.net/browser" target="_blank"><%=intl._t("that you may retrieve from here.")%></a>
-<%=intl._t("Be aware that this product is currently in beta-testing.")%>
-</p><p>
-<%=intl._t("Alternatively, you can configure your browser of choice to use I2P.")%>
+<%=intl._t("You can configure your browser of choice to use I2P.")%>
 <a href="https://geti2p.net/htproxyports" target="_blank"><%=intl._t("If you want to do this yourself, here are instructions.")%></a>
 <%
         if (net.i2p.util.SystemVersion.isWindows()) {
