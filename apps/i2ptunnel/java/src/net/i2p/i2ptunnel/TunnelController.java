@@ -837,6 +837,8 @@ public class TunnelController implements Logging {
             if (type.equals(TYPE_HTTP_SERVER)) {
                 if (!_config.containsKey(OPT_LIMIT_ACTION))
                     _config.setProperty(OPT_LIMIT_ACTION, "http");
+            }
+            if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
                 String tgzip = _config.getProperty(PROP_TUN_GZIP);
                 if (tgzip == null || Boolean.valueOf(tgzip)) {
                     // Web server will gzip
@@ -846,8 +848,6 @@ public class TunnelController implements Logging {
                     if (!_config.containsKey(OPT_I2CP_GZIP))
                         _config.setProperty(OPT_I2CP_GZIP, "false");
                 }
-            }
-            if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");
             } else if (!isClient(type)) {
