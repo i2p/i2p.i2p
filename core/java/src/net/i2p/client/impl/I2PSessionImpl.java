@@ -145,6 +145,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private final AtomicInteger _lookupID = new AtomicInteger();
     protected final Object _bwReceivedLock = new Object();
     protected volatile int[] _bwLimits;
+    private volatile String _routerVersion;
     
     protected final I2PClientMessageHandlerMap _handlerMap;
     
@@ -227,6 +228,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /** @param routerVersion as rcvd in the SetDateMessage, may be null for very old routers */
     void dateUpdated(String routerVersion) {
+        _routerVersion = routerVersion;
         boolean isrc = _context.isRouterContext();
         _routerSupportsFastReceive = isrc ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
@@ -1879,6 +1881,18 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         if (id == null)
             id = DUMMY_SESSION;
         sendMessage_unchecked(new BlindingInfoMessage(bd, id));
+    }
+
+    /**
+     *  Always valid in RouterContext. Returns null if not yet connected in I2PAppContext.
+     *
+     *  @return null if unknown
+     *  @since 0.9.46
+     */
+    public String getRouterVersion() {
+        if (_context.isRouterContext())
+            return CoreVersion.VERSION;
+        return _routerVersion;
     }
 
     protected void updateActivity() {

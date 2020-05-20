@@ -444,6 +444,14 @@ public interface I2PSession {
     public void sendBlindingInfo(BlindData bd) throws I2PSessionException;
 
     /**
+     *  Always valid in RouterContext. Returns null if not yet connected in I2PAppContext.
+     *
+     *  @return null if unknown
+     *  @since 0.9.46
+     */
+    public String getRouterVersion();
+
+    /**
      *  Listen on specified protocol and port.
      *
      *  An existing listener with the same proto and port is replaced.
