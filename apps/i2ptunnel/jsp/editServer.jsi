@@ -181,7 +181,7 @@
             </th>
         </tr><tr>
             <td>
-                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=editBean.getDestinationBase64(curTunnel)%></div>
+                <div class="displayText resetScrollLeft" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0"><%=editBean.getDestinationBase64(curTunnel)%></div>
             </td><td>
 <%
                        String value3 = editBean.getPrivateKeyFile(curTunnel);
@@ -739,7 +739,7 @@
             </th>
         </tr><tr>
             <td colspan="2">
-                <div class="displayText" title="<%=intl._t("Read Only: Alternate Local Destination")%>" onblur="resetScrollLeft(this)"><%=ab64%></div>
+                <div class="displayText resetScrollLeft" title="<%=intl._t("Read Only: Alternate Local Destination")%>"><%=ab64%></div>
             </td>
         </tr><tr>
             <td colspan="2">

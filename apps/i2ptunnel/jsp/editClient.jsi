@@ -504,7 +504,7 @@
             </td>
         </tr><tr>
             <td colspan="2">
-                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=destb64%></div>
+                <div class="displayText resetScrollLeft" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0"><%=destb64%></div>
             </td>
         </tr><tr>
             <td colspan="2">
