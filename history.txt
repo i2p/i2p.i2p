@@ -1,3 +1,11 @@
+2020-05-21 zzz
+ * Streaming: Fix timer race (ticket #2739)
+
+2020-05-20 zzz
+ * i2ptunnel: Disable gzip for streamr server
+ * i2ptunnel, SusiDNS: Replace onblur with CSP-safe js
+ * Tunnels: Reduce the IBGW and client OBGW batch time
+
 2020-05-19 zzz
  * Util: Speed up zero compression
 

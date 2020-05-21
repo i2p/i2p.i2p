@@ -402,28 +402,27 @@ class Connection {
                 windowSize = _options.getWindowSize();
                 remaining = windowSize - _outboundPackets.size() ;
                 _outboundPackets.notifyAll();
-            }
 
-            if (_isChoking) {
-                packet.setOptionalDelay(Packet.SEND_DELAY_CHOKE);
-                packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
-            } else if (packet.isFlagSet(Packet.FLAG_CLOSE) ||
-                _unchokesToSend.decrementAndGet() > 0 ||
-                // the other end has no idea what our window size is, so
-                // help him out by requesting acks below the 1/3 point,
-                // if remaining < 3, and every 8 minimum.
-                (remaining < 3) ||
-                (remaining < (windowSize + 2) / 3) /* ||
-                (packet.getSequenceNum() % 8 == 0) */ ) {
-                packet.setOptionalDelay(0);
-                packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug("Requesting no ack delay for packet " + packet);
-            } else {
-                // This is somewhat of a waste of time, unless the RTT < 4000,
-                // since the other end limits it to getSendAckDelay()
-                // which is always 2000, but it's good for diagnostics to see what the other end thinks
-                // the RTT is.
+                if (_isChoking) {
+                    packet.setOptionalDelay(Packet.SEND_DELAY_CHOKE);
+                    packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+                } else if (packet.isFlagSet(Packet.FLAG_CLOSE) ||
+                    _unchokesToSend.decrementAndGet() > 0 ||
+                    // the other end has no idea what our window size is, so
+                    // help him out by requesting acks below the 1/3 point,
+                    // if remaining < 3, and every 8 minimum.
+                    (remaining < 3) ||
+                    (remaining < (windowSize + 2) / 3) /* ||
+                    (packet.getSequenceNum() % 8 == 0) */ ) {
+                    packet.setOptionalDelay(0);
+                    packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("Requesting no ack delay for packet " + packet);
+                } else {
+                    // This is somewhat of a waste of time, unless the RTT < 4000,
+                    // since the other end limits it to getSendAckDelay()
+                    // which is always 2000, but it's good for diagnostics to see what the other end thinks
+                    // the RTT is.
 /**
                 int delay = _options.getRTT() / 2;
                 packet.setOptionalDelay(delay);
@@ -432,20 +431,21 @@ class Connection {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
 **/
-            }
+                }
             
-            int timeout = _options.getRTO();
+                int timeout = _options.getRTO();
 
-            // RFC 6298 section 5.1
-            if (_retransmitEvent.scheduleIfNotRunning(timeout)) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(Connection.this + " Resend in " + timeout + " for " + packet);
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(Connection.this + " timer was already running");
+                // RFC 6298 section 5.1
+                if (_retransmitEvent.scheduleIfNotRunning(timeout)) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(Connection.this + " Resend in " + timeout + " for " + packet);
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(Connection.this + " timer was already running");
+                }
+
+                packet.setTimeout(timeout);
             }
-
-            packet.setTimeout(timeout);
         }
 
         // warning, getStatLog() can be null
@@ -578,23 +578,23 @@ class Connection {
             }
             anyLeft = !_outboundPackets.isEmpty();
             _outboundPackets.notifyAll();
-        }
-        if ((acked != null) && (!acked.isEmpty()) ) {
-            _ackSinceCongestion.set(true);
-            _bwEstimator.addSample(acked.size());
-            if (anyLeft) {
-                // RFC 6298 section 5.3
-                int rto = _options.getRTO();
-                _retransmitEvent.pushBackRTO(rto);
-                
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(Connection.this + " not all packets acked, pushing timer out " + rto);
-            } else {
-                // RFC 6298 section 5.2
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(Connection.this + " all outstanding packets acked, cancelling timer");
+            if ((acked != null) && (!acked.isEmpty()) ) {
+                _ackSinceCongestion.set(true);
+                _bwEstimator.addSample(acked.size());
+                if (anyLeft) {
+                    // RFC 6298 section 5.3
+                    int rto = _options.getRTO();
+                    _retransmitEvent.pushBackRTO(rto);
+                    
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(Connection.this + " not all packets acked, pushing timer out " + rto);
+                } else {
+                    // RFC 6298 section 5.2
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(Connection.this + " all outstanding packets acked, cancelling timer");
 
-                _retransmitEvent.cancel();
+                    _retransmitEvent.cancel();
+                }
             }
         }
         return acked;
