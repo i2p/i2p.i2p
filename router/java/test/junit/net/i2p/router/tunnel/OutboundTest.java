@@ -46,6 +46,10 @@ public class OutboundTest extends TestCase{
         }
         
         boolean eq = DataHelper.eq(orig, 16, message, 16, orig.length - 16);
+        if (!eq) {
+            System.out.println("Orig:\n" + net.i2p.util.HexDump.dump(orig, 16, orig.length - 16));
+            System.out.println("Rcvd:\n" + net.i2p.util.HexDump.dump(message, 16, orig.length - 16));
+        }
         assertTrue(eq);
     }
     

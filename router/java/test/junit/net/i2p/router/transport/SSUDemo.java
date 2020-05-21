@@ -28,6 +28,7 @@ public class SSUDemo {
 
     public static void main(String args[]) {
         boolean testNTCP = args.length > 0 && args[0].equals("ntcp");
+        System.out.println("Testing " + (testNTCP ? "NTCP" : "SSU"));
         SSUDemo demo = new SSUDemo();
         demo.run(testNTCP);
     }
@@ -38,10 +39,12 @@ public class SSUDemo {
         String cfgFile = "router.config";
         Properties envProps = getEnv(testNTCP);
         Router r = new Router(cfgFile, envProps);
+        System.out.println("Starting router...");
         r.runRouter();
         _us = r.getContext();
         setupHandlers();
         // wait for it to warm up a bit
+        System.out.println("30 second warmup...");
         try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
         // now write out our ident and info
         RouterInfo myInfo = _us.router().getRouterInfo();
@@ -60,8 +63,7 @@ public class SSUDemo {
         else
             envProps.setProperty("i2np.ntcp.enable", "false");
         envProps.setProperty("i2np.upnp.enable", "false");
-        // we want SNTP synchronization for replay prevention
-        envProps.setProperty("time.disabled", "false");
+        envProps.setProperty("time.disabled", "true");
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
         // peers who say they're on an invalid IP are banlisted
         envProps.setProperty("i2np.allowLocal", "true");
