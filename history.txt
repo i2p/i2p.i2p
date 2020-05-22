@@ -1,3 +1,7 @@
+2020-05-22 zzz
+ * Console: Translations update
+ * UPnP: More fixes
+
 2020-05-21 zzz
  * Streaming: Fix timer race (ticket #2739)
 
