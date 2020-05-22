@@ -825,7 +825,7 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
 
 .username, .password {
      width: 200px;
-     padding-left: 22px;
+     padding-left: 22px !important;
      background-blend-mode: luminosity;
 }
 
@@ -963,6 +963,8 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
 
 #customOptions {
     margin-top: 15px !important;
+    width: 99%;
+    width: calc(100% - 10px) !important;
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,

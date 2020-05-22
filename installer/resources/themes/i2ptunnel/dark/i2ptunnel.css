@@ -961,16 +961,15 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents {
 
 .username, .password {
      width: 200px;
+     padding-left: 22px !important;
 }
 
 .username {
      background: url(/themes/console/images/buttons/user.png) 3px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%) !important;
-     padding-left: 22px;
 }
 
 .password {
      background: url(/themes/console/images/buttons/password.png) 3px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%) !important;
-     padding-left: 22px;
 }
 
 .username:focus {
