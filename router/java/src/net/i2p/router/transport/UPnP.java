@@ -1634,6 +1634,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				                   ": " + DataHelper.escapeHTML(device.getFriendlyName()) + "</h3>");
 				System.out.println("<p>UDN: " + DataHelper.escapeHTML(device.getUDN()));
 				System.out.println("<br>IP: " + getIP(device));
+				String loc = device.getLocation();
+				if (loc != null && loc.length() > 0)
+					System.out.println("<br>URL: <a href=\"" + loc + "\">" + loc + "</a>");
 				System.out.println(sb.toString());
 				sb.setLength(0);
 			}
