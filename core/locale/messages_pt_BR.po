@@ -110,7 +110,7 @@ msgstr[1] "{0,number,###} μs"
 
 #: ../java/src/net/i2p/util/LogRecordFormatter.java:106
 msgid "CRIT"
-msgstr ""
+msgstr "CRIT"
 
 #: ../java/src/net/i2p/util/LogRecordFormatter.java:106
 msgid "DEBUG"

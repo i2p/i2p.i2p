@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# AO <ao@localizationlab.org>, 2019
+# AO <ao@localizationlab.org>, 2019-2020
 # Boxoa590, 2012-2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # AO <ao@localizationlab.org>, 2017-2018
 # Boxoa590, 2013
-# TraderStf, 2017
+# 88debc4075076105339fa4916a2f6c30, 2017
 # syl_, 2015-2016
 # Towinet, 2013-2017
 # zzzi2p, 2016-2017
@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-24 13:14+0000\n"
-"PO-Revision-Date: 2019-11-25 17:03+0000\n"
+"PO-Revision-Date: 2020-05-14 18:48+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -416,7 +416,7 @@ msgstr "Avertissement : La requête a été refusée"
 
 #: ../java/build/Proxy.java:185
 msgid "You attempted to connect to a non-I2P website or location."
-msgstr "Vous avez tenté de vous connecter à un site Web ou à un emplacement non I2P."
+msgstr "Vous avez tenté de vous connecter à un site Web ou à un emplacement extérieur à I2P."
 
 #: ../java/build/Proxy.java:186
 msgid "Proxy Authorization Required"

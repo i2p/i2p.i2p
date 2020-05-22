@@ -2,47 +2,36 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# 123hund123 <M8R-ra4r1r@mailinator.com>, 2011
-# Allan Nordhøy <epost@anotheragency.no>, 2017
-# Anders Nilsson <anders@devode.se>, 2016
-# Anders Nilsson <anders@devode.se>, 2015-2016
-# cacapo <handelsehorisont@gmail.com>, 2015
-# Calle Rundgren <samaire@samaire.net>, 2013
-# cacapo <handelsehorisont@gmail.com>, 2015-2016
-# hottuna <i2p@robertfoss.se>, 2011,2013
-# hottuna <i2p@robertfoss.se>, 2013
-# hottuna <i2p@robertfoss.se>, 2011-2012
-# Jonatan Nyberg, 2016-2017
-# Jonatan Nyberg, 2018-2019
-# Jonatan Nyberg, 2017-2018
-# Martin Svensson <digitalmannen@gmail.com>, 2011-2012
-# mon <mattias.ohlsson@inprose.com>, 2013
-# mon <mattias.ohlsson@inprose.com>, 2013
-# WinterFairy <winterfairy@riseup.net>, 2014
-# WinterFairy <winterfairy@riseup.net>, 2014
+# zzzi2p, 2019
+# 123hund123 <M8R-ra4r1r@mailinator.com>, 2019
+# Jonatan Nyberg <jonatan.nyberg.karl@gmail.com>, 2020
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:32+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: Jonatan Nyberg\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/"
-"sv_SE/)\n"
-"Language: sv_SE\n"
+"POT-Creation-Date: 2019-12-17 18:42+0000\n"
+"PO-Revision-Date: 2019-12-17 17:16+0000\n"
+"Last-Translator: Jonatan Nyberg <jonatan.nyberg.karl@gmail.com>, 2020\n"
+"Language-Team: Swedish (Sweden) (https://www.transifex.com/otf/teams/12694/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
-#. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there
+#. are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it
+#. is used in
 #. a lot of tables.
 #. milliseconds
 #. Note to translators, may be negative or zero, 2999 maximum.
-#. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English
+#. locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
 #: ../java/src/net/i2p/data/DataHelper.java:1383
@@ -120,34 +109,29 @@ msgid_plural "{0,number,###} μs"
 msgstr[0] "{0,number,####} μs"
 msgstr[1] "{0,number,###} μs"
 
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "CRIT"
+msgstr "CRIT"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "DEBUG"
+msgstr "FELSÖK"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "ERROR"
+msgstr "FEL"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "INFO"
+msgstr "INFO"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "WARN"
+msgstr "WARN"
+
 #: ../java/src/net/i2p/util/LogWriter.java:161
 #, java-format
 msgid "{0} similar message omitted"
 msgid_plural "{0} similar messages omitted"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:153
-msgid "CRIT"
-msgstr "CRIT"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-msgid "DEBUG"
-msgstr "FELSÖK"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:155
-msgid "ERROR"
-msgstr "FEL"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:160
-msgid "INFO"
-msgstr "INFO"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:157
-msgid "WARN"
-msgstr "WARN"
-
+msgstr[0] "{0} liknande meddelande utelämnat"
+msgstr[1] "{0} liknande meddelanden utelämnade"
