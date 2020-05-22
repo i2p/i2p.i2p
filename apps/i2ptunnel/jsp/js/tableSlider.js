@@ -52,6 +52,14 @@ hideableTables.forEach(function(configTable) {
             }
         }
         configTable.parentNode.style.visibility = "visible";
+        var iiframe = document.getElementById("i2ptunnelframe");
+        if (iiframe != null) {
+            var adjustHeight = 0;
+            for (var child = frame.firstChild; child !== null; child.nextSibling){
+                adjustHeight += child.offsetHeight;
+            }
+            iiframe.height = adjustHeight;
+        }
     };
     showAllControls()
     for (var i = 0, row; (row = hideableTables[0].offsetParent.rows[i]); i++) {
