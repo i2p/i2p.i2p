@@ -467,6 +467,8 @@ public class Router implements RouterClock.ClockShiftListener {
         _watchdogThread.setPriority(Thread.NORM_PRIORITY + 1);
         _watchdogThread.start();
         
+        if (SystemVersion.isWindows())
+            BasePerms.fix(_context);
     }
     
     /**
@@ -495,8 +497,6 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
 
-    /** @deprecated unused */
-    @Deprecated
     public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
     /** @return absolute path */

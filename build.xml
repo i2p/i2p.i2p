@@ -1737,6 +1737,7 @@
         <copy todir="pkg-temp/man/">
             <fileset dir="installer/resources/man/" />
         </copy>
+        <copy file="installer/resources/fixperms2.bat" todir="pkg-temp/scripts/" />
     </target>
 
     <target name="truncatehistory">
