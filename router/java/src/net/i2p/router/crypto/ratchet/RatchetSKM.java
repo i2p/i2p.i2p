@@ -72,7 +72,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
     final static long SESSION_PENDING_DURATION_MS = 3 * 60 * 1000;
     // replace an old session created before this if we get a new NS
-    private static final long SESSION_REPLACE_AGE = 3*60*1000;
+    private static final long SESSION_REPLACE_AGE = 2*60*1000;
 
     private static final byte[] ZEROLEN = new byte[0];
 
