@@ -139,7 +139,7 @@ public class LogsHelper extends HelperBase {
 
     /**
      *  last line number -1 on error
-     *  @param buf out parameter
+     *  @param obuf out parameter
      *  @return Long timestamp, Long last line number, String filename (escaped)
      */
     public Object[] getServiceLogs(StringBuilder obuf) {
