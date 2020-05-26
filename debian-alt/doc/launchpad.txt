@@ -18,7 +18,7 @@ precise		saucy   	precise		wheezy
 trusty		wily		precise		jessie, stretch
 xenial		yakkety		xenial		--
 bionic		cosmic		bionic		--
-disco		focal		bionic		buster, sid
+disco		groovy		bionic		buster, sid
 
 
 Prep (first time only)

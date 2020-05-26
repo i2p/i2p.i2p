@@ -9,7 +9,7 @@ trusty may be copied to vivid.
 trusty may be used for jessie with libjetty9-java from backports.
 xenial may be copied to yakkety, zesty
 bionic may be copied to cosmic
-disco may be copied to eoan and focal
+disco may be copied to eoan, focal and groovy
 
 Not maintained:
 wheezy files are not maintained. Use the precise files instead.
