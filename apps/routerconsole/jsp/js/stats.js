@@ -1,14 +1,14 @@
-function init()
+function initStats()
 {
 	var buttons = document.getElementsByClassName("onchange");
 	for(index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
-		addChangeHandler(button);
+		addSChangeHandler(button);
 	}
 }
 
-function addChangeHandler(elem)
+function addSChangeHandler(elem)
 {
 	elem.addEventListener("change", function() {
 		location.href=event.target.value;
@@ -16,5 +16,5 @@ function addChangeHandler(elem)
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    init();
+    initStats();
 }, true);

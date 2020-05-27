@@ -1,14 +1,14 @@
-function init()
+function initConfigClients()
 {
 	var buttons = document.getElementsByClassName("delete");
 	for(index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
-		addClickHandler(button);
+		addCCClickHandler(button);
 	}
 }
 
-function addClickHandler(elem)
+function addCCClickHandler(elem)
 {
 	elem.addEventListener("click", function() {
               if (!confirm(deleteMessage.replace("{0}", elem.getAttribute("client")))) {
@@ -19,5 +19,5 @@ function addClickHandler(elem)
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    init();
+    initConfigClients();
 }, true);

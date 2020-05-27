@@ -1,4 +1,4 @@
-function init()
+function initDelete()
 {
 	var buttons = document.getElementsByClassName("delete");
 	for(index = 0; index < buttons.length; index++)
@@ -19,5 +19,5 @@ function addClickHandler(elem)
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    init();
+    initDelete();
 }, true);

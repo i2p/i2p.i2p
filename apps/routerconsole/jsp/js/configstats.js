@@ -1,4 +1,4 @@
-function init()
+function initConfigStats()
 {
 	checkAll = false;
 	var buttons = document.getElementsByClassName("script");
@@ -7,10 +7,10 @@ function init()
 		var button = buttons[index];
 		// toggle-foo
 		var group = button.id.substring(7);
-		addClickHandler(button, group);
+		addCSClickHandler(button, group);
 	}
 }
-function addClickHandler(elem, category)
+function addCSClickHandler(elem, category)
 {
 	elem.addEventListener("click", function(){toggleAll(category); event.preventDefault(); return false;});
 }
@@ -64,5 +64,5 @@ function toggleAll(category)
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    init();
+    initConfigStats();
 }, true);
