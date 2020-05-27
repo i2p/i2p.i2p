@@ -62,7 +62,5 @@ class Dummy {
         _t("host");
         _t("key");
         _t("port");
-        // capabilities
-        _t("caps");
     }
 }

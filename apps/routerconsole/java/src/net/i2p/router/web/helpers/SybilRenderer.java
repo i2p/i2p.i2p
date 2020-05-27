@@ -846,7 +846,7 @@ public class SybilRenderer {
             }
         }
         buf.append("<p><b>").append(_t("Version")).append(":</b> ").append(DataHelper.stripHTML(info.getVersion())).append("</p>\n" +
-                   "<p><b>").append(_t("Caps")).append(":</b> ").append(DataHelper.stripHTML(info.getCapabilities())).append("</p>\n");
+                   "<p><b>").append("Caps").append(":</b> ").append(DataHelper.stripHTML(info.getCapabilities())).append("</p>\n");
         String kr = info.getOption("netdb.knownRouters");
 ;
         if (kr != null) {
