@@ -157,11 +157,14 @@ public class Router implements RouterClock.ClockShiftListener {
             System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
             System.setProperty("networkaddress.cache.negative.ttl", DNS_NEG_CACHE_TIME);
         }
-        if (System.getProperty("I2P_DISABLE_HTTP_AGENT_OVERRIDE") == null) {
-            System.setProperty("http.agent", "I2P");
-        }
+        // ref: https://docs.oracle.com/javase/8/docs/api/java/net/doc-files/net-properties.html#Proxies
+        // This doesn't do what you think, and a bad idea anyway
+        //if (System.getProperty("I2P_DISABLE_HTTP_AGENT_OVERRIDE") == null) {
+        //    System.setProperty("http.agent", "I2P");
+        //}
         if (System.getProperty("I2P_DISABLE_HTTP_KEEPALIVE_OVERRIDE") == null) {
             // (no need for keepalive)
+            // Note that doc link above is wrong, it IS capital A Alive
             System.setProperty("http.keepAlive", "false");
         }
         // Save it for LogManager
