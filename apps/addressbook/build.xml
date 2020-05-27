@@ -7,7 +7,7 @@
 	<property name="jar" value="addressbook.jar"/>
 	<property name="war" value="addressbook.war"/>
 	<property name="javac.compilerargs" value="" />
-	<property name="javac.version" value="1.7" />
+	<property name="javac.version" value="1.8" />
 
 	<target name="all" depends="jar, emptyWar"/> 
 	

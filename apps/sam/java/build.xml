@@ -24,7 +24,7 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs7" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- compile everything including client classes -->
@@ -45,7 +45,7 @@
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
-            debug="true" deprecation="on" source="1.7" target="1.7" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" 

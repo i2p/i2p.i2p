@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.servlet.ServletRequest;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
@@ -360,17 +361,20 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava8) {
-                s = "Java 8 or higher will be required in a future release, please upgrade Java";
+                s = "Java 8 or higher is required, please upgrade Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 is required for plugins and automatic updates, please upgrade Java";
+                if (SystemVersion.isJava(14))
+                    s = "Pack200 is required for some plugins, please consider downgrading Java to 13 or lower";
+                else
+                    s = "Pack200 is required for some plugins, please consider upgrading Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (openARM) {
-                s = "OpenJDK 7/8 are not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
+                s = "OpenJDK 8 is not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -1081,8 +1085,8 @@ public class RouterConsoleRunner implements RouterApp {
         }
 
         @Override
-        public UserIdentity login(String username, Object credentials) {
-            UserIdentity rv = super.login(username, credentials);
+        public UserIdentity login(String username, Object credentials, ServletRequest request) {
+            UserIdentity rv = super.login(username, credentials, request);
             if (rv == null)
                 //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
                 _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);

@@ -1,4 +1,9 @@
 2020-05-27 zzz
+ * Installer:
+   - Require Java 8 (ticket #2511)
+   - Sign the dlls (ticket #2704)
+ * Jetty 9.3.28 (ticket #2098)
+ * UPnP: More fixes
  * Util: Faster gzip
 
 * 2020-05-25 0.9.46 released

@@ -19,7 +19,7 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
     <property name="izpack5.version" value="5.1.3" />
 
     <property name="izpack.lib" value="${izpack5.home}/lib" />

@@ -7,7 +7,7 @@
 	<property name="jar" value="desktopgui.jar"/>
 	<property name="javadoc" value="javadoc"/>
 	<property name="javac.compilerargs" value=""/>
-	<property name="javac.version" value="1.7" />
+	<property name="javac.version" value="1.8" />
 	<property name="require.gettext" value="true" />
 
     <condition property="no.bundle">

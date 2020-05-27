@@ -27,7 +27,7 @@ To get development branch from source control: https://geti2p.net/newdevelopers
 
 ### Prerequisites
 
-- Java SDK (preferably Oracle/Sun or OpenJDK) 1.7.0 or higher
+- Java SDK (preferably Oracle/Sun or OpenJDK) 1.8.0 or higher
   - Non-linux operating systems and JVMs: See https://trac.i2p2.de/wiki/java
   - Certain subsystems for embedded (core, router, mstreaming, streaming, i2ptunnel)
     require only Java 1.6

@@ -40,7 +40,7 @@ To uninstall I2P:
    rm -rf $I2PInstallDir ~/.i2p
 
 Supported JVMs:
-  All platforms: Java 1.7 or higher required
+  All platforms: Java 1.8 or higher required
   Windows: OpenJDK or Oracle from http://java.com/download
   Linux:   OpenJDK or Oracle from http://java.com/download
   FreeBSD: OpenJDK or Oracle from http://java.com/download

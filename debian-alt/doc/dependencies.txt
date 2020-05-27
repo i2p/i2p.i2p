@@ -54,8 +54,7 @@ Current Runtime Dependencies
 * libjetty9-java
   For /usr/share/java/jetty9-*.jar.
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
-  This is for Jetty 9.2.x, which is what's in Debian.
-  We are not compatible with Jetty 9.4.x, which is what's in RedHat.
+  This is for Jetty 9.3.x, which is the same as 9.4.x except it's Java 8 compatible.
 
 * libtomcat8-java
   For /usr/share/java/tomcat8-*.jar.

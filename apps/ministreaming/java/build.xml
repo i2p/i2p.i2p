@@ -22,7 +22,7 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
     <property name="require.gettext" value="true" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
