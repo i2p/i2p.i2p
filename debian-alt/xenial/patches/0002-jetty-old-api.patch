@@ -1,7 +1,29 @@
+Index: b/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
+============================================================
+--- a/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
++++ b/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
+@@ -317,7 +317,7 @@ public class I2PRequestLog extends Abstr
+                 buf.append(request.getMethod());
+                 buf.append(' ');
+                 
+-                u8buf.append(request.getHttpURI().toString());
++                request.getUri().writeTo(u8buf);
+                 
+                 buf.append(' ');
+                 buf.append(request.getProtocol());
 Index: b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
 ===================================================================
 --- a/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
+@@ -15,7 +15,7 @@ import org.eclipse.jetty.server.Request;
+ import net.i2p.util.PortMapper;
+ 
+ import org.eclipse.jetty.server.Request;
+-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
++import org.eclipse.jetty.servlets.gzip.GzipHandler;
+ 
+ /**
+  * Block certain Host headers to prevent DNS rebinding attacks.
 @@ -44,19 +44,12 @@ public class HostCheckHandler extends Gz
          _listenHosts = new HashSet<String>(8);
          setMinGzipSize(64*1024);
@@ -24,3 +46,18 @@ Index: b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
          }
      }
      
+Index: b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
+============================================================
+--- a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
++++ b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
+@@ -1085,8 +1085,8 @@ public class RouterConsoleRunner impleme
+         }
+ 
+         @Override
+-        public UserIdentity login(String username, Object credentials, ServletRequest request) {
+-            UserIdentity rv = super.login(username, credentials, request);
++        public UserIdentity login(String username, Object credentials) {
++            UserIdentity rv = super.login(username, credentials);
+             if (rv == null)
+                 //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
+                 _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);

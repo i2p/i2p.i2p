@@ -2592,12 +2592,22 @@
     </target>
 
     <target name="debcheckpatch">
+        <echo message="Checking debian/patches/0001-path-substitution.patch" />
         <exec executable="patch" failonerror="true" input="debian/patches/0001-path-substitution.patch" >
             <arg value="--dry-run" />
             <arg value="-F0" />
             <arg value="-p1" />
         </exec>
+        <echo />
+        <echo message="Checking debian/patches/0002-jetty-compatibility.patch" />
         <exec executable="patch" failonerror="true" input="debian/patches/0002-jetty-compatibility.patch" >
+            <arg value="--dry-run" />
+            <arg value="-F0" />
+            <arg value="-p1" />
+        </exec>
+        <echo />
+        <echo message="Checking debian-alt/xenial/patches/0002-jetty-old-api.patch" />
+        <exec executable="patch" failonerror="true" input="debian-alt/xenial/patches/0002-jetty-old-api.patch" >
             <arg value="--dry-run" />
             <arg value="-F0" />
             <arg value="-p1" />
