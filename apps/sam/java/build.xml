@@ -23,7 +23,7 @@
     </target>
 
     <!-- only used if not set by a higher build.xml -->
-    <property name="javac.compilerargs7" value="" />
+    <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
@@ -38,7 +38,7 @@
             encoding="UTF-8"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs7}" />
+            <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
 
@@ -50,7 +50,7 @@
             encoding="UTF-8"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs7}" />
+            <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
 

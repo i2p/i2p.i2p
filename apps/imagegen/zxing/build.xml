@@ -18,7 +18,7 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.version" value="1.8" />
-    <property name="javac.compilerargs7" value="" />
+    <property name="javac.compilerargs" value="" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
@@ -27,13 +27,13 @@
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="./build/obj" >
-            <compilerarg line="${javac.compilerargs7}" />
+            <compilerarg line="${javac.compilerargs}" />
         </javac>
         <javac srcdir="./javase/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="./build/obj" classpath="./build/obj" >
-            <compilerarg line="${javac.compilerargs7}" />
+            <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
 
@@ -47,7 +47,7 @@
             encoding="UTF-8"
             destdir="./buildTest/obj"
             classpath="./build/zxing.jar" >
-            <compilerarg line="${javac.compilerargs7}" />
+            <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
 

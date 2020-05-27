@@ -1072,15 +1072,10 @@
     </target>
 
     <target name="-pre-sign">
-            <!-- if you're distributing su3 files to others, at a minimum you should set these -->
+            <!-- if you're distributing su3 files to others, at a minimum you should set this -->
             <fail message="javac.compilerargs must contain a -bootclasspath option in override.properties">
                 <condition>
                     <not><contains string="${javac.compilerargs}" substring="-bootclasspath"/></not>
-                </condition>
-            </fail>
-            <fail message="javac.compilerargs7 must contain a -bootclasspath option in override.properties">
-                <condition>
-                    <not><contains string="${javac.compilerargs7}" substring="-bootclasspath"/></not>
                 </condition>
             </fail>
             <fail message="build.built-by must be set in override.properties">
