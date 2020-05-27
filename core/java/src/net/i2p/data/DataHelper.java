@@ -1708,7 +1708,20 @@ public class DataHelper {
 
     /** */
     public static final int MAX_UNCOMPRESSED = 40*1024;
+    /**
+     *  Appx. 30% slower, 2.5% smaller than MEDIUM_COMPRESSION
+     */
     public static final int MAX_COMPRESSION = Deflater.BEST_COMPRESSION;
+    /**
+     *  Appx. 15% slower, 1.5% smaller than MEDIUM_COMPRESSION
+     *  @since 0.9.47
+     */
+    public static final int HIGH_COMPRESSION = 5;
+    /**
+     *  New default as of 0.9.47
+     *  @since 0.9.47
+     */
+    public static final int MEDIUM_COMPRESSION = 3;
     public static final int NO_COMPRESSION = Deflater.NO_COMPRESSION;
 
     /**
@@ -1719,6 +1732,10 @@ public class DataHelper {
      *  Prior to 0.9.29, this would return a zero-length output
      *  for a zero-length input. As of 0.9.29, output is valid for
      *  a zero-length input also.
+     *
+     *  As of 0.9.47, this uses a level of MEDIUM_COMPRESSION,
+     *  which is a good space/speed tradeoff.
+     *  Prior to that, it used MAX_COMPRESSION.
      *
      *  @throws IllegalArgumentException if input size is over 40KB
      *  @throws IllegalStateException on compression failure, as of 0.9.29
@@ -1737,12 +1754,16 @@ public class DataHelper {
      *  for a zero-length input. As of 0.9.29, output is valid for
      *  a zero-length input also.
      *
+     *  As of 0.9.47, this uses a level of MEDIUM_COMPRESSION,
+     *  which is a good space/speed tradeoff.
+     *  Prior to that, it used MAX_COMPRESSION.
+     *
      *  @throws IllegalArgumentException if size is over 40KB
      *  @throws IllegalStateException on compression failure, as of 0.9.29
      *  @return null if orig is null
      */
     public static byte[] compress(byte orig[], int offset, int size) {
-        return compress(orig, offset, size, MAX_COMPRESSION);
+        return compress(orig, offset, size, MEDIUM_COMPRESSION);
     }
 
     /**
@@ -1850,6 +1871,10 @@ public class DataHelper {
      */
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if (orig == null) return orig;
+        if (length < 23)
+            throw new IOException("length");
+        if (length < 65559 && orig[offset + 10] == 0x01)
+            return zeroDecompress(orig, offset, length);
         if (offset + length > orig.length)
             throw new IOException("Bad params arrlen " + orig.length + " off " + offset + " len " + length);
         
@@ -1880,6 +1905,53 @@ public class DataHelper {
             ReusableGZIPInputStream.release(in);
         }
     }
+
+    /**
+     *  Fast NO_COMPRESSION.
+     *  ~30x faster for typ. lengths, ~20x faster for 4 KB or more.
+     *
+     *  Ref: RFC 1951, RFC 1952, ResettableGzipOutputStream
+     *
+     *  @param in in[off + 10] MUST BE VALIDATED == 1 before calling this.
+     *  @param len 65558 max
+     *  @return 23 bytes shorter
+     *  @throws IOException on all errors
+     *  @since 0.9.47
+     */
+    private static byte[] zeroDecompress(byte[] in, int off, int len) throws IOException {
+        if (len > 65535 + 23)
+            throw new IOException("length");
+        try {
+            final int olen = len - 23;
+            if (in[off++] != 0x1F ||
+                in[off++] != (byte) 0x8B ||
+                in[off] != 0x08)
+                throw new IOException("header");
+            off += 8;
+            if (in[off++] != 0x01 ||
+                fromLongLE(in, off, 2) != olen)
+                throw new IOException("header");
+            off += 2;
+            if (in[off] != (byte) ~ in[off - 2] ||
+                in[off + 1] != (byte) ~ in[off - 1])
+                throw new IOException("header");
+            off += 2;
+            final int trailer = off + olen;
+            if (fromLongLE(in, trailer + 4, 4) != olen)
+                throw new IOException("trailer");
+            CRC32 crc = new CRC32();
+            crc.update(in, off, olen);
+            long val = crc.getValue();
+            if (val != fromLongLE(in, trailer, 4))
+                throw new IOException("CRC");
+            final byte[] rv = new byte[olen];
+            System.arraycopy(in, off, rv, 0, olen);
+            return rv;
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            throw new IOException(aioobe);
+        }
+    }
+
 
     /**
      *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException

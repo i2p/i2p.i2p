@@ -1,3 +1,6 @@
+2020-05-27 zzz
+ * Util: Faster gzip
+
 * 2020-05-25 0.9.46 released
 
 2020-05-23 zzz
