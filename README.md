@@ -15,7 +15,7 @@ See [INSTALL.txt](INSTALL.txt) or [https://geti2p.net/download](https://geti2p.n
 FAQ: [https://geti2p.net/faq](https://geti2p.net/how)
 
 API: [http://docs.i2p-projekt.de/javadoc/](http://docs.i2p-projekt.de/javadoc/)
-or run 'ant javadoc' then start at [build/javadoc/index.html](build/javadoc/index.html)
+or run 'ant javadoc' then start at build/javadoc/index.html
 
 ## How to contribute / Hack on I2P
 
