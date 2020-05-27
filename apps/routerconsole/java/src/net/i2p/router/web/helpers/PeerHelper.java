@@ -111,22 +111,34 @@ public class PeerHelper extends HelperBase {
 
         SortedMap<String, Transport> transports = _context.commSystem().getTransports();
         if (_transport != null && !_transport.equals("upnp")) {
+            boolean rendered = false;
             for (Map.Entry<String, Transport> e : transports.entrySet()) {
                 String style = e.getKey();
                 Transport t = e.getValue();
                 if (style.equals("NTCP") && "ntcp".equals(_transport)) {
                     NTCPTransport nt = (NTCPTransport) t;
                     render(nt, out, urlBase, sortFlags);
+                    rendered = true;
+                    break;
                 } else if (style.equals("SSU") && "ssu".equals(_transport)) {
                     UDPTransport ut = (UDPTransport) t;
                     render(ut, out, urlBase, sortFlags);
-                } else {
+                    rendered = true;
+                    break;
+                } else if (style.equals(_transport)) {
                     // pluggable (none yet)
                     t.renderStatusHTML(out, urlBase, sortFlags);
+                    rendered = true;
+                    break;
                 }
             }
-            if (!transports.isEmpty()) {
+            if (rendered) {
                 out.write(getTransportsLegend());
+            } else {
+                out.write("<p class=\"infohelp\">" +
+                          "Transport not enabled: " +
+                          DataHelper.escapeHTML(_transport) +
+                          "</p>");
             }
         } else if (_transport == null) {
             StringBuilder buf = new StringBuilder(4*1024);
