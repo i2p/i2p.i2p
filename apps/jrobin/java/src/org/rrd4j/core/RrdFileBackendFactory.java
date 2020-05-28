@@ -1,8 +1,11 @@
 package org.rrd4j.core;
 
-import java.io.File;
+import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * An abstract backend factory which is used to store RRD data to ordinary files on the disk.
@@ -20,7 +23,7 @@ public abstract class RrdFileBackendFactory extends RrdBackendFactory {
      */
     @Override
     protected boolean exists(String path) {
-        return Util.fileExists(path);
+        return Files.exists(Paths.get(path));
     }
 
     /** {@inheritDoc} */
@@ -37,25 +40,27 @@ public abstract class RrdFileBackendFactory extends RrdBackendFactory {
 
     @Override
     public URI getCanonicalUri(URI uri) {
+        // Resolve only parent, to avoid failing if the file is missing
+        Path file;
         try {
-            if (uri.isOpaque()) {
-                return new File(uri.getSchemeSpecificPart()).getCanonicalFile().toURI();
-            } else if (uri.isAbsolute()) {
-                return new File(uri).getCanonicalFile().toURI();
+            if (uri.isOpaque() || uri.getScheme() == null) {
+                file = Paths.get(uri.getSchemeSpecificPart());
             } else {
-                return new File(uri.getPath()).getCanonicalFile().toURI();
+                file = Paths.get(uri);
             }
-        } catch (IOException e) {
-            throw new IllegalArgumentException("can't get canonical URI from " + uri + ": " + e);
+            Path parent = file.getParent().toRealPath();
+            return parent.resolve(file.getFileName()).toUri();
+        } catch (IOError | IOException e) {
+            throw new IllegalArgumentException("can't get canonical URI from " + uri + ": " + e, e);
         }
     }
 
     @Override
     public URI getUri(String path) {
         try {
-            return new File(path).getCanonicalFile().toURI();
-        } catch (IOException e) {
-            throw new IllegalArgumentException("can't get canonical URI from path " + path + ": " + e);
+            return Paths.get(path).normalize().toUri();
+        } catch (IOError e) {
+            throw new IllegalArgumentException("can't get URI from path " + path + ": " + e, e);
         }
     }
 
@@ -64,7 +69,7 @@ public abstract class RrdFileBackendFactory extends RrdBackendFactory {
         if (uri.isOpaque()) {
             return uri.getSchemeSpecificPart();
         } else if (uri.isAbsolute()) {
-            return new File(uri).getPath();
+            return Paths.get(uri).normalize().toString();
         } else {
             return uri.getPath();
         }

@@ -65,7 +65,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
         }
 
         /**
-         * Builds a {@link RrdDb} instance.
+         * Builds or imports a {@link RrdDb} instance.
          *
          * @return a new build RrdDb
          * @throws IOException              in case of I/O error.
@@ -108,12 +108,12 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
 
         /**
          * Import an external rrd data, import definition must have been done using {@link #setExternalPath(String)}
-         * or {@link #setImporter(DataImporter)}
+         * or {@link #setImporter(DataImporter)}.<p>
+         * It can be used when it's not need to keep a reference to the rrd.
          *
          * @throws IOException              in case of I/O error.
          * @throws IllegalArgumentException if the builder settings were incomplete
          */
-        @SuppressWarnings("deprecation")
         public void doimport() throws IOException {
             if (rrdDef != null || (importer == null && externalPath == null)) {
                 throw new IllegalArgumentException("Not an importing configuration");
@@ -128,8 +128,8 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
             }
             try (DataImporter rrdImporter = resoleImporter(externalPath, importer)) {
                 if (usePool) {
-                    RrdDb db = resolvePool(pool).requestRrdDb(rrdUri, factory, importer);
-                    resolvePool(pool).release(db);
+                    try (RrdDb db = resolvePool(pool).requestRrdDb(rrdUri, factory, importer)) {
+                    };
                 } else {
                     try (RrdDb db = new RrdDb(path, rrdUri, null, rrdImporter, factory, null)) {
                     }
@@ -151,16 +151,29 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
             return this;
         }
 
+        /**
+         * @param factory The backend factory to use for that rrd.
+         * @return the same builder.
+         */
         public Builder setBackendFactory(RrdBackendFactory factory) {
             this.factory = factory;
             return this;
         }
 
+        /**
+         * @param readOnly true if the rrd is to be read only
+         * @return the same builder.
+         */
         public Builder setReadOnly(boolean readOnly) {
             this.readOnly = readOnly;
             return this;
         }
 
+        /**
+         * Set the rrd as readonly
+         * 
+         * @return the same builder.
+         */
         public Builder readOnly() {
             this.readOnly = true;
             return this;
@@ -174,7 +187,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
         /**
          * Activate the pool usage
          *
-         * @return
+         * @return the same builder.
          */
         public Builder usePool() {
             this.usePool = true;
@@ -185,14 +198,19 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
          * Set the pool that will be used if {@link #usePool} is true. If not defined,
          * the singleton instance will be used.
          *
-         * @param pool
-         * @return
+         * @param pool true if a pool is going to be used
+         * @return the same builder.
          */
         public Builder setPool(RrdDbPool pool) {
             this.pool = pool;
             return this;
         }
 
+        /**
+         * Set when the builder will be used to import external data with a predefined source: XML or RRDTool.
+         * @param externalPath an URI-like indication of RRD data to import
+         * @return the same builder.
+         */
         public Builder setExternalPath(String externalPath) {
             this.externalPath = externalPath;
             this.importer = null;
@@ -201,6 +219,11 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
             return this;
         }
 
+        /**
+         * Set when the builder will be used to import external data with a custom source.
+         * @param importer a custom import
+         * @return the same builder.
+         */
         public Builder setImporter(DataImporter importer) {
             this.importer = importer;
             this.externalPath = null;
@@ -209,6 +232,12 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
             return this;
         }
 
+        /**
+         * Set when the builder will be used to import a RRDTool file.
+         * @param externalPath the path to a RRDTool file
+         * @return the same builder.
+         * @throws IOException if the RRDTool file can‘t be read
+         */
         public Builder setRrdToolImporter(String externalPath) throws IOException {
             this.importer = new RrdToolReader(externalPath);
             this.externalPath = null;
@@ -217,6 +246,10 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
             return this;
         }
 
+        /**
+         * @param rrdDef a {@link RrdDef} to a new rrd file.
+         * @return the same builder.
+         */
         public Builder setRrdDef(RrdDef rrdDef) {
             this.rrdDef = rrdDef;
             this.importer = null;
@@ -440,6 +473,32 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
     }
 
     /**
+     * <p>Opens an existing RRD with read/write access.
+     * The path will be parsed as an URI and checked against the active factories.
+     * If it's a relative URI (no scheme given, or just a plain path), the default factory will be used.</p>
+     *
+     * @param path Path to existing RRD.
+     * @return a {link RrdDb} opened with default settings
+     * @throws java.io.IOException Thrown in case of I/O error.
+     */
+    public static RrdDb of(String path) throws IOException {
+        return new RrdDb(path, null, false, null, null);
+    }
+
+    /**
+     * <p>Opens an existing RRD with read/write access.
+     * The URI will checked against the active factories.
+     * If it's a relative URI (no scheme given, or just a plain path), the default factory will be used.</p>
+     *
+     * @param uri URI to existing RRD.
+     * @return a {link RrdDb} opened with default settings
+     * @throws java.io.IOException Thrown in case of I/O error.
+     */
+    public static RrdDb of(URI uri) throws IOException {
+        return new RrdDb(null, uri, false, null, null);
+    }
+
+    /**
      * <p>Constructor used to open already existing RRD. The path will be parsed as an URI and checked against the active factories. If
      * it's a relative URI (no scheme given, or just a plain path), the default factory will be used.</p>
      * <p>Constructor obtains read or read/write access to this RRD.</p>
@@ -514,18 +573,6 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
     }
 
     /**
-     * <p>Opens an existing RRD with read/write access.
-     * The path will be parsed as an URI and checked against the active factories.
-     * If it's a relative URI (no scheme given, or just a plain path), the default factory will be used.</p>
-     *
-     * @param path Path to existing RRD.
-     * @throws java.io.IOException Thrown in case of I/O error.
-     */
-    public static RrdDb of(String path) throws IOException {
-        return new RrdDb(path, null, false, null, null);
-    }
-
-    /**
      * <p>Constructor used to open already existing RRD. The URI will checked against the active factories. If
      * it's a relative URI (no scheme given, or just a plain path), the default factory will be used.</p>
      * <p>Constructor obtains read/write access to this RRD.</p>
@@ -537,18 +584,6 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
     @Deprecated
     public RrdDb(URI uri) throws IOException {
         this(null, uri, false, null, null);
-    }
-
-    /**
-     * <p>Opens an existing RRD with read/write access.
-     * The URI will checked against the active factories.
-     * If it's a relative URI (no scheme given, or just a plain path), the default factory will be used.</p>
-     *
-     * @param uri URI to existing RRD.
-     * @throws java.io.IOException Thrown in case of I/O error.
-     */
-    public static RrdDb of(URI uri) throws IOException {
-        return new RrdDb(null, uri, false, null, null);
     }
 
     /**

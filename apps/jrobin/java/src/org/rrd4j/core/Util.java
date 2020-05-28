@@ -29,6 +29,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -236,6 +237,7 @@ public class Util {
 
     /**
      * Returns timestamp (unix epoch) for the given year, month, day, hour and minute.
+     * <p>The date is resolved in the current time zone</p>
      *
      * @param year  Year
      * @param month Month (zero-based)
@@ -253,6 +255,7 @@ public class Util {
 
     /**
      * Returns timestamp (unix epoch) for the given year, month and day.
+     * <p>The date is resolved in the current time zone</p>
      *
      * @param year  Year
      * @param month Month (zero-based)
@@ -403,8 +406,8 @@ public class Util {
             root = Paths.get(getUserHomeDirectory(), RRD4J_DIR);
         }
         try {
-            Files.createDirectories(root);
-            return root.toAbsolutePath().toString() + File.separator;
+            root = Files.createDirectories(root.toAbsolutePath().normalize());
+            return root.toString() + File.separator;
         } catch (IOException e) {
             return null;
         }
@@ -731,7 +734,7 @@ public class Util {
      * @throws java.io.IOException Thrown if canonical file path could not be resolved
      */
     public static String getCanonicalPath(String path) throws IOException {
-        return new File(path).getCanonicalPath();
+        return Paths.get(path).toRealPath().toString();
     }
 
     /**
@@ -739,9 +742,27 @@ public class Util {
      *
      * @param file File object representing file on the disk
      * @return Last modification time in seconds (without milliseconds)
+     * @deprecated use #getLastModifiedTime, that can throws exceptions if needed
      */
+    @Deprecated
     public static long getLastModified(String file) {
-        return (new File(file).lastModified() + 500L) / 1000L;
+        try {
+            return Files.getLastModifiedTime(Paths.get(file)).to(TimeUnit.SECONDS);
+        } catch (IOException e) {
+            // For compatibility with old API
+            return 0;
+        }
+    }
+
+    /**
+     * Returns last modification time for the given file.
+     *
+     * @param file File object representing file on the disk
+     * @return Last modification time in seconds (without milliseconds)
+     * @throws IOException 
+     */
+    public static long getLastModifiedTime(String file) throws IOException {
+        return Files.getLastModifiedTime(Paths.get(file)).to(TimeUnit.SECONDS);
     }
 
     /**
@@ -751,7 +772,7 @@ public class Util {
      * @return <code>true</code> if file exists, <code>false</code> otherwise
      */
     public static boolean fileExists(String filename) {
-        return new File(filename).exists();
+        return Files.exists(Paths.get(filename));
     }
 
     /**

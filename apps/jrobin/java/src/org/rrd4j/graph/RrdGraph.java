@@ -175,7 +175,7 @@ public class RrdGraph implements RrdGraphConstants {
 
     private void drawOverlay() throws IOException {
         if (gdef.overlayImage != null) {
-            worker.loadImage(gdef.overlayImage);
+            worker.loadImage(gdef.overlayImage, 0, 0, im.xgif, im.ygif);
         }
     }
 
@@ -393,7 +393,10 @@ public class RrdGraph implements RrdGraphConstants {
     private void drawBackground() throws IOException {
         worker.fillRect(0, 0, im.xgif, im.ygif, gdef.getColor(ElementsNames.back));
         if (gdef.backgroundImage != null) {
-            worker.loadImage(gdef.backgroundImage);
+            worker.loadImage(gdef.backgroundImage, 0, 0, im.xgif, im.ygif);
+        }
+        if (gdef.canvasImage != null) {
+            worker.loadImage(gdef.canvasImage, im.xorigin, im.yorigin - im.ysize, im.xsize, im.ysize);
         }
         worker.fillRect(im.xorigin, im.yorigin - im.ysize, im.xsize, im.ysize, gdef.getColor(ElementsNames.canvas));
     }
@@ -666,14 +669,14 @@ public class RrdGraph implements RrdGraphConstants {
         im.end = gdef.endTime;
     }
 
-    private boolean lazyCheck() {
+    private boolean lazyCheck() throws IOException {
         // redraw if lazy option is not set or file does not exist
         if (!gdef.lazy || !Util.fileExists(gdef.filename)) {
             return false; // 'false' means 'redraw'
         }
         // redraw if not enough time has passed
         long secPerPixel = (gdef.endTime - gdef.startTime) / gdef.width;
-        long elapsed = Util.getTimestamp() - Util.getLastModified(gdef.filename);
+        long elapsed = Util.getTimestamp() - Util.getLastModifiedTime(gdef.filename);
         return elapsed <= secPerPixel;
     }
 

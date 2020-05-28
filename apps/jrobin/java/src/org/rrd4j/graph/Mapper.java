@@ -1,8 +1,5 @@
 package org.rrd4j.graph;
 
-import org.rrd4j.graph.ImageParameters;
-import org.rrd4j.graph.RrdGraphDef;
-
 class Mapper {
     private final RrdGraphDef gdef;
     private final ImageParameters im;

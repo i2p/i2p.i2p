@@ -35,33 +35,34 @@ import java.util.Date;
  *
  */
 public class Epoch extends JFrame {
-    private static final String[] supportedFormats = {
+    private final String[] supportedFormats = {
             "MM/dd/yy HH:mm:ss", "dd.MM.yy HH:mm:ss", "yy-MM-dd HH:mm:ss", "MM/dd/yy HH:mm",
             "dd.MM.yy HH:mm", "yy-MM-dd HH:mm", "MM/dd/yy", "dd.MM.yy", "yy-MM-dd", "HH:mm MM/dd/yy",
             "HH:mm dd.MM.yy", "HH:mm yy-MM-dd", "HH:mm:ss MM/dd/yy", "HH:mm:ss dd.MM.yy", "HH:mm:ss yy-MM-dd"
     };
 
-    @SuppressWarnings("unchecked")
-    private static final ThreadLocal<SimpleDateFormat>[] parsers = new ThreadLocal[supportedFormats.length];
-    private static final String helpText;
+    private final SimpleDateFormat[] parsers = new SimpleDateFormat[supportedFormats.length];
+    private final String helpText;
 
-    private Timer timer = new Timer(1000, new ActionListener() {
+    private final Timer timer = new Timer(1000, new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             showTimestamp();
         }
     });
 
-    static {
+    private final JLabel topLabel = new JLabel("Enter timestamp or readable date:");
+    private final JTextField inputField = new JTextField(25);
+    private final JButton convertButton = new JButton("Convert");
+    private final JButton helpButton = new JButton("Help");
+
+    private final SimpleDateFormat OUTPUT_DATE_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm:ss EEE");
+
+    private Epoch() {
+        super("Epoch");
         for (int i = 0; i < parsers.length; i++) {
-            final String format = supportedFormats[i];
-            parsers[i] = new ThreadLocal<SimpleDateFormat>() {
-                @Override
-                protected SimpleDateFormat initialValue() {
-                    SimpleDateFormat sdf = new SimpleDateFormat(format);
-                    sdf.setLenient(true);
-                    return sdf;
-                }
-            };
+            String format = supportedFormats[i];
+            parsers[i] = new SimpleDateFormat(format);
+            parsers[i].setLenient(true);
         }
         StringBuilder tooltipBuff = new StringBuilder("<html><b>Supported input formats:</b><br>");
         for (String supportedFormat : supportedFormats) {
@@ -69,24 +70,8 @@ public class Epoch extends JFrame {
         }
         tooltipBuff.append("<b>AT-style time specification</b><br>");
         tooltipBuff.append("timestamp<br><br>");
-        tooltipBuff.append("Copyright (c) 2013 The RRD4J Authors. Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor. Copyright (c) 2013 The OpenNMS Group, Inc. Licensed under the Apache License, Version 2.0.</html>");
+        tooltipBuff.append("Copyright (c) 2013-2020 The RRD4J Authors. Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor. Copyright (c) 2013 The OpenNMS Group, Inc. Licensed under the Apache License, Version 2.0.</html>");
         helpText = tooltipBuff.toString();
-    }
-
-    private JLabel topLabel = new JLabel("Enter timestamp or readable date:");
-    private JTextField inputField = new JTextField(25);
-    private JButton convertButton = new JButton("Convert");
-    private JButton helpButton = new JButton("Help");
-
-    private static final ThreadLocal<SimpleDateFormat> OUTPUT_DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("MM/dd/yy HH:mm:ss EEE");
-        }
-    };
-
-    Epoch() {
-        super("Epoch");
         constructUI();
         timer.start();
     }
@@ -118,7 +103,7 @@ public class Epoch extends JFrame {
         setVisible(true);
     }
 
-    void centerOnScreen() {
+    private void centerOnScreen() {
         Toolkit t = Toolkit.getDefaultToolkit();
         Dimension screenSize = t.getScreenSize();
         Dimension frameSize = getPreferredSize();
@@ -153,14 +138,14 @@ public class Epoch extends JFrame {
         setTitle(timestamp + " seconds since epoch");
     }
 
-    void formatDate(Date date) {
-        inputField.setText(OUTPUT_DATE_FORMAT.get().format(date));
+    private synchronized void formatDate(Date date) {
+        inputField.setText(OUTPUT_DATE_FORMAT.format(date));
     }
 
-    private long parseDate(String time) {
-        for (ThreadLocal<SimpleDateFormat> parser : parsers) {
+    private synchronized long parseDate(String time) {
+        for (SimpleDateFormat parser : parsers) {
             try {
-                return Util.getTimestamp(parser.get().parse(time));
+                return Util.getTimestamp(parser.parse(time));
             }
             catch (ParseException e) {
             }

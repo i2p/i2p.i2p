@@ -264,7 +264,7 @@ Applications:
    See licenses/LICENSE-Apache2.0.txt
    See licenses/LICENSE-ECLIPSE-1.0.html
 
-   RRD4J 3.5 (jrobin.jar):
+   RRD4J 3.6 (jrobin.jar):
    Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor.
    Copyright (c) 2011 The OpenNMS Group, Inc.
    Copyright 2011 The RRD4J Authors.

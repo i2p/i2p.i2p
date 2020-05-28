@@ -90,9 +90,9 @@ public class RrdNioBackendFactory extends RrdFileBackendFactory {
     }
 
     /**
-     * Creates a new RrdNioBackendFactory.
+     * Creates a new RrdNioBackendFactory, using a default {@link RrdSyncThreadPool}.
      *
-     * @param syncPeriod If syncPeriod is negative or 0, sync threads are disabled.
+     * @param syncPeriod the sync period, in seconds. If negative or 0, sync threads are disabled.
      */
     public RrdNioBackendFactory(int syncPeriod) {
         this(syncPeriod, syncPeriod > 0 ? DefaultSyncThreadPool.INSTANCE : null);
@@ -101,8 +101,8 @@ public class RrdNioBackendFactory extends RrdFileBackendFactory {
     /**
      * Creates a new RrdNioBackendFactory.
      *
-     * @param syncPeriod
-     * @param syncPoolSize The number of threads to use to sync the mapped file to disk, if inferior to 0, sync threads are disabled.
+     * @param syncPeriod the sync period, in seconds.
+     * @param syncPoolSize The number of threads to use to sync the mapped file to disk, if negative or 0, sync threads are disabled.
      */
     public RrdNioBackendFactory(int syncPeriod, int syncPoolSize) {
         this(syncPeriod, syncPoolSize > 0 ? new RrdSyncThreadPool(syncPoolSize) : null);
@@ -111,7 +111,7 @@ public class RrdNioBackendFactory extends RrdFileBackendFactory {
     /**
      * Creates a new RrdNioBackendFactory.
      *
-     * @param syncPeriod
+     * @param syncPeriod the sync period, in seconds.
      * @param syncThreadPool If null, disable background sync threads
      */
     public RrdNioBackendFactory(int syncPeriod, ScheduledExecutorService syncThreadPool) {
@@ -121,7 +121,7 @@ public class RrdNioBackendFactory extends RrdFileBackendFactory {
     /**
      * Creates a new RrdNioBackendFactory.
      *
-     * @param syncPeriod
+     * @param syncPeriod the sync period, in seconds.
      * @param syncThreadPool If null, disable background sync threads
      */
     public RrdNioBackendFactory(int syncPeriod, RrdSyncThreadPool syncThreadPool) {
