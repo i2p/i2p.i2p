@@ -2341,8 +2341,21 @@
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
 
+    <target name="forceJava7">
+        <!-- must be set for Android -->
+        <fail message="javac.version is set to ${javac.version} - must be 1.7 for Android" >
+            <condition>
+              <and>
+                <isset property="javac.version" />
+                <not><equals arg1="${javac.version}" arg2="1.7"/></not>
+              </and>
+            </condition>
+        </fail>
+        <property name="javac.version" value="1.7" />
+    </target>
+
     <!-- depends on buildCoreTest so that the router unit test javadocs can find the core unit test classes -->
-    <target name="mavenCentral.deps" depends="buildRouter, buildStreaming, buildCoreTest">
+    <target name="mavenCentral.deps" depends="forceJava7, buildRouter, buildStreaming, buildCoreTest">
         <ant dir="core/java/">
             <target name="javadocJar" />
             <target name="sourcesJar" />
@@ -2360,6 +2373,8 @@
             <target name="sourcesJar" />
         </ant>
         <ant dir="apps/jetty/">
+            <!-- not used in Android -->
+            <property name="javac.version" value="1.8" />
             <target name="servletJar" />
             <target name="servletJavadocJar" />
             <target name="servletSourcesJar" />
