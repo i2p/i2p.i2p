@@ -1,3 +1,9 @@
+2020-05-30 zzz
+ * Streaming: Increase MTU for ratchet (proposal 155)
+
+2020-05-28 zzz
+ * Console: RRD4J 3.6 (ticket #2716)
+
 2020-05-27 zzz
  * Installer:
    - Require Java 8 (ticket #2511)

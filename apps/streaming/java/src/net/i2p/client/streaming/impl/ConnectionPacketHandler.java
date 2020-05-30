@@ -87,14 +87,38 @@ class ConnectionPacketHandler {
         }
 
         if (packet.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
-            int size = packet.getOptionalMaxSize();
-            if (size < ConnectionOptions.MIN_MESSAGE_SIZE) {
-                // log.error? connection reset?
-                size = ConnectionOptions.MIN_MESSAGE_SIZE;
+            // inbound SYN handled in ConnectionManager.receiveConnection()
+            if (!(con.isInbound() && packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))) {
+                int size = packet.getOptionalMaxSize();
+                if (size < ConnectionOptions.MIN_MESSAGE_SIZE) {
+                    // log.error? connection reset?
+                    size = ConnectionOptions.MIN_MESSAGE_SIZE;
+                }
+                int mtu = con.getOptions().getMaxMessageSize();
+                if (size < mtu) {
+                    if (_log.shouldInfo())
+                        _log.info("Reducing MTU to " + size 
+                                  + " from " + mtu);
+                    con.getOptions().setMaxMessageSize(size);
+                    con.getOutputStream().setBufferSize(size);
+                } else if (size > con.getOptions().getMaxInitialMessageSize()) {
+                    if (size > mtu)
+                        size = mtu;
+                    if (_log.shouldInfo())
+                        _log.info("Increasing MTU to " + size 
+                                  + " from " + con.getOptions().getMaxInitialMessageSize());
+                    if (size != mtu)
+                        con.getOptions().setMaxMessageSize(size);
+                    con.getOutputStream().setBufferSize(size);
+                }
             }
+        } else if (!con.isInbound() && packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+            // SYN ACK w/o MAX_PACKET_SIZE?
+            // specs not clear if this is allowed
+            final int size = ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE;
             if (size < con.getOptions().getMaxMessageSize()) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Reducing our max message size to " + size 
+                if (_log.shouldInfo())
+                    _log.info("SYN ACK w/o MTU, Reducing MTU to " + size 
                               + " from " + con.getOptions().getMaxMessageSize());
                 con.getOptions().setMaxMessageSize(size);
                 con.getOutputStream().setBufferSize(size);

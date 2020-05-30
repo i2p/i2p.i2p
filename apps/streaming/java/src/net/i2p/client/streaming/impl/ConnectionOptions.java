@@ -34,6 +34,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
+    private int _maxInitialMessageSize;
     private int _maxResends;
     private int _inactivityTimeout;
     private int _inactivityAction;
@@ -304,6 +305,12 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public static final int DEFAULT_MAX_MESSAGE_SIZE = 1730;
     public static final int MIN_MESSAGE_SIZE = 512;
+    /**
+     *
+     *  See analysis in proposal 144
+     *  @since 0.9.48
+     */
+    public static final int DEFAULT_MAX_MESSAGE_SIZE_RATCHET = 1812;
 
     /**
      *  Sets max buffer size, connect timeout, read timeout, and write timeout
@@ -774,7 +781,25 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return Maximum message size (MTU/MRU)
      */
     public int getMaxMessageSize() { return _maxMessageSize; }
-    public void setMaxMessageSize(int bytes) { _maxMessageSize = Math.max(bytes, MIN_MESSAGE_SIZE); }
+    public void setMaxMessageSize(int bytes) {
+        _maxMessageSize = Math.max(bytes, MIN_MESSAGE_SIZE);
+        _maxInitialMessageSize = Math.min(_maxMessageSize, DEFAULT_MAX_MESSAGE_SIZE);
+    }
+    
+    /**
+     *  What is the largest message to send in the SYN from Alice to Bob?
+     *  @return the max
+     *  @since 0.9.47
+     */
+    public int getMaxInitialMessageSize() { return _maxInitialMessageSize; }
+
+    /**
+     *  What is the largest message to send in the SYN from Alice to Bob?
+     *  @since 0.9.47
+     */
+    public void setMaxInitialMessageSize(int bytes) {
+        _maxInitialMessageSize = bytes;
+    }
     
     /**
      * What profile do we want to use for this connection?

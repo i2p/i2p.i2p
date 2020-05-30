@@ -32,6 +32,7 @@ import net.i2p.client.streaming.IncomingConnectionFilter;
 import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
@@ -202,6 +203,27 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _name = name + " " + (__managerId.incrementAndGet());
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
+        if (opts != null && opts.getProperty(ConnectionOptions.PROP_MAX_MESSAGE_SIZE) == null) {
+            // set higher MTU for ECIES
+            String senc = opts.getProperty("i2cp.leaseSetEncType");
+            if (senc != null && !senc.equals("0")) {
+                String[] senca = DataHelper.split(senc, ",");
+                boolean has0 = false;
+                boolean has4 = false;
+                for (int i = 0; i < senca.length; i++) {
+                    if (senca[i].equals("0")) {
+                        has0 = true;
+                    } else if (senca[i].equals("4")) {
+                        has4 = true;
+                    }
+                }
+                if (has4) {
+                    _defaultOptions.setMaxMessageSize(ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE_RATCHET);
+                    if (!has0)
+                        _defaultOptions.setMaxInitialMessageSize(ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE_RATCHET);
+                }
+            }
+        }
         _connectionManager = new ConnectionManager(_context, _session, _defaultOptions, connectionFilter);
         _serverSocket = new I2PServerSocketFull(this);
         

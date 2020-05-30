@@ -230,23 +230,13 @@ class ConnectionManager {
      * Create a new connection based on the SYN packet we received.
      *
      * @param synPacket SYN packet to process
-     * @return created Connection with the packet's data already delivered to
-     *         it, or null if the syn's streamId was already taken
+     * @return created Connection with the packet's data already delivered to it,
+     *         or null if the syn's streamId was already taken,
+     *         or if the connection was rejected
      */
     public Connection receiveConnection(Packet synPacket) {
-        ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
-        opts.setPort(synPacket.getRemotePort());
-        opts.setLocalPort(synPacket.getLocalPort());
         boolean reject = false;
-        int active = 0;
-        int total = 0;
 
-            // just for the stat
-            //total = _connectionByInboundId.size();
-            //for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
-            //    if ( ((Connection)iter.next()).getIsConnected() )
-            //        active++;
-            //}
             if (locked_tooManyStreams()) {
                 if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                     _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of " 
@@ -263,7 +253,7 @@ class ConnectionManager {
                 }
             }
         
-        _context.statManager().addRateData("stream.receiveActive", active, total);
+        _context.statManager().addRateData("stream.receiveActive", 1);
         
         if (reject) {
             Destination from = synPacket.getOptionalFrom();
@@ -331,6 +321,40 @@ class ConnectionManager {
             return null;
         }
         
+        ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
+        opts.setPort(synPacket.getRemotePort());
+        opts.setLocalPort(synPacket.getLocalPort());
+
+        // set up the MTU for the connection
+        int size;
+        if (synPacket.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
+            size = synPacket.getOptionalMaxSize();
+            if (size < ConnectionOptions.MIN_MESSAGE_SIZE) {
+                // log.error? connection reset?
+                size = ConnectionOptions.MIN_MESSAGE_SIZE;
+            }
+        } else {
+            // specs not clear if MTU may be omitted from SYN
+            size = ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE;
+        }
+        int mtu = opts.getMaxMessageSize();
+        if (size < mtu) {
+            if (_log.shouldInfo())
+                _log.info("Reducing MTU for IB conn to " + size 
+                          + " from " + mtu);
+            opts.setMaxMessageSize(size);
+            opts.setMaxInitialMessageSize(size);
+        } else if (size > opts.getMaxInitialMessageSize()) {
+            if (size > mtu)
+                size = mtu;
+            if (_log.shouldInfo())
+                _log.info("Increasing MTU for IB conn to " + size 
+                          + " from " + mtu);
+            if (size != mtu)
+                opts.setMaxMessageSize(size);
+            opts.setMaxInitialMessageSize(size);
+        }
+
         Connection con = new Connection(_context, this, synPacket.getSession(), _schedulerChooser,
                                         _timer, _outboundQueue, _conPacketHandler, opts, true);
         _tcbShare.updateOptsFromShare(con);
