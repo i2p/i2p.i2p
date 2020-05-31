@@ -56,12 +56,10 @@ public class GetRateHandler implements RequestHandler {
             if (input == null) {
                 return new JSONRPC2Response(JSONRPC2Error.INVALID_PARAMS, req.getID());
             }
-            long period;
-            try {
-                period = (Long) inParams.get("Period");
-            } catch (NumberFormatException e) {
+            Number p = (Number) inParams.get("Period");
+            if (p == null)
                 return new JSONRPC2Response(JSONRPC2Error.INVALID_PARAMS, req.getID());
-            }
+            long period = p.longValue();
 
             RateStat rateStat = I2PAppContext.getGlobalContext().statManager().getRate(input);
 

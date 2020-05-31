@@ -12,9 +12,9 @@ import java.util.Map;
 
 import gnu.getopt.Getopt;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.simple.JsonArray;
+import org.json.simple.JsonObject;
+import org.json.simple.Jsoner;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -31,7 +31,6 @@ import net.i2p.data.DataHelper;
 public class DNSOverHTTPS implements EepGet.StatusListener {
     private final I2PAppContext ctx;
     private final Log _log;
-    private final JSONParser parser;
     private final ByteArrayOutputStream baos;
     private SSLEepGet.SSLState state;
     private long fetchStart;
@@ -105,7 +104,6 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         _log = ctx.logManager().getLog(DNSOverHTTPS.class);
         state = sslState;
         baos = new ByteArrayOutputStream(512);
-        parser = new JSONParser();
     }
 
     public enum Type { V4_ONLY, V6_ONLY, V4_PREFERRED, V6_PREFERRED }
@@ -263,7 +261,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
             byte[] b = baos.toByteArray();
             try {
                 String s = new String(b, "ISO-8859-1");
-                JSONObject map = (JSONObject) parser.parse(s);
+                JsonObject map = (JsonObject) Jsoner.deserialize(s);
                 if (map == null) {
                     log("No map");
                     return null;
@@ -273,7 +271,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                     log("Bad status: " + status);
                     return null;
                 }
-                JSONArray list = (JSONArray) map.get("Answer");
+                JsonArray list = (JsonArray) map.get("Answer");
                 if (list == null || list.isEmpty()) {
                     log("No answer");
                     return null;
@@ -282,7 +280,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                 String hostAnswer = host + '.';
                 for (Object o : list) {
                     try {
-                        JSONObject a = (JSONObject) o;
+                        JsonObject a = (JsonObject) o;
                         String data = (String) a.get("data");
                         if (data == null) {
                             log("no data");

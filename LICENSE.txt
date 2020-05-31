@@ -89,8 +89,9 @@ Public domain except as listed below:
    From Apache HttpClient 4.4.1 and HttpCore 4.4.1
    See licenses/LICENSE-Apache2.0.txt
 
-   json-simple 1.1.1
+   json-simple 2.3.0
    (not included in most distribution packages)
+   Copyright 2016 Clifton Labs
    See licenses/LICENSE-Apache2.0.txt
 
    Noise library:

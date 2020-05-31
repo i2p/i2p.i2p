@@ -4,9 +4,8 @@ package com.thetransactioncompany.jsonrpc2;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.parser.ContainerFactory;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.simple.Jsoner;
+import org.json.simple.DeserializationException;
 
 
 /**
@@ -56,12 +55,6 @@ import org.json.simple.parser.ParseException;
 public class JSONRPC2Parser {
 
 
-	/**
-	 * Reusable JSON parser. Not thread-safe!
-	 */
-	private final JSONParser parser;
-	
-	
 	/**
 	 * If {@code true} the order of the parsed JSON object members must be
 	 * preserved.
@@ -153,10 +146,7 @@ public class JSONRPC2Parser {
 	public JSONRPC2Parser(final boolean preserveOrder, 
 		              final boolean ignoreVersion, 
 		              final boolean parseNonStdAttributes) {
-	
-		// Numbers parsed as long/double, requires JSON Smart 1.0.9+
-		parser = new JSONParser();
-		
+
 		this.preserveOrder = preserveOrder;
 		this.ignoreVersion = ignoreVersion;
 		this.parseNonStdAttributes = parseNonStdAttributes;
@@ -189,13 +179,9 @@ public class JSONRPC2Parser {
 		
 		// Parse the JSON string
 		try {
-			//if (preserveOrder)
-			//	json = parser.parse(jsonString, ContainerFactory.FACTORY_ORDERED);
-
-			//else
-				json = parser.parse(jsonString);
+			json = Jsoner.deserialize(jsonString);
 				
-		} catch (ParseException e) {
+		} catch (DeserializationException e) {
 
 			// Terse message, do not include full parse exception message
 			throw new JSONRPC2ParseException("Invalid JSON", 

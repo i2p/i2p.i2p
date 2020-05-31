@@ -30,9 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.internet2.ndt.Tcpbw100;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.simple.JsonObject;
+import org.json.simple.Jsoner;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -153,10 +152,9 @@ public class MLabRunner {
                                 int code = eepget.getStatusCode();
                                 if (code != 200)
                                     throw new IOException("ns fetch failed: " + code);
-                                JSONParser parser = new JSONParser();
                                 byte[] b = baos.toByteArray();
                                 String s = new String(b, "ISO-8859-1");
-                                JSONObject map = (JSONObject) parser.parse(s);
+                                JsonObject map = (JsonObject) Jsoner.deserialize(s);
                                 if (map == null) {
                                     throw new IOException("no map");
                                 }

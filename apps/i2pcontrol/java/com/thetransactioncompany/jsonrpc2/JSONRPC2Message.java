@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.JSONAware;
-import org.json.simple.JSONObject;
+import org.json.simple.JsonObject;
 
 
 /**
@@ -54,7 +53,7 @@ import org.json.simple.JSONObject;
  * 
  * @author Vladimir Dzhuvinov
  */
-public abstract class JSONRPC2Message implements JSONAware {
+public abstract class JSONRPC2Message {
 
 
 	/**
@@ -220,7 +219,7 @@ public abstract class JSONRPC2Message implements JSONAware {
 	 *
 	 * @return The JSON object.
 	 */
-	public abstract JSONObject toJSONObject();
+	public abstract JsonObject toJSONObject();
 	
 	
 	/**
@@ -246,6 +245,6 @@ public abstract class JSONRPC2Message implements JSONAware {
 	@Override
 	public String toString() {
 		
-		return toJSONObject().toString();
+		return toJSONObject().toJson();
 	}
 }

@@ -16,7 +16,7 @@ Build-Depends: debhelper (>= 9.20160709)
  ,bash-completion
  ,gettext
  ,libgetopt-java
- ,libjson-simple-java (<< 3)
+ ,libjson-simple-java (>= 2),libjson-simple-java (<< 3)
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
  ,po-debconf
@@ -78,7 +78,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  geoip-database,
  gettext-base,
  libgetopt-java,
- libjson-simple-java (<< 3),
+ libjson-simple-java (>= 2),libjson-simple-java (<< 3),
  libjetty9-java (>= 9.4),
  libtaglibs-standard-jstlel-java,
  libtomcat8-java,

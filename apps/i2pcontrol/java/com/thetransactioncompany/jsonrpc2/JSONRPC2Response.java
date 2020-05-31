@@ -3,7 +3,7 @@ package com.thetransactioncompany.jsonrpc2;
 
 import java.util.Map;
 
-import org.json.simple.JSONObject;
+import org.json.simple.JsonObject;
 
 
 /** 
@@ -384,9 +384,9 @@ public class JSONRPC2Response extends JSONRPC2Message {
 	
 	
 	@Override
-	public JSONObject toJSONObject() {
+	public JsonObject toJSONObject() {
 		
-		JSONObject out = new JSONObject();
+		JsonObject out = new JsonObject();
 		
 		// Result and error are mutually exclusive
 		if (error != null) {

@@ -86,7 +86,7 @@ public class AuthenticateHandler implements RequestHandler {
 
         Integer apiVersion;
         try {
-            apiVersion = ((Long) api).intValue();
+            apiVersion = ((Number) api).intValue();
         } catch (ClassCastException e) {
             e.printStackTrace();
             return JSONRPC2ExtendedError.UNSPECIFIED_API_VERSION;
