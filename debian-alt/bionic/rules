@@ -109,20 +109,20 @@ endif
 	ln -sf /usr/share/java/jetty9-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
 	@# following two are from libservlet3.1-java which is a dependency of libjetty9-java
 	ln -sf /usr/share/java/servlet-api-3.1.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
-	@# this is roughly the same as tomcat8-jsp-api.jar, we use this one
+	@# this is roughly the same as tomcat9-jsp-api.jar, we use this one
 	ln -sf /usr/share/java/jsp-api-2.3.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
 
 	@# debian and ubuntu: wheezy-backports, jessie+, xenial+
-	@/bin/echo -e "with-libtomcat8-java=true" >> $(CURDIR)/override.properties
+	@/bin/echo -e "with-libtomcat9-java=true" >> $(CURDIR)/override.properties
 	mkdir -p $(CURDIR)/apps/jetty/jettylib
-	ln -sf /usr/share/java/tomcat8-api.jar $(CURDIR)/apps/jetty/jettylib/tomcat-api.jar
-	ln -sf /usr/share/java/tomcat8-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
-	ln -sf /usr/share/java/tomcat8-el-api.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
-	ln -sf /usr/share/java/tomcat8-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
-	ln -sf /usr/share/java/tomcat8-jasper-el.jar $(CURDIR)/apps/jetty/jettylib/jasper-el.jar
-	ln -sf /usr/share/java/tomcat8-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
-	ln -sf /usr/share/java/tomcat8-util.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util.jar
-	ln -sf /usr/share/java/tomcat8-util-scan.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util-scan.jar
+	ln -sf /usr/share/java/tomcat9-api.jar $(CURDIR)/apps/jetty/jettylib/tomcat-api.jar
+	ln -sf /usr/share/java/tomcat9-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	ln -sf /usr/share/java/tomcat9-el-api.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
+	ln -sf /usr/share/java/tomcat9-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	ln -sf /usr/share/java/tomcat9-jasper-el.jar $(CURDIR)/apps/jetty/jettylib/jasper-el.jar
+	ln -sf /usr/share/java/tomcat9-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+	ln -sf /usr/share/java/tomcat9-util.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util.jar
+	ln -sf /usr/share/java/tomcat9-util-scan.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util-scan.jar
 
 	@# debian and ubuntu: stretch+, zesty+
 	@/bin/echo -e "with-libtaglibs-standard=true" >> $(CURDIR)/override.properties
