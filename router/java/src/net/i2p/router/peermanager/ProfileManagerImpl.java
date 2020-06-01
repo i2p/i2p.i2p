@@ -112,36 +112,46 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that a tunnel that the router is participating in
      * was successfully tested with the given round trip latency
      *
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void tunnelTestSucceeded(Hash peer, long responseTimeMs) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         data.updateTunnelTestTimeAverage(responseTimeMs);
         data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
     }
     
+    /**
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     */
     public void tunnelDataPushed(Hash peer, long rtt, int size) {
         if (_context.routerHash().equals(peer))
             return;
-        PeerProfile data = getProfile(peer);
-        //if (data != null)
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data != null)
             data.dataPushed(size); // ignore rtt, as we are averaging over a minute
     }
 
+    /**
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     */
     public void tunnelDataPushed1m(Hash peer, int size) {
         if (_context.routerHash().equals(peer))
             return;
-        PeerProfile data = getProfile(peer);
-        //if (data != null)
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data != null)
             data.dataPushed1m(size);
     }
 
     
+    /**
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     */
     public void tunnelLifetimePushed(Hash peer, long lifetime, long size) {
         if (_context.routerHash().equals(peer))
             return;
-        PeerProfile data = getProfile(peer);
-        //if (data != null)
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data != null)
             data.tunnelDataTransferred(size);
     }
     
@@ -163,10 +173,11 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that the peer was able to return the valid data for a db lookup
      *
      * This will force creation of DB stats
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void dbLookupSuccessful(Hash peer, long responseTimeMs) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
@@ -180,10 +191,11 @@ public class ProfileManagerImpl implements ProfileManager {
      * a lookupReply redirecting the user elsewhere
      *
      * This will force creation of DB stats
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void dbLookupFailed(Hash peer) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
         DBHistory hist = data.getDBHistory();
@@ -197,10 +209,11 @@ public class ProfileManagerImpl implements ProfileManager {
      * routers that were invalid in some way, and the duplicate number of routers that we explicitly
      * asked them not to send us, but they did anyway
      *
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void dbLookupReply(Hash peer, int newPeers, int oldPeers, int invalid, int duplicate, long responseTimeMs) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             return;
@@ -213,10 +226,11 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that the local router received a db lookup from the given peer
      *
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void dbLookupReceived(Hash peer) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             return;
@@ -227,10 +241,11 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that the local router received an unprompted db store from the given peer
      *
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void dbStoreReceived(Hash peer, boolean wasNewKey) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             return;
@@ -297,20 +312,22 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that the local router received a reference to the given peer, either
      * through an explicit dbStore or in a dbLookupReply
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void heardAbout(Hash peer) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         data.setLastHeardAbout(_context.clock().now());
     }
 
     /**
      * Note that the local router received a reference to the given peer
      * at a certain time. Only update the time if newer.
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void heardAbout(Hash peer, long when) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileNonblocking(peer);
+        if (data == null) return;
         data.setLastHeardAbout(when);
     }
     
