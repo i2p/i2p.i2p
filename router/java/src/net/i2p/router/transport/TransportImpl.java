@@ -61,6 +61,8 @@ public abstract class TransportImpl implements Transport {
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private final Map<Hash, Long>  _unreachableEntries;
     private final Map<Hash, Long> _wasUnreachableEntries;
+    // one-entry cache for reachable check
+    private volatile Hash _lastReachablePeer;
     private final Set<InetAddress> _localAddresses;
     /** global router ident -> IP */
     private static final Map<Hash, byte[]> _IPMap;
@@ -851,14 +853,18 @@ public abstract class TransportImpl implements Transport {
     public void mayDisconnect(Hash peer) {}
 
     public boolean isUnreachable(Hash peer) {
+        if (peer == _lastReachablePeer) return false;
         boolean rv;
         Long when = _unreachableEntries.get(peer);
         if ((rv = when != null)) {
             long now = _context.clock().now();
             rv = when.longValue() + UNREACHABLE_PERIOD >= now;
             if (!rv) {
+                _lastReachablePeer = peer;
                 _unreachableEntries.remove(peer);
             }
+        } else {
+            _lastReachablePeer = peer;
         }
         return rv;
     }
@@ -872,6 +878,8 @@ public abstract class TransportImpl implements Transport {
         Long now = Long.valueOf(_context.clock().now());
         // This isn't very useful since it is cleared when they contact us
         _unreachableEntries.put(peer, now);
+        if (peer == _lastReachablePeer)
+            _lastReachablePeer = null;
         // This is not cleared when they contact us
         markWasUnreachable(peer, true);
     }
