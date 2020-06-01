@@ -1,6 +1,7 @@
 package net.i2p.router.crypto.ratchet;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 
 /**
  *  8 bytes of random data.
@@ -23,7 +24,7 @@ public class RatchetSessionTag {
     public RatchetSessionTag(byte val[]) {
         if (val.length < LENGTH)
             throw new IllegalArgumentException();
-        _data = RatchetPayload.fromLong8(val, 0);
+        _data = DataHelper.fromLong8(val, 0);
     }
     
     /**
@@ -31,7 +32,7 @@ public class RatchetSessionTag {
      */
     public byte[] getData() {
         byte[] rv = new byte[LENGTH];
-        RatchetPayload.toLong8(rv, 0, _data);
+        DataHelper.toLong8(rv, 0, _data);
         return rv;
     }
     

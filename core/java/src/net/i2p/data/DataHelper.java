@@ -807,6 +807,37 @@ public class DataHelper {
             throw new IllegalArgumentException("fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
         return rv;
     }
+
+    /**
+     * Big endian.
+     * Same as fromLong(src, offset, 8) but allows negative result
+     *
+     * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.47 moved from NTCP2Payload
+     */
+    public static long fromLong8(byte src[], int offset) {
+        long rv = 0;
+        int limit = offset + 8;
+        for (int i = offset; i < limit; i++) {
+            rv <<= 8;
+            rv |= src[i] & 0xFF;
+        }
+        return rv;
+    }
+    
+    /**
+     * Big endian.
+     * Same as toLong(target, offset, 8, value) but allows negative value
+     *
+     * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.47 moved from NTCP2Payload
+     */
+    public static void toLong8(byte target[], int offset, long value) {
+        for (int i = offset + 7; i >= offset; i--) {
+            target[i] = (byte) value;
+            value >>= 8;
+        }
+    }
     
     /** Read in a date from the stream as specified by the I2P data structure spec.
      * A date is an 8 byte unsigned integer in network byte order specifying the number of

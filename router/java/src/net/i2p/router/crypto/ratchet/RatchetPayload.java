@@ -473,35 +473,6 @@ class RatchetPayload {
             return off + 2;
         }
     }
-
-    /**
-     * Big endian.
-     * Same as DataHelper.fromLong(src, offset, 8) but allows negative result
-     *
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    static long fromLong8(byte src[], int offset) {
-        long rv = 0;
-        int limit = offset + 8;
-        for (int i = offset; i < limit; i++) {
-            rv <<= 8;
-            rv |= src[i] & 0xFF;
-        }
-        return rv;
-    }
-    
-    /**
-     * Big endian.
-     * Same as DataHelper.toLong(target, offset, 8, value) but allows negative value
-     *
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    static void toLong8(byte target[], int offset, long value) {
-        for (int i = offset + 7; i >= offset; i--) {
-            target[i] = (byte) value;
-            value >>= 8;
-        }
-    }
     
     /**
      * Big endian.
