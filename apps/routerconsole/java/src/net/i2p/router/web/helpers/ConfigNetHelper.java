@@ -206,8 +206,8 @@ public class ConfigNetHelper extends HelperBase {
     }
     
     public Set<String> getAddresses() {
-        // exclude local, include IPv6
-        return Addresses.getAddresses(false, true);
+        // exclude local, include IPv6, exclude IPv6 temporary
+        return Addresses.getAddresses(false, false, true, false);
     }
 
     /** @since IPv6 */
