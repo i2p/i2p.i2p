@@ -392,7 +392,7 @@ public class PeerHelper extends HelperBase {
 
         if (!peers.isEmpty()) {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
-            buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>")
+            buf.append("<tr class=\"tablefooter\"><td colspan=\"5\" align=\"left\"><b>")
                .append(ngettext("{0} peer", "{0} peers", peers.size()));
             buf.append("</b></td><td align=\"center\" nowrap><span class=\"right\"><b>").append(formatRate(bpsRecv/1000)).append("</b></span>");
             buf.append(THINSP).append("<span class=\"left\"><b>").append(formatRate(bpsSend/1000)).append("</b></span>");
