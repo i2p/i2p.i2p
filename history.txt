@@ -1,5 +1,17 @@
+2020-06-03 zzz
+ * Router: Implement ratchet-layer acks (proposal 144)
+
+2020-06-01 zzz
+ * Profiles: Make more calls nonblocking
+ * Transports: Make unreachable maps concurrent
+
+2020-05-31 zzz
+ * Tomcat 9.0.35 (Servlet 4.0)
+ * Util: Update json-simple lib to 2.3.0
+
 2020-05-30 zzz
  * Streaming: Increase MTU for ratchet (proposal 155)
+ * Util: Fix DoH handling of Cloudflare responses
 
 2020-05-28 zzz
  * Console: RRD4J 3.6 (ticket #2716)

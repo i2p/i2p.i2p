@@ -184,13 +184,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * For inbound (NS rcvd), if no other pending outbound sessions, creates one
      * and returns true, or false if one already exists.
      *
+     * @param d null if unknown
      * @param callback null for inbound, may be null for outbound
      */
-    boolean createSession(PublicKey target, HandshakeState state, ReplyCallback callback) {
+    boolean createSession(PublicKey target, Destination d, HandshakeState state, ReplyCallback callback) {
         EncType type = target.getType();
         if (type != EncType.ECIES_X25519)
             throw new IllegalArgumentException("Bad public key type " + type);
-        OutboundSession sess = new OutboundSession(target, null, state, callback);
+        OutboundSession sess = new OutboundSession(target, d, null, state, callback);
         boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
         if (isInbound) {
             // we are Bob, NS received
@@ -309,7 +310,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     /**
      * @since 0.9.46
      */
-    public void nextKeyReceived(PublicKey target, NextSessionKey key) {
+    void nextKeyReceived(PublicKey target, NextSessionKey key) {
         OutboundSession sess = getSession(target);
         if (sess == null) {
             if (_log.shouldWarn())
@@ -317,6 +318,35 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             return;
         }
         sess.nextKeyReceived(key);
+    }
+
+    /**
+     * Side effect - binds this session to the supplied destination.
+     *
+     * @param the far-end Destination for this PublicKey if known, or null
+     * @return true if registered
+     * @since 0.9.47
+     */
+    boolean registerTimer(PublicKey target, Destination d, SimpleTimer2.TimedEvent timer) {
+        OutboundSession sess = getSession(target);
+        if (sess == null) {
+            if (_log.shouldWarn())
+                _log.warn("registerTimer() but no session found for "  + target);
+            return false;
+        }
+        return sess.registerTimer(d, timer);
+    }
+
+    /**
+     * @return the far-end Destination for this PublicKey, or null
+     * @since 0.9.47
+     */
+    Destination getDestination(PublicKey target) {
+        OutboundSession sess = getSession(target);
+        if (sess != null) {
+            return sess.getDestination();
+        }
+        return null;
     }
 
     /**
@@ -888,6 +918,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         private RatchetTagSet _tagSet;
         private final ConcurrentHashMap<Integer, ReplyCallback> _callbacks;
         private final LinkedBlockingQueue<Integer> _acksToSend;
+        private SimpleTimer2.TimedEvent _ackTimer;
+        private Destination _destination;
         /**
          *  Set to true after first tagset is acked.
          *  Upon repeated failures, we may revert back to false.
@@ -924,11 +956,13 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         private static final int MAX_SEND_REVERSE_KEY = 64;
 
         /**
+         * @param d may be null
          * @param key may be null
          * @param callback may be null. Always null for IB.
          */
-        public OutboundSession(PublicKey target, SessionKey key, HandshakeState state, ReplyCallback callback) {
+        public OutboundSession(PublicKey target, Destination d, SessionKey key, HandshakeState state, ReplyCallback callback) {
             _target = target;
+            _destination = d;
             _currentKey = key;
             _NScallback = callback;
             _established = _context.clock().now();
@@ -1376,6 +1410,13 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
             }
             synchronized (_unackedTagSets) {
                 if (_tagSet != null) {
+                    if (_ackTimer != null) {
+                        // cancel all ratchet-layer acks
+                        _ackTimer.cancel();
+                        _ackTimer = null;
+                        //if (_log.shouldDebug())
+                        //    _log.debug("Cancelled the ack timer");
+                    }
                     synchronized(_tagSet) {
                         // use even if expired, this will reset the expiration
                         RatchetSessionTag tag = _tagSet.consumeNext();
@@ -1394,6 +1435,41 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                 }
             }
             return null;
+        }
+
+        /**
+         * A timer that we will cancel when we send someting.
+         * Side effect - binds this session to the supplied destination.
+         *
+         * @param d the far-end Destination for this PublicKey if known, or null
+         * @return true if registered
+         * @since 0.9.47
+         */
+        public boolean registerTimer(Destination d, SimpleTimer2.TimedEvent timer) {
+            synchronized (_unackedTagSets) {
+                if (_ackTimer != null)
+                    return false;
+                if (d != null) {
+                    if (_destination == null)
+                        _destination = d;
+                    else if (_log.shouldWarn() && !_destination.equals(d))
+                        _log.warn("Destination mismatch? was: " + _destination.toBase32() + " now: " + d.toBase32());
+                }
+                _ackTimer = timer;
+                if (_log.shouldDebug())
+                    _log.debug("Registered an ack timer to: " + (_destination != null ? _destination.toBase32() : _target.toString()));
+            }
+            return true;
+        }
+
+        /**
+         * @return the far-end Destination for this PublicKey, or null
+         * @since 0.9.47
+         */
+        public Destination getDestination() {
+            synchronized (_unackedTagSets) {
+                return _destination;
+            }
         }
 
         /** @return the total number of tags in acked RatchetTagSets */

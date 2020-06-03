@@ -187,7 +187,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private static final int REPLY_REQUEST_INTERVAL = 60*1000;
 
     /**
-     * Send the sucker
+     * Send it.
+     *
+     * @param msg may have a null payload for ratchet-layer acks
      */
     public OutboundClientMessageOneShotJob(RouterContext ctx, OutboundCache cache, ClientMessage msg) {
         super(ctx);
@@ -198,7 +200,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         _clientMessage = msg;
         _clientMessageId = msg.getMessageId();
-        _clientMessageSize = msg.getPayload().getSize();
+        Payload payload = msg.getPayload();
+        _clientMessageSize = (payload != null) ? payload.getSize() : 0;
         _from = msg.getFromDestination();
         _to = msg.getDestination();
         Hash toHash = _to.calculateHash();
@@ -652,10 +655,16 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             token = -1;
         }
 
-        PayloadGarlicConfig clove = buildClove();
-        if (clove == null) {
-            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION);
-            return;
+        PayloadGarlicConfig clove;
+        if (_clientMessageSize > 0) {
+            clove = buildClove();
+            if (clove == null) {
+                dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION);
+                return;
+            }
+        } else {
+            // ratchet-layer acks
+            clove = null;
         }
 
         SessionKey sessKey = new SessionKey();
@@ -941,8 +950,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     
         clearCaches();
         getContext().messageHistory().sendPayloadMessage(_clientMessageId.getMessageId(), false, sendTime);
-        getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId,
-                                                                 _clientMessage.getMessageNonce(), status);
+        long nonce = _clientMessage.getMessageNonce();
+        if (nonce > 0)
+            getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, nonce, status);
         getContext().statManager().updateFrequency("client.sendMessageFailFrequency");
     }
     
@@ -1112,8 +1122,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             
             //long dataMsgId = _cloveId;   // fake ID 99999
             getContext().messageHistory().sendPayloadMessage(99999, true, sendTime);
-            getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, _clientMessage.getMessageNonce(),
-                                                                     MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
+            long nonce = _clientMessage.getMessageNonce();
+            if (nonce > 0)
+                getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, nonce,
+                                                                         MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
             // unused
             //_lease.setNumSuccess(_lease.getNumSuccess()+1);
         

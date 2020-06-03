@@ -443,7 +443,7 @@ public final class ECIESAEADEngine {
 
         // tell the SKM
         PublicKey alice = new PublicKey(EncType.ECIES_X25519, alicePK);
-        keyManager.createSession(alice, state, null);
+        keyManager.createSession(alice, null, state, null);
 
         if (pc.cloveSet.isEmpty()) {
             // this is legal
@@ -455,8 +455,7 @@ public final class ECIESAEADEngine {
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
-        // TODO
-        //setResponseTimer(alice, pc.cloveSet, keyManager);
+        setResponseTimerNS(alice, pc.cloveSet, keyManager);
         return rv;
     }
 
@@ -597,8 +596,7 @@ public final class ECIESAEADEngine {
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
-        // TODO
-        //setResponseTimer(bob, pc.cloveSet, keyManager);
+        setResponseTimer(bob, pc.cloveSet, keyManager);
         return rv;
     }
 
@@ -647,13 +645,20 @@ public final class ECIESAEADEngine {
         } catch (Exception e) {
             throw new DataFormatException("ES payload error", e);
         }
+        boolean shouldAck = false;
         if (pc.nextKeys != null) {
             for (NextSessionKey nextKey : pc.nextKeys) {
                 keyManager.nextKeyReceived(remote, nextKey);
+                if (!nextKey.isReverse())
+                    shouldAck = true;
             }
         }
         if (pc.ackRequested) {
             keyManager.ackRequested(remote, key.getID(), nonce);
+            shouldAck = true;
+        }
+        if (shouldAck) {
+            setResponseTimer(remote, pc.cloveSet, keyManager);
         }
         if (pc.cloveSet.isEmpty()) {
             // this is legal
@@ -706,18 +711,18 @@ public final class ECIESAEADEngine {
      * @return encrypted data or null on failure
      *
      */
-    public byte[] encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
+    public byte[] encrypt(CloveSet cloves, PublicKey target, Destination to, PrivateKey priv,
                           RatchetSKM keyManager,
                           ReplyCallback callback) {
         try {
-            return x_encrypt(cloves, target, priv, keyManager, callback);
+            return x_encrypt(cloves, target, to, priv, keyManager, callback);
         } catch (Exception e) {
             _log.error("ECIES encrypt error", e);
             return null;
         }
     }
 
-    private byte[] x_encrypt(CloveSet cloves, PublicKey target, PrivateKey priv,
+    private byte[] x_encrypt(CloveSet cloves, PublicKey target, Destination to, PrivateKey priv,
                              RatchetSKM keyManager,
                              ReplyCallback callback) {
         if (target.getType() != EncType.ECIES_X25519)
@@ -732,7 +737,7 @@ public final class ECIESAEADEngine {
         if (re == null) {
             if (_log.shouldDebug())
                 _log.debug("Encrypting as NS to " + target);
-            return encryptNewSession(cloves, target, priv, keyManager, callback);
+            return encryptNewSession(cloves, target, to, priv, keyManager, callback);
         }
 
         HandshakeState state = re.key.getHandshakeState();
@@ -772,7 +777,7 @@ public final class ECIESAEADEngine {
      * @param callback may be null
      * @return encrypted data or null on failure
      */
-    private byte[] encryptNewSession(CloveSet cloves, PublicKey target, PrivateKey priv,
+    private byte[] encryptNewSession(CloveSet cloves, PublicKey target, Destination to, PrivateKey priv,
                                      RatchetSKM keyManager,
                                      ReplyCallback callback) {
         HandshakeState state;
@@ -813,7 +818,7 @@ public final class ECIESAEADEngine {
             _log.debug("Elligator2 encoded eph. key: " + Base64.encode(enc, 0, 32));
 
         // tell the SKM
-        keyManager.createSession(target, state, callback);
+        keyManager.createSession(target, to, state, callback);
         return enc;
     }
 
@@ -1222,10 +1227,11 @@ public final class ECIESAEADEngine {
 
     /*
      * Set a timer for a ratchet-layer reply if the application does not respond.
+     * NS only. CloveSet must include a LS for validation.
      *
      * @since 0.9.46
      */
-    private void setResponseTimer(PublicKey from, List<GarlicClove> cloveSet, RatchetSKM skm) {
+    private void setResponseTimerNS(PublicKey from, List<GarlicClove> cloveSet, RatchetSKM skm) {
         for (GarlicClove clove : cloveSet) {
             I2NPMessage msg = clove.getData();
             if (msg.getType() != DatabaseStoreMessage.MESSAGE_TYPE)
@@ -1246,11 +1252,37 @@ public final class ECIESAEADEngine {
             Destination d = ls2.getDestination();
             if (_log.shouldInfo())
                 _log.info("Validated NS sender: " + d.toBase32());
-            // TODO
+            Destination us = skm.getDestination();
+            ACKTimer ack = new ACKTimer(_context, us, d);
+            if (skm.registerTimer(from, d, ack)) {
+                ack.schedule(1000);
+            }
             return;
         }
         if (_log.shouldInfo())
             _log.info("Unvalidated NS sender: " + from);
+    }
+
+    /*
+     * Set a timer for a ratchet-layer reply if the application does not respond.
+     * NSR/ES only.
+     *
+     * @since 0.9.47
+     */
+    private void setResponseTimer(PublicKey from, List<GarlicClove> cloveSet, RatchetSKM skm) {
+        Destination us = skm.getDestination();
+        Destination d = skm.getDestination(from);
+        if (d != null) {
+            ACKTimer ack = new ACKTimer(_context, us, d);
+            if (skm.registerTimer(from, null, ack)) {
+                ack.schedule(1000);
+            }
+        } else {
+            // we didn't get a LS in the original NS, but maybe we have one now
+            if (_log.shouldInfo())
+                _log.info("No full dest to ack to, looking for LS from: " + from);
+            setResponseTimerNS(from, cloveSet, skm);
+        }
     }
 
 

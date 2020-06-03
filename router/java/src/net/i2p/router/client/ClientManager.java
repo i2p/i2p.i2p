@@ -669,7 +669,7 @@ class ClientManager {
     
     /**
      *  @param id the router's ID for this message
-     *  @param messageNonce the client's ID for this message
+     *  @param messageNonce the client's ID for this message, greater than zero
      *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, long messageNonce, int status) {

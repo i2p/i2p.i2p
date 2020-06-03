@@ -101,6 +101,7 @@ class OutboundClientMessageJobHelper {
      *
      * This is called from OCMOSJ
      *
+     * @param dataClove may be null for ECIES-layer ack
      * @param tagsToSendOverride if &gt; 0, use this instead of skm's default
      * @param lowTagsOverride if &gt; 0, use this instead of skm's default
      * @param wrappedKey non-null with null data,
@@ -130,7 +131,7 @@ class OutboundClientMessageJobHelper {
             return null;
         GarlicMessage msg;
         if (isECIES) {
-            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm, callback);
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, dest, skm, callback);
         } else {
             // no use sending tags unless we have a reply token set up already
             int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
@@ -145,7 +146,7 @@ class OutboundClientMessageJobHelper {
      * Make the top-level config, with a data clove, an optional ack clove, and
      * an optional leaseset clove.
      *
-     * @param dataClove non-null
+     * @param dataClove may be null for ECIES-layer ack
      * @param replyTunnel non-null if requireAck is true or bundledReplyLeaseSet is non-null
      * @param requireAck if true, bundle replyToken in an ack clove
      * @param bundledReplyLeaseSet may be null; if non-null, put it in a clove
@@ -183,7 +184,8 @@ class OutboundClientMessageJobHelper {
         // As of 0.9.2, since the receiver processes them in-order,
         // put data clove last to speed up the ack,
         // and get the leaseset stored before handling the data
-        config.addClove(dataClove);
+        if (dataClove != null)
+            config.addClove(dataClove);
 
         config.setRecipientPublicKey(recipientPK);
         

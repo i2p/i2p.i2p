@@ -19,6 +19,7 @@ import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -283,7 +284,7 @@ public class GarlicMessageBuilder {
      * @since 0.9.44
      */
     static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config,
-                                           PublicKey target, Hash from, SessionKeyManager skm,
+                                           PublicKey target, Hash from, Destination to, SessionKeyManager skm,
                                            ReplyCallback callback) {
         PublicKey key = config.getRecipientPublicKey();
         if (key.getType() != EncType.ECIES_X25519)
@@ -314,7 +315,7 @@ public class GarlicMessageBuilder {
                 log.warn("No SKM for " + from.toBase32());
             return null;
         }
-        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, callback);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, to, priv, rskm, callback);
         if (encData == null) {
             if (log.shouldWarn())
                 log.warn("Encrypt fail for " + from.toBase32());
