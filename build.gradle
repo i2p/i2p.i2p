@@ -107,8 +107,8 @@ configure(javaProjects) {
         testCompile 'org.mockito:mockito-core:2.5.0'
     }
 
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     jar {
         // Empty attributes are set by each project. They are initialized
