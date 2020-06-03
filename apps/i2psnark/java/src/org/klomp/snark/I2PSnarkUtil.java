@@ -295,6 +295,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.answerPings", "false");
             if (opts.getProperty(I2PClient.PROP_SIGTYPE) == null)
                 opts.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
+            if (opts.getProperty("i2cp.leaseSetEncType") == null)
+                opts.setProperty("i2cp.leaseSetEncType", "4,0");
             // assume compressed content
             if (opts.getProperty(I2PClient.PROP_GZIP) == null)
                 opts.setProperty(I2PClient.PROP_GZIP, "false");
