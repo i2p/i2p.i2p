@@ -306,8 +306,14 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         I2PSession session = sockMgr.getSession();
         if (session.isOffline()) {
             long exp = session.getOfflineExpiration();
-            if (exp < getTunnel().getContext().clock().now())
+            long remaining = exp - getTunnel().getContext().clock().now();
+            if (remaining <= 0)
                 throw new IllegalArgumentException("Offline signature expired " + DataHelper.formatTime(exp));
+            if (remaining < 60*24*60*60*1000L) {
+                String msg = "Offline signature expires in " + DataHelper.formatDuration(remaining);
+                _log.logAlways(Log.WARN, msg);
+                l.log(msg);
+            }
         }
         while (session.isClosed()) {
             try {
