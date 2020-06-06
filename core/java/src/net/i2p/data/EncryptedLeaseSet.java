@@ -411,10 +411,6 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         if (_signature == null)
             throw new IllegalStateException("not signed");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // inner LS is always unpublished
-        int saveFlags = _flags;
-        setUnpublished();
-        setBlindedWhenPublished();
         try {
             // Inner layer - type - data covered by sig
             baos.write(KEY_TYPE_LS2);
@@ -425,8 +421,6 @@ public class EncryptedLeaseSet extends LeaseSet2 {
             throw new IllegalStateException("Error encrypting LS2", dfe);
         } catch (IOException ioe) {
             throw new IllegalStateException("Error encrypting LS2", ioe);
-        } finally {
-            _flags = saveFlags;
         }
 
         // layer 2 (inner) encryption
@@ -847,14 +841,16 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         // inner LS is always unpublished
         int saveFlags = _flags;
         setUnpublished();
+        setBlindedWhenPublished();
         super.sign(key);
-        _flags = saveFlags;
         if (_log.shouldDebug()) {
+            _log.debug("Created inner: " + super.toString());
             _log.debug("Sign inner with key: " + key.getType() + ' ' + key.toBase64());
             _log.debug("Corresponding pubkey: " + key.toPublic());
             _log.debug("Inner sig: " + _signature.getType() + ' ' + _signature.toBase64());
         }
         encrypt(authType, clientKeys);
+        _flags = saveFlags;
         SigningPrivateKey bkey = Blinding.blind(key, _alpha);
         int len = size();
         ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);

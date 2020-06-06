@@ -1,4 +1,9 @@
+2020-06-06 zzz
+ * Data: Fix creation of Encrypted LS2
+ * I2CP: Fix issues with persisted leaseset private keys
+
 2020-06-03 zzz
+ * i2psnark: Enable dual-keys
  * Router: Implement ratchet-layer acks (proposal 144)
 
 2020-06-01 zzz

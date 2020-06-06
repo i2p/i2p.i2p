@@ -88,7 +88,12 @@ public class LeaseSet2 extends LeaseSet {
         return (_flags & FLAG_UNPUBLISHED) != 0;
     }
 
+    /**
+     *  @throws IllegalStateException if already signed
+     */
     public void setUnpublished() {
+        if (_signature != null && (_flags & FLAG_UNPUBLISHED) == 0)
+            throw new IllegalStateException();
         _flags |= FLAG_UNPUBLISHED;
     }
 
@@ -102,9 +107,12 @@ public class LeaseSet2 extends LeaseSet {
 
     /**
      *  Set if the unencrypted LS, when published, will be blinded/encrypted
+     *  @throws IllegalStateException if already signed
      *  @since 0.9.42
      */
     public void setBlindedWhenPublished() {
+        if (_signature != null && (_flags & FLAG_BLINDED) == 0)
+            throw new IllegalStateException();
         _flags |= FLAG_BLINDED;
     }
     
@@ -251,8 +259,11 @@ public class LeaseSet2 extends LeaseSet {
      *  @param transientSPK the key that will sign the leaseset
      *  @param offlineSig the signature by the spk in the destination
      *  @return success, false if verify failed or expired
+     *  @throws IllegalStateException if already signed
      */
     public boolean setOfflineSignature(long expires, SigningPublicKey transientSPK, Signature offlineSig) {
+        if (_signature != null)
+            throw new IllegalStateException();
         _flags |= FLAG_OFFLINE_KEYS;
         _transientExpires = expires;
         _transientSigningPublicKey = transientSPK;
@@ -691,6 +702,7 @@ public class LeaseSet2 extends LeaseSet {
             }
         }
         buf.append("\n\tUnpublished? ").append(isUnpublished());
+        buf.append("\n\tBlinded? ").append(isBlindedWhenPublished());
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));
