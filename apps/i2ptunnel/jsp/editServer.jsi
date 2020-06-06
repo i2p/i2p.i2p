@@ -767,6 +767,9 @@
               <a class="control" title="<%=intl._t("Add to Private addressbook")%>" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=ab64%>#add"><%=intl._t("Add to local addressbook")%></a>
 <%
                     }
+%>
+        </td></tr>
+<%
                 } else {
 %>
         <tr>
@@ -794,9 +797,9 @@
                 <span class="multiOption"><label title="<%=intl._t("Allow all clients to connect to this service")%>"><input value="0" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Disable")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Prevent listed clients from connecting to this service")%>"><input value="2" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blacklist")%></label></span>
+                    <%=intl._t("Deny List")%></label></span>
                 <span class="multiOption"><label title="<%=intl._t("Only allow listed clients to connect to this service")%>"><input value="1" type="radio" name="accessMode"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Whitelist")%></label></span>
+                    <%=intl._t("Allow List")%></label></span>
             </td>
         </tr><tr>
             <td colspan="8">
