@@ -43,6 +43,7 @@ import net.i2p.client.streaming.IncomingConnectionFilter;
 import net.i2p.client.streaming.StatefulConnectionFilter;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -302,9 +303,15 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     private void connectManager() {
         int retries = 0;
-        while (sockMgr.getSession().isClosed()) {
+        I2PSession session = sockMgr.getSession();
+        if (session.isOffline()) {
+            long exp = session.getOfflineExpiration();
+            if (exp < getTunnel().getContext().clock().now())
+                throw new IllegalArgumentException("Offline signature expired " + DataHelper.formatTime(exp));
+        }
+        while (session.isClosed()) {
             try {
-                sockMgr.getSession().connect();
+                session.connect();
                 // Now connect the subsessions, if any
                 List<I2PSession> subs = sockMgr.getSubsessions();
                 if (!subs.isEmpty()) {

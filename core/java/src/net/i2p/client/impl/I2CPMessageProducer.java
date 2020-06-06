@@ -23,6 +23,7 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.client.SendMessageOptions;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
@@ -148,7 +149,10 @@ class I2CPMessageProducer {
         }
         cfg.setOptions(p);
         if (isOffline) {
-            cfg.setOfflineSignature(session.getOfflineExpiration(),
+            long exp = session.getOfflineExpiration();
+            if (exp < _context.clock().now())
+                throw new I2PSessionException("Offline signature expired " + DataHelper.formatTime(exp));
+            cfg.setOfflineSignature(exp,
                                     session.getTransientSigningPublicKey(),
                                     session.getOfflineSignature());
         }

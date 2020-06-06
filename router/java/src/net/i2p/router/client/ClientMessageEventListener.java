@@ -250,8 +250,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                     msg += DataHelper.formatDuration(0 - skew) + " in the future";
                 _log.error(msg);
                 _runner.disconnectClient(msg);
+            } else if (in.getOfflineSignature() != null && in.getOfflineExpiration() < _context.clock().now()) {
+                String msg = "Offline signature expired " + DataHelper.formatTime(in.getOfflineExpiration());
+                _log.error(msg);
+                _runner.disconnectClient(msg);
             } else {
-                _log.error("Signature verification failed on a create session message");
+                _log.error("Signature verification failed on a create session message:\n" + in);
                 _runner.disconnectClient("Invalid signature on CreateSessionMessage");
             }
             return;
