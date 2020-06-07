@@ -203,7 +203,10 @@
     <target name="copyJettylib2" depends="extractJettylib, copyTomcatLib1" unless="${with-libtomcat-java}" >
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
             <!-- all versions - Servlet API -->
+          <!--
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/servlet-api-3.1.jar" />
+           -->
+            <zipfileset src="${tomcat.lib}/servlet-api.jar" />
 
           <!--
             Jetty version - see below for why we don't use this one
@@ -221,7 +224,9 @@
 
             <!-- Apache package version -->
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jsp-api.jar"/>
+          <!--
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jetty-schemas-3.1.jar" />
+           -->
         </jar>
       <!--
         <delete file="jetty.tar" />

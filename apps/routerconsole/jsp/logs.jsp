@@ -31,7 +31,7 @@
 <jsp:getProperty name="logsHelper" property="unavailableCrypto" />
 <tr><td><b>Wrapper version:</b></td><td><%=System.getProperty("wrapper.version", "none")%></td></tr>
 <tr><td><b>Server version:</b></td><td><jsp:getProperty name="logsHelper" property="jettyVersion" /></td></tr>
-<tr><td><b>Servlet version:</b></td><td><%=getServletInfo()%></td></tr>
+<tr><td><b>Servlet version:</b></td><td><%=getServletInfo()%> (<%=getServletConfig().getServletContext().getMajorVersion()%>.<%=getServletConfig().getServletContext().getMinorVersion()%>)</td></tr>
 <tr><td><b>JSTL version:</b></td><td><jsp:getProperty name="logsHelper" property="jstlVersion" /></td></tr>
 <tr><td><b>Platform:</b></td><td><%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%></td></tr>
 <tr><td><b>Processor:</b></td><td>
