@@ -1006,4 +1006,22 @@ public class I2PAppContext {
     public ClientAppManager clientAppManager() {
         return _appManager;
     }
+
+    /** 
+     *  How long this router was down before it started, or 0 if unknown.
+     *
+     *  This may be used for a determination of whether to regenerate keys, for example.
+     *  We use the timestamp of the previous ping file left behind on crash,
+     *  as set by isOnlyRouterRunning(), if present.
+     *  Otherwise, the last STOPPED entry in the event log.
+     *
+     *  May take a while to run the first time, if it has to go through the event log.
+     *  Once called, the result is cached.
+     *
+     *  @return 0 always in app context
+     *  @since 0.0.47
+     */
+    public long getEstimatedDowntime() {
+        return 0L;
+    }
 }

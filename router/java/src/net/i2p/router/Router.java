@@ -105,6 +105,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private boolean _familyKeyCryptoFail;
     public final Object _familyKeyLock = new Object();
     private UPnPScannerCallback _upnpScannerCallback;
+    private long _downtime = -1;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -711,7 +712,8 @@ public class Router implements RouterClock.ClockShiftListener {
         synchronized(_configFileLock) {
             // persistent key for peer ordering since 0.9.17
             // These will be replaced in CreateRouterInfoJob if we rekey
-            if (!_config.containsKey(PROP_IB_RANDOM_KEY)) {
+            if (!_config.containsKey(PROP_IB_RANDOM_KEY) ||
+                getEstimatedDowntime() > 12*60*60*1000L) {
                 byte rk[] = new byte[32];
                 _context.random().nextBytes(rk);
                 _config.put(PROP_IB_RANDOM_KEY, Base64.encode(rk));
@@ -1809,6 +1811,9 @@ public class Router implements RouterClock.ClockShiftListener {
         ((RouterClock) _context.clock()).removeShiftListener(this);
         // Let's not stop accepting tunnels, etc
         //_started = _context.clock().now();
+        synchronized(_configFileLock) {
+            _downtime = 1;
+        }
         Thread t = new I2PThread(new Restarter(_context), "Router Restart");
         t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();
@@ -1915,7 +1920,12 @@ public class Router implements RouterClock.ClockShiftListener {
         File f = getPingFile();
         if (f.exists()) {
             long lastWritten = f.lastModified();
-            if (System.currentTimeMillis()-lastWritten > LIVELINESS_DELAY) {
+            long downtime = System.currentTimeMillis() - lastWritten;
+            synchronized(_configFileLock) {
+                if (downtime > 0 && _downtime < 0)
+                    _downtime = downtime;
+            }
+            if (downtime > LIVELINESS_DELAY) {
                 System.err.println("WARN: Old router was not shut down gracefully, deleting " + f);
                 f.delete();
             } else {
@@ -1934,6 +1944,49 @@ public class Router implements RouterClock.ClockShiftListener {
         _context.simpleTimer2().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
     }
     
+    /** 
+     *  How long this router was down before it started, or 0 if unknown.
+     *
+     *  This may be used for a determination of whether to regenerate keys, for example.
+     *  We use the timestamp of the previous ping file left behind on crash,
+     *  as set by isOnlyRouterRunning(), if present.
+     *  Otherwise, the last STOPPED entry in the event log.
+     *
+     *  May take a while to run the first time, if it has to go through the event log.
+     *  Once called, the result is cached.
+     *
+     *  @since 0.0.47
+     */
+    public long getEstimatedDowntime() {
+        synchronized(_configFileLock) {
+            if (_downtime >= 0)
+                return _downtime;
+            long begin = System.currentTimeMillis();
+            long stopped = _eventLog.getLastEvent(EventLog.STOPPED, _context.clock().now() - 365*24*60*60*1000L);
+            long downtime = stopped > 0 ? _started - stopped : 0;
+            if (downtime < 0)
+                downtime = 0;
+            if (_log.shouldWarn())
+                _log.warn("Downtime was " + DataHelper.formatDuration(downtime) +
+                          "; calculation took " + DataHelper.formatDuration(System.currentTimeMillis() - begin));
+            _downtime = downtime;
+            return downtime;
+        }
+    }
+    
+    /** 
+     *  Only for soft restart. Not for external use.
+     *
+     *  @since 0.0.47
+     */
+    public void setEstimatedDowntime(long downtime) {
+        if (downtime <= 0)
+            downtime = 1;
+        synchronized(_configFileLock) {
+            _downtime = downtime;
+        }
+    }
+
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
     public static final int DEFAULT_SHARE_PERCENTAGE = 80;
     

@@ -252,12 +252,7 @@ public class NTCPTransport extends TransportImpl {
             String b64IV = null;
             String s = null;
             // try to determine if we've been down for 30 days or more
-            // no stopping, no crashes, and only one start (this one)
-            EventLog el = _context.router().eventLog();
-            long since = _context.clock().now() - MIN_DOWNTIME_TO_REKEY;
-            boolean shouldRekey = el.getEvents(EventLog.STOPPED, since).isEmpty() &&
-                                  el.getEvents(EventLog.CRASHED, since).isEmpty() &&
-                                  el.getEvents(EventLog.STARTED, since).size() <= 1;
+            boolean shouldRekey = _context.getEstimatedDowntime() >= MIN_DOWNTIME_TO_REKEY;
             if (!shouldRekey) {
                 s = ctx.getProperty(PROP_NTCP2_SP);
                 if (s != null) {
