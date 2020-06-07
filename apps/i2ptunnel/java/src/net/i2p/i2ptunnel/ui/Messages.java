@@ -54,4 +54,11 @@ public class Messages {
     public static String ngettext(String s, String p, int n, I2PAppContext ctx) {
         return Translate.getString(n, s, p, ctx, BUNDLE_NAME);
     }
+
+    /** translate (ngettext)
+     *  @since 0.9.47
+     */
+    public String ngettext(String s, String p, int n) {
+        return Translate.getString(n, s, p, _context, BUNDLE_NAME);
+    }
 }

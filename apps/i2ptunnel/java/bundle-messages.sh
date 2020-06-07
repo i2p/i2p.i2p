@@ -70,7 +70,7 @@ do
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_t --keyword=_x --keyword=intl._ --keyword=intl.title \
+	                 --keyword=_t --keyword=_x --keyword=intl._ --keyword=intl.title --keyword=unlessAdvanced \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then

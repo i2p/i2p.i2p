@@ -530,7 +530,8 @@ public class EditBean extends IndexBean {
     public String getQuantityOptions(int tunnel, int mode) {
         int tunnelQuantity = mode == 2 ? getTunnelQuantityOut(tunnel, DFLT_QUANTITY)
                                        : getTunnelQuantity(tunnel, DFLT_QUANTITY);
-        int maxQuantity = isAdvanced() ? MAX_ADVANCED_QUANTITY :
+        boolean adv = isAdvanced();
+        int maxQuantity = adv ? MAX_ADVANCED_QUANTITY :
                                      (isClient(tunnel) ? MAX_CLIENT_QUANTITY : MAX_SERVER_QUANTITY);
         if (tunnelQuantity > maxQuantity)
             maxQuantity = tunnelQuantity;
@@ -546,7 +547,7 @@ public class EditBean extends IndexBean {
                  buf.append(ngettext("{0} outbound tunnel", "{0} outbound tunnels", i));
              else
                  buf.append(ngettext("{0} inbound, {0} outbound tunnel", "{0} inbound, {0} outbound tunnels", i));
-             if (i <= 3) {
+             if (i <= 3 && !adv) {
                  buf.append(" (");
                  if (i == 1)
                      buf.append(_t("lower bandwidth and reliability"));
@@ -559,5 +560,15 @@ public class EditBean extends IndexBean {
              buf.append("</option>\n");
         }
         return buf.toString();
+    }
+
+    /**
+     *  @return translated s or ""
+     *  @since 0.9.47
+     */
+    public String unlessAdvanced(String s) {
+        if (isAdvanced())
+            return "";
+        return " (" + _t(s) + ')';
     }
 }

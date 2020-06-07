@@ -1,6 +1,11 @@
+2020-06-07 zzz
+ * i2ptunnel: Fix missing tunnel quantity section for servers
+ * Jetty: Update servlet-api
+
 2020-06-06 zzz
- * Data: Fix creation of Encrypted LS2
+ * Data: Fix creation of Encrypted LS2 (ticket #2746)
  * I2CP: Fix issues with persisted leaseset private keys
+ * I2CP, i2ptunnel: Check for expired offline signature client-side
 
 2020-06-03 zzz
  * i2psnark: Enable dual-keys
