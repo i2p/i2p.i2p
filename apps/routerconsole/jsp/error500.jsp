@@ -66,10 +66,9 @@
 <b>Java version:</b> <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%> (<%=System.getProperty("java.runtime.name")%> <%=System.getProperty("java.runtime.version")%>)<br>
  <jsp:useBean class="net.i2p.router.web.helpers.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=i2pcontextId%>" />
-<jsp:getProperty name="logsHelper" property="unavailableCrypto" />
 <b>Wrapper version:</b> <%=System.getProperty("wrapper.version", "none")%><br>
 <b>Server version:</b> <jsp:getProperty name="logsHelper" property="jettyVersion" /><br>
-<b>Servlet version:</b></td><td><%=getServletInfo()%> (<%=getServletConfig().getServletContext().getMajorVersion()%>.<%=getServletConfig().getServletContext().getMinorVersion()%>)<br>
+<b>Servlet version:</b> <%=getServletInfo()%> (<%=getServletConfig().getServletContext().getMajorVersion()%>.<%=getServletConfig().getServletContext().getMinorVersion()%>)<br>
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
 <b>JBigI status:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
