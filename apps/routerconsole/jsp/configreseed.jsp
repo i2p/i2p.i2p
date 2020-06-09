@@ -106,6 +106,10 @@
 <input type="submit" name="action" class="download" value="<%=intl._t("Reseed from file")%>" />
   </td>
  </tr>
+</table></form>
+
+<form action="/createreseed" method="GET">
+<table id="manualreseed3" class="configtable">
  <tr id="create">
   <th colspan="2">
 <%=intl._t("Create Reseed File")%>
@@ -117,10 +121,6 @@
 <%=intl._t("This file will never contain your own router's identity or IP.")%>
   </td>
  </tr>
-</table></form>
-
-<form action="/createreseed" method="GET">
-<table id="manualreseed3" class="configtable">
  <tr>
   <td class="optionsave" colspan="2">
 <input type="submit" name="action" class="go" value="<%=intl._t("Create reseed file")%>" />
