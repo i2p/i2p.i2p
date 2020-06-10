@@ -323,7 +323,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     /**
      * Side effect - binds this session to the supplied destination.
      *
-     * @param the far-end Destination for this PublicKey if known, or null
+     * @param d the far-end Destination for this PublicKey if known, or null
      * @return true if registered
      * @since 0.9.47
      */

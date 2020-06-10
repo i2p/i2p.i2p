@@ -21,7 +21,7 @@ import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 
 /**
- * PRELIMINARY - Subject to change - see proposal 123
+ * See proposal 123
  *
  * @since 0.9.38
  */

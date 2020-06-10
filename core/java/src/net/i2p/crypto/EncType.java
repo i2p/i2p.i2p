@@ -11,8 +11,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
 
 /**
- * PRELIMINARY - subject to change
- *
  * Defines the properties for various encryption types
  * that I2P supports or may someday support.
  *

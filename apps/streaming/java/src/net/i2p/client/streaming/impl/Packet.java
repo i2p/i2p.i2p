@@ -391,7 +391,7 @@ class Packet {
     /**
      * What is the largest payload the sender of this packet wants to receive?
      *
-     * @return Maximum payload size sender can receive (MRU)
+     * @return Maximum payload size sender can receive (MRU) or zero if unset
      */
     public int getOptionalMaxSize() { return _optionMaxSize; }
 
