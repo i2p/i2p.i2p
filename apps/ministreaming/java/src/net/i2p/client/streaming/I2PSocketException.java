@@ -113,6 +113,10 @@ public class I2PSocketException extends SocketException {
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
                 return _x("Destination lease set not found");
 
+            // don't translate for now
+            case MessageStatusMessage.STATUS_SEND_FAILURE_META_LEASESET:
+                return "Meta lease set";
+
             case SendMessageStatusListener.STATUS_CANCELLED:
                 return _x("Local destination shutdown");
 

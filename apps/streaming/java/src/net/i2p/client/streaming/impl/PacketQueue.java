@@ -344,6 +344,16 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 }
                 break;
 
+            case MessageStatusMessage.STATUS_SEND_FAILURE_META_LEASESET:
+                // TODO
+                _messageStatusMap.remove(id);
+                IOException ioe = new I2PSocketException(status);
+                con.getOutputStream().streamErrorOccurred(ioe);
+                con.getInputStream().streamErrorOccurred(ioe);
+                con.setConnectionError(ioe.getLocalizedMessage());
+                con.disconnect(false);
+                break;
+
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
             case MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL:
