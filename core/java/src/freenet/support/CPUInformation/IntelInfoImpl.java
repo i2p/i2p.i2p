@@ -353,6 +353,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
 
                     // Broadwell 14 nm
                     // See Haswell notes below
+                    case 0x47:
                     case 0x3d: {
                         CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
