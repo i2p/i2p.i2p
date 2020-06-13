@@ -289,7 +289,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         if (_leaseSet != null && _leaseSet.getType() == DatabaseEntry.KEY_TYPE_META_LS2) {
             // can't send to a meta LS
-            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET);
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_META_LEASESET);
             return;
         }
 
@@ -420,6 +420,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // TODO Encrypted LS2 must have been previously decrypted.
         if (lsType != DatabaseEntry.KEY_TYPE_LEASESET &&
             lsType != DatabaseEntry.KEY_TYPE_LS2) {
+            if (lsType == DatabaseEntry.KEY_TYPE_META_LS2) {
+                // can't send to a meta LS
+                return MessageStatusMessage.STATUS_SEND_FAILURE_META_LEASESET;
+            }
             return MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
         }
 
