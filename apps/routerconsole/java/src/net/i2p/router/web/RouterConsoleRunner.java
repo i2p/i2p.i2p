@@ -887,8 +887,9 @@ public class RouterConsoleRunner implements RouterApp {
             ConfigServiceHandler.registerSignalHandler(_context);
 
             if (_mgr != null &&
-                _context.getBooleanProperty(HelperBase.PROP_ADVANCED) &&
-                _context.getProperty(Analysis.PROP_FREQUENCY, 0L) > 0) {
+                //_context.getBooleanProperty(HelperBase.PROP_ADVANCED) &&
+                !SystemVersion.isSlow() &&
+                _context.getProperty(Analysis.PROP_FREQUENCY, Analysis.DEFAULT_FREQUENCY) > 0) {
                 // registers and starts itself
                 Analysis.getInstance(_context);
             }
