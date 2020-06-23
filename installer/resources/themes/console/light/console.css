@@ -1833,7 +1833,7 @@ h3#passwordheading {
     width: 30%;
     position: absolute;
     top: 17%;
-    font-size: larger;
+    font-size: 10pt !important;
 }
 
 h3#themeheading, h3#pluginmanage, h3#pconfig, h3#webappconfig, h3#advancedclientconfig, h3#i2pclientconfig, #config_stats h3 {
@@ -2564,7 +2564,7 @@ td {
     left: 32%;
     position: absolute;
     background: none;
-    font-size: larger;
+    font-size: 10pt !important;
 }
 
 .configtable.wizard {

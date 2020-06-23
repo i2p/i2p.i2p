@@ -3466,7 +3466,6 @@ img.wizard.progress {
     left: 32%;
     position: absolute;
     background: none;
-    font-size: larger;
 }
 
 .wizardtext {
@@ -3514,13 +3513,13 @@ table#bandwidthconfig td:first-child {
 #bandwidthconfig td:last-child {
      white-space: normal;
      background: none;
-     font-size: larger;
+/*     font-size: larger;*/
 }
 
 #bandwidthconfig.configtable td {
      white-space: normal;
      background: none;
-     font-size: larger;
+/*     font-size: larger;*/
 }
 
 #bandwidthconfig.configtable.wizard td {

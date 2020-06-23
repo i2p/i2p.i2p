@@ -109,7 +109,7 @@
 <%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
 <img class="wizard progress" src="/themes/console/images/wizard/logogrey1.png">
 <h3 id="wizardheading" class="wizard"><%=uihelper._t("Router Console Language")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_globe.png">
+<img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div id="wizlangsettings" class="wizard">
 <jsp:getProperty name="uihelper" property="langSettings" />
 </div>
@@ -122,7 +122,7 @@
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/logogrey2.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Why I2P?")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_connected_world.png">
+<img class="wizardimg" src="/themes/console/images/wizard/step-1.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("I2P is a communication tool for people who value privacy and wish to remain anonymous online.")%>
@@ -136,7 +136,7 @@
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/logogrey3.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_speed_test.png">
+<img class="wizardimg" src="/themes/console/images/wizard/step-2.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("I2P will now test your internet connection to identify the optimal speed settings.")%>
@@ -157,7 +157,7 @@
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/logogrey4.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test in Progress")%></h3>
-<img class="wizardimg" src="themes/console/images/wizard/undraw_in_progress.png">
+<img class="wizardimg" src="themes/console/images/wizard/step-3.png">
 <div id="xhr" class="notifcation">
 <!-- for non-script -->
 <%=intl._t("Javascript is disabled - wait 60 seconds for the bandwidth test to complete and then click Next")%>
@@ -179,17 +179,15 @@
 <img class="wizard progress bwtest" src="/themes/console/images/wizard/logogrey5.png">
 <h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
 <table class="mlabtable">
-<tr><td><%=intl._t("Test running?")%></td><td><%=wizhelper.isNDTRunning()%></td></tr>
-<tr><td><%=intl._t("Test complete?")%></td><td><%=wizhelper.isNDTComplete()%></td></tr>
-<tr><td><%=intl._t("Test server location")%></td><td><%=wizhelper.getServerLocation()%></td></tr>
-<tr><td><%=intl._t("Completion status")%></td><td><%=wizhelper.getCompletionStatus()%></td></tr>
-<tr><td><%=intl._t("Details")%></td><td><%=wizhelper.getDetailStatus()%></td></tr>
+<tr><td><%=intl._t("Test server location")%></td><td colspan="3"><%=wizhelper.getServerLocation()%></td></tr>
+<tr><td><%=intl._t("Completion status")%></td><td colspan="3"><%=wizhelper.getCompletionStatus()%></td></tr>
 <%
             if (wizhelper.isNDTSuccessful()) {
                 // don't display this if test failed
 %>
-<tr><td><%=intl._t("Downstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getDownBandwidth())%>Bps</td></tr>
-<tr><td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>
+<tr><td><%=intl._t("Details")%></td><td colspan="3"><%=wizhelper.getDetailStatus()%></td></tr>
+<tr><td><%=intl._t("Downstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getDownBandwidth())%>Bps</td>
+<td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>
 <tr><td><%=intl._t("Share of Bandwidth for I2P")%></td><td><%=Math.round(net.i2p.router.web.helpers.WizardHelper.BW_SCALE * 100)%>%</td></tr>
 <%
             } // sucessful
@@ -251,7 +249,7 @@
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Browser Setup")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_startup_life.png">
+<img class="wizardimg" src="/themes/console/images/wizard/step-4.png">
 <div class="wizardtext"><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
 <%=intl._t("We have instructions for configuring both Firefox and Chromium based browsers with I2P.")%>
@@ -274,7 +272,7 @@
         // Done
 %>
 <h3 id="wizardheading" class="wizard"><%=intl._t("Welcome to I2P!")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/undraw_High_five.png">
+<img class="wizardimg" src="/themes/console/images/wizard/step-5.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("When you start I2P, it may take a few minutes to bootstrap (integrate) your router into the network and find additional peers, so please be patient.")%>
