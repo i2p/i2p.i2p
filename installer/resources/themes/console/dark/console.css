@@ -3143,6 +3143,7 @@ td#themeselect {
     box-shadow: inset 0 0 0 1px #fff;
     filter: drop-shadow(0 0 1px #ccf);
     background: rgba(0,0,0,0.7);
+    padding: 2px;
 }
 
 #bandwidthconfig {
@@ -3544,11 +3545,6 @@ table#bandwidthconfig td:first-child {
     left: 30%;
     top: 40%;
     font-size: larger;
-    background: #000;
-    background: linear-gradient(to right, #fafaff, #000);
-    background-size: auto 100%, 100% 100%;
-    box-shadow: inset 0 0 0 1px #fff;
-    filter: drop-shadow(0 0 1px #ccf);
 }
 
 table#bandwidthconfig {

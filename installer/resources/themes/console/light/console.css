@@ -2543,6 +2543,10 @@ td {
     box-shadow: none !important;
 }
 
+.clickableProgression {
+	color: #327bbf;
+}
+
 #infodiv {
     position: absolute;
     right: 12%;
