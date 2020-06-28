@@ -1,3 +1,7 @@
+2020-06-23 idk
+ * Update the images on the bandwidth wizard, based on undraw
+ assets, used under licenses/LICENSE-Undraw.txt.
+
 2020-06-07 zzz
  * i2ptunnel: Fix missing tunnel quantity section for servers
  * Jetty: Update servlet-api
