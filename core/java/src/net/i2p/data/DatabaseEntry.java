@@ -231,8 +231,9 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      * This is the same as isValid() in RouterInfo
      * or verifySignature() in LeaseSet.
      * @return valid
+     * @since public since 0.9.47, was protected
      */
-    protected boolean verifySignature() {
+    public boolean verifySignature() {
         if (_signature == null)
             return false;
         byte data[];

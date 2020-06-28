@@ -35,7 +35,7 @@ import net.i2p.util.Log;
 class FloodfillVerifyStoreJob extends JobImpl {
     private final Log _log;
     private final Hash _key, _client;
-    private Hash _target;
+    private volatile Hash _target;
     private final Hash _sentTo;
     private final FloodfillNetworkDatabaseFacade _facade;
     private long _expiration;
@@ -329,6 +329,15 @@ class FloodfillVerifyStoreJob extends JobImpl {
                 // Verify it's as recent as the one we sent
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage)_message;
                 DatabaseEntry entry = dsm.getEntry();
+                if (!entry.verifySignature()) {
+                    if (_log.shouldWarn())
+                        _log.warn(getJobId() + ": Sent bad data for verify: " + _target);
+                    pm.dbLookupFailed(_target);
+                    ctx.banlist().banlistRouterForever(_target, "Sent bad netdb data");
+                    ctx.statManager().addRateData("netDb.floodfillVerifyFail", delay);
+                    resend();
+                    return;
+                }
                 long newDate;
                 boolean success;
                 if (_isLS2 &&
@@ -376,7 +385,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             // but we have to use one of them to affect the FloodfillPeerSelector ordering.
             // If we don't do this we get stuck using the same verify peer every time even
             // though it is the real problem.
-            if (_target != null && !_target.equals(_sentTo))
+            if (!_target.equals(_sentTo))
                 pm.dbLookupFailed(_target);
             ctx.statManager().addRateData("netDb.floodfillVerifyFail", delay);
             resend();
@@ -416,8 +425,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             Set<Hash> toSkip = new HashSet<Hash>(2);
             if (_sentTo != null)
                 toSkip.add(_sentTo);
-            if (_target != null)
-                toSkip.add(_target);
+            toSkip.add(_target);
             if (_log.shouldWarn())
                 _log.warn(getJobId() + ": Verify failed, starting new store for: " + _key);
             _facade.sendStore(_key, ds, null, null, FloodfillNetworkDatabaseFacade.PUBLISH_TIMEOUT, toSkip);
