@@ -12,10 +12,8 @@ body {
 }
 
 body.iframed {
-     /*background: transparent url(/themes/console/images/transparent.gif) !important;*/
      margin: 0;
      padding: 0;
-     overflow: hidden;
 }
 
 input::selection {
