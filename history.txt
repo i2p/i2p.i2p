@@ -1,9 +1,24 @@
+2020-07-02 zzz
+ * i2ptunnel: Fix missing throttling section for non-HTTP servers
+
+2020-06-28 zzz
+ * NetDB: Check signature in verify
+
 2020-06-23 idk
  * Update the images on the bandwidth wizard, based on undraw
- assets, used under licenses/LICENSE-Undraw.txt.
+   assets, used under licenses/LICENSE-Undraw.txt.
+
+2020-06-22 zzz
+ * Sybil: Enable analysis and blocking by default
+
+2020-06-12 zzz
+ * I2CP: Meta LS2 error code handling
+
+2020-06-10 zzz
+ * Util: Support hostname lookups in LookupDest CLI
 
 2020-06-07 zzz
- * i2ptunnel: Fix missing tunnel quantity section for servers
+ * i2ptunnel: Fix missing tunnel quantity section for servers (ticket #2747)
  * Jetty: Update servlet-api
 
 2020-06-06 zzz

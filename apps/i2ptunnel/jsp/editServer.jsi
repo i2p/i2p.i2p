@@ -902,11 +902,7 @@
                 <input type="text" id="reduceTime" name="reduceTime" size="4" maxlength="4" title="<%=intl._t("Period of inactivity before tunnel number is reduced")%>" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext period" />
                 <%=intl._t("minutes")%>
             </td>
-        </tr>
-<%
-               if ("httpserver".equals(tunnelType) || isBidirServer) {
-%>
-        <tr>
+        </tr><tr>
             <th colspan="8">
                 <%=intl._t("Server Throttling")%>
             </th>
@@ -944,7 +940,11 @@
             <td></td><td>
                 <input type="text" name="maxStreams" title="<%=intl._t("Maximum number of simultaneous client connections")%>" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />
             </td><td></td><td></td><td class="blankColumn"></td>
-        </tr><tr>
+        </tr>
+<%
+               if ("httpserver".equals(tunnelType) || isBidirServer) {
+%>
+        <tr>
             <th colspan="5">
                 <%=intl._t("POST limits (0=unlimited)")%>
             </th>
