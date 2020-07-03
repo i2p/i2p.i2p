@@ -117,7 +117,6 @@
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
 </div>
 <div id="wizlangsettings" class="wizard">
 <jsp:getProperty name="uihelper" property="langSettings" />
