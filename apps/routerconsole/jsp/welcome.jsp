@@ -107,7 +107,7 @@
 <jsp:setProperty name="uihelper" property="contextId" value="<%=i2pcontextId%>" />
 <%-- needed for CSS: --%><div id="config_ui">
 <%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=uihelper._t("Router Console Language")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div class="clickableProgression">
@@ -128,7 +128,7 @@
         // I2P Philosophy
         // license info?
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Why I2P?")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-1.png">
 <div class="clickableProgression">
@@ -150,7 +150,7 @@
     } else if (ipg == 3) {
         // Overview of bandwidth test
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-2.png">
 <div class="clickableProgression">
@@ -179,7 +179,7 @@
     } else if (ipg == 4) {
         // Bandwidth test in progress (w/ AJAX)
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test in Progress")%></h3>
 <img class="wizardimg" src="themes/console/images/wizard/step-3.png">
 <div class="clickableProgression">
@@ -208,7 +208,7 @@
         if (request.getParameter("skipbw") == null) {
             // don't display this if we skipped the test
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
@@ -236,7 +236,7 @@
 <%
         } // skipbw
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Configuration")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-4.png">
 <style>
@@ -288,7 +288,7 @@
     } else if (ipg == 6) {
         // Browser setup
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Browser Setup")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-5.png">
 <div class="clickableProgression">
@@ -320,7 +320,7 @@
     } else if (ipg == LAST_PAGE) {
         // Done
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/logogrey7.png">
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Welcome to I2P!")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-6.png">
 <div class="clickableProgression">
