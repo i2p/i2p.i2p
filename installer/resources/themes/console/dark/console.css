@@ -3123,8 +3123,8 @@ td#themeselect {
     width: 100%;
     padding: 2%;
     margin: auto;
-    top: 2%;
-    font-size: xx-large;
+    top: 1%;
+    font-size: xx-large !important;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
@@ -3137,9 +3137,9 @@ td#themeselect {
 
 #infodiv {
     position: absolute;
-    left: 76%;
+    left: 32%;
     width: 16%;
-    top: 23%;
+    top: 50%;
     box-shadow: inset 0 0 0 1px #fff;
     filter: drop-shadow(0 0 1px #ccf);
     background: rgba(0,0,0,0.7);
