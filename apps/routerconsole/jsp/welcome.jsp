@@ -4,7 +4,7 @@
     // The MLabHelper singleton will prevent multiple simultaneous tests, even across sessions.
 
     // page ID
-    final int LAST_PAGE = 7;
+    final int LAST_PAGE = 6;
     String pg = request.getParameter("page");
     int ipg;
     if (pg == null) {
@@ -14,14 +14,14 @@
             ipg = Integer.parseInt(pg);
             if (request.getParameter("prev") != null) {
                 // previous button handling
-                if (ipg == 6)
-                    ipg = 3;
+                if (ipg == 5)
+                    ipg = 2;
                 else
                     ipg -= 2;
             }
             if (ipg <= 0 || ipg > LAST_PAGE) {
                 ipg = 1;
-            } else if (ipg == 4 && request.getParameter("skipbw") != null) {
+            } else if (ipg == 3 && request.getParameter("skipbw") != null) {
                 ipg++;  // skip bw test
             }
         } catch (NumberFormatException nfe) {
@@ -64,7 +64,7 @@
 <%=intl.title("New Install Wizard")%>
 <%
     wizhelper.setContextId(i2pcontextId);
-    if (ipg == 4) {
+    if (ipg == 3) {
 %>
 <script src="/js/welcomeajax.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <script nonce="<%=cspNonce%>" type="text/javascript">
@@ -81,7 +81,7 @@
   }, true);
 </script>
 <%
-    }  // ipg == 4
+    }  // ipg == 3
 %>
 </head><body>
 <div id="wizard" class="overlay">
@@ -108,10 +108,11 @@
 <%-- needed for CSS: --%><div id="config_ui">
 <%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
 <img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=uihelper._t("Router Console Language")%></h3>
+<h3 id="wizardheading" class="wizard"><%=uihelper._t("Select Language")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div class="clickableProgression">
 <span class="currentProgression">&#x2B24;</span>
+<span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
@@ -121,33 +122,21 @@
 <div id="wizlangsettings" class="wizard">
 <jsp:getProperty name="uihelper" property="langSettings" />
 </div>
+<div class="wizardtext">
+<p>
+<%=intl._t("Please select your preferred language")%>
+</p>
+<p>
+<%=intl._t("This project is supported by Transifex and OTF through the Localization Lab.")%>
+<%=intl._t("Thank you to all of the volunteers all over the world who help keep our project")%>
+<%=intl._t("accessible. I2P is always looking for support to keep its documentation up to date,")%>
+<a href="https://www.transifex.com/projects/p/I2P/" target="_blank"><%=intl._t("please consider supporting our translation efforts.")%></a>
+</p>
+</div>
 </div>
 <%
 
     } else if (ipg == 2) {
-        // I2P Philosophy
-        // license info?
-%>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=intl._t("Why I2P?")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-1.png">
-<div class="clickableProgression">
-<span class="visitedProgression">&#x25EF;</span>
-<span class="currentProgression">&#x2B24;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-</div>
-<div class="wizardtext">
-<p>
-<%=intl._t("I2P is a communication tool for people who value privacy and wish to remain anonymous online.")%>
-<%=intl._t("I2P is a peer to peer network where you can browse and create hidden services.")%>
-</p>
-</div>
-<%
-
-    } else if (ipg == 3) {
         // Overview of bandwidth test
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
@@ -155,8 +144,8 @@
 <img class="wizardimg" src="/themes/console/images/wizard/step-2.png">
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
 <span class="currentProgression">&#x2B24;</span>
+<span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
@@ -166,6 +155,7 @@
 <%=intl._t("I2P will now test your internet connection to identify the optimal speed settings.")%>
 <%=intl._t("Bandwidth participation improves the anonymity level of all users on the network and maximizes your download speed.")%>
 <%=intl._t("This is done using the third-party M-Lab service.")%>
+<%=intl._t("During this time you will be connected directly to M-Lab's service, with your real IP address.")%>
 </p><p>
 <%=intl._t("Please review the M-Lab privacy policies linked below.")%>
 <%=intl._t("If you do not wish to run the M-Lab bandwidth test, you may skip it by clicking the button below.")%>
@@ -176,7 +166,7 @@
 </div>
 <%
 
-    } else if (ipg == 4) {
+    } else if (ipg == 3) {
         // Bandwidth test in progress (w/ AJAX)
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
@@ -185,8 +175,8 @@
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
 <span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
 <span class="currentProgression">&#x2B24;</span>
+<span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 </div>
@@ -196,9 +186,23 @@
 </div>
 <div id="xhr2" class="notification">
 </div>
+<div class="wizardtext">
+<p>
+<%=intl._t("While the I2P router software is getting ready to go, it's testing your bandwidth, obtaining an initial")%>
+<%=intl._t("set of peers from a reseed server, making it's first few exploratory peer connections, and getting.")%>
+<%=intl._t("integrated with the rest of the network.")%>
+</p>
+<p>
+<%=intl._t("To learn more about these topics and what functions they perform for I2P, you can visit our")%>
+<a href="http://geti2p.net" target="_blank"><%=intl._t("web site")%></a><%=intl._t(", our")%>
+<a href="http://wiki.i2p-projekt.i2p" target="_blank"><%=intl._t("wiki")%></a><%=intl._t(", or contact us on our")%>
+<a href="http://i2pforum.net" target="_blank"><%=intl._t("forums")%></a>
+<%=intl._t("to get help from the community.")%>
+</p>
+</div>
 <%
 
-    } else if (ipg == 5) {
+    } else if (ipg == 4) {
         // Bandwidth test results
         // and/or manual bw entry?
 %>
@@ -270,26 +274,31 @@
         out.print(intl._t("NOTE"));
         out.print("</b>: ");
         out.print(intl._t("You have configured I2P to share only {0} KBps.", share));
-        out.print("\n");
+        out.print("</br>");
 
         out.print(intl._t("I2P requires at least 12KBps to enable sharing. "));
-        out.print(intl._t("Please enable sharing (participating in tunnels) by configuring more bandwidth. "));
-        out.print(intl._t("It improves your anonymity by creating cover traffic, and helps the network."));
+        out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve "));
+        out.print(intl._t("your own anonymity by creating cover traffic."));
+        out.print("</br>");
+        out.print(intl._t("We recommend sharing 75% or more for I2P, but you can adjust based on your needs."));
     } else {
         out.print(intl._t("You have configured I2P to share {0} KBps.", share));
-        out.print("\n");
+        out.print("</br>");
 
-        out.print(intl._t("The higher the share bandwidth the more you improve your anonymity and help the network."));
+        out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve "));
+        out.print(intl._t("your own anonymity by creating cover traffic."));
+        out.print("</br>");
+        out.print(intl._t("We recommend sharing 75% or more for I2P, but you can adjust based on your needs."));
     }
 %>
 </div>
 <%
 
-    } else if (ipg == 6) {
+    } else if (ipg == 5) {
         // Browser setup
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=intl._t("Browser Setup")%></h3>
+<h3 id="wizardheading" class="wizard"><%=intl._t("Browser and Application Setup")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-5.png">
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
@@ -314,7 +323,25 @@
 <%
         } //isWindows()
 %>
-</p></div>
+</p>
+<p>
+<%=intl._t("The I2P router also comes with it's own versions of common, useful internet applications like")%>
+<a href="/torrents" target="_blank"><%=intl._t("bittorrent")%></a>
+<%=intl._t("and")%>
+<a href="/webmail" target="_blank"><%=intl._t("e-mail")%></a>
+<%=intl._t("so you can keep doing the things you need to do.")%>
+<%=intl._t("These applications work with I2P automatically and require no additional configuration.")%>
+</p>
+<p>
+<%=intl._t("Normally, I2P addresses are long and random. To help make I2P addresses easier to read and remember,")%>
+<%=intl._t("the I2P router also includes it's own built-in")%>
+<a href="/dns" target="_blank"><%=intl._t("Address Book")%></a>
+<%=intl._t("so you can")%>
+<%=intl._t("privately assign human-readable names to the sites you like to visit.")%>
+<%=intl._t("The Address Book can also be used to subscribe to lists of URL's shared by other I2P users who choose")%>
+<%=intl._t("to distribute their own lists of hostnames and addresses.")%>
+</p>
+</div>
 <%
 
     } else if (ipg == LAST_PAGE) {
@@ -333,10 +360,11 @@
 </div>
 <div class="wizardtext">
 <p>
-<%=intl._t("When you start I2P, it may take a few minutes to bootstrap (integrate) your router into the network and find additional peers, so please be patient.")%>
+<%=intl._t("When you start I2P for the first time, it needs need to integrate with the I2P network. It may also")%>
+<%=intl._t("indicate that it is temporarily \"Rejecting Tunnels.\" This is a normal part of the process. Please be patient.")%>
 </p><p>
-<%=intl._t("When I2P starts up, and during normal operation, I2P's tunnel build readiness indicator in the side panel may indicate that I2P is \"Rejecting Tunnels\"; this is normal behavior.")%>
-<%=intl._t("Once green stars are indicated next to your Local Tunnels, there is a wide variety of things you can do with I2P.")%>
+<%=intl._t("Green circles in the sidebar area of the I2P Router Console indicate that you are ready to use I2P")%>
+<%=intl._t("for browsing or applications.")%>
 </p>
 </div>
 <%
@@ -359,11 +387,11 @@
 %>
 <input type="submit" class="cancel wizardbutton" name="skip" value="<%=intl._t("Skip Setup")%>" >
 <%
-        if (ipg == 3) {
+        if (ipg == 2) {
 %>
 <input type="submit" class="cancel wizardbutton" name="skipbw" value="<%=intl._t("Skip Bandwidth Test")%>" >
 <%
-        } else if (ipg == 4) {
+        } else if (ipg == 3) {
 %>
 <input type="submit" class="cancel wizardbutton" name="cancelbw" value="<%=intl._t("Cancel Bandwidth Test")%>" >
 <%

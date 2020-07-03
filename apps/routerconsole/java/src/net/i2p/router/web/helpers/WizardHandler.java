@@ -45,9 +45,9 @@ public class WizardHandler extends FormHandler {
                 // Saved in CSSHelper, assume success
                 addFormNoticeNoEscape(_t("Console language saved."));
             }
-            if ("4".equals(page)) {
+            if ("3".equals(page)) {
                 startNDT();
-            } else if ("5".equals(page)) {
+            } else if ("4".equals(page)) {
                 synchronized (_helper) {
                     if (_helper.isNDTSuccessful()) {
                         addFormNotice(_t("Bandwidth test completed successfully"));
@@ -60,7 +60,7 @@ public class WizardHandler extends FormHandler {
                         addFormError(_t("Bandwidth test did not complete"));
                     }
                 }
-            } else if ("6".equals(page)) {
+            } else if ("5".equals(page)) {
                 Map<String, String> changes = new HashMap<String, String>();
                 boolean updated = updateRates(changes);
                 if (updated) {
