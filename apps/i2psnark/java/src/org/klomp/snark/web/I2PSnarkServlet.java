@@ -564,7 +564,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</th>\n<th class=\"snarkTorrentETA\" align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             if (showSort) {
-                sort = ("-4".equals(currentSort)) ? "4" : "-4";
+                sort = ("4".equals(currentSort)) ? "-4" : "4";
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
@@ -4141,6 +4141,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (mime.equals("text/html"))
             icon = "html";
         else if (mime.equals("text/plain") ||
+                 mime.equals("text/markdown") ||
                  mime.equals("text/x-sfv") ||
                  mime.equals("application/rtf"))
             icon = "page";
