@@ -6,7 +6,8 @@
 
 2020-06-23 idk
  * Update the images on the bandwidth wizard, based on undraw
-   assets, used under licenses/LICENSE-Undraw.txt.
+   assets, used under licenses/LICENSE-Undraw.txt. Design and assets
+   were developed by @sadie.
 
 2020-06-22 zzz
  * Sybil: Enable analysis and blocking by default
