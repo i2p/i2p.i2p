@@ -58,7 +58,7 @@ public class SAMStreamSink {
     private static I2PSSLSocketFactory _sslSocketFactory;
     
     private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4, RAWHDR = 5, FORWARD = 6, FORWARDSSL=7;
-    private static final int MASTER=8;
+    private static final int PRIMARY=8;
     private static final String USAGE = "Usage: SAMStreamSink [-s] [-m mode] [-v version] [-b samHost] [-p samPort]\n" +
                                         "                     [-o opt=val] [-u user] [-w password] myDestFile sinkDir\n" +
                                         "       modes: stream: 0; datagram: 1; v1datagram: 2;\n" +
@@ -66,7 +66,7 @@ public class SAMStreamSink {
                                         "              stream-forward: 6; stream-forward-ssl: 7\n" +
                                         "              default is stream\n" +
                                         "       -s: use SSL to connect to bridge\n" +
-                                        "       -x: use master session (forces -v 3.3)\n" +
+                                        "       -x: use primary session (forces -v 3.3)\n" +
                                         "       multiple -o session options are allowed";
     private static final int V3FORWARDPORT=9998;
     private static final int V3DGPORT=9999;
@@ -74,7 +74,7 @@ public class SAMStreamSink {
     public static void main(String args[]) {
         Getopt g = new Getopt("SAM", args, "sxhb:m:p:u:v:w:");
         boolean isSSL = false;
-        boolean isMaster = false;
+        boolean isPrimary = false;
         int mode = STREAM;
         String version = "3.3";
         String host = "127.0.0.1";
@@ -90,7 +90,7 @@ public class SAMStreamSink {
                 break;
 
             case 'x':
-                isMaster = true;
+                isPrimary = true;
                 break;
 
             case 'm':
@@ -139,8 +139,8 @@ public class SAMStreamSink {
             System.err.println(USAGE);
             return;
         }
-        if (isMaster) {
-            mode += MASTER;
+        if (isPrimary) {
+            mode += PRIMARY;
             version = "3.3";
         }
         if ((user == null && password != null) ||
@@ -181,8 +181,8 @@ public class SAMStreamSink {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
             String ourDest = handshake(out, version, true, eventHandler, mode, user, password, sessionOpts);
-            if (mode >= MASTER)
-                mode -= MASTER;
+            if (mode >= PRIMARY)
+                mode -= PRIMARY;
             if (ourDest == null)
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
@@ -578,10 +578,10 @@ public class SAMStreamSink {
     }
     
     /**
-     * @param isMaster is this the control socket
+     * @param isPrimary is this the control socket
      * @return our b64 dest or null
      */
-    private String handshake(OutputStream samOut, String version, boolean isMaster,
+    private String handshake(OutputStream samOut, String version, boolean isPrimary,
                              SAMEventHandler eventHandler, int mode, String user, String password,
                              String sopts) {
         synchronized (samOut) {
@@ -598,7 +598,7 @@ public class SAMStreamSink {
                     _log.debug("Hello reply found: " + hisVersion);
                 if (hisVersion == null) 
                     throw new IOException("Hello failed");
-                if (!isMaster) {
+                if (!isPrimary) {
                     // only for v3
                     //String req = "STREAM ACCEPT SILENT=true ID=" + _v3ID + "\n";
                     // TO_PORT not supported until 3.2 but 3.0-3.1 will ignore
@@ -650,7 +650,7 @@ public class SAMStreamSink {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Requesting new transient destination");
                     }
-                    if (isMaster) {
+                    if (isPrimary) {
                         byte[] id = new byte[5];
                         _context.random().nextBytes(id);
                         _v3ID = Base32.encode(id);
@@ -661,14 +661,14 @@ public class SAMStreamSink {
                     // and give it to the SAM server
                     dest = _destFile;
                 }
-                boolean masterMode;  // are we using v3.3 master session
+                boolean primaryMode;  // are we using v3.3 primary session
                 String command;
-                if (mode >= MASTER) {
-                    masterMode = true;
+                if (mode >= PRIMARY) {
+                    primaryMode = true;
                     command = "ADD";
-                    mode -= MASTER;
+                    mode -= PRIMARY;
                 } else {
-                    masterMode = false;
+                    primaryMode = false;
                     command = "CREATE DESTINATION=" + dest;
                 }
                 String style;
@@ -685,19 +685,19 @@ public class SAMStreamSink {
                 else
                     style = "RAW HEADER=true PORT=" + V3DGPORT;
 
-                if (masterMode) {
+                if (primaryMode) {
                     if (mode == V1DG || mode == V1RAW)
-                        throw new IllegalArgumentException("v1 dg/raw incompatible with master session");
-                    String req = "SESSION CREATE DESTINATION=" + dest + " STYLE=MASTER ID=masterSink " + sopts + '\n';
+                        throw new IllegalArgumentException("v1 dg/raw incompatible with primary session");
+                    String req = "SESSION CREATE DESTINATION=" + dest + " STYLE=PRIMARY ID=primarySink " + sopts + '\n';
                     samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("SESSION CREATE STYLE=MASTER sent");
+                        _log.debug("SESSION CREATE STYLE=PRIMARY sent");
                     boolean ok = eventHandler.waitForSessionCreateReply();
                     if (!ok) 
-                        throw new IOException("SESSION CREATE STYLE=MASTER failed");
+                        throw new IOException("SESSION CREATE STYLE=PRIMARY failed");
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("SESSION CREATE STYLE=MASTER reply found: " + ok);
+                        _log.debug("SESSION CREATE STYLE=PRIMARY reply found: " + ok);
                 }
 
                 String req = "SESSION " + command + " STYLE=" + style + ' ' + _conOptions + ' ' + sopts + '\n';
@@ -707,7 +707,7 @@ public class SAMStreamSink {
                     _log.debug("SESSION " + command + " sent");
                 //if (mode == STREAM) {
                     boolean ok;
-                    if (masterMode)
+                    if (primaryMode)
                         ok = eventHandler.waitForSessionAddReply();
                     else
                         ok = eventHandler.waitForSessionCreateReply();
@@ -716,7 +716,7 @@ public class SAMStreamSink {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("SESSION " + command + " reply found: " + ok);
                 //}
-                if (masterMode) {
+                if (primaryMode) {
                     // do a bunch more
                     req = "SESSION ADD STYLE=STREAM FROM_PORT=99 ID=stream99\n";
                     samOut.write(req.getBytes("UTF-8"));
@@ -736,7 +736,7 @@ public class SAMStreamSink {
                     samOut.write(req.getBytes("UTF-8"));
                     req = "SESSION REMOVE ID=notfound\n";
                     samOut.write(req.getBytes("UTF-8"));
-                    req = "SESSION REMOVE ID=masterSink\n"; // shouldn't remove ourselves
+                    req = "SESSION REMOVE ID=primarySink\n"; // shouldn't remove ourselves
                     samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
                 }

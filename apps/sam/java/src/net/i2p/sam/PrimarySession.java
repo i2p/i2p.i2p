@@ -36,7 +36,7 @@ import net.i2p.util.Log;
  *
  * @since 0.9.25
  */
-class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, SAMRawReceiver,
+class PrimarySession extends SAMv3StreamSession implements SAMDatagramReceiver, SAMRawReceiver,
                                                           SAMMessageSess, I2PSessionMuxedListener {
 	private final SAMv3Handler handler;
 	private final SAMv3DatagramServer dgs;
@@ -55,13 +55,13 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	 * @throws IOException
 	 * @throws DataFormatException
 	 */
-	public MasterSession(String nick, SAMv3DatagramServer dgServer, SAMv3Handler handler, Properties props) 
+	public PrimarySession(String nick, SAMv3DatagramServer dgServer, SAMv3Handler handler, Properties props) 
 			throws IOException, DataFormatException, SAMException {
 		super(nick);
 		for (int i = 0; i < INVALID_OPTS.length; i++) {
 			String p = INVALID_OPTS[i];
 			if (props.containsKey(p))
-				throw new SAMException("MASTER session options may not contain " + p);
+				throw new SAMException("PRIMARY session options may not contain " + p);
 		}
 		dgs = dgServer;
 		sessions = new ConcurrentHashMap<String, SAMMessageSess>(4);
@@ -78,7 +78,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	 */
 	@Override
 	public void start() {
-		Thread t = new I2PAppThread(streamAcceptor, "SAMMasterAcceptor");
+		Thread t = new I2PAppThread(streamAcceptor, "SAMPrimaryAcceptor");
 		t.start();
 	}
 
@@ -208,7 +208,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	 */
 	public void receiveDatagramBytes(Destination sender, byte[] data, int proto,
 	                                 int fromPort, int toPort) throws IOException {
-		throw new IOException("master session");
+		throw new IOException("primary session");
 	}
 
 	/**
@@ -220,7 +220,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	 *  @throws IOException always
 	 */
 	public void receiveRawBytes(byte[] data, int proto, int fromPort, int toPort) throws IOException {
-		throw new IOException("master session");
+		throw new IOException("primary session");
 	}
 
 	/**
@@ -235,19 +235,19 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	/** @throws I2PException always */
 	@Override
 	public void connect(SAMv3Handler handler, String dest, Properties props) throws I2PException {
-		throw new I2PException("master session");
+		throw new I2PException("primary session");
 	}
 
 	/** @throws SAMException always */
 	@Override
 	public void accept(SAMv3Handler handler, boolean verbose) throws SAMException {
-		throw new SAMException("master session");
+		throw new SAMException("primary session");
 	}
 
 	/** @throws SAMException always */
 	@Override
 	public void startForwardingIncoming(Properties props, boolean sendPorts) throws SAMException {
-		throw new SAMException("master session");
+		throw new SAMException("primary session");
 	}
 
 	/** does nothing */
@@ -268,7 +268,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	}
 
 	/**
-	 * Close the master session
+	 * Close the primary session
 	 * Overridden to stop the acceptor.
 	 */
 	@Override
