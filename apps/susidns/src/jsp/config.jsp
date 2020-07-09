@@ -45,7 +45,7 @@
 <div id="navi">
 <a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
-<a class="abook" href="addressbook?book=master&amp;filter=none"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=local&amp;filter=none"><%=intl._t("Local")%></a>&nbsp;
 <a class="abook" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;
 <a class="abook" href="addressbook?book=published&amp;filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
@@ -74,11 +74,11 @@
 <%=intl._t("File and directory paths here are relative to the addressbook's working directory, which is normally ~/.i2p/addressbook/ (Linux) or %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows).")%>
 </li>
 <li>
-<%=intl._t("If you want to manually add lines to an addressbook, add them to the private or master addressbooks.")%>
+<%=intl._t("If you want to manually add lines to an addressbook, add them to the private or local addressbooks.")%>
 <%=intl._t("The router addressbook and the published addressbook are updated by the addressbook application.")%>
 </li>
 <li>
-<%=intl._t("When you publish your addressbook, ALL destinations from the master and router addressbooks appear there.")%>
+<%=intl._t("When you publish your addressbook, ALL destinations from the local and router addressbooks appear there.")%>
 <%=intl._t("Use the private addressbook for private destinations, these are not published.")%>
 </li>
 </ol>
@@ -96,7 +96,7 @@
 <li><b>router_addressbook</b> -
 <%=intl._t("Your hosts.txt (don't change)")%>
 </li>
-<li><b>master_addressbook</b> -
+<li><b>local_addressbook</b> -
 <%=intl._t("Your personal addressbook, these hosts will be published")%>
 </li>
 <li><b>private_addressbook</b> -

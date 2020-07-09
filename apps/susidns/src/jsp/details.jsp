@@ -42,7 +42,7 @@
 <div id="navi">
 <a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
-<a class="abook" href="addressbook?book=master&amp;filter=none"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=local&amp;filter=none"><%=intl._t("Local")%></a>&nbsp;
 <a class="abook" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;
 <a class="abook" href="addressbook?book=published&amp;filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;

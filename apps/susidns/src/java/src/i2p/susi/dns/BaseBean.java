@@ -79,6 +79,12 @@ public class BaseBean
                 // added in 0.5, for compatibility with 0.4 config.txt
                 if( properties.getProperty(PRIVATE_BOOK) == null)
                     properties.setProperty(PRIVATE_BOOK, DEFAULT_PRIVATE_BOOK);
+                // migrate
+                String local = properties.getProperty("master_addressbook");
+                if (local != null) {
+                    properties.setProperty("local_addressbook", local);
+                    properties.remove("master_addressbook");
+                }
                 configLastLoaded = System.currentTimeMillis();
             }
         }

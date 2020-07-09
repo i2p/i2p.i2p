@@ -155,7 +155,7 @@ public abstract class LocalHTTPServer {
         }
 
         // Add to addressbook (form submit)
-        // Parameters are url, host, dest, nonce, and master | router | private.
+        // Parameters are url, host, dest, nonce, and local | router | private.
         // Do the add and redirect.
         if (targetRequest.equals("/add")) {
             if (query == null) {
@@ -170,7 +170,7 @@ public abstract class LocalHTTPServer {
             String nonce = opts.get("nonce");
             String referer = opts.get("referer");
             String book = "privatehosts.txt";
-            if (opts.get("master") != null)
+            if (opts.get("local") != null)
                 book = "userhosts.txt";
             else if (opts.get("router") != null)
                 book = "hosts.txt";
@@ -345,7 +345,7 @@ public abstract class LocalHTTPServer {
         if ("hosts.txt".equals(book))
             tbook = _t("router");
         else if ("userhosts.txt".equals(book))
-            tbook = _t("master");
+            tbook = _t("local");
         else if ("privatehosts.txt".equals(book))
             tbook = _t("private");
         else

@@ -54,7 +54,7 @@
 <div id="navi">
 <a id="overview" class="active" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
-<a class="abook" href="addressbook?book=master&amp;filter=none"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=local&amp;filter=none"><%=intl._t("Local")%></a>&nbsp;
 <a class="abook" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;
 <a class="abook" href="addressbook?book=published&amp;filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
@@ -77,7 +77,7 @@
 <h3><%=intl._t("How does the addressbook application work?")%></h3>
 <p>
 <%=intl._t("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
-<%=intl._t("Then it merges your \"master\" address book into the router address book as well.")%>
+<%=intl._t("Then it merges your \"local\" address book into the router address book as well.")%>
 <%=intl._t("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an eepsite.")%>
 </p><p>
 <%=intl._t("The router also uses a private address book, which is not merged or published.")%>
@@ -85,7 +85,7 @@
 <%=intl._t("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
 <div class="illustrate">
-<object type="image/svg+xml" data="images/how.svg">
+<object type="image/svg+xml" data="images/how.svg?<%=net.i2p.CoreVersion.VERSION%>">
 <img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" />
 </object>
 </div>

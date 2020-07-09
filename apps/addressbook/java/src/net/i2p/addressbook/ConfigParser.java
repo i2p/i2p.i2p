@@ -166,6 +166,10 @@ class ConfigParser {
         Map<String, String> result;
         try {
             result = parse(file);
+            // migrate
+            String local = result.remove("master_addressbook");
+            if (local != null)
+                result.put("local_addressbook", local);
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (!result.containsKey(entry.getKey()))
                     result.put(entry.getKey(), entry.getValue());
