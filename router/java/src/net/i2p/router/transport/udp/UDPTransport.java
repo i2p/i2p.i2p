@@ -1542,9 +1542,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
                 if (peer != null)
                     sendDestroy(peer);
-                dropPeer(peerHash, false, "wrong network");
+                dropPeer(peerHash, false, "Not in our network");
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping the peer " + peerHash + " because they are in the wrong net: " + entry);
+                    _log.warn("Not in our network: " + entry, new Exception());
                 return;
             } else {
                 if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {

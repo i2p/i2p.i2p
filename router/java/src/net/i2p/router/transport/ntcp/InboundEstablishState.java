@@ -591,7 +591,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         if (!rv) {
             Hash aliceHash = alice.getHash();
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping inbound connection from wrong network: " + aliceID + ' ' + aliceHash);
+                _log.warn("Not in our network: " + alice, new Exception());
             // So next time we will not accept the con from this IP,
             // rather than doing the whole handshake
             InetAddress addr = _con.getChannel().socket().getInetAddress();

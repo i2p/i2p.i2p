@@ -393,8 +393,8 @@ class PeerTestManager {
                     if (test.getReceiveBobTime() > 0)
                         testComplete(true);
                 } catch (UnknownHostException uhe) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
+                    if (_log.shouldWarn())
+                        _log.warn("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
                     _context.statManager().addRateData("udp.testBadIP", 1);
                 }
             } else {

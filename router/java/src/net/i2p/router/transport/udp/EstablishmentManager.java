@@ -253,8 +253,10 @@ class EstablishmentManager {
         Hash toHash = toIdentity.calculateHash();
         if (toRouterInfo.getNetworkId() != _networkID) {
             _context.banlist().banlistRouterForever(toHash, "Not in our network: " + toRouterInfo.getNetworkId());
+            if (_log.shouldWarn())
+                _log.warn("Not in our network: " + toRouterInfo, new Exception());
             _transport.markUnreachable(toHash);
-            _transport.failed(msg, "Remote peer is on the wrong network, cannot establish");
+            _transport.failed(msg, "Not in our network");
             return;
         }
         UDPAddress addr = new UDPAddress(ra);

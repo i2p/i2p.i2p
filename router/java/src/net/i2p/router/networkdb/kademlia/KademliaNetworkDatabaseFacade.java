@@ -1062,7 +1062,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (routerInfo.getNetworkId() != _networkID){
             _context.banlist().banlistRouterForever(key, "Not in our network: " + routerInfo.getNetworkId());
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Bad network: " + routerInfo);
+                _log.warn("Not in our network: " + routerInfo, new Exception());
             return "Not in our network";
         }
         FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();

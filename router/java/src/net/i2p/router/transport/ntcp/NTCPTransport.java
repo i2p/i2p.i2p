@@ -531,6 +531,8 @@ public class NTCPTransport extends TransportImpl {
         }
         if (toAddress.getNetworkId() != _networkID) {
             _context.banlist().banlistRouterForever(peer, "Not in our network: " + toAddress.getNetworkId());
+            if (_log.shouldWarn())
+                _log.warn("Not in our network: " + toAddress, new Exception());
             markUnreachable(peer);
             return null;    
         }
