@@ -18,6 +18,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterInfo;
@@ -293,29 +294,28 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return;
         }
 
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug(getJobId() + ": Send outbound client message job beginning" +
-        //               ": preparing to search for the leaseSet for " + _toString);
         SendJob success = new SendJob(getContext());
         // set in constructor
-        //_leaseSet = getContext().netDb().lookupLeaseSetLocally(key);
         if (_leaseSet != null) {
-            //getContext().statManager().addRateData("client.leaseSetFoundLocally", 1);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - leaseSet found locally for " + _toString);
-
             if (!_leaseSet.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
                 // If it's about to expire, refetch in the background, we'll
                 // probably need it again. This will prevent stalls later.
-                // We don't know if the other end is actually publishing his LS, so this could be a waste of time.
-                // When we move to LS2, we will have a bit that tells us if it is published.
-                if (_log.shouldWarn()) {
-                    long exp = now - _leaseSet.getLatestLeaseDate();
-                    _log.warn(getJobId() + ": leaseSet expired " + DataHelper.formatDuration(exp) + " ago, firing search: " + _leaseSet.getHash().toBase32());
+                boolean shouldFetch = true;
+                if (_leaseSet.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+                    // For LS2, we have a bit that tells us if it is published.
+                    LeaseSet2 ls2 = (LeaseSet2) _leaseSet;
+                    shouldFetch = !ls2.isUnpublished() || ls2.isBlindedWhenPublished();
                 }
-                getContext().netDb().lookupLeaseSetRemotely(_leaseSet.getHash(), _from.calculateHash());
+                if (shouldFetch) {
+                    if (_log.shouldInfo()) {
+                        long exp = now - _leaseSet.getLatestLeaseDate();
+                        _log.info(getJobId() + ": leaseSet expired " + DataHelper.formatDuration(exp) + " ago, firing search: " + _leaseSet.getHash().toBase32());
+                    }
+                    getContext().netDb().lookupLeaseSetRemotely(_leaseSet.getHash(), _from.calculateHash());
+                }
             }
-
             success.runJob();
         } else {
             _leaseSetLookupBegin = getContext().clock().now();
