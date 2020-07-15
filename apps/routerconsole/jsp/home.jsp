@@ -84,34 +84,15 @@
 <%
    }  // shouldShowSearch()
 %>
-  <div class="ag2">
-    <h4 class="app"><%=intl._t("Applications")%></h4>
-    <div class="homeapps">
-      <jsp:getProperty name="homehelper" property="services" /><br>
-    <div class="clearer">&nbsp;</div>
-    </div>
-  </div>
-  <div class="ag2">
-    <h4 class="app2"><%=intl._t("Websites Inside I2P")%></h4>
-    <div class="homesites">
-      <jsp:getProperty name="homehelper" property="favorites" /><br>
-    <div class="clearer">&nbsp;</div>
-    </div>
-  </div>
-  <div class="ag2">
-    <h4 class="app"><%=intl._t("Configuration")%></h4>
-    <div class="homeconfig">
-      <jsp:getProperty name="homehelper" property="config" /><br>
-    <div class="clearer">&nbsp;</div>
-    </div>
-  </div>
-  <div class="ag2">
-    <h4 class="app"><%=intl._t("Developer Information")%></h4>
-    <div class="homedevs">
-      <jsp:getProperty name="homehelper" property="monitoring" /><br>
-    <div class="clearer">&nbsp;</div>
-    </div>
-  </div>
-</div>
+  <jsp:getProperty name="homehelper" property="services" />
+
+  <jsp:getProperty name="homehelper" property="plugins" />
+
+  <jsp:getProperty name="homehelper" property="favorites" /><br>
+
+  <jsp:getProperty name="homehelper" property="config" /><br>
+
+  <jsp:getProperty name="homehelper" property="monitoring" /><br>
+
 </div>
 </body></html>

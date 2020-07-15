@@ -111,27 +111,112 @@ public class HomeHelper extends HelperBase {
     }
 
     public String getServices() {
-        List<App> plugins = NavHelper.getClientApps(_context);
-        return homeTable(PROP_SERVICES, DEFAULT_SERVICES, plugins);
+    	String table = homeTable(PROP_SERVICES, DEFAULT_SERVICES, null);
+    	if (table.length() == 0) {
+    		return "";
+    	}
+    	StringBuilder buf = new StringBuilder(1380);
+		buf.append("<div class=\"ag2\">");
+		buf.append("<h4 class=\"app\">");
+		buf.append(_t("Applications"));
+		buf.append("</h4>");
+		buf.append("<div class=\"homeapps\">");
+		buf.append(table);
+		buf.append("<br>");
+		buf.append("<div class=\"clearer\">&nbsp;</div>");
+		buf.append("</div>");
+		buf.append("</div>");
+        return buf.toString();
     }
-
+    
+    /** @since 0.9.47 */
+    public String getPlugins(){
+        List<App> plugins = NavHelper.getClientApps(_context);
+    	String table = pluginTable(plugins);
+    	if (table.length() == 0) {
+    		return "";
+    	}
+    	StringBuilder buf = new StringBuilder(1380);
+		buf.append("<div class=\"ag2\">");
+		buf.append("<h4 class=\"app\">");
+		buf.append(_t("Plugins"));
+		buf.append("</h4>");
+		buf.append("<div class=\"homeapps\">");
+		buf.append(table);
+		buf.append("<br>");
+		buf.append("<div class=\"clearer\">&nbsp;</div>");
+		buf.append("</div>");
+		buf.append("</div>");
+        return buf.toString();
+    }
+    
     /** @since 0.9.44 */
     public String getConfig(){
-        return homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
+    	String table = homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
+    	if (table.length() == 0) {
+    		return "";
+    	}
+    	StringBuilder buf = new StringBuilder(1380);
+		buf.append("<div class=\"ag2\">");
+		buf.append("<h4 class=\"app\">");
+		buf.append(_t("Configuration"));
+		buf.append("</h4>");
+		buf.append("<div class=\"homeapps\">");
+		buf.append(table);
+		buf.append("<br>");
+		buf.append("<div class=\"clearer\">&nbsp;</div>");
+		buf.append("</div>");
+		buf.append("</div>");
+        return buf.toString();
     }
 
     /** @since 0.9.44 */
     public String getMonitoring(){
-        return homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
+    	String table = homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
+    	if (table.length() == 0) {
+    		return "";
+    	}
+    	StringBuilder buf = new StringBuilder(1380);
+		buf.append("<div class=\"ag2\">");
+		buf.append("<h4 class=\"app\">");
+		buf.append(_t("Developer Information"));
+		buf.append("</h4>");
+		buf.append("<div class=\"homeapps\">");
+		buf.append(table);
+		buf.append("<br>");
+		buf.append("<div class=\"clearer\">&nbsp;</div>");
+		buf.append("</div>");
+		buf.append("</div>");
+        return buf.toString();
     }
 
     public String getFavorites() {
-        return homeTable(PROP_FAVORITES, DEFAULT_FAVORITES, null);
+    	String table = homeTable(PROP_FAVORITES, DEFAULT_FAVORITES, null);
+    	if (table.length() == 0) {
+    		return "";
+    	}
+    	StringBuilder buf = new StringBuilder(1380);
+		buf.append("<div class=\"ag2\">");
+		buf.append("<h4 class=\"app\">");
+		buf.append(_t("I2P Sites"));
+		buf.append("</h4>");
+		buf.append("<div class=\"homeapps\">");
+		buf.append(table);
+		buf.append("<br>");
+		buf.append("<div class=\"clearer\">&nbsp;</div>");
+		buf.append("</div>");
+		buf.append("</div>");
+        return buf.toString();
     }
 
     public String getConfigServices() {
         return configTable(PROP_SERVICES, DEFAULT_SERVICES);
     }
+
+	/** @since 0.9.47 */
+	public String getConfigPlugins() {
+		return getPlugins();
+	}
 
     /** @since 0.9.44 */
     public String getConfigConfig() {
@@ -164,6 +249,14 @@ public class HomeHelper extends HelperBase {
                              _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST) + ':' + port) +
                "\">";
     }
+
+
+	private String pluginTable(Collection<App> toAdd) {
+        Collection<App> apps = buildApps(_context, "");
+        if (toAdd != null)
+            apps.addAll(toAdd);
+        return renderApps(apps);
+	}
 
     private String homeTable(String prop, String dflt, Collection<App> toAdd) {
         String config = _context.getProperty(prop, dflt);
@@ -223,6 +316,9 @@ public class HomeHelper extends HelperBase {
     }
 
     private String renderApps(Collection<App> apps) {
+    	if (apps.size() == 0) {
+    		return "";
+    	}
         String website = _t("Web Server");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
