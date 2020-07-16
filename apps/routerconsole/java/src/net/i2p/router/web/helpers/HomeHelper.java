@@ -34,6 +34,10 @@ public class HomeHelper extends HelperBase {
     static final String PROP_MONITORING = "routerconsole.monitoring";
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
     private static final String PROP_SEARCH = "routerconsole.showSearch";
+    public final String bottomWrap = "<br>\n" +
+    		"<div class=\"clearer\">&nbsp;</div>\n" +
+    			"</div>\n" + 
+    			"</div>\n";
 
     // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
@@ -110,22 +114,24 @@ public class HomeHelper extends HelperBase {
         return _context.getBooleanProperty(PROP_SEARCH);
     }
 
+	public String topWrap(String headline){
+    	String str = "<div class=\"ag2\">\n" +
+    		"<h4 class=\"app\">" +
+    		_t(headline) +
+    		"</h4>\n" +
+    		"<div class=\"homeapps\">\n";
+		return str;
+	}
+	
     public String getServices() {
     	String table = homeTable(PROP_SERVICES, DEFAULT_SERVICES, null);
     	if (table.length() == 0) {
     		return "";
     	}
     	StringBuilder buf = new StringBuilder(1380);
-		buf.append("<div class=\"ag2\">");
-		buf.append("<h4 class=\"app\">");
-		buf.append(_t("Applications"));
-		buf.append("</h4>");
-		buf.append("<div class=\"homeapps\">");
+    	buf.append(topWrap("Applications"));
 		buf.append(table);
-		buf.append("<br>");
-		buf.append("<div class=\"clearer\">&nbsp;</div>");
-		buf.append("</div>");
-		buf.append("</div>");
+		buf.append(bottomWrap);
         return buf.toString();
     }
     
@@ -137,16 +143,9 @@ public class HomeHelper extends HelperBase {
     		return "";
     	}
     	StringBuilder buf = new StringBuilder(1380);
-		buf.append("<div class=\"ag2\">");
-		buf.append("<h4 class=\"app\">");
-		buf.append(_t("Plugins"));
-		buf.append("</h4>");
-		buf.append("<div class=\"homeapps\">");
+    	buf.append(topWrap("Plugins"));
 		buf.append(table);
-		buf.append("<br>");
-		buf.append("<div class=\"clearer\">&nbsp;</div>");
-		buf.append("</div>");
-		buf.append("</div>");
+		buf.append(bottomWrap);
         return buf.toString();
     }
     
@@ -157,16 +156,9 @@ public class HomeHelper extends HelperBase {
     		return "";
     	}
     	StringBuilder buf = new StringBuilder(1380);
-		buf.append("<div class=\"ag2\">");
-		buf.append("<h4 class=\"app\">");
-		buf.append(_t("Configuration"));
-		buf.append("</h4>");
-		buf.append("<div class=\"homeapps\">");
+    	buf.append(topWrap("Configuration"));
 		buf.append(table);
-		buf.append("<br>");
-		buf.append("<div class=\"clearer\">&nbsp;</div>");
-		buf.append("</div>");
-		buf.append("</div>");
+		buf.append(bottomWrap);
         return buf.toString();
     }
 
@@ -177,16 +169,9 @@ public class HomeHelper extends HelperBase {
     		return "";
     	}
     	StringBuilder buf = new StringBuilder(1380);
-		buf.append("<div class=\"ag2\">");
-		buf.append("<h4 class=\"app\">");
-		buf.append(_t("Developer Information"));
-		buf.append("</h4>");
-		buf.append("<div class=\"homeapps\">");
+    	buf.append(topWrap("Developer Information"));
 		buf.append(table);
-		buf.append("<br>");
-		buf.append("<div class=\"clearer\">&nbsp;</div>");
-		buf.append("</div>");
-		buf.append("</div>");
+		buf.append(bottomWrap);
         return buf.toString();
     }
 
@@ -196,16 +181,9 @@ public class HomeHelper extends HelperBase {
     		return "";
     	}
     	StringBuilder buf = new StringBuilder(1380);
-		buf.append("<div class=\"ag2\">");
-		buf.append("<h4 class=\"app\">");
-		buf.append(_t("I2P Sites"));
-		buf.append("</h4>");
-		buf.append("<div class=\"homeapps\">");
+    	buf.append(topWrap("I2P Community Sites"));
 		buf.append(table);
-		buf.append("<br>");
-		buf.append("<div class=\"clearer\">&nbsp;</div>");
-		buf.append("</div>");
-		buf.append("</div>");
+		buf.append(bottomWrap);
         return buf.toString();
     }
 
