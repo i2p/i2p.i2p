@@ -68,7 +68,7 @@ abstract class ExtensionHandler {
         handshake.put("m", m);
         handshake.put("p", Integer.valueOf(TrackerClient.PORT));
         handshake.put("v", "I2PSnark");
-        handshake.put("reqq", Integer.valueOf(5));
+        handshake.put("reqq", Integer.valueOf(PeerState.MAX_PIPELINE));
         // BEP 21
         if (uploadOnly)
             handshake.put("upload_only", Integer.valueOf(1));

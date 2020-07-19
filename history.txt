@@ -1,5 +1,16 @@
+2020-07-19 zzz
+ * i2psnark: Increase max pipeline, negotiate actual value
+
+2020-07-11 zzz
+ * NTCP: Atomics for NTCP final state (ticket #2701)
+ * OCMOSJ: Don't lookup an expiring LS2 if unpublished
+
+2020-07-07 zzz
+ * i2psnark: Change ETA default sort order (ticket #2733)
+ * Reseed: Enforce minimum version in generated bundle
+
 2020-07-02 zzz
- * i2ptunnel: Fix missing throttling section for non-HTTP servers
+ * i2ptunnel: Fix missing throttling section for non-HTTP servers (ticket #2758)
 
 2020-06-28 zzz
  * NetDB: Check signature in verify

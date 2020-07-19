@@ -38,6 +38,7 @@ import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 
 public class Peer implements Comparable<Peer>
 {
@@ -92,6 +93,7 @@ public class Peer implements Comparable<Peer>
   private long options;
   private final boolean _isIncoming;
   private int _totalCommentsSent;
+  private int _maxPipeline = PeerState.MIN_PIPELINE;
 
   /**
    * Outgoing connection.
@@ -428,9 +430,30 @@ public class Peer implements Comparable<Peer>
       return handshakeMap;
   }
 
-  /** @since 0.8.4 */
+  /**
+   *  @param map non-null
+   *  @since 0.8.4
+   */
   public void setHandshakeMap(Map<String, BEValue> map) {
       handshakeMap = map;
+      BEValue bev = map.get("reqq");
+      if (bev != null) {
+          try {
+              int reqq = bev.getInt();
+              _maxPipeline = Math.min(PeerState.MAX_PIPELINE, Math.max(PeerState.MIN_PIPELINE, reqq));
+          } catch (InvalidBEncodingException ibee) {}
+      } else {
+          // BEP 10 "The default in libtorrent is 250"
+          _maxPipeline = PeerState.MAX_PIPELINE;
+      }
+  }
+
+  /**
+   *  @return min of PeerState.MIN_PIPELINE, max of PeerState.MAX_PIPELINE
+   *  @since 0.9.47
+   */
+  public int getMaxPipeline() {
+      return _maxPipeline;
   }
 
   /** @since 0.8.4 */
@@ -644,7 +667,8 @@ public class Peer implements Comparable<Peer>
 
   /**
    * Returns the number of bytes that have been downloaded.
-   * Can be reset to zero with <code>resetCounters()</code>/
+   * Can be reset to zero with <code>resetCounters()</code>
+   * which is called every CHECK_PERIOD by PeerCheckerTask.
    */
   public long getDownloaded()
   {
@@ -653,7 +677,8 @@ public class Peer implements Comparable<Peer>
 
   /**
    * Returns the number of bytes that have been uploaded.
-   * Can be reset to zero with <code>resetCounters()</code>/
+   * Can be reset to zero with <code>resetCounters()</code>
+   * which is called every CHECK_PERIOD by PeerCheckerTask.
    */
   public long getUploaded()
   {
