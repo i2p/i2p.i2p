@@ -748,7 +748,21 @@ public class GeneralHelper {
      *  @since 0.9.44
      */
     public boolean hasEncType(int tunnel, int encType) {
-        String senc = getProperty(tunnel, "i2cp.leaseSetEncType", "0");
+        TunnelController tun = getController(tunnel);
+        if (tun == null) {
+            // New clients and servers default to both
+            return encType == 4 || encType == 0;
+        }
+        // migration: HTTP proxy and shared clients default to both
+        String dflt;
+        if (tun.isClient() &&
+            (TunnelController.TYPE_HTTP_CLIENT.equals(tun.getType()) ||
+             Boolean.parseBoolean(tun.getSharedClient()))) {
+            dflt = "4,0";
+        } else {
+            dflt = "0";
+        }
+        String senc = getProperty(tunnel, "i2cp.leaseSetEncType", dflt);
         String[] senca = DataHelper.split(senc, ",");
         String se = Integer.toString(encType);
         for (int i = 0; i < senca.length; i++) {

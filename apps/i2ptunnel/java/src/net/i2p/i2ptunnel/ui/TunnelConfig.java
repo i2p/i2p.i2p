@@ -844,7 +844,13 @@ public class TunnelConfig {
 
             // As of 0.9.18, add persistent leaseset keys if not present
             // but only if we know the sigtype
-            String senc = config.getProperty(OPT + "i2cp.leaseSetEncType", "0");
+            // TODO: Put server enctype migration here
+            String dflt;
+            //if (...)
+            //    dflt = "4,0";
+            //else
+                dflt = "0";
+            String senc = config.getProperty(OPT + "i2cp.leaseSetEncType", dflt);
             String slstyp = config.getProperty(OPT + "i2cp.leaseSetType", "0");
             if (senc.equals("0") && slstyp.equals("0")) {
                 // only for LS1

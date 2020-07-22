@@ -1,5 +1,11 @@
+2020-07-22 zzz
+ * i2ptunnel:
+   - Change default encType to both for new tunnels, http client,
+     shared clients, and all tunnels for new installs (ticket #2751)
+   - Change IRC tunnel sigType to EdDSA for new installs (ticket #2749)
+
 2020-07-19 zzz
- * i2psnark: Increase max pipeline, negotiate actual value
+ * i2psnark: Increase max pipeline, negotiate actual value (ticket #2280)
 
 2020-07-11 zzz
  * NTCP: Atomics for NTCP final state (ticket #2701)

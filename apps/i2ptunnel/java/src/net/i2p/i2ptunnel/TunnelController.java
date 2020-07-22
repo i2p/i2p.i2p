@@ -143,6 +143,8 @@ public class TunnelController implements Logging {
     private static final String OPT_LIMIT_ACTION = PFX_OPTION + PROP_LIMIT_ACTION;
     private static final String OPT_I2CP_GZIP = PFX_OPTION + I2PClient.PROP_GZIP;
 
+    private static final String OPT_ENCTYPE = PFX_OPTION + "i2cp.leaseSetEncType";
+
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
     public static final String TYPE_HTTP_BIDIR_SERVER = "httpbidirserver";
@@ -900,6 +902,12 @@ public class TunnelController implements Logging {
                     }
                 }
             }
+            if (isClient(type) &&
+                (type.equals(TYPE_HTTP_CLIENT) || Boolean.valueOf(_config.getProperty(PROP_SHARED, "false")))) {
+                // migration: HTTP proxy and shared clients default to both
+                if (!_config.containsKey(OPT_ENCTYPE))
+                    _config.setProperty(OPT_ENCTYPE, "4,0");
+            }
         }
 
         // tell i2ptunnel, who will tell the TunnelTask, who will tell the SocketManager
@@ -1011,6 +1019,7 @@ public class TunnelController implements Logging {
      *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
      *
      *  @since 0.9.17 moved from IndexBean
+     *  @return false if type == null
      */
     public static boolean isClient(String type) {
         return TYPE_STD_CLIENT.equals(type) ||
