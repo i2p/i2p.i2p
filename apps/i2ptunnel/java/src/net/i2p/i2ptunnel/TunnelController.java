@@ -863,10 +863,10 @@ public class TunnelController implements Logging {
                 if (!_config.containsKey(OPT_LOW_TAGS))
                     _config.setProperty(OPT_LOW_TAGS, "14");
             }
-            // same default logic as in EditBean.getSigType()
+            // same default logic as in EditBean.getSigType() and GeneralHelper.getSigType()
             if (!isClient(type) ||
                 type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) ||
-                type.equals(TYPE_SOCKS) ||
+                type.equals(TYPE_SOCKS) || type.equals(TYPE_CONNECT) ||
                 type.equals(TYPE_SOCKS_IRC) || type.equals(TYPE_STREAMR_CLIENT) ||
                 type.equals(TYPE_HTTP_CLIENT)) {
                 if (!_config.containsKey(OPT_SIG_TYPE))

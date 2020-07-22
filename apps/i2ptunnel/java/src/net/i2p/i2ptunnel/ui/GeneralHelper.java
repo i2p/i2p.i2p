@@ -735,6 +735,7 @@ public class GeneralHelper {
                 TunnelController.TYPE_SOCKS.equals(ttype) ||
                 TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
                 TunnelController.TYPE_STD_CLIENT.equals(ttype) ||
+                TunnelController.TYPE_CONNECT.equals(ttype) ||
                 TunnelController.TYPE_HTTP_CLIENT.equals(ttype))
                 type = TunnelController.PREFERRED_SIGTYPE;
             else
