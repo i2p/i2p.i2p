@@ -131,7 +131,7 @@
 <a href="https://www.transifex.com/projects/p/I2P/" target="_blank"><%=intl._t("please consider the I2P translation efforts.")%></a>
 </p>
 <p>
-<%=intl._t("Please select your preferred language")%>
+<%=intl._t("Please select your preferred language:")%>
 </p>
 </div>
 </div>
@@ -333,10 +333,9 @@
 </p>
 <p>
 <%=intl._t("The I2P router also comes with it's own versions of common, useful internet applications like")%>
-<a href="/torrents" target="_blank"><%=intl._t("bittorrent")%></a>
-<%=intl._t("and")%>
-<a href="/webmail" target="_blank"><%=intl._t("e-mail")%></a>
-<%=intl._t("and a.")%>
+<a href="/torrents" target="_blank"><%=intl._t("bittorrent,")%></a>
+<a href="/webmail" target="_blank"><%=intl._t("e-mail,")%></a>
+<%=intl._t("and a")%>
 <a href="/i2ptunnel" target="_blank"><%=intl._t("web server")%></a>
 <%=intl._t("so you can create, communicate, and share your content.")%>
 <%=intl._t("These applications work with I2P automatically and require no additional configuration.")%>
@@ -371,7 +370,7 @@
 <p>
 <%=intl._t("It will take some time for your peers to integrate your router into the network,")%>
 <%=intl._t("but while that is happening you can still explore I2P applications and get to know your way around the router console.")%>
-<%=intl._t("There is quick guide, news about the latest release, an FAQ, and troubleshooting guide available on the /console page.")%>
+<%=intl._t("There is a quick guide, news about the latest release, an FAQ, and troubleshooting guide available on the /console page.")%>
 </p><p>
 <%=intl._t("You may notice a message in the sidebar that I2P is rejecting tunnels.")%>
 <%=intl._t("This is normal behavior as part of the start-up process, to make sure that")%>
