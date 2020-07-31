@@ -35,9 +35,9 @@ public class HomeHelper extends HelperBase {
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
     private static final String PROP_SEARCH = "routerconsole.showSearch";
     public final String bottomWrap = "<br>\n" +
-    		"<div class=\"clearer\">&nbsp;</div>\n" +
-    			"</div>\n" + 
-    			"</div>\n";
+            "<div class=\"clearer\">&nbsp;</div>\n" +
+                "</div>\n" + 
+                "</div>\n";
 
     // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
@@ -114,76 +114,76 @@ public class HomeHelper extends HelperBase {
         return _context.getBooleanProperty(PROP_SEARCH);
     }
 
-	public String topWrap(String headline){
-    	String str = "<div class=\"ag2\">\n" +
-    		"<h4 class=\"app\">" +
-    		_t(headline) +
-    		"</h4>\n" +
-    		"<div class=\"homeapps\">\n";
-		return str;
-	}
-	
+    public String topWrap(String headline){
+        String str = "<div class=\"ag2\">\n" +
+            "<h4 class=\"app\">" +
+            _t(headline) +
+            "</h4>\n" +
+            "<div class=\"homeapps\">\n";
+        return str;
+    }
+    
     public String getServices() {
-    	String table = homeTable(PROP_SERVICES, DEFAULT_SERVICES, null);
-    	if (table.length() == 0) {
-    		return "";
-    	}
-    	StringBuilder buf = new StringBuilder(1380);
-    	buf.append(topWrap("Applications"));
-		buf.append(table);
-		buf.append(bottomWrap);
+        String table = homeTable(PROP_SERVICES, DEFAULT_SERVICES, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap("Applications"));
+        buf.append(table);
+        buf.append(bottomWrap);
         return buf.toString();
     }
     
     /** @since 0.9.47 */
     public String getPlugins(){
         List<App> plugins = NavHelper.getClientApps(_context);
-    	String table = pluginTable(plugins);
-    	if (table.length() == 0) {
-    		return "";
-    	}
-    	StringBuilder buf = new StringBuilder(1380);
-    	buf.append(topWrap("Plugins"));
-		buf.append(table);
-		buf.append(bottomWrap);
+        String table = pluginTable(plugins);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap("Plugins"));
+        buf.append(table);
+        buf.append(bottomWrap);
         return buf.toString();
     }
     
     /** @since 0.9.44 */
     public String getConfig(){
-    	String table = homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
-    	if (table.length() == 0) {
-    		return "";
-    	}
-    	StringBuilder buf = new StringBuilder(1380);
-    	buf.append(topWrap("Configuration"));
-		buf.append(table);
-		buf.append(bottomWrap);
+        String table = homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap("Configuration"));
+        buf.append(table);
+        buf.append(bottomWrap);
         return buf.toString();
     }
 
     /** @since 0.9.44 */
     public String getMonitoring(){
-    	String table = homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
-    	if (table.length() == 0) {
-    		return "";
-    	}
-    	StringBuilder buf = new StringBuilder(1380);
-    	buf.append(topWrap("Developer Information"));
-		buf.append(table);
-		buf.append(bottomWrap);
+        String table = homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap("Developer Information"));
+        buf.append(table);
+        buf.append(bottomWrap);
         return buf.toString();
     }
 
     public String getFavorites() {
-    	String table = homeTable(PROP_FAVORITES, DEFAULT_FAVORITES, null);
-    	if (table.length() == 0) {
-    		return "";
-    	}
-    	StringBuilder buf = new StringBuilder(1380);
-    	buf.append(topWrap("I2P Community Sites"));
-		buf.append(table);
-		buf.append(bottomWrap);
+        String table = homeTable(PROP_FAVORITES, DEFAULT_FAVORITES, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap("I2P Community Sites"));
+        buf.append(table);
+        buf.append(bottomWrap);
         return buf.toString();
     }
 
@@ -191,10 +191,10 @@ public class HomeHelper extends HelperBase {
         return configTable(PROP_SERVICES, DEFAULT_SERVICES);
     }
 
-	/** @since 0.9.47 */
-	public String getConfigPlugins() {
-		return getPlugins();
-	}
+    /** @since 0.9.47 */
+    public String getConfigPlugins() {
+        return getPlugins();
+    }
 
     /** @since 0.9.44 */
     public String getConfigConfig() {
@@ -229,12 +229,12 @@ public class HomeHelper extends HelperBase {
     }
 
 
-	private String pluginTable(Collection<App> toAdd) {
+    private String pluginTable(Collection<App> toAdd) {
         Collection<App> apps = buildApps(_context, "");
         if (toAdd != null)
             apps.addAll(toAdd);
         return renderApps(apps);
-	}
+    }
 
     private String homeTable(String prop, String dflt, Collection<App> toAdd) {
         String config = _context.getProperty(prop, dflt);
@@ -294,9 +294,9 @@ public class HomeHelper extends HelperBase {
     }
 
     private String renderApps(Collection<App> apps) {
-    	if (apps.size() == 0) {
-    		return "";
-    	}
+        if (apps.size() == 0) {
+            return "";
+        }
         String website = _t("Web Server");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
