@@ -1,8 +1,22 @@
+2020-08-01 zzz
+ * Debian: Support libjson-simple-java 3 for bullseye
+ * I2NP: Locking for message ID
+ * NetDB: Track client that requested LS
+ * OCMOSJ: Don't send to a RAP LS
+ * Router: Logging fix for client start failures
+ * Util:
+   - More efficient use of random data
+   - Add KeyStore and SHA256 to CLI
+
+2020-07-28 zzz
+ * Data: Don't check LS1 revocation signature
+
 2020-07-22 zzz
  * i2ptunnel:
    - Change default encType to both for new tunnels, http client,
      shared clients, and all tunnels for new installs (ticket #2751)
    - Change IRC tunnel sigType to EdDSA for new installs (ticket #2749)
+   - Change CONNECT tunnel default sigType to EdDSA (ticket #2749)
 
 2020-07-19 zzz
  * i2psnark: Increase max pipeline, negotiate actual value (ticket #2280)
