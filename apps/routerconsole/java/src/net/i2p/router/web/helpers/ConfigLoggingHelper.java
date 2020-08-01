@@ -12,22 +12,25 @@ import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
 public class ConfigLoggingHelper extends HelperBase {
-    public ConfigLoggingHelper() {}
     
     public String getLogFilePattern() {
         return _context.logManager().getBaseLogfilename();
     }
+
     public String getRecordPattern() {
         return new String(_context.logManager().getFormat());
     }
+
     public String getDatePattern() {
         return _context.logManager().getDateFormatPattern();
     }
+
     public String getMaxFileSize() {
         int bytes = _context.logManager().getFileSize();
         if (bytes <= 0) return "1.00 MiB";
         return DataHelper.formatSize2(bytes, false) + 'B';
     }
+
     public String getLogLevelTable() {
         StringBuilder buf = new StringBuilder(32*1024);
         Properties limits = _context.logManager().getLimits();
@@ -41,13 +44,8 @@ public class ConfigLoggingHelper extends HelperBase {
             String level = limits.getProperty(prefix);
             buf.append(prefix).append('=').append(level).append('\n');
         }
-        buf.append("</textarea><br>\n");
-        buf.append("<p>")
-           .append(_t("Add additional logging statements above (e.g. {0}).", "<b>net.i2p.router.tunnel=WARN</b>"))
-           .append("<br>")
-           .append(_t("Alternatively, put entries in the file {0} (e.g. {1}).",
-                      "<b>" + new File(_context.getConfigDir(), "logger.config") + "</b>",
-                      "<b>logger.record.net.i2p.router.tunnel=WARN</b>"))
+        buf.append("</textarea><br>\n<p>");
+        buf.append(_t("Add additional logging statements above (e.g. {0}).", "<b>net.i2p.router.tunnel=WARN</b>"))
            .append("<br>")
            .append(_t("Valid log levels are {0}.", "<b>DEBUG, INFO, WARN, ERROR, CRIT</b>"))
            .append("</p>\n");
@@ -72,12 +70,13 @@ public class ConfigLoggingHelper extends HelperBase {
     private static final String[] levels = { "CRIT", "ERROR", "WARN", "INFO", "DEBUG" };
 
     public String getDefaultLogLevelBox() {
+        StringBuilder buf = new StringBuilder(128);
         String cur = _context.logManager().getDefaultLimit();
-        return getLogLevelBox("defaultloglevel", cur, false);
+        getLogLevelBox(buf, "defaultloglevel", cur, false);
+        return buf.toString();
     }
 
-    private String getLogLevelBox(String name, String cur, boolean showRemove) {
-        StringBuilder buf = new StringBuilder(128);
+    private void getLogLevelBox(StringBuilder buf, String name, String cur, boolean showRemove) {
         buf.append("<select name=\"").append(name).append("\">\n");
         
         for (int i = 0; i < levels.length; i++) {
@@ -88,10 +87,9 @@ public class ConfigLoggingHelper extends HelperBase {
             buf.append('>').append(_c(l)).append("</option>\n");
         }        
         
-        if (showRemove)
-            buf.append("<option value=\"remove\">").append(_t("Remove")).append("</option>");
+        //if (showRemove)
+        //    buf.append("<option value=\"remove\">").append(_t("Remove")).append("</option>");
         buf.append("</select>\n");
-        return buf.toString();
     }
 
     /**
@@ -135,7 +133,7 @@ public class ConfigLoggingHelper extends HelperBase {
         }        
         
         buf.append("</select>\n");
-        buf.append(getLogLevelBox("newloglevel", "WARN", false));
+        getLogLevelBox(buf, "newloglevel", "WARN", false);
         return buf.toString();
     }
 
