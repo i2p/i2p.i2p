@@ -10,6 +10,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -55,21 +56,22 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _activeFloodQueries = new HashMap<Hash, FloodSearchJob>();
          _verifiesInProgress = new ConcurrentHashSet<Hash>(8);
 
+        long[] rate = new long[] { 60*60*1000L };
         _context.statManager().createRequiredRateStat("netDb.successTime", "Time for successful lookup (ms)", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.failedRetries", "How many additional queries for an iterative search", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.successRetries", "How many additional queries for an iterative search", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.failedRetries", "How many additional queries for an iterative search", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.successRetries", "How many additional queries for an iterative search", "NetworkDatabase", rate);
         _context.statManager().createRateStat("netDb.failedAttemptedPeers", "How many peers we sent a search to when the search fails", "NetworkDatabase", new long[] { 10*60*1000l });
-        _context.statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.searchMessageCount", "Overall number of mesages for all searches sent", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.searchReplyValidated", "How many search replies we get that we are able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.searchMessageCount", "Overall number of mesages for all searches sent", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.searchReplyValidated", "How many search replies we get that we are able to validate (fetch)", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", rate);
+        _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", rate);
         // for ISJ
-        _context.statManager().createRateStat("netDb.RILookupDirect", "Was an iterative RI lookup sent directly?", "NetworkDatabase", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("netDb.RILookupDirect", "Was an iterative RI lookup sent directly?", "NetworkDatabase", rate);
         _ffMonitor = new FloodfillMonitorJob(_context, this);
     }
 
@@ -228,7 +230,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
 
         // todo key cert skip?
         long until = gen.getTimeTillMidnight();
-        if (until < NEXT_RKEY_LS_ADVANCE_TIME ||
+        if ((type != DatabaseEntry.KEY_TYPE_ROUTERINFO && until < NEXT_RKEY_LS_ADVANCE_TIME &&
+             (((LeaseSet)ds).getLatestLeaseDate() - _context.clock().now()) > until) ||
             (type == DatabaseEntry.KEY_TYPE_ROUTERINFO && until < NEXT_RKEY_RI_ADVANCE_TIME)) {
             // to avoid lookup faulures after midnight, also flood to some closest to the
             // next routing key for a period of time before midnight.
