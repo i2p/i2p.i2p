@@ -70,6 +70,7 @@ public class LeaseSet extends DatabaseEntry {
     protected final List<Lease> _leases;
     protected boolean _receivedAsPublished;
     private boolean _receivedAsReply;
+    private Hash _receivedBy;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
     protected long _lastExpiration;
@@ -198,8 +199,29 @@ public class LeaseSet extends DatabaseEntry {
      */
     public boolean getReceivedAsReply() { return _receivedAsReply; }
 
-    /** set to true @since 0.7.14 */
+    /**
+     * set to true
+     * @since 0.7.14
+     */
     public void setReceivedAsReply() { _receivedAsReply = true; }
+
+    /**
+     * The Hash of the local client that received this LS,
+     * null if the router or unknown.
+     *
+     * @since 0.9.47
+     */
+    public Hash getReceivedBy() { return _receivedBy; }
+
+    /**
+     * Also sets receivedAsReply to true
+     * @param localClient may be null
+     * @since 0.9.47
+     */
+    public void setReceivedBy(Hash localClient) {
+        _receivedAsReply = true;
+        _receivedBy = localClient;
+    }
 
     /**
      * @throws IllegalStateException if already signed

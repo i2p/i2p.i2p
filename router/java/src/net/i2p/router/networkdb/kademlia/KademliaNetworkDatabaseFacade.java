@@ -602,7 +602,26 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     public void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest) {
         if (!_initialized) return;
         key = _blindCache.getHash(key);
+        if (isNegativeCached(key))
+            return;
         search(key, null, null, 20*1000, true, fromLocalDest);
+    }
+    
+    /**
+     *  Unconditionally lookup using the client's tunnels.
+     *
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @param onFindJob may be null
+     *  @param onFailedLookupJob may be null
+     *  @since 0.9.47
+     */
+    public void lookupLeaseSetRemotely(Hash key, Job onFindJob, Job onFailedLookupJob,
+                                       long timeoutMs, Hash fromLocalDest) {
+        if (!_initialized) return;
+        key = _blindCache.getHash(key);
+        if (isNegativeCached(key))
+            return;
+        search(key, onFindJob, onFailedLookupJob, timeoutMs, true, fromLocalDest);
     }
 
     /**
@@ -936,6 +955,16 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             rv = (LeaseSet)_ds.get(key);
             if ( (rv != null) && (rv.equals(leaseSet)) ) {
                 // if it hasn't changed, no need to do anything
+                // except copy over the flags
+                Hash to = leaseSet.getReceivedBy();
+                if (to != null) {
+                    rv.setReceivedBy(to);
+                } else if (leaseSet.getReceivedAsReply()) {
+                    rv.setReceivedAsReply();
+                }
+                if (leaseSet.getReceivedAsPublished()) {
+                    rv.setReceivedAsPublished(true);
+                }
                 return rv;
             }
         } catch (ClassCastException cce) {

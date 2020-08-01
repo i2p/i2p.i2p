@@ -207,7 +207,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _to = msg.getDestination();
         Hash toHash = _to.calculateHash();
         _hashPair = new OutboundCache.HashPair(_from.calculateHash(), toHash);
-        _toString = toHash.toBase64().substring(0,4);
+        _toString = toHash.toBase32();
         // we look up here rather than runJob() so we may adjust the timeout
         _leaseSet = ctx.netDb().lookupLeaseSetLocally(toHash);
         
@@ -297,6 +297,23 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         SendJob success = new SendJob(getContext());
         // set in constructor
         if (_leaseSet != null) {
+            if (!_leaseSet.getReceivedAsReply()) {
+                boolean shouldFetch = true;
+                if (_leaseSet.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+                    LeaseSet2 ls2 = (LeaseSet2) _leaseSet;
+                    shouldFetch = !ls2.isUnpublished() || ls2.isBlindedWhenPublished();
+                }
+                if (shouldFetch) {
+                    if (_log.shouldInfo())
+                        _log.info(getJobId() + ": RAP LS, firing search: " + _leaseSet.getHash().toBase32());
+                    LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
+                    getContext().netDb().lookupLeaseSetRemotely(_leaseSet.getHash(), success, failed,
+                                                                LS_LOOKUP_TIMEOUT, _from.calculateHash());
+                } else {
+                    dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET);
+                }
+                return;
+            }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - leaseSet found locally for " + _toString);
             if (!_leaseSet.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
@@ -405,12 +422,16 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private int getNextLease() {
         // set in runJob if found locally
-        if (_leaseSet == null) {
+        if (_leaseSet == null || !_leaseSet.getReceivedAsReply()) {
             _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
             if (_leaseSet == null) {
                 // shouldn't happen
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet for " + _toString);
+                return MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
+            } else if (_leaseSet.getReceivedAsPublished()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getJobId() + ": Only have RAP LS for " + _toString);
                 return MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
             } 
         } 
@@ -571,8 +592,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                     _log.warn("Unable to send to " + _toString + " because the sig type is unsupported");
                 cause = MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION;
             } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Unable to send to " + _toString + " because we couldn't find their leaseSet");
+                if (_log.shouldInfo())
+                    _log.info("Unable to send to " + _toString + ", no LS found");
                 cause = MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
             }
 

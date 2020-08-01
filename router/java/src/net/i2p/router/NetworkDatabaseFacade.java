@@ -75,6 +75,17 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest);
 
     /**
+     *  Unconditionally lookup using the client's tunnels.
+     *
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @param onFindJob may be null
+     *  @param onFailedLookupJob may be null
+     *  @since 0.9.47
+     */
+    public abstract void lookupLeaseSetRemotely(Hash key, Job onFindJob, Job onFailedLookupJob,
+                                       long timeoutMs, Hash fromLocalDest);
+
+    /**
      *  Lookup using the client's tunnels
      *  Succeeds even if LS validation fails due to unsupported sig type
      *
