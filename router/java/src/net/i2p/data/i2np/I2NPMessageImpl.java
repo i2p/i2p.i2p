@@ -38,7 +38,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *  Extending classes should take care when accessing this field;
      *  to ensure initialization, use getUniqueId() instead.
      */
-    protected long _uniqueId = -1;
+    private long _uniqueId = -1;
 
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
     public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
@@ -145,7 +145,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         
         // Compare the checksum in data to the checksum of the data after the checksum
         _context.sha().calculateHash(data, cur + CHECKSUM_LENGTH, sz, calc, 0);
-        boolean eq = DataHelper.eq(data, cur, calc, 0, CHECKSUM_LENGTH);
+        //boolean eq = DataHelper.eq(data, cur, calc, 0, CHECKSUM_LENGTH);
+        boolean eq = data[cur] == calc[0];
         cur += CHECKSUM_LENGTH;
 
         SimpleByteCache.release(calc);
@@ -177,7 +178,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     /**
      * Replay resistant message Id
      */
-    public long getUniqueId() {
+    public synchronized long getUniqueId() {
         // Lazy initialization of value
         if (_uniqueId < 0) {
             _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
@@ -188,7 +189,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     /**
      *  The ID is set to a random value when written but it can be overridden here.
      */
-    public void setUniqueId(long id) { _uniqueId = id; }
+    public synchronized void setUniqueId(long id) { _uniqueId = id; }
 
     /**
      * Date after which the message should be dropped (and the associated uniqueId forgotten)
@@ -256,19 +257,14 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             _context.sha().calculateHash(buffer, off + HEADER_LENGTH, payloadLen, h, 0);
 
             buffer[off++] = (byte) getType();
-
-            // Lazy initialization of value
-            if (_uniqueId < 0) {
-                _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
-            }
-            DataHelper.toLong(buffer, off, 4, _uniqueId);
-
+            DataHelper.toLong(buffer, off, 4, getUniqueId());
             off += 4;
             DataHelper.toLong(buffer, off, DataHelper.DATE_LENGTH, _expiration);
             off += DataHelper.DATE_LENGTH;
             DataHelper.toLong(buffer, off, 2, payloadLen);
             off += 2;
-            System.arraycopy(h, 0, buffer, off, CHECKSUM_LENGTH);
+            //System.arraycopy(h, 0, buffer, off, CHECKSUM_LENGTH);
+            buffer[off] = h[0];
             SimpleByteCache.release(h);
 
             return rv;
@@ -322,11 +318,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public int toRawByteArrayNTCP2(byte buffer[], int off) {
         try {
             buffer[off++] = (byte) getType();
-            // Lazy initialization of value
-            if (_uniqueId < 0) {
-                _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
-            }
-            DataHelper.toLong(buffer, off, 4, _uniqueId);
+            DataHelper.toLong(buffer, off, 4, getUniqueId());
             off += 4;
             // January 19 2038? No, unsigned, good until Feb. 7 2106
             // in seconds, round up so we don't lose time every hop
@@ -393,7 +385,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         I2NPMessage msg = createMessage(ctx, type);
 
         try {
-            long id = DataHelper.fromLong(buffer, offset, 4);
+            msg.setUniqueId(DataHelper.fromLong(buffer, offset, 4));
             offset += 4;
             // January 19 2038? No, unsigned, good until Feb. 7 2106
             // in seconds, round up so we don't lose time every hop
@@ -401,7 +393,6 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             offset += 4;
             int dataSize = len - 9;
             msg.readMessage(buffer, offset, dataSize, type, handler);
-            msg.setUniqueId(id);
             msg.setMessageExpiration(expiration);
             return msg;
         } catch (IllegalArgumentException iae) {

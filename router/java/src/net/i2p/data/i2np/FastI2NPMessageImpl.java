@@ -68,7 +68,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
             type = data[cur] & 0xff;
             cur++;
         }
-        _uniqueId = DataHelper.fromLong(data, cur, 4);
+        setUniqueId(DataHelper.fromLong(data, cur, 4));
         cur += 4;
         _expiration = DataHelper.fromLong(data, cur, DataHelper.DATE_LENGTH);
         cur += DataHelper.DATE_LENGTH;
@@ -140,7 +140,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
             int payloadLen = writtenLen - HEADER_LENGTH;
             int off = 0;
             buffer[off++] = (byte) getType();
-            DataHelper.toLong(buffer, off, 4, _uniqueId);
+            DataHelper.toLong(buffer, off, 4, getUniqueId());
             off += 4;
             DataHelper.toLong(buffer, off, DataHelper.DATE_LENGTH, _expiration);
             off += DataHelper.DATE_LENGTH;
