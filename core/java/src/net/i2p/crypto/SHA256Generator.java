@@ -92,4 +92,12 @@ public final class SHA256Generator {
             throw new RuntimeException(e);
         }
     }
+
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: SHA256Generator 'text to hash'");
+            System.exit(1);
+        }
+        System.out.println(net.i2p.data.Base64.encode(getInstance().calculateHash(net.i2p.data.DataHelper.getUTF8(args[0])).getData()));
+    }
 }
