@@ -38,6 +38,18 @@ export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{prin
 export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
+# debian: bullseye - transitioning
+JSON_SIMPLE_VERSION = $(shell dpkg -l libjson-simple-java | grep '^ii' | awk '{print $$3}')
+JSON_SIMPLE_3 = $(shell dpkg --compare-versions '$(JSON_SIMPLE_VERSION)' '>' '3.1.1-1~' && echo yes || echo no)
+ifeq (yes,$(JSON_SIMPLE_3))
+JSON_SIMPLE_PACKAGE = com.github.cliftonlabs.json_simple
+JSON_EXCEPTION = JsonException
+else
+JSON_SIMPLE_PACKAGE = org.json.simple
+JSON_EXCEPTION = DeserializationException
+endif
+
+
 %:
 	dh $@ --with systemd,bash-completion
 
@@ -56,6 +68,8 @@ override_dh_auto_clean:
 	rm -f $(CURDIR)/apps/susidns/src/lib/jstl.jar
 	rm -f $(CURDIR)/apps/susidns/src/lib/jstlel.jar
 	debconf-updatepo
+	find . -type f -name \*.java.json-simple \
+	  -exec sh -c 'file={} && mv $$file $${file%.json-simple}' \; -print
 
 override_dh_auto_build:
 
@@ -157,6 +171,13 @@ endif
 	@/bin/echo -e "with-libjson-simple-java=true" >> $(CURDIR)/override.properties
 	@mkdir -p $(CURDIR)/core/java/build
 	ln -sf /usr/share/java/json-simple.jar $(CURDIR)/core/java/build/json-simple.jar
+
+	@# debian: bullseye - transitioning
+	find . -type f -name \*.java -exec grep -q 'import @JSON_SIMPLE@' {} \; \
+	  -exec sed -i.json-simple \
+		    -e 's,@JSON_SIMPLE@,$(JSON_SIMPLE_PACKAGE),' \
+		    -e 's/@JSON_EXCEPTION@/$(JSON_EXCEPTION)/' \
+		    {} \; -print
 
 	@# debian: everywhere; ubuntu: trusty+
 	@/bin/echo -e "with-famfamfam-flag-png=true" >> $(CURDIR)/override.properties
