@@ -2805,7 +2805,7 @@ tr#addnew, tr#addnew:hover {
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
-     border: 1px solid #292929;
+     /*! border: 1px solid #292929; */
      float: left;
      text-align: center;
      padding: 0 4px;
@@ -5084,13 +5084,10 @@ div.app {
      float: left;
      padding: 2px 0 0 !important;
      min-width: 70px;
-     border: 1px solid #292929;
-     border-radius: 2px;
      margin: 2px 3px 5px;
      text-align: center !important;
      padding-top: 4px;
      opacity: 0.9;
-     box-shadow: 0 1px 3px #000;
 }
 
 .app a:link, .app a:visited {
@@ -5196,7 +5193,6 @@ button.search {
 }
 
 .appimg {
-     filter: hue-rotate(100deg) brightness(95%) saturate(3000%);
      height: 32px;
      padding: 0 0 6px;
 }
@@ -7395,11 +7391,10 @@ pre, #logs li, .smallhead th {
 }
 
 div.app {
-     min-width: 138px;
+     min-width: 180px;
 }
 
 .appimg {
-     filter: hue-rotate(100deg) brightness(95%) saturate(3000%);
      height: 35px;
      padding: 5px 0 8px;
 }
@@ -7896,3 +7891,4 @@ th.options, table#externali2cp th {
      letter-spacing: 0 !important;
      word-spacing: 0 !important;
 }
+

@@ -2675,15 +2675,11 @@ div.app {
      padding: 0;
      min-width: 140px;
      text-align: center !important;
-     border: 1px solid #dee2e6;
      border-radius: 2px;
      margin: 3px;
-     background: #dee2e6;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
 }
 
 div.app:hover {
-     border: 1px solid #dee2e6;
      background: #e9ecef;
      box-shadow: none;
      cursor: pointer;
@@ -2825,14 +2821,10 @@ table.search select {
 }
 
 .applabel {
-     background: #dee2e6 !important;
      font-size: 8pt;
      margin: 0;
      padding: 4px 6px;
-     border-top: 1px solid #dee2e6;
-     box-shadow: inset 0 0 0 1px #fff;
      text-align: center;
-     width: 146px;
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
@@ -4706,13 +4698,13 @@ body.iframed {
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
-     border: 1px solid #dee2e6;
+     /*! border: 1px solid #dee2e6; */
      float: left;
      text-align: center;
      padding: 0 4px;
      margin: 4px;
      border-radius: 2px;
-     background: #dee2e6;
+/*     background: #dee2e6;*/
 
      transition: filter ease 0.3s 0s;
 
@@ -4726,7 +4718,7 @@ body.iframed {
 }
 
 .themechoice:hover > img ~ .themelabel {
-     border-top: 1px solid #dee2e6 !important;
+     /*! border-top: 1px solid #dee2e6 !important; */
      background: #e9ecef !important;
 
 }
@@ -4800,17 +4792,17 @@ p#helptranslate {
 }
 
 div.themelabel {
-     border-top: 1px solid #dee2e6 !important;
+     /*! border-top: 1px solid #dee2e6 !important; */
      margin-left: -4px;
      margin-right: -4px;
      margin-top: -24px;
      padding: 3px 2px;
-     background: #dee2e6;
+/*     background: #dee2e6;*/
 
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
-     box-shadow: inset 0 0 0 1px #fff;
+     /*! box-shadow: inset 0 0 0 1px #fff; */
      font-size: 9pt;
 }
 
@@ -4820,7 +4812,7 @@ div.themelabel {
 }
 
 .themechoice .optbox:checked + img ~ .themelabel {
-     background: #e9ecef !important;
+/*     background: #e9ecef !important;*/
      color: #338 !important;
      font-weight: bold;
 }
@@ -4828,7 +4820,7 @@ div.themelabel {
 .themechoice .optbox:focus + img ~ .themelabel {
      color: #f60 !important;
      box-shadow: inset 0 0 0 1px #fff;
-     background: linear-gradient(to right, #eef, #fff, #eef) !important;
+     /*! background: linear-gradient(to right, #eef, #fff, #eef) !important; */
 }
 
 .themechoice .optbox:active + img ~ .themelabel {
@@ -7336,7 +7328,7 @@ input[type="checkbox"], input[type="checkbox"]:checked, input[type="checkbox"][d
      box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
      border-radius: 2px;
      -webkit-appearance: inherit;
-     border: 1px solid #999daf !important;
+/*     border: 1px solid #999daf !important;*/
      position: relative;
      box-sizing: border-box;
      filter: drop-shadow(0 0 1px #ccf);
@@ -7369,7 +7361,7 @@ input[type="radio"], input[type="radio"]:checked, input[type="radio"][disabled],
      box-shadow: inset 0 0 2px #7778bf;
      border-radius: 50%;
      -webkit-appearance: none;
-     border: 1px solid #999daf !important;
+/*! border: 1px solid #999daf !important; */
      position: relative;
      box-sizing: border-box;
      filter: drop-shadow(0 0 1px #ccf);
@@ -7754,11 +7746,11 @@ h3#shutdownrouter, h3#systray, h3#servicedebug {
 }
 
 div.app {
-     width: 160px;
+     width: 180px;
 }
 
 .applabel {
-     width: 148px !important;
+     width: 168px !important;
 }
 
 .footnote {
@@ -8264,3 +8256,6 @@ th.options .optbox {
 }
 
 /* end chrome overrides */
+
+
+

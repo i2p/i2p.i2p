@@ -68,7 +68,7 @@ public class HomeHelper extends HelperBase {
         //_x("Dev Builds") + S + _x("Development builds of I2P") + S + "http://bobthebuilder.i2p/" + S + I + "script_gear.png" + S +
         _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "group_gear.png" + S +
         //_x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "i2psnark.png" + S +
-        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "box_open.png" + S +
+        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "echelon.png" + S +
         //"exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S + "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
         _x("I2P FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/faq" + S + I + "question.png" + S +
         _x("I2P Forum") + S + _x("Community forum") + S + "http://i2pforum.i2p/" + S + I + "group.png" + S +
@@ -87,7 +87,7 @@ public class HomeHelper extends HelperBase {
         //_x("I2P Plugins") + S + _x("Add-on directory") + S + "http://i2pwiki.i2p/index.php?title=Plugins" + S + I + "info/plugin_link.png" + S +
         //_x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
         //_x("PrivateBin") + S + _x("Encrypted I2P Pastebin") + S + "http://paste.crypthost.i2p/" + S + I + "paste_plain.png" + S +
-        _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "info_rhombus.png" + S +
+        _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "glass.png" + S +
         //_x("lenta news [ru]") + S + _x("Russian News Feed") + S + "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +
         //"Salt" + S + "salt.i2p" + S + "http://salt.i2p/" + S + I + "salt_console.png" + S +
         _x("The Tin Hat") + S + _x("Privacy guides and tutorials") + S + "http://secure.thetinhat.i2p/" + S + I + "thetinhat.png" + S +
@@ -98,12 +98,12 @@ public class HomeHelper extends HelperBase {
     // No commas allowed in text strings!
     /** @since 0.9.44 */
     static final String DEFAULT_MONITORING =
-        _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "billiard_marker.png" + S +
+        _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "info/logs.png" + S +
         _x("Graphs") + S + _x("Visualize information about the router") + S + "/graphs" + S + I + "chart_line.png" + S +
         _x("I2P Technical Docs") + S + _x("Technical documentation") + S + "http://i2p-projekt.i2p/how" + S + I + "education.png" + S +
-        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "billiard_marker.png" + S +
+        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "trac_wiki.png" + S +
         _x("I2P Bug Reports") + S + _x("Bug tracker") + S + "http://trac.i2p2.i2p/report/1" + S + I + "bug.png" + S +
-        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_line.png" + S +
+        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_bar.png" + S +
         "";
 
     public boolean shouldShowWelcome() {
