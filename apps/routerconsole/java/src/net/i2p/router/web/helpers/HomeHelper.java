@@ -90,7 +90,6 @@ public class HomeHelper extends HelperBase {
         _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "info_rhombus.png" + S +
         //_x("lenta news [ru]") + S + _x("Russian News Feed") + S + "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +
         //"Salt" + S + "salt.i2p" + S + "http://salt.i2p/" + S + I + "salt_console.png" + S +
-        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_line.png" + S +
         _x("The Tin Hat") + S + _x("Privacy guides and tutorials") + S + "http://secure.thetinhat.i2p/" + S + I + "thetinhat.png" + S +
         //_x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "billiard_marker.png" + S +
         //"sponge.i2p" + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
@@ -104,6 +103,7 @@ public class HomeHelper extends HelperBase {
         _x("I2P Technical Docs") + S + _x("Technical documentation") + S + "http://i2p-projekt.i2p/how" + S + I + "education.png" + S +
         _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "billiard_marker.png" + S +
         _x("I2P Bug Reports") + S + _x("Bug tracker") + S + "http://trac.i2p2.i2p/report/1" + S + I + "bug.png" + S +
+        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_line.png" + S +
         "";
 
     public boolean shouldShowWelcome() {
@@ -156,7 +156,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap("Configuration"));
+        buf.append(topWrap("Configuration and Help"));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();
@@ -169,7 +169,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap("Developer Information"));
+        buf.append(topWrap("Network Information and Developer Information"));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();

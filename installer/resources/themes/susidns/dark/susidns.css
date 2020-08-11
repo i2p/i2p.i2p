@@ -5,7 +5,6 @@ body {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
      line-height: 120%;
      background: #1F1A24;
-     /*background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.45)), url(/themes/console/dark/images/camotile2.png) top left fixed;*/
      color: #e6e6e7;
      padding-top: 5px;
      margin: 0 10px;
@@ -71,7 +70,6 @@ body.iframed {
      box-shadow: inset 0 0 0 1px #000, 0 2px 2px 2px rgba(0,0,0,0.7);
      background: #1F1A24 !important;
      /*url(/themes/console/dark/images/header.png) repeat-x scroll center center !important;*/
-     /*background: repeating-linear-gradient(135deg, #000 1px, #000 2px, #010 2px, #010 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, #010 2px, #010 4px), linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;*/
      background-blend-mode: exclusion, exclusion, normal, normal;
 }
 
@@ -83,7 +81,6 @@ body.iframed {
      border-left: none;
      border-radius: 0;
      box-shadow: inset 0 0 0 1px #000;
-     /*background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;*/
      background: #1F1A24;
      background-blend-mode: exclusion, normal;
 }
