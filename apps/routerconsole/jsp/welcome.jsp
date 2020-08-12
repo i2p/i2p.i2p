@@ -127,8 +127,7 @@
 <%=intl._t("This project is supported by Transifex and OTF through the Localization Lab.")%>
 <%=intl._t("This helps keep I2P accessible to everyone all over the world.")%>
 <%=intl._t("Thank you to all of the volunteers all over the world who help make I2P accessible.")%>
-<%=intl._t("If you would like to get involved,")%>
-<a href="https://www.transifex.com/projects/p/I2P/" target="_blank"><%=intl._t("please consider the I2P translation efforts.")%></a>
+<%=intl._t("If you would like to get involved, {0}please consider the I2P translation efforts{1}.", "<a href=\"https://www.transifex.com/projects/p/I2P/\" target=\"_blank\">", "</a>")%>
 </p>
 <p>
 <%=intl._t("Please select your preferred language:")%>
@@ -160,15 +159,15 @@
 <%=intl._t("When everyone is sharing as much bandwidth as possible, everyone gets to have better performance and privacy by sharing participating traffic.")%>
 </p>
 <p>
-<%=intl._t("I2P uses M-Lab to help you test your internet connection and find the optimal speed settings.")%>
-<%=intl._t("M-Lab is a third-party service.")%>
+<%=intl._t("I2P uses M-Lab, a third party service, to help you test your internet connection and find the optimal speed settings.")%>
 <%=intl._t("During this time you will be connected directly to M-Lab's service with your real IP address.")%>
 </p><p>
 <%=intl._t("Please review the M-Lab privacy policies linked below.")%>
 <%=intl._t("If you do not wish to run the M-Lab bandwidth test, you can skip it and configure your bandwidth later.")%>
 </p><p>
-<a href="https://www.measurementlab.net/privacy/" target="_blank"><%=intl._t("M-Lab Privacy Policy")%></a>
-<br><a href="https://github.com/m-lab/mlab-ns/blob/master/MLAB-NS_PRIVACY_POLICY.md" target="_blank"><%=intl._t("M-Lab Name Server Privacy Policy")%></a>
+<%=intl._t("{0}M-Lab Privacy Policy{1}", "<a href=\"https://www.measurementlab.net/privacy/\" target=\"_blank\">", "</a>")%>
+<br>
+<%=intl._t("{0}M-Lab Name Server Privacy Policy{1}","<a href=\"https://github.com/m-lab/mlab-ns/blob/master/MLAB-NS_PRIVACY_POLICY.md\" target=\"_blank\">", "</a>")%>
 </p>
 </div>
 <%
@@ -195,16 +194,13 @@
 </div>
 <div class="wizardtext">
 <p>
-<%=intl._t("While the I2P router software is getting ready to go, it's testing your bandwidth, obtaining an initial")%>
-<%=intl._t("set of peers from a reseed server, making it's first few connections, and getting")%>
-<%=intl._t("integrated with the rest of the network.")%>
+<%=intl._t("While the I2P router software is getting ready to go, it's testing your bandwidth, obtaining an initial, set of peers from a reseed server, making its first few connections, and getting integrated with the rest of the network.")%>
 </p>
 <p>
-<%=intl._t("To learn more about how important I2P Reseed servers are, or explore other topics and what functions they perform for I2P, you can visit the")%>
-<a href="http://geti2p.net" target="_blank"><%=intl._t("I2P web site")%></a><%=intl._t(", our")%>
-<a href="http://wiki.i2p-projekt.i2p" target="_blank"><%=intl._t("I2P Wiki")%></a><%=intl._t(", or contact us on our")%>
-<a href="http://i2pforum.net" target="_blank"><%=intl._t("forums")%></a>
-<%=intl._t("to get help from the community.")%>
+<%=intl._t("To learn more about how important I2P Reseed servers are, or explore other topics and what functions they perform for I2P, you can visit the {0}I2P Wiki{1}.", "<a href=\"http://wiki.i2p-projekt.i2p\" target=\"_blank\">", "</a>")%>
+<%=intl._t("If you would like to discuss I2P topics or get help from the community, you can visit the {0}I2P Forums{1}.", "<a href=\"http://i2pforum.net\" target=\"_blank\">", "</a>")%>
+<%=intl._t("If you want to know more about the I2P Project itself, or the Invisible Internet in general, you can visit our {0}Project Website{1}.",
+"<a href=\"http://geti2p.net\" target=\"_blank\">", "</a>")%>
 </p>
 </div>
 <%
@@ -318,36 +314,31 @@
 <div class="wizardtext"><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
 <%=intl._t("We have instructions for configuring both Firefox and Chromium based browsers with I2P.")%>
-<a href="https://geti2p.net/htproxyports" target="_blank"><%=intl._t("You can find these instructions on our website")%></a>.
+<%=intl._t("You can find these instructions on our {0}website{1}.", "<a href=\"https://geti2p.net/htproxyports\" target=\"_blank\">", "</a>")%>
 <%
         if (net.i2p.util.SystemVersion.isWindows()) {
 %>
 </p><p>
 <%=intl._t("Otherwise, the recommended way to browse I2P websites is with a separate profile in the Firefox browser.")%>
-<ol><li><a href="https://www.mozilla.org/firefox/" target="_blank"><%=intl._t("Install Firefox")%></a>
-</li><li><a href="https://geti2p.net/firefox" target="_blank"><%=intl._t("Install the I2P Firefox profile")%></a>
+<ol><li><%=intl._t("{0}Install Firefox{1}", "<a href=\"https://www.mozilla.org/firefox/\" target=\"_blank\">", "</a>")%>
+</li><li><%=intl._t("{0}Install the I2P Firefox profile{1}", "<a href=\"https://geti2p.net/firefox\" target=\"_blank\">", "</a>")%>
 </li></ol>
 <%
         } //isWindows()
 %>
 </p>
 <p>
-<%=intl._t("The I2P router also comes with it's own versions of common, useful internet applications like")%>
-<a href="/torrents" target="_blank"><%=intl._t("bittorrent,")%></a>
-<a href="/webmail" target="_blank"><%=intl._t("e-mail,")%></a>
-<%=intl._t("and a")%>
-<a href="/i2ptunnel" target="_blank"><%=intl._t("web server")%></a>
-<%=intl._t("so you can create, communicate, and share your content.")%>
+<%=intl._t("The I2P router also comes with its own versions of common, useful internet applications.")%>
+<%=intl._t("You can download files with {0}bittorrent{1}.", "<a href=\"/torrents\" target=\"_blank\">", "</a>")%>
+<%=intl._t("You can also send and recieve {0}email{1}.", "<a href=\"/webmail\" target=\"_blank\">", "</a>")%>
+<%=intl._t("Besides that, you can use the built-in {0}web server{1} so you can create, communicate, and share your content.", "<a href=\"/i2ptunnel\" target=\"_blank\">", "</a>")%>
 <%=intl._t("These applications work with I2P automatically and require no additional configuration.")%>
 </p>
 <p>
-<%=intl._t("Normally, I2P addresses are long and random. To help make I2P addresses easier to read and remember,")%>
-<%=intl._t("the I2P router also includes it's own built-in")%>
-<a href="/dns" target="_blank"><%=intl._t("Address Book")%></a>
-<%=intl._t("which is where you keep track of all your I2P \"Contacts\" by")%>
-<%=intl._t("giving them human-readable names. This can be used for the sites you like to visit, messaging contacts, or potentially any other service on I2P.")%>
-<%=intl._t("To help you get started, the address book can be used to subscribe to lists of")%>
-<%=intl._t("addresses distributed by other I2P users.")%>
+<%=intl._t("To help make I2P addresses easier to read and remember, the I2P router also includes its built-in {0}Address Book{1}.", "<a href=\"/dns\" target=\"_blank\">", "</a>")%>
+<%=intl._t("The Address Book is where you keep track of all your I2P \"Contacts\" by giving them human-readable names.")%>
+<%=intl._t("This can be used for the sites you like to visit, messaging contacts, or potentially any other service on I2P.")%>
+<%=intl._t("To help you get started, the address book can be used to subscribe to lists of addresses distributed by other I2P users.")%>
 </p>
 </div>
 <%
@@ -368,15 +359,12 @@
 </div>
 <div class="wizardtext">
 <p>
-<%=intl._t("It will take some time for your peers to integrate your router into the network,")%>
-<%=intl._t("but while that is happening you can still explore I2P applications and get to know your way around the router console.")%>
-<%=intl._t("There is a quick guide, news about the latest release, an FAQ, and troubleshooting guide available on the /console page.")%>
+<%=intl._t("It will take some time for your peers to integrate your router into the network, but while that is happening you can still explore I2P applications and get to know your way around the router console.")%>
+<%=intl._t("There is a quick guide, news about the latest release, an FAQ, and troubleshooting guide available on the {0}console{1} page.", "<a href=\"/console\" target=\"_blank\">", "</a>")%>
 </p><p>
 <%=intl._t("You may notice a message in the sidebar that I2P is rejecting tunnels.")%>
-<%=intl._t("This is normal behavior as part of the start-up process, to make sure that")%>
-<%=intl._t("your router is ready to help others with participating traffic.")%>
-<%=intl._t("When the connection indicators in the sidebar turn green, you are ready to")%>
-<%=intl._t("explore the Invisible Internet.")%>
+<%=intl._t("This is normal behavior as part of the start-up process, to make sure that your router is ready to help others with participating traffic.")%>
+<%=intl._t("When the connection indicators in the sidebar turn green, you are ready to explore the Invisible Internet.")%>
 </p>
 </div>
 <%
