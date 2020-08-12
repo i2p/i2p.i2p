@@ -167,7 +167,7 @@
 </p><p>
 <%=intl._t("{0}M-Lab Privacy Policy{1}", "<a href=\"https://www.measurementlab.net/privacy/\" target=\"_blank\">", "</a>")%>
 <br>
-<%=intl._t("{0}M-Lab Name Server Privacy Policy{1}","<a href=\"https://github.com/m-lab/mlab-ns/blob/master/MLAB-NS_PRIVACY_POLICY.md\" target=\"_blank\">", "</a>")%>
+<%=intl._t("{0}M-Lab Name Server Privacy Policy{1}", "<a href=\"https://github.com/m-lab/mlab-ns/blob/master/MLAB-NS_PRIVACY_POLICY.md\" target=\"_blank\">", "</a>")%>
 </p>
 </div>
 <%
@@ -280,16 +280,14 @@
         out.print("</br>");
 
         out.print(intl._t("I2P requires at least 12KBps to enable sharing. "));
-        out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve "));
-        out.print(intl._t("your own anonymity and performance."));
+        out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve your own anonymity and performance."));
         out.print("</br>");
         out.print(intl._t("We recommend sharing 75% or more for I2P, but you can adjust based on your needs."));
     } else {
         out.print(intl._t("You have configured I2P to share {0} KBps.", share));
         out.print("</br>");
 
-        out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve "));
-        out.print(intl._t("your own anonymity and performance."));
+        out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve your own anonymity and performance."));
         out.print("</br>");
         out.print(intl._t("We recommend sharing 75% or more for I2P, but you can adjust based on your needs."));
     }
