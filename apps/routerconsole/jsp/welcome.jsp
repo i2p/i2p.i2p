@@ -194,7 +194,7 @@
 </div>
 <div class="wizardtext">
 <p>
-<%=intl._t("While the I2P router software is getting ready to go, it's testing your bandwidth, obtaining an initial, set of peers from a reseed server, making its first few connections, and getting integrated with the rest of the network.")%>
+<%=intl._t("While the I2P router software is getting ready to go, it's testing your bandwidth, obtaining an initial set of peers from a reseed server, making its first few connections, and getting integrated with the rest of the network.")%>
 </p>
 <p>
 <%=intl._t("To learn more about how important I2P Reseed servers are, or explore other topics and what functions they perform for I2P, you can visit the {0}I2P Wiki{1}.", "<a href=\"http://wiki.i2p-projekt.i2p\" target=\"_blank\">", "</a>")%>
