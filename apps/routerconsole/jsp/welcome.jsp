@@ -328,7 +328,7 @@
 <p>
 <%=intl._t("The I2P router also comes with its own versions of common, useful internet applications.")%>
 <%=intl._t("You can download files with {0}bittorrent{1}.", "<a href=\"/torrents\" target=\"_blank\">", "</a>")%>
-<%=intl._t("You can also send and recieve {0}email{1}.", "<a href=\"/webmail\" target=\"_blank\">", "</a>")%>
+<%=intl._t("You can also send and receive {0}email{1}.", "<a href=\"/webmail\" target=\"_blank\">", "</a>")%>
 <%=intl._t("Besides that, you can use the built-in {0}web server{1} so you can create, communicate, and share your content.", "<a href=\"/i2ptunnel\" target=\"_blank\">", "</a>")%>
 <%=intl._t("These applications work with I2P automatically and require no additional configuration.")%>
 </p>
