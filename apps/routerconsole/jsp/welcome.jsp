@@ -124,7 +124,7 @@
 <div class="wizardtext">
 <p>
 
-<%=intl._t("This project is supported by Transifex and OTF through the Localization Lab.")%>
+<%=intl._t("This project is supported by volunteer translators on Transifex.")%>
 <%=intl._t("This helps keep I2P accessible to everyone all over the world.")%>
 <%=intl._t("Thank you to all of the volunteers all over the world who help make I2P accessible.")%>
 <%=intl._t("If you would like to get involved, {0}please consider the I2P translation efforts{1}.", "<a href=\"https://www.transifex.com/projects/p/I2P/\" target=\"_blank\">", "</a>")%>
