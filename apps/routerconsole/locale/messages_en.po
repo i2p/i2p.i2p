@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-13 19:09+0000\n"
+"POT-Creation-Date: 2020-08-14 14:58+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -74,50 +74,50 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:233
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:232
 #, java-format
 msgid "Reseeding: got router info from file ({0} successful, {1} errors)."
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:338
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:337
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 msgid "Reseeding"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:360
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:359
 #, java-format
 msgid "Reseed successful, fetched {0} router info"
 msgid_plural "Reseed successful, fetched {0} router infos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:366
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:365
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:390
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:389
 msgid "Reseed failed."
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:391
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:390
 #, java-format
 msgid "See {0} for help."
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:392
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:391
 msgid "reseed configuration page"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:647
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:781
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:646
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:780
 msgid "Reseeding: fetching seed URL."
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:706
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:825
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:705
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:824
 #, java-format
 msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
@@ -7824,8 +7824,7 @@ msgid "Select Language"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:443
-msgid ""
-"This project is supported by Transifex and OTF through the Localization Lab."
+msgid "This project is supported by volunteer translators on Transifex."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:445
