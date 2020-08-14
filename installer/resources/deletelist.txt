@@ -115,6 +115,8 @@ certificates/router/killyourtv_at_mail.i2p.crt
 certificates/reseed/atomike_at_mail.i2p.crt
 certificates/reseed/reseedi2pnetin_at_mail.i2p.crt
 certificates/reseed/backup_at_mail.i2p.crt
+certificates/reseed/bugme_at_mail.i2p.crt
+certificates/ssl/i2p.mooo.com.crt
 # moved css
 docs/themes/console/dark/i2ptunnel.css
 docs/themes/console/light/i2ptunnel.css

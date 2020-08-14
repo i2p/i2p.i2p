@@ -117,7 +117,6 @@ public class Reseeder {
         "https://i2pseed.creativecowpat.net:8443/" + ',' + // creativecowpat_at_mail.i2p.crt // i2pseed.creativecowpat.net.crt // Java 7+
         "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // reseed.onion.im.crt        // Java 8+ only
         "https://reseed.memcpy.io/"           + ',' +   // hottuna_at_mail.i2p.crt   // CA                         // SNI required
-        "https://i2p.mooo.com/netDb/"         + ',' +   // bugme_at_mail.i2p.crt     // i2p.mooo.com.crt
         //"https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
         "https://reseed.i2p2.no/"             + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
         //"https://reseed2.i2p2.no/"            + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
