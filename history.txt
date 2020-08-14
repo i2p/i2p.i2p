@@ -1,7 +1,10 @@
+2020-08-14 zzz
+ * Profiles: Create profiles in the nonblocking path
+
 2020-08-10 idk
  * Replace all icons with icons from a single consistent source/style, icons
-  used from FontAwesome suggested by design team and selected and edited by
-  Sadie.
+   used from FontAwesome suggested by design team and selected and edited by
+   Sadie.
 
 2020-08-01 zzz
  * Debian: Support libjson-simple-java 3 for bullseye

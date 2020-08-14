@@ -361,10 +361,11 @@ public class ProfileManagerImpl implements ProfileManager {
     
     /**
      *  Non-blocking.
-     *  @return null if the profile doesn't exist, or the fetch would have blocked
+     *  Creates a new profile if it didn't exist.
+     *  @return null if the fetch or create would have blocked
      *  @since 0.8.12
      */
     private PeerProfile getProfileNonblocking(Hash peer) {
-        return _context.profileOrganizer().getProfileNonblocking(peer);
+        return _context.profileOrganizer().getOrCreateProfileNonblocking(peer);
     }
 }

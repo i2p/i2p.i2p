@@ -132,6 +132,15 @@ public class ProfileOrganizer {
         _reorganizeLock.readLock().unlock();
     }
 
+    /**
+     *  Get the lock if we can. Non-blocking.
+     *  @return true if the lock was acquired
+     *  @since 0.9.47
+     */
+    private boolean tryWriteLock() {
+        return _reorganizeLock.writeLock().tryLock();
+    }
+
     /** @return true if the lock was acquired */
     private boolean getWriteLock() {
         try {
@@ -187,6 +196,48 @@ public class ProfileOrganizer {
             } finally { releaseReadLock(); }
         }
         return null;
+    }
+    
+    /**
+     * Retrieve the profile for the given peer, if one exists.
+     * If it does not exist and it can get the lock, it will create and return a new profile.
+     * Non-blocking. Returns null if a reorganize is happening.
+     * @since 0.9.47
+     */
+    PeerProfile getOrCreateProfileNonblocking(Hash peer) {
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who wanted our own profile?", new Exception("I did"));
+            return null;
+        }
+        if (!tryReadLock())
+            return null;
+        PeerProfile rv;
+        try {
+            rv = locked_getProfile(peer);
+        } finally { releaseReadLock(); }
+        if (rv != null)
+            return rv;
+        rv = new PeerProfile(_context, peer);
+        rv.coalesceStats();
+        if (!tryWriteLock())
+            return null;
+        try {
+            // double check
+            PeerProfile old = locked_getProfile(peer);
+            if (old != null)
+                return old;
+            _notFailingPeers.put(peer, rv);
+            _notFailingPeersList.add(peer);
+            // Add to high cap only if we have room. Don't add to Fast; wait for reorg.
+            if (_thresholdCapacityValue <= rv.getCapacityValue() &&
+                isSelectable(peer) &&
+                _highCapacityPeers.size() < getMaximumHighCapPeers()) {
+                _highCapacityPeers.put(peer, rv);
+            }
+            _strictCapacityOrder.add(rv);
+        } finally { releaseWriteLock(); }
+        return rv;
     }
     
     /**
