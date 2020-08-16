@@ -734,6 +734,14 @@ reference.
 ./i2p.i2p/installer/themes/susimail/images/offline.png
 ./i2p.i2p/installer/themes/susimail/images/all.png
 ./i2p.i2p/installer/themes/susimail/images/reply-all.png
+./i2p.i2p/installer/resources/themes/console/dark/images/move_bottom.png
+./i2p.i2p/installer/resources/themes/console/dark/images/move_top.png
+./i2p.i2p/installer/resources/themes/console/light/images/inbox.png
+./i2p.i2p/installer/resources/themes/console/light/images/mail_black.png
+./i2p.i2p/installer/resources/themes/console/light/images/news.png
+./i2p.i2p/installer/resources/themes/snark/dark/images/config.png
+./i2p.i2p/installer/resources/themes/susimail/dark/images/help.png
+./i2p.i2p/installer/resources/themes/susimail/light/images/help.png
 ./i2p.i2p/apps/i2psnark/resources/icons/clock.png
 ./i2p.i2p/apps/i2psnark/resources/icons/plugin.png
 ./i2p.i2p/apps/i2psnark/resources/icons/cancel.png
