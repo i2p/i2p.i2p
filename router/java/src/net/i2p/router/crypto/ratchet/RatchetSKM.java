@@ -1157,7 +1157,6 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     _hisIBKey = receivedKey;
 
                     // create new OB TS, delete old one
-                    PublicKey pub = nextKeys.getPublic();
                     PrivateKey priv = nextKeys.getPrivate();
                     PrivateKey sharedSecret = ECIESAEADEngine.doDH(priv, key);
                     byte[] sk = new byte[32];

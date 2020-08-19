@@ -1196,7 +1196,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
 
         public void onReply() {
-            runJob();
+            super.runJob();
         }
     }
     

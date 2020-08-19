@@ -190,7 +190,6 @@ public final class ECIESAEADEngine {
         RatchetSessionTag st = new RatchetSessionTag(tag);
         SessionKeyAndNonce key = keyManager.consumeTag(st);
         CloveSet decrypted;
-        final boolean shouldDebug = _log.shouldDebug();
         if (key != null) {
             decrypted = xx_decryptFast(tag, st, key, data, targetPrivateKey, keyManager);
             // we do NOT retry as NS
@@ -957,9 +956,11 @@ public final class ECIESAEADEngine {
     /**
      * No ad
      */
+/*
     private final byte[] encryptAEADBlock(byte data[], SessionKey key, long n) {
         return encryptAEADBlock(null, data, key, n);
     }
+*/
 
     /**
      *

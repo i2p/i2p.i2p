@@ -70,7 +70,7 @@
 <b><%=intl._t("Enter zip or su3 URL")%>:</b>
 <%
    String url = request.getParameter("url");
-   String value = url != null ? "value=\"" + url + '"' : "";
+   String value = url != null ? "value=\"" + net.i2p.data.DataHelper.escapeHTML(url) + '"' : "";
 %>
 <input name="url" type="text" size="60" <%=value%> />
   </td>
@@ -93,7 +93,7 @@
    String file = request.getParameter("file");
    if (file != null && file.length() > 0) {
 %>
-<input type="text" size="60" name="file" value="<%=file%>">
+<input type="text" size="60" name="file" value="<%=net.i2p.data.DataHelper.escapeHTML(file)%>">
 <%
    } else {
 %>

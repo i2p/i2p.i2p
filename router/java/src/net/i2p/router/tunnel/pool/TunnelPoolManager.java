@@ -562,7 +562,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting") ||
              _context.router().isHidden() ||
              _context.router().getRouterInfo().getAddressCount() <= 0)) {
-            Hash client = cfg.getDestination();
             TunnelPool pool = cfg.getTunnelPool();
             _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
         }

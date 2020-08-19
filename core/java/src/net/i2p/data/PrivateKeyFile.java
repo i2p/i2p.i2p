@@ -967,7 +967,6 @@ public class PrivateKeyFile {
             SigType type = spk.getType();
             if (type == SigType.EdDSA_SHA512_Ed25519 ||
                 type == SigType.RedDSA_SHA512_Ed25519) {
-                I2PAppContext ctx = I2PAppContext.getGlobalContext();
                 s.append("\nBlinded B32: ").append(Blinding.encode(spk));
                 s.append("\n + auth key: ").append(Blinding.encode(spk, false, true));
                 s.append("\n + password: ").append(Blinding.encode(spk, true, false));

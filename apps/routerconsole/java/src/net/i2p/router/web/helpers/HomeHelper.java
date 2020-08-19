@@ -34,7 +34,7 @@ public class HomeHelper extends HelperBase {
     static final String PROP_MONITORING = "routerconsole.monitoring";
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
     private static final String PROP_SEARCH = "routerconsole.showSearch";
-    public final String bottomWrap = "<br>\n" +
+    private static final String bottomWrap = "<br>\n" +
             "<div class=\"clearer\">&nbsp;</div>\n" +
                 "</div>\n" + 
                 "</div>\n";

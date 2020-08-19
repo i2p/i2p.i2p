@@ -60,7 +60,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <b>URL:</b>
 <%
    String url = request.getParameter("pluginURL");
-   String value = url != null ? "value=\"" + url + '"' : "";
+   String value = url != null ? "value=\"" + net.i2p.data.DataHelper.escapeHTML(url) + '"' : "";
 %>
  <input type="text" size="60" name="pluginURL" title="<%=intl._t("To install a plugin, enter the download URL:")%>" <%=value%>>
 </td>
@@ -84,7 +84,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
    String file = request.getParameter("pluginFile");
    if (file != null && file.length() > 0) {
 %>
-<input type="text" size="60" name="pluginFile" value="<%=file%>">
+<input type="text" size="60" name="pluginFile" value="<%=net.i2p.data.DataHelper.escapeHTML(file)%>">
 <%
    } else {
 %>
