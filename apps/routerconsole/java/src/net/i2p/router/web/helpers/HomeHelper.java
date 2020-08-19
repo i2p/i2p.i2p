@@ -114,7 +114,8 @@ public class HomeHelper extends HelperBase {
         return _context.getBooleanProperty(PROP_SEARCH);
     }
 
-    public String topWrap(String headline){
+    /** @since 0.9.47 */
+    private String topWrap(String headline) {
         String str = "<div class=\"ag2\">\n" +
             "<h4 class=\"app\">" +
             _t(headline) +
@@ -136,7 +137,7 @@ public class HomeHelper extends HelperBase {
     }
     
     /** @since 0.9.47 */
-    public String getPlugins(){
+    public String getPlugins() {
         List<App> plugins = NavHelper.getClientApps(_context);
         String table = pluginTable(plugins);
         if (table.length() == 0) {
@@ -150,7 +151,7 @@ public class HomeHelper extends HelperBase {
     }
     
     /** @since 0.9.44 */
-    public String getConfig(){
+    public String getConfig() {
         String table = homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
         if (table.length() == 0) {
             return "";
@@ -163,7 +164,7 @@ public class HomeHelper extends HelperBase {
     }
 
     /** @since 0.9.44 */
-    public String getMonitoring(){
+    public String getMonitoring() {
         String table = homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
         if (table.length() == 0) {
             return "";
