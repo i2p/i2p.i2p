@@ -8,6 +8,7 @@ package net.i2p.router.web.helpers;
  *
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
@@ -42,6 +43,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import static net.i2p.router.sybil.Util.biLog2;
+import net.i2p.router.transport.GeoIP;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.WebAppStarter;
@@ -806,6 +808,16 @@ class NetDbRenderer {
                 buf.append(" src=\"/flags.jsp?c=").append(country).append("\">");
                 buf.append(getTranslatedCountry(country));
                 buf.append("</a></td><td align=\"center\">").append(num).append("</td></tr>\n");
+            }
+            // https://db-ip.com/db/download/ip-to-country-lite
+            String geoDir = _context.getProperty(GeoIP.PROP_GEOIP_DIR, GeoIP.GEOIP_DIR_DEFAULT);
+            File geoFile = new File(geoDir);
+            if (!geoFile.isAbsolute())
+                geoFile = new File(_context.getBaseDir(), geoDir);
+            geoFile = new File(geoFile, GeoIP.GEOIP2_FILE_DEFAULT);
+            if (geoFile.exists()) {
+                // we'll assume we are using it, ignore case where Debian file is newer
+                buf.append("<tr><td colspan=\"2\"><font size=\"-2\"><a href=\"https://db-ip.com/\">IP Geolocation by DB-IP</a></font></td></tr>");
             }
             buf.append("</table>\n");
         }

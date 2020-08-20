@@ -172,8 +172,8 @@ Installer:
 
 GeoIP Data:
    (not included in most distribution packages)
-   This product includes GeoLite2 data created by MaxMind, available from http://www.maxmind.com/
-   See licenses/LICENSE-GeoIP.txt
+   IP Geolocation by DB-IP https://db-ip.com/
+   See https://creativecommons.org/licenses/by/4.0/
 
 Launchers:
    (not included in distribution packages)

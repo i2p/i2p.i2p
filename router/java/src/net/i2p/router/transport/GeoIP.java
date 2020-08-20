@@ -73,7 +73,7 @@ public class GeoIP {
     public static final String PROP_GEOIP_DIR = "geoip.dir";
     public static final String GEOIP_DIR_DEFAULT = "geoip";
     static final String GEOIP_FILE_DEFAULT = "geoip.txt";
-    static final String GEOIP2_FILE_DEFAULT = "GeoLite2-Country.mmdb";
+    public static final String GEOIP2_FILE_DEFAULT = "GeoLite2-Country.mmdb";
     static final String COUNTRY_FILE_DEFAULT = "countries.txt";
     public static final String PROP_IP_COUNTRY = "i2np.lastCountry";
     public static final String PROP_DEBIAN_GEOIP = "geoip.dat";
