@@ -294,6 +294,7 @@ Applications:
        FatCow icons: See licenses/LICENSE-FatCowIcons.txt
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
        Feather icons: Copyright (c) 2013-2017 Cole Bemis; see licenses/LICENSE-Feather.txt
+       Fontawesome icons: Copyright (c) 2018 @fontawesome(company) see licenses/LICENSE-fontawesome.txt
 
    Router Console unthemed, light, and dark theme logos:
    Copyright (c) 2019 The Invisible Internet Project. All rights reserved.
