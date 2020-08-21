@@ -12,6 +12,7 @@
 # Ettore Atalan <atalanttore@googlemail.com>, 2014-2015
 # Florian Maier <contact@marsmenschen.com>, 2017
 # foo <foo@bar>, 2009
+# Lars Schimmer <echelon@i2pmail.org>, 2020
 # mixxy, 2011
 # nextloop <ga25day@mytum.de>, 2013
 # pirr <pirr@tormail.org>, 2012
@@ -20,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: Florian Maier <contact@marsmenschen.com>\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2020-08-20 15:42+0000\n"
+"Last-Translator: Lars Schimmer <echelon@i2pmail.org>\n"
 "Language-Team: German (http://www.transifex.com/otf/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -770,6 +771,9 @@ msgstr "Wallis und Futuna"
 
 msgid "Samoa"
 msgstr "Samoa"
+
+msgid "Kosovo"
+msgstr "Kosovo"
 
 msgid "Yemen"
 msgstr "Jemen"

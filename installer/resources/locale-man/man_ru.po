@@ -13,13 +13,14 @@
 # Boris Shminke, 2017
 # R4SAS, 2019
 # zzzi2p, 2019
+# Irina Fedulova <istartlin@gmail.com>, 2020
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:31+0000\n"
-"Last-Translator: zzzi2p, 2019\n"
+"Last-Translator: Irina Fedulova <istartlin@gmail.com>, 2020\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -79,8 +80,8 @@ msgid ""
 "Download a file non-interactively via HTTP. Transfers through both I2P and "
 "the regular Internet are supported."
 msgstr ""
-"Неинтерактивное скачивание файла через HTTP. Поддерживается передача как "
-"через I2P, так и через обычный Интернет."
+"Неинтерактивная загрузка файла через HTTP. Поддерживается передача как через"
+" I2P, так и через обычный интернет."
 
 #. type: Plain text
 #: man/eepget.1:21
@@ -92,9 +93,9 @@ msgid ""
 "continue the download from the point of interruption."
 msgstr ""
 "Eepget способна работать с медленными или нестабильными сетевыми "
-"подключениями; в случае неудочной загрузки из-за сетевых неполадок, будут "
+"подключениями; в случае неудачной загрузки из-за сетевых неполадок будут "
 "предприниматься попытки переподключения до тех пор, пока файл не будет "
-"скачан полностью (если установлен параметр -n). Eepget отправит команду "
+"загружен полностью (если установлен параметр -n). Eepget отправит команду "
 "серверу на продолжение загрузки из точки прерывания, если удаленный сервер "
 "поддерживает такую возможность."
 
@@ -430,7 +431,7 @@ msgstr "B<dump>"
 #. type: Plain text
 #: man/i2prouter.1:53
 msgid "Dumps the current threads into B<wrapper.log>."
-msgstr "Сохраняет текщие потоки в B<wrapper.log>."
+msgstr "Сохраняет текущие потоки в B<wrapper.log>."
 
 #. type: Plain text
 #: man/i2prouter.1:61
@@ -460,9 +461,9 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
-"Запускает роутер I2P без сервисного враппера. Это значит что роутер не будет"
-" перезапущен в случае ошибки.  Также по умолчанию используется стандартный "
-"лимит память, чего может быть недостаточно для I2P."
+"Запускает роутер I2P без сервисного упаковщика. Это значит, что роутер не "
+"будет перезапущен в случае ошибки.  Также по умолчанию используется "
+"стандартный лимит памяти, чего может быть недостаточно для I2P."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23

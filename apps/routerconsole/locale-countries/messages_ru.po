@@ -8,6 +8,7 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # gmind, 2012-2013
+# Irina Fedulova <istartlin@gmail.com>, 2020
 # dimi <zhopa@mita.pp.ru>, 2013
 # Foster Snowhill, 2013
 # varnav, 2013
@@ -18,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: brianhopes <voganc-12@live.ru>\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2020-08-12 19:28+0000\n"
+"Last-Translator: Irina Fedulova <istartlin@gmail.com>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -248,7 +249,7 @@ msgid "Ethiopia"
 msgstr "Эфиопия"
 
 msgid "European Union"
-msgstr "Европейский союз"
+msgstr "Европейский Союз"
 
 msgid "Finland"
 msgstr "Финляндия"
@@ -410,7 +411,7 @@ msgid "Kuwait"
 msgstr "Кувейт"
 
 msgid "Cayman Islands"
-msgstr "Каймановы острова"
+msgstr "Каймановы Острова"
 
 msgid "Kazakhstan"
 msgstr "Казахстан"
@@ -461,7 +462,7 @@ msgid "Montenegro"
 msgstr "Черногория"
 
 msgid "Saint Martin"
-msgstr "Остров святого Мартина"
+msgstr "Сент-Мартин"
 
 msgid "Madagascar"
 msgstr "Мадагаскар"
@@ -587,7 +588,7 @@ msgid "Puerto Rico"
 msgstr "Пуэрто-Рико"
 
 msgid "Palestinian Territory"
-msgstr "Палестинская автономия"
+msgstr "Палестинская территория"
 
 msgid "Portugal"
 msgstr "Португалия"
@@ -768,6 +769,9 @@ msgstr "Уоллис и Футуна"
 
 msgid "Samoa"
 msgstr "Самоа"
+
+msgid "Kosovo"
+msgstr "Косово"
 
 msgid "Yemen"
 msgstr "Йемен"

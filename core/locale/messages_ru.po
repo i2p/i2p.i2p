@@ -2,69 +2,37 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Aleksey Orekhov <opexob@yandex.ru>, 2013
-# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
-# Alexey Solomin <a.rainman@gmail.com>, 2013
-# Allclear <sypermario@icloud.com>, 2019
-# Andrey Lukyanenko <operru32@yandex.ru>, 2013
-# brianhopes <voganc-12@live.ru>, 2015
-# dimi <zhopa@mita.pp.ru>, 2013
-# ducki2p <ducki2p@gmail.com>, 2011
-# Eugene, 2013
-# Eugene, 2013
-# foo <foo@bar>, 2009
-# Foster Snowhill, 2013,2015
-# Foster Snowhill, 2015
-# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
-# gmind, 2012-2013
-# gmind, 2013
-# gmind, 2012
-# Aleksey Orekhov <opexob@yandex.ru>, 2013
-# dimi <zhopa@mita.pp.ru>, 2013
-# Maxym Mykhalchuk, 2015
-# Maxym Mykhalchuk, 2015
-# Nikolay Parukhin <parukhin@gmail.com>, 2014,2019
-# Petr Polyakov, 2014
-# Petr Polyakov, 2014
-# R4SAS, 2019
-# rineri, 2014
-# Foster Snowhill, 2013
-# Foster Snowhill, 2013
-# ValdikSS <iam@valdikss.org.ru>, 2017-2019
-# varnav, 2013
-# vertnis, 2015-2016
-# brianhopes <voganc-12@live.ru>, 2015
-# Foster Snowhill, 2013
-# yume, 2014-2015
-# yume, 2017-2019
-# Andrey Lukyanenko <operru32@yandex.ru>, 2013
-# Василий Суматохин <basilbasilbasil@gmail.com>, 2019
-# Foster Snowhill, 2013
+# yume, 2019
+# zzzi2p, 2019
+# gmind, 2019
+# Irina Fedulova <istartlin@gmail.com>, 2020
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:32+0000\n"
-"PO-Revision-Date: 2019-11-24 19:23+0000\n"
-"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/"
-"ru_RU/)\n"
-"Language: ru_RU\n"
+"POT-Creation-Date: 2019-12-17 18:42+0000\n"
+"PO-Revision-Date: 2019-12-17 17:16+0000\n"
+"Last-Translator: Irina Fedulova <istartlin@gmail.com>, 2020\n"
+"Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
-#. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there
+#. are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it
+#. is used in
 #. a lot of tables.
 #. milliseconds
 #. Note to translators, may be negative or zero, 2999 maximum.
-#. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English
+#. locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
 #: ../java/src/net/i2p/data/DataHelper.java:1383
@@ -158,36 +126,31 @@ msgstr[1] "{0,number,###} мкс"
 msgstr[2] "{0,number,###} мкс"
 msgstr[3] "{0,number,###} мкс"
 
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "CRIT"
+msgstr "CRIT"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "DEBUG"
+msgstr "DEBUG"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "ERROR"
+msgstr "ERROR"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "INFO"
+msgstr "INFO"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "WARN"
+msgstr "WARN"
+
 #: ../java/src/net/i2p/util/LogWriter.java:161
 #, java-format
 msgid "{0} similar message omitted"
 msgid_plural "{0} similar messages omitted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:153
-msgid "CRIT"
-msgstr "CRIT"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-msgid "DEBUG"
-msgstr "DEBUG"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:155
-msgid "ERROR"
-msgstr "ERROR"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:160
-msgid "INFO"
-msgstr "INFO"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:157
-msgid "WARN"
-msgstr "WARN"
-
+msgstr[0] "{0} похожее сообщение пропущено"
+msgstr[1] "{0} похожих сообщения пропущено"
+msgstr[2] "{0} похожих сообщений пропущено"
+msgstr[3] "{0} похожих сообщений пропущено"

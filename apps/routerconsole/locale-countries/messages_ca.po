@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2020-08-12 18:51+0000\n"
+"Last-Translator: zzzi2p\n"
 "Language-Team: Catalan (http://www.transifex.com/otf/I2P/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -250,7 +250,7 @@ msgid "Falkland Islands (Malvinas)"
 msgstr "Illes Malvines (Falkland) "
 
 msgid "Micronesia"
-msgstr ""
+msgstr "Micronèsia"
 
 msgid "Faroe Islands"
 msgstr "Illes Fèroe "
@@ -352,7 +352,7 @@ msgid "Iraq"
 msgstr "Iraq "
 
 msgid "Iran"
-msgstr ""
+msgstr "Iran"
 
 msgid "Iceland"
 msgstr "Islàndia "
@@ -436,7 +436,7 @@ msgid "Latvia"
 msgstr "Letònia "
 
 msgid "Libya"
-msgstr ""
+msgstr "Líbia"
 
 msgid "Morocco"
 msgstr "Marroc "
@@ -445,7 +445,7 @@ msgid "Monaco"
 msgstr "Mònaco "
 
 msgid "Moldova"
-msgstr ""
+msgstr "Moldàvia"
 
 msgid "Montenegro"
 msgstr "Montenegro "
@@ -460,7 +460,7 @@ msgid "Marshall Islands"
 msgstr "Illes Marshall "
 
 msgid "Macedonia"
-msgstr ""
+msgstr "Macedònia"
 
 msgid "Mali"
 msgstr "Mali "
@@ -664,7 +664,7 @@ msgid "Sint Maarten"
 msgstr ""
 
 msgid "Syria"
-msgstr ""
+msgstr "Síria"
 
 msgid "Swaziland"
 msgstr "Swazilàndia "
@@ -715,7 +715,7 @@ msgid "Taiwan"
 msgstr "Taiwan "
 
 msgid "Tanzania"
-msgstr ""
+msgstr "Tanzània"
 
 msgid "Ukraine"
 msgstr "Ucraïna "
@@ -736,7 +736,7 @@ msgid "Uzbekistan"
 msgstr "Uzbekistan "
 
 msgid "Vatican"
-msgstr ""
+msgstr "Vaticà"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Saint Vincent i les Grenadines "
@@ -748,7 +748,7 @@ msgid "Virgin Islands"
 msgstr "Illes Verges "
 
 msgid "Vietnam"
-msgstr ""
+msgstr "Vietnam"
 
 msgid "Vanuatu"
 msgstr "Vanuatu "
@@ -758,6 +758,9 @@ msgstr "Wallis i Futuna "
 
 msgid "Samoa"
 msgstr "Samoa "
+
+msgid "Kosovo"
+msgstr ""
 
 msgid "Yemen"
 msgstr "Iemen "

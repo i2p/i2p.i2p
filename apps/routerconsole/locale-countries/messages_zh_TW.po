@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: 黃彥儒 <r1235613@gmail.com>\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2020-08-12 18:51+0000\n"
+"Last-Translator: zzzi2p\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -585,13 +585,13 @@ msgid "Portugal"
 msgstr "葡萄牙"
 
 msgid "Palau"
-msgstr ""
+msgstr "帛琉"
 
 msgid "Paraguay"
 msgstr "巴拉圭"
 
 msgid "Qatar"
-msgstr ""
+msgstr "卡達"
 
 msgid "Réunion"
 msgstr ""
@@ -600,13 +600,13 @@ msgid "Romania"
 msgstr "羅馬尼亞"
 
 msgid "Serbia"
-msgstr ""
+msgstr "塞爾維亞"
 
 msgid "Russian Federation"
 msgstr "蘇聯"
 
 msgid "Rwanda"
-msgstr ""
+msgstr "盧安達"
 
 msgid "Saudi Arabia"
 msgstr "沙烏地阿拉伯"
@@ -615,7 +615,7 @@ msgid "Solomon Islands"
 msgstr "所羅門群島"
 
 msgid "Seychelles"
-msgstr ""
+msgstr "塞舌爾群島"
 
 msgid "Sudan"
 msgstr "蘇丹"
@@ -639,10 +639,10 @@ msgid "Slovakia"
 msgstr "斯洛伐克"
 
 msgid "Sierra Leone"
-msgstr ""
+msgstr "塞拉利昂"
 
 msgid "San Marino"
-msgstr ""
+msgstr "聖瑪利諾"
 
 msgid "Senegal"
 msgstr "塞內加爾"
@@ -681,13 +681,13 @@ msgid "French Southern Territories"
 msgstr ""
 
 msgid "Togo"
-msgstr ""
+msgstr "多哥"
 
 msgid "Thailand"
 msgstr "泰國"
 
 msgid "Tajikistan"
-msgstr ""
+msgstr "塔吉克斯坦"
 
 msgid "Tokelau"
 msgstr ""
@@ -702,7 +702,7 @@ msgid "Tunisia"
 msgstr "突尼西亞"
 
 msgid "Tonga"
-msgstr ""
+msgstr "東加"
 
 msgid "Turkey"
 msgstr "土耳其"
@@ -753,12 +753,15 @@ msgid "Vietnam"
 msgstr "越南"
 
 msgid "Vanuatu"
-msgstr ""
+msgstr "萬那杜"
 
 msgid "Wallis and Futuna"
 msgstr ""
 
 msgid "Samoa"
+msgstr "薩摩亞群島"
+
+msgid "Kosovo"
 msgstr ""
 
 msgid "Yemen"
