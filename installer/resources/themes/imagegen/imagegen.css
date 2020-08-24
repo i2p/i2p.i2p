@@ -2,8 +2,6 @@
 /* Author: dr|z3d */
 
 body {
-     background: #eef url(/themes/console/classic/images/bg0.png);
-     background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.2)), url(/themes/console/classic/images/bg0.png);
      background-size: 100% 100%, 120px 120px;
      font: 10pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "DejaVu Sans", "Segoe UI", Verdana, "Lucida Grande", Helvetica, sans-serif;
      margin: 18px 20px 10px;
@@ -68,7 +66,7 @@ a:active {
 }
 
 .reference {
-     background: url(/themes/console/classic/images/newtab.png) top 2px right no-repeat;
+     background: url(/themes/console/light/images/newtab.png) top 2px right no-repeat;
      background-size: 12px 10px;
      padding-right: 14px;
 }
@@ -239,8 +237,8 @@ select {
      vertical-align: middle;
      -moz-appearance: none;
      -webit-appearance: none;
-     background: url(/themes/console/classic/images/dropdown.png) right center no-repeat #fff;
-     background: url(/themes/console/classic/images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/light/images/dropdown.png) right center no-repeat #fff;
+     background: url(/themes/console/light/images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      border-radius: 2px;
      border: 1px solid #bbb;
      box-shadow: inset 0 0 0 1px #fff;
@@ -260,11 +258,11 @@ select:focus, select:active {
 }
 
 select:hover, select:active {
-     background: url(/themes/console/classic/images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(/themes/console/light/images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
 }
 
 select:focus {
-     background: url(/themes/console/classic/images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(/themes/console/light/images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
      box-shadow: 0 0 0 1px #89f;
 }
 
