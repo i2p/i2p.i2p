@@ -1,3 +1,5 @@
+* 2020-08-24 0.9.47 released
+
 2020-08-14 zzz
  * Profiles: Create profiles in the nonblocking path
 
