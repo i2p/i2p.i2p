@@ -14,11 +14,13 @@ Versions are as follows:
 
 Min version	Max version	Uses src pkg	Copied to Debian
 -----------	-----------	------------	----------------
-precise		saucy   	precise		wheezy
-trusty		wily		precise		jessie, stretch
 xenial		yakkety		xenial		--
 bionic		cosmic		bionic		--
-disco		groovy		bionic		buster, sid
+focal		groovy		bionic		buster, sid
+
+Unsupported (Java 7):
+precise		saucy   	precise		wheezy
+trusty		wily		precise		jessie, stretch
 
 
 Prep (first time only)
@@ -62,7 +64,7 @@ Generate files to upload
 - edit debian/changelog to add the release at the top
   * version MUST be 0.9.XX-1ubuntu1
     next version for fixes would be 0.9.XX-2ubunutu1
-  * series MUST be xenial or trusty or precise
+  * series MUST be xenial or bionic or focal
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
     (or add -kkeyid argument to debuild, which you must do
@@ -71,24 +73,19 @@ Generate files to upload
     run gpg -K to list your private keys
 - Remove patch files in debian/patches that are not listed in debian/patches/series
 - ant debian-release-tarball (this is currently for bionic and higher)
-  (ant precise-release-tarball for precise thru wily... only do this once for both the precise and trusty build)
   (ant xenial-release-tarball for xenial)
   this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
   and a tarball ../i2p_0.9.XX.orig.tar.bz2
 - cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
 - cp debian-alt/(series)/(other files besides changelog) to ../i2p-0.9.XX-0-xxxxxxxx/debian/
-- (if you build trusty after precise, cp debian/i2p.postinst ../i2p-0.9.XX-0-xxxxxxxx/debian/
-  since precise modifies it but trusty does not)
 - cd ../i2p-0.9.XX-0-xxxxxxxx/
-- Note: If building for precise/trusty and you are on yakkety or higher without Java 7,
-  make a symlink so debuild will work: cd /var/lib/jvm; sudo ln -s java-8-openjdk-amd64/ java-7-openjdk-amd64
 - Build the *1ubuntu1* files:
   If you have NOT done a successful dput for this release yet:
     debuild -S -sa -kkeyid
   otherwise, if just fixing up the control files, patches, etc:
     debuild -S -sd -kkeyid
   (note: no space allowed in -kkeyid)
-  If you get a dpkg-checkbuilddeps error for precise/trusty/xenial,
+  If you get a dpkg-checkbuilddeps error for xenial,
   add a -d option, e.g. debuild -d -S -sa -kkeyid
 - If patches fail, you must fix them up, either manually or with quilt
   (quilt instructions go here)
@@ -154,13 +151,11 @@ Release
 -------
 
 Then copy from your PPA to the i2p-maintainers PPA.
-Then in the i2p-maintainers PPA, copy bionic to cosmic.
+Then in the i2p-maintainers PPA, copy focal to groovy.
 Did a new series open up since the last time you did this? Copy to the new one also.
   (select "copy existing binaries")
   Copy xenial first and wait for it to be published in i2p-maintainers or the others will fail.
 For xenial, build and copy it separately. It is built from the "ant xenial-release-tarball" source.
-For precise and trusty, build and copy it separately. Both precise and trusty are built
-from the "ant precise-release-tarball" source.
 
 
 Creating milestone, release, and uploading files

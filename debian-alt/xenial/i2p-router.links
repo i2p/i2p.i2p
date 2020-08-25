@@ -80,7 +80,7 @@ usr/share/java/gnu-getopt.jar usr/share/i2p/lib/gnu-getopt.jar
 
 # comment out if not building with libjson-simple-java
 # ubuntu: trusty+; debian: jessie+
-usr/share/java/json-simple.jar usr/share/i2p/lib/json-simple.jar
+#usr/share/java/json-simple.jar usr/share/i2p/lib/json-simple.jar
 
 
 # comment out if not building with famfamfam-flag-png

@@ -143,9 +143,9 @@ endif
 	ln -sf /usr/share/java/gnu-getopt.jar $(CURDIR)/core/java/build/gnu-getopt.jar
 
 	@# debian: jessie+; ubuntu: trusty+
-	@/bin/echo -e "with-libjson-simple-java=true" >> $(CURDIR)/override.properties
-	@mkdir -p $(CURDIR)/core/java/build
-	ln -sf /usr/share/java/json-simple.jar $(CURDIR)/core/java/build/json-simple.jar
+	@#/bin/echo -e "with-libjson-simple-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/core/java/build
+	@#ln -sf /usr/share/java/json-simple.jar $(CURDIR)/core/java/build/json-simple.jar
 
 	@# debian: everywhere; ubuntu: trusty+
 	@/bin/echo -e "with-famfamfam-flag-png=true" >> $(CURDIR)/override.properties
