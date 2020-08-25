@@ -1568,7 +1568,7 @@ hr + #newsStatus, hr + #newsStatus + #newsDisplay {
 div.news h3, #news h3 {
      background:  #f6f6fa !important;
      text-align: left;
-     padding: 6px 10px 5px 30px;
+     padding: 6px 10px 5px 15px;
      border: 1px solid #dee2e6;
      border-radius: 2px 2px 0 0;
      font-size: 10pt !important;
@@ -1581,7 +1581,7 @@ div.news h3, #news h3 {
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
 div.news h3, #news h3 {
-     padding: 7px 10px 5px 30px;
+     padding: 7px 10px 5px 15px;
 }
 }
 

@@ -77,4 +77,4 @@
 <link href="<%=theThemePath%>mobile.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    }
-%><!--[if IE]><link href="/themes/console/classic/ieshim.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /><![endif]-->
+%>
