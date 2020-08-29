@@ -83,11 +83,11 @@ class ProfileOrganizerRenderer {
 
         //buf.append("<h2>").append(_t("Peer Profiles")).append("</h2>\n<p>");
         buf.append("<p id=\"profiles_overview\" class=\"infohelp\">");
-        buf.append(ngettext("Showing 1 recent profile.", "Showing {0} recent profiles.", order.size())).append('\n');
+        buf.append(ngettext("Showing {0} recent profile.", "Showing {0} recent profiles.", order.size())).append('\n');
         if (older > 0)
-            buf.append(ngettext("Hiding 1 older profile.", "Hiding {0} older profiles.", older)).append('\n');
+            buf.append(ngettext("Hiding {0} older profile.", "Hiding {0} older profiles.", older)).append('\n');
         if (standard > 0)
-            buf.append("<a href=\"/profiles?f=1\">").append(ngettext("Hiding 1 standard profile.", "Hiding {0} standard profiles.", standard)).append("</a>\n");
+            buf.append("<a href=\"/profiles?f=1\">").append(ngettext("Hiding {0} standard profile.", "Hiding {0} standard profiles.", standard)).append("</a>\n");
         buf.append("</p>");
                    buf.append("<div class=\"widescroll\"><table id=\"profilelist\">");
                    buf.append("<tr>");
@@ -288,11 +288,11 @@ class ProfileOrganizerRenderer {
            .append("</th><th><b>")
            .append(_t("Integration")).append(": </b>").append(num(_organizer.getIntegrationThreshold()))
            .append("</th></tr><tr><td>")
-           .append(fast).append(' ').append(_t("fast peers"))
+           .append(ngettext("{0} fast peer", "{0} fast peers", fast))
            .append("</td><td>")
-           .append(reliable).append(' ').append(_t("high capacity peers"))
+           .append(ngettext("{0} high capacity peer", "{0} high capacity peers", reliable))
            .append("</td><td>")
-           .append(integrated).append(' ').append(_t(" well integrated peers"))
+           .append(ngettext("{0} integrated peer", "{0} integrated peers", integrated))
            .append("</td></tr></tbody></table>\n");
         buf.append("<h3 class=\"tabletitle\">").append(_t("Definitions")).append("</h3>\n")
            .append("<table id=\"profile_defs\"><tbody>");

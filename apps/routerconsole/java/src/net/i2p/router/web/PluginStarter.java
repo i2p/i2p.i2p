@@ -246,7 +246,7 @@ public class PluginStarter implements Runnable {
                 updated++;
         }
         if (updated > 0)
-            mgr.notifyComplete(null, ngettext("1 plugin updated", "{0} plugins updated", updated, ctx));
+            mgr.notifyComplete(null, ngettext("{0} plugin updated", "{0} plugins updated", updated, ctx));
         else
             mgr.notifyComplete(null, Messages.getString("Plugin update check complete", ctx));
     }
