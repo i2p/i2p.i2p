@@ -831,8 +831,8 @@
 
     <!-- the apps need to compile the jsps to poupdate -->
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui, buildJrobin" >
-        <echo message="Setting environment variable LG2 to a lang code (eg: de,zh,nl etc)" />
-        <echo message=" will restrict language update to the language you specified, leaving other language untact." />
+        <echo message="Setting environment variable LG2 to a language code (e.g. de)" />
+        <echo message="will restrict language update to the language you specified, leaving other languages unchanged." />
         <!-- set if unset -->
         <property name="lg2" value="" />
         <ant dir="core/java/" target="poupdate" />
