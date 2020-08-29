@@ -1271,9 +1271,9 @@ public final class ECIESAEADEngine {
      * @since 0.9.47
      */
     private void setResponseTimer(PublicKey from, List<GarlicClove> cloveSet, RatchetSKM skm) {
-        Destination us = skm.getDestination();
         Destination d = skm.getDestination(from);
         if (d != null) {
+            Destination us = skm.getDestination();
             ACKTimer ack = new ACKTimer(_context, us, d);
             if (skm.registerTimer(from, null, ack)) {
                 ack.schedule(1000);
