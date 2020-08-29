@@ -718,14 +718,17 @@
             /* alternate dest, only if current dest is set and is DSA_SHA1 */
 
             if (currentSigType == 0 && !"".equals(b64) && !isStreamrServer) {
+                String attitle = canChangeEncType ? "" : tstopFirst;
+                String atitle = canChangeEncType ? intl._t("Path to Private Key File") : stopFirst;
+                String adisabled = canChangeEncType ? "" : " readonly=\"readonly\" ";
 %>
         <tr>
-            <th colspan="2">
+            <th colspan="2" <%=attitle%> >
                 <%=intl._t("Alternate private key file")%> (Ed25519-SHA-512)
             </th>
         </tr><tr>
             <td colspan="2">
-                <input type="text" class="freetext" size="30" id="altPrivKeyFile" name="altPrivKeyFile" title="<%=intl._t("Path to Private Key File")%>" value="<%=editBean.getAltPrivateKeyFile(curTunnel)%>" />
+                <input type="text" class="freetext" size="30" id="altPrivKeyFile" name="altPrivKeyFile" title="<%=atitle%>" <%=adisabled%> value="<%=editBean.getAltPrivateKeyFile(curTunnel)%>" />
             </td>
         </tr>
 <%
