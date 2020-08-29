@@ -308,7 +308,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     /**
      *
      *  See analysis in proposal 144
-     *  @since 0.9.48
+     *  @since 0.9.47
      */
     public static final int DEFAULT_MAX_MESSAGE_SIZE_RATCHET = 1812;
 
