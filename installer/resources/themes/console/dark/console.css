@@ -5098,7 +5098,6 @@ div.app {
 
 div.app:hover {
     opacity: 1;
-    border: 1px solid #1F1A24;
     background: #7778bf;
     box-shadow: none;
     color: #e6e6e7 !important;
