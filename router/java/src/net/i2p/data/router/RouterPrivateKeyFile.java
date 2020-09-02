@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -36,7 +37,10 @@ public class RouterPrivateKeyFile extends PrivateKeyFile {
             in = new BufferedInputStream(new FileInputStream(this.file));
             RouterIdentity ri = new RouterIdentity();
             ri.readBytes(in);
-            privKey = new PrivateKey();
+            EncType etype = ri.getPublicKey().getType();
+            if (etype == null)
+                throw new DataFormatException("Unknown enc type");
+            privKey = new PrivateKey(etype);
             privKey.readBytes(in);
             SigType type = ri.getSigningPublicKey().getType();
             if (type == null)

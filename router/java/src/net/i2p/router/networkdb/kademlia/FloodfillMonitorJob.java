@@ -2,6 +2,7 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.util.List;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -139,6 +140,11 @@ class FloodfillMonitorJob extends JobImpl {
         RouterInfo ri = getContext().router().getRouterInfo();
         if (ri == null)
             return false;
+
+        // temp until router ratchet SKM implemented
+        if (ri.getIdentity().getPublicKey().getType() != EncType.ELGAMAL_2048)
+            return false;
+
         char bw = ri.getBandwidthTier().charAt(0);
         // Only if class N, O, P, X
         if (bw != Router.CAPABILITY_BW128 && bw != Router.CAPABILITY_BW256 &&

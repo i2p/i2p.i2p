@@ -934,7 +934,9 @@ class NetDbRenderer {
         }
         if (full) {
             buf.append("</td></tr><tr><td><b>").append(_t("Signing Key")).append(":</b></td><td colspan=\"2\">")
-               .append(info.getIdentity().getSigningPublicKey().getType().toString());
+               .append(info.getIdentity().getSigningPublicKey().getType());
+            buf.append("</td></tr><tr><td><b>").append(_t("Encryption Key")).append(":</b></td><td colspan=\"2\">")
+               .append(info.getIdentity().getPublicKey().getType());
         }
         buf.append("</td></tr>\n<tr>")
            .append("<td><b>").append(_t("Addresses")).append(":</b></td><td colspan=\"2\"");
