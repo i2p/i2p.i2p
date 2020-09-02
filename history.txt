@@ -1,3 +1,11 @@
+2020-09-02 zzz
+ * Installer: New Ed25519 destinations for postman's servers
+ * Router:
+   - Prep for router encryption types (Proposal 156 WIP)
+   - Randomize SSU intro key
+   - Reduce next key threshold for ratchet
+   - Change ratchet SparseArray from int to char to reduce space
+
 2020-08-29 zzz
  * i2ptunnel: Prevent creating bad alt destination when
    tunnel is running
