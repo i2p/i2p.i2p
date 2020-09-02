@@ -83,7 +83,7 @@ class RatchetTagSet implements TagSetHandle {
     private static final int MAX = 65535;
     private static final boolean TEST_RATCHET = false;
     // 4 * max streaming window
-    private static final int LOW = TEST_RATCHET ? (MAX - 512) : 512;
+    private static final int LOW = TEST_RATCHET ? (MAX - 512) : (MAX - 4096);
     static final int DEBUG_OB_NSR = 0x10001;
     static final int DEBUG_IB_NSR = 0x10002;
     static final int DEBUG_SINGLE_ES = 0x10003;
