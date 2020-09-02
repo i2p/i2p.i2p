@@ -1902,7 +1902,8 @@ public class DataHelper {
      */
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if (orig == null) return orig;
-        if (length < 23)
+        // normal overhead is 23 bytes, but a compress of zero bytes is 20 bytes
+        if (length < 20)
             throw new IOException("length");
         if (length < 65559 && orig[offset + 10] == 0x01)
             return zeroDecompress(orig, offset, length);
