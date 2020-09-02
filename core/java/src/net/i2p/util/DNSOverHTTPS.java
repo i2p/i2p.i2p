@@ -23,8 +23,12 @@ import net.i2p.data.DataHelper;
  *  Simple implemetation of DNS over HTTPS.
  *  Also sets the local clock from the received date header.
  *
+ *  This supports the JSON format only. Does NOT support RFC 8484 (DNS format)
+ *  or RFC 7858 (DNS over TLS).
+ *
  *  https://developers.google.com/speed/public-dns/docs/dns-over-https
  *  https://developers.cloudflare.com/1.1.1.1/dns-over-https/json-format/
+ *  https://github.com/curl/curl/wiki/DNS-over-HTTPS
  *
  *  @since 0.9.35
  */
