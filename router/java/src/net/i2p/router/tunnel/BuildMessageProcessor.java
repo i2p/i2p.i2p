@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -88,6 +89,10 @@ public class BuildMessageProcessor {
      * @return the current hop's decrypted record or null on failure
      */
     public BuildRequestRecord decrypt(TunnelBuildMessage msg, Hash ourHash, PrivateKey privKey) {
+        // TODO proposal 152
+        if (privKey.getType() != EncType.ELGAMAL_2048)
+            return null;
+
         BuildRequestRecord rv = null;
         int ourHop = -1;
         long beforeActualDecrypt = 0;
