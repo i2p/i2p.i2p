@@ -25,16 +25,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.update.UpdateManager;
+import net.i2p.update.UpdateType;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 
 /**
@@ -86,6 +90,8 @@ public class Blocklist {
     private static final String PROP_BLOCKLIST_FILE = "router.blocklist.file";
     private static final String BLOCKLIST_FILE_DEFAULT = "blocklist.txt";
     private static final String BLOCKLIST_FEED_FILE = "docs/feed/blocklist/blocklist.txt";
+    /** @since 0.9.48 */
+    public static final String BLOCKLIST_COUNTRY_FILE = "blocklist-country.txt";
 
     /**
      *  Limits of transient (in-memory) blocklists.
@@ -99,6 +105,17 @@ public class Blocklist {
     private final Map<BigInteger, Object> _singleIPv6Blocklist = new LHMCache<BigInteger, Object>(MAX_IPV6_SINGLES);
 
     private static final Object DUMMY = Integer.valueOf(0);    
+
+    /**
+     *  For Update Manager
+     *  @since 0.9.48
+     */
+    public static final String ID_FEED = "feed";
+    private static final String ID_SYSTEM = "system";
+    private static final String ID_LOCAL = "local";
+    private static final String ID_COUNTRY = "country";
+    private static final String ID_USER = "user";
+
 
     /**
      *  Router MUST call startup()
@@ -121,6 +138,7 @@ public class Blocklist {
      *  $I2P/blocklist.txt
      *  ~/.i2p/blocklist.txt
      *  ~/.i2p/docs/feed/blocklist/blocklist.txt
+     *  ~/.i2p/blocklist-countries.txt
      *  File if specified with router.blocklist.file
      */
     public synchronized void startup() {
@@ -129,24 +147,26 @@ public class Blocklist {
         _started = true;
         if (! _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_ENABLED))
             return;
-        List<File> files = new ArrayList<File>(4);
+        List<BLFile> files = new ArrayList<BLFile>(5);
 
         // install dir
         File blFile = new File(_context.getBaseDir(), BLOCKLIST_FILE_DEFAULT);
-        files.add(blFile);
+        files.add(new BLFile(blFile, ID_SYSTEM));
         // config dir
         if (!_context.getConfigDir().equals(_context.getBaseDir())) {
             blFile = new File(_context.getConfigDir(), BLOCKLIST_FILE_DEFAULT);
-            files.add(blFile);
+            files.add(new BLFile(blFile, ID_LOCAL));
         }
-        files.add(_blocklistFeedFile);
+        files.add(new BLFile(_blocklistFeedFile, ID_FEED));
+        blFile = new File(_context.getConfigDir(), BLOCKLIST_COUNTRY_FILE);
+        files.add(new BLFile(blFile, ID_COUNTRY));
         // user specified
         String file = _context.getProperty(PROP_BLOCKLIST_FILE);
         if (file != null && !file.equals(BLOCKLIST_FILE_DEFAULT)) {
             blFile = new File(file);
             if (!blFile.isAbsolute())
                  blFile = new File(_context.getConfigDir(), file);
-            files.add(blFile);
+            files.add(new BLFile(blFile, ID_USER));
         }
         Job job = new ReadinJob(files);
         // Run immediately, so it's initialized before netdb.
@@ -158,13 +178,51 @@ public class Blocklist {
         _context.jobQueue().addJob(job);
     }
 
+    /**
+     *  @since 0.9.48
+     */
+    private static class BLFile {
+        public final File file;
+        public final String id;
+        public long version;
+        public BLFile(File f, String s) { file = f; id = s; }
+    }
+
+    /**
+     *  Delay telling update manager until it's there
+     *  @since 0.9.48
+     */
+    private class VersionNotifier extends SimpleTimer2.TimedEvent {
+        public final List<BLFile> blfs;
+
+        public VersionNotifier(List<BLFile> bf) {
+            super(_context.simpleTimer2(), 2*60*1000L);
+            blfs = bf;
+        }
+
+        public void timeReached() {
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null) {
+                UpdateManager umgr = (UpdateManager) cmgr.getRegisteredApp(UpdateManager.APP_NAME);
+                if (umgr != null) {
+                    for (BLFile blf : blfs) {
+                        if (blf.version > 0)
+                               umgr.notifyInstalled(UpdateType.BLOCKLIST, blf.id, Long.toString(blf.version));
+                    }
+                } else {
+                    _log.warn("No update manager");
+                }
+            }
+        }
+    }
+
     private class ReadinJob extends JobImpl {
-        private final List<File> _files;
+        private final List<BLFile> _files;
 
         /**
          *  @param files not necessarily existing, but avoid dups
          */
-        public ReadinJob (List<File> files) {
+        public ReadinJob (List<BLFile> files) {
             super(_context);
             _files = files;
         }
@@ -172,48 +230,35 @@ public class Blocklist {
         public String getName() { return "Read Blocklist"; }
 
         public void runJob() {
-            allocate(_files);
-            if (_blocklist == null)
-                return;
-            int ccount = process();
-            if (_blocklist == null)
-                return;
-            if (ccount <= 0) {
-                disable();
-                return;
-            }
-            merge(ccount);
-         /**** debug, and now run before netdb is initialized anyway
-            if (_log.shouldLog(Log.WARN)) {
-                if (_blocklistSize <= 0)
+            synchronized (_lock) {
+                allocate(_files);
+                if (_blocklist == null)
                     return;
-                FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
-                int count = 0;
-                for (RouterInfo ri : fndf.getKnownRouterData()) {
-                    Hash peer = ri.getIdentity().getHash();
-                    if (isBlocklisted(peer))
-                        count++;
+                int ccount = process();
+                if (_blocklist == null)
+                    return;
+                if (ccount <= 0) {
+                    disable();
+                    return;
                 }
-                if (count > 0)
-                    _log.warn("Blocklisted " + count + " routers in the netDb");
+                merge(ccount);
+                _peerBlocklist = null;
             }
-          ****/
-            _peerBlocklist = null;
+            // schedules itself
+            new VersionNotifier(_files);
         }
 
         private int process() {
             int count = 0;
-            synchronized (_lock) {
                 try {
-                    for (File f : _files) {
-                        count = readBlocklistFile(f, count);
+                    for (BLFile blf : _files) {
+                        count = readBlocklistFile(blf, count);
                     }
                 } catch (OutOfMemoryError oom) {
                     _log.log(Log.CRIT, "OOM processing the blocklist");
                     disable();
                     return 0;
                 }
-            }
             for (Hash peer : _peerBlocklist.keySet()) {
                 String reason;
                 String comment = _peerBlocklist.get(peer);
@@ -240,10 +285,10 @@ public class Blocklist {
      *  @return success
      *  @since 0.9.18 split out from readBlocklistFile()
      */
-    private void allocate(List<File> files) {
+    private void allocate(List<BLFile> files) {
         int maxSize = 0;
-        for (File f : files) {
-            maxSize += getSize(f);
+        for (BLFile blf : files) {
+            maxSize += getSize(blf.file);
         }
         try {
             _blocklist = new long[maxSize + files.size()];  // extra for wrapsave
@@ -285,7 +330,8 @@ public class Blocklist {
     *  @param count current number of entries
     *  @return new number of entries
     */
-    private int readBlocklistFile(File blFile, int count) {
+    private int readBlocklistFile(BLFile blf, int count) {
+        File blFile = blf.file;
         if (blFile == null || (!blFile.exists()) || blFile.length() <= 0) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Blocklist file not found: " + blFile);
@@ -296,6 +342,7 @@ public class Blocklist {
         int oldcount = count;
         int badcount = 0;
         int peercount = 0;
+        int feedcount = 0;
         long ipcount = 0;
         final boolean isFeedFile = blFile.equals(_blocklistFeedFile);
         BufferedReader br = null;
@@ -319,6 +366,7 @@ public class Blocklist {
                     if (isFeedFile) {
                         // temporary
                         add(ip1);
+                        feedcount++;
                     } else {
                         byte[] ip2 = e.ip2;
                         store(ip1, ip2, count++);
@@ -348,11 +396,15 @@ public class Blocklist {
             ipcount += 1 + toInt(_wrapSave.ip2) - toInt(_wrapSave.ip1);
             _wrapSave = null;
         }
+        int read = isFeedFile ? feedcount : (count - oldcount);
+        // save to tell the update manager
+        if (read > 0)
+            blf.version = blFile.lastModified();
         if (_log.shouldLog(Log.INFO)) {
             _log.info("Stats for " + blFile);
             _log.info("Removed " + badcount + " bad entries and comment lines");
-            _log.info("Read " + (count - oldcount) + " valid entries from the blocklist " + blFile);
-            _log.info("Blocking " + ipcount + " IPs and " + peercount + " hashes");
+            _log.info("Read " + read + " valid entries from the blocklist " + blFile);
+            _log.info("Blocking " + (isFeedFile ? feedcount : ipcount) + " IPs and " + peercount + " hashes");
             _log.info("Blocklist processing finished, time: " + (_context.clock().now() - start));
         }
         return count;
