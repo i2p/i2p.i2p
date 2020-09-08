@@ -905,6 +905,7 @@ public class NTCPConnection implements Closeable {
                         break;
                     }
                     if (msg.getExpiration() >= now) {
+                        _currentOutbound.add(msg);
                         block = new NTCP2Payload.I2NPBlock(m);
                         blocks.add(block);
                         size += NTCP2Payload.BLOCK_HEADER_SIZE + msz;
