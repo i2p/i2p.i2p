@@ -20,7 +20,7 @@ import net.i2p.data.SessionKey;
  * Cleartext:
  * <pre>
  *   bytes     0-3: tunnel ID to receive messages as
- *   bytes    4-35: local router identity hash
+ *   bytes    4-35: local router identity hash (Unused and no accessor here)
  *   bytes   36-39: next tunnel ID
  *   bytes   40-71: next router identity hash
  *   bytes  72-103: AES-256 tunnel layer key

@@ -34,7 +34,7 @@ public class BuildResponseRecord {
         //Log log = ctx.logManager().getLog(BuildResponseRecord.class);
         byte rv[] = new byte[TunnelBuildReplyMessage.RECORD_SIZE];
         ctx.random().nextBytes(rv, Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE - Hash.HASH_LENGTH - 1);
-        DataHelper.toLong(rv, TunnelBuildMessage.RECORD_SIZE-1, 1, status);
+        rv[TunnelBuildMessage.RECORD_SIZE-1] = (byte) status;
         // rv = AES(SHA256(padding+status) + padding + status, replyKey, replyIV)
         ctx.sha().calculateHash(rv, Hash.HASH_LENGTH, rv.length - Hash.HASH_LENGTH, rv, 0);
         //if (log.shouldLog(Log.DEBUG))
