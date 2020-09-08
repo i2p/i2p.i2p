@@ -18,6 +18,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.BuildMessageGenerator;
+import net.i2p.router.tunnel.HopConfig;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -83,11 +84,12 @@ abstract class BuildRequestor {
         int len = cfg.getLength();
         boolean isIB = cfg.isInbound();
         for (int i = 0; i < len; i++) {
+            HopConfig hop = cfg.getConfig(i);
             if ( (!isIB) && (i == 0) ) {
                 // outbound gateway (us) doesn't receive on a tunnel id
                 if (len <= 1)  { // zero hop, pretend to have a send id
                     long id = ctx.tunnelDispatcher().getNewOBGWID();
-                    cfg.getConfig(i).setSendTunnelId(DataHelper.toLong(4, id));
+                    hop.setSendTunnelId(DataHelper.toLong(4, id));
                 }
             } else {
                 long id;
@@ -97,15 +99,15 @@ abstract class BuildRequestor {
                     id = ctx.tunnelDispatcher().getNewIBEPID();
                 else
                     id = 1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE);
-                cfg.getConfig(i).setReceiveTunnelId(DataHelper.toLong(4, id));
+                hop.setReceiveTunnelId(DataHelper.toLong(4, id));
             }
             
             if (i > 0)
-                cfg.getConfig(i-1).setSendTunnelId(cfg.getConfig(i).getReceiveTunnelId());
+                cfg.getConfig(i-1).setSendTunnelId(hop.getReceiveTunnelId());
             byte iv[] = new byte[16];
             ctx.random().nextBytes(iv);
-            cfg.getConfig(i).setReplyIV(iv);
-            cfg.getConfig(i).setReplyKey(ctx.keyGenerator().generateSessionKey());
+            hop.setReplyIV(iv);
+            hop.setReplyKey(ctx.keyGenerator().generateSessionKey());
         }
         // This is in BuildExecutor.buildTunnel() now
         // And it was overwritten by the one in createTunnelBuildMessage() anyway!
