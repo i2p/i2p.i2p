@@ -7,9 +7,11 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -226,6 +228,18 @@ public class DatabaseReader implements Closeable {
             return null;
         return (String) o;
 
+    }
+
+    /**
+     *  I2P -
+     *  Write all IPv4 address ranges for the given country to out.
+     *
+     *  @param country two-letter case-insensitive
+     *  @param out caller must close
+     *  @since 0.9.48
+     */
+    public void countryToIP(String country, Writer out) throws IOException {
+        reader.countryToIP(country.toUpperCase(Locale.US), out);
     }
 
     /**

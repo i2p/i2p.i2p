@@ -4,9 +4,12 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -147,6 +150,127 @@ public final class Reader implements Closeable {
             return null;
         }
         return this.resolveDataPointer(buffer, pointer);
+    }
+
+    /**
+     *  I2P -
+     *  Write all IPv4 address ranges for the given country to out.
+     *
+     *  @param country two-letter uppper-case
+     *  @param out caller must close
+     *  @since 0.9.48
+     */
+    public void countryToIP(String country, Writer out) throws IOException {
+        Walker walker = new Walker(country, out);
+        walker.walk();
+    }
+
+    /**
+     *  I2P
+     *  @since 0.9.48
+     */
+    private class Walker {
+        private final String _country;
+        private final Writer _out;
+        private final int _nodeCount;
+        private final ByteBuffer _buffer;
+        private final Set<Integer> _negativeCache;
+        //private boolean _ipv6;
+        private int _countryRecord = -1;
+
+        /**
+         *  Write all IPv4 address ranges for the given country to out.
+         *
+         *  @param country two-letter uppper-case
+         */
+        public Walker(String country, Writer out) throws IOException {
+            _country = country;
+            _out = out;
+            _nodeCount = metadata.getNodeCount();
+            _buffer = getBufferHolder().get();
+            _negativeCache = new HashSet<Integer>(256);
+        }
+
+        /** only call once */
+        public void walk() throws IOException {
+            _out.write("# IPs for country " + _country + " from GeoIP2 database\n");
+            int record = startNode(32);
+            walk(record, 0, 0);
+            // TODO if supported in blocklist
+            //record = startNode(128);
+            //_ipv6 = true;
+            //walk(record, 0, 0);
+        }
+
+        /**
+         * Recursive, depth first
+         * @param ip big endian
+         */
+        private void walk(int record, int ip, int depth) throws IOException {
+            if (record == _nodeCount) {
+                return;
+            }
+            if (record > _nodeCount) {
+                boolean found;
+                if (_countryRecord < 0) {
+                    // Without a negative cache, perversely, the rarest
+                    // countries take the longest, because it takes longer to
+                    // find the right record and set _countryRecord.
+                    // The negative cache speeds up the search for an unknown country by 25x.
+                    // If we could find the country record in advance that would
+                    // be even better, but there's no way to do that other than
+                    // "priming" it with a known IP.
+                    if (_negativeCache.contains(Integer.valueOf(record)))
+                        return;
+                    // This is the slow part
+                    // we only need to read and parse the country record once
+                    // wouldn't work on a city database?
+                    Object o = resolveDataPointer(_buffer, record);
+                    if (!(o instanceof Map))
+                        return;
+                    Map m = (Map) o;
+                    o = m.get("country");
+                    if (!(o instanceof Map))
+                        return;
+                    m = (Map) o;
+                    o = m.get("iso_code");
+                    found = _country.equals(o);
+                    if (found) {
+                        _countryRecord = record;
+                        _negativeCache.clear();
+                    } else {
+                        if (_negativeCache.size() < 10000)  // don't blow up on city database?
+                            _negativeCache.add(Integer.valueOf(record));
+                    }
+                } else {
+                    found = record == _countryRecord;
+                }
+                if (found) {
+                    String sip;
+                    //if (_ipv6) {
+                    //    sip = Integer.toHexString((ip >> 16) & 0xffff) + ":" +
+                    //          Integer.toHexString(ip & 0xffff) + "::/" + depth;
+                    //} else {
+                        sip = ((ip >> 24) & 0xff) + "." +
+                                 ((ip >> 16) & 0xff) + '.' +
+                                 ((ip >> 8) & 0xff) + '.' +
+                                 (ip & 0xff);
+                    //}
+                    _out.write(sip);
+                    if (depth < 32) {
+                        _out.write('/');
+                        _out.write(Integer.toString(depth));
+                    }
+                    _out.write('\n');
+                }
+                return;
+            }
+            if (depth >= 32)
+                return;
+            walk(readNode(_buffer, record, 0), ip, depth + 1);
+            ip |= 1 << (31 - depth);
+            walk(readNode(_buffer, record, 1), ip, depth + 1);
+        }
     }
 
     private BufferHolder getBufferHolder() throws ClosedDatabaseException {
