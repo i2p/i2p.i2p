@@ -231,7 +231,7 @@ public class Blocklist {
 
         public void runJob() {
             synchronized (_lock) {
-                allocate(_files);
+                _blocklist = allocate(_files);
                 if (_blocklist == null)
                     return;
                 int ccount = process();
@@ -241,7 +241,7 @@ public class Blocklist {
                     disable();
                     return;
                 }
-                merge(ccount);
+                _blocklistSize = merge(_blocklist, ccount);
                 _peerBlocklist = null;
             }
             // schedules itself
@@ -252,7 +252,7 @@ public class Blocklist {
             int count = 0;
                 try {
                     for (BLFile blf : _files) {
-                        count = readBlocklistFile(blf, count);
+                        count = readBlocklistFile(blf, _blocklist, count);
                     }
                 } catch (OutOfMemoryError oom) {
                     _log.log(Log.CRIT, "OOM processing the blocklist");
@@ -282,19 +282,19 @@ public class Blocklist {
     }
 
     /**
-     *  @return success
+     *  @return array or null on failure
      *  @since 0.9.18 split out from readBlocklistFile()
      */
-    private void allocate(List<BLFile> files) {
+    private long[] allocate(List<BLFile> files) {
         int maxSize = 0;
         for (BLFile blf : files) {
             maxSize += getSize(blf.file);
         }
         try {
-            _blocklist = new long[maxSize + files.size()];  // extra for wrapsave
+            return new long[maxSize + files.size()];  // extra for wrapsave
         } catch (OutOfMemoryError oom) {
             _log.log(Log.CRIT, "OOM creating the blocklist");
-            disable();
+            return null;
         }
     }
 
@@ -327,10 +327,11 @@ public class Blocklist {
     *
     * Must call allocate() before and merge() after.
     *
+    *  @param out parameter, entries stored here
     *  @param count current number of entries
     *  @return new number of entries
     */
-    private int readBlocklistFile(BLFile blf, int count) {
+    private int readBlocklistFile(BLFile blf, long[] blocklist, int count) {
         File blFile = blf.file;
         if (blFile == null || (!blFile.exists()) || blFile.length() <= 0) {
             if (_log.shouldLog(Log.WARN))
@@ -369,7 +370,7 @@ public class Blocklist {
                         feedcount++;
                     } else {
                         byte[] ip2 = e.ip2;
-                        store(ip1, ip2, count++);
+                        store(ip1, ip2, blocklist, count++);
                         ipcount += 1 + toInt(ip2) - toInt(ip1); // includes dups, oh well
                     }
                 } else {
@@ -382,9 +383,9 @@ public class Blocklist {
                 _log.error("Error reading the blocklist file", ioe);
             return count;
         } catch (OutOfMemoryError oom) {
-            _blocklist = null;
+            disable();
             _log.log(Log.CRIT, "OOM reading the blocklist");
-            return count;
+            return 0;
         } finally {
             if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
@@ -392,7 +393,7 @@ public class Blocklist {
         if (_wrapSave != null) {
             // the extra record generated in parse() by a line that
             // wrapped around 128.0.0.0
-            store(_wrapSave.ip1, _wrapSave.ip2, count++);
+            store(_wrapSave.ip1, _wrapSave.ip2, blocklist, count++);
             ipcount += 1 + toInt(_wrapSave.ip2) - toInt(_wrapSave.ip1);
             _wrapSave = null;
         }
@@ -411,36 +412,38 @@ public class Blocklist {
     }
 
     /**
-     *  @param count valid entries in _blocklist
+     *  @param count valid entries in blocklist before merge
+     *  @return count valid entries in blocklist after merge
      *  @since 0.9.18 split out from readBlocklistFile()
      */
-    private void merge(int count) {
+    private int merge(long[] blocklist, int count) {
         long start = _context.clock().now();
         // This is a standard signed sort, so the entries will be ordered
         // 128.0.0.0 ... 255.255.255.255 0.0.0.0 .... 127.255.255.255
         // But that's ok.
         int removed = 0;
         try {
-            Arrays.sort(_blocklist, 0, count);
-            removed = removeOverlap(_blocklist, count);
+            Arrays.sort(blocklist, 0, count);
+            removed = removeOverlap(blocklist, count);
             if (removed > 0) {
                 // Sort again to remove the dups that were "zeroed" out as 127.255.255.255-255.255.255.255
-                Arrays.sort(_blocklist, 0, count);
+                Arrays.sort(blocklist, 0, count);
                 // sorry, no realloc to save memory, don't want to blow up now
             }
         } catch (OutOfMemoryError oom) {
-            _blocklist = null;
+            disable();
             _log.log(Log.CRIT, "OOM sorting the blocklist");
-            return;
+            return 0;
         }
-        _blocklistSize = count - removed;
+        int blocklistSize = count - removed;
         if (_log.shouldLog(Log.INFO)) {
             _log.info("Merged Stats");
             _log.info("Read " + count + " total entries from the blocklists");
             _log.info("Merged " + removed + " overlapping entries");
-            _log.info("Result is " + _blocklistSize + " entries");
+            _log.info("Result is " + blocklistSize + " entries");
             _log.info("Blocklist processing finished, time: " + (_context.clock().now() - start));
         }
+        return blocklistSize;
     }
 
     /**
@@ -611,7 +614,7 @@ public class Blocklist {
                     _log.warn("Combining entries " + toStr(blist[i]) + " and " + toStr(blist[next]));
                 int nextTo = getTo(blist[next]);
                 if (nextTo > to) // else entry next is totally inside entry i
-                    store(getFrom(blist[i]), nextTo, i);
+                    store(getFrom(blist[i]), nextTo, blist, i);
                 blist[next] = Long.MAX_VALUE;  // to be removed with another sort
                 lines++;
                 removed++;
@@ -908,14 +911,14 @@ public class Blocklist {
     /**
      *  IPv4 only
      */
-    private void store(byte ip1[], byte ip2[], int idx) {
-        _blocklist[idx] = toEntry(ip1, ip2);
+    private static void store(byte ip1[], byte ip2[], long[] blocklist, int idx) {
+        blocklist[idx] = toEntry(ip1, ip2);
     }
 
-    private void store(int ip1, int ip2, int idx) {
+    private static void store(int ip1, int ip2, long[] blocklist, int idx) {
         long entry = ((long) ip1) << 32;
         entry |= ((long)ip2) & 0xffffffff;
-        _blocklist[idx] = entry;
+        blocklist[idx] = entry;
     }
 
     private static int toInt(byte ip[]) {
@@ -1183,7 +1186,7 @@ public class Blocklist {
             }
             if (_blocklistSize > MAX_DISPLAY)
                 // very rare, don't bother translating
-                out.write("<tr><th colspan=2>First " + MAX_DISPLAY + " displayed, see the " +
+                out.write("<tr><th colspan=3>First " + MAX_DISPLAY + " displayed, see the " +
                           BLOCKLIST_FILE_DEFAULT + " file for the full list</th></tr>");
         } else {
             out.write("<tr><td><i>");
