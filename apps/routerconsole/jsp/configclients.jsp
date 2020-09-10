@@ -30,8 +30,20 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <h3 id="i2pclientconfig"><%=intl._t("Client Configuration")%></h3>
  <p class="infohelp" id="clientconf">
  <%=intl._t("The Java clients listed below are started by the router and run in the same JVM.")%>&nbsp;
- <%=intl._t("To change other client options, edit the file")%>
- <tt><%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.</tt>
+<%
+   if (!clientshelper.isAdvanced()) {
+       net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
+       if (net.i2p.router.startup.ClientAppConfig.isSplitConfig(ctx)) {
+%>
+           <%=intl._t("To change client options, edit the files in the directory {0}.", "<tt>" + net.i2p.router.startup.ClientAppConfig.configDir(ctx).getAbsolutePath() + "</tt>")%>
+<%
+       } else {
+%>
+           <%=intl._t("To change client options, edit the file {0}.", "<tt>" + net.i2p.router.startup.ClientAppConfig.configFile(ctx).getAbsolutePath() + "</tt>")%>
+<%
+       }
+   } // !isAdvanced()
+%>
  <%=intl._t("All changes require restart to take effect.")%>
  </p>
  <p class="infowarn" id="clientconf">
