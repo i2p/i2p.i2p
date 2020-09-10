@@ -5,12 +5,19 @@ package net.i2p.router.transport;
  */
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +35,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.Blocklist;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -36,6 +44,7 @@ import net.i2p.update.UpdateType;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -68,6 +77,7 @@ public class GeoIP {
     private final Set<Long> _notFound;
     private final AtomicBoolean _lock;
     private int _lookupRunCount;
+    private static final Map<String, List<String>> _associatedCountries;
     
     static final String PROP_GEOIP_ENABLED = "routerconsole.geoip.enable";
     public static final String PROP_GEOIP_DIR = "geoip.dir";
@@ -82,10 +92,22 @@ public class GeoIP {
     private static final String DEBIAN_GEOIPV6_FILE = "/usr/share/GeoIP/GeoIPv6.dat";
     private static final boolean DISABLE_DEBIAN = false;
     private static final boolean ENABLE_DEBIAN = !DISABLE_DEBIAN && !(SystemVersion.isWindows() || SystemVersion.isAndroid());
+    private static final String PROP_BLOCK_MY_COUNTRY = "i2np.blockMyCountry";
     /** maxmind API */
     private static final String UNKNOWN_COUNTRY_CODE = "--";
     /** db-ip.com https://db-ip.com/faq.php */
     private static final String UNKNOWN_COUNTRY_CODE2 = "ZZ";
+
+    static {
+        // To block additional countries b,c,d when blocking country a,
+        // put the list a,b,c,d for country a.
+        _associatedCountries = new HashMap<String, List<String>>(2);
+        List<String> c = new ArrayList<String>(2);
+        c.add("cn");
+        c.add("hk");
+        _associatedCountries.put("cn", c);
+        _associatedCountries.put("hk", c);
+    }
 
     /**
      *  @param context RouterContext in production, I2PAppContext for testing only
@@ -148,8 +170,9 @@ public class GeoIP {
             Thread.currentThread().setPriority(pri - 1);
         try {
             LookupJob j = new LookupJob();
-            j.run();
-            updateOurCountry();
+            long ts = j.runit();
+            if (ts > 0)
+                updateOurCountry(ts);
         } finally {
             if (pri > Thread.MIN_PRIORITY)
                 Thread.currentThread().setPriority(pri);
@@ -160,12 +183,20 @@ public class GeoIP {
         private static final int CLEAR = 8;
 
         public void run() {
+            runit();
+        }
+
+        /**
+         *  @return timestamp of the geoip ipv4 file used, or 0 on failure
+         */
+        public long runit() {
             if (_lock.getAndSet(true))
-                return;
+                return 0;
             int toSearch = 0;
             int found = 0;
             File geoip2 = getGeoIP2();
             DatabaseReader dbr = null;
+            long rv = 0;
             long start = _context.clock().now();
             try {
                 // clear the negative cache every few runs, to prevent it from getting too big
@@ -199,8 +230,11 @@ public class GeoIP {
                         try {
                             ls = new LookupService(f, LookupService.GEOIP_STANDARD);
                             Date date = ls.getDatabaseInfo().getDate();
-                            if (date != null)
-                                notifyVersion("GeoIPv4", date.getTime());
+                            if (date != null) {
+                                long time = date.getTime();
+                                notifyVersion("GeoIPv4", time);
+                                rv = time;
+                            }
                             for (int i = 0; i < search.length; i++) {
                                 Long ipl = search[i];
                                 long ip = ipl.longValue();
@@ -228,6 +262,11 @@ public class GeoIP {
                         // Maxmind v2 database
                         try {
                             dbr = openGeoIP2(geoip2);
+                            long time = dbr.getMetadata().getBuildDate().getTime();
+                            if (time > 0) {
+                                notifyVersion("GeoIP2", time);
+                                rv = time;
+                            }
                             for (int i = 0; i < search.length; i++) {
                                 Long ipl = search[i];
                                 String ipv4 = toV4(ipl);
@@ -250,6 +289,14 @@ public class GeoIP {
                     } else {
                         // Tor-style database
                         String[] countries = readGeoIPFile(search);
+                        if (countries.length > 0) {
+                            String geoDir = _context.getProperty(PROP_GEOIP_DIR, GEOIP_DIR_DEFAULT);
+                            File geoFile = new File(geoDir);
+                            if (!geoFile.isAbsolute())
+                                geoFile = new File(_context.getBaseDir(), geoDir);
+                            geoFile = new File(geoFile, GEOIP_FILE_DEFAULT);
+                            rv = geoFile.lastModified();
+                        }
                         for (int i = 0; i < countries.length; i++) {
                             if (countries[i] != null) {
                                 _IPToCountry.put(search[i], countries[i]);
@@ -344,7 +391,76 @@ public class GeoIP {
             if (_log.shouldInfo())
                 _log.info("GeoIP processing finished, looked up: " + toSearch + " found: " + found +
                           " time: " + (_context.clock().now() - start));
+            return rv;
         }
+    }
+
+    /**
+     *  Write all IP ranges for country to blocklist-country.txt.
+     *  Inline, blocking.
+     *
+     *  @param two-letter lower-case country code
+     *  @since 0.9.48
+     */
+    private void countryToIP(String country) {
+        while (_lock.getAndSet(true)) {
+            try { Thread.sleep(1000); } catch (InterruptedException ie) { return; }
+        }
+        File geoip2 = getGeoIP2();
+        DatabaseReader dbr = null;
+        if (_log.shouldInfo())
+            _log.info("Generating blocklist for our country " + country);
+        long start = _context.clock().now();
+        File fout = new File(_context.getConfigDir(), Blocklist.BLOCKLIST_COUNTRY_FILE);
+        BufferedWriter out = null;
+        List<String> countries = _associatedCountries.get(country);
+        if (countries == null)
+            countries = Collections.singletonList(country);
+        try {
+            File f = new File(_context.getProperty(PROP_DEBIAN_GEOIP, DEBIAN_GEOIP_FILE));
+            // if we have both, prefer the most recent.
+            // The Debian data can be pretty old.
+            // For now, we use the file date, we don't open it up to get the metadata.
+            if (ENABLE_DEBIAN && f.exists() &&
+                (geoip2 == null || f.lastModified() > geoip2.lastModified())) {
+                // Maxmind v1 database
+                LookupService ls = null;
+                try {
+                    out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(fout), "UTF-8"));
+                    ls = new LookupService(f, LookupService.GEOIP_STANDARD);
+                    for (String c : countries) {
+                        ls.countryToIP(c, out);
+                        // TODO close out, tell blocklist
+                    }
+                } catch (IOException ioe) {
+                    _log.error("GeoIP failure", ioe);
+                } catch (InvalidDatabaseException ide) {
+                    _log.error("GeoIP failure", ide);
+                } finally {
+                    if (ls != null) ls.close();
+                }
+            } else if (geoip2 != null) {
+                // Maxmind v2 database
+                try {
+                    out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(fout), "UTF-8"));
+                    dbr = openGeoIP2(geoip2);
+                    for (String c : countries) {
+                        dbr.countryToIP(c, out);
+                        // TODO close out, tell blocklist
+                    }
+                } catch (IOException ioe) {
+                    _log.error("GeoIP2 failure", ioe);
+                }
+            } else {
+                // Tor-style database, unsupported
+            }
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException e) {}
+            if (dbr != null) try { dbr.close(); } catch (IOException ioe) {}
+            _lock.set(false);
+        }
+        if (_log.shouldInfo())
+            _log.info("Finished generating blocklist for our country, time: " + (_context.clock().now() - start));
     }
 
    /**
@@ -377,8 +493,6 @@ public class GeoIP {
         DatabaseReader rv = b.build();
         if (_log.shouldDebug())
             _log.debug("Opened GeoIP2 Database, Metadata: " + rv.getMetadata());
-        long time = rv.getMetadata().getBuildDate().getTime();
-        notifyVersion("GeoIP2", time);
         return rv;
     }
 
@@ -543,8 +657,9 @@ public class GeoIP {
      *  and it will be there next time at startup.
      *
      *  Does nothing in I2PAppContext
+     *  @param ts the timestamp of the geoip file that was read, greater than zero
      */
-    private void updateOurCountry() {
+    private void updateOurCountry(long ts) {
         if (! (_context instanceof RouterContext))
             return;
         RouterContext ctx = (RouterContext) _context;
@@ -591,6 +706,17 @@ public class GeoIP {
             boolean isStrict = ctx.commSystem().isInStrictCountry();
             if (_log.shouldInfo())
                 _log.info("Old country was strict? " + wasStrict + "; new country is strict? " + isStrict);
+            if (isStrict || ctx.getBooleanProperty(Router.PROP_HIDDEN_HIDDEN) ||
+                ctx.getBooleanProperty(PROP_BLOCK_MY_COUNTRY)) {
+                // generate country blocklist
+                countryToIP(country);
+                // go thru the netdb
+                banCountry(ctx, country);
+            } else {
+                // remove country blocklist, won't take effect until restart
+                File bc = new File(_context.getConfigDir(), Blocklist.BLOCKLIST_COUNTRY_FILE);
+                bc.delete();
+            }
             if (wasStrict != isStrict && ctx.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
                 if (isStrict) {
                     String name = fullName(country);
@@ -600,6 +726,36 @@ public class GeoIP {
                                              ", you may override on the network configuration page");
                 }
                 ctx.router().rebuildRouterInfo();
+            }
+        } else if (country != null) {
+            // No change, but we may need to update blocklist-country.txt
+            boolean isStrict = ctx.commSystem().isInStrictCountry();
+            if (isStrict || ctx.getBooleanProperty(Router.PROP_HIDDEN_HIDDEN) ||
+                ctx.getBooleanProperty(PROP_BLOCK_MY_COUNTRY)) {
+                // check country blocklist timestamp
+                File bc = new File(_context.getConfigDir(), Blocklist.BLOCKLIST_COUNTRY_FILE);
+                long lm = bc.lastModified();
+                if (lm < ts) {
+                    // regenerate blocklist
+                    countryToIP(country);
+                }
+                if (_lookupRunCount == 1) {
+                    // go thru the netdb
+                    banCountry(ctx, country);
+                }
+            }
+        }
+    }
+
+    /**
+     *  @param two-letter lower-case country code
+     *  @since 0.9.48
+     */
+    private static void banCountry(RouterContext ctx, String country) {
+        for (Hash h : ctx.netDb().getAllRouters()) {
+            String hisCountry = ctx.commSystem().getCountry(h);
+            if (country.equals(hisCountry)) {
+                ctx.banlist().banlistRouterForever(h, "In our country");
             }
         }
     }
@@ -741,6 +897,7 @@ public class GeoIP {
         g.blockingLookup();
         System.out.println("Lookup took " + (System.currentTimeMillis() - start));
 /***
+        g.countryToIP("af");
         for (int i = 0; i < tests.length; i++)
             System.out.println(tests[i] + " : " + g.get(tests[i]));
 ***/
