@@ -9,7 +9,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
+import net.i2p.crypto.EncType;
 import net.i2p.data.Hash;
+import net.i2p.data.PublicKey;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
@@ -17,6 +19,8 @@ import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.crypto.ElGamalAESEngine;
 import net.i2p.router.crypto.ratchet.ECIESAEADEngine;
+import net.i2p.router.crypto.ratchet.MuxedSKM;
+import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
 import net.i2p.router.message.GarlicMessageParser;
@@ -629,16 +633,25 @@ public class RouterContext extends I2PAppContext {
 
     /**
      *  As of 0.9.15, this returns a dummy SessionKeyManager in I2PAppContext.
-     *  Overridden in RouterContext to return the full TransientSessionKeyManager.
+     *  Overridden in RouterContext to return the full TransientSessionKeyManager
+     *  or MuxedSKM, depending on configured router encryption type.
      *
      *  @since 0.9.15
      */
     @Override
     protected void initializeSessionKeyManager() {
         synchronized (_lock3) {
-            if (_sessionKeyManager == null) 
-                //_sessionKeyManager = new PersistentSessionKeyManager(this);
-                _sessionKeyManager = new TransientSessionKeyManager(this);
+            if (_sessionKeyManager == null) {
+                TransientSessionKeyManager tskm = new TransientSessionKeyManager(this);
+                PublicKey pk = keyManager().getPublicKey();
+                if (pk != null && pk.getType() == EncType.ECIES_X25519) {
+                    // TODO RatchetSKM only after updating MessageWrapper
+                    RatchetSKM rskm = new RatchetSKM(this);
+                    _sessionKeyManager = new MuxedSKM(tskm, rskm);
+                } else {
+                    _sessionKeyManager = tskm;
+                }
+            }
             _sessionKeyManagerInitialized = true;
         }
     }

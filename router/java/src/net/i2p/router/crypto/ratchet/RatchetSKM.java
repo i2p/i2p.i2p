@@ -78,10 +78,19 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
 
     /**
-     * The session key manager should only be constructed and accessed through the 
-     * application context.  This constructor should only be used by the 
-     * appropriate application context itself.
+     * For the router SKM only.
      *
+     * @since 0.9.48
+     */
+    public RatchetSKM(RouterContext context) {
+        this(context, null);
+    }
+
+    /**
+     * The session key manager is constructed and accessed through the 
+     * client manager.
+     *
+     * @param dest null for router's SKM only
      */
     public RatchetSKM(RouterContext context, Destination dest) {
         super(context);
