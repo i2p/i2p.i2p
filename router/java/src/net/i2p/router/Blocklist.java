@@ -88,7 +88,7 @@ public class Blocklist {
     private static final String PROP_BLOCKLIST_ENABLED = "router.blocklist.enable";
     private static final String PROP_BLOCKLIST_DETAIL = "router.blocklist.detail";
     private static final String PROP_BLOCKLIST_FILE = "router.blocklist.file";
-    private static final String BLOCKLIST_FILE_DEFAULT = "blocklist.txt";
+    public static final String BLOCKLIST_FILE_DEFAULT = "blocklist.txt";
     private static final String BLOCKLIST_FEED_FILE = "docs/feed/blocklist/blocklist.txt";
     /** @since 0.9.48 */
     public static final String BLOCKLIST_COUNTRY_FILE = "blocklist-country.txt";
@@ -437,11 +437,11 @@ public class Blocklist {
         }
         int blocklistSize = count - removed;
         if (_log.shouldLog(Log.INFO)) {
-            _log.info("Merged Stats");
-            _log.info("Read " + count + " total entries from the blocklists");
-            _log.info("Merged " + removed + " overlapping entries");
-            _log.info("Result is " + blocklistSize + " entries");
-            _log.info("Blocklist processing finished, time: " + (_context.clock().now() - start));
+            _log.info("Merged Stats:\n" +
+                      "Read " + count + " total entries from the blocklists\n" +
+                      "Merged " + removed + " overlapping entries\n" +
+                      "Result is " + blocklistSize + " entries\n" +
+                      "Blocklist processing finished, time: " + (_context.clock().now() - start));
         }
         return blocklistSize;
     }
@@ -610,8 +610,8 @@ public class Blocklist {
             for (int next = i + 1; next < count; next++) {
                 if (to < getFrom(blist[next]))
                     break;
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Combining entries " + toStr(blist[i]) + " and " + toStr(blist[next]));
+                if (_log.shouldInfo())
+                    _log.info("Combining entries " + toStr(blist[i]) + " and " + toStr(blist[next]));
                 int nextTo = getTo(blist[next]);
                 if (nextTo > to) // else entry next is totally inside entry i
                     store(getFrom(blist[i]), nextTo, blist, i);
@@ -652,8 +652,8 @@ public class Blocklist {
             rv = add(new BigInteger(1, ip));
         else
             rv = false;
-        if (rv && _log.shouldLog(Log.WARN))
-            _log.warn("Adding IP to blocklist: " + Addresses.toString(ip));
+        if (rv && _log.shouldInfo())
+            _log.info("Adding IP to blocklist: " + Addresses.toString(ip));
     }
 
     /**
@@ -836,9 +836,11 @@ public class Blocklist {
      * The array is sorted in signed order, but we don't care.
      * Each long is ((from << 32) | to)
      *
-     * @since 0.9.45 split out from above
+     * Public for console only, not a public API
+     *
+     * @since 0.9.45 split out from above, public since 0.9.48 for console
      */ 
-    private boolean isPermanentlyBlocklisted(int ip) {
+    public boolean isPermanentlyBlocklisted(int ip) {
         int hi = _blocklistSize - 1;
         if (hi <= 0)
             return false;
@@ -883,11 +885,19 @@ public class Blocklist {
 
     // methods to get and store the from/to values in the array
 
-    private static int getFrom(long entry) {
+    /**
+     *  Public for console only, not a public API
+     *  @since public since 0.9.48
+     */
+    public static int getFrom(long entry) {
         return (int) ((entry >> 32) & 0xffffffff);
     }
 
-    private static int getTo(long entry) {
+    /**
+     *  Public for console only, not a public API
+     *  @since public since 0.9.48
+     */
+    public static int getTo(long entry) {
         return (int) (entry & 0xffffffff);
     }
 
@@ -940,7 +950,11 @@ public class Blocklist {
         return buf.toString();
     }
 
-    private static String toStr(int ip) {
+    /**
+     *  Public for console only, not a public API
+     *  @since public since 0.9.48
+     */
+    public static String toStr(int ip) {
         StringBuilder buf = new StringBuilder(16);
         for (int i = 3; i >= 0; i--) {
             buf.append((ip >> (8*i)) & 0xff);
@@ -1070,149 +1084,82 @@ public class Blocklist {
         // We already banlisted in banlist(peer), that's good enough
     }
 
-    private static final int MAX_DISPLAY = 1000;
-
     /**
-     *  Write directly to the stream so we don't OOM on a huge list.
-     *  Go through each list twice since we store out-of-order.
+     *  Single IPs blocked until restart. Unsorted.
      *
-     *  TODO move to routerconsole, but that would require exposing the _blocklist array.
+     *  Public for console only, not a public API
+     *
+     *  @return a copy, unsorted
+     *  @since 0.9.48
      */
-    public void renderStatusHTML(Writer out) throws IOException {
-        // move to the jsp
-        //out.write("<h2>Banned IPs</h2>");
-        out.write("<table id=\"bannedips\"><tr><td>");
-        out.write("<table id=\"banneduntilrestart\"><tr><th align=\"center\"><b>");
-        out.write(_t("IPs Banned Until Restart"));
-        out.write("</b></th></tr>");
-        Set<Integer> singles = new TreeSet<Integer>();
-        singles.addAll(_singleIPBlocklist);
-        if (!(singles.isEmpty() && _singleIPv6Blocklist.isEmpty())) {
-            if (!singles.isEmpty()) {
-                out.write("<tr id=\"ipv4\" align=\"center\"><td><b>");
-                out.write(_t("IPv4 Addresses"));
-                out.write("</b></td></tr>");
-            }
-            // first 0 - 127
-            for (Integer ii : singles) {
-                 int ip = ii.intValue();
-                 if (ip < 0)
-                     continue;
-                 // don't display if on the permanent blocklist also
-                 if (isPermanentlyBlocklisted(ip))
-                     continue;
-                 out.write("<tr><td align=\"center\">");
-                 out.write(toStr(ip));
-                 out.write("</td></tr>\n");
-            }
-            // then 128 - 255
-            for (Integer ii : singles) {
-                 int ip = ii.intValue();
-                 if (ip >= 0)
-                     break;
-                 // don't display if on the permanent blocklist also
-                 if (isPermanentlyBlocklisted(ip))
-                     continue;
-                 out.write("<tr><td align=\"center\">");
-                 out.write(toStr(ip));
-                 out.write("</td></tr>\n");
-            }
-            // then IPv6
-            if (!_singleIPv6Blocklist.isEmpty()) {
-                out.write("<tr id=\"ipv6\" align=\"center\"><td><b>");
-                out.write(_t("IPv6 Addresses"));
-                out.write("</b></td></tr>");
-                List<BigInteger> s6;
-                synchronized(_singleIPv6Blocklist) {
-                    s6 = new ArrayList<BigInteger>(_singleIPv6Blocklist.keySet());
-                }
-                Collections.sort(s6);
-                for (BigInteger bi : s6) {
-                     out.write("<tr><td align=\"center\">");
-                     out.write(Addresses.toString(toIPBytes(bi)));
-                     out.write("</td></tr>\n");
-                }
-            }
-        } else {
-            out.write("<tr><td><i>");
-            out.write(_t("none"));
-            out.write("</i></td></tr>");
-        }
-        out.write("</table>");
-        out.write("</td><td>");
-        out.write("<table id=\"permabanned\"><tr><th align=\"center\" colspan=\"3\"><b>");
-        out.write(_t("IPs Permanently Banned"));
-        out.write("</b></th></tr>");
-        if (_blocklistSize > 0) {
-            out.write("<tr><td align=\"center\" width=\"49%\"><b>");
-            out.write(_t("From"));
-            out.write("</b></td><td></td><td align=\"center\" width=\"49%\"><b>");
-            out.write(_t("To"));
-            out.write("</b></td></tr>");
-            int max = Math.min(_blocklistSize, MAX_DISPLAY);
-            int displayed = 0;
-            // first 0 - 127
-            for (int i = 0; i < _blocklistSize && displayed < max; i++) {
-                 int from = getFrom(_blocklist[i]);
-                 if (from < 0)
-                     continue;
-                 out.write("<tr><td align=\"center\" width=\"49%\">");
-                 out.write(toStr(from));
-                 out.write("</td>");
-                 int to = getTo(_blocklist[i]);
-                 if (to != from) {
-                     out.write("<td align=\"center\">-</td><td align=\"center\" width=\"49%\">");
-                     out.write(toStr(to));
-                     out.write("</td></tr>\n");
-                 } else
-                     out.write("<td></td><td width=\"49%\">&nbsp;</td></tr>\n");
-                 displayed++;
-            }
-            // then 128 - 255
-            for (int i = 0; i < max && displayed++ < max; i++) {
-                 int from = getFrom(_blocklist[i]);
-                 if (from >= 0)
-                     break;
-                 out.write("<tr><td align=\"center\" width=\"49%\">");
-                 out.write(toStr(from));
-                 out.write("</td>");
-                 int to = getTo(_blocklist[i]);
-                 if (to != from) {
-                     out.write("<td align=\"center\">-</td><td align=\"center\" width=\"49%\">");
-                     out.write(toStr(to));
-                     out.write("</td></tr>\n");
-                 } else
-                     out.write("<td></td><td width=\"49%\">&nbsp;</td></tr>\n");
-            }
-            if (_blocklistSize > MAX_DISPLAY)
-                // very rare, don't bother translating
-                out.write("<tr><th colspan=3>First " + MAX_DISPLAY + " displayed, see the " +
-                          BLOCKLIST_FILE_DEFAULT + " file for the full list</th></tr>");
-        } else {
-            out.write("<tr><td><i>");
-            out.write(_t("none"));
-            out.write("</i></td></tr>");
-        }
-        out.write("</table>");
-        out.write("</td></tr></table>");
-        out.flush();
+    public List<Integer> getTransientIPv4Blocks() {
+        return new ArrayList<Integer>(_singleIPBlocklist);
     }
 
     /**
-     *  Convert a (non-negative) two's complement IP to exactly 16 bytes
-     *  @since IPv6
+     *  Single IPs blocked until restart. Unsorted.
+     *
+     *  Public for console only, not a public API
+     *
+     *  @return a copy, unsorted
+     *  @since 0.9.48
      */
-    private static byte[] toIPBytes(BigInteger bi) {
-        byte[] ba = bi.toByteArray();
-        int len = ba.length;
-        if (len == 16)
-            return ba;
-        byte[] rv = new byte[16];
-        if (len < 16)
-            System.arraycopy(ba, 0, rv, 16 - len, len);
-        else
-            System.arraycopy(ba, len - 16, rv, 0, 16);
+    public List<BigInteger> getTransientIPv6Blocks() {
+        synchronized(_singleIPv6Blocklist) {
+            return new ArrayList<BigInteger>(_singleIPv6Blocklist.keySet());
+        }
+    }
+
+    /**
+     *  IP ranges blocked until restart. Sorted,
+     *  but as signed longs, so 128-255 are first
+     *
+     *  Public for console only, not a public API
+     *
+     *  @param max maximum entries to return
+     *  @return a copy, sorted
+     *  @since 0.9.48
+     */
+    public synchronized long[] getPermanentBlocks(int max) {
+        long[] rv;
+        if (_blocklistSize <= max) {
+            rv = new long[_blocklistSize];
+            System.arraycopy(_blocklist, 0, rv, 0, _blocklistSize);
+        } else {
+            // skip ahead to the positive entries
+            int i = 0;
+            for (; i < _blocklistSize; i++) {
+                int from = Blocklist.getFrom(_blocklist[i]);
+                if (from >= 0)
+                    break;
+            }
+            int sz = Math.min(_blocklistSize - i, max);
+            rv = new long[sz];
+            System.arraycopy(_blocklist, i, rv, 0, sz);
+        }
         return rv;
+    }
+
+    /**
+     *  Size of permanent blocklist
+     *
+     *  Public for console only, not a public API
+     *
+     *  @param max maximum entries to return
+     *  @return sorted
+     *  @since 0.9.48
+     */
+    public synchronized int getBlocklistSize() {
+        return _blocklistSize;
+    }
+
+    /**
+     *  Does nothing, moved to console ConfigPeerHelper
+     *
+     *  @deprecated
+     */
+    @Deprecated
+    public void renderStatusHTML(Writer out) throws IOException {
     }
 
     /**
@@ -1223,13 +1170,6 @@ public class Blocklist {
      */
     private static final String _x(String s) {
         return s;
-    }
-
-    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
-
-    /** translate */
-    private String _t(String key) {
-        return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
 /****
