@@ -430,8 +430,11 @@ public class GeoIP {
                     ls = new LookupService(f, LookupService.GEOIP_STANDARD);
                     for (String c : countries) {
                         ls.countryToIP(c, out);
-                        // TODO close out, tell blocklist
                     }
+                    out.close();
+                    out = null;
+                    RouterContext ctx = (RouterContext) _context;
+                    ctx.blocklist().addCountryFile();
                 } catch (IOException ioe) {
                     _log.error("GeoIP failure", ioe);
                 } catch (InvalidDatabaseException ide) {
@@ -446,8 +449,11 @@ public class GeoIP {
                     dbr = openGeoIP2(geoip2);
                     for (String c : countries) {
                         dbr.countryToIP(c, out);
-                        // TODO close out, tell blocklist
                     }
+                    out.close();
+                    out = null;
+                    RouterContext ctx = (RouterContext) _context;
+                    ctx.blocklist().addCountryFile();
                 } catch (IOException ioe) {
                     _log.error("GeoIP2 failure", ioe);
                 }

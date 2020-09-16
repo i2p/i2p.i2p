@@ -77,13 +77,15 @@ public class Blocklist {
     private final RouterContext _context;
     private long _blocklist[];
     private int _blocklistSize;
+    private long _countryBlocklist[];
+    private int _countryBlocklistSize;
     private final Object _lock = new Object();
     private Entry _wrapSave;
     private final Set<Hash> _inProcess = new HashSet<Hash>(4);
     private final File _blocklistFeedFile;
     private boolean _started;
     // temp
-    private Map<Hash, String> _peerBlocklist = new HashMap<Hash, String>(4);
+    private final Map<Hash, String> _peerBlocklist = new HashMap<Hash, String>(4);
     
     private static final String PROP_BLOCKLIST_ENABLED = "router.blocklist.enable";
     private static final String PROP_BLOCKLIST_DETAIL = "router.blocklist.detail";
@@ -242,7 +244,9 @@ public class Blocklist {
                     return;
                 }
                 _blocklistSize = merge(_blocklist, ccount);
-                _peerBlocklist = null;
+                // we're done with _peerBlocklist, but leave it
+                // in case we need it for a later readin
+                //_peerBlocklist = null;
             }
             // schedules itself
             new VersionNotifier(_files);
@@ -271,6 +275,33 @@ public class Blocklist {
             _peerBlocklist.clear();
             return count;
         }
+    }
+
+    /**
+     *  The blocklist-country.txt file was created or updated.
+     *  Read it in. Not required normally, as the country file
+     *  is read by startup().
+     *  @since 0.9.48
+     */
+    public synchronized void addCountryFile() {
+        File blFile = new File(_context.getConfigDir(), BLOCKLIST_COUNTRY_FILE);
+        BLFile blf = new BLFile(blFile, ID_COUNTRY);
+        List<BLFile> c = Collections.singletonList(blf);
+        long[] cb = allocate(c);
+        if (cb == null)
+            return;
+        int count = readBlocklistFile(blf, cb, 0);
+        if (count <= 0)
+            return;
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null) {
+            UpdateManager umgr = (UpdateManager) cmgr.getRegisteredApp(UpdateManager.APP_NAME);
+            if (umgr != null)
+                umgr.notifyInstalled(UpdateType.BLOCKLIST, ID_COUNTRY, Long.toString(blFile.lastModified()));
+        }
+        count = merge(cb, count);
+        _countryBlocklistSize = count;
+        _countryBlocklist = cb;
     }
 
     public void disable() {
@@ -827,6 +858,10 @@ public class Blocklist {
     private boolean isBlocklisted(int ip) {
         if (isOnSingleList(ip))
             return true;
+        if (_countryBlocklist != null) {
+            if (isPermanentlyBlocklisted(ip, _countryBlocklist, _countryBlocklistSize))
+                return true;
+        }
         return isPermanentlyBlocklisted(ip);
     }
 
@@ -841,14 +876,26 @@ public class Blocklist {
      * @since 0.9.45 split out from above, public since 0.9.48 for console
      */ 
     public boolean isPermanentlyBlocklisted(int ip) {
-        int hi = _blocklistSize - 1;
+        return isPermanentlyBlocklisted(ip, _blocklist, _blocklistSize);
+    }
+
+    /**
+     * Do a binary search through the in-memory range list which
+     * is a sorted array of longs.
+     * The array is sorted in signed order, but we don't care.
+     * Each long is ((from << 32) | to)
+     *
+     * @since 0.9.48 split out from above
+     */ 
+    private static boolean isPermanentlyBlocklisted(int ip, long[] blocklist, int blocklistSize) {
+        int hi = blocklistSize - 1;
         if (hi <= 0)
             return false;
         int lo = 0;
         int cur = hi / 2;
 
-        while  (!match(ip, cur)) {
-            if (isHigher(ip, cur))
+        while  (!match(ip, blocklist[cur])) {
+            if (isHigher(ip, blocklist[cur]))
                 lo = cur;
             else
                 hi = cur;
@@ -863,7 +910,7 @@ public class Blocklist {
                 cur = lo + ((hi - lo) / 2);
             }
         }
-        return match(ip, cur);
+        return match(ip, blocklist[cur]);
     }
 
     // Is the IP included in the entry _blocklist[cur] ?
@@ -872,15 +919,15 @@ public class Blocklist {
     }
 
     // Is the IP included in the compressed entry?
-    private boolean match(int ip, long entry) {
+    private static boolean match(int ip, long entry) {
         if (getFrom(entry) > ip)
                 return false;
         return (ip <= getTo(entry));
     }
 
     // Is the IP higher than the entry _blocklist[cur] ?
-    private boolean isHigher(int ip, int cur) {
-        return ip > getFrom(_blocklist[cur]);
+    private static boolean isHigher(int ip, long entry) {
+        return ip > getFrom(entry);
     }
 
     // methods to get and store the from/to values in the array

@@ -1,3 +1,21 @@
+2020-09-16 zzz
+ * Router: Block same-country when in hidden mode (ticket #2759)
+
+2020-09-11 zzz
+ * Blocklist: Refactoring, Move HTML status generation to console
+ * Console: Fix /configclients help message for split client config files
+ * Crypto: Cache HMAC256 instances
+ * GeoIP: Add methods to get all IPs for a country (ticket #2759)
+ * Router: Use MuxedSKM for ECIES routers (proposal 156 WIP)
+
+2020-09-08 zzz
+ * Blocklist: Track versions of each file
+ * NTCP: Call afterSend() for multiple messages in NTCP2 (ticket #2769)
+
+2020-09-04 zzz
+ * Console: Support remote lookup of full router hash from search form
+ * Tunnels: Don't try to decrypt build record if router is ECIES (proposal 152 WIP)
+
 2020-09-02 zzz
  * Installer: New Ed25519 destinations for postman's servers
  * Router:
@@ -5,6 +23,7 @@
    - Randomize SSU intro key
    - Reduce next key threshold for ratchet
    - Change ratchet SparseArray from int to char to reduce space
+ * Util: Fix decompression of compressed zero bytes (ticket #2770)
 
 2020-08-29 zzz
  * i2ptunnel: Prevent creating bad alt destination when
