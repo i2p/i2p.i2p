@@ -24,6 +24,13 @@ public class MagnetURI {
     public static final String MAGNET_FULL = MAGNET + "?xt=urn:btih:";
     /** http://sponge.i2p/files/maggotspec.txt */
     public static final String MAGGOT = "maggot://";
+    /**
+     *  https://blog.libtorrent.org/2020/09/bittorrent-v2/
+     *  TODO, dup param parsing, as a dual v1/v2 link
+     *  will contain two xt params
+     *  @since 0.9.48
+     */
+    public static final String MAGNET_FULL_V2 = MAGNET + "?xt=urn:btmh:";
 
     /**
      *  @param url non-null
@@ -35,6 +42,7 @@ public class MagnetURI {
         if (url.startsWith(MAGNET)) {
             // magnet:?xt=urn:btih:0691e40aae02e552cfcb57af1dca56214680c0c5&tr=http://tracker2.postman.i2p/announce.php
             String xt = getParam("xt", url);
+            // TODO btmh
             if (xt == null || !xt.startsWith("urn:btih:"))
                 throw new IllegalArgumentException();
             ihash = xt.substring("urn:btih:".length());

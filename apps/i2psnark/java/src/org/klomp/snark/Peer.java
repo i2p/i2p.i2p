@@ -81,15 +81,14 @@ public class Peer implements Comparable<Peer>
   private long downloaded_old[] = {-1,-1,-1};
 
   private static final byte[] HANDSHAKE = DataHelper.getASCII("BitTorrent protocol");
+  // See BEP 4 for definitions
   //  bytes per bt spec:                         0011223344556677
   private static final long OPTION_EXTENSION = 0x0000000000100000l;
   private static final long OPTION_FAST      = 0x0000000000000004l;
   //private static final long OPTION_DHT       = 0x0000000000000001l;
-  /** we use a different bit since the compact format is different */
-/* no, let's use an extension message
-  static final long OPTION_I2P_DHT   = 0x0000000040000000l;
-*/
   //private static final long OPTION_AZMP      = 0x1000000000000000l;
+  // hybrid support TODO
+  private static final long OPTION_V2        = 0x0000000000000010L;
   private long options;
   private final boolean _isIncoming;
   private int _totalCommentsSent;

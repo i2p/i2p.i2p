@@ -238,8 +238,18 @@ public class MetaInfo
     piece_length = val.getInt();
 
     val = info.get("pieces");
-    if (val == null)
+    if (val == null) {
+        // BEP 52
+        // We do the check here because a torrent file could be combined v1/v2,
+        // so a version 2 value isn't by itself fatal
+        val = info.get("meta version");
+        if (val != null) {
+            int version = val.getInt();
+            if (version != 1)
+                throw new InvalidBEncodingException("Version " + version + " torrent file not supported");
+        }
         throw new InvalidBEncodingException("Missing piece bytes");
+    }
     piece_hashes = val.getBytes();
 
     val = info.get("length");
