@@ -515,6 +515,21 @@
         </condition>
     </target>
 
+    <!-- if both present, only mtn will run -->
+    <target name="checkoutFromMtn" depends="checkForMtn" if="mtn.available" >
+        <echo message="Checking out fresh copy into ${checkoutDir}" />
+        <delete dir="${checkoutDir}" />
+        <exec executable="mtn" failonerror="true">
+            <arg value="co" />
+            <!-- w: is the revision of the current workspace -->
+            <arg value="-r" />
+            <arg value="w:" />
+            <arg value="-b" />
+            <arg value="i2p.i2p" />
+            <arg value="${checkoutDir}" />
+        </exec>
+    </target>
+
     <target name="revisions" depends="getReleaseNumber, getBuildNumber, failIfNoMtn">
         <!-- mtn log __brief __no-graph __to t:i2p-0.9.xx | cut -d ' ' -f 2 | sort | uniq -c | sort -rn -->
         <exec executable="mtn" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
@@ -571,6 +586,18 @@
         </condition>
     </target>
 
+    <!-- if both present, only mtn will run -->
+    <target name="checkoutFromGit" depends="checkForGit" if="git.available" unless="mtn.available" >
+        <echo message="Checking out fresh copy into ${checkoutDir}" />
+        <delete dir="${checkoutDir}" />
+        <exec executable="git" failonerror="true">
+            <arg value="clone" />
+            <arg value="-l" />
+            <arg value="." />
+            <arg value="${checkoutDir}" />
+        </exec>
+    </target>
+
 
     <!-- end git targets -->
 
@@ -612,6 +639,9 @@
         <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
+
+    <!-- if both present, only mtn will run -->
+    <target name="checkoutFromVCS" depends="failIfNoVCS, checkoutFromMtn, checkoutFromGit" />
 
     <!-- end combined mtn/git targets -->
 
@@ -2266,15 +2296,8 @@
         <!-- TODO if i2pupdate200.zip is present zip it instead -->
         <su3sign infile="i2pupdate.zip" sigtype="ROUTER" outfile="i2pupdate.su3" su3.ver="${release.number}" />
         <!-- this will use the monotonerc file in the current workspace -->
-        <echo message="Checking out fresh copy into ../i2p-${release.number} for tarballing:" />
-        <delete dir="../i2p-${release.number}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="../i2p-${release.number}/" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${release.number}" />
+        <ant target="checkoutFromVCS" />
         <exec executable="tar" failonerror="true">
             <arg value="cjf" />
             <arg value="i2psource_${release.number}.tar.bz2" />
@@ -2282,6 +2305,7 @@
             <arg value=".." />
             <arg value="--exclude" />
             <arg value="i2p-${release.number}/_MTN*" />
+            <arg value="i2p-${release.number}/.git" />
             <arg value="i2p-${release.number}/" />
         </exec>
         <echo message="Sign the files:" />
@@ -2675,15 +2699,8 @@
     <target name="debian-tarball" depends="getExtendedVersion, failIfNoVCS">
         <!-- this will use the monotonerc file in the current workspace -->
         <property name="debian.tarball.name" value="i2p_${Extended.Version}.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2696,6 +2713,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
@@ -2757,17 +2775,8 @@
       -->
     <target name="precise-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}p.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2780,6 +2789,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
@@ -2844,17 +2854,8 @@
       -->
     <target name="xenial-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}x.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2867,6 +2868,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
@@ -2919,17 +2921,8 @@
     <!-- same as debian-tarball but with a release tar.bz2 file name and tar prefix -->
     <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2942,6 +2935,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
