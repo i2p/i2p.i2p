@@ -1,8 +1,15 @@
+/* @license http://creativecommons.org/publicdomain/zero/1.0/legalcode CC0-1.0 */
+
+// This component is dedicated to the public domain. It uses the CC0
+// as a formal dedication to the public domain and in circumstances where
+// a public domain is not usable.
+
 function injectClass(f) {
     f.className += ' iframed';
     var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
     doc.body.className += ' iframed';
 }
+
 function resizeFrame(f) {
     // offsetHeight returns the height of the visible area for an object, in pixels.
     // The value contains the height with the padding, scrollBar, and the border,
@@ -39,3 +46,5 @@ function resizeFrame(f) {
 document.addEventListener("DOMContentLoaded", function() {
     setupFrame();
 }, true);
+
+/* @license-end */

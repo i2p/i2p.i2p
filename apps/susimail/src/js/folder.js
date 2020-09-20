@@ -1,3 +1,5 @@
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+
 function initButtons() {
 	var buttons = document.getElementsByClassName("delete1");
 	for(index = 0; index < buttons.length; index++)
@@ -100,3 +102,5 @@ document.addEventListener("DOMContentLoaded", function() {
     initButtons();
     deleteboxclicked();
 }, true);
+
+/* @license-end */

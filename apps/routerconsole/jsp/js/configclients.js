@@ -1,3 +1,9 @@
+/* @license http://creativecommons.org/publicdomain/zero/1.0/legalcode CC0-1.0 */
+
+// This component is dedicated to the public domain. It uses the CC0
+// as a formal dedication to the public domain and in circumstances where
+// a public domain is not usable.
+
 function initConfigClients()
 {
 	var buttons = document.getElementsByClassName("delete");
@@ -21,3 +27,5 @@ function addCCClickHandler(elem)
 document.addEventListener("DOMContentLoaded", function() {
     initConfigClients();
 }, true);
+
+/* @license-end */

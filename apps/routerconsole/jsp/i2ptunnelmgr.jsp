@@ -27,6 +27,8 @@
 <script src="/js/iframed.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 <script nonce="<%=cspNonce%>" type="text/javascript">
+/* @license http://creativecommons.org/publicdomain/zero/1.0/legalcode CC0-1.0 */
+
   function injectClassSpecific(f) {
       var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
       if (doc.getElementsByClassName == undefined) {
@@ -56,6 +58,8 @@
           resizeFrame(f);
       }, true);
   }
+
+/* @license-end */
 </script>
 </head><body>
 

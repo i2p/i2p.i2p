@@ -1,3 +1,5 @@
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+
 function initTables() {
 
 var hideableTables = document.querySelectorAll("table.tunnelConfig th");
@@ -75,3 +77,5 @@ hideableTables.forEach(function(configTable) {
 document.addEventListener("DOMContentLoaded", function() {
     initTables();
 }, true);
+
+/* @license-end */

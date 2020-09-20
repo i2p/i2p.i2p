@@ -1,3 +1,5 @@
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+
 function initDelete()
 {
 	var main = document.getElementById("mainsection");
@@ -21,3 +23,5 @@ function initDelete()
 document.addEventListener("DOMContentLoaded", function() {
     initDelete();
 }, true);
+
+/* @license-end */

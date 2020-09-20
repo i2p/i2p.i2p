@@ -1,3 +1,4 @@
+/* #license http://www.jclark.com/xml/copying.txt Expat */
 
 function HideMessages() {
   var hideableMessages = document.getElementsByClassName("messages");
@@ -17,3 +18,5 @@ function HideMessages() {
 document.addEventListener("DOMContentLoaded", function() {
     document.body.addEventListener('click', HideMessages, true);
 }, true);
+
+/* @license-end */

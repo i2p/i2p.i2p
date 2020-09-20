@@ -68,6 +68,8 @@
 %>
 <script src="/js/welcomeajax.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <script nonce="<%=cspNonce%>" type="text/javascript">
+/* @license http://creativecommons.org/publicdomain/zero/1.0/legalcode CC0-1.0 */
+
   var failMessage = "<b><%=intl._t("Router is down")%><\/b>";
   var progressMessage = "<b><%=intl._t("Bandwidth test in progress...")%><\/b>";
   var doneMessage = "<b><%=intl._t("Bandwidth test is complete, click Next")%><\/b>";
@@ -79,6 +81,8 @@
   document.addEventListener("DOMContentLoaded", function() {
       initAjax();
   }, true);
+
+/* @license-end */
 </script>
 <%
     }  // ipg == 3

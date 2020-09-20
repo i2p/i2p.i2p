@@ -1,3 +1,5 @@
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+
 function initNotifications() {
 	var buttons = document.getElementsByClassName("notifications");
 	for(index = 0; index < buttons.length; index++)
@@ -17,3 +19,5 @@ function addClickHandler6(elem)
 document.addEventListener("DOMContentLoaded", function() {
     initNotifications();
 }, true);
+
+/* @license-end */

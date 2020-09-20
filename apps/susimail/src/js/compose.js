@@ -1,3 +1,5 @@
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+
 let beforePopup = true;
 window.addEventListener('beforeunload', (e)=>{if (beforePopup) e.returnValue=true;} );
 
@@ -20,3 +22,5 @@ function addClickHandler5(elem)
 document.addEventListener("DOMContentLoaded", function() {
     initPopup();
 }, true);
+
+/* @license-end */

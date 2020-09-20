@@ -1,3 +1,5 @@
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+
 const setupbuttons=()=>{
 	let sp = document.forms[0].savepri;
 	if ( sp ) updatesetallbuttons(), sp.disabled = true, sp.className = 'disabled';
@@ -115,3 +117,5 @@ function addClickHandler(elem)
 document.addEventListener("DOMContentLoaded", function() {
     setupbuttons();
 }, true);
+
+/* @license-end */

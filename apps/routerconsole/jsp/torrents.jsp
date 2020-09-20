@@ -28,6 +28,8 @@
 <script src="/js/iframed.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 <script nonce="<%=cspNonce%>" type="text/javascript">
+/* @license http://creativecommons.org/publicdomain/zero/1.0/legalcode CC0-1.0 */
+
   function setupFrame() {
       f = document.getElementById("i2psnarkframe");
       f.addEventListener("load", function() {
@@ -35,6 +37,8 @@
           resizeFrame(f);
       }, true);
   }
+
+/* @license-end */
 </script>
 </head><body>
 <%@include file="summary.jsi" %>
