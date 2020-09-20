@@ -36,10 +36,6 @@ Public domain except as listed below:
    Copyright (c) 2003, TheCrypto
    See licenses/LICENSE-ElGamalDSA.txt
 
-   HMAC:
-   Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
-   See licenses/LICENSE-SHA256.txt
-
    ElGamal:
    Copyright (c) 2000 - 2013 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
    See licenses/LICENSE-SHA256.txt
@@ -125,6 +121,10 @@ Public domain except as listed below:
    SparseArray:
    Copyright (C) 2006 The Android Open Source Project
    See licenses/LICENSE-Apache2.0.txt
+
+   SSU HMAC:
+   Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
+   See licenses/LICENSE-SHA256.txt
 
 
 Installer:
