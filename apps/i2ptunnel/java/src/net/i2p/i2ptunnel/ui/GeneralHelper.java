@@ -755,10 +755,18 @@ public class GeneralHelper {
             return encType == 4 || encType == 0;
         }
         // migration: HTTP proxy and shared clients default to both
+        String type = tun.getType();
         String dflt;
         if (tun.isClient() &&
-            (TunnelController.TYPE_HTTP_CLIENT.equals(tun.getType()) ||
+            (TunnelController.TYPE_HTTP_CLIENT.equals(type) ||
+             TunnelController.TYPE_IRC_CLIENT.equals(type) ||
+             TunnelController.TYPE_SOCKS_IRC.equals(type) ||
+             TunnelController.TYPE_STREAMR_CLIENT.equals(type) ||
              Boolean.parseBoolean(tun.getSharedClient()))) {
+            dflt = "4,0";
+        } else if (TunnelController.TYPE_HTTP_SERVER.equals(type) ||
+                   TunnelController.TYPE_IRC_SERVER.equals(type) ||
+                   TunnelController.TYPE_STREAMR_SERVER.equals(type)) {
             dflt = "4,0";
         } else {
             dflt = "0";
