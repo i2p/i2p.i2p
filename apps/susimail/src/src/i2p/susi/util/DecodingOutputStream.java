@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -65,7 +66,8 @@ public class DecodingOutputStream extends OutputStream {
     }
 
     private void decodeAndWrite(boolean endOfInput) throws IOException {
-        _bb.flip();
+        // not ByteBuffer to avoid Java 8/9 issues with flip()
+        ((Buffer)_bb).flip();
 	if (!_bb.hasRemaining())
             return;
         CoderResult result;
@@ -83,9 +85,9 @@ public class DecodingOutputStream extends OutputStream {
         if (result == null || (result.isError() && !_cb.hasRemaining())) {
             _out.write(REPLACEMENT);
         } else {
-            _cb.flip();
+            ((Buffer)_cb).flip();
             _out.append(_cb);
-            _cb.clear();
+            ((Buffer)_cb).clear();
         }
     }
 

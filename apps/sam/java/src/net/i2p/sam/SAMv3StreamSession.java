@@ -14,10 +14,11 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
@@ -464,7 +465,8 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 				bridge.register(this);
 			try {
 				while (!Thread.interrupted() && (in.read(buf)>=0 || buf.position() != 0)) {
-					 buf.flip();
+					// not ByteBuffer to avoid Java 8/9 issues with flip()
+					((Buffer)buf).flip();
 					 out.write(buf);
 					 buf.compact();
 				}
@@ -475,7 +477,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 					in.close();
 				} catch (IOException e) {}
 				try {
-					buf.flip();
+					((Buffer)buf).flip();
 					while (buf.hasRemaining()) {
 						out.write(buf);
 					}

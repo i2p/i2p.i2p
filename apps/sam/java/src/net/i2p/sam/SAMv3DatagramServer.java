@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.Properties;
@@ -114,16 +115,17 @@ class SAMv3DatagramServer implements Handler {
 			
 			while (!Thread.interrupted())
 			{
-				inBuf.clear();
+				// not ByteBuffer to avoid Java 8/9 issues
+				((Buffer)inBuf).clear();
 				try {
 					server.receive(inBuf);
 				} catch (IOException e) {
 					break ;
 				}
-				inBuf.flip();
+				((Buffer)inBuf).flip();
 				ByteBuffer outBuf = ByteBuffer.wrap(new byte[inBuf.remaining()]);
 				outBuf.put(inBuf);
-				outBuf.flip();
+				((Buffer)outBuf).flip();
 				// A new thread for every message is wildly inefficient...
 				//new I2PAppThread(new MessageDispatcher(outBuf.array()), "MessageDispatcher").start();
 				// inline
