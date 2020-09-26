@@ -5852,11 +5852,6 @@ p:empty { /* empty paragraph nuke */
      padding: 0 !important;
 }
 
-.netdb_gateway {
-     margin-left: -3px !important;
-     margin-right: -3px !important;
-}
-
 .netdb_tunnel {
      display: inline-block;
      background: #e2e2ff;

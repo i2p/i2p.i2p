@@ -4444,12 +4444,6 @@ th > img[src^="/imagegen"] { /* scale down header images */
      padding: 0 !important;
 }
 
-.netdb_gateway {
-     margin-left: 0 !important;
-     margin-right: -10px !important;
-     vertical-align: bottom;
-}
-
 .netdb_tunnel {
      display: inline-block;
      background: #030;

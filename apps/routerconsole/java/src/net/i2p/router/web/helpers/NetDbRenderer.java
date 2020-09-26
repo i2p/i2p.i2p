@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -474,7 +473,7 @@ class NetDbRenderer {
         if (debug) {
             buf.append("<tr><td><b>Published (RAP) Leasesets:</b></td><td colspan=\"3\">").append(netdb.getKnownLeaseSets()).append("</td></tr>\n")
                .append("<tr><td><b>Mod Data:</b></td><td>").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData())).append("</td>")
-               .append("<td><b>Last Changed:</b></td><td>").append(new Date(_context.routerKeyGenerator().getLastChanged())).append("</td></tr>\n")
+               .append("<td><b>Last Changed:</b></td><td>").append(DataHelper.formatTime(_context.routerKeyGenerator().getLastChanged())).append("</td></tr>\n")
                .append("<tr><td><b>Next Mod Data:</b></td><td>").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData())).append("</td>")
                .append("<td><b>Change in:</b></td><td>").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight())).append("</td></tr>\n");
         }
@@ -639,9 +638,7 @@ class NetDbRenderer {
             boolean isMeta = ls.getType() == DatabaseEntry.KEY_TYPE_META_LS2;
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 Lease lease = ls.getLease(i);
-                buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"netdb_gateway\" title=\"")
-                   .append(_t("Gateway")).append("\"><img src=\"themes/console/images/info/gateway.png\" alt=\"")
-                   .append(_t("Gateway")).append("\"></span> <span class=\"tunnel_peer\">");
+                buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"tunnel_peer\">");
                 buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
                 buf.append("</span> ");
                 if (!isMeta) {
