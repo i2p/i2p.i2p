@@ -193,7 +193,7 @@ Jbigi Libraries (jbigi.jar):
    GMP 4.3.2 / 5.0.2:
    Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv3.txt
-   GMP 6.0.0 / 6.1.2:
+   GMP 6.0.0 / 6.1.2 / 6.2.0:
    See licenses/LICENSE-GPLv2.txt
 
 

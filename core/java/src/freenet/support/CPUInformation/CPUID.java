@@ -420,6 +420,8 @@ public class CPUID {
             System.out.println("Is Piledriver-compatible:  " + cc.IsPiledriverCompatible());
             System.out.println("Is Steamroller-compatible: " + cc.IsSteamrollerCompatible());
             System.out.println("Is Excavator-compatible:   " + cc.IsExcavatorCompatible());
+            System.out.println("Is Zen-compatible:         " + cc.IsZenCompatible());
+            System.out.println("Is Zen2-compatible:        " + cc.IsZen2Compatible());
         }
     }
 

@@ -1,4 +1,17 @@
+2020-09-26 zzz
+ * JBigI: GMP 6.2.0 for linux 64 bit Zen and Zen2 (ticket #1869)
+
+2020-09-22 zzz
+ * i2ptunnel: Change enctype default to both for:
+   HTTP, IRC, and Streamr servers
+   IRC, SOCKS IRC, and Streamr clients
+ * Susimail, SAM: More defensive ByteBuffer casting (ticket #2775)
+
+2020-09-18 zzz
+ * Build: More git support for release and Debian targets
+
 2020-09-16 zzz
+ * i2psnark: Defensive checks for v2 format files and magnet links
  * Router: Block same-country when in hidden mode (ticket #2759)
 
 2020-09-11 zzz

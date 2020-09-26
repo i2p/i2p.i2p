@@ -73,4 +73,16 @@ public interface AMDCPUInfo extends CPUInfo {
      */
 	public boolean IsExcavatorCompatible();
 
+    /**
+     * @return true if the CPU present in the machine is at least a Zen family CPU
+     * @since 0.9.48
+     */
+	public boolean IsZenCompatible();
+
+    /**
+     * @return true if the CPU present in the machine is at least a Zen2 family CPU
+     * @since 0.9.48
+     */
+	public boolean IsZen2Compatible();
+
 }

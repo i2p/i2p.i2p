@@ -50,7 +50,7 @@ TRANSLATE_NAME_armv7a="armv7"
 # Note! these build on 32bit as 32bit when operating as 32bit...
 # starting with k10 added for 6.0.0
 # As of GMP 6.0.0, libgmp 3,
-X86_64_PLATFORMS="skylake coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
+X86_64_PLATFORMS="zen2 zen silvermont goldmont skylake coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
 TRANSLATE_NAME_x86_64="none" # Rename x86_64 to none_64, since that is what NativeBigInteger refers to it as
 
 # Note! these are 32bit _ONLY_ (after the 64 bit ones)
@@ -84,7 +84,7 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     exit 1
 fi
 
-if ! command m4 > /dev/null; then
+if [ ! $(which m4) ]; then
     printf "\aWARNING: \`m4\` not found. Install m4 " >&2
     printf "and re-run this script.\n\n\n\a" >&2
     exit 1
@@ -140,7 +140,7 @@ else
   exit 1
 fi
 
-if ! command ${CC} > /dev/null; then
+if [ ! $(which ${CC}) ]; then
   echo "The compiler you've selected \"$CC\" does not appear to exist"
   exit 1
 fi
