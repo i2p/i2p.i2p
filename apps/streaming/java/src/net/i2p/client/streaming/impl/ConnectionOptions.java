@@ -454,7 +454,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
         _tagsToSend = getInt(opts, PROP_TAGS_TO_SEND, DEFAULT_TAGS_TO_SEND);
-        _tagsToSend = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
+        _tagThreshold = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
     }
     
     /**
@@ -525,9 +525,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.getProperty(PROP_LIMIT_ACTION) != null)
             _limitAction = opts.getProperty(PROP_LIMIT_ACTION);
         if (opts.getProperty(PROP_TAGS_TO_SEND) != null)
-            _maxConns = getInt(opts, PROP_TAGS_TO_SEND, DEFAULT_TAGS_TO_SEND);
+            _tagsToSend = getInt(opts, PROP_TAGS_TO_SEND, DEFAULT_TAGS_TO_SEND);
         if (opts.getProperty(PROP_TAG_THRESHOLD) != null)
-            _maxConns = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
+            _tagThreshold = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
     }
