@@ -550,8 +550,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             String val = opts.getProperty(TunnelController.PROP_TUN_GZIP);
             if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
                 allowGZIP = false;
-            if (_log.shouldLog(Log.INFO))
-                _log.info("HTTP server encoding header: " + enc + "/" + altEnc);
+            if (_log.shouldDebug())
+                _log.debug("HTTP server encoding header: " + enc + "/" + altEnc);
             boolean alt = (altEnc != null) && (altEnc.indexOf("x-i2p-gzip") >= 0);
             boolean useGZIP = alt || ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) );
             // Don't pass this on, outproxies should strip so I2P traffic isn't so obvious but they probably don't
@@ -646,8 +646,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
 
         public void run() {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Compressed requestor running");
+            if (_log.shouldDebug())
+                _log.debug("Compressed requestor running");
             OutputStream serverout = null;
             OutputStream browserout = null;
             InputStream browserin = null;
@@ -701,11 +701,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 compressedOut.write(DataHelper.getUTF8(modifiedHeaders));
 
                 s = new Sender(compressedOut, serverin, "server: server to browser", _log);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Before pumping the compressed response");
+                if (_log.shouldDebug())
+                    _log.debug("Before pumping the compressed response");
                 s.run(); // same thread
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("After pumping the compressed response: " + compressedOut.getTotalRead() + "/" + compressedOut.getTotalCompressed());
+                if (_log.shouldDebug())
+                    _log.debug("After pumping the compressed response: " + compressedOut.getTotalRead() + "/" + compressedOut.getTotalCompressed());
             } catch (SSLException she) {
                 _log.error("SSL error", she);
                 try {
@@ -780,12 +780,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
 
         public void run() {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(_name + ": Begin sending");
+            if (_log.shouldDebug())
+                _log.debug(_name + ": Begin sending");
             try {
                 DataHelper.copy(_in, _out);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(_name + ": Done sending");
+                if (_log.shouldDebug())
+                    _log.debug(_name + ": Done sending");
                 //_out.flush();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.DEBUG))

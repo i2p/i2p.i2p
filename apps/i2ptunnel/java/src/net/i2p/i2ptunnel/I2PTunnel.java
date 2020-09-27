@@ -307,6 +307,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 try {
                     wait();
                 } catch (InterruptedException ie) {
+                    break;
                 }
             }
         }
@@ -1400,7 +1401,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             notifyEvent("owndestResult", "ok");
         } else {
             l.log("owndest yes|no\n" +
-                  "  Specifies whether to use its own destination \n" + "  for each outgoing tunnel");
+                  "  Specifies whether to use its own destination \n" + "  for each outgoing tunnel\n" +
+                  "Current setting: " + (ownDest ? "yes" : "no (shared client)"));
             notifyEvent("owndestResult", "error");
         }
     }
@@ -1692,6 +1694,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                     _clientOptions.setProperty("inbound.nickname", "I2Ping");
                 if (!_clientOptions.containsKey("outbound.nickname"))
                     _clientOptions.setProperty("outbound.nickname", "I2Ping");
+                if (!_clientOptions.containsKey("inbound.quantity"))
+                    _clientOptions.setProperty("inbound.quantity", "1");
+                if (!_clientOptions.containsKey("outbound.quantity"))
+                    _clientOptions.setProperty("outbound.quantity", "1");
             }
             I2PTunnelClientBase task = new I2Ping(l, ownDest, this, this);
             task.startRunning();
