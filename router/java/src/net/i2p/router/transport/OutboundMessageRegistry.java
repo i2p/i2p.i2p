@@ -130,7 +130,7 @@ public class OutboundMessageRegistry {
                 OutNetMessage msg = null;
                 List<OutNetMessage> msgs = null;
                 synchronized (_selectorToMessage) {
-                    Object o = null;
+                    Object o;
                     if ( (removedSelectors != null) && (removedSelectors.contains(sel)) ) {
                         o = _selectorToMessage.remove(sel);
                         removed = true;
@@ -229,7 +229,7 @@ public class OutboundMessageRegistry {
     }
     
     /**
-     *  @param msg may be be null
+     *  @param msg may be be null, if non-null should have a non-null selector
      */
     @SuppressWarnings("unchecked")
     public void unregisterPending(OutNetMessage msg) {
