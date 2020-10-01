@@ -563,7 +563,7 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
 
 .snarkTrackerDetails img, .snarkTorrentDetails img, .snarkCommentDetails img, .snarkDirInfo td:first-child img {
      margin: 0;
-     padding: 3px !important;
+     padding: 3px;
      max-width: 16px;
      max-height: 16px;
      border: 1px solid transparent !important;
@@ -907,6 +907,8 @@ tr:hover .percentBarText {
 
 .snarkDirInfo .percentBarText, .snarkDirInfo .percentBarOuter, .peerinfo .percentBarText, .peerinfo .percentBarOuter {
      width: 80px !important;
+     margin-left: 30%;
+     margin-top: 5%;
 }
 
 /* end download bars */
@@ -1971,15 +1973,15 @@ hr.debug:last-child {
 }
 
 .priorityHigh {
-     background: url(/i2psnark/.resources/icons/clock_red.png) left 24px center no-repeat;
+     background: url(/themes/snark/light/images/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/i2psnark/.resources/icons/clock.png) left 24px center no-repeat;
+     background: url(/themes/snark/light/images/icons/clock.png) left 24px center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/i2psnark/.resources/icons/cancel.png) left 22px center no-repeat;
+     background: url(/themes/snark/light/images/icons/cancel.png) left 22px center no-repeat;
 }
 
 /* end priorities */
@@ -2706,3 +2708,84 @@ a, a:link, th, td, button, input, select, textarea {
      background: #f60 url(images/button_tracker_active.png) left 3px center no-repeat !important;
      background-size: 14px auto !important;
 }
+
+.snarkTorrentDetails img {
+    height: 0px !important;
+    width: 0px !important;
+    padding: 16px !important;
+}
+
+.snarkDirInfo img {
+    height: 0px !important;
+    width: 0px !important;
+    padding: 16px !important;
+}
+
+img[src*="i2psnark/.resources/icons/application.png"]{
+    background: url("/themes/snark/light/images/icons/application") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/basket_put.png"]{
+    background: url("/themes/snark/light/images/icons/basket_put.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/cancel.png"]{
+    background: url("/themes/snark/light/images/icons/cancel.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/cd.png"]{
+    background: url("/themes/snark/light/images/icons/cd.pmg") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/clock.png"]{
+    background: url("/themes/snark/light/images/icons/clock.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/clock_red.png"]{
+    background: url("/themes/snark/light/images/icons/clock_red.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/compress.png"]{
+    background: url("/themes/snark/light/images/icons/compress.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/ebook.png"]{
+    background: url("/themes/snark/light/images/icons/ebook.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/film.png"]{
+    background: url("/themes/snark/light/images/icons/film.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/folder.png"]{
+    background: url("/themes/snark/light/images/icons/folder.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/html.png"]{
+    background: url("/themes/snark/light/images/icons/html.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/itoopie_xxsm.png"]{
+    background: url("/themes/snark/light/images/icons/itoopie_xxsm.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/magnet.png"]{
+    background: url("/themes/snark/light/images/icons/magnet.png") center no-repeat;
+    height: 0px;
+    width: 0px;
+    padding: 16px;
+    margin: -4px !important;
+}
+img[src*="i2psnark/.resources/icons/music.png"]{
+    background: url("/themes/snark/light/images/icons/music.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/package.png"]{
+    background: url("/themes/snark/light/images/icons/package.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/page.png"]{
+    background: url("/themes/snark/light/images/icons/page.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/page_white.png"]{
+    background: url("/themes/snark/light/images/icons/page_white.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/page_white_acrobat.png"]{
+    background: url("/themes/snark/light/images/icons/page_white_acrobat.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/photo.png"]{
+    background: url("/themes/snark/light/images/icons/photo.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/plugin.png"]{
+    background: url("/themes/snark/light/images/icons/plugin.png") center no-repeat
+}
+img[src*="i2psnark/.resources/icons/tick.png"]{
+    background: url("/themes/snark/light/images/icons/tick.png") center no-repeat
+}
+
