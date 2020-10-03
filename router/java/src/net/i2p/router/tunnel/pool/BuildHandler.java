@@ -1,12 +1,15 @@
 package net.i2p.router.tunnel.pool;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.i2p.crypto.EncType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.EmptyProperties;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
@@ -96,6 +99,7 @@ class BuildHandler implements Runnable {
     private static final long MAX_REQUEST_FUTURE = 5*60*1000;
     /** must be > 1 hour due to rouding down */
     private static final long MAX_REQUEST_AGE = 65*60*1000;
+    private static final long MAX_REQUEST_AGE_ECIES = 8*60*1000;
 
     private static final long JOB_LAG_LIMIT_TUNNEL = 350;
 
@@ -441,6 +445,7 @@ class BuildHandler implements Runnable {
             _context.statManager().addRateData("tunnel.corruptBuildReply", 1);
             // don't leak
             _exec.buildComplete(cfg);
+            // TODO blame everybody
         }
     }
     
@@ -718,13 +723,24 @@ class BuildHandler implements Runnable {
             }
         }
 
-        // time is in hours, rounded down.
-        // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it was not.
-        // As of 0.9.16, allow + 5 minutes to - 65 minutes.
         long time = req.readRequestTime();
         long now = _context.clock().now();
-        long roundedNow = (now / (60l*60l*1000l)) * (60*60*1000);
-        long timeDiff = roundedNow - time;
+        boolean isEC = _context.keyManager().getPrivateKey().getType() == EncType.ECIES_X25519;
+        long timeDiff;
+        long maxAge;
+        if (isEC) {
+            // time is in minutes, rounded down.
+            long roundedNow = (now / (60*1000L)) * (60*1000);
+            timeDiff = roundedNow - time;
+            maxAge = MAX_REQUEST_AGE_ECIES;
+        } else {
+            // time is in hours, rounded down.
+            // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it was not.
+            // As of 0.9.16, allow + 5 minutes to - 65 minutes.
+            long roundedNow = (now / (60*60*1000L)) * (60*60*1000);
+            timeDiff = roundedNow - time;
+            maxAge = MAX_REQUEST_AGE;
+        }
         if (timeDiff > MAX_REQUEST_AGE) {
             _context.statManager().addRateData("tunnel.rejectTooOld", 1);
             if (_log.shouldLog(Log.WARN))
@@ -915,7 +931,14 @@ class BuildHandler implements Runnable {
                        + " after " + recvDelay + " with " + response 
                        + " from " + (from != null ? from : "tunnel") + ": " + req);
 
-        EncryptedBuildRecord reply = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
+        EncryptedBuildRecord reply;
+        if (isEC) {
+            // TODO options
+            Properties props = EmptyProperties.INSTANCE;
+            reply = BuildResponseRecord.create(_context, response, req.getChaChaReplyKey(), req.getChaChaReplyAD(), props);
+        } else {
+            reply = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
+        }
         int records = state.msg.getRecordCount();
         int ourSlot = -1;
         for (int j = 0; j < records; j++) {

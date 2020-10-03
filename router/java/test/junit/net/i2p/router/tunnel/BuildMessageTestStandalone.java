@@ -18,6 +18,7 @@ import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
@@ -41,7 +42,7 @@ public class BuildMessageTestStandalone extends TestCase {
     private long _replyTunnel;
     
     public void testBuildMessage() {
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        RouterContext ctx = new RouterContext(null);
         Log log = ctx.logManager().getLog(getClass());
         
         List<Integer> order = pickOrder();

@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -39,6 +40,10 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     //private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
     private long _peakThroughputCurrentTotal;
     private long _peakThroughputLastCoallesce = System.currentTimeMillis();
+    private Hash _blankHash;
+    private SessionKey[] _replyKeys;
+    private byte[][] _replyADs;
+
     // Make configurable? - but can't easily get to pool options from here
     private static final int MAX_CONSECUTIVE_TEST_FAILURES = 3;
     
@@ -238,6 +243,61 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      */
     public void setPriority(int priority) { _priority = priority; }
 
+    /**
+     *  Checksum for blank record
+     *  @since 0.9.48
+     */
+    public Hash getBlankHash() { return _blankHash; }
+
+    /**
+     *  Checksum for blank record
+     *  @since 0.9.48
+     */
+    public void setBlankHash(Hash h) { _blankHash = h; }
+
+    /**
+     *  Set ECIES reply key and IV
+     *  @since 0.9.48
+     */
+    public void setChaChaReplyKeys(int hop, SessionKey key, byte[] ad) {
+        if (_replyKeys == null) {
+            _replyKeys = new SessionKey[_config.length];
+            _replyADs = new byte[_config.length][];
+        }
+        _replyKeys[hop] = key;
+        _replyADs[hop] = ad;
+    }
+
+    /**
+     *  Is it an ECIES hop?
+     *  @since 0.9.48
+     */
+    public boolean isEC(int hop) {
+        if (_replyKeys == null)
+            return false;
+        return _replyKeys[hop] != null;
+    }
+
+    /**
+     *  Get ECIES reply key
+     *  @since 0.9.48
+     */
+    public SessionKey getChaChaReplyKey(int hop) {
+        if (_replyKeys == null)
+            return null;
+        return _replyKeys[hop];
+    }
+
+    /**
+     *  Get ECIES reply AD
+     *  @since 0.9.48
+     */
+    public byte[] getChaChaReplyAD(int hop) {
+        if (_replyADs == null)
+            return null;
+        return _replyADs[hop];
+    }
+
     @Override
     public String toString() {
         // H0:1235-->H1:2345-->H2:2345
@@ -253,7 +313,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         buf.append(": GW ");
         for (int i = 0; i < _peers.length; i++) {
             buf.append(_peers[i].toBase64().substring(0,4));
-            buf.append(':');
+            buf.append(isEC(i) ? " EC:" : " ElG:");
             if (_config[i].getReceiveTunnel() != null)
                 buf.append(_config[i].getReceiveTunnel());
             else

@@ -1,10 +1,14 @@
 package net.i2p.data.i2np;
 
+import java.security.GeneralSecurityException;
+import java.util.Properties;
+
+import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
-//import net.i2p.util.Log;
 
 /**
  * Class that creates an encrypted tunnel build message record.
@@ -22,7 +26,8 @@ import net.i2p.data.SessionKey;
 public class BuildResponseRecord {
 
     /**
-     * Create a new encrypted response
+     * Create a new encrypted response.
+     * AES only for ElGamal routers.
      *
      * @param status the response 0-255
      * @param replyIV 16 bytes
@@ -31,17 +36,85 @@ public class BuildResponseRecord {
      */
     public static EncryptedBuildRecord create(I2PAppContext ctx, int status, SessionKey replyKey,
                                               byte replyIV[], long responseMessageId) {
-        //Log log = ctx.logManager().getLog(BuildResponseRecord.class);
         byte rv[] = new byte[TunnelBuildReplyMessage.RECORD_SIZE];
         ctx.random().nextBytes(rv, Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE - Hash.HASH_LENGTH - 1);
         rv[TunnelBuildMessage.RECORD_SIZE-1] = (byte) status;
         // rv = AES(SHA256(padding+status) + padding + status, replyKey, replyIV)
         ctx.sha().calculateHash(rv, Hash.HASH_LENGTH, rv.length - Hash.HASH_LENGTH, rv, 0);
-        //if (log.shouldLog(Log.DEBUG))
-        //    log.debug(responseMessageId + ": before encrypt: " + Base64.encode(rv, 0, 128) + " with " + replyKey.toBase64() + "/" + Base64.encode(replyIV));
         ctx.aes().encrypt(rv, 0, rv, 0, replyKey, replyIV, rv.length);
-        //if (log.shouldLog(Log.DEBUG))
-        //    log.debug(responseMessageId + ": after encrypt: " + Base64.encode(rv, 0, 128));
         return new EncryptedBuildRecord(rv);
+    }
+
+    /**
+     * Create a new encrypted response.
+     * ChaCha/Poly only for ECIES routers.
+     *
+     * @param status the response 0-255
+     * @param replyAD 32 bytes
+     * @param options 511 bytes max when serialized
+     * @return a 528-byte response record
+     * @throws IllegalArgumentException if options too big or on encryption failure
+     * @since 0.9.48
+     */
+    public static EncryptedBuildRecord create(I2PAppContext ctx, int status, SessionKey replyKey,
+                                              byte replyAD[], Properties options) {
+        byte rv[] = new byte[TunnelBuildReplyMessage.RECORD_SIZE];
+        int off;
+        try {
+            off = DataHelper.toProperties(rv, 0, options);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("options", e);
+        }
+        int sz = TunnelBuildReplyMessage.RECORD_SIZE - off - 1;
+        if (sz > 0)
+            ctx.random().nextBytes(rv, off, sz);
+        else if (sz < 0)
+            throw new IllegalArgumentException("options");
+        rv[TunnelBuildMessage.RECORD_SIZE - 17] = (byte) status;
+        boolean ok = encryptAEADBlock(replyAD, rv, replyKey);
+        if (!ok)
+            throw new IllegalArgumentException("encrypt fail");
+        return new EncryptedBuildRecord(rv);
+    }
+
+    /**
+     * Encrypts in place
+     * @param ad non-null
+     * @return success
+     * @since 0.9.48
+     */
+    private static final boolean encryptAEADBlock(byte[] ad, byte data[], SessionKey key) {
+        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+        chacha.initializeKey(key.getData(), 0);
+        try {
+            chacha.encryptWithAd(ad, data, 0, data, 0, TunnelBuildReplyMessage.RECORD_SIZE - 16);
+        } catch (GeneralSecurityException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+     * ChaCha/Poly only for ECIES routers.
+     * Decrypts in place in bytes 0-511.
+     * Status will be rec.getData()[511].
+     * Properties will be at rec.getData()[0].
+     *
+     * @param rec 528 bytes, data will be decrypted in place.
+     * @param ad non-null
+     * @return success
+     * @since 0.9.48
+     */
+    public static boolean decrypt(EncryptedBuildRecord rec, SessionKey key, byte[] ad) {
+        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+        chacha.initializeKey(key.getData(), 0);
+        try {
+            // this is safe to do in-place, it checks the mac before starting decryption
+            byte[] data = rec.getData();
+            chacha.decryptWithAd(ad, data, 0, data, 0, TunnelBuildReplyMessage.RECORD_SIZE);
+        } catch (GeneralSecurityException e) {
+            return false;
+        }
+        return true;
     }
 }

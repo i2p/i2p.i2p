@@ -39,10 +39,12 @@ class SymmetricState implements Destroyable, Cloneable {
 	// precalculated hash of the Noise name
 	private static final byte[] INIT_HASH_XK;
 	private static final byte[] INIT_HASH_IK;
+	private static final byte[] INIT_HASH_N;
 
 	static {
 		INIT_HASH_XK = initHash(HandshakeState.protocolName);
 		INIT_HASH_IK = initHash(HandshakeState.protocolName2);
+		INIT_HASH_N = initHash(HandshakeState.protocolName3);
 	}
 
 	/**
@@ -102,6 +104,8 @@ class SymmetricState implements Destroyable, Cloneable {
 			initHash = INIT_HASH_XK;
 		else if (patternId.equals(HandshakeState.PATTERN_ID_IK))
 			initHash = INIT_HASH_IK;
+		else if (patternId.equals(HandshakeState.PATTERN_ID_N))
+			initHash = INIT_HASH_N;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		System.arraycopy(initHash, 0, h, 0, hashLength);

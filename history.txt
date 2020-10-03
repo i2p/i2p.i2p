@@ -1,3 +1,12 @@
+2020-10-03 zzz
+ * Router: Support building tunnels through ECIES routers (proposal 152)
+
+2020-09-28 zzz
+ * Router: Don't unregister a message without a selector (ticket #2771)
+
+2020-09-27 zzz
+ * Streaming: Fix tag option handling
+
 2020-09-26 zzz
  * JBigI: GMP 6.2.0 for linux 64 bit Zen and Zen2 (ticket #1869)
 

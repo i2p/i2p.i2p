@@ -10,6 +10,9 @@ import net.i2p.data.TunnelId;
 /**
  * Defines the general configuration for a hop in a tunnel.
  *
+ * This is used for both participating tunnels and tunnels we create.
+ * Data only stored for tunnels we create should be in
+ * TunnelCreatorConfig to save space.
  */
 public class HopConfig {
     private byte _receiveTunnelId[];
@@ -87,19 +90,26 @@ public class HopConfig {
     public SessionKey getIVKey() { return _ivKey; }
     public void setIVKey(SessionKey key) { _ivKey = key; }
     
-    /** key to encrypt the reply sent for the new tunnel creation crypto */
+    /**
+     *  Key to encrypt the reply sent for the tunnel creation crypto.
+     *  Not used for participating tunnels, will return null,
+     *  candidate for moving to TunnelCreatorConfig.
+     *  @return key or null
+     */
     public SessionKey getReplyKey() { return _replyKey; }
     public void setReplyKey(SessionKey key) { _replyKey = key; }
     
     /**
-     *  IV used to encrypt the reply sent for the new tunnel creation crypto
+     *  IV used to encrypt the reply sent for the tunnel creation crypto.
+     *  Not used for participating tunnels, will return null,
+     *  candidate for moving to TunnelCreatorConfig.
      *
-     *  @return 16 bytes
+     *  @return 16 bytes or null
      */
     public byte[] getReplyIV() { return _replyIV; }
 
     /**
-     *  IV used to encrypt the reply sent for the new tunnel creation crypto
+     *  IV used to encrypt the reply sent for the tunnel creation crypto
      *
      *  @throws IllegalArgumentException if not 16 bytes
      */

@@ -130,16 +130,19 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 	public static final String protocolName = "Noise_XKaesobfse+hs2+hs3_25519_ChaChaPoly_SHA256";
 	public static final String protocolName2 = "Noise_IKelg2+hs2_25519_ChaChaPoly_SHA256";
+	public static final String protocolName3 = "Noise_N_25519_ChaChaPoly_SHA256";
 	private static final String prefix;
 	private final String patternId;
 	public static final String PATTERN_ID_XK = "XK";
 	public static final String PATTERN_ID_IK = "IK";
+	public static final String PATTERN_ID_N = "N";
 	private static String dh;
 	private static final String cipher;
 	private static final String hash;
 	private final short[] pattern;
 	private static final short[] PATTERN_XK;
 	private static final short[] PATTERN_IK;
+	private static final short[] PATTERN_N;
 
 	static {
 		// Parse the protocol name into its components.
@@ -169,13 +172,21 @@ public class HandshakeState implements Destroyable, Cloneable {
 		PATTERN_IK = Pattern.lookup(id);
 		if (PATTERN_IK == null)
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		// N
+		components = protocolName3.split("_");
+		id = components[1];
+		if (!PATTERN_ID_N.equals(id))
+			throw new IllegalArgumentException();
+		PATTERN_N = Pattern.lookup(id);
+		if (PATTERN_N == null)
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
 	}
 
 	/**
 	 * Creates a new Noise handshake.
 	 * Noise protocol name is hardcoded.
 	 * 
-	 * @param patternId XK or IK
+	 * @param patternId XK, IK, or N
 	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER.
 	 * @param xdh The key pair factory for ephemeral keys
 	 * 
@@ -192,6 +203,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 			pattern = PATTERN_XK;
 		else if (patternId.equals(PATTERN_ID_IK))
 			pattern = PATTERN_IK;
+		else if (patternId.equals(PATTERN_ID_N))
+			pattern = PATTERN_N;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		short flags = pattern[0];
