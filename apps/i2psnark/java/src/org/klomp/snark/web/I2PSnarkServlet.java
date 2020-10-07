@@ -4206,7 +4206,7 @@ public class I2PSnarkServlet extends BasicServlet {
      *  @since 0.8.2
      */
     private String toImg(String icon, String altText) {
-        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
+        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + _manager.getThemeIconSet() + icon + ".png\">";
     }
 
     /**

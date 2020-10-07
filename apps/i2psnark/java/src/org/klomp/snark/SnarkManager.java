@@ -881,6 +881,28 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         return theme;
     }
+    
+    /**
+     * Get the path to the preferred embedded icons for toImg, "solid/" for
+     * dark and light, "" for everything else.
+     *
+     * If you add a theme with a new icon set, then you need to add a
+     * corresponding condition here.
+     *
+     * @return String "solid/" or ""
+     * @since 0.9.48
+     */
+    public String getThemeIconSet() {
+        String iconset = "";
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Theme was: " + this.getTheme());
+        if (this.getTheme().equals("dark") || this.getTheme().equals("light")) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Using solid iconset.");
+            iconset = "solid/";
+        }
+        return iconset;
+    }
 
     /**
      * Get all themes
