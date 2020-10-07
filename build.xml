@@ -2,6 +2,9 @@
 <project basedir="." default="all" name="i2p"
     xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
+    <!-- for javac "release" parameter -->
+    <property name="ant.minimumVersion" value="1.9.8"/>
+
     <!-- Include property files so that values can be easily overridden.
          Users should create an override.properties file to make changes.
      -->
@@ -325,12 +328,12 @@
         </sequential>
     </target>
 
-    <target name="buildBOB" depends="buildStreaming" >
+    <target name="buildBOB" depends="buildMinistreaming" >
         <ant dir="apps/BOB/" target="jar" />
         <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
     </target>
 
-    <target name="buildSAM" depends="buildStreaming" >
+    <target name="buildSAM" depends="buildMinistreaming" >
         <ant dir="apps/sam/java/" target="jar" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
     </target>
@@ -361,7 +364,7 @@
         <copy file="apps/i2pcontrol/build/jsonrpc.war" todir="build/" />
     </target>
 
-    <target name="buildI2PSnark" depends="buildStreaming, buildJetty, buildSystray" >
+    <target name="buildI2PSnark" depends="buildMinistreaming, buildJetty, buildSystray" >
         <ant dir="apps/i2psnark/java/" target="war" />
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
@@ -387,7 +390,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel-ui.jar" todir="build/" />
     </target>
 
-    <target name="buildI2PTunnel" depends="buildStreaming, buildJetty, buildImagegen" >
+    <target name="buildI2PTunnel" depends="buildMinistreaming, buildJetty, buildImagegen" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
@@ -446,6 +449,14 @@
     </target>
 
     <target name="buildProperties" depends="getMtnRev, getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
+        <antversion property="antversion"/>
+        <fail message="FATAL: Minimum Ant version is ${ant.minimumVersion} - your Ant version is ${antversion}">
+            <condition>
+                <not>
+                    <antversion atleast="${ant.minimumVersion}"/>
+                </not>
+            </condition>
+        </fail>
         <!-- default if not set above -->
         <property name="workspace.version" value="unknown" />
         <!-- default if not set by setBuildTimestamp -->
@@ -2378,6 +2389,7 @@
             </condition>
         </fail>
         <property name="javac.version" value="1.7" />
+        <property name="javac.release" value="7" />
     </target>
 
     <!-- depends on buildCoreTest so that the router unit test javadocs can find the core unit test classes -->
@@ -2401,6 +2413,7 @@
         <ant dir="apps/jetty/">
             <!-- not used in Android -->
             <property name="javac.version" value="1.8" />
+            <property name="javac.release" value="8" />
             <target name="servletJar" />
             <target name="servletJavadocJar" />
             <target name="servletSourcesJar" />
@@ -2769,6 +2782,7 @@
         </tar>
     </target>
 
+    <!-- Precise no longer supported, does not work -->
     <!-- same as debian-release-tarball but with bundled jetty
       -  We add a 'p' to the release name and tarball since the source package is different;
       -  Launchpad does not allow different source packages with the same name.
@@ -2846,6 +2860,7 @@
         </tar>
     </target>
 
+    <!-- Xenial no longer supported, does not work -->
     <!-- xenial/yakkety only -->
     <!-- same as debian-release-tarball but with bundled jstl.jar
          (there's no libtaglibs-standard-* packages)

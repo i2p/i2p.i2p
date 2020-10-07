@@ -6,7 +6,7 @@ Priority: optional
 Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 9.20160709)
- ,ant (>= 1.8)
+ ,ant (>= 1.9.8)
  ,debconf
  ,openjdk-8-jdk
  ,libjetty9-java (>= 9.4)

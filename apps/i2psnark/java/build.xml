@@ -28,6 +28,7 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="require.gettext" value="true" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
@@ -41,6 +42,7 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/obj" 
             encoding="UTF-8"
             includeAntRuntime="false" >
@@ -164,6 +166,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -290,8 +293,6 @@
               todir="build/standalone-resources/.resources/themes/snark/dark/images" />
         <copy file="../../../installer/resources/themes/console/light/images/header.png"
               todir="build/standalone-resources/.resources/themes/snark/light/images" />
-        <copy file="../../../installer/resources/themes/console/dark/images/camotile2.png"
-              todir="build/standalone-resources/.resources/themes/snark/dark/images" />
         <copy file="../../../installer/resources/themes/console/images/info/errortriangle.png"
               todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
 

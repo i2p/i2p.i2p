@@ -37,12 +37,14 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <target name="compile" depends="depend, dependVersion">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               release="${javac.release}"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
                encoding="UTF-8"
@@ -108,6 +110,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -256,6 +259,7 @@
         <property name="hamcrest.home" value="${ant.home}/lib/" />
         <property name="junit.home" value="${ant.home}/lib/" />
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+            release="${javac.release}"
             debuglevel="lines,vars,source"
             includeAntRuntime="true"
             encoding="UTF-8"

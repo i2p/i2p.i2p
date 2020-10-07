@@ -23,6 +23,7 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="require.gettext" value="true" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
@@ -35,6 +36,7 @@
         <mkdir dir="./build/obj" />
         <!-- half of this is deprecated classes so turn deprecation off -->
         <javac srcdir="./src" debug="true" deprecation="off" source="${javac.version}" target="${javac.version}"
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
@@ -48,6 +50,7 @@
         <javac
             srcdir="./demo"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./buildDemo/obj"
@@ -123,6 +126,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -238,6 +242,7 @@
         <javac
             srcdir="./test/junit"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" >

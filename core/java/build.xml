@@ -23,6 +23,7 @@
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- fixups if we're using libintl.jar for GettextResource.java -->
@@ -77,6 +78,7 @@
         <mkdir dir="./build/obj" />
         <!-- sourcepath="" necessary for excludes to work, see ant manual for javac -->
         <javac sourcepath="" srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               release="${javac.release}"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
                encoding="UTF-8"
@@ -149,6 +151,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -291,6 +294,7 @@
         <echo message="[DEBUG] junit home after override is ${junit.home}" />
         <echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               release="${javac.release}"
                debuglevel="lines,vars,source"
                includeAntRuntime="true"
                encoding="UTF-8"
@@ -543,6 +547,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj_bench" />
         <javac srcdir="./bench" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               release="${javac.release}"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
                encoding="UTF-8"

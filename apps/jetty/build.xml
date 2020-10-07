@@ -23,6 +23,7 @@
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- everything we need is in the deployer package, except for tomcat-api.jar in the full package,
@@ -389,6 +390,7 @@
         <javac 
             srcdir="./java/src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/obj" 
             encoding="UTF-8"
             includeAntRuntime="false" >
@@ -472,6 +474,7 @@
         <javac 
             srcdir="./patches/jetty-util/src/main/java" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/objPatches" 
             includeAntRuntime="false"
             encoding="UTF-8"

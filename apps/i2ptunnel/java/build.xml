@@ -29,6 +29,7 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="require.gettext" value="true" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
@@ -40,6 +41,7 @@
             srcdir="./src" 
             excludes="net/i2p/i2ptunnel/web/**/*"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/obj" 
             includeAntRuntime="false"
             encoding="UTF-8"
@@ -56,6 +58,7 @@
             srcdir="./src" 
             includes="net/i2p/i2ptunnel/web/**/*"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/obj" 
             includeAntRuntime="false"
             encoding="UTF-8"
@@ -167,6 +170,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="../jsp/WEB-INF/classes">
@@ -212,6 +216,7 @@
             <arg value="./bundle-messages-proxy.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-proxy-src" destdir="build/obj">
@@ -350,6 +355,7 @@
             <arg value="../jsp/" />
         </java>
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
@@ -415,6 +421,7 @@
         <mkdir dir="./build/obj" />
         <!-- We need the ant runtime, as it includes junit -->
         <javac srcdir="./src:./test/junit" debug="true" source="${javac.version}" target="${javac.version}"
+               release="${javac.release}"
                includeAntRuntime="true"
                encoding="UTF-8"
                deprecation="on" destdir="./build/obj" >

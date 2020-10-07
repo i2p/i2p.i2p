@@ -1,3 +1,11 @@
+2020-10-07 zzz
+ * Build:
+   - Set javac release property (ticket #2775)
+   - Ant version 1.9.8 or higher now required
+   - Drop support for Xenial package build
+   - Fix up BOB build configuration
+   - Fix i2psnark standalone build
+
 2020-10-03 zzz
  * Router: Support building tunnels through ECIES routers (proposal 152)
 

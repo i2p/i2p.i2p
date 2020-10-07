@@ -18,18 +18,21 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="javac.compilerargs" value="" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./core/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
         <javac srcdir="./javase/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="./build/obj" classpath="./build/obj" >
@@ -43,6 +46,7 @@
         <javac
             srcdir="./test/junit"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./buildTest/obj"

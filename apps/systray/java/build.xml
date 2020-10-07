@@ -22,6 +22,7 @@
 
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
@@ -32,6 +33,7 @@
             deprecation="on"
             source="${javac.version}"
             target="${javac.version}"
+            release="${javac.release}"
             destdir="./build/obj"
             includeAntRuntime="false"
             encoding="UTF-8"
