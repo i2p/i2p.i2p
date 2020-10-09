@@ -752,13 +752,19 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     /**
      *  Return a map of PublicKey to a set of inbound RatchetTagSets for that key.
      *  Only for renderStatusHTML() below.
+     *  Does not return expired sets or sets with null keys.
      */
     private Map<PublicKey, Set<RatchetTagSet>> getRatchetTagSetsByPublicKey() {
         Set<RatchetTagSet> inbound = getRatchetTagSets();
         Map<PublicKey, Set<RatchetTagSet>> inboundSets = new HashMap<PublicKey, Set<RatchetTagSet>>(inbound.size());
+        long now = _context.clock().now();
         // Build a map of the inbound tag sets, grouped by PublicKey
         for (RatchetTagSet ts : inbound) {
             PublicKey pk = ts.getRemoteKey();
+            if (pk == null)
+                continue;
+            if (ts.getExpiration() < now)
+                continue;
             Set<RatchetTagSet> sets = inboundSets.get(pk);
             if (sets == null) {
                 sets = new HashSet<RatchetTagSet>(4);
@@ -808,10 +814,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     //buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
                     //   .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
                     long expires = ts.getExpiration() - now;
-                    if (expires > 0)
-                        buf.append(" expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
-                    else
-                        buf.append(" expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
+                    buf.append(" expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                     buf.append(size).append('+').append(ts.remaining() - size).append(" tags remaining</li>");
                 }
             }
@@ -847,6 +850,9 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                        "<tr><td colspan=\"2\"><ul>");
             for (RatchetTagSet ts : sets) {
                 synchronized(ts) {
+                    long expires = ts.getExpiration() - now;
+                    if (expires <= 0)
+                        continue;
                     int size = ts.remaining();
                     buf.append("<li><b>ID: ");
                     int id = ts.getID();
@@ -859,11 +865,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                         buf.append(" acked");
                     buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
                        .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
-                    long expires = ts.getExpiration() - now;
-                    if (expires > 0)
-                        buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
-                    else
-                        buf.append(" <b>expired:</b> ").append(DataHelper.formatDuration2(0 - expires)).append(" ago with ");
+                    buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                     buf.append(size).append(" tags remaining");
                     if (ts.getNextKey() != null)
                         buf.append(" <b>NK sent</b>");
