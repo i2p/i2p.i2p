@@ -18,6 +18,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.Router;
@@ -485,7 +486,10 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             maxLen++;
         if (cap.length() <= maxLen)
             return true;
-        EncType type = peer.getIdentity().getPublicKey().getType();
+        RouterIdentity ident = peer.getIdentity();
+        if (ident.getSigningPublicKey().getType() == SigType.DSA_SHA1)
+            return true;
+        EncType type = ident.getPublicKey().getType();
         if (!LeaseSetKeys.SET_BOTH.contains(type))
             return true;
 

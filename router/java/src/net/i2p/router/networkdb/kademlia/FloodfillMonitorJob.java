@@ -6,6 +6,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -141,8 +142,11 @@ class FloodfillMonitorJob extends JobImpl {
         if (ri == null)
             return false;
 
+        RouterIdentity ident = ri.getIdentity();
+        if (ident.getSigningPublicKey().getType() == SigType.DSA_SHA1)
+            return false;
         // temp until router ratchet SKM implemented
-        if (ri.getIdentity().getPublicKey().getType() != EncType.ELGAMAL_2048)
+        if (ident.getPublicKey().getType() != EncType.ELGAMAL_2048)
             return false;
 
         char bw = ri.getBandwidthTier().charAt(0);

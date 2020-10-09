@@ -24,6 +24,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -630,7 +631,15 @@ abstract class StoreJob extends JobImpl {
      */
     static boolean shouldStoreTo(RouterInfo ri) {
         String v = ri.getVersion();
-        return VersionComparator.comp(v, MIN_STORE_VERSION) >= 0;
+        if (VersionComparator.comp(v, MIN_STORE_VERSION) < 0)
+            return false;
+        RouterIdentity ident = ri.getIdentity();
+        if (ident.getSigningPublicKey().getType() == SigType.DSA_SHA1)
+            return false;
+        // temp until router ratchet SKM implemented
+        if (ident.getPublicKey().getType() != EncType.ELGAMAL_2048)
+            return false;
+        return true;
     }
 
     /** @since 0.9.38 */
