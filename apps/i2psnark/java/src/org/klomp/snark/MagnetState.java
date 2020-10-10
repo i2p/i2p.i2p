@@ -49,7 +49,7 @@ class MagnetState {
         infohash = iHash;
         if (meta != null) {
             metainfo = meta;
-            initialize(meta.getInfoBytes().length);
+            initialize(meta.getInfoBytesLength());
             complete = true;
         }
     }

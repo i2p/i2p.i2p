@@ -290,7 +290,7 @@ public class Peer implements Comparable<Peer>
         if ((options & OPTION_EXTENSION) != 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Peer supports extensions, sending reply message");
-            int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
+            int metasize = metainfo != null ? metainfo.getInfoBytesLength() : -1;
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
             boolean dht = util.getDHT() != null;
             boolean comment = util.utCommentsEnabled();
