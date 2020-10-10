@@ -187,11 +187,8 @@ public abstract class TransportUtil {
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             if (allowIPv6) {
-                // loopback, broadcast,
-                // IPv4 compat ::xxxx:xxxx
-                if (addr[0] == 0)
-                    return false;
-                if (addr[0] == 0x20) {
+                int a0 = addr[0] & 0xFF;
+                if (a0 == 0x20) {
                     // disallow 2002::/16 (6to4 RFC 3056)
                     if (addr[1] == 0x02)
                         return false;
@@ -203,32 +200,29 @@ public abstract class TransportUtil {
                         if (addr[2] == 0x0d && (addr[3] & 0xff) == 0xb8)
                             return false;
                     }
-                } else if ((addr[0] & 0xfe) == 0xfc) {
-                    // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
-                    // not recognized as local by InetAddress
-                    return false;
-                } else if (addr[0] == 0x26) {
+                    return true;
+                } else if (a0 == 0x26) {
                     // Hamachi IPv6
                     if (addr[1] == 0x20 && addr[2] == 0x00 && (addr[3] & 0xff) == 0x9b)
                         return false;
-                } else if (addr[0] == 0x3f) {
-                    // 6bone RFC 2471
-                    if ((addr[1] & 0xff) == 0xfe)
-                        return false;
-                } else if ((addr[0] & 0xfe) == 0x02) {
+                    return true;
+                } else {
+                    // https://www.iana.org/assignments/ipv6-address-space/ipv6-address-space.xhtml
+                    // Global unicast
+                    if (a0 >= 0x20 && a0 <= 0x3f)
+                        return true;
+                    // 00-1f and 40-ff
+                    // loopback, broadcast,
+                    // IPv4 compat ::xxxx:xxxx
                     // Yggdrasil 0200:/7
                     // https://yggdrasil-network.github.io/faq.html
-                    return false;
+                    // reserved
+                    // 6bone RFC 2471 3ff3::
+                    // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
+                    // not recognized as local by InetAddress
+                    // reserved, unique local, site local, multicast
+                    // fall through return false
                 }
-                try {
-                    InetAddress ia = InetAddress.getByAddress(addr);
-                    return
-                        (!ia.isLinkLocalAddress()) &&
-                        (!ia.isMulticastAddress()) &&
-                        (!ia.isAnyLocalAddress()) &&
-                        (!ia.isLoopbackAddress()) &&
-                        (!ia.isSiteLocalAddress());
-                } catch (UnknownHostException uhe) {}
             }
         }
         return false;
