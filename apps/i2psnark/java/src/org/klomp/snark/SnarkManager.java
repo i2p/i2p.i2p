@@ -893,13 +893,16 @@ public class SnarkManager implements CompleteListener, ClientApp {
      * @since 0.9.48
      */
     public String getThemeIconSet() {
-        String iconset = "";
+        String iconset;
+        String theme = getTheme();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Theme was: " + this.getTheme());
-        if (this.getTheme().equals("dark") || this.getTheme().equals("light")) {
+            _log.debug("Theme was: " + theme);
+        if (theme.equals("dark") || theme.equals("light")) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Using solid iconset.");
             iconset = "solid/";
+        } else {
+            iconset = "";
         }
         return iconset;
     }
