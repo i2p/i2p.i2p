@@ -857,8 +857,6 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
      text-align: left;
      white-space: nowrap;
      width: 140px;
-     overflow: hidden;
-     text-overflow: ellipsis;
 }
 
 .snarkTorrentInfo img {

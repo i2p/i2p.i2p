@@ -769,8 +769,6 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
      font-style: italic;
      text-align: left !important;
      white-space: nowrap;
-     overflow: hidden;
-     text-overflow: ellipsis;
      width: 140px;
 }
 

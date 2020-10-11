@@ -808,8 +808,6 @@ tr:hover .percentBarText {
      text-align: left;
      white-space: nowrap;
      width: 140px;
-     overflow: hidden;
-     text-overflow: ellipsis;
 }
 
 /* download bars */
