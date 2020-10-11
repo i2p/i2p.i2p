@@ -157,7 +157,9 @@ https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491730/GUI+Preferences
             <fileset dir="pkg-temp" includes="**/*.jar"
                      excludes="lib/commons-logging.jar lib/jasper-compiler.jar lib/jetty-java5-threadpool.jar lib/jetty-sslengine.jar lib/jbigi.jar"
                      targetdir="$INSTALL_PATH">
+              <!--
                 <pack200/>
+                -->
             </fileset>
             <!-- non-pack200 jars -->
             <fileset dir="pkg-temp"
