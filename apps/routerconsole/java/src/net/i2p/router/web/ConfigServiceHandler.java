@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.awt.SystemTray;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -202,9 +203,9 @@ public class ConfigServiceHandler extends FormHandler {
      *  @since 0.9.26
      */
     public boolean shouldShowSystray() {
-        return !
-            (SystemVersion.isLinuxService() ||
-             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService()));
+        return SystemTray.isSupported() &&
+               !SystemVersion.isService() &&
+               !(SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService());
     }
 
     /**
@@ -213,10 +214,7 @@ public class ConfigServiceHandler extends FormHandler {
      *  @since 0.9.26
      */
     public boolean isSystrayEnabled() {
-        // default false for now, except on OSX and non-service windows
-        String sdtg = _context.getProperty(RouterConsoleRunner.PROP_DTG_ENABLED);
-        return Boolean.parseBoolean(sdtg) ||
-               (sdtg == null && (SystemVersion.isWindows() || SystemVersion.isMac()));
+        return RouterConsoleRunner.isSystrayEnabled(_context);
     }
 
     /**

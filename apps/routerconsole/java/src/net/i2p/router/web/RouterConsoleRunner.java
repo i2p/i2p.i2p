@@ -313,6 +313,26 @@ public class RouterConsoleRunner implements RouterApp {
         return Server.getVersion();
     }
 
+    /**
+     *  Package private for ConfigServiceHandler
+     *  @since 0.9.48 pulled out of startTrayApp
+     */
+    static boolean isSystrayEnabled(I2PAppContext _context) {
+            // default false except on OSX and non-service windows,
+            // and on Linux KDE and LXDE
+            // Xubuntu XFCE works but doesn't look very good
+            // Ubuntu Unity was far too buggy to enable
+            // Ubuntu GNOME does not work, SystemTray.isSupported() returns false
+            String xdg = System.getenv("XDG_CURRENT_DESKTOP");
+            boolean dflt = !SystemVersion.isService() &&
+                           (SystemVersion.isWindows() ||
+                            SystemVersion.isMac() ||
+                            //"XFCE".equals(xdg) ||
+                            "KDE".equals(xdg) ||
+                            "LXDE".equals(xdg));
+            return _context.getProperty(PROP_DTG_ENABLED, dflt);
+    }
+
     private void startTrayApp() {
         // if no permissions, don't even try
         // isLaunchedAsService() always returns true on Linux
@@ -323,11 +343,7 @@ public class RouterConsoleRunner implements RouterApp {
             return;
         }
         try {
-            // default false for now, except on OSX and non-service windows
-            String sdtg = _context.getProperty(PROP_DTG_ENABLED);
-            boolean desktopguiEnabled = Boolean.parseBoolean(sdtg) ||
-                                        (sdtg == null && (SystemVersion.isWindows() || SystemVersion.isMac()));
-            if (desktopguiEnabled) {
+            if (isSystrayEnabled(_context)) {
                 System.setProperty("java.awt.headless", "false");
                 net.i2p.desktopgui.Main dtg = new net.i2p.desktopgui.Main(_context, _mgr, null);    
                 dtg.startup();
