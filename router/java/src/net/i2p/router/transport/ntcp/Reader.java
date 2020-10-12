@@ -121,8 +121,18 @@ class Reader {
                         // FailedEstablishState.receive() (race - see below)
                         if (_log.shouldWarn())
                             _log.warn("Error in the ntcp reader", ise);
+                    } catch (IllegalArgumentException iae) {
+                        // probably a race with a cancelled key
+                        // java.lang.IllegalArgumentException
+                        // at java.nio.Buffer.position(Unknown Source)
+                        // at java.nio.HeapByteBuffer.get(Unknown Source)
+                        // at net.i2p.router.transport.ntcp.NTCPConnection$NTCP2ReadState.receive(NTCPConnection.java:2054)
+                        // at net.i2p.router.transport.ntcp.NTCPConnection.recvEncryptedI2NP(NTCPConnection.java:1383)
+                        // at net.i2p.router.transport.ntcp.Reader.processRead(Reader.java:170)
+                        if (_log.shouldWarn())
+                            _log.warn("Error in the ntcp reader", iae);
                     } catch (RuntimeException re) {
-                        _log.log(Log.CRIT, "Error in the ntcp reader", re);
+                        _log.error("Error in the ntcp reader", re);
                     }
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("end read for " + con);
