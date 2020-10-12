@@ -302,8 +302,8 @@ class EventPumper implements Runnable {
                                 if ( con.getTimeSinceSend(now) > expire &&
                                      con.getTimeSinceReceive(now) > expire) {
                                     // we haven't sent or received anything in a really long time, so lets just close 'er up
+                                    // con will cancel the key
                                     con.sendTerminationAndClose();
-                                    key.cancel();
                                     if (_log.shouldInfo())
                                         _log.info("Failsafe or expire close for " + con);
                                     failsafeCloses++;

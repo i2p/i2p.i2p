@@ -1043,8 +1043,8 @@ public class NTCPConnection implements Closeable {
 
     /**
      *  NTCP 1 or 2.
-     *  For NTCP1, sends termination and then closes the connection after a brief delay.
-     *  For NTCP2, simply closes the connection immediately.
+     *  For NTCP1, simply closes the connection immediately.
+     *  For NTCP2, sends termination and then closes the connection after a brief delay.
      *
      *  @since 0.9.36
      */
@@ -1066,6 +1066,8 @@ public class NTCPConnection implements Closeable {
      *  @since 0.9.36
      */
     private void sendTermination(int reason, int validFramesRcvd) {
+        // So we don't get called again by the event pumper idle closer
+        _lastSendTime = _context.clock().now();
         // TODO add param to clear queues?
         // no synch needed, sendNTCP2() is synched
         if (_log.shouldInfo())
