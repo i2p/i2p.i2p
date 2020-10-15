@@ -380,8 +380,8 @@ public class BuildRequestRecord {
             try {
                 KeyFactory kf = TEST ? TESTKF : ctx.commSystem().getXDHFactory();
                 state = new HandshakeState(HandshakeState.PATTERN_ID_N, HandshakeState.RESPONDER, kf);
-                state.getLocalKeyPair().setPublicKey(ourKey.toPublic().getData(), 0);
-                state.getLocalKeyPair().setPrivateKey(ourKey.getData(), 0);
+                state.getLocalKeyPair().setKeys(ourKey.getData(), 0,
+                                                ourKey.toPublic().getData(), 0);
                 state.start();
                 decrypted = new byte[LENGTH_EC];
                 state.readMessage(encryptedRecord.getData(), PEER_SIZE, EncryptedBuildRecord.LENGTH - PEER_SIZE,

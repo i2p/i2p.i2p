@@ -685,8 +685,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             } catch (GeneralSecurityException gse) {
                 throw new IllegalStateException("bad proto", gse);
             }
-            _handshakeState.getLocalKeyPair().setPublicKey(_transport.getNTCP2StaticPubkey(), 0);
-            _handshakeState.getLocalKeyPair().setPrivateKey(_transport.getNTCP2StaticPrivkey(), 0);
+            _handshakeState.getLocalKeyPair().setKeys(_transport.getNTCP2StaticPrivkey(), 0,
+                                                      _transport.getNTCP2StaticPubkey(), 0);
             Hash h = _context.routerHash();
             SessionKey bobHash = new SessionKey(h.getData());
             // save encrypted data for CBC for msg 2

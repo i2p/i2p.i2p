@@ -356,8 +356,8 @@ public final class ECIESAEADEngine {
         } catch (GeneralSecurityException gse) {
             throw new IllegalStateException("bad proto", gse);
         }
-        state.getLocalKeyPair().setPublicKey(targetPrivateKey.toPublic().getData(), 0);
-        state.getLocalKeyPair().setPrivateKey(targetPrivateKey.getData(), 0);
+        state.getLocalKeyPair().setKeys(targetPrivateKey.getData(), 0,
+                                        targetPrivateKey.toPublic().getData(), 0);
         state.start();
         if (_log.shouldDebug())
             _log.debug("State before decrypt new session: " + state);
@@ -786,8 +786,8 @@ public final class ECIESAEADEngine {
             throw new IllegalStateException("bad proto", gse);
         }
         state.getRemotePublicKey().setPublicKey(target.getData(), 0);
-        state.getLocalKeyPair().setPublicKey(priv.toPublic().getData(), 0);
-        state.getLocalKeyPair().setPrivateKey(priv.getData(), 0);
+        state.getLocalKeyPair().setKeys(priv.getData(), 0,
+                                        priv.toPublic().getData(), 0);
         state.start();
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session: " + state);
