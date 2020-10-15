@@ -373,6 +373,7 @@ public final class ECIESAEADEngine {
             if (_log.shouldDebug())
                 _log.debug("Elg2 decode fail NS");
             data[KEYLEN - 1] = xx31;
+            state.destroy();
             return null;
         }
         // rewrite in place, must restore below on failure
@@ -390,6 +391,7 @@ public final class ECIESAEADEngine {
             // restore original data for subsequent ElG attempt
             System.arraycopy(xx, 0, data, 0, KEYLEN - 1);
             data[KEYLEN - 1] = xx31;
+            state.destroy();
             return null;
         }
         // bloom filter here based on ephemeral key
@@ -412,6 +414,7 @@ public final class ECIESAEADEngine {
             // TODO
             if (_log.shouldWarn())
                 _log.warn("Zero static key in IB NS");
+            state.destroy();
             return NO_CLOVES;
         }
 
@@ -420,6 +423,7 @@ public final class ECIESAEADEngine {
             // disallowed, datetime block required
             if (_log.shouldWarn())
                 _log.warn("Zero length payload in NS");
+            state.destroy();
             return NO_CLOVES;
         }
         PLCallback pc = new PLCallback();
@@ -428,8 +432,10 @@ public final class ECIESAEADEngine {
             if (_log.shouldDebug())
                 _log.debug("Processed " + blocks + " blocks in IB NS");
         } catch (DataFormatException e) {
+            state.destroy();
             throw e;
         } catch (Exception e) {
+            state.destroy();
             throw new DataFormatException("NS payload error", e);
         }
 
@@ -437,6 +443,7 @@ public final class ECIESAEADEngine {
             // disallowed, datetime block required
             if (_log.shouldWarn())
                 _log.warn("No datetime block in IB NS");
+            state.destroy();
             return NO_CLOVES;
         }
 
@@ -448,6 +455,7 @@ public final class ECIESAEADEngine {
             // this is legal
             if (_log.shouldDebug())
                 _log.debug("No garlic block in NS payload");
+            state.destroy();
             return NO_CLOVES;
         }
         int num = pc.cloveSet.size();
@@ -800,6 +808,7 @@ public final class ECIESAEADEngine {
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Encrypt fail NS", gse);
+            state.destroy();
             return null;
         }
         if (_log.shouldDebug())
@@ -810,6 +819,7 @@ public final class ECIESAEADEngine {
         if (eph == null || !eph.hasEncodedPublicKey()) {
             if (_log.shouldWarn())
                 _log.warn("Bad NS state");
+            state.destroy();
             return null;
         }
         eph.getEncodedPublicKey(enc, 0);
