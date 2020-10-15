@@ -1336,33 +1336,74 @@ public final class ECIESAEADEngine {
 
 
 /****
-    public static void main(String args[]) {
-        I2PAppContext ctx = new I2PAppContext();
+    public static void main(String args[]) throws Exception {
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty("i2p.dummyClientFacade", "true");
+        props.setProperty("i2p.dummyNetDb", "true");
+        props.setProperty("i2p.vmCommSystem", "true");
+        props.setProperty("i2p.dummyPeerManager", "true");
+        props.setProperty("i2p.dummyTunnelManager", "true");
+        RouterContext ctx = new RouterContext(null, props);
+        ctx.initAll();
         ECIESAEADEngine e = new ECIESAEADEngine(ctx);
-        Object kp[] = ctx.keyGenerator().generatePKIKeypair();
-        PublicKey pubKey = (PublicKey)kp[0];
-        PrivateKey privKey = (PrivateKey)kp[1];
-        SessionKey sessionKey = ctx.keyGenerator().generateSessionKey();
-        for (int i = 0; i < 10; i++) {
-            try {
-                Set tags = new HashSet(5);
-                if (i == 0) {
-                    for (int j = 0; j < 5; j++)
-                        tags.add(new SessionTag(true));
-                }
-                byte encrypted[] = e.encrypt("blah".getBytes(), pubKey, sessionKey, tags, 1024);
-                byte decrypted[] = e.decrypt(encrypted, privKey);
-                if ("blah".equals(new String(decrypted))) {
-                    System.out.println("equal on " + i);
-                } else {
-                    System.out.println("NOT equal on " + i + ": " + new String(decrypted));
-                    break;
-                }
-                ctx.sessionKeyManager().tagsDelivered(pubKey, sessionKey, tags);
-            } catch (Exception ee) {
-                ee.printStackTrace();
-                break;
-            }
+        RatchetSKM rskm = new RatchetSKM(ctx);
+        net.i2p.crypto.KeyPair kp = ctx.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+        PublicKey pubKey = kp.getPublic();
+        PrivateKey privKey = kp.getPrivate();
+        kp = ctx.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
+        PublicKey pubKey2 = kp.getPublic();
+        PrivateKey privKey2 = kp.getPrivate();
+
+        Destination dest = new Destination();
+        GarlicClove clove = new GarlicClove(ctx);
+        net.i2p.data.i2np.DataMessage msg = new net.i2p.data.i2np.DataMessage(ctx);
+        byte[] orig = DataHelper.getUTF8("blahblahblah");
+        msg.setData(orig);
+        clove.setData(msg);
+        clove.setCertificate(Certificate.NULL_CERT);
+        clove.setCloveId(0);
+        clove.setExpiration(new java.util.Date(System.currentTimeMillis() + 10000));
+        clove.setInstructions(net.i2p.data.i2np.DeliveryInstructions.LOCAL);
+        GarlicClove[] arr = new GarlicClove[1];
+        arr[0] = clove;
+        CloveSet cs = new CloveSet(arr, Certificate.NULL_CERT, clove.getCloveId(), clove.getExpiration().getTime());
+
+        // IK test
+        byte[] encrypted = e.encrypt(cs, pubKey, dest, privKey2, rskm, null);
+        System.out.println("IK Encrypted:\n" + net.i2p.util.HexDump.dump(encrypted));
+
+        CloveSet cs2 = e.decrypt(encrypted, privKey, rskm);
+        if (cs2 == null) {
+            System.out.println("IK DECRYPT FAIL");
+            return;
+        }
+        System.out.println("IK Decrypted: " + cs);
+        GarlicClove clove2 = cs2.getClove(0);
+        net.i2p.data.i2np.DataMessage msg2 = (net.i2p.data.i2np.DataMessage) clove2.getData();
+        byte[] decrypted = msg2.getData();
+        if (Arrays.equals(orig, decrypted)) {
+            System.out.println("IK Test passed");
+        } else {
+            System.out.println("IK Test FAILED: " + new String(decrypted));
+        }
+
+        // N test
+        encrypted = e.encrypt(cs, pubKey);
+        System.out.println("N Encrypted:\n" + net.i2p.util.HexDump.dump(encrypted));
+
+        cs2 = e.decrypt(encrypted, privKey, rskm);
+        if (cs2 == null) {
+            System.out.println("N DECRYPT FAIL");
+            return;
+        }
+        System.out.println("N Decrypted: " + cs);
+        clove2 = cs2.getClove(0);
+        msg2 = (net.i2p.data.i2np.DataMessage) clove2.getData();
+        decrypted = msg2.getData();
+        if (Arrays.equals(orig, decrypted)) {
+            System.out.println("N Test passed");
+        } else {
+            System.out.println("N Test FAILED: " + new String(decrypted));
         }
     }
 ****/
