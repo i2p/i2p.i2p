@@ -401,19 +401,6 @@ public final class ECIESAEADEngine {
         if (keyManager.isDuplicate(pk)) {
             if (_log.shouldWarn())
                 _log.warn("Dup eph. key in IB NS: " + pk);
-            return NO_CLOVES;
-        }
-
-        byte[] alicePK = new byte[KEYLEN];
-        state.getRemotePublicKey().getPublicKey(alicePK, 0);
-        if (_log.shouldDebug()) {
-            _log.debug("NS decrypt success from PK " + Base64.encode(alicePK));
-            _log.debug("State after decrypt new session: " + state);
-        }
-        if (Arrays.equals(alicePK, NULLPK)) {
-            // TODO
-            if (_log.shouldWarn())
-                _log.warn("Zero static key in IB NS");
             state.destroy();
             return NO_CLOVES;
         }
@@ -447,10 +434,6 @@ public final class ECIESAEADEngine {
             return NO_CLOVES;
         }
 
-        // tell the SKM
-        PublicKey alice = new PublicKey(EncType.ECIES_X25519, alicePK);
-        keyManager.createSession(alice, null, state, null);
-
         if (pc.cloveSet.isEmpty()) {
             // this is legal
             if (_log.shouldDebug())
@@ -458,11 +441,26 @@ public final class ECIESAEADEngine {
             state.destroy();
             return NO_CLOVES;
         }
+
+        byte[] alicePK = new byte[KEYLEN];
+        state.getRemotePublicKey().getPublicKey(alicePK, 0);
+        if (_log.shouldDebug()) {
+            _log.debug("NS decrypt success from PK " + Base64.encode(alicePK));
+            _log.debug("State after decrypt new session: " + state);
+        }
+        if (Arrays.equals(alicePK, NULLPK)) {
+            state.destroy();
+        } else {
+            // tell the SKM
+            PublicKey alice = new PublicKey(EncType.ECIES_X25519, alicePK);
+            keyManager.createSession(alice, null, state, null);
+            setResponseTimerNS(alice, pc.cloveSet, keyManager);
+        }
+
         int num = pc.cloveSet.size();
         GarlicClove[] arr = new GarlicClove[num];
         // msg id and expiration not checked in GarlicMessageReceiver
         CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
-        setResponseTimerNS(alice, pc.cloveSet, keyManager);
         return rv;
     }
 
@@ -713,8 +711,12 @@ public final class ECIESAEADEngine {
      * This is the one called from GarlicMessageBuilder and is the primary entry point.
      *
      * @param target public key to which the data should be encrypted. 
+     * @param to ignored if priv is null
      * @param priv local private key to encrypt with, from the leaseset
-     * @param callback may be null, if non-null an ack will be requested (except NS/NSR)
+     *             may be null for anonymous (N-in-IK)
+     * @param keyManager ignored if priv is null
+     * @param callback may be null, if non-null an ack will be requested (except NS/NSR),
+     *                 ignored if priv is null
      * @return encrypted data or null on failure
      *
      */
@@ -729,16 +731,27 @@ public final class ECIESAEADEngine {
         }
     }
 
+    /**
+     * @param to ignored if priv is null
+     * @param priv local private key to encrypt with, from the leaseset
+     *             may be null for anonymous (N-in-IK)
+     * @param keyManager ignored if priv is null
+     * @param callback may be null, ignored if priv is null
+     */
     private byte[] x_encrypt(CloveSet cloves, PublicKey target, Destination to, PrivateKey priv,
                              RatchetSKM keyManager,
                              ReplyCallback callback) {
         if (target.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
         if (Arrays.equals(target.getData(), NULLPK)) {
-            // TODO
             if (_log.shouldWarn())
                 _log.warn("Zero static key target");
             return null;
+        }
+        if (priv == null) {
+            if (_log.shouldDebug())
+                _log.debug("Encrypting as NS zero-key to " + target);
+            return encryptNewSession(cloves, target, null, null, null, null);
         }
         RatchetEntry re = keyManager.consumeNextAvailableTag(target);
         if (re == null) {
@@ -781,7 +794,11 @@ public final class ECIESAEADEngine {
      *  - 16 byte MAC
      * </pre>
      *
-     * @param callback may be null
+     * @param to ignored if priv is null
+     * @param priv local private key to encrypt with, from the leaseset
+     *             may be null for anonymous (N-in-IK)
+     * @param keyManager ignored if priv is null
+     * @param callback may be null, ignored if priv is null
      * @return encrypted data or null on failure
      */
     private byte[] encryptNewSession(CloveSet cloves, PublicKey target, Destination to, PrivateKey priv,
@@ -794,8 +811,12 @@ public final class ECIESAEADEngine {
             throw new IllegalStateException("bad proto", gse);
         }
         state.getRemotePublicKey().setPublicKey(target.getData(), 0);
-        state.getLocalKeyPair().setKeys(priv.getData(), 0,
-                                        priv.toPublic().getData(), 0);
+        if (priv != null) {
+            state.getLocalKeyPair().setKeys(priv.getData(), 0,
+                                            priv.toPublic().getData(), 0);
+        } else {
+            state.getLocalKeyPair().setKeys(NULLPK, 0, NULLPK, 0);
+        }
         state.start();
         if (_log.shouldDebug())
             _log.debug("State before encrypt new session: " + state);
@@ -826,8 +847,12 @@ public final class ECIESAEADEngine {
         if (_log.shouldDebug())
             _log.debug("Elligator2 encoded eph. key: " + Base64.encode(enc, 0, 32));
 
-        // tell the SKM
-        keyManager.createSession(target, to, state, callback);
+        if (priv != null) {
+            // tell the SKM
+            keyManager.createSession(target, to, state, callback);
+        } else {
+            state.destroy();
+        }
         return enc;
     }
 
@@ -961,6 +986,19 @@ public final class ECIESAEADEngine {
         byte encr[] = encryptAEADBlock(rawTag, payload, key, 0);
         System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
         return encr;
+    }
+
+    /**
+     * Encrypt the data to the target using the given key from an anonymous source,
+     * for netdb lookups.
+     * Called from MessageWrapper.
+     *
+     * @param target public key to which the data should be encrypted. 
+     * @return encrypted data or null on failure
+     * @since 0.9.48
+     */
+    public byte[] encrypt(CloveSet cloves, PublicKey target) {
+        return encrypt(cloves, target, null, null, null, null);
     }
 
     /**

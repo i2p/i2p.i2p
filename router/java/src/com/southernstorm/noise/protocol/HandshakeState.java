@@ -548,6 +548,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 		// Format the message.
 		try {
 			// Process tokens until the direction changes or the patten ends.
+			loop:
 			for (;;) {
 				if (patternIndex >= pattern.length) {
 					// The pattern has finished, so the next action is "split".
@@ -627,6 +628,11 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 					case Pattern.SS:
 					{
+						// I2P N extension to IK
+						if (patternId.equals(PATTERN_ID_IK) &&
+						    localKeyPair.isNullPublicKey()) {
+							break loop;
+						}
 						// DH operation with initiator and responder static keys.
 						mixDH(localKeyPair, remotePublicKey);
 					}
@@ -702,6 +708,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 		// Process the message.
 		try {
 			// Process tokens until the direction changes or the patten ends.
+			loop:
 			for (;;) {
 				if (patternIndex >= pattern.length) {
 					// The pattern has finished, so the next action is "split".
@@ -792,6 +799,11 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 					case Pattern.SS:
 					{
+						// I2P N extension to IK
+						if (patternId.equals(PATTERN_ID_IK) &&
+						    remotePublicKey.isNullPublicKey()) {
+							break loop;
+						}
 						// DH operation with initiator and responder static keys.
 						mixDH(localKeyPair, remotePublicKey);
 					}
