@@ -131,7 +131,7 @@ class OutboundClientMessageJobHelper {
             return null;
         GarlicMessage msg;
         if (isECIES) {
-            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, dest, skm, callback);
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, from, dest, skm, callback);
         } else {
             // no use sending tags unless we have a reply token set up already
             int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
@@ -145,6 +145,8 @@ class OutboundClientMessageJobHelper {
     /**
      * Make the top-level config, with a data clove, an optional ack clove, and
      * an optional leaseset clove.
+     *
+     * The returned GarlicConfig will have the recipientPublicKey set.
      *
      * @param dataClove may be null for ECIES-layer ack
      * @param replyTunnel non-null if requireAck is true or bundledReplyLeaseSet is non-null

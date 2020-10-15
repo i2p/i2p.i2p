@@ -275,16 +275,14 @@ public class GarlicMessageBuilder {
      * Called by OCMJH only.
      *
      * @param ctx scope
-     * @param config how/what to wrap
-     * @param target public key of the location being garlic routed to (may be null if we 
-     *               know the encryptKey and encryptTag)
+     * @param config how/what to wrap, must have key set with setRecipientPublicKey()
      * @param callback may be null
      * @return null if expired or on other errors
      * @throws IllegalArgumentException on error
      * @since 0.9.44
      */
     static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config,
-                                           PublicKey target, Hash from, Destination to, SessionKeyManager skm,
+                                           Hash from, Destination to, SessionKeyManager skm,
                                            ReplyCallback callback) {
         PublicKey key = config.getRecipientPublicKey();
         if (key.getType() != EncType.ECIES_X25519)
@@ -315,10 +313,46 @@ public class GarlicMessageBuilder {
                 log.warn("No SKM for " + from.toBase32());
             return null;
         }
-        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, to, priv, rskm, callback);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, key, to, priv, rskm, callback);
         if (encData == null) {
             if (log.shouldWarn())
                 log.warn("Encrypt fail for " + from.toBase32());
+            return null;
+        }
+        msg.setData(encData);
+        msg.setMessageExpiration(config.getExpiration());
+        long timeFromNow = config.getExpiration() - ctx.clock().now();
+        if (timeFromNow < 1*1000) {
+            if (log.shouldDebug())
+                log.debug("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
+            return null;
+        }
+        if (log.shouldDebug())
+            log.debug("Built ECIES CloveSet (" + config.getCloveCount() + " cloves) in " + msg);
+        return msg;
+    }
+    
+    /**
+     * Encrypt from an anonymous source.
+     * ECIES_X25519 only.
+     * Called by MessageWrapper only.
+     *
+     * @param ctx scope
+     * @param config how/what to wrap, must have key set with setRecipientPublicKey()
+     * @throws IllegalArgumentException on error
+     * @since 0.9.48
+     */
+    public static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config) {
+        PublicKey key = config.getRecipientPublicKey();
+        if (key.getType() != EncType.ECIES_X25519)
+            throw new IllegalArgumentException();
+        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        GarlicMessage msg = new GarlicMessage(ctx);
+        CloveSet cloveSet = buildECIESCloveSet(ctx, config);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, key);
+        if (encData == null) {
+            if (log.shouldWarn())
+                log.warn("Encrypt fail for " + config);
             return null;
         }
         msg.setData(encData);

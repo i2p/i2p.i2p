@@ -1,3 +1,30 @@
+2020-10-15 zzz
+ * Router:
+   - More efficient initialization of Noise state
+   - Destroy ratchet HandshakeState after NS failure
+   - Add support for ratchet zero key (proposals #144, #156)
+
+2020-10-12 zzz
+ * DTG: Enable by default for Linux KDE and LXDE;
+   Hide option on /configservice if not supported
+ * New translations for Kurdish, Turkmen, Argentinian Spanish
+ * NTCP:
+   - Fix sending termination on idle timeout (ticket #2777)
+   - Catch possible race IAE in Reader
+
+2020-10-11 zzz
+ * Installer: Disable pack200 (ticket #2778)
+
+2020-10-10 zzz
+ * i2psnark: Cache length of metainfo
+ * Transport: Improved IPv6 address validation
+
+2020-10-09 zzz
+ *  NetDB:
+    - Don't use DSA-SHA1 routers for lookups, stores, or tunnel peers
+    - Don't use non-ElGamal routers for lookups or stores
+    - Prevent DSA-SHA1 routers from auto-floodfill
+
 2020-10-07 zzz
  * Build:
    - Set javac release property (ticket #2775)
@@ -5,6 +32,7 @@
    - Drop support for Xenial package build
    - Fix up BOB build configuration
    - Fix i2psnark standalone build
+ * i2ptunnel: Filter server response headers even if not compressing
 
 2020-10-03 zzz
  * Router: Support building tunnels through ECIES routers (proposal 152)
