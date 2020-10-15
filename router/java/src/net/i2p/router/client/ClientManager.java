@@ -582,7 +582,7 @@ class ClientManager {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Cannot request the lease set, as we can't find a client runner for " 
-                          + dest + ".  disconnected?");
+                          + dest.toBase32() + ".  disconnected?");
         }
     }
     
@@ -677,12 +677,12 @@ class ClientManager {
         if (runner != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Delivering status " + status + " to " 
-                           + fromDest.calculateHash() + " for message " + id);
+                           + fromDest.toBase32() + " for message " + id);
             runner.updateMessageDeliveryStatus(fromDest, id, messageNonce, status);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Cannot deliver status " + status + " to " 
-                          + fromDest.calculateHash() + " for message " + id);
+                          + fromDest.toBase32() + " for message " + id);
         }
     }
     
@@ -799,7 +799,7 @@ class ClientManager {
                 // we should pool these somewhere...
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Message received but we don't have a connection to " 
-                              + dest + "/" + _msg.getDestinationHash() 
+                              + dest + "/" + _msg.getDestinationHash().toBase32()
                               + " currently.  DROPPED", new Exception());
             }
         }

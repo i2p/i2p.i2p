@@ -47,7 +47,9 @@ public class StatisticsManager {
         _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
         _pct = new DecimalFormat("#0.00%", new DecimalFormatSymbols(Locale.UK));
         _log = context.logManager().getLog(StatisticsManager.class);
-        _networkID = Integer.toString(context.router().getNetworkID());
+        // null for some tests
+        Router r = context.router();
+        _networkID = r != null ? Integer.toString(r.getNetworkID()) : "2";
     }
         
     /**

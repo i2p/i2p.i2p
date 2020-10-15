@@ -1192,8 +1192,6 @@ public class Blocklist {
      *
      *  Public for console only, not a public API
      *
-     *  @param max maximum entries to return
-     *  @return sorted
      *  @since 0.9.48
      */
     public synchronized int getBlocklistSize() {
