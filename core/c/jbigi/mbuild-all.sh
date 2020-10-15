@@ -41,6 +41,8 @@ ARM_PLATFORMS="armv5 armv6 armv7a armcortex8 armcortex9 armcortex15"
 # Rename output of armv7a to armv7 since that's what NBI expects.
 # This is due to versions after GMP 6.0.0 changing the target name.
 TRANSLATE_NAME_armv7a="armv7"
+# aarch64
+TRANSLATE_NAME_aarch64="armv8"
 
 #
 # X86_64
@@ -85,7 +87,7 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
 fi
 
 if [ ! $(which m4) ]; then
-    printf "\aWARNING: \`m4\` not found. Install m4 " >&2
+    printf "\aERROR: \`m4\` not found. Install m4 " >&2
     printf "and re-run this script.\n\n\n\a" >&2
     exit 1
 fi
@@ -131,7 +133,7 @@ if [ $BITS -eq 32 ]; then
   fi
 elif [ $BITS -eq 64 ]; then
   export ABI=64
-  if [ "$TARGET" != "android" ]; then
+  if [ "$TARGET" != "android" -a "$UNAME" != "aarch64" ]; then
       export CFLAGS="-m64"
       export LDFLAGS="-m64"
   fi
@@ -277,6 +279,8 @@ linux*|*kfreebsd)
                         fi;;
                 arm*)
                         PLATFORM_LIST="${ARM_PLATFORMS}";;
+                aarch64)
+                        PLATFORM_LIST="aarch64";;
                 *)
                         PLATFORM_LIST="${LINUX_PLATFORMS}";;
         esac
