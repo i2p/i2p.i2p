@@ -4730,7 +4730,7 @@ a[href^="configpeer?peer"] {
 }
 
 a[href^="configpeer?peer"]::after {
-     content: url(/themes/console/images/buttons/edit.png);
+     content: url(/themes/console/images/buttons/unban.png);
      vertical-align: bottom;
      margin-left: 4px;
 }
