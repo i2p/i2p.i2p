@@ -1147,8 +1147,8 @@ public class I2PSnarkServlet extends BasicServlet {
                             try { if (in != null) in.close(); } catch (IOException ioe) {}
                         }
                     } else {
-                        _manager.addMessage(_t("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"",
-                                               MagnetURI.MAGNET, MagnetURI.MAGGOT));
+                        _manager.addMessage(_t("Invalid URL: Must start with \"{0}\" or \"{1}\"",
+                                               "http://", MagnetURI.MAGNET));
                     }
                 }
             } else {
@@ -2304,7 +2304,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_t("From URL"));
         out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"" +
                   " title=\"");
-        out.write(_t("Enter the torrent file download URL (I2P only), magnet link, maggot link, or info hash"));
+        out.write(_t("Enter the torrent file download URL (I2P only), magnet link, or info hash"));
         out.write("\">\n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
