@@ -36,7 +36,7 @@ class ACKTimer extends SimpleTimer2.TimedEvent {
      */
     public ACKTimer(RouterContext context, Destination from, Destination to) {
         super(context.simpleTimer2());
-        _context = context;;
+        _context = context;
         _log = context.logManager().getLog(ACKTimer.class);
         _from = from;
         _to = to;

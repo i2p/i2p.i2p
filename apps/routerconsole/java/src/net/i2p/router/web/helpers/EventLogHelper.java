@@ -169,7 +169,7 @@ public class EventLogHelper extends FormHandler {
         if (events.isEmpty()) {
             if (isAll) {
                 if (_age == 0)
-                    return ("<table id=\"eventlog\"><tr><td class=\"infohelp\">") + _t("No events found") + ("</td></tr></table>");;
+                    return ("<table id=\"eventlog\"><tr><td class=\"infohelp\">") + _t("No events found") + ("</td></tr></table>");
                 return ("<table id=\"eventlog\"><tr><td>") + _t("No events found in previous {0}", DataHelper.formatDuration2(_age)) + ("</td></tr></table>");
             }
             if (_age == 0)

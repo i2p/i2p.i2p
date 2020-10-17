@@ -64,7 +64,7 @@ class SAMStreamSession implements SAMMessageSess {
     /** stream id (Long) to StreamSender */
     private final HashMap<Integer,StreamSender> sendersMap = new HashMap<Integer,StreamSender>();
 
-    private final AtomicInteger lastNegativeId = new AtomicInteger();;
+    private final AtomicInteger lastNegativeId = new AtomicInteger();
 
     // Can we create outgoing connections?
     protected final boolean canCreate;

@@ -39,7 +39,7 @@ class SummaryBarRenderer {
     static final Map<String, String> SECTION_NAMES;
 
     static {
-        Map<String, String> aMap = new HashMap<String, String>();;
+        Map<String, String> aMap = new HashMap<String, String>();
         aMap.put("HelpAndFAQ", _x("Help &amp; FAQ"));
         aMap.put("I2PServices", _x("I2P Services"));
         aMap.put("I2PInternals", _x("I2P Internals"));

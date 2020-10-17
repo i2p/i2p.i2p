@@ -592,7 +592,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         _signingPrivateKey = new SigningPrivateKey(dtype);
         _signingPrivateKey.readBytes(destKeyStream);
         if (_signingPrivateKey.isOffline()) {
-            _offlineExpiration = DataHelper.readLong(destKeyStream, 4) * 1000;;
+            _offlineExpiration = DataHelper.readLong(destKeyStream, 4) * 1000;
             int itype = (int) DataHelper.readLong(destKeyStream, 2);
             SigType type = SigType.getByCode(itype);
             if (type == null)

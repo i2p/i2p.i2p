@@ -613,7 +613,7 @@ class ConnectionPacketHandler {
                 return;
             } else {
                 if (_log.shouldWarn())
-                    _log.warn("Reset received on " + con);;
+                    _log.warn("Reset received on " + con);
                 // ok, valid RST
                 con.resetReceived();
                 con.eventOccurred();
