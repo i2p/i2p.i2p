@@ -345,6 +345,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         _context.simpleTimer2().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
+
+    /**
+     * @returns the instance of OutboundMessageFragments
+     * @since 0.9.48
+     */
+    OutboundMessageFragments getOMF() {
+        return _fragments;
+    }
     
     /**
      *  Pick a port if not previously configured, so that TransportManager may

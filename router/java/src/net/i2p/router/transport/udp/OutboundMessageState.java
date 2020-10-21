@@ -31,7 +31,6 @@ class OutboundMessageState implements CDPQEntry {
     private long _fragmentAcks;
     private final int _numFragments;
     private final long _startedOn;
-    private long _nextSendTime;
     private int _pushCount;
     private int _maxSends;
     // we can't use the ones in _message since it is null for injections
@@ -77,7 +76,6 @@ class OutboundMessageState implements CDPQEntry {
         _i2npMessage = msg;
         _peer = peer;
         _startedOn = _context.clock().now();
-        _nextSendTime = _startedOn;
         _expiration = _startedOn + EXPIRATION;
         //_expiration = msg.getExpiration();
 
@@ -166,9 +164,6 @@ class OutboundMessageState implements CDPQEntry {
         return isComplete();
     }
     
-    public long getNextSendTime() { return _nextSendTime; }
-    public void setNextSendTime(long when) { _nextSendTime = when; }
-
     /**
      *  The max number of sends for any fragment, which is the
      *  same as the push count, at least as it's coded now.

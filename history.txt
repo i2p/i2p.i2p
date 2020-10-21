@@ -2,7 +2,9 @@
  * NetDB:
    - ECIES router support for encrypted lookups and stores (proposal #156)
    - Reseed after a long downtime
- * SSU: Increase socket buffer size (ticket #2781)
+ * SSU:
+   - Increase socket buffer size (ticket #2781)
+   - Redesign of the congestion control (tickets #2412, #2649, #2654, #2713)
 
 2020-10-17 zzz
  * i2psnark: Remove references to "maggot" links
