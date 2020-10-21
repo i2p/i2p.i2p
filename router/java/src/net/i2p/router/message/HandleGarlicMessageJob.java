@@ -77,9 +77,10 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
                 getContext().inNetMessagePool().add(data, null, null);
                 return;
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("this message didn't come down a tunnel, not forwarding to a destination: " 
-                               + instructions + " - " + data);
+                // i2pd bug with DLM to ratchet router
+                if (_log.shouldWarn())
+                    _log.warn("this message didn't come down a tunnel, not forwarding to a destination:\n" 
+                               + instructions + '\n' + data);
                 return;
             case DeliveryInstructions.DELIVERY_MODE_ROUTER:
                 if (getContext().routerHash().equals(instructions.getRouter())) {
