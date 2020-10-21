@@ -313,8 +313,9 @@ public class IterativeSearchJob extends FloodSearchJob {
      *  Send a DLM to the peer
      */
     private void sendQuery(Hash peer) {
-            TunnelManagerFacade tm = getContext().tunnelManager();
-            RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
+            final RouterContext ctx = getContext();
+            TunnelManagerFacade tm = ctx.tunnelManager();
+            RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(peer);
             if (ri != null) {
                 // Now that most of the netdb is Ed RIs and EC LSs, don't even bother
                 // querying old floodfills that don't know about those sig types.
@@ -337,7 +338,7 @@ public class IterativeSearchJob extends FloodSearchJob {
                 outTunnel = tm.selectOutboundTunnel(_fromLocalDest, peer);
                 if (outTunnel == null)
                     outTunnel = tm.selectOutboundExploratoryTunnel(peer);
-                LeaseSetKeys lsk = getContext().keyManager().getKeys(_fromLocalDest);
+                LeaseSetKeys lsk = ctx.keyManager().getKeys(_fromLocalDest);
                 supportsRatchet = lsk != null &&
                                   lsk.isSupported(EncType.ECIES_X25519) &&
                                   DatabaseLookupMessage.supportsRatchetReplies(ri);
@@ -357,7 +358,7 @@ public class IterativeSearchJob extends FloodSearchJob {
                     replyTunnel = tm.selectInboundExploratoryTunnel(peer);
                 }
                 isDirect = false;
-            } else if ((!_isLease) && ri != null && getContext().commSystem().isEstablished(peer)) {
+            } else if ((!_isLease) && ri != null && ctx.commSystem().isEstablished(peer)) {
                 // If it's a RI lookup, not from a client, and we're already connected, just ask directly
                 // This also saves the ElG encryption for us and the decryption for the ff
                 // There's no anonymity reason to use an expl. tunnel... the main reason
@@ -367,13 +368,13 @@ public class IterativeSearchJob extends FloodSearchJob {
                 replyTunnel = null;
                 isClientReplyTunnel = false;
                 isDirect = true;
-                getContext().statManager().addRateData("netDb.RILookupDirect", 1);
+                ctx.statManager().addRateData("netDb.RILookupDirect", 1);
             } else {
                 outTunnel = tm.selectOutboundExploratoryTunnel(peer);
                 replyTunnel = tm.selectInboundExploratoryTunnel(peer);
                 isClientReplyTunnel = false;
                 isDirect = false;
-                getContext().statManager().addRateData("netDb.RILookupDirect", 0);
+                ctx.statManager().addRateData("netDb.RILookupDirect", 0);
             }
             if ((!isDirect) && (replyTunnel == null || outTunnel == null)) {
                 failed();
@@ -401,14 +402,15 @@ public class IterativeSearchJob extends FloodSearchJob {
                 }
             }
             
-            DatabaseLookupMessage dlm = new DatabaseLookupMessage(getContext(), true);
+            DatabaseLookupMessage dlm = new DatabaseLookupMessage(ctx, true);
             if (isDirect) {
-                dlm.setFrom(getContext().routerHash());
+                dlm.setFrom(ctx.routerHash());
             } else {
                 dlm.setFrom(replyTunnel.getPeer(0));
                 dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
             }
-            dlm.setMessageExpiration(getContext().clock().now() + SINGLE_SEARCH_MSG_TIME);
+            long now = ctx.clock().now();
+            dlm.setMessageExpiration(now + SINGLE_SEARCH_MSG_TIME);
             dlm.setSearchKey(_key);
             dlm.setSearchType(_isLease ? DatabaseLookupMessage.Type.LS : DatabaseLookupMessage.Type.RI);
             
@@ -423,15 +425,16 @@ public class IterativeSearchJob extends FloodSearchJob {
                           " direct? " + isDirect +
                           " reply via client tunnel? " + isClientReplyTunnel);
             }
-            long now = getContext().clock().now();
             _sentTime.put(peer, Long.valueOf(now));
 
+            EncType type = ri != null ? ri.getIdentity().getPublicKey().getType() : null;
+            boolean encryptElG = ctx.getProperty(PROP_ENCRYPT_RI, DEFAULT_ENCRYPT_RI);
             I2NPMessage outMsg = null;
             if (isDirect) {
                 // never wrap
             } else if (_isLease ||
-                       (getContext().getProperty(PROP_ENCRYPT_RI, DEFAULT_ENCRYPT_RI) &&
-                        getContext().jobQueue().getMaxLag() < 300)) {
+                       (encryptElG && type == EncType.ELGAMAL_2048 && ctx.jobQueue().getMaxLag() < 300) ||
+                       type == EncType.ECIES_X25519) {
                 // Full ElG is fairly expensive so only do it for LS lookups
                 // and for RI lookups on fast boxes.
                 // if we have the ff RI, garlic encrypt it
@@ -439,8 +442,7 @@ public class IterativeSearchJob extends FloodSearchJob {
                     // request encrypted reply
                     // now covered by version check above, which is more recent
                     //if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
-                    EncType type = ri.getIdentity().getPublicKey().getType();
-                    if (type != EncType.ELGAMAL_2048) {
+                    if (!LeaseSetKeys.SET_BOTH.contains(type)) {
                         failed(peer, false);
                         if (_log.shouldLog(Log.WARN))
                             _log.warn(getJobId() + ": Can't do encrypted lookup to " + peer + " with EncType " + type);
@@ -448,23 +450,38 @@ public class IterativeSearchJob extends FloodSearchJob {
                     }
 
                     MessageWrapper.OneTimeSession sess;
-                    if (isClientReplyTunnel)
-                        sess = MessageWrapper.generateSession(getContext(), _fromLocalDest, SINGLE_SEARCH_MSG_TIME, !supportsRatchet);
-                    else
-                        sess = MessageWrapper.generateSession(getContext(), SINGLE_SEARCH_MSG_TIME);
+                    if (isClientReplyTunnel) {
+                        sess = MessageWrapper.generateSession(ctx, _fromLocalDest, SINGLE_SEARCH_MSG_TIME, !supportsRatchet);
+                    } else {
+                        EncType ourType = ctx.keyManager().getPublicKey().getType();
+                        boolean ratchet1 = ourType.equals(EncType.ECIES_X25519);
+                        boolean ratchet2 = DatabaseLookupMessage.supportsRatchetReplies(ri);
+                        if (ratchet1 && !ratchet2) {
+                            failed(peer, false);
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn(getJobId() + ": Can't do encrypted lookup to " + peer + ", does not support AEAD replies");
+                            return;
+                        }
+                        supportsRatchet = ratchet1 && ratchet2;
+                        sess = MessageWrapper.generateSession(ctx, ctx.sessionKeyManager(), SINGLE_SEARCH_MSG_TIME, !supportsRatchet);
+                    }
                     if (sess != null) {
                         if (sess.tag != null) {
                             if (_log.shouldInfo())
-                                _log.info(getJobId() + ": Requesting AES reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
+                                _log.info(getJobId() + ": Requesting AES reply from " + peer + " with: " + sess.key + ' ' + sess.tag);
                             dlm.setReplySession(sess.key, sess.tag);
                         } else {
                             if (_log.shouldInfo())
-                                _log.info(getJobId() + ": Requesting AEAD reply from " + peer + ' ' + sess.key + ' ' + sess.rtag);
+                                _log.info(getJobId() + ": Requesting AEAD reply from " + peer + " with: " + sess.key + ' ' + sess.rtag);
                             dlm.setReplySession(sess.key, sess.rtag);
                         }
-                    } // else client went away, but send it anyway
+                    } else {
+                        if (_log.shouldWarn())
+                            _log.warn(getJobId() + ": Failed encrypt to " + ri);
+                        // client went away, but send it anyway
+                    }
 
-                    outMsg = MessageWrapper.wrap(getContext(), dlm, ri);
+                    outMsg = MessageWrapper.wrap(ctx, dlm, ri);
                     // ElG can take a while so do a final check before we send it,
                     // a response may have come in.
                     if (_dead) {
@@ -479,7 +496,7 @@ public class IterativeSearchJob extends FloodSearchJob {
             if (outMsg == null)
                 outMsg = dlm;
             if (isDirect) {
-                OutNetMessage m = new OutNetMessage(getContext(), outMsg, outMsg.getMessageExpiration(),
+                OutNetMessage m = new OutNetMessage(ctx, outMsg, outMsg.getMessageExpiration(),
                                                     OutNetMessage.PRIORITY_MY_NETDB_LOOKUP, ri);
                 // Should always succeed, we are connected already
                 //m.setOnFailedReplyJob(onFail);
@@ -487,14 +504,14 @@ public class IterativeSearchJob extends FloodSearchJob {
                 //m.setOnReplyJob(onReply);
                 //m.setReplySelector(selector);
                 //getContext().messageRegistry().registerPending(m);
-                getContext().commSystem().processMessage(m);
+                ctx.commSystem().processMessage(m);
             } else {
-                getContext().tunnelDispatcher().dispatchOutbound(outMsg, outTunnel.getSendTunnelId(0), peer);
+                ctx.tunnelDispatcher().dispatchOutbound(outMsg, outTunnel.getSendTunnelId(0), peer);
             }
 
             // The timeout job is always run (never cancelled)
             // Note that the timeout is much shorter than the message expiration (see above)
-            Job j = new IterativeTimeoutJob(getContext(), peer, this);
+            Job j = new IterativeTimeoutJob(ctx, peer, this);
             long expire = Math.min(_expiration, now + _singleSearchTime);
             j.getTiming().setStartAfter(expire);
             getContext().jobQueue().addJob(j);

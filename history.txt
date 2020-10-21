@@ -1,8 +1,21 @@
+2020-10-21 zzz
+ * NetDB:
+   - ECIES router support for encrypted lookups and stores (proposal #156)
+   - Reseed after a long downtime
+ * SSU: Increase socket buffer size (ticket #2781)
+
+2020-10-17 zzz
+ * i2psnark: Remove references to "maggot" links
+ * SSU: Fix calculation of nextSendDelay (ticket #2714)
+
 2020-10-15 zzz
+ * Crypto: libjbigi for aarch64 (ticket #1840)
+ * i2psnark: Hide BEP 48 padding directory from UI
  * Router:
    - More efficient initialization of Noise state
    - Destroy ratchet HandshakeState after NS failure
    - Add support for ratchet zero key (proposals #144, #156)
+ * Util: Singleton OrderedProperties comparator
 
 2020-10-12 zzz
  * DTG: Enable by default for Linux KDE and LXDE;

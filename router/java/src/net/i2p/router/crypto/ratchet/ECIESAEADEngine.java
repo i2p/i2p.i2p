@@ -1278,9 +1278,14 @@ public final class ECIESAEADEngine {
      * Set a timer for a ratchet-layer reply if the application does not respond.
      * NS only. CloveSet must include a LS for validation.
      *
+     * @param skm must have non-null destination
      * @since 0.9.46
      */
     private void setResponseTimerNS(PublicKey from, List<GarlicClove> cloveSet, RatchetSKM skm) {
+        Destination us = skm.getDestination();
+        // temp for router SKM
+        if (us == null)
+            return;
         for (GarlicClove clove : cloveSet) {
             I2NPMessage msg = clove.getData();
             if (msg.getType() != DatabaseStoreMessage.MESSAGE_TYPE)
@@ -1301,7 +1306,6 @@ public final class ECIESAEADEngine {
             Destination d = ls2.getDestination();
             if (_log.shouldInfo())
                 _log.info("Validated NS sender: " + d.toBase32());
-            Destination us = skm.getDestination();
             ACKTimer ack = new ACKTimer(_context, us, d);
             if (skm.registerTimer(from, d, ack)) {
                 ack.schedule(1000);
@@ -1316,12 +1320,16 @@ public final class ECIESAEADEngine {
      * Set a timer for a ratchet-layer reply if the application does not respond.
      * NSR/ES only.
      *
+     * @param skm must have non-null destination
      * @since 0.9.47
      */
     private void setResponseTimer(PublicKey from, List<GarlicClove> cloveSet, RatchetSKM skm) {
         Destination d = skm.getDestination(from);
         if (d != null) {
             Destination us = skm.getDestination();
+            // temp for router SKM
+            if (us == null)
+                return;
             ACKTimer ack = new ACKTimer(_context, us, d);
             if (skm.registerTimer(from, null, ack)) {
                 ack.schedule(1000);

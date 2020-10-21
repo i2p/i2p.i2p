@@ -29,6 +29,8 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
@@ -160,14 +162,16 @@ public class GarlicMessageBuilder {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
-            if (config.getRecipient() == null) {
+            RouterInfo ri = config.getRecipient();
+            if (ri == null)
                 throw new IllegalArgumentException("Null recipient specified");
-            } else if (config.getRecipient().getIdentity() == null) {
+            RouterIdentity ident = ri.getIdentity();
+            if (ident == null)
                 throw new IllegalArgumentException("Null recipient.identity specified");
-            } else if (config.getRecipient().getIdentity().getPublicKey() == null) {
+            PublicKey pk = ident.getPublicKey();
+            if (pk == null)
                 throw new IllegalArgumentException("Null recipient.identity.publicKey specified");
-            } else
-                key = config.getRecipient().getIdentity().getPublicKey();
+            key = pk;
         }
         if (key.getType() != EncType.ELGAMAL_2048)
             throw new IllegalArgumentException();

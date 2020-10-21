@@ -43,8 +43,11 @@ public class MessageWrapper {
      *  to hide the contents from the OBEP.
      *  Caller must call acked() or fail() on the returned object.
      *
+     *  ELGAMAL ONLY. Both from and to must support ElGamal.
+     *
      *  @param from must be a local client with a session key manager,
-     *              or null to use the router's session key manager
+     *              or null to use the router's session key manager.
+     *              SessionKeyManager MUST support ElGamal.
      *  @param to must be ELGAMAL_2048 EncType
      *  @return null on encrypt failure
      */
@@ -185,9 +188,9 @@ public class MessageWrapper {
 
     /**
      *  Create a single key and tag, for receiving a single encrypted message,
-     *  and register it with the router's session key manager, to expire in two minutes.
-     *  The recipient can then send us an AES-encrypted message,
-     *  avoiding ElGamal.
+     *  and register it with the client's session key manager, to expire in the time specified.
+     *  The recipient can then send us an AES- or ChaCha- encrypted message,
+     *  avoiding full ElGamal or ECIES.
      *
      *  @param expiration time from now
      *  @since 0.9.7
@@ -198,9 +201,9 @@ public class MessageWrapper {
 
     /**
      *  Create a single key and tag, for receiving a single encrypted message,
-     *  and register it with the client's session key manager, to expire in two minutes.
-     *  The recipient can then send us an AES-encrypted message,
-     *  avoiding ElGamal.
+     *  and register it with the client's session key manager, to expire in the time specified.
+     *  The recipient can then send us an AES- or ChaCha- encrypted message,
+     *  avoiding full ElGamal or ECIES.
      *
      *  @param expiration time from now
      *  @return null if we can't find the SKM for the localDest
@@ -216,9 +219,9 @@ public class MessageWrapper {
 
     /**
      *  Create a single key and tag, for receiving a single encrypted message,
-     *  and register it with the given session key manager, to expire in two minutes.
-     *  The recipient can then send us an AES-encrypted message,
-     *  avoiding ElGamal.
+     *  and register it with the client's session key manager, to expire in the time specified.
+     *  The recipient can then send us an AES- or ChaCha- encrypted message,
+     *  avoiding full ElGamal or ECIES.
      *
      *  @param expiration time from now
      *  @return non-null

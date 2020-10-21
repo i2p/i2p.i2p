@@ -486,6 +486,8 @@ class SearchJob extends JobImpl {
         //I2NPMessage msg = buildMessage(expiration);
         I2NPMessage msg = buildMessage(null, router.getIdentity().getHash(), expiration, router);	
         if (msg == null) {
+            if (_log.shouldWarn())
+                _log.warn("Failed to create DLM to : " + router);
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }

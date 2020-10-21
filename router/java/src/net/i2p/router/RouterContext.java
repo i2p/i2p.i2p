@@ -642,13 +642,13 @@ public class RouterContext extends I2PAppContext {
     protected void initializeSessionKeyManager() {
         synchronized (_lock3) {
             if (_sessionKeyManager == null) {
-                TransientSessionKeyManager tskm = new TransientSessionKeyManager(this);
                 PublicKey pk = keyManager().getPublicKey();
                 if (pk != null && pk.getType() == EncType.ECIES_X25519) {
-                    // TODO RatchetSKM only after updating MessageWrapper
                     RatchetSKM rskm = new RatchetSKM(this);
-                    _sessionKeyManager = new MuxedSKM(tskm, rskm);
+                    //_sessionKeyManager = new MuxedSKM(tskm, rskm);
+                    _sessionKeyManager = rskm;
                 } else {
+                    TransientSessionKeyManager tskm = new TransientSessionKeyManager(this);
                     _sessionKeyManager = tskm;
                 }
             }
