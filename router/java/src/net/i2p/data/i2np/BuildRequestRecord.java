@@ -112,6 +112,7 @@ public class BuildRequestRecord {
     public static final int IV_SIZE = 16;
     /** we show 16 bytes of the peer hash outside the elGamal block */
     public static final int PEER_SIZE = 16;
+    private static final int DEFAULT_EXPIRATION_SECONDS = 10*60;
     
     /**
      *  @return 222 (ElG) or 464 (ECIES) bytes, non-null
@@ -143,7 +144,8 @@ public class BuildRequestRecord {
     private static final int OFF_REPLY_IV_EC = OFF_REPLY_KEY_EC + SessionKey.KEYSIZE_BYTES;
     private static final int OFF_FLAG_EC = OFF_REPLY_IV_EC + IV_SIZE;
     private static final int OFF_REQ_TIME_EC = OFF_FLAG_EC + 4;
-    private static final int OFF_SEND_MSG_ID_EC = OFF_REQ_TIME_EC + 4;
+    private static final int OFF_EXPIRATION = OFF_REQ_TIME_EC + 4;
+    private static final int OFF_SEND_MSG_ID_EC = OFF_EXPIRATION + 4;
     private static final int OFF_OPTIONS = OFF_SEND_MSG_ID_EC + 4;
     private static final int LENGTH_EC = 464;
     private static final int MAX_OPTIONS_LENGTH = LENGTH_EC - OFF_OPTIONS; // includes options length
@@ -251,6 +253,16 @@ public class BuildRequestRecord {
     public long readReplyMessageId() {
         int off = _isEC ? OFF_SEND_MSG_ID_EC : OFF_SEND_MSG_ID;
         return DataHelper.fromLong(_data, off, 4);
+    }
+
+    /**
+     * The expiration in milliseconds from now.
+     * @since 0.9.48
+     */
+    public long readExpiration() {
+        if (!_isEC)
+            return DEFAULT_EXPIRATION_SECONDS * 1000L;
+        return DataHelper.fromLong(_data, OFF_EXPIRATION, 4) * 1000L;
     }
 
     /**
@@ -511,6 +523,7 @@ public class BuildRequestRecord {
         // this ignores leap seconds
         truncatedMinute /= (60*1000L);
         DataHelper.toLong(buf, OFF_REQ_TIME_EC, 4, truncatedMinute);
+        DataHelper.toLong(buf, OFF_EXPIRATION, 4, DEFAULT_EXPIRATION_SECONDS);
         DataHelper.toLong(buf, OFF_SEND_MSG_ID_EC, 4, nextMsgId);
         try {
             int off = DataHelper.toProperties(buf, OFF_OPTIONS, options);
@@ -547,7 +560,8 @@ public class BuildRequestRecord {
            .append(" reply key: ").append(readReplyKey())
            .append(" reply IV: ").append(Base64.encode(readReplyIV()))
            .append(" time: ").append(DataHelper.formatTime(readRequestTime()))
-           .append(" reply msg id: ").append(readReplyMessageId());
+           .append(" reply msg id: ").append(readReplyMessageId())
+           .append(" expires in: ").append(DataHelper.formatDuration(readExpiration()));
         if (_isEC) {
             buf.append(" options: ").append(readOptions());
             if (_chachaReplyKey != null) {
@@ -562,6 +576,7 @@ public class BuildRequestRecord {
 
 /****
     public static void main(String[] args) throws Exception {
+        System.out.println("OFF_OPTIONS is " + OFF_OPTIONS);
         RouterContext ctx = new RouterContext(null);
         TESTKF = new net.i2p.router.transport.crypto.X25519KeyFactory(ctx);
         byte[] h = new byte[32];
