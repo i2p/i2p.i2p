@@ -1848,7 +1848,7 @@ public class Router implements RouterClock.ClockShiftListener {
             if (remaining > 1) {
                 error = true;
             } else if (remaining == 1) {
-                rebuild = args[g.getOptind()].equals("rebuild");;
+                rebuild = args[g.getOptind()].equals("rebuild");
                 if (!rebuild)
                     error = true;
             }
