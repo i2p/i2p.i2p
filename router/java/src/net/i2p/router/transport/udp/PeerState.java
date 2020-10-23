@@ -1712,16 +1712,8 @@ public class PeerState {
                     if (should) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Allocate sending (OLD) to " + _remotePeer + ": " + state.getMessageId());
-                        /*
-                        while (iter.hasNext()) {
-                            OutboundMessageState later = (OutboundMessageState)iter.next();
-                            OutNetMessage msg = later.getMessage();
-                            if (msg != null)
-                                msg.timestamp("not reached for allocation " + msgs.size() + " other peers");
-                        }
-                         */
                         if (rv == null)
-                            rv = new ArrayList<OutboundMessageState>(_outboundMessages.size());
+                            rv = new ArrayList<OutboundMessageState>((1 + _outboundMessages.size()) / 2);
                         rv.add(state);
                         if (rv.size() >= _outboundMessages.size() / 2)
                             return rv;
@@ -1740,7 +1732,7 @@ public class PeerState {
                         return rv;
                     } 
                 }
-                return null;
+                return rv;
             }
             // Peek at head of _outboundQueue and see if we can send it.
             // If so, pull it off, put it in _outbundMessages, test
