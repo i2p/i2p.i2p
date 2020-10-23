@@ -37,9 +37,6 @@ public class HopConfig {
     //private int _messagesSent;
     //private int _oldMessagesSent;
     
-    /** IV length for {@link #getReplyIV} */
-    public static final int REPLY_IV_LENGTH = 16;
-    
     public HopConfig() {
         _creation = -1;
         _expiration = -1;
@@ -89,35 +86,6 @@ public class HopConfig {
     /** what key should we use to encrypt the preIV before passing it on? */
     public SessionKey getIVKey() { return _ivKey; }
     public void setIVKey(SessionKey key) { _ivKey = key; }
-    
-    /**
-     *  Key to encrypt the reply sent for the tunnel creation crypto.
-     *  Not used for participating tunnels, will return null,
-     *  candidate for moving to TunnelCreatorConfig.
-     *  @return key or null
-     */
-    public SessionKey getReplyKey() { return _replyKey; }
-    public void setReplyKey(SessionKey key) { _replyKey = key; }
-    
-    /**
-     *  IV used to encrypt the reply sent for the tunnel creation crypto.
-     *  Not used for participating tunnels, will return null,
-     *  candidate for moving to TunnelCreatorConfig.
-     *
-     *  @return 16 bytes or null
-     */
-    public byte[] getReplyIV() { return _replyIV; }
-
-    /**
-     *  IV used to encrypt the reply sent for the tunnel creation crypto
-     *
-     *  @throws IllegalArgumentException if not 16 bytes
-     */
-    public void setReplyIV(byte[] iv) {
-        if (iv.length != REPLY_IV_LENGTH)
-            throw new IllegalArgumentException();
-        _replyIV = iv;
-    }
     
     /** when does this tunnel expire (in ms since the epoch)? */
     public long getExpiration() { return _expiration; }

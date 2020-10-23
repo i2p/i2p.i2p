@@ -19,6 +19,7 @@ import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.BuildMessageGenerator;
 import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -104,10 +105,9 @@ abstract class BuildRequestor {
             
             if (i > 0)
                 cfg.getConfig(i-1).setSendTunnelId(hop.getReceiveTunnelId());
-            byte iv[] = new byte[16];
+            byte iv[] = new byte[TunnelCreatorConfig.REPLY_IV_LENGTH];
             ctx.random().nextBytes(iv);
-            hop.setReplyIV(iv);
-            hop.setReplyKey(ctx.keyGenerator().generateSessionKey());
+            cfg.setAESReplyKeys(i, ctx.keyGenerator().generateSessionKey(), iv);
         }
         // This is in BuildExecutor.buildTunnel() now
         // And it was overwritten by the one in createTunnelBuildMessage() anyway!

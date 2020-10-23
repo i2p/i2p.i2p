@@ -41,8 +41,16 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     private long _peakThroughputCurrentTotal;
     private long _peakThroughputLastCoallesce = System.currentTimeMillis();
     private Hash _blankHash;
-    private SessionKey[] _replyKeys;
-    private byte[][] _replyADs;
+    private SessionKey[] _ChaReplyKeys;
+    private byte[][] _ChaReplyADs;
+    private final SessionKey[] _AESReplyKeys;
+    private final byte[][] _AESReplyIVs;
+    
+    /**
+     *  IV length for {@link #getAESReplyIV}
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public static final int REPLY_IV_LENGTH = 16;
 
     // Make configurable? - but can't easily get to pool options from here
     private static final int MAX_CONSECUTIVE_TEST_FAILURES = 3;
@@ -70,6 +78,8 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         }
         _isInbound = isInbound;
         _destination = destination;
+        _AESReplyKeys = new SessionKey[length];
+        _AESReplyIVs = new byte[length][];
     }
     
     /**
@@ -244,6 +254,36 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     public void setPriority(int priority) { _priority = priority; }
 
     /**
+     *  Key and IV to encrypt the reply sent for the tunnel creation crypto.
+     *
+     *  @throws IllegalArgumentException if iv not 16 bytes
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public void setAESReplyKeys(int hop, SessionKey key, byte[] iv) {
+        if (iv.length != REPLY_IV_LENGTH)
+            throw new IllegalArgumentException();
+        _AESReplyKeys[hop] = key;
+        _AESReplyIVs[hop] = iv;
+    }
+    
+    /**
+     *  Key to encrypt the reply sent for the tunnel creation crypto.
+     *
+     *  @return key or null
+     *  @throws IllegalArgumentException if iv not 16 bytes
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public SessionKey getAESReplyKey(int hop) { return _AESReplyKeys[hop]; }
+
+    /**
+     *  IV used to encrypt the reply sent for the tunnel creation crypto.
+     *
+     *  @return 16 bytes or null
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public byte[] getAESReplyIV(int hop) { return _AESReplyIVs[hop]; }
+
+    /**
      *  Checksum for blank record
      *  @since 0.9.48
      */
@@ -260,12 +300,12 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      *  @since 0.9.48
      */
     public void setChaChaReplyKeys(int hop, SessionKey key, byte[] ad) {
-        if (_replyKeys == null) {
-            _replyKeys = new SessionKey[_config.length];
-            _replyADs = new byte[_config.length][];
+        if (_ChaReplyKeys == null) {
+            _ChaReplyKeys = new SessionKey[_config.length];
+            _ChaReplyADs = new byte[_config.length][];
         }
-        _replyKeys[hop] = key;
-        _replyADs[hop] = ad;
+        _ChaReplyKeys[hop] = key;
+        _ChaReplyADs[hop] = ad;
     }
 
     /**
@@ -273,9 +313,9 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      *  @since 0.9.48
      */
     public boolean isEC(int hop) {
-        if (_replyKeys == null)
+        if (_ChaReplyKeys == null)
             return false;
-        return _replyKeys[hop] != null;
+        return _ChaReplyKeys[hop] != null;
     }
 
     /**
@@ -283,9 +323,9 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      *  @since 0.9.48
      */
     public SessionKey getChaChaReplyKey(int hop) {
-        if (_replyKeys == null)
+        if (_ChaReplyKeys == null)
             return null;
-        return _replyKeys[hop];
+        return _ChaReplyKeys[hop];
     }
 
     /**
@@ -293,9 +333,9 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      *  @since 0.9.48
      */
     public byte[] getChaChaReplyAD(int hop) {
-        if (_replyADs == null)
+        if (_ChaReplyADs == null)
             return null;
-        return _replyADs[hop];
+        return _ChaReplyADs[hop];
     }
 
     @Override

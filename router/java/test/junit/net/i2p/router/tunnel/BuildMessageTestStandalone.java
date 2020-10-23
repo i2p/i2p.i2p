@@ -172,10 +172,9 @@ public class BuildMessageTestStandalone extends TestCase {
             hop.setExpiration(now+10*60*1000);
             hop.setIVKey(ctx.keyGenerator().generateSessionKey());
             hop.setLayerKey(ctx.keyGenerator().generateSessionKey());
-            hop.setReplyKey(ctx.keyGenerator().generateSessionKey());
             byte iv[] = new byte[BuildRequestRecord.IV_SIZE];
             Arrays.fill(iv, (byte)i); // consistent for repeatability
-            hop.setReplyIV(iv);
+            cfg.setAESReplyKeys(i, ctx.keyGenerator().generateSessionKey(), iv);
             hop.setReceiveTunnelId(new TunnelId(i+1));
         }
         return cfg;

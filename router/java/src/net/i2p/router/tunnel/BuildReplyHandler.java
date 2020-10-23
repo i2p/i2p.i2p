@@ -108,9 +108,8 @@ public class BuildReplyHandler {
             end++;
         // do we need to adjust this for the endpoint?
         for (int j = start; j >= end; j--) {
-            HopConfig hopConfig = cfg.getConfig(j);
-            SessionKey replyKey = hopConfig.getReplyKey();
-            byte replyIV[] = hopConfig.getReplyIV();
+            SessionKey replyKey = cfg.getAESReplyKey(j);
+            byte replyIV[] = cfg.getAESReplyIV(j);
             if (log.shouldLog(Log.DEBUG)) {
                 log.debug(reply.getUniqueId() + ": Decrypting record " + recordNum + "/" + hop + "/" + j + " with replyKey " 
                           + replyKey.toBase64() + "/" + Base64.encode(replyIV) + ": " + cfg);

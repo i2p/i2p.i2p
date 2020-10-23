@@ -96,12 +96,10 @@ public abstract class BuildMessageGenerator {
             }
             SessionKey layerKey = hopConfig.getLayerKey();
             SessionKey ivKey = hopConfig.getIVKey();
-            SessionKey replyKey = hopConfig.getReplyKey();
-            byte iv[] = hopConfig.getReplyIV();
+            SessionKey replyKey = cfg.getAESReplyKey(hop);
+            byte iv[] = cfg.getAESReplyIV(hop);
             if (iv == null) {
-                iv = new byte[BuildRequestRecord.IV_SIZE];
-                ctx.random().nextBytes(iv);
-                hopConfig.setReplyIV(iv);
+                throw new IllegalStateException();
             }
             boolean isInGW = (cfg.isInbound() && (hop == 0));
             boolean isOutEnd = (!cfg.isInbound() && (hop + 1 >= cfg.getLength()));
@@ -152,9 +150,8 @@ public abstract class BuildMessageGenerator {
             // ok, now decrypt the record with all of the reply keys from cfg.getConfig(0) through hop-1
             int stop = (cfg.isInbound() ? 0 : 1);
             for (int j = hop-1; j >= stop; j--) {
-                HopConfig hopConfig = cfg.getConfig(j);
-                SessionKey key = hopConfig.getReplyKey();
-                byte iv[] = hopConfig.getReplyIV();
+                SessionKey key = cfg.getAESReplyKey(j);
+                byte iv[] = cfg.getAESReplyIV(j);
                 // corrupts the SDS
                 ctx.aes().decrypt(rec.getData(), 0, rec.getData(), 0, key, iv, TunnelBuildMessage.RECORD_SIZE);
             }
