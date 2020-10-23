@@ -888,7 +888,7 @@ public class TunnelControllerGroup implements ClientApp {
             if (key.startsWith(PREFIX)) {
                 if (_log.shouldDebug())
                     _log.debug("Found monolithic config file " + cfgFile);
-                return loadMonolithicConfig(config, cfgFile.getAbsolutePath());
+                return splitMonolithicConfig(config);
             } else {
                 if (_log.shouldDebug())
                     _log.debug("Found split config file " + cfgFile);
@@ -902,14 +902,14 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Load up the config data from the file, this is the old version for the
-     * numbered config file
+     * Split up the config data loaded from a single file, this is the old version for the
+     * numbered config file, into properties one for each tunnel.
      *
      * @return non-null, properties loaded, one for each tunnel
      * @throws IOException if unable to load from file
      * @since 0.9.42
      */
-    private List<Properties> loadMonolithicConfig(Properties config, String cfgFile) throws IOException {
+    private List<Properties> splitMonolithicConfig(Properties config) throws IOException {
         List<Properties> rv = new ArrayList<Properties>();
         int i = 0;
         while (true) {
