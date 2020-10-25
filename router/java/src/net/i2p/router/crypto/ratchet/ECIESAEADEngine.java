@@ -350,18 +350,6 @@ public final class ECIESAEADEngine {
      */
     private CloveSet decryptNewSession(byte data[], PrivateKey targetPrivateKey, RatchetSKM keyManager)
                                      throws DataFormatException {
-        HandshakeState state;
-        try {
-            state = new HandshakeState(HandshakeState.PATTERN_ID_IK, HandshakeState.RESPONDER, _edhThread);
-        } catch (GeneralSecurityException gse) {
-            throw new IllegalStateException("bad proto", gse);
-        }
-        state.getLocalKeyPair().setKeys(targetPrivateKey.getData(), 0,
-                                        targetPrivateKey.toPublic().getData(), 0);
-        state.start();
-        if (_log.shouldDebug())
-            _log.debug("State before decrypt new session: " + state);
-
         // Elg2
         byte[] xx = new byte[KEYLEN];
         System.arraycopy(data, 0, xx, 0, KEYLEN);
@@ -373,11 +361,30 @@ public final class ECIESAEADEngine {
             if (_log.shouldDebug())
                 _log.debug("Elg2 decode fail NS");
             data[KEYLEN - 1] = xx31;
-            state.destroy();
             return null;
         }
+        // fast MSB check for key < 2^255
+        if ((pk.getData()[KEYLEN - 1] & 0x80) != 0) {
+            if (_log.shouldDebug())
+                _log.debug("Bad PK decode fail NS");
+            data[KEYLEN - 1] = xx31;
+            return null;
+        }
+
         // rewrite in place, must restore below on failure
         System.arraycopy(pk.getData(), 0, data, 0, KEYLEN);
+
+        HandshakeState state;
+        try {
+            state = new HandshakeState(HandshakeState.PATTERN_ID_IK, HandshakeState.RESPONDER, _edhThread);
+        } catch (GeneralSecurityException gse) {
+            throw new IllegalStateException("bad proto", gse);
+        }
+        state.getLocalKeyPair().setKeys(targetPrivateKey.getData(), 0,
+                                        targetPrivateKey.toPublic().getData(), 0);
+        state.start();
+        if (_log.shouldDebug())
+            _log.debug("State before decrypt new session: " + state);
 
         int payloadlen = data.length - (KEYLEN + KEYLEN + MACLEN + MACLEN);
         byte[] payload = new byte[payloadlen];

@@ -672,11 +672,25 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             }
             changeState(State.IB_NTCP2_GOT_X);
             _received = 0;
-
             // replay check using encrypted key
             if (!_transport.isHXHIValid(_X)) {
                 _context.statManager().addRateData("ntcp.replayHXxorBIH", 1);
                 fail("Replay msg 1, eX = " + Base64.encode(_X, 0, KEY_SIZE));
+                return;
+            }
+
+            Hash h = _context.routerHash();
+            SessionKey bobHash = new SessionKey(h.getData());
+            // save encrypted data for CBC for msg 2
+            System.arraycopy(_X, KEY_SIZE - IV_SIZE, _prevEncrypted, 0, IV_SIZE);
+            _context.aes().decrypt(_X, 0, _X, 0, bobHash, _transport.getNTCP2StaticIV(), KEY_SIZE);
+            if (DataHelper.eqCT(_X, 0, ZEROKEY, 0, KEY_SIZE)) {
+                fail("Bad msg 1, X = 0");
+                return;
+            }
+            // fast MSB check for key < 2^255
+            if ((_X[KEY_SIZE - 1] & 0x80) != 0) {
+                fail("Bad PK msg 1");
                 return;
             }
 
@@ -687,15 +701,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             }
             _handshakeState.getLocalKeyPair().setKeys(_transport.getNTCP2StaticPrivkey(), 0,
                                                       _transport.getNTCP2StaticPubkey(), 0);
-            Hash h = _context.routerHash();
-            SessionKey bobHash = new SessionKey(h.getData());
-            // save encrypted data for CBC for msg 2
-            System.arraycopy(_X, KEY_SIZE - IV_SIZE, _prevEncrypted, 0, IV_SIZE);
-            _context.aes().decrypt(_X, 0, _X, 0, bobHash, _transport.getNTCP2StaticIV(), KEY_SIZE);
-            if (DataHelper.eqCT(_X, 0, ZEROKEY, 0, KEY_SIZE)) {
-                fail("Bad msg 1, X = 0");
-                return;
-            }
             byte options[] = new byte[OPTIONS1_SIZE];
             try {
                 _handshakeState.start();
