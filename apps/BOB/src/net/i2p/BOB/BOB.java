@@ -38,6 +38,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import net.i2p.client.I2PClient;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
 
@@ -111,7 +112,9 @@ import net.i2p.util.SimpleTimer2;
  * BOB, main command socket listener, launches the command parser engine.
  *
  * @author sponge
+ * @deprecated Please port applications to SAMv3
  */
+@Deprecated
 public class BOB implements Runnable, ClientApp {
 
 	public final static String PROP_CONFIG_LOCATION = "BOB.config";
@@ -140,6 +143,7 @@ public class BOB implements Runnable, ClientApp {
 
 	private volatile ServerSocket listener;
 	private volatile Thread _runner;
+	private volatile boolean _warned;
 
 	/**
 	 * Stop BOB gracefully
@@ -342,6 +346,12 @@ public class BOB implements Runnable, ClientApp {
 				}
 
 				if (g) {
+					if (!_warned) {
+						_warned = true;
+						String s = "BOB is deprecated. Please port applications to SAMv3.";
+						_context.logManager().getLog(BOB.class).logAlways(Log.WARN, s);
+						_log.warn(s);
+					}
 					DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
 					Thread t = new I2PAppThread(conn_c);
 					t.setName("BOB.DoCMDS " + i);
