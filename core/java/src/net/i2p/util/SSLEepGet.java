@@ -263,8 +263,9 @@ public class SSLEepGet extends EepGet {
         String proxyHost = "127.0.0.1";
         int proxyPort = 0;
         ProxyType ptype = ProxyType.NONE;
+        boolean doh = false;
         boolean error = false;
-        Getopt g = new Getopt("ssleepget", args, "p:y:sz");
+        Getopt g = new Getopt("ssleepget", args, "dp:y:sz");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -308,6 +309,10 @@ public class SSLEepGet extends EepGet {
                     noVerify = true;
                     break;
 
+                case 'd':
+                    doh = true;
+                    break;
+
                 case '?':
                 case ':':
                 default:
@@ -347,6 +352,8 @@ public class SSLEepGet extends EepGet {
             get._saveCerts = saveCerts;
         if (noVerify)
             get._bypassVerification = true;
+        if (doh)
+            get.forceDNSOverHTTPS(true);
         get._commandLine = true;
         get.addStatusListener(get.new CLIStatusListener(1024, 40));
         if(!get.fetch(45*1000, -1, 60*1000))
@@ -354,7 +361,8 @@ public class SSLEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("Usage: SSLEepGet [-psyz] https://url\n" +
+        System.err.println("Usage: SSLEepGet [-dpsyz] https://url\n" +
+                           "  -d use DNSOverHTTPS\n" +
                            "  -p proxyHost[:proxyPort]    // default port 8080 for HTTPS and 1080 for SOCKS; default localhost:4444 for I2P\n" +
                            "  -y HTTPS|SOCKS4|SOCKS5|I2P  // proxy type, default HTTPS if proxyHost is set\n" +
                            "  -s save unknown certs\n" +

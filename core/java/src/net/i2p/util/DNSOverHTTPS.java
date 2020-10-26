@@ -141,6 +141,16 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
      *  @return null if not found
      */
     public String lookup(String host, Type type) {
+        return lookup(host, type, null);
+    }
+
+    /**
+     *  Lookup in cache, then query servers
+     *  @param url null to query several default servers, or specify single server
+     *  @return null if not found
+     *  @since 0.9.48
+     */
+    private String lookup(String host, Type type, String url) {
         if (Addresses.isIPAddress(host))
             return host;
         if (host.startsWith("["))
@@ -175,7 +185,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
             if (rv != null)
                 return rv;
         }
-        return query(host, type);
+        return query(host, type, url);
     }
 
     public static void clearCaches() {
@@ -206,10 +216,15 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
 
     /**
      *  Query servers
+     *  @param url null to query several default servers, or specify single server
      *  @return null if not found
      */
-    private String query(String host, Type type) {
-        List<String> toQuery = new ArrayList<String>((type == Type.V6_ONLY) ? v6urls : v4urls);
+    private String query(String host, Type type, String url) {
+        List<String> toQuery;
+        if (url != null)
+            toQuery = Collections.singletonList(url);
+        else
+            toQuery = new ArrayList<String>((type == Type.V6_ONLY) ? v6urls : v4urls);
         Collections.shuffle(toQuery);
         final long timeout = System.currentTimeMillis() + OVERALL_TIMEOUT;
         if (type == Type.V4_ONLY || type == Type.V4_PREFERRED) {
@@ -430,7 +445,8 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     public static void main(String[] args) {
         Type type = Type.V4_PREFERRED;
         boolean error = false;
-        Getopt g = new Getopt("dnsoverhttps", args, "46fs");
+        String url = null;
+        Getopt g = new Getopt("dnsoverhttps", args, "46fsu:");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -451,6 +467,10 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                     type = Type.V6_PREFERRED;
                     break;
 
+                case 'u':
+                    url = g.getOptarg();
+                    break;
+
                 case '?':
                 case ':':
                 default:
@@ -467,18 +487,19 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
             System.exit(1);
         }
 
-        String url = args[g.getOptind()];
-        String result = (new DNSOverHTTPS(I2PAppContext.getGlobalContext())).lookup(url, type);
+        String hostname = args[g.getOptind()];
+        String result = (new DNSOverHTTPS(I2PAppContext.getGlobalContext())).lookup(hostname, type, url);
         if (result != null)
-            System.out.println(type + " lookup for " + url + " is " + result);
+            System.out.println(type + " lookup for " + hostname + " is " + result);
         else
-            System.err.println(type + " lookup failed for " + url);
+            System.err.println(type + " lookup failed for " + hostname);
     }
     
     private static void usage() {
         System.err.println("DNSOverHTTPS [-fs46] hostname\n" +
                            "             [-f] (IPv4 preferred) (default)\n" +
                            "             [-s] (IPv6 preferred)\n" +
+                           "             [-u 'https://host/dns-query?...&'] (request from this URL only)\n" +
                            "             [-4] (IPv4 only)\n" +
                            "             [-6] (IPv6 only)");
     }
