@@ -99,6 +99,7 @@ public class SSLEepGet extends EepGet {
     /** may be null if init failed */
     private SavingTrustManager _stm;
     private final ProxyType _proxyType;
+    private int _forceDoH;
 
     private static final String CERT_DIR = "certificates/ssl";
     private static final String PROP_USE_DNS_OVER_HTTPS = "eepget.useDNSOverHTTPS";
@@ -547,6 +548,15 @@ public class SSLEepGet extends EepGet {
         return new SSLState(_sslContext);
     }
 
+    /**
+     *  Override the config setting, force DNSoverHTTPS on or off
+     *  Call before the fetch.
+     *  @since 0.9.49
+     */
+    public void forceDNSOverHTTPS(boolean on) {
+        _forceDoH = on ? 2 : 1;
+    }
+
     ///// end of all the SSL stuff
     ///// start of overrides
 
@@ -732,10 +742,16 @@ public class SSLEepGet extends EepGet {
                     port = 443;
 
                 String originalHost = host;
-                boolean useDNSOverHTTPS = _context.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
+                boolean useDNSOverHTTPS;
+                if (_forceDoH == 2)
+                    useDNSOverHTTPS = true;
+                else if (_forceDoH == 1)
+                    useDNSOverHTTPS = false;
+                else
+                    useDNSOverHTTPS = _context.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
                 // This duplicates checks in DNSOverHTTPS.lookup() but do it here too so
                 // we don't even construct it if we don't need it
-                if (useDNSOverHTTPS && !host.equals("dns.google.com") && !Addresses.isIPAddress(host)) {
+                if (useDNSOverHTTPS && !host.equals("dns.google") && !Addresses.isIPAddress(host)) {
                     DNSOverHTTPS doh = new DNSOverHTTPS(_context, getSSLState());
                     String ip = doh.lookup(host);
                     if (ip != null)
