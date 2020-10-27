@@ -126,7 +126,18 @@ public class SSLEepGet extends EepGet {
      *  @since 0.8.2
      */
     public SSLEepGet(I2PAppContext ctx, OutputStream outputStream, String url, SSLState state) {
-        this(ctx, null, outputStream, url, null);
+        this(ctx, null, outputStream, url, -1, state);
+    }
+
+    /**
+     *  @param maxSize The maximum size of the response
+     *  @param state an SSLState retrieved from a previous SSLEepGet with getSSLState(), or null.
+     *               This makes repeated fetches from the same host MUCH faster,
+     *               and prevents repeated key store loads even for different hosts.
+     *  @since 0.9.48
+     */
+    public SSLEepGet(I2PAppContext ctx, OutputStream outputStream, String url, long maxSize, SSLState state) {
+        this(ctx, null, outputStream, url, maxSize, state);
     }
 
     /**
@@ -144,7 +155,7 @@ public class SSLEepGet extends EepGet {
      *  @since 0.9.9
      */
     public SSLEepGet(I2PAppContext ctx, String outputFile, String url, SSLState state) {
-        this(ctx, outputFile, null, url, null);
+        this(ctx, outputFile, null, url, -1, state);
     }
 
     /**
@@ -239,10 +250,10 @@ public class SSLEepGet extends EepGet {
      *               and prevents repeated key store loads even for different hosts.
      *  @since 0.9.9
      */
-    private SSLEepGet(I2PAppContext ctx, String outputFile, OutputStream outputStream, String url, SSLState state) {
+    private SSLEepGet(I2PAppContext ctx, String outputFile, OutputStream outputStream, String url, long maxSize, SSLState state) {
         // we're using this constructor:
         // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
-        super(ctx, false, null, -1, 0, -1, -1, outputFile, outputStream, url, true, null, null);
+        super(ctx, false, null, -1, 0, -1, maxSize, outputFile, outputStream, url, true, null, null);
         _proxyType = ProxyType.NONE;
         if (state != null && state.context != null)
             _sslContext = state.context;

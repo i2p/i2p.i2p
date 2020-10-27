@@ -52,6 +52,8 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     // ESR version of Firefox, same as Tor Browser
     private static final String UA_CLEARNET = "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0";
 
+    private static final int MAX_RESPONSE_SIZE = 2048;
+
     // Don't look up any of these TLDs
     // RFC 2606, 6303, 7393
     // https://www.iana.org/assignments/locally-served-dns-zones/locally-served-dns-zones.xhtml
@@ -270,7 +272,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
             String furl = url + "name=" + host + "&type=" + tcode;
             log("Fetching " + furl);
             baos.reset();
-            SSLEepGet eepget = new SSLEepGet(ctx, baos, furl, state);
+            SSLEepGet eepget = new SSLEepGet(ctx, baos, furl, MAX_RESPONSE_SIZE, state);
             eepget.forceDNSOverHTTPS(false);
             eepget.addHeader("User-Agent", UA_CLEARNET);
             if (ctx.isRouterContext())
@@ -512,6 +514,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                 type = Type.V6_ONLY;
                 totest = v6urls;
             }
+            Collections.sort(totest);
             DNSOverHTTPS doh = new DNSOverHTTPS(I2PAppContext.getGlobalContext());
             System.out.println("Testing " + totest.size() + " servers");
             int pass = 0, fail = 0;
