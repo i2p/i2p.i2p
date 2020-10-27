@@ -447,10 +447,11 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     }
 
     public static void main(String[] args) {
-        Type type = Type.V4_PREFERRED;
+        Type type = Type.V4_ONLY;
         boolean error = false;
+        boolean testall = false;
         String url = null;
-        Getopt g = new Getopt("dnsoverhttps", args, "46fsu:");
+        Getopt g = new Getopt("dnsoverhttps", args, "46fstu:");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -471,8 +472,18 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                     type = Type.V6_PREFERRED;
                     break;
 
+                case 't':
+                    if (url != null)
+                        error = true;
+                    else
+                        testall = true;
+                    break;
+
                 case 'u':
-                    url = g.getOptarg();
+                    if (testall || url != null)
+                        error = true;
+                    else
+                        url = g.getOptarg();
                     break;
 
                 case '?':
@@ -492,19 +503,46 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         }
 
         String hostname = args[g.getOptind()];
-        String result = (new DNSOverHTTPS(I2PAppContext.getGlobalContext())).lookup(hostname, type, url);
-        if (result != null)
-            System.out.println(type + " lookup for " + hostname + " is " + result);
-        else
-            System.err.println(type + " lookup failed for " + hostname);
+        if (testall) {
+            List<String> totest;
+            if (type == Type.V4_PREFERRED || type == Type.V4_ONLY) {
+                type = Type.V4_ONLY;
+                totest = v4urls;
+            } else {
+                type = Type.V6_ONLY;
+                totest = v6urls;
+            }
+            DNSOverHTTPS doh = new DNSOverHTTPS(I2PAppContext.getGlobalContext());
+            System.out.println("Testing " + totest.size() + " servers");
+            int pass = 0, fail = 0;
+            for (String test : totest) {
+                String result = doh.lookup(hostname, type, test);
+                if (result != null) {
+                    pass++;
+                    System.out.println(type + " lookup from " + test + " for " + hostname + " is " + result);
+                } else {
+                    fail++;
+                    System.err.println(type + " lookup from " + test + " failed for " + hostname);
+                }
+                clearCaches();
+            }
+            System.out.println("Test complete: " + pass + " pass, " + fail + " fail");
+        } else {
+            String result = (new DNSOverHTTPS(I2PAppContext.getGlobalContext())).lookup(hostname, type, url);
+            if (result != null)
+                System.out.println(type + " lookup for " + hostname + " is " + result);
+            else
+                System.err.println(type + " lookup failed for " + hostname);
+        }
     }
     
     private static void usage() {
-        System.err.println("DNSOverHTTPS [-fs46] hostname\n" +
-                           "             [-f] (IPv4 preferred) (default)\n" +
+        System.err.println("DNSOverHTTPS [-fstu46] hostname\n" +
+                           "             [-f] (IPv4 preferred)\n" +
                            "             [-s] (IPv6 preferred)\n" +
+                           "             [-t] (test all servers)\n" +
                            "             [-u 'https://host/dns-query?...&'] (request from this URL only)\n" +
-                           "             [-4] (IPv4 only)\n" +
+                           "             [-4] (IPv4 only) (default)\n" +
                            "             [-6] (IPv6 only)");
     }
 }
