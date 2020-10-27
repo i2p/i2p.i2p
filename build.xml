@@ -2451,7 +2451,7 @@
                 url="https://geti2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2462,7 +2462,7 @@
                 url="https://geti2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2474,7 +2474,7 @@
                 url="https://geti2p.net/en/docs/api/streaming">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2486,7 +2486,7 @@
                 url="https://geti2p.net/en/docs/api/streaming">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2499,7 +2499,7 @@
                 url="https://geti2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
