@@ -123,7 +123,7 @@ class TestJob extends JobImpl {
             // to client. false means don't force AES
             sess = MessageWrapper.generateSession(ctx, _pool.getSettings().getDestination(), testPeriod, false);
         } else {
-            // to router. AES.
+            // to router. AES or ChaCha.
             sess = MessageWrapper.generateSession(ctx, testPeriod);
         }
         if (sess == null) {

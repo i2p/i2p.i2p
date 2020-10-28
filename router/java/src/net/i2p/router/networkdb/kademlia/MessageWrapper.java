@@ -196,7 +196,7 @@ public class MessageWrapper {
      *  @since 0.9.7
      */
     public static OneTimeSession generateSession(RouterContext ctx, long expiration) {
-        return generateSession(ctx, ctx.sessionKeyManager(), expiration, true);
+        return generateSession(ctx, ctx.sessionKeyManager(), expiration, false);
     }
 
     /**
