@@ -2,6 +2,7 @@ package net.i2p.util;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,8 +46,15 @@ public class ObjectCounter<K> implements Serializable {
 
     /**
      *  @return set of objects with counts &gt; 0
+     *
+     * note that on Android ConcurrentMap.keySet() returns a Set instead of a
+     * keySetView. The workaround is to cast it to a map before returning the
+     * keySet on Android.
      */
     public Set<K> objects() {
+        if (System.getProperty("java.vendor").toUpperCase().contains("ANDROID")){
+            return ((Map< K, ?>)this.map).keySet();
+        }
         return this.map.keySet();
     }
 
