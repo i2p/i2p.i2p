@@ -13,6 +13,9 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.crypto.ratchet.MuxedSKM;
+import net.i2p.router.crypto.ratchet.RatchetSessionTag;
+import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -35,6 +38,7 @@ class TestJob extends JobImpl {
     private PooledTunnelCreatorConfig _otherTunnel;
     /** save this so we can tell the SKM to kill it if the test fails */
     private SessionTag _encryptTag;
+    private RatchetSessionTag _ratchetEncryptTag;
     private static final AtomicInteger __id = new AtomicInteger();
     private int _id;
     
@@ -130,13 +134,16 @@ class TestJob extends JobImpl {
             scheduleRetest();
             return;
         }
-        // null for ratchet
-        _encryptTag = sess.tag;
         GarlicMessage msg;
-        if (sess.tag != null) // AES
+        if (sess.tag != null) {
+            // AES
+            _encryptTag = sess.tag;
             msg = MessageWrapper.wrap(ctx, m, sess.key, sess.tag);
-        else // ratchet
+        } else {
+            // ratchet
+            _ratchetEncryptTag = sess.rtag;
             msg = MessageWrapper.wrap(ctx, m, sess.key, sess.rtag);
+        }
         if (msg == null) {
             // overloaded / unknown peers / etc
             scheduleRetest();
@@ -332,13 +339,30 @@ class TestJob extends JobImpl {
                 _log.warn("Tunnel test #" + _id + " timeout: found? " + _found);
             if (!_found) {
                 // don't clog up the SKM with old one-tag tagsets
+                SessionKeyManager skm;
                 if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
-                    SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());
-                    if (skm != null && _encryptTag != null)
-                        skm.consumeTag(_encryptTag);
-                    // else null tag for ratchet, let it expire
+                    skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());
                 } else {
-                    getContext().sessionKeyManager().consumeTag(_encryptTag);
+                    skm = getContext().sessionKeyManager();
+                }
+                if (skm != null) {
+                    if (_encryptTag != null) {
+                        // AES
+                        skm.consumeTag(_encryptTag);
+                    } else {
+                        // ratchet
+                        RatchetSKM rskm;
+                        if (skm instanceof RatchetSKM) {
+                            rskm = (RatchetSKM) skm;
+                        } else if (skm instanceof MuxedSKM) {
+                            rskm = ((MuxedSKM) skm).getECSKM();
+                        } else {
+                            // shouldn't happen
+                            rskm = null;
+                        }
+                        if (rskm != null)
+                            rskm.consumeTag(_ratchetEncryptTag);
+                    }
                 }
                 testFailed(getContext().clock().now() - _started);
             }
