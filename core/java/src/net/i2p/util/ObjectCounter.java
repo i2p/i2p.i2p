@@ -52,8 +52,8 @@ public class ObjectCounter<K> implements Serializable {
      * keySet on Android.
      */
     public Set<K> objects() {
-        if (System.getProperty("java.vendor").toUpperCase().contains("ANDROID")){
-            return ((Map< K, ?>)this.map).keySet();
+        if (SystemVersion.isAndroid()) {
+            return ((Map<K, ?>)this.map).keySet();
         }
         return this.map.keySet();
     }
