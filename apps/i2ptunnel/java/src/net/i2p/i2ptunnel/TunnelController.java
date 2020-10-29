@@ -213,7 +213,7 @@ public class TunnelController implements Logging {
      *                  overwrite existing ones)
      */
     public TunnelController(Properties config, String prefix, boolean createKey) {
-        _tunnel = new I2PTunnel();
+        _tunnel = new I2PTunnel(this);
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelController.class);
         setConfig(config, prefix);
         _messages = new ArrayList<String>(4);

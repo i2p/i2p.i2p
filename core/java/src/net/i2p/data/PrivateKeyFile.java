@@ -107,7 +107,7 @@ public class PrivateKeyFile {
         String signername = null;
         String signaction = null;
         String certfile = null;
-        int days = 365;
+        double days = 365;
         int mode = 0;
         boolean error = false;
         Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:p:b:y:z:w:");
@@ -178,7 +178,7 @@ public class PrivateKeyFile {
                 break;
 
             case 'd':
-                days = Integer.parseInt(g.getOptarg());
+                days = Double.parseDouble(g.getOptarg());
                 break;
 
             case 'r':
@@ -344,7 +344,7 @@ public class PrivateKeyFile {
                 SigningPublicKey tSigningPubKey = (SigningPublicKey) signingKeys[0];
                 SigningPrivateKey tSigningPrivKey = (SigningPrivateKey) signingKeys[1];
                 // set expires
-                long expires = System.currentTimeMillis() + (days * 24*60*60*1000L);
+                long expires = System.currentTimeMillis() + (long) (days * 24*60*60*1000L);
                 // sign
                 byte[] data = new byte[4 + 2 + tSigningPubKey.length()];
                 DataHelper.toLong(data, 0, 4, expires / 1000);
@@ -374,7 +374,7 @@ public class PrivateKeyFile {
                     java.security.PrivateKey jpriv = SigUtil.toJavaKey(priv);
                     if (signername == null)
                         signername = "example.i2p";
-                    X509Certificate cert = SelfSignedGenerator.generate(priv, signername, days);
+                    X509Certificate cert = SelfSignedGenerator.generate(priv, signername, (int) days);
                     java.security.cert.Certificate[] certs = { cert };
                     out = new FileOutputStream(certfile);
                     CertUtil.exportPrivateKey(jpriv, certs, out);

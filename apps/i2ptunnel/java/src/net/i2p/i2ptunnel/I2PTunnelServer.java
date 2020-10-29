@@ -307,12 +307,15 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (session.isOffline()) {
             long exp = session.getOfflineExpiration();
             long remaining = exp - getTunnel().getContext().clock().now();
-            if (remaining <= 0)
-                throw new IllegalArgumentException("Offline signature expired " + DataHelper.formatTime(exp));
+            if (remaining <= 0) {
+                String msg = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                _log.log(Log.CRIT, msg);
+                throw new IllegalArgumentException(msg);
+            }
             if (remaining < 60*24*60*60*1000L) {
-                String msg = "Offline signature expires in " + DataHelper.formatDuration(remaining);
+                String msg = "Offline signature for tunnel expires in " + DataHelper.formatDuration(remaining);
                 _log.logAlways(Log.WARN, msg);
-                l.log(msg);
+                l.log("WARNING: " + msg);
             }
         }
         while (session.isClosed()) {
@@ -641,9 +644,15 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 // so sockMgr will call ConnectionManager.setAllowIncomingConnections(true) again
                 i2pss = sockMgr.getServerSocket();
             } catch (I2PException ipe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error accepting - KILLING THE TUNNEL SERVER", ipe);
-                open = false;
+                String s = "Error accepting - KILLING THE TUNNEL SERVER";
+                _log.log(Log.CRIT, s, ipe);
+                l.log(s + ": " + ipe);
+                // Tell TunnelController so it will change state
+                TunnelController tc = getTunnel().getController();
+                if (tc != null)
+                    tc.stopTunnel();
+                else
+                    close(true);
                 if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 break;
             } catch (ConnectException ce) {

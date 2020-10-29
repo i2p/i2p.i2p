@@ -326,10 +326,16 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         // offline keys
         if (session.isOffline()) {
             LeaseSet2 ls2 = (LeaseSet2) leaseSet;
-            boolean ok = ls2.setOfflineSignature(session.getOfflineExpiration(), session.getTransientSigningPublicKey(),
+            long exp = session.getOfflineExpiration();
+            boolean ok = ls2.setOfflineSignature(exp, session.getTransientSigningPublicKey(),
                                                  session.getOfflineSignature());
             if (!ok) {
-                session.propogateError("Bad offline signature", new Exception());
+                String s;
+                if (exp <= _context.clock().now())
+                    s = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                else
+                    s = "Bad offline signature";
+                session.propogateError(s, new Exception());
                 session.destroySession();
             }
         }

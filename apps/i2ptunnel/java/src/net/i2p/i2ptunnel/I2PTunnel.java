@@ -95,6 +95,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private final long _tunnelId;
     private final Properties _clientOptions;
     private final Set<I2PSession> _sessions;
+    private final TunnelController _controller;
 
     public static final int PACKET_DELAY = 100;
 
@@ -153,6 +154,16 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     }
 
     /**
+     *  New standard constructor in router, with back ref to tc
+     *  @param tc may be null
+     *  @throws IllegalArgumentException
+     *  @since 0.9.48
+     */
+    public I2PTunnel(TunnelController tc) {
+        this(nocli_args, null, tc);
+    }
+
+    /**
      *  See usage() for options
      *  @throws IllegalArgumentException
      */
@@ -166,10 +177,21 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *  @throws IllegalArgumentException
      */
     public I2PTunnel(String[] args, ConnectionEventListener lsnr) {
+        this(args, lsnr, null);
+    }
+
+    /**
+     *  @param lsnr may be null
+     *  @param tc may be null
+     *  @throws IllegalArgumentException
+     *  @since 0.9.48
+     */
+    private I2PTunnel(String[] args, ConnectionEventListener lsnr, TunnelController tc) {
         super();
         _context = I2PAppContext.getGlobalContext(); // new I2PAppContext();
         _tunnelId = __tunnelId.incrementAndGet();
         _log = _context.logManager().getLog(I2PTunnel.class);
+        _controller = tc;
         // as of 0.8.4, include context properties
         Properties p = _context.getProperties();
         _clientOptions = p;
@@ -365,6 +387,13 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *  @return non-null, NOT a copy, do NOT modify for per-connection options
      */
     public Properties getClientOptions() { return _clientOptions; }
+    
+    /**
+     *  TunnelController that constructed this, or null.
+     *  @return controller or null
+     *  @since 0.9.48
+     */
+    TunnelController getController() { return _controller; }
     
     private void addtask(I2PTunnelTask tsk) {
         tsk.setTunnel(this);

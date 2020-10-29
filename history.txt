@@ -1,3 +1,21 @@
+2020-10-29 zzz
+ * Tunnels: Improved logging and handling of offline signature expiration
+
+2020-10-28 zzz
+ * Tunnels: Fix tunnel tests for ECIES routers
+
+2020-10-27 zzz
+ * Util:
+   - DNSOverHTTPS improvements
+   - Fix SSLEepGet handling of previous SSL state
+
+2020-10-26 zzz
+ * Util: Fix EepGet allowCaching parameter
+
+2020-10-25 zzz
+ * Router: Quick checks of eph. key MSB before Noise DH
+ * Tunnels: Additional checks on ECIES BRR to catch old/buggy routers
+
 2020-10-23 zzz
  * i2ptunnel: Remove mtn tunnel (new installs only)
  * Tunnels:

@@ -150,8 +150,11 @@ class I2CPMessageProducer {
         cfg.setOptions(p);
         if (isOffline) {
             long exp = session.getOfflineExpiration();
-            if (exp < _context.clock().now())
-                throw new I2PSessionException("Offline signature expired " + DataHelper.formatTime(exp));
+            if (exp < _context.clock().now()) {
+                String s = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                _log.log(Log.CRIT, s);
+                throw new I2PSessionException(s);
+            }
             cfg.setOfflineSignature(exp,
                                     session.getTransientSigningPublicKey(),
                                     session.getOfflineSignature());
@@ -218,7 +221,7 @@ class I2CPMessageProducer {
         msg.setDestination(dest);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " send message w/o session", new Exception());
+            _log.error(session.toString() + " cannot send message, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);
@@ -245,7 +248,7 @@ class I2CPMessageProducer {
         msg.setDestination(dest);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " send message w/o session", new Exception());
+            _log.error(session.toString() + " cannot send message, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);
@@ -412,7 +415,7 @@ class I2CPMessageProducer {
         msg.setLeaseSet(leaseSet);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " create LS w/o session", new Exception());
+            _log.error(session.toString() + " cannot create LS, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);
@@ -444,7 +447,7 @@ class I2CPMessageProducer {
         msg.setSessionConfig(cfg);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " update config w/o session", new Exception());
+            _log.error(session.toString() + " cannot update config, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);
