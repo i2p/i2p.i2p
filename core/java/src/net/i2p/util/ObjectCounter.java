@@ -46,15 +46,8 @@ public class ObjectCounter<K> implements Serializable {
 
     /**
      *  @return set of objects with counts &gt; 0
-     *
-     * note that on Android ConcurrentMap.keySet() returns a Set instead of a
-     * keySetView. The workaround is to cast it to a map before returning the
-     * keySet on Android.
      */
     public Set<K> objects() {
-        if (SystemVersion.isAndroid()) {
-            return ((Map<K, ?>)this.map).keySet();
-        }
         return this.map.keySet();
     }
 
