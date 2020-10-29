@@ -441,7 +441,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 		}
 		
 		// Hash the prologue value.
-		symmetric.mixHash(emptyPrologue, 0, 0);
+		// Now precalculated in SymmetricState.
+		//symmetric.mixHash(emptyPrologue, 0, 0);
 		
 		// Mix the pre-supplied public keys into the handshake hash.
 		if (isInitiator) {

@@ -36,15 +36,30 @@ import javax.crypto.ShortBufferException;
  */
 class SymmetricState implements Destroyable, Cloneable {
 	
-	// precalculated hash of the Noise name
-	private static final byte[] INIT_HASH_XK;
-	private static final byte[] INIT_HASH_IK;
-	private static final byte[] INIT_HASH_N;
+	// precalculated hash of the Noise name if over 32 bytes, else simply null-padded name
+	private static final byte[] INIT_CK_XK;
+	private static final byte[] INIT_CK_IK;
+	private static final byte[] INIT_CK_N;
+	// precalculated hash of the hash of the Noise name = mixHash(nullPrologue)
+	private static final byte[] INIT_HASH_XK = new byte[32];
+	private static final byte[] INIT_HASH_IK = new byte[32];
+	private static final byte[] INIT_HASH_N = new byte[32];
 
 	static {
-		INIT_HASH_XK = initHash(HandshakeState.protocolName);
-		INIT_HASH_IK = initHash(HandshakeState.protocolName2);
-		INIT_HASH_N = initHash(HandshakeState.protocolName3);
+		INIT_CK_XK = initHash(HandshakeState.protocolName);
+		INIT_CK_IK = initHash(HandshakeState.protocolName2);
+		INIT_CK_N = initHash(HandshakeState.protocolName3);
+		try {
+			MessageDigest md = Noise.createHash("SHA256");
+			md.update(INIT_CK_XK, 0, 32);
+			md.digest(INIT_HASH_XK, 0, 32);
+			md.update(INIT_CK_IK, 0, 32);
+			md.digest(INIT_HASH_IK, 0, 32);
+			md.update(INIT_CK_N, 0, 32);
+			md.digest(INIT_HASH_N, 0, 32);
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
@@ -99,17 +114,21 @@ class SymmetricState implements Destroyable, Cloneable {
 		h = new byte [hashLength];
 		prev_h = new byte [hashLength];
 		
-		byte[] initHash;
-		if (patternId.equals(HandshakeState.PATTERN_ID_XK))
+		byte[] initHash, initCK;
+		if (patternId.equals(HandshakeState.PATTERN_ID_XK)) {
+			initCK = INIT_CK_XK;
 			initHash = INIT_HASH_XK;
-		else if (patternId.equals(HandshakeState.PATTERN_ID_IK))
+		} else if (patternId.equals(HandshakeState.PATTERN_ID_IK)) {
+			initCK = INIT_CK_IK;
 			initHash = INIT_HASH_IK;
-		else if (patternId.equals(HandshakeState.PATTERN_ID_N))
+		} else if (patternId.equals(HandshakeState.PATTERN_ID_N)) {
+			initCK = INIT_CK_N;
 			initHash = INIT_HASH_N;
-		else
+		} else {
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		}
 		System.arraycopy(initHash, 0, h, 0, hashLength);
-		System.arraycopy(h, 0, ck, 0, hashLength);
+		System.arraycopy(initCK, 0, ck, 0, hashLength);
 	}
 
 	/**
