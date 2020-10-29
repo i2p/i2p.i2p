@@ -58,6 +58,7 @@ public class MetaInfo
   private final String name_utf8;
   private final List<List<String>> files;
   private final List<List<String>> files_utf8;
+  private final BitField paddingFileBitfield;
   private final List<Long> lengths;
   private final int piece_length;
   private final byte[] piece_hashes;
@@ -97,6 +98,9 @@ public class MetaInfo
     this.comment = null;
     this.created_by = created_by;
     this.creation_date = I2PAppContext.getGlobalContext().clock().now();
+
+    // TODO BEP 52 hybrid torrent with piece layers, meta version and file tree
+    this.paddingFileBitfield = null;
 
     // TODO if we add a parameter for other keys
     //if (other != null) {
@@ -261,6 +265,7 @@ public class MetaInfo
         files = null;
         files_utf8 = null;
         lengths = null;
+        paddingFileBitfield = null;
       }
     else
       {
@@ -276,8 +281,9 @@ public class MetaInfo
           throw new InvalidBEncodingException("zero size files list");
 
         List<List<String>> m_files = new ArrayList<List<String>>(size);
-        List<List<String>> m_files_utf8 = new ArrayList<List<String>>(size);
+        List<List<String>> m_files_utf8 = null;
         List<Long> m_lengths = new ArrayList<Long>(size);
+        BitField paddingBitfield = null;
         long l = 0;
         for (int i = 0; i < list.size(); i++)
           {
@@ -323,6 +329,7 @@ public class MetaInfo
             
             val = desc.get("path.utf-8");
             if (val != null) {
+                m_files_utf8 = new ArrayList<List<String>>(size);
                 path_list = val.getList();
                 path_length = path_list.size();
                 if (path_length > 0) {
@@ -333,11 +340,23 @@ public class MetaInfo
                     m_files_utf8.add(Collections.unmodifiableList(file));
                 }
             }
+
+            // BEP 47
+            val = desc.get("attr");
+            if (val != null) {
+                String s = val.getString();
+                if (s.contains("p")) {
+                    if (paddingBitfield == null)
+                        paddingBitfield = new BitField(size);
+                    paddingBitfield.set(i);
+                }
+            }
           }
         files = Collections.unmodifiableList(m_files);
-        files_utf8 = Collections.unmodifiableList(m_files_utf8);
+        files_utf8 = m_files_utf8 != null ? Collections.unmodifiableList(m_files_utf8) : null;
         lengths = Collections.unmodifiableList(m_lengths);
         length = l;
+        paddingFileBitfield = paddingBitfield;
       }
 
     info_hash = calculateInfoHash();
@@ -426,6 +445,16 @@ public class MetaInfo
   public List<List<String>> getFiles()
   {
     return files;
+  }
+
+  /**
+   * Is this file a padding file?
+   * @since 0.9.48
+   */
+  public boolean isPaddingFile(int filenum) {
+      if (paddingFileBitfield == null)
+          return false;
+      return paddingFileBitfield.get(filenum);
   }
 
   /**
@@ -563,6 +592,7 @@ public class MetaInfo
 
   /**
    * Returns the total length of the torrent in bytes.
+   * This includes any padding files.
    */
   public long getTotalLength()
   {
@@ -696,6 +726,8 @@ public class MetaInfo
           }
         info.put("files", new BEValue(l));
       }
+
+    // TODO BEP 52 meta version and file tree
 
     // TODO if we add the ability for other keys in the first constructor
     //if (otherInfo != null)
