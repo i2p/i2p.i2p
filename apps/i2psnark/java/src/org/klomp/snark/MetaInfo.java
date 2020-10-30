@@ -68,6 +68,7 @@ public class MetaInfo
   private final String comment;
   private final String created_by;
   private final long creation_date;
+  private final List<String> url_list;
   private Map<String, BEValue> infoMap;
   private int infoBytesLength;
 
@@ -79,10 +80,12 @@ public class MetaInfo
    *  @param lengths null for single-file torrent
    *  @param announce_list may be null
    *  @param created_by may be null
+   *  @param url_list may be null
+   *  @param comment may be null
    */
   MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
            int piece_length, byte[] piece_hashes, long length, boolean privateTorrent,
-           List<List<String>> announce_list, String created_by)
+           List<List<String>> announce_list, String created_by, List<String> url_list, String comment)
   {
     this.announce = announce;
     this.name = name;
@@ -95,9 +98,10 @@ public class MetaInfo
     this.length = length;
     this.privateTorrent = privateTorrent;
     this.announce_list = announce_list;
-    this.comment = null;
+    this.comment = comment;
     this.created_by = created_by;
     this.creation_date = I2PAppContext.getGlobalContext().clock().now();
+    this.url_list = url_list;
 
     // TODO BEP 52 hybrid torrent with piece layers, meta version and file tree
     this.paddingFileBitfield = null;
@@ -173,6 +177,18 @@ public class MetaInfo
                 sl2.add(bev2.getString());
             }
             this.announce_list.add(sl2);
+        }
+    }
+
+    // BEP 19
+    val = m.get("url-list");
+    if (val == null) {
+        this.url_list = null;
+    } else {
+        List<BEValue> bl1 = val.getList();
+        this.url_list = new ArrayList<String>(bl1.size());
+        for (BEValue bev : bl1) {
+            this.url_list.add(bev.getString());
         }
     }
 
@@ -400,6 +416,15 @@ public class MetaInfo
    */
   public List<List<String>> getAnnounceList() {
     return announce_list;
+  }
+
+  /**
+   * Returns a list of urls or null.
+   *
+   * @since 0.9.48
+   */
+  public List<String> getWebSeedURLs() {
+    return url_list;
   }
 
   /**
@@ -640,6 +665,8 @@ public class MetaInfo
         if (announce_list != null)
             m.put("announce-list", announce_list);
         // misc. optional  top-level stuff
+        if (url_list != null)
+            m.put("url-list", url_list);
         if (comment != null)
             m.put("comment", comment);
         if (created_by != null)
@@ -765,7 +792,9 @@ public class MetaInfo
       boolean error = false;
       String created_by = null;
       String announce = null;
-      Getopt g = new Getopt("Storage", args, "a:c:");
+      String url = null;
+      String comment = null;
+      Getopt g = new Getopt("Storage", args, "a:c:m:w:");
       try {
           int c;
           while ((c = g.getopt()) != -1) {
@@ -776,6 +805,14 @@ public class MetaInfo
 
               case 'c':
                   created_by = g.getOptarg();
+                  break;
+
+              case 'm':
+                  comment = g.getOptarg();
+                  break;
+
+              case 'w':
+                  url = g.getOptarg();
                   break;
 
               case '?':
@@ -790,7 +827,8 @@ public class MetaInfo
           error = true;
       }
       if (error || args.length - g.getOptind() <= 0) {
-          System.err.println("Usage: MetaInfo [-a announceURL] [-c created-by] file.torrent [file2.torrent...]");
+          System.err.println("Usage: MetaInfo [-a announceURL] [-c created-by] [-m comment] [-w web-seed-url] file.torrent [file2.torrent...]");
+          System.exit(1);
       }
       for (int i = g.getOptind(); i < args.length; i++) {
           InputStream in = null;
@@ -798,16 +836,21 @@ public class MetaInfo
           try {
               in = new FileInputStream(args[i]);
               MetaInfo meta = new MetaInfo(in);
-              System.out.println(args[i] + "\nInfoHash: " + I2PSnarkUtil.toHex(meta.getInfoHash()) +
-                                 "\nAnnounce: " + meta.getAnnounce() +
-                                 "\nCreated By: " + meta.getCreatedBy());
-              if (created_by != null || announce != null) {
+              System.out.println(args[i] +
+                                 "\nInfoHash:     " + I2PSnarkUtil.toHex(meta.getInfoHash()) +
+                                 "\nAnnounce:     " + meta.getAnnounce() +
+                                 "\nWebSeed URLs: " + meta.getWebSeedURLs() +
+                                 "\nCreated By:   " + meta.getCreatedBy() +
+                                 "\nComment:      " + meta.getComment());
+              if (created_by != null || announce != null || url != null || comment != null) {
                   String cb = created_by != null ? created_by : meta.getCreatedBy();
                   String an = announce != null ? announce : meta.getAnnounce();
-                  // changes/adds creation date, loses comment
+                  String cm = comment != null ? comment : meta.getComment();
+                  List<String> urls = url != null ? Collections.singletonList(url) : meta.getWebSeedURLs();
+                  // changes/adds creation date
                   MetaInfo meta2 = new MetaInfo(an, meta.getName(), null, meta.getFiles(), meta.getLengths(),
                                                 meta.getPieceLength(0), meta.getPieceHashes(), meta.getTotalLength(), meta.isPrivate(),
-                                                meta.getAnnounceList(), cb);
+                                                meta.getAnnounceList(), cb, urls, cm);
                   java.io.File from = new java.io.File(args[i]);
                   java.io.File to = new java.io.File(args[i] + ".bak");
                   if (net.i2p.util.FileUtil.copy(from, to, true, false)) {
@@ -815,9 +858,12 @@ public class MetaInfo
                       out.write(meta2.getTorrentData());
                       out.close();
                       System.out.println("Modified " + from + " and backed up old file to " + to);
-                      System.out.println(args[i] + "\nInfoHash: " + I2PSnarkUtil.toHex(meta2.getInfoHash()) +
-                                         "\nAnnounce: " + meta2.getAnnounce() +
-                                         "\nCreated By: " + meta2.getCreatedBy());
+                      System.out.println(args[i] +
+                                         "\nInfoHash:     " + I2PSnarkUtil.toHex(meta2.getInfoHash()) +
+                                         "\nAnnounce:     " + meta2.getAnnounce() +
+                                         "\nWebSeed URLs: " + meta2.getWebSeedURLs() +
+                                         "\nCreated By:   " + meta2.getCreatedBy() +
+                                         "\nComment:      " + meta2.getComment());
                   } else {
                       System.out.println("Failed backup of " + from + " to " + to);
                   }

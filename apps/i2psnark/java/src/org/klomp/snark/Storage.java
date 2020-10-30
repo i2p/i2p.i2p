@@ -210,7 +210,7 @@ public class Storage implements Closeable
     byte[] piece_hashes = fast_digestCreate();
     metainfo = new MetaInfo(announce, baseFile.getName(), null, files,
                             lengthsList, piece_size, piece_hashes, total, privateTorrent,
-                            announce_list, created_by);
+                            announce_list, created_by, null, null);
 
   }
 
