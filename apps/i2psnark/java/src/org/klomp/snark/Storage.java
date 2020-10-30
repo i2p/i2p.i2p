@@ -145,6 +145,30 @@ public class Storage implements Closeable
                  boolean privateTorrent, StorageListener listener)
     throws IOException
   {
+      this(util, baseFile, announce, announce_list, created_by, privateTorrent, null, null, listener);
+  }
+
+  /**
+   * Creates a storage from the existing file or directory.
+   * Creates an in-memory metainfo but does not save it to
+   * a file, caller must do that.
+   *
+   * Creates the metainfo, this may take a LONG time. BLOCKING.
+   *
+   * @param announce may be null
+   * @param listener may be null
+   * @param created_by may be null
+   * @param url_list may be null
+   * @param comment may be null
+   * @throws IOException when creating and/or checking files fails.
+   * @since 0.9.48
+   */
+  public Storage(I2PSnarkUtil util, File baseFile, String announce,
+                 List<List<String>> announce_list,
+                 String created_by,
+                 boolean privateTorrent, List<String> url_list, String comment, StorageListener listener)
+    throws IOException
+  {
     _util = util;
     _base = baseFile;
     _log = util.getContext().logManager().getLog(Storage.class);
@@ -210,7 +234,7 @@ public class Storage implements Closeable
     byte[] piece_hashes = fast_digestCreate();
     metainfo = new MetaInfo(announce, baseFile.getName(), null, files,
                             lengthsList, piece_size, piece_hashes, total, privateTorrent,
-                            announce_list, created_by, null, null);
+                            announce_list, created_by, url_list, comment);
 
   }
 
@@ -1685,7 +1709,9 @@ public class Storage implements Closeable
       boolean error = false;
       String created_by = null;
       String announce = null;
-      Getopt g = new Getopt("Storage", args, "a:c:");
+      List<String> url_list = null;
+      String comment = null;
+      Getopt g = new Getopt("Storage", args, "a:c:m:w:");
       try {
           int c;
           while ((c = g.getopt()) != -1) {
@@ -1696,6 +1722,16 @@ public class Storage implements Closeable
 
               case 'c':
                   created_by = g.getOptarg();
+                  break;
+
+              case 'm':
+                  comment = g.getOptarg();
+                  break;
+
+              case 'w':
+                  if (url_list == null)
+                      url_list = new ArrayList<String>();
+                  url_list.add(g.getOptarg());
                   break;
 
               case '?':
@@ -1710,7 +1746,7 @@ public class Storage implements Closeable
           error = true;
       }
       if (error || args.length - g.getOptind() != 1) {
-          System.err.println("Usage: Storage [-a announceURL] [-c created-by] file-or-dir");
+          System.err.println("Usage: Storage [-a announceURL] [-c created-by] [-m comment] [-w webseed-url]* file-or-dir");
           System.exit(1);
       }
       File base = new File(args[g.getOptind()]);
@@ -1719,7 +1755,7 @@ public class Storage implements Closeable
       File file = null;
       FileOutputStream out = null;
       try {
-          Storage storage = new Storage(util, base, announce, null, created_by, false, null);
+          Storage storage = new Storage(util, base, announce, null, created_by, false, url_list, comment, null);
           MetaInfo meta = storage.getMetaInfo();
           file = new File(storage.getBaseName() + ".torrent");
           out = new FileOutputStream(file);

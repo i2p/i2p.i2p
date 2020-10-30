@@ -141,6 +141,8 @@
                 <arg value="http://tracker2.postman.i2p/announce.php" />
                 <arg value="-c" />
                 <arg value="${build.built-by}" />
+                <arg value="-m" />
+                <arg value="Official torrent for version ${full.version}" />
                 <arg value="@{file}" />
             </java>
         </sequential>
@@ -1685,6 +1687,12 @@
     <target name="signed-updater200WithJettyAndGeoIP" depends="-pre-sign, updater200WithJettyAndGeoIP, -sign-update" />
     <target name="signed-updater200WithJavadoc" depends="-pre-sign, updater200WithJavadoc, -sign-update" />
     <target name="signed-updater200WithJavadocAndJetty" depends="-pre-sign, updater200WithJavadocAndJetty, -sign-update" />
+
+    <!-- just to test the torrent creation macro -->
+    <target name="updater-torrent" depends="updater">
+        <copy file="i2pupdate.zip" tofile="i2pupdate-${full.version}.zip" />
+        <mktorrent file="i2pupdate-${full.version}.zip" />
+    </target>
 
     <target name="zipit" depends="getReleaseNumber">
         <!--
