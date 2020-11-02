@@ -307,8 +307,13 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (session.isOffline()) {
             long exp = session.getOfflineExpiration();
             long remaining = exp - getTunnel().getContext().clock().now();
-            if (remaining <= 0) {
-                String msg = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+            // if expires before the LS expires...
+            if (remaining <= 10*60*1000) {
+                String msg;
+                if (remaining > 0)
+                    msg = "Offline signature for tunnel expires " + DataHelper.formatTime(exp);
+                else
+                    msg = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
                 _log.log(Log.CRIT, msg);
                 throw new IllegalArgumentException(msg);
             }

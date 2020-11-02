@@ -20,6 +20,7 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.KeyCertificate;
 import net.i2p.data.PrivateKey;
@@ -35,6 +36,7 @@ import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -56,6 +58,7 @@ public class TunnelController implements Logging {
     private final List<String> _messages;
     private List<I2PSession> _sessions;
     private volatile TunnelState _state;
+    private volatile SimpleTimer2.TimedEvent _pkfc;
 
     /** @since 0.9.19 */
     private enum TunnelState {
@@ -485,6 +488,14 @@ public class TunnelController implements Logging {
         }
         acquire();
         changeState(TunnelState.RUNNING);
+        if ((!isClient() || getPersistentClientKey()) && getIsOfflineKeys()) {
+            File f = getPrivateKeyFile();
+            long time = f.lastModified();
+            if (time > 0) {
+                _pkfc = new PKFChecker(f, time);
+                _pkfc.schedule(5*60*1000L);
+            }
+        }
     }
 
     private void startHttpClient() {
@@ -771,6 +782,10 @@ public class TunnelController implements Logging {
                 return;
             changeState(TunnelState.STOPPING);
         }
+        if (_pkfc != null) {
+            _pkfc.cancel();
+            _pkfc = null;
+        }
         // I2PTunnel removes the session in close(),
         // so save the sessions to pass to release() and TCG
         Collection<I2PSession> sessions = getAllSessions();
@@ -791,6 +806,10 @@ public class TunnelController implements Logging {
                 return;
             changeState(TunnelState.DESTROYING);
         }
+        if (_pkfc != null) {
+            _pkfc.cancel();
+            _pkfc = null;
+        }
         // I2PTunnel removes the session in close(),
         // so save the sessions to pass to release() and TCG
         Collection<I2PSession> sessions = getAllSessions();
@@ -800,7 +819,16 @@ public class TunnelController implements Logging {
     }
 
     public void restartTunnel() {
-        stopTunnel();
+        TunnelState oldState;
+        synchronized (this) {
+            oldState = _state;
+            if (oldState != TunnelState.STOPPED)
+                stopTunnel();
+        }
+        if (oldState != TunnelState.STOPPED) {
+            long ms = _tunnel.getContext().isRouterContext() ? 100 : 500;
+            try { Thread.sleep(ms); } catch (InterruptedException ie) {}
+        }
         startTunnel();
     }
 
@@ -1145,14 +1173,12 @@ public class TunnelController implements Logging {
      *  @since 0.9.17
      */
     public Destination getDestination() {
-        if (_tunnel != null) {
-            List<I2PSession> sessions = _tunnel.getSessions();
-            for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = sessions.get(i);
-                Destination dest = session.getMyDestination();
-                if (dest != null)
-                    return dest;
-            }
+        List<I2PSession> sessions = _tunnel.getSessions();
+        for (int i = 0; i < sessions.size(); i++) {
+            I2PSession session = sessions.get(i);
+            Destination dest = session.getMyDestination();
+            if (dest != null)
+                return dest;
         }
         return null;
     }
@@ -1163,11 +1189,9 @@ public class TunnelController implements Logging {
      *  @since 0.9.40
      */
     public boolean getIsOfflineKeys() {
-        if (_tunnel != null) {
-            List<I2PSession> sessions = _tunnel.getSessions();
-            if (!sessions.isEmpty())
-                return sessions.get(0).isOffline();
-        }
+        List<I2PSession> sessions = _tunnel.getSessions();
+        if (!sessions.isEmpty())
+            return sessions.get(0).isOffline();
         return false;
     }
 
@@ -1343,5 +1367,86 @@ public class TunnelController implements Logging {
     @Override
     public String toString() {
         return "TC " + getType() + ' ' + getName() + " for " + _tunnel + ' ' + _state;
+    }
+
+    /**
+     * Periodically check for an updated offline-signed private key file.
+     * Log if about to expire.
+     *
+     * @since 0.9.48
+     */
+    private class PKFChecker extends SimpleTimer2.TimedEvent {
+        private final File f;
+        private final long stamp;
+        private boolean wasRun;
+
+        /** caller must schedule */
+        public PKFChecker(File f, long stamp) {
+            super(SimpleTimer2.getInstance());
+            this.f = f;
+            this.stamp = stamp;
+        }
+
+        public void timeReached() {
+            if (!getIsRunning() && !getIsStarting())
+                return;
+            List<I2PSession> sessions = _tunnel.getSessions();
+            if (!sessions.isEmpty()) {
+                I2PSession sess = sessions.get(0);
+                long delay;
+                if (sess.isOffline()) {
+                    if (f.lastModified() > stamp) {
+                        String msg = "Private key file with offline signature updated, restarting tunnel";
+                        _log.logAlways(Log.WARN, msg);
+                        _tunnel.log(msg);
+                        restartTunnel();
+                        return;
+                    }
+                    long exp = sess.getOfflineExpiration();
+                    I2PAppContext ctx = _tunnel.getContext();
+                    long now = ctx.clock().now();
+                    long remaining = exp - now;
+                    if (remaining > 10*365*24*60*60*1000L) {
+                        // don't bother
+                        return;
+                    }
+                    if (remaining <= 10*60*1000) {
+                        // can't sign another LS
+                        String msg;
+                        if (remaining > 0)
+                            msg = "Offline signature for tunnel expires " + DataHelper.formatTime(exp);
+                        else
+                            msg = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                        _log.log(Log.CRIT, msg);
+                        _tunnel.log(msg);
+                        stopTunnel();
+                        return;
+                    }
+                    if (remaining < 24*60*60*1000L) {
+                        delay = Math.min(60*60*1000L, remaining - (9*60*1000));
+                    } else if (remaining < 7*24*60*60*1000L) {
+                        delay = 6*60*60*1000L;
+                        if (!wasRun) {
+                            delay += ctx.random().nextLong(4 * delay);
+                            wasRun = true;
+                        }
+                    } else {
+                        delay = 24*60*60*1000L;
+                        if (!wasRun) {
+                            delay += ctx.random().nextLong(delay);
+                            wasRun = true;
+                        }
+                    }
+                    if (remaining < 30*24*60*60*1000L) {
+                        String msg = "Offline signature for tunnel expires in " + DataHelper.formatDuration(remaining);
+                        _log.logAlways(Log.WARN, msg);
+                        _tunnel.log("WARNING: " + msg);
+                    }
+                } else {
+                    delay = 24*60*60*1000L;
+                }
+                schedule(delay);
+            }
+        }
     }
 }
