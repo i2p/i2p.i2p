@@ -37,20 +37,6 @@ import net.i2p.data.DataHelper;
 public class BEncoder
 {
 
-  public static byte[] bencode(Object o) throws IllegalArgumentException
-  {
-    try
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bencode(o, baos);
-        return baos.toByteArray();
-      }
-    catch (IOException ioe)
-      {
-        throw new InternalError(ioe.toString());
-      }
-  }
-
   public static void bencode(Object o, OutputStream out)
     throws IOException, IllegalArgumentException
   {
@@ -72,38 +58,10 @@ public class BEncoder
       throw new IllegalArgumentException("Cannot bencode: " + o.getClass());
   }
 
-  public static byte[] bencode(String s)
-  {
-    try
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bencode(s, baos);
-        return baos.toByteArray();
-      }
-    catch (IOException ioe)
-      {
-        throw new InternalError(ioe.toString());
-      }
-  }
-
   public static void bencode(String s, OutputStream out) throws IOException
   {
     byte[] bs = s.getBytes("UTF-8");
     bencode(bs, out);
-  }
-
-  public static byte[] bencode(Number n)
-  {
-    try
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bencode(n, baos);
-        return baos.toByteArray();
-      }
-    catch (IOException ioe)
-      {
-        throw new InternalError(ioe.toString());
-      }
   }
 
   public static void bencode(Number n, OutputStream out) throws IOException
@@ -114,20 +72,6 @@ public class BEncoder
     out.write('e');
   }
 
-  public static byte[] bencode(List<?> l)
-  {
-    try
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bencode(l, baos);
-        return baos.toByteArray();
-      }
-    catch (IOException ioe)
-      {
-        throw new InternalError(ioe.toString());
-      }
-  }
-
   public static void bencode(List<?> l, OutputStream out) throws IOException
   {
     out.write('l');
@@ -135,20 +79,6 @@ public class BEncoder
     while (it.hasNext())
       bencode(it.next(), out);
     out.write('e');
-  }
-
-  public static byte[] bencode(byte[] bs)
-  {
-    try
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bencode(bs, baos);
-        return baos.toByteArray();
-      }
-    catch (IOException ioe)
-      {
-        throw new InternalError(ioe.toString());
-      }
   }
 
   public static void bencode(byte[] bs, OutputStream out) throws IOException
@@ -216,7 +146,8 @@ public class BEncoder
     if (l != null) {
         // Keys must be sorted. XXX - This is not the correct order.
         // Spec says to sort by bytes, not lexically
-        Collections.sort(l);
+        if (l.size() > 1)
+            Collections.sort(l);
         for (String key : l) {
             bencode(key, out);
             bencode(m.get(key), out);
@@ -224,7 +155,8 @@ public class BEncoder
     } else if (b != null) {
         // Works for arrays of equal lengths, otherwise is probably not
         // what the bittorrent spec intends.
-        Collections.sort(b, new BAComparator());
+        if (b.size() > 1)
+            Collections.sort(b, new BAComparator());
         for (byte[] key : b) {
             bencode(key, out);
             bencode(m.get(key), out);
