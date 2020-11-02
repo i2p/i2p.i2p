@@ -2671,6 +2671,16 @@ a, a:link, th, td, button, input, select, textarea {
      margin-right: 3px;
 }
 
+.video-wrapper {
+     height: 100%;
+     width: 100%;
+}
+
+.video {
+     max-height: 95vh;
+     max-width: 80vw;
+}
+
 .info_tracker {
      margin: 0 4px 0 2px;
      padding: 1px 6px 1px 18px;

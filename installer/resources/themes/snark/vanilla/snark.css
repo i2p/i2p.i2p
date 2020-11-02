@@ -3153,6 +3153,16 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img 
      padding-bottom: 8px;
 }
 
+.video-wrapper {
+     height: 100%;
+     width: 100%;
+}
+
+.video {
+     max-height: 95vh;
+     max-width: 80vw;
+}
+
 .snarkFileStatus {
      font-size: 0;
      text-align: center;

@@ -3439,14 +3439,14 @@ public class I2PSnarkServlet extends BasicServlet {
                     if (isAudio)
                         buf.append("<audio");
                     else
-                        buf.append("<video");
+                        buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
                     // strip trailing slash
                     String path = base.substring(0, base.length() - 1);
                     buf.append(" controls><source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
                     if (isAudio)
                         buf.append("</audio>");
                     else
-                        buf.append("</video>");
+                        buf.append("</video></div>");
                 }
             }
             if (er || ec)
@@ -3659,7 +3659,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     if (isAudio)
                         buf.append("<audio");
                     else
-                        buf.append("<video");
+                        buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
                     buf.append(" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
                 }
                 buf.append("<a href=\"").append(ppath).append("\">");
@@ -3673,7 +3673,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isAudio)
                     buf.append("</audio>");
                 else if (isVideo)
-                    buf.append("</video>");
+                    buf.append("</video></div>");
             } else {
                 buf.append(toImg(icon));
             }

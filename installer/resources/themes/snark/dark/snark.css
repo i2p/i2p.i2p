@@ -3108,6 +3108,16 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img,
      float: left;
 }
 
+.video-wrapper {
+     height: 100%;
+     width: 100%;
+}
+
+.video {
+     max-height: 95vh;
+     max-width: 80vw;
+}
+
 th a img {
      max-height: 16px !important;
 }
