@@ -1,4 +1,15 @@
+2020-11-02 zzz
+ * I2CP: Remove tunnels immediately on client disconnect
+ * i2psnark: Limit max size of embedded video
+ * i2ptunnel: Restart tunnel if offline-signed private key file updated
+
+2020-10-30 zzz
+ * i2psnark: MetaInfo support for url-list (prep for BEP 19)
+ * Util: Fix NPE in EepGet CLI callback via PartialEepGet
+
 2020-10-29 zzz
+ * Crypto: Precalculate Noise initial hashes
+ * i2psnark: Store BEP 47 padding file info
  * Tunnels: Improved logging and handling of offline signature expiration
 
 2020-10-28 zzz
