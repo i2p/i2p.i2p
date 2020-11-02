@@ -534,8 +534,20 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
 
     /**
+     *  Must be called AFTER deregistration by the client manager.
+     *
+     *  @since 0.9.48
+     */
+    public void removeTunnels(Destination dest) {
+        removeTunnels(dest.calculateHash());
+    }
+
+    /**
      *  This will be called twice, once by the inbound and once by the outbound pool.
      *  Synched with buildTunnels() above.
+     *
+     *  Must be called AFTER deregistration by the client manager.
+     *
      */
     public synchronized void removeTunnels(Hash destination) {
         if (destination == null) return;

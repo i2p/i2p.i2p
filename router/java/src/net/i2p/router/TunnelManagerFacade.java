@@ -149,6 +149,12 @@ public interface TunnelManagerFacade extends Service {
     public void buildTunnels(Destination client, ClientTunnelSettings settings);
 
     /**
+     *  Must be called AFTER deregistration by the client manager.
+     *  @since 0.9.48
+     */
+    public void removeTunnels(Destination client);
+
+    /**
      *  Add another destination to the same tunnels.
      *  Must have same encryption key and a different signing key.
      *  @throws IllegalArgumentException if not

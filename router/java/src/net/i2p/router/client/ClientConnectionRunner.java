@@ -212,6 +212,9 @@ class ClientConnectionRunner {
         _manager.unregisterConnection(this);
         // netdb may be null in unit tests
         if (_context.netDb() != null) {
+            // Note that if the client sent us a destroy message,
+            // removeSession() was called just before this, and
+            // _sessions will be empty.
             for (SessionParams sp : _sessions.values()) {
                 LeaseSet ls = sp.currentLeaseSet;
                 if (ls != null)
@@ -222,6 +225,10 @@ class ClientConnectionRunner {
                     _context.netDb().unpublish(ls);
                 if (!sp.isPrimary)
                     _context.tunnelManager().removeAlias(sp.dest);
+            }
+            for (SessionParams sp : _sessions.values()) {
+                if (sp.isPrimary)
+                    _context.tunnelManager().removeTunnels(sp.dest);
             }
         }
         synchronized (_alreadyProcessed) {
@@ -455,7 +462,9 @@ class ClientConnectionRunner {
                 if (ls != null)
                     _context.netDb().unpublish(ls);
                 isPrimary = sp.isPrimary;
-                if (!isPrimary)
+                if (isPrimary)
+                    _context.tunnelManager().removeTunnels(sp.dest);
+                else
                     _context.tunnelManager().removeAlias(sp.dest);
                 break;
             }
@@ -475,6 +484,7 @@ class ClientConnectionRunner {
                     _context.netDb().unpublish(ls);
                 _context.tunnelManager().removeAlias(sp.dest);
             }
+            _sessions.clear();
         }
     }
 
