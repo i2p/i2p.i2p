@@ -597,10 +597,15 @@ class NetDbRenderer {
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;
                     buf.append("&nbsp;&nbsp;<b>Unpublished? </b>").append(ls2.isUnpublished());
-                    boolean isOff = ls2.isOffline();
-                    buf.append("&nbsp;&nbsp;<b>Offline signed? </b>").append(isOff);
-                    if (isOff)
+                    if (ls2.isOffline()) {
+                        buf.append("&nbsp;&nbsp;<b>Offline signed: </b>");
+                        exp = ls2.getTransientExpiration() - now;
+                        if (exp > 0)
+                            buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
+                        else
+                            buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
                         buf.append("&nbsp;&nbsp;<b>Type: </b>").append(ls2.getTransientSigningKey().getType());
+                    }
                 }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");

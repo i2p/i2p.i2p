@@ -253,6 +253,15 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     /**
+     *  Absolute time, not time from now.
+     *  @return transient expiration time or 0 if not offline signed
+     *  @since 0.9.48
+     */
+    public long getTransientExpiration() {
+        return _transientExpires;
+    }
+
+    /**
      *  Destination must be previously set.
      *
      *  @param expires absolute ms
