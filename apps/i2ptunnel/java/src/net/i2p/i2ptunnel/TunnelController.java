@@ -488,13 +488,11 @@ public class TunnelController implements Logging {
         }
         acquire();
         changeState(TunnelState.RUNNING);
-        if ((!isClient() || getPersistentClientKey()) && getIsOfflineKeys()) {
+        if ((!isClient() || getPersistentClientKey()) && getIsOfflineKeysAnySession()) {
             File f = getPrivateKeyFile();
-            long time = f.lastModified();
-            if (time > 0) {
-                _pkfc = new PKFChecker(f, time);
-                _pkfc.schedule(5*60*1000L);
-            }
+            File f2 = getAlternatePrivateKeyFile();
+            _pkfc = new PKFChecker(f, f2);
+            _pkfc.schedule(5*60*1000L);
         }
     }
 
@@ -1185,13 +1183,31 @@ public class TunnelController implements Logging {
 
     /**
      *  Returns false if not running.
-     *  @return true if offline keys or not running
+     *  @return true if the primary session has offline keys
      *  @since 0.9.40
      */
     public boolean getIsOfflineKeys() {
         List<I2PSession> sessions = _tunnel.getSessions();
         if (!sessions.isEmpty())
             return sessions.get(0).isOffline();
+        return false;
+    }
+
+    /**
+     *  Returns false if not running.
+     *  @return true if ANY session or subsession has offline keys
+     *  @since 0.9.48
+     */
+    private boolean getIsOfflineKeysAnySession() {
+        List<I2PSession> sessions = _tunnel.getSessions();
+        for (I2PSession sess : sessions) {
+            if (sess.isOffline())
+                return true;
+            for (I2PSession sub : sess.getSubsessions()) {
+                if (sub.isOffline())
+                    return true;
+            }
+        }
         return false;
     }
 
@@ -1376,75 +1392,99 @@ public class TunnelController implements Logging {
      * @since 0.9.48
      */
     private class PKFChecker extends SimpleTimer2.TimedEvent {
-        private final File f;
-        private final long stamp;
+        private final List<File> files;
+        private final List<Long> stamps;
         private boolean wasRun;
 
-        /** caller must schedule */
-        public PKFChecker(File f, long stamp) {
+        /**
+         *  caller must schedule
+         *  @param f2 may be null
+         */
+        public PKFChecker(File f, File f2) {
             super(SimpleTimer2.getInstance());
-            this.f = f;
-            this.stamp = stamp;
+            files = new ArrayList<File>(2);
+            stamps = new ArrayList<Long>(2);
+            files.add(f);
+            stamps.add(Long.valueOf(f.lastModified()));
+            if (f2 != null) {
+                files.add(f2);
+                stamps.add(Long.valueOf(f2.lastModified()));
+            }
         }
 
         public void timeReached() {
             if (!getIsRunning() && !getIsStarting())
                 return;
             List<I2PSession> sessions = _tunnel.getSessions();
-            if (!sessions.isEmpty()) {
-                I2PSession sess = sessions.get(0);
-                long delay;
-                if (sess.isOffline()) {
+            if (getIsOfflineKeysAnySession()) {
+                I2PAppContext ctx = _tunnel.getContext();
+                long now = ctx.clock().now();
+                long delay = 2*24*60*60*1000L;
+                for (int i = 0; i < files.size(); i++) {
+                    File f = files.get(i);
+                    long stamp = stamps.get(i).longValue();
+                    if (_log.shouldDebug())
+                        _log.debug("PKFC checking: " + f + " stamp: " + DataHelper.formatTime(stamp));
+                    if (stamp <= 0)
+                        continue;
                     if (f.lastModified() > stamp) {
-                        String msg = "Private key file with offline signature updated, restarting tunnel";
+                        String msg = "Private key file " + f + " with offline signature updated, restarting tunnel";
                         _log.logAlways(Log.WARN, msg);
                         _tunnel.log(msg);
                         restartTunnel();
                         return;
                     }
-                    long exp = sess.getOfflineExpiration();
-                    I2PAppContext ctx = _tunnel.getContext();
-                    long now = ctx.clock().now();
-                    long remaining = exp - now;
-                    if (remaining > 10*365*24*60*60*1000L) {
-                        // don't bother
-                        return;
+                    if (sessions.isEmpty())
+                        continue;
+                    I2PSession sess = sessions.get(0);
+                    if (i > 0) {
+                        List<I2PSession> subs = sess.getSubsessions();
+                        if (subs.isEmpty())
+                            continue;
+                        sess = subs.get(0);
                     }
-                    if (remaining <= 10*60*1000) {
+                    if (!sess.isOffline())
+                        continue;
+                    long exp = sess.getOfflineExpiration();
+                    long remaining = exp - now;
+                    if (remaining <= 11*60*1000) {
                         // can't sign another LS
                         String msg;
                         if (remaining > 0)
-                            msg = "Offline signature for tunnel expires " + DataHelper.formatTime(exp);
+                            msg = "Offline signature in private key file " + f + " for tunnel expires " + DataHelper.formatTime(exp) + ", stopping the tunnel!";
                         else
-                            msg = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                            msg = "Offline signature in private key file " + f + " for tunnel expired " + DataHelper.formatTime(exp) + ", stopping the tunnel!";
                         _log.log(Log.CRIT, msg);
                         _tunnel.log(msg);
                         stopTunnel();
                         return;
                     }
+                    long d;
                     if (remaining < 24*60*60*1000L) {
-                        delay = Math.min(60*60*1000L, remaining - (9*60*1000));
+                        d = Math.min(60*60*1000L, remaining - (11*60*1000));
                     } else if (remaining < 7*24*60*60*1000L) {
-                        delay = 6*60*60*1000L;
+                        d = 6*60*60*1000L;
                         if (!wasRun) {
-                            delay += ctx.random().nextLong(4 * delay);
+                            d += ctx.random().nextLong(4 * delay);
                             wasRun = true;
                         }
                     } else {
-                        delay = 24*60*60*1000L;
+                        d = 24*60*60*1000L;
                         if (!wasRun) {
                             delay += ctx.random().nextLong(delay);
                             wasRun = true;
                         }
                     }
                     if (remaining < 30*24*60*60*1000L) {
-                        String msg = "Offline signature for tunnel expires in " + DataHelper.formatDuration(remaining);
+                        String msg = "Offline signature in private key file " + f + " for tunnel expires in " + DataHelper.formatDuration(remaining);
                         _log.logAlways(Log.WARN, msg);
                         _tunnel.log("WARNING: " + msg);
                     }
-                } else {
-                    delay = 24*60*60*1000L;
+                    if (d < delay)
+                        delay = d;
                 }
+                if (_log.shouldDebug())
+                    _log.debug("PKFC sleeping " + DataHelper.formatDuration(delay));
                 schedule(delay);
             }
         }

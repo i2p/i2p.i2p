@@ -281,7 +281,27 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         FileInputStream privData = null;
         try {
             privData = new FileInputStream(altFile);
-            return sMgr.addSubsession(privData, props);
+            I2PSession rv = sMgr.addSubsession(privData, props);
+            if (rv.isOffline()) {
+                long exp = rv.getOfflineExpiration();
+                long remaining = exp - getTunnel().getContext().clock().now();
+                // if expires before the LS expires...
+                if (remaining <= 10*60*1000) {
+                    String msg;
+                    if (remaining > 0)
+                        msg = "Offline signature for tunnel alternate destination expires " + DataHelper.formatTime(exp);
+                    else
+                        msg = "Offline signature for tunnel alternate destination expired " + DataHelper.formatTime(exp);
+                    _log.log(Log.CRIT, msg);
+                    throw new IllegalArgumentException(msg);
+                }
+                if (remaining < 60*24*60*60*1000L) {
+                    String msg = "Offline signature for tunnel alternate destination expires in " + DataHelper.formatDuration(remaining);
+                    _log.logAlways(Log.WARN, msg);
+                    l.log("WARNING: " + msg);
+                }
+            }
+            return rv;
         } catch (IOException ioe) {
             _log.error("Failed to add subssession", ioe);
             return null;
