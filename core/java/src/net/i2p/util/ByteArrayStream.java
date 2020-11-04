@@ -18,6 +18,9 @@ public class ByteArrayStream extends ByteArrayOutputStream {
         super();
     }
 
+    /**
+     *  @param size if accurate, toByteArray() will be zero-copy
+     */
     public ByteArrayStream(int size) {
         super(size);
     }

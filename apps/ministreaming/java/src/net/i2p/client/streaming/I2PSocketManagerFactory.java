@@ -1,7 +1,6 @@
 package net.i2p.client.streaming;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -15,6 +14,7 @@ import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SigType;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Log;
 
 /**
@@ -171,10 +171,10 @@ public class I2PSocketManagerFactory {
     public static I2PSocketManager createManager(String i2cpHost, int i2cpPort, Properties opts,
                     IncomingConnectionFilter filter) {
         I2PClient client = I2PClientFactory.createClient();
-        ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
+        ByteArrayStream keyStream = new ByteArrayStream(1024);
         try {
             client.createDestination(keyStream, getSigType(opts));
-            ByteArrayInputStream in = new ByteArrayInputStream(keyStream.toByteArray());
+            ByteArrayInputStream in = keyStream.asInputStream();
             return createManager(in, i2cpHost, i2cpPort, opts, filter);
         } catch (IOException ioe) {
             getLog().error("Error creating the destination for socket manager", ioe);
@@ -359,7 +359,7 @@ public class I2PSocketManagerFactory {
                                     throws I2PSessionException {
         if (myPrivateKeyStream == null) {
             I2PClient client = I2PClientFactory.createClient();
-            ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
+            ByteArrayStream keyStream = new ByteArrayStream(1024);
             try {
                 client.createDestination(keyStream, getSigType(opts));
             } catch (I2PException e) {
@@ -367,7 +367,7 @@ public class I2PSocketManagerFactory {
             } catch (IOException e) {
                 throw new I2PSessionException("Error creating keys", e);
             }
-            myPrivateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());
+            myPrivateKeyStream = keyStream.asInputStream();
         }
         return createManager(myPrivateKeyStream, i2cpHost, i2cpPort, opts, false, filter);
     }

@@ -10,7 +10,6 @@ package net.i2p.data;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +21,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
@@ -335,7 +335,7 @@ public class LeaseSet extends DatabaseEntry {
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null))
             return null;
         int len = size();
-        ByteArrayOutputStream out = new ByteArrayOutputStream(len);
+        ByteArrayStream out = new ByteArrayStream(len);
         try {
             _destination.writeBytes(out);
             _encryptionKey.writeBytes(out);
@@ -497,7 +497,7 @@ public class LeaseSet extends DatabaseEntry {
         if (size < 1 || size > MAX_LEASES-1)
             throw new IllegalArgumentException("Bad number of leases for encryption");
         int datalen = ((DATA_LEN * size / 16) + 1) * 16;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
+        ByteArrayStream baos = new ByteArrayStream(datalen);
         for (int i = 0; i < size; i++) {
             _leases.get(i).getGateway().writeBytes(baos);
             _leases.get(i).getTunnelId().writeBytes(baos);
@@ -545,7 +545,7 @@ public class LeaseSet extends DatabaseEntry {
             throw new DataFormatException("Bad number of leases decrypting " + _destination.toBase32() +
                                           " - is this destination encrypted?");
         int datalen = DATA_LEN * size;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
+        ByteArrayStream baos = new ByteArrayStream(datalen);
         for (int i = 0; i < size; i++) {
             _leases.get(i).getGateway().writeBytes(baos);
             _leases.get(i).getTunnelId().writeBytes(baos);

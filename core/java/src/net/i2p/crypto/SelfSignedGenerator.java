@@ -40,6 +40,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.Addresses;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.HexDump;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFileOutputStream;
@@ -904,11 +905,11 @@ public final class SelfSignedGenerator {
      *  @throws IllegalArgumentException
      */
     private static byte[] getEncodedOIDSeq(String oid) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(16);
+        byte[] b = getEncodedOID(oid);
+        ByteArrayStream baos = new ByteArrayStream(4 + b.length);
         baos.write(0x30);
         // len to be filled in later
         baos.write(0);
-        byte[] b = getEncodedOID(oid);
         baos.write(b, 0, b.length);
         // NULL
         baos.write(0x05);

@@ -33,6 +33,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.ntcp.OutboundNTCP2State.*;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
@@ -456,7 +457,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             long rtt = now - _con.getCreated();
             _peerSkew = (now - (tsA * 1000) - (rtt / 2) + 500) / 1000; 
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(768);
+            ByteArrayStream baos = new ByteArrayStream(256 + 256 + 32 + 4 + 4);
             baos.write(_X);
             baos.write(_Y);
             baos.write(_context.routerHash().getData());

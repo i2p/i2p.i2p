@@ -19,6 +19,7 @@ import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
 import net.i2p.crypto.x25519.X25519DH;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
@@ -853,7 +854,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         _flags = saveFlags;
         SigningPrivateKey bkey = Blinding.blind(key, _alpha);
         int len = size();
-        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        ByteArrayStream out = new ByteArrayStream(1 + len);
         try {
             // unlike LS1, sig covers type
             out.write(getType());

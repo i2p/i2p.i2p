@@ -8,7 +8,6 @@ package net.i2p.router.message;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
@@ -37,6 +36,7 @@ import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.router.crypto.ratchet.RatchetSessionTag;
 import net.i2p.router.crypto.ratchet.ReplyCallback;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Log;
 
 /**
@@ -393,11 +393,11 @@ public class GarlicMessageBuilder {
      * @throws IllegalArgumentException on error
      */
     private static byte[] buildCloveSet(RouterContext ctx, GarlicConfig config) {
-        ByteArrayOutputStream baos;
+        ByteArrayStream baos;
         try {
             if (config instanceof PayloadGarlicConfig) {
                 byte clove[] = buildClove(ctx, (PayloadGarlicConfig)config);
-                baos = new ByteArrayOutputStream(clove.length + 16);
+                baos = new ByteArrayStream(1 + clove.length + 3 + 4 + 8);
                 baos.write((byte) 1);
                 baos.write(clove);
             } else {
@@ -417,7 +417,7 @@ public class GarlicMessageBuilder {
                 int len = 1;
                 for (int i = 0; i < cloves.length; i++)
                     len += cloves[i].length;
-                baos = new ByteArrayOutputStream(len + 16);
+                baos = new ByteArrayStream(1 + len + 3 + 4 + 8);
                 baos.write((byte) cloves.length);
                 for (int i = 0; i < cloves.length; i++)
                     baos.write(cloves[i]);

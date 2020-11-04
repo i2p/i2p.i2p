@@ -9,13 +9,13 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Clock;
 
 /**
@@ -74,7 +74,7 @@ public class SetDateMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_date == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(32);
+        ByteArrayStream os = new ByteArrayStream(8 + 1 + 6);
         try {
             DataHelper.writeDate(os, _date);
             if (_version != null)

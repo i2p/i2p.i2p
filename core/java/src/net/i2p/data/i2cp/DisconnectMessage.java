@@ -9,12 +9,12 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * Defines the message a client sends to a router when destroying
@@ -48,7 +48,10 @@ public class DisconnectMessage extends I2CPMessageImpl {
 
     @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream(64);
+        int len = 1;
+        if (_reason != null)
+            len += _reason.length();
+        ByteArrayStream os = new ByteArrayStream(len);
         try {
             DataHelper.writeString(os, _reason);
         } catch (DataFormatException dfe) {

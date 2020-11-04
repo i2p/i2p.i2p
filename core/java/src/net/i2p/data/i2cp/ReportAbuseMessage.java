@@ -9,11 +9,11 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * Defines the message a client sends to a router when asking the 
@@ -93,7 +93,11 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if ((_sessionId == null) || (_severity == null) || (_reason == null))
             throw new I2CPMessageException("Not enough information to construct the message");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(32);
+        int len = 2 + 1 + 4 + 1;
+        String r = _reason.getReason();
+        if (r != null)
+            len += r.length();
+        ByteArrayStream os = new ByteArrayStream(len);
         try {
             _sessionId.writeBytes(os);
             _severity.writeBytes(os);

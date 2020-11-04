@@ -5,7 +5,6 @@ package net.i2p.data.i2cp;
  * with no warranty of any kind, either expressed or implied.  
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +12,7 @@ import java.io.InputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * Request the router look up the dest for a hash
@@ -158,7 +158,7 @@ public class HostLookupMessage extends I2CPMessageImpl {
         } else {
             throw new I2CPMessageException("bad type");
         }
-        ByteArrayOutputStream os = new ByteArrayOutputStream(len);
+        ByteArrayStream os = new ByteArrayStream(len);
         try {
             _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 4, _reqID);

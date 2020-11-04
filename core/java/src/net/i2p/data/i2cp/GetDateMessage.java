@@ -9,7 +9,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -17,6 +16,7 @@ import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.OrderedProperties;
 
 /**
@@ -99,7 +99,7 @@ public class GetDateMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_version == null)
             return new byte[0];
-        ByteArrayOutputStream os = new ByteArrayOutputStream(_options != null ? 128 : 16);
+        ByteArrayStream os = new ByteArrayStream(_options != null ? 128 : (1 + 6));
         try {
             DataHelper.writeString(os, _version);
             if (_options != null && !_options.isEmpty())
