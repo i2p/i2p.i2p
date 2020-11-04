@@ -46,6 +46,7 @@ import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.FileUtil;
 import net.i2p.util.OrderedProperties;
@@ -283,9 +284,8 @@ public class DataHelper {
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
-            byte propBytes[] = baos.toByteArray();
-            writeLong(rawStream, 2, propBytes.length);
-            rawStream.write(propBytes);
+            writeLong(rawStream, 2, baos.size());
+            baos.writeTo(rawStream);
         } else {
             writeLong(rawStream, 2, 0);
         }
@@ -318,7 +318,7 @@ public class DataHelper {
                 p = new OrderedProperties();
                 p.putAll(props);
             }
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
+            ByteArrayStream baos = new ByteArrayStream(p.size() * 64);
             for (Map.Entry<Object, Object> entry : p.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
@@ -329,11 +329,10 @@ public class DataHelper {
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
-            byte propBytes[] = baos.toByteArray();
-            toLong(target, offset, 2, propBytes.length);
+            toLong(target, offset, 2, baos.size());
             offset += 2;
-            System.arraycopy(propBytes, 0, target, offset, propBytes.length);
-            offset += propBytes.length;
+            baos.copyTo(target, offset);
+            offset += baos.size();
             return offset;
         } else {
             toLong(target, offset, 2, 0);

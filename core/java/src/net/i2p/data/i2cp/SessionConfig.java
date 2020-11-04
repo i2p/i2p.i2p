@@ -289,9 +289,7 @@ public class SessionConfig extends DataStructureImpl {
             } catch (DataFormatException dfe) {
                 return false;
             }
-            byte[] odata = baos.toByteArray();
-            boolean ok = DSAEngine.getInstance().verifySignature(sig, odata, 0, odata.length,
-                                                                 _destination.getSigningPublicKey());
+            boolean ok = baos.verifySignature(sig, _destination.getSigningPublicKey());
             if (!ok)
                 return false;
         } else {

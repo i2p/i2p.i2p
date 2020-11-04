@@ -1,7 +1,6 @@
 package net.i2p.client.streaming.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,6 +15,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Log;
 
 /**
@@ -799,7 +799,7 @@ class Packet {
                     l.warn("Offline signature expired " + toString());
                 return false;
             }
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(6 + _transientSigningPublicKey.length());
+            ByteArrayStream baos = new ByteArrayStream(6 + _transientSigningPublicKey.length());
             try {
                 DataHelper.writeLong(baos, 4, _transientExpires / 1000);
                 DataHelper.writeLong(baos, 2, _transientSigningPublicKey.getType().getCode());
@@ -809,8 +809,7 @@ class Packet {
             } catch (DataFormatException dfe) {
                 return false;
             }
-            byte[] data = baos.toByteArray();
-            boolean ok = ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, spk);
+            boolean ok = baos.verifySignature(ctx, _offlineSignature, spk);
             if (!ok) {
                 Log l = ctx.logManager().getLog(Packet.class);
                 if (l.shouldLog(Log.WARN))
@@ -915,7 +914,7 @@ class Packet {
             else
                 buf.append(" (no expiration)");
             if (_transientSigningPublicKey != null)
-                buf.append(" TRANSKEY ").append(_transientSigningPublicKey.getType());
+                buf.append(" TRANSKEY ").append(_transientSigningPublicKey.getType()).append(':').append(_transientSigningPublicKey.toBase64());
             else
                 buf.append(" (no key data)");
             if (_offlineSignature != null)

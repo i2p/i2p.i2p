@@ -299,9 +299,7 @@ public class LeaseSet2 extends LeaseSet {
         } catch (DataFormatException dfe) {
             return null;
         }
-        byte[] data = baos.toByteArray();
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        return ctx.dsa().sign(data, priv);
+        return baos.sign(priv);
     }
 
     public boolean verifyOfflineSignature() {
@@ -324,8 +322,7 @@ public class LeaseSet2 extends LeaseSet {
         } catch (DataFormatException dfe) {
             return false;
         }
-        byte[] data = baos.toByteArray();
-        return ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, getSigningPublicKey());
+        return baos.verifySignature(ctx, _offlineSignature, getSigningPublicKey());
     }
 
     /**
@@ -613,9 +610,8 @@ public class LeaseSet2 extends LeaseSet {
         } catch (IOException ioe) {
             throw new DataFormatException("Signature failed", ioe);
         }
-        byte data[] = out.toByteArray();
         // now sign with the key 
-        _signature = DSAEngine.getInstance().sign(data, key);
+        _signature = out.sign(key);
         if (_signature == null)
             throw new DataFormatException("Signature failed with " + key.getType() + " key");
     }
@@ -659,8 +655,7 @@ public class LeaseSet2 extends LeaseSet {
             dfe.printStackTrace();
             return false;
         }
-        byte data[] = out.toByteArray();
-        return DSAEngine.getInstance().verifySignature(_signature, data, spk);
+        return out.verifySignature(_signature, spk);
     }
     
     @Override

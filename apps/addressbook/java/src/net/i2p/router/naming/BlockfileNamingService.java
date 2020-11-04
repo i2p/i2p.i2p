@@ -2069,9 +2069,8 @@ public class BlockfileNamingService extends DummyNamingService {
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
-            byte propBytes[] = baos.toByteArray();
-            DataHelper.writeLong(rawStream, 2, propBytes.length);
-            rawStream.write(propBytes);
+            DataHelper.writeLong(rawStream, 2, baos.size());
+            baos.writeTo(rawStream);
         } else {
             DataHelper.writeLong(rawStream, 2, 0);
         }
