@@ -140,7 +140,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private final static long ROUTER_INFO_EXPIRATION_MIN = 90*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 75*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
-    private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 45*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 54*60*1000l;
     
     /**
      * Don't let leaseSets go too far into the future 
