@@ -73,7 +73,7 @@ public class HomeHelper extends HelperBase {
         _x("I2P FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/faq" + S + I + "question.png" + S +
         _x("I2P Forum") + S + _x("Community forum") + S + "http://i2pforum.i2p/" + S + I + "group.png" + S +
         _x("Git Project Hosting") + S + _x("Community git project hosting") + S + "http://git.idk.i2p" + S + I + "i2pgit.png" + S +
-        _x("I2P Pastebin") + S + _x("Pastebin for I2P users") + S + "http://paste.idk.i2p" + S + I + "pasteidk.png" + S +
+        _x("I2P Pastebin") + S + _x("Pastebin for I2P users") + S + "http://paste.idk.i2p" + S + I + "paste.png" + S +
         //"git.repo.i2p" + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
         //"hiddengate [ru]" + S + _x("Russian I2P-related wiki") + S + "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
         //_x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
