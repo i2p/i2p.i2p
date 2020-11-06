@@ -469,6 +469,8 @@ reference.
 ./i2p.i2p/installer/themes/console/images/education.png
 ./i2p.i2p/installer/themes/console/images/email.png
 ./i2p.i2p/installer/themes/console/images/eepsite.png
+./i2p.i2p/installer/themes/console/images/i2pgit.png
+./i2p.i2p/installer/themes/console/images/pasteidk.png
 ./i2p.i2p/installer/themes/console/images/cursor_zoom.png
 ./i2p.i2p/installer/themes/console/images/info/from_file.png
 ./i2p.i2p/installer/themes/console/images/info/reboot.png

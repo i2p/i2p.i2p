@@ -72,6 +72,8 @@ public class HomeHelper extends HelperBase {
         //"exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S + "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
         _x("I2P FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/faq" + S + I + "question.png" + S +
         _x("I2P Forum") + S + _x("Community forum") + S + "http://i2pforum.i2p/" + S + I + "group.png" + S +
+        _x("Git Project Hosting") + S + _x("Community git project hosting") + S + "http://git.idk.i2p" + S + I + "i2pgit.png" + S +
+        _x("I2P Pastebin") + S + _x("Pastebin for I2P users") + S + "http://paste.idk.i2p" + S + I + "pasteidk.png" + S +
         //"git.repo.i2p" + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
         //"hiddengate [ru]" + S + _x("Russian I2P-related wiki") + S + "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
         //_x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
@@ -118,7 +120,7 @@ public class HomeHelper extends HelperBase {
     private String topWrap(String headline) {
         String str = "<div class=\"ag2\">\n" +
             "<h4 class=\"app\">" +
-            _t(headline) +
+            headline +
             "</h4>\n" +
             "<div class=\"homeapps\">\n";
         return str;
@@ -130,7 +132,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap("Applications"));
+        buf.append(topWrap(_t("Applications")));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();
@@ -144,7 +146,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap("Plugins"));
+        buf.append(topWrap(_t("Plugins")));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();
@@ -157,7 +159,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap("Configuration and Help"));
+        buf.append(topWrap(_t("Configuration and Help")));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();
@@ -170,7 +172,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap("Network Information and Developer Information"));
+        buf.append(topWrap(_t("Network Information and Developer Information")));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();
@@ -182,7 +184,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap("I2P Community Sites"));
+        buf.append(topWrap(_t("I2P Community Sites")));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();
