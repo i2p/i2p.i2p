@@ -392,13 +392,13 @@ public class TunnelDispatcher implements Service {
      *  does not fully prevent joinOutbound() from failing later.
      *  @since 0.9.5
      */
-    public long getNewOBGWID() {
-        long rv;
-        TunnelId tid;
+    public TunnelId getNewOBGWID() {
+        long id;
+        TunnelId rv;
         do {
-            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
-            tid = new TunnelId(rv);
-        } while (_outboundGateways.containsKey(tid));
+            id = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            rv = new TunnelId(id);
+        } while (_outboundGateways.containsKey(rv));
         return rv;
     }
     
@@ -409,13 +409,13 @@ public class TunnelDispatcher implements Service {
      *  does not fully prevent joinInbound() from failing later.
      *  @since 0.9.5
      */
-    public long getNewIBEPID() {
-        long rv;
-        TunnelId tid;
+    public TunnelId getNewIBEPID() {
+        long id;
+        TunnelId rv;
         do {
-            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
-            tid = new TunnelId(rv);
-        } while (_participants.containsKey(tid));
+            id = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            rv = new TunnelId(id);
+        } while (_participants.containsKey(rv));
         return rv;
     }
     
@@ -426,13 +426,13 @@ public class TunnelDispatcher implements Service {
      *  does not fully prevent joinInbound() from failing later.
      *  @since 0.9.5
      */
-    public long getNewIBZeroHopID() {
-        long rv;
-        TunnelId tid;
+    public TunnelId getNewIBZeroHopID() {
+        long id;
+        TunnelId rv;
         do {
-            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
-            tid = new TunnelId(rv);
-        } while (_inboundGateways.containsKey(tid));
+            id = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            rv = new TunnelId(id);
+        } while (_inboundGateways.containsKey(rv));
         return rv;
     }
 

@@ -138,17 +138,19 @@ class TunnelRenderer {
             if (++displayed > DISPLAY_LIMIT)
                 continue;
             out.write("<tr>");
-            if (cfg.getReceiveTunnel() != null)
+            long recv = cfg.getReceiveTunnelId();
+            if (recv != 0)
                 out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" +
-                          cfg.getReceiveTunnel().getTunnelId() + "</span></td>");
+                          recv + "</span></td>");
             else
                 out.write("<td class=\"cells\" align=\"center\">n/a</td>");
             if (cfg.getReceiveFrom() != null)
                 out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(cfg.getReceiveFrom()) +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
-            if (cfg.getSendTunnel() != null)
-                out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" + cfg.getSendTunnel().getTunnelId() +"</span></td>");
+            long send = cfg.getSendTunnelId();
+            if (send != 0)
+                out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" + send +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
             if (cfg.getSendTo() != null)

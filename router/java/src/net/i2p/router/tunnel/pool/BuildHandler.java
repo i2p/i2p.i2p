@@ -864,14 +864,14 @@ class BuildHandler implements Runnable {
                     return;
                 }
             }
-            cfg.setReceiveTunnelId(DataHelper.toLong(4, ourId));
+            cfg.setReceiveTunnelId(ourId);
             if (isOutEnd) {
                 // default
                 //cfg.setSendTo(null);
                 //cfg.setSendTunnelId(null);
             } else {
                 cfg.setSendTo(nextPeer);
-                cfg.setSendTunnelId(DataHelper.toLong(4, nextId));
+                cfg.setSendTunnelId(nextId);
             }
 
             // now "actually" join

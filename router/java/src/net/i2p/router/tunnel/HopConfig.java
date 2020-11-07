@@ -15,10 +15,8 @@ import net.i2p.data.TunnelId;
  * TunnelCreatorConfig to save space.
  */
 public class HopConfig {
-    private byte _receiveTunnelId[];
     private TunnelId _receiveTunnel;
     private Hash _receiveFrom;
-    private byte _sendTunnelId[];
     private TunnelId _sendTunnel;
     private Hash _sendTo;
     private SessionKey _layerKey;
@@ -42,41 +40,67 @@ public class HopConfig {
         _expiration = -1;
     }
     
-    /** what tunnel ID are we receiving on? */
-    public byte[] getReceiveTunnelId() { return _receiveTunnelId; }
+    /**
+     * What tunnel ID are we receiving on? (0 if uninitialized)
+     */
+    public long getReceiveTunnelId() { return (_receiveTunnel != null) ? _receiveTunnel.getTunnelId() : 0; }
+
+    /**
+     * What tunnel ID are we receiving on? (null if uninitialized)
+     */
     public TunnelId getReceiveTunnel() { 
-        if (_receiveTunnel == null)
-            _receiveTunnel = getTunnel(_receiveTunnelId); 
         return _receiveTunnel;
     }
 
-    public void setReceiveTunnelId(byte id[]) { _receiveTunnelId = id; }
-    public void setReceiveTunnelId(TunnelId id) { _receiveTunnelId = DataHelper.toLong(4, id.getTunnelId()); }
-    
+    public void setReceiveTunnelId(TunnelId id) { _receiveTunnel = id; }
+
+    /**
+     *  @param id 1 to 0xffffffff
+     *  @throws IllegalArgumentException if less than or equal to zero or greater than max value
+     *  @since 0.9.48
+     */
+    public void setReceiveTunnelId(long id) { _receiveTunnel = new TunnelId(id); }
+
     /** what is the previous peer in the tunnel (null if gateway) */
     public Hash getReceiveFrom() { return _receiveFrom; }
+
+    /**
+     *  Do not set for gateway
+     */
     public void setReceiveFrom(Hash from) { _receiveFrom = from; }
     
-    /** what is the next tunnel ID we are sending to? (null if endpoint) */
-    public byte[] getSendTunnelId() { return _sendTunnelId; }
+    /**
+     * What is the next tunnel ID we are sending to? (0 if endpoint)
+     */
+    public long getSendTunnelId() { return (_sendTunnel != null) ? _sendTunnel.getTunnelId() : 0; }
 
-    /** what is the next tunnel we are sending to? (null if endpoint) */
+    /**
+     * What is the next tunnel ID we are sending to? (null if endpoint)
+     */
     public TunnelId getSendTunnel() { 
-        if (_sendTunnel == null)
-            _sendTunnel = getTunnel(_sendTunnelId); 
         return _sendTunnel;
     }
-    public void setSendTunnelId(byte id[]) { _sendTunnelId = id; }
-    
-    private static TunnelId getTunnel(byte id[]) {
-        if (id == null)
-            return null;
-        else
-            return new TunnelId(DataHelper.fromLong(id, 0, id.length));
-    }
+
+    /**
+     *  Do not set for endpoint
+     *  @since 0.9.48
+     */
+    public void setSendTunnelId(TunnelId id) { _sendTunnel = id; }
+
+    /**
+     *  Do not set for endpoint
+     *  @param id 1 to 0xffffffff
+     *  @throws IllegalArgumentException if less than or equal to zero or greater than max value
+     *  @since 0.9.48
+     */
+    public void setSendTunnelId(long id) { _sendTunnel = new TunnelId(id); }
     
     /** what is the next peer in the tunnel (null if endpoint) */
     public Hash getSendTo() { return _sendTo; }
+
+    /**
+     *  Do not set for endpoint
+     */
     public void setSendTo(Hash to) { _sendTo = to; }
     
     /** what key should we use to encrypt the layer before passing it on? */
@@ -156,16 +180,16 @@ public class HopConfig {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
-        if (_receiveTunnelId != null) {
+        if (_receiveTunnel != null) {
             buf.append("recv on ");
-            buf.append(DataHelper.fromLong(_receiveTunnelId, 0, 4));
+            buf.append(_receiveTunnel.getTunnelId());
             buf.append(' ');
         }
         
         if (_sendTo != null) {
             buf.append("send to ").append(_sendTo.toBase64().substring(0,4)).append(":");
-            if (_sendTunnelId != null)
-                buf.append(DataHelper.fromLong(_sendTunnelId, 0, 4));
+            if (_sendTunnel != null)
+                buf.append(_sendTunnel.getTunnelId());
         }
         
         buf.append(" exp. ").append(new Date(_expiration));

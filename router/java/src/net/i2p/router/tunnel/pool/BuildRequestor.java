@@ -89,18 +89,18 @@ abstract class BuildRequestor {
             if ( (!isIB) && (i == 0) ) {
                 // outbound gateway (us) doesn't receive on a tunnel id
                 if (len <= 1)  { // zero hop, pretend to have a send id
-                    long id = ctx.tunnelDispatcher().getNewOBGWID();
-                    hop.setSendTunnelId(DataHelper.toLong(4, id));
+                    TunnelId id = ctx.tunnelDispatcher().getNewOBGWID();
+                    hop.setSendTunnelId(id);
                 }
             } else {
-                long id;
+                TunnelId id;
                 if (isIB && len == 1)
                     id = ctx.tunnelDispatcher().getNewIBZeroHopID();
                 else if (isIB && i == len - 1)
                     id = ctx.tunnelDispatcher().getNewIBEPID();
                 else
-                    id = 1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE);
-                hop.setReceiveTunnelId(DataHelper.toLong(4, id));
+                    id = new TunnelId(1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE));
+                hop.setReceiveTunnelId(id);
             }
             
             if (i > 0)

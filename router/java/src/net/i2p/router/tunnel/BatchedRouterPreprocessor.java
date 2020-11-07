@@ -48,20 +48,24 @@ class BatchedRouterPreprocessor extends BatchedPreprocessor {
     
     private static String getName(HopConfig cfg) {
         if (cfg == null) return "IB??";
-        if (cfg.getReceiveTunnel() != null)
-            return "IB " + cfg.getReceiveTunnel().getTunnelId();
-        else if (cfg.getSendTunnel() != null)
-            return "IB " + cfg.getSendTunnel().getTunnelId();
+        long id = cfg.getReceiveTunnelId();
+        if (id != 0)
+            return "IB " + id;
+        id = cfg.getSendTunnelId();
+        if (id != 0)
+            return "IB " + id;
         else
             return "IB??";
     }
     
     private static String getName(TunnelCreatorConfig cfg) {
         if (cfg == null) return "OB??";
-        if (cfg.getReceiveTunnelId(0) != null)
-            return "OB " + cfg.getReceiveTunnelId(0).getTunnelId();
-        else if (cfg.getSendTunnelId(0) != null)
-            return "OB " + cfg.getSendTunnelId(0).getTunnelId();
+        long id = cfg.getConfig(0).getReceiveTunnelId();
+        if (id != 0)
+            return "OB " + id;
+        id = cfg.getConfig(0).getSendTunnelId();
+        if (id != 0)
+            return "OB " + id;
         else
             return "OB??";
     }

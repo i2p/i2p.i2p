@@ -79,6 +79,6 @@ class OutboundTunnelEndpoint {
     /** @since 0.9.8 */
     @Override
     public String toString() {
-        return "OBEP " + _config.getReceiveTunnel();
+        return "OBEP " + _config.getReceiveTunnelId();
     }
 }

@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.TunnelId;
 import net.i2p.router.RouterContext;
 
 /**
@@ -55,12 +56,12 @@ public class OutboundTest extends TestCase{
     
     private TunnelCreatorConfig prepareConfig(int numHops) {
         Hash peers[] = new Hash[numHops];
-        byte tunnelIds[][] = new byte[numHops][4];
+        long tunnelIds[] = new long[numHops];
         for (int i = 0; i < numHops; i++) {
             peers[i] = new Hash();
             peers[i].setData(new byte[Hash.HASH_LENGTH]);
             _context.random().nextBytes(peers[i].getData());
-            _context.random().nextBytes(tunnelIds[i]);
+            tunnelIds[i] = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE);
         }
         
         TunnelCreatorConfig config = new TCConfig(_context, numHops, false);
@@ -72,15 +73,10 @@ public class OutboundTest extends TestCase{
             cfg.setLayerKey(_context.keyGenerator().generateSessionKey());
             if (i > 0)
                 cfg.setReceiveFrom(peers[i-1]);
-            else
-                cfg.setReceiveFrom(null);
             cfg.setReceiveTunnelId(tunnelIds[i]);
             if (i < numHops - 1) {
                 cfg.setSendTo(peers[i+1]);
                 cfg.setSendTunnelId(tunnelIds[i+1]);
-            } else {
-                cfg.setSendTo(null);
-                cfg.setSendTunnelId(null);
             }
         }
         return config;
