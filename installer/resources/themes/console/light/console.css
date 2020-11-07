@@ -2925,6 +2925,7 @@ a:link, #graphopts a:visited, .news #newsdisplay a, .news #newsdisplay a:visited
      font-weight: bold;
      word-wrap: break-word;
      outline: none;
+     padding-top: 4px;
 }
 
 a:visited, .tab a {
