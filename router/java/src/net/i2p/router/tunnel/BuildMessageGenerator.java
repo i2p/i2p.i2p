@@ -76,13 +76,13 @@ public abstract class BuildMessageGenerator {
             Hash peer = cfg.getPeer(hop);
             long recvTunnelId = -1;
             if (cfg.isInbound() || (hop > 0))
-                recvTunnelId = hopConfig.getReceiveTunnel().getTunnelId();
+                recvTunnelId = hopConfig.getReceiveTunnelId();
             else
                 recvTunnelId = 0;
             long nextTunnelId = -1;
             Hash nextPeer = null;
             if (hop + 1 < cfg.getLength()) {
-                nextTunnelId = cfg.getConfig(hop+1).getReceiveTunnel().getTunnelId();
+                nextTunnelId = cfg.getConfig(hop+1).getReceiveTunnelId();
                 nextPeer = cfg.getPeer(hop+1);
             } else {
                 if ( (replyTunnel >= 0) && (replyRouter != null) ) {

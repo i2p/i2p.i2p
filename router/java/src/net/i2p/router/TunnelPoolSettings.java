@@ -277,6 +277,9 @@ public class TunnelPoolSettings {
      */
     public int getPriority() { return _priority; }
 
+    /**
+     *  @return non-null
+     */
     public Properties getUnknownOptions() { return _unknownOptions; }
 
     /**

@@ -104,14 +104,12 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
     protected boolean shouldSelectExplicit(TunnelPoolSettings settings) {
         if (settings.isExploratory()) return false;
         Properties opts = settings.getUnknownOptions();
-        if (opts != null) {
-            String peers = opts.getProperty("explicitPeers");
-            if (peers == null)
-                peers = ctx.getProperty("explicitPeers");
-            // only one out of 4 times so we don't break completely if peer doesn't build one
-            if (peers != null && ctx.random().nextInt(4) == 0)
-                return true;
-        }
+        String peers = opts.getProperty("explicitPeers");
+        if (peers == null)
+            peers = ctx.getProperty("explicitPeers");
+        // only one out of 4 times so we don't break completely if peer doesn't build one
+        if (peers != null && ctx.random().nextInt(4) == 0)
+            return true;
         return false;
     }
     
@@ -123,8 +121,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
     protected List<Hash> selectExplicit(TunnelPoolSettings settings, int length) {
         String peers = null;
         Properties opts = settings.getUnknownOptions();
-        if (opts != null)
-            peers = opts.getProperty("explicitPeers");
+        peers = opts.getProperty("explicitPeers");
         
         if (peers == null)
             peers = ctx.getProperty("explicitPeers");
