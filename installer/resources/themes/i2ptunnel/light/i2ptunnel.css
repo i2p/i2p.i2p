@@ -210,7 +210,7 @@ hr {
      font-weight: normal;
      color: #33333f;
      border: 1px solid #999daf;
-     border-radius: 12px;
+     border-radius: 15px;
      background: #eee;
      background: linear-gradient(to bottom, #fff, #efefff);
      box-shadow: inset 0 0 0 1px #fff;
@@ -218,7 +218,7 @@ hr {
      box-sizing: border-box;
      margin: 2px 4px !important;
      min-width: 70px !important;
-     padding: 7px 8px;
+     padding: 7px 8px 3px;
 }
 
 button.control, input.control {
