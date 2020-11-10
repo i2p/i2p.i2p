@@ -210,7 +210,7 @@ hr {
      font-weight: normal;
      color: #33333f;
      border: 1px solid #999daf;
-     border-radius: 15px;
+     border-radius: 12px;
      background: #eee;
      background: linear-gradient(to bottom, #fff, #efefff);
      box-shadow: inset 0 0 0 1px #fff;
@@ -282,10 +282,10 @@ a.control {
 
 select {
      margin: 4px !important;
-     padding: 4px 16px 4px 4px !important;
+     padding: 7px 16px 4px 4px !important;
      min-width: 140px;
      background: #fff;
-     background: url(/themes/console/light/images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #efefff);
+     background: url(/themes/console/light/images/dropdown.png) right 4px center no-repeat, linear-gradient(to bottom, #fff, #efefff);
      background-blend-mode: hard-light, normal;
      color: #33333f;
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
@@ -299,6 +299,7 @@ select {
      -webkit-appearance: none;
      appearance: none;
      filter: drop-shadow(0 0 1px #ccf);
+     border-radius: 12px !important;
 }
 
 select:hover {
@@ -440,12 +441,8 @@ th:first-child {
      padding-left: 10px;
 }
 
-h2, h3, th, a, button.control, select {
+h2, h3, th, select {
      text-shadow: 0 1px 1px #fff;
-}
-
-a:hover, a:focus, a:active, button:hover, button:focus, button:active, select:hover, select:focus, select:active {
-     text-shadow: none;
 }
 
 .tunnelConfig tr, #wizardPanel tr, #registration tr {
@@ -1135,7 +1132,7 @@ _:-ms-lang(x), td.tunnelDestination, td.tunnelDescription {
 @media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blinkoverflow issue */
 select {
      white-space: normal;
-     padding: 5px 16px 5px 6px !important;
+     padding: 7px 16px 5px 6px !important;
 }
 }
 
@@ -1333,6 +1330,7 @@ input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked,
 textarea, input[type="text"], .displayText, *[readonly] {
      filter: none !important;
      box-shadow: 0 0 1px #ccf;
+     border-radius: 6px;
 }
 
 table {

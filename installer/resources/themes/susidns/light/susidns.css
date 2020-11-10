@@ -98,7 +98,7 @@ code, tt, .destaddress {
 #navi a#overview {
      box-sizing: border-box;
      border: 1px solid #dee2e6;
-     border-radius: 15px;
+     border-radius: 12px;
      min-width: 60px!important;
      line-height: 130%;
      background: #f6f6fa;
@@ -496,7 +496,7 @@ input[type="text"], input[type="password"], textarea {
      padding: 5px !important;
      box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
      border: 1px solid #999daf;
-     border-radius: 2px;
+     border-radius: 6px;
      color: #33333f;
      background: #f8f8ff;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;

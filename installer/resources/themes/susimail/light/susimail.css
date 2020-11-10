@@ -880,7 +880,7 @@ input[type="text"], input[type="password"], textarea {
      background: #fafaff;
      box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
      border: 1px solid #999daf;
-     border-radius: 2px;
+     border-radius: 6px;
      color: #33333f;
      filter: drop-shadow(0px 0 1px #ccf);
 }

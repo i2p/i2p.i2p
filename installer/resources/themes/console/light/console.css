@@ -150,21 +150,17 @@ pre {
      margin: 0 !important;
      width: 190px;
      height: auto;
-     filter: drop-shadow(0 0 1px #dee2e6);
 }
 
 .routersummary img[src$="i2plogo.png"]:hover {
      opacity: 1;
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
-     filter: drop-shadow(0 0 1px #adb5bd);
 }
 
 .routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
-     filter: drop-shadow(0 0 1px #dee2e6);
 }
 
 .routersummary a:active img[src$="i2plogo.png"] {
-     filter: drop-shadow(0 0 2px #4661A9);
 }
 
 .routersummary a[href="/"], .routersummary a[href="/console"] {
@@ -248,7 +244,7 @@ pre {
      line-height: 110%;
 }
 
-.routersummary h3:hover a, .routersummary h3 a:hover {
+.routersummary h3:hover, .routersummary h3 a:hover {
      color: #4661A9
  !important;
      text-shadow: 0 0 1px #fff;
@@ -357,7 +353,6 @@ h4.sb_info + hr + form {
 }
 
 #sb_localtunnels td img {
-     filter: drop-shadow(0 0 1px #ccf);
 }
 
 #sb_localtunnels td:last-child {
@@ -604,7 +599,6 @@ a:active #sb_bandwidthgraph {
      box-shadow: inset 0 0 0 1px #fff;
      margin: -7px 2px 5px !important;
      padding: 4px 0 3px;
-     filter: drop-shadow(0 0 1px #ccf);
 }
 
 .sb_info .percentBarOuter {
@@ -859,7 +853,7 @@ p:empty + .sb_notice {
      vertical-align: -30%;
      vertical-align: middle;
      display: inline-block;
-     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+     filter: drop-shadow(.*);
 }
 
 .tunnelBuildStatus::before {
@@ -1278,7 +1272,6 @@ p:empty + .sb_notice {
      border: 1px solid #dee2e6;
      border-radius: 0 0 2px 2px;
      box-shadow: inset 0 0 0 1px #dee2e6;
-     filter: drop-shadow(0 1px 1px #999daf);
 }
 
 .main[id^="config_"] {
@@ -1309,7 +1302,6 @@ p:empty + .sb_notice {
      line-height: 140%;
      box-shadow: inset 0 0 0 1px #dee2e6;
      min-width: 546px;
-     filter: drop-shadow(0 1px 1px #999daf);
 }
 
 .main#proof, .main#oldconsole {
@@ -1502,7 +1494,7 @@ div.newscontent p {
 .news #newsdisplay a, #graphopts a {
      border: 1px solid #8b8edf;
      padding: 2px 10px;
-     border-radius: 15px;
+     border-radius: 12px;
      background: #f8f8ff;
      background: rgba(248,248,255,0.5);
      margin-left: -3px;
@@ -1636,7 +1628,7 @@ h1, .confignav {
      box-sizing: border-box;
      display: inline-block;
      border: 1px solid #dee2e6;
-     border-radius: 15px;
+     border-radius: 12px;
      margin: 2 1px 1px 1px !important;
      padding: 1px 0;
      background: #fff;
@@ -1739,7 +1731,6 @@ h3#iptransport a::after, h3#advancedconfig a::after {
 }
 
 h3#iptransport a:hover, h3#advancedconfig a:hover {
-     filter: drop-shadow(0 0 1px #f60);
 }
 
 h3#transports, h3#upnp {
@@ -1809,18 +1800,15 @@ h3#exploratorytunnels {
      content: url(/themes/console/images/buttons/configure.png);
      float: right;
      padding: 0 0 0 8px;
-     filter: drop-shadow(0 0 1px #999daf);
 }
 
 a.delete::after {
      content: url(/themes/console/images/buttons/delete.png);
      float: right;
      padding: 0 0 0 8px;
-     filter: drop-shadow(0 0 1px #999daf);
 }
 
 #tunnels h3 a[href^="/configtunnels#"]:hover, a.configure:hover, a.delete:hover {
-     filter: drop-shadow(0 0 1px #f60);
 }
 
 h3#passwordheading {
@@ -2009,7 +1997,6 @@ p#tunnelconfig {
      box-shadow: inset 0 0 0 1px #fff;
      background: #e8e8ff;
      background: repeating-linear-gradient(135deg, rgba(248,248,255,0.6) 2px, rgba(220, 220, 255, 0.3) 3px, #f8f8ff 5px), #f8f8ff;
-     filter: drop-shadow(0 0 1px #ccc);
 }
 
 #graphopts a {
@@ -2115,7 +2102,6 @@ h3#graphdisplay {
      background: linear-gradient(to right, #fafaff, #eef);
      background-size: auto 100%, 100% 100%;
      box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #dee2e6);
      font-weight: bold;
      line-height: 130%;
 }
@@ -2526,6 +2512,8 @@ td {
 
 .main[id^="config_"] select, .main[id^="config_"] textarea, .main[id^="config_"] .optbox {
      margin-left: 3px !important;
+     padding-right: 11% !important;
+     border-radius: 12px;
 }
 
 #wizardheading {
@@ -2535,7 +2523,6 @@ td {
     margin: auto;
     top: 1%;
     font-size: xx-large;
-    text-transform: uppercase;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
     color: #41465f;
@@ -2554,7 +2541,6 @@ td {
     width: 35%;
     top: 50%;
     box-shadow: inset 0 0 0 1px #fff;
-    filter: drop-shadow(0 0 1px #ccf);
     background: rgba(255,255,255,0.7);
     font-size: larger;
 }
@@ -2612,7 +2598,6 @@ td {
     font-size: larger;
     background: #eef;
     box-shadow: inset 0 0 0 1px #fff;
-    filter: drop-shadow(0 0 1px #ccf);
 }
 
 #xhr2.notification {
@@ -2625,7 +2610,6 @@ td {
     background: linear-gradient(to right, #fafaff, #eef);
     background-size: auto 100%, 100% 100%;
     box-shadow: inset 0 0 0 1px #fff;
-    filter: drop-shadow(0 0 1px #ccf);
 }
 
 /* begin home page */
@@ -2691,9 +2675,7 @@ div.app:hover a:link, div.app:hover a:visited {
 }
 
 div.app:hover img.app, .app:hover img {
-     filter: drop-shadow(0 0 0px #adb5bd);
      transition: ease filter 0.3s 0s;
-     filter: drop-shadow(0 0 1px #4661A9);
 
 }
 
@@ -2983,7 +2965,6 @@ p.infohelp, p#sybilinfo, p#debugmode, p#upnpstatus, p#pluginconfigtext, p#gather
 p#upnpstatus, p#keyringhelp, .widescroll + p.infohelp, #profiles ul#banlist, #config_reseed .confignav + p.infohelp
 p#sybilinfo, p#debugmode, #config_family p.infohelp, p#profiles_overview, p#gatherstats {
      border-radius: 2px;
-     filter: drop-shadow(0 0 1px #dee2e6);
 }
 
 p#profiles_overview {
@@ -3014,7 +2995,6 @@ p#profiles_overview {
     padding: 0 0 0 10px;
     border-collapse: separate;
     border-radius: 2px;
-    filter: drop-shadow(0 0 1px #ccf);
     background: linear-gradient(135deg, #fafaff, #f8f8ff);
 }
 
@@ -3044,7 +3024,6 @@ p#sybilinfo {
      background: url(/themes/console/images/info/experimental.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
      background-size: 28px 28px;
      border-radius: 2px;
-     filter: drop-shadow(0px 0 1px #ccf);
 }
 
 p.infowarn {
@@ -3421,7 +3400,6 @@ span.newtab {
 }
 
 .newtab img:hover {
-     filter: drop-shadow(0 0 1px #f60);
 }
 
 h2 {
@@ -3473,7 +3451,6 @@ h3 {
      margin: 12px 0 15px 0;
      border-radius: 0 2px 2px 0;
      font-size: 11pt;
-     text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      color: #41465f;
@@ -3789,15 +3766,12 @@ input, input:visited, button, button:visited {
      border-radius: 12px;
      opacity: 1;
      background-size: 14px auto, 100% 100% !important;
-     filter: drop-shadow(0 0 1px #ccf);
 }
 
 input[type="text"], textarea, input[type="password"] {
-     filter: drop-shadow(0 0 1px #ccf);
 }
 
 input[type="submit"], input[type="reset"], button, select {
-     filter: drop-shadow(0 0 1px #ccf);
 }
 
 button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
@@ -4268,7 +4242,6 @@ input[name="refreshInterval"] {
 input[type="text"]:focus, input[type="password"]:focus {
      background: #fff;
      box-shadow: none;
-     filter: drop-shadow(0 0 1px #89f);
      color: #19191f;
      border: 1px solid #676c7f;
 }
@@ -4338,7 +4311,6 @@ select {
      -webkit-appearance: none;
      appearance: none;
      background: url(images/dropdown.png) right 4px center no-repeat #fff;
-     background: url(images/dropdown.png) right 4px center no-repeat;
      background-blend-mode: hard-light, normal;
      padding: 4px 16px 4px 4px !important;
      color: #41465f;
@@ -4349,7 +4321,6 @@ select {
      border-radius: 2px;
      text-align: left !important;
      box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #ccf);
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -4416,7 +4387,6 @@ textarea:focus {
      color: #19191f !important;
      box-shadow: none;
      border: 1px solid #676c7f;
-     filter: drop-shadow(0 0 1px #89f);
 }
 
 .statusnotes {
@@ -4730,7 +4700,6 @@ body.iframed {
 }
 
 .themechoice:hover > img {
-     filter: drop-shadow(0 0 1px #4661A9);
 }
 
 #config_ui .themechoice .optbox {
@@ -4918,7 +4887,6 @@ img.wizard.progress {
      float: left;
      margin-left: 15%;
      transition: transform 0.3s ease 0s;
-     filter: drop-shadow(0 0 1px #ccf);
 }
 
 .wizardimg {
@@ -4969,7 +4937,6 @@ img.wizard.progress {
 .langselect input[name="lang"]:checked + img {
      transform: scale(1.1);
      -webkit-transform: scale(1.1);
-     filter: drop-shadow(0 0 1px rgba(256, 100, 0, 0.1));
 }
 
 .langselect:hover > input[name="lang"] + img + .ui_lang {
@@ -5027,7 +4994,6 @@ div.langselect br {
      height: 40px;
      opacity: 0.9 !important;
      transform: none !important;
-     filter: drop-shadow(0 0 1px #77d);
 }
 
 .langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
@@ -5044,7 +5010,6 @@ div.langselect br {
      box-shadow: none !important;
      border: none !important;
      transition: none !important;
-     filter: drop-shadow(0 0 2px #f60);
 }
 
 .langselect input[name="lang"]:checked + img + .ui_lang {
@@ -5409,7 +5374,7 @@ a.viewfullentry:not(old), #profilelist a[href^="viewprofile"]:not(old) {
 a.viewfullentry::after, #profilelist a[href^="viewprofile"]::after {
      content: url(/themes/console/images/buttons/fullview.png);
      vertical-align: text-top;
-     filter: drop-shadow(0 0 1px #999daf);
+
 }
 
  #profilelist a[href^="viewprofile"]::after {
@@ -5417,7 +5382,7 @@ a.viewfullentry::after, #profilelist a[href^="viewprofile"]::after {
 }
 
 a.viewfullentry:hover {
-     filter: drop-shadow(0 0 1px #f60);
+/*     filter: drop-shadow(0 0 1px #f60);*/
 }
 
 #leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
@@ -5428,11 +5393,11 @@ a.viewfullentry:hover {
      content: url(/themes/console/images/buttons/floodfill.png);
      vertical-align: text-top;
      padding-right: 0;
-     filter: drop-shadow(0 0 1px #999daf);
+
 }
 
 #leasesetdebug th a:hover, table#leasesetsummary th a:hover {
-     filter: drop-shadow(0 0 1px #f60);
+/*     filter: drop-shadow(0 0 1px #f60);*/
 }
 
 #leasesetsummary {
@@ -5611,7 +5576,7 @@ a.viewfullentry:hover {
 }
 
 .addtobook a:hover {
-     filter: drop-shadow(0 0 1px #f60);
+/*     filter: drop-shadow(0 0 1px #f60);*/
 }
 
 #noleasesets, #notinitialized, .netdbnotfound {
@@ -5680,7 +5645,7 @@ h3.sybils {
      background: #eef url(images/eye.png) 5px center no-repeat;
      background: url(images/eye.png) 5px center no-repeat, linear-gradient(45deg, #fafaff 60%, #eef);
      line-height: 88%;
-     filter: drop-shadow(0 0 1px #ccf);
+
 }
 
 #sybilnav li a {
@@ -5929,7 +5894,7 @@ ul#banlist {
      background: #eef url(/themes/console/images/buttons/ban.png) 10px center no-repeat;
      background: url(/themes/console/images/buttons/ban.png) 10px center no-repeat, repeating-linear-gradient(135deg, rgba(252,252,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fafaff;
      font-size: 9pt;
-     filter: drop-shadow(0 0 1px #f8f8ff);
+
      -webkit-break-inside: avoid;
      break-inside: avoid;
      page-break-inside: avoid;
@@ -6665,7 +6630,7 @@ a[href^="configpeer?peer"]::after {
 }
 
 a[href^="configpeer?peer"]:hover {
-     filter: drop-shadow(0 0 1px #f60);
+/*     filter: drop-shadow(0 0 1px #f60);*/
 }
 
 .widescroll {
@@ -6978,7 +6943,7 @@ b.netdb_transport {
 }
 
 #debug table {
-     filter: drop-shadow(0 0 1px #ccf);
+
 }
 
 #debug h2 + table {
@@ -6999,7 +6964,7 @@ b.netdb_transport {
      background: linear-gradient(to bottom, #fafaff, rgba(250,250,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #efefff !important;
      border: 1px solid #dee2e6;
      box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0px 0 1px #ccf);
+
 }
 
 .debug_container:empty {
@@ -7327,7 +7292,7 @@ input[type="checkbox"], input[type="checkbox"]:checked, input[type="checkbox"][d
 /*     border: 1px solid #999daf !important;*/
      position: relative;
      box-sizing: border-box;
-     filter: drop-shadow(0 0 1px #ccf);
+
      vertical-align: middle !important;
 }
 
@@ -7360,7 +7325,7 @@ input[type="radio"], input[type="radio"]:checked, input[type="radio"][disabled],
 /*! border: 1px solid #999daf !important; */
      position: relative;
      box-sizing: border-box;
-     filter: drop-shadow(0 0 1px #ccf);
+
      vertical-align: middle !important;
 }
 
@@ -7379,7 +7344,7 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
      background: #fff;
      width: 19px !important;
      height: 19px !important;
-     filter: drop-shadow(0 0 3px #89f) !important;
+
 }
 
 input[type="checkbox"][disabled], input[type="radio"][disabled], input[type="checkbox"][disabled]:hover, input[type="radio"][disabled]:hover,
@@ -7659,12 +7624,12 @@ body {
 
 #profiles .tab:first-child, #profiles .tab2:first-child, #help .tab:first-child, #help .tab2:first-child,
 #netdb .tab:first-child, #netdb .tab2:first-child, #debug .tab:first-child, #debug .tab2:first-child {
-     border-radius: 15px;
+     border-radius: 12px;
 }
 
 #profiles .tab:last-child, #profiles .tab2:last-child, #help .tab:last-child, #help .tab2:last-child,
 #netdb .tab:last-child, #netdb .tab2:last-child, #debug .tab:last-child, #debug .tab2:last-child {
-     border-radius: 15px;
+     border-radius: 12px;
 }
 }
 
