@@ -13,11 +13,6 @@ import net.i2p.crypto.SHA256Generator;
 
 /**
  * A SimpleDataStructure contains only a single fixed-length byte array.
- * The main reason to do this is to override
- * toByteArray() and fromByteArray(), which are used by toBase64(), fromBase64(),
- * and calculateHash() in DataStructureImpl - otherwise these would go through
- * a wasteful array-to-stream-to-array pass.
- * It also centralizes a lot of common code.
  *
  * Implemented in 0.8.2 and retrofitted over several of the classes in this package.
  *
@@ -27,10 +22,12 @@ import net.i2p.crypto.SHA256Generator;
  * subsequent attempts to set the data via setData(), readBytes(),
  * fromByteArray(), or fromBase64() will throw a RuntimeException.
  *
+ * As of 0.9.48, no longer extends DataStrucureImpl to save space
+ *
  * @since 0.8.2
  * @author zzz
  */
-public abstract class SimpleDataStructure extends DataStructureImpl {
+public abstract class SimpleDataStructure implements DataStructure {
     protected byte[] _data;
     
     /** A new instance with the data set to null. Call readBytes(), setData(), or fromByteArray() after this to set the data */
@@ -83,13 +80,22 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
         // Throws on incomplete read
         read(in, _data);
     }
+
+    /**
+     * Repeated reads until the buffer is full or IOException is thrown
+     *
+     * @return number of bytes read (should always equal target.length)
+     * @since 0.9.48, copied from former superclass DataStructureImpl
+     */
+    protected int read(InputStream in, byte target[]) throws IOException {
+        return DataHelper.read(in, target);
+    }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data to write out");
         out.write(_data);
     }
     
-    @Override
     public String toBase64() {
         if (_data == null)
             return null;
@@ -101,7 +107,6 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
      * @throws DataFormatException if decoded data is not the legal number of bytes or on decoding error
      * @throws RuntimeException if data already set.
      */
-    @Override
     public void fromBase64(String data) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         byte[] d = Base64.decode(data);
@@ -114,29 +119,24 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     }
 
     /** @return the SHA256 hash of the byte array, or null if the data is null */
-    @Override
     public Hash calculateHash() {
         if (_data != null) return SHA256Generator.getInstance().calculateHash(_data);
         return null;
     }
 
     /**
-     * Overridden for efficiency.
      * @return same thing as getData()
      */
-    @Override
     public byte[] toByteArray() {
         return _data;
     }
 
     /**
-     * Overridden for efficiency.
      * Does the same thing as setData() but null not allowed.
      * @param data non-null
      * @throws DataFormatException if null or wrong length
      * @throws RuntimeException if data already set.
      */
-    @Override
     public void fromByteArray(byte data[]) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         if (data.length != length())
