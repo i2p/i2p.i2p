@@ -322,7 +322,7 @@ public class SessionConfig extends DataStructureImpl {
         if (_options == null) return null;
         if (_creationDate == null) return null;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream(512);
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
         try {
             //_log.debug("PubKey size for destination: " + _destination.getPublicKey().getData().length);
             //_log.debug("SigningKey size for destination: " + _destination.getSigningPublicKey().getData().length);
