@@ -472,6 +472,8 @@ class BasicServlet extends HttpServlet
         /* ------------------------------------------------------------ */
         public InputStream getInputStream() throws IOException
         {
+            if (getContentLength() > 4*1024*1024)
+                return new BufferedInputStream(new FileInputStream(_file), 64*1024);
             return new BufferedInputStream(new FileInputStream(_file));
         }
 
