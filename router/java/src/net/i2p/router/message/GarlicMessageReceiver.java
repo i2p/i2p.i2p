@@ -134,11 +134,11 @@ public class GarlicMessageReceiver {
         // is no longer a separate field for the clove ID in the transmission format.
         //String invalidReason = _context.messageValidator().validateMessage(clove.getCloveId(), 
         //                                                                   clove.getExpiration().getTime());
-        String invalidReason = _context.messageValidator().validateMessage(clove.getExpiration().getTime());
+        String invalidReason = _context.messageValidator().validateMessage(clove.getExpiration());
 
         boolean rv = invalidReason == null;
         if (!rv) {
-            String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());
+            String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration());
             if (_log.shouldInfo())
                 _log.info("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago", new Exception("Invalid within..."));

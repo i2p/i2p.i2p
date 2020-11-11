@@ -467,7 +467,7 @@ public class GarlicMessageBuilder {
     private static byte[] buildCommonClove(GarlicClove clove, GarlicConfig config) {
         clove.setCertificate(config.getCertificate());
         clove.setCloveId(config.getId());
-        clove.setExpiration(new Date(config.getExpiration()));
+        clove.setExpiration(config.getExpiration());
         clove.setInstructions(config.getDeliveryInstructions());
         return clove.toByteArray();
     }
@@ -514,7 +514,7 @@ public class GarlicMessageBuilder {
         clove.setData(config.getPayload());
         clove.setCertificate(Certificate.NULL_CERT);
         clove.setCloveId(0);
-        clove.setExpiration(new Date(config.getExpiration()));
+        clove.setExpiration(config.getExpiration());
         clove.setInstructions(config.getDeliveryInstructions());
         return clove;
     }
