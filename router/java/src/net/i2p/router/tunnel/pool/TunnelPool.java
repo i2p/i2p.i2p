@@ -652,7 +652,13 @@ public class TunnelPool {
      */
     private static class LeaseComparator implements Comparator<Lease>, Serializable {
          public int compare(Lease l, Lease r) {
-             return r.getEndDate().compareTo(l.getEndDate());
+             long lt = l.getEndTime();
+             long rt = r.getEndTime();
+             if (rt > lt)
+                 return 1;
+             if (rt < lt)
+                 return -1;
+             return 0;
         }
     }
 
@@ -755,7 +761,7 @@ public class TunnelPool {
             // Get the "real" expiration from the gateway hop config,
             // HopConfig expirations are the same as the "real" expiration and don't change
             // see configureNewTunnel()
-            lease.setEndDate(new Date(((TunnelCreatorConfig)tunnel).getConfig(0).getExpiration()));
+            lease.setEndDate(((TunnelCreatorConfig)tunnel).getConfig(0).getExpiration());
             lease.setTunnelId(inId);
             lease.setGateway(gw);
             leases.add(lease);

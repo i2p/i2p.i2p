@@ -236,7 +236,7 @@ public class LeaseSet extends DatabaseEntry {
         if (_leases.size() >= MAX_LEASES)
             throw new IllegalArgumentException("Too many leases - max is " + MAX_LEASES);
         _leases.add(lease);
-        long expire = lease.getEndDate().getTime();
+        long expire = lease.getEndTime();
         if (expire < _firstExpiration)
             _firstExpiration = expire;
         if (expire > _lastExpiration)
@@ -517,7 +517,7 @@ public class LeaseSet extends DatabaseEntry {
         RandomSource.getInstance().nextBytes(enc, datalen, padlen);
         // add the padded lease...
         Lease padLease = new Lease();
-        padLease.setEndDate(_leases.get(0).getEndDate());
+        padLease.setEndDate(_leases.get(0).getEndTime());
         _leases.add(padLease);
         // ...and replace all the gateways and tunnel ids
         ByteArrayInputStream bais = new ByteArrayInputStream(enc);
@@ -567,7 +567,7 @@ public class LeaseSet extends DatabaseEntry {
             TunnelId t = new TunnelId();
             t.readBytes(bais);
             l.setTunnelId(t);
-            l.setEndDate(_leases.get(i).getEndDate());
+            l.setEndDate(_leases.get(i).getEndTime());
             _decryptedLeases.add(l);
         }
     }

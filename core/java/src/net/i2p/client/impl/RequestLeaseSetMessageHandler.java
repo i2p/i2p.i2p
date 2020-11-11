@@ -158,7 +158,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                 lease.setTunnelId(msg.getTunnelId(i));
             }
             lease.setGateway(msg.getRouter(i));
-            lease.setEndDate(msg.getEndDate());
+            lease.setEndDate(msg.getEndDate().getTime());
             //lease.setStartDate(msg.getStartDate());
             leaseSet.addLease(lease);
         }

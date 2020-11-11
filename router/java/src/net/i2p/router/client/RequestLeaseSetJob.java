@@ -102,12 +102,12 @@ class RequestLeaseSetJob extends JobImpl {
             rmsg.setSessionId(id);
             for (int i = 0; i < requested.getLeaseCount(); i++) {
                 Lease lease = requested.getLease(i);
-                if (lease.getEndDate().getTime() < endTime) {
+                if (lease.getEndTime() < endTime) {
                     // don't modify old object, we don't know where it came from
                     Lease nl = new Lease();
                     nl.setGateway(lease.getGateway());
                     nl.setTunnelId(lease.getTunnelId());
-                    nl.setEndDate(new Date(endTime));
+                    nl.setEndDate(endTime);
                     lease = nl;
                     //if (_log.shouldLog(Log.INFO))
                     //    _log.info("Adjusted end date to " + endTime + " for " + lease);
