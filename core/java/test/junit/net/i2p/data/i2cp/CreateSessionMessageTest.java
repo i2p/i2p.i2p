@@ -8,8 +8,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import net.i2p.data.StructureTest;
-import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;
 
 /**
@@ -17,11 +15,11 @@ import net.i2p.data.DataFormatException;
  *
  * @author jrandom
  */
-public class CreateSessionMessageTest extends StructureTest {
-    public DataStructure createDataStructure() throws DataFormatException {
+public class CreateSessionMessageTest extends I2CPTstBase {
+    public I2CPMessageImpl createDataStructure() throws DataFormatException {
         CreateSessionMessage msg = new CreateSessionMessage();
         msg.setSessionConfig((SessionConfig)(new SessionConfigTest()).createDataStructure());
         return msg; 
     }
-    public DataStructure createStructureToRead() { return new CreateSessionMessage(); }
+    public I2CPMessageImpl createStructureToRead() { return new CreateSessionMessage(); }
 }

@@ -14,15 +14,16 @@ import java.io.OutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.DataStructureImpl;
 
 /**
  * Defines the token passed between the router and client to associate messages
  * with a particular session.  These IDs are not globally unique.
  *
+ * As of 0.9.48, does NOT extend DataStructureImpl.
+ *
  * @author jrandom
  */
-public class SessionId extends DataStructureImpl {
+public class SessionId {
     private int _sessionId;
 
     public SessionId() {

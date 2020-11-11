@@ -15,15 +15,16 @@ import java.io.OutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.DataStructureImpl;
 
 /**
  * Defines the message ID of a message delivered between a router and a client
  * in a particular session.  These IDs are not globally unique.
  *
+ * As of 0.9.48, does NOT extend DataStructureImpl.
+ *
  * @author jrandom
  */
-public class MessageId extends DataStructureImpl {
+public class MessageId {
     private long _messageId;
 
     public MessageId() {

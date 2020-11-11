@@ -26,7 +26,7 @@ public class TunnelIdTest extends StructureTest {
      * so we can test it as a structure
      * @since 0.9.48 TunnelId no longer extends DataStructureImpl
      */
-    private class TunnelIdStructure extends TunnelId implements DataStructure {
+    private static class TunnelIdStructure extends TunnelId implements DataStructure {
         public Hash calculateHash() { return null; }
         public void fromByteArray(byte[] in) {}
         public byte[] toByteArray() { return null; }

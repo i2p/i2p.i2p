@@ -8,8 +8,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import net.i2p.data.StructureTest;
-import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Payload;
 import net.i2p.data.PayloadTest;
@@ -20,14 +18,14 @@ import net.i2p.data.PayloadTest;
  * @author jrandom
  */
  
- public class MessagePayloadMessageTest extends StructureTest {
-    public DataStructure createDataStructure() throws DataFormatException {
+ public class MessagePayloadMessageTest extends I2CPTstBase {
+    public I2CPMessageImpl createDataStructure() throws DataFormatException {
         MessagePayloadMessage msg = new MessagePayloadMessage();
         msg.setMessageId(123);
         msg.setPayload((Payload)(new PayloadTest()).createDataStructure());
         msg.setSessionId(321);
         return msg; 
     }
-    public DataStructure createStructureToRead() { return new MessagePayloadMessage(); }
+    public I2CPMessageImpl createStructureToRead() { return new MessagePayloadMessage(); }
     
 }

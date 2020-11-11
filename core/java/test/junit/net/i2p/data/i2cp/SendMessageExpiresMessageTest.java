@@ -8,8 +8,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import net.i2p.data.StructureTest;
-import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.DestinationTest;
@@ -24,9 +22,9 @@ import net.i2p.data.DateAndFlagsTest;
  * @author str4d
  */
  
- public class SendMessageExpiresMessageTest extends StructureTest {
+ public class SendMessageExpiresMessageTest extends I2CPTstBase {
     
-    public DataStructure createDataStructure() throws DataFormatException {
+    public I2CPMessageImpl createDataStructure() throws DataFormatException {
         SendMessageExpiresMessage msg = new SendMessageExpiresMessage();
         msg.setDestination((Destination)(new DestinationTest()).createDataStructure());
         msg.setPayload((Payload)(new PayloadTest()).createDataStructure());
@@ -37,6 +35,6 @@ import net.i2p.data.DateAndFlagsTest;
         msg.setFlags(daf.getFlags());
         return msg; 
     }
-    public DataStructure createStructureToRead() { return new SendMessageExpiresMessage(); }  
+    public I2CPMessageImpl createStructureToRead() { return new SendMessageExpiresMessage(); }  
     
 }

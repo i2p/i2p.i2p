@@ -10,8 +10,6 @@ package net.i2p.data.i2cp;
 
 import java.util.Date;
 
-import net.i2p.data.StructureTest;
-import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
@@ -22,8 +20,8 @@ import net.i2p.data.TunnelIdTest;
  *
  * @author jrandom
  */
-public class RequestLeaseSetMessageTest extends StructureTest {
-    public DataStructure createDataStructure() throws DataFormatException {
+public class RequestLeaseSetMessageTest extends I2CPTstBase {
+    public I2CPMessageImpl createDataStructure() throws DataFormatException {
         RequestLeaseSetMessage msg = new RequestLeaseSetMessage();
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
         msg.setEndDate(new Date(1000*60*60*12));
@@ -31,5 +29,5 @@ public class RequestLeaseSetMessageTest extends StructureTest {
         msg.addEndpoint(new Hash(h), (TunnelId)(new TunnelIdTest()).createDataStructure());
         return msg; 
     }
-    public DataStructure createStructureToRead() { return new RequestLeaseSetMessage(); }
+    public I2CPMessageImpl createStructureToRead() { return new RequestLeaseSetMessage(); }
 }
