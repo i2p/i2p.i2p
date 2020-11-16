@@ -255,7 +255,7 @@ Applications:
        Copyright (c) 2000, 2001 Markus Friedl.  All rights reserved.
        Copyright (c) 2008 Alexander von Gernler.  All rights reserved.
        See licenses/LICENSE-BSD.txt
-     Zxing 3.3.0:
+     Zxing 3.4.1:
        See licenses/LICENSE-Apache2.0.txt
 
    Jetty 9.3.28.v20191105 (jetty-*.jar, org.mortbay.*.jar):
