@@ -1,3 +1,29 @@
+2020-11-16 zzz
+ * GeoIP 2020-11-01
+ * I2NP: Don't extend DataStructureImpl, to save space
+ * Wrapper: Update to 3.5.44
+
+2020-11-11 zzz
+ * Data: Store timestamps as longs, not Dates, to save space
+ * I2CP: Don't have I2CP Messages extend DataStructureImpl, to save space
+
+2020-11-10 zzz
+ * Data: SDS no longer extends DataStructureImpl to save space
+ * i2psnark: Larger read buffer for large files
+ * Ratchet: Destroy HandshakeState after fatal NS/NSR errors
+
+2020-11-07 zzz
+ * Tunnels: Simplify TunnelId and HopConfig to save space
+
+2020-11-05 zzz
+ * NetDB: Ensure RI republish time is less than validation time
+
+2020-11-04 zzz
+ * Util: ELiminate unneeded data copying in ByteArrayOutputStream
+
+2020-11-03 zzz
+ * i2ptunnel: Add checks for offline expiration of alternate destination
+
 2020-11-02 zzz
  * I2CP: Remove tunnels immediately on client disconnect
  * i2psnark: Limit max size of embedded video
