@@ -869,7 +869,7 @@ public class Blocklist {
      * Do a binary search through the in-memory range list which
      * is a sorted array of longs.
      * The array is sorted in signed order, but we don't care.
-     * Each long is ((from << 32) | to)
+     * Each long is ((from &lt;&lt; 32) | to)
      *
      * Public for console only, not a public API
      *
