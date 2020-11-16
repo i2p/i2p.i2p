@@ -180,10 +180,10 @@ Launchers:
    Copyright (c) 2002-2018 EPFL, Lausanne / Lightbend, Inc. , unless otherwise specified.
    See licenses/LICENSE-Scala.md
 
-Java Service Wrapper Community Edition 3.5.39:
+Java Service Wrapper Community Edition 3.5.44:
    (Windows: 3.5.25)
    (not included in most distribution packages)
-   Copyright (C) 1999-2019 Tanuki Software, Ltd. All Rights Reserved.
+   Copyright (C) 1999-2020 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
 
