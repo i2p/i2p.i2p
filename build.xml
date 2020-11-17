@@ -1347,6 +1347,12 @@
         <copy todir="pkg-temp/lib/wrapper/linux-armv6/">
             <fileset dir="installer/lib/wrapper/linux-armv6/" excludes="*.txt" />
         </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
+            <fileset dir="installer/lib/wrapper/linux-armv7/" excludes="*.txt" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux64-armv8/">
+            <fileset dir="installer/lib/wrapper/linux64-armv8/" excludes="*.txt" />
+        </copy>
     </target>
 
     <target name="preppkg-osx" depends="preppkg-unix">
