@@ -175,13 +175,15 @@
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver}.jar" tofile="jettylib/jetty-security.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlet-${jetty.ver}.jar" tofile="jettylib/jetty-servlet.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlets-${jetty.ver}.jar" tofile="jettylib/jetty-servlets.jar" />
+<!--
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" tofile="jettylib/jetty-util.jar" />
-      <!-- comment out above line and uncomment below and the patches section further down if we need patches
+-->
+      <!-- comment out above line and uncomment below and the patches section further down if we need patches -->
         <jar destfile="jettylib/jetty-util.jar"  manifest="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
-            <zipfileset excludes="**/RolloverFileOutputStream*.class" src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
+            <zipfileset excludes="**/JavaVersion.class" src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
             <zipfileset src="build/jetty-util-patch.jar" />
         </jar>
-       -->
+
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-webapp-${jetty.ver}.jar" tofile="jettylib/jetty-webapp.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-xml-${jetty.ver}.jar" tofile="jettylib/jetty-xml.jar" />
         <jar destfile="jettylib/jetty-java5-threadpool.jar" >
@@ -464,8 +466,10 @@
     </target>    
 
     <!-- empty, uncomment below if needed -->
-    <target name="buildPatches" unless="${with-libjetty9-java}" />
 <!--
+    <target name="buildPatches" unless="${with-libjetty9-java}" />
+-->
+
     <target name="buildPatches" depends="jarPatches" unless="${with-libjetty9-java}" />
 
     <target name="compilePatches" unless="${with-libjetty9-java}" >
@@ -498,7 +502,6 @@
             </or>
         </condition>
     </target>    
--->
 
     <target name="clean" >
         <delete dir="./build" />

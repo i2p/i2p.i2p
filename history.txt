@@ -1,6 +1,16 @@
+2020-11-17 zzz
+ * Jetty:
+   - Update to 9.3.29.v20201019
+   - Patch to fix console not starting on Java 11.0.9.1
+
+2020-11-17 zzz
+ * Wrapper: Add missing binaries for armv7 and aarch64
+   to installer (ticket #2308)
+
 2020-11-16 zzz
  * GeoIP 2020-11-01
  * I2NP: Don't extend DataStructureImpl, to save space
+ * Imagegen: Update zxing to 3.4.1
  * Wrapper: Update to 3.5.44
 
 2020-11-11 zzz
