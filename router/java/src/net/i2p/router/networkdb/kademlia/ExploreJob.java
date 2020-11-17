@@ -143,7 +143,7 @@ class ExploreJob extends SearchJob {
         boolean encryptElG = ctx.getProperty(IterativeSearchJob.PROP_ENCRYPT_RI, IterativeSearchJob.DEFAULT_ENCRYPT_RI);
         I2NPMessage outMsg;
         if (replyTunnelId != null &&
-            ((encryptElG && type == EncType.ELGAMAL_2048) || type == EncType.ECIES_X25519)) {
+            ((encryptElG && type == EncType.ELGAMAL_2048) || (type == EncType.ECIES_X25519 && DatabaseLookupMessage.USE_ECIES_FF))) {
             EncType ourType = ctx.keyManager().getPublicKey().getType();
             boolean ratchet1 = ourType.equals(EncType.ECIES_X25519);
             boolean ratchet2 = DatabaseLookupMessage.supportsRatchetReplies(peer);

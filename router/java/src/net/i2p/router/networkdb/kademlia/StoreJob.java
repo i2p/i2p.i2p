@@ -23,6 +23,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterIdentity;
@@ -649,7 +650,10 @@ abstract class StoreJob extends JobImpl {
         RouterIdentity ident = ri.getIdentity();
         if (ident.getSigningPublicKey().getType() == SigType.DSA_SHA1)
             return false;
-        return LeaseSetKeys.SET_BOTH.contains(ident.getPublicKey().getType());
+        EncType type = ident.getPublicKey().getType();
+        if (DatabaseLookupMessage.USE_ECIES_FF)
+            return LeaseSetKeys.SET_BOTH.contains(type);
+        return type == EncType.ELGAMAL_2048;
     }
 
     /** @since 0.9.38 */

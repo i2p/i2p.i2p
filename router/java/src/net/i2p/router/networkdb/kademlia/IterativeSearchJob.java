@@ -442,7 +442,7 @@ public class IterativeSearchJob extends FloodSearchJob {
                     // request encrypted reply
                     // now covered by version check above, which is more recent
                     //if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
-                    if (!LeaseSetKeys.SET_BOTH.contains(type)) {
+                    if (!(type == EncType.ELGAMAL_2048 || (type == EncType.ECIES_X25519 && DatabaseLookupMessage.USE_ECIES_FF))) {
                         failed(peer, false);
                         if (_log.shouldLog(Log.WARN))
                             _log.warn(getJobId() + ": Can't do encrypted lookup to " + peer + " with EncType " + type);

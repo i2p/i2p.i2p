@@ -2,8 +2,7 @@
  * Jetty:
    - Update to 9.3.29.v20201019
    - Patch to fix console not starting on Java 11.0.9.1
-
-2020-11-17 zzz
+ * NetDB: Disable sending encrypted messages to ECIES routers
  * Wrapper: Add missing binaries for armv7 and aarch64
    to installer (ticket #2308)
 
