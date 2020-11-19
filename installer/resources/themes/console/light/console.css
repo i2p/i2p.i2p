@@ -4813,6 +4813,7 @@ div#themesettings {
 
 select#langsettings {
      width: 15rem;
+     margin: 20px !important;
 }
 
 div#langsettings {
