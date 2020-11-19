@@ -213,7 +213,6 @@ pre {
      letter-spacing: 0.04em;
      margin: -9px -7px -2px;
      padding: 2px 0;
-     text-transform: uppercase;
      background: #f6f6fa !important;
      border: 1px solid #dee2e6;
      border-left: none;
@@ -3373,7 +3372,6 @@ h1 {
      font-size: 18pt;
      line-height: 90%;
      letter-spacing: 0.08em;
-     text-transform: uppercase;
      text-shadow: 0 1px 1px #fff;
      box-shadow: inset 0 0 0 1px #dee2e6;
      white-space: normal;
@@ -3425,8 +3423,7 @@ h2 {
 }
 
 h2 a, h3 a {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+        letter-spacing: 0.08em;
     word-spacing: 0.1em;
 }
 
@@ -3561,7 +3558,6 @@ h4 {
      padding: 4px 6px;
      margin: 5px 0 10px 0;
      font-size: 10pt;
-     text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      border-radius: 2px;
@@ -4307,7 +4303,7 @@ select {
      -moz-appearance: none;
      -webkit-appearance: none;
      appearance: none;
-     background: url(images/dropdown.png) right 4px center no-repeat #fff;
+     background: url(images/dropdown.png) right 4px center no-repeat #f6f6fa;
      background-blend-mode: hard-light, normal;
      padding: 4px 16px 4px 4px !important;
      color: #41465f;
@@ -4315,7 +4311,7 @@ select {
      border: 1px solid #999daf;
      min-width: 120px;
      font-size: 9pt;
-     border-radius: 2px;
+     border-radius: 6px !important;
      text-align: left !important;
      box-shadow: inset 0 0 0 1px #fff;
 }
@@ -6286,7 +6282,6 @@ h3#ntcpcon, h3#udpcon {
 #help h2 {
      margin: -1px -11px 10px !important;
      border-radius: 2px 2px 0 0;
-     text-transform: uppercase;
      filter: none;
 }
 
