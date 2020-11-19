@@ -50,6 +50,11 @@ code, tt, .destaddress {
      font-size: 8.5pt;
 }
 
+object {
+    height: 50%;
+    width: 100%;
+}
+
 #host_list .destaddress {
      -moz-user-select: all;
      -webkit-user-select: all;

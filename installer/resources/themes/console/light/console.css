@@ -2512,7 +2512,6 @@ td {
 
 .main[id^="config_"] select, .main[id^="config_"] textarea, .main[id^="config_"] .optbox {
      margin-left: 3px !important;
-     padding-right: 11% !important;
      border-radius: 12px;
 }
 
