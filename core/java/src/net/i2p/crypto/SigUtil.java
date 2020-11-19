@@ -44,6 +44,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.LHMCache;
 import net.i2p.util.NativeBigInteger;
+import net.i2p.util.SystemVersion;
 
 
 /**
@@ -53,10 +54,11 @@ import net.i2p.util.NativeBigInteger;
  */
 public final class SigUtil {
 
-    private static final Map<SigningPublicKey, ECPublicKey> _ECPubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(64);
-    private static final Map<SigningPrivateKey, ECPrivateKey> _ECPrivkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(16);
-    private static final Map<SigningPublicKey, EdDSAPublicKey> _EdPubkeyCache = new LHMCache<SigningPublicKey, EdDSAPublicKey>(64);
-    private static final Map<SigningPrivateKey, EdDSAPrivateKey> _EdPrivkeyCache = new LHMCache<SigningPrivateKey, EdDSAPrivateKey>(16);
+    private static final int FACTOR = SystemVersion.isAndroid() ? 1 : 4;
+    private static final Map<SigningPublicKey, ECPublicKey> _ECPubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(FACTOR * 8);
+    private static final Map<SigningPrivateKey, ECPrivateKey> _ECPrivkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(8);
+    private static final Map<SigningPublicKey, EdDSAPublicKey> _EdPubkeyCache = new LHMCache<SigningPublicKey, EdDSAPublicKey>(FACTOR * 64);
+    private static final Map<SigningPrivateKey, EdDSAPrivateKey> _EdPrivkeyCache = new LHMCache<SigningPrivateKey, EdDSAPrivateKey>(FACTOR * 4);
 
     private SigUtil() {}
 
