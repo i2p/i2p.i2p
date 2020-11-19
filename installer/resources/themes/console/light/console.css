@@ -2156,7 +2156,6 @@ table {
      border-collapse: collapse;
      width: 100%;
      border: 1px solid #dee2e6;
-     margin: 1px 0 5px 0;
      font-size: 9pt;
      background: #fafaff;
 }
@@ -2173,17 +2172,13 @@ table {
 td.optionsave {
      text-align: right;
      padding: 5px !important;
-     background: none;
+     background: #f6f6fa;
      /*border-top: 1px solid #dee2e6 !important;*/
-}
-
-.formaction, form[action="configpeer"] tr:last-child td, table#addkeyring tr:last-child td {
-     background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
 }
 
 #pluginupdater {
      padding: 15px 5px 15px 50px;
-     background: url(/themes/console/images/info/update.png) 12px center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
+     background: #f6f6fa !important;
      background-size: 28px 28px, 100% 100% !important;
 }
 
@@ -2432,7 +2427,6 @@ th {
      border-top: 1px solid #dee2e6 !important;
      vertical-align: middle;
      background: #f6f6ff !important;
-     background: linear-gradient(to bottom, #fafaff 50%, rgba(252, 252, 255, 0.8) 50%, #e2e2ff 100%) #fafaff !important;
 }
 
 th img[src="/themes/console/images/outbound.png"] {
@@ -3076,8 +3070,7 @@ p.infowarn {
 }
 
 #leavefamily tr:last-child td:first-child {
-     background: #fff url(/themes/console/images/info/leave_family.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/leave_family.png) 12px center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: #f6f6fa url(/themes/console/images/info/leave_family.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
 }
@@ -3094,8 +3087,7 @@ p.infowarn {
 }
 
 #floodfillconfig tr:first-child .infohelp {
-     background: #fff url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
@@ -3112,29 +3104,25 @@ p#clientconf.infohelp, p#webappconfigtext.infohelp {
 }
 
 p#pluginconfigtext {
-     background: #fff url(/themes/console/images/info/plugin_edit.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/plugin_edit.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/plugin_link.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 #plugininstall .infohelp {
-     background: #fff url(/themes/console/images/info/plugin_link.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/plugin_link.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
-     background: url(/themes/console/images/info/plugin_link.png) 12px center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(220, 220, 255, 0.3)) repeat scroll 0 0%, rgba(0, 0, 0, 0) repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #ffffff 5px) repeat scroll 0 0;
+     background: #f6f6fa url(/themes/console/images/info/plugin_link.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2) {
-     background: #fafaff url(/themes/console/images/info/url.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/url.png) 12px center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: #f6f6fa url(/themes/console/images/info/plugin_link.png) 12px center no-repeat;
      padding: 10px 15px 10px 50px;
      background-size: 28px 28px, 100% 100%, 100% 100% !important;
 }
 
 #plugininstall tr:nth-child(3) td:nth-last-child(1), #manualreseed tr:nth-child(3) td:nth-last-child(1), #manualreseed tr:nth-child(5) td:nth-last-child(1) {
-     background: #fafaff;
+     background: #f6f6fa;
 }
 
 .optionsave form {
@@ -3143,35 +3131,34 @@ p#pluginconfigtext {
 }
 
 #manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall2 tr:nth-child(2) td:nth-last-child(2) {
-     background: #fafaff url(/themes/console/images/info/from_file.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/from_file.png) 12px center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: #f6f6fa url(/themes/console/images/info/from_file.png) 12px center no-repeat;
      padding: 10px 15px 10px 50px;
      background-size: 28px 28px, 100% 100%, 100% 100% !important;
 }
 
 #manualreseed tr:nth-last-child(2) td.infohelp {
-     background: #fafaff url(/themes/console/images/info/box.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/box.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/box.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/box.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 #config_peers tr:nth-child(3) td.infohelp {
-     background: #fafaff url(/themes/console/images/info/blocked.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/blocked.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/blocked.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/blocked.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 h3#shutdownrouter + p.infohelp {
-     background: #fafaff url(/themes/console/images/info/power.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/power.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/power.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/power.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 h3#restartrouter + p.infohelp, #config_family .infohelp.needrestart {
-     background: url(/themes/console/images/info/reboot.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: url(/themes/console/images/info/reboot.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
@@ -3181,29 +3168,29 @@ h3#shutdownrouter, h3#systray, h3#servicedebug {
 }
 
 h3#systray + p.infohelp {
-     background: #fafaff url(/themes/console/images/info/systray.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/systray.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/systray.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/systray.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 h3#servicedebug + p.infohelp {
-     background: #fafaff url(/themes/console/images/info/debug.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/debug.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/debug.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/debug.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 10px 15px 10px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 h3#browseronstart + p.infohelp {
-     background: #fafaff url(/themes/console/images/info/launch_browser.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/launch_browser.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/launch_browser.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/launch_browser.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 .main#config_reseed p.infohelp {
-     background: #fafaff url(/themes/console/images/info/connect.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/connect.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/connect.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/connect.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 10px 15px 10px 50px;
      background-size: 28px 28px, 100% 100%;
      border-radius: 2px;
@@ -3211,15 +3198,15 @@ h3#browseronstart + p.infohelp {
 }
 
 p#enablefullstats, p#gatherstats {
-     background: #fafaff url(/themes/console/images/info/statistics.png) 12px center no-repeat;
-     background: url(/themes/console/images/info/statistics.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
+     background: #f6f6fa url(/themes/console/images/info/statistics.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/statistics.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, 100% 100%;
 }
 
 #config_family .infohelp {
-      background: #fafaff url(/themes/console/images/info/family.png) 12px center no-repeat !important;
-      background: url(/themes/console/images/info/family.png) 12px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff) !important;
+      background: #f6f6fa url(/themes/console/images/info/family.png) 12px center no-repeat !important;
+      background: url(/themes/console/images/info/family.png) 12px center no-repeat, linear-gradient(135deg, #f6f6fa, #f8f8ff) !important;
       padding: 15px 15px 15px 50px !important;
       background-size: 28px 28px, 100% 100% !important;
 }
@@ -6496,7 +6483,6 @@ h3#ntcpcon, h3#udpcon {
 .homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
      text-align: center;
      background: #f6f6ff url(/themes/console/images/buttons/delete.png) center center no-repeat !important;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(252, 252, 255, 0.8) 50%, #e2e2ff 100%) #fafaff !important;
      font-size: 0 !important;
      width: 5%;
 }
@@ -6564,9 +6550,7 @@ table#plugininstall td:first-child {
 }
 
 h4#updateplugins {
-     background: #fcfcff !important;
-     background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) #fff !important;
-     border: 1px solid #7778bf;
+     background: #f6f6fa !important;
      padding: 5px;
      font-size: 10pt;
      margin: -15px 0 14px;
@@ -8188,10 +8172,6 @@ to {
 #help #volunteer {
      background: #f3f3ff !important;
      background-size: auto 80%;
-}
-
-#help tr:nth-child(even), .main tr:nth-child(even), #themeoptions {
-     background: #f0f0ff !important;
 }
 
 #help tr:nth-child(odd), .main tr:nth-child(odd) {
