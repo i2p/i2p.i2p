@@ -1279,7 +1279,7 @@ p:empty + .sb_notice {
 }
 
 .main#console {
-     box-shadow: inset 0 0 0 1px #bbf !important;
+     box-shadow: inset 0 0 0 1px #dee2e6;
 }
 
 .news, .main#news, .main#proof, .main#oldconsole, #warning2 {
@@ -1445,11 +1445,9 @@ textarea[name="reseedURL"] {
 
 .newscontent {
      background: #f6f6fa !important;
-     border: 1px solid #dee2e6;
-     border-radius: 0 0 2px 2px;
+     /*border-radius: 0 0 2px 2px;*/
      margin: 0 0 14px;
      padding: 10px 15px;
-     box-shadow: inset 0 0 0 1px #fff;
 }
 
 div.newscontent p {
@@ -1562,7 +1560,6 @@ div.news h3, #news h3 {
      background:  #f6f6fa !important;
      text-align: left;
      padding: 6px 10px 5px 15px;
-     border: 1px solid #dee2e6;
      border-radius: 2px 2px 0 0;
      font-size: 10pt !important;
      letter-spacing: 0.08em;
@@ -1570,6 +1567,7 @@ div.news h3, #news h3 {
      text-transform: capitalize !important;
      margin-bottom: -1px;
      filter: none;
+     border: none;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -2620,18 +2618,19 @@ td {
 h4.app, h4.app2 {
      margin: 0 auto 3px;
      padding: 7px 10px 6px;
-     border: 1px solid #dee2e6;
+     border: none;
      font-size: 12pt;
      text-transform: capitalize;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      background: #eef;
      background: linear-gradient(to bottom, #fff 50%, #eef 50%);
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
+     box-shadow: inset 0 0 0 1px #dee2e6;
      display: inline-block;
      width: 99%;
      border-radius: 2px;
      color: #41465f;
+     padding-right: 5px;
 }
 
 h4.app {
@@ -3410,14 +3409,14 @@ h2 {
      border: 1px solid #dee2e6;
      border-radius: 2px;
      margin: 15px 0 15px 0 !important;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
+     /*box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;*/
      word-wrap: break-word;
      text-transform: uppercase !important;
 }
 
 .welcome h2 { /* fixes occluded langbox rendering bug */
      filter: none;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
+     /*box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;*/
      white-space: nowrap;
 }
 
@@ -3444,16 +3443,14 @@ h2 img {
 }
 
 h3 {
-     border: 1px solid #dee2e6;
-     border-left: 5px solid #dee2e6;
      padding: 7px 5px 6px 7px;
-     margin: 12px 0 15px 0;
+     margin: 12px 0 0 0;
      border-radius: 0 2px 2px 0;
      font-size: 11pt;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      color: #41465f;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
+     border: 1px solid #dee2e6;
 }
 
 h3.tabletitle, h3.ptitle, #config_advanced h3.tabletitle, h3#bannedpeers {
@@ -3768,6 +3765,7 @@ input, input:visited, button, button:visited {
 }
 
 input[type="text"], textarea, input[type="password"] {
+     border-radius: 6px;
 }
 
 input[type="submit"], input[type="reset"], button, select {
@@ -4808,7 +4806,6 @@ div.themelabel {
 div#themesettings {
      clear: both;
      padding: 4px 5px 0;
-     margin: -16px 0 0;
      border: 1px solid #dee2e6;
      background: #fafaff;
      background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(248, 248, 255, 0.3) 3px, #fafaff 5px);
@@ -6301,9 +6298,8 @@ h3#ntcpcon, h3#udpcon {
 }
 
 #help div, .logtable tr:nth-child(n+2) td, .main#console, .debug_container {
-     background: linear-gradient(to bottom, rgba(248,248,255,0.5), rgba(250,250,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fafaff !important;
+     background: #f6f6fa;
      margin-bottom: 13px;
-     box-shadow: inset 0 0 0 1px #fff;
 }
 
 #help #volunteer, #wrapperlogs pre {
@@ -8181,7 +8177,7 @@ to {
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
 
 .main, table {
-     background: #f6f6ff !important;
+     background: #f6f6fa !important;
 }
 
 #help #sidebarhelp, #help #configurationhelp, #help pre, #help #faq, .debug_container {
