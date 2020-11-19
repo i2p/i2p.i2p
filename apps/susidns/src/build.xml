@@ -90,9 +90,32 @@
             <arg value="-webapp" />
             <arg value="./jsp" />
         </java>
+        <!--
+          -  Reproducible build.
+          -  Strip full file path
+          -  Put two entries in a standard order
+          -  Set file timestamp
+          -  Before:
+          -   _jspx_dependants.put("file:/full/path/to/build/dir/apps/susidns/src/lib/standard.jar", Long.valueOf(1546376600000L));
+          -   _jspx_dependants.put("jar:file:lib/standard.jar!/META-INF/c.tld", Long.valueOf(1279278984000L));
+          -  After:
+          -   _jspx_dependants.put("jar:file:lib/standard.jar!/META-INF/c.tld", Long.valueOf(1200000000000L));
+          -   _jspx_dependants.put("file:lib/standard.jar", Long.valueOf(1200000000000L));
+          -  We first strip the full path in case the latter steps don't work due to changing JspC implementation.
+          -->
         <replace file="tmp/i2p/susi/dns/jsp/addressbook_jsp.java">
             <replacefilter token="${user.dir}/apps/susidns/src/" value="" />
         </replace>
+        <replaceregexp file="tmp/i2p/susi/dns/jsp/addressbook_jsp.java"
+                       match="_jspx_dependants.put\(.*\);"
+                       replace="//_jspx_dependants.put(@@@);"
+                       flags="g" />
+        <replaceregexp file="tmp/i2p/susi/dns/jsp/addressbook_jsp.java"
+                       match="//_jspx_dependants.put\(@@@\);"
+                       replace="_jspx_dependants.put(&quot;jar:file:lib/standard.jar!/META-INF/c.tld&quot;, Long.valueOf(1200000000000L));" />
+        <replaceregexp file="tmp/i2p/susi/dns/jsp/addressbook_jsp.java"
+                       match="//_jspx_dependants.put\(@@@\);"
+                       replace="_jspx_dependants.put(&quot;file:lib/standard.jar&quot;, Long.valueOf(1200000000000L));" />
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                release="${javac.release}"
                includeAntRuntime="false"
