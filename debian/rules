@@ -142,20 +142,6 @@ endif
 	ln -sf /usr/share/java/taglibs-standard-jstlel.jar $(CURDIR)/apps/susidns/src/lib/jstlel.jar
 
 	@# debian and ubuntu: everywhere
-	@#/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
-	@# glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
-	@#ln -sf /usr/share/java/glassfish-javaee.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
-	@#ln -sf /usr/share/java/glassfish-appserv-jstl.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
-
-	@# debian and ubuntu: everywhere
-	@#/bin/echo -e "with-libjakarta-taglibs-standard-java=true" >> $(CURDIR)/override.properties
-	@#ln -sf /usr/share/java/standard.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
-
-	@# debian and ubuntu: everywhere
-	@#/bin/echo -e "with-libjstl1.1-java=true" >> $(CURDIR)/override.properties
-	@#ln -sf /usr/share/java/jstl1.1.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
-
-	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-gettext-base=true" >> $(CURDIR)/override.properties
 	@mkdir -p $(CURDIR)/core/java/build
 	ln -sf /usr/share/java/libintl.jar $(CURDIR)/core/java/build/libintl.jar
@@ -179,15 +165,6 @@ endif
 
 	@# debian: everywhere; ubuntu: trusty+
 	@/bin/echo -e "with-famfamfam-flag-png=true" >> $(CURDIR)/override.properties
-
-	@# 2 MB of dependencies vs. 20 KB of copied source
-	@# Requires 4.4 or higher.
-	@# Debian: Not in wheezy/jessie
-	@# Ubuntu: Only in wily and later
-	@#/bin/echo -e "with-libhttpclient-java=true" >> $(CURDIR)/override.properties
-	@#mkdir -p $(CURDIR)/core/java/build
-	@#ln -sf /usr/share/java/httpclient.jar $(CURDIR)/core/java/build/httpclient.jar
-	@#ln -sf /usr/share/java/httpcore.jar $(CURDIR)/core/java/build/httpcore.jar
 
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
