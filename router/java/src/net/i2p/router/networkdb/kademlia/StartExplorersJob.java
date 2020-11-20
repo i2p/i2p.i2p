@@ -76,6 +76,8 @@ class StartExplorersJob extends JobImpl {
                 num *= 10;  // 3x was not sufficient to keep hidden routers from losing peers
             if (getContext().router().getUptime() < STARTUP_TIME)
                 num *= 2;
+            if (getContext().router().isHidden())
+                num *= 2;
             Set<Hash> toExplore = selectKeysToExplore(num);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Keys to explore during this run: " + toExplore + ", wanted " + num + ", got " + toExplore.size());
