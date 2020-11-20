@@ -117,9 +117,6 @@ public class Reseeder {
         "https://i2pseed.creativecowpat.net:8443/" + ',' + // creativecowpat_at_mail.i2p.crt // i2pseed.creativecowpat.net.crt // Java 7+
         "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // CA                         // Java 8+ only
         "https://reseed.memcpy.io/"           + ',' +   // hottuna_at_mail.i2p.crt   // CA                         // SNI required
-        //"https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
-        "https://reseed.i2p2.no/"             + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
-        //"https://reseed2.i2p2.no/"            + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
         "https://reseed.i2p-projekt.de/";               // echelon_at_mail.i2p.crt   // echelon.reseed2017.crt     // Java 8+
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
