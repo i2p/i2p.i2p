@@ -3437,6 +3437,10 @@ h3 {
      border: 1px solid #dee2e6;
 }
 
+h3#transports {
+    margin: revert !important;
+}
+
 h3.tabletitle, h3.ptitle, #config_advanced h3.tabletitle, h3#bannedpeers {
      border-radius: 0;
      border: 1px solid #dee2e6;
