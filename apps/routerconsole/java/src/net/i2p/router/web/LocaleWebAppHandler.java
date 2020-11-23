@@ -61,6 +61,8 @@ public class LocaleWebAppHandler extends HandlerWrapper
         if (pathInContext.equals("/") || pathInContext.equals("/index.html")) {
             // home page
             pathInContext = "/index.jsp";
+        } else if (pathInContext.equals("/favicon.ico")) {
+            // pass thru unchanged
         } else if (pathInContext.indexOf('/', 1) < 0 &&
                    (!pathInContext.endsWith(".jsp")) &&
                    (!pathInContext.endsWith(".log")) &&
