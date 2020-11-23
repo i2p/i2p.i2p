@@ -145,8 +145,9 @@ public class JSONRPC2Servlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        httpServletResponse.setContentType("text/html");
+        setHeaders(httpServletResponse);
         PrintWriter out = httpServletResponse.getWriter();
+        out.println("<html><head></head><body>");
         out.println("<p>I2PControl RPC Service version " + I2PControlVersion.VERSION + " : Running");
 	if ("/password".equals(httpServletRequest.getServletPath())) {
             out.println("<form method=\"POST\" action=\"password\">");
@@ -160,16 +161,19 @@ public class JSONRPC2Servlet extends HttpServlet {
                         "<input name=\"save\" type=\"submit\" value=\"Change API Password\">" +
                         "<p>If you forget the API password, stop i2pcontrol, delete the file <tt>" + _conf.getConfFile() +
                         "</tt>, and restart i2pcontrol.");
+            out.println("</form>");
         } else {	
             out.println("<p><a href=\"password\">Change API Password</a>");
         }
+        out.println("</body></html>");
         out.close();
     }
 
     /** @since 0.12 */
     private void doPasswordChange(HttpServletRequest req, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        httpServletResponse.setContentType("text/html");
+        setHeaders(httpServletResponse);
         PrintWriter out = httpServletResponse.getWriter();
+        out.println("<html><head></head><body>");
         String pw = req.getParameter("password");
         if (pw == null)
             pw = _secMan.DEFAULT_AUTH_PASSWORD;
@@ -194,6 +198,21 @@ public class JSONRPC2Servlet extends HttpServlet {
             }
         }
         out.println("<p><a href=\"password\">Change API Password</a>");
+        out.println("</body></html>");
+        out.close();
+    }
+
+    /**
+     *  @since 0.9.48
+     */
+    private static void setHeaders(HttpServletResponse resp) {
+        resp.setContentType("text/html");
+        resp.setHeader("X-Frame-Options", "SAMEORIGIN");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
+        resp.setHeader("X-XSS-Protection", "1; mode=block");
+        resp.setHeader("X-Content-Type-Options", "nosniff");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("Cache-Control","no-cache");
     }
 
     @Override
