@@ -1178,8 +1178,11 @@
                     <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
             </exec>
             <echo message="Everything is checked in, right? Let's be sure:" />
-            <exec executable="mtn" failonerror="true">
+            <exec executable="mtn" failonerror="false" >
                     <arg value="st" />
+            </exec>
+            <exec executable="git" failonerror="false" >
+                    <arg value="status" />
             </exec>
             <echo message="If there are any modified files above, stop now!" />
             <echo message="================================================================" />
@@ -2361,6 +2364,7 @@
             <arg value=".." />
             <arg value="--exclude" />
             <arg value="i2p-${release.number}/_MTN*" />
+            <arg value="--exclude" />
             <arg value="i2p-${release.number}/.git" />
             <arg value="i2p-${release.number}/" />
         </exec>
