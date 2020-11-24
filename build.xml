@@ -543,7 +543,7 @@
         </exec>
     </target>
 
-    <target name="revisions" depends="getReleaseNumber, getBuildNumber, failIfNoMtn">
+    <target name="revisionsMtn" depends="checkForMtn, getReleaseNumber, getBuildNumber" if="mtn.available">
         <!-- mtn log __brief __no-graph __to t:i2p-0.9.xx | cut -d ' ' -f 2 | sort | uniq -c | sort -rn -->
         <exec executable="mtn" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
             <arg value="log" />
@@ -611,6 +611,34 @@
         </exec>
     </target>
 
+    <target name="revisionsGit" depends="checkForGit, getReleaseNumber, getBuildNumber" if="git.available" unless="mtn.available">
+        <!-- git log i2p-0.9.xx | grep '^Author:' | cut -d ' ' -f 2- | sort | uniq -c | sort -rn -->
+        <exec executable="git" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
+            <arg value="log" />
+            <arg value="i2p-${release.number}..HEAD" />
+        </exec>
+        <exec executable="grep" inputstring="${getrevisions1}" outputproperty="getrevisions2" failifexecutionfails="true" >
+            <arg value="^Author:" />
+        </exec>
+        <exec executable="cut" inputstring="${getrevisions2}" outputproperty="getrevisions3" failifexecutionfails="true" >
+            <arg value="-d" />
+            <arg value=" " />
+            <arg value="-f" />
+            <arg value="2-" />
+        </exec>
+        <exec executable="sort" inputstring="${getrevisions3}" outputproperty="getrevisions4" failifexecutionfails="true" >
+        </exec>
+        <exec executable="uniq" inputstring="${getrevisions4}" outputproperty="getrevisions5" failifexecutionfails="true" >
+            <arg value="-c" />
+        </exec>
+        <exec executable="sort" inputstring="${getrevisions5}" outputproperty="getrevisions6" failifexecutionfails="true" >
+            <arg value="-rn" />
+        </exec>
+        <echo message="Revisions since ${release.number}:" />
+        <echo message="${getrevisions6}" />
+    </target>
+
+
 
     <!-- end git targets -->
 
@@ -655,6 +683,9 @@
 
     <!-- if both present, only mtn will run -->
     <target name="checkoutFromVCS" depends="failIfNoVCS, checkoutFromMtn, checkoutFromGit" />
+
+    <!-- if both present, only mtn will run -->
+    <target name="revisions" depends="failIfNoVCS, revisionsMtn, revisionsGit" />
 
     <!-- end combined mtn/git targets -->
 
