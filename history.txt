@@ -1,3 +1,20 @@
+2020-11-24 zzz
+ * Build: Fix targets for git
+ * NTCP: Add nodelay option for testing
+
+2020-11-23 zzz
+ * Console: Serve default favicon.ico
+ * i2pcontrol: Basic HTML fixes and HTTP headers for static pages
+
+2020-11-22 zzz
+ * NetDB: Increase min FF version for LS lookups
+
+2020-11-21 zzz
+ * i2psnark: Remove old default opentrackers
+ * Proxy:
+   - Remove old default jump servers
+   - Fix CSP for conflict error page
+
 2020-11-20 zzz
  * NetDB: Increase exploration rate when hidden
  * Tomcat 9.0.40

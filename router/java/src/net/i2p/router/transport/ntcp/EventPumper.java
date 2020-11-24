@@ -57,6 +57,7 @@ class EventPumper implements Runnable {
     private final ObjectCounter<ByteArray> _blockedIPs;
     private long _expireIdleWriteTime;
     private static final boolean _useDirect = false;
+    private final boolean _nodelay;
     
     /**
      *  This probably doesn't need to be bigger than the largest typical
@@ -102,6 +103,7 @@ class EventPumper implements Runnable {
      *  @see java.nio.ByteBuffer
      */
     //private static final String PROP_DIRECT = "i2np.ntcp.useDirectBuffers";
+    private static final String PROP_NODELAY = "i2np.ntcp.nodelay";
 
     private static final int MIN_MINB = 4;
     private static final int MAX_MINB = 12;
@@ -128,6 +130,7 @@ class EventPumper implements Runnable {
         _context.statManager().createRateStat("ntcp.zeroRead", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.zeroReadDrop", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.dropInboundNoMessage", "", "ntcp", new long[] {10*60*1000} );
+        _nodelay = ctx.getBooleanProperty(PROP_NODELAY);
     }
     
     public synchronized void startPumping() {
@@ -531,6 +534,8 @@ class EventPumper implements Runnable {
 
             if (shouldSetKeepAlive(chan))
                 chan.socket().setKeepAlive(true);
+            if (_nodelay)
+                chan.socket().setTcpNoDelay(true);
 
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
             NTCPConnection con = new NTCPConnection(_context, _transport, chan, ckey);
@@ -551,6 +556,8 @@ class EventPumper implements Runnable {
             if (connected) {
                 if (shouldSetKeepAlive(chan))
                     chan.socket().setKeepAlive(true);
+                if (_nodelay)
+                    chan.socket().setTcpNoDelay(true);
                 // key was already set when the channel was created, why do it again here?
                 con.setKey(key);
                 con.outboundConnected();
