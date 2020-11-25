@@ -137,7 +137,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      color: #559;
      letter-spacing: 0.08em;
      text-decoration: none !important;
-     text-transform: uppercase !important;
+/*     text-transform: uppercase !important;*/
      outline: none;
      border-radius: 0;
      border: 1px solid #7778bf;

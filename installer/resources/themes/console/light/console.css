@@ -2093,6 +2093,10 @@ h3#graphdisplay {
      margin: 15px 0;
      padding: 10px 15px;
      z-index: 999;
+     border-radius: 2px;
+     border: 1px solid #dee2e6;
+     background: #eef;
+     background: linear-gradient(to right, #fafaff, #eef);
      background-size: auto 100%, 100% 100%;
      box-shadow: inset 0 0 0 1px #fff;
      font-weight: bold;
@@ -2591,9 +2595,11 @@ td {
 	position: absolute;
 	left: 70%;
 	top: 30%;
-  font-size: larger;
-  background-size: auto 100%, 100% 100%;
-  box-shadow: inset 0 0 0 1px #fff;
+    font-size: larger;
+    background: #eef;
+    background: linear-gradient(to right, #fafaff, #eef);
+    background-size: auto 100%, 100% 100%;
+    box-shadow: inset 0 0 0 1px #fff;
 }
 
 /* begin home page */

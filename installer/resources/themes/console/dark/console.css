@@ -335,7 +335,7 @@ div.warning {
      letter-spacing: 0.08em;
      margin: -7px -10px -8px -10px;
      padding: 4px 0 !important;
-     text-transform: uppercase;
+
      border-radius: 0;
      mix-blend-mode: exclusion;
      transition: none !important;
@@ -1208,7 +1208,7 @@ div.messages li {
 div.widepanel h3 {
      text-align: left !important;
      padding: 8px 10px;
-     text-transform: uppercase;
+
      font-size: 10.5pt;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -1781,7 +1781,7 @@ h1 {
      font-size: 17pt;
      font-weight: bold;
      font-style: normal;
-     text-transform: uppercase;
+
      letter-spacing: 0.15em;
      text-shadow: 0 0 2px #010;
      white-space: normal;
@@ -1823,7 +1823,7 @@ h2, h2.welcome {
      border-radius: 2px;
      vertical-align: middle;
      margin: 15px 0 12px 0 !important;
-     text-transform: uppercase;
+
      word-wrap: break-word;
 }
 
@@ -1840,7 +1840,7 @@ h3, h3.welcome {
      padding: 7px 10px;
      margin: 12px 0 10px 0;
      border-radius: 0 2px 2px 0;
-     text-transform: uppercase;
+
      text-shadow: 0 0 2px #010;
      letter-spacing: 0.08em;
 }
@@ -3125,7 +3125,6 @@ td#themeselect {
     margin: auto;
     top: 1%;
     font-size: xx-large !important;
-    text-transform: uppercase;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
     color: #41465f;
@@ -3325,7 +3324,7 @@ table#newfamily, #leavefamily {
 }
 
 #exportfamily tr:nth-child(2) td:first-child {
-     background: #000 url(/themes/console/images/info/export_key.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/export_key.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
 }
@@ -3335,7 +3334,7 @@ table#newfamily, #leavefamily {
 }
 
 #leavefamily tr:last-child td:first-child {
-     background: #000 url(/themes/console/images/info/leave_family.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/leave_family.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
 }
@@ -3611,7 +3610,7 @@ form[action="events"] > .formaction {
      text-align: left;
      padding-left: 10px;
      font-size: 10pt;
-     text-transform: uppercase;
+
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
 }
@@ -4081,7 +4080,7 @@ table#externali2cp {
 
 #legal h2, #sidebarhelp h2, #volunteer h2, #reachabilityhelp h2, #configurationhelp h2, #advancedsettings h2, #faq h2 {
      padding: 10px;
-     text-transform: uppercase;
+
      font-size: 11pt;
      text-align: left;
      letter-spacing: 0.08em;
@@ -4123,7 +4122,7 @@ table#configinfo {
 
 #sidebarhelp h3, #faq h3 {
      padding: 10px;
-     text-transform: uppercase;
+
      font-size: 10.5pt;
      text-align: left;
      letter-spacing: 0.08em;
@@ -4136,7 +4135,7 @@ table#configinfo {
 
 #changelog h2 {
      padding: 10px;
-     text-transform: uppercase;
+
      font-size: 11pt;
      text-align: left;
      letter-spacing: 0.08em;
@@ -5058,7 +5057,7 @@ h4.app, h4.app2 {
     font-variant: small-caps;
     margin: 11px -8px -9px;
     padding: 7px 8px 7px;
-    text-transform: uppercase;
+
     text-align: left;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
@@ -5325,7 +5324,7 @@ h3[id*="job"] {
      padding: 6px;
      margin: 12px 0 10px 0;
      border-radius: 0;
-     text-transform: uppercase;
+
      text-shadow: 0 0 2px #010;
      letter-spacing: 0.08em;
 }
@@ -5745,7 +5744,6 @@ table.configtable tr:last-child {
 table#netconfig th, table#externali2cp th, table#plugininstall th, table#plugininstall2 th, .configtable th, th.th_title {
     text-align: left;
     padding: 5px 10px !important;
-    text-transform: uppercase;
     font-size: 10pt;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
@@ -5788,13 +5786,12 @@ table.logtable, #enviro {
 }
 
 p.infohelp, p#debugmode, p#sybilinfo {
-     border: 1px solid #524b5e;
+     border: 1px solid #292929;
 }
 
 p.infowarn, td.infowarn {
      background: #1F1A24 url(images/infowarn.png) 12px center no-repeat !important;
      border: 1px solid #292929;
-     box-shadow: inset 0 0 0 1px #300;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px !important;
 }
@@ -5820,7 +5817,7 @@ h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#
      margin-bottom: 0 !important;
      border-radius: 0;
      border: 1px solid #292929;
-     text-transform: uppercase;
+
      letter-spacing: 0.08em;
      padding: 8px 10px;
 }
@@ -5963,7 +5960,7 @@ h4.embeddedtitle#updateplugins {
      background: linear-gradient(to bottom, #332940 10%, #1F1A24 50%);
      border: 1px solid #292929;
      text-align: left;
-     text-transform: uppercase;
+
      font-size: 10pt;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -6015,7 +6012,7 @@ table#configstats {
 }
 
 #configstats th b {
-     text-transform: uppercase;
+
      font-size: 10pt;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -7781,7 +7778,7 @@ th.options, table#externali2cp th {
      margin: -2px 2px -2px 0;
      padding: 2px 5px;
      font-weight: bold;
-     text-transform: uppercase;
+
      border-radius: 2px;
      background: #030;
 }

@@ -84,7 +84,7 @@ object {
 #navi a,
 #navi a:visited {
      margin: 2px 0;
-     text-transform: capitalize;
+     
      font-weight: bold;
 }
 #navi.private .private,
@@ -163,6 +163,7 @@ h3 {
 .headline#subscriptions h3, .headline#configure h3, .headline#addressbook h3, .headline h3 {
      margin: -8px -5px -5px;
      padding: 9px 5px 8px 32px;
+     text-transform: capitalize;
 }
 
 span.location {
@@ -339,7 +340,7 @@ h3 {
      font-size: 11pt;
      letter-spacing: 0.08em;
      font-weight: bold;
-     text-transform: uppercase;
+     
      margin-bottom: 0;
 }
 
@@ -591,7 +592,7 @@ textarea[name="config"]:focus, textarea[name="content"]:focus {
      border-radius: 2px;
      color: #3b6bbf;
      text-align: center;
-     text-transform: capitalize;
+     
      background: #fff;
      filter: drop-shadow(0 0 1px #ccc);
 }
@@ -611,7 +612,7 @@ textarea[name="config"]:focus, textarea[name="content"]:focus {
 #filter span {
      display: inline-block;
      text-align: center;
-     text-transform: uppercase;
+     
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      vertical-align: middle;
@@ -635,7 +636,7 @@ textarea[name="config"]:focus, textarea[name="content"]:focus {
 #filter span b {
      font-size: 11pt;
      margin: 0 3px 0 0;
-     text-transform: uppercase;
+     
      line-height: 80%;
 }
 

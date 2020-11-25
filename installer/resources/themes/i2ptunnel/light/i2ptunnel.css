@@ -351,7 +351,7 @@ h2, h3 {
      background: #fcfcff;
      background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%) #fff !important;
      font-size: 11.5pt;
-     text-transform: uppercase;
+
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      margin: 10px 0 -1px;

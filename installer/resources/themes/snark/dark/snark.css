@@ -1197,7 +1197,7 @@ to {
      text-align: left;
      border-top: 1px solid #433e47;
      padding: 8px;
-     text-transform: uppercase;
+
      font-variant: normal;
      font-size: 10.5pt !important;
      filter: none;
@@ -2175,7 +2175,7 @@ hr.debug {
 
 hr.debug + b {
      color: #ff7;
-     text-transform: uppercase;
+
 }
 
 hr.debug:first-of-type {
