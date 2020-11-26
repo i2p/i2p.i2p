@@ -1,3 +1,7 @@
+2020-11-26 zzz
+ * NTCP: Enable nodelay by default
+ * SSU: Don't wakeup OMF after ack if no more messages are pending
+
 2020-11-24 zzz
  * Build: Fix targets for git
  * NTCP: Add nodelay option for testing

@@ -130,7 +130,7 @@ class EventPumper implements Runnable {
         _context.statManager().createRateStat("ntcp.zeroRead", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.zeroReadDrop", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.dropInboundNoMessage", "", "ntcp", new long[] {10*60*1000} );
-        _nodelay = ctx.getBooleanProperty(PROP_NODELAY);
+        _nodelay = ctx.getBooleanPropertyDefaultTrue(PROP_NODELAY);
     }
     
     public synchronized void startPumping() {
