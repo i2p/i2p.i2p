@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-19 04:49+0000\n"
+"PO-Revision-Date: 2020-11-19 00:44+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -42,7 +42,7 @@ msgstr "Web Sitesine Erişilemiyor"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
 msgid "Router Console"
-msgstr "Yöneltici Konsolu"
+msgstr "Yöneltici Panosu"
 
 #: ../java/build/Proxy.java:7 ../java/build/Proxy.java:18
 #: ../java/build/Proxy.java:30 ../java/build/Proxy.java:42
@@ -55,7 +55,7 @@ msgstr "Yöneltici Konsolu"
 #: ../java/build/Proxy.java:174 ../java/build/Proxy.java:187
 #: ../java/build/Proxy.java:199 ../java/build/Proxy.java:209
 msgid "I2P Router Console"
-msgstr "I2P Yöneltici Konsolu"
+msgstr "I2P Yöneltici Panosu"
 
 #: ../java/build/Proxy.java:8 ../java/build/Proxy.java:19
 #: ../java/build/Proxy.java:31 ../java/build/Proxy.java:43
@@ -243,7 +243,7 @@ msgstr "Web tarayıcınızın ayarları hatalı."
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr "Yöneltici konsolu, yerel sunucu ya da yerel ağ hedeflerine erişmek için vekil sunucu kullanmayın."
+msgstr "Yöneltici panosu, yerel sunucu ya da yerel ağ hedeflerine erişmek için vekil sunucu kullanmayın."
 
 #: ../java/build/Proxy.java:78
 msgid "Website Unknown"

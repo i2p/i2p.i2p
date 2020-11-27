@@ -4,7 +4,8 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Beta Ba <linsui555@gmail.com>, 2019
+# Beta Ba <linsui@inbox.lv>, 2019
+# bright hong <heathcliff2333@outlook.com>, 2020
 # ciaran <ciaranchen@qq.com>, 2020
 # CLASpEsm, 2020
 # ducki2p <ducki2p@gmail.com>, 2011
@@ -20,8 +21,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-13 02:19+0000\n"
-"Last-Translator: Scott Rhodes <starring169@gmail.com>\n"
+"PO-Revision-Date: 2020-11-02 15:09+0000\n"
+"Last-Translator: bright hong <heathcliff2333@outlook.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -497,7 +498,7 @@ msgstr "Base 32 地址"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:489
 msgid "Helper link to share host address with option to add to addressbook"
-msgstr ""
+msgstr "链接助手用于分享主机地址, 有加入地址簿选项"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:495
 msgid "More information on this entry"
@@ -527,7 +528,7 @@ msgstr "添加新目标"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:645
 msgid "Destination or Base 32 Address"
-msgstr ""
+msgstr "目标或32位地址"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:667
 msgid "Import from hosts.txt file"
@@ -555,7 +556,7 @@ msgid ""
 "File and directory paths here are relative to the addressbook's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr ""
+msgstr "这里的文件和文件夹路径是和地址簿的工作目录相关的，一般为~/.i2p/addressbook/ (Linux) 或 %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:244
 msgid ""
@@ -573,7 +574,7 @@ msgstr "路由地址簿与已发布地址簿会由地址簿程序负责更新。
 msgid ""
 "When you publish your addressbook, ALL destinations from the local and "
 "router addressbooks appear there."
-msgstr ""
+msgstr "当你发布你的地址簿但时候, 所有本地的和路由地址簿中的目标都会在那里显示"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:250
 msgid ""
@@ -713,7 +714,7 @@ msgstr "注释"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:402
 msgid "Visual Identification for"
-msgstr ""
+msgstr "可视化认证"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:414
 msgid "Create your own identification images"
@@ -773,7 +774,7 @@ msgstr "地址簿应用会定期下载订阅的地址簿并将它们的内容合
 msgid ""
 "Then it merges your \"local\" address book into the router address book as "
 "well."
-msgstr ""
+msgstr "接着它也会把你的“本地”地址簿合并到路由地址簿"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:223
 msgid ""
@@ -849,7 +850,7 @@ msgstr "公开地址簿"
 msgid ""
 "To configure SusiDNS to push your Router address book to your Published "
 "address book, set 'should_publish=true' on the configuration page."
-msgstr ""
+msgstr "如想要配置SusiDNS来将你的路由地址簿加入到你发布的地址簿中, 请在配置页面设定 ‘should_publish=true’"
 
 #: build/HowSVG.java:8
 msgid ""
@@ -865,7 +866,7 @@ msgstr "路由地址簿"
 msgid ""
 "Hosts you manually add here will never be published. You can also add "
 "aliases to hosts in other address books here."
-msgstr ""
+msgstr "您在这里手动添加的主机永远不会被发布. 你也可以在这里别的地址簿中加入主机的别名"
 
 #: build/HowSVG.java:11
 msgid "Private Addressbook"
@@ -885,13 +886,13 @@ msgstr "I2P 应用（包括HTTP代理）使用你的本地地址簿上的主机�
 msgid ""
 "Additional subscriptions can be found in the FAQ section of the Router help "
 "page."
-msgstr ""
+msgstr "在路由的帮助界面中FAQ类别中, 您可以找到更多订阅"
 
 #: build/HowSVG.java:16
 msgid ""
 "Hosts sourced from your subscriptions are added to your Router address book,"
 " and are automatically synced (by default every 12 hours)."
-msgstr ""
+msgstr "源自您的订阅的主机不被加入到您的路由地址簿中, 并被自动同步(默认每12小时同步)"
 
 #: build/HowSVG.java:17
 msgid "Configure Subscriptions"

@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-19 04:45+0000\n"
+"PO-Revision-Date: 2020-11-19 00:46+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -224,7 +224,7 @@ msgstr "Tür"
 msgid ""
 "Name of tunnel to be displayed on Tunnel Manager home page and the router "
 "console sidebar"
-msgstr "Tünel Yöneticisi ana sayfasında ve yöneltici konsolu yan çubuğunda görüntülenecek tünel adı"
+msgstr "Tünel Yöneticisi ana sayfasında ve yöneltici panosu yan çubuğunda görüntülenecek tünel adı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:273
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1128
@@ -496,8 +496,8 @@ msgstr "Her bir Tünelin Uzunluğu"
 #, java-format
 msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
-msgstr[0] "{0} sıçrama tüneli"
-msgstr[1] "{0} sıçrama tüneli"
+msgstr[0] "{0} durak tüneli"
+msgstr[1] "{0} durak tüneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:543
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1433
@@ -527,7 +527,7 @@ msgstr "Tünel Uzunluğu Rastlantısallaştırma Düzeyi"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1486
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1577
 msgid "0 hop variance"
-msgstr "0 sıçrama değişimi"
+msgstr "0 durak değişimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:598
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1487
@@ -538,7 +538,7 @@ msgstr "rastgelelik yok, başarım sabit"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1491
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1581
 msgid "+ 0-1 hop variance"
-msgstr "+ 0-1 sıçrama değişimi"
+msgstr "+ 0-1 durak değişimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:603
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1492
@@ -549,7 +549,7 @@ msgstr "orta rastgelelik, daha düşük başarım"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1496
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1585
 msgid "+ 0-2 hop variance"
-msgstr "+ 0-2 sıçrama değişimi"
+msgstr "+ 0-2 durak değişimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:608
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1497
@@ -560,7 +560,7 @@ msgstr "yüksek rastgelelik, çok düşük başarım"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1501
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1589
 msgid "+/- 0-1 hop variance"
-msgstr "+/- 0-1 sıçrama değişimi"
+msgstr "+/- 0-1 durak değişimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:613
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1502
@@ -571,7 +571,7 @@ msgstr "standart rastgelelik, standart başarım"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1506
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1593
 msgid "+/- 0-2 hop variance"
-msgstr "+/- 0-2 sıçrama değişimi"
+msgstr "+/- 0-2 durak değişimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:618
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1507
@@ -582,7 +582,7 @@ msgstr "önerilmez"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1518
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1604
 msgid "hop variance"
-msgstr "sıçrama değişimi"
+msgstr "durak değişimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:634
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1613
@@ -2146,7 +2146,7 @@ msgstr "Tüneliniz için bir ad ve açıklama yazın."
 msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
-msgstr "İstediğiniz gibi yazabilirsiniz. Bu bilgiler Yöneltici Konsolunda tünellerin kolayca ayırt edilebilmesi için kullanılır."
+msgstr "İstediğiniz gibi yazabilirsiniz. Bu bilgiler Yöneltici Panosunda tünellerin kolayca ayırt edilebilmesi için kullanılır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:410
 msgid ""

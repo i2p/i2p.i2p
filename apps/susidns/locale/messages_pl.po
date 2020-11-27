@@ -8,15 +8,15 @@
 # sebx, 2014-2015
 # Smert i2p <Smert@safe-mail.net>, 2013
 # Verdulo :-), 2016-2017
-# Verdulo :-), 2018
+# Verdulo :-), 2018,2020
 # Tracerneo <ziolkoneo@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-12 18:52+0000\n"
-"Last-Translator: Michał Nowak <nowak1michal@gmail.com>\n"
+"PO-Revision-Date: 2020-11-27 17:39+0000\n"
+"Last-Translator: Verdulo :-)\n"
 "Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -160,7 +160,7 @@ msgstr "Nazwa hosta {0} jest już w książce adresowej z innym miejscem przezna
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:286
 msgid "Unable to resolve Base 32 address"
-msgstr ""
+msgstr "Nie można rozwiązać adresu Base32"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:309
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
@@ -182,7 +182,7 @@ msgstr "Uwaga - nazwa hosta nie kończy się na \".i2p\""
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:320
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:334
 msgid "Invalid Base 32 host name."
-msgstr ""
+msgstr "Nieprawidłowa nazwa hosta Base32."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:322
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:336
@@ -333,38 +333,38 @@ msgstr "Musisz podać plik"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:571
 msgid "No entries found in file"
-msgstr ""
+msgstr "Brak wpisów w pliku"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:581
 #, java-format
 msgid "Imported from file {0}"
-msgstr ""
+msgstr "Zaimportowano z pliku {0}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:583
 msgid "Imported from file"
-msgstr ""
+msgstr "Zaimportowano z pliku"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:595
 #, java-format
 msgid "Loaded {0} entry from file"
 msgid_plural "Loaded {0} entries from file"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Załadowano {0} wpis z pliku"
+msgstr[1] "Załadowano {0} wpisy z pliku"
+msgstr[2] "Załadowano {0} wpisów z pliku"
+msgstr[3] "Załadowano {0} wpisów z pliku"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:599
 #, java-format
 msgid "Skipped {0} duplicate entry from file"
 msgid_plural "Skipped {0} duplicate entries from file"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Pominięto {0} zduplikowany wpis z pliku"
+msgstr[1] "Pominięto {0} zduplikowane wpisy z pliku"
+msgstr[2] "Pominięto {0} zduplikowanych wpisów z pliku"
+msgstr[3] "Pominięto {0} zduplikowanych wpisów z pliku"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:605
 msgid "Import from file failed"
-msgstr ""
+msgstr "Import z pliku nie powiódł się"
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
@@ -543,11 +543,11 @@ msgstr "Dodaj nowe miejsce przeznaczenia"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:645
 msgid "Destination or Base 32 Address"
-msgstr ""
+msgstr "Adres przeznaczenia lub Base32"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:667
 msgid "Import from hosts.txt file"
-msgstr ""
+msgstr "Import z pliku hosts.txt"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:669
 msgid "File"
@@ -571,13 +571,13 @@ msgid ""
 "File and directory paths here are relative to the addressbook's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr ""
+msgstr "Ścieżki do plików i katalogów są podane w stosunku do katalogu roboczego książki adresowej, którym jest zwykle ~/.i2p/addressbook/ (Linuks) lub %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:244
 msgid ""
 "If you want to manually add lines to an addressbook, add them to the private"
 " or local addressbooks."
-msgstr ""
+msgstr "Jeśli chcesz ręcznie dodać wiersze do książki adresowej, dodaj je do prywatnej lub lokalnej książki adresowej."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:246
 msgid ""
@@ -589,7 +589,7 @@ msgstr "Książka adresowa routera i opublikowana książka adresowa są aktuali
 msgid ""
 "When you publish your addressbook, ALL destinations from the local and "
 "router addressbooks appear there."
-msgstr ""
+msgstr "Kiedy publikujesz swoja książkę adresowa, WSZYSTKIE adresy przeznaczenia z książek adresowych lokalnej i węzła pojawią się tutaj."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:250
 msgid ""
@@ -773,7 +773,7 @@ msgstr "Zapisywanie się do innych witryn jest proste, wystarczy dodać je do pl
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
-msgstr "Aby dowiedzieć się więcej na temat nazewnictwa w I2P, zobacz <a href=\"http://i2p-projekt.i2p/pl/docs/naming\" target=\"_blank\">ten artykuł</a>."
+msgstr "Aby dowiedzieć się więcej na temat nazewnictwa w I2P, przeczytaj <a href=\"http://i2p-projekt.i2p/pl/docs/naming\" target=\"_blank\">ten artykuł</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:217
 msgid "How does the addressbook application work?"
@@ -783,20 +783,20 @@ msgstr "Jak działa aplikacja książki adresowej?"
 msgid ""
 "The addressbook application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
-msgstr "Aplikacja książki adresowej regularnie pobiera twoje subskrypcje i łączy ich zawartość w twoja książkę adresowa \"routera\"."
+msgstr "Aplikacja książki adresowej regularnie pobiera Twoje subskrypcje i łączy ich zawartość w książkę adresową „węzła”."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:221
 msgid ""
 "Then it merges your \"local\" address book into the router address book as "
 "well."
-msgstr ""
+msgstr "Następnie dodaje wpisy z „lokalnej” książki adresowej do Twojej książki adresowej węzła."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:223
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an "
 "eepsite."
-msgstr "Jeżeli skonfigurowana, książka adresowa routera jest teraz zapisana do \"opublikowanej\" książki adresowej, która będzie publicznie dostępna jeżeli masz swoją stronę eepsite."
+msgstr "Jeżeli skonfigurowana, książka adresowa węzła jest teraz zapisana do „opublikowanej” książki adresowej, która będzie publicznie dostępna jeżeli masz swoją ukrytą stronę w sieci I2P."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:225
 msgid ""
@@ -871,7 +871,7 @@ msgstr "Aby skonfigurować SusiDNS tak, aby wpisy książki adresowej węzła po
 msgid ""
 "All hosts derived from subscriptions will appear in this address book, in "
 "addition to any you manually add here or to your Local address book."
-msgstr ""
+msgstr "Wszystkie adresy pobrane z subskrypcji pojawią się w tej książce adresowej, wraz z ręcznie dodanymi adresami do Twojej lokalnej książki adresowej."
 
 #: build/HowSVG.java:9
 msgid "Router Addressbook"
@@ -921,7 +921,7 @@ msgstr "Jeżeli ręcznie dodasz tutaj adresy, zostaną one uwzględnione w Twoje
 
 #: build/HowSVG.java:19
 msgid "Local Addressbook"
-msgstr ""
+msgstr "Lokalna książka adresowa"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
@@ -935,7 +935,7 @@ msgstr "aplikacji I2P"
 msgid ""
 "The Local, Router and Private address books collectively serve as the DNS "
 "authority for I2P applications."
-msgstr ""
+msgstr "Książki adresowe lokalna, węzła i prywatna razem działają jako rejestr domen internetowych dla aplikacji I2P."
 
 #: build/HowSVG.java:23
 msgid "Optional,"
@@ -956,7 +956,7 @@ msgstr "Jeżeli skonfigurujesz SusiDNS, aby publikować Twoją książkę adreso
 msgid ""
 "Addresses manually added to your Local address book will merge with your "
 "Router address book."
-msgstr ""
+msgstr "Adresy ręcznie dodane do Twojej lokalnej książki adresowej zostaną scalone do książki adresowej węzła."
 
 #: build/HowSVG.java:27
 msgid ""

@@ -25,19 +25,19 @@
 
     <h2>Guida all'hosting web anonimo su I2P</h2>
 
-    <p>This is your own anonymous I2P webserver (traditionally referred to as an <i>eepsite</i>).
-      To serve your own content, simply edit the files in the webserver's root directory and the site will be public once you follow the instructions below.</p>
+    <p>Questo è il tuo server web I2P anonimo (tradizionalmente indicato come <i>eepsite</i>). 
+     Per inserire il tuo contenuto è sufficiente modificare i file nella directory root del server web: il sito verrà pubblicato seguendo le istruzioni riportate di seguito.</p>
 
-    <p id="dir">The webserver's root directory can be found in one of the following locations, depending on your operating system:</p>
+    <p id="dir">La directory root del server web può essere trovata in uno dei seguenti percorsi, a seconda del sistema operativo:</p>
 
     <ul>
 <li>
 <b>Linux</b><br>
-        Standard install: <code>~/.i2p/eepsite/docroot/</code><br>
-        Package install, running as a service: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+     Installazione standard: <code>~/.i2p/eepsite/docroot/</code><br>
+     Installazione dei pacchetti, in esecuzione come servizio: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
-<b>Windows</b><br><code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
 <b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
@@ -47,16 +47,16 @@
       The Base32 address may be used as a hostname, until you assign a register a name following the instructions below.
       The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
 
-    <p>The instructions below detail how to assign a name like "mysite.i2p" to your website and enable access by others.
-       You may reach your site locally via <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
+    <p>Le istruzioni di seguito descrivono come assegnare un nome del tipo "mysite.i2p" al tuo sito web e consentire l'accesso ad altri.
+       Puoi raggiungere il tuo sito localmente da <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a></p>
 
-    <h2>How to set up and announce your hidden service</h2>
+    <h2>Come configurare e annunciare il servizio nascosto</h2>
 
-     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
-      After you start your I2P Webserver tunnel, it will be difficult for other people to find
-      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
-      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
-      Here are detailed instructions.</p>
+     <p>Il vostro server web è in esecuzione per impostazione predefinita ma non è accessibile da altri fino a quando non si avvia il tunnel di servizio nascosto.
+      Dopo aver avviato il tuo Tunnel Webserver I2P, sarà difficile da raggiungere dalle altre persone.
+      È possibile accedere solo con la Destinazione lunga o con l'indirizzo più breve Base32  (.b32.i2p), che è un hash della Destinazione.
+      Potresti solo comunicare alla gente la Destinazione o l'indirizzo in Base32 ma per fortuna I2P ha una rubrica e diversi modi semplici per comunicare alla gente il tuo sito web.
+      Ecco le istruzioni dettagliate.</p>
 
     <ul>
 <li>Pick a name for your website (<i>something</i>.i2p), using lower-case.
@@ -73,8 +73,8 @@
          Make sure you copy the whole thing, it is over 500 characters.</li>
       <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>.
          Click "Add" to save the new entry.</li>
-      <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
-          Hopefully it worked!</li>
+      <li>Inserisci nel tuo browser, il nome del tuo sito web (<i>qualchecosa</i>.i2p) e poi dovresti ritornare quì.
+          Spero che abbia funzionato!</li>
       <li>Before you tell the world about your new website, you should add some content.
           Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.</li>
     </ul>
@@ -84,13 +84,13 @@
       The <a href="lib/resources">resources subdirectory</a> demonstrates the default style.
       If you need a template for a basic site, feel free to adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">associated content</a>.</p>
 
-    <p>If you're returned to this page after editing the content, try clearing your browser's web cache:</p>
+    <p>Se stai ritornando su questa pagina dopo la modifica del contenuto, prova a pulire la cache del browser:</p>
 
     <ul>
 <li>
-<b>Firefox:</b> Preferences ➜ Advanced ➜ Network ➜ Cached Web Content ➜ Clear Now</li>
+<b>Firefox:</b> Preferenze ➜ Avanzate ➜ Rete ➜ Cache dei contenuti web ➜ Pulisci adesso</li>
       <li>
-<b>Chrome/Chromium:</b> Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data</li>
+<b>Chrome/Chromium:</b> Impostazioni ➜ Impostazioni Avanzate ➜ Privacy ➜ Pulisci dati del browser</li>
       <li>
 <b>Opera:</b> Impostazioni ➜ Privacy ➜ Elimina dati navigazione</li>
     </ul>
@@ -132,7 +132,7 @@
       There are plenty of other ways to tell people. Here are a few ideas:</p>
 
     <ul>
-<li>Post a message on the <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> telling everyone about your new I2P website!</li>
+<li>Manda un messaggio sul <a href="http://i2pforum.i2p/" target="_blank">Forum I2P</a> e parla con qualcuno del tuo nuovo sito I2P!</li>
       <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.</li>
       <li>Put it on the <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>
 </li>
@@ -140,7 +140,7 @@
 <p>Note that some sites recommend pasting in that really long destination.
       You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
 
-    <h2>Using an alternative webserver to host your site</h2>
+    <h2>Usa un server web alternativo per ospitare il tuo sito</h2>
 
     <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content. 
       To maintain anonymity, be sure that your webserver is configured to only allow connections from localhost (127.0.0.1), and check the documentation to ensure your webserver isn't advertising details that may compromise your anonymity.</p>
@@ -162,16 +162,16 @@
 
     <h2>Assistenza</h2>
 
-        <p>If you have any questions, the following places are available for support:</p>
+        <p>Per qualunque domanda, puoi rivolgerti al supporto nei seguenti posti:</p>
 
         <ul>
 <li>Il nostro canale IRC di supporto:<ul>
 <li><a href="irc://irc.freenode.net/i2p">#i2p su Freenode</a></li>
-                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
+                <li>Anonimamente usando il tuo tunnel <a href="irc://127.0.0.1:6668/i2p">locale IRC I2P</a>.</li>
              </ul>
 </li>
 <li>Il forum del progetto <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
-            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Guida all'hosting di Eepsite</a></li>
         </ul>
 <hr>
 <div class="notify">This page, the project website and the router console need translations!

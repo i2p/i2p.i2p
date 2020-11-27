@@ -2,44 +2,45 @@
 
 <ul class="links">
 <li>
-<b>Starting Up</b><br>
-If you've just started I2P, the number of <i>Active Peers</i> indicated under the <i>Peers</i> section in the side panel on the left should start to grow over the next few minutes.
-When your router is ready, you'll also see a <i>Local Tunnel</i> named <i>Shared Clients</i> listed there, and possibly other clients and servers.
-If not, see the troubleshooting section <a href="#trouble">below</a>.
-These <i>Local Tunnels</i> provide connections to the I2P network, enabling your bittorrent, email, web proxy and other services.
-Your <a href="/netdb">Network Database</a> indicates all known peers on the network.
-Additionally, you can monitor existing <a href="/peers">Peer Connections</a>, and view existing <a href="/tunnels">Tunnels</a> and their status.
-More information is available on the <a href="/help">help page</a>.</li>
+<b>Başlatma</b><br>
+I2P uygulamasını yeni başlattıysanız, sol taraftaki panoda<i>Eşler</i> bölümü altında görüntülenen <i>Etkin Eş Sayısı</i> bir kaç dakika içinde artmaya başlamalıdır. 
+Yönelticiniz hazır olduğunda, orada listelenen <i>Paylaşılmış İstemciler</i> adında bir <i>Yerel Tünel</i> ile diğer istemci ve sunucuları görebilirsiniz.
+Bunları göremiyorsanız <a href="#trouble">sorun çözme bölümüne</a> bakabilirsiniz. 
+Bu <i>Yerel Tüneller</i> I2P ağıyla bağlantılar kurarak, bittorrent, e-posta, web vekil sunucusu ve diğer hizmetlerinizin çalışmasını sağlar. 
+Ağdaki bilinen tüm eşleri <a href="/netdb">Ağ Veritabanı</a> bölümünde görebilirsiniz. 
+Bunlara ek olarak, var olan <a href="/peers">Eş Bağlantılarını</a> izleyebilir ve var olan <a href="/tunnels">Tüneller</a> ile durumlarını görebilirsiniz. 
+Ayrıntılı bilgi almak için <a href="/help">yardım sayfasına</a> bakabilirsiniz.</li>
 
 <li>
-<b>Network Integration</b><br>
-When you start I2P, it may take a few minutes to bootstrap (integrate) your router into the network and find additional peers, so please be patient.
-When I2P starts up, and during normal operation, I2P's tunnel build readiness indicator in the side panel may indicate that I2P is "Rejecting Tunnels"; this is normal behavior.
-Once green circles are indicated next to your <i>Local Tunnels</i>, there is a wide variety of things you can do with I2P, and below we introduce you to some of them.</li>
+<b>Ağ Bütünleştirmesi</b><br>
+I2P uygulamasını başlattığınızda, yönelticinizin ağ ile bağlantı kurması (bütünleşmesi) ve diğer eşleri bulması bir kaç dakika sürer. Bu nedenle sabırlı olun. 
+I2P başladıktan sonra ve normal çalışırken, yan panodaki I2P tünel oluşturma göstergesinde "Tüneller Reddediliyor" iletisini görebilirsiniz. Bu durum normaldir.
+<i>Yerel Tünellerinizin</i> yanında yeşil daireler göründüğünde I2P ile pek çok şey yapabilirsiniz. Bunlardan bazılarını aşağıda anlatacağız.</li>
 
 </ul>
 <h3>I2P Hizmetleri</h3>
 
 <ul class="links">
 <li>
-<b>Hidden Services and Public Web Browsing</b><br>
-On I2P you can access hidden service websites ("I2P sites") and other services, and you can host your own services.
-You can also access the normal web anonymously via I2P's built-in web proxy (outproxy).
-<a href="https://geti2p.net/en/about/browser-config" target="_blank">Configure your browser</a> to use the HTTP proxy at <code>127.0.0.1 port 4444</code>, then browse to a I2P Site or a web-site at an <code>http://</code> address.
-If you wish to disable or change outproxy access to the non-anonymous internet, remove or modify the outproxy entry for <code>false.i2p</code> under the <i>Outproxies</i> option in the <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy Tunnel Editor</a>.
-In the "Sites of Interest" section <a href="#eepsites">below</a>, we list a few of the sites hosted on I2P.<br>
-There are also a number of semi-official and unofficial efforts to build browsing tools for I2P,
-including a <a href="https://geti2p.net/en/download/firefox">preconfigured Firefox Browser profile</a>,
-<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">an easy-to-install WebExtension</a>,
-or via <a href="https://www.whonix.org/wiki/I2P">automatic launchers in privacy-focused Linux distributions like Whonix</a>.
-While these are all interesting projects, please evaluate them to see if they fit within your personal threat
-model before trusting them with your well-being.</li>
+<b>Gizli Hizmetler ve Herkese Açık Web Taraması</b><br>
+I2P üzerinden gizli hizmet web sitelerine ("I2P siteleri") ve diğer hizmetlere erişebilir ve kendi hizmetlerinizi sunabilirsiniz. 
+I2P içindeki vekil sunucuyu (çıkış vekil sunucusu) kullanarak normal web sitelerine anonim olarak erişebilirsiniz. 
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Web tarayıcınızın yapılandırma ayarlarından</a> HTTP vekil sunucusunu <code>127.0.0.1 kapı numarası 4444</code> olarak ayarladıktan sonra, bir I2P sitesine ya da hizmet web sitesine ya da normal şifrelenmemiş<code>http://</code> adresine bakın. 
+Normal İnternet bağlantısını kurarken çıkış sunucusu erişimini devre dışı bırakmak isterseniz, <code>false.i2p</code> dosyasında <i>Outproxies</i> bölümü altındaki çıkış sunucusu (outproxy) kaydını <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Vekil Sunucu Tünel Düzenleyici</a>değiştirin ya da silin. 
+<a href="#eepsites">Aşağıdaki</a> "İlginç Siteler" bölümünde I2P üzerinden sunulan bir kaç örnek site bulabilirsiniz.<br>
+Ayrıca I2P için bazı yarı resmi ya da resmi olmayan tarama araçları geliştirme girişimi var. Bazı örnekler;
+<a href="https://geti2p.net/en/download/firefox">önceden hazırlanmış Firefox tarayıcı profili</a>,
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">kolay kurulan bir web eklentisi</a> ya da
+<a href="https://www.whonix.org/wiki/I2P">Whonix gibi kişisel gizliliğin sağlanmasına odaklanmış Linux dağıtımları için otomatik başlatıcılar</a>.
+Bunlar ilginç projeler olsa da, kendi güvenliğiniz için, karşı karşıya bulunduğunuz tehdit modeline uygun
+olup olmadıklarını anlamak için denedikten sonra kullanmaya karar verin.
+</li>
 
 <li>
-<b>Anonymous Email</b><br>
-Postman's I2P-based mail system can be accessed either via <a href="/webmail">I2P's built-in mail client</a> or with any external mail client.
-Accounts can send and receive mail from the normal internet.
-For an account, visit <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>.</li>
+<b>Anonim E-posta Kullanımı</b><br>
+Postman I2P temelli posta sistemine <a href="/webmail">I2P içindeki posta istemcisini</a> ya da herhangi bir dış posta istemcisi kullanılarak erişilebilir. 
+Hesaplar normal İnternet üzerindeki gibi e-posta gönderip alabilir. 
+Bir hesap edinmek için <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a> adresine bakabilirsiniz.</li>
 
 <li>
 <b>Anonim Dosya Aktarımı</b><br><a href="/torrents">I2PSnark</a> I2P ile bütünleşik olarak, anonim ve şifreli BitTorrent aktarımlarının yapılmasını sağlar.</li>
@@ -86,7 +87,7 @@ Detailed instructions for starting your website, registering an .i2p domain and 
 
 <ul class="links twocol">
 <li>
-<b>Görünmez Internet Projesi (I2P) Resmi Web Sitesi</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a> sitesine güvenli ve anonim bağlantılar. I2P ağının çalışması ve nasıl katkıda bulunabileceğiniz ile ilgili bilgiler almak istiyorsanız ilk bakacağınız yer burasıdır!</li>
+<b>Invisible Internet Projesi (I2P) Resmi Web Sitesi</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a> sitesine güvenli ve anonim bağlantılar. I2P ağının çalışması ve nasıl katkıda bulunabileceğiniz ile ilgili bilgiler almak istiyorsanız ilk bakacağınız yer burasıdır!</li>
 
 <li>
 <b>I2P Topluluk Forumları</b><br><a href="http://zzz.i2p/" target="_blank">zzz geliştirici forumlarında</a> I2P geliştirmesi ile ilgili tartışmaları bulabilirsiniz.

@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-13 14:07+0000\n"
+"PO-Revision-Date: 2020-10-07 20:34+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -1449,11 +1449,11 @@ msgstr "Total de demandes de pages Web par jour avant que l’accès au serveur 
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2335
 msgid "Max concurrent connections (0=unlimited)"
-msgstr "Connexions simultanées maximales (0=illimité)"
+msgstr "Maximum de connexions simultanées (0 = illimité)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2337
 msgid "Maximum number of simultaneous client connections"
-msgstr "Nombre maximal de connexions client parallèles"
+msgstr "Nombre maximal de connexions client simultanées"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2345
 msgid "POST limits (0=unlimited)"
@@ -2278,7 +2278,7 @@ msgstr "Port du tunnel"
 msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
-msgstr "En plus de ces réglages de base, il existe plusieurs options évoluées pour la configuration des tunnels."
+msgstr "En plus de ces paramètres de base, il existe plusieurs options évoluées pour la configuration des tunnels."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:727
 msgid ""

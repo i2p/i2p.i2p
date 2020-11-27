@@ -24,7 +24,7 @@
 # Nikolay Parukhin <parukhin@gmail.com>, 2014
 # sfix <anon-9b36b2e@lycos.com>, 2013
 # t bo <tarantulko.bo@googlemail.com>, 2017
-# ValdikSS <iam@valdikss.org.ru>, 2017-2019
+# ValdikSS <iam@valdikss.org.ru>, 2017-2020
 # vertnis, 2017
 # brianhopes <voganc-12@live.ru>, 2015
 # yume, 2014-2015
@@ -36,8 +36,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-12 19:31+0000\n"
-"Last-Translator: Irina Fedulova <istartlin@gmail.com>\n"
+"PO-Revision-Date: 2020-08-31 12:37+0000\n"
+"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -526,10 +526,10 @@ msgstr "Длина каждого туннеля"
 #, java-format
 msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Туннель длиной в {0} узел"
+msgstr[1] "Туннель длиной в {0} узла"
+msgstr[2] "Туннель длиной в {0} узлов"
+msgstr[3] "Туннель длиной в {0} узлов"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:543
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1433
@@ -559,51 +559,51 @@ msgstr "Уровень случайного разброса длины тунн
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1486
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1577
 msgid "0 hop variance"
-msgstr ""
+msgstr "Нет разброса длины туннеля"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:598
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1487
 msgid "no randomization, consistent performance"
-msgstr ""
+msgstr "без рандомизации, фиксированная производительность"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:602
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1491
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1581
 msgid "+ 0-1 hop variance"
-msgstr ""
+msgstr "+ 0-1 разброс длины туннеля"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:603
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1492
 msgid "medium randomization, lower performance"
-msgstr ""
+msgstr "умеренная рандомизация, ниже производительность"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:607
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1496
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1585
 msgid "+ 0-2 hop variance"
-msgstr ""
+msgstr "+ 0-2 разброс длины туннеля"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:608
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1497
 msgid "high randomization, very low performance"
-msgstr ""
+msgstr "повышенная рандомизация, очень низкая производительность"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:612
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1501
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1589
 msgid "+/- 0-1 hop variance"
-msgstr ""
+msgstr "+/- 0-1 разброс длины туннеля"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:613
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1502
 msgid "standard randomization, standard performance"
-msgstr ""
+msgstr "стандартная рандомизация, стандартная производительность"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:617
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1506
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1593
 msgid "+/- 0-2 hop variance"
-msgstr ""
+msgstr "+/- 0-2 разброс длины туннеля"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:618
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1507
@@ -614,7 +614,7 @@ msgstr "не рекомендовано"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1518
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1604
 msgid "hop variance"
-msgstr "разброс"
+msgstr "разброс длины"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:634
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1613
@@ -663,30 +663,30 @@ msgstr "Число резервных туннелей"
 #, java-format
 msgid "{0} backup tunnel"
 msgid_plural "{0} backup tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} резервный туннель"
+msgstr[1] "{0} резервных туннеля"
+msgstr[2] "{0} резервных туннелей"
+msgstr[3] "{0} резервных туннелей"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:653
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1640
 msgid "no redundancy, no added resource usage"
-msgstr ""
+msgstr "отсутствие избыточности, отсутствие дополнительной нагрузки на систему"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:658
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1645
 msgid "low redundancy, low resource usage"
-msgstr ""
+msgstr "низкая избыточность, низкая нагрузка на систему"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:663
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1650
 msgid "medium redundancy, medium resource usage"
-msgstr ""
+msgstr "умеренная избыточность, умеренная нагрузка на систему"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:668
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1655
 msgid "high redundancy, high resource usage"
-msgstr ""
+msgstr "высокая избыточность, высокая нагрузка на систему"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:682
 msgid "Tunnel Management Options"
@@ -1303,7 +1303,7 @@ msgstr "Запретить подключение клиентам из спис
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2185
 msgid "Deny List"
-msgstr ""
+msgstr "Черный список"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2187
 msgid "Only allow listed clients to connect to this service"
@@ -1311,7 +1311,7 @@ msgstr "Разрешить подключение только клиентам 
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2191
 msgid "Allow List"
-msgstr ""
+msgstr "Белый список"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2193
 msgid "Access List Description"
