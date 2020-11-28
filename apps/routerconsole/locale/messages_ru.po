@@ -48,8 +48,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-16 17:30+0000\n"
-"PO-Revision-Date: 2020-11-18 17:55+0000\n"
-"Last-Translator: gmind\n"
+"PO-Revision-Date: 2020-11-28 19:25+0000\n"
+"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1089,10 +1089,10 @@ msgstr "Не удалось проверить наличие обновлени
 #, java-format
 msgid "{0} plugin updated"
 msgid_plural "{0} plugins updated"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} плагин обновлён"
+msgstr[1] "{0} плагина обновлены"
+msgstr[2] "{0} плагинов обновлено"
+msgstr[3] "{0} плагинов обновлено"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:251
 msgid "Plugin update check complete"
@@ -2396,19 +2396,19 @@ msgstr "Ошибка сохранения конфигурации (примен
 #, java-format
 msgid "{0} hop"
 msgid_plural "{0} hops"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} узел"
+msgstr[1] "{0} узла"
+msgstr[2] "{0} узлов"
+msgstr[3] "{0} узлов"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:17
 #, java-format
 msgid "{0} tunnel"
 msgid_plural "{0} tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} туннель"
+msgstr[1] "{0} туннеля"
+msgstr[2] "{0} туннелей"
+msgstr[3] "{0} туннелей"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:35
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:42
@@ -2964,11 +2964,11 @@ msgstr "Форум I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Community git project hosting"
-msgstr ""
+msgstr "Git-хостинг от сообщества"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Git Project Hosting"
-msgstr ""
+msgstr "Git-хостинг проектов"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "I2P Pastebin"
@@ -2976,7 +2976,7 @@ msgstr "I2P Pastebin"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "Pastebin for I2P users"
-msgstr ""
+msgstr "Pastebin для пользователей I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:85
 msgid "Easy anonymous file sharing"
@@ -3091,15 +3091,15 @@ msgstr "Приложения"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:162
 msgid "Configuration and Help"
-msgstr ""
+msgstr "Конфигурация и помощь"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:175
 msgid "Network Information and Developer Information"
-msgstr ""
+msgstr "Сетевая информация и информация для разработчиков"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:187
 msgid "I2P Community Sites"
-msgstr ""
+msgstr "Сайты в I2P от сообщества"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:227
 msgid "The HTTP proxy is not up"
@@ -3812,28 +3812,28 @@ msgstr "перегружен"
 #, java-format
 msgid "Showing {0} recent profile."
 msgid_plural "Showing {0} recent profiles."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Отображается {0} недавний профиль."
+msgstr[1] "Отображаются {0} недавних профиля."
+msgstr[2] "Отображаются {0} недавних профилей."
+msgstr[3] "Отображаются {0} недавних профилей."
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:88
 #, java-format
 msgid "Hiding {0} older profile."
 msgid_plural "Hiding {0} older profiles."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Скрывается {0} старый профиль."
+msgstr[1] "Скрываются {0} старых профиля."
+msgstr[2] "Скрываются {0} старых профилей."
+msgstr[3] "Скрываются {0} старых профилей."
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:90
 #, java-format
 msgid "Hiding {0} standard profile."
 msgid_plural "Hiding {0} standard profiles."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Скрывается {0} стандартный профиль."
+msgstr[1] "Скрываются {0} стандартных профиля."
+msgstr[2] "Скрываются {0} стандартных профилей."
+msgstr[3] "Скрываются {0} стандартных профилей."
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:95
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
@@ -3985,28 +3985,28 @@ msgstr "Пороговые значения"
 #, java-format
 msgid "{0} fast peer"
 msgid_plural "{0} fast peers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} быстрый пир"
+msgstr[1] "{0} быстрых пира"
+msgstr[2] "{0} быстрых пиров"
+msgstr[3] "{0} быстрых пиров"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:293
 #, java-format
 msgid "{0} high capacity peer"
 msgid_plural "{0} high capacity peers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} высокоёмкий пир"
+msgstr[1] "{0} высокоёмкий пира"
+msgstr[2] "{0} высокоёмкий пиров"
+msgstr[3] "{0} высокоёмкий пиров"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:295
 #, java-format
 msgid "{0} integrated peer"
 msgid_plural "{0} integrated peers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} интегрированный пир"
+msgstr[1] "{0} интегрированных пира"
+msgstr[2] "{0} интегрированных пиров"
+msgstr[3] "{0} интегрированных пиров"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
 msgid "as determined by the profile organizer"
@@ -4201,10 +4201,10 @@ msgstr "Средняя частота за время работы"
 #, java-format
 msgid "{0} event"
 msgid_plural "{0} events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} событие"
+msgstr[1] "{0} события"
+msgstr[2] "{0} событиий"
+msgstr[3] "{0} событиий"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:201
 msgid "rate"
@@ -4222,10 +4222,10 @@ msgstr "Максимальное среднее"
 #, java-format
 msgid "There was {0} event in this period."
 msgid_plural "There were {0} events in this period."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "За этот период произошло {0} событие."
+msgstr[1] "За этот период произошло {0} события."
+msgstr[2] "За этот период произошло {0} событий."
+msgstr[3] "За этот период произошло {0} событий."
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:236
 #, java-format
@@ -5670,12 +5670,12 @@ msgstr "Перечисленные ниже Java-клиенты запускаю
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:570
 #, java-format
 msgid "To change client options, edit the files in the directory {0}."
-msgstr ""
+msgstr "Для изменения настроек клиента отредактируйте файлы в директории {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:576
 #, java-format
 msgid "To change client options, edit the file {0}."
-msgstr ""
+msgstr "Для изменения настроек клиента отредактируйте файл {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:584
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:564

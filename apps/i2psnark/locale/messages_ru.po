@@ -20,7 +20,7 @@
 # Foster Snowhill, 2013
 # sr4d <sr4d@bitmessage.ch>, 2014
 # t bo <tarantulko.bo@googlemail.com>, 2017
-# ValdikSS <iam@valdikss.org.ru>, 2017-2019
+# ValdikSS <iam@valdikss.org.ru>, 2017-2020
 # vertnis, 2015
 # Foster Snowhill, 2013
 # yume, 2014-2015
@@ -32,8 +32,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-16 17:30+0000\n"
-"PO-Revision-Date: 2020-11-18 17:55+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2020-11-28 19:27+0000\n"
+"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -844,7 +844,7 @@ msgstr "Загрузка не из I2P локации {0} не поддержи�
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1150
 #, java-format
 msgid "Invalid URL: Must start with \"{0}\" or \"{1}\""
-msgstr ""
+msgstr "Некорректный URL: он должен начинаться с \"{0}\" или \"{1}\""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1192
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1227
@@ -1204,7 +1204,7 @@ msgstr "Из URL"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2307
 msgid ""
 "Enter the torrent file download URL (I2P only), magnet link, or info hash"
-msgstr ""
+msgstr "Введите URL для скачивания torrent-файла (только I2P), magnet-ссылку или инфохэш"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2312
 msgid "Add torrent"
