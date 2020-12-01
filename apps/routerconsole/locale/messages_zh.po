@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Beta Ba <linsui@inbox.lv>, 2019-2020
+# Beta Ba <linsui@inbox.lv>, 2020
 # ducki2p <ducki2p@gmail.com>, 2011
 # K <daleks@foxmail.com>, 2017
 # nobody <oiiu19@yahoo.com>, 2013-2014
@@ -30,8 +31,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-16 17:30+0000\n"
-"PO-Revision-Date: 2020-11-22 03:51+0000\n"
-"Last-Translator: Scott Rhodes <starring169@gmail.com>\n"
+"PO-Revision-Date: 2020-11-29 04:07+0000\n"
+"Last-Translator: Beta Ba <linsui@inbox.lv>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1065,7 +1066,7 @@ msgstr "检查插件更新失败"
 #, java-format
 msgid "{0} plugin updated"
 msgid_plural "{0} plugins updated"
-msgstr[0] ""
+msgstr[0] "{0} 插件已更新"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:251
 msgid "Plugin update check complete"
@@ -2363,13 +2364,13 @@ msgstr "配置保存出错（已应用但未保存） - 参见错误日志"
 #, java-format
 msgid "{0} hop"
 msgid_plural "{0} hops"
-msgstr[0] ""
+msgstr[0] "{0} 跳点"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:17
 #, java-format
 msgid "{0} tunnel"
 msgid_plural "{0} tunnels"
-msgstr[0] ""
+msgstr[0] "{0} 隧道"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:35
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:42
@@ -2925,11 +2926,11 @@ msgstr "I2P 论坛"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Community git project hosting"
-msgstr ""
+msgstr "社区 git 项目托管"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Git Project Hosting"
-msgstr ""
+msgstr "Git 项目托管"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "I2P Pastebin"
@@ -2937,7 +2938,7 @@ msgstr "I2P Pastebin"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "Pastebin for I2P users"
-msgstr ""
+msgstr "面向 I2P 用户的 Pastebin"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:85
 msgid "Easy anonymous file sharing"
@@ -3056,11 +3057,11 @@ msgstr "配置和帮助"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:175
 msgid "Network Information and Developer Information"
-msgstr ""
+msgstr "网络信息和开发者信息"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:187
 msgid "I2P Community Sites"
-msgstr ""
+msgstr "I2P 社区站点"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:227
 msgid "The HTTP proxy is not up"
@@ -3767,19 +3768,19 @@ msgstr "积压"
 #, java-format
 msgid "Showing {0} recent profile."
 msgid_plural "Showing {0} recent profiles."
-msgstr[0] ""
+msgstr[0] "显示 {0} 最近配置。"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:88
 #, java-format
 msgid "Hiding {0} older profile."
 msgid_plural "Hiding {0} older profiles."
-msgstr[0] ""
+msgstr[0] "隐藏 {0} 较旧配置。"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:90
 #, java-format
 msgid "Hiding {0} standard profile."
 msgid_plural "Hiding {0} standard profiles."
-msgstr[0] ""
+msgstr[0] "隐藏 {0} 标准配置。"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:95
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
@@ -3931,19 +3932,19 @@ msgstr "临界值"
 #, java-format
 msgid "{0} fast peer"
 msgid_plural "{0} fast peers"
-msgstr[0] ""
+msgstr[0] "{0} 快速对等节点"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:293
 #, java-format
 msgid "{0} high capacity peer"
 msgid_plural "{0} high capacity peers"
-msgstr[0] ""
+msgstr[0] "{0} 高容量对等节点"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:295
 #, java-format
 msgid "{0} integrated peer"
 msgid_plural "{0} integrated peers"
-msgstr[0] ""
+msgstr[0] "{0} 已整合对等节点"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
 msgid "as determined by the profile organizer"
@@ -4138,7 +4139,7 @@ msgstr "全程平均频率"
 #, java-format
 msgid "{0} event"
 msgid_plural "{0} events"
-msgstr[0] ""
+msgstr[0] "{0} 事件"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:201
 msgid "rate"
@@ -4156,7 +4157,7 @@ msgstr "最高均值"
 #, java-format
 msgid "There was {0} event in this period."
 msgid_plural "There were {0} events in this period."
-msgstr[0] ""
+msgstr[0] "此周期内有 {0} 个事件。"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:236
 #, java-format
@@ -5601,12 +5602,12 @@ msgstr "下面列出的 Java 客户端随路由启动并运行于同一 JVM 中�
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:570
 #, java-format
 msgid "To change client options, edit the files in the directory {0}."
-msgstr ""
+msgstr "要更改客户端选项，请编辑文件夹 {0} 中的文件。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:576
 #, java-format
 msgid "To change client options, edit the file {0}."
-msgstr ""
+msgstr "要更改客户端选项，请编辑文件 {0}。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:584
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:564

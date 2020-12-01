@@ -11,14 +11,14 @@
 # sebx, 2013-2014
 # Smert i2p <Smert@safe-mail.net>, 2013
 # Verdulo :-), 2016-2017
-# Verdulo :-), 2018-2019
+# Verdulo :-), 2018-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-12 18:50+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2020-11-27 19:08+0000\n"
+"Last-Translator: Verdulo :-)\n"
 "Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -274,11 +274,11 @@ msgstr "Automatyczny start tunelu podczas startu węzła"
 msgid ""
 "The client tunnel and all other shared client tunnels must be stopped to "
 "change this setting"
-msgstr ""
+msgstr "Tunel klienta i tunele współdzielone muszą zostać zatrzymane, aby zastosować zmiany"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:290
 msgid "The client tunnel must be stopped to change this setting"
-msgstr ""
+msgstr "Tunel klienta musi zostać zatrzymany, aby zastosować zmiany"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:304
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1159
@@ -428,7 +428,7 @@ msgstr "Ruch ze wszystkich klientów z włączoną tą opcją będzie tunelowany
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:484
 msgid "Share tunnels with other clients?"
-msgstr ""
+msgstr "Czy współdzielić tunele z innymi klientami?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:502
 msgid "Enable DCC"
@@ -458,7 +458,7 @@ msgstr "Uwaga: kiedy klient proxy jest skonfigurowany do współdzielenia tuneli
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:528
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1410
 msgid "Tunnel Length Options"
-msgstr ""
+msgstr "Opcje długości tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:530
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1421
@@ -507,30 +507,30 @@ msgstr "Długość każdego tunelu"
 #, java-format
 msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0}-skokowy tunel"
+msgstr[1] "{0}-skokowy tunel"
+msgstr[2] "{0}-skokowy tunel"
+msgstr[3] "{0}-skokowy tunel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:543
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1433
 msgid "no anonymity"
-msgstr ""
+msgstr "brak anonimowości"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:548
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1438
 msgid "low anonymity"
-msgstr ""
+msgstr "niska anonimowość"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:553
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1443
 msgid "medium anonymity"
-msgstr ""
+msgstr "średnia anonimowość"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:558
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1448
 msgid "high anonymity"
-msgstr ""
+msgstr "wysoka anonimowość"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:590
 msgid "Level of Randomization for Tunnel Length"
@@ -540,56 +540,56 @@ msgstr "Poziom losowości długości tuneli"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1486
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1577
 msgid "0 hop variance"
-msgstr ""
+msgstr "zmienność: 0"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:598
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1487
 msgid "no randomization, consistent performance"
-msgstr ""
+msgstr "brak losowości, stała wydajność"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:602
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1491
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1581
 msgid "+ 0-1 hop variance"
-msgstr ""
+msgstr "zmienność: 0,+1"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:603
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1492
 msgid "medium randomization, lower performance"
-msgstr ""
+msgstr "średnia losowość, niższa wydajność"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:607
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1496
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1585
 msgid "+ 0-2 hop variance"
-msgstr ""
+msgstr "zmienność: 0,+1,+2"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:608
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1497
 msgid "high randomization, very low performance"
-msgstr ""
+msgstr "wysoka losowość, dużo niższa wydajność"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:612
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1501
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1589
 msgid "+/- 0-1 hop variance"
-msgstr ""
+msgstr "zmienność: 0,±1"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:613
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1502
 msgid "standard randomization, standard performance"
-msgstr ""
+msgstr "normalna losowość, normalna wydajność"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:617
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1506
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1593
 msgid "+/- 0-2 hop variance"
-msgstr ""
+msgstr "zmienność: 0,±1,±2"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:618
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1507
 msgid "not recommended"
-msgstr ""
+msgstr "niezalecane"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:629
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1518
@@ -600,7 +600,7 @@ msgstr "Zmienność przeskoków"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:634
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1613
 msgid "Tunnel Quantity Options"
-msgstr ""
+msgstr "Opcje długości tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:636
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1624
@@ -644,34 +644,34 @@ msgstr "Liczba tuneli rezerwowych"
 #, java-format
 msgid "{0} backup tunnel"
 msgid_plural "{0} backup tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} tunel zapasowy"
+msgstr[1] "{0} tunele zapasowe"
+msgstr[2] "{0} tuneli zapasowych"
+msgstr[3] "{0} tuneli zapasowych"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:653
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1640
 msgid "no redundancy, no added resource usage"
-msgstr ""
+msgstr "brak redundancji, brak dodatkowego użycia zasobów"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:658
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1645
 msgid "low redundancy, low resource usage"
-msgstr ""
+msgstr "niska redundancja, niskie dodatkowe użycie zasobów"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:663
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1650
 msgid "medium redundancy, medium resource usage"
-msgstr ""
+msgstr "średnia redundancja, średnie dodatkowe użycie zasobów"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:668
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1655
 msgid "high redundancy, high resource usage"
-msgstr ""
+msgstr "wysoka redundancja, wysokie dodatkowe użycie zasobów"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:682
 msgid "Tunnel Management Options"
-msgstr ""
+msgstr "Opcje zarządzania tunelami"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:688
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2258
@@ -831,7 +831,7 @@ msgstr "Lokalny Base32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:850
 msgid "Tunnel Filtering Options"
-msgstr ""
+msgstr "Opcje filtracji tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:852
 msgid "HTTP Filtering"
@@ -878,12 +878,12 @@ msgstr "Zezwalaj na SSL do adresów I2P"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:884
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2019
 msgid "Configuration cannot be changed after destination is created"
-msgstr ""
+msgstr "Brak możliwości zmiany konfiguracji po utworzeniu adresu przeznaczenia"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:889
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1724
 msgid "Tunnel Cryptography Options"
-msgstr ""
+msgstr "Opcje kryptografii tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:893
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2028
@@ -914,11 +914,11 @@ msgstr "Tylko dla zaawansowanych!"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:957
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2091
 msgid "Both encryption types"
-msgstr ""
+msgstr "Obie metody szyfrowania"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:963
 msgid "Tunnel Authentication Options"
-msgstr ""
+msgstr "Opcje uwierzytelniania tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:965
 msgid "Local Authorization"
@@ -976,7 +976,7 @@ msgstr "Wpisz hasło wymagane przez proxy wyjściowe"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1007
 msgid "Tunnel Address Lookup Options"
-msgstr ""
+msgstr "Opcje odpytywania adresów tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1009
 msgid "Jump URL List"
@@ -1045,7 +1045,7 @@ msgstr "Ustawienia nowego serwera"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1143
 msgid "The hidden service must be stopped to change this setting"
-msgstr ""
+msgstr "Należy zatrzymać ukrytą usługę, aby zmienić to ustawienie"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1183
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:492
@@ -1272,7 +1272,7 @@ msgstr "Tylko do odczytu: zmienny adres docelowy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2171
 msgid "Tunnel Access Control Options"
-msgstr ""
+msgstr "Opcje kontroli dostępu tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2173
 msgid "Restricted Access List"
@@ -1284,7 +1284,7 @@ msgstr "Zabroń następującym klientom na łączenie się z tą usługą"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2185
 msgid "Deny List"
-msgstr ""
+msgstr "Lista blokowanych"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2187
 msgid "Only allow listed clients to connect to this service"
@@ -1292,7 +1292,7 @@ msgstr "Tylko zezwalaj następującym klientom na łączenie się z tą usługą
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2191
 msgid "Allow List"
-msgstr ""
+msgstr "Lista dozwolonych"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2193
 msgid "Access List Description"
@@ -1370,7 +1370,7 @@ msgstr "Optymalizacja dla hostingu zwielokrotnionego."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2252
 msgid "Tunnel Performance Options"
-msgstr ""
+msgstr "Opcje wydajności tuneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2285
 msgid "Number of tunnels to keep open to maintain availability of service"
