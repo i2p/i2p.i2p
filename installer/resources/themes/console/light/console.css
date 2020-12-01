@@ -6939,7 +6939,6 @@ b.netdb_transport {
 
 .debug_container {
      padding: 10px 15px;
-     margin-top: -16px;
      background: linear-gradient(to bottom, #fafaff, rgba(250,250,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #efefff !important;
      border: 1px solid #dee2e6;
      box-shadow: inset 0 0 0 1px #fff;
@@ -6960,10 +6959,6 @@ b.netdb_transport {
 
 .main#debug h3 {
      border-width: 1px;
-}
-
-.main#debug h3 + table {
-     margin-top: -16px;
 }
 
 #debug td {
@@ -6999,10 +6994,6 @@ b.netdb_transport {
 
 .debug_section .debug_container {
      margin-bottom: -13px;
-}
-
-.debug_container:empty+ h3 {
-     margin-top: -16px !important;
 }
 
 .expiry td {

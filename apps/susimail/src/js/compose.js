@@ -1,4 +1,5 @@
 /* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+/* see also licenses/LICENSE-GPLv2.txt */
 
 let beforePopup = true;
 window.addEventListener('beforeunload', (e)=>{if (beforePopup) e.returnValue=true;} );

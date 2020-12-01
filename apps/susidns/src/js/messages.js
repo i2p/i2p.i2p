@@ -1,4 +1,5 @@
-/* #license http://www.jclark.com/xml/copying.txt Expat */
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+/* see also licenses/LICENSE-GPLv2.txt */
 
 function HideMessages() {
   var hideableMessages = document.getElementsByClassName("messages");
