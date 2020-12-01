@@ -110,6 +110,7 @@ certificates/reseed/parg_at_mail.i2p.crt
 certificates/ssl/reseed.i2p.vzaws.com2017.crt
 certificates/ssl/netdb.i2p2.no.crt
 certificates/ssl/reseed.onion.im.crt
+certificates/reseed/meeh_at_mail.i2p.crt
 # vanished
 certificates/news/killyourtv_at_mail.i2p.crt
 certificates/router/killyourtv_at_mail.i2p.crt

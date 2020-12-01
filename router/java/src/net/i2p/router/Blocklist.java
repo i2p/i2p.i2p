@@ -358,7 +358,7 @@ public class Blocklist {
     *
     * Must call allocate() before and merge() after.
     *
-    *  @param out parameter, entries stored here
+    *  @param blocklist out parameter, entries stored here
     *  @param count current number of entries
     *  @return new number of entries
     */
