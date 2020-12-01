@@ -1,3 +1,5 @@
+* 2020-12-01 0.9.48 released
+
 2020-11-26 zzz
  * NTCP: Enable nodelay by default
  * SSU: Don't wakeup OMF after ack if no more messages are pending
