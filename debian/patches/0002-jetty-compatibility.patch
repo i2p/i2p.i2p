@@ -33,7 +33,7 @@
  import org.eclipse.jetty.security.authentication.DigestAuthenticator;
  import org.eclipse.jetty.server.AbstractConnector;
  import org.eclipse.jetty.server.ConnectionFactory;
-@@ -973,6 +975,8 @@
+@@ -989,6 +991,8 @@
              } else {
                  HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
                                                                      ctx.logManager().getLog(RouterConsoleRunner.class));
@@ -42,7 +42,7 @@
                  sec.setLoginService(realm);
                  sec.setAuthenticator(authenticator);
                  String[] role = new String[] {JETTY_ROLE};
-@@ -980,7 +984,7 @@
+@@ -996,7 +1000,7 @@
                      String user = e.getKey();
                      String pw = e.getValue();
                      Credential cred = Credential.getCredential(MD5_CREDENTIAL_TYPE + pw);
@@ -51,7 +51,7 @@
                      Constraint constraint = new Constraint(user, JETTY_ROLE);
                      constraint.setAuthenticate(true);
                      ConstraintMapping cm = new ConstraintMapping();
-@@ -1000,7 +1004,7 @@
+@@ -1016,7 +1020,7 @@
                          try {
                              // each char truncated to 8 bytes
                              String user2 = new String(b2, "ISO-8859-1");
@@ -60,7 +60,7 @@
                              constraint = new Constraint(user2, JETTY_ROLE);
                              constraint.setAuthenticate(true);
                              cm = new ConstraintMapping();
-@@ -1011,7 +1015,7 @@
+@@ -1027,7 +1031,7 @@
                              // each UTF-8 byte as a char
                              // this is what chrome does
                              String user3 = new String(b1, "ISO-8859-1");
@@ -71,7 +71,7 @@
                              cm = new ConstraintMapping();
 --- a/apps/routerconsole/java/src/net/i2p/router/web/LocaleWebAppHandler.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/LocaleWebAppHandler.java
-@@ -85,9 +85,9 @@
+@@ -87,9 +87,9 @@
                      String testPath = pathInContext.substring(0, len - 4) + '_' + lang + ".jsp";
                      // Do we have a servlet for the new path that isn't the catchall *.jsp?
                      @SuppressWarnings("rawtypes")

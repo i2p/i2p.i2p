@@ -14,13 +14,15 @@ Versions are as follows:
 
 Min version	Max version	Uses src pkg	Copied to Debian
 -----------	-----------	------------	----------------
-xenial		yakkety		xenial		--
 bionic		cosmic		bionic		--
-focal		groovy		bionic		buster, sid
+focal		hirsute		bionic		buster, sid
 
 Unsupported (Java 7):
 precise		saucy   	precise		wheezy
 trusty		wily		precise		jessie, stretch
+
+Unsupported (ant < 1.9.8)
+xenial		yakkety		xenial		--
 
 
 Prep (first time only)
@@ -151,7 +153,7 @@ Release
 -------
 
 Then copy from your PPA to the i2p-maintainers PPA.
-Then in the i2p-maintainers PPA, copy focal to groovy.
+Then in the i2p-maintainers PPA, copy focal to groovy and hirsute.
 Did a new series open up since the last time you did this? Copy to the new one also.
   (select "copy existing binaries")
   Copy xenial first and wait for it to be published in i2p-maintainers or the others will fail.
@@ -182,7 +184,7 @@ At your milestone, 'release now'
     Release notes: empty
     Changelog: empty
 Click 'create release'
-Now you on the page for that milestone
+Now you are on the page for that milestone
 Click 'add download file'
 For each of the four files
     i2psource_0.9.xx.tar.bz2

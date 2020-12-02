@@ -531,7 +531,7 @@ Index: b/installer/resources/locale/po/messages_ru.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
-@@ -192,13 +192,13 @@ msgid "Request a Java thread dump if run
+@@ -193,13 +193,13 @@ msgid "Request a Java thread dump if run
  msgstr "Запросить дамп нитей Java, если запущено."
  
  #: ../i2prouter:1874

@@ -98,7 +98,7 @@
     release.gpg.keyid=0xnnnnnnnn
     release.signer.su3=xxx@mail.i2p
     build.built-by=xxx
-    javac.compilerargs=-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar
+    javac.compilerargs=-bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jce.jar
     ```
 
 5. Copy latest trust list _MTN/monotonerc from website or some other workspace
@@ -145,7 +145,7 @@
   - Run rh.bat to edit the resources
   - Sign the windows installer:
     Open Visual Studio developer prompt
-    signtool sign /debug /fd SHA256 i2pinstall_${release.number}_windows.exe
+    signtool sign /a /debug /fd SHA256 i2pinstall_${release.number}_windows.exe
   - GPG sign the signed windows installer: gpg -u keyid -b i2pinstall_${release.number}_windows.exe
   - sha256sum i2pinstall_${release.number}_windows.exe
 
