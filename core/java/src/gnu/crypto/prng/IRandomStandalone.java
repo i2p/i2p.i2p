@@ -114,10 +114,9 @@ public interface IRandomStandalone extends Cloneable {
      * 
      * @return the next 8 bits of random data generated from this instance.
      * @throws IllegalStateException if the instance is not yet initialised.
-     * @throws LimitReachedExceptionStandalone this instance has reached its
      * theoretical limit for generating non-repetitive pseudo-random data.
      */
-   byte nextByte() throws IllegalStateException, LimitReachedExceptionStandalone;
+   byte nextByte() throws IllegalStateException;
 
    /**
      * <p>Fills the designated byte array, starting from byte at index
@@ -131,11 +130,10 @@ public interface IRandomStandalone extends Cloneable {
      * @param length the maximum number of required random bytes. This method
      * does nothing if this parameter is less than <code>1</code>.
      * @throws IllegalStateException if the instance is not yet initialised.
-     * @throws LimitReachedExceptionStandalone this instance has reached its
      * theoretical limit for generating non-repetitive pseudo-random data.
      */
    void nextBytes(byte[] out, int offset, int length)
-   throws IllegalStateException, LimitReachedExceptionStandalone;
+   throws IllegalStateException;
 
    /**
     * <p>Supplement, or possibly replace, the random state of this PRNG with

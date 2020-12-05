@@ -95,7 +95,7 @@ import net.i2p.crypto.SHA256Generator;
  *
  * NOTE: As of 0.8.8, uses the java.security.MessageDigest instead of GNU Sha256Standalone
  */
-public class FortunaStandalone extends BasePRNGStandalone implements Serializable, RandomEventListenerStandalone
+public class FortunaStandalone extends BasePRNGStandalone implements Serializable
 {
 
   private static final long serialVersionUID = 0xFACADE;
@@ -189,19 +189,6 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     if (pool == 0)
       pool0Count += length;
     pool = (pool + 1) % NUM_POOLS;
-  }
-
-  public void addRandomEvent(RandomEventStandalone event)
-  {
-    if (event.getPoolNumber() < 0 || event.getPoolNumber() >= pools.length)
-      throw new IllegalArgumentException("pool number out of range: "
-                                         + event.getPoolNumber());
-    pools[event.getPoolNumber()].update(event.getSourceNumber());
-    pools[event.getPoolNumber()].update((byte) event.getData().length);
-    byte data[] = event.getData();
-    pools[event.getPoolNumber()].update(data, 0, data.length); //event.getData());
-    if (event.getPoolNumber() == 0)
-      pool0Count += event.getData().length;
   }
 
   // Reading and writing this object is equivalent to storing and retrieving
