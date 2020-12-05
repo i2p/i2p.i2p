@@ -94,6 +94,12 @@ Public domain except as listed below:
    Copyright (C) 2016 Southern Storm Software, Pty Ltd.
    See licenses/LICENSE-Noise.txt
 
+   MiniDNS library 1.0.0
+   This software may be used under the terms of (at your choice)
+   - LGPL version 2 (or later) (see licenses/LICENSE-LGPL2.1.txt)
+   - Apache Software licence (see licenses/LICENSE-Apache2.0.txt)
+   - DWTFYWTPL
+
 
 Router (router.jar):
 Public domain except as listed below:
