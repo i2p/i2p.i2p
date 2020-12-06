@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,6 +153,10 @@ class PeerCoordinator implements PeerListener
   private static final long COMMENT_REQ_INTERVAL = 12*60*60*1000L;
   private static final long COMMENT_REQ_DELAY = 60*60*1000L;
   private static final int MAX_COMMENT_NOT_REQ = 10;
+
+  /** hostname to expire time, sync on this */
+  private Map<String, Long> _webPeerBans;
+  private static final long WEBPEER_BAN_TIME = 30*60*1000L;
   
   /**
    *  @param metainfo null if in magnet mode
@@ -916,6 +921,7 @@ class PeerCoordinator implements PeerListener
                       // As connections are already up, new Pieces will
                       // not have their PeerID list populated, so do that.
                           for (Peer p : peers) {
+                              // TODO don't access state directly
                               PeerState s = p.state;
                               if (s != null) {
                                   BitField bf = s.bitfield;
@@ -1299,6 +1305,7 @@ class PeerCoordinator implements PeerListener
                                      if (++seeds >= 4)
                                          break;
                                  } else {
+                                     // TODO don't access state directly
                                      PeerState state = pr.state;
                                      if (state == null) continue;
                                      BitField bf = state.bitfield;
@@ -1336,6 +1343,7 @@ class PeerCoordinator implements PeerListener
       // Temporary? So PeerState never calls wantPiece() directly for now...
       Piece piece = wantPiece(peer, havePieces, true);
       if (piece != null) {
+          // TODO padding
           return new PartialPiece(piece, metainfo.getPieceLength(piece.getId()), _util.getTempDir());
       }
       if (_log.shouldLog(Log.DEBUG))
@@ -1452,6 +1460,10 @@ class PeerCoordinator implements PeerListener
           if (bev.getMap().get(ExtensionHandler.TYPE_PEX) != null) {
               List<Peer> pList = peerList();
               pList.remove(peer);
+              for (Iterator<Peer> iter = pList.iterator(); iter.hasNext(); ) {
+                  if (iter.next().isWebPeer())
+                      iter.remove();
+              }
               if (!pList.isEmpty())
                   ExtensionHandler.sendPEX(peer, pList);
           }
@@ -1748,6 +1760,44 @@ class PeerCoordinator implements PeerListener
    */
   public I2PSnarkUtil getUtil() {
       return _util;
+  }
+
+  /**
+   *  Ban a web peer for this torrent, for while or permanently.
+   *  @param host the host name
+   *  @since 0.9.49
+   */
+  public synchronized void banWebPeer(String host, boolean isPermanent) {
+      if (_webPeerBans == null)
+          _webPeerBans = new HashMap<String, Long>(4);
+      Long time;
+      if (isPermanent) {
+          time = Long.valueOf(Long.MAX_VALUE);
+      } else {
+          long now = _util.getContext().clock().now();
+          time = Long.valueOf(now + WEBPEER_BAN_TIME);
+      }
+      Long old = _webPeerBans.put(host, time);
+      if (old != null && old.longValue() > time)
+          _webPeerBans.put(host, old);
+  }
+
+  /**
+   *  Is a web peer banned?
+   *  @param host the host name
+   *  @since 0.9.49
+   */
+  public synchronized boolean isWebPeerBanned(String host) {
+      if (_webPeerBans == null)
+          return false;
+      Long time = _webPeerBans.get(host);
+      if (time == null)
+          return false;
+      long now = _util.getContext().clock().now();
+      boolean rv = time.longValue() > now;
+      if (!rv)
+          _webPeerBans.remove(host);
+      return rv;
   }
 }
 
