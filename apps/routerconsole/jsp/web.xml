@@ -30,11 +30,6 @@
     <!-- yeah, i'm lazy, using a jsp instead of a servlet.. -->
     <servlet-mapping> 
       <servlet-name>net.i2p.router.web.jsp.viewtheme_jsp</servlet-name>
-      <url-pattern>/themes/*</url-pattern>
-    </servlet-mapping>
-    
-    <servlet-mapping> 
-      <servlet-name>net.i2p.router.web.jsp.viewtheme_jsp</servlet-name>
       <url-pattern>/javadoc/*</url-pattern>
     </servlet-mapping>
     

@@ -80,7 +80,7 @@
 		<!-- set if unset -->
 		<property name="workspace.changes.tr" value="" />
                 <!-- ideal for linux: 24x24, but transparency doesn't work -->
-                <copy tofile="${build}/desktopgui/resources/images/logo.png" file="../../installer/resources/themes/console/images/itoopie_xsm.png" />
+                <copy tofile="${build}/desktopgui/resources/images/logo.png" file="../../apps/routerconsole/jsp/themes/console/images/itoopie_xsm.png" />
                 <copy todir="${build}/desktopgui/resources/images" file="images/itoopie_black_24.png" />
                 <copy todir="${build}/desktopgui/resources/images" file="images/itoopie_white_24.png" />
 		<jar basedir="${build}" excludes="messages-src/**" destfile="${dist}/${jar}">

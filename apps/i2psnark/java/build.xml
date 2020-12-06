@@ -250,6 +250,9 @@
 
     <!-- add css, image, and js files for standalone snark to the war -->
     <target name="standalone_war" depends="war">
+<!--  FIXME
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
         <mkdir dir="build/standalone-resources/.resources/themes/snark" />
         <copy todir="build/standalone-resources/.resources/themes/snark" >
             <fileset dir="../../../installer/resources/themes/snark/" />

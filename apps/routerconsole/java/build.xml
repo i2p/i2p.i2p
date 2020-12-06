@@ -339,7 +339,7 @@
         <!-- set if unset -->
         <property name="workspace.changes.w.tr" value="" />
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
-        <copy file="../../../installer/resources/themes/console/images/favicon.ico" tofile="../jsp/favicon.ico" />
+        <copy file="../jsp/themes/console/images/favicon.ico" tofile="../jsp/favicon.ico" />
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
             <manifest>

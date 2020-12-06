@@ -1436,7 +1436,7 @@
     </target>
 
     <!-- see targets below for conditional copying -->
-    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, copyflags, truncatehistory">
+    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, copyflags, truncatehistory">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
         <delete>
@@ -1484,7 +1484,7 @@
         <copy todir="pkg-temp/eepsite-jetty9.3" >
             <fileset dir="installer/resources/eepsite-jetty9.3" />
         </copy>
-        <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
+        <copy file="apps/routerconsole/jsp/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
     </target>
 
     <target name="copyflags" depends="copyflags-unlesspkg" >
@@ -1583,12 +1583,6 @@
         <copy file="installer/lib/launch4j/lib/JGoodies.Forms.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Forms.txt" />
         <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
-    </target>
-
-    <target name="prepthemeupdates">
-        <copy todir="pkg-temp/docs/themes/" >
-            <fileset dir="installer/resources/themes/" />
-        </copy>
     </target>
 
     <!-- SSL Certs -->
@@ -1837,7 +1831,7 @@
         <concat append="true" destfile="pkg-temp/history.txt">&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE</concat>
     </target>
 
-    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes, prepthemeupdates">
+    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
