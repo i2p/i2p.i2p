@@ -2920,7 +2920,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
      background-size: 15px auto, 100% 100% !important;
 }
 
-img[src="/themes/snark/ubergine/images/details.png"] {
+img[src="images/details.png"] {
      width: 14px;
      height: 14px;
 }

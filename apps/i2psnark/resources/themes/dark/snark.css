@@ -2238,15 +2238,15 @@ hr.debug:last-child {
 }
 
 .priorityHigh {
-     background: url(/themes/snark/dark/images/icons/clock_red.png) left 24px center no-repeat;
+     background: url(images/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/themes/snark/dark/images/icons/clock.png) left 24px  center no-repeat;
+     background: url(images/icons/clock.png) left 24px  center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/themes/snark/dark/images/icons/cancel.png) left 22px center no-repeat;
+     background: url(images/icons/cancel.png) left 22px center no-repeat;
 }
 
 /* configs */

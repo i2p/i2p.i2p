@@ -1769,8 +1769,8 @@ img[src$="details.png"] {
 }
 
 .configsectionpanel {
-     background: #dfd7d1 url(/themes/snark/ubergine/images/configuration.png) no-repeat scroll right center;
-     background: url(/themes/snark/ubergine/images/configuration.png) no-repeat scroll right center, linear-gradient(to bottom, #dfd7d1, #cfc7c2);
+     background: #dfd7d1 url(images/configuration.png) no-repeat scroll right center;
+     background: url(images/configuration.png) no-repeat scroll right center, linear-gradient(to bottom, #dfd7d1, #cfc7c2);
      background-size: 84px 82px, 100% 100%;
 }
 

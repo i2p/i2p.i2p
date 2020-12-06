@@ -1661,7 +1661,7 @@ code, tt {
 .trackerconfig th:first-child {
      border-radius: 2px 0 0 2px;
      border-left: 1px solid #339;
-     background: url(/themes/snark/light/images/delete.png) center right 8px no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
+     background: url(images/delete.png) center right 8px no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
 }
 
 .trackerconfig th:last-child {
@@ -1957,15 +1957,15 @@ hr.debug:last-child {
 }
 
 .priorityHigh {
-     background: url(/themes/snark/light/images/icons/clock_red.png) left 24px center no-repeat;
+     background: url(images/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/themes/snark/light/images/icons/clock.png) left 24px center no-repeat;
+     background: url(images/icons/clock.png) left 24px center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/themes/snark/light/images/icons/cancel.png) left 22px center no-repeat;
+     background: url(images/icons/cancel.png) left 22px center no-repeat;
 }
 
 /* end priorities */

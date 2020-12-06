@@ -201,10 +201,7 @@ public class I2PSnarkServlet extends BasicServlet {
             return;
         }
 
-        if (_context.isRouterContext())
-            _themePath = "/themes/snark/" + _manager.getTheme() + '/';
-        else
-            _themePath = _contextPath + WARBASE + "themes/snark/" + _manager.getTheme() + '/';
+        _themePath = _contextPath + WARBASE + "themes/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
         req.setCharacterEncoding("UTF-8");
 
