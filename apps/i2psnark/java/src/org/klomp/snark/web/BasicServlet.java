@@ -42,6 +42,8 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SystemVersion;
 
+import org.klomp.snark.URIUtil;
+
 
 /* ------------------------------------------------------------ */
 /**

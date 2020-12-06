@@ -16,7 +16,7 @@
 //  ========================================================================
 //
 
-package org.klomp.snark.web;
+package org.klomp.snark;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -35,9 +35,9 @@ import net.i2p.data.DataHelper;
  * see UrlEncoded
  * 
  * I2P modded from Jetty 8.1.15
- * @since 0.9.15
+ * @since 0.9.15, moved from web in 0.9.49
  */
-class URIUtil
+public class URIUtil
 {
 
     /** Encode a URI path.
