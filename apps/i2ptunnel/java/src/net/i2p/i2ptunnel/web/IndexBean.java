@@ -351,7 +351,7 @@ public class IndexBean {
             if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
                 theme = "light";
         }
-        return "/themes/i2ptunnel/" + theme + "/";
+        return "themes/" + theme + "/";
     }
 
     public int getTunnelCount() {
