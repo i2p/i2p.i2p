@@ -317,7 +317,7 @@ public class RouterConsoleRunner implements RouterApp {
      *  Package private for ConfigServiceHandler
      *  @since 0.9.48 pulled out of startTrayApp
      */
-    static boolean isSystrayEnabled(I2PAppContext _context) {
+    static boolean isSystrayEnabled(I2PAppContext context) {
             // default false except on OSX and non-service windows,
             // and on Linux KDE and LXDE
             // Xubuntu XFCE works but doesn't look very good
@@ -330,7 +330,7 @@ public class RouterConsoleRunner implements RouterApp {
                             //"XFCE".equals(xdg) ||
                             "KDE".equals(xdg) ||
                             "LXDE".equals(xdg));
-            return _context.getProperty(PROP_DTG_ENABLED, dflt);
+            return context.getProperty(PROP_DTG_ENABLED, dflt);
     }
 
     private void startTrayApp() {
