@@ -67,13 +67,15 @@ class ConnectionManager {
     /** once over throttle limits, respond this many times before just dropping */
     private static final int DROP_OVER_LIMIT = 3;
 
-    // TODO https://stackoverflow.com/questions/16022624/examples-of-http-api-rate-limiting-http-response-headers
+    // https://stackoverflow.com/questions/16022624/examples-of-http-api-rate-limiting-http-response-headers
+    // RFC 6585
     private static final String LIMIT_HTTP_RESPONSE =
          "HTTP/1.1 429 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
+         "Retry-After: 900\r\n"+
          "\r\n"+
          "<html><head><title>429 Denied</title></head>"+
          "<body><h3>429 Denied</h3>" +
@@ -236,20 +238,23 @@ class ConnectionManager {
      */
     public Connection receiveConnection(Packet synPacket) {
         boolean reject = false;
+        int retryAfter = 0;
 
             if (locked_tooManyStreams()) {
                 if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                     _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of " 
                               + _defaultOptions.getMaxConns() + " connections");
                 reject = true;
+                retryAfter = 120;
             } else {
                 // this may not be right if more than one is enabled
-                String why = shouldRejectConnection(synPacket);
+                Reason why = shouldRejectConnection(synPacket);
                 if (why != null) {
                     if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                         _log.logAlways(Log.WARN, "Refusing connection since peer is " + why +
                            (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().toBase32()));
                     reject = true;
+                    retryAfter = why.getSeconds();
                 }
             }
         
@@ -265,9 +270,7 @@ class ConnectionManager {
                 return null;
             }
             Hash h = from.calculateHash();
-            if (_globalBlacklist.contains(h) ||
-                (_defaultOptions.isAccessListEnabled() && !_defaultOptions.getAccessList().contains(h)) ||
-                (_defaultOptions.isBlacklistEnabled() && _defaultOptions.getBlacklist().contains(h))) {
+            if (retryAfter >= MAX_TIME) {
                 // always drop these regardless of setting
                 return null;
             }
@@ -290,7 +293,10 @@ class ConnectionManager {
             boolean custom = !(reset || http);
             String sendResponse;
             if (http) {
-                sendResponse = LIMIT_HTTP_RESPONSE;
+                if (retryAfter > 0)
+                    sendResponse = LIMIT_HTTP_RESPONSE.replace("900", Integer.toString(retryAfter));
+                else
+                    sendResponse = LIMIT_HTTP_RESPONSE.replace("Retry-After: 900\r\n", "");
             } else if (custom) {
                 sendResponse = resp.replace("\\r", "\r").replace("\\n", "\n");
             } else {
@@ -391,7 +397,7 @@ class ConnectionManager {
             return false;
         if (con == null) {
             // Use the same throttling as for connections
-            String why = shouldRejectConnection(ping);
+            Reason why = shouldRejectConnection(ping);
             if (why != null) {
                 if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                     _log.logAlways(Log.WARN, "Dropping ping since peer is " + why + ": " + dest.calculateHash());
@@ -591,14 +597,35 @@ class ConnectionManager {
     }
     
     /**
+     *  @since 0.9.49
+     */
+    private static class Reason {
+        private final String txt;
+        private final int seconds;
+
+        public Reason(String text, int secs) {
+            txt = text; seconds = secs;
+        }
+
+        @Override
+        public String toString() { return txt; }
+
+        public int getSeconds() { return seconds; }
+    }
+
+    private static final int MAX_TIME = 9999999;
+
+
+    /**
+     *  Reason time is in seconds for Retry-After header; MAX_TIME for drop, 0 if unknown
      *  @return reason string or null if not rejected
      */
-    private String shouldRejectConnection(Packet syn) {
+    private Reason shouldRejectConnection(Packet syn) {
         // unfortunately we don't have access to the router client manager here,
         // so we can't whitelist local access
         Destination from = syn.getOptionalFrom();
         if (from == null)
-            return "null";
+            return new Reason("null", MAX_TIME);
         Hash h = from.calculateHash();
 
         // As of 0.9.9, run the blacklist checks BEFORE the port counters,
@@ -631,61 +658,61 @@ class ConnectionManager {
             }
         }
         if (hashes.length() > 0 && _globalBlacklist.contains(h))
-            return "blacklisted globally";
+            return new Reason("blacklisted globally", MAX_TIME);
 
         if (_defaultOptions.isAccessListEnabled() &&
             !_defaultOptions.getAccessList().contains(h))
-            return "not whitelisted";
+            return new Reason("not whitelisted", MAX_TIME);
         if (_defaultOptions.isBlacklistEnabled() &&
             _defaultOptions.getBlacklist().contains(h))
-            return "blacklisted";
+            return new Reason("blacklisted", MAX_TIME);
 
 
         if (_dayThrottler != null && _dayThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledDay", 1);
             if (_defaultOptions.getMaxConnsPerDay() <= 0)
-                return "throttled by" +
+                return new Reason("throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
-                        " per day";
+                        " per day", 86400);
             else if (_defaultOptions.getMaxTotalConnsPerDay() <= 0)
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
-                        " per day";
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
+                        " per day", 86400);
             else
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
-                        " per day";
+                        " per day", 86400);
         }
         if (_hourThrottler != null && _hourThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledHour", 1);
             if (_defaultOptions.getMaxConnsPerHour() <= 0)
-                return "throttled by" +
+                return new Reason("throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
-                        " per hour";
+                        " per hour", 3600);
             else if (_defaultOptions.getMaxTotalConnsPerHour() <= 0)
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
-                        " per hour";
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
+                        " per hour", 3600);
             else
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
-                        " per hour";
+                        " per hour", 3600);
         }
         if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledMinute", 1);
             if (_defaultOptions.getMaxConnsPerMinute() <= 0)
-                return "throttled by" +
+                return new Reason("throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
-                        " per minute";
+                        " per minute", 60);
             else if (_defaultOptions.getMaxTotalConnsPerMinute() <= 0)
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
-                        " per minute";
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
+                        " per minute", 60);
             else
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
-                        " per minute";
+                        " per minute", 60);
         }
 
         if (!_connectionFilter.allowDestination(from)) {
-            return "not allowed by filter";
+            return new Reason("not allowed by filter", 0);
         }
 
         return null;
