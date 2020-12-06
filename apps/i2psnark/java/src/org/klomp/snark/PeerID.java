@@ -227,6 +227,10 @@ public class PeerID implements Comparable<PeerID>
   {
     if (_toStringCache != null)
         return _toStringCache;
+    if (id != null && DataHelper.eq(id, 0, WebPeer.IDBytes, 0, WebPeer.IDBytes.length)) {
+        _toStringCache = "WebSeed@" + Base32.encode(destHash) + ".b32.i2p";
+        return _toStringCache;
+    }
     if (id == null || address == null)
         return "unkn@" + Base64.encode(destHash).substring(0, 6);
     int nonZero = 0;

@@ -407,6 +407,8 @@ public class TrackerClient implements Runnable {
                 return;
             }
 
+            int webPeers = getWebPeers();
+
             // Local DHT tracker announce
             DHT dht = _util.getDHT();
             if (dht != null && (meta == null || !meta.isPrivate()))
@@ -438,7 +440,7 @@ public class TrackerClient implements Runnable {
             }
 
             // we could try and total the unique peers but that's too hard for now
-            snark.setTrackerSeenPeers(maxSeenPeers);
+            snark.setTrackerSeenPeers(maxSeenPeers + webPeers);
 
             if (stop)
                 return;
@@ -720,6 +722,62 @@ public class TrackerClient implements Runnable {
             return rv;
   }
 
+  /**
+   *  @return valid web peers from metainfo
+   *  @since 0.9.49
+   */
+  private int getWebPeers() {
+      if (meta == null)
+          return 0;
+      // prevent connecting out to a webseed for comments only
+      if (coordinator.getNeededLength() <= 0)
+          return 0;
+      List<String> urls = meta.getWebSeedURLs();
+      if (urls == null || urls.isEmpty())
+          return 0;
+      // Uncomment to skip multifile torrents
+      //if (meta.getLengths() != null)
+      //    return 0;
+      List<Peer> peers = new ArrayList<Peer>(urls.size());
+      for (String url : urls) {
+          Hash h = getHostHash(url);
+          if (h == null)
+              continue;
+          try {
+              PeerID pID = new PeerID(h.getData(), _util);
+              byte[] id = new byte[20];
+              System.arraycopy(WebPeer.IDBytes, 0, id, 0, 12);
+              System.arraycopy(h.getData(), 0, id, 12, 8);
+              pID.setID(id);
+              URI uri = new URI(url);
+              String host = uri.getHost();
+              if (host == null)
+                  continue;
+              if (coordinator.isWebPeerBanned(host)) {
+                  if (_log.shouldWarn())
+                      _log.warn("Skipping banned webseed " + url);
+                  continue;
+              }
+              peers.add(new WebPeer(coordinator, uri, pID, snark.getMetaInfo()));
+          } catch (InvalidBEncodingException ibe) {
+          } catch (URISyntaxException use) {
+          }
+      }
+      if (peers.isEmpty())
+          return 0;
+      Random r = _util.getContext().random();
+      if (peers.size() > 1)
+          Collections.shuffle(peers, r);
+      Iterator<Peer> it = peers.iterator();
+      while ((!stop) && it.hasNext() && coordinator.needOutboundPeers()) {
+          Peer cur = it.next();
+          if (coordinator.addPeer(cur) && it.hasNext()) {
+              int delay = r.nextInt(DELAY_RAND) + DELAY_MIN;
+              try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+          }
+      }
+      return peers.size();
+  }
 
   /**
    *  Creates a thread for each tracker in parallel if tunnel is still open
