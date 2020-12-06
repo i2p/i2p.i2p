@@ -1388,6 +1388,7 @@ public class Storage implements Closeable
                       //rafs[i].write(bs, off + written, len);
                       pp.write(raf, written, len);
                   } catch (IOException ioe) {
+                      try { tf.closeRAF(); } catch (IOException ioe2) {}
                       // get the file name in the logs
                       IOException ioe2 = new IOException("Error writing " + tf.RAFfile.getAbsolutePath());
                       ioe2.initCause(ioe);
@@ -1494,6 +1495,7 @@ public class Storage implements Closeable
                 raf.seek(start);
                 raf.readFully(bs, read, len);
             } catch (IOException ioe) {
+                try { tf.closeRAF(); } catch (IOException ioe2) {}
                 // get the file name in the logs
                 IOException ioe2 = new IOException("Error reading " + tf.RAFfile.getAbsolutePath());
                 ioe2.initCause(ioe);
