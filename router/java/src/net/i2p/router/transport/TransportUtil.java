@@ -247,6 +247,8 @@ public abstract class TransportUtil {
                port != 4045 &&  // lockd
                port != 4444 &&  // HTTP
                port != 4445 &&  // HTTPS
+               port != 5060 &&  // SIP https://groups.google.com/a/chromium.org/g/blink-dev/c/tTGznHWRB9U
+               port != 5061 &&  // SIP https://groups.google.com/a/chromium.org/g/blink-dev/c/tTGznHWRB9U
                port != 6000 &&  // lockd
                (!(port >= 6665 && port <= 6669)) && // IRC and alternates
                port != 6697 &&  // IRC+TLS
@@ -268,7 +270,7 @@ public abstract class TransportUtil {
      */
     public static void logInvalidPort(Log log, String transportStyle, int port) {
         log.error("Specified " + transportStyle + " port " + port + " is not valid, selecting a new port");
-        log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
+        log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 5060, 5061, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
     }
 
     /**
