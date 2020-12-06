@@ -143,20 +143,20 @@ h3 {
 
 .headline h3 {
      font-size: 11.5pt !important;
-     background: url(/themes/susidns/images/addressbook.png) 6px center no-repeat #fcfcff;
-     background: url(/themes/susidns/images/addressbook.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: url(../images/addressbook.png) 6px center no-repeat #fcfcff;
+     background: url(../images/addressbook.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
 .headline#subscriptions h3 {
-     background: url(/themes/susidns/images/subs_24.png) 6px center no-repeat #fcfcff;
-     background: url(/themes/susidns/images/subs_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: url(../images/subs_24.png) 6px center no-repeat #fcfcff;
+     background: url(../images/subs_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
 .headline#configure h3 {
-     background: url(/themes/susidns/images/configure_24.png) 6px center no-repeat #fcfcff;
-     background: url(/themes/susidns/images/configure_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: url(../images/configure_24.png) 6px center no-repeat #fcfcff;
+     background: url(../images/configure_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
@@ -178,7 +178,7 @@ span.location {
      border-top: 1px solid #dee2e6;
      margin: 5px -6px 0;
      padding: 8px 10px 0 33px;
-     background: url(/themes/susidns/images/drive.png) 9px 7px no-repeat;
+     background: url(../images/drive.png) 9px 7px no-repeat;
 }
 
 #content {
@@ -994,7 +994,7 @@ div#book, #emptybook {
 }
 
 p.book {
-     background: url(/themes/susidns/images/abook.png) 2px center no-repeat;
+     background: url(../images/abook.png) 2px center no-repeat;
      padding: 5px 5px 5px 24px;
 }
 
@@ -1402,7 +1402,7 @@ input.export {
 }
 
 .headline h4 {
-     background: url(/themes/susidns/images/drive.png) no-repeat scroll 10px 8px;
+     background: url(../images/drive.png) no-repeat scroll 10px 8px;
 }
 }
 

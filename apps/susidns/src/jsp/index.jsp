@@ -86,7 +86,7 @@
 </p>
 <div class="illustrate">
 <object type="image/svg+xml" data="images/how.svg?<%=net.i2p.CoreVersion.VERSION%>">
-<img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" />
+<img src="images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" />
 </object>
 </div>
 </div>

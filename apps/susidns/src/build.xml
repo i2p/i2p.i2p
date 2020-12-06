@@ -168,9 +168,10 @@
         <property name="workspace.changes.tr" value="" />
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
         	<fileset dir=".">
-        		<include name="WEB-INF/**/*.class"/>
-        		<include name="svg/*"/>
-                <include name="js/*"/>
+                    <include name="WEB-INF/**/*.class"/>
+                    <include name="svg/*"/>
+                    <include name="themes/**/*"/>
+                    <include name="js/*"/>
         	</fileset>
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />

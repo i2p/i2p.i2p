@@ -118,29 +118,29 @@ body.iframed {
 }
 
 #navi a.abook {
-     background: #332940 url(/themes/susidns/images/abook.png) 5px center no-repeat;
-     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, #332940;
+     background: #332940 url(../images/abook.png) 5px center no-repeat;
+     background: url(../images/abook.png) 5px center no-repeat, #332940;
 }
 
 #navi a.abook:hover, #navi a.abook:focus {
-     background: #332940 url(/themes/susidns/images/abook.png) 5px center no-repeat !important;
+     background: #332940 url(../images/abook.png) 5px center no-repeat !important;
 }
 
 #navi a.abook:active {
-     background: #da736b url(/themes/susidns/images/abook.png) 5px center no-repeat !important;
+     background: #da736b url(../images/abook.png) 5px center no-repeat !important;
 }
 
 #navi a#subs {
-     background: #332940 url(/themes/susidns/images/subs.png) 5px center no-repeat;
-     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, #1F1A24;
+     background: #332940 url(../images/subs.png) 5px center no-repeat;
+     background: url(../images/subs.png) 5px center no-repeat, #1F1A24;
 }
 
 #navi a#subs:hover, #navi a#subs:focus {
-     background: #332940 url(/themes/susidns/images/subs.png) 5px center no-repeat !important;
+     background: #332940 url(../images/subs.png) 5px center no-repeat !important;
 }
 
 #navi a#subs:active {
-     background: #da736b url(/themes/susidns/images/subs.png) 5px center no-repeat !important;
+     background: #da736b url(../images/subs.png) 5px center no-repeat !important;
 }
 
 #navi a#config {
@@ -156,16 +156,16 @@ body.iframed {
 }
 
 #navi a#overview {
-     background: #1F1A24 url(/themes/susidns/images/overview.png) 5px center no-repeat;
-     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, #1F1A24;
+     background: #1F1A24 url(../images/overview.png) 5px center no-repeat;
+     background: url(../images/overview.png) 5px center no-repeat, #1F1A24;
 }
 
 #navi a#overview:hover, #navi a#overview:focus {
-     background: #1F1A24 url(/themes/susidns/images/overview.png) 5px center no-repeat !important;
+     background: #1F1A24 url(../images/overview.png) 5px center no-repeat !important;
 }
 
 #navi a#overview:active {
-     background: #1F1A24 url(/themes/susidns/images/overview.png) 5px center no-repeat !important;
+     background: #1F1A24 url(../images/overview.png) 5px center no-repeat !important;
 }
 
 /* end topnav */
@@ -374,7 +374,7 @@ div#messages {
 
 #messages + p, p.book {
      border: 1px solid #292929;
-     background: #000 url(/themes/susidns/images/addressbook.png) 10px center no-repeat;
+     background: #000 url(../images/addressbook.png) 10px center no-repeat;
      padding: 20px 20px 20px 50px !important;
 }
 
@@ -418,7 +418,7 @@ h4 {
      border: 1px solid #292929;
      padding: 8px 10px 8px 35px;
      margin-bottom: 30px !important;
-     background: url(/themes/susidns/images/drive.png) 9px center no-repeat #332940 !important;
+     background: url(../images/drive.png) 9px center no-repeat #332940 !important;
 }
 
 a {
@@ -903,7 +903,7 @@ input[name="search"]:focus {
 
 .headline h3 {
      padding: 10px 5px 10px 35px;
-     background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat, #1F1A24;
+     background: url(../images/addressbook.png) 5px center no-repeat, #1F1A24;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -911,16 +911,16 @@ input[name="search"]:focus {
 }
 
 .headline#subscriptions h3 {
-     background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat;
+     background: url(../images/subs_24.png) 5px center no-repeat;
      /*linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);*/
-     background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat;
+     background: url(../images/subs_24.png) 5px center no-repeat;
      /*linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);*/
 }
 
 .headline#configure h3 {
-     background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat ;
+     background: url(../images/configure_24.png) 5px center no-repeat ;
      /*, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);*/
-     background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat;
+     background: url(../images/configure_24.png) 5px center no-repeat;
      /*, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);*/
 }
 
@@ -950,7 +950,7 @@ p.book {
 
 #messages + p, p.book {
      border: 1px solid #292929;
-     background: #332940 url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
+     background: #332940 url(../images/addressbook.png) 5px center no-repeat;
 }
 
 /* hide export button on published addressbook if empty */
