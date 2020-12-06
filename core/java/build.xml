@@ -111,6 +111,7 @@
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/i2p.jar" >
             <fileset dir="./build/obj" includes="**/*.class" />
+            <fileset dir="./src" includes="net/i2p/util/resources/*" />
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
             <manifest>

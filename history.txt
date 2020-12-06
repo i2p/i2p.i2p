@@ -1,3 +1,8 @@
+2020-12-06 zzz
+ * Console, webapps: Move web resources to wars
+ * i2psnark: Initial support for web seeds (WIP)
+ * Util: Change DoH to RFC 8484 protocol
+
 * 2020-12-01 0.9.48 released
 
 2020-11-26 zzz

@@ -1,0 +1,148 @@
+#
+# https://github.com/curl/curl/wiki/DNS-over-HTTPS
+#
+# Includes all marked as non-logging and not malware/ad blocking
+# Excludes logging, filtering, experimental
+# Excludes google, cloudflare, and quad9 - those are hardcoded
+# in the DNSOverHTTPS.java source file.
+#
+# Failures in testing are commented out below.
+#
+# Notes on some not included:
+#
+# Exclude big companies without any privacy policy:
+# - Alibaba
+# - OpenDNS (Cisco)
+# - Xfinity (Comcast)
+
+# Exclude these too:
+# - DNS.SB - 3 months logs
+# - doh.*.pi-dns.com - has blocking/filtering
+# - anything in China
+#
+# Grouped as in the link above.
+#
+https://dns.aa.net.uk/dns-query
+#
+https://dnses.alekberg.net/dns-query
+#
+# 400
+#https://dnsnl.alekberg.net/dns-query
+# 400
+#https://dnsse.alekberg.net/dns-query
+# down, see https://www.armadillodns.net/ for status
+#https://doh.armadillodns.net/dns-query
+#
+https://doh.42l.fr/dns-query
+#
+https://doh-fi.blahdns.com/dns-query
+https://doh-jp.blahdns.com/dns-query
+https://doh-de.blahdns.com/dns-query
+#
+# not found
+#https://doh.captnemo.in/dns-query
+#
+https://private.canadianshield.cira.ca/dns-query
+#
+https://doh.opendns.com/dns-query
+#
+https://dns.containerpi.com/dns-query
+#
+https://dns.digitale-gesellschaft.ch/dns-query
+#
+https://dnsforge.de/dns-query
+#
+# not found
+#https://doh.dnslify.com/dns-query
+#
+https://doh.li/dns-query
+#
+https://rdns.faelix.net/
+#
+https://doh.ffmuc.net/dns-query
+#
+# not found
+#https://doh.applied-privacy.net/query
+#
+https://dns.hostux.net/dns-query
+#
+# not found
+#https://jcdns.fun/dns-query
+#
+https://jp.tiar.app/dns-query
+https://jp.tiarap.org/dns-query
+#
+# timeout
+#https://resolver-eu.lelux.fi/dns-query
+#
+https://doh.libredns.gr/dns-query
+#
+https://fi.doh.dns.snopyta.org/dns-query
+#
+https://dns.twnic.tw/dns-query
+#
+# not found
+#https://dns.wugui.zone/dns-query
+#https://dns-asia.wugui.zone/dns-query
+#
+https://dns.dnsoverhttps.net/dns-query
+#
+https://ibksturm.synology.me/dns-query
+#
+https://ibuki.cgnat.net/dns-query
+#
+# timeout
+#https://doh-2.seby.io/dns-query
+https://doh.seby.io:8443/dns-query
+#
+#
+#############################################
+#
+#
+# Additional from:
+# https://dnscrypt.info/public-servers/
+# but not listed above.
+# Click on name, check for 'no filters true' and 'no logs true'
+#
+# Excludes logging, filtering, experimental
+# Failures in testing are commented out below.
+#
+# bortzmayer
+https://doh.bortzmeyer.fr/
+#
+# cz.nic
+# experimental
+#https://odvr.nic.cz/doh
+# dns.ryan-palmer
+https://dns1.ryan-palmer.com/dns-query
+#
+# dnscrypt.ca-1-doh
+# not found
+#https://dns1.dnscrypt.ca/dns-query
+#https://dns2.dnscrypt.ca/dns-query
+# dnshome-doh
+https://dns.dnshome.de/dns-query
+# doh-crypto-sx
+https://doh.crypto.sx/dns-query
+# id-gmail-doh
+https://doh.tiar.app/dns-query
+#
+# meganerd-doh
+# 404
+#https://chewbacca.meganerd.nl/dns-query
+# nextdns
+https://dns.nextdns.io/dns-query
+# powerdns
+https://doh.powerdns.org/dns-query
+#
+# rumpelsepp.org
+# 404
+#https://rumpelsepp.org/dns-query
+#
+#
+#############################################
+#
+#
+# Others:
+# njalla
+https://dns.njal.la/dns-query

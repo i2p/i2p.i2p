@@ -1,27 +1,40 @@
 package net.i2p.util;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import gnu.getopt.Getopt;
 
-import org.json.simple.JsonArray;
-import org.json.simple.JsonObject;
-import org.json.simple.Jsoner;
+import org.minidns.dnsmessage.DnsMessage;
+import org.minidns.dnsmessage.Question;
+import org.minidns.record.A;
+import org.minidns.record.AAAA;
+import org.minidns.record.CNAME;
+import org.minidns.record.Data;
+import org.minidns.record.Record;
+import org.minidns.record.Record.TYPE;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 
 /**
  *  Simple implemetation of DNS over HTTPS.
  *  Also sets the local clock from the received date header.
+ *
+ *  Warning - not thread-safe. Create new instances as necessary.
  *
  *  This supports the JSON format only. Does NOT support RFC 8484 (DNS format)
  *  or RFC 7858 (DNS over TLS).
@@ -53,19 +66,29 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     private static final String UA_CLEARNET = "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0";
 
     private static final int MAX_RESPONSE_SIZE = 2048;
+    private static final boolean DEBUG = false;
 
     // Don't look up any of these TLDs
-    // RFC 2606, 6303, 7393
+    // RFC 2606, 3166, 6303, 7393
     // https://www.iana.org/assignments/locally-served-dns-zones/locally-served-dns-zones.xhtml
+    // https://ithi.research.icann.org/graph-m3.html#M332
+    // https://tools.ietf.org/html/draft-ietf-dnsop-private-use-tld-00
     private static final List<String> locals = Arrays.asList(new String[] {
         "localhost",
         "in-addr.arpa", "ip6.arpa", "home.arpa",
         "i2p", "onion",
         "i2p.arpa", "onion.arpa",
         "corp", "home", "internal", "intranet", "lan", "local", "private",
+        "dhcp", "localdomain", "bbrouter", "dlink", "ctc", "intra", "loc", "modem", "ip",
         "test", "example", "invalid",
+        "alt",
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
-        "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+        "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        "aa",
+        "qm", "qn", "qo", "qp", "qq", "qr", "qs", "qt", "qu", "qv", "qw", "qx", "qy", "qz",
+        "xa", "xb", "xc", "xd", "xe", "xf", "xg", "xh", "xi", "xj", "xk", "xl", "xm",
+        "xn", "xo", "xp", "xq", "xr", "xs", "xt", "xu", "xv", "xw", "xx", "xy", "xz",
+        "zz"
     } );
 
     static {
@@ -77,22 +100,24 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         // Google
         // https://developers.google.com/speed/public-dns/docs/doh/
         // 8.8.8.8 and 8.8.4.4 now redirect to dns.google, but SSLEepGet doesn't support redirect
-        v4urls.add("https://dns.google/resolve?edns_client_subnet=0.0.0.0/0&");
-        v6urls.add("https://dns.google/resolve?edns_client_subnet=0.0.0.0/0&");
+        v4urls.add("https://dns.google/dns-query");
+        v6urls.add("https://dns.google/dns-query");
         // Cloudflare cloudflare-dns.com
         // https://developers.cloudflare.com/1.1.1.1/nitty-gritty-details/
         // 1.1.1.1 is a privacy centric resolver so it does not send any client IP information
         // and does not send the EDNS Client Subnet Header to authoritative servers
-        v4urls.add("https://1.1.1.1/dns-query?ct=application/dns-json&");
-        v4urls.add("https://1.0.0.1/dns-query?ct=application/dns-json&");
-        v6urls.add("https://[2606:4700:4700::1111]/dns-query?ct=application/dns-json&");
-        v6urls.add("https://[2606:4700:4700::1001]/dns-query?ct=application/dns-json&");
+        v4urls.add("https://1.1.1.1/dns-query");
+        v4urls.add("https://1.0.0.1/dns-query");
+        v6urls.add("https://[2606:4700:4700::1111]/dns-query");
+        v6urls.add("https://[2606:4700:4700::1001]/dns-query");
         // Quad9
         // https://quad9.net/doh-quad9-dns-servers/
-        v4urls.add("https://9.9.9.9:5053/dns-query?");
-        v4urls.add("https://149.112.112.112:5053/dns-query?");
-        v6urls.add("https://[2620:fe::fe]:5053/dns-query?");
-        v6urls.add("https://[2620:fe::fe:9]:5053/dns-query?");
+        v4urls.add("https://9.9.9.9/dns-query");
+        v4urls.add("https://149.112.112.112/dns-query");
+        v6urls.add("https://[2620:fe::fe]/dns-query");
+        v6urls.add("https://[2620:fe::fe:9]/dns-query");
+
+        loadURLs();
     }
 
     // keep the timeout very short, as we try multiple addresses,
@@ -105,9 +130,6 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     private static final int MAX_FAILS = 3;
     // each for v4 and v6
     private static final int MAX_REQUESTS = 4;
-    private static final int V4_CODE = 1;
-    private static final int CNAME_CODE = 5;
-    private static final int V6_CODE = 28;
     private static final int MAX_DATE_SETS = 2;
     // From RouterClock
     private static final int DEFAULT_STRATUM = 8;
@@ -257,6 +279,23 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
      *  @return null if not found
      */
     private String query(String host, boolean isv6, List<String> toQuery, long timeout) {
+        Question q = new Question(host, isv6 ? TYPE.AAAA : TYPE.A);
+        DnsMessage msg = DnsMessage.builder()
+                                   .setId(0)
+                                   .setOpcode(DnsMessage.OPCODE.QUERY)
+                                   .setQrFlag(false)
+                                   .setRecursionDesired(true)
+                                   .setQuestion(q)
+                                   .build();
+        byte[] msgb = msg.toArray();
+        String msgb64 = Base64.encode(msgb, true);
+        // google (and only google) returns 400 for trailing unescaped '='
+        // and rejects %3d also
+        msgb64 = msgb64.replace("=", "");
+        if (DEBUG) {
+            log(msg.asTerminalOutput());
+            log(msgb64);
+        }
         int requests = 0;
         final String loopcheck = "https://" + host + '/';
         for (String url : toQuery) {
@@ -268,18 +307,18 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                 continue;
             if (fails.count(url) > MAX_FAILS)
                 continue;
-            int tcode = isv6 ? V6_CODE : V4_CODE;
-            String furl = url + "name=" + host + "&type=" + tcode;
+            String furl = url + "?dns=" + msgb64;
             log("Fetching " + furl);
             baos.reset();
             SSLEepGet eepget = new SSLEepGet(ctx, baos, furl, MAX_RESPONSE_SIZE, state);
             eepget.forceDNSOverHTTPS(false);
             eepget.addHeader("User-Agent", UA_CLEARNET);
+            eepget.addHeader("Accept", "application/dns-message");
             if (ctx.isRouterContext())
                 eepget.addStatusListener(this);
             else
                 fetchStart = System.currentTimeMillis();  // debug
-            String rv = fetch(eepget, host, isv6);
+            String rv = fetch(eepget, host, isv6, q);
             if (rv != null) {
                 fails.clear(url);
                 return rv;
@@ -298,93 +337,87 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     /**
      *  @return null if not found
      */
-    private String fetch(SSLEepGet eepget, String host, boolean isv6) {
+    private String fetch(SSLEepGet eepget, String host, boolean isv6, Question q) {
         if (eepget.fetch(TIMEOUT, TIMEOUT, TIMEOUT) &&
             eepget.getStatusCode() == 200 && baos.size() > 0) {
             long end = System.currentTimeMillis();
             log("Got response in " + (end - fetchStart) + "ms");
             byte[] b = baos.toByteArray();
             try {
-                String s = new String(b, "ISO-8859-1");
-                JsonObject map = (JsonObject) Jsoner.deserialize(s);
-                if (map == null) {
-                    log("No map");
+                DnsMessage msg = new DnsMessage(b);
+                if (DEBUG) {
+                    log("Response:\n" + msg.asTerminalOutput());
+                }
+                if (msg.responseCode != DnsMessage.RESPONSE_CODE.NO_ERROR) {
+                    log("Response: " + msg.responseCode);
                     return null;
                 }
-                Number status = (Number) map.get("Status");
-                if (status == null || status.intValue() != 0) {
-                    log("Bad status: " + status);
-                    return null;
-                }
-                JsonArray list = (JsonArray) map.get("Answer");
-                if (list == null || list.isEmpty()) {
-                    log("No answer");
-                    return null;
-                }
-                log(list.size() + " answers");
-                String hostAnswer = host + '.';
-                for (Object o : list) {
-                    try {
-                        JsonObject a = (JsonObject) o;
-                        String data = (String) a.get("data");
-                        if (data == null) {
-                            log("no data");
-                            continue;
-                        }
-                        Number typ = (Number) a.get("type");
-                        if (typ == null)
-                            continue;
-                        String name = (String) a.get("name");
-                        if (name == null)
-                            continue;
-                        if (typ.intValue() == CNAME_CODE) {
-                            log("CNAME is: " + data);
-                            hostAnswer = data;
-                            continue;
-                        }
-                        if (isv6) {
-                            if (typ.intValue() != V6_CODE) {
-                                log("type mismatch: " + typ);
-                                continue;
+                Set<Data> ans = msg.getAnswersFor(q);
+                if (ans == null || ans.isEmpty()) {
+                    // make another question to get the CNAME answers
+                    q = new Question(host, TYPE.CNAME);
+                    ans = msg.getAnswersFor(q);
+                    if (ans == null || ans.isEmpty()) {
+                        log("No answers");
+                        return null;
+                    }
+                    // process CNAME
+                    // we only do this once, we won't loop
+                    for (Data d : ans) {
+                        if (d.getType() == TYPE.CNAME) {
+                            CNAME resp = (CNAME) d;
+                            String tgt = resp.getTarget().toString();
+                            log("CNAME is: " + tgt);
+                            // make another question to get the real answers
+                            q = new Question(tgt, isv6 ? TYPE.AAAA : TYPE.A);
+                            ans = msg.getAnswersFor(q);
+                            if (ans == null || ans.isEmpty()) {
+                                log("CNAME but no answers");
+                                return null;
                             }
-                            if (!Addresses.isIPv6Address(data)) {
-                                log("bad addr: " + data);
-                                continue;
-                            }
-                        } else {
-                            if (typ.intValue() != V4_CODE) {
-                                log("type mismatch: " + typ);
-                                continue;
-                            }
-                            if (!Addresses.isIPv4Address(data)) {
-                                log("bad addr: " + data);
-                                continue;
-                            }
+                            break;
                         }
-                        // Cloudflare no longer adds the '.'
-                        if (!(hostAnswer.equals(name) || host.equals(name))) {
-                            log("name mismatch: " + name);
-                            continue;
-                        }
-                        Number ttl = (Number) a.get("TTL");
-                        int ittl = (ttl != null) ? Math.min(ttl.intValue(), MAX_TTL) : 3600;
-                        long expires = end + (ittl * 1000L);
-                        Map<String, Result> cache = isv6 ? v6Cache : v4Cache;
-                        synchronized(cache) {
-                            cache.put(host, new Result(data, expires));
-                        }
-                        log("Got answer: " + name + ' ' + typ + ' ' + ttl + ' ' + data + " in " + (end - fetchStart) + "ms");
-                        return data;
-                    } catch (Exception e) {
-                        log("Fail parsing", e);
                     }
                 }
+                log(ans.size() + " answers");
+                String data = null;
+                for (Data d : ans) {
+                    if (isv6) {
+                        if (d.getType() != TYPE.AAAA)
+                            continue;
+                        AAAA resp = (AAAA) d;
+                        byte[] ip = resp.getIp();
+                        data = Addresses.toString(ip);
+                        break;
+                    } else {
+                        if (d.getType() != TYPE.A)
+                            continue;
+                        A resp = (A) d;
+                        byte[] ip = resp.getIp();
+                        data = Addresses.toString(ip);
+                        break;
+                    }
+                }
+                if (data == null)
+                    return null;
+                long ttl = msg.getAnswersMinTtl();
+                int ittl = (int) Math.min(ttl, MAX_TTL);
+                long expires = end + (ittl * 1000L);
+                Map<String, Result> cache = isv6 ? v6Cache : v4Cache;
+                synchronized(cache) {
+                    cache.put(host, new Result(data, expires));
+                }
+                log("Got answer: " + host + ' ' + ttl + ' ' + data + " in " + (end - fetchStart) + "ms");
+                return data;
             } catch (Exception e) {
                 log("Fail parsing", e);
             }
-            log("Bad response:\n" + new String(b));
         } else {
             log("Fail fetching, rc: " + eepget.getStatusCode());
+            if (DEBUG && baos.size() > 0) {
+                // google says "the HTTP body should explain the error"
+                log("Response body:\n" + DataHelper.getUTF8(baos.toByteArray()));
+            }
         }
         return null;
     }
@@ -446,6 +479,47 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     private void log(String msg, Throwable t) {
         int level = (t != null) ? Log.WARN : Log.INFO;
         _log.log(level, msg, t);
+    }
+
+    /**
+     *  @since 0.9.49
+     */
+    private static void loadURLs() {
+        BufferedReader in = null;
+        try {
+            InputStream is = DNSOverHTTPS.class.getResourceAsStream("/net/i2p/util/resources/dohservers.txt");
+            if (is == null) {
+                System.out.println("Warning: dohservers.txt resource not found, contact packager");
+                return;
+            }
+            in = new BufferedReader(new InputStreamReader(is, "ISO-8859-1"), 4096);
+            int count = 0;
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                line = line.trim();
+                if (!line.startsWith("https://"))
+                    continue;
+                try {
+                    URI uri = new URI(line);
+                    String host = uri.getHost();
+                    if (host == null)
+                        continue;
+                    if (!Addresses.isIPv6Address(host))
+                        v4urls.add(line);
+                    if (!Addresses.isIPv4Address(host))
+                        v6urls.add(line);
+                    count++;
+                } catch (Exception e) {
+                    if (DEBUG) e.printStackTrace();
+                }
+            }
+            if (DEBUG)
+                System.out.println("Loaded " + count + " DoH server entries from resource");
+        } catch (Exception e) {
+            if (DEBUG) e.printStackTrace();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
     }
 
     public static void main(String[] args) {
