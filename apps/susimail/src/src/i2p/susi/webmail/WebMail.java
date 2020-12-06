@@ -2029,7 +2029,7 @@ public class WebMail extends HttpServlet
 		synchronized( sessionObject ) {
 
 			sessionObject.pageChanged = false;
-			sessionObject.themePath = "/themes/susimail/" + theme + '/';
+			sessionObject.themePath = "themes/" + theme + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			sessionObject.isMobile = isMobile;
 
@@ -2340,7 +2340,7 @@ public class WebMail extends HttpServlet
 						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css?" + CoreVersion.VERSION + "\" />" );
 				}
 				if(state != State.AUTH)
-					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
+					out.println("<link rel=\"stylesheet\" href=\"themes/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
 				if (state == State.NEW || state == State.CONFIG) {
 					// TODO cancel if to and body are empty
 					out.println("<script src=\"/susimail/js/compose.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
