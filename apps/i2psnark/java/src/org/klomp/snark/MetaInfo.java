@@ -58,7 +58,7 @@ public class MetaInfo
   private final String name_utf8;
   private final List<List<String>> files;
   private final List<List<String>> files_utf8;
-  private final BitField paddingFileBitfield;
+  private final List<String> attributes;
   private final List<Long> lengths;
   private final int piece_length;
   private final byte[] piece_hashes;
@@ -104,7 +104,7 @@ public class MetaInfo
     this.url_list = url_list;
 
     // TODO BEP 52 hybrid torrent with piece layers, meta version and file tree
-    this.paddingFileBitfield = null;
+    this.attributes = null;
 
     // TODO if we add a parameter for other keys
     //if (other != null) {
@@ -281,7 +281,7 @@ public class MetaInfo
         files = null;
         files_utf8 = null;
         lengths = null;
-        paddingFileBitfield = null;
+        attributes = null;
       }
     else
       {
@@ -299,7 +299,7 @@ public class MetaInfo
         List<List<String>> m_files = new ArrayList<List<String>>(size);
         List<List<String>> m_files_utf8 = null;
         List<Long> m_lengths = new ArrayList<Long>(size);
-        BitField paddingBitfield = null;
+        List<String> m_attributes = null;
         long l = 0;
         for (int i = 0; i < list.size(); i++)
           {
@@ -361,18 +361,23 @@ public class MetaInfo
             val = desc.get("attr");
             if (val != null) {
                 String s = val.getString();
-                if (s.contains("p")) {
-                    if (paddingBitfield == null)
-                        paddingBitfield = new BitField(size);
-                    paddingBitfield.set(i);
+                if (m_attributes == null) {
+                    m_attributes = new ArrayList<String>(size);
+                    for (int j = 0; j < i; j++) {
+                        m_attributes.add("");
+                    }
+                    m_attributes.add(s);
                 }
+            } else {
+                if (m_attributes != null)
+                    m_attributes.add("");
             }
           }
         files = Collections.unmodifiableList(m_files);
         files_utf8 = m_files_utf8 != null ? Collections.unmodifiableList(m_files_utf8) : null;
         lengths = Collections.unmodifiableList(m_lengths);
         length = l;
-        paddingFileBitfield = paddingBitfield;
+        attributes = m_attributes;
       }
 
     info_hash = calculateInfoHash();
@@ -477,9 +482,9 @@ public class MetaInfo
    * @since 0.9.48
    */
   public boolean isPaddingFile(int filenum) {
-      if (paddingFileBitfield == null)
+      if (attributes == null)
           return false;
-      return paddingFileBitfield.get(filenum);
+      return attributes.get(filenum).indexOf('p') >= 0;
   }
 
   /**
@@ -749,6 +754,12 @@ public class MetaInfo
                 file.put("path.utf-8", new BEValue(beufiles));
             }
             file.put("length", new BEValue(lengths.get(i)));
+            String attr = null;
+            if (attributes != null) {
+                attr = attributes.get(i);
+                if (attr.length() > 0)
+                    file.put("attr", new BEValue(DataHelper.getASCII(attr)));
+            }
             l.add(new BEValue(file));
           }
         info.put("files", new BEValue(l));
