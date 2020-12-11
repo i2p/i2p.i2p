@@ -1,6 +1,16 @@
+2020-12-11 zzz
+ * Router (proposal 156):
+   - Change router ECIES SKM to use N pattern
+   - Allow encrypted messages to ECIES routers
+   - Allow ECIES routers to become floodfill
+   - Add XDH factory to VM comm system for tests
+
 2020-12-06 zzz
  * Console, webapps: Move web resources to wars
- * i2psnark: Initial support for web seeds (WIP)
+ * i2psnark:
+   - Add support for web seeds
+   - Preserve file attribute strings in metainfo
+ * Streaming: Add Retry-After header to throttle response
  * Util: Change DoH to RFC 8484 protocol
 
 * 2020-12-01 0.9.48 released

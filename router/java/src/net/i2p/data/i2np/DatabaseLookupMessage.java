@@ -47,7 +47,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     private PublicKey _ratchetPubKey;
     private Type _type;
     
-    public static final boolean USE_ECIES_FF = false;
+    public static final boolean USE_ECIES_FF = true;
 
     //private static volatile long _currentLookupPeriod = 0;
     //private static volatile int _currentLookupCount = 0;

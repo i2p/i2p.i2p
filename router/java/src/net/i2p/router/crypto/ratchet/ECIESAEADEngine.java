@@ -64,9 +64,11 @@ public final class ECIESAEADEngine {
     private static final int BHLEN = RatchetPayload.BLOCK_HEADER_SIZE;  // 3
     private static final int DATETIME_SIZE = BHLEN + 4; // 7
     private static final int NS_OVERHEAD = KEYLEN + KEYLEN + MACLEN + MACLEN; // 96
+    private static final int NS_N_OVERHEAD = KEYLEN + MACLEN; // 48
     private static final int NSR_OVERHEAD = TAGLEN + KEYLEN + MACLEN + MACLEN; // 72
     private static final int ES_OVERHEAD = TAGLEN + MACLEN; // 24
     private static final int MIN_NS_SIZE = NS_OVERHEAD + DATETIME_SIZE; // 103
+    private static final int MIN_NS_N_SIZE = NS_N_OVERHEAD + DATETIME_SIZE; // 55
     private static final int MIN_NSR_SIZE = NSR_OVERHEAD; // 72
     private static final int MIN_ES_SIZE = ES_OVERHEAD; // 24
     private static final int MIN_ENCRYPTED_SIZE = MIN_ES_SIZE;
@@ -312,8 +314,12 @@ public final class ECIESAEADEngine {
     private CloveSet x_decryptSlow(byte data[], PrivateKey targetPrivateKey,
                                    RatchetSKM keyManager) throws DataFormatException {
         CloveSet decrypted;
-        if (data.length >= MIN_NS_SIZE) {
-            decrypted = decryptNewSession(data, targetPrivateKey, keyManager);
+        boolean isRouter = keyManager.getDestination() == null;
+        if (data.length >= MIN_NS_SIZE || (isRouter && data.length >= MIN_NS_N_SIZE)) {
+            if (isRouter)
+                decrypted = decryptNewSession_N(data, targetPrivateKey, keyManager);
+            else
+                decrypted = decryptNewSession(data, targetPrivateKey, keyManager);
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.eciesAEAD.decryptNewSession");
             } else {
@@ -463,6 +469,113 @@ public final class ECIESAEADEngine {
             keyManager.createSession(alice, null, state, null);
             setResponseTimerNS(alice, pc.cloveSet, keyManager);
         }
+
+        int num = pc.cloveSet.size();
+        GarlicClove[] arr = new GarlicClove[num];
+        // msg id and expiration not checked in GarlicMessageReceiver
+        CloveSet rv = new CloveSet(pc.cloveSet.toArray(arr), Certificate.NULL_CERT, 0, pc.datetime);
+        return rv;
+    }
+
+    /**
+     * scenario 1A: New Session Message Anonymous
+     *
+     * <pre>
+     *  - 32 byte ephemeral key (NOT Elligator2)
+     *  - payload (7 bytes minimum for DateTime block)
+     *  - 16 byte MAC
+     * </pre>
+     *
+     * @param data 55 bytes minimum
+     * @return null if decryption fails
+     * @since 0.9.49
+     */
+    private CloveSet decryptNewSession_N(byte data[], PrivateKey targetPrivateKey, RatchetSKM keyManager)
+                                     throws DataFormatException {
+        // fast MSB check for key < 2^255
+        if ((data[KEYLEN - 1] & 0x80) != 0) {
+            if (_log.shouldDebug())
+                _log.debug("Bad PK N");
+            return null;
+        }
+
+        HandshakeState state;
+        try {
+            state = new HandshakeState(HandshakeState.PATTERN_ID_N, HandshakeState.RESPONDER, _context.commSystem().getXDHFactory());
+        } catch (GeneralSecurityException gse) {
+            throw new IllegalStateException("bad proto", gse);
+        }
+        state.getLocalKeyPair().setKeys(targetPrivateKey.getData(), 0,
+                                        targetPrivateKey.toPublic().getData(), 0);
+        state.start();
+        if (_log.shouldDebug())
+            _log.debug("State before decrypt new session: " + state);
+
+        int payloadlen = data.length - (KEYLEN + MACLEN);
+        byte[] payload = new byte[payloadlen];
+        try {
+            state.readMessage(data, 0, data.length, payload, 0);
+        } catch (GeneralSecurityException gse) {
+            // we'll get this a lot from very old routers
+            // logged at INFO in caller
+            if (_log.shouldDebug())
+                _log.debug("Decrypt fail N, state at failure: " + state, gse);
+            state.destroy();
+            return null;
+        }
+        // bloom filter here based on ephemeral key
+        byte[] xx = new byte[KEYLEN];
+        System.arraycopy(data, 0, xx, 0, KEYLEN);
+        PublicKey pk = new PublicKey(EncType.ECIES_X25519, xx);
+        if (keyManager.isDuplicate(pk)) {
+            if (_log.shouldWarn())
+                _log.warn("Dup eph. key in IB N: " + pk);
+            state.destroy();
+            return NO_CLOVES;
+        }
+
+        // payload
+        if (payloadlen == 0) {
+            // disallowed, datetime block required
+            if (_log.shouldWarn())
+                _log.warn("Zero length payload in N");
+            state.destroy();
+            return NO_CLOVES;
+        }
+        PLCallback pc = new PLCallback();
+        try {
+            int blocks = RatchetPayload.processPayload(_context, pc, payload, 0, payload.length, true);
+            if (_log.shouldDebug())
+                _log.debug("Processed " + blocks + " blocks in IB N");
+        } catch (DataFormatException e) {
+            state.destroy();
+            throw e;
+        } catch (Exception e) {
+            state.destroy();
+            throw new DataFormatException("N payload error", e);
+        }
+
+        if (pc.datetime == 0) {
+            // disallowed, datetime block required
+            if (_log.shouldWarn())
+                _log.warn("No datetime block in IB N");
+            state.destroy();
+            return NO_CLOVES;
+        }
+
+        if (pc.cloveSet.isEmpty()) {
+            // this is legal ?
+            if (_log.shouldDebug())
+                _log.debug("No garlic block in N payload");
+            state.destroy();
+            return NO_CLOVES;
+        }
+
+        if (_log.shouldDebug()) {
+            _log.debug("N decrypt success");
+            //_log.debug("State after decrypt new session: " + state);
+        }
+        state.destroy();
 
         int num = pc.cloveSet.size();
         GarlicClove[] arr = new GarlicClove[num];
@@ -763,8 +876,10 @@ public final class ECIESAEADEngine {
         }
         if (priv == null) {
             if (_log.shouldDebug())
-                _log.debug("Encrypting as NS zero-key to " + target);
-            return encryptNewSession(cloves, target, null, null, null, null);
+                _log.debug("Encrypting as N to " + target);
+            // N-in-IK, unused
+            //return encryptNewSession(cloves, target, null, null, null, null);
+            return encryptNewSession(cloves, target);
         }
         RatchetEntry re = keyManager.consumeNextAvailableTag(target);
         if (re == null) {
@@ -866,6 +981,49 @@ public final class ECIESAEADEngine {
         } else {
             state.destroy();
         }
+        return enc;
+    }
+
+
+    /**
+     * scenario 1A: New Session Message from an anonymous source.
+     *
+     * <pre>
+     *  - 32 byte ephemeral key (NOT Elligator2)
+     *  - payload
+     *  - 16 byte MAC
+     * </pre>
+     *
+     * @return encrypted data or null on failure
+     * @since 0.9.49
+     */
+    private byte[] encryptNewSession(CloveSet cloves, PublicKey target) {
+        HandshakeState state;
+        try {
+            state = new HandshakeState(HandshakeState.PATTERN_ID_N, HandshakeState.INITIATOR, _context.commSystem().getXDHFactory());
+        } catch (GeneralSecurityException gse) {
+            throw new IllegalStateException("bad proto", gse);
+        }
+        state.getRemotePublicKey().setPublicKey(target.getData(), 0);
+        state.start();
+        if (_log.shouldDebug())
+            _log.debug("State before encrypt new session: " + state);
+
+        byte[] payload = createPayload(cloves, cloves.getExpiration(), NS_N_OVERHEAD);
+
+        byte[] enc = new byte[KEYLEN + payload.length + MACLEN];
+        try {
+            state.writeMessage(enc, 0, payload, 0, payload.length);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldWarn())
+                _log.warn("Encrypt fail N", gse);
+            state.destroy();
+            return null;
+        }
+        if (_log.shouldDebug())
+            _log.debug("Encrypted N: " + enc.length + " bytes, state: " + state);
+
+        state.destroy();
         return enc;
     }
 
@@ -1367,7 +1525,7 @@ public final class ECIESAEADEngine {
         RouterContext ctx = new RouterContext(null, props);
         ctx.initAll();
         ECIESAEADEngine e = new ECIESAEADEngine(ctx);
-        RatchetSKM rskm = new RatchetSKM(ctx);
+        RatchetSKM rskm = new RatchetSKM(ctx, new Destination());
         net.i2p.crypto.KeyPair kp = ctx.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
         PublicKey pubKey = kp.getPublic();
         PrivateKey privKey = kp.getPrivate();
@@ -1383,11 +1541,11 @@ public final class ECIESAEADEngine {
         clove.setData(msg);
         clove.setCertificate(Certificate.NULL_CERT);
         clove.setCloveId(0);
-        clove.setExpiration(new java.util.Date(System.currentTimeMillis() + 10000));
+        clove.setExpiration(System.currentTimeMillis() + 10000);
         clove.setInstructions(net.i2p.data.i2np.DeliveryInstructions.LOCAL);
         GarlicClove[] arr = new GarlicClove[1];
         arr[0] = clove;
-        CloveSet cs = new CloveSet(arr, Certificate.NULL_CERT, clove.getCloveId(), clove.getExpiration().getTime());
+        CloveSet cs = new CloveSet(arr, Certificate.NULL_CERT, clove.getCloveId(), clove.getExpiration());
 
         // IK test
         byte[] encrypted = e.encrypt(cs, pubKey, dest, privKey2, rskm, null);
@@ -1409,6 +1567,7 @@ public final class ECIESAEADEngine {
         }
 
         // N test
+        rskm = new RatchetSKM(ctx);
         encrypted = e.encrypt(cs, pubKey);
         System.out.println("N Encrypted:\n" + net.i2p.util.HexDump.dump(encrypted));
 

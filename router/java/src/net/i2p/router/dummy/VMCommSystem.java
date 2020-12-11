@@ -16,6 +16,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.util.Log;
 
 /**
@@ -29,6 +30,8 @@ import net.i2p.util.Log;
 public class VMCommSystem extends CommSystemFacade {
     private final Log _log;
     private final RouterContext _context;
+    private final X25519KeyFactory _xdhThread;
+
     /**
      * Mapping from Hash to VMCommSystem for all routers hooked together
      */
@@ -47,7 +50,16 @@ public class VMCommSystem extends CommSystemFacade {
         _context.statManager().createRateStat("transport.sendMessageLarge", "How many messages over 4KB are sent?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.receiveMessageLarge", "How many messages over 4KB are received?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRequiredRateStat("transport.sendProcessingTime", "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        // we do NOT start the thread, all keys will be generated inline
+        _xdhThread = new X25519KeyFactory(context);
     }
+
+    /**
+     *  Factory for making X25519 key pairs.
+     *  @since 0.9.49 so some tests don't NPE
+     */
+    @Override
+    public X25519KeyFactory getXDHFactory() { return _xdhThread; }
     
     public int countActivePeers() { return _commSystemFacades.size() - 1; }
 

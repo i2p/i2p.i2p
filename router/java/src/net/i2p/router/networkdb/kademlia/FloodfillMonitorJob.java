@@ -145,9 +145,6 @@ class FloodfillMonitorJob extends JobImpl {
         RouterIdentity ident = ri.getIdentity();
         if (ident.getSigningPublicKey().getType() == SigType.DSA_SHA1)
             return false;
-        // temp until router ratchet SKM implemented
-        if (ident.getPublicKey().getType() != EncType.ELGAMAL_2048)
-            return false;
 
         char bw = ri.getBandwidthTier().charAt(0);
         // Only if class N, O, P, X
