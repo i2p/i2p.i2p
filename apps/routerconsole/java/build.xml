@@ -353,6 +353,7 @@
             </manifest>
             <classes dir="./build/obj" includes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*" />
         </war>
+        <delete file="../jsp/favicon.ico" />
     </target>
 
     <target name="warUpToDate">
