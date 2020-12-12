@@ -718,7 +718,7 @@ public class PeerState {
      *  We received the message specified completely.
      *  @param bytes if less than or equal to zero, message is a duplicate.
      */
-    void messageFullyReceived(Long messageId, int bytes) {
+    synchronized void messageFullyReceived(Long messageId, int bytes) {
         if (bytes > 0) {
             _receiveBytes += bytes;
             _messagesReceived++;
