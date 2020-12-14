@@ -221,10 +221,6 @@ hr {
      padding: 7px 8px 3px;
 }
 
-button.control, input.control {
-     padding: 5px 8px !important;
-}
-
 .control:hover, .control:focus {
      text-decoration: none;
      color: #19191f;
@@ -659,7 +655,6 @@ input {
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
 #tunnelDepthOut, #tunnelVarianceOut, #tunnelQuantityOut, #tunnelBackupQuantityOut,
 #localDestination, #customOptions, #leasesetKey, #name, #description, textarea[name="accessList"] {
-     width: 100% !important;
      margin: 0 !important;
      text-align: left !important;
 }
@@ -960,8 +955,6 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
 
 #customOptions {
     margin-top: 15px !important;
-    width: 99%;
-    width: calc(100% - 10px) !important;
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
