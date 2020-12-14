@@ -54,4 +54,10 @@ sloccount.sc
 .settings/
 # IDEA
 *.iml
+.idea
 
+# Gradle
+.gradle
+
+# TODO: why does this file appear?
+apps/routerconsole/jsp/favicon.ico
