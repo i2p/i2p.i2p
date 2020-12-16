@@ -197,9 +197,17 @@ class FloodfillMonitorJob extends JobImpl {
         // For reference, the avg lifetime job lag on my Pi is 6.
         // Should we consider avg. dropped ff jobs?
         RateStat lagStat = getContext().statManager().getRate("jobQueue.jobLag");
+        if (lagStat != null) {
+            Rate rate = lagStat.getRate(60*60*1000L);
+            if (rate != null)
+                happy = happy && rate.getAvgOrLifetimeAvg() < 25;
+        }
         RateStat queueStat = getContext().statManager().getRate("router.tunnelBacklog");
-        happy = happy && lagStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 25;
-        happy = happy && queueStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 5;
+        if (queueStat != null) {
+            Rate rate = queueStat.getRate(60*60*1000L);
+            if (rate != null)
+                happy = happy && rate.getAvgOrLifetimeAvg() < 5;
+        }
         // Only if we're pretty well integrated...
         happy = happy && _facade.getKnownRouters() >= 400;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;
