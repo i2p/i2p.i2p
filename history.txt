@@ -1,3 +1,6 @@
+2020-12-16 zzz
+ * SSU: Fix occasional high CPU usage
+
 2020-12-11 zzz
  * Router (proposal 156):
    - Change router ECIES SKM to use N pattern
@@ -8,10 +11,10 @@
 2020-12-06 zzz
  * Console, webapps: Move web resources to wars
  * i2psnark:
-   - Add support for web seeds
+   - Add support for web seeds (ticket #2780)
    - Preserve file attribute strings in metainfo
  * Streaming: Add Retry-After header to throttle response
- * Util: Change DoH to RFC 8484 protocol
+ * Util: Change DoH to RFC 8484 protocol (ticket #2201)
 
 * 2020-12-01 0.9.48 released
 

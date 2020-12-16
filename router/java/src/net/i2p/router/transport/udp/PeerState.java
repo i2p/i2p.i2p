@@ -1491,7 +1491,8 @@ public class PeerState {
         synchronized(this) {
             retransmitTimer = _retransmitTimer;
         }
-        List<OutboundMessageState> rv = allocateSend2(retransmitTimer > 0 && now >= retransmitTimer, now);
+        boolean canSendOld = retransmitTimer > 0 && now >= retransmitTimer;
+        List<OutboundMessageState> rv = allocateSend2(canSendOld, now);
         if (rv != null && !rv.isEmpty()) {
             synchronized(this) {
                 long old = _retransmitTimer;
@@ -1499,6 +1500,18 @@ public class PeerState {
                     _retransmitTimer = now + getRTO();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(_remotePeer + " allocated " + rv.size() + " pushing retransmitter from " + old + " to " + _retransmitTimer);
+            }
+        } else if (canSendOld) {
+            // failsafe - push out or cancel timer to prevent looping
+            boolean isEmpty;
+            synchronized (_outboundMessages) {
+                isEmpty = _outboundMessages.isEmpty();
+            }
+            synchronized(this) {
+                if (isEmpty)
+                    _retransmitTimer = 0;
+                else
+                    _retransmitTimer = now + 250;
             }
         }
         return rv;
