@@ -1,11 +1,12 @@
 package net.i2p.router.transport.udp;
 
-import java.util.Date;
+import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
+import net.i2p.router.transport.udp.PacketBuilder.Fragment;
 import net.i2p.router.util.CDPQEntry;
 import net.i2p.util.Log;
 
@@ -30,12 +31,16 @@ class OutboundMessageState implements CDPQEntry {
     /** bitmask, 0 if acked, all 0 = complete */
     private long _fragmentAcks;
     private final int _numFragments;
+    /** sends for each fragment, or null if only one fragment */
+    private final byte _fragmentSends[];
     private final long _startedOn;
     private int _pushCount;
     private int _maxSends;
     // we can't use the ones in _message since it is null for injections
     private long _enqueueTime;
     private long _seqNum;
+    /** how many bytes push() is allowed to send */
+    private int _allowedSendBytes;
     
     public static final int MAX_MSG_SIZE = 32 * 1024;
 
@@ -95,6 +100,7 @@ class OutboundMessageState implements CDPQEntry {
         _numFragments = numFragments;
         // all 1's where we care
         _fragmentAcks = _numFragments < 64 ? mask(_numFragments) - 1L : -1L;
+        _fragmentSends = (numFragments > 1) ? new byte[numFragments] : null;
     }
     
     /**
@@ -143,6 +149,105 @@ class OutboundMessageState implements CDPQEntry {
         return rv;
     }
 
+    /**
+     *  Is any fragment unsent?
+     *
+     *  @since 0.9.49
+     */
+    public synchronized boolean hasUnsentFragments() {
+        if (isComplete())
+            return false;
+        if (_numFragments == 1)
+            return _maxSends == 0;
+        for (int i = _numFragments - 1; i >= 0; i--) {
+            if (_fragmentSends[i] == 0)
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     *  The min send count of unacked fragments.
+     *  Only call if not complete and _numFragments greater than 1.
+     *  Caller must synch.
+     *
+     *  @since 0.9.49
+     */
+    private int getMinSendCount() {
+        int rv = 127;
+        for (int i = 0; i < _numFragments; i++) {
+            if (needsSending(i)) {
+                int count = _fragmentSends[i];
+                if (count < rv)
+                    rv = count;
+            }
+        }
+        return rv;
+    }
+
+    /**
+     *  The minimum number of bytes we can send, which is the smallest unacked fragment we will send next.
+     *
+     *  @return 0 to total size
+     *  @since 0.9.49
+     */
+    public synchronized int getMinSendSize() {
+        if (isComplete())
+            return 0;
+        if (_numFragments == 1)
+            return _messageBuf.length;
+        if (_pushCount == 0)
+            return fragmentSize(_numFragments - 1);
+        int minSendCount = getMinSendCount();
+        int rv = _fragmentSize;
+        for (int i = 0; i < _numFragments; i++) {
+            if (needsSending(i) && _fragmentSends[i] == minSendCount) {
+                int sz = fragmentSize(i);
+                if (sz < rv) {
+                    rv = sz;
+                }
+            }
+        }
+        return rv;
+    }
+
+    /**
+     *  How many bytes we can send under the max given.
+     *  Side effect: if applicable, amount to send will be saved for the push() call.
+     *  Note: With multiple fragments, this will allocate only the fragments with the lowest push count.
+     *  Example: If push counts are 1 1 1 0 0, this will only return the size of the last two fragments,
+     *  even if any of the first three need to be retransmitted.
+     *
+     *  @param max the maximum number of bytes we can send
+     *  @return 0 to max bytes
+     *  @since 0.9.49
+     */
+    public synchronized int getSendSize(int max) {
+        if (isComplete())
+            return 0;
+        if (_numFragments == 1)
+            return _messageBuf.length <= max ? _messageBuf.length : 0;
+        // find the fragments we've sent the least
+        int minSendCount = getMinSendCount();
+        // Allow only the fragments we've sent the least
+        int rv = 0;
+        for (int i = 0; i < _numFragments; i++) {
+            if (needsSending(i) && _fragmentSends[i] == minSendCount) {
+                int sz = fragmentSize(i);
+                int tot = rv + sz;
+                if (tot <= max) {
+                    rv = tot;
+                } else {
+                    if (_log.shouldInfo())
+                        _log.info("Send window limited to " + (max - rv) + ", not sending fragment " + i + " for " + toString());
+                }
+            }
+        }
+        if (rv > 0)
+            _allowedSendBytes = rv;
+        return rv;
+    }
+
     public synchronized boolean needsSending(int fragment) {
         return (_fragmentAcks & mask(fragment)) != 0;
     }
@@ -165,27 +270,79 @@ class OutboundMessageState implements CDPQEntry {
     }
     
     /**
-     *  The max number of sends for any fragment, which is the
-     *  same as the push count, at least as it's coded now.
+     *  The max number of sends for any fragment.
+     *  As of 0.9.49, may be less than getPushCount() if we pushed only some fragments
      */
     public synchronized int getMaxSends() { return _maxSends; }
 
     /**
-     *  The number of times we've pushed some fragments, which is the
-     *  same as the max sends, at least as it's coded now.
+     *  The number of times we've pushed some fragments.
+     *  As of 0.9.49, may be greater than getMaxSends() if we pushed only some fragments.
      */
     public synchronized int getPushCount() { return _pushCount; }
 
     /**
-     * Note that we have pushed the message fragments.
-     * Increments push count (and max sends... why?)
-     * @return true if this is the first push
+     *  Add fragments up to the number of bytes allowed by setAllowedSendBytes()
+     *  Side effects: Clears setAllowedSendBytes. Increments pushCount. Increments maxSends if applicable.
+     *  Note: With multiple fragments, this will send only the fragments with the lowest push count.
+     *  Example: If push counts are 1 1 1 0 0, this will only send the last two fragments,
+     *  even if any of the first three need to be retransmitted.
+     *
+     *  @param toSend out parameter
+     *  @return the number of Fragments added
+     *  @since 0.9.49
      */
-    public synchronized boolean push() { 
-        boolean rv = _pushCount == 0;
-        // these will never be different...
-        _pushCount++; 
-        _maxSends = _pushCount;
+    public synchronized int push(List<Fragment> toSend) { 
+        int rv = 0;
+        if (_allowedSendBytes <= 0 || _numFragments == 1) {
+            // easy way
+            // send all, or only one fragment
+            for (int i = 0; i < _numFragments; i++) {
+                if (needsSending(i)) {
+                    toSend.add(new Fragment(this, i));
+                    rv++;
+                    if (_fragmentSends != null) {
+                        _fragmentSends[i]++;
+                        if (_fragmentSends[i] > _maxSends)
+                            _maxSends = _fragmentSends[i];
+                    }
+                }
+            }
+            if (_fragmentSends == null)
+                _maxSends++;
+        } else {
+            // hard way.
+            // send the fragments we've sent the least, up to the max size
+            int minSendCount = getMinSendCount();
+            int sent = 0;
+            for (int i = 0; i < _numFragments; i++) {
+                if (needsSending(i)) {
+                    int count = _fragmentSends[i];
+                    if (count == minSendCount) {
+                        int sz = fragmentSize(i);
+                        if (sz <= _allowedSendBytes - sent) {
+                            sent += sz;
+                            toSend.add(new Fragment(this, i));
+                            rv++;
+                            _fragmentSends[i]++;
+                            if (_fragmentSends[i] > _maxSends)
+                                _maxSends = _fragmentSends[i];
+                            if (sent >= _allowedSendBytes)
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        if (rv > 0) {
+            _pushCount++;
+            if (_log.shouldDebug())
+                _log.debug("Pushed " + rv + " fragments for " + toString());
+        } else {
+            if (_log.shouldDebug())
+                _log.debug("Nothing pushed??? allowedSendBytes=" + _allowedSendBytes + " for " + toString());
+        }
+        _allowedSendBytes = 0;
         return rv;
     }
 
@@ -296,15 +453,28 @@ class OutboundMessageState implements CDPQEntry {
         StringBuilder buf = new StringBuilder(256);
         buf.append("OB Message ").append(_i2npMessage.getUniqueId());
         buf.append(" type ").append(_i2npMessage.getType());
-        buf.append(" with ").append(_numFragments).append(" fragments");
-        buf.append(" of size ").append(_messageBuf.length);
+        buf.append(" size ").append(_messageBuf.length);
+        if (_numFragments > 1)
+            buf.append(" fragments: ").append(_numFragments);
         buf.append(" volleys: ").append(_maxSends);
         buf.append(" lifetime: ").append(getLifetime());
         if (!isComplete()) {
-            buf.append(" pending fragments: ");
-            for (int i = 0; i < _numFragments; i++) {
-                if (needsSending(i))
-                    buf.append(i).append(' ');
+            if (_fragmentSends != null) {
+                buf.append(" unacked fragments: ");
+                for (int i = 0; i < _numFragments; i++) {
+                    if (needsSending(i))
+                        buf.append(i).append(' ');
+                }
+                buf.append("sizes: ");
+                for (int i = 0; i < _numFragments; i++) {
+                    buf.append(fragmentSize(i)).append(' ');
+                }
+                buf.append("send counts: ");
+                for (int i = 0; i < _numFragments; i++) {
+                    buf.append(_fragmentSends[i]).append(' ');
+                }
+            } else {
+                buf.append(" unacked");
             }
         }
         //buf.append(" to: ").append(_peer.toString());

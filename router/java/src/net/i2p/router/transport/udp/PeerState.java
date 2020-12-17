@@ -609,39 +609,34 @@ public class PeerState {
      *
      *  Caller should synch
      */
-    private boolean allocateSendingBytes(int size, int messagePushCount, long now) {
+    private boolean allocateSendingBytes(OutboundMessageState state, long now, boolean resetWindow) {
         long duration = now - _lastSendRefill;
-        if (duration >= 1000) {
+        if (resetWindow || duration >= 1000) {
             _sendWindowBytesRemaining = _sendWindowBytes;
-            _sendBytes += size;
+            if (duration <= 0)
+                duration = 10;
             _sendBps = (int)(0.9f*_sendBps + 0.1f*(_sendBytes * (1000f/duration)));
             _sendBytes = 0;
             _lastSendRefill = now;
         }
+        int messagePushCount = state.getPushCount();
+        if (messagePushCount == 0 && _outboundMessages.size() > _concurrentMessagesAllowed) {
+            _consecutiveRejections++;
+            _context.statManager().addRateData("udp.rejectConcurrentActive", _outboundMessages.size(), _consecutiveRejections);
+            return false;
+        }
+        if (_sendWindowBytesRemaining <= 0)
+            return false;
 
-        // Ticket 2505
-        // We always send all unacked fragments for a message,
-        // because we don't have any mechanism in OutboundMessageFragments
-        // to track the next send time for fragments individually.
-        // Huge messages that are larger than the window size could never
-        // get sent and block the outbound queue forever.
-        // So we let it through when the window is empty (full window remaining).
-        if (size <= _sendWindowBytesRemaining ||
-            (size > _sendWindowBytes && _sendWindowBytesRemaining >= _sendWindowBytes)) {
-            // move this check to getSendWindowBytesRemaining() ?
-            if (messagePushCount == 0 && _outboundMessages.size() > _concurrentMessagesAllowed) {
-                _consecutiveRejections++;
-                _context.statManager().addRateData("udp.rejectConcurrentActive", _outboundMessages.size(), _consecutiveRejections);
-                return false;
-            } else if (messagePushCount == 0) {
+        int size = state.getSendSize(_sendWindowBytesRemaining);
+        if (size > 0) {
+            if (messagePushCount == 0) {
                 _context.statManager().addRateData("udp.allowConcurrentActive", _outboundMessages.size(), _concurrentMessagesAllowed);
                 if (_consecutiveRejections > 0) 
                     _context.statManager().addRateData("udp.rejectConcurrentSequence", _consecutiveRejections, _outboundMessages.size());
                 _consecutiveRejections = 0;
             }
             _sendWindowBytesRemaining -= size; 
-            if (_sendWindowBytesRemaining < 0)
-                _sendWindowBytesRemaining = 0; 
             _sendBytes += size;
             _lastSendTime = now;
             return true;
@@ -853,8 +848,8 @@ public class PeerState {
                         randomResends.add(rack.id);
                     } else {
                         iter.remove();
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Expired ack " + rack.id + " sent " + (cutoff + RESEND_ACK_TIMEOUT - rack.time) +
+                        if (_log.shouldDebug())
+                            _log.debug("Expired ack " + rack.id + " sent " + (cutoff + RESEND_ACK_TIMEOUT - rack.time) +
                                       " ago, now " + _currentACKsResend.size()  + " resend acks");
                     }
                 }
@@ -875,8 +870,8 @@ public class PeerState {
                 // acks already in _currentACKsResend.
                 _currentACKsResend.offer(new ResendACK(messageId, _context.clock().now()));
                 // trim happens in getCurrentResendACKs above
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Sent ack " + messageId + " now " + _currentACKs.size() + " current and " +
+                if (_log.shouldDebug())
+                    _log.debug("Sent ack " + messageId + " now " + _currentACKs.size() + " current and " +
                               _currentACKsResend.size() + " resend acks");
             }
             // should we only do this if removed?
@@ -1124,8 +1119,8 @@ public class PeerState {
         synchronized(this) {
             locked_messageACKed(bytesACKed, lifetime, numSends, anyPending, anyQueued);
         }
-        if (numSends >= 2 && _log.shouldLog(Log.INFO))
-            _log.info(_remotePeer + " acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
+        if (numSends >= 2 && _log.shouldDebug())
+            _log.debug(_remotePeer + " acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
         
         _context.statManager().addRateData("udp.sendBps", _sendBps);
     }
@@ -1442,7 +1437,7 @@ public class PeerState {
                     _context.statManager().addRateData("udp.sendFailed", state.getPushCount());
                     if (failed == null) failed = new ArrayList<OutboundMessageState>(4);
                     failed.add(state);
-                } else if (state.getPushCount() > OutboundMessageFragments.MAX_VOLLEYS) {
+                } else if (state.getMaxSends() > OutboundMessageFragments.MAX_VOLLEYS) {
                     iter.remove();
                     _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount());
                     if (failed == null) failed = new ArrayList<OutboundMessageState>(4);
@@ -1470,7 +1465,7 @@ public class PeerState {
                 // it can not have an OutNetMessage if the source is the
                 // final after establishment message
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Unable to send a direct message: " + state);
+                    _log.warn("Unable to send a direct message: " + state + " to: " + this);
             }
         }
         
@@ -1496,10 +1491,11 @@ public class PeerState {
         if (rv != null && !rv.isEmpty()) {
             synchronized(this) {
                 long old = _retransmitTimer;
-                if (_retransmitTimer == 0)
+                if (_retransmitTimer == 0) {
                     _retransmitTimer = now + getRTO();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_remotePeer + " allocated " + rv.size() + " pushing retransmitter from " + old + " to " + _retransmitTimer);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(_remotePeer + " allocated " + rv.size() + " pushing retransmitter from " + old + " to " + _retransmitTimer);
+                }
             }
         } else if (canSendOld) {
             // failsafe - push out or cancel timer to prevent looping
@@ -1529,7 +1525,7 @@ public class PeerState {
         synchronized (_outboundMessages) {
             if (canSendOld) {
                 for (OutboundMessageState state : _outboundMessages) {
-                    boolean should = locked_shouldSend(state, now);
+                    boolean should = locked_shouldSend(state, now, true);
                     if (should) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Allocate sending (OLD) to " + _remotePeer + ": " + state.getMessageId());
@@ -1554,6 +1550,31 @@ public class PeerState {
                     } 
                 }
                 return rv;
+            } else if (!_outboundMessages.isEmpty()) {
+                // send some unsent fragments of pending messages, if any
+                for (OutboundMessageState state : _outboundMessages) {
+                    if (!state.hasUnsentFragments())
+                        continue;
+                    boolean should = locked_shouldSend(state, now, false);
+                    if (should) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Allocate sending more fragments to " + _remotePeer + ": " + state.getMessageId());
+                        if (rv == null)
+                            rv = new ArrayList<OutboundMessageState>(_concurrentMessagesAllowed);
+                        rv.add(state);
+                    } else {
+                        // no more bandwidth available
+                        if (_log.shouldLog(Log.DEBUG)) {
+                            if (rv == null)
+                                _log.debug("Nothing to send (BW) to " + _remotePeer + ", with " + _outboundMessages.size() +
+                                       " / " + _outboundQueue.size() + " remaining");
+                            else 
+                               _log.debug(_remotePeer + " ran out of BW, but managed to send " + rv.size());
+                        }
+                        return rv;
+                    } 
+                }
+                // fall through to new messages
             }
             // Peek at head of _outboundQueue and see if we can send it.
             // If so, pull it off, put it in _outbundMessages, test
@@ -1561,7 +1582,7 @@ public class PeerState {
             OutboundMessageState state;
             synchronized (_outboundQueue) {
                 while ((state = _outboundQueue.peek()) != null &&
-                       locked_shouldSend(state, now)) {
+                       locked_shouldSend(state, now, false)) {
                     // This is guaranted to be the same as what we got in peek(),
                     // due to locking and because we aren't using the dropping CDPBQ.
                     // If we do switch to CDPBQ,
@@ -1643,22 +1664,21 @@ public class PeerState {
     /**
      *  Caller should synch
      */
-    private boolean locked_shouldSend(OutboundMessageState state, long now) {
-            int size = state.getUnackedSize();
-            if (allocateSendingBytes(size, state.getPushCount(), now)) {
+    private boolean locked_shouldSend(OutboundMessageState state, long now, boolean resetWindow) {
+            if (allocateSendingBytes(state, now, resetWindow)) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_remotePeer + " Allocation of " + size + " allowed with " 
+                    _log.debug(_remotePeer + " Allocation allowed with " 
                               + getSendWindowBytesRemaining() 
                               + "/" + getSendWindowBytes() 
                               + " remaining"
                               + " for message " + state.getMessageId() + ": " + state);
-                if (state.push())
+                if (state.getPushCount() == 0)
                     _messagesSent++;
                 return true;
             } else {
                 _context.statManager().addRateData("udp.sendRejected", state.getPushCount());
                 if (_log.shouldLog(Log.INFO))
-                    _log.info(_remotePeer + " Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
+                    _log.info(_remotePeer + " Allocation rejected w/ wsize=" + getSendWindowBytes()
                               + " available=" + getSendWindowBytesRemaining()
                               + " for message " + state.getMessageId() + ": " + state);
                 return false;
@@ -1695,10 +1715,11 @@ public class PeerState {
         
         if (state != null) {
             int numSends = state.getMaxSends();
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Received ack of " + messageId + " by " + _remotePeer
-                          + " after " + state.getLifetime() + " and " + numSends + " sends");
-            _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime());
+            long lifetime = state.getLifetime();
+            if (_log.shouldDebug())
+                _log.debug("Received ack of " + messageId + " by " + _remotePeer
+                          + " after " + lifetime + " and " + numSends + " sends");
+            _context.statManager().addRateData("udp.sendConfirmTime", lifetime);
             if (state.getFragmentCount() > 1)
                 _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount());
             _context.statManager().addRateData("udp.sendConfirmVolley", numSends);
@@ -1713,8 +1734,7 @@ public class PeerState {
                 }
             }
             // this adjusts the rtt/rto/window/etc
-            messageACKed(state.getMessageSize(), state.getLifetime(), numSends, anyPending, anyQueued);
-            
+            messageACKed(state.getUnackedSize(), lifetime, numSends, anyPending, anyQueued);
         } else {
             // dupack, likely
             //if (_log.shouldLog(Log.DEBUG))
@@ -1740,14 +1760,18 @@ public class PeerState {
         OutboundMessageState state = null;
         boolean isComplete = false;
         boolean anyPending;
+        int ackedSize = 0;
         synchronized (_outboundMessages) {
             for (Iterator<OutboundMessageState> iter = _outboundMessages.iterator(); iter.hasNext(); ) {
                 state = iter.next();
                 if (state.getMessageId() == messageId) {
+                    ackedSize = state.getUnackedSize();
                     boolean complete = state.acked(bitfield);
                     if (complete) {
                         isComplete = true;
                         iter.remove();
+                    } else {
+                        ackedSize -= state.getUnackedSize();
                     }
                     break;
                 } else if (state.getPushCount() <= 0) {
@@ -1768,18 +1792,23 @@ public class PeerState {
             int numACKed = bitfield.ackCount();
             _context.statManager().addRateData("udp.partialACKReceived", numACKed);
             
+            long lifetime = state.getLifetime();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Received partial ack of " + state.getMessageId() + " by " + _remotePeer
-                          + " after " + state.getLifetime() + " and " + numSends + " sends: " + bitfield + ": completely removed? " 
-                          + isComplete + ": " + state);
+                          + " after " + lifetime + " and " + numSends + " sends"
+                          + " complete? " + isComplete
+                          + " newly-acked: " + ackedSize
+                          + ' ' + bitfield
+                          + " for: " + state);
             
             if (isComplete) {
-                _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime());
+                _context.statManager().addRateData("udp.sendConfirmTime", lifetime);
                 if (state.getFragmentCount() > 1)
                     _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount());
                 _context.statManager().addRateData("udp.sendConfirmVolley", numSends);
                 _transport.succeeded(state);
-                
+            }
+            if (ackedSize > 0) {
                 boolean anyQueued;
                 if (anyPending) {
                     // locked_messageACKed will nudge()
@@ -1790,7 +1819,7 @@ public class PeerState {
                     }
                 }
                 // this adjusts the rtt/rto/window/etc
-                messageACKed(state.getMessageSize(), state.getLifetime(), numSends, anyPending, anyQueued);
+                messageACKed(ackedSize, lifetime, numSends, anyPending, anyQueued);
             }
             return isComplete;
         } else {

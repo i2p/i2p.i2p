@@ -1,4 +1,8 @@
+2020-12-17 zzz
+ * SSU: Send subset of fragments (ticket #2427)
+
 2020-12-16 zzz
+ * NetDB: Fix rare floodfill monitor NPE
  * SSU: Fix occasional high CPU usage
 
 2020-12-11 zzz
