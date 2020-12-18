@@ -625,7 +625,7 @@ public class PeerState {
             _context.statManager().addRateData("udp.rejectConcurrentActive", _outboundMessages.size(), _consecutiveRejections);
             return false;
         }
-        if (_sendWindowBytesRemaining <= 0)
+        if (_sendWindowBytesRemaining <= fragmentOverhead())
             return false;
 
         int size = state.getSendSize(_sendWindowBytesRemaining);
@@ -1658,6 +1658,18 @@ public class PeerState {
         // 46 + 40 + 8 + 13 = 94 + 13 = 107 (IPv6)
         return _mtu -
                (_remoteIP.length == 4 ? PacketBuilder.MIN_DATA_PACKET_OVERHEAD : PacketBuilder.MIN_IPV6_DATA_PACKET_OVERHEAD) -
+               MIN_ACK_SIZE;
+    }
+
+    /**
+     *  Packet overhead plus room for acks
+     *  @return 87 (IPv4), 107 (IPv6)
+     *  @since 0.9.49
+     */
+    int fragmentOverhead() {
+        // 46 + 20 + 8 + 13 = 74 + 13 = 87 (IPv4)
+        // 46 + 40 + 8 + 13 = 94 + 13 = 107 (IPv6)
+        return (_remoteIP.length == 4 ? PacketBuilder.MIN_DATA_PACKET_OVERHEAD : PacketBuilder.MIN_IPV6_DATA_PACKET_OVERHEAD) +
                MIN_ACK_SIZE;
     }
     

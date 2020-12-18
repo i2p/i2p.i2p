@@ -131,6 +131,9 @@ class OutboundMessageState implements CDPQEntry {
         return _fragmentAcks == 0;
     }
 
+    /**
+     *  As of 0.9.49, includes packet overhead
+     */
     public synchronized int getUnackedSize() {
         int rv = 0;
         if (isComplete())
@@ -138,12 +141,14 @@ class OutboundMessageState implements CDPQEntry {
         int lastSize = _messageBuf.length % _fragmentSize;
         if (lastSize == 0)
             lastSize = _fragmentSize;
+        int overhead = _peer.fragmentOverhead();
         for (int i = 0; i < _numFragments; i++) {
             if (needsSending(i)) {
                 if (i + 1 == _numFragments)
                     rv += lastSize;
                 else
                     rv += _fragmentSize;
+                rv += overhead;
             }
         }
         return rv;
@@ -187,6 +192,7 @@ class OutboundMessageState implements CDPQEntry {
 
     /**
      *  The minimum number of bytes we can send, which is the smallest unacked fragment we will send next.
+     *  Includes packet overhead.
      *
      *  @return 0 to total size
      *  @since 0.9.49
@@ -194,15 +200,16 @@ class OutboundMessageState implements CDPQEntry {
     public synchronized int getMinSendSize() {
         if (isComplete())
             return 0;
+        int overhead = _peer.fragmentOverhead();
         if (_numFragments == 1)
-            return _messageBuf.length;
+            return _messageBuf.length + overhead;
         if (_pushCount == 0)
-            return fragmentSize(_numFragments - 1);
+            return fragmentSize(_numFragments - 1) + overhead;
         int minSendCount = getMinSendCount();
         int rv = _fragmentSize;
         for (int i = 0; i < _numFragments; i++) {
             if (needsSending(i) && _fragmentSends[i] == minSendCount) {
-                int sz = fragmentSize(i);
+                int sz = fragmentSize(i) + overhead;
                 if (sz < rv) {
                     rv = sz;
                 }
@@ -217,23 +224,27 @@ class OutboundMessageState implements CDPQEntry {
      *  Note: With multiple fragments, this will allocate only the fragments with the lowest push count.
      *  Example: If push counts are 1 1 1 0 0, this will only return the size of the last two fragments,
      *  even if any of the first three need to be retransmitted.
+     *  Includes packet overhead.
      *
-     *  @param max the maximum number of bytes we can send
+     *  @param max the maximum number of bytes we can send, including packet overhead
      *  @return 0 to max bytes
      *  @since 0.9.49
      */
     public synchronized int getSendSize(int max) {
         if (isComplete())
             return 0;
-        if (_numFragments == 1)
-            return _messageBuf.length <= max ? _messageBuf.length : 0;
+        int overhead = _peer.fragmentOverhead();
+        if (_numFragments == 1) {
+            int rv = _messageBuf.length + overhead;
+            return rv <= max ? rv : 0;
+        }
         // find the fragments we've sent the least
         int minSendCount = getMinSendCount();
         // Allow only the fragments we've sent the least
         int rv = 0;
         for (int i = 0; i < _numFragments; i++) {
             if (needsSending(i) && _fragmentSends[i] == minSendCount) {
-                int sz = fragmentSize(i);
+                int sz = fragmentSize(i) + overhead;
                 int tot = rv + sz;
                 if (tot <= max) {
                     rv = tot;
@@ -315,11 +326,12 @@ class OutboundMessageState implements CDPQEntry {
             // send the fragments we've sent the least, up to the max size
             int minSendCount = getMinSendCount();
             int sent = 0;
+            int overhead = _peer.fragmentOverhead();
             for (int i = 0; i < _numFragments; i++) {
                 if (needsSending(i)) {
                     int count = _fragmentSends[i];
                     if (count == minSendCount) {
-                        int sz = fragmentSize(i);
+                        int sz = fragmentSize(i) + overhead;
                         if (sz <= _allowedSendBytes - sent) {
                             sent += sz;
                             toSend.add(new Fragment(this, i));
@@ -327,7 +339,7 @@ class OutboundMessageState implements CDPQEntry {
                             _fragmentSends[i]++;
                             if (_fragmentSends[i] > _maxSends)
                                 _maxSends = _fragmentSends[i];
-                            if (sent >= _allowedSendBytes)
+                            if (_allowedSendBytes - sent <= overhead)
                                 break;
                         }
                     }
@@ -359,7 +371,8 @@ class OutboundMessageState implements CDPQEntry {
     public int getMessageSize() { return _messageBuf.length; }
 
     /**
-     * The size in bytes of the fragment
+     * The size in bytes of the fragment.
+     * Does NOT include any SSU overhead.
      *
      * @param fragmentNum the number of the fragment 
      * @return the size of the fragment specified by the number
@@ -383,7 +396,7 @@ class OutboundMessageState implements CDPQEntry {
      * @param out target to write
      * @param outOffset into outOffset to begin writing
      * @param fragmentNum fragment to write (0 indexed)
-     * @return bytesWritten
+     * @return bytesWritten, NOT including packet overhead
      */
     public int writeFragment(byte out[], int outOffset, int fragmentNum) {
         int start = _fragmentSize * fragmentNum;
