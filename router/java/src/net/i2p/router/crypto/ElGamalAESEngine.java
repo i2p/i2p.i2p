@@ -347,12 +347,12 @@ public final class ElGamalAESEngine {
         //byte iv[] = new byte[16];
         //System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
         byte[] iv = halfHash(preIV);
-        SimpleByteCache.release(preIV);
 
         //_log.debug("Pre IV for decryptExistingSession: " + DataHelper.toString(preIV, 32));
         //_log.debug("SessionKey for decryptNewSession: " + DataHelper.toString(key.getData(), 32));
         byte decrypted[] = decryptAESBlock(data, 32, data.length-32, key, iv, preIV, foundTags, foundKey);
         SimpleByteCache.release(iv);
+        SimpleByteCache.release(preIV);
         if (decrypted == null) {
             // it begins with a valid session tag, but thats just a coincidence.
             //if (_log.shouldLog(Log.DEBUG))
