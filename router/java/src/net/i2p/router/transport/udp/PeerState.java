@@ -62,14 +62,6 @@ public class PeerState {
      */
     private SessionKey _nextCipherKey;
 
-    /**
-     * The keying material used for the rekeying, or null if we are not in
-     * the process of rekeying.
-     */
-    //private byte[] _nextKeyingMaterial;
-    /** true if we began the current rekeying, false otherwise */
-    //private boolean _rekeyBeganLocally;
-
     /** when were the current cipher and MAC keys established/rekeyed? */
     private long _keyEstablishedTime;
 
@@ -131,10 +123,6 @@ public class PeerState {
     // smoothed value, for display only
     private int _receiveBps;
     private int _receiveBytes;
-    //private int _sendACKBps;
-    //private int _sendZACKBytes;
-    //private int _receiveACKBps;
-    //private int _receiveACKBytes;
     private long _receivePeriodBegin;
     private volatile long _lastCongestionOccurred;
     /** 
@@ -173,8 +161,6 @@ public class PeerState {
     private int _largeMTU;
     /* how many consecutive packets at or under the min MTU have been received */
     private long _consecutiveSmall;
-    /** when did we last check the MTU? */
-    //private long _mtuLastChecked;
     private int _mtuIncreases;
     private int _mtuDecreases;
     /** current round trip time estimate */
@@ -192,11 +178,6 @@ public class PeerState {
     private int _packetsTransmitted;
     /** how many packets were retransmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private int _packetsRetransmitted;
-
-    /** how many packets were transmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
-    //private long _packetsPeriodTransmitted;
-    //private int _packetsPeriodRetransmitted;
-    //private int _packetRetransmissionRate;
 
     /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private int _packetsReceivedDuplicate;
@@ -363,7 +344,6 @@ public class PeerState {
             _mtuReceive = MIN_IPV6_MTU;
             _largeMTU = transport.getMTU(true);
         }
-        //_mtuLastChecked = -1;
         _lastACKSend = -1;
 
         _rto = INIT_RTO;
@@ -534,7 +514,6 @@ public class PeerState {
         // the real one-way delay is much less than RTT / 2, due to ack delays,
         // so add a fudge factor
         long actualSkew = skew + CLOCK_SKEW_FUDGE - (_rtt / 2); 
-        //_log.error("Skew " + skew + " actualSkew " + actualSkew + " rtt " + _rtt + " pktsRcvd " + _packetsReceived);
         // First time...
         // This is important because we need accurate
         // skews right from the beginning, since the median is taken
@@ -795,7 +774,7 @@ public class PeerState {
 
         int oldRto = _rto;
         long oldTimer = _retransmitTimer - now;
-        _rto = Math.min(MAX_RTO, Math.max(minRTO(), _rto << 1 ));
+        _rto = Math.min(MAX_RTO, Math.max(MIN_RTO, _rto << 1 ));
         _retransmitTimer = now + _rto;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(_remotePeer + " Congestion, RTO: " + oldRto + " -> " + _rto + " timer: " + oldTimer + " -> " + (_retransmitTimer - now));
@@ -1064,15 +1043,11 @@ public class PeerState {
             if (_sendWindowBytes <= _slowStartThreshold) {
                 _sendWindowBytes += bytesACKed;
             } else {
-                //if (false) {
-                //    _sendWindowBytes += 16; // why 16?
-                //} else {
                     float prob = ((float)bytesACKed) / ((float)(_sendWindowBytes<<1));
                     float v = _context.random().nextFloat();
                     if (v < 0) v = 0-v;
                     if (v <= prob)
                         _sendWindowBytes += bytesACKed; //512; // bytesACKed;
-                //}
             }
         } else {
             int allow = _concurrentMessagesAllowed - 1;
@@ -1143,7 +1118,7 @@ public class PeerState {
             _rtt = (int)((_rtt * (1.0f - RTT_DAMPENING)) + (RTT_DAMPENING * lifetime));
         }
         // K = 4
-        _rto = Math.min(MAX_RTO, Math.max(minRTO(), _rtt + (_rttDeviation<<2)));
+        _rto = Math.min(MAX_RTO, Math.max(MIN_RTO, _rtt + (_rttDeviation<<2)));
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
         //               + " rttDev=" + _rttDeviation + " rto=" + _rto);
@@ -1316,15 +1291,6 @@ public class PeerState {
                 - 16); // padding safety
     }
 
-    private int minRTO() {
-        //if (_packetRetransmissionRate < 10)
-            return MIN_RTO;
-        //else if (_packetRetransmissionRate < 50)
-        //    return 2*MIN_RTO;
-        //else
-        //    return MAX_RTO;
-    }
-    
     /** @return non-null */
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
     
