@@ -773,7 +773,7 @@ public class PeerState {
             _log.info(_remotePeer + " Congestion, RTO: " + oldRto + " -> " + _rto + " timer: " + oldTimer + " -> " + (_retransmitTimer - now) +
                                     " window: " + congestionAt + " -> " + _sendWindowBytes +
                                     " SST: " + oldsst + " -> " + _slowStartThreshold +
-                                    " BWE: " + DataHelper.formatSize2Decimal((long) (bwe * 1000)) + "bps");
+                                    " BWE: " + DataHelper.formatSize2Decimal((long) (bwe * 1000), false) + "bps");
     }
     
     /**
@@ -1036,12 +1036,15 @@ public class PeerState {
             
             if (_sendWindowBytes <= _slowStartThreshold) {
                 _sendWindowBytes += bytesACKed;
+                _sendWindowBytesRemaining += bytesACKed;
             } else {
                     float prob = ((float)bytesACKed) / ((float)(_sendWindowBytes<<1));
                     float v = _context.random().nextFloat();
                     if (v < 0) v = 0-v;
-                    if (v <= prob)
-                        _sendWindowBytes += bytesACKed; //512; // bytesACKed;
+                    if (v <= prob) {
+                        _sendWindowBytes += bytesACKed;
+                        _sendWindowBytesRemaining += bytesACKed;
+                    }
             }
         } else {
             int allow = _concurrentMessagesAllowed - 1;
