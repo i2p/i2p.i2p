@@ -155,6 +155,23 @@ class OutboundMessageState implements CDPQEntry {
     }
 
     /**
+     * @return count of unacked fragments
+     * @since 0.9.49
+     */
+    public synchronized int getUnackedFragments() {
+        if (isComplete())
+            return 0;
+        if (_numFragments == 1)
+            return 1;
+        int rv = 0;
+        for (int i = 0; i < _numFragments; i++) {
+            if (needsSending(i))
+                rv++;
+        }
+        return rv;
+    }
+
+    /**
      *  Is any fragment unsent?
      *
      *  @since 0.9.49
