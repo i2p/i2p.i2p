@@ -5,6 +5,7 @@ package net.i2p.i2ptunnel.localServer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -124,32 +125,30 @@ public abstract class LocalHTTPServer {
         if ((method.equals("GET") || method.equals("HEAD")) &&
             targetRequest.startsWith("/themes/") &&
             !targetRequest.contains("..")) {
-            String filename = null;
-            try {
-                filename = targetRequest.substring(8); // "/themes/".length
-            } catch (IndexOutOfBoundsException ioobe) {
-                 return;
-            }
+            String filename = targetRequest.substring(1);
             // theme hack
-            if (filename.startsWith("console/default/"))
+            if (filename.startsWith("themes/console/default/"))
                 filename = filename.replaceFirst("default", context.getProperty("routerconsole.theme", "light"));
-            File themesDir = new File(context.getBaseDir(), "docs/themes");
-            File file = new File(themesDir, filename);
-            if (file.exists() && !file.isDirectory()) {
-                String type;
-                if (filename.endsWith(".css"))
-                    type = "text/css";
-                else if (filename.endsWith(".ico"))
-                    type = "image/x-icon";
-                else if (filename.endsWith(".png"))
-                    type = "image/png";
-                else if (filename.endsWith(".jpg"))
-                    type = "image/jpeg";
-                else type = "text/html";
-                out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes("UTF-8"));
-                out.write(type.getBytes("UTF-8"));
-                out.write("\r\nCache-Control: max-age=86400\r\nConnection: close\r\nProxy-Connection: close\r\n\r\n".getBytes("UTF-8"));
-                FileUtil.readFile(filename, themesDir.getAbsolutePath(), out);
+            InputStream in = getResource(filename);
+            if (in != null) {
+                try {
+                    String type;
+                    if (filename.endsWith(".css"))
+                        type = "text/css";
+                    else if (filename.endsWith(".ico"))
+                        type = "image/x-icon";
+                    else if (filename.endsWith(".png"))
+                        type = "image/png";
+                    else if (filename.endsWith(".jpg"))
+                        type = "image/jpeg";
+                    else type = "text/html";
+                    out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes("UTF-8"));
+                    out.write(type.getBytes("UTF-8"));
+                    out.write("\r\nCache-Control: max-age=86400\r\nConnection: close\r\nProxy-Connection: close\r\n\r\n".getBytes("UTF-8"));
+                    DataHelper.copy(in, out);
+                } finally {
+                    try { in.close(); } catch (IOException ioe) {}
+                }
                 return;
             }
         }
@@ -481,6 +480,15 @@ public abstract class LocalHTTPServer {
             }
         }
         return buf.toString();
+    }
+
+    /**
+     *  @param resource relative path
+     *  @return stream or null if not found
+     *  @since 0.9.49
+     */
+    public static InputStream getResource(String resource) {
+            return LocalHTTPServer.class.getResourceAsStream("/net/i2p/i2ptunnel/resources/" + resource);
     }
 
     /** these strings go in the jar, not the war */

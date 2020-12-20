@@ -1659,11 +1659,10 @@
         <fixcrlf srcdir="pkg-temp/docs" includes="*.ht" encoding="utf8" eol="crlf" />
     </target>
 
-    <!-- readme and proxy error page files -->
+    <!-- readme files -->
     <target name="prepConsoleDocUpdates">
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
-          <fileset dir="installer/resources/proxy/" includes="*.ht" />
           <!--
                As of 0.9.36:
                All new and changed flags must go in the flags16x11/ dir,
@@ -3101,9 +3100,6 @@
 			<copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
 			<!-- HTTP Header files, english only,
 				if you need a different lang do it in a seperate target -->
-			<copy todir="pkg-temp/docs/" >
-				<fileset dir="installer/resources/proxy/"  includes="**-header.ht" />
-			</copy>
 			<!-- Theme light only -->
 			<copy todir="pkg-temp/docs/themes/console/light/" overwrite="true" >
 				<fileset dir="installer/resources/themes/console/light/" includes="**.css" />

@@ -86,7 +86,12 @@
     <target name="jar" depends="builddep, compile, bundle-proxy, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
-        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" excludes="**/ui/*.class **/web/*.class" >
+        <mkdir dir="./build/obj/net/i2p/i2ptunnel/resources"/>
+        <copy todir="./build/obj/net/i2p/i2ptunnel/resources">
+            <fileset dir="../../routerconsole/jsp/" includes="themes/console/*/*.css themes/console/images/i2plogo.png themes/console/images/favicon.ico themes/console/images/itoopie_sm.png" />
+            <fileset dir="../resources" includes="**/*.ht" />
+        </copy>
+        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" excludes="**/ui/*.class **/web/*.class" >
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
                 <attribute name="${manifest.classpath.name}" value="i2p.jar mstreaming.jar" />
