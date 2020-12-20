@@ -76,6 +76,7 @@ public class ConfigUIHelper extends HelperBase {
          Set<String> rv = new TreeSet<String>();
          // add a failsafe even if we can't find any themes
          rv.add(CSSHelper.DEFAULT_THEME);
+         rv.add(CSSHelper.ALT_THEME);
          File dir = new File(_context.getBaseDir(), "docs/themes/console");
          File[] files = dir.listFiles();
          if (files == null)
