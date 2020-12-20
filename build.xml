@@ -28,7 +28,7 @@
         <echo message="  osxLauncher: build the Mac OS X router/GUI launcher (OSX only)" />
         <echo message="  bbLauncher: build the Browser Bundle router launcher" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
-        <echo message="  bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
+        <echo message="  git-bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
         <!--<echo message="  bundleRelease:    (GIT ONLY!) generate a git bundle only up to the most recent tag, and a corresponding torrent." />-->
         <echo message="  updater:   Package the built files in i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updater200: Updater compressed with pack200 (creates i2pupdate200.zip, 60% smaller)" />
