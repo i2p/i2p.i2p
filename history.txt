@@ -1,3 +1,9 @@
+2020-12-20 zzz
+ * SSU: Westwood+ congestion control (ticket #2427)
+
+2020-12-18 zzz
+ * Crypto: Fix use after free (ticket #2797)
+
 2020-12-17 zzz
  * SSU: Send subset of fragments (ticket #2427)
 

@@ -652,9 +652,8 @@ class UDPPacketReader {
             buf.append(" with ACKs for: [");
             int numFrags = fragmentCount();
             for (int i = 0; i < numFrags; i++) {
-                if (!received(i))
-                    buf.append('!');
-                buf.append(i).append(' ');
+                if (received(i))
+                    buf.append(i).append(' ');
             }
             buf.append("] / ").append(numFrags);
             return buf.toString();
