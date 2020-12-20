@@ -235,7 +235,7 @@
                 <pathelement location="../../../build/i2p.jar" />
             </classpath>
             <arg value="tag" />
-            <arg value="../../../installer/resources/proxy/" />
+            <arg value="../resources/proxy/" />
             <arg value="build/Proxy.java" />
         </java>
     </target>
