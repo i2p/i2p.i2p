@@ -364,8 +364,6 @@ class PacketBuilder {
             for (ACKBitfield bf : partialACKsRemaining) {
                 if (partialAcksToSend >= ABSOLUTE_MAX_ACKS)
                     break;  // ack count
-                if (bf.receivedComplete())
-                    continue;
                 // only send what we have to
                 //int acksz = 4 + (bf.fragmentCount() / 7) + 1;
                 int bits = bf.highestReceived() + 1;

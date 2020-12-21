@@ -226,7 +226,11 @@ class InboundMessageState implements CDQEntry {
         return _completeSize;
     }
 
-    /** FIXME synch here or PeerState.fetchPartialACKs() */
+    /**
+     *  Only call this if not complete.
+     *  TODO remove this, have InboundMessageState implement ACKBitfield.
+     *  FIXME synch here or PeerState.fetchPartialACKs()
+     */
     public ACKBitfield createACKBitfield() {
         int last = _lastFragment;
         int sz = (last >= 0) ? last + 1 : _fragments.length;
@@ -236,9 +240,12 @@ class InboundMessageState implements CDQEntry {
     /**
      *  A true partial bitfield that is probably not complete.
      *  fragmentCount() will return 64 if unknown.
+     *
+     *  TODO remove this, have InboundMessageState implement ACKBitfield.
      */
     private static final class PartialBitfield implements ACKBitfield {
         private final long _bitfieldMessageId;
+        private final int _fragmentCount;
         private final int _ackCount;
         private final int _highestReceived;
         // bitfield, 1 for acked
@@ -263,6 +270,7 @@ class InboundMessageState implements CDQEntry {
                 }
             }
             _fragmentAcks = acks;
+            _fragmentCount = size;
             _ackCount = ackCount;
             _highestReceived = highestReceived;
         }
@@ -274,7 +282,12 @@ class InboundMessageState implements CDQEntry {
             return 1L << fragment;
         }
 
-        public int fragmentCount() { return _highestReceived + 1; }
+        /**
+         *  Don't use for serialization since it may be unknown;
+         *  use highestReceived() instead.
+         *  @return 64 if unknown
+         */
+        public int fragmentCount() { return _fragmentCount; }
 
         public int ackCount() { return _ackCount; }
 
@@ -288,7 +301,10 @@ class InboundMessageState implements CDQEntry {
             return (_fragmentAcks & mask(fragmentNum)) != 0;
         }
 
-        public boolean receivedComplete() { return _ackCount == _highestReceived + 1; }
+        /**
+         *  @return should always be false
+         */
+        public boolean receivedComplete() { return _ackCount == _fragmentCount; }
         
         @Override
         public String toString() { 

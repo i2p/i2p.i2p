@@ -259,7 +259,8 @@ class OutboundMessageState implements CDPQEntry {
         int minSendCount = getMinSendCount();
         // Allow only the fragments we've sent the least
         int rv = 0;
-        for (int i = 0; i < _numFragments; i++) {
+        // see below for why we go in reverse order
+        for (int i = _numFragments - 1; i >= 0; i--) {
             if (needsSending(i) && _fragmentSends[i] == minSendCount) {
                 int sz = fragmentSize(i) + overhead;
                 int tot = rv + sz;
@@ -344,7 +345,13 @@ class OutboundMessageState implements CDPQEntry {
             int minSendCount = getMinSendCount();
             int sent = 0;
             int overhead = _peer.fragmentOverhead();
-            for (int i = 0; i < _numFragments; i++) {
+            // Send in reverse order,
+            // receiver bug workaround.
+            // Through 0.9.48, InboundMessageState.PartialBitfield.isComplete() would return true
+            // if consecutive fragments were complete, and we would not receive partial acks.
+            // Also, if we send the last fragment first, receiver can be more efficient
+            // because it knows the size.
+            for (int i = _numFragments - 1; i >= 0; i--) {
                 if (needsSending(i)) {
                     int count = _fragmentSends[i];
                     if (count == minSendCount) {
