@@ -41,11 +41,11 @@ class OutboundMessageState implements CDPQEntry {
     private long _seqNum;
     /** how many bytes push() is allowed to send */
     private int _allowedSendBytes;
-    
+
     public static final int MAX_MSG_SIZE = 32 * 1024;
 
     private static final long EXPIRATION = 10*1000;
-    
+
 
     /**
      *  "injected" message from the establisher.
@@ -56,7 +56,7 @@ class OutboundMessageState implements CDPQEntry {
     public OutboundMessageState(I2PAppContext context, I2NPMessage msg, PeerState peer) {
         this(context, null, msg, peer);
     }
-    
+
     /**
      *  Normal constructor.
      *
@@ -66,7 +66,7 @@ class OutboundMessageState implements CDPQEntry {
     public OutboundMessageState(I2PAppContext context, OutNetMessage m, PeerState peer) {
         this(context, m, m.getMessage(), peer);
     }
-    
+
     /**
      *  Internal.
      *  @param m null if msg is "injected"
@@ -102,7 +102,7 @@ class OutboundMessageState implements CDPQEntry {
         _fragmentAcks = _numFragments < 64 ? mask(_numFragments) - 1L : -1L;
         _fragmentSends = (numFragments > 1) ? new byte[numFragments] : null;
     }
-    
+
     /**
      *  @param fragment 0-63
      */
@@ -117,14 +117,14 @@ class OutboundMessageState implements CDPQEntry {
     public PeerState getPeer() { return _peer; }
 
     public boolean isExpired() {
-        return _expiration < _context.clock().now(); 
+        return _expiration < _context.clock().now();
     }
 
     /**
      * @since 0.9.38
      */
     public boolean isExpired(long now) {
-        return _expiration < now; 
+        return _expiration < now;
     }
 
     public synchronized boolean isComplete() {
@@ -282,7 +282,7 @@ class OutboundMessageState implements CDPQEntry {
     }
 
     public long getLifetime() { return _context.clock().now() - _startedOn; }
-    
+
     /**
      * Ack all the fragments in the ack list.
      *
@@ -297,7 +297,7 @@ class OutboundMessageState implements CDPQEntry {
         }
         return isComplete();
     }
-    
+
     /**
      *  The max number of sends for any fragment.
      *  As of 0.9.49, may be less than getPushCount() if we pushed only some fragments
@@ -321,7 +321,7 @@ class OutboundMessageState implements CDPQEntry {
      *  @return the number of Fragments added
      *  @since 0.9.49
      */
-    public synchronized int push(List<Fragment> toSend) { 
+    public synchronized int push(List<Fragment> toSend) {
         int rv = 0;
         if (_allowedSendBytes <= 0 || _numFragments == 1) {
             // easy way
@@ -383,10 +383,10 @@ class OutboundMessageState implements CDPQEntry {
     }
 
     /**
-     * How many fragments in the message.
+     * How many fragments in the message
      */
-    public int getFragmentCount() { 
-            return _numFragments; 
+    public int getFragmentCount() {
+            return _numFragments;
     }
 
     /**
@@ -398,7 +398,7 @@ class OutboundMessageState implements CDPQEntry {
      * The size in bytes of the fragment.
      * Does NOT include any SSU overhead.
      *
-     * @param fragmentNum the number of the fragment 
+     * @param fragmentNum the number of the fragment
      * @return the size of the fragment specified by the number
      */
     public int fragmentSize(int fragmentNum) {
@@ -435,7 +435,7 @@ class OutboundMessageState implements CDPQEntry {
         }
         return -1;
     }
-    
+
     /**
      *  For CDQ
      *  @since 0.9.3
