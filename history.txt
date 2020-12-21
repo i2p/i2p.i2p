@@ -1,4 +1,9 @@
+2020-12-21 zzz
+ * SSU: Fix partial acks not being sent
+
 2020-12-20 zzz
+ * Console: Fix theme selection
+ * Proxy: Move error page resources to jar
  * SSU: Westwood+ congestion control (ticket #2427)
 
 2020-12-18 zzz
