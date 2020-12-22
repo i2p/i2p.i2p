@@ -25,7 +25,7 @@
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
  <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
 </div><div class="main" id="console">
- <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.ResourceHelper" id="contenthelper" scope="request" />
  <div class="welcome">
   <div class="langbox" title="<%=intl._t("Configure Language")%>">
     <a href="/configui#langheading"><img src="/themes/console/images/info/control.png" alt="<%=intl._t("Configure Language")%>"></a>
@@ -33,7 +33,6 @@
   <a name="top"></a>
   <h2><%=intl._t("Welcome to I2P")%></h2>
  </div>
- <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/readme.html"); %>
  <jsp:setProperty name="contenthelper" property="page" value="docs/readme.html" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
  <jsp:setProperty name="contenthelper" property="contextId" value="<%=i2pcontextId%>" />
