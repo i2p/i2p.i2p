@@ -34,8 +34,8 @@
   <h2><%=intl._t("Welcome to I2P")%></h2>
  </div>
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/readme.html"); %>
- <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
+ <jsp:setProperty name="contenthelper" property="page" value="docs/readme.html" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
  <jsp:setProperty name="contenthelper" property="contextId" value="<%=i2pcontextId%>" />
- <jsp:getProperty name="contenthelper" property="content" />
+ <jsp:getProperty name="contenthelper" property="resource" />
 </div></body></html>

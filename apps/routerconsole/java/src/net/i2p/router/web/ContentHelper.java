@@ -1,6 +1,10 @@
 package net.i2p.router.web;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.Locale;
 
 import net.i2p.util.FileUtil;
@@ -12,12 +16,16 @@ public class ContentHelper extends HelperBase {
     private String _lang;
     
     /**
-     * Caution, use absolute paths only, do not assume files are in CWD
+     * Caution, use absolute paths only for getContent() and getTextContent(),
+     * do not assume files are in CWD.
+     * Use relative path for getResource().
      */
     public void setPage(String page) { _page = page; }
+
     public void setStartAtBeginning(String moo) { 
         _startAtBeginning = Boolean.parseBoolean(moo); 
     }
+
     public void setLang(String l) {
 /*****
         if((_lang == null || !_lang.equals(l)) && (l != null)) {
@@ -105,5 +113,62 @@ public class ContentHelper extends HelperBase {
         if (newfile.exists())
             return newname;
         return _page;
+    }
+
+    /**
+     * Convert file.ext to file_lang.ext if it exists.
+     * Get lang from the cgi lang param, then properties, then from the default locale.
+     * _context must be set to check the property.
+     * @return "" on error
+     * @since 0.9.49
+     */
+    public String getResource() {
+        if (_page == null || _page.contains(".."))
+            return "";
+        String lang = _lang;
+        String page = null;
+        int lastdot = _page.lastIndexOf('.');
+        if (lastdot <= 0) {
+            page = _page;
+        } else {
+            if (lang == null || lang.length() <= 0) {
+                if (_context != null)
+                    lang = _context.getProperty(Messages.PROP_LANG);
+                if (lang == null || lang.length() <= 0) {
+                    lang = Locale.getDefault().getLanguage();
+                    if (lang == null || lang.length() <= 0)
+                        page = _page;
+                }
+            }
+        }
+        if (page == null) {
+            if (lang.equals("en"))
+                page = _page;
+            else
+                page = _page.substring(0, lastdot) + '_' + lang + _page.substring(lastdot);
+        }
+        InputStream is = ContentHelper.class.getResourceAsStream("/net/i2p/router/web/resources/" + page);
+        if (is == null) {
+            is = ContentHelper.class.getResourceAsStream("/net/i2p/router/web/resources/" + _page);
+            if (is == null)
+                return "";
+        }
+        BufferedReader in = null;
+        StringBuilder buf = new StringBuilder(20000);
+        try {
+            in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String line = null;
+            int i = 0;
+            while ( (line = in.readLine()) != null) {
+                buf.append(line);
+                if (_maxLines > 0 && ++i >= _maxLines)
+                    break;
+            }
+        } catch (IOException ioe) {
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            try { is.close(); } catch (IOException ioe) {}
+        }
+        return buf.toString();
     }
 }

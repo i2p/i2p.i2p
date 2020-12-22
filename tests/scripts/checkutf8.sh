@@ -16,8 +16,10 @@ DIRS="\
   apps/routerconsole/locale \
   apps/routerconsole/locale-news \
   apps/routerconsole/locale-countries \
+  apps/routerconsole/resources/docs \
   apps/i2ptunnel/locale \
   apps/i2ptunnel/locale-proxy \
+  apps/i2ptunnel/resources/proxy \
   apps/i2psnark/locale \
   apps/ministreaming/locale \
   apps/susidns/locale \
@@ -26,8 +28,6 @@ DIRS="\
   debian/po \
   installer/resources/eepsite/docroot/help \
   installer/resources/initialNews \
-  installer/resources/proxy \
-  installer/resources/readme \
   apps/routerconsole/jsp \
   apps/i2ptunnel/jsp \
   apps/susidns/src/jsp"

@@ -619,21 +619,21 @@ trans.tr_TR = installer/resources/eepsite/docroot/help/index_tr.html
 ;; Text on /console
 ;;
 type = HTML
-source_file = installer/resources/readme/readme.html
+source_file = apps/routerconsole/resources/docs/readme.html
 source_lang = en
-trans.ar = installer/resources/readme/readme_ar.html
-trans.de = installer/resources/readme/readme_de.html
-trans.fr = installer/resources/readme/readme_fr.html
+trans.ar = apps/routerconsole/resources/docs/readme_ar.html
+trans.de = apps/routerconsole/resources/docs/readme_de.html
+trans.fr = apps/routerconsole/resources/docs/readme_fr.html
 ;; Java converts id to in
-trans.id = installer/resources/readme/readme_in.html
-trans.it = installer/resources/readme/readme_it.html
-trans.ja = installer/resources/readme/readme_ja.html
-trans.pl = installer/resources/readme/readme_pl.html
-trans.pt = installer/resources/readme/readme_pt.html
-trans.ro = installer/resources/readme/readme_ro.html
-trans.ru_RU = installer/resources/readme/readme_ru.html
-trans.tr_TR = installer/resources/readme/readme_tr.html
-trans.zh_CN = installer/resources/readme/readme_zh.html
+trans.id = apps/routerconsole/resources/docs/readme_in.html
+trans.it = apps/routerconsole/resources/docs/readme_it.html
+trans.ja = apps/routerconsole/resources/docs/readme_ja.html
+trans.pl = apps/routerconsole/resources/docs/readme_pl.html
+trans.pt = apps/routerconsole/resources/docs/readme_pt.html
+trans.ro = apps/routerconsole/resources/docs/readme_ro.html
+trans.ru_RU = apps/routerconsole/resources/docs/readme_ru.html
+trans.tr_TR = apps/routerconsole/resources/docs/readme_tr.html
+trans.zh_CN = apps/routerconsole/resources/docs/readme_zh.html
 
 [main]
 host = https://www.transifex.com

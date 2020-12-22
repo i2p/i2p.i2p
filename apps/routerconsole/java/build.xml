@@ -140,7 +140,7 @@
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_nl_NL.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_nl.properties" />
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_pt_BR.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_pt.properties" />
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_ru_RU.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_ru.properties" />
-        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*">
+        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/**/* net/i2p/router/web/servlets/**/* net/i2p/router/web/resources/**/*">
             <manifest>
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <!-- very old installs don't have i2psnark,jstl,standard in the classpath... not added in WebAppConfiguration any more -->
@@ -338,10 +338,13 @@
     <target name="war" depends="precompilejsp, warUpToDate, listChangedFiles2" unless="war.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.w.tr" value="" />
-        <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <copy file="../jsp/themes/console/images/favicon.ico" tofile="../jsp/favicon.ico" />
+        <mkdir dir="build/obj/net/i2p/router/web/resources" />
+        <copy todir="build/obj/net/i2p/router/web/resources" >
+            <fileset dir="../resources" />
+        </copy>
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
-             basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
+             basedir="../jsp/" excludes="web.xml, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
@@ -351,7 +354,7 @@
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
-            <classes dir="./build/obj" includes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*" />
+            <classes dir="./build/obj" includes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/* net/i2p/router/web/resources/**/*" />
         </war>
         <delete file="../jsp/favicon.ico" />
     </target>

@@ -1650,19 +1650,16 @@
         <delete dir="./pkg-mavencentral" />
     </target>
 
-    <!-- readme and proxy error page files, initialNews.xml files, GeoIP files, and flag icons -->
+    <!-- initialNews.xml files, GeoIP files, and flag icons -->
     <target name="prepConsoleDocs" depends="prepConsoleDocUpdates, prepgeoupdate" >
         <copy todir="pkg-temp/docs/initialNews/">
           <fileset dir="installer/resources/initialNews/" />
         </copy>
-        <!-- ensure the proxy files have the correct line endings -->
-        <fixcrlf srcdir="pkg-temp/docs" includes="*.ht" encoding="utf8" eol="crlf" />
     </target>
 
-    <!-- readme files -->
+    <!-- flag icons -->
     <target name="prepConsoleDocUpdates">
         <copy todir="pkg-temp/docs/" >
-          <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <!--
                As of 0.9.36:
                All new and changed flags must go in the flags16x11/ dir,
@@ -3094,7 +3091,6 @@
 			<!-- config.txt is in installer/resources/portable -->
 		<mkdir dir="pkg-temp/docs" />
 			<copy file="installer/resources/initialNews/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
-			<copy file="installer/resources/readme/readme.html" tofile="pkg-temp/docs/readme.html" />
 			<copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
