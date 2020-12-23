@@ -198,6 +198,8 @@ public final class ECIESAEADEngine {
         } else {
             decrypted = x_decryptSlow(data, targetPrivateKey, keyManager);
         }
+        if (decrypted == null && _log.shouldDebug())
+            _log.info("Decrypt fail NS/NSR/ES, possible tag: " + st);
         return decrypted;
     }
 
@@ -863,6 +865,7 @@ public final class ECIESAEADEngine {
      *             may be null for anonymous (N-in-IK)
      * @param keyManager ignored if priv is null
      * @param callback may be null, ignored if priv is null
+     * @return encrypted data or null on failure
      */
     private byte[] x_encrypt(CloveSet cloves, PublicKey target, Destination to, PrivateKey priv,
                              RatchetSKM keyManager,
@@ -901,9 +904,15 @@ public final class ECIESAEADEngine {
                 _log.debug("Encrypting as NSR to " + target + " with tag " + re.tag.toBase64());
             return encryptNewSessionReply(cloves, target, state, re.tag, keyManager, callback);
         }
-        if (_log.shouldDebug())
-            _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64());
         byte rv[] = encryptExistingSession(cloves, target, re, callback, keyManager);
+        if (rv == null) {
+            if (_log.shouldWarn())
+                _log.warn("ECIES ES encrypt fail");
+        } else if (_log.shouldDebug())
+            _log.debug("Encrypting as ES to " + target + " with key " + re.key + " and tag " + re.tag.toBase64() +
+                       " fwd key: " + re.nextForwardKey +
+                       " rev key: " + re.nextReverseKey +
+                       "; " + rv.length + " bytes");
         return rv;
     }
 
@@ -1126,11 +1135,11 @@ public final class ECIESAEADEngine {
         SessionKeyAndNonce key = re.key;
         int nonce = key.getNonce();
         byte encr[] = encryptAEADBlock(rawTag, payload, key, nonce);
-        System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
-        if (callback != null) {
-            keyManager.registerCallback(target, re.keyID, nonce, callback);
+        if (encr != null) {
+            System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
+            if (callback != null)
+                keyManager.registerCallback(target, re.keyID, nonce, callback);
         }
-            _log.debug("Encrypted ES: " + encr.length + " bytes");
         return encr;
     }
 
@@ -1155,7 +1164,11 @@ public final class ECIESAEADEngine {
         byte rawTag[] = tag.getData();
         byte[] payload = createPayload(cloves, 0, ES_OVERHEAD);
         byte encr[] = encryptAEADBlock(rawTag, payload, key, 0);
-        System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
+        if (encr != null) {
+            System.arraycopy(rawTag, 0, encr, 0, TAGLEN);
+        } else if (_log.shouldWarn()) {
+            _log.warn("ECIES ES encrypt fail");
+        }
         return encr;
     }
 
@@ -1184,7 +1197,7 @@ public final class ECIESAEADEngine {
     /**
      *
      * @param ad may be null
-     * @return space will be left at beginning for ad (tag)
+     * @return space will be left at beginning for ad (tag), null on error
      */
     private final byte[] encryptAEADBlock(byte[] ad, byte data[], SessionKey key, long n) {
         ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();

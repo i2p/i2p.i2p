@@ -1,3 +1,11 @@
+2020-12-23 zzz
+ * Crypto: Increase ratchet tag window
+
+2020-12-22 zzz
+ * Console:
+   - Add netdb search by enc. type
+   - Move readme files to war
+
 2020-12-21 zzz
  * SSU: Fix partial acks not being sent
 

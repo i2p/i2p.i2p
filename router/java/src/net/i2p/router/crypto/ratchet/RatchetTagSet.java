@@ -424,14 +424,14 @@ class RatchetTagSet implements TagSetHandle {
         int lookAhead, trimBehind;
         if (_maxSize > _originalSize) {
             // grow from originalSize at N = 0 to
-            // maxSize at N = 4 * (maxSize - originalSize)
+            // maxSize at N = 2 * (maxSize - originalSize)
             // for typical loss rates, this keeps us at about maxSize,
-            // but worst case maxSize * 3/2
-            lookAhead = Math.min(_maxSize, _originalSize + (usedTagNumber / 4));
-            trimBehind = lookAhead / 2;
+            // but worst case about maxSize * 2
+            lookAhead = Math.min(_maxSize, _originalSize + (usedTagNumber / 2));
+            trimBehind = lookAhead;
         } else {
             lookAhead = _originalSize;
-            trimBehind = _originalSize / 2;
+            trimBehind = _originalSize;
         }
 
         // add as many as we need to maintain minSize from the tag used

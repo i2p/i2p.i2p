@@ -959,12 +959,12 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
         private static final int MIN_RCV_WINDOW_NSR = 12;
         private static final int MAX_RCV_WINDOW_NSR = 12;
         private static final int MIN_RCV_WINDOW_ES = 24;
-        private static final int MAX_RCV_WINDOW_ES = 160;
+        private static final int MAX_RCV_WINDOW_ES = 320;
 
         private static final String INFO_0 = "SessionReplyTags";
         private static final String INFO_7 = "XDHRatchetTagSet";
         private static final int MAX_SEND_ACKS = 16;
-        private static final int MAX_SEND_REVERSE_KEY = 64;
+        private static final int MAX_SEND_REVERSE_KEY = 128;
 
         /**
          * @param d may be null
@@ -1435,8 +1435,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                             _tagSet.setDate(now);
                             SessionKeyAndNonce skn = _tagSet.consumeNextKey();
                             // TODO PN
-                            return new RatchetEntry(tag, skn, _tagSet.getID(), 0, _tagSet.getNextKey(),
-                                                    getReverseSendKey(), getAcksToSend());
+                            NextSessionKey fwd = _tagSet.getNextKey();
+                            NextSessionKey rev = getReverseSendKey();
+                            if ((fwd != null || rev != null) && _log.shouldInfo())
+                                _log.info("Sending fwd key: " + fwd +
+                                          " rev key: " + rev +
+                                          " for " + _tagSet);
+                            return new RatchetEntry(tag, skn, _tagSet.getID(), 0, fwd,
+                                                    rev, getAcksToSend());
                         } else if (_log.shouldInfo()) {
                             _log.info("Removing empty " + _tagSet);
                         }
