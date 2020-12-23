@@ -219,6 +219,14 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
+     *  Helper
+     *  @since 0.9.49
+     */
+    public I2PAppContext getContext() {
+        return _context;
+    }
+
+    /**
      *  ClientApp interface
      *  @throws IllegalArgumentException if unable to load config from file
      *  @since 0.9.4
@@ -375,6 +383,8 @@ public class TunnelControllerGroup implements ClientApp {
      * @throws IllegalArgumentException if unable to load from file
      */
     private synchronized void loadControllers(File cfgFile, boolean shouldMigrate) {
+        if (_log.shouldInfo())
+            _log.info("Getting controllers from config file " + cfgFile);
         File dir = new SecureDirectory(_context.getConfigDir(), CONFIG_DIR);
         List<Properties> props = null;
         if (cfgFile.exists()) {
@@ -960,9 +970,6 @@ public class TunnelControllerGroup implements ClientApp {
      * @since 0.9.42
      */
     private List<TunnelController> getControllers(File cfgFile) {
-        if (_log.shouldInfo())
-            _log.info("Getting controllers from config file " + cfgFile);
-
         synchronized (this) {
             if (!_controllersLoaded)
                 loadControllers(cfgFile);

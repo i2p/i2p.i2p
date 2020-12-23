@@ -88,24 +88,53 @@ public class GeneralHelper {
             return null;
     }
 
+    /**
+     *  Save the configuration for a new or existing tunnel to disk.
+     *  For new tunnels, adds to controller and (if configured) starts it.
+     */
     public List<String> saveTunnel(int tunnel, TunnelConfig config) {
         return saveTunnel(_context, _group, tunnel, config);
     }
 
-    public static List<String> saveTunnel(
-            I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
-        List<String> msgs = updateTunnelConfig(tcg, tunnel, config);
-        msgs.addAll(saveConfig(context, tcg, tunnel));
+    /**
+     *  Save the configuration for a new or existing tunnel to disk.
+     *  For new tunnels, adds to controller and (if configured) starts it.
+     *
+     *  @param context unused, taken from tcg
+     */
+    public static List<String> saveTunnel(I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
+        List<String> msgs = new ArrayList<String>();
+        TunnelController cur = updateTunnelConfig(tcg, tunnel, config, msgs);
+        msgs.addAll(saveConfig(tcg, cur));
         return msgs;
     }
 
+    /**
+     *  Update the config and if shared, adjust and save the config of other shared clients.
+     *  If a new tunnel, this will call tcg.addController(), and start it if so configured.
+     *  This does NOT save this tunnel's config. Caller must call saveConfig() also.
+     */
     protected static List<String> updateTunnelConfig(TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
+        List<String> msgs = new ArrayList<String>();
+        updateTunnelConfig(tcg, tunnel, config, msgs);
+        return msgs;
+    }
+
+    /**
+     *  Update the config and if shared, adjust and save the config of other shared clients.
+     *  If a new tunnel, this will call tcg.addController(), and start it if so configured.
+     *  This does NOT save this tunnel's config. Caller must call saveConfig() also.
+     *
+     *  @param msgs out parameter, messages will be added
+     *  @return the old or new controller, non-null.
+     *  @since 0.9.49
+     */
+    private static TunnelController updateTunnelConfig(TunnelControllerGroup tcg, int tunnel, TunnelConfig config, List<String> msgs) {
         // Get current tunnel controller
         TunnelController cur = getController(tcg, tunnel);
 
         Properties props = config.getConfig();
 
-        List<String> msgs = new ArrayList<String>();
         String type = props.getProperty(TunnelController.PROP_TYPE);
         if (TunnelController.TYPE_STD_CLIENT.equals(type) || TunnelController.TYPE_IRC_CLIENT.equals(type)) {
             //
@@ -154,20 +183,8 @@ public class GeneralHelper {
             tcg.addController(cur);
             if (cur.getStartOnLoad())
                 cur.startTunnelBackground();
-            try {
-                tcg.saveConfig(cur);
-            } catch (IOException ioe) {
-                msgs.add("Failed to save initial tunnel config after creation " +
-                    cur.getName() + ", check logs:" + ioe);
-            }
         } else {
             cur.setConfig(props, "");
-            try {
-                tcg.saveConfig(cur);
-            } catch (IOException ioe) {
-                msgs.add("Failed to save initial tunnel config after creation " +
-                    cur.getName() + ", check logs:" + ioe);
-            }
         }
         // Only modify other shared tunnels
         // if the current tunnel is shared, and of supported type
@@ -188,14 +205,13 @@ public class GeneralHelper {
                     try {
                         tcg.saveConfig(c);
                     } catch (IOException ioe) {
-                        msgs.add("Failed to save initial tunnel config after creation " +
-                            cur.getName() + ", check logs:" + ioe);
+                        msgs.add(0, _t("Failed to save configuration", tcg.getContext()) + ": " + ioe);
                     }
                 }
             }
         }
 
-        return msgs;
+        return cur;
     }
 
     /**
@@ -240,16 +256,35 @@ public class GeneralHelper {
         to.setConfig(cOpt, "");
     }
 
-    protected static List<String> saveConfig(
-            I2PAppContext context, TunnelControllerGroup tcg, int tunnel) {
+    /**
+     *  Save the configuration for an existing tunnel to disk.
+     *  New tunnels must use saveConfig(..., TunnelController).
+     *
+     *  @param context unused, taken from tcg
+     *  @param tunnel must already exist
+     *  @since 0.9.49
+     */
+    protected static List<String> saveConfig(I2PAppContext context, TunnelControllerGroup tcg, int tunnel) {
+        TunnelController cur = getController(tcg, tunnel);
+        if (cur == null) {
+            List<String> rv = tcg.clearAllMessages();
+            rv.add("Invalid tunnel number");
+            return rv;
+        }
+        return saveConfig(tcg, cur);
+    }
+
+    /**
+     *  Save the configuration to disk.
+     *  For new and existing tunnels.
+     *  Does NOT call tcg.addController() for new tunnels. See udpateConfig()
+     *
+     *  @since 0.9.49
+     */
+    private static List<String> saveConfig(TunnelControllerGroup tcg, TunnelController cur) {
+        I2PAppContext context = tcg.getContext();
         List<String> rv = tcg.clearAllMessages();
         try {
-            TunnelController cur = getController(tcg, tunnel);
-            if (cur == null) {
-                //List<String> msgs = new ArrayList<String>();
-                rv.add("Invalid tunnel number");
-                return rv;
-            }
             tcg.saveConfig(cur);
             rv.add(0, _t("Configuration changes saved", context));
         } catch (IOException ioe) {
