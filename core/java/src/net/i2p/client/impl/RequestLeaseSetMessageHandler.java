@@ -99,14 +99,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     protected boolean requiresLS2(I2PSessionImpl session) {
         if (!session.supportsLS2())
             return false;
-        if (session.isOffline())
-            return true;
-        String s = session.getOptions().getProperty(PROP_LS_ENCTYPE);
-        if (s != null) {
-            if (!s.equals("0") && !s.equals("ELGAMAL_2048"))
-                return true;
-        }
-        s = session.getOptions().getProperty(PROP_LS_TYPE);
+        // we do this check first because we must set _ls2Type regardless
+        String s = session.getOptions().getProperty(PROP_LS_TYPE);
         if (s != null) {
             try {
                 int type = Integer.parseInt(s);
@@ -118,6 +112,13 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
               session.destroySession();
               return true;
             }
+        }
+        if (session.isOffline())
+            return true;
+        s = session.getOptions().getProperty(PROP_LS_ENCTYPE);
+        if (s != null) {
+            if (!s.equals("0") && !s.equals("ELGAMAL_2048"))
+                return true;
         }
         return false;
     }

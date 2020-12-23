@@ -1,5 +1,6 @@
 2020-12-23 zzz
  * Crypto: Increase ratchet tag window
+ * I2CP: Fix encrypted leaseset for ECIES and offline keys
 
 2020-12-22 zzz
  * Console:
