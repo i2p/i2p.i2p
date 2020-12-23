@@ -159,20 +159,3 @@ Index: i2p-0.9.45/apps/routerconsole/java/src/edu/internet2/ndt/JSONUtils.java
  
  /**
   * Created by Sebastian Malecki on 13.05.14.
-Index: i2p-0.9.45/core/java/src/net/i2p/util/DNSOverHTTPS.java
-===================================================================
---- i2p-0.9.45.orig/core/java/src/net/i2p/util/DNSOverHTTPS.java
-+++ i2p-0.9.45/core/java/src/net/i2p/util/DNSOverHTTPS.java
-@@ -12,9 +12,9 @@ import java.util.Map;
- 
- import gnu.getopt.Getopt;
- 
--import org.json.simple.JsonArray;
--import org.json.simple.JsonObject;
--import org.json.simple.Jsoner;
-+import @JSON_SIMPLE@.JsonArray;
-+import @JSON_SIMPLE@.JsonObject;
-+import @JSON_SIMPLE@.Jsoner;
- 
- import net.i2p.I2PAppContext;
- import net.i2p.data.DataHelper;
