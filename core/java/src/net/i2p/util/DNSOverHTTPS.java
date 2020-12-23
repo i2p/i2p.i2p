@@ -36,7 +36,8 @@ import net.i2p.data.DataHelper;
  *
  *  Warning - not thread-safe. Create new instances as necessary.
  *
- *  This supports the JSON format only. Does NOT support RFC 8484 (DNS format)
+ *  As of 0.9.49, this supports the RFC 8484 (DNS) format only.
+ *  Does NOT support the JSON format (used prior to 0.9.49)
  *  or RFC 7858 (DNS over TLS).
  *
  *  https://developers.google.com/speed/public-dns/docs/dns-over-https
