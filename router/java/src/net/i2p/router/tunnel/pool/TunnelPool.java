@@ -112,7 +112,7 @@ public class TunnelPool {
             }
 
             if (ls != null)
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                requestLeaseSet(ls);
         }
         _context.statManager().createRequiredRateStat(_rateName,
                                "Tunnel Bandwidth (Bytes/sec)", "Tunnels", 
@@ -460,7 +460,7 @@ public class TunnelPool {
         }
         
         if (ls != null)
-            _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+            requestLeaseSet(ls);
     }
     
     /**
@@ -492,7 +492,7 @@ public class TunnelPool {
         
         if (_alive && _settings.isInbound() && !_settings.isExploratory()) {
             if (ls != null) {
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                requestLeaseSet(ls);
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": unable to build a new leaseSet on removal (" + remaining 
@@ -551,7 +551,7 @@ public class TunnelPool {
         
         if (_settings.isInbound() && !_settings.isExploratory()) {
             if (ls != null) {
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                requestLeaseSet(ls);
             }
         }
     }
@@ -606,13 +606,28 @@ public class TunnelPool {
                 ls = locked_buildNewLeaseSet();
             }
             if (ls != null) {
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
-                Set<Hash> aliases = _settings.getAliases();
-                if (aliases != null && !aliases.isEmpty()) {
-                    for (Hash h : aliases) {
-                        _context.clientManager().requestLeaseSet(h, ls);
-                    }
-                }
+                requestLeaseSet(ls);
+            }
+        }
+    }
+
+    /**
+     *  Request lease set from client for the primary and all aliases.
+     *
+     *  @param ls non-null
+     *  @since 0.9.49
+     */
+    private void requestLeaseSet(LeaseSet ls) {
+        _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+        Set<Hash> aliases = _settings.getAliases();
+        if (aliases != null && !aliases.isEmpty()) {
+            for (Hash h : aliases) {
+                 // don't corrupt other requests
+                 LeaseSet ls2 = new LeaseSet();
+                 for (int i = 0; i < ls.getLeaseCount(); i++) {
+                     ls2.addLease(ls.getLease(i));
+                 }
+                _context.clientManager().requestLeaseSet(h, ls2);
             }
         }
     }
@@ -709,6 +724,8 @@ public class TunnelPool {
     /**
      * Build a leaseSet with the required tunnels that aren't about to expire.
      * Caller must synchronize on _tunnels.
+     * The returned LeaseSet will be incomplete; it will not have the destination
+     * set and will not be signed. Only the leases will be included.
      *
      * @return null on failure
      */
