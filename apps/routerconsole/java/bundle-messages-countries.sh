@@ -33,9 +33,9 @@ fi
 # set LG2 to the language you need in environment variables to enable this
 
 #
-# generate strings/Countries.java from ../../../installer/resources/countries.txt
+# generate strings/Countries.java from ../../../core/resources/countries.txt
 #
-CFILE=../../../installer/resources/countries.txt
+CFILE=../../../core/resources/countries.txt
 # add ../java/ so the refs will work in the po file
 JFILE=../java/build/Countries.java
 if [ $CFILE -nt $JFILE -o ! -s $JFILE ]

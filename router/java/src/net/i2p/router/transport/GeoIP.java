@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
@@ -520,20 +521,15 @@ public class GeoIP {
     *
     */
     private void readCountryFile() {
-        String geoDir = _context.getProperty(PROP_GEOIP_DIR, GEOIP_DIR_DEFAULT);
-        File geoFile = new File(geoDir);
-        if (!geoFile.isAbsolute())
-            geoFile = new File(_context.getBaseDir(), geoDir);
-        geoFile = new File(geoFile, COUNTRY_FILE_DEFAULT);
-        if (!geoFile.exists()) {
+        InputStream is = GeoIP.class.getResourceAsStream("/net/i2p/util/resources/" + COUNTRY_FILE_DEFAULT);
+        if (is == null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Country file not found: " + geoFile.getAbsolutePath());
+                _log.warn("Country file not found");
             return;
         }
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(geoFile), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             String line = null;
             while ( (line = br.readLine()) != null) {
                 try {
@@ -551,6 +547,7 @@ public class GeoIP {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error reading the Country File", ioe);
         } finally {
+            try { is.close(); } catch (IOException ioe) {}
             if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
     }
