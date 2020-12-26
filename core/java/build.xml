@@ -109,9 +109,12 @@
     <target name="jar" depends="compile, bundle, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
+        <mkdir dir="build/obj/net/i2p/util/resources" />
+        <copy todir="build/obj/net/i2p/util/resources" >
+            <fileset dir="../resources" />
+        </copy>
         <jar destfile="./build/i2p.jar" >
-            <fileset dir="./build/obj" includes="**/*.class" />
-            <fileset dir="./src" includes="net/i2p/util/resources/*" />
+            <fileset dir="./build/obj" />
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
             <manifest>

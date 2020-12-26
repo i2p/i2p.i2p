@@ -1827,7 +1827,6 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- decapitalized the file in 0.7.8 -->
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
         <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
        -->
@@ -1846,7 +1845,6 @@
     <!-- GeoIP files -->
     <target name="prepgeoupdate" depends="prepgeoupdate-unlesspkg" >
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
         <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
        -->

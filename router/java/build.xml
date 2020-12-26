@@ -70,7 +70,11 @@
     <target name="jar" depends="compile, bundle, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <jar destfile="./build/router.jar" basedir="./build/obj" includes="**/*.class" >
+        <mkdir dir="build/obj/net/i2p/router/util/resources" />
+        <copy todir="build/obj/net/i2p/router/util/resources" >
+            <fileset dir="../resources" />
+        </copy>
+        <jar destfile="./build/router.jar" basedir="./build/obj" >
             <manifest>
                 <!-- so people with very old wrapper.config files will still work with Jetty 6 -->
                 <attribute name="${manifest.classpath.name}" value="i2p.jar addressbook.jar jetty-i2p.jar jetty-rewrite-handler.jar jetty-start.jar jetty-util.jar" />
