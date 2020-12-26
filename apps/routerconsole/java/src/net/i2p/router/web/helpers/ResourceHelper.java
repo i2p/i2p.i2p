@@ -76,6 +76,7 @@ public class ResourceHelper extends HelperBase {
             int i = 0;
             while ( (line = in.readLine()) != null) {
                 buf.append(line);
+                buf.append('\n');
                 if (_maxLines > 0 && ++i >= _maxLines)
                     break;
             }
