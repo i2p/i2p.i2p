@@ -140,6 +140,10 @@
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_nl_NL.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_nl.properties" />
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_pt_BR.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_pt.properties" />
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_ru_RU.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_ru.properties" />
+        <mkdir dir="build/obj/net/i2p/router/news/resources" />
+        <copy todir="build/obj/net/i2p/router/news/resources" >
+            <fileset dir="../resources-news" />
+        </copy>
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/**/* net/i2p/router/web/servlets/**/* net/i2p/router/web/resources/**/*">
             <manifest>
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
@@ -160,7 +164,11 @@
 
     <!-- newsxml.jar only (subset of routerconsole, no war) for Android -->
     <target name="newsxmljar" depends="compileNewsOnly" >
-        <jar destfile="./build/newsxml.jar" basedir="./build/obj" includes="**/*.class">
+        <mkdir dir="build/obj/net/i2p/router/news/resources" />
+        <copy todir="build/obj/net/i2p/router/news/resources" >
+            <fileset dir="../resources-news" />
+        </copy>
+        <jar destfile="./build/newsxml.jar" basedir="./build/obj" includes="net/i2p/router/news/**/*" >
         </jar>
     </target>
 

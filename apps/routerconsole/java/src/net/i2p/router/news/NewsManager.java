@@ -1,7 +1,7 @@
 package net.i2p.router.news;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.text.DateFormat;
@@ -190,12 +190,17 @@ public class NewsManager implements ClientApp {
     }
 
     private List<NewsEntry> parseInitialNews() {
-        File file = new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml");
+        InputStream is = NewsManager.class.getResourceAsStream("/net/i2p/router/news/resources/docs/initialNews/initialNews.xml");
+        if (is == null) {
+            if (_log.shouldWarn())
+                _log.warn("failed to load initial news");
+            return Collections.emptyList();
+        }
         Reader reader = null;
         try {
             char[] buf = new char[512];
             StringBuilder out = new StringBuilder(2048);
-            reader = new TranslateReader(_context, BUNDLE_NAME, new FileInputStream(file));
+            reader = new TranslateReader(_context, BUNDLE_NAME, is);
             int len;
             while((len = reader.read(buf)) > 0) {
                 out.append(buf, 0, len);
@@ -206,14 +211,17 @@ public class NewsManager implements ClientApp {
                 rv.get(0).updated = _context.clock().now();
             } else {
                 if (_log.shouldWarn())
-                    _log.warn("failed to load " + file);
+                    _log.warn("failed to load initial news");
             }
             return rv;
         } catch (IOException ioe) {
             if (_log.shouldWarn())
-                _log.warn("failed to load " + file, ioe);
+                _log.warn("failed to load initial news", ioe);
             return Collections.emptyList();
         } finally {
+            try {
+                is.close();
+            } catch (IOException foo) {}
             try {
                 if (reader != null)
                     reader.close();

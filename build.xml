@@ -1650,11 +1650,8 @@
         <delete dir="./pkg-mavencentral" />
     </target>
 
-    <!-- initialNews.xml files and GeoIP files -->
+    <!-- GeoIP file -->
     <target name="prepConsoleDocs" depends="prepgeoupdate" >
-        <copy todir="pkg-temp/docs/initialNews/">
-          <fileset dir="installer/resources/initialNews/" />
-        </copy>
     </target>
 
     <target name="consoleDocs" depends="deletepkg-temp, prepConsoleDocs">
@@ -3071,7 +3068,6 @@
 			<copy file="apps/addressbook/myhosts.txt"  todir="pkg-temp/addressbook/" />
 			<!-- config.txt is in installer/resources/portable -->
 		<mkdir dir="pkg-temp/docs" />
-			<copy file="installer/resources/initialNews/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
 			<copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
