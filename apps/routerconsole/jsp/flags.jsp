@@ -12,8 +12,8 @@
  *  with headers set so the browser caches.
  *
  *  As of 0.9.36:
- *  All new and changed flags must go in the flags16x11/ dir,
- *  which will be checked first by flags.jsp.
+ *  All new and changed flags must go in the ../resources/docs/icons/flags16x11/ dir,
+ *  which is copied into the war and will be checked first by flags.jsp.
  *  The flags/ dir is the original set from famfamfam,
  *  which may be symlinked in package installs.
  *
@@ -23,44 +23,54 @@ if (c != null &&
     (c.length() == 2 || c.length() == 7) &&
     c.replaceAll("[a-z0-9_]", "").length() == 0) {
     String flagSet = "flags16x11";
-    String s = request.getParameter("s");
 
-    String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
+    java.io.File ffile;
+    long lastmod;
+    java.io.InputStream fin = flags_jsp.class.getResourceAsStream("/net/i2p/router/web/resources/docs/icons/" + flagSet + '/' + c + ".png");
+    if (fin != null) {
+        // found in the war
+        java.io.File war = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "webapps/routerconsole.war");
+        ffile = null;
+        lastmod = war.lastModified();
+    } else {
+        // fallback to flags dir, which will be symlinked to /usr/share/flags/countries/16x11 for package builds
+        String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
                   java.io.File.separatorChar +
                   "docs" + java.io.File.separatorChar + "icons";
-    String file = flagSet + java.io.File.separatorChar + c + ".png";
-    java.io.File ffile = new java.io.File(base, file);
-    if (!ffile.exists()) {
-        // fallback to flags dir, which will be symlinked to /usr/share/flags/countries/16x11 for package builds
-        file = "flags" + java.io.File.separatorChar + c + ".png";
+        String file = "flags" + java.io.File.separatorChar + c + ".png";
         ffile = new java.io.File(base, file);
+        long length = ffile.length();
+        if (length <= 0) {
+            response.sendError(403, "Flag not found");
+            return;
+        }
+        response.setHeader("Content-Length", Long.toString(length));
+        lastmod = ffile.lastModified();
     }
-    long lastmod = ffile.lastModified();
     if (lastmod > 0) {
         long iflast = request.getDateHeader("If-Modified-Since");
         // iflast is -1 if not present; round down file time
         if (iflast >= ((lastmod / 1000) * 1000)) {
             response.setStatus(304);
+            if (fin != null)
+                fin.close();
             return;
         }
         response.setDateHeader("Last-Modified", lastmod);
-        // cache for a day
-        response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + 86400000l);
-        response.setHeader("Cache-Control", "public, max-age=604800");
-        response.setHeader("X-Content-Type-Options", "nosniff");
     }
-    long length = ffile.length();
-    if (length > 0)
-        response.setHeader("Content-Length", Long.toString(length));
+    // cache for a day
+    response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + 86400000l);
+    response.setHeader("Cache-Control", "public, max-age=604800");
+    response.setHeader("X-Content-Type-Options", "nosniff");
     response.setContentType("image/png");
     response.setHeader("Accept-Ranges", "none");
-    java.io.FileInputStream fin = null;
     java.io.OutputStream cout = response.getOutputStream();
     try {
         // flags dir may be a symlink, which readFile will reject
         // We carefully vetted the "c" value above.
         //net.i2p.util.FileUtil.readFile(file, base, cout);
-        fin = new java.io.FileInputStream(ffile);
+        if (fin == null)
+            fin = new java.io.FileInputStream(ffile);
         net.i2p.data.DataHelper.copy(fin, cout);
     } catch (java.io.IOException ioe) {
         // prevent 'Committed' IllegalStateException from Jetty

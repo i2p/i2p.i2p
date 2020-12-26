@@ -1498,7 +1498,7 @@
             <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png hu.png id.png ir.png it.png jp.png nl.png pl.png pt.png ro.png ru.png se.png tr.png us.png" />
         </copy>
         <copy todir="pkg-temp/docs/icons/flags" >
-          <!-- base flags/ dir only. flags16x11/ dir already copied by prepConsoleDocs target -->
+          <!-- base flags/ dir only. flags16x11/ dir now in the war -->
           <fileset dir="installer/resources/icons/flags" />
         </copy>
     </target>
@@ -1650,24 +1650,10 @@
         <delete dir="./pkg-mavencentral" />
     </target>
 
-    <!-- initialNews.xml files, GeoIP files, and flag icons -->
-    <target name="prepConsoleDocs" depends="prepConsoleDocUpdates, prepgeoupdate" >
+    <!-- initialNews.xml files and GeoIP files -->
+    <target name="prepConsoleDocs" depends="prepgeoupdate" >
         <copy todir="pkg-temp/docs/initialNews/">
           <fileset dir="installer/resources/initialNews/" />
-        </copy>
-    </target>
-
-    <!-- flag icons -->
-    <target name="prepConsoleDocUpdates">
-        <copy todir="pkg-temp/docs/" >
-          <!--
-               As of 0.9.36:
-               All new and changed flags must go in the flags16x11/ dir,
-               which will be checked first by flags.jsp.
-               The flags/ dir is the original set from famfamfam,
-               which may be symlinked in package installs.
-           -->
-          <fileset dir="installer/resources/" includes="icons/flags16x11/*" />
         </copy>
     </target>
 
@@ -1790,7 +1776,7 @@
         </exec>
     </target>
 
-    <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation, truncatehistory">
+    <target name="prepupdate" depends="build2, prepupdateSmall, prepCertificates, prep-script-translation, truncatehistory">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
