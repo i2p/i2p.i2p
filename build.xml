@@ -1489,7 +1489,7 @@
 
     <target name="copyflags" depends="copyflags-unlesspkg" >
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
-            <fileset dir="installer/resources/icons/flags16x11" includes="lang_ar.png" />
+            <fileset dir="apps/routerconsole/resources/docs/icons/flags16x11" includes="lang_ar.png" />
         </copy>
     </target>
 
