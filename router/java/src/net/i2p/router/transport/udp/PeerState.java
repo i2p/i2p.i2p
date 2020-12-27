@@ -1434,18 +1434,18 @@ public class PeerState {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Unable to send a direct message: " + state + " to: " + this);
                 }
-                if (failedSize > 0) {
-                    // restore the window
-                    synchronized(this) {
-                        // this isn't exactly right, because some fragments may not have been sent at all,
-                        // but that should be unlikely
-                        _sendWindowBytesRemaining += failedSize;
-                        _sendWindowBytesRemaining += failedCount * fragmentOverhead();
-                        if (_sendWindowBytesRemaining > _sendWindowBytes)
-                            _sendWindowBytesRemaining = _sendWindowBytes;
-                    }
-                    // no need to nudge(), this is called from OMF loop before allocateSend()
+            }
+            if (failedSize > 0) {
+                // restore the window
+                synchronized(this) {
+                    // this isn't exactly right, because some fragments may not have been sent at all,
+                    // but that should be unlikely
+                    _sendWindowBytesRemaining += failedSize;
+                    _sendWindowBytesRemaining += failedCount * fragmentOverhead();
+                    if (_sendWindowBytesRemaining > _sendWindowBytes)
+                        _sendWindowBytesRemaining = _sendWindowBytes;
                 }
+                // no need to nudge(), this is called from OMF loop before allocateSend()
             }
         }
 
