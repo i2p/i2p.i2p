@@ -18,7 +18,7 @@
 <div class="panel" id="overview"><h2><%=intl._t("Hidden Services Manager")%></h2><p>
 <%=intl._t("These are the local services provided by your router.")%>
 &nbsp;
-<%=intl._t("By default, most of your client services (email, HTTP proxy, IRC) will share the same set of tunnels and be listed as \"Shared Clients\" and \"Shared Clients(DSA)\".")%>
+<%=intl._t("By default, most of your client services (email, HTTP proxy, IRC) will share the same set of tunnels and be listed as \"Shared Clients\".")%>
 </p></div>
 <%
   boolean isInitialized = indexBean.isInitialized();

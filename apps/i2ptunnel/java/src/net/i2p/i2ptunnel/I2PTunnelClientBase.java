@@ -307,9 +307,15 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             if (_log.shouldLog(Log.INFO))
                 _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since there is no other one");
             socketManager = buildSocketManager(tunnel, pkf);
+
+/*
+   since we enabled ratchet by default, we're not compatible with ancient servers anyway.
+
             I2PSession sub = addSubsession(tunnel);
             if (sub != null && _log.shouldLog(Log.WARN))
                 _log.warn("Added subsession " + sub);
+*/
+
         }
         return socketManager;
     }
@@ -319,7 +325,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *
      *  @return subsession, or null if none was added
      *  @since 0.9.20
+     *  @deprecated unused as of 0.9.49
      */
+    @Deprecated
     protected static synchronized I2PSession addSubsession(I2PTunnel tunnel) {
         I2PSession sess = socketManager.getSession();
         if (sess.getMyDestination().getSigType() == SigType.DSA_SHA1)

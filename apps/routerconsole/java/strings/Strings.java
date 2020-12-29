@@ -34,7 +34,6 @@ class Dummy {
         // note that if the wording changes in i2ptunnel.config, we have to
         // keep the old string here as well for existing installs
         _t("shared clients");
-        _t("shared clients (DSA)");
         _t("IRC proxy");
         _t("eepsite");
         _t("I2P webserver");
