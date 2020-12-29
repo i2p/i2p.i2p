@@ -519,7 +519,7 @@ class NetDbRenderer {
                 buf.append("<b>").append(_t("Destination")).append(":</b> ");
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
                 if (in != null && in.getDestinationNickname() != null)
-                    buf.append(in.getDestinationNickname());
+                    buf.append(DataHelper.escapeHTML(in.getDestinationNickname()));
                 else
                     buf.append(dest.toBase64().substring(0, 6));
                 buf.append("</th></tr>\n");

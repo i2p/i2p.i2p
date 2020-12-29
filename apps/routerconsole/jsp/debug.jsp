@@ -76,8 +76,18 @@
         net.i2p.data.Hash h = dest.calculateHash();
         net.i2p.crypto.SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(h);
         if (skm != null) {
-            out.print("<div class=\"debug_section\" id=\"cskm" + (i++) + "\">");
-            out.print("<h2><font size=\"-2\">" + dest.toBase32() + "</font> Session Key Manager</h2>");
+            out.print("<div class=\"debug_section\" id=\"cskm" + (i++) + "\"><h2>");
+            net.i2p.router.TunnelPoolSettings tps = ctx.tunnelManager().getInboundSettings(h);
+            if (tps != null) {
+                String nick = tps.getDestinationNickname();
+                if (nick != null)
+                    out.print(net.i2p.data.DataHelper.escapeHTML(nick));
+                else
+                    out.print("<font size=\"-2\">" + dest.toBase32() + "</font>");
+            } else {
+                out.print("<font size=\"-2\">" + dest.toBase32() + "</font>");
+            }
+            out.print(" Session Key Manager</h2>");
             skm.renderStatusHTML(out);
             out.print("</div>");
         }
