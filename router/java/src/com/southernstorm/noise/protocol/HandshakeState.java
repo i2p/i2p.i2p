@@ -648,10 +648,19 @@ public class HandshakeState implements Destroyable, Cloneable {
 			}
 			
 			// Add the payload to the message buffer and encrypt it.
-			if (payload != null)
-				messagePosn += symmetric.encryptAndHash(payload, payloadOffset, message, messagePosn, payloadLength);
-			else
-				messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, 0);
+			if (payload != null) {
+				// no need to hash for N, we don't split() and no more messages follow
+				if (patternId.equals(PATTERN_ID_N))
+					messagePosn += symmetric.encryptOnly(payload, payloadOffset, message, messagePosn, payloadLength);
+				else
+					messagePosn += symmetric.encryptAndHash(payload, payloadOffset, message, messagePosn, payloadLength);
+			} else {
+				// no need to hash for N, we don't split() and no more messages follow
+				if (patternId.equals(PATTERN_ID_N))
+					messagePosn += symmetric.encryptOnly(message, messagePosn, message, messagePosn, 0);
+				else
+					messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, 0);
+			}
 			success = true;
 		} finally {
 			// If we failed, then clear any sensitive data that may have
@@ -819,7 +828,12 @@ public class HandshakeState implements Destroyable, Cloneable {
 			}
 			
 			// Decrypt the message payload.
-			int payloadLength = symmetric.decryptAndHash(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
+			int payloadLength;
+			// no need to hash for N, we don't split() and no more messages follow
+			if (patternId.equals(PATTERN_ID_N))
+				payloadLength = symmetric.decryptOnly(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
+			else
+				payloadLength = symmetric.decryptAndHash(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
 			success = true;
 			return payloadLength;
 		} finally {
