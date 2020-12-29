@@ -12,6 +12,7 @@ package net.i2p.crypto;
 import java.security.InvalidKeyException;
 
 // for using system version
+import java.util.concurrent.LinkedBlockingQueue;
 import java.security.GeneralSecurityException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -37,13 +38,20 @@ import net.i2p.util.SystemVersion;
  * @author jrandom, thecrypto
  */
 public final class CryptixAESEngine extends AESEngine {
+    private final LinkedBlockingQueue<Cipher> _ciphers;
+
     private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;
     
     /** see test results below */
-    private static final int MIN_SYSTEM_AES_LENGTH = 704;
+    private static final int MIN_SYSTEM_AES_LENGTH = 640;
     private static final boolean USE_SYSTEM_AES = hasAESNI() && CryptoCheck.isUnlimited();
+
+    private static final boolean CACHE = true;
+    private static final int CACHE_SIZE = 8;
+    private static final SecretKeySpec ZERO_KEY = new SecretKeySpec(new byte[32], "AES");
+    private static final IvParameterSpec ZERO_IV = new IvParameterSpec(new byte[16], 0, 16);
 
     /**
      *  Do we have AES-NI support in the processor and JVM?
@@ -67,6 +75,9 @@ public final class CryptixAESEngine extends AESEngine {
     /** */
     public CryptixAESEngine(I2PAppContext context) {
         super(context);
+        // testing
+        //_ciphers = new LinkedBlockingQueue<Cipher>(CACHE_SIZE);
+        _ciphers = USE_SYSTEM_AES ? new LinkedBlockingQueue<Cipher>(CACHE_SIZE) : null;
         //_cache = new CryptixAESKeyCache();
     }
     
@@ -106,9 +117,10 @@ public final class CryptixAESEngine extends AESEngine {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
                 IvParameterSpec ivps = new IvParameterSpec(iv, ivOffset, 16);
-                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+                Cipher cipher = acquire();
                 cipher.init(Cipher.ENCRYPT_MODE, key, ivps, _context.random());
                 cipher.doFinal(payload, payloadIndex, length, out, outIndex);
+                release(cipher);
                 return;
             } catch (GeneralSecurityException gse) {
                 if (_log.shouldLog(Log.WARN))
@@ -153,9 +165,10 @@ public final class CryptixAESEngine extends AESEngine {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
                 IvParameterSpec ivps = new IvParameterSpec(iv, ivOffset, 16);
-                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+                Cipher cipher = acquire();
                 cipher.init(Cipher.DECRYPT_MODE, key, ivps, _context.random());
                 cipher.doFinal(payload, payloadIndex, length, out, outIndex);
+                release(cipher);
                 return;
             } catch (GeneralSecurityException gse) {
                 if (_log.shouldLog(Log.WARN))
@@ -250,10 +263,38 @@ public final class CryptixAESEngine extends AESEngine {
         CryptixRijndael_Algorithm.blockDecrypt(payload, rv, inIndex, outIndex, pkey);
     }
     
-/******
-    private static final int MATCH_RUNS = 11000;
-    private static final int TIMING_RUNS = 100000;
-******/
+    /**
+     *  @return cached or new
+     *  @since 0.9.49
+     */
+    private Cipher acquire() {
+        Cipher rv = _ciphers.poll();
+        if (rv == null) {
+            try {
+                rv = Cipher.getInstance("AES/CBC/NoPadding");
+            } catch (GeneralSecurityException e) {
+                throw new UnsupportedOperationException("AES/CBC/NoPadding", e);
+            }
+        }
+        return rv;
+    }
+    
+    /**
+     *  Cipher will be initialized with a zero key and IV.
+     *
+     *  @since 0.9.49
+     */
+    private void release(Cipher cipher) {
+        if (CACHE) {
+            try {
+                cipher.init(Cipher.DECRYPT_MODE, ZERO_KEY, ZERO_IV, _context.random());
+            } catch (GeneralSecurityException e) {
+                return;
+            }
+            _ciphers.offer(cipher);
+        }
+    }
+    
 
     /**
      *  Test results 10K timing runs.
@@ -286,6 +327,8 @@ public final class CryptixAESEngine extends AESEngine {
      */
 /*******
     public static void main(String args[]) {
+        final int MATCH_RUNS = 11000;
+        final int TIMING_RUNS = 100000;
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         try {
             boolean canTestSystem = USE_SYSTEM_AES;
