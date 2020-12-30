@@ -1,5 +1,5 @@
 language: java
-dist: xenial
+dist: trusty
 
 jdk:
   - oraclejdk11
