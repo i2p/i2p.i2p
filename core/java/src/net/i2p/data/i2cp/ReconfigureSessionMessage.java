@@ -71,7 +71,7 @@ public class ReconfigureSessionMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionId == null || _sessionConfig == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(64);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
         try {
             _sessionId.writeBytes(os);
             _sessionConfig.writeBytes(os);

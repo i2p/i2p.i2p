@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+
+<!-- =============================================================== -->
+<!-- Mixin the GZIP Handler                                          -->
+<!-- This applies the GZIP Handler to the entire server              -->
+<!-- If a GZIP handler is required for an individual context, then   -->
+<!-- use a context XML (see test.xml example in distribution)        -->
+<!-- =============================================================== -->
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+  <Call name="insertHandler">
+    <Arg>
+      <New id="GzipHandler" class="org.eclipse.jetty.server.handler.gzip.GzipHandler">
+        <Set name="minGzipSize"><Property name="jetty.gzip.minGzipSize" deprecated="gzip.minGzipSize" default="512"/></Set>
+        <Set name="checkGzExists"><Property name="jetty.gzip.checkGzExists" deprecated="gzip.checkGzExists" default="false"/></Set>
+        <Set name="compressionLevel"><Property name="jetty.gzip.compressionLevel" deprecated="gzip.compressionLevel" default="-1"/></Set>
+        <Set name="syncFlush"><Property name="jetty.gzip.syncFlush" default="false" /></Set>
+
+        <Set name="excludedAgentPatterns">
+          <Array type="String">
+            <Item><Property name="jetty.gzip.excludedUserAgent" deprecated="gzip.excludedUserAgent" default=".*MSIE.6\.0.*"/></Item>
+          </Array>
+        </Set>
+
+        <Set name="includedMethods">
+          <Array type="String">
+            <Item>GET</Item>
+            <Item>POST</Item>
+          </Array>
+        </Set>
+
+<!--
+        <Set name="includedPaths">
+          <Array type="String">
+            <Item>/*</Item>
+          </Array>
+        </Set>
+-->
+
+        <Set name="excludedPaths">
+          <Array type="String">
+            <Item>*.su3</Item>
+          </Array>
+        </Set>
+
+        <Call name="addIncludedMimeTypes">
+          <Arg><Array type="String">
+            <Item>application/javascript</Item>
+            <Item>application/x-javascript</Item>
+            <Item>application/pdf</Item>
+            <Item>application/xhtml+xml</Item>
+            <Item>application/xml</Item>
+            <Item>application/x-bittorrent</Item>
+            <Item>image/svg+xml</Item>
+            <Item>text/css</Item>
+            <Item>text/html</Item>
+            <Item>text/plain</Item>
+          </Array></Arg>
+        </Call>
+
+<!--
+        <Call name="addExcludedMimeTypes">
+          <Arg><Array type="String">
+            <Item>some/type</Item>
+          </Array></Arg>
+        </Call>
+-->
+
+      </New>
+    </Arg>
+  </Call>
+</Configure>

@@ -22,7 +22,8 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="require.gettext" value="true" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
@@ -35,6 +36,7 @@
         <mkdir dir="./build/obj" />
         <!-- half of this is deprecated classes so turn deprecation off -->
         <javac srcdir="./src" debug="true" deprecation="off" source="${javac.version}" target="${javac.version}"
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
@@ -48,6 +50,7 @@
         <javac
             srcdir="./demo"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./buildDemo/obj"
@@ -123,6 +126,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -187,11 +191,33 @@
     <target name="javadocJar" depends="javadoc">
         <jar jarfile="./build/mstreaming-${release.number}-javadoc.jar">
             <fileset dir="./build/javadoc" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Streaming API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Streaming API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
     <target name="sourcesJar">
         <jar jarfile="./build/mstreaming-${release.number}-sources.jar">
             <fileset dir="./src" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Streaming API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Streaming API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
 
@@ -216,6 +242,7 @@
         <javac
             srcdir="./test/junit"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" >

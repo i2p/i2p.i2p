@@ -69,7 +69,7 @@ public class StatsGenerator {
         buf.append("</p>");
 
         buf.append("<form action=\"\"><b>");
-        buf.append(_t("Jump to section")).append(":</b> <select name=\"go\" onChange='location.href=this.value'>");
+        buf.append(_t("Jump to section")).append(":</b> <select class=\"onchange\">");
         out.write(buf.toString());
         buf.setLength(0);
 
@@ -92,6 +92,7 @@ public class StatsGenerator {
             //out.write(buf.toString());
             //buf.setLength(0);
         }
+        // TODO this is broken for non-js
         buf.append("</select> <input type=\"submit\" value=\"").append(_t("GO")).append("\" />");
         buf.append("</form>");
 
@@ -172,7 +173,7 @@ public class StatsGenerator {
         buf.append("<li><b>").append(_t("Lifetime average frequency")).append(":</b> ");
         buf.append(DataHelper.formatDuration2(freq.getFrequency()));
         buf.append(" (");
-        buf.append(ngettext("1 event", "{0} events", (int) freq.getEventCount()));
+        buf.append(ngettext("{0} event", "{0} events", (int) freq.getEventCount()));
         buf.append(")</li></ul><br>\n");
     }
     
@@ -230,7 +231,7 @@ public class StatsGenerator {
                 }
 
                 buf.append("<span class=\"nowrap\">");
-                buf.append(ngettext("There was 1 event in this period.", "There were {0} events in this period.", (int)curRate.getLastEventCount()));
+                buf.append(ngettext("There was {0} event in this period.", "There were {0} events in this period.", (int)curRate.getLastEventCount()));
                 buf.append("</span> <span class=\"nowrap\">");
                 buf.append(_t("The period ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
                 buf.append("</span>");
@@ -265,7 +266,7 @@ public class StatsGenerator {
         buf.append("<li><b>").append(_t("Lifetime average value")).append(":</b> ");
         buf.append(num(rate.getLifetimeAverageValue()));
         buf.append(" (");
-        buf.append(ngettext("1 event", "{0} events", (int) rate.getLifetimeEventCount()));
+        buf.append(ngettext("{0} event", "{0} events", (int) rate.getLifetimeEventCount()));
         buf.append(")<br></li>" +
                    "</ul>" +
                    "<br>\n");

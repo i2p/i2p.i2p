@@ -361,6 +361,7 @@ public class FileUtil {
      * Warning - this inefficiently allocates a StringBuilder of size maxNumLines*80,
      *           so don't make it too big.
      * Warning - converts \r\n to \n
+     * Warning - inefficient if startAtBeginning is false, see console LogsHelper for better version
      *
      * @param startAtBeginning if true, read the first maxNumLines, otherwise read
      *                         the last maxNumLines

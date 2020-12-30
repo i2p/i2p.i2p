@@ -18,6 +18,7 @@
 
 <p class="infohelp">
 <%=intl._t("Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining.")%>
+</p>
 <ol><li>
 <%=intl._t("If reseeding has failed, you should first check your network connection.")%>
 </li><li>
@@ -52,45 +53,64 @@
 </li><li>
 <%=intl._t("See {0} for instructions on reseeding manually.", "<a href=\"https://geti2p.net/faq#manual_reseed\">" + intl._t("the FAQ") + "</a>")%>
 </li></ol>
-</p>
 <h3 class="tabletitle"><%=intl._t("Manual Reseed")%></h3>
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <table id="manualreseed" class="configtable">
  <tr>
   <td class="infohelp" colspan="2">
 <%=intl._t("The su3 format is preferred, as it will be verified as signed by a trusted source.")%>&nbsp;
 <%=intl._t("The zip format is unsigned; use a zip file only from a source that you trust.")%>
   </td>
- <tr>
+ <tr id="url">
   <th colspan="2"><%=intl._t("Reseed from URL")%></th>
  </tr>
  <tr>
-<form action="" method="POST">
-<input type="hidden" name="nonce" value="<%=pageNonce%>" >
   <td>
 <b><%=intl._t("Enter zip or su3 URL")%>:</b>
-<input name="url" type="text" size="60" value="" />
+<%
+   String url = request.getParameter("url");
+   String value = url != null ? "value=\"" + net.i2p.data.DataHelper.escapeHTML(url) + '"' : "";
+%>
+<input name="url" type="text" size="60" <%=value%> />
   </td>
   <td class="optionsave">
 <input type="submit" name="action" class="download" value="<%=intl._t("Reseed from URL")%>" />
   </td>
-</form>
  </tr>
- <tr>
+</table></form>
+
+<form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<table id="manualreseed2" class="configtable">
+ <tr id="file">
   <th colspan="2"><%=intl._t("Reseed from File")%></th>
  </tr>
  <tr>
-<form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
-<input type="hidden" name="nonce" value="<%=pageNonce%>" >
   <td>
 <b><%=intl._t("Select zip or su3 file")%>:</b>
+<%
+   String file = request.getParameter("file");
+   if (file != null && file.length() > 0) {
+%>
+<input type="text" size="60" name="file" value="<%=net.i2p.data.DataHelper.escapeHTML(file)%>">
+<%
+   } else {
+%>
 <input name="file" type="file" accept=".zip,.su3" value="" />
+<%
+   }
+%>
   </td>
   <td class="optionsave">
 <input type="submit" name="action" class="download" value="<%=intl._t("Reseed from file")%>" />
   </td>
-</form>
  </tr>
- <tr>
+</table></form>
+
+<form action="/createreseed" method="GET">
+<table id="manualreseed3" class="configtable">
+ <tr id="create">
   <th colspan="2">
 <%=intl._t("Create Reseed File")%>
   </th>
@@ -103,12 +123,10 @@
  </tr>
  <tr>
   <td class="optionsave" colspan="2">
-<form action="/createreseed" method="GET">
 <input type="submit" name="action" class="go" value="<%=intl._t("Create reseed file")%>" />
-</form>
   </td>
  </tr>
-</table>
+</table></form>
 
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >

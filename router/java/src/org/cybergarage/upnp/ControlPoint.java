@@ -64,6 +64,7 @@ package org.cybergarage.upnp;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import org.cybergarage.http.HTTPRequest;
 import org.cybergarage.http.HTTPRequestListener;
@@ -111,12 +112,14 @@ public class ControlPoint implements HTTPRequestListener
 	private SSDPNotifySocketList ssdpNotifySocketList;
 	private SSDPSearchResponseSocketList ssdpSearchResponseSocketList;
 
-	private SSDPNotifySocketList getSSDPNotifySocketList()
+	/** I2P was private */
+	protected SSDPNotifySocketList getSSDPNotifySocketList()
 	{
 		return ssdpNotifySocketList;
 	}
 	
-	private SSDPSearchResponseSocketList getSSDPSearchResponseSocketList()
+	/** I2P was private */
+	protected SSDPSearchResponseSocketList getSSDPSearchResponseSocketList()
 	{
 		return ssdpSearchResponseSocketList;
 	}
@@ -251,6 +254,15 @@ public class ControlPoint implements HTTPRequestListener
 		String location = ssdpPacket.getLocation();
 		try {	
 			URL locationUrl = new URL(location);
+			// I2P
+			// Roku fake json port, the real UPnP port is 8060
+			if (locationUrl.getPort() == 9080) {
+				String lcusn = usn.toLowerCase(Locale.US);
+				if (lcusn.contains("rku") || lcusn.contains("roku")) {
+					Debug.warning("Ignoring Roku at " + location);
+					return;
+				}
+			}
 			Parser parser = UPnP.getXMLParser();
 			Node rootNode = parser.parse(locationUrl);
 			Device rootDev = getDevice(rootNode);
@@ -268,12 +280,10 @@ public class ControlPoint implements HTTPRequestListener
 			performAddDeviceListener( rootDev );
 		}
 		catch (MalformedURLException me) {
-			Debug.warning(ssdpPacket.toString());
-			Debug.warning(me);
+			Debug.warning("Bad location: " + location, me);
 		}
 		catch (ParserException pe) {
-			Debug.warning(ssdpPacket.toString());
-			Debug.warning(pe);
+			Debug.warning("Error parsing data at location: " + location, pe);
 		}
 	}
 
@@ -574,7 +584,8 @@ public class ControlPoint implements HTTPRequestListener
 
 	private HTTPServerList httpServerList = new HTTPServerList();
 	
-	private HTTPServerList getHTTPServerList()
+	/** I2P was private */
+	protected HTTPServerList getHTTPServerList()
 	{
 		return httpServerList;
 	}

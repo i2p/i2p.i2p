@@ -140,7 +140,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private final static long ROUTER_INFO_EXPIRATION_MIN = 90*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 75*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
-    private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 45*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 54*60*1000l;
     
     /**
      * Don't let leaseSets go too far into the future 
@@ -602,7 +602,26 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     public void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest) {
         if (!_initialized) return;
         key = _blindCache.getHash(key);
+        if (isNegativeCached(key))
+            return;
         search(key, null, null, 20*1000, true, fromLocalDest);
+    }
+    
+    /**
+     *  Unconditionally lookup using the client's tunnels.
+     *
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @param onFindJob may be null
+     *  @param onFailedLookupJob may be null
+     *  @since 0.9.47
+     */
+    public void lookupLeaseSetRemotely(Hash key, Job onFindJob, Job onFailedLookupJob,
+                                       long timeoutMs, Hash fromLocalDest) {
+        if (!_initialized) return;
+        key = _blindCache.getHash(key);
+        if (isNegativeCached(key))
+            return;
+        search(key, onFindJob, onFailedLookupJob, timeoutMs, true, fromLocalDest);
     }
 
     /**
@@ -936,6 +955,16 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             rv = (LeaseSet)_ds.get(key);
             if ( (rv != null) && (rv.equals(leaseSet)) ) {
                 // if it hasn't changed, no need to do anything
+                // except copy over the flags
+                Hash to = leaseSet.getReceivedBy();
+                if (to != null) {
+                    rv.setReceivedBy(to);
+                } else if (leaseSet.getReceivedAsReply()) {
+                    rv.setReceivedAsReply();
+                }
+                if (leaseSet.getReceivedAsPublished()) {
+                    rv.setReceivedAsPublished(true);
+                }
                 return rv;
             }
         } catch (ClassCastException cce) {
@@ -1062,7 +1091,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (routerInfo.getNetworkId() != _networkID){
             _context.banlist().banlistRouterForever(key, "Not in our network: " + routerInfo.getNetworkId());
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Bad network: " + routerInfo);
+                _log.warn("Not in our network: " + routerInfo, new Exception());
             return "Not in our network";
         }
         FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();

@@ -76,7 +76,7 @@ class LocalClientManager extends ClientManager {
                 if (jitter > 0)
                     delay += (int) (jitter * _ctx.random().nextGaussian());
                 if (delay > 0) {
-                    System.out.println("Message " + msgId + " DELAYED " + delay + " ms");
+                    //System.out.println("Message " + msgId + " DELAYED " + delay + " ms");
                     DelayedSend ds = new DelayedSend(_ctx, sender, runner, fromDest, toDest, payload, msgId, messageNonce);
                     ds.schedule(delay);
                     return;
@@ -122,8 +122,9 @@ class LocalClientManager extends ClientManager {
 
     public static void main(String args[]) {
         int dropX1000 = 0, jitter = 0, latency = 0;
+        int port = ClientManagerFacadeImpl.DEFAULT_PORT;
         boolean error = false;
-        Getopt g = new Getopt("router", args, "d:j:l:");
+        Getopt g = new Getopt("router", args, "d:j:l:p:");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -147,6 +148,12 @@ class LocalClientManager extends ClientManager {
                             error = true;
                         break;
 
+                    case 'p':
+                        port = Integer.parseInt(g.getOptarg());
+                        if (port < 1024 || port > 65535)
+                            error = true;
+                        break;
+
                     default:
                         error = true;
                 }
@@ -164,7 +171,6 @@ class LocalClientManager extends ClientManager {
         // prevent NTP queries
         props.setProperty("time.disabled", "true");
         RouterContext ctx = new RouterContext(null, props);
-        int port = ClientManagerFacadeImpl.DEFAULT_PORT;
         LocalClientManager mgr = new LocalClientManager(ctx, port);
         mgr.dropX1000 = dropX1000;
         mgr.jitter = jitter;
@@ -179,6 +185,7 @@ class LocalClientManager extends ClientManager {
         System.err.println("usage: LocalClientManager\n" +
                            "         [-d droppercent] // 0.0 - 99.99999 (default 0)\n" +
                            "         [-j jitter]      // (integer ms for 1 std. deviation, default 0)\n" +
-                           "         [-l latency]     // (integer ms, default 0)");
+                           "         [-l latency]     // (integer ms, default 0)\n" +
+                           "         [-p port]        // (I2CP port, default 7654)");
     }
 }

@@ -9,7 +9,6 @@ package net.i2p.data;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,6 +17,7 @@ import java.util.Arrays;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * KeysAndCert has a public key, a signing key, and a certificate.
@@ -239,7 +239,9 @@ public class KeysAndCert extends DataStructureImpl {
             return __calculatedHash;
         byte identBytes[];
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(400);
+            if (_certificate == null)
+                throw new IllegalStateException("KAC hash error");
+            ByteArrayStream baos = new ByteArrayStream(384 + _certificate.size());
             writeBytes(baos);
             identBytes = baos.toByteArray();
         } catch (IOException ioe) {

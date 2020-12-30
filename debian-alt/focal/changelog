@@ -1,0 +1,1085 @@
+i2p (0.9.48-1ubuntu1) focal; urgency=medium
+
+  * New upstream version 0.9.48
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 02 Dec 2020 12:12:12 +0000
+
+i2p (0.9.47-1ubuntu1) focal; urgency=medium
+
+  * New upstream version 0.9.47
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 25 Aug 2020 12:12:12 +0000
+
+i2p (0.9.46-1ubuntu1) eoan; urgency=medium
+
+  * New upstream version 0.9.46
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 26 May 2020 12:12:12 +0000
+
+i2p (0.9.45-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.45
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 24 Feb 2020 12:12:12 +0000
+
+i2p (0.9.44-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.44
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Sun, 01 Dec 2019 12:12:12 +0000
+
+i2p (0.9.43-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.43
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 22 Oct 2019 12:12:12 +0000
+
+i2p (0.9.42-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.42
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 28 Aug 2019 12:12:12 +0000
+
+i2p (0.9.41-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.41
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 3 Jul 2019 12:12:12 +0000
+
+i2p (0.9.40-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.40
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 8 May 2019 12:12:12 +0000
+
+i2p (0.9.39-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.39
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 22 Mar 2019 12:12:12 +0000
+
+i2p (0.9.38-1~disco+1) disco; urgency=medium
+
+  * New upstream version 0.9.38
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 23 Jan 2019 12:12:12 +0000
+
+i2p (0.9.37-1ubuntu1) bionic; urgency=medium
+
+  * New upstream version 0.9.37
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 05 Oct 2018 12:12:12 +0000
+
+i2p (0.9.36-2ubuntu1) bionic; urgency=medium
+
+  * New upstream version 0.9.36
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 23 Aug 2018 12:12:12 +0000
+
+i2p (0.9.35-1ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.35
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 27 Jun 2018 12:12:12 +0000
+
+i2p (0.9.34-2ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.34
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Apr 2018 12:12:12 +0000
+
+i2p (0.9.33-1ubuntu1) artful; urgency=medium
+
+  * New upstream version 0.9.33
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 30 Jan 2018 12:12:12 +0000
+
+i2p (0.9.32-1ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.32
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 08 Nov 2017 12:12:12 +0000
+
+i2p (0.9.31-1ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.31
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 09 Aug 2017 12:12:12 +0000
+
+i2p (0.9.30-3ubuntu1) xenial; urgency=medium
+
+  * New upstream version 0.9.30
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 03 May 2017 12:12:12 +0000
+
+i2p (0.9.29-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.29
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 27 Feb 2017 12:12:12 +0000
+
+i2p (0.9.28-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.28
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 13 Dec 2016 12:12:12 +0000
+
+i2p (0.9.27-1-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.27
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 17 Oct 2016 12:12:12 +0000
+
+i2p (0.9.26-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.26
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 07 Jun 2016 12:12:12 +0000
+
+i2p (0.9.25-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.25
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Sat, 26 Mar 2016 12:12:12 +0000
+
+i2p (0.9.24-1ubuntu1) trusty; urgency=medium
+
+  * Upload to PPA
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 30 Jan 2016 14:12:27 +0000
+
+i2p (0.9.24-1) unstable; urgency=medium
+
+  * New upstream version 0.9.24
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 30 Jan 2016 12:08:27 +0000
+
+i2p (0.9.23-2) unstable; urgency=medium
+
+  * Backport of two fixes from after the release of 0.9.23
+    - debian/patches/0005-Console-Fix-escaping-of-plugin-description-on-config.patch
+    - debian/patches/0006-NetDb-Fix-deadlock-ticket-1722.patch
+  * AppArmor:
+    - Remove 'l' from the debian AppArmor profiles
+    - Allow writing to /tmp/imageio*, needed by graph creation on some systems
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 06 Dec 2015 14:28:23 +0000
+
+i2p (0.9.23-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Accelerate transition to Ed25519
+    - Fix some bugs soft restarting after a large clock shift (e.g. resume) (but more to do)
+    - Fix streaming retransmission timers that were dying, and related timer bugs
+    - Fix streaming connections rejected while tunnel is opening
+    - Fix rare i2psnark and UPnP deadlocks
+    - Fix lifetime participating bandwidth display in console
+    - Increase default outbound exploratory tunnel length to 3
+    - Use max of 2 not-failing peers in exploratory tunnels to improve build success
+    - Add support for hostnames prefixed with "www.";
+    - Store news feed items separately on disk, show on new /news page, limit display on home page to 2
+    - Increase probability of rekeying to EdDSA
+    - Detect for broken ECDSA support in Gentoo
+    - Console: Add a Java 6 warning, this is the last release to support Java 6
+    - Changes to prepare for Java 9 compatibility
+    - i2ptunnel: Pass Accept-Encoding header through client and server proxies, to allow end-to-end compression
+    - i2psnark: Increase piece size, piece count, and file count limits
+    - i2psnark: Save added and completed times
+    - i2psnark: Save magnet parameters across restart
+    - i2psnark: Don't delete .torrent file on errors at startup, rename to .torrent.BAD
+    - i2psnark: Add recheck, start, stop buttons on details pages
+    - i2psnark: Add option to disable "smart sort"
+    - Speed up IP address validation
+    - Separate streaming blacklists for ECDSA and EdDSA
+    - Translation updates
+    - Update GeoIP data (new installs and PPA only)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 19 Nov 2015 12:41:36 +0000
+
+i2p (0.9.22-1) unstable; urgency=medium
+
+  * New Upstream Version
+   - Start migration to Ed25519 router info signatures
+   - Fix i2psnark getting stuck before download complete, and not deleting temp
+     files
+   - Fix excluded SSL ciphers in console
+   - Translation updates
+   - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 13 Sep 2015 11:27:16 +0000
+
+i2p (0.9.21-2) unstable; urgency=medium
+
+  * Add exception to apparmor rules for scrypt, needed by I2P-Bote
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 02 Aug 2015 15:00:30 +0000
+
+i2p (0.9.21-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Add multisession support for dual-signature crypto on the same tunnels
+    - Use multisession for shared clients
+    - Increase default outbound bandwidth limit to 60 KBps
+    - Increase default maximum participating tunnels
+    - Floodfills will send database store acks directly if connected, for efficiency
+    - Set TCP keepalive on I2CP and SAM sockets
+    - More efficient decompression in HTTP proxy, use less threads
+    - Add support for fast extensions in i2psnark
+    - i2psnark only autostarts torrents that were running previously
+    - Add support for translated console news
+    - SSU fixes to compete better with NTCP for bandwidth when limited
+    - Fixes to prevent SSU stalls
+    - Wait for outbound tunnels before sending first leaseset to client, to
+      prevent dropping first message
+    - Clean up resources correctly when SAM stops
+    - Better error handling and notification when HTTP proxy is not running
+    - More i2ptunnel fixes at startup and shutdown of tunnels
+    - Fix total_size in i2psnark metadata message
+    - Restore dates in console news headers
+    - Several I2CP fixes
+    - Use same session for naming lookups in I2PSocketEepGet
+    - Increase max bandwidth to 16 MBps, add larger Bloom filter
+    - New floodfills will send their info to nearby floodfills to speed integration
+    - Apache Tomcat 6.0.44
+    - Translation updates
+  * Drop the following patches; included in 0.9.21:
+    - 0005-i2ptunnel-Don-t-connect-manager-to-router-in-constru.patch
+    - 0006-i2ptunnel-Don-t-call-startup-in-chained-constructor-.patch
+    - 0007-Define-I2PTunnelClientBase-stats-in-one-place.patch
+    - 0008-i2psnark-Fix-NPE-ticket-1602.patch
+
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 31 Jul 2015 20:01:42 +0000
+
+i2p (0.9.20-3) unstable; urgency=medium
+
+  * Add datagram exception to the apparmor profile
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 20 Jun 2015 11:22:28 +0000
+i2p (0.9.20-2) unstable; urgency=medium
+
+  [str4d]
+  * i2ptunnel: Don't connect manager to router in constructor (ticket #815)
+  * i2ptunnel: Don't call startup() in chained constructor (ticket #1593)
+  * Define I2PTunnelClientBase stats in one place
+
+  [killyourtv]
+  * Tighten apparmor rules for TMPDIR
+  * Add support for specifying limits to the initscript
+  * Fix NPE in I2PSnark (I2P Trac #1602)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 14 Jun 2015 16:11:33 +0000
+
+i2p (0.9.20-1) unstable; urgency=medium
+
+  * New Upstream Version
+   - Add support for address book export
+   - Add support for SSL in HTTP server tunnel
+   - Allow class 'M' (64-128 KBps share bandwidth) to become floodfill
+   - Raise connection limits for new classes 'P' (512-2000 KBps share
+     bandwidth) and 'X' (over 2000 KBps)
+   - Add support for signed development builds
+   - Clock skew fixes
+   - Fixes and configuration for when IPv4 is firewalled but IPv6 still works
+   - Locking fixes for i2ptunnel clients to prevent hangs at startup
+   - Verify hostnames when reseeding
+   - Fix deletion of config files for deleted torrents in i2psnark
+   - Fix hangs fetching proxy.i2p local resources via Privoxy
+   - Fixes for duplicate shared clients
+   - Fix for occasional page truncation in HTTP client
+   - Fixes for handling corrupted SSU packets
+   - Fix closing of SAM sessions when I2P session closes
+   - Reduce NTCP threads
+   - Eliminate SimpleScheduler threads
+   - Add continent-based NTP servers as fallbacks for country-based ones
+   - Remove all default non-SSL reseed hosts
+   - Disable fallback to non-su3 reseeding
+   - Several fixes in streaming for better "loopback" performance,
+     may or may not help in real world
+   - Reduce latency in i2ptunnel
+   - Add a larger Bloom filter for very high bandwidth and memory
+   - Add Bloom filter warning when configured for high bandwidth but not
+     enough memory
+   - Reduce max netdb search depth to reduce floodfill load
+   - Improved header processing and error handling in i2ptunnel HTTP server
+   - Better error handling and user feedback when HTTP client tunnel is
+     disabled
+   - More changes to improve floodfill capacity
+   - New configuration for forcing IPv4 (only) to firewalled on /confignet
+   - New configuration for floodfill on /configadvanced
+   - Show separate IPv4 and IPv6 status in summary bar when appropriate
+   - Better handling of corrupt SSU packets
+   - Jetty 8.1.17.v20150415
+   - Translation updates
+   - Update GeoIP data (new installs and PPA only)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 02 Jun 2015 18:36:42 +0000
+
+i2p (0.9.19-4) unstable; urgency=medium
+
+  * Re-enable systemd unit file
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 30 Apr 2015 22:54:56 +0000
+
+i2p (0.9.19-3) unstable; urgency=medium
+
+  * A couple more apparmor profile tweaks
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 14 Apr 2015 20:35:39 +0000
+
+i2p (0.9.19-2) unstable; urgency=medium
+
+  * Fix usr.bin.i2prouter apparmor profile
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 14 Apr 2015 12:58:22 +0000
+
+i2p (0.9.19-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Floodfill performance improvements
+    - Easier ways to reseed manually from a file or URL
+    - New way to export reseed data for others
+    - Support for installing plugin from file
+    - Fixes for high CPU usage in floodfills
+    - i2ptunnel locking fixes
+    - Fixes in read timeout handling in streaming
+    - Update to UPnP library 3.0
+    - Improve tracking of floodfill lookup success
+    - Direct router info lookups if connected to floodfill
+    - Auto-adjustment of i2psnark tunnel quantity
+    - Increase exploratory tunnel quantity when floodfill
+    - Increase min and default bandwidth for i2psnark
+    - Improved strategies for dropping jobs on high job lag to prevent overload
+    - Apache Tomcat 6.0.43
+    - Translation updates
+    - Update GeoIP data
+  * debconf translation updates
+  * Minor updates to AppArmor profiles
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 12 Apr 2015 22:34:40 +0000
+
+i2p (0.9.18-1) unstable; urgency=medium
+
+  * New Upstream Version
+  * Daemon runs confined with AppArmor
+    Bug Fixes
+    - Fix parsing of ECDSA address helper in HTTP client proxy
+    - Fix news last-modified processing which prevented notification of update
+    - Improve handling of UPnP device changes
+    - Don't hang at startup forever waiting for entropy
+    - Possible fixes for high CPU usage in NTCP
+    Other
+    - Publish router info faster when address costs change
+    - Start i2ptunnel 90s sooner
+    - Accept tunnels 10m sooner
+    - Increase exploratory tunnel quantity during initial exploration
+    - Latency reductions in several places
+    - Add startup browser configuration with advanced config
+      routerconsole.browser
+    - Persistent leaseset keys to eliminate correlation with restart
+    - Faster unchoking of new peers in i2psnark
+    - More aggressive throttling of lookups at floodfills
+    - Tunnel build request record refactoring
+    - Reduce thread usage in i2ptunnel
+    - Add i2ptunnel server option for multihomed sites
+    - Disallow some common I2P application ports as router ports
+    - Increase connection limits for fast routers
+    - Add Save-As button for SusiMail messages
+    - Use 'hidden service' terminology in the console
+    - Encrypted netdb lookups for 32-bit x86
+    - Translation updates
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 22 Feb 2015 22:23:50 +0000
+
+i2p (0.9.17-1) unstable; urgency=medium
+
+  * New Upstream Version
+    Changes
+    - Signed news
+    - ECDSA default for new server tunnels
+    - Reseeding now SSL-only by default
+    Bug Fixes
+    - Fix SSU sending corrupt ack-only packets with partial bitfields
+    - Fix SSU inbound connection fail from non-DSA router
+    - Don't select incompatible peers if we are a non-DSA router
+    - Fix EdDSA signature verification bug
+    - Set I2NP lookup type flags in all cases, not just when a reply tunnel is used
+    - Stop i2ptunnel server acceptor thread after close
+    - Fix bug preventing some plugins from stopping completely
+    - Fix SAM v3 bug causing failures in incoming connections
+    Other
+    - Add a warning in the console sidebar if ECDSA not supported
+    - Log warnings for Java 6 that we will eventually require Java 7
+    - Don't let proxied routers auto-floodfill
+    - Don't resend SSU acks that are too old
+    - Don't publish direct info in SSU address if introducers are required
+    - New default opentrackers in i2psnark
+    - Add support for specifiying data directory per-torrent in i2psnark
+    - Changes in streaming accept() error behavior
+    - Minor blockfile format changes
+    - New option for persistent random key to preserve peer ordering across restarts
+    - Translation updates
+    - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 30 Nov 2014 22:20:06 +0000
+
+i2p (0.9.16-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Add support for stronger Router Info signatures
+    - Encrypt RI lookups and responses on faster boxes
+    - Require I2CP authorization for all messages when enabled (requires 0.9.11
+      or higher client)
+    - Disable TLSv3 and older ciphers for reseeding and other uses of SSL
+    - Use ECDSA by default for i2ptunnel IRC, SOCKS-IRC, and standard client
+      tunnels
+    - Don't prefer floodfills in some countries
+    - New column sorting, set-all priority buttons, and upload ratio display in
+      i2psnark
+    - Increase i2psnark tunnel default to 3 hops
+    - Implement bundling of multiple fragments in a single SSU message for
+      efficiency
+    - New add-to-addressbook links on netdb leaseset page
+    - Implement I2NP DatabaseLookupMessage search type field to improve lookup
+      efficiency
+    - CPUID fixes and updates for recent processors
+    - i2psnark fix magnet links with %-encoding
+    - Improve handling of SSU socket closing out from under us (hopefully fix
+      100% CPU)
+    - SSU bitfield handling fixes
+    - Fix HTTP header issues in i2psnark
+    - Fix rare NPE when building garlic message
+    - Fix console lockups (hopefully)
+    - Fix i2ptunnel js confirm-delete
+    - Move router data structures from i2p.jar to router.jar (breaks i2pcontrol
+      plugin)
+    - New router keys now stored in router.keys.dat (privKeys.dat format)
+      instead of router.keys
+    - Improve handling of unsupported encryption throughout
+    - More error checking of client I2CP messages by the router
+    - Initial work on hooks for pluggable transports
+    - Enforce request timestamp in tunnel build messages
+    - Re-enable message status in streaming, but treat no leaseset as a soft
+      failure for now
+    - Return unused DH keypairs to the pool for efficiency
+    - Raise failsafe tagset limit and improve deletion strategy when hit
+    - Change eepsite Jetty threadpool and queue configuration
+    - NTCP establishment refactoring in prep for NTCP2 and PT
+    - Jetty 8.1.16-v20140903
+    - Translation updates
+    - Update GeoIP data
+
+i2p (0.9.15-1) unstable; urgency=medium
+
+  * New Upstream release
+    - Add support for Ed25519 signatures
+    - i2psnark move to separate config file for each torrent to better support
+      per-torrent settings
+    - Add i2psnark support for data outside the i2psnark/ directory
+    - Enable stronger signatures (su3 format) for plugins
+    - Speed up SSU introductions by responding to hole punch messages
+    - Several improvements in SAM efficiency
+    - More HTML escaping and form submission fixes in the console and i2psnark
+    - Streaming fixes for long signatures
+    - i2psnark fixes for file name character mapping when seeding
+    - I2PTunnel fixes stopping client tunnels
+    - I2PTunnel fix updating options on a running delay-open client tunnel
+    - Re-enable plugin installation via the console, removed in 0.9.14
+    - i2psnark now remembers uploaded count across restarts
+    - i2psnark increase max piece size to 8 MB
+    - i2psnark several UI fixes
+    - Prohibit SSU peer test requests unless a connection is established
+    - i2ptunnel add support for local SSL connections for standard and IRC
+      client tunnels
+    - Console and log warnings for unavailable crypto
+    - More consistent routing for Delivery Status Messages to reduce network
+      connections
+    - Disable external entities in UPnP XML parser
+    - Translation updates
+    - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 21 Sep 2014 00:07:36 +0000
+
+i2p (0.9.14.1-1) unstable; urgency=medium
+
+  * New upstream point release, 0.9.14.1
+    - Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+      database from 2014-08-06.
+    - Console:
+      + Fix update buttons
+      + Don't filter parameter names starting with "nofilter_"
+      + Re-allow configadvanced, news URL, and unsigned update URL if
+        routerconsole.advanced=true
+      + Re-allow plugin install if routerconsole.advanced=true or
+        routerconsole.enablePluginInstall=true
+      + Only allow whitelisted plugin signers, unless
+        routerconsole.allowUntrustedPlugins=true
+      + Re-allow clients.config changes if routerconsole.advanced=true or
+        routerconsole.enableClientChange=true
+      + More escaping
+    - i2psnark: Fix add torrent form
+    - ExecNamingService: Remove
+    - Plugins: Add whitelist of keys
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 09 Aug 2014 23:09:33 +0000
+
+i2p (0.9.14-1) unstable; urgency=high
+
+  * New upstream release, 0.9.14
+  * Fix several XSS issues
+    - Disable changing news feed URL from UI
+    - Disable plugin install
+    - Disable setting unsigned update URL from UI
+    - Disable clients.config editing from the UI
+    - Add Content-Security-Policy and X-XSS-Protection headers
+    - Disable unused ExecNamingService (thx joernchen of Phenoelit)
+  * Bug fixes
+    - Fix tunnel building so it doesn't get "stuck" on a single pool
+    - Reject participating tunnels when hidden
+    - Several i2psnark improvements and fixes (GUI and DHT), including changes
+      for better compatibility with Vuze
+  * Other
+    - Reseeding now fetches a signed zip file containing router infos for
+      security and speed
+    - Use JVM's AES implementation if it is faster
+    - More advanced options shown in the i2ptunnel edit pages
+    - Per-message reliabilitiy settings in I2CP and error propagation back
+      from router to client
+    - Lots of findbugs fixes and cleanups
+    - Support signature types in SAM, bump rev to 3.1
+    - New event log page in console
+    - Jetty 8.1.15.v20140411
+    - Tomcat 6.0.41
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 26 Jul 2014 23:23:36 +0000
+
+i2p (0.9.13-1) unstable; urgency=medium
+
+  * New Upstream release
+  * debconf: New Slovak translation
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 22 May 2014 19:08:45 +0000
+
+i2p (0.9.12-2) unstable; urgency=low
+
+  * Re-enable i2p-docs package
+  * Have libjbigi package depend on i2p-router
+  * Remove ${misc:Depends} from the i2p dependencies to avoid hard-depending
+    on i2p-router (= ${source:Version}. This prevents users from trying dev
+    builds using "dpkg -i i2p-router-${devbuild}_all.deb. The i2p package
+    already depended on i2p-router.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 06 Apr 2014 16:27:31 +0000
+
+i2p (0.9.12-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 31 Mar 2014 19:07:54 +0000
+
+i2p (0.9.11-3) unstable; urgency=medium
+
+  * Enable systemd for unstable and saucy|trusty
+  * Fix postinst
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 11 Mar 2014 00:45:52 +0000
+
+i2p (0.9.11-1) unstable; urgency=medium
+
+  * New release
+  * Debconf: New Korean and Polish translations
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 09 Feb 2014 00:00:00 +0000
+
+i2p (0.9.10-1) unstable; urgency=medium
+
+  * New release
+  * Remove /var/lib/i2p when i2p package is purged.
+  * Bump standards version to 3.9.5 (no changes needed)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 22 Jan 2014 16:00:24 +0000
+
+i2p (0.9.9-1) unstable; urgency=medium
+
+  * New Upstream release
+  * debconf:
+    - Updated French translation
+    - New Romanian translation
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 07 Dec 2013 18:17:24 +0000
+
+i2p (0.9.8-1) unstable; urgency=low
+
+  * New Upstream Version
+  * Debconf: updated Swedish translation
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 30 Sep 2013 16:14:40 +0000
+
+i2p (0.9.7.1-1) unstable; urgency=low
+
+  * New upstream version 0.9.7.1
+  * Compress packages with xz
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 10 Aug 2013 22:10:08 +0000
+
+i2p (0.9.7-2) unstable; urgency=low
+
+  * Bugfix: Add missing ; to i2prouter script.
+  * Test scripts with "sh -n" in the build target
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 16 Jul 2013 11:08:48 +0000
+
+i2p (0.9.7-1) unstable; urgency=low
+
+  * New upstream release
+  * debconf:
+    - New Chinese, Portuguese, and Turkish translations
+    - Russian translation updates
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 15 Jul 2013 19:35:09 +0000
+
+i2p (0.9.6-1) unstable; urgency=low
+
+  * New upstream release
+  * i2prouter: allow overrides to be set in /etc/default/i2p
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 May 2013 00:00:00 +0000
+
+i2p (0.9.5-2) unstable; urgency=low
+
+  * debian/i2p.postinst: Explicitly set permissions on /etc/i2p/wrapper.config
+    to compensate for stricter umasks.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 31 Mar 2013 12:50:17 +0000
+
+i2p (0.9.5-1) unstable; urgency=low
+
+  * New Upstream release
+  * Drop debian/patches/0007-backported-news-fix.patch and
+    debian/patches/#0006-remove-izpack.patch
+  * Spanish debconf update
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 08 Mar 2013 23:04:51 +0000
+
+i2p (0.9.4-3) unstable; urgency=low
+
+  * Backport fix from MTN for ticket #817
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 22 Dec 2012 13:07:47 +0000
+
+i2p (0.9.4-2) unstable; urgency=low
+
+  * Add missing build-dep on libservice-wrapper-java
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 17 Dec 2012 20:40:07 +0000
+
+i2p (0.9.4-1) stable; urgency=low
+
+  * explicitly prefer openjdk-*-headless over default-jre-headless. Debian
+    Squeeze has default-jre-headless set to gij. Performance with gij is
+    subpar. We can't force a depend on openjdk since kFreeBSD does not include
+    it (yet).
+  * French Debconf translation updates
+  * Initscript: Don't display a warning if /var/run/i2p contains files after
+    shutdown.
+  * Upsteam changelog (full details in history.txt):
+    - Add per-destination outbound priorities
+    - Fix major bug that reduced SSU connection limits which reduced tunnel
+      build success rates
+    - Fix bug with external I2CP that prevented some external apps from working
+    - Fixed several bugs in i2psnark DHT
+    - Fixed bug in i2psnark PEX that inflated peer counts
+    - Handle dropped I2CP messages better
+    - Reduce overhead of I2CP messages
+    - Enforce max size in transport outbound message queues
+    - Fix a bug that would drop messages of exactly 512 bytes in SSU
+    - More performance improvements, memory reduction, and object churn reduction
+    - Better detection of network disconnections
+    - Further improvements in the SSU transport
+    - Add console password form
+    - Convert http proxy and console from basic to digest authentication for added security
+    - Improved verification of console form submissions, using jsp sessions.
+      Cookies may now be required on forms, except when the console password is
+      enabled
+    - Initial work on new interfaces to manage applications started via
+      clients.config
+    - Increase minimum peer port to 1024
+    - Increase granularity of bandwidth limiter for smoother transmissions
+    - Translation updates: Chinese, French, German, Italian, Polish,
+      Portuguese, Swedish, and Ukrainian
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 17 Dec 2012 23:59:59 +0000
+
+i2p (0.9.3-1) stable; urgency=low
+
+  * New Upstream release
+  * Upstream changelog (full details in history.txt):
+    - Active Queue Management
+    - I2PSnark DHT: Several bug fixes, enable by default.
+    - Priority queues
+    - Several SSU fixes including memory leak, and better handling of routers
+      behind firewalls that change UDP ports; additional defenses for malicious
+      packets.
+    - Fix piece selection (rarest-first) bugs in i2psnark
+    - Fix bug causing multiple browsers to open at startup
+    - Improvements in caching
+    - Several synchronization fixes and lock contention reduction
+    - Major reduction in SSU buffers memory use
+    - Fix streaming connection timeout back to 1 minute, was inadvertently
+      changed to 5 minutes; set i2ptunnel server read timeout to 5 minutes, was
+      unlimited
+    - Improved defenses in i2ptunnel for "darkloris"
+    - More validation at torrent creation in i2psnark
+    - Several parameter changes in SSU to improve throughput
+    - New event log for major events including restarts; show multiple restart
+      lines on graphs
+    - Remove duplicate messages from logs
+    - Don't respond to blocked streaming connections with a reset, just drop
+    - Remove all uses of inefficient SimpleTimer
+    - More checks for valid IPs and ports entered in console
+    - Fix bug that wasted a lot of entropy
+    - Translation updates: Italian, Portuguese, Spanish, Swedish
+    - Add non-NIO configuration in jetty.xml, recommended for Java 5
+    - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 27 Oct 2012 16:47:37 +0000
+
+i2p (0.9.2-2) stable; urgency=high
+
+  * Fix stupid bug in i2prouter
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 22 Sep 2012 13:57:39 +0000
+
+i2p (0.9.2-1) stable; urgency=low
+
+  * New upstream release (see history.txt for details)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 21 Sep 2012 18:13:32 +0000
+
+i2p (0.9.1-1) stable; urgency=low
+
+  * New upstream version 0.9.1
+  * Don't depend on Debian's/Ubuntu's version of Jetty. Jetty6 is going away
+    in the next Debian stable, so we'll switch to our libs sooner than later.
+  * Debconf
+    - New Greek translation
+    - New Italian translation
+    - New Hungarian translation
+  * Initscript
+    - Add graceful option
+    - Change exit statuses
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 30 Jul 2012 17:41:04 +0000
+
+i2p (0.9-1) stable; urgency=low
+
+  * New Upstream Version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 02 May 2012 16:33:11 +0000
+
+i2p (0.8.13-2) stable; urgency=low
+
+  * Fix bug in postinst cause by changes to adduser's behaviour.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 09 Apr 2012 16:25:19 +0000
+
+i2p (0.8.13-1) stable; urgency=low
+
+  * New upstream version 0.8.13
+  * Packages are compressed with bzip2
+  * Remove debian/patches/0005-EepGet_correct_status.patch
+  * Bump standards version to 3.9.3 (no changes to source needed)
+  * Debconf:
+    - New Czech language translation
+    - Updated German, Polish, Russian, and Ukrainian translations
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 Feb 2012 21:06:56 +0000
+
+i2p (0.8.12-2) stable; urgency=low
+
+  * postinst: Don't fail if the i2psvc group doesn't exist
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 06 Jan 2012 18:43:09 +0000
+
+i2p (0.8.12-1) stable; urgency=low
+
+  * New upstream I2P release
+  * Debconf:
+    - add wrapper.java.maxmemory from wrapper.config
+    - The warning about the daemon user needing to exist was confusing to some
+      that assumed this meant that i2psvc had to exit. This warning has been
+      clarified.
+    - Spanish, Swedish, Ukrainian translation updates
+  * Initscript changes/fixes:
+    - increase shutdown wait-time in initscript
+    - renumber "wrapper.additional" lines (since gaps are allowed with newer
+      wrapper versions)
+    - move I2PTEMP to /tmp/i2p-daemon
+    - move router.ping to /var/run/i2p
+    - various other clean-ups
+    - explicity redirect errors to stderr
+  * maintainer scripts:
+    - postinst: rewrite the handling of an existing i2psvc account
+    - postrm: remove /etc/default/i2p if the package is purged
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 06 Jan 2012 02:49:03 +0000
+
+i2p (0.8.11-2) stable; urgency=medium
+
+  * Fix STUPID bug running I2P with i2prouter. Thanks soundwave.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 08 Nov 2011 20:02:05 +0000
+
+i2p (0.8.11-1) stable; urgency=low
+
+  * New Upstream Version
+  * sv and uk debconf translation updates
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 07 Nov 2011 19:20:15 +0000
+
+i2p (0.8.10-1) stable; urgency=medium
+
+  * New upstream version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 20 Oct 2011 05:25:04 +0000
+
+i2p (0.8.9-1) stable; urgency=medium
+
+  * New upstream version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 11 Oct 2011 19:55:08 +0000
+
+i2p (0.8.8-3) UNRELEASED; urgency=low
+
+  * Add dump option to initscript
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 06 Sep 2011 12:42:22 +0000
+
+i2p (0.8.8-2) stable; urgency=medium
+
+  * Backport patch from mtn 04ec606 to fix trac #515
+  * Fix trac ticket #514 ("debconf values are overwritten upon
+    installation")
+  * Fix initscript bug that caused the encoding to be ANSI when the router
+    started at boot.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 02 Sep 2011 23:32:32 +0000
+
+i2p (0.8.8-1) stable; urgency=low
+
+  * New Upstream Version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 23 Aug 2011 20:24:22 +0000
+
+i2p (0.8.7-6) UNRELEASED; urgency=low
+
+  * Add ttf-dejavu-core and ttf-dejavu-extra as dependencies so that graphs on
+    headless systems can be generated.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 18 Aug 2011 15:50:59 +0000
+
+i2p (0.8.7-5) stable; urgency=low
+
+  * Depend on default-jre-headless | java5-runtime-headless |
+    java6-runtime-headless instead of the non-headless versions. Sure the
+    -headless packages fulfilled the dependency, but this way it should pull in
+    the headless package by default.
+  * Remove unused lock from core/java/src/net/i2p/crypto/ElGamalEngine.java to
+    fix lock-ups on arm/ppc CPUs
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 01 Aug 2011 17:51:14 +0000
+
+i2p (0.8.7-4) stable; urgency=low
+
+  * Change to allow jbigi to be built on non-x86
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 26 Jul 2011 23:13:00 +0000
+
+i2p (0.8.7-3) stable; urgency=low
+
+  * When i2p-doc package is installed, add the Javadoc link to the router
+    console.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 28 Jun 2011 22:39:46 +0000
+
+i2p (0.8.7-2) stable; urgency=low
+
+  * Remove --with quilt from debian/rules. This is only meant for use in mtn
+    <facepalm>
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 Jun 2011 16:41:40 +0000
+
+i2p (0.8.7-1) stable; urgency=low
+
+  * The "W00t! My debs are official!" release
+  * New upstream release. See /usr/share/doc/i2p/changelog.gz for the details.
+  * Drop from debian/patches: 0002-sync-countries, 0006-i2p-jetty,
+    0007-eepget-redirections, 0008-config-news, 0009-jetty-snark-disable and
+    re-work the existing patches.
+  * Debconf translations (thanks guys!)
+    - Russian (by hiddenz@mail.i2p)
+    - German & Spanish (by m1xxy@mail.i2p)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 Jun 2011 12:38:59 +0000
+
+i2p (0.8.6-7) stable; urgency=low
+
+  * Fix bug in maintainer script that caused upgrade to fail on some systems.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 29 May 2011 15:53:04 +0000
+
+i2p (0.8.6-6) stable; urgency=low
+
+  * Remove extraneous cruft from debian/rules from back when cpuid couldn't be
+    built for i386
+  * Ship our own router.config with router.updatesDisabled=true to prevent
+    upgrades to be performed by the router itself. Per Debian policy, upgrades
+    *must* take place via the package manager.
+  * Backported eepget fix
+  * Backported news fix
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 28 May 2011 10:23:51 +0000
+
+i2p (0.8.6-5) stable; urgency=low
+
+  * Remove /etc/i2p/wrapper.service. Changes have been moved to the
+    initscript.
+  * Don't disable browser launch. This is handled automatically for the i2psvc
+    user.
+  * Create debian/copyright dynamically at build time
+  * Don't ship the standalone jetty-i2psnark
+  * Create split package so that the wrapper isn't required
+  * Install missing certificates directory
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 27 May 2011 03:48:56 +0000
+
+i2p (0.8.6-4) stable; urgency=low
+
+  * backported patch from 9a26dcaef3687ff7fa08cf3b3eb2180ebb2dedde to fix
+    missing "addWebApplications" in Jetty.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 22 May 2011 19:00:37 +0000
+
+i2p (0.8.6-3) stable; urgency=low
+
+  [Kill Your TV]
+  * Creating libjbigi-jni packages again. Backported patch from MTN so that
+    jbigi can be built for i386
+  * Drop build-dep on unzip since jbigi can be built.
+  * Check to see if doc/libjbigi-jni is a directory and remove it. It is
+    supposed to be a symlink to doc/i2p
+  * Don't chown $I2P to i2psvc
+  * Add Build-Dep for tor-geoipdb and remove from debian/
+  * Add launch-i2psnark to doc/examples
+  * Remove obsolete build-dep on default-jdk-builddep
+   [Karl Goetz]
+  * Move adduser to depends from pre-depends
+  * Tidy postinst
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 20 May 2011 22:03:52 +0000
+
+i2p (0.8.6-2) stable; urgency=low
+
+  * Fix permissions bug for /var/run/i2p, reported by "signhere" on IRC
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 17 May 2011 16:30:29 +0000
+
+i2p (0.8.6-1) stable; urgency=low
+
+  * New upstream version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 17 May 2011 12:30:07 +0000
+
+i2p (0.8.5-4) stable; urgency=low
+
+  * Correct lintian error
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 15 May 2011 16:20:39 +0000
+
+i2p (0.8.5-3) stable; urgency=low
+
+  * *Sigh* Set debian/i2p.default run_daemon to false
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 29 Apr 2011 09:54:39 +0000
+
+i2p (0.8.5-2) stable; urgency=low
+
+  * Change debconf priority to medium. 
+  * RUN_DAEMON defaults to false. Earlier versions defaulted to true. Since
+    the priority is changing, this should as well.
+  * Split jbigi into its own source package
+  * Update geoip.txt
+  * Update Suggests:
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 25 Apr 2011 17:00:43 +0000
+
+i2p (0.8.5-1) stable; urgency=low
+
+  * New upstream
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 18 Apr 2011 15:41:42 +0000
+
+i2p (0.8.4-4) stable; urgency=low
+
+  * Update geoip from tor-0.2.2.23-alpha
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 09 Apr 2011 23:34:11 +0000
+
+i2p (0.8.4-3) stable; urgency=low
+
+  * Back out upgrade 'do you want to reboot' logic since it's utterly borked.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 17 Mar 2011 18:54:09 +0000
+
+i2p (0.8.4-2) stable; urgency=low
+
+  * Stop including /usr/share/i2p/lib/jbigi.jar. 
+  * Compile a dynamic jbigi and create a new package, libjbigi-jni. Since I
+    can't get jcpuid to compile I take this library from jbigi.jar.
+    Unfortunately it was not compiled with -fPIC, causing lintian to complain.
+    Additionally it is a 32bit compile, forcing libc-i386 to be installed on 
+    amd64 boxes. 
+  * Add dependency on libc-i386 because of jcpuid and a build-dep on unzip for
+    the same reason.
+  * Don't display errors generated from chowning files that don't exist.
+  * Bug fix: Somehow I missed packaging the geoip information before. Oops.
+  * Bug fix: Add history.txt to /usr/share/i2p. I didn't realize it was shown
+    in the console at /help.
+  * Since I'm packaging the missing geoip information, I use an updated
+    geoiodb from tor (taken from Debian package tor-geoipdb version
+    0.2.2.22-alpha-1)
+  * Patching countries.txt to add entries that are in Maxmind's database.
+  * Now using debconf to ask about running as a daemon.
+  * From this point forward, users will be asked to confirm that they want to
+    upgrade this package, due to it requiring a router reboot.
+  * Updated README.Debian to better explain differences compared with
+    upstream.
+  * Add history.txt to /usr/share/i2p
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 13 Mar 2011 10:45:47 +0000
+
+i2p (0.8.4-1) stable; urgency=low
+
+  * New upstream version, monotone revision
+    fea6969d789a6b85396439be9906abb9b4a4a405
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Thu, 03 Mar 2011 11:37:37 +0000
+
+i2p (0.8.3-2) testing; urgency=low
+
+  * Minor changes to initscript
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Wed, 26 Jan 2011 14:29:50 +0000
+
+i2p (0.8.3-1) testing; urgency=low
+
+  * New upstream
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Mon, 24 Jan 2011 20:23:38 +0000
+
+i2p (0.8.2-1) testing; urgency=low
+
+  * Initial packaging
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Sun, 23 Jan 2011 00:03:31 +0000
+

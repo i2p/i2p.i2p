@@ -118,7 +118,7 @@ public class AddressbookBean extends BaseBean
 	 */
 	public String getBook()
 	{
-		if( book == null || ( !book.equalsIgnoreCase( "master" ) &&
+		if( book == null || ( !book.equalsIgnoreCase( "local" ) &&
 				!book.equalsIgnoreCase( "router" ) &&
 				!book.equalsIgnoreCase( "private" ) &&
 				!book.equalsIgnoreCase( "published" )))
@@ -127,6 +127,8 @@ public class AddressbookBean extends BaseBean
 		return book;
 	}
 	public void setBook(String book) {
+		if ("master".equals(book))
+			book = "local";
 		this.book = DataHelper.stripHTML(book);  // XSS
 	}
 
@@ -403,25 +405,6 @@ public class AddressbookBean extends BaseBean
 		return filter;
 	}
 
-/****
-	public boolean isMaster()
-	{
-		return getBook().equalsIgnoreCase("master");
-	}
-	public boolean isRouter()
-	{
-		return getBook().equalsIgnoreCase("router");
-	}
-	public boolean isPublished()
-	{
-		return getBook().equalsIgnoreCase("published");
-	}
-	public boolean isPrivate()
-	{
-		return getBook().equalsIgnoreCase("private");
-	}
-****/
-
 	/**
 	 * Because the following from addressbook.jsp fails parsing in the new EL:
 	 * javax.el.ELException: Failed to parse the expression
@@ -437,7 +420,7 @@ public class AddressbookBean extends BaseBean
 	public boolean isValidBook() {
 		String s = getBook().toLowerCase(Locale.US);
 		return s.equals("router") ||
-		       s.equals("master") ||
+		       s.equals("local") ||
 		       s.equals("published") ||
 		       s.equals("private");
 	}

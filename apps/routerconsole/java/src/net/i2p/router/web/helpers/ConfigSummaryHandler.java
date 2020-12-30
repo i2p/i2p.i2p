@@ -1,5 +1,6 @@
 package net.i2p.router.web.helpers;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,11 +29,22 @@ public class ConfigSummaryHandler extends FormHandler {
         if (_action.equals(_t("Save")) && "0".equals(group)) {
             try {
                 int refreshInterval = Integer.parseInt(getJettyString("refreshInterval"));
-                if (refreshInterval >= CSSHelper.MIN_REFRESH) {
-                    _context.router().saveConfig(CSSHelper.PROP_REFRESH, Integer.toString(refreshInterval));
+                if (refreshInterval < 0)
+                    refreshInterval = 0;
+                else if (refreshInterval > 0 && refreshInterval < CSSHelper.MIN_REFRESH)
+                    refreshInterval = CSSHelper.MIN_REFRESH;
+                Map<String, String> toAdd = new HashMap<String, String>(2);
+                if (refreshInterval == 0) {
+                    toAdd.put(CSSHelper.PROP_DISABLE_REFRESH, "true");
+                    toAdd.put(CSSHelper.PROP_REFRESH, CSSHelper.DEFAULT_REFRESH);
+                    _context.router().saveConfig(toAdd, null);
+                    addFormNotice(_t("Refresh disabled"));
+                } else {
+                    toAdd.put(CSSHelper.PROP_DISABLE_REFRESH, "false");
+                    toAdd.put(CSSHelper.PROP_REFRESH, Integer.toString(refreshInterval));
+                    _context.router().saveConfig(toAdd, null);
                     addFormNotice(_t("Refresh interval changed"));
-                } else
-                    addFormError(_t("Refresh interval must be at least {0} seconds", CSSHelper.MIN_REFRESH));
+                }
             } catch (java.lang.NumberFormatException e) {
                 addFormError(_t("Refresh interval must be a number"));
                 return;

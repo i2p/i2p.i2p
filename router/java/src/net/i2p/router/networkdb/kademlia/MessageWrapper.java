@@ -9,13 +9,17 @@ import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Certificate;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
-import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.TransientSessionKeyManager;
+import net.i2p.router.crypto.ratchet.MuxedSKM;
+import net.i2p.router.crypto.ratchet.RatchetSKM;
+import net.i2p.router.crypto.ratchet.RatchetSessionTag;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.router.util.RemovableSingletonSet;
@@ -39,8 +43,11 @@ public class MessageWrapper {
      *  to hide the contents from the OBEP.
      *  Caller must call acked() or fail() on the returned object.
      *
+     *  ELGAMAL ONLY. Both from and to must support ElGamal.
+     *
      *  @param from must be a local client with a session key manager,
-     *              or null to use the router's session key manager
+     *              or null to use the router's session key manager.
+     *              SessionKeyManager MUST support ElGamal.
      *  @param to must be ELGAMAL_2048 EncType
      *  @return null on encrypt failure
      */
@@ -63,7 +70,7 @@ public class MessageWrapper {
         if (skm == null)
             return null;
         SessionKey sentKey = new SessionKey();
-        Set<SessionTag> sentTags = new HashSet<SessionTag>();
+        Set<SessionTag> sentTags = new HashSet<SessionTag>(NETDB_TAGS_TO_DELIVER);
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, sentKey, sentTags, 
                                                               NETDB_TAGS_TO_DELIVER, NETDB_LOW_THRESHOLD, skm);
         if (msg == null)
@@ -121,16 +128,13 @@ public class MessageWrapper {
     /**
      *  Garlic wrap a message from nobody, destined for a router,
      *  to hide the contents from the OBEP.
-     *  Forces ElGamal.
+     *  Forces full asymmetric encryption.
      *
-     *  @param to must be ELGAMAL_2048 EncType
+     *  @param to must be ELGAMAL_2048 or ECIES_X25519 EncType
      *  @return null on encrypt failure
      *  @since 0.9.5
      */
     static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, RouterInfo to) {
-        PublicKey key = to.getIdentity().getPublicKey();
-        if (key.getType() != EncType.ELGAMAL_2048)
-            return null;
 
         PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                               ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
@@ -138,9 +142,19 @@ public class MessageWrapper {
                                                               DeliveryInstructions.LOCAL, m);
         payload.setRecipient(to);
 
-        SessionKey sentKey = ctx.keyGenerator().generateSessionKey();
-        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, 
-                                                              key, sentKey, null);
+        PublicKey key = to.getIdentity().getPublicKey();
+        EncType type = key.getType();
+        GarlicMessage msg;
+        if (type == EncType.ELGAMAL_2048) {
+            SessionKey sentKey = ctx.keyGenerator().generateSessionKey();
+            msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, key, sentKey, null);
+        } else if (type == EncType.ECIES_X25519) {
+            payload.setRecipientPublicKey(key);
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, payload);
+        } else {
+            // unsupported
+            msg = null;
+        }
         return msg;
     }
 
@@ -150,71 +164,108 @@ public class MessageWrapper {
      *  @since 0.9.7
      */
     public static class OneTimeSession {
+        /** ElG or ratchet */
         public final SessionKey key;
+        /** non-null for ElG */
         public final SessionTag tag;
+        /**
+         * non-null for ratchet
+         * @since 0.9.46
+         */
+        public final RatchetSessionTag rtag;
 
         public OneTimeSession(SessionKey key, SessionTag tag) {
             this.key = key; this.tag = tag;
+            rtag = null;
+        }
+
+        /** @since 0.9.46 */
+        public OneTimeSession(SessionKey key, RatchetSessionTag tag) {
+            this.key = key; rtag = tag;
+            this.tag = null;
         }
     }
 
     /**
      *  Create a single key and tag, for receiving a single encrypted message,
-     *  and register it with the router's session key manager, to expire in two minutes.
-     *  The recipient can then send us an AES-encrypted message,
-     *  avoiding ElGamal.
+     *  and register it with the client's session key manager, to expire in the time specified.
+     *  The recipient can then send us an AES- or ChaCha- encrypted message,
+     *  avoiding full ElGamal or ECIES.
      *
+     *  @param expiration time from now
      *  @since 0.9.7
      */
-    public static OneTimeSession generateSession(RouterContext ctx) {
-        return generateSession(ctx, ctx.sessionKeyManager());
+    public static OneTimeSession generateSession(RouterContext ctx, long expiration) {
+        return generateSession(ctx, ctx.sessionKeyManager(), expiration, false);
     }
 
     /**
      *  Create a single key and tag, for receiving a single encrypted message,
-     *  and register it with the client's session key manager, to expire in two minutes.
-     *  The recipient can then send us an AES-encrypted message,
-     *  avoiding ElGamal.
+     *  and register it with the client's session key manager, to expire in the time specified.
+     *  The recipient can then send us an AES- or ChaCha- encrypted message,
+     *  avoiding full ElGamal or ECIES.
      *
+     *  @param expiration time from now
      *  @return null if we can't find the SKM for the localDest
      *  @since 0.9.9
      */
-    public static OneTimeSession generateSession(RouterContext ctx, Hash localDest) {
+    public static OneTimeSession generateSession(RouterContext ctx, Hash localDest,
+                                                 long expiration, boolean forceElG) {
          SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(localDest);
          if (skm == null)
              return null;
-         return generateSession(ctx, skm);
+         return generateSession(ctx, skm, expiration, forceElG);
     }
 
     /**
      *  Create a single key and tag, for receiving a single encrypted message,
-     *  and register it with the given session key manager, to expire in two minutes.
-     *  The recipient can then send us an AES-encrypted message,
-     *  avoiding ElGamal.
+     *  and register it with the client's session key manager, to expire in the time specified.
+     *  The recipient can then send us an AES- or ChaCha- encrypted message,
+     *  avoiding full ElGamal or ECIES.
      *
+     *  @param expiration time from now
      *  @return non-null
      *  @since 0.9.9
      */
-    public static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm) {
+    public static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm,
+                                                 long expiration, boolean forceElG) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
-        SessionTag tag = new SessionTag(true);
-        Set<SessionTag> tags = new RemovableSingletonSet<SessionTag>(tag);
-        skm.tagsReceived(key, tags, 2*60*1000);
+        if (forceElG || (skm instanceof TransientSessionKeyManager)) {
+            SessionTag tag = new SessionTag(true);
+            Set<SessionTag> tags = new RemovableSingletonSet<SessionTag>(tag);
+            skm.tagsReceived(key, tags, expiration);
+            return new OneTimeSession(key, tag);
+        }
+        // ratchet
+        RatchetSKM rskm;
+        if (skm instanceof RatchetSKM) {
+            rskm = (RatchetSKM) skm;
+        } else if (skm instanceof MuxedSKM) {
+            rskm = ((MuxedSKM) skm).getECSKM();
+        } else {
+            throw new IllegalStateException("skm not a ratchet " + skm);
+        }
+        RatchetSessionTag tag = new RatchetSessionTag(ctx.random().nextLong());
+        rskm.tagsReceived(key, tag, expiration);
         return new OneTimeSession(key, tag);
     }
 
     /**
      *  Garlic wrap a message from nobody, destined for an unknown router,
      *  to hide the contents from the IBGW.
-     *  Uses a supplied one-time session key tag for AES encryption,
-     *  avoiding ElGamal.
+     *  Uses a supplied one-time session key tag for AES or AEAD encryption,
+     *  avoiding ElGamal or X25519.
+     *
+     *  Used by OCMJH for DSM.
      *
      *  @param session non-null
      *  @return null on encrypt failure
      *  @since 0.9.12
      */
     public static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, OneTimeSession session) {
-        return wrap(ctx, m, session.key, session.tag);
+        if (session.tag != null)
+            return wrap(ctx, m, session.key, session.tag);
+        return wrap(ctx, m, session.key, session.rtag);
     }
 
     /**
@@ -222,6 +273,8 @@ public class MessageWrapper {
      *  to hide the contents from the IBGW.
      *  Uses a supplied session key and session tag for AES encryption,
      *  avoiding ElGamal.
+     *
+     *  Used by above and for DLM replies in HDLMJ.
      *
      *  @param encryptKey non-null
      *  @param encryptTag non-null
@@ -233,9 +286,30 @@ public class MessageWrapper {
                                                               ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
                                                               m.getMessageExpiration(),
                                                               DeliveryInstructions.LOCAL, m);
-
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, 
                                                               null, encryptKey, encryptTag);
+        return msg;
+    }
+
+    /**
+     *  Garlic wrap a message from nobody, destined for an unknown router,
+     *  to hide the contents from the IBGW.
+     *  Uses a supplied session key and session tag for ratchet encryption,
+     *  avoiding full ECIES.
+     *
+     *  Used by above and for DLM replies in HDLMJ.
+     *
+     *  @param encryptKey non-null
+     *  @param encryptTag non-null
+     *  @return null on encrypt failure
+     *  @since 0.9.46
+     */
+    public static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, SessionKey encryptKey, RatchetSessionTag encryptTag) {
+        PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
+                                                              ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
+                                                              m.getMessageExpiration(),
+                                                              DeliveryInstructions.LOCAL, m);
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, encryptKey, encryptTag);
         return msg;
     }
 }    

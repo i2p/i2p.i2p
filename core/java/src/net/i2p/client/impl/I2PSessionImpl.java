@@ -145,6 +145,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private final AtomicInteger _lookupID = new AtomicInteger();
     protected final Object _bwReceivedLock = new Object();
     protected volatile int[] _bwLimits;
+    private volatile String _routerVersion;
     
     protected final I2PClientMessageHandlerMap _handlerMap;
     
@@ -227,6 +228,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /** @param routerVersion as rcvd in the SetDateMessage, may be null for very old routers */
     void dateUpdated(String routerVersion) {
+        _routerVersion = routerVersion;
         boolean isrc = _context.isRouterContext();
         _routerSupportsFastReceive = isrc ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
@@ -514,18 +516,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 continue;
             }
             String val = options.getProperty(key);
-            // Long strings MUST be removed, even in router context,
-            // as the session config properties must be serialized to be signed.
-            // fixme, bytes could still be over 255 (unlikely)
-            if (key.length() > 255 || val.length() > 255) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not passing on property ["
-                              + key
-                              + "] in the session config, key or value is too long (max = 255): "
-                              + val);
-            } else {
-                rv.setProperty(key, val);
-            }
+            rv.setProperty(key, val);
         }
         return rv;
     }
@@ -601,7 +592,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         _signingPrivateKey = new SigningPrivateKey(dtype);
         _signingPrivateKey.readBytes(destKeyStream);
         if (_signingPrivateKey.isOffline()) {
-            _offlineExpiration = DataHelper.readLong(destKeyStream, 4) * 1000;;
+            _offlineExpiration = DataHelper.readLong(destKeyStream, 4) * 1000;
             int itype = (int) DataHelper.readLong(destKeyStream, 2);
             SigType type = SigType.getByCode(itype);
             if (type == null)
@@ -814,7 +805,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                            + (connected - startConnect)
                            + "ms - ready to participate in the network!");
             }
-            Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
+            Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getName(), true);
             notifier.start();
             startIdleMonitor();
             startVerifyUsage();
@@ -1475,6 +1466,25 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected String getPrefix() {
         StringBuilder buf = new StringBuilder();
         buf.append('[');
+        getName(buf);
+        buf.append('(').append(_state.toString()).append(')');
+        buf.append("]: ");
+        return buf.toString();
+    }
+
+    /**
+     * @since 0.9.46
+     */
+    protected String getName() {
+        StringBuilder buf = new StringBuilder();
+        getName(buf);
+        return buf.toString();
+    }
+
+    /**
+     * @since 0.9.46
+     */
+    private void getName(StringBuilder buf) {
         String s = _options.getProperty("inbound.nickname");
         if (s != null)
             buf.append(s);
@@ -1483,9 +1493,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SessionId id = _sessionId;
         if (id != null)
             buf.append(" #").append(id.getSessionId());
-        buf.append('(').append(_state.toString()).append(')');
-        buf.append("]: ");
-        return buf.toString();
     }
 
     /**
@@ -1863,6 +1870,18 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         if (id == null)
             id = DUMMY_SESSION;
         sendMessage_unchecked(new BlindingInfoMessage(bd, id));
+    }
+
+    /**
+     *  Always valid in RouterContext. Returns null if not yet connected in I2PAppContext.
+     *
+     *  @return null if unknown
+     *  @since 0.9.46
+     */
+    public String getRouterVersion() {
+        if (_context.isRouterContext())
+            return CoreVersion.VERSION;
+        return _routerVersion;
     }
 
     protected void updateActivity() {

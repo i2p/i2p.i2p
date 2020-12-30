@@ -29,7 +29,9 @@ class TCBShare {
     private final CleanEvent _cleaner;
     private final double _rttDampening, _wdwDampening, _rttDevDampening;
 
-    private static final long EXPIRE_TIME = 15*60*1000;
+    // Must be less than SessionKeyManager outbound timeout (12 minutes)
+    // to avoid large number of DH operations
+    private static final long EXPIRE_TIME = 10*60*1000;
     private static final long CLEAN_TIME = 5*60*1000;
     ///// constants defined in rfc 2140
     ///// do not change unless you know what you're doing
@@ -40,7 +42,7 @@ class TCBShare {
     private static final String WDW_DAMP_PROP="i2p.streaming.tcbcache.wdwDampening";
     private static final String RTTDEV_DAMP_PROP="i2p.streaming.tcbcache.rttdevDampening";
     /////
-    private static final int MAX_RTT = ((int) Connection.MAX_RESEND_DELAY) / 2;
+    private static final int MAX_RTT = Connection.MAX_RESEND_DELAY / 2;
     private static final int MAX_RTT_DEV = (int) (MAX_RTT * 1.5);
     private static final int MAX_WINDOW_SIZE = ConnectionPacketHandler.MAX_SLOW_START_WINDOW;
     

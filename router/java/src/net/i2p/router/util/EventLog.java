@@ -190,4 +190,40 @@ public class EventLog {
         }
         return rv;
     }
+
+    /**
+     *  Timestamp of last event.
+     *
+     *  @param event matching this event, case sensitive
+     *  @param since since this time, 0 for all
+     *  @return last event time, or 0 for none
+     *  @since 0.9.47
+     */
+    public synchronized long getLastEvent(String event, long since) {
+        long rv = 0;
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(_file), "UTF-8"));
+            String line = null;
+            while ( (line = br.readLine()) != null) {
+                try {
+                    String[] s = DataHelper.split(line.trim(), " ", 3);
+                    if (s.length < 2)
+                        continue;
+                    if (!s[1].equals(event))
+                        continue;
+                    long time = Long.parseLong(s[0]);
+                    if (time <= since)
+                        continue;
+                    rv = time;
+                } catch (NumberFormatException nfe) {
+                }
+            }
+        } catch (IOException ioe) {
+        } finally {
+            if (br != null) try { br.close(); } catch (IOException ioe) {}
+        }
+        return rv;
+    }
 }

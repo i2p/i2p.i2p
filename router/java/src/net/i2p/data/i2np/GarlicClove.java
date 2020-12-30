@@ -11,7 +11,6 @@ package net.i2p.data.i2np;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Certificate;
@@ -35,7 +34,7 @@ public class GarlicClove extends DataStructureImpl {
     private DeliveryInstructions _instructions;
     private I2NPMessage _msg;
     private long _cloveId;
-    private Date _expiration;
+    private long _expiration;
     private Certificate _certificate;
     
     public GarlicClove(I2PAppContext context) {
@@ -49,8 +48,8 @@ public class GarlicClove extends DataStructureImpl {
     public void setData(I2NPMessage msg) { _msg = msg; }
     public long getCloveId() { return _cloveId; }
     public void setCloveId(long id) { _cloveId = id; }
-    public Date getExpiration() { return _expiration; }
-    public void setExpiration(Date exp) { _expiration = exp; }
+    public long getExpiration() { return _expiration; }
+    public void setExpiration(long exp) { _expiration = exp; }
     public Certificate getCertificate() { return _certificate; }
     public void setCertificate(Certificate cert) { _certificate = cert; }
     
@@ -79,7 +78,7 @@ public class GarlicClove extends DataStructureImpl {
         }
         _cloveId = DataHelper.fromLong(source, cur, 4);
         cur += 4;
-        _expiration = DataHelper.fromDate(source, cur);
+        _expiration = DataHelper.fromLong(source, cur, 8);
         cur += DataHelper.DATE_LENGTH;
         _certificate = Certificate.create(source, cur);
         cur += _certificate.size();
@@ -99,7 +98,7 @@ public class GarlicClove extends DataStructureImpl {
             I2NPMessageHandler handler = new I2NPMessageHandler(_context);
             _msg = I2NPMessageImpl.fromRawByteArrayNTCP2(_context, source, offset + isz, len - isz, handler);
             _cloveId = _msg.getUniqueId();
-            _expiration = new Date(_msg.getMessageExpiration());
+            _expiration = _msg.getMessageExpiration();
             _certificate = Certificate.NULL_CERT;
         } catch (I2NPMessageException ime) {
             throw new DataFormatException("Unable to read the message from a garlic clove", ime);
@@ -125,7 +124,7 @@ public class GarlicClove extends DataStructureImpl {
         offset = _msg.toByteArray(rv, offset);
         DataHelper.toLong(rv, offset, 4, _cloveId);
         offset += 4;
-        DataHelper.toDate(rv, offset, _expiration.getTime());
+        DataHelper.toLong(rv, offset, 8, _expiration);
         offset += DataHelper.DATE_LENGTH;
         offset += _certificate.writeBytes(rv, offset);
         if (offset != rv.length) {
@@ -173,7 +172,7 @@ public class GarlicClove extends DataStructureImpl {
         return DataHelper.eq(_certificate, clove._certificate) &&
                _cloveId == clove._cloveId &&
                DataHelper.eq(_msg, clove._msg) &&
-               DataHelper.eq(_expiration, clove._expiration) &&
+               _expiration == clove._expiration &&
                DataHelper.eq(_instructions,  clove._instructions);
     }
     
@@ -182,7 +181,7 @@ public class GarlicClove extends DataStructureImpl {
         return DataHelper.hashCode(_certificate) ^
                (int) _cloveId ^
                DataHelper.hashCode(_msg) ^
-               DataHelper.hashCode(_expiration) ^
+               (int) _expiration ^
                DataHelper.hashCode(_instructions);
     }
     
@@ -193,7 +192,7 @@ public class GarlicClove extends DataStructureImpl {
         buf.append("\n\tInstructions: ").append(_instructions);
         buf.append("\n\tCertificate: ").append(_certificate);
         buf.append("\n\tClove ID: ").append(_cloveId);
-        buf.append("\n\tExpiration: ").append(_expiration);
+        buf.append("\n\tExpiration: ").append(DataHelper.formatTime(_expiration));
         buf.append("\n\tData: ").append(_msg);
         buf.append("]");
         return buf.toString();

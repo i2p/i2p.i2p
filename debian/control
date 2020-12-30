@@ -8,7 +8,7 @@ Homepage: https://geti2p.net/
 Vcs-Browser: https://salsa.debian.org/debian/i2p
 Vcs-Git: https://salsa.debian.org/debian/i2p.git
 Build-Depends: debhelper (>= 9.20160709)
- ,ant (>= 1.8)
+ ,ant (>= 1.9.8)
  ,debconf
  ,default-jdk
  ,libjetty9-java (>= 9.4)
@@ -18,7 +18,7 @@ Build-Depends: debhelper (>= 9.20160709)
  ,bash-completion
  ,gettext
  ,libgetopt-java
- ,libjson-simple-java (<< 3)
+ ,libjson-simple-java (>= 2),libjson-simple-java (<< 3)
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
  ,po-debconf
@@ -78,11 +78,11 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-14-jre-headless | openjdk-13-jre-headless | openjdk-12-jre-headless | openjdk-11-jre-headless | default-jre-headless | java14-runtime-headless | java13-runtime-headless | java12-runtime-headless | java11-runtime-headless,
+ openjdk-16-jre-headless | openjdk-15-jre-headless | openjdk-14-jre-headless | openjdk-13-jre-headless | openjdk-12-jre-headless | openjdk-11-jre-headless | default-jre-headless | java16-runtime-headless | java15-runtime-headless | java14-runtime-headless | java13-runtime-headless | java12-runtime-headless | java11-runtime-headless,
  geoip-database,
  gettext-base,
  libgetopt-java,
- libjson-simple-java (<< 3),
+ libjson-simple-java (>= 2),libjson-simple-java (<< 3),
  libjetty9-java (>= 9.4),
  libtaglibs-standard-jstlel-java,
  libtomcat9-java,

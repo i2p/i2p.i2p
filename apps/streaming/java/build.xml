@@ -23,7 +23,8 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
@@ -31,6 +32,7 @@
         <javac
             srcdir="./src"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj"
@@ -60,6 +62,7 @@
         <javac
             srcdir="./test/junit"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" >
@@ -277,12 +280,34 @@
     <target name="javadocJar" depends="javadoc">
         <jar jarfile="./build/streaming-${release.number}-javadoc.jar">
             <fileset dir="./build/javadoc" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Streaming Implementation" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Streaming Implementation" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
 
     <target name="sourcesJar">
         <jar jarfile="./build/streaming-${release.number}-sources.jar">
             <fileset dir="./src" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Streaming Implementation" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Streaming Implementation" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
 

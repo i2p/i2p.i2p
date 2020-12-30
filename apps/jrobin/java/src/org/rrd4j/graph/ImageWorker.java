@@ -3,17 +3,14 @@ package org.rrd4j.graph;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
-import java.awt.TexturePaint;
 import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,8 +25,7 @@ import javax.imageio.stream.ImageOutputStream;
 
 class ImageWorker {
     private static final String DUMMY_TEXT = "Dummy";
-
-    static final int IMG_BUFFER_CAPACITY = 10000; // bytes
+    private static final int IMG_BUFFER_CAPACITY = 10000; // bytes
 
     private BufferedImage img;
     private Graphics2D g2d;
@@ -224,16 +220,9 @@ class ImageWorker {
         }
     }
 
-    /**
-     * <p>loadImage.</p>
-     *
-     * @param imageFile a {@link java.lang.String} object.
-     * @throws java.io.IOException if any.
-     */
-    public void loadImage(String imageFile) throws IOException {
-        BufferedImage wpImage = ImageIO.read(new File(imageFile));
-        TexturePaint paint = new TexturePaint(wpImage, new Rectangle(0, 0, wpImage.getWidth(), wpImage.getHeight()));
-        g2d.setPaint(paint);
-        g2d.fillRect(0, 0, wpImage.getWidth(), wpImage.getHeight());
+    void loadImage(RrdGraphDef.ImageSource imageSource, int x, int y, int w, int h) throws IOException {
+        BufferedImage wpImage = imageSource.apply(w, h).getSubimage(0, 0, w, h);
+        g2d.drawImage(wpImage, new AffineTransform(1f, 0f, 0f, 1f, x, y), null);
     }
+
 }

@@ -15,9 +15,11 @@ import net.i2p.data.DataStructure;
 /**
  * Base interface for all I2NP messages
  *
+ * Note: No longer extends DataStructure as of 0.9.48
+ *
  * @author jrandom
  */
-public interface I2NPMessage extends DataStructure {
+public interface I2NPMessage {
 
     /** 4 bytes unsigned */
     public static final long MAX_ID_VALUE = (1l << 32) - 1l;
@@ -101,6 +103,11 @@ public interface I2NPMessage extends DataStructure {
 
     /** How large the raw message is with the short 5 byte header */
     public int getRawMessageSize();
+
+    /**
+     * @since 0.9.48 from DataStructure
+     */
+    public byte[] toByteArray();
 
     /** 
      * Write the message to the buffer, returning the new offset (NOT the length).

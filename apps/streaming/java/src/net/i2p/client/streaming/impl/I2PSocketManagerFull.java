@@ -1,7 +1,5 @@
 package net.i2p.client.streaming.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
@@ -32,11 +30,13 @@ import net.i2p.client.streaming.IncomingConnectionFilter;
 import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -202,6 +202,27 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _name = name + " " + (__managerId.incrementAndGet());
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
+        if (opts != null && opts.getProperty(ConnectionOptions.PROP_MAX_MESSAGE_SIZE) == null) {
+            // set higher MTU for ECIES
+            String senc = opts.getProperty("i2cp.leaseSetEncType");
+            if (senc != null && !senc.equals("0")) {
+                String[] senca = DataHelper.split(senc, ",");
+                boolean has0 = false;
+                boolean has4 = false;
+                for (int i = 0; i < senca.length; i++) {
+                    if (senca[i].equals("0")) {
+                        has0 = true;
+                    } else if (senca[i].equals("4")) {
+                        has4 = true;
+                    }
+                }
+                if (has4) {
+                    _defaultOptions.setMaxMessageSize(ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE_RATCHET);
+                    if (!has0)
+                        _defaultOptions.setMaxInitialMessageSize(ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE_RATCHET);
+                }
+            }
+        }
         _connectionManager = new ConnectionManager(_context, _session, _defaultOptions, connectionFilter);
         _serverSocket = new I2PServerSocketFull(this);
         
@@ -253,7 +274,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             // We don't actually need the same pubkey in the dest, just in the LS.
             // The dest one is unused. But this is how we find the LS keys
             // to reuse in RequestLeaseSetMessageHandler.
-            ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
+            ByteArrayStream keyStream = new ByteArrayStream(1024);
             try {
                 SigType type = getSigType(opts);
                 if (type != SigType.DSA_SHA1) {
@@ -277,7 +298,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             } catch (RuntimeException e) {
                 throw new I2PSessionException("Error creating keys", e);
             }
-            privateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());
+            privateKeyStream = keyStream.asInputStream();
         }
         I2PSession rv = _session.addSubsession(privateKeyStream, opts);
         boolean added = _subsessions.add(rv);

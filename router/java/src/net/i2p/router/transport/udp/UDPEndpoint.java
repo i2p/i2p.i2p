@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Coordinate the low-level datagram socket, creating and managing the UDPSender and
@@ -27,6 +28,8 @@ class UDPEndpoint implements SocketListener {
     private final InetAddress _bindAddress;
     private final boolean _isIPv4, _isIPv6;
     private static final AtomicInteger _counter = new AtomicInteger();
+
+    private static final int MIN_SOCKET_BUFFER = 256*1024;
     
     /**
      *  @param transport may be null for unit testing ONLY
@@ -124,6 +127,12 @@ class UDPEndpoint implements SocketListener {
                      socket = new DatagramSocket(port);
                  else
                      socket = new DatagramSocket(port, _bindAddress);
+                 if (!SystemVersion.isAndroid()) {
+                     if (socket.getSendBufferSize() < MIN_SOCKET_BUFFER)
+                         socket.setSendBufferSize(MIN_SOCKET_BUFFER);
+                     if (socket.getReceiveBufferSize() < MIN_SOCKET_BUFFER)
+                         socket.setReceiveBufferSize(MIN_SOCKET_BUFFER);
+                 }
                  break;
              } catch (SocketException se) {
                  if (_log.shouldLog(Log.WARN))

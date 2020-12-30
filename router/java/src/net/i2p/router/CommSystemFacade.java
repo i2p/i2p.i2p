@@ -22,6 +22,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.util.Translate;
 
 /**
@@ -197,6 +198,12 @@ public abstract class CommSystemFacade implements Service {
      *  @since 0.9.16
      */
     public DHSessionKeyBuilder.Factory getDHFactory() { return null; }
+
+    /**
+     *  Factory for making X25519 key pairs.
+     *  @since 0.9.46
+     */
+    public X25519KeyFactory getXDHFactory() { return null; }
 
     /**
      *  Router must call after netdb is initialized
@@ -495,12 +502,12 @@ public abstract class CommSystemFacade implements Service {
                         case IPV4_SNAT_IPV6_OK:
                             return IPV4_FIREWALLED_IPV6_OK;
 
+                        case REJECT_UNSOLICITED:
                         case IPV4_OK_IPV6_FIREWALLED:
                         case IPV4_DISABLED_IPV6_FIREWALLED:
                             return REJECT_UNSOLICITED;
 
                         case DIFFERENT:
-                        case REJECT_UNSOLICITED:
                             return newStatus;
 
                         // cases where we already knew the IPv6 state only

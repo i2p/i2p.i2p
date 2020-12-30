@@ -42,9 +42,11 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.FileUtil;
 import net.i2p.util.OrderedProperties;
@@ -282,9 +284,8 @@ public class DataHelper {
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
-            byte propBytes[] = baos.toByteArray();
-            writeLong(rawStream, 2, propBytes.length);
-            rawStream.write(propBytes);
+            writeLong(rawStream, 2, baos.size());
+            baos.writeTo(rawStream);
         } else {
             writeLong(rawStream, 2, 0);
         }
@@ -301,20 +302,23 @@ public class DataHelper {
      *
      * Properties from the defaults table of props (if any) are not written out by this method.
      *
-     * @deprecated unused
-     *
      * @param target returned array as specified in data structure spec
      * @param props source may be null
      * @return new offset
      * @throws DataFormatException if any string is over 255 bytes long, or if the total length
      *                             (not including the two length bytes) is greater than 65535 bytes.
+     * @since un-deprecated in 0.9.48
      */
-    @Deprecated
     public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
-        if (props != null) {
-            OrderedProperties p = new OrderedProperties();
-            p.putAll(props);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
+        if (props != null && !props.isEmpty()) {
+            Properties p;
+            if (props instanceof OrderedProperties) {
+                p = props;
+            } else {
+                p = new OrderedProperties();
+                p.putAll(props);
+            }
+            ByteArrayStream baos = new ByteArrayStream(p.size() * 64);
             for (Map.Entry<Object, Object> entry : p.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
@@ -325,11 +329,10 @@ public class DataHelper {
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
-            byte propBytes[] = baos.toByteArray();
-            toLong(target, offset, 2, propBytes.length);
+            toLong(target, offset, 2, baos.size());
             offset += 2;
-            System.arraycopy(propBytes, 0, target, offset, propBytes.length);
-            offset += propBytes.length;
+            baos.copyTo(target, offset);
+            offset += baos.size();
             return offset;
         } else {
             toLong(target, offset, 2, 0);
@@ -805,6 +808,37 @@ public class DataHelper {
         if (rv < 0)
             throw new IllegalArgumentException("fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
         return rv;
+    }
+
+    /**
+     * Big endian.
+     * Same as fromLong(src, offset, 8) but allows negative result
+     *
+     * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.47 moved from NTCP2Payload
+     */
+    public static long fromLong8(byte src[], int offset) {
+        long rv = 0;
+        int limit = offset + 8;
+        for (int i = offset; i < limit; i++) {
+            rv <<= 8;
+            rv |= src[i] & 0xFF;
+        }
+        return rv;
+    }
+    
+    /**
+     * Big endian.
+     * Same as toLong(target, offset, 8, value) but allows negative value
+     *
+     * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.47 moved from NTCP2Payload
+     */
+    public static void toLong8(byte target[], int offset, long value) {
+        for (int i = offset + 7; i >= offset; i--) {
+            target[i] = (byte) value;
+            value >>= 8;
+        }
     }
     
     /** Read in a date from the stream as specified by the I2P data structure spec.
@@ -1707,7 +1741,20 @@ public class DataHelper {
 
     /** */
     public static final int MAX_UNCOMPRESSED = 40*1024;
+    /**
+     *  Appx. 30% slower, 2.5% smaller than MEDIUM_COMPRESSION
+     */
     public static final int MAX_COMPRESSION = Deflater.BEST_COMPRESSION;
+    /**
+     *  Appx. 15% slower, 1.5% smaller than MEDIUM_COMPRESSION
+     *  @since 0.9.47
+     */
+    public static final int HIGH_COMPRESSION = 5;
+    /**
+     *  New default as of 0.9.47
+     *  @since 0.9.47
+     */
+    public static final int MEDIUM_COMPRESSION = 3;
     public static final int NO_COMPRESSION = Deflater.NO_COMPRESSION;
 
     /**
@@ -1718,6 +1765,10 @@ public class DataHelper {
      *  Prior to 0.9.29, this would return a zero-length output
      *  for a zero-length input. As of 0.9.29, output is valid for
      *  a zero-length input also.
+     *
+     *  As of 0.9.47, this uses a level of MEDIUM_COMPRESSION,
+     *  which is a good space/speed tradeoff.
+     *  Prior to that, it used MAX_COMPRESSION.
      *
      *  @throws IllegalArgumentException if input size is over 40KB
      *  @throws IllegalStateException on compression failure, as of 0.9.29
@@ -1736,12 +1787,16 @@ public class DataHelper {
      *  for a zero-length input. As of 0.9.29, output is valid for
      *  a zero-length input also.
      *
+     *  As of 0.9.47, this uses a level of MEDIUM_COMPRESSION,
+     *  which is a good space/speed tradeoff.
+     *  Prior to that, it used MAX_COMPRESSION.
+     *
      *  @throws IllegalArgumentException if size is over 40KB
      *  @throws IllegalStateException on compression failure, as of 0.9.29
      *  @return null if orig is null
      */
     public static byte[] compress(byte orig[], int offset, int size) {
-        return compress(orig, offset, size, MAX_COMPRESSION);
+        return compress(orig, offset, size, MEDIUM_COMPRESSION);
     }
 
     /**
@@ -1760,6 +1815,8 @@ public class DataHelper {
      */
     public static byte[] compress(byte orig[], int offset, int size, int level) {
         if (orig == null) return orig;
+        if (level == NO_COMPRESSION && size <= 32767)
+            return zeroCompress(orig, offset, size);
         if (size > MAX_UNCOMPRESSED) 
             throw new IllegalArgumentException("tell jrandom size=" + size);
         ReusableGZIPOutputStream out = ReusableGZIPOutputStream.acquire();
@@ -1794,7 +1851,41 @@ public class DataHelper {
         }
         
     }
-    
+
+    /**
+     *  Fast NO_COMPRESSION.
+     *  135x faster for 23 bytes, 15x faster for 1752 bytes.
+     *
+     *  Ref: RFC 1951, RFC 1952, ResettableGzipOutputStream
+     *
+     *  @param len 32767 max
+     *  @return 23 bytes longer
+     *  @since 0.9.46
+     */
+    private static byte[] zeroCompress(byte[] in, int off, int len) {
+        if (len > 32767)
+            throw new IllegalArgumentException();
+        byte[] rv = new byte[len + 23];
+        rv[0] = 0x1F;
+        rv[1] = (byte) 0x8B;
+        rv[2] = 0x08;
+        rv[8] = 0x02;         // XFL max compression slowest algorithm
+        rv[9] = (byte) 0xFF;  // unknown OS
+        rv[10] = 0x01;        // BFINAL, BTYPE = 0 (no compression)
+        rv[11] = (byte) (len & 0xff);
+        rv[12] = (byte) ((len >> 8) & 0xff);
+        rv[13] = (byte) ~ rv[11];
+        rv[14] = (byte) ~ rv[12];
+        System.arraycopy(in, off, rv, 15, len);
+        CRC32 crc = new CRC32();
+        crc.update(in, off, len);
+        long val = crc.getValue();
+        toLongLE(rv, rv.length - 8, 4, val);
+        rv[rv.length - 4] = rv[11];
+        rv[rv.length - 3] = rv[12];
+        return rv;
+    }
+
     /**
      *  Decompress the GZIP compressed data (returning null on error).
      *  @throws IOException if uncompressed is over 40 KB,
@@ -1813,6 +1904,11 @@ public class DataHelper {
      */
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if (orig == null) return orig;
+        // normal overhead is 23 bytes, but a compress of zero bytes is 20 bytes
+        if (length < 20)
+            throw new IOException("length");
+        if (length < 65559 && orig[offset + 10] == 0x01)
+            return zeroDecompress(orig, offset, length);
         if (offset + length > orig.length)
             throw new IOException("Bad params arrlen " + orig.length + " off " + offset + " len " + length);
         
@@ -1843,6 +1939,53 @@ public class DataHelper {
             ReusableGZIPInputStream.release(in);
         }
     }
+
+    /**
+     *  Fast NO_COMPRESSION.
+     *  ~30x faster for typ. lengths, ~20x faster for 4 KB or more.
+     *
+     *  Ref: RFC 1951, RFC 1952, ResettableGzipOutputStream
+     *
+     *  @param in in[off + 10] MUST BE VALIDATED == 1 before calling this.
+     *  @param len 65558 max
+     *  @return 23 bytes shorter
+     *  @throws IOException on all errors
+     *  @since 0.9.47
+     */
+    private static byte[] zeroDecompress(byte[] in, int off, int len) throws IOException {
+        if (len > 65535 + 23)
+            throw new IOException("length");
+        try {
+            final int olen = len - 23;
+            if (in[off++] != 0x1F ||
+                in[off++] != (byte) 0x8B ||
+                in[off] != 0x08)
+                throw new IOException("header");
+            off += 8;
+            if (in[off++] != 0x01 ||
+                fromLongLE(in, off, 2) != olen)
+                throw new IOException("header");
+            off += 2;
+            if (in[off] != (byte) ~ in[off - 2] ||
+                in[off + 1] != (byte) ~ in[off - 1])
+                throw new IOException("header");
+            off += 2;
+            final int trailer = off + olen;
+            if (fromLongLE(in, trailer + 4, 4) != olen)
+                throw new IOException("trailer");
+            CRC32 crc = new CRC32();
+            crc.update(in, off, olen);
+            long val = crc.getValue();
+            if (val != fromLongLE(in, trailer, 4))
+                throw new IOException("CRC");
+            final byte[] rv = new byte[olen];
+            System.arraycopy(in, off, rv, 0, olen);
+            return rv;
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            throw new IOException(aioobe);
+        }
+    }
+
 
     /**
      *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException

@@ -11,6 +11,10 @@ button span.hide{
 input.default { width: 1px; height: 1px; visibility: hidden; }
 </style>
 <%@include file="summaryajax.jsi" %>
+<script nonce="<%=cspNonce%>" type="text/javascript">
+  var deleteMessage = "<%=intl._t("Are you sure you want to delete {0}?")%>";
+</script>
+<script src="/js/configclients.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head><body>
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigClientsHelper" id="clientshelper" scope="request" />
@@ -41,10 +45,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        } // pluginUpdateEnabled
        if (clientshelper.isPluginInstallEnabled()) {
 %>
-<h3 id="pluginmanage"><a name="plugin"></a><%=intl._t("Plugin Installation")%></h3><p>
+<h3 id="pluginmanage"><%=intl._t("Plugin Installation")%></h3><p>
 <form action="configplugins" method="POST">
 <table id="plugininstall" class="configtable">
-<tr><td class="infohelp" colspan="2">
+<tr id="url"><td class="infohelp" colspan="2">
  <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://i2pwiki.i2p/index.php?title=Plugins\" target=\"_blank\">i2pwiki.i2p</a>")%>
 </td></tr>
 <tr><th colspan="2">
@@ -54,7 +58,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <td>
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <b>URL:</b>
- <input type="text" size="60" name="pluginURL" title="<%=intl._t("To install a plugin, enter the download URL:")%>" >
+<%
+   String url = request.getParameter("pluginURL");
+   String value = url != null ? "value=\"" + net.i2p.data.DataHelper.escapeHTML(url) + '"' : "";
+%>
+ <input type="text" size="60" name="pluginURL" title="<%=intl._t("To install a plugin, enter the download URL:")%>" <%=value%>>
 </td>
 <td class="optionsave" align="right">
  <input type="submit" name="action" class="default hideme" value="<%=intl._t("Install Plugin")%>" />
@@ -65,14 +73,25 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 </table></form>
 <form action="configplugins" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <table id="plugininstall2" class="configtable">
-<tr><th colspan="2">
-<a name="plugin"></a><%=intl._t("Installation from File")%>
+<tr id="file"><th colspan="2">
+<%=intl._t("Installation from File")%>
 </th></tr>
 <tr>
 <td>
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <b><%=intl._t("Select xpi2p or su3 file")%>:</b>
+<%
+   String file = request.getParameter("pluginFile");
+   if (file != null && file.length() > 0) {
+%>
+<input type="text" size="60" name="pluginFile" value="<%=net.i2p.data.DataHelper.escapeHTML(file)%>">
+<%
+   } else {
+%>
 <input type="file" name="pluginFile" accept=".xpi2p,.su3" >
+<%
+   }
+%>
 </td>
 <td class="optionsave" align="right">
 <input type="submit" name="action" class="download" value="<%=intl._t("Install Plugin from File")%>" />
@@ -84,7 +103,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        } // pluginInstallEnabled
        if (clientshelper.isPluginUpdateEnabled()) {
 %>
-<h4 id="updateplugins" class="embeddedtitle"><a name="plugin"></a><%=intl._t("Update All Plugins")%></h4>
+<h4 id="updateplugins" class="embeddedtitle"><%=intl._t("Update All Plugins")%></h4>
 <div class="formaction" id="pluginupdater">
 <form action="configplugins" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >

@@ -1,0 +1,271 @@
+/* I2P Imagegen Theme */
+/* Author: dr|z3d */
+
+body {
+     background-size: 100% 100%, 120px 120px;
+     font: 10pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "DejaVu Sans", "Segoe UI", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     margin: 18px 20px 10px;
+     color: #333;
+     min-width: 660px;
+}
+
+* {
+     outline: none;
+}
+
+h1 {
+     font-size: 14pt;
+     border: 1px solid #77789f;
+     border-radius: 2px;
+     background: #fff;
+     padding: 8px 10px;
+}
+
+h2 {
+     font-size: 11pt;
+     border: 1px solid #77789f;
+     border-radius: 2px;
+     background: #fff;
+     padding: 5px 10px;
+}
+
+h1, h2 {
+     background: linear-gradient(to bottom, #fff 50%, #eef 50%);
+     color: #0c153d;
+     margin-bottom: 10px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
+     text-shadow: 1px 1px 1px #fff;
+     text-transform: uppercase;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+}
+
+p {
+     margin: 5px 20px;
+     text-align: justify;
+     line-height: 130%;
+}
+
+a:link {
+     text-decoration: none;
+     outline: none;
+     color: #33f;
+}
+
+a:visited {
+     color: #227;
+}
+
+a:hover, a:focus {
+     color: #f60;
+}
+
+a:active {
+     color: #f90;
+     text-decoration: underline;
+}
+
+.reference {
+     background: url(/themes/console/light/images/newtab.png) top 2px right no-repeat;
+     background-size: 12px 10px;
+     padding-right: 14px;
+}
+
+img {
+     border: 1px solid #77789f;
+     margin: 5px;
+     border-radius: 2px;
+     padding: 1px;
+     background: #fff;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
+}
+
+table {
+     border-collapse: separate;
+     border-spacing: 10px;
+     margin: 0 auto;
+}
+
+th {
+     background: #fff;
+     border: 1px solid #77789f;
+     border-radius: 2px;
+     text-align: center;
+     font-weight: normal;
+     height: 16px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
+}
+
+th.title {
+     font-size: 11pt;
+     font-weight: bold;
+     white-space: nowrap;
+     padding: 5px;
+     background: linear-gradient(to right, #efefff, #fff 10%, #fff 90%, #efefff);
+}
+
+td {
+     text-align: center;
+     padding: 0 5px;
+     vertical-align: top;
+}
+
+hr {
+     height: 2px;
+     background: #7778bf;
+     border: none;
+     border-bottom: 1px solid #fff;
+     margin-top: 10px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+hr {
+     height: 1px;
+}
+}
+
+iframe {
+     border: none;
+     margin: 40px 20px 0 60px;
+     overflow: hidden;
+     width: 230px;
+     height: 200px;
+     transform: scale(1.4);
+}
+
+iframe pre {
+     font-size: 20pt !important;
+}
+
+#qr, #randomart, #identicon {
+     text-align: center;
+     padding: 5px 0;
+}
+
+#nav {
+     text-align: right;
+}
+
+form {
+     margin: 15px auto 0;
+     padding-top: 0;
+     border-top: 1px solid #77789f;
+     min-width: 640px;
+}
+
+form > * {
+     vertical-align: middle;
+}
+
+.formtitle {
+     border: 1px solid #7778bf;
+     text-transform: uppercase;
+     font-size: 11pt;
+     font-weight: bold;
+     letter-spacing: 0.2em;
+     word-spacing: 0.1em;
+     margin: -1px auto 10px;
+     padding: 4px 5px;
+     width: 400px;
+     background: #fff; 
+     background: linear-gradient(to right, #efefff, #fff 10%, #fff 90%, #efefff);
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
+     border-radius: 0 0 2px 2px;
+     text-rendering: optimizeLegibility;
+}
+
+input, button, select {
+     font: 10pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     margin: 5px 3px;
+}
+
+button, select {
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
+}
+
+button::-moz-focus-inner {
+    border: none;
+    outline:none;
+}
+
+button {
+     border: 1px solid #bbb;
+     padding: 4.5px 8px;
+     border-radius: 2px;
+     background: #fff;
+     background: linear-gradient(to bottom, #fff, #ddd);
+     box-shadow: inset 0 0 0 1px #fff;
+     color: #333;
+     display: inline-block;
+}
+
+button > * {
+     vertical-align: middle;
+}
+
+button:hover, button:focus {
+     background: linear-gradient(to bottom, #ddd, #fff);
+     border: 1px solid #89f;
+     color: #111;
+     filter: drop-shadow(0 0 1px #89f);
+}
+
+button:active {
+     box-shadow: inset 3px 3px 3px #555;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #555;
+     border: 1px solid #999;
+     color: #333;
+}
+
+input[type="text"] {
+     padding: 3px 5px;
+     border-radius: 2px;
+     border: 1px solid #bbb;
+     background: #fff;
+     box-shadow: inset 1px 1px 2px #ccc;
+     color: #333;
+}
+
+input[type="text"]:focus {
+     box-shadow: none;
+     border: 1px solid #999;
+     color: #111;
+     filter: drop-shadow(0 0 1px #89f);
+}
+
+select {
+     vertical-align: middle;
+     -moz-appearance: none;
+     -webit-appearance: none;
+     background: url(/themes/console/light/images/dropdown.png) right center no-repeat #fff;
+     background: url(/themes/console/light/images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     border-radius: 2px;
+     border: 1px solid #bbb;
+     box-shadow: inset 0 0 0 1px #fff;
+     padding: 4px 16px 4px 4px;
+     text-overflow: ellipsis;
+     color: #333;
+}
+
+select option {
+     background: #fff;
+}
+
+select:focus, select:active {
+     color: #111;
+     border: 1px solid #89f;
+     outline: none;
+}
+
+select:hover, select:active {
+     background: url(/themes/console/light/images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+}
+
+select:focus {
+     background: url(/themes/console/light/images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     box-shadow: 0 0 0 1px #89f;
+}
+
+select::-ms-expand {
+     display: none;
+}

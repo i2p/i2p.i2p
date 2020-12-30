@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
@@ -115,22 +116,27 @@ class LoadRouterInfoJob extends JobImpl {
                 PrivateKey privkey = kd.privateKey;
                 SigningPrivateKey signingPrivKey = kd.signingPrivateKey;
                 SigType stype = signingPubKey.getType();
+                EncType etype = pubkey.getType();
 
-                // check if the sigtype config changed
+                // check if the sigtype or enctype config changed
                 SigType cstype = CreateRouterInfoJob.getSigTypeConfig(getContext());
                 boolean sigTypeChanged = stype != cstype;
-                if (sigTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_SIGTYPE) == null) {
+                EncType cetype = CreateRouterInfoJob.getEncTypeConfig(getContext());
+                boolean encTypeChanged = etype != cetype;
+                if ((sigTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_SIGTYPE) == null) ||
+                    (encTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_ENCTYPE) == null)) {
                     // Not explicitly configured, and default has changed
                     // Give a 25% chance of rekeying for each restart
                     // TODO reduce to ~3 (i.e. increase probability) in future release
-                    if (getContext().random().nextInt(4) > 0) {
+                    if (getContext().random().nextInt(16) > 0) {
                         sigTypeChanged = false;
+                        encTypeChanged = false;
                         if (_log.shouldWarn())
                             _log.warn("Deferring RI rekey from " + stype + " to " + cstype);
                     }
                 }
 
-                if (sigTypeChanged || shouldRebuild(privkey)) {
+                if (sigTypeChanged || encTypeChanged || shouldRebuild(privkey)) {
                     if (_us != null) {
                         Hash h = _us.getIdentity().getHash();
                         _log.logAlways(Log.WARN, "Deleting old router identity " + h.toBase64());
@@ -143,6 +149,8 @@ class LoadRouterInfoJob extends JobImpl {
                     }
                     if (sigTypeChanged)
                         _log.logAlways(Log.WARN, "Rebuilding RouterInfo with new signature type " + cstype);
+                    if (encTypeChanged)
+                        _log.logAlways(Log.WARN, "Rebuilding RouterInfo with new encryption type " + cetype);
                     // windows... close before deleting
                     if (fis1 != null) {
                         try { fis1.close(); } catch (IOException ioe) {}

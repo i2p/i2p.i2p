@@ -13,8 +13,8 @@ public class ConfigTunnelsHelper extends HelperBase {
     private static final String HOP = "hop";
     private static final String TUNNEL = "tunnel";
     /** dummies for translation */
-    private static final String HOPS = ngettext("1 hop", "{0} hops");
-    private static final String TUNNELS = ngettext("1 tunnel", "{0} tunnels");
+    private static final String HOPS = ngettext("{0} hop", "{0} hops");
+    private static final String TUNNELS = ngettext("{0} tunnel", "{0} tunnels");
 
     public String getForm() {
         StringBuilder buf = new StringBuilder(1024);
@@ -219,7 +219,6 @@ public class ConfigTunnelsHelper extends HelperBase {
     }
 
     /** to fool xgettext so the following isn't tagged */
-    private static final String DUMMY1 = "1 ";
     private static final String DUMMY2 = "{0} ";
 
     private void renderOptions(StringBuilder buf, int min, int max, int now, String prefix, String name) {
@@ -227,7 +226,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
                 buf.append(SELECTED);
-            buf.append(">").append(ngettext(DUMMY1 + name, DUMMY2 + name + 's', i));
+            buf.append(">").append(ngettext(DUMMY2 + name, DUMMY2 + name + 's', i));
             buf.append("</option>\n");
         }
     }

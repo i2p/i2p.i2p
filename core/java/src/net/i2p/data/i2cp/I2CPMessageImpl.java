@@ -16,14 +16,15 @@ import java.io.OutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.DataStructureImpl;
 
 /**
  * Defines the base message implementation.
  *
+ * As of 0.9.48, does NOT extend DataStructureImpl.
+ *
  * @author jrandom
  */
-public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPMessage {
+public abstract class I2CPMessageImpl implements I2CPMessage {
 
     public I2CPMessageImpl() { // nop
     }

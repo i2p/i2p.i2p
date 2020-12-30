@@ -1,3 +1,581 @@
+2020-12-24 zzz
+ * I2CP: Fix requesting leasesets for subsessions (ticket #2458)
+
+2020-12-23 zzz
+ * Crypto: Increase ratchet tag window
+ * I2CP: Fix encrypted leaseset for ECIES and offline keys
+ * i2ptunnel: Fix writing config file twice on save
+
+2020-12-22 zzz
+ * Console:
+   - Add netdb search by enc. type
+   - Move readme files to war
+
+2020-12-21 zzz
+ * SSU: Fix partial acks not being sent
+
+2020-12-20 zzz
+ * Console: Fix theme selection
+ * Proxy: Move error page resources to jar
+ * SSU: Westwood+ congestion control (ticket #2427)
+
+2020-12-18 zzz
+ * Crypto: Fix use after free (ticket #2797)
+
+2020-12-17 zzz
+ * SSU: Send subset of fragments (ticket #2427)
+
+2020-12-16 zzz
+ * NetDB: Fix rare floodfill monitor NPE
+ * SSU: Fix occasional high CPU usage
+
+2020-12-11 zzz
+ * Router (proposal 156):
+   - Change router ECIES SKM to use N pattern
+   - Allow encrypted messages to ECIES routers
+   - Allow ECIES routers to become floodfill
+   - Add XDH factory to VM comm system for tests
+
+2020-12-06 zzz
+ * Console, webapps: Move web resources to wars
+ * i2psnark:
+   - Add support for web seeds (ticket #2780)
+   - Preserve file attribute strings in metainfo
+ * Streaming: Add Retry-After header to throttle response
+ * Util: Change DoH to RFC 8484 protocol (ticket #2201)
+
+* 2020-12-01 0.9.48 released
+
+2020-11-26 zzz
+ * NTCP: Enable nodelay by default
+ * SSU: Don't wakeup OMF after ack if no more messages are pending
+
+2020-11-24 zzz
+ * Build: Fix targets for git
+ * NTCP: Add nodelay option for testing
+
+2020-11-23 zzz
+ * Console: Serve default favicon.ico
+ * i2pcontrol: Basic HTML fixes and HTTP headers for static pages
+
+2020-11-22 zzz
+ * NetDB: Increase min FF version for LS lookups
+
+2020-11-21 zzz
+ * i2psnark: Remove old default opentrackers
+ * Proxy:
+   - Remove old default jump servers
+   - Fix CSP for conflict error page
+
+2020-11-20 zzz
+ * NetDB: Increase exploration rate when hidden
+ * Tomcat 9.0.40
+
+2020-11-19 zzz
+ * Build: Reproducible build fix (ticket #2279)
+ * Crypto: Adjust Java key cache sizes
+ * Debian: Update apparmor profile for usrmerge
+
+2020-11-17 zzz
+ * Jetty:
+   - Update to 9.3.29.v20201019
+   - Patch to fix console not starting on Java 11.0.9.1
+ * NetDB: Disable sending encrypted messages to ECIES routers
+ * Wrapper: Add missing binaries for armv7 and aarch64
+   to installer (ticket #2308)
+
+2020-11-16 zzz
+ * GeoIP 2020-11-01
+ * I2NP: Don't extend DataStructureImpl, to save space
+ * Imagegen: Update zxing to 3.4.1
+ * Wrapper: Update to 3.5.44
+
+2020-11-11 zzz
+ * Data: Store timestamps as longs, not Dates, to save space
+ * I2CP: Don't have I2CP Messages extend DataStructureImpl, to save space
+
+2020-11-10 zzz
+ * Data: SDS no longer extends DataStructureImpl to save space
+ * i2psnark: Larger read buffer for large files
+ * Ratchet: Destroy HandshakeState after fatal NS/NSR errors
+
+2020-11-07 zzz
+ * Tunnels: Simplify TunnelId and HopConfig to save space
+
+2020-11-05 zzz
+ * NetDB: Ensure RI republish time is less than validation time
+
+2020-11-04 zzz
+ * Util: ELiminate unneeded data copying in ByteArrayOutputStream
+
+2020-11-03 zzz
+ * i2ptunnel: Add checks for offline expiration of alternate destination
+
+2020-11-02 zzz
+ * I2CP: Remove tunnels immediately on client disconnect
+ * i2psnark: Limit max size of embedded video
+ * i2ptunnel: Restart tunnel if offline-signed private key file updated
+
+2020-10-30 zzz
+ * i2psnark: MetaInfo support for url-list (prep for BEP 19)
+ * Util: Fix NPE in EepGet CLI callback via PartialEepGet
+
+2020-10-29 zzz
+ * Crypto: Precalculate Noise initial hashes
+ * i2psnark: Store BEP 47 padding file info
+ * Tunnels: Improved logging and handling of offline signature expiration
+
+2020-10-28 zzz
+ * Tunnels: Fix tunnel tests for ECIES routers
+
+2020-10-27 zzz
+ * Util:
+   - DNSOverHTTPS improvements
+   - Fix SSLEepGet handling of previous SSL state
+
+2020-10-26 zzz
+ * Util: Fix EepGet allowCaching parameter
+
+2020-10-25 zzz
+ * Router: Quick checks of eph. key MSB before Noise DH
+ * Tunnels: Additional checks on ECIES BRR to catch old/buggy routers
+
+2020-10-23 zzz
+ * i2ptunnel: Remove mtn tunnel (new installs only)
+ * Tunnels:
+   - Move AES reply keys from HopConfig to TunnelCreatorConfig
+   - Add missing expiration field to ECIES BRR
+
+2020-10-21 zzz
+ * NetDB:
+   - ECIES router support for encrypted lookups and stores (proposal #156)
+   - Reseed after a long downtime
+ * SSU:
+   - Increase socket buffer size (ticket #2781)
+   - Redesign of the congestion control (tickets #2412, #2649, #2654, #2713)
+
+2020-10-17 zzz
+ * i2psnark: Remove references to "maggot" links
+ * SSU: Fix calculation of nextSendDelay (ticket #2714)
+
+2020-10-15 zzz
+ * Crypto: libjbigi for aarch64 (ticket #1840)
+ * i2psnark: Hide BEP 48 padding directory from UI
+ * Router:
+   - More efficient initialization of Noise state
+   - Destroy ratchet HandshakeState after NS failure
+   - Add support for ratchet zero key (proposals #144, #156)
+ * Util: Singleton OrderedProperties comparator
+
+2020-10-12 zzz
+ * DTG: Enable by default for Linux KDE and LXDE;
+   Hide option on /configservice if not supported
+ * New translations for Kurdish, Turkmen, Argentinian Spanish
+ * NTCP:
+   - Fix sending termination on idle timeout (ticket #2777)
+   - Catch possible race IAE in Reader
+
+2020-10-11 zzz
+ * Installer: Disable pack200 (ticket #2778)
+
+2020-10-10 zzz
+ * i2psnark: Cache length of metainfo
+ * Transport: Improved IPv6 address validation
+
+2020-10-09 zzz
+ *  NetDB:
+    - Don't use DSA-SHA1 routers for lookups, stores, or tunnel peers
+    - Don't use non-ElGamal routers for lookups or stores
+    - Prevent DSA-SHA1 routers from auto-floodfill
+
+2020-10-07 zzz
+ * Build:
+   - Set javac release property (ticket #2775)
+   - Ant version 1.9.8 or higher now required
+   - Drop support for Xenial package build
+   - Fix up BOB build configuration
+   - Fix i2psnark standalone build
+ * i2ptunnel: Filter server response headers even if not compressing
+
+2020-10-03 zzz
+ * Router: Support building tunnels through ECIES routers (proposal 152)
+
+2020-09-28 zzz
+ * Router: Don't unregister a message without a selector (ticket #2771)
+
+2020-09-27 zzz
+ * Streaming: Fix tag option handling
+
+2020-09-26 zzz
+ * JBigI: GMP 6.2.0 for linux 64 bit Zen and Zen2 (ticket #1869)
+
+2020-09-22 zzz
+ * i2ptunnel: Change enctype default to both for:
+   HTTP, IRC, and Streamr servers
+   IRC, SOCKS IRC, and Streamr clients
+ * Susimail, SAM: More defensive ByteBuffer casting (ticket #2775)
+
+2020-09-18 zzz
+ * Build: More git support for release and Debian targets
+
+2020-09-16 zzz
+ * i2psnark: Defensive checks for v2 format files and magnet links
+ * Router: Block same-country when in hidden mode (ticket #2759)
+
+2020-09-11 zzz
+ * Blocklist: Refactoring, Move HTML status generation to console
+ * Console: Fix /configclients help message for split client config files
+ * Crypto: Cache HMAC256 instances
+ * GeoIP: Add methods to get all IPs for a country (ticket #2759)
+ * Router: Use MuxedSKM for ECIES routers (proposal 156 WIP)
+
+2020-09-08 zzz
+ * Blocklist: Track versions of each file
+ * NTCP: Call afterSend() for multiple messages in NTCP2 (ticket #2769)
+
+2020-09-04 zzz
+ * Console: Support remote lookup of full router hash from search form
+ * Tunnels: Don't try to decrypt build record if router is ECIES (proposal 152 WIP)
+
+2020-09-02 zzz
+ * Installer: New Ed25519 destinations for postman's servers
+ * Router:
+   - Prep for router encryption types (Proposal 156 WIP)
+   - Randomize SSU intro key
+   - Reduce next key threshold for ratchet
+   - Change ratchet SparseArray from int to char to reduce space
+ * Util: Fix decompression of compressed zero bytes (ticket #2770)
+
+2020-08-29 zzz
+ * i2ptunnel: Prevent creating bad alt destination when
+   tunnel is running
+
+* 2020-08-24 0.9.47 released
+
+2020-08-14 zzz
+ * Profiles: Create profiles in the nonblocking path
+
+2020-08-10 idk
+ * Replace all icons with icons from a single consistent source/style, icons
+   used from FontAwesome suggested by design team and selected and edited by
+   Sadie.
+
+2020-08-01 zzz
+ * Debian: Support libjson-simple-java 3 for bullseye
+ * I2NP: Locking for message ID
+ * NetDB: Track client that requested LS
+ * OCMOSJ: Don't send to a RAP LS
+ * Router: Logging fix for client start failures
+ * Util:
+   - More efficient use of random data
+   - Add KeyStore and SHA256 to CLI
+
+2020-07-28 zzz
+ * Data: Don't check LS1 revocation signature
+
+2020-07-22 zzz
+ * i2ptunnel:
+   - Change default encType to both for new tunnels, http client,
+     shared clients, and all tunnels for new installs (ticket #2751)
+   - Change IRC tunnel sigType to EdDSA for new installs (ticket #2749)
+   - Change CONNECT tunnel default sigType to EdDSA (ticket #2749)
+
+2020-07-19 zzz
+ * i2psnark: Increase max pipeline, negotiate actual value (ticket #2280)
+
+2020-07-11 zzz
+ * NTCP: Atomics for NTCP final state (ticket #2701)
+ * OCMOSJ: Don't lookup an expiring LS2 if unpublished
+
+2020-07-07 zzz
+ * i2psnark: Change ETA default sort order (ticket #2733)
+ * Reseed: Enforce minimum version in generated bundle
+
+2020-07-02 zzz
+ * i2ptunnel: Fix missing throttling section for non-HTTP servers (ticket #2758)
+
+2020-06-28 zzz
+ * NetDB: Check signature in verify
+
+2020-06-23 idk
+ * Update the images on the bandwidth wizard, based on undraw
+   assets, used under licenses/LICENSE-Undraw.txt. Design and assets
+   were developed by @sadie.
+
+2020-06-22 zzz
+ * Sybil: Enable analysis and blocking by default
+
+2020-06-12 zzz
+ * I2CP: Meta LS2 error code handling
+
+2020-06-10 zzz
+ * Util: Support hostname lookups in LookupDest CLI
+
+2020-06-07 zzz
+ * i2ptunnel: Fix missing tunnel quantity section for servers (ticket #2747)
+ * Jetty: Update servlet-api
+
+2020-06-06 zzz
+ * Data: Fix creation of Encrypted LS2 (ticket #2746)
+ * I2CP: Fix issues with persisted leaseset private keys
+ * I2CP, i2ptunnel: Check for expired offline signature client-side
+
+2020-06-03 zzz
+ * i2psnark: Enable dual-keys
+ * Router: Implement ratchet-layer acks (proposal 144)
+
+2020-06-01 zzz
+ * Profiles: Make more calls nonblocking
+ * Transports: Make unreachable maps concurrent
+
+2020-05-31 zzz
+ * Tomcat 9.0.35 (Servlet 4.0)
+ * Util: Update json-simple lib to 2.3.0
+
+2020-05-30 zzz
+ * Streaming: Increase MTU for ratchet (proposal 155)
+ * Util: Fix DoH handling of Cloudflare responses
+
+2020-05-28 zzz
+ * Console: RRD4J 3.6 (ticket #2716)
+
+2020-05-27 zzz
+ * Installer:
+   - Require Java 8 (ticket #2511)
+   - Sign the dlls (ticket #2704)
+ * Jetty 9.3.28 (ticket #2098)
+ * UPnP: More fixes
+ * Util: Faster gzip
+
+* 2020-05-25 0.9.46 released
+
+2020-05-23 zzz
+ * Windows: Fix permissions in install directory
+
+2020-05-22 zzz
+ * Console: Translations update
+ * UPnP: More fixes
+
+2020-05-21 zzz
+ * Streaming: Fix timer race (ticket #2739)
+
+2020-05-20 zzz
+ * i2ptunnel: Disable gzip for streamr server
+ * i2ptunnel, SusiDNS: Replace onblur with CSP-safe js
+ * Tunnels: Reduce the IBGW and client OBGW batch time
+
+2020-05-19 zzz
+ * Util: Speed up zero compression
+
+2020-05-18 zzz
+ * NetDB: Reseed update
+ * Proxy: Fix error code for incompatible encryption
+ * Ratchet: Prep for ratchet-layer acks (WIP)
+
+2020-05-17 zzz
+ * Streamr: Add expiration timer
+ * UPnP:
+   - Fixes for multiple devices
+   - Fixes for device and interface changes
+   - Handle devices that support permanent leases only
+   - Prevent using public IP on Android
+
+2020-05-15 zzz
+ * i2ptunnel: Remove javascript from proxy error pages
+
+2020-05-14 zzz
+ * Streaming: Change pushBackRTO() log error to warn (ticket #2739)
+
+2020-05-13 zzz
+ * Console:
+   - Fix option text on /confignet (ticket #2738)
+   - Changes to support handlers on /configplugins and /configreseed
+   - HTML fixes on /configplugins
+
+2020-05-12 zzz
+ * Console: Hide sensitive properties on /configadvanced
+ * Console, susimail: Refactor js, stricter CSP
+ * i2ptunnel:
+   - Fix data loss in forms
+   - Encrypt keys in forms
+   - Disable more options when running
+   - Hide shared client warning when it doesn't apply
+
+2020-05-11 zzz
+ * Console: Fix delete confirmation dialog on /configplugins
+ * Console, i2psnark, i2ptunnel: Refactor js, stricter CSP
+
+2020-05-10 zzz
+ * i2psnark: Support file paths in add form (ticket #2100)
+
+2020-05-10 idk
+ * SusiDNS: Fix trac #2419
+
+2020-05-08 zzz
+ * Build: Use git revisions when available
+ * i2ptunnel: Disable changing some options while running
+ * Router: FloodfillPeerSelector cleanup (ticket #2694)
+
+2020-05-07 zzz
+ * Router:
+   - Fix INMP NPE on non-default config (ticket #2688)
+   - Min version for tunnel peers
+
+2020-05-06 zzz
+ * Streaming: Reduce default ack delay (ticket #2706)
+
+2020-05-05 zzz
+ * Build: Use --java2 for msgfmt
+ * i2ptunnel:
+   - Add ECIES persistent key support
+   - Fix changing enc type on servers
+   - Remove experts label from dual-key option
+ * Ratchet: Add padding based on optimal message size
+
+2020-05-04 zzz
+ * Console: Add log clear buttons (ticket #2449)
+ * i2ptunnel: Copy over all relevant options to other shared clients
+   when saving, not just tunnel quantity and length (ticket #1545)
+
+2020-05-02 zzz
+ * eepsite: Fix RTL issues on Arabic help page (ticket #2731)
+ * i2ptunnel: Disable I2CP gzip for HTTP server tunnels
+ * i2psnark: Disable I2CP gzip
+
+2020-05-01 zzz
+ * Ratchet: Fix NPE ratcheting IB NSR tagset
+
+2020-05-01 idk
+ * i2ptunnel: Collapse/Expand UI elements for advanced features, organize
+   advanced features by category. Replace nested tables.
+ * SusiMail: Fix missing icon from dark theme (ticket #2726)
+
+2020-04-30 zzz
+ * i2ptunnel: Prevent changing enc type on running tunnel
+ * Ratchet: Error handling fixes
+ * Streaming: Westwood+ congestion control (ticket #2719)
+
+2020-04-29 zzz
+ * Ratchet: Increase callback timeout
+ * Router: Replace old data structure classes
+
+2020-04-27 zzz
+ * Crypto: Reduce max ElG tagset expiration at receiver
+ * i2psnark:
+   - Don't unchoke when we don't have pieces
+   - Don't avoid partial pieces if there are several seeds
+
+2020-04-25 zzz
+ * i2psnark: Increase min size for video preview
+ * Ratchet: Variable tagset lookahead/trim limits
+
+2020-04-24 zzz
+ * i2psnark: Don't mark torrent BAD on I2CP errors (ticket #2725)
+ * Logging: Log to wrapper log after log manager shutdown (ticket #2725)
+ * Router:
+   - Allow more time to send disconnect messages at shutdown (ticket #2725)
+   - Don't delete router context at shutdown, to prevent a late
+     creation of a new app context (ticket #2725)
+
+2020-04-23 zzz
+ * Ratchet: Fixes and parameter adjustments
+ * Router: Check for key certs in dests (proposal 145)
+ * Streaming: Reduce TCB cache time
+ * SusiDNS: Fix typo that broke the add form
+
+2020-04-21 zzz
+ * Router: Fix logging NPE (thx zlatinb)
+
+2020-04-19 zzz
+ * Ratchet: Adaptive order of muxed decrypt based on previous traffic
+ * Streaming: Single retransmit timer per connection (ticket #2715)
+
+2020-04-18 zzz
+ * i2psnark: Connect out to other seeds to fetch comments (ticket #2288)
+
+2020-04-17 zzz
+ * Crypto: Disable speculative AES tagset usage
+ * Streaming: Slow start fix
+
+2020-04-16 zzz
+ * Build: Reproducible build fix (ticket #2279)
+
+2020-04-14 zzz
+ * Ratchet: Improve muxed decrypt
+ * Streaming:
+   - Fix slow start (ticket #2708)
+   - Reset retransmission timer after ack (ticket #2710)
+
+2020-04-13 zzz
+ * i2ptunnel: Allow comments in CLI command files
+
+2020-04-10 zzz
+ * Streaming: Fix retransmission time (ticket #2709)
+
+2020-04-10 zzz
+ * Jetty: Add GzipHandler for eepsites on Jetty 9.3/9.4 (ticket #2599)
+
+2020-04-08 zzz
+ * i2psnark: Give peers preference to get first pieces (ticket #2473)
+ * NetDB: Remove class M from auto-floodfill
+ * NTCP: Retain pending messages when replacing connection
+ * Ratchet: TagSet cleanups
+
+2020-04-07 zzz
+ * Console: Fix disabling sidebar refresh
+ * Graphs:
+   - Reduce rrd4j sync thread pool size
+   - Disable pool if not persisting
+   - Stop pool on shutdown
+
+2020-04-06 zzz
+ * Ratchet:
+   - Finish Next Key impl.
+   - Simplify OB Session
+   - Performance improvements and cleanups
+   - Debug page fixes
+
+2020-04-03 zzz
+ * PrivateKeyFile: Add support for addsubdomain authentication strings
+
+2020-04-01 zzz
+ * Ratchet:
+   - Next Key WIP
+   - Validate NS datetime block; add NS key bloom filter
+
+2020-03-31 zzz
+ * NetDB:
+   - Add support for ratchet replies (proposal 154)
+   - Add support for ElG lookups and stores from ECIES-only destinations
+   - Variable timeout for MessageWrapper-generated tags
+ * Ratchet:
+   - Variable timeout for tagsets
+   - Expire tags too far behind current one
+   - Remove ID and DI from ACKREQ block
+   - Add timeout job in OCMOSJ
+   - Prep for next key support
+   - Add support for acks and callbacks
+ * Tunnels:
+   - Refactor TestJob to use MessageWrapper
+   - Add support for ratchet
+
+2020-03-24 zzz
+ * Blockfile: Add b32 to export output
+ * Graphs: Fix rrd4j deprecation warnings
+ * Profiles:
+   - Don't decay during first 90 minutes of uptime
+   - Change decay from .75 twice a day to .84 four times a day
+ * Tunnels: Make new tunnel selection round-robin
+
+2020-03-20 zzz
+ * Tunnels: FragmentHandler cleanup (ticket #2699)
+
+2020-03-17 zzz
+ * i2psnark: Hide non-i2p trackers on details page
+
+2020-03-15 zzz
+ * Ratchet: Stub out ack and ack request blocks
+
 2020-03-01 zzz
  * Console:
    - Disable browser launch on /configclients when a service

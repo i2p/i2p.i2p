@@ -40,6 +40,7 @@ import javax.security.auth.x500.X500Principal;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Log;
 import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.SecureFileOutputStream;
@@ -583,6 +584,10 @@ public final class CertUtil {
                 Certificate cert = loadCert(f);
                 boolean rv = isRevoked(I2PAppContext.getGlobalContext(), cert);
                 System.out.println("Revoked? " + rv);
+            } else if (args[0].equals("loadprivatekey")) {
+                PrivateKey priv = loadPrivateKey(new FileInputStream(f));
+                SigningPrivateKey spk = SigUtil.fromJavaKey(priv);
+                System.out.println("Found private key: " + spk);
             } else if (args[0].equals("checkall")) {
                 int rv = checkAll(f);
                 //System.exit(rv);

@@ -114,7 +114,8 @@ public abstract class ByteBufferBackend extends RrdBackend {
      */
     protected synchronized void read(long offset, byte[] b) throws IOException {
         checkOffsetAndByteBuffer(offset);
-        byteBuffer.get(b, (int) offset, b.length);
+        byteBuffer.position((int)offset);
+        byteBuffer.get(b);
     }
 
     @Override

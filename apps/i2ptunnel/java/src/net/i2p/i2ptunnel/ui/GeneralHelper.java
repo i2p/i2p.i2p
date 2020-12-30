@@ -88,24 +88,53 @@ public class GeneralHelper {
             return null;
     }
 
+    /**
+     *  Save the configuration for a new or existing tunnel to disk.
+     *  For new tunnels, adds to controller and (if configured) starts it.
+     */
     public List<String> saveTunnel(int tunnel, TunnelConfig config) {
         return saveTunnel(_context, _group, tunnel, config);
     }
 
-    public static List<String> saveTunnel(
-            I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
-        List<String> msgs = updateTunnelConfig(tcg, tunnel, config);
-        msgs.addAll(saveConfig(context, tcg, tunnel));
+    /**
+     *  Save the configuration for a new or existing tunnel to disk.
+     *  For new tunnels, adds to controller and (if configured) starts it.
+     *
+     *  @param context unused, taken from tcg
+     */
+    public static List<String> saveTunnel(I2PAppContext context, TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
+        List<String> msgs = new ArrayList<String>();
+        TunnelController cur = updateTunnelConfig(tcg, tunnel, config, msgs);
+        msgs.addAll(saveConfig(tcg, cur));
         return msgs;
     }
 
+    /**
+     *  Update the config and if shared, adjust and save the config of other shared clients.
+     *  If a new tunnel, this will call tcg.addController(), and start it if so configured.
+     *  This does NOT save this tunnel's config. Caller must call saveConfig() also.
+     */
     protected static List<String> updateTunnelConfig(TunnelControllerGroup tcg, int tunnel, TunnelConfig config) {
+        List<String> msgs = new ArrayList<String>();
+        updateTunnelConfig(tcg, tunnel, config, msgs);
+        return msgs;
+    }
+
+    /**
+     *  Update the config and if shared, adjust and save the config of other shared clients.
+     *  If a new tunnel, this will call tcg.addController(), and start it if so configured.
+     *  This does NOT save this tunnel's config. Caller must call saveConfig() also.
+     *
+     *  @param msgs out parameter, messages will be added
+     *  @return the old or new controller, non-null.
+     *  @since 0.9.49
+     */
+    private static TunnelController updateTunnelConfig(TunnelControllerGroup tcg, int tunnel, TunnelConfig config, List<String> msgs) {
         // Get current tunnel controller
         TunnelController cur = getController(tcg, tunnel);
 
         Properties props = config.getConfig();
 
-        List<String> msgs = new ArrayList<String>();
         String type = props.getProperty(TunnelController.PROP_TYPE);
         if (TunnelController.TYPE_STD_CLIENT.equals(type) || TunnelController.TYPE_IRC_CLIENT.equals(type)) {
             //
@@ -154,20 +183,8 @@ public class GeneralHelper {
             tcg.addController(cur);
             if (cur.getStartOnLoad())
                 cur.startTunnelBackground();
-            try {
-                tcg.saveConfig(cur);
-            } catch (IOException ioe) {
-                msgs.add("Failed to save initial tunnel config after creation " +
-                    cur.getName() + ", check logs:" + ioe);
-            }
         } else {
             cur.setConfig(props, "");
-            try {
-                tcg.saveConfig(cur);
-            } catch (IOException ioe) {
-                msgs.add("Failed to save initial tunnel config after creation " +
-                    cur.getName() + ", check logs:" + ioe);
-            }
         }
         // Only modify other shared tunnels
         // if the current tunnel is shared, and of supported type
@@ -184,35 +201,90 @@ public class GeneralHelper {
                 // Only modify this non-current tunnel
                 // if it belongs to a shared destination, and is of supported type
                 if (Boolean.parseBoolean(c.getSharedClient()) && TunnelController.isClient(c.getType())) {
-                    Properties cOpt = c.getConfig("");
-                    config.updateTunnelQuantities(cOpt);
-                    cOpt.setProperty("option.inbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
-                    cOpt.setProperty("option.outbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
-
-                    c.setConfig(cOpt, "");
+                    copySharedOptions(config, props, c);
                     try {
                         tcg.saveConfig(c);
                     } catch (IOException ioe) {
-                        msgs.add("Failed to save initial tunnel config after creation " +
-                            cur.getName() + ", check logs:" + ioe);
+                        msgs.add(0, _t("Failed to save configuration", tcg.getContext()) + ": " + ioe);
                     }
                 }
             }
         }
 
-        return msgs;
+        return cur;
     }
 
-    protected static List<String> saveConfig(
-            I2PAppContext context, TunnelControllerGroup tcg, int tunnel) {
+    /**
+     *  I2CP/Dest/LS options affecting shared client tunnels.
+     *  Streaming options should not be here, each client gets its own SocketManger.
+     *  All must be prefixed with "option."
+     *  @since 0.9.46
+     */
+    private static final String[] SHARED_OPTIONS = {
+        // I2CP
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume",
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
+        // dest / LS
+        I2PClient.PROP_SIGTYPE, "i2cp.leaseSetEncType", "i2cp.leaseSetType",
+        "persistentClientKey",
+        // following are mostly server but could also be persistent client
+        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey"
+    };
+
+    /**
+     *  Copy relevant options over
+     *  @since 0.9.46 pulled out of updateTunnelConfig
+     */
+    private static void copySharedOptions(TunnelConfig fromConfig, Properties from,
+                                          TunnelController to) {
+        Properties cOpt = to.getConfig("");
+        fromConfig.updateTunnelQuantities(cOpt);
+        cOpt.setProperty("option.inbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
+        cOpt.setProperty("option.outbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
+        for (String p : SHARED_OPTIONS) {
+            String k = TunnelController.PFX_OPTION + p;
+            String v = from.getProperty(k);
+            if (v != null)
+                cOpt.setProperty(k, v);
+            else
+                cOpt.remove(k);
+        }
+        // persistent client key, not prefixed with "option."
+        String v = from.getProperty(TunnelController.PROP_FILE);
+        if (v != null)
+            cOpt.setProperty(TunnelController.PROP_FILE, v);
+        to.setConfig(cOpt, "");
+    }
+
+    /**
+     *  Save the configuration for an existing tunnel to disk.
+     *  New tunnels must use saveConfig(..., TunnelController).
+     *
+     *  @param context unused, taken from tcg
+     *  @param tunnel must already exist
+     *  @since 0.9.49
+     */
+    protected static List<String> saveConfig(I2PAppContext context, TunnelControllerGroup tcg, int tunnel) {
+        TunnelController cur = getController(tcg, tunnel);
+        if (cur == null) {
+            List<String> rv = tcg.clearAllMessages();
+            rv.add("Invalid tunnel number");
+            return rv;
+        }
+        return saveConfig(tcg, cur);
+    }
+
+    /**
+     *  Save the configuration to disk.
+     *  For new and existing tunnels.
+     *  Does NOT call tcg.addController() for new tunnels. See udpateConfig()
+     *
+     *  @since 0.9.49
+     */
+    private static List<String> saveConfig(TunnelControllerGroup tcg, TunnelController cur) {
+        I2PAppContext context = tcg.getContext();
         List<String> rv = tcg.clearAllMessages();
         try {
-            TunnelController cur = getController(tcg, tunnel);
-            if (cur == null) {
-                //List<String> msgs = new ArrayList<String>();
-                rv.add("Invalid tunnel number");
-                return rv;
-            }
             tcg.saveConfig(cur);
             rv.add(0, _t("Configuration changes saved", context));
         } catch (IOException ioe) {
@@ -673,22 +745,22 @@ public class GeneralHelper {
     public int getSigType(int tunnel, String newTunnelType) {
         SigType type;
         String ttype;
-        boolean isShared;
         if (tunnel >= 0) {
-            Destination d = getDestination(tunnel);
-            if (d != null) {
-                type = d.getSigType();
-                if (type != null)
-                    return type.getCode();
+            ttype = getTunnelType(tunnel);
+            if (!TunnelController.isClient(ttype) ||
+                getBooleanProperty(tunnel, "persistentClientKey")) {
+                Destination d = getDestination(tunnel);
+                if (d != null) {
+                    type = d.getSigType();
+                    if (type != null)
+                        return type.getCode();
+                }
             }
             String stype = getProperty(tunnel, I2PClient.PROP_SIGTYPE, null);
             type = stype != null ? SigType.parseSigType(stype) : null;
-            ttype = getTunnelType(tunnel);
-            isShared = isSharedClient(tunnel);
         } else {
             type = null;
             ttype = newTunnelType;
-            isShared = false;
         }
         if (type == null) {
             // same default logic as in TunnelController.setConfig()
@@ -698,6 +770,7 @@ public class GeneralHelper {
                 TunnelController.TYPE_SOCKS.equals(ttype) ||
                 TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
                 TunnelController.TYPE_STD_CLIENT.equals(ttype) ||
+                TunnelController.TYPE_CONNECT.equals(ttype) ||
                 TunnelController.TYPE_HTTP_CLIENT.equals(ttype))
                 type = TunnelController.PREFERRED_SIGTYPE;
             else
@@ -711,7 +784,29 @@ public class GeneralHelper {
      *  @since 0.9.44
      */
     public boolean hasEncType(int tunnel, int encType) {
-        String senc = getProperty(tunnel, "i2cp.leaseSetEncType", "0");
+        TunnelController tun = getController(tunnel);
+        if (tun == null) {
+            // New clients and servers default to both
+            return encType == 4 || encType == 0;
+        }
+        // migration: HTTP proxy and shared clients default to both
+        String type = tun.getType();
+        String dflt;
+        if (tun.isClient() &&
+            (TunnelController.TYPE_HTTP_CLIENT.equals(type) ||
+             TunnelController.TYPE_IRC_CLIENT.equals(type) ||
+             TunnelController.TYPE_SOCKS_IRC.equals(type) ||
+             TunnelController.TYPE_STREAMR_CLIENT.equals(type) ||
+             Boolean.parseBoolean(tun.getSharedClient()))) {
+            dflt = "4,0";
+        } else if (TunnelController.TYPE_HTTP_SERVER.equals(type) ||
+                   TunnelController.TYPE_IRC_SERVER.equals(type) ||
+                   TunnelController.TYPE_STREAMR_SERVER.equals(type)) {
+            dflt = "4,0";
+        } else {
+            dflt = "0";
+        }
+        String senc = getProperty(tunnel, "i2cp.leaseSetEncType", dflt);
         String[] senca = DataHelper.split(senc, ",");
         String se = Integer.toString(encType);
         for (int i = 0; i < senca.length; i++) {
@@ -1014,6 +1109,7 @@ public class GeneralHelper {
     private boolean getBooleanProperty(int tunnel, String prop) {
         return getBooleanProperty(tunnel, prop, false);
     }
+
     private boolean getBooleanProperty(int tunnel, String prop, boolean def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {

@@ -31,8 +31,10 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
+import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
+import net.i2p.util.VersionComparator;
 
 import org.eclipse.jetty.server.AbstractNetworkConnector;
 import org.eclipse.jetty.server.Connector;
@@ -59,6 +61,9 @@ public class JettyStart implements ClientApp {
     private final I2PAppContext _context;
     private volatile ClientAppState _state;
     private volatile int _port, _sslPort;
+    private static final String GZIP_DIR = "eepsite-jetty9.3";
+    private static final String GZIP_CONFIG = "jetty-gzip.xml";
+    private static final String MIN_GZIP_HANDLER_VER = "9.3";
 
     /**
      *  All args must be XML file names.
@@ -81,7 +86,46 @@ public class JettyStart implements ClientApp {
      *  Modified from XmlConfiguration.main()
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void parseArgs(String[] args) throws Exception {
+    private void parseArgs(String[] args) throws Exception {
+        if (VersionComparator.comp(Server.getVersion(), MIN_GZIP_HANDLER_VER) >= 0) {
+            // If 9.3 or higher,
+            // look for jetty-gzip.xml in args.
+            // If not found, copy over from $I2P if necessary and add to args
+            // so content will be gzipped.
+            boolean found = false;
+            File path = new File(".");
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].toLowerCase().endsWith(".properties"))
+                    continue;
+                if (args[i].toLowerCase().endsWith(GZIP_CONFIG)) {
+                    found = true;
+                    break;
+                }
+                // save path to dir of other xml file for use below
+                File f = new File(args[i]);
+                File p = f.getParentFile();
+                if (p != null)
+                    path = p;
+            }
+            if (!found) {
+                File f = new File(path, GZIP_CONFIG);
+                boolean exists = f.exists();
+                if (!exists && !_context.getBaseDir().equals(_context.getConfigDir())) {
+                    // copy jetty-gzip.xml over
+                    File from = new File(_context.getBaseDir(), GZIP_DIR);
+                    from = new File(from, GZIP_CONFIG);
+                    exists = FileUtil.copy(from, f, false, true);
+                }
+                if (exists) {
+                    // add to args
+                    String[] nargs = new String[args.length + 1];
+                    System.arraycopy(args, 0, nargs, 0, args.length);
+                    nargs[args.length] = f.getPath();
+                    args = nargs;
+                }
+            }
+        }
+
         Properties properties=new Properties();
         XmlConfiguration last=null;
         for (int i = 0; i < args.length; i++) {

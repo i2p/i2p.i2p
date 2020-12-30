@@ -22,6 +22,8 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     private static boolean isPiledriverCompatible;
     private static boolean isSteamrollerCompatible;
     private static boolean isExcavatorCompatible;
+    private static boolean isZenCompatible;
+    private static boolean isZen2Compatible;
 
 
     public boolean IsK6Compatible(){ return isK6Compatible; }
@@ -49,6 +51,18 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     public boolean IsSteamrollerCompatible(){ return isSteamrollerCompatible; }
 
     public boolean IsExcavatorCompatible(){ return isExcavatorCompatible; }
+
+    /**
+     * @return true if the CPU present in the machine is at least a Zen family CPU
+     * @since 0.9.48
+     */
+    public boolean IsZenCompatible() { return isZenCompatible; }
+
+    /**
+     * @return true if the CPU present in the machine is at least a Zen2 family CPU
+     * @since 0.9.48
+     */
+    public boolean IsZen2Compatible() { return isZen2Compatible; }
 
     
     public String getCPUModelString() throws UnknownCPUException
@@ -454,9 +468,10 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
           }
           break;
 
-        //Ryzen 7 (model 1), Ryzen 5 TBD
+        // Zen / Zen+ / Zen2 / Zen3 / Ryzen 3/5/7/9/Threadripper / EPYC
         // untested
-          case 23: {
+          case 23:
+          case 25: {
             // Quote wikipedia:
             // Zen is a clean sheet design that differs from the long-standing Bulldozer architecture.
             // All models support: x87, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AES, CLMUL,
@@ -466,18 +481,30 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            // Pending testing of the bulldozer jbigi
-            //isPiledriverCompatible = true;
-            //isSteamrollerCompatible = true;
-            //isExcavatorCompatible = true;
-            //isBulldozerCompatible = true;
-            if (model == 1)
+            isPiledriverCompatible = true;
+            isSteamrollerCompatible = true;
+            isExcavatorCompatible = true;
+            isBulldozerCompatible = true;
+            isZenCompatible = true;
+            // Family 25 is zen 3, so they are definitely zen2 compatible
+            // For now, we're only using zen2 binary for zen 3 processors.
+            // TODO test for one of these instructions:
+            // https://en.wikipedia.org/wiki/Zen_2
+            // Some new instruction set extensions: WBNOINVD, CLWB, RDPID, RDPRU, MCOMMIT.
+            // Each instruction uses its own CPUID bit.
+            // As of GMP 6.2.0, the difference is only some parameter tweaks,
+            // and zen2 is actually a little slower than zen.
+            isZen2Compatible = family == 25;
+            if (isZen2Compatible)
+               modelString = "Ryzen/Epyc Zen 3 model " + model;
+            else if (model == 1)
                modelString = "Ryzen 7";
             else
-               modelString = "Ryzen model " + model;
+               modelString = "Ryzen/Epyc model " + model;
           }
           break;
 
+        // Hygon Dhyana
         // http://lkml.iu.edu/hypermail/linux/kernel/1806.1/00730.html
         // untested
           case 24: {

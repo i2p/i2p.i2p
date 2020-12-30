@@ -39,9 +39,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -62,7 +63,7 @@ class MailCache {
 	}
 
 	private final POP3MailBox mailbox;
-	private final Hashtable<String, Mail> mails;
+	private final Map<String, Mail> mails;
 	private final PersistentMailCache disk;
 	private final I2PAppContext _context;
 	private final Folder<String> folder;
@@ -87,7 +88,7 @@ class MailCache {
 		  String host, int port, String user, String pass) throws IOException {
 		_log = ctx.logManager().getLog(MailCache.class);
 		this.mailbox = mailbox;
-		mails = new Hashtable<String, Mail>();
+		mails = new HashMap<String, Mail>();
 		disk = new PersistentMailCache(ctx, host, port, user, pass, folderName);
 		_context = ctx;
 		Folder<String> folder = new Folder<String>();	
@@ -336,7 +337,7 @@ class MailCache {
 		Mail mail = null, newMail = null;
 
 		/*
-		 * synchronize update to hashtable
+		 * synchronize update to Map
 		 */
 		synchronized(mails) {
 			mail = mails.get( uidl );
@@ -421,7 +422,7 @@ class MailCache {
 			boolean headerOnly = hOnly;
 
 			/*
-			 * synchronize update to hashtable
+			 * synchronize update to Map
 			 */
 			synchronized(mails) {
 				mail = mails.get( uidl );

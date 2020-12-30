@@ -39,7 +39,7 @@ class SummaryBarRenderer {
     static final Map<String, String> SECTION_NAMES;
 
     static {
-        Map<String, String> aMap = new HashMap<String, String>();;
+        Map<String, String> aMap = new HashMap<String, String>();
         aMap.put("HelpAndFAQ", _x("Help &amp; FAQ"));
         aMap.put("I2PServices", _x("I2P Services"));
         aMap.put("I2PInternals", _x("I2P Internals"));
@@ -478,7 +478,7 @@ class SummaryBarRenderer {
            // 7 days
         tx = _t("Events");
         rbuf.setLength(0);
-        rbuf.append("<a href=\"/events?from=604800000\" target=\"_top\" title=\"")
+        rbuf.append("<a href=\"/events?from=604800\" target=\"_top\" title=\"")
            .append(_t("View historical log of router events"))
            .append("\">")
            .append(nbsp(tx))

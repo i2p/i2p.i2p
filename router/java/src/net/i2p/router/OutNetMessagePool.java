@@ -33,16 +33,18 @@ public class OutNetMessagePool {
      *
      */
     public void add(OutNetMessage msg) {
+        if (msg == null) return;
+        MessageSelector selector = msg.getReplySelector();
         boolean valid = validate(msg);
         if (!valid) {
-            _context.messageRegistry().unregisterPending(msg);
+            if (selector != null)
+                _context.messageRegistry().unregisterPending(msg);
             return;
         }        
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding " + msg);
         
-        MessageSelector selector = msg.getReplySelector();
         if (selector != null) {
             _context.messageRegistry().registerPending(msg);
         }
@@ -50,8 +52,10 @@ public class OutNetMessagePool {
         return;
     }
     
+    /**
+     * @param msg non-null
+     */
     private boolean validate(OutNetMessage msg) {
-        if (msg == null) return false;
         if (msg.getMessage() == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Null message in the OutNetMessage - expired too soon");

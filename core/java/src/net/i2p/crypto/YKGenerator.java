@@ -126,10 +126,13 @@ final class YKGenerator {
         if (rv != null)
             return rv;
         ctx.statManager().addRateData("crypto.YKEmpty", 1);
-        return generateYK();
+        rv = generateYK();
+        if (_precalcThread != null)
+            _precalcThread.interrupt();
+        return rv;
     }
 
-    private final static BigInteger _two = new NativeBigInteger(1, new byte[] { 0x02});
+    private final static BigInteger TWO = new NativeBigInteger(1, new byte[] { 0x02});
 
     /** @return rv[0] = Y; rv[1] = K */
     private final BigInteger[] generateYK() {
@@ -145,7 +148,7 @@ final class YKGenerator {
                 k = null;
                 continue;
             }
-            BigInteger kPlus2 = k.add(_two);
+            BigInteger kPlus2 = k.add(TWO);
             if (kPlus2.compareTo(CryptoConstants.elgp) > 0) k = null;
         }
         //long t2 = Clock.getInstance().now();

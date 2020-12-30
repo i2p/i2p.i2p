@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="systray4j">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/apps/systray/java/lib/systray4j.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

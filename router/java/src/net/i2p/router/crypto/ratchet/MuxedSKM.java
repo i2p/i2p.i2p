@@ -3,6 +3,7 @@ package net.i2p.router.crypto.ratchet;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
@@ -22,6 +23,11 @@ public class MuxedSKM extends SessionKeyManager {
 
     private final TransientSessionKeyManager _elg;
     private final RatchetSKM _ec;
+    private final AtomicInteger _elgCounter = new AtomicInteger();
+    private final AtomicInteger _ecCounter = new AtomicInteger();
+    // ElG is about this much slower than EC
+    private static final int ELG_SLOW_FACTOR = 5;
+    private static final int RESTART_COUNTERS = 500;
 
     public MuxedSKM(TransientSessionKeyManager elg, RatchetSKM ec) {
         _elg = elg;
@@ -31,6 +37,42 @@ public class MuxedSKM extends SessionKeyManager {
     public TransientSessionKeyManager getElgSKM() { return _elg; }
 
     public RatchetSKM getECSKM() { return _ec; }
+
+    /**
+     *  Should we try the Ratchet slow decrypt before ElG slow decrypt?
+     *  Adaptive test based on previous mix of traffic for this SKM,
+     *  as reported by reportDecryptResult().
+     *
+     *  @since 0.9.46
+     */
+    boolean preferRatchet() {
+        int ec = _ecCounter.get();
+        int elg = _elgCounter.get();
+        if (ec > RESTART_COUNTERS / 10 &&
+            elg > RESTART_COUNTERS / 10 &&
+            ec + elg > RESTART_COUNTERS) {
+            _ecCounter.set(0);
+            _elgCounter.set(0);
+            return true;
+        }
+        return ec >= elg / ELG_SLOW_FACTOR;
+    }
+
+    /**
+     *  Report the result of a slow decrypt attempt.
+     *
+     *  @param isRatchet true for EC, false for ElG
+     *  @param success true for successful decrypt
+     *  @since 0.9.46
+     */
+    void reportDecryptResult(boolean isRatchet, boolean success) {
+        if (success) {
+            if (isRatchet)
+                _ecCounter.incrementAndGet();
+            else
+                _elgCounter.incrementAndGet();
+        }
+    }
 
     /**
      *  ElG only
@@ -146,13 +188,14 @@ public class MuxedSKM extends SessionKeyManager {
         return 0;
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public TagSetHandle tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             return _elg.tagsDelivered(target, key, sessionTags);
-        if (type == EncType.ECIES_X25519)
-            return _ec.tagsDelivered(target, key, sessionTags);
          return null;
     }
 
@@ -176,8 +219,7 @@ public class MuxedSKM extends SessionKeyManager {
     public SessionKey consumeTag(SessionTag tag) {
         SessionKey rv = _elg.consumeTag(tag);
         if (rv == null) {
-            long stag = RatchetPayload.fromLong8(tag.getData(), 0);
-            RatchetSessionTag rstag = new RatchetSessionTag(stag);
+            RatchetSessionTag rstag = new RatchetSessionTag(tag.getData());
             rv = _ec.consumeTag(rstag);
         }
         return rv;
@@ -195,21 +237,23 @@ public class MuxedSKM extends SessionKeyManager {
         _ec.renderStatusHTML(out);
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public void failTags(PublicKey target, SessionKey key, TagSetHandle ts) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             _elg.failTags(target, key, ts);
-        else if (type == EncType.ECIES_X25519)
-            _ec.failTags(target, key, ts);
     }
 
+    /**
+     *  ElG only
+     */
     @Override
     public void tagsAcked(PublicKey target, SessionKey key, TagSetHandle ts) {
         EncType type = target.getType();
         if (type == EncType.ELGAMAL_2048)
             _elg.tagsAcked(target, key, ts);
-        else if (type == EncType.ECIES_X25519)
-            _ec.tagsAcked(target, key, ts);
     }
 }

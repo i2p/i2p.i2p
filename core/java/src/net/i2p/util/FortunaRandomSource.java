@@ -98,23 +98,16 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         if (n<=0)
           throw new IllegalArgumentException("n must be positive");
 
-        ////
-        // this shortcut from sun's docs neither works nor is necessary.
-        //
-        //if ((n & -n) == n)  {
-        //    // i.e., n is a power of 2
-        //    return (int)((n * (long)nextBits(31)) >> 31);
-        //}
-
+        boolean isPowerOfTwo = (n & (n - 1)) == 0;
         // get at least 4 extra bits if possible for better
         // distribution after the %
         // No extra needed if power of two.
         int numBits;
-        if (n > 0x100000)
+        if (n > 0x1000000 || (n > 0x100000 && !isPowerOfTwo))
             numBits = 31;
-        else if (n > 0x1000)
+        else if (n > 0x10000 || (n > 0x1000 && !isPowerOfTwo))
             numBits = 24;
-        else if (n > 0x10)
+        else if (n > 0x100 || (n > 0x10 && !isPowerOfTwo))
             numBits = 16;
         else
             numBits = 8;
@@ -123,14 +116,6 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
             rv = nextBits(numBits);
         }
         return rv % n;
-        
-        //int bits, val;
-        //do {
-        //    bits = nextBits(31);
-        //    val = bits % n;
-        //} while(bits - val + (n-1) < 0);
-        //
-        //return val;
     }
 
     /**

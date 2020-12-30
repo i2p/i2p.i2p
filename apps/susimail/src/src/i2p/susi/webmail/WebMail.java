@@ -391,12 +391,15 @@ public class WebMail extends HttpServlet
 	private static String button( String name, String label )
 	{
 		StringBuilder buf = new StringBuilder(128);
-		buf.append("<input type=\"submit\" class=\"").append(name).append("\" name=\"")
+		buf.append("<input type=\"submit\" name=\"")
 		   .append(name).append("\" value=\"").append(label).append('"');
+		buf.append(" class=\"").append(name);
 		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT) ||
 		    name.equals(NEW_UPLOAD) || name.equals(SAVE_AS_DRAFT) ||  // compose page
 		    name.equals(SETPAGESIZE) || name.equals(SAVE))  // config page
-			buf.append(" onclick=\"beforePopup=false;\"");
+			buf.append(" beforePopup\"");
+		else
+			buf.append('"');
 		// These are icons only now, via the CSS, so add a tooltip
 		if (name.equals(FIRSTPAGE) || name.equals(PREVPAGE) || name.equals(NEXTPAGE) || name.equals(LASTPAGE) ||
 		    name.equals(PREV) || name.equals(LIST) || name.equals(NEXT))
@@ -2008,7 +2011,7 @@ public class WebMail extends HttpServlet
 		httpRequest.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
                 response.setHeader("X-Frame-Options", "SAMEORIGIN");
-                response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
+                response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
                 response.setHeader("X-XSS-Protection", "1; mode=block");
 		response.setHeader("X-Content-Type-Options", "nosniff");
 		response.setHeader("Referrer-Policy", "no-referrer");
@@ -2026,7 +2029,7 @@ public class WebMail extends HttpServlet
 		synchronized( sessionObject ) {
 
 			sessionObject.pageChanged = false;
-			sessionObject.themePath = "/themes/susimail/" + theme + '/';
+			sessionObject.themePath = "themes/" + theme + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			sessionObject.isMobile = isMobile;
 
@@ -2337,7 +2340,7 @@ public class WebMail extends HttpServlet
 						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css?" + CoreVersion.VERSION + "\" />" );
 				}
 				if(state != State.AUTH)
-					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
+					out.println("<link rel=\"stylesheet\" href=\"themes/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
 				if (state == State.NEW || state == State.CONFIG) {
 					// TODO cancel if to and body are empty
 					out.println("<script src=\"/susimail/js/compose.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
@@ -2348,7 +2351,8 @@ public class WebMail extends HttpServlet
 			                out.println("<meta http-equiv=\"refresh\" content=\"5;url=" + myself + "\">");
 					// TODO we don't need the form below
 				}
-				out.print("</head>\n<body" + (state == State.LIST ? " onload=\"deleteboxclicked()\">" : ">"));
+				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+				out.print("</head>\n<body>");
 				String nonce = state == State.AUTH ? LOGIN_NONCE :
 				                                                   Long.toString(ctx.random().nextLong());
 				sessionObject.addNonce(nonce);
@@ -2414,7 +2418,7 @@ public class WebMail extends HttpServlet
 					}
 				}
 				if (showRefresh || sessionObject.error.length() > 0 || sessionObject.info.length() > 0) {
-					out.println("<div class=\"notifications\" onclick=\"this.remove()\">");
+					out.println("<div class=\"notifications\">");
 					if (sessionObject.error.length() > 0)
 						out.println("<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>");
 					if (sessionObject.info.length() > 0 || showRefresh) {
@@ -3088,10 +3092,10 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showLogin( PrintWriter out )
 	{
-		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
-		String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
-		String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
-		String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
+		//boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
+		//String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
+		//String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+		//String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 
 		out.println( "<div id=\"dologin\"><h1>" + _t("Email Login") + "</h1><table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
@@ -3198,7 +3202,7 @@ public class WebMail extends HttpServlet
 			String b64UIDL = Base64.encode(uidl);
 			String loc = myself + '?' + (folderName.equals(DIR_DRAFTS) ? NEW_UIDL : SHOW) + '=' + b64UIDL + floc;
 			String link = "<a href=\"" + loc + "\" class=\"" + type + "\">";
-			String jslink = " onclick=\"document.location='" + loc + "';\" ";
+			String jslink = " class=\"tdclick\" onclickloc=\"" + loc + "\" ";
 
 			boolean idChecked = false;
 			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + b64UIDL );
@@ -3221,8 +3225,7 @@ public class WebMail extends HttpServlet
 			if (subj.length() <= 0)
 				subj = "<i>" + _t("no subject") + "</i>";
 			out.println( "<tr class=\"list" + bg + "\">" +
-					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" +
-					" onclick=\"deleteboxclicked();\" " +
+					"<td><input type=\"checkbox\" class=\"optbox delete1\" name=\"check" + b64UIDL + "\" value=\"1\"" +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
 					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _t("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">");
 			// mail.shortSender and mail.shortSubject already html encoded
@@ -3271,6 +3274,7 @@ public class WebMail extends HttpServlet
 		}
 		out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
 		if (i > 0) {
+			// TODO do this in js
 			if( sessionObject.reallyDelete ) {
 				// TODO ngettext
 				out.println("<p class=\"error\">" + _t("Really delete the marked messages?") +

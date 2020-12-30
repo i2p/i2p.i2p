@@ -342,8 +342,9 @@ public class NTCPConnection implements Closeable {
     void finishInboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         NTCPConnection toClose = locked_finishInboundEstablishment(key, clockSkew, prevWriteEnd, prevReadEnd);
         if (toClose != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Old connection closed: " + toClose + " replaced by " + this);
+            int drained = toClose.drainOutboundTo(_outbound);
+            if (_log.shouldWarn())
+                _log.warn("Old connection closed: " + toClose + " replaced by " + this + "; drained " + drained);
             _context.statManager().addRateData("ntcp.inboundEstablishedDuplicate", toClose.getUptime());
             toClose.close();
         }
@@ -411,6 +412,24 @@ public class NTCPConnection implements Closeable {
         synchronized(_currentOutbound) {
             return ! _currentOutbound.isEmpty();
         }
+    }
+
+    /**
+     *  Drain any pending outbound messages to a new queue
+     *  @return number drained
+     *  @since 0.9.46
+     */
+    private int drainOutboundTo(Queue<OutNetMessage> to) {
+        int rv = 0;
+        synchronized (_currentOutbound) {
+            rv = _currentOutbound.size();
+            if (rv > 0) {
+                to.addAll(_currentOutbound);
+                _currentOutbound.clear();
+            }
+            rv += _outbound.drainTo(to);
+        }
+        return rv;
     }
     
     /** @return milliseconds */
@@ -886,6 +905,7 @@ public class NTCPConnection implements Closeable {
                         break;
                     }
                     if (msg.getExpiration() >= now) {
+                        _currentOutbound.add(msg);
                         block = new NTCP2Payload.I2NPBlock(m);
                         blocks.add(block);
                         size += NTCP2Payload.BLOCK_HEADER_SIZE + msz;
@@ -1023,8 +1043,8 @@ public class NTCPConnection implements Closeable {
 
     /**
      *  NTCP 1 or 2.
-     *  For NTCP1, sends termination and then closes the connection after a brief delay.
-     *  For NTCP2, simply closes the connection immediately.
+     *  For NTCP1, simply closes the connection immediately.
+     *  For NTCP2, sends termination and then closes the connection after a brief delay.
      *
      *  @since 0.9.36
      */
@@ -1046,6 +1066,8 @@ public class NTCPConnection implements Closeable {
      *  @since 0.9.36
      */
     private void sendTermination(int reason, int validFramesRcvd) {
+        // So we don't get called again by the event pumper idle closer
+        _lastSendTime = _context.clock().now();
         // TODO add param to clear queues?
         // no synch needed, sendNTCP2() is synched
         if (_log.shouldInfo())
@@ -1860,8 +1882,9 @@ public class NTCPConnection implements Closeable {
         }
         NTCPConnection toClose = _transport.inboundEstablished(this);
         if (toClose != null && toClose != this) {
+            int drained = toClose.drainOutboundTo(_outbound);
             if (_log.shouldWarn())
-                _log.warn("Old connection closed: " + toClose + " replaced by " + this);
+                _log.warn("Old connection closed: " + toClose + " replaced by " + this + "; drained " + drained);
             _context.statManager().addRateData("ntcp.inboundEstablishedDuplicate", toClose.getUptime());
             toClose.close();
         }

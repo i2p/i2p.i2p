@@ -44,15 +44,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title><%=intl._t("I2P Tunnel Manager - Tunnel Creation Wizard")%></title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
-
-    <% if (editBean.allowCSS()) {
-  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico" />
     <link href="<%=editBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" />
-    <% }
-  %>
 </head>
 <body id="tunnelWizardPage">
 

@@ -27,6 +27,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -278,7 +279,7 @@ public class SessionConfig extends DataStructureImpl {
             Signature sig = getOfflineSignature();
             if (sig == null)
                 return false;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(128);
+            ByteArrayStream baos = new ByteArrayStream(6 + spk.length());
             try {
                 DataHelper.writeLong(baos, 4, expires / 1000);
                 DataHelper.writeLong(baos, 2, spk.getType().getCode());
@@ -288,9 +289,7 @@ public class SessionConfig extends DataStructureImpl {
             } catch (DataFormatException dfe) {
                 return false;
             }
-            byte[] odata = baos.toByteArray();
-            boolean ok = DSAEngine.getInstance().verifySignature(sig, odata, 0, odata.length,
-                                                                 _destination.getSigningPublicKey());
+            boolean ok = baos.verifySignature(sig, _destination.getSigningPublicKey());
             if (!ok)
                 return false;
         } else {
@@ -323,7 +322,7 @@ public class SessionConfig extends DataStructureImpl {
         if (_options == null) return null;
         if (_creationDate == null) return null;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
         try {
             //_log.debug("PubKey size for destination: " + _destination.getPublicKey().getData().length);
             //_log.debug("SigningKey size for destination: " + _destination.getSigningPublicKey().getData().length);

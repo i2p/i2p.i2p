@@ -186,17 +186,18 @@ public class KeyStoreProvider {
         if (_keystore == null) {
             File keyStoreFile = new File(getKeyStoreLocation());
 
+            InputStream is = null;
             try {
                 _keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 if (keyStoreFile.exists()) {
-                    InputStream is = new FileInputStream(keyStoreFile);
+                    is = new FileInputStream(keyStoreFile);
                     _keystore.load(is, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
                     return _keystore;
                 }
 
                 initialize();
                 if (keyStoreFile.exists()) {
-                    InputStream is = new FileInputStream(keyStoreFile);
+                    is = new FileInputStream(keyStoreFile);
                     _keystore.load(is, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
                     return _keystore;
                 } else {
@@ -204,6 +205,8 @@ public class KeyStoreProvider {
                 }
             } catch (Exception e) {
                 // Ignore. Not an issue. Let's just create a new keystore instead.
+            } finally {
+                if (is != null) try { is.close(); } catch (IOException ioe) {}
             }
             return null;
         } else {

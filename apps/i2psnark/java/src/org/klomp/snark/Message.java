@@ -49,6 +49,9 @@ class Message
   final static byte REJECT       = 16;  // Fast (BEP 6)
   final static byte ALLOWED_FAST = 17;  // Fast (BEP 6)
   final static byte EXTENSION    = 20;  // BEP 10
+  final static byte HASH_REQUEST = 21;  // BEP 52
+  final static byte HASHES       = 22;  // BEP 52
+  final static byte HASH_REJECT  = 23;  // BEP 52
   
   // Not all fields are used for every message.
   // KEEP_ALIVE doesn't have a real wire representation
@@ -278,6 +281,13 @@ class Message
         return "REJECT(" + piece + ',' + begin + ',' + length + ')';
       case ALLOWED_FAST:
         return "ALLOWED_FAST(" + piece + ')';
+      // BEP 52 below here
+      case HASH_REQUEST:
+        return "HASH_REQUEST";
+      case HASHES:
+        return "HASHES";
+      case HASH_REJECT:
+        return "HASH_REJECT";
       default:
         return "UNKNOWN (" + type + ')';
       }

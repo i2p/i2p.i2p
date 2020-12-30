@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -26,6 +25,8 @@ import net.i2p.router.OutNetMessage;
  * To implement a new or pluggable I2P transport, implement this interface,
  * and add it to TransportManager.startListening().
  *
+ * API is subject to change.
+ * Please contact us if you're writing a new transport or transport plugin.
  */
 public interface Transport {
 
@@ -162,7 +163,12 @@ public interface Transport {
     public int countActiveSendPeers();
     public boolean haveCapacity();
     public boolean haveCapacity(int pct);
-    public Vector<Long> getClockSkews();
+
+    /**
+     *  Previously returned Vector, now List as of 0.9.46.
+     */
+    public List<Long> getClockSkews();
+
     public List<String> getMostRecentErrorMessages();
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;

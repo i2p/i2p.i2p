@@ -1,9 +1,11 @@
 <%
     // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
 
+    String cspNonce = Integer.toHexString(net.i2p.util.RandomSource.getInstance().nextInt());
+
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
     // edit pages need script for the delete button 'are you sure'
-    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
+    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'nonce-" + cspNonce + "'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
     response.setHeader("X-XSS-Protection", "1; mode=block");
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
@@ -37,16 +39,16 @@ if (tun != null) {
     <title><%=intl._t("Hidden Services Manager")%> - <%=(__isClient ? intl._t("Edit Client Tunnel") : intl._t("Edit Hidden Service"))%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
-
-    <% if (editBean.allowCSS()) {
-  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico" />
     <link href="<%=editBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
-    <% }
-  %>
 <style type='text/css'>
-input.default { width: 1px; height: 1px; visibility: hidden; }
+  input.default { width: 1px; height: 1px; visibility: hidden; }
 </style>
-<script src="/js/resetScroll.js" type="text/javascript"></script>
+<script src="/js/resetScroll.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<script src="js/tableSlider.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
+  var deleteMessage = "<%=intl._t("Are you sure you want to delete?")%>";
+</script>
+<script src="js/delete.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head>
 <body id="tunnelEditPage">
 <%

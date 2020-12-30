@@ -509,7 +509,7 @@ Index: b/installer/resources/locale/po/messages_fr.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_fr.po
 +++ b/installer/resources/locale/po/messages_fr.po
-@@ -188,13 +188,13 @@ msgid "Request a Java thread dump if run
+@@ -189,13 +189,13 @@ msgid "Request a Java thread dump if run
  msgstr "Demander un vidage des fils d’exécution de Java si elle est en cours d’exécution."
  
  #: ../i2prouter:1874
@@ -531,7 +531,7 @@ Index: b/installer/resources/locale/po/messages_ru.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
-@@ -192,13 +192,13 @@ msgid "Request a Java thread dump if run
+@@ -193,13 +193,13 @@ msgid "Request a Java thread dump if run
  msgstr "Запросить дамп нитей Java, если запущено."
  
  #: ../i2prouter:1874
@@ -553,7 +553,7 @@ Index: b/installer/resources/locale/po/messages_sv.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_sv.po
 +++ b/installer/resources/locale/po/messages_sv.po
-@@ -187,13 +187,13 @@ msgid "Request a Java thread dump if run
+@@ -189,13 +189,13 @@ msgid "Request a Java thread dump if run
  msgstr "Fråga efter en Java thread dump vid drift."
  
  #: ../i2prouter:1874

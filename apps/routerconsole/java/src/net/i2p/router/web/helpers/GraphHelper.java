@@ -486,8 +486,11 @@ public class GraphHelper extends FormHandler {
             changes.put(PROP_EVENTS, Boolean.toString(_showEvents));
             changes.put(PROP_LEGEND, Boolean.toString(_graphHideLegend));
             changes.put(SummaryListener.PROP_PERSISTENT, Boolean.toString(_persistent));
+            boolean warn = _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             _context.router().saveConfig(changes, null);
             addFormNotice(_t("Graph settings saved"));
+            if (warn)
+                addFormError(_t("Restart required to take effect"));
         }
     }
 

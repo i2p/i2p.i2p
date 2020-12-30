@@ -1,6 +1,7 @@
 package org.klomp.snark.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -50,6 +51,7 @@ import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
 import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
+import org.klomp.snark.URIUtil;
 import org.klomp.snark.dht.DHT;
 import org.klomp.snark.comments.Comment;
 import org.klomp.snark.comments.CommentSet;
@@ -200,19 +202,17 @@ public class I2PSnarkServlet extends BasicServlet {
             return;
         }
 
-        if (_context.isRouterContext())
-            _themePath = "/themes/snark/" + _manager.getTheme() + '/';
-        else
-            _themePath = _contextPath + WARBASE + "themes/snark/" + _manager.getTheme() + '/';
+        _themePath = _contextPath + WARBASE + "themes/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
         req.setCharacterEncoding("UTF-8");
 
         String pOverride = _manager.util().connected() ? null : "";
         String peerString = getQueryString(req, pOverride, null, null);
 
+        String cspNonce = Integer.toHexString(_context.random().nextInt());
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
-            setHTMLHeaders(resp);
+            setHTMLHeaders(resp, cspNonce, false);
             PrintWriter out = resp.getWriter();
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
@@ -241,7 +241,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     String base = addPaths(req.getRequestURI(), "/");
                     String listing = getPlaylist(req.getRequestURL().toString(), base, req.getParameter("sort"));
                     if (listing != null) {
-                        setHTMLHeaders(resp);
+                        setHTMLHeaders(resp, cspNonce, false);
                         // TODO custom name
                         resp.setContentType("audio/mpegurl; charset=UTF-8; name=\"playlist.m3u\"");
                         resp.addHeader("Content-Disposition", "attachment; filename=\"playlist.m3u\"");
@@ -257,7 +257,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         // P-R-G
                         sendRedirect(req, resp, "");
                     } else if (listing != null) {
-                        setHTMLHeaders(resp);
+                        setHTMLHeaders(resp, cspNonce, true);
                         resp.getWriter().write(listing);
                     } else { // shouldn't happen
                         resp.sendError(404);
@@ -291,7 +291,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean noCollapse = noCollapsePanels(req);
         boolean collapsePanels = _manager.util().collapsePanels();
 
-        setHTMLHeaders(resp);
+        setHTMLHeaders(resp, cspNonce, false);
         PrintWriter out = resp.getWriter();
         out.write(DOCTYPE + "<html>\n" +
                   "<head><link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n" +
@@ -301,13 +301,15 @@ public class I2PSnarkServlet extends BasicServlet {
         else
             out.write(_contextName);
         out.write(" - ");
-        if (isConfigure)
+        if (isConfigure) {
             out.write(_t("Configuration"));
-        else
-            out.write(_t("Anonymous BitTorrent Client"));
-        String peerParam = req.getParameter("p");
-        if ("2".equals(peerParam))
-            out.write(" | Debug Mode");
+        } else {
+            String peerParam = req.getParameter("p");
+            if ("2".equals(peerParam))
+                out.write("Debug Mode");
+            else
+                out.write(_t("Anonymous BitTorrent Client"));
+        }
         out.write("</title>\n");
 
         // we want it to go to the base URI so we don't refresh with some funky action= value
@@ -319,15 +321,18 @@ public class I2PSnarkServlet extends BasicServlet {
                 String downMsg = _context.isRouterContext() ? _t("Router is down") : _t("I2PSnark has stopped");
                 // fallback to metarefresh when javascript is disabled
                 out.write("<noscript><meta http-equiv=\"refresh\" content=\"" + delay + ";" + _contextPath + "/" + peerString + "\"></noscript>\n" +
-                          "<script src=\"" + jsPfx + "/js/ajax.js\" type=\"text/javascript\"></script>\n" +
-                          "<script type=\"text/javascript\">\n"  +
+                          "<script src=\"" + jsPfx + "/js/ajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
+                          "<script nonce=\"" + cspNonce + "\" type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
-                          "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" +
-                          peerString.replace("&amp;", "&") +  // don't html escape in js
-                          "\", \"mainsection\", " + (delay*1000) + "); }\n" +
-                          "function initAjax() { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
-                          "</script>\n");
+                          "var ajaxDelay = " + (delay * 1000) + ";\n" +
+                          "</script>\n" +
+                          "<script src=\".resources/js/initajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
             }
+            out.write("<script nonce=\"" + cspNonce + "\" type=\"text/javascript\">\n"  +
+                      "var deleteMessage1 = \"" + _t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?") + "\";\n" +
+                      "var deleteMessage2 = \"" + _t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?") + "\";\n" +
+                      "</script>\n" +
+                      "<script src=\".resources/js/delete.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         }
         out.write(HEADER_A + _themePath + HEADER_B);
 
@@ -335,13 +340,9 @@ public class I2PSnarkServlet extends BasicServlet {
         if (noCollapse || !collapsePanels) {
             out.write(HEADER_A + _themePath + HEADER_C);
         }
-        out.write("</head>\n");
-
-        if (isConfigure || delay <= 0)
-            out.write("<body>");
-        else
-            out.write("<body onload=\"initAjax()\">");
-        out.write("<center>");
+        out.write("</head>\n" +
+                  "<body>" +
+                  "<center>");
         List<Tracker> sortedTrackers = null;
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
@@ -411,12 +412,12 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      *  @since 0.9.16 moved from doGetAndPost()
      */
-    private static void setHTMLHeaders(HttpServletResponse resp) {
+    private static void setHTMLHeaders(HttpServletResponse resp, String cspNonce, boolean allowMedia) {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
         // "no-store, max-age=0" forces all our images to be reloaded on ajax refresh
         resp.setHeader("Cache-Control", "max-age=86400, no-cache, must-revalidate");
-        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'self'; object-src 'none'");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'nonce-" + cspNonce + "'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src '" + (allowMedia ? "self" : "none") + "'");
         resp.setDateHeader("Expires", 86400);
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
@@ -561,7 +562,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</th>\n<th class=\"snarkTorrentETA\" align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             if (showSort) {
-                sort = ("-4".equals(currentSort)) ? "4" : "-4";
+                sort = ("4".equals(currentSort)) ? "-4" : "4";
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
@@ -1067,9 +1068,14 @@ public class I2PSnarkServlet extends BasicServlet {
                     _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
                     return;
                 }
-                if (newURL.startsWith("http://")) {
-                    FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL, dir);
-                    _manager.addDownloader(fetch);
+                if (newURL.startsWith("http://") || newURL.startsWith("https://")) {
+                    if (isI2PTracker(newURL)) {
+                        FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL, dir);
+                        _manager.addDownloader(fetch);
+                    } else {
+                        // TODO
+                        _manager.addMessageNoEscape(_t("Download from non-I2P location {0} is not supported", urlify(newURL)));
+                    }
                 } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
                     addMagnet(newURL, dir);
                 } else if (newURL.length() == 40 && newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
@@ -1080,9 +1086,68 @@ public class I2PSnarkServlet extends BasicServlet {
                     // b32
                     newURL = newURL.toUpperCase(Locale.US);
                     addMagnet(MagnetURI.MAGNET_FULL + newURL, dir);
+                } else if (newURL.length() == 68 && newURL.startsWith("1220") &&
+                           newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
+                    // hex v2 multihash
+                    // TODO
+                    _manager.addMessage("Version 2 info hashes are not supported");
+                    //addMagnet(MagnetURI.MAGNET_FULL_V2 + newURL, dir);
                 } else {
-                    _manager.addMessage(_t("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"",
-                                          MagnetURI.MAGNET, MagnetURI.MAGGOT));
+                    // try as file path, hopefully we're on the same box
+                    if (newURL.startsWith("file://"))
+                        newURL = newURL.substring(7);
+                    File file = new File(newURL);
+                    if (file.isAbsolute() && file.exists()) {
+                        if (!newURL.endsWith(".torrent")) {
+                            _manager.addMessageNoEscape(_t("Torrent at {0} was not valid", DataHelper.escapeHTML(newURL)));
+                            return;
+                        }
+                        FileInputStream in = null;
+                        try {
+                            // This is all copied from FetchAndAdd
+                            // test that it's a valid torrent file, and get the hash to check for dups
+                            in = new FileInputStream(file);
+                            byte[] fileInfoHash = new byte[20];
+                            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+                            try { in.close(); } catch (IOException ioe) {}
+                            Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
+                            if (snark != null) {
+                                _manager.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                                return;
+                            }
+
+                            // check for dup file name
+                            String originalName = Storage.filterName(name);
+                            name = originalName + ".torrent";
+                            File torrentFile = new File(dd, name);
+                            String canonical = torrentFile.getCanonicalPath();
+                            if (torrentFile.exists()) {
+                                if (_manager.getTorrent(canonical) != null)
+                                    _manager.addMessage(_t("Torrent already running: {0}", name));
+                                else
+                                    _manager.addMessage(_t("Torrent already in the queue: {0}", name));
+                            } else {
+                                // This may take a LONG time to create the storage.
+                                boolean ok = _manager.copyAndAddTorrent(file, canonical, dd);
+                                if (!ok)
+                                    throw new IOException("Unknown error - check logs");
+                                snark = _manager.getTorrentByBaseName(originalName);
+                                if (snark != null)
+                                    snark.startTorrent();
+                                else
+                                    throw new IOException("Unknown error - check logs");
+                            }
+                        } catch (IOException ioe) {
+                            _manager.addMessageNoEscape(_t("Torrent at {0} was not valid", DataHelper.escapeHTML(newURL)) + ": " + DataHelper.stripHTML(ioe.getMessage()));
+                        } catch (OutOfMemoryError oom) {
+                            _manager.addMessageNoEscape(_t("ERROR - Out of memory, cannot create torrent from {0}", DataHelper.escapeHTML(newURL)) + ": " + DataHelper.stripHTML(oom.getMessage()));
+                        } finally {
+                            try { if (in != null) in.close(); } catch (IOException ioe) {}
+                        }
+                    } else {
+                        _manager.addMessage(_t("Invalid URL: Must start with \"{0}\" or \"{1}\"",
+                                               "http://", MagnetURI.MAGNET));
+                    }
                 }
             } else {
                 // no file or URL specified
@@ -1885,16 +1950,11 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce +
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
-                    out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
+                    out.write("<input class=\"delete1\" type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_t("Remove the torrent from the active list, deleting the .torrent file"));
-                out.write("\" onclick=\"if (!confirm('");
-                // Can't figure out how to escape double quotes inside the onclick string.
-                // Single quotes in translate strings with parameters must be doubled.
-                // Then the remaining single quote must be escaped
-                out.write(_t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?",
-                            escapeJSString(snark.getName())));
-                out.write("')) { return false; }\"");
-                out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
+                out.write("\" client=\"");
+                out.write(escapeJSString(snark.getName()));
+                out.write("\" src=\"" + _imgPath + "remove.png\" alt=\"");
                 out.write(_t("Remove"));
                 out.write("\">");
                 if (isDegraded)
@@ -1909,16 +1969,11 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce +
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
-                    out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
+                    out.write("<input class=\"delete2\" type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_t("Delete the .torrent file and the associated data files"));
-                out.write("\" onclick=\"if (!confirm('");
-                // Can't figure out how to escape double quotes inside the onclick string.
-                // Single quotes in translate strings with parameters must be doubled.
-                // Then the remaining single quote must be escaped
-                out.write(_t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?",
-                            escapeJSString(fullBasename)));
-                out.write("')) { return false; }\"" +
-                          " src=\"" + _imgPath + "delete.png\" alt=\"");
+                out.write("\" client=\"");
+                out.write(escapeJSString(snark.getName()));
+                out.write("\" src=\"" + _imgPath + "delete.png\" alt=\"");
                 out.write(_t("Delete"));
                 out.write("\">");
                 if (isDegraded)
@@ -1938,35 +1993,43 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(_t("Peer attached to swarm"));
                 out.write("\"></td><td colspan=\"5\">");
                 PeerID pid = peer.getPeerID();
-                String ch = pid != null ? pid.toString().substring(0, 4) : "????";
-                String client;
-                if ("AwMD".equals(ch))
-                    client = _t("I2PSnark");
-                else if ("LUFa".equals(ch))
-                    client = "Vuze" + getAzVersion(pid.getID());
-                else if ("LUJJ".equals(ch))
-                    client = "BiglyBT" + getAzVersion(pid.getID());
-                else if ("LVhE".equals(ch))
-                    client = "XD" + getAzVersion(pid.getID());
-                else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
-                    client = "Robert" + getRobtVersion(pid.getID());
-                else if (ch.startsWith("LV")) // LVCS 1.0.2?; LVRS 1.0.4
-                    client = "Transmission" + getAzVersion(pid.getID());
-                else if ("LUtU".equals(ch))
-                    client = "KTorrent" + getAzVersion(pid.getID());
-                else if ("CwsL".equals(ch))
-                    client = "I2PSnarkXL";
-                else if ("BFJT".equals(ch))
-                    client = "I2PRufus";
-                else if ("TTMt".equals(ch))
-                    client = "I2P-BT";
-                else
-                    client = _t("Unknown") + " (" + ch + ')';
-                out.write(client + "&nbsp;<tt title=\"");
-                out.write(_t("Destination (identity) of peer"));
-                out.write("\">" + peer.toString().substring(5, 9)+ "</tt>");
-                if (showDebug)
-                    out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
+                String ch = pid != null ? pid.toString() : "????";
+                if (ch.startsWith("WebSeed@")) {
+                    out.write(ch);
+                } else {
+                    ch = ch.substring(0, 4);
+                    String client;
+                    if ("AwMD".equals(ch))
+                        client = _t("I2PSnark");
+                    else if ("LUJJ".equals(ch))
+                        client = "BiglyBT" + getAzVersion(pid.getID());
+                    else if ("LUFa".equals(ch))
+                        client = "Vuze" + getAzVersion(pid.getID());
+                    else if ("LVhE".equals(ch))
+                        client = "XD" + getAzVersion(pid.getID());
+                    else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
+                        client = "Robert" + getRobtVersion(pid.getID());
+                    else if (ch.startsWith("LV")) // LVCS 1.0.2?; LVRS 1.0.4
+                        client = "Transmission" + getAzVersion(pid.getID());
+                    else if ("LUtU".equals(ch))
+                        client = "KTorrent" + getAzVersion(pid.getID());
+                    else if ("CwsL".equals(ch))
+                        client = "I2PSnarkXL";
+                    else if ("BFJT".equals(ch))
+                        client = "I2PRufus";
+                    else if ("TTMt".equals(ch))
+                        client = "I2P-BT";
+                    else
+                        client = _t("Unknown") + " (" + ch + ')';
+                    out.write(client + "&nbsp;<tt title=\"");
+                    out.write(_t("Destination (identity) of peer"));
+                    out.write("\">" + peer.toString().substring(5, 9)+ "</tt>");
+                }
+                if (showDebug) {
+                    long t = peer.getInactiveTime();
+                    if (t >= 5000)
+                        out.write(" inactive " + (t / 1000) + "s");
+                }
                 out.write("</td>\n\t" +
                           "<td class=\"snarkTorrentETA\">" +
                           "</td>\n\t" +
@@ -2224,12 +2287,17 @@ public class I2PSnarkServlet extends BasicServlet {
         //String newFile = req.getParameter("newFile");
         //if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
 
-        out.write("<div class=\"snarkNewTorrent\">\n" +
+        out.write("<div id=\"add\" class=\"snarkNewTorrent\">\n" +
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
                   "<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Add");
         out.write("<div class=\"addtorrentsection\">" +
-                  "<input class=\"toggle_input\" id=\"toggle_addtorrent\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_addtorrent\">");
+                  "<input class=\"toggle_input\" id=\"toggle_addtorrent\" type=\"checkbox\"");
+        if (newURL.length() > 0)
+            out.write(" checked=\"checked\">");  // force toggle open
+        else
+            out.write('>');
+        out.write("<label class=\"toggleview\" for=\"toggle_addtorrent\">");
         out.write(toThemeImg("add"));
         out.write(' ');
         out.write(_t("Add Torrent"));
@@ -2239,7 +2307,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_t("From URL"));
         out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"" +
                   " title=\"");
-        out.write(_t("Enter the torrent file download URL (I2P only), magnet link, maggot link, or info hash"));
+        out.write(_t("Enter the torrent file download URL (I2P only), magnet link, or info hash"));
         out.write("\">\n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
@@ -2263,7 +2331,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
-        out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n" +
+        out.write("<div id=\"new\" class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n" +
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
                   "<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Create");
@@ -2742,6 +2810,10 @@ public class I2PSnarkServlet extends BasicServlet {
      *  @since 0.8.4
      */
     private void addMagnet(String url, File dataDir) {
+        if (url.startsWith(MagnetURI.MAGNET_FULL_V2)) {
+            _manager.addMessage("Version 2 magnet links are not supported");
+            return;
+        }
         try {
             MagnetURI magnet = new MagnetURI(_manager.util(), url);
             String name = magnet.getName();
@@ -3002,11 +3074,9 @@ public class I2PSnarkServlet extends BasicServlet {
            .append("<noscript><style type=\"text/css\">.script {display: none;}</style></noscript>" +
                    "<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
-            buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");
-        buf.append("</head><body");
-        if (showPriority)
-            buf.append(" onload=\"setupbuttons()\"");
-        buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"" +
+            buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+        buf.append("</head><body>\n" +
+                   "<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"" +
                    " class=\"snarkNav nav_main\">");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_t("I2PSnark"));
@@ -3112,9 +3182,34 @@ public class I2PSnarkServlet extends BasicServlet {
                     }
                     buf.append("</td></tr>\n");
                 }
-            }
 
-            if (meta != null) {
+                List<String> weblist = meta.getWebSeedURLs();
+                if (weblist != null) {
+                    List<String> wlist = new ArrayList<String>(weblist.size());
+                    // strip non-i2p web seeds
+                    for (String s : weblist) {
+                        if (isI2PTracker(s))
+                            wlist.add(s);
+                    }
+                    if (!wlist.isEmpty()) {
+                        buf.append("<tr><td>");
+                        toThemeImg(buf, "details");
+                        buf.append("</td><td><b>")
+                           .append(_t("Web Seeds")).append("</b></td><td>");
+                        boolean more = false;
+                        for (String s : wlist) {
+                            buf.append("<span class=\"info_tracker\">");
+                            if (more)
+                                buf.append(' ');
+                            else
+                                more = true;
+                            buf.append(getShortTrackerLink(DataHelper.stripHTML(s), snark.getInfoHash()));
+                            buf.append("</span> ");
+                        }
+                        buf.append("</td></tr>\n");
+                    }
+                }
+
                 String com = meta.getComment();
                 if (com != null && com.length() > 0) {
                     if (com.length() > 1024)
@@ -3221,6 +3316,7 @@ public class I2PSnarkServlet extends BasicServlet {
             else
                 buf.append(_t("Complete")).append("</b>");
             buf.append("</td><td><span>");
+            // TODO adjust for padding files
             buf.append("<b>")
                .append(_t("Size"))
                .append(":</b> ")
@@ -3239,6 +3335,7 @@ public class I2PSnarkServlet extends BasicServlet {
             } else {
                 buf.append('0');
             }
+            // TODO adjust for padding files
             // not including skipped files, but -1 when not running
             long needed = snark.getNeededLength();
             if (needed < 0) {
@@ -3252,6 +3349,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(":</b> ")
                    .append(formatSize(needed));
             }
+            // TODO adjust for padding files
             long skipped = snark.getSkippedLength();
             if (skipped > 0) {
                 buf.append("</span>&nbsp;<span>");
@@ -3260,9 +3358,8 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(":</b> ")
                    .append(formatSize(skipped));
             }
-            if (meta != null) {
-                List<List<String>> files = meta.getFiles();
-                int fileCount = files != null ? files.size() : 1;
+            if (storage != null) {
+                int fileCount = storage.getFileCount();
                 buf.append("</span>&nbsp;<span>");
                 buf.append("<b>")
                    .append(_t("Files"))
@@ -3370,14 +3467,14 @@ public class I2PSnarkServlet extends BasicServlet {
                     if (isAudio)
                         buf.append("<audio");
                     else
-                        buf.append("<video");
+                        buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
                     // strip trailing slash
                     String path = base.substring(0, base.length() - 1);
                     buf.append(" controls><source src=\"").append(path).append("\" type=\"").append(mime).append("\">");
                     if (isAudio)
                         buf.append("</audio>");
                     else
-                        buf.append("</video>");
+                        buf.append("</video></div>");
                 }
             }
             if (er || ec)
@@ -3394,7 +3491,16 @@ public class I2PSnarkServlet extends BasicServlet {
         long[] remainingArray = (arrays != null) ? arrays[0] : null;
         long[] previewArray = (arrays != null) ? arrays[1] : null;
         for (int i = 0; i < ls.length; i++) {
-            fileList.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray, previewArray));
+            File f = ls[i];
+            if (isTopLevel) {
+                // Hide (assumed) padding directory if it's in the filesystem.
+                // Storage now will not create padding files, but
+                // may have been created by an old version or other client.
+                String n = f.getName();
+                if ((n.equals(".pad") || n.equals("_pad")) && f.isDirectory())
+                    continue;
+            }
+            fileList.add(new Sorters.FileAndIndex(f, storage, remainingArray, previewArray));
         }
 
         boolean showSort = fileList.size() > 1;
@@ -3555,7 +3661,7 @@ public class I2PSnarkServlet extends BasicServlet {
             }
 
             String path = addPaths(decodedBase, item.getName());
-            if (item.isDirectory() && !path.endsWith("/"))
+            if (fai.isDirectory && !path.endsWith("/"))
                 path=addPaths(path,"/");
             path = encodePath(path);
             String icon = toIcon(item);
@@ -3567,7 +3673,9 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean isVideo = !isAudio && isVideo(mime);
             buf.append("<td class=\"snarkFileIcon\">");
             String preview = null;
-            if (complete || (isAudio && fai.preview > 1024*100) || (isVideo && fai.preview > 1024*1024)) {
+            if (complete ||
+                (isAudio && fai.preview > 100*1024) ||
+                (isVideo && fai.preview > 5*1024*1024 && fai.preview / (double) fai.length >= 0.01d)) {
                 String ppath = complete ? path : path + "?limit=" + fai.preview;
                 if (!complete) {
                     double pct = fai.preview / (double) fai.length;
@@ -3579,7 +3687,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     if (isAudio)
                         buf.append("<audio");
                     else
-                        buf.append("<video");
+                        buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
                     buf.append(" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
                 }
                 buf.append("<a href=\"").append(ppath).append("\">");
@@ -3593,7 +3701,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isAudio)
                     buf.append("</audio>");
                 else if (isVideo)
-                    buf.append("</video>");
+                    buf.append("</video></div>");
             } else {
                 buf.append(toImg(icon));
             }
@@ -3613,17 +3721,17 @@ public class I2PSnarkServlet extends BasicServlet {
             if (preview != null)
                 buf.append(preview);
             buf.append("</td><td align=right class=\"snarkFileSize\">");
-            if (!item.isDirectory())
+            if (!fai.isDirectory)
                 buf.append(formatSize(length));
             buf.append("</td><td class=\"snarkFileStatus\">");
             buf.append(status);
             buf.append("</td>");
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
-                if ((!complete) && (!item.isDirectory())) {
+                if ((!complete) && (!fai.isDirectory)) {
                     if (!inOrder) {
                         buf.append("<label class=\"priorityHigh\" title=\"").append(_t("Download file at high priority")).append("\">" +
-                                   "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
+                                   "\n<input type=\"radio\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
                         if (priority > 0)
                             buf.append("checked=\"checked\"");
                         buf.append('>')
@@ -3631,14 +3739,14 @@ public class I2PSnarkServlet extends BasicServlet {
                     }
 
                     buf.append("<label class=\"priorityNormal\" title=\"").append(_t("Download file at normal priority")).append("\">" +
-                               "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
+                               "\n<input type=\"radio\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority == 0 || (inOrder && priority >= 0))
                         buf.append("checked=\"checked\"");
                     buf.append('>')
                        .append(_t("Normal")).append("</label>");
 
                     buf.append("<label class=\"prioritySkip\" title=\"").append(_t("Do not download this file")).append("\">" +
-                               "\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"priskip\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
+                               "\n<input type=\"radio\" class=\"priskip\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority < 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>')
@@ -3653,12 +3761,12 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<thead><tr id=\"setPriority\"><th class=\"headerpriority\" colspan=\"5\">" +
                        "<span class=\"script\">");
             if (!inOrder) {
-                buf.append("<a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">")
+                buf.append("<a class=\"control\" id=\"setallhigh\" href=\"#\">")
                    .append(toImg("clock_red")).append(_t("Set all high")).append("</a>\n");
             }
-            buf.append("<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">")
+            buf.append("<a class=\"control\" id=\"setallnorm\" href=\"#\">")
                .append(toImg("clock")).append(_t("Set all normal")).append("</a>\n" +
-                       "<a class=\"control\" id=\"setallskip\" href=\"javascript:void(null);\" onclick=\"setallskip();\">")
+                       "<a class=\"control\" id=\"setallskip\" href=\"#\">")
                .append(toImg("cancel")).append(_t("Skip all")).append("</a></span>\n" +
                        "<input type=\"submit\" class=\"accept\" value=\"").append(_t("Save priorities"))
                .append("\" name=\"savepri\" >\n" +
@@ -4082,6 +4190,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (mime.equals("text/html"))
             icon = "html";
         else if (mime.equals("text/plain") ||
+                 mime.equals("text/markdown") ||
                  mime.equals("text/x-sfv") ||
                  mime.equals("application/rtf"))
             icon = "page";
@@ -4142,7 +4251,7 @@ public class I2PSnarkServlet extends BasicServlet {
      *  @since 0.8.2
      */
     private String toImg(String icon, String altText) {
-        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
+        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + _manager.getThemeIconSet() + icon + ".png?" + CoreVersion.VERSION + "\">";
     }
 
     /**

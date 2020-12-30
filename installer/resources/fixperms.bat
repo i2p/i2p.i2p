@@ -16,4 +16,4 @@
 :: Specifying the SID will work on ALL versions of Windows.
 :: List of well-known SIDs at http://support.microsoft.com/kb/243330/en-us
 ::
-echo Y|icacls %1 /grant  *S-1-5-32-545:F /c /t > %1%\fixperms.log
+echo Y|icacls %1 /grant %username%:F /c /t /q > %1%\fixperms.log

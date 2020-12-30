@@ -62,7 +62,7 @@ public class MetaLease extends Lease {
         DataHelper.skip(in, 2);
         _type = in.read();
         _cost = in.read();
-        _end = new Date(DataHelper.readLong(in, 4) * 1000);
+        _end = DataHelper.readLong(in, 4) * 1000;
     }
     
     @Override
@@ -74,7 +74,7 @@ public class MetaLease extends Lease {
         DataHelper.writeLong(out, 2, 0);
         out.write(_type);
         out.write(_cost);
-        DataHelper.writeLong(out, 4, _end.getTime() / 1000);
+        DataHelper.writeLong(out, 4, _end / 1000);
     }
     
     @Override
@@ -82,7 +82,7 @@ public class MetaLease extends Lease {
         if (object == this) return true;
         if ((object == null) || !(object instanceof MetaLease)) return false;
         MetaLease lse = (MetaLease) object;
-        return DataHelper.eq(_end, lse.getEndDate())
+        return _end == lse.getEndTime()
                && _type == lse._type
                && _cost == lse._cost
                && DataHelper.eq(_gateway, lse.getGateway());
@@ -90,7 +90,7 @@ public class MetaLease extends Lease {
     
     @Override
     public int hashCode() {
-        return (int) _end.getTime() ^ DataHelper.hashCode(_gateway)
+        return (int) _end ^ DataHelper.hashCode(_gateway)
                ^ _cost;
     }
     
@@ -98,7 +98,7 @@ public class MetaLease extends Lease {
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[Meta Lease: ");
-        buf.append("\n\tEnd Date: ").append(_end);
+        buf.append("\n\tEnd Date: ").append(DataHelper.formatTime(_end));
         buf.append("\n\tTarget: ").append(_gateway);
         buf.append("\n\tCost: ").append(_cost);
         buf.append("\n\tType: ").append(_type);

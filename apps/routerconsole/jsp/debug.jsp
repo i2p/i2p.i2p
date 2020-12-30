@@ -19,7 +19,8 @@
 <span class="tab"><a href="#debug_portmapper">Port Mapper</a></span>
 <span class="tab"><a href="#appmanager">App Manager</a></span>
 <span class="tab"><a href="#updatemanager">Update Manager</a></span>
-<span class="tab"><a href="#skm">Session Key Manager</a></span>
+<span class="tab"><a href="#skm">Router Session Key Manager</a></span>
+<span class="tab"><a href="#cskm0">Client Session Key Managers</a></span>
 <span class="tab"><a href="#dht">Router DHT</a></span>
 </div>
 
@@ -70,12 +71,23 @@
     ctx.sessionKeyManager().renderStatusHTML(out);
     java.util.Set<net.i2p.data.Destination> clients = ctx.clientManager().listClients();
     out.print("</div>");
+    int i = 0;
     for (net.i2p.data.Destination dest : clients) {
         net.i2p.data.Hash h = dest.calculateHash();
         net.i2p.crypto.SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(h);
         if (skm != null) {
-            out.print("<div class=\"debug_section\">");
-            out.print("<h2><font size=\"-2\">" + dest.toBase32() + "</font> Session Key Manager</h2>");
+            out.print("<div class=\"debug_section\" id=\"cskm" + (i++) + "\"><h2>");
+            net.i2p.router.TunnelPoolSettings tps = ctx.tunnelManager().getInboundSettings(h);
+            if (tps != null) {
+                String nick = tps.getDestinationNickname();
+                if (nick != null)
+                    out.print(net.i2p.data.DataHelper.escapeHTML(nick));
+                else
+                    out.print("<font size=\"-2\">" + dest.toBase32() + "</font>");
+            } else {
+                out.print("<font size=\"-2\">" + dest.toBase32() + "</font>");
+            }
+            out.print(" Session Key Manager</h2>");
             skm.renderStatusHTML(out);
             out.print("</div>");
         }

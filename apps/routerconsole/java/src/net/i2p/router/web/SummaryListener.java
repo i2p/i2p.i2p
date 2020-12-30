@@ -125,7 +125,7 @@ public class SummaryListener implements RateSummaryListener {
         _eventName = createName(_context, baseName + ".events");
         File rrdFile = null;
         try {
-            RrdBackendFactory factory = RrdBackendFactory.getFactory(getBackendName());
+            RrdBackendFactory factory = getBackendFactory();
             String rrdDefName;
             if (_isPersistent) {
                 // generate full path for persistent RRD files
@@ -133,7 +133,7 @@ public class SummaryListener implements RateSummaryListener {
                 rrdFile = new File(rrdDir, RRD_PREFIX + _name + RRD_SUFFIX);
                 rrdDefName = rrdFile.getAbsolutePath();
                 if (rrdFile.exists()) {
-                    _db = new RrdDb(rrdDefName, factory);
+                    _db = RrdDb.getBuilder().setPath(rrdDefName).setBackendFactory(factory).build();
                     Archive arch = _db.getArchive(CF, STEPS);
                     if (arch == null)
                         throw new IOException("No average CF in " + rrdDefName);
@@ -160,7 +160,7 @@ public class SummaryListener implements RateSummaryListener {
                     _rows = MIN_ROWS;
                 }
                 def.addArchive(CF, XFF, STEPS, _rows);
-                _db = new RrdDb(def, factory);
+                _db = RrdDb.getBuilder().setRrdDef(def).setBackendFactory(factory).build();
                 if (_isPersistent)
                     SecureFileOutputStream.setPerms(new File(rrdDefName));
                 if (_log.shouldLog(Log.INFO))
@@ -179,6 +179,12 @@ public class SummaryListener implements RateSummaryListener {
                 rrdFile.delete();
         } catch (IOException ioe) {
             _log.error("Error starting RRD for stat " + baseName, ioe);
+        } catch (IllegalArgumentException iae) {
+            // No backend from RrdBackendFactory
+            _log.error("Error starting RRD for stat " + baseName, iae);
+            _log.log(Log.CRIT, "rrd4j backend error, graphs disabled");
+            System.out.println("rrd4j backend error, graphs disabled");
+            StatSummarizer.setDisabled(_context);
         } catch (NoSuchMethodError nsme) {
             // Covariant fail Java 8/9/10
             // java.lang.NoSuchMethodError: java.nio.MappedByteBuffer.position(I)Ljava/nio/MappedByteBuffer;
@@ -207,7 +213,7 @@ public class SummaryListener implements RateSummaryListener {
         _rate.setSummaryListener(null);
         if (!_isPersistent) {
             // close() does not release resources for memory backend
-            ((RrdMemoryBackendFactory)RrdBackendFactory.getFactory("MEMORY")).delete(_db.getPath());
+            ((RrdMemoryBackendFactory)getBackendFactory(false)).delete(_db.getPath());
         }
         _db = null;
     }
@@ -254,9 +260,24 @@ public class SummaryListener implements RateSummaryListener {
 
     long now() { return _context.clock().now(); }
     
-    /** @since 0.8.7 */
-    String getBackendName() {
-        return _isPersistent ? "NIO" : "MEMORY";
+    /** @since 0.9.46 */
+    RrdBackendFactory getBackendFactory() {
+        return getBackendFactory(_isPersistent);
+    }
+
+    /** @since 0.9.46 */
+    @SuppressWarnings("deprecation")
+    private static RrdBackendFactory getBackendFactory(boolean isPersistent) {
+        // getFactory(String) is deprecated, but to avoid it
+        // we'd have to use findFactory(URI), but it only returns from the active factory list,
+        // so we'd have to call addActiveFactories(getFactory(String)) anyway.
+        //try {
+            return isPersistent ? RrdBackendFactory.getDefaultFactory()                   // NIO
+                                //: RrdBackendFactory.findFactory(new URI("memory:foo")); // MEMORY
+                                : RrdBackendFactory.getFactory("MEMORY");                 // MEMORY
+        //} catch (URISyntaxException use) {
+        //    throw new IllegalArgumentException(use);
+        //}
     }
 
     /** @since 0.8.7 */

@@ -27,7 +27,8 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="require.gettext" value="true" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
@@ -41,6 +42,7 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/obj" 
             encoding="UTF-8"
             includeAntRuntime="false" >
@@ -164,6 +166,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -247,53 +250,51 @@
 
     <!-- add css, image, and js files for standalone snark to the war -->
     <target name="standalone_war" depends="war">
-        <mkdir dir="build/standalone-resources/.resources/themes/snark" />
-        <copy todir="build/standalone-resources/.resources/themes/snark" >
-            <fileset dir="../../../installer/resources/themes/snark/" />
+        <mkdir dir="build/standalone-resources/.resources/themes/" />
+        <copy todir="build/standalone-resources/.resources/themes/" >
+            <fileset dir="../resources/themes/" />
         </copy>
 
-        <replace dir="build/standalone-resources/.resources/themes/snark"
+        <replace dir="build/standalone-resources/.resources/themes"
             summary="true"
             token="url(/themes/console/dark/images/"
-            value="url(/i2psnark/.resources/themes/snark/dark/images/" >
+            value="url(/i2psnark/.resources/themes/dark/images/" >
             <include name="**/*.css" />
         </replace>
-        <replace dir="build/standalone-resources/.resources/themes/snark"
+        <replace dir="build/standalone-resources/.resources/themes"
             summary="true"
             token="url(../../console/light/images/"
-            value="url(/i2psnark/.resources/themes/snark/light/images/" >
+            value="url(/i2psnark/.resources/themes/light/images/" >
             <include name="**/*.css" />
         </replace>
-        <replace dir="build/standalone-resources/.resources/themes/snark"
+        <replace dir="build/standalone-resources/.resources/themes"
             summary="true"
             token="url(/themes/console/light/images/"
-            value="url(/i2psnark/.resources/themes/snark/light/images/" >
+            value="url(/i2psnark/.resources/themes/light/images/" >
             <include name="**/*.css" />
         </replace>
-        <replace dir="build/standalone-resources/.resources/themes/snark"
+        <replace dir="build/standalone-resources/.resources/themes"
             summary="true"
             token="url(/themes/console/images/transparent.gif"
-            value="url(/i2psnark/.resources/themes/snark/ubergine/images/transparent.gif" >
+            value="url(/i2psnark/.resources/themes/ubergine/images/transparent.gif" >
             <include name="**/*.css" />
         </replace>
-        <replace dir="build/standalone-resources/.resources/themes/snark"
+        <replace dir="build/standalone-resources/.resources/themes"
             summary="true"
             token="url(/themes/console/images/info/"
-            value="url(/i2psnark/.resources/themes/snark/ubergine/images/" >
+            value="url(/i2psnark/.resources/themes/ubergine/images/" >
             <include name="**/*.css" />
         </replace>
 
         <!-- Rather than pulling in all the console theme images, let's just specify the ones we need -->
-        <copy file="../../../installer/resources/themes/console/images/transparent.gif"
-              todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
-        <copy file="../../../installer/resources/themes/console/dark/images/header.png"
-              todir="build/standalone-resources/.resources/themes/snark/dark/images" />
-        <copy file="../../../installer/resources/themes/console/light/images/header.png"
-              todir="build/standalone-resources/.resources/themes/snark/light/images" />
-        <copy file="../../../installer/resources/themes/console/dark/images/camotile2.png"
-              todir="build/standalone-resources/.resources/themes/snark/dark/images" />
-        <copy file="../../../installer/resources/themes/console/images/info/errortriangle.png"
-              todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
+        <copy file="../../routerconsole/jsp/themes/console/images/transparent.gif"
+              todir="build/standalone-resources/.resources/themes/ubergine/images" />
+        <copy file="../../routerconsole/jsp/themes/console/dark/images/header.png"
+              todir="build/standalone-resources/.resources/themes/dark/images" />
+        <copy file="../../routerconsole/jsp/themes/console/light/images/header.png"
+              todir="build/standalone-resources/.resources/themes/light/images" />
+        <copy file="../../routerconsole/jsp/themes/console/images/info/errortriangle.png"
+              todir="build/standalone-resources/.resources/themes/ubergine/images" />
 
         <mkdir dir="build/standalone-resources/.resources/js" />
         <copy file="../../routerconsole/jsp/js/ajax.js" todir="build/standalone-resources/.resources/js" />

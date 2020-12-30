@@ -32,7 +32,7 @@
     <title>_("To configure SusiDNS to push your Router address book to your Published address book, set 'should_publish=true' on the configuration page.")</title>
   </path>
   <a xlink:href="/susidns/addressbook?book=router" target="_parent" class="book">
-    <title>_("All hosts derived from subscriptions will appear in this address book, in addition to any you manually add here or to your Master address book.")</title>
+    <title>_("All hosts derived from subscriptions will appear in this address book, in addition to any you manually add here or to your Local address book.")</title>
     <rect class="a tooltip" width="428" height="66" x="264" y="362" ry="10">
     </rect>
     <text class="b" x="477" y="403">
@@ -72,17 +72,17 @@
     </text>
   </a>
   </g>
-  <a xlink:href="/susidns/addressbook?book=master" target="_parent" class="book">
+  <a xlink:href="/susidns/addressbook?book=local" target="_parent" class="book">
     <title>_("If you manually add hosts here, they will be included your Published address book (if configured).")</title>
     <rect class="a tooltip" width="419" height="64" x="34" y="94" ry="10">
     </rect>
     <text class="b" x="243" y="134">
-      <tspan class="c" x="243" y="134">_("Master Addressbook")</tspan>
+      <tspan class="c" x="243" y="134">_("Local Addressbook")</tspan>
     </text>
   </a>
   <text class="f tooltip" x="817" y="389">
     <tspan class="g" x="817" y="389">_("Searchable by")</tspan> <tspan class="g" x="817" y="416">_("I2P applications")</tspan>
-    <title>_("The Master, Router and Private address books collectively serve as the DNS authority for I2P applications.")</title>
+    <title>_("The Local, Router and Private address books collectively serve as the DNS authority for I2P applications.")</title>
   </text>
   <a xlink:href="/susidns/config" target="_parent">
     <text class="f" x="817" y="518">
@@ -91,7 +91,7 @@
     </text>
   </a>
   <path class="a tooltip" d="M382 164v133h-21l22 31 22 31 23-31 22-31h-19V164h-49z">
-    <title>_("Addresses manually added to your Master address book will merge with your Router address book.")</title>
+    <title>_("Addresses manually added to your Local address book will merge with your Router address book.")</title>
   </path>
   <path class="a tooltip" d="M553 164v133h-21l22 31 22 31 23-31 22-31h-19V164z">
     <title>_("Hosts you receive from your subscriptions will merge with your Router address book.")</title>

@@ -102,7 +102,8 @@ public final class HKDF {
         try {
             // here we use Java Mac directly rather than
             // HMAC256Generator for efficiency.
-            Mac mac = Mac.getInstance("HmacSHA256");
+            HMAC256Generator hmac = _context.hmac256();
+            Mac mac = hmac.acquire();
             // SecretKeySpec copies the data, HMACKey doesn't
             SecretKey keyObj = new HMACKey(key);
             mac.init(keyObj);
@@ -125,8 +126,7 @@ public final class HKDF {
             mac.update(out, 0, 32);
             mac.update(tmp, 0, ilen + 1);
             mac.doFinal(out2, off2);
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnsupportedOperationException("HmacSHA256", e);
+            hmac.release(mac);
         } catch (GeneralSecurityException e) {
             throw new IllegalArgumentException("HmacSHA256", e);
         } finally {

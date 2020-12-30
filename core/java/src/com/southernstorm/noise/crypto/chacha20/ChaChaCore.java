@@ -27,6 +27,11 @@ package com.southernstorm.noise.crypto.chacha20;
  */
 public final class ChaChaCore {
 
+	private static final int INIT0 = char4('e', 'x', 'p', 'a');
+	private static final int INIT1 = char4('n', 'd', ' ', '3');
+	private static final int INIT2 = char4('2', '-', 'b', 'y');
+	private static final int INIT3 = char4('t', 'e', ' ', 'k');
+
 	private ChaChaCore() {}
 	
 	/**
@@ -42,8 +47,7 @@ public final class ChaChaCore {
 		int index;
 		
 		// Copy the input to the output to start with.
-		for (index = 0; index < 16; ++index)
-			output[index] = input[index];
+		System.arraycopy(input, 0, output, 0, 16);
 		
 		// Perform the 20 ChaCha rounds in groups of two.
 		for (index = 0; index < 20; index += 2) {
@@ -85,10 +89,10 @@ public final class ChaChaCore {
 	 */
 	public static void initKey256(int[] output, byte[] key, int offset)
 	{
-		output[0] = char4('e', 'x', 'p', 'a');
-		output[1] = char4('n', 'd', ' ', '3');
-		output[2] = char4('2', '-', 'b', 'y');
-		output[3] = char4('t', 'e', ' ', 'k');
+		output[0] = INIT0;
+		output[1] = INIT1;
+		output[2] = INIT2;
+		output[3] = INIT3;
 		output[4] = fromLittleEndian(key, offset);
 		output[5] = fromLittleEndian(key, offset + 4);
 		output[6] = fromLittleEndian(key, offset + 8);

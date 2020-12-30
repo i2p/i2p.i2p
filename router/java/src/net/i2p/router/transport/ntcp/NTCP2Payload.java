@@ -135,7 +135,7 @@ class NTCP2Payload {
                         throw new IOException("Illegal block in handshake: " + type);
                     if (len < 9)
                         throw new IOException("Bad length for TERMINATION: " + len);
-                    long last = fromLong8(payload, i);
+                    long last = DataHelper.fromLong8(payload, i);
                     int rsn = payload[i + 8] & 0xff;
                     cb.gotTermination(rsn, last);
                     gotTermination = true;
@@ -333,40 +333,9 @@ class NTCP2Payload {
         }
 
         public int writeData(byte[] tgt, int off) {
-            toLong8(tgt, off, rcvd);
+            DataHelper.toLong8(tgt, off, rcvd);
             tgt[off + 8] = rsn;
             return off + 9;
-        }
-    }
-
-    /**
-     * Big endian.
-     * Same as DataHelper.fromLong(src, offset, 8) but allows negative result
-     *
-     * @throws ArrayIndexOutOfBoundsException
-     * @since 0.9.36
-     */
-    private static long fromLong8(byte src[], int offset) {
-        long rv = 0;
-        int limit = offset + 8;
-        for (int i = offset; i < limit; i++) {
-            rv <<= 8;
-            rv |= src[i] & 0xFF;
-        }
-        return rv;
-    }
-    
-    /**
-     * Big endian.
-     * Same as DataHelper.toLong(target, offset, 8, value) but allows negative value
-     *
-     * @throws ArrayIndexOutOfBoundsException
-     * @since 0.9.36
-     */
-    private static void toLong8(byte target[], int offset, long value) {
-        for (int i = offset + 7; i >= offset; i--) {
-            target[i] = (byte) value;
-            value >>= 8;
         }
     }
 }

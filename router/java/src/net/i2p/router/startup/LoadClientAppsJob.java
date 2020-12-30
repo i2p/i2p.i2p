@@ -291,6 +291,7 @@ public class LoadClientAppsJob extends JobImpl {
         }
 
         public void run() {
+            boolean ok = false;
             try {
                 Class<?> cls = Class.forName(_className, true, _cl);
                 if (isRouterApp(cls)) {
@@ -298,22 +299,27 @@ public class LoadClientAppsJob extends JobImpl {
                     RouterAppManager mgr = _ctx.routerAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     RouterApp app = (RouterApp) con.newInstance(conArgs);
-                    mgr.addAndStart(app, _args);
+                    ok = mgr.addAndStart(app, _args);
                 } else if (isClientApp(cls)) {
                     Constructor<?> con = cls.getConstructor(I2PAppContext.class, ClientAppManager.class, String[].class);
                     RouterAppManager mgr = _ctx.routerAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     ClientApp app = (ClientApp) con.newInstance(conArgs);
-                    mgr.addAndStart(app, _args);
+                    ok = mgr.addAndStart(app, _args);
                 } else {
                     Method method = cls.getMethod("main", String[].class);
                     method.invoke(cls, new Object[] { _args });
+                    ok = true;
                 }
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error starting up the client class " + _className, t);
             }
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Done running client application " + _appName);
+            if (ok) {
+                if (_log.shouldInfo())
+                    _log.info("Done running client application " + _appName);
+            } else {
+                _log.log(Log.CRIT, "Error starting up the client class " + _className);
+            }
         }
 
         private static boolean isRouterApp(Class<?> cls) {

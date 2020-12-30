@@ -51,13 +51,13 @@ final class GrowingArrayUtils {
     }
 
     /**
-     * Primitive int version of {@link #append(Object[], int, Object)}.
+     * Primitive char version of {@link #append(Object[], int, Object)}.
      */
-    public static int[] append(int[] array, int currentSize, int element) {
+    public static char[] append(char[] array, int currentSize, char element) {
         assert currentSize <= array.length;
 
         if (currentSize + 1 > array.length) {
-            int[] newArray = ArrayUtils.newUnpaddedIntArray(growSize(currentSize));
+            char[] newArray = ArrayUtils.newUnpaddedCharArray(growSize(currentSize));
             System.arraycopy(array, 0, newArray, 0, currentSize);
             array = newArray;
         }
@@ -95,9 +95,9 @@ final class GrowingArrayUtils {
     }
 
     /**
-     * Primitive int version of {@link #insert(Object[], int, int, Object)}.
+     * Primitive char version of {@link #insert(Object[], int, int, Object)}.
      */
-    public static int[] insert(int[] array, int currentSize, int index, int element) {
+    public static char[] insert(char[] array, int currentSize, int index, char element) {
         assert currentSize <= array.length;
 
         if (currentSize + 1 <= array.length) {
@@ -106,7 +106,7 @@ final class GrowingArrayUtils {
             return array;
         }
 
-        int[] newArray = ArrayUtils.newUnpaddedIntArray(growSize(currentSize));
+        char[] newArray = ArrayUtils.newUnpaddedCharArray(growSize(currentSize));
         System.arraycopy(array, 0, newArray, 0, index);
         newArray[index] = element;
         System.arraycopy(array, index, newArray, index + 1, array.length - index);

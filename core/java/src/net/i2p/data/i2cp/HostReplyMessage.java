@@ -6,7 +6,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +13,7 @@ import java.io.InputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * Response to HostLookupMessage. Replaces DestReplyMessage.
@@ -135,7 +135,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
                 throw new I2CPMessageException("Unable to write out the message as there is not enough data");
             len += _dest.size();
         }
-        ByteArrayOutputStream os = new ByteArrayOutputStream(len);
+        ByteArrayStream os = new ByteArrayStream(len);
         try {
             _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 4, _reqID);

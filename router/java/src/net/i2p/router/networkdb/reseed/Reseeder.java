@@ -111,14 +111,12 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://reseed.diva.exchange/"       + ',' +   // reseed_at_diva.exchange.crt       // CA
+        "https://reseed.i2pgit.org/"          + ',' +   // hankhill19580_at_gmail.com.crt    // CA
         "https://i2p.novg.net/"               + ',' +   // igor_at_novg.net.crt      // CA                         // Java 8+ only
         "https://i2pseed.creativecowpat.net:8443/" + ',' + // creativecowpat_at_mail.i2p.crt // i2pseed.creativecowpat.net.crt // Java 7+
-        "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // reseed.onion.im.crt        // Java 8+ only
+        "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // CA                         // Java 8+ only
         "https://reseed.memcpy.io/"           + ',' +   // hottuna_at_mail.i2p.crt   // CA                         // SNI required
-        "https://i2p.mooo.com/netDb/"         + ',' +   // bugme_at_mail.i2p.crt     // i2p.mooo.com.crt
-        "https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
-        "https://reseed.i2p2.no/"             + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
-        "https://reseed2.i2p2.no/"            + ',' +   // meeh_at_mail.i2p.crt      // CA                         // SNI required
         "https://reseed.i2p-projekt.de/";               // echelon_at_mail.i2p.crt   // echelon.reseed2017.crt     // Java 8+
 
     private static final String SU3_FILENAME = "i2pseeds.su3";

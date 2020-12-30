@@ -9,7 +9,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +18,7 @@ import java.util.List;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Lease;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -38,7 +38,7 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
     private static final String MIN_VERSION = "0.9.7";
 
     public RequestVariableLeaseSetMessage() {
-        _endpoints = new ArrayList<Lease>();
+        _endpoints = new ArrayList<Lease>(6);
     }
 
     /**
@@ -109,7 +109,8 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("No data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(256);
+        int len = 2 + 1 + (_endpoints.size() * 44);
+        ByteArrayStream os = new ByteArrayStream(len);
         try {
             _sessionId.writeBytes(os);
             os.write((byte) _endpoints.size());

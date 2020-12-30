@@ -23,6 +23,7 @@ package com.maxmind.geoip;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -31,6 +32,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Provides a lookup service for information based on an IP address. The
@@ -498,6 +500,90 @@ public class LookupService {
             return UNKNOWN_COUNTRY;
         } else {
             return new Country(countryCode[ret], countryName[ret]);
+        }
+    }
+
+    /**
+     *  I2P -
+     *  Write all IPv4 address ranges for the given country to out.
+     *
+     *  @param country two-letter case-insensitive
+     *  @param out caller must close
+     *  @since 0.9.48
+     */
+    public synchronized void countryToIP(String country, Writer out) throws IOException {
+        if (file == null && (dboptions & GEOIP_MEMORY_CACHE) == 0) {
+            throw new IllegalStateException("Database has been closed.");
+        }
+        country = country.toUpperCase(Locale.US);
+        // get the country ID we're looking for
+        int id = 0;
+        for (int i = 0; i < countryCode.length; i++) {
+            if (countryCode[i].equals(country)) {
+                id = i;
+                break;
+            }
+        }
+        if (id <= 0)
+            return;
+        // segment
+        id += COUNTRY_BEGIN;
+        Walker walker = new Walker(id, out);
+        out.write("# IPs for country " + country + " from GeoIP database\n");
+        walker.walk();
+    }
+
+    /**
+     *  I2P
+     *  @since 0.9.48
+     */
+    private class Walker {
+        private final int _country;
+        private final Writer _out;
+        private final byte[] _buf = new byte[2 * MAX_RECORD_LENGTH];
+        private final int[] _x = new int[2];
+        private final int _dbs0 = databaseSegments[0];
+
+        /**
+         * @param country the segment
+         */
+        public Walker(int country, Writer out) throws IOException {
+            _country = country;
+            _out = out;
+        }
+
+        /** only call once */
+        public void walk() throws IOException {
+            walk(0, 0, 31);
+        }
+
+        /**
+         * Recursive, depth first
+         * @param ip big endian
+         */
+        private void walk(int offset, int ip, int depth) throws IOException {
+            if (offset >= _dbs0) {
+                if (offset == _country) {
+                    String sip = ((ip >> 24) & 0xff) + "." +
+                                 ((ip >> 16) & 0xff) + '.' +
+                                 ((ip >> 8) & 0xff) + '.' +
+                                 (ip & 0xff);
+                    _out.write(sip);
+                    if (depth >= 0) {
+                        _out.write('/');
+                        _out.write(Integer.toString(31 - depth));
+                    }
+                    _out.write('\n');
+                }
+                return;
+            }
+            if (depth < 0)
+                return;
+            readNode(_buf, _x, offset);
+            int x1 = _x[1];
+            walk(_x[0], ip, depth - 1);
+            ip |= 1 << depth;
+            walk(x1, ip, depth - 1);
         }
     }
 

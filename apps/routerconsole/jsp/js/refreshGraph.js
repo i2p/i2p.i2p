@@ -1,3 +1,9 @@
+/* @license http://creativecommons.org/publicdomain/zero/1.0/legalcode CC0-1.0 */
+
+// This component is dedicated to the public domain. It uses the CC0
+// as a formal dedication to the public domain and in circumstances where
+// a public domain is not usable.
+
 // refresh the sidebar mini graph every 15 seconds
 
 function refreshGraph() {
@@ -6,3 +12,5 @@ function refreshGraph() {
 }
 
 refreshGraph();
+
+/* @license-end */

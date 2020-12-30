@@ -12,7 +12,7 @@
 
    <div class="langbar">
       <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
-      <a href="index_ar.html"><img src="lib/lang_ar.png" title="ﻉﺮﺒﻳﺓ" alt="ﻉﺮﺒﻳﺓ"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
       <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
       <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
       <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
@@ -44,14 +44,14 @@
 
     <ul>
       <li><b>Linux</b><br>
-        Standard install: <code>~/.i2p/eepsite/docroot/</code><br>
-        Package install, running as a service: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
       </li>
       <li><b>Windows</b><br>
-        <code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+        <code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
       </li>        
       <li><b>Mac</b><br>
-        <code>/Users/(user)/Library/Application Support/i2p</code>
+        <code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
       </li>
     </ul>
 
@@ -140,15 +140,15 @@
     </p>
 
     <ul>
-      <li><code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)
+      <li><code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)
       </li>
-      <li><code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)
+      <li><code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)
       </li>
     </ul>
     
     <p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
       This will work within a few minutes of your registering your hostname on the same site.
-      Test it yourself first by entering <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
+      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
       Once it is working, you can tell others to use it.
     </p>
 
@@ -187,7 +187,7 @@
         </p> 
 
         <p>There is one important issue with the Apache web server.
-          The <code>mod_status</code> and <code>mod_info</code> Apache modules are enabled by default on some operating systems.
+          The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
           These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
           Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.
         </p>

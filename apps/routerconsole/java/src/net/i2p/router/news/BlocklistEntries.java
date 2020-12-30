@@ -175,7 +175,7 @@ public class BlocklistEntries {
         StringBuilder buf = new StringBuilder();
         long now = System.currentTimeMillis();
         String date = RFC3339Date.to3339Date(now);
-        buf.append(date).append('\n');;
+        buf.append(date).append('\n');
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF-8"));
@@ -196,7 +196,7 @@ public class BlocklistEntries {
                     rlist.add(s.substring(1));
                 } else {
                     elist.add(s);
-                    buf.append(s).append('\n');;
+                    buf.append(s).append('\n');
                 }
             }
         } catch (IOException ioe) {

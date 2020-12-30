@@ -105,7 +105,7 @@ do
         then
             # slow way
             # convert to class files in build/obj
-            msgfmt --java --statistics -r $CLASS -l $LG -d build/obj $i
+            msgfmt --java2 --statistics -r $CLASS -l $LG -d build/obj $i
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"
@@ -123,7 +123,7 @@ do
             TDY=$TD2/net/i2p/util
             rm -rf $TD
             mkdir -p $TD $TDY
-            msgfmt --java --statistics --source -r $CLASS -l $LG -d $TD $i
+            msgfmt --java2 --statistics --source -r $CLASS -l $LG -d $TD $i
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"

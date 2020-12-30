@@ -89,8 +89,7 @@
     mtn -d i2p.mtn co --branch=i2p.i2p /path/to/releasedir
     ```
 
-  - You must build with Java 7 or higher.
-    If you build with Java 8 or higher, you must also have the Java 7 JRE installed for the bootclasspath.
+  - You must build with Java 8 or higher.
 
 4. Create override.properties with (adjust as necessary):
 
@@ -99,8 +98,7 @@
     release.gpg.keyid=0xnnnnnnnn
     release.signer.su3=xxx@mail.i2p
     build.built-by=xxx
-    javac.compilerargs=-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar
-    javac.compilerargs7=-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar
+    javac.compilerargs=-bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jce.jar
     ```
 
 5. Copy latest trust list _MTN/monotonerc from website or some other workspace
@@ -134,8 +132,12 @@
 0. Make sure you're using the right JDK
    `echo $JAVA_HOME` and `java -version`
 
-1. `ant releaseRepack` or `ant releaseWithGeoIPRepack` or `ant releaseWithJbigiRepack`
-
+1.  Build the release.
+  - Decide if you want to include GeoIP or not.
+    If it's been a few months since it was last included,
+    use releaseWithGeoIPRepack. Otherwise, use releaseRepack.
+    Use releaseWithJbigiRepack only if jbigi binaries were updated.
+  - `ant releaseRepack` or `ant releaseWithGeoIPRepack` or `ant releaseWithJbigiRepack`
   - Copy i2pinstall_${release.number}_windows.exe,
     console.ico, ../lib/izpack/rh.bat, and ../lib/izpack/VersionInfo_template.rc
     to Windows machine
@@ -143,7 +145,7 @@
   - Run rh.bat to edit the resources
   - Sign the windows installer:
     Open Visual Studio developer prompt
-    signtool sign /debug i2pinstall_${release.number}_windows.exe
+    signtool sign /a /debug /fd SHA256 i2pinstall_${release.number}_windows.exe
   - GPG sign the signed windows installer: gpg -u keyid -b i2pinstall_${release.number}_windows.exe
   - sha256sum i2pinstall_${release.number}_windows.exe
 

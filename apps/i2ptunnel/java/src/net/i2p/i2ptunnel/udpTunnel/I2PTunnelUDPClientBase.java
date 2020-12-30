@@ -66,7 +66,7 @@ import net.i2p.util.EventDispatcher;
    public I2PTunnelUDPClientBase(String destination, Logging l, EventDispatcher notifyThis,
                                   I2PTunnel tunnel) throws IllegalArgumentException {
         super("UDPServer", notifyThis, tunnel);
-        _clientId = __clientId.incrementAndGet();;
+        _clientId = __clientId.incrementAndGet();
         this.l = l;
 
         _context = tunnel.getContext();

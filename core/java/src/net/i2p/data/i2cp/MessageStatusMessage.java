@@ -189,6 +189,14 @@ public class MessageStatusMessage extends I2CPMessageImpl {
      */
     public final static int STATUS_SEND_FAILURE_META_LEASESET = 22;
 
+    // NOTE:
+    // Add any new status codes to handlers in:
+    // net.i2p.client.impl.MessageState
+    // net.i2p.client.impl.MessageStatusMessageHandler
+    // net.i2p.client.streaming.I2PSocketException
+    // net.i2p.client.streaming.impl.PacketQueue
+    // net.i2p.i2ptunnel.I2PTunnelHTTPClientBase
+    // and update http://i2p-projekt.i2p/spec/i2cp
 
     public MessageStatusMessage() {
         _sessionId = -1;

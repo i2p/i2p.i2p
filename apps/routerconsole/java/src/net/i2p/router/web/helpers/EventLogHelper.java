@@ -51,7 +51,8 @@ public class EventLogHelper extends FormHandler {
         EventLog.UPDATED, _x("Updated router"),
         EventLog.WATCHDOG, _x("Watchdog warning")
     };
-    private static final long DAY = 24*60*60*1000L;
+    // in seconds
+    private static final long DAY = 24*60*60L;
     private static final long[] _times = { 0, DAY, 7*DAY, 30*DAY, 90*DAY, 365*DAY };
 
     public EventLogHelper() {
@@ -72,7 +73,7 @@ public class EventLogHelper extends FormHandler {
     
     public void setFrom(String s) { 
         try {
-            _age = Long.parseLong(s);
+            _age = Long.parseLong(s) * 1000;
             if (_age > 0)
                 _from = _context.clock().now() - _age;
             else
@@ -135,17 +136,20 @@ public class EventLogHelper extends FormHandler {
          _out.write("</option>\n");
     }
 
+    /**
+     * @param age seconds
+     */
     private void writeOption(long age) throws IOException {
          _out.write("<option value=\"");
          _out.write(Long.toString(age));
          _out.write("\"");
-         if (age == _age)
+         if (age == _age / 1000)
              _out.write(HelperBase.SELECTED);
          _out.write(">");
          if (age == 0)
              _out.write(_t("All events"));
          else
-             _out.write(DataHelper.formatDuration2(age));
+             _out.write(DataHelper.formatDuration2(age * 1000));
          _out.write("</option>\n");
     }
 
@@ -165,7 +169,7 @@ public class EventLogHelper extends FormHandler {
         if (events.isEmpty()) {
             if (isAll) {
                 if (_age == 0)
-                    return ("<table id=\"eventlog\"><tr><td class=\"infohelp\">") + _t("No events found") + ("</td></tr></table>");;
+                    return ("<table id=\"eventlog\"><tr><td class=\"infohelp\">") + _t("No events found") + ("</td></tr></table>");
                 return ("<table id=\"eventlog\"><tr><td>") + _t("No events found in previous {0}", DataHelper.formatDuration2(_age)) + ("</td></tr></table>");
             }
             if (_age == 0)

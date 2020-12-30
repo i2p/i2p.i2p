@@ -28,11 +28,13 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _receiveWindow;
     private int _profile;
     private int _rtt;
+    private int _minRtt = Integer.MAX_VALUE;
     private int _rttDev;
     private int _rto = INITIAL_RTO;
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
+    private int _maxInitialMessageSize;
     private int _maxResends;
     private int _inactivityTimeout;
     private int _inactivityAction;
@@ -83,9 +85,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * These values are specified in RFC 6298
      * Do not change unless you know what you're doing
      */
-    private static final double TCP_ALPHA = 1.0/8;
-    private static final double TCP_BETA = 1.0/4; 
-    private static final double TCP_KAPPA = 4;
+    private static final float TCP_ALPHA = 1.0f/8;
+    private static final float TCP_BETA = 1.0f/4; 
+    private static final float TCP_KAPPA = 4;
     
     private static final String PROP_INITIAL_RTO = "i2p.streaming.initialRTO";
     private static final int INITIAL_RTO = 9000; 
@@ -134,11 +136,15 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     
     
     private static final int TREND_COUNT = 3;
-    static final int INITIAL_WINDOW_SIZE = 6;
+    /** RFC 5681 sec. 3.1 */
+    static final int INITIAL_WINDOW_SIZE = 3;
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
     private static final int MAX_RTT = 60*1000;    
-    private static final int DEFAULT_INITIAL_ACK_DELAY = 750;  
+    /**
+     *  Ref: RFC 5681 sec. 4.3, RFC 1122 sec. 4.2.3.3, ticket #2706
+     */
+    private static final int DEFAULT_INITIAL_ACK_DELAY = 500;  
     static final int MIN_WINDOW_SIZE = 1;
     private static final boolean DEFAULT_ANSWER_PINGS = true;
     private static final int DEFAULT_INACTIVITY_TIMEOUT = 90*1000;
@@ -175,17 +181,33 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  1003 Tunnel Payload
      *  - 39 Unfragmented instructions (see router/tunnel/TrivialPreprocessor.java)
      * -----
-     *   964 Unfragmented I2NP Message
-     *  - 20 ??
+     *   964 Garlic Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
-     *   944 Garlic Message padded to 16 bytes
-     *  -  0 Pad to 16 bytes (why?)
+     *   944 Garlic Message AES payload padded to 16 bytes
+     *  -  0 Pad to 16 bytes
      * -----
      *   944 Garlic Message (assumes no bundled leaseSet or keys)
-     *  - 71 Garlic overhead
+     *  - 32 session tag
+     *  -  2 tag count
+     *  -  4 payload size
+     *  - 32 payload hash
+     *  -  1 flags
+     *  -  1 clove count
+     *  - 33 clove delivery instructions
+     *       (Tunnel Data Message goes here)
+     *  -  4 clove ID
+     *  -  8 clove expiration
+     *  -  3 clove cert
+     *  -  3 garlic cert
+     *  -  4 garlic ID
+     *  -  8 garlic expiration
+     * - 135 total overhead
      * -----
-     *   873 Tunnel Data Message
-     *  - 84 ??
+     *   809 Data Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
      *   789 Gzipped I2NP message
      *  - 23 Gzip 10 byte header, 5 byte block header, 8 byte trailer (yes we always use gzip, but it
@@ -194,7 +216,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *       (see client/I2PSessionImpl2.java, util/ReusableGZipOutputStream.java, and the gzip and deflate specs)
      * -----
      *   766
-     *  - 28 Streaming header (24 min, but leave room for a nack or other optional things) (See Packet.java)
+     *  - 28 Streaming header (22 min) and 6 bytes of options or nacks
      * -----
      *   738 Streaming message size
      *
@@ -207,24 +229,40 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  2006 Tunnel Payload
      *  - 50 Fragmented instructions (43 for first + 7 for second)
      * -----
-     *  1956 Unfragmented I2NP Message
-     *  - 20 ??
+     *  1956 Garlic Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
-     *  1936 Garlic Message padded to 16 bytes
+     *  1936 Garlic Message AES payload padded to 16 bytes
      *  1936
      *  -  0 Pad to 16 bytes
      * -----
      *  1936 Garlic Message
-     *  - 71 Garlic overhead
+     *  - 32 session tag
+     *  -  2 tag count
+     *  -  4 payload size
+     *  - 32 payload hash
+     *  -  1 flags
+     *  -  1 clove count
+     *  - 33 clove delivery instructions
+     *       (Tunnel Data Message goes here)
+     *  -  4 clove ID
+     *  -  8 clove expiration
+     *  -  3 clove cert
+     *  -  3 garlic cert
+     *  -  4 garlic ID
+     *  -  8 garlic expiration
+     * - 135 total overhead
      * -----
-     *  1865 Tunnel Data Message
-     *  - 84 ??
+     *  1801 Data Message
+     *  - 16 I2NP header
+     *  -  4 length
      * -----
      *  1781 Gzipped I2NP message
-     *  - 23 Gzip header
+     *  - 23 Gzip 10 byte header, 5 byte block header, 8 byte trailer
      * -----
      *  1758
-     *  - 28 Streaming header
+     *  - 28 Streaming header (22 min) and 6 bytes of options or nacks
      * -----
      *  1730 Streaming message size to fit in 2 tunnel messages
      *
@@ -267,6 +305,12 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public static final int DEFAULT_MAX_MESSAGE_SIZE = 1730;
     public static final int MIN_MESSAGE_SIZE = 512;
+    /**
+     *
+     *  See analysis in proposal 144
+     *  @since 0.9.47
+     */
+    public static final int DEFAULT_MAX_MESSAGE_SIZE_RATCHET = 1812;
 
     /**
      *  Sets max buffer size, connect timeout, read timeout, and write timeout
@@ -410,7 +454,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
         _tagsToSend = getInt(opts, PROP_TAGS_TO_SEND, DEFAULT_TAGS_TO_SEND);
-        _tagsToSend = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
+        _tagThreshold = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
     }
     
     /**
@@ -481,9 +525,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.getProperty(PROP_LIMIT_ACTION) != null)
             _limitAction = opts.getProperty(PROP_LIMIT_ACTION);
         if (opts.getProperty(PROP_TAGS_TO_SEND) != null)
-            _maxConns = getInt(opts, PROP_TAGS_TO_SEND, DEFAULT_TAGS_TO_SEND);
+            _tagsToSend = getInt(opts, PROP_TAGS_TO_SEND, DEFAULT_TAGS_TO_SEND);
         if (opts.getProperty(PROP_TAG_THRESHOLD) != null)
-            _maxConns = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
+            _tagThreshold = getInt(opts, PROP_TAG_THRESHOLD, DEFAULT_TAG_THRESHOLD);
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
     }
@@ -578,6 +622,13 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public synchronized int getRTT() { return _rtt; }
 
     /**
+     * @return minimum RTT observed over the life of the connection, greater than zero
+     * @since 0.9.46
+     */
+    public synchronized int getMinRTT() {return _minRtt; }
+
+
+    /**
      *  not public, use updateRTT()
      */
     private void setRTT(int ms) { 
@@ -599,6 +650,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         }
     }
 
+    /**
+     *  @return Connection.MIN_RESEND_DELAY to Connection.MAX_RESEND_DELAY
+     */
     public synchronized int getRTO() { return _rto; }
 
     /** used in TCB @since 0.9.8 */
@@ -633,22 +687,24 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         }
         
         if (_rto < Connection.MIN_RESEND_DELAY) 
-            _rto = (int)Connection.MIN_RESEND_DELAY;
+            _rto = Connection.MIN_RESEND_DELAY;
         else if (_rto > Connection.MAX_RESEND_DELAY)
-            _rto = (int)Connection.MAX_RESEND_DELAY;
+            _rto = Connection.MAX_RESEND_DELAY;
     }
     
     /** 
      * Double the RTO (after congestion).
      * See RFC 6298 section 5 item 5.5
      *
+     * @return new value, Connection.MIN_RESEND_DELAY to Connection.MAX_RESEND_DELAY
      * @since 0.9.33
      */
-    synchronized void doubleRTO() {
+    synchronized int doubleRTO() {
         // we don't need to switch on _initState, _rto is set in constructor
         _rto *= 2;
         if (_rto > Connection.MAX_RESEND_DELAY)
-            _rto = (int)Connection.MAX_RESEND_DELAY;
+            _rto = Connection.MAX_RESEND_DELAY;
+        return _rto;
     }
     
     /**
@@ -671,6 +727,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  @param measuredValue must be positive
      */
     public synchronized void updateRTT(int measuredValue) {
+        _minRtt = Math.min(_minRtt, measuredValue);
         switch(_initState) {
         case INIT:
             _initState = AckInit.FIRST;
@@ -704,12 +761,19 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * (_lastSendTime+_sendAckDelay), send an ACK of what
      * we have received so far.
      *
+     * Ref: RFC 5681 sec. 4.3, RFC 1122 sec. 4.2.3.3, ticket #2706
+     *
      * @return ACK delay in ms
      */
     public int getSendAckDelay() { return _sendAckDelay; }
+
     /**
-     *  Unused except here, so expect the default initial delay of 2000 ms unless set by the user
+     *  Unused except here, so expect the default initial delay of DEFAULT_INITIAL_ACK_DELAY unless set by the user
      *  to remain constant.
+     *
+     *  Changing the default is not recommended.
+     *  Ref: RFC 5681 sec. 4.3, RFC 1122 sec. 4.2.3.3, ticket #2706
+     *
      */
     public void setSendAckDelay(int delayMs) { _sendAckDelay = delayMs; }
     
@@ -717,7 +781,25 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return Maximum message size (MTU/MRU)
      */
     public int getMaxMessageSize() { return _maxMessageSize; }
-    public void setMaxMessageSize(int bytes) { _maxMessageSize = Math.max(bytes, MIN_MESSAGE_SIZE); }
+    public void setMaxMessageSize(int bytes) {
+        _maxMessageSize = Math.max(bytes, MIN_MESSAGE_SIZE);
+        _maxInitialMessageSize = Math.min(_maxMessageSize, DEFAULT_MAX_MESSAGE_SIZE);
+    }
+    
+    /**
+     *  What is the largest message to send in the SYN from Alice to Bob?
+     *  @return the max
+     *  @since 0.9.47
+     */
+    public int getMaxInitialMessageSize() { return _maxInitialMessageSize; }
+
+    /**
+     *  What is the largest message to send in the SYN from Alice to Bob?
+     *  @since 0.9.47
+     */
+    public void setMaxInitialMessageSize(int bytes) {
+        _maxInitialMessageSize = bytes;
+    }
     
     /**
      * What profile do we want to use for this connection?

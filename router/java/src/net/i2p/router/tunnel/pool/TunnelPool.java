@@ -40,8 +40,7 @@ public class TunnelPool {
     private final TunnelPoolManager _manager;
     protected volatile boolean _alive;
     private long _lifetimeProcessed;
-    private TunnelInfo _lastSelected;
-    private long _lastSelectionPeriod;
+    private int _lastSelectedIdx;
     private final int _expireSkew;
     private long _started;
     private long _lastRateUpdate;
@@ -113,7 +112,7 @@ public class TunnelPool {
             }
 
             if (ls != null)
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                requestLeaseSet(ls);
         }
         _context.statManager().createRequiredRateStat(_rateName,
                                "Tunnel Bandwidth (Bytes/sec)", "Tunnels", 
@@ -124,8 +123,6 @@ public class TunnelPool {
         if (_log.shouldLog(Log.WARN))
             _log.warn(toString() + ": Shutdown called");
         _alive = false;
-        _lastSelectionPeriod = 0;
-        _lastSelected = null;
         _context.statManager().removeRateStat(_rateName);
         synchronized (_inProgress) {
             _inProgress.clear();
@@ -152,20 +149,6 @@ public class TunnelPool {
             _settings.readFromProperties(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY, props);
     }
     
-    /** 
-     * when selecting tunnels, stick with the same one for a brief 
-     * period to allow batching if we can.
-     */
-    private long curPeriod() {
-        long period = _context.clock().now();
-        long ms = period % 1000;
-        if (ms > 500)
-            period = period - ms + 500;
-        else
-            period = period - ms;
-        return period;
-    }
-    
     private long getLifetime() { return System.currentTimeMillis() - _started; }
     
     /**
@@ -180,33 +163,24 @@ public class TunnelPool {
     private TunnelInfo selectTunnel(boolean allowRecurseOnFail) {
         boolean avoidZeroHop = !_settings.getAllowZeroHop();
         
-        long period = curPeriod();
         synchronized (_tunnels) {
-            if (_lastSelectionPeriod == period) {
-                if ( (_lastSelected != null) && 
-                     (_lastSelected.getExpiration() > period) &&
-                     (_tunnels.contains(_lastSelected)) )
-                    return _lastSelected;
-            }
-            _lastSelectionPeriod = period;
-            _lastSelected = null;
-
             if (_tunnels.isEmpty()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": No tunnels to select from");
             } else {
-                Collections.shuffle(_tunnels, _context.random());
                 
                 // if there are nonzero hop tunnels and the zero hop tunnels are fallbacks, 
                 // avoid the zero hop tunnels
                 TunnelInfo backloggedTunnel = null;
                 if (avoidZeroHop) {
                     for (int i = 0; i < _tunnels.size(); i++) {
-                        TunnelInfo info = _tunnels.get(i);
+                        _lastSelectedIdx++;
+                        if (_lastSelectedIdx >= _tunnels.size())
+                            _lastSelectedIdx = 0;
+                        TunnelInfo info = _tunnels.get(_lastSelectedIdx);
                         if ( (info.getLength() > 1) && (info.getExpiration() > _context.clock().now()) ) {
                             // avoid outbound tunnels where the 1st hop is backlogged
                             if (_settings.isInbound() || !_context.commSystem().isBacklogged(info.getPeer(1))) {
-                                _lastSelected = info;
                                 return info;
                             } else {
                                 backloggedTunnel = info;
@@ -229,7 +203,6 @@ public class TunnelPool {
                         if (_settings.isInbound() || info.getLength() <= 1 ||
                             !_context.commSystem().isBacklogged(info.getPeer(1))) {
                             //_log.debug("Selecting tunnel: " + info + " - " + _tunnels);
-                            _lastSelected = info;
                             return info;
                         } else {
                             backloggedTunnel = info;
@@ -487,7 +460,7 @@ public class TunnelPool {
         }
         
         if (ls != null)
-            _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+            requestLeaseSet(ls);
     }
     
     /**
@@ -505,10 +478,6 @@ public class TunnelPool {
             if (_settings.isInbound() && !_settings.isExploratory())
                 ls = locked_buildNewLeaseSet();
             remaining = _tunnels.size();
-            if (_lastSelected == info) {
-                _lastSelected = null;
-                _lastSelectionPeriod = 0;
-            }
         }
 
         _manager.getExecutor().repoll();
@@ -523,7 +492,7 @@ public class TunnelPool {
         
         if (_alive && _settings.isInbound() && !_settings.isExploratory()) {
             if (ls != null) {
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                requestLeaseSet(ls);
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": unable to build a new leaseSet on removal (" + remaining 
@@ -573,10 +542,6 @@ public class TunnelPool {
                 return;
             if (_settings.isInbound() && !_settings.isExploratory())
                 ls = locked_buildNewLeaseSet();
-            if (_lastSelected == cfg) {
-                _lastSelected = null;
-                _lastSelectionPeriod = 0;
-            }
         }
         
         _manager.tunnelFailed();
@@ -586,7 +551,7 @@ public class TunnelPool {
         
         if (_settings.isInbound() && !_settings.isExploratory()) {
             if (ls != null) {
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                requestLeaseSet(ls);
             }
         }
     }
@@ -641,13 +606,28 @@ public class TunnelPool {
                 ls = locked_buildNewLeaseSet();
             }
             if (ls != null) {
-                _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
-                Set<Hash> aliases = _settings.getAliases();
-                if (aliases != null && !aliases.isEmpty()) {
-                    for (Hash h : aliases) {
-                        _context.clientManager().requestLeaseSet(h, ls);
-                    }
-                }
+                requestLeaseSet(ls);
+            }
+        }
+    }
+
+    /**
+     *  Request lease set from client for the primary and all aliases.
+     *
+     *  @param ls non-null
+     *  @since 0.9.49
+     */
+    private void requestLeaseSet(LeaseSet ls) {
+        _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+        Set<Hash> aliases = _settings.getAliases();
+        if (aliases != null && !aliases.isEmpty()) {
+            for (Hash h : aliases) {
+                 // don't corrupt other requests
+                 LeaseSet ls2 = new LeaseSet();
+                 for (int i = 0; i < ls.getLeaseCount(); i++) {
+                     ls2.addLease(ls.getLease(i));
+                 }
+                _context.clientManager().requestLeaseSet(h, ls2);
             }
         }
     }
@@ -687,7 +667,13 @@ public class TunnelPool {
      */
     private static class LeaseComparator implements Comparator<Lease>, Serializable {
          public int compare(Lease l, Lease r) {
-             return r.getEndDate().compareTo(l.getEndDate());
+             long lt = l.getEndTime();
+             long rt = r.getEndTime();
+             if (rt > lt)
+                 return 1;
+             if (rt < lt)
+                 return -1;
+             return 0;
         }
     }
 
@@ -738,6 +724,8 @@ public class TunnelPool {
     /**
      * Build a leaseSet with the required tunnels that aren't about to expire.
      * Caller must synchronize on _tunnels.
+     * The returned LeaseSet will be incomplete; it will not have the destination
+     * set and will not be signed. Only the leases will be included.
      *
      * @return null on failure
      */
@@ -790,7 +778,7 @@ public class TunnelPool {
             // Get the "real" expiration from the gateway hop config,
             // HopConfig expirations are the same as the "real" expiration and don't change
             // see configureNewTunnel()
-            lease.setEndDate(new Date(((TunnelCreatorConfig)tunnel).getConfig(0).getExpiration()));
+            lease.setEndDate(((TunnelCreatorConfig)tunnel).getConfig(0).getExpiration());
             lease.setTunnelId(inId);
             lease.setGateway(gw);
             leases.add(lease);

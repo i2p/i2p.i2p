@@ -1,6 +1,5 @@
 package net.i2p.data;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,12 +15,13 @@ import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 
 /**
- * PRELIMINARY - Subject to change - see proposal 123
+ * See proposal 123
  *
  * @since 0.9.38
  */
@@ -88,7 +88,12 @@ public class LeaseSet2 extends LeaseSet {
         return (_flags & FLAG_UNPUBLISHED) != 0;
     }
 
+    /**
+     *  @throws IllegalStateException if already signed
+     */
     public void setUnpublished() {
+        if (_signature != null && (_flags & FLAG_UNPUBLISHED) == 0)
+            throw new IllegalStateException();
         _flags |= FLAG_UNPUBLISHED;
     }
 
@@ -102,9 +107,12 @@ public class LeaseSet2 extends LeaseSet {
 
     /**
      *  Set if the unencrypted LS, when published, will be blinded/encrypted
+     *  @throws IllegalStateException if already signed
      *  @since 0.9.42
      */
     public void setBlindedWhenPublished() {
+        if (_signature != null && (_flags & FLAG_BLINDED) == 0)
+            throw new IllegalStateException();
         _flags |= FLAG_BLINDED;
     }
     
@@ -245,14 +253,26 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     /**
+     *  Absolute time, not time from now.
+     *  @return transient expiration time or 0 if not offline signed
+     *  @since 0.9.48
+     */
+    public long getTransientExpiration() {
+        return _transientExpires;
+    }
+
+    /**
      *  Destination must be previously set.
      *
      *  @param expires absolute ms
      *  @param transientSPK the key that will sign the leaseset
      *  @param offlineSig the signature by the spk in the destination
      *  @return success, false if verify failed or expired
+     *  @throws IllegalStateException if already signed
      */
     public boolean setOfflineSignature(long expires, SigningPublicKey transientSPK, Signature offlineSig) {
+        if (_signature != null)
+            throw new IllegalStateException();
         _flags |= FLAG_OFFLINE_KEYS;
         _transientExpires = expires;
         _transientSigningPublicKey = transientSPK;
@@ -269,7 +289,7 @@ public class LeaseSet2 extends LeaseSet {
      *  @return null on error
      */
     public static Signature offlineSign(long expires, SigningPublicKey transientSPK, SigningPrivateKey priv) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(128);
+        ByteArrayStream baos = new ByteArrayStream(4 + 2 + transientSPK.length());
         try {
             DataHelper.writeLong(baos, 4, expires / 1000);
             DataHelper.writeLong(baos, 2, transientSPK.getType().getCode());
@@ -279,9 +299,7 @@ public class LeaseSet2 extends LeaseSet {
         } catch (DataFormatException dfe) {
             return null;
         }
-        byte[] data = baos.toByteArray();
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        return ctx.dsa().sign(data, priv);
+        return baos.sign(priv);
     }
 
     public boolean verifyOfflineSignature() {
@@ -294,7 +312,7 @@ public class LeaseSet2 extends LeaseSet {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         if (_transientExpires < ctx.clock().now())
             return false;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(6 + _transientSigningPublicKey.length());
+        ByteArrayStream baos = new ByteArrayStream(4 + 2 + _transientSigningPublicKey.length());
         try {
             DataHelper.writeLong(baos, 4, _transientExpires / 1000);
             DataHelper.writeLong(baos, 2, _transientSigningPublicKey.getType().getCode());
@@ -304,8 +322,7 @@ public class LeaseSet2 extends LeaseSet {
         } catch (DataFormatException dfe) {
             return false;
         }
-        byte[] data = baos.toByteArray();
-        return ctx.dsa().verifySignature(_offlineSignature, data, 0, data.length, getSigningPublicKey());
+        return baos.verifySignature(ctx, _offlineSignature, getSigningPublicKey());
     }
 
     /**
@@ -367,7 +384,7 @@ public class LeaseSet2 extends LeaseSet {
         if (_destination == null)
             return null;
         int len = size();
-        ByteArrayOutputStream out = new ByteArrayOutputStream(len);
+        ByteArrayStream out = new ByteArrayStream(len);
         try {
             writeBytesWithoutSig(out);
         } catch (IOException ioe) {
@@ -585,7 +602,7 @@ public class LeaseSet2 extends LeaseSet {
         if (key == null)
             throw new DataFormatException("No signing key");
         int len = size();
-        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        ByteArrayStream out = new ByteArrayStream(1 + len);
         try {
             // unlike LS1, sig covers type
             out.write(getType());
@@ -593,9 +610,8 @@ public class LeaseSet2 extends LeaseSet {
         } catch (IOException ioe) {
             throw new DataFormatException("Signature failed", ioe);
         }
-        byte data[] = out.toByteArray();
         // now sign with the key 
-        _signature = DSAEngine.getInstance().sign(data, key);
+        _signature = out.sign(key);
         if (_signature == null)
             throw new DataFormatException("Signature failed with " + key.getType() + " key");
     }
@@ -627,7 +643,7 @@ public class LeaseSet2 extends LeaseSet {
             spk = getSigningPublicKey();
         }
         int len = size();
-        ByteArrayOutputStream out = new ByteArrayOutputStream(1 + len);
+        ByteArrayStream out = new ByteArrayStream(1 + len);
         try {
             // unlike LS1, sig covers type
             out.write(getType());
@@ -639,8 +655,7 @@ public class LeaseSet2 extends LeaseSet {
             dfe.printStackTrace();
             return false;
         }
-        byte data[] = out.toByteArray();
-        return DSAEngine.getInstance().verifySignature(_signature, data, spk);
+        return out.verifySignature(_signature, spk);
     }
     
     @Override
@@ -691,6 +706,7 @@ public class LeaseSet2 extends LeaseSet {
             }
         }
         buf.append("\n\tUnpublished? ").append(isUnpublished());
+        buf.append("\n\tBlinded? ").append(isBlindedWhenPublished());
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished: ").append(new java.util.Date(_published));
         buf.append("\n\tExpires: ").append(new java.util.Date(_expires));

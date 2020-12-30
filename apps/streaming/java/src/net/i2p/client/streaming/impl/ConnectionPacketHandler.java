@@ -28,7 +28,7 @@ class ConnectionPacketHandler {
     private final Log _log;
     private final ByteCache _cache = ByteCache.getInstance(32, 4*1024);
 
-    public static final int MAX_SLOW_START_WINDOW = 24;
+    public static final int MAX_SLOW_START_WINDOW = 64;
     
     // see tickets 1939 and 2584
     private static final int IMMEDIATE_ACK_DELAY = 150;
@@ -87,14 +87,38 @@ class ConnectionPacketHandler {
         }
 
         if (packet.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
-            int size = packet.getOptionalMaxSize();
-            if (size < ConnectionOptions.MIN_MESSAGE_SIZE) {
-                // log.error? connection reset?
-                size = ConnectionOptions.MIN_MESSAGE_SIZE;
+            // inbound SYN handled in ConnectionManager.receiveConnection()
+            if (!(con.isInbound() && packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))) {
+                int size = packet.getOptionalMaxSize();
+                if (size < ConnectionOptions.MIN_MESSAGE_SIZE) {
+                    // log.error? connection reset?
+                    size = ConnectionOptions.MIN_MESSAGE_SIZE;
+                }
+                int mtu = con.getOptions().getMaxMessageSize();
+                if (size < mtu) {
+                    if (_log.shouldInfo())
+                        _log.info("Reducing MTU to " + size 
+                                  + " from " + mtu);
+                    con.getOptions().setMaxMessageSize(size);
+                    con.getOutputStream().setBufferSize(size);
+                } else if (size > con.getOptions().getMaxInitialMessageSize()) {
+                    if (size > mtu)
+                        size = mtu;
+                    if (_log.shouldInfo())
+                        _log.info("Increasing MTU to " + size 
+                                  + " from " + con.getOptions().getMaxInitialMessageSize());
+                    if (size != mtu)
+                        con.getOptions().setMaxMessageSize(size);
+                    con.getOutputStream().setBufferSize(size);
+                }
             }
+        } else if (!con.isInbound() && packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+            // SYN ACK w/o MAX_PACKET_SIZE?
+            // specs not clear if this is allowed
+            final int size = ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE;
             if (size < con.getOptions().getMaxMessageSize()) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Reducing our max message size to " + size 
+                if (_log.shouldInfo())
+                    _log.info("SYN ACK w/o MTU, Reducing MTU to " + size 
                               + " from " + con.getOptions().getMaxMessageSize());
                 con.getOptions().setMaxMessageSize(size);
                 con.getOutputStream().setBufferSize(size);
@@ -204,9 +228,11 @@ class ConnectionPacketHandler {
                 // see tickets 1939 and 2584
                 con.setNextSendTime(_context.clock().now() + IMMEDIATE_ACK_DELAY);
             } else {
-                int delay = con.getOptions().getSendAckDelay();
+                int delay;
                 if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) // delayed ACK requested
                     delay = packet.getOptionalDelay();
+                else
+                    delay = con.getOptions().getSendAckDelay();
                 con.setNextSendTime(delay + _context.clock().now());
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Scheduling ack in " + delay + "ms for received packet " + packet);
@@ -431,9 +457,9 @@ class ConnectionPacketHandler {
 
             _context.statManager().addRateData("stream.trend", trend, newWindowSize);
             
-            if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
-                if (newWindowSize < con.getLastCongestionSeenAt() / 2) {
-                    // Don't make this <= LastCongestion/2 or we'll jump right back to where we were
+            if ( (!congested) && (acked > 0) ) {
+                int ssthresh = con.getSSThresh();
+                if (newWindowSize < ssthresh) {
                     // slow start - exponential growth
                     // grow acked/N times (where N = the slow start factor)
                     // always grow at least 1
@@ -443,10 +469,7 @@ class ConnectionPacketHandler {
                         // as it often leads to a big packet loss (30-50) all at once that
                         // takes quite a while (a minute or more) to recover from,
                         // especially if crypto tags are lost
-                        if (newWindowSize >= MAX_SLOW_START_WINDOW)
-                            newWindowSize++;
-                        else
-                            newWindowSize = Math.min(MAX_SLOW_START_WINDOW, newWindowSize + acked);
+                        newWindowSize = Math.min(ssthresh, newWindowSize + acked);
                     } else if (acked < factor)
                         newWindowSize++;
                     else
@@ -483,8 +506,8 @@ class ConnectionPacketHandler {
             con.setCongestionWindowEnd(newWindowSize + lowest);
                                 
             if (_log.shouldLog(Log.INFO))
-                _log.info("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize() + " congestionSeenAt: "
-                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
+                _log.info("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize()
+                           + " (#resends: " + numResends 
                            + ") for " + con);
         } else {
             if (_log.shouldLog(Log.DEBUG))
@@ -590,7 +613,7 @@ class ConnectionPacketHandler {
                 return;
             } else {
                 if (_log.shouldWarn())
-                    _log.warn("Reset received on " + con);;
+                    _log.warn("Reset received on " + con);
                 // ok, valid RST
                 con.resetReceived();
                 con.eventOccurred();

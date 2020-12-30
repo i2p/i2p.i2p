@@ -17,6 +17,7 @@ public class Restarter implements Runnable {
     }
 
     public void run() {
+        Long start = System.currentTimeMillis();
         _context.router().eventLog().addEvent(EventLog.SOFT_RESTART);
         Log log = _context.logManager().getLog(Router.class);
         log.error("Stopping the router for a restart...");
@@ -36,6 +37,7 @@ public class Restarter implements Runnable {
     
         log.logAlways(Log.WARN, "Router teardown complete, restarting the router...");
         try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+        _context.router().setEstimatedDowntime(System.currentTimeMillis() - start);
     
         log.logAlways(Log.WARN, "Restarting the comm system");
         log.logAlways(Log.WARN, "Restarting the tunnel manager");

@@ -8,6 +8,7 @@ package net.i2p.sam;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress ;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
@@ -97,7 +98,8 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 			ByteBuffer msgBuf = ByteBuffer.allocate(msg.length()+data.length);
 			msgBuf.put(DataHelper.getASCII(msg));
 			msgBuf.put(data);
-			msgBuf.flip();
+			// not ByteBuffer to avoid Java 8/9 issues with flip()
+			((Buffer)msgBuf).flip();
 			this.server.send(this.clientAddress, msgBuf);
 		}
 	}

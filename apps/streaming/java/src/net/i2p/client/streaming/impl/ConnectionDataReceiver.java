@@ -146,12 +146,11 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         return packet;
     }
     
-    private static boolean isAckOnly(Connection con, int size) {
-        boolean ackOnly = ( (size <= 0) && // no data
-                            (con.getLastSendId() >= 0) && // not a SYN
-                            ( (!con.getOutputStream().getClosed()) || // not a CLOSE
-                            (con.getOutputStream().getClosed() && 
-                             con.getCloseSentOn() > 0) )); // or it is a dup CLOSE
+    private boolean isAckOnly(int size) {
+        boolean ackOnly = size <= 0 && // no data
+                          _connection.getLastSendId() >= 0 && // not a SYN
+                          (!_connection.getOutputStream().getClosed() || // not a CLOSE
+                           _connection.getCloseSentOn() > 0); // or it is a dup CLOSE
         return ackOnly;
     }
     
@@ -170,7 +169,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      */
     private PacketLocal buildPacket(byte buf[], int off, int size, boolean forceIncrement) {
         if (size > Packet.MAX_PAYLOAD_SIZE) throw new IllegalArgumentException("size is too large (" + size + ")");
-        boolean ackOnly = isAckOnly(_connection, size);
+        boolean ackOnly = isAckOnly(size);
         boolean isFirst = (_connection.getAckedPackets() <= 0) && (_connection.getUnackedPacketsSent() <= 0);
         
         PacketLocal packet = new PacketLocal(_context, _connection.getRemotePeer(), _connection);

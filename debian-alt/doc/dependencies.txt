@@ -8,7 +8,7 @@ improve our official packages and support other packagers.
 Our packages are available at https://deb.i2p2.de/ and
 instructions are at https://geti2p.net/debian
 
-This document is current as of release 0.9.38, 2018-01-xx.
+This document is current as of release 0.9.47, 2020-08-xx.
 
 
 Build-only Dependencies
@@ -18,8 +18,7 @@ Build-only Dependencies
   This is the standard java build system.
 
 * Java JDK
-  We require openjdk-7-java or higher to build. For 8, set bootclasspath to
-  java 7 jars if available.
+  We require openjdk-8-java or higher to build.
   For 9 or higher, require the same or higher runtime, since bootclasspath
   isn't possible.
 
@@ -30,7 +29,7 @@ Current Runtime Dependencies
 ----------------------------
 
 * Java JRE
-  We require Java 7 or higher runtime, if built with Java 7 or bootclasspath was set
+  We require Java 8 or higher runtime, if built with Java 8 or bootclasspath was set
   in the build. If built with 8 or higher and bootclasspath was not set,
   then require the same JRE or higher.
 
@@ -48,22 +47,21 @@ Current Runtime Dependencies
 
 * libjson-simple-java (jessie and later, trusty and later only)
   For /usr/share/java/json-simple.jar.
-  In non-Debian builds we bundle the 1.1.1 source code; it's removed in the Debian source package.
-  Compatible with 1.x and 2.x only; not compatible with 3.x.
+  In non-Debian builds we bundle the 2.x API portion of the 2.3.0 source code; it's removed in the Debian source package.
+  Compatible with 2.x only; not compatible with 3.x.
 
 * libjetty9-java
   For /usr/share/java/jetty9-*.jar.
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
-  This is for Jetty 9.2.x, which is what's in Debian.
-  We are not compatible with Jetty 9.4.x, which is what's in RedHat.
+  This is for Jetty 9.3.x, which is the same as 9.4.x except it's Java 8 compatible.
 
-* libtomcat8-java
-  For /usr/share/java/tomcat8-*.jar.
+* libtomcat9-java
+  For /usr/share/java/tomcat9-*.jar.
   In non-Debian builds we bundle the jars as packaged in the Jetty 9.2 binary release,
   which are different than the way they are packaged for Debian.
   They are removed in the Debian source package.
-  This is for Tomcat 8.5.x, which is what's in recent Debian/Ubuntu.
-  Tomcat 8.0.x in older Debian/Ubuntu may or may not work.
+  This is for Tomcat 9.0.x, which is what's in recent Debian/Ubuntu.
+  Tomcat 8.5.x in Xenial also works.
 
 * libtaglibs-standard-*-java (stretch and later, artful and later only)
   Provides JSTL 1.2, solves the glassfish-javaee problem described below.
@@ -94,7 +92,7 @@ Current Runtime Dependencies
 
 * famfamfam-flag-png
   Country flags (all except precise)
-  In precise and non-Debian builds we bundle the flags.
+  In non-Debian builds we bundle the flags.
 
 
 Bundled code, NOT current dependencies

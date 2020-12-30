@@ -4,7 +4,7 @@ package com.thetransactioncompany.jsonrpc2;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.JSONObject;
+import org.json.simple.JsonObject;
 
 
 /** 
@@ -472,9 +472,9 @@ public class JSONRPC2Request extends JSONRPC2Message {
 	
 	
 	@Override
-	public JSONObject toJSONObject() {
+	public JsonObject toJSONObject() {
 	
-		JSONObject req = new JSONObject();
+		JsonObject req = new JsonObject();
 		
 		req.put("method", method);
 		

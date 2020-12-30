@@ -38,6 +38,11 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
     if (!fakeBw)
       rate = rs.getRate(per);
     if ( (rate != null) || (fakeBw) ) {
+      if (stat != null &&
+          (stat.indexOf('\n') >= 0 || stat.indexOf('\r') >= 0)) {
+          response.sendError(403, "param");
+          return;
+      }
       java.io.OutputStream cout = response.getOutputStream();
       String format = request.getParameter("format");
       response.setHeader("X-Content-Type-Options", "nosniff");

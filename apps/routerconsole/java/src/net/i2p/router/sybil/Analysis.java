@@ -93,8 +93,11 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double POINTS_UNREACHABLE = 4.0;
     private static final double POINTS_NEW = 4.0;
     private static final double POINTS_BANLIST = 25.0;
-    private static final double DEFAULT_BLOCK_THRESHOLD = 50.0;
-    private static final long DEFAULT_BLOCK_TIME = 7*24*60*60*1000L;
+    public static final boolean DEFAULT_BLOCK = true;
+    public static final double DEFAULT_BLOCK_THRESHOLD = 75.0;
+    public static final long DEFAULT_BLOCK_TIME = 7*24*60*60*1000L;
+    public static final long DEFAULT_REMOVE_TIME = 30*24*60*60*1000L;
+    public static final long DEFAULT_FREQUENCY = 24*60*60*1000L;
     public static final float MIN_BLOCK_POINTS = 12.01f;
 
     /** Get via getInstance() */
@@ -188,7 +191,7 @@ public class Analysis extends JobImpl implements RouterApp {
     }
 
     public synchronized void schedule() {
-        long freq = _context.getProperty(PROP_FREQUENCY, 0L);
+        long freq = _context.getProperty(PROP_FREQUENCY, DEFAULT_FREQUENCY);
         if (freq > 0) {
             List<Long> previous = _persister.load();
             long now = _context.clock().now() + 15*1000;
@@ -320,8 +323,6 @@ public class Analysis extends JobImpl implements RouterApp {
         if (_log.shouldWarn())
             _log.warn("Analyzing " + ris.size() + " routers, including non-floodfills? " + includeAll);
 
-        double avgMinDist = getAvgMinDist(ris);
-
         // IP analysis
         calculateIPGroupsFamily(ris, points);
         List<RouterInfo> ri32 = new ArrayList<RouterInfo>(4);
@@ -372,7 +373,7 @@ public class Analysis extends JobImpl implements RouterApp {
         // Profile analysis
         addProfilePoints(ris, points);
         addVersionPoints(ris, points);
-        if (_context.getBooleanProperty(PROP_BLOCK))
+        if (_context.getProperty(PROP_BLOCK, DEFAULT_BLOCK))
             doBlocking(points);
         return points;
     }
@@ -404,6 +405,12 @@ public class Analysis extends JobImpl implements RouterApp {
                     }
                 }
                 String reason = "Sybil analysis " + day + " with " + fmt.format(p) + " threat points";
+                if (_log.shouldWarn()) {
+                    if (ri != null)
+                        _log.warn("Banned by " + reason + " and blocking IPs:\n" + ri);
+                    else
+                        _log.warn("Banned " + h.toBase64() + " by " + reason);
+                }
                 _context.banlist().banlistRouter(h, reason, null, null, blockUntil);
             }
         }

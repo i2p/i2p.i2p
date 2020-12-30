@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2020-08-13 11:54+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/otf/I2P/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,7 +27,7 @@ msgid "Satellite Provider"
 msgstr "Furnizues Satelitor"
 
 msgid "Andorra"
-msgstr "Andorrë "
+msgstr "Andorrë"
 
 msgid "United Arab Emirates"
 msgstr "Emiratet e Bashkuar Arabe"
@@ -75,10 +75,10 @@ msgid "Aruba"
 msgstr "Aruba"
 
 msgid "Åland Islands"
-msgstr "Ishujt Åland"
+msgstr "Ishujt Aland"
 
 msgid "Azerbaijan"
-msgstr "Azerbajxhan "
+msgstr "Azerbajxhan"
 
 msgid "Bosnia and Herzegovina"
 msgstr "Bosnjë-Hercegovinë"
@@ -132,10 +132,10 @@ msgid "Bhutan"
 msgstr "Butan"
 
 msgid "Bouvet Island"
-msgstr "Ishulli Bouve "
+msgstr "Ishulli Bouve"
 
 msgid "Botswana"
-msgstr "Botsvana"
+msgstr "Botsvanë"
 
 msgid "Belarus"
 msgstr "Bjellorusi"
@@ -267,7 +267,7 @@ msgid "United Kingdom"
 msgstr "Mbretëria e Bashkuar"
 
 msgid "Grenada"
-msgstr "Grenada "
+msgstr "Grenada"
 
 msgid "Georgia"
 msgstr "Georgji"
@@ -279,7 +279,7 @@ msgid "Guernsey"
 msgstr "Gernsi"
 
 msgid "Ghana"
-msgstr "Ganë "
+msgstr "Ganë"
 
 msgid "Gibraltar"
 msgstr "Gjibraltar"
@@ -291,7 +291,7 @@ msgid "Gambia"
 msgstr "Gambia"
 
 msgid "Guinea"
-msgstr "Guinea "
+msgstr "Guinea"
 
 msgid "Guadeloupe"
 msgstr "Guadalup"
@@ -306,7 +306,7 @@ msgid "South Georgia and the South Sandwich Islands"
 msgstr "Xhorxhia Jugore dhe Ishujt Jugorë Sanduiç"
 
 msgid "Guatemala"
-msgstr "Guatemalë "
+msgstr "Guatemalë"
 
 msgid "Guam"
 msgstr "Guam"
@@ -315,7 +315,7 @@ msgid "Guinea-Bissau"
 msgstr "Guinea-Bisau"
 
 msgid "Guyana"
-msgstr "Guajana "
+msgstr "Guajana"
 
 msgid "Hong Kong"
 msgstr "Hong Kong"
@@ -399,7 +399,7 @@ msgid "Republic of Korea"
 msgstr "Republika e Koresë"
 
 msgid "Kuwait"
-msgstr "Kuvait      "
+msgstr "Kuvajt"
 
 msgid "Cayman Islands"
 msgstr "Ishujt Kajman"
@@ -435,7 +435,7 @@ msgid "Luxembourg"
 msgstr "Luksemburg"
 
 msgid "Latvia"
-msgstr "Letoni "
+msgstr "Letoni"
 
 msgid "Libya"
 msgstr "Libi"
@@ -555,7 +555,7 @@ msgid "Peru"
 msgstr "Peru"
 
 msgid "French Polynesia"
-msgstr "Polinezia Franceze"
+msgstr "Polinezia Frënge"
 
 msgid "Papua New Guinea"
 msgstr "Papua Guinea e Re"
@@ -594,7 +594,7 @@ msgid "Qatar"
 msgstr "Katar"
 
 msgid "Réunion"
-msgstr "Réunion"
+msgstr "Reunion"
 
 msgid "Romania"
 msgstr "Rumani"
@@ -630,13 +630,13 @@ msgid "Saint Helena"
 msgstr "Shën Helena"
 
 msgid "Slovenia"
-msgstr "Slloveni "
+msgstr "Slloveni"
 
 msgid "Svalbard and Jan Mayen"
 msgstr "Ishujt Svalbard dhe Jan Mayen"
 
 msgid "Slovakia"
-msgstr "Sllovaki  "
+msgstr "Sllovaki"
 
 msgid "Sierra Leone"
 msgstr "Sierra Leone"
@@ -684,7 +684,7 @@ msgid "Togo"
 msgstr "Togo"
 
 msgid "Thailand"
-msgstr "Tailandë "
+msgstr "Tailandë"
 
 msgid "Tajikistan"
 msgstr "Taxhikistan"
@@ -723,7 +723,7 @@ msgid "Ukraine"
 msgstr "Ukrainë"
 
 msgid "Uganda"
-msgstr "Uganda"
+msgstr "Ugandë"
 
 msgid "United States Minor Outlying Islands"
 msgstr "Ishujt e Vegjël të Përtejmë të Shteteve të Bashkuara"
@@ -760,6 +760,9 @@ msgstr "Uallis dhe Futuna"
 
 msgid "Samoa"
 msgstr "Samoa"
+
+msgid "Kosovo"
+msgstr "Kosovë"
 
 msgid "Yemen"
 msgstr "Jemen"

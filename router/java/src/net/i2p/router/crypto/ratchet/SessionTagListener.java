@@ -1,7 +1,5 @@
 package net.i2p.router.crypto.ratchet;
 
-import net.i2p.data.SessionTag;
-
 /**
  * Something that looks for SessionTags.
  *

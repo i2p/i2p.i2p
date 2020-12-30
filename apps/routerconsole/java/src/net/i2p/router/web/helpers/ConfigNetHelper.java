@@ -206,8 +206,8 @@ public class ConfigNetHelper extends HelperBase {
     }
     
     public Set<String> getAddresses() {
-        // exclude local, include IPv6
-        return Addresses.getAddresses(false, true);
+        // exclude local, include IPv6, exclude IPv6 temporary
+        return Addresses.getAddresses(false, false, true, false);
     }
 
     /** @since IPv6 */
@@ -348,9 +348,9 @@ public class ConfigNetHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(256);
         buf.append("<select style=\"text-align: right !important;\" name=\"sharePercentage\">\n");
         boolean found = false;
-        for (int i = 100; i >= -10; i -= 10) {
+        for (int i = 100; i >= -5; i -= 5) {
             int val = i;
-            if (i == -10) {
+            if (i == -5) {
                 if (found)
                     break;
                 else

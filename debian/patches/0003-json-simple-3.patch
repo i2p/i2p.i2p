@@ -1,0 +1,161 @@
+Description: Migrate away from deprecated json-simple 1.x classes
+ See json-simple 2.0.0 changelog:
+ > * Deprecated JSONParse and JSONValue in favor of Jsoner.
+ > * Deprecated JSONStreamAware and JSONAware in favor of Jsonable.
+ > * Deprecated JSONObject in favor of JsonObject.
+ > * Deprecated JSONArray in favor of JsonArray.
+ .
+ This patch uses the new json-simple Json* classes. It is compatible with
+ both 2.x and 3.x json-simple releases, with a few ajustments regarding
+ backward incompatible changes in json-simple 3.x:
+ - The package name, changed to com.github.cliftonlabs.json_simple
+ - The exception DeserializationExcetpion renamed as JsonException
+ These two changes are handled using place-holders @JSON_SIMPLE@ and
+ @JSON_EXCETPION@ which are substituted at build time by debian/rules.
+ .
+ With these tricks the package is compatible with json-simple 2.x and 3.x.
+Author: Gilles Filippini <pini@debian.org>
+Index: i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Error.java
+===================================================================
+--- i2p-0.9.45.orig/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Error.java
++++ i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Error.java
+@@ -1,7 +1,7 @@
+ package com.thetransactioncompany.jsonrpc2;
+ 
+ 
+-import org.json.simple.JsonObject;
++import @JSON_SIMPLE@.JsonObject;
+ 
+ 
+ /** 
+Index: i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Message.java
+===================================================================
+--- i2p-0.9.45.orig/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Message.java
++++ i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Message.java
+@@ -5,7 +5,7 @@ package com.thetransactioncompany.jsonrp
+ import java.util.List;
+ import java.util.Map;
+ 
+-import org.json.simple.JsonObject;
++import @JSON_SIMPLE@.JsonObject;
+ 
+ 
+ /**
+Index: i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Notification.java
+===================================================================
+--- i2p-0.9.45.orig/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Notification.java
++++ i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Notification.java
+@@ -4,7 +4,7 @@ package com.thetransactioncompany.jsonrp
+ import java.util.List;
+ import java.util.Map;
+ 
+-import org.json.simple.JsonObject;
++import @JSON_SIMPLE@.JsonObject;
+ 
+ 
+ /** 
+Index: i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Parser.java
+===================================================================
+--- i2p-0.9.45.orig/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Parser.java
++++ i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Parser.java
+@@ -4,8 +4,8 @@ package com.thetransactioncompany.jsonrp
+ import java.util.List;
+ import java.util.Map;
+ 
+-import org.json.simple.Jsoner;
+-import org.json.simple.DeserializationException;
++import @JSON_SIMPLE@.Jsoner;
++import @JSON_SIMPLE@.@JSON_EXCEPTION@;
+ 
+ 
+ /**
+@@ -181,7 +181,7 @@ public class JSONRPC2Parser {
+ 		try {
+ 			json = Jsoner.deserialize(jsonString);
+ 				
+-		} catch (DeserializationException e) {
++		} catch (@JSON_EXCEPTION@ e) {
+ 
+ 			// Terse message, do not include full parse exception message
+ 			throw new JSONRPC2ParseException("Invalid JSON", 
+Index: i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Request.java
+===================================================================
+--- i2p-0.9.45.orig/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Request.java
++++ i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Request.java
+@@ -4,7 +4,7 @@ package com.thetransactioncompany.jsonrp
+ import java.util.List;
+ import java.util.Map;
+ 
+-import org.json.simple.JsonObject;
++import @JSON_SIMPLE@.JsonObject;
+ 
+ 
+ /** 
+Index: i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Response.java
+===================================================================
+--- i2p-0.9.45.orig/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Response.java
++++ i2p-0.9.45/apps/i2pcontrol/java/com/thetransactioncompany/jsonrpc2/JSONRPC2Response.java
+@@ -3,7 +3,7 @@ package com.thetransactioncompany.jsonrp
+ 
+ import java.util.Map;
+ 
+-import org.json.simple.JsonObject;
++import @JSON_SIMPLE@.JsonObject;
+ 
+ 
+ /** 
+Index: i2p-0.9.45/apps/i2pcontrol/java/net/i2p/i2pcontrol/SocketController.java
+===================================================================
+--- i2p-0.9.45.orig/apps/i2pcontrol/java/net/i2p/i2pcontrol/SocketController.java
++++ i2p-0.9.45/apps/i2pcontrol/java/net/i2p/i2pcontrol/SocketController.java
+@@ -37,8 +37,8 @@ import net.i2p.util.I2PSSLSocketFactory;
+ import net.i2p.util.Log;
+ import net.i2p.util.PortMapper;
+ 
+-import org.json.simple.Jsoner;
+-import org.json.simple.DeserializationException;
++import @JSON_SIMPLE@.Jsoner;
++import @JSON_SIMPLE@.@JSON_EXCEPTION@;
+ 
+ import net.i2p.i2pcontrol.security.KeyStoreProvider;
+ import net.i2p.i2pcontrol.security.SecurityManager;
+@@ -199,7 +199,7 @@ public class SocketController implements
+                     // TODO
+                     System.out.println("i2pcontrol got: " + o);
+                 }
+-            } catch (DeserializationException pe) {
++            } catch (@JSON_EXCEPTION@ pe) {
+                 _log.error("i2pcontrol handler", pe);
+                 return;
+             } catch (IOException ioe) {
+Index: i2p-0.9.45/apps/routerconsole/java/src/com/vuze/plugins/mlab/MLabRunner.java
+===================================================================
+--- i2p-0.9.45.orig/apps/routerconsole/java/src/com/vuze/plugins/mlab/MLabRunner.java
++++ i2p-0.9.45/apps/routerconsole/java/src/com/vuze/plugins/mlab/MLabRunner.java
+@@ -30,8 +30,8 @@ import java.util.concurrent.atomic.Atomi
+ 
+ import edu.internet2.ndt.Tcpbw100;
+ 
+-import org.json.simple.JsonObject;
+-import org.json.simple.Jsoner;
++import @JSON_SIMPLE@.JsonObject;
++import @JSON_SIMPLE@.Jsoner;
+ 
+ import net.i2p.I2PAppContext;
+ import net.i2p.data.DataHelper;
+Index: i2p-0.9.45/apps/routerconsole/java/src/edu/internet2/ndt/JSONUtils.java
+===================================================================
+--- i2p-0.9.45.orig/apps/routerconsole/java/src/edu/internet2/ndt/JSONUtils.java
++++ i2p-0.9.45/apps/routerconsole/java/src/edu/internet2/ndt/JSONUtils.java
+@@ -1,9 +1,9 @@
+ package edu.internet2.ndt;
+ 
+-import org.json.simple.JsonObject;
+-import org.json.simple.Jsoner;
++import @JSON_SIMPLE@.JsonObject;
++import @JSON_SIMPLE@.Jsoner;
+ import java.util.Iterator;
+ import java.util.Map;
+ 
+ /**
+  * Created by Sebastian Malecki on 13.05.14.

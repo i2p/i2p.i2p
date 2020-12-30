@@ -125,7 +125,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         // allow DSM of our own key (used by FloodfillVerifyStoreJob)
                         // or other keys (used by IterativeSearchJob)
                         // as long as there's no reply token (we will never set a reply token but an attacker might)
-                        ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
+                        ((LeaseSet)dsm.getEntry()).setReceivedBy(_client);
                     }
                     break;
 
@@ -155,7 +155,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         return;
                     }
                     if (dsm.getEntry().isLeaseSet())
-                        ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
+                        ((LeaseSet)dsm.getEntry()).setReceivedBy(_client);
                     break;
 
                 case DatabaseSearchReplyMessage.MESSAGE_TYPE:
@@ -264,9 +264,10 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                     // Or, it's a normal LS bundled with data and a MessageStatusMessage.
 
                                     // ... and inject it.
-                                    ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
+                                    ((LeaseSet)dsm.getEntry()).setReceivedBy(_client);
                                     if (_log.shouldLog(Log.INFO))
-                                        _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: " + _client.toBase32());
+                                        _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: " +
+                                                  (_client != null ? _client.toBase32() : "router"));
                                     _context.inNetMessagePool().add(dsm, null, null);
                             } else {                                        
                                 if (_client != null) {

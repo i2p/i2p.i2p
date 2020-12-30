@@ -180,7 +180,7 @@ public class PersistSybil {
      *  @since 0.9.41
      */
     public synchronized void removeOld() {
-        long age = _context.getProperty(Analysis.PROP_REMOVETIME, 0L);
+        long age = _context.getProperty(Analysis.PROP_REMOVETIME, Analysis.DEFAULT_REMOVE_TIME);
         if (age < 60*1000)
             return;
         long cutoff = _context.clock().now() - age;

@@ -67,8 +67,8 @@ class Daemon {
      * Update the router and published address books using remote data from the
      * subscribed address books listed in subscriptions.
      * 
-     * @param master
-     *            The master AddressBook. This address book is never
+     * @param local
+     *            The local AddressBook. This address book is never
      *            overwritten, so it is safe for the user to write to.
      *            It is only merged to the published addressbook.
      *            May be null.
@@ -87,7 +87,7 @@ class Daemon {
      *            The log to write changes and conflicts to.
      *            May be null.
      */
-    public static void update(AddressBook master, AddressBook router,
+    public static void update(AddressBook local, AddressBook router,
             File published, SubscriptionList subscriptions, Log log) {
         for (AddressBook book : subscriptions) {
             // yes, the EepGet fetch() is done in next()
@@ -95,8 +95,8 @@ class Daemon {
         }
         router.write();
         if (published != null) {
-            if (master != null)
-                router.merge(master, true, null);
+            if (local != null)
+                router.merge(local, true, null);
             router.write(published);
         }
         subscriptions.write();
@@ -105,7 +105,7 @@ class Daemon {
     /**
      * Update the router and published address books using remote data from the
      * subscribed address books listed in subscriptions.
-     * Merging of the "master" addressbook is NOT supported.
+     * Merging of the "local" addressbook is NOT supported.
      * 
      * @param router
      *            The NamingService to update, generally the root NamingService from the context.
@@ -751,17 +751,17 @@ class Daemon {
         if (Boolean.parseBoolean(settings.get("update_direct"))) {
             // Direct hosts.txt access
             File routerFile = new File(home, settings.get("router_addressbook"));
-            AddressBook master;
+            AddressBook local;
             if (should_publish) {
-                File masterFile = new File(home, settings.get("master_addressbook"));
-                master = new AddressBook(masterFile);
+                File localFile = new File(home, settings.get("local_addressbook"));
+                local = new AddressBook(localFile);
             } else {
-                master = null;
+                local = null;
             }
             AddressBook router = new AddressBook(routerFile);
-            update(master, router, published, subscriptions, log);
+            update(local, router, published, subscriptions, log);
         } else {
-            // Naming service - no merging of master to router and published is supported.
+            // Naming service - no merging of local to router and published is supported.
             update(getNamingService(settings.get("naming_service")), published, subscriptions, log);
         }
     }
@@ -841,7 +841,7 @@ class Daemon {
         Map<String, String> defaultSettings = new HashMap<String, String>();
         defaultSettings.put("proxy_host", "127.0.0.1");
         defaultSettings.put("proxy_port", "4444");
-        defaultSettings.put("master_addressbook", "../userhosts.txt");
+        defaultSettings.put("local_addressbook", "../userhosts.txt");
         defaultSettings.put("router_addressbook", "../hosts.txt");
         defaultSettings.put("published_addressbook", "../eepsite/docroot/hosts.txt");
         defaultSettings.put("should_publish", "false");
@@ -868,7 +868,7 @@ class Daemon {
         // wait
         try {
             Thread.sleep(5*60*1000 + I2PAppContext.getGlobalContext().random().nextLong(5*60*1000));
-	    // Static method, and redundent Thread.currentThread().sleep(5*60*1000);
+	    // Static method, and redundant Thread.currentThread().sleep(5*60*1000);
         } catch (InterruptedException ie) {}
         
         while (_running) {

@@ -118,7 +118,7 @@ public class ClientAppConfig {
      * Only valid after getClientApps(ctx) has been called.
      * @since 0.9.42
      */
-    public synchronized static boolean isSplitConfig(RouterContext ctx) {
+    public synchronized static boolean isSplitConfig(I2PAppContext ctx) {
         File dir = new File(ctx.getConfigDir(), CLIENT_CONFIG_DIR);
         return dir.exists() && !configFile(ctx).exists();
     }
@@ -132,6 +132,14 @@ public class ClientAppConfig {
         if (!cfgFile.isAbsolute())
             cfgFile = new File(ctx.getConfigDir(), clientConfigFile);
         return cfgFile;
+    }
+
+    /*
+     * This is the config dir. Only valid if a split config.
+     * @since 0.9.48
+     */
+    public static File configDir(I2PAppContext ctx) {
+        return new File(ctx.getConfigDir(), CLIENT_CONFIG_DIR);
     }
 
     /*

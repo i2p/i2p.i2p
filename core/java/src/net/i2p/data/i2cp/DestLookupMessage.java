@@ -5,7 +5,6 @@ package net.i2p.data.i2cp;
  * with no warranty of any kind, either expressed or implied.  
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,27 +31,17 @@ public class DestLookupMessage extends I2CPMessageImpl {
     }
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
-        //Hash h = new Hash();
         try {
-            //h.readBytes(in);
             _hash = Hash.create(in);
-        //} catch (DataFormatException dfe) {
         } catch (IllegalArgumentException dfe) {
             throw new I2CPMessageException("Unable to load the hash", dfe);
         }
-        //_hash = h;
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_hash == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(Hash.HASH_LENGTH);
-        try {
-            _hash.writeBytes(os);
-        } catch (DataFormatException dfe) {
-            throw new I2CPMessageException("Error writing out the hash", dfe);
-        }
-        return os.toByteArray();
+        return _hash.getData();
     }
 
     public int getType() {

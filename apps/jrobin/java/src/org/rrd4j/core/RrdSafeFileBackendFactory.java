@@ -34,8 +34,8 @@ public class RrdSafeFileBackendFactory extends RrdRandomAccessFileBackendFactory
 
     /**
      * Generate a factory with custom lock settings
-     * @param lockWaitTime
-     * @param lockRetryPeriod
+     * @param lockWaitTime wait time in ms
+     * @param lockRetryPeriod retry period in ms
      */
     public RrdSafeFileBackendFactory(long lockWaitTime, long lockRetryPeriod) {
         this.lockWaitTime = lockWaitTime;

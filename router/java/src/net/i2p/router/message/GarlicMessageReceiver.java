@@ -77,7 +77,7 @@ public class GarlicMessageReceiver {
                 }
             } else {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not trying to decrypt a garlic routed message to a disconnected client");
+                    _log.warn("Not decrypting " + message + " for disconnected " + _clientDestination.toBase32());
                 return;
             }
         } else {
@@ -99,10 +99,8 @@ public class GarlicMessageReceiver {
         } else {
             if (_log.shouldLog(Log.WARN)) {
                 String d = (_clientDestination != null) ? _clientDestination.toBase32() : "the router";
-                _log.warn("CloveMessageParser failed to decrypt the " + message.getData().length +
-                          " byte message [" + message.getUniqueId() 
-                           + "] for " + d + " with key " + decryptionKey.getType(),
-                          new Exception("Decrypt garlic failed"));
+                String keys = (decryptionKey2 != null) ? "both ElGamal and ECIES keys" : decryptionKey.getType().toString();
+                _log.warn("Failed to decrypt " + message + " for " + d + " with " + keys);
             }
             _context.statManager().addRateData("crypto.garlic.decryptFail", 1);
             _context.messageHistory().messageProcessingError(message.getUniqueId(), 
@@ -136,11 +134,11 @@ public class GarlicMessageReceiver {
         // is no longer a separate field for the clove ID in the transmission format.
         //String invalidReason = _context.messageValidator().validateMessage(clove.getCloveId(), 
         //                                                                   clove.getExpiration().getTime());
-        String invalidReason = _context.messageValidator().validateMessage(clove.getExpiration().getTime());
+        String invalidReason = _context.messageValidator().validateMessage(clove.getExpiration());
 
         boolean rv = invalidReason == null;
         if (!rv) {
-            String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());
+            String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration());
             if (_log.shouldInfo())
                 _log.info("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago", new Exception("Invalid within..."));

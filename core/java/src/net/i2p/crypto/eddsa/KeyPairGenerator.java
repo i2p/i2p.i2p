@@ -17,7 +17,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGeneratorSpi;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.i2p.crypto.eddsa.spec.EdDSAGenParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveSpec;
@@ -38,10 +39,10 @@ public class KeyPairGenerator extends KeyPairGeneratorSpi {
     protected SecureRandom random;
     protected boolean initialized;
 
-    private static final Hashtable<Integer, AlgorithmParameterSpec> edParameters;
+    private static final Map<Integer, AlgorithmParameterSpec> edParameters;
 
     static {
-        edParameters = new Hashtable<Integer, AlgorithmParameterSpec>();
+        edParameters = new HashMap<Integer, AlgorithmParameterSpec>();
 
         edParameters.put(Integer.valueOf(256), new EdDSAGenParameterSpec(EdDSANamedCurveTable.ED_25519));
     }

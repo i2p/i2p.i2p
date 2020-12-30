@@ -31,6 +31,8 @@ import java.util.TreeSet;
  */
 public class OrderedProperties extends Properties {
 
+    private static final EntryComparator ECOMP = new EntryComparator();
+
     public OrderedProperties() {
         super();
     }
@@ -46,7 +48,7 @@ public class OrderedProperties extends Properties {
     public Set<Map.Entry<Object, Object>> entrySet() {
         if (size() <= 1)
             return super.entrySet();
-        TreeSet<Map.Entry<Object, Object>> rv = new TreeSet<Map.Entry<Object, Object>>(new EntryComparator());
+        TreeSet<Map.Entry<Object, Object>> rv = new TreeSet<Map.Entry<Object, Object>>(ECOMP);
         rv.addAll(super.entrySet());
         return Collections.unmodifiableSortedSet(rv);
     }

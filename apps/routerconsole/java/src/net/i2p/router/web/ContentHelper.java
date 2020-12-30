@@ -1,6 +1,10 @@
 package net.i2p.router.web;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.Locale;
 
 import net.i2p.util.FileUtil;
@@ -12,12 +16,15 @@ public class ContentHelper extends HelperBase {
     private String _lang;
     
     /**
-     * Caution, use absolute paths only, do not assume files are in CWD
+     * Caution, use absolute paths only for getContent() and getTextContent(),
+     * do not assume files are in CWD.
      */
     public void setPage(String page) { _page = page; }
+
     public void setStartAtBeginning(String moo) { 
         _startAtBeginning = Boolean.parseBoolean(moo); 
     }
+
     public void setLang(String l) {
 /*****
         if((_lang == null || !_lang.equals(l)) && (l != null)) {

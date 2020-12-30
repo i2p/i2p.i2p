@@ -28,10 +28,16 @@
            i2pcontextId = (String) session.getAttribute("i2p.contextId");
        }
    } catch (IllegalStateException ise) {}
+
 %><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
-<jsp:setProperty name="intl" property="contextId" value="<%=i2pcontextId%>" />
-<link rel="icon" href="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/favicon.ico"><%
+<jsp:setProperty name="intl" property="contextId" value="<%=i2pcontextId%>" /><%
+
+   // used several times below
+   String theUserAgent = request.getHeader("User-Agent");
+   String theThemePath = intl.getTheme(theUserAgent);
+
+%><link rel="icon" href="<%=theThemePath%>images/favicon.ico"><%
    response.setHeader("Accept-Ranges", "none");
 
    String cspNonce = Integer.toHexString(net.i2p.util.RandomSource.getInstance().nextInt());
@@ -55,20 +61,20 @@
        intl.setLang(request.getParameter("lang"));
        intl.setNews(request.getParameter("news"));
    }
-%><link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
+%><link href="<%=theThemePath%>console.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    if (intl.getLang().equals("zh")) {
        // make the fonts bigger for chinese
-%><link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_big.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
+%><link href="<%=theThemePath%>console_big.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    } else if (intl.getLang().equals("ar")) {
        // Use RTL theme for Arabic
-%><link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_ar.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
+%><link href="<%=theThemePath%>console_ar.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    }
-   if (!intl.allowIFrame(request.getHeader("User-Agent"))) {
+   if (!intl.allowIFrame(theUserAgent)) {
 %><meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>mobile.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
+<link href="<%=theThemePath%>mobile.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    }
-%><!--[if IE]><link href="/themes/console/classic/ieshim.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /><![endif]-->
+%>

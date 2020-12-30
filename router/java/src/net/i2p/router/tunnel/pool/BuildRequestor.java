@@ -18,6 +18,8 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.BuildMessageGenerator;
+import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -83,29 +85,29 @@ abstract class BuildRequestor {
         int len = cfg.getLength();
         boolean isIB = cfg.isInbound();
         for (int i = 0; i < len; i++) {
+            HopConfig hop = cfg.getConfig(i);
             if ( (!isIB) && (i == 0) ) {
                 // outbound gateway (us) doesn't receive on a tunnel id
                 if (len <= 1)  { // zero hop, pretend to have a send id
-                    long id = ctx.tunnelDispatcher().getNewOBGWID();
-                    cfg.getConfig(i).setSendTunnelId(DataHelper.toLong(4, id));
+                    TunnelId id = ctx.tunnelDispatcher().getNewOBGWID();
+                    hop.setSendTunnelId(id);
                 }
             } else {
-                long id;
+                TunnelId id;
                 if (isIB && len == 1)
                     id = ctx.tunnelDispatcher().getNewIBZeroHopID();
                 else if (isIB && i == len - 1)
                     id = ctx.tunnelDispatcher().getNewIBEPID();
                 else
-                    id = 1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE);
-                cfg.getConfig(i).setReceiveTunnelId(DataHelper.toLong(4, id));
+                    id = new TunnelId(1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE));
+                hop.setReceiveTunnelId(id);
             }
             
             if (i > 0)
-                cfg.getConfig(i-1).setSendTunnelId(cfg.getConfig(i).getReceiveTunnelId());
-            byte iv[] = new byte[16];
+                cfg.getConfig(i-1).setSendTunnelId(hop.getReceiveTunnelId());
+            byte iv[] = new byte[TunnelCreatorConfig.REPLY_IV_LENGTH];
             ctx.random().nextBytes(iv);
-            cfg.getConfig(i).setReplyIV(iv);
-            cfg.getConfig(i).setReplyKey(ctx.keyGenerator().generateSessionKey());
+            cfg.setAESReplyKeys(i, ctx.keyGenerator().generateSessionKey(), iv);
         }
         // This is in BuildExecutor.buildTunnel() now
         // And it was overwritten by the one in createTunnelBuildMessage() anyway!

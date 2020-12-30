@@ -24,8 +24,8 @@ class ArrayUtils {
 
     private ArrayUtils() { /* cannot be instantiated */ }
 
-    public static int[] newUnpaddedIntArray(int minLen) {
-        return new int[minLen];
+    public static char[] newUnpaddedCharArray(int minLen) {
+        return new char[minLen];
     }
 
     public static Object[] newUnpaddedObjectArray(int minLen) {

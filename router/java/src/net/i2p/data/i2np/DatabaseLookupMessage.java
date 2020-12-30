@@ -15,13 +15,17 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.router.RouterInfo;
+import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.TunnelId;
-//import net.i2p.util.Log;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.router.LeaseSetKeys;
+import net.i2p.router.crypto.ratchet.RatchetSessionTag;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -31,7 +35,6 @@ import net.i2p.util.VersionComparator;
  * @author jrandom
  */
 public class DatabaseLookupMessage extends FastI2NPMessageImpl {
-    //private final static Log _log = new Log(DatabaseLookupMessage.class);
     public final static int MESSAGE_TYPE = 2;
     private Hash _key;
     private Hash _fromHash;
@@ -40,8 +43,12 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     private List<Hash> _dontIncludePeers;
     private SessionKey _replyKey;
     private SessionTag _replyTag;
+    private RatchetSessionTag _ratchetReplyTag;
+    private PublicKey _ratchetPubKey;
     private Type _type;
     
+    public static final boolean USE_ECIES_FF = true;
+
     //private static volatile long _currentLookupPeriod = 0;
     //private static volatile int _currentLookupCount = 0;
     // if we try to send over 20 netDb lookups in 10 seconds, we're acting up
@@ -60,6 +67,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     private static final byte FLAG_TYPE_LS = 0x04;
     private static final byte FLAG_TYPE_RI = 0x08;
     private static final byte FLAG_TYPE_EXPL = 0x0c;
+    // 0.9.46 or higher
+    private static final byte FLAG_RATCHET = 0x10;
 
     /** @since 0.9.16 */
     public enum Type {
@@ -80,6 +89,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
      *  the receiver rejecting the whole message as invalid.
      */
     private static final String MIN_ENCRYPTION_VERSION = "0.9.7";
+    private static final String MIN_RATCHET_VERSION = "0.9.46";
 
     public DatabaseLookupMessage(I2PAppContext context) {
         this(context, false);
@@ -215,11 +225,37 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         if (to == null)
             return false;
         String v = to.getVersion();
-        return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
+        if (VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) < 0)
+            return false;
+        RouterIdentity ident = to.getIdentity();
+        EncType type = ident.getPublicKey().getType();
+        if (USE_ECIES_FF)
+            return LeaseSetKeys.SET_BOTH.contains(type);
+        return type == EncType.ELGAMAL_2048;
     }
     
     /**
-     *  The included session key or null if unset
+     *  Does this router support ratchet replies?
+     *
+     *  @param to null OK
+     *  @since 0.9.46
+     */
+    public static boolean supportsRatchetReplies(RouterInfo to) {
+        if (to == null)
+            return false;
+        String v = to.getVersion();
+        if (VersionComparator.comp(v, MIN_RATCHET_VERSION) < 0)
+            return false;
+        RouterIdentity ident = to.getIdentity();
+        EncType type = ident.getPublicKey().getType();
+        if (USE_ECIES_FF)
+            return LeaseSetKeys.SET_BOTH.contains(type);
+        return type == EncType.ELGAMAL_2048;
+    }
+    
+    /**
+     *  The included session key or null if unset.
+     *  If non-null, either getReplyTag() or getRatchetReplyTag() is non-null.
      *
      *  @since 0.9.7
      */
@@ -241,10 +277,54 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
      *  @since 0.9.7
      */
     public void setReplySession(SessionKey encryptKey, SessionTag encryptTag) {
-        if (_replyKey != null || _replyTag != null)
+        if (_replyKey != null || _replyTag != null ||
+            _ratchetReplyTag != null || _ratchetPubKey != null)
             throw new IllegalStateException();
         _replyKey = encryptKey;
         _replyTag = encryptTag;
+    }
+    
+    /**
+     *  The included session tag or null if unset
+     *
+     *  @since 0.9.46
+     */
+    public RatchetSessionTag getRatchetReplyTag() { return _ratchetReplyTag; }
+
+    /**
+     *  Ratchet
+     *
+     *  @throws IllegalStateException if key or tag previously set, to protect saved checksum
+     *  @param encryptKey non-null
+     *  @param encryptTag non-null
+     *  @since 0.9.46
+     */
+    public void setReplySession(SessionKey encryptKey, RatchetSessionTag encryptTag) {
+        if (_replyKey != null || _replyTag != null ||
+            _ratchetReplyTag != null || _ratchetPubKey != null)
+            throw new IllegalStateException();
+        _replyKey = encryptKey;
+        _ratchetReplyTag = encryptTag;
+    }
+    
+    /**
+     *  The included session key or null if unset.
+     *  Preliminary, not fully supported, see proposal 154.
+     *
+     *  @since 0.9.46
+     */
+    public PublicKey getRatchetPublicKey() { return _ratchetPubKey; }
+
+    /**
+     *  Ratchet.
+     *  Preliminary, not fully supported, see proposal 154.
+     *
+     *  @throws IllegalStateException if key or tag previously set, to protect saved checksum
+     *  @param pubKey non-null
+     *  @since 0.9.46
+     */
+    public void setReplySession(PublicKey pubKey) {
+        _ratchetPubKey = pubKey;
     }
     
     /**
@@ -329,6 +409,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         // TODO store the whole flag byte
         boolean tunnelSpecified = (data[curIndex] & FLAG_TUNNEL) != 0;
         boolean replyKeySpecified = (data[curIndex] & FLAG_ENCRYPT) != 0;
+        boolean ratchetSpecified = (data[curIndex] & FLAG_RATCHET) != 0;
         switch (data[curIndex] & FLAG_TYPE_MASK) {
             case FLAG_TYPE_LS:
                 _type = Type.LS;
@@ -365,20 +446,31 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             peers.add(p);
         }
         _dontIncludePeers = peers;
-        if (replyKeySpecified) {
+        if (replyKeySpecified || ratchetSpecified) {
+            // all 3 flavors are 32 bytes
             byte[] rk = new byte[SessionKey.KEYSIZE_BYTES];
             System.arraycopy(data, curIndex, rk, 0, SessionKey.KEYSIZE_BYTES);
-            _replyKey = new SessionKey(rk);
+            if (replyKeySpecified && ratchetSpecified)
+                _ratchetPubKey = new PublicKey(EncType.ECIES_X25519, rk);
+            else
+                _replyKey = new SessionKey(rk);
             curIndex += SessionKey.KEYSIZE_BYTES;
-            // number of tags, assume always 1 for now
-            curIndex++;
-            byte[] rt = new byte[SessionTag.BYTE_LENGTH];
-            System.arraycopy(data, curIndex, rt, 0, SessionTag.BYTE_LENGTH);
-            _replyTag = new SessionTag(rt);
+            if (!(replyKeySpecified && ratchetSpecified)) {
+                // number of tags, assume always 1 for now
+                curIndex++;
+                if (replyKeySpecified) {
+                    byte[] rt = new byte[SessionTag.BYTE_LENGTH];
+                    System.arraycopy(data, curIndex, rt, 0, SessionTag.BYTE_LENGTH);
+                    _replyTag = new SessionTag(rt);
+                } else {
+                    byte[] rt = new byte[RatchetSessionTag.LENGTH];
+                    System.arraycopy(data, curIndex, rt, 0, RatchetSessionTag.LENGTH);
+                    _ratchetReplyTag = new RatchetSessionTag(rt);
+                }
+            }
         }
     }
 
-    
     protected int calculateWrittenLength() {
         int totalLength = 0;
         totalLength += Hash.HASH_LENGTH*2; // key+fromHash
@@ -388,9 +480,17 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         totalLength += 2; // numPeers
         if (_dontIncludePeers != null) 
             totalLength += Hash.HASH_LENGTH * _dontIncludePeers.size();
-        if (_replyKey != null)
+        if (_replyKey != null) {
             // number of tags, assume always 1 for now
-            totalLength += SessionKey.KEYSIZE_BYTES + 1 + SessionTag.BYTE_LENGTH;
+            totalLength += SessionKey.KEYSIZE_BYTES + 1;
+            if (_ratchetReplyTag != null)
+                totalLength += RatchetSessionTag.LENGTH;
+            else
+                totalLength += SessionTag.BYTE_LENGTH;
+        } else if (_ratchetPubKey != null) {
+            totalLength += 32;
+            // no tags
+        }
         return totalLength;
     }
     
@@ -404,8 +504,12 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         // Generate the flag byte
         byte flag;
-        if (_replyKey != null)
+        if (_replyTag != null)
             flag = FLAG_ENCRYPT;
+        else if (_ratchetReplyTag != null)
+            flag = FLAG_RATCHET;
+        else if (_ratchetPubKey != null)
+            flag = FLAG_RATCHET | FLAG_ENCRYPT;
         else
             flag = 0;
         switch (_type) {
@@ -450,8 +554,17 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             curIndex += SessionKey.KEYSIZE_BYTES;
             // number of tags, always 1 for now
             out[curIndex++] = 1;
-            System.arraycopy(_replyTag.getData(), 0, out, curIndex, SessionTag.BYTE_LENGTH);
-            curIndex += SessionTag.BYTE_LENGTH;
+            if (_replyTag != null) {
+                System.arraycopy(_replyTag.getData(), 0, out, curIndex, SessionTag.BYTE_LENGTH);
+                curIndex += SessionTag.BYTE_LENGTH;
+            } else {
+                System.arraycopy(_ratchetReplyTag.getData(), 0, out, curIndex, RatchetSessionTag.LENGTH);
+                curIndex += RatchetSessionTag.LENGTH;
+            }
+        } else if (_ratchetPubKey != null) {
+            System.arraycopy(_ratchetPubKey.getData(), 0, out, curIndex, _ratchetPubKey.length());
+            curIndex += _ratchetPubKey.length();
+            // no tags
         }
         return curIndex;
     }
@@ -499,6 +612,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             buf.append("\n\tReply Key: ").append(_replyKey);
         if (_replyTag != null)
             buf.append("\n\tReply Tag: ").append(_replyTag);
+        else if (_ratchetReplyTag != null)
+            buf.append("\n\tRatchetReply Tag: ").append(_ratchetReplyTag);
         if (_dontIncludePeers != null) {
             buf.append("\n\tDon't Include Peers: ");
             buf.append(_dontIncludePeers.size());

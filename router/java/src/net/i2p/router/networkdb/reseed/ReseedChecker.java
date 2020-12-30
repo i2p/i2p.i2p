@@ -32,9 +32,12 @@ public class ReseedChecker {
     private volatile String _lastStatus = "";
     private volatile String _lastError = "";
     private volatile boolean _networkLogged;
+    private volatile boolean _alreadyRun;
 
     public static final int MINIMUM = 50;
     private static final long STATUS_CLEAN_TIME = 20*60*1000;
+    // if down this long, reseed at startup
+    private static final long RESEED_MIN_DOWNTIME = 60*24*60*60*1000L;
 
     /**
      *  All reseeding must be done through this instance.
@@ -54,8 +57,14 @@ public class ReseedChecker {
      *  @return true if a reseed was started
      */
     public boolean checkReseed(int count) {
-        if (count >= MINIMUM)
-            return false;
+        if (_alreadyRun) {
+            if (count >= MINIMUM)
+                return false;
+        } else {
+            _alreadyRun = true;
+            if (count >= MINIMUM && _context.getEstimatedDowntime() < RESEED_MIN_DOWNTIME)
+                return false;
+        }
 
         if (_context.getBooleanProperty(Reseeder.PROP_DISABLE)) {
             int x = count - 1;  // us
@@ -126,6 +135,7 @@ public class ReseedChecker {
      */
     public boolean requestReseed() {
         if (_inProgress.compareAndSet(false, true)) {
+            _alreadyRun = true;
             try {
                 Reseeder reseeder = new Reseeder(_context, this);
                 reseeder.requestReseed();

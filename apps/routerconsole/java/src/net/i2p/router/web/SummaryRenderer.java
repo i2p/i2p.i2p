@@ -26,6 +26,7 @@ import net.i2p.util.SystemVersion;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.RrdException;
+import org.rrd4j.data.Variable;
 import org.rrd4j.graph.ElementsNames;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
@@ -207,16 +208,22 @@ class SummaryRenderer {
             //if (started > start && started < end)
             //    def.vrule(started / 1000, RESTART_BAR_COLOR, _t("Restart"), 4.0f);
 
-            def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
+            def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendFactory());
             if (descr.length() > 0) {
                 def.area(plotName, AREA_COLOR, descr + "\\l");
             } else {
                 def.area(plotName, AREA_COLOR);
             }
             if (!hideLegend) {
-                def.gprint(plotName, SummaryListener.CF, "   " + _t("Avg") + ": %.2f%s");
-                def.gprint(plotName, ConsolFun.MAX, ' ' + _t("Max") + ": %.2f%S");
-                def.gprint(plotName, ConsolFun.LAST, ' ' + _t("Now") + ": %.2f%S\\l");
+                Variable var = new Variable.AVERAGE();
+                def.datasource("avg", plotName, var);
+                def.gprint("avg", "   " + _t("Avg") + ": %.2f%s");
+                var = new Variable.MAX();
+                def.datasource("max", plotName, var);
+                def.gprint("max", ' ' + _t("Max") + ": %.2f%S");
+                var = new Variable.LAST();
+                def.datasource("last", plotName, var);
+                def.gprint("last", ' ' + _t("Now") + ": %.2f%S\\l");
             }
             String plotName2 = null;
             if (lsnr2 != null) {
@@ -224,12 +231,18 @@ class SummaryRenderer {
                 plotName2 = dsNames2[0];
                 String path2 = lsnr2.getData().getPath();
                 String descr2 = _t(lsnr2.getRate().getRateStat().getDescription());
-                def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendName());
+                def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendFactory());
                 def.line(plotName2, LINE_COLOR, descr2 + "\\l", 2);
                 if (!hideLegend) {
-                    def.gprint(plotName2, SummaryListener.CF, "   " + _t("Avg") + ": %.2f%s");
-                    def.gprint(plotName2, ConsolFun.MAX, ' ' + _t("Max") + ": %.2f%S");
-                    def.gprint(plotName2, ConsolFun.LAST, ' ' + _t("Now") + ": %.2f%S\\l");
+                    Variable var = new Variable.AVERAGE();
+                    def.datasource("avg2", plotName2, var);
+                    def.gprint("avg2", "   " + _t("Avg") + ": %.2f%s");
+                    var = new Variable.MAX();
+                    def.datasource("max2", plotName2, var);
+                    def.gprint("max2", ' ' + _t("Max") + ": %.2f%S");
+                    var = new Variable.LAST();
+                    def.datasource("last2", plotName2, var);
+                    def.gprint("last2", ' ' + _t("Now") + ": %.2f%S\\l");
                 }
             }
             if (!hideLegend) {

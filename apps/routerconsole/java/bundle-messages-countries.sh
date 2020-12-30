@@ -33,9 +33,9 @@ fi
 # set LG2 to the language you need in environment variables to enable this
 
 #
-# generate strings/Countries.java from ../../../installer/resources/countries.txt
+# generate strings/Countries.java from ../../../core/resources/countries.txt
 #
-CFILE=../../../installer/resources/countries.txt
+CFILE=../../../core/resources/countries.txt
 # add ../java/ so the refs will work in the po file
 JFILE=../java/build/Countries.java
 if [ $CFILE -nt $JFILE -o ! -s $JFILE ]
@@ -117,7 +117,7 @@ do
         then
             # slow way
             # convert to class files in build/obj
-            msgfmt --java --statistics -r $CLASS -l $LG -d build/obj $i
+            msgfmt --java2 --statistics -r $CLASS -l $LG -d build/obj $i
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"
@@ -135,7 +135,7 @@ do
             TDY=$TD2/net/i2p/router/countries
             rm -rf $TD
             mkdir -p $TD $TDY
-            msgfmt --java --statistics --source -r $CLASS -l $LG -d $TD $i
+            msgfmt --java2 --statistics --source -r $CLASS -l $LG -d $TD $i
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"

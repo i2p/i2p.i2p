@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -39,6 +40,18 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     //private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
     private long _peakThroughputCurrentTotal;
     private long _peakThroughputLastCoallesce = System.currentTimeMillis();
+    private Hash _blankHash;
+    private SessionKey[] _ChaReplyKeys;
+    private byte[][] _ChaReplyADs;
+    private final SessionKey[] _AESReplyKeys;
+    private final byte[][] _AESReplyIVs;
+    
+    /**
+     *  IV length for {@link #getAESReplyIV}
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public static final int REPLY_IV_LENGTH = 16;
+
     // Make configurable? - but can't easily get to pool options from here
     private static final int MAX_CONSECUTIVE_TEST_FAILURES = 3;
     
@@ -65,6 +78,8 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         }
         _isInbound = isInbound;
         _destination = destination;
+        _AESReplyKeys = new SessionKey[length];
+        _AESReplyIVs = new byte[length][];
     }
     
     /**
@@ -81,19 +96,21 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      * hop 0.
      */
     public HopConfig getConfig(int hop) { return _config[hop]; }
+
     /**
      * retrieve the tunnelId that the given hop receives messages on.  
      * the gateway is hop 0.
      *
      */
     public TunnelId getReceiveTunnelId(int hop) { return _config[hop].getReceiveTunnel(); }
+    
     /**
      * retrieve the tunnelId that the given hop sends messages on.  
      * the gateway is hop 0.
      *
      */
     public TunnelId getSendTunnelId(int hop) { return _config[hop].getSendTunnel(); }
-    
+
     /** retrieve the peer at the given hop.  the gateway is hop 0 */
     public Hash getPeer(int hop) { return _peers[hop]; }
     public void setPeer(int hop, Hash peer) { _peers[hop] = peer; }
@@ -140,6 +157,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     /** component ordering in the new style request */
     public List<Integer> getReplyOrder() { return _order; }
     public void setReplyOrder(List<Integer> order) { _order = order; }
+
     /** new style reply message id */
     public long getReplyMessageId() { return _replyMessageId; }
     public void setReplyMessageId(long id) { _replyMessageId = id; }
@@ -158,7 +176,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         long timeSince = now - _peakThroughputLastCoallesce;
         if (timeSince >= 60*1000) {
             long tot = _peakThroughputCurrentTotal;
-            double normalized = tot * 60d*1000d / timeSince;
+            int normalized = (int) (tot * 60d*1000d / timeSince);
             _peakThroughputLastCoallesce = now;
             _peakThroughputCurrentTotal = 0;
             if (_context != null) {
@@ -166,7 +184,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
                 int start = _isInbound ? 0 : 1;
                 int end = _isInbound ? _peers.length - 1 : _peers.length;
                 for (int i = start; i < end; i++) {
-                    _context.profileManager().tunnelDataPushed1m(_peers[i], (int)normalized);
+                    _context.profileManager().tunnelDataPushed1m(_peers[i], normalized);
                 }
             }
         }
@@ -202,6 +220,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
             return true;
         }
     }
+
     public boolean getTunnelFailed() { return _failed; }
     public int getTunnelFailures() { return _failures; }
     
@@ -236,6 +255,91 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      */
     public void setPriority(int priority) { _priority = priority; }
 
+    /**
+     *  Key and IV to encrypt the reply sent for the tunnel creation crypto.
+     *
+     *  @throws IllegalArgumentException if iv not 16 bytes
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public void setAESReplyKeys(int hop, SessionKey key, byte[] iv) {
+        if (iv.length != REPLY_IV_LENGTH)
+            throw new IllegalArgumentException();
+        _AESReplyKeys[hop] = key;
+        _AESReplyIVs[hop] = iv;
+    }
+    
+    /**
+     *  Key to encrypt the reply sent for the tunnel creation crypto.
+     *
+     *  @return key or null
+     *  @throws IllegalArgumentException if iv not 16 bytes
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public SessionKey getAESReplyKey(int hop) { return _AESReplyKeys[hop]; }
+
+    /**
+     *  IV used to encrypt the reply sent for the tunnel creation crypto.
+     *
+     *  @return 16 bytes or null
+     *  @since 0.9.48 moved from HopConfig
+     */
+    public byte[] getAESReplyIV(int hop) { return _AESReplyIVs[hop]; }
+
+    /**
+     *  Checksum for blank record
+     *  @since 0.9.48
+     */
+    public Hash getBlankHash() { return _blankHash; }
+
+    /**
+     *  Checksum for blank record
+     *  @since 0.9.48
+     */
+    public void setBlankHash(Hash h) { _blankHash = h; }
+
+    /**
+     *  Set ECIES reply key and IV
+     *  @since 0.9.48
+     */
+    public void setChaChaReplyKeys(int hop, SessionKey key, byte[] ad) {
+        if (_ChaReplyKeys == null) {
+            _ChaReplyKeys = new SessionKey[_config.length];
+            _ChaReplyADs = new byte[_config.length][];
+        }
+        _ChaReplyKeys[hop] = key;
+        _ChaReplyADs[hop] = ad;
+    }
+
+    /**
+     *  Is it an ECIES hop?
+     *  @since 0.9.48
+     */
+    public boolean isEC(int hop) {
+        if (_ChaReplyKeys == null)
+            return false;
+        return _ChaReplyKeys[hop] != null;
+    }
+
+    /**
+     *  Get ECIES reply key
+     *  @since 0.9.48
+     */
+    public SessionKey getChaChaReplyKey(int hop) {
+        if (_ChaReplyKeys == null)
+            return null;
+        return _ChaReplyKeys[hop];
+    }
+
+    /**
+     *  Get ECIES reply AD
+     *  @since 0.9.48
+     */
+    public byte[] getChaChaReplyAD(int hop) {
+        if (_ChaReplyADs == null)
+            return null;
+        return _ChaReplyADs[hop];
+    }
+
     @Override
     public String toString() {
         // H0:1235-->H1:2345-->H2:2345
@@ -251,14 +355,16 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         buf.append(": GW ");
         for (int i = 0; i < _peers.length; i++) {
             buf.append(_peers[i].toBase64().substring(0,4));
-            buf.append(':');
-            if (_config[i].getReceiveTunnel() != null)
-                buf.append(_config[i].getReceiveTunnel());
+            buf.append(isEC(i) ? " EC:" : " ElG:");
+            long id = _config[i].getReceiveTunnelId();
+            if (id != 0)
+                buf.append(id);
             else
                 buf.append("me");
-            if (_config[i].getSendTunnel() != null) {
+            id = _config[i].getSendTunnelId();
+            if (id != 0) {
                 buf.append('.');
-                buf.append(_config[i].getSendTunnel());
+                buf.append(id);
             } else if (_isInbound || i == 0) {
                 buf.append(".me");
             }

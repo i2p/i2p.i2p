@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.servlet.ServletRequest;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
@@ -129,8 +130,8 @@ public class RouterConsoleRunner implements RouterApp {
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
     public static final String ENABLED = ".startOnLoad";
-    private static final String PROP_KEYSTORE_PASSWORD = "routerconsole.keystorePassword";
-    private static final String PROP_KEY_PASSWORD = "routerconsole.keyPassword";
+    public static final String PROP_KEYSTORE_PASSWORD = "routerconsole.keystorePassword";
+    public static final String PROP_KEY_PASSWORD = "routerconsole.keyPassword";
     public static final int DEFAULT_LISTEN_PORT = PortMapper.DEFAULT_CONSOLE_PORT;
     private static final String DEFAULT_WEBAPPS_DIR = "./webapps/";
     private static final String USAGE = "Bad RouterConsoleRunner arguments, check clientApp.0.args in your clients.config file! " +
@@ -312,6 +313,26 @@ public class RouterConsoleRunner implements RouterApp {
         return Server.getVersion();
     }
 
+    /**
+     *  Package private for ConfigServiceHandler
+     *  @since 0.9.48 pulled out of startTrayApp
+     */
+    static boolean isSystrayEnabled(I2PAppContext context) {
+            // default false except on OSX and non-service windows,
+            // and on Linux KDE and LXDE
+            // Xubuntu XFCE works but doesn't look very good
+            // Ubuntu Unity was far too buggy to enable
+            // Ubuntu GNOME does not work, SystemTray.isSupported() returns false
+            String xdg = System.getenv("XDG_CURRENT_DESKTOP");
+            boolean dflt = !SystemVersion.isService() &&
+                           (SystemVersion.isWindows() ||
+                            SystemVersion.isMac() ||
+                            //"XFCE".equals(xdg) ||
+                            "KDE".equals(xdg) ||
+                            "LXDE".equals(xdg));
+            return context.getProperty(PROP_DTG_ENABLED, dflt);
+    }
+
     private void startTrayApp() {
         // if no permissions, don't even try
         // isLaunchedAsService() always returns true on Linux
@@ -322,11 +343,7 @@ public class RouterConsoleRunner implements RouterApp {
             return;
         }
         try {
-            // default false for now, except on OSX and non-service windows
-            String sdtg = _context.getProperty(PROP_DTG_ENABLED);
-            boolean desktopguiEnabled = Boolean.parseBoolean(sdtg) ||
-                                        (sdtg == null && (SystemVersion.isWindows() || SystemVersion.isMac()));
-            if (desktopguiEnabled) {
+            if (isSystrayEnabled(_context)) {
                 System.setProperty("java.awt.headless", "false");
                 net.i2p.desktopgui.Main dtg = new net.i2p.desktopgui.Main(_context, _mgr, null);    
                 dtg.startup();
@@ -360,17 +377,20 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava8) {
-                s = "Java 8 or higher will be required in a future release, please upgrade Java";
+                s = "Java 8 or higher is required, please upgrade Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 is required for plugins and automatic updates, please upgrade Java";
+                if (SystemVersion.isJava(14))
+                    s = "Pack200 is required for some plugins, please consider downgrading Java to 13 or lower";
+                else
+                    s = "Pack200 is required for some plugins, please consider upgrading Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (openARM) {
-                s = "OpenJDK 7/8 are not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
+                s = "OpenJDK 8 is not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -883,8 +903,9 @@ public class RouterConsoleRunner implements RouterApp {
             ConfigServiceHandler.registerSignalHandler(_context);
 
             if (_mgr != null &&
-                _context.getBooleanProperty(HelperBase.PROP_ADVANCED) &&
-                _context.getProperty(Analysis.PROP_FREQUENCY, 0L) > 0) {
+                //_context.getBooleanProperty(HelperBase.PROP_ADVANCED) &&
+                !SystemVersion.isSlow() &&
+                _context.getProperty(Analysis.PROP_FREQUENCY, Analysis.DEFAULT_FREQUENCY) > 0) {
                 // registers and starts itself
                 Analysis.getInstance(_context);
             }
@@ -1081,8 +1102,8 @@ public class RouterConsoleRunner implements RouterApp {
         }
 
         @Override
-        public UserIdentity login(String username, Object credentials) {
-            UserIdentity rv = super.login(username, credentials);
+        public UserIdentity login(String username, Object credentials, ServletRequest request) {
+            UserIdentity rv = super.login(username, credentials, request);
             if (rv == null)
                 //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
                 _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);

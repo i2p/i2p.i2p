@@ -23,10 +23,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -61,6 +61,8 @@ public abstract class TransportImpl implements Transport {
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private final Map<Hash, Long>  _unreachableEntries;
     private final Map<Hash, Long> _wasUnreachableEntries;
+    // one-entry cache for reachable check
+    private volatile Hash _lastReachablePeer;
     private final Set<InetAddress> _localAddresses;
     /** global router ident -> IP */
     private static final Map<Hash, byte[]> _IPMap;
@@ -102,8 +104,8 @@ public abstract class TransportImpl implements Transport {
             _sendPool = new ArrayBlockingQueue<OutNetMessage>(8);
         else
             _sendPool = null;
-        _unreachableEntries = new HashMap<Hash, Long>(32);
-        _wasUnreachableEntries = new HashMap<Hash, Long>(32);
+        _unreachableEntries = new ConcurrentHashMap<Hash, Long>(32);
+        _wasUnreachableEntries = new ConcurrentHashMap<Hash, Long>(32);
         _localAddresses = new ConcurrentHashSet<InetAddress>(4);
         _context.simpleTimer2().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
@@ -199,10 +201,10 @@ public abstract class TransportImpl implements Transport {
 
     /**
      * Return our peer clock skews on a transport.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * Dummy version. Transports override it.
      */
-    public Vector<Long> getClockSkews() { return new Vector<Long>(); }
+    public List<Long> getClockSkews() { return Collections.emptyList(); }
 
     public List<String> getMostRecentErrorMessages() { return Collections.emptyList(); }
 
@@ -851,17 +853,20 @@ public abstract class TransportImpl implements Transport {
     public void mayDisconnect(Hash peer) {}
 
     public boolean isUnreachable(Hash peer) {
-        synchronized (_unreachableEntries) {
-            Long when = _unreachableEntries.get(peer);
-            if (when == null) return false;
+        if (peer == _lastReachablePeer) return false;
+        boolean rv;
+        Long when = _unreachableEntries.get(peer);
+        if ((rv = when != null)) {
             long now = _context.clock().now();
-            if (when.longValue() + UNREACHABLE_PERIOD < now) {
+            rv = when.longValue() + UNREACHABLE_PERIOD >= now;
+            if (!rv) {
+                _lastReachablePeer = peer;
                 _unreachableEntries.remove(peer);
-                return false;
-            } else {
-                return true;
             }
+        } else {
+            _lastReachablePeer = peer;
         }
+        return rv;
     }
 
     /** called when we can't reach a peer */
@@ -871,10 +876,10 @@ public abstract class TransportImpl implements Transport {
             status == Status.HOSED)
             return;
         Long now = Long.valueOf(_context.clock().now());
-        synchronized (_unreachableEntries) {
-            // This isn't very useful since it is cleared when they contact us
-            _unreachableEntries.put(peer, now);
-        }
+        // This isn't very useful since it is cleared when they contact us
+        _unreachableEntries.put(peer, now);
+        if (peer == _lastReachablePeer)
+            _lastReachablePeer = null;
         // This is not cleared when they contact us
         markWasUnreachable(peer, true);
     }
@@ -883,9 +888,7 @@ public abstract class TransportImpl implements Transport {
     public void markReachable(Hash peer, boolean isInbound) {
         // if *some* transport can reach them, then we shouldn't banlist 'em
         _context.banlist().unbanlistRouter(peer);
-        synchronized (_unreachableEntries) {
-            _unreachableEntries.remove(peer);
-        }
+        _unreachableEntries.remove(peer);
         if (!isInbound)
             markWasUnreachable(peer, false);
     }
@@ -893,19 +896,15 @@ public abstract class TransportImpl implements Transport {
     private class CleanupUnreachable implements SimpleTimer.TimedEvent {
         public void timeReached() {
             long now = _context.clock().now();
-            synchronized (_unreachableEntries) {
-                for (Iterator<Long> iter = _unreachableEntries.values().iterator(); iter.hasNext(); ) {
-                    Long when = iter.next();
-                    if (when.longValue() + UNREACHABLE_PERIOD < now)
-                        iter.remove();
-                }
+            for (Iterator<Long> iter = _unreachableEntries.values().iterator(); iter.hasNext(); ) {
+                Long when = iter.next();
+                if (when.longValue() + UNREACHABLE_PERIOD < now)
+                    iter.remove();
             }
-            synchronized (_wasUnreachableEntries) {
-                for (Iterator<Long> iter = _wasUnreachableEntries.values().iterator(); iter.hasNext(); ) {
-                    Long when = iter.next();
-                    if (when.longValue() + WAS_UNREACHABLE_PERIOD < now)
-                        iter.remove();
-                }
+            for (Iterator<Long> iter = _wasUnreachableEntries.values().iterator(); iter.hasNext(); ) {
+                Long when = iter.next();
+                if (when.longValue() + WAS_UNREACHABLE_PERIOD < now)
+                    iter.remove();
             }
         }
     }
@@ -915,16 +914,14 @@ public abstract class TransportImpl implements Transport {
      * This is NOT reset if the peer contacts us.
      */
     public boolean wasUnreachable(Hash peer) {
-        synchronized (_wasUnreachableEntries) {
-            Long when = _wasUnreachableEntries.get(peer);
-            if (when != null) {
-                long now = _context.clock().now();
-                if (when.longValue() + WAS_UNREACHABLE_PERIOD < now) {
-                    _unreachableEntries.remove(peer);
-                    return false;
-                } else {
-                    return true;
-                }
+        Long when = _wasUnreachableEntries.get(peer);
+        if (when != null) {
+            long now = _context.clock().now();
+            if (when.longValue() + WAS_UNREACHABLE_PERIOD < now) {
+                _unreachableEntries.remove(peer);
+                return false;
+            } else {
+                return true;
             }
         }
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
@@ -939,13 +936,9 @@ public abstract class TransportImpl implements Transport {
     private void markWasUnreachable(Hash peer, boolean yes) {
         if (yes) {
             Long now = Long.valueOf(_context.clock().now());
-            synchronized (_wasUnreachableEntries) {
-                _wasUnreachableEntries.put(peer, now);
-            }
+            _wasUnreachableEntries.put(peer, now);
         } else {
-            synchronized (_wasUnreachableEntries) {
-                _wasUnreachableEntries.remove(peer);
-            }
+            _wasUnreachableEntries.remove(peer);
         }
         if (_log.shouldDebug())
             _log.debug(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer,

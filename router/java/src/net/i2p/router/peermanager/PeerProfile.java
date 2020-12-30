@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.Hash;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
@@ -86,8 +87,15 @@ public class PeerProfile {
     /** total number of bytes pushed through a single tunnel in a 1 minute period */
     private final float _peakTunnel1mThroughput[] = new float[THROUGHPUT_COUNT];
     /** periodically cut the measured throughput values */
-    private static final int DROP_PERIOD_MINUTES = 120;
-    private static final float DEGRADE_FACTOR = 0.75f;
+    private static final int DEGRADES_PER_DAY = 4;
+    // one in this many times, ~= 61
+    private static final int DEGRADE_PROBABILITY = PeerManager.REORGANIZES_PER_DAY / DEGRADES_PER_DAY;
+    private static final double TOTAL_DEGRADE_PER_DAY = 0.5d;
+    // the goal is to cut an unchanged profile in half in 24 hours.
+    // x**4 = .5; x = 4th root of .5,  x = .5**(1/4), x ~= 0.84
+    private static final float DEGRADE_FACTOR = (float) Math.pow(TOTAL_DEGRADE_PER_DAY, 1.0d / DEGRADES_PER_DAY);
+    //static { System.out.println("Degrade factor is " + DEGRADE_FACTOR); }
+
     private long _lastCoalesceDate = System.currentTimeMillis();
     
     /**
@@ -160,21 +168,33 @@ public class PeerProfile {
     
     /** @since 0.8.11 */
     boolean isEstablished() {
-        return _context.commSystem().isEstablished(_peer);
+        // null for tests
+        CommSystemFacade cs = _context.commSystem();
+        if (cs == null)
+            return false;
+        return cs.isEstablished(_peer);
     }
 
     /** @since 0.8.11 */
     boolean wasUnreachable() {
-        return _context.commSystem().wasUnreachable(_peer);
+        // null for tests
+        CommSystemFacade cs = _context.commSystem();
+        if (cs == null)
+            return false;
+        return cs.wasUnreachable(_peer);
     }
 
     /** @since 0.8.11 */
     boolean isSameCountry() {
-        String us = _context.commSystem().getOurCountry();
+        // null for tests
+        CommSystemFacade cs = _context.commSystem();
+        if (cs == null)
+            return false;
+        String us = cs.getOurCountry();
         return us != null &&
                (_bigCountries.contains(us) ||
                 _context.getProperty(CapacityCalculator.PROP_COUNTRY_BONUS) != null) &&
-               us.equals(_context.commSystem().getCountry(_peer));
+               us.equals(cs.getCountry(_peer));
     }
 
     /**
@@ -212,7 +232,7 @@ public class PeerProfile {
         long before = _context.clock().now() - period;
         return getLastHeardFrom() < before ||
                getLastSendSuccessful() < before ||
-             _context.commSystem().isEstablished(_peer);
+               isEstablished();
     }
     
     
@@ -437,6 +457,8 @@ public class PeerProfile {
     }
 
     /**
+     * This is the speed value
+     *
      * @return the average of the three fastest one-minute data transfers, on a per-tunnel basis,
      *         through this peer. Ever. Except that the peak values are cut in half
      *         periodically by coalesceThroughput().
@@ -523,10 +545,12 @@ public class PeerProfile {
         _expandedDB = true;
     }
 
-    private void coalesceThroughput() {
+    private void coalesceThroughput(boolean decay) {
         long now = System.currentTimeMillis();
         long measuredPeriod = now - _lastCoalesceDate;
         if (measuredPeriod >= 60*1000) {
+            // so we don't call random() twice
+            boolean shouldDecay =  decay && _context.random().nextInt(DEGRADE_PROBABILITY) <= 0;
             long tot = _peakThroughputCurrentTotal;
             float lowPeak = _peakThroughput[THROUGHPUT_COUNT-1];
             if (tot > lowPeak) {
@@ -539,7 +563,7 @@ public class PeerProfile {
                     }
                 }
             } else {
-                if (_context.random().nextInt(DROP_PERIOD_MINUTES) <= 0) {
+                if (shouldDecay) {
                     for (int i = 0; i < THROUGHPUT_COUNT; i++)
                         _peakThroughput[i] *= DEGRADE_FACTOR;
                 }
@@ -547,7 +571,7 @@ public class PeerProfile {
             
             // we degrade the tunnel throughput here too, regardless of the current
             // activity
-            if (_context.random().nextInt(DROP_PERIOD_MINUTES) <= 0) {
+            if (shouldDecay) {
                 for (int i = 0; i < THROUGHPUT_COUNT; i++) {
                     _peakTunnelThroughput[i] *= DEGRADE_FACTOR;
                     _peakTunnel1mThroughput[i] *= DEGRADE_FACTOR;
@@ -558,11 +582,13 @@ public class PeerProfile {
         }
     }
     
-    /** update the stats and rates (this should be called once a minute) */
-    public void coalesceStats() {
+    /**
+     *  Update the stats and rates. This is only called by addProfile()
+     */
+    void coalesceStats() {
         if (!_expanded) return;
 
-        coalesceOnly();
+        coalesceOnly(false);
         updateValues();
         
         if (_log.shouldLog(Log.DEBUG))
@@ -573,7 +599,7 @@ public class PeerProfile {
      *  Caller must next call updateValues()
      *  @since 0.9.4
      */
-    void coalesceOnly() {
+    void coalesceOnly(boolean shouldDecay) {
     	_coalescing = true;
     	
     	//_receiveSize.coalesceStats();
@@ -587,7 +613,7 @@ public class PeerProfile {
     		_dbHistory.coalesceStats();
     	}
     	
-    	coalesceThroughput();
+    	coalesceThroughput(shouldDecay);
     	
     	_speedValueNew = calculateSpeed();
     	_capacityValueNew = calculateCapacity();
@@ -604,7 +630,7 @@ public class PeerProfile {
      */
     void updateValues() {
     	if (!_coalescing) // can happen
-    		coalesceOnly();
+    		coalesceOnly(false);
     	_coalescing = false;
     	
     	_speedValue = _speedValueNew;

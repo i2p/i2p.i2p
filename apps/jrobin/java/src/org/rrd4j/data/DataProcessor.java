@@ -148,7 +148,7 @@ public class DataProcessor {
     /**
      * Defines the {@link org.rrd4j.core.RrdDbPool RrdDbPool} to use. If not defined, but {{@link #setPoolUsed(boolean)}
      * set to true, the default {@link RrdDbPool#getInstance()} will be used.
-     * @param pool
+     * @param pool an optional pool to use.
      */
     public void setPool(RrdDbPool pool) {
         this.pool = pool;

@@ -8,7 +8,6 @@ package net.i2p.router.message;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,6 +18,7 @@ import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -28,10 +28,15 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
+import net.i2p.router.crypto.ratchet.RatchetSessionTag;
+import net.i2p.router.crypto.ratchet.ReplyCallback;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Log;
 
 /**
@@ -157,14 +162,16 @@ public class GarlicMessageBuilder {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
-            if (config.getRecipient() == null) {
+            RouterInfo ri = config.getRecipient();
+            if (ri == null)
                 throw new IllegalArgumentException("Null recipient specified");
-            } else if (config.getRecipient().getIdentity() == null) {
+            RouterIdentity ident = ri.getIdentity();
+            if (ident == null)
                 throw new IllegalArgumentException("Null recipient.identity specified");
-            } else if (config.getRecipient().getIdentity().getPublicKey() == null) {
+            PublicKey pk = ident.getPublicKey();
+            if (pk == null)
                 throw new IllegalArgumentException("Null recipient.identity.publicKey specified");
-            } else
-                key = config.getRecipient().getIdentity().getPublicKey();
+            key = pk;
         }
         if (key.getType() != EncType.ELGAMAL_2048)
             throw new IllegalArgumentException();
@@ -195,7 +202,7 @@ public class GarlicMessageBuilder {
     /**
      *  ELGAMAL_2048 only.
      *  Used by TestJob, and directly above,
-     *  and by MessageWrapper for encrypting DatabaseLookupMessages
+     *  and by MessageWrapper for encrypting DatabaseLookupMessages and DSM/DSRM replies.
      *
      * @param ctx scope
      * @param config how/what to wrap
@@ -236,30 +243,51 @@ public class GarlicMessageBuilder {
                 log.debug("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
             return null;
         }
-        
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId() + " is " + cloveSet.length
-                     + " bytes and encrypted message data is " + encData.length + " bytes");
-        
+        if (log.shouldDebug())
+            log.debug("Built ElG CloveSet (" + config.getCloveCount() + " cloves " + cloveSet.length + " bytes) in " + msg);
+        return msg;
+    }
+    
+    /**
+     *  Ratchet only.
+     *  Used by TestJob,
+     *  and by MessageWrapper for encrypting DatabaseLookupMessages and DSM/DSRM replies.
+     *
+     * @param ctx scope
+     * @param config how/what to wrap
+     * @param encryptKey sessionKey used to encrypt the current message, non-null
+     * @param encryptTag sessionTag used to encrypt the current message, non-null
+     * @since 0.9.46
+     */
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config,
+                                             SessionKey encryptKey, RatchetSessionTag encryptTag) {
+        GarlicMessage msg = new GarlicMessage(ctx);
+        CloveSet cloveSet = buildECIESCloveSet(ctx, config);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, encryptKey, encryptTag);
+        if (encData == null)
+            return null;
+        msg.setData(encData);
+        msg.setMessageExpiration(config.getExpiration());
+        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        if (log.shouldDebug())
+            log.debug("Built ECIES CloveSet (" + config.getCloveCount() + " cloves) in " + msg);
         return msg;
     }
     
     /**
      * ECIES_X25519 only.
-     * Called by GarlicMessageBuilder only.
+     * Called by OCMJH only.
      *
      * @param ctx scope
-     * @param config how/what to wrap
-     * @param target public key of the location being garlic routed to (may be null if we 
-     *               know the encryptKey and encryptTag)
-     * @param replyDI non-null to request an ack, or null
+     * @param config how/what to wrap, must have key set with setRecipientPublicKey()
+     * @param callback may be null
      * @return null if expired or on other errors
      * @throws IllegalArgumentException on error
      * @since 0.9.44
      */
     static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config,
-                                           PublicKey target, Hash from, SessionKeyManager skm,
-                                           DeliveryInstructions replyDI) {
+                                           Hash from, Destination to, SessionKeyManager skm,
+                                           ReplyCallback callback) {
         PublicKey key = config.getRecipientPublicKey();
         if (key.getType() != EncType.ECIES_X25519)
             throw new IllegalArgumentException();
@@ -289,7 +317,7 @@ public class GarlicMessageBuilder {
                 log.warn("No SKM for " + from.toBase32());
             return null;
         }
-        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, target, priv, rskm, replyDI);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, key, to, priv, rskm, callback);
         if (encData == null) {
             if (log.shouldWarn())
                 log.warn("Encrypt fail for " + from.toBase32());
@@ -304,8 +332,43 @@ public class GarlicMessageBuilder {
             return null;
         }
         if (log.shouldDebug())
-            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId()
-                     + " encrypted message data is " + encData.length + " bytes");
+            log.debug("Built ECIES CloveSet (" + config.getCloveCount() + " cloves) in " + msg);
+        return msg;
+    }
+    
+    /**
+     * Encrypt from an anonymous source.
+     * ECIES_X25519 only.
+     * Called by MessageWrapper only.
+     *
+     * @param ctx scope
+     * @param config how/what to wrap, must have key set with setRecipientPublicKey()
+     * @throws IllegalArgumentException on error
+     * @since 0.9.48
+     */
+    public static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config) {
+        PublicKey key = config.getRecipientPublicKey();
+        if (key.getType() != EncType.ECIES_X25519)
+            throw new IllegalArgumentException();
+        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        GarlicMessage msg = new GarlicMessage(ctx);
+        CloveSet cloveSet = buildECIESCloveSet(ctx, config);
+        byte encData[] = ctx.eciesEngine().encrypt(cloveSet, key);
+        if (encData == null) {
+            if (log.shouldWarn())
+                log.warn("Encrypt fail for " + config);
+            return null;
+        }
+        msg.setData(encData);
+        msg.setMessageExpiration(config.getExpiration());
+        long timeFromNow = config.getExpiration() - ctx.clock().now();
+        if (timeFromNow < 1*1000) {
+            if (log.shouldDebug())
+                log.debug("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
+            return null;
+        }
+        if (log.shouldDebug())
+            log.debug("Built ECIES CloveSet (" + config.getCloveCount() + " cloves) in " + msg);
         return msg;
     }
     
@@ -330,11 +393,11 @@ public class GarlicMessageBuilder {
      * @throws IllegalArgumentException on error
      */
     private static byte[] buildCloveSet(RouterContext ctx, GarlicConfig config) {
-        ByteArrayOutputStream baos;
+        ByteArrayStream baos;
         try {
             if (config instanceof PayloadGarlicConfig) {
                 byte clove[] = buildClove(ctx, (PayloadGarlicConfig)config);
-                baos = new ByteArrayOutputStream(clove.length + 16);
+                baos = new ByteArrayStream(1 + clove.length + 3 + 4 + 8);
                 baos.write((byte) 1);
                 baos.write(clove);
             } else {
@@ -354,7 +417,7 @@ public class GarlicMessageBuilder {
                 int len = 1;
                 for (int i = 0; i < cloves.length; i++)
                     len += cloves[i].length;
-                baos = new ByteArrayOutputStream(len + 16);
+                baos = new ByteArrayStream(1 + len + 3 + 4 + 8);
                 baos.write((byte) cloves.length);
                 for (int i = 0; i < cloves.length; i++)
                     baos.write(cloves[i]);
@@ -404,7 +467,7 @@ public class GarlicMessageBuilder {
     private static byte[] buildCommonClove(GarlicClove clove, GarlicConfig config) {
         clove.setCertificate(config.getCertificate());
         clove.setCloveId(config.getId());
-        clove.setExpiration(new Date(config.getExpiration()));
+        clove.setExpiration(config.getExpiration());
         clove.setInstructions(config.getDeliveryInstructions());
         return clove.toByteArray();
     }
@@ -451,7 +514,7 @@ public class GarlicMessageBuilder {
         clove.setData(config.getPayload());
         clove.setCertificate(Certificate.NULL_CERT);
         clove.setCloveId(0);
-        clove.setExpiration(new Date(config.getExpiration()));
+        clove.setExpiration(config.getExpiration());
         clove.setInstructions(config.getDeliveryInstructions());
         return clove;
     }

@@ -38,17 +38,18 @@ import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 
 public class Peer implements Comparable<Peer>
 {
-  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Peer.class);
+  protected final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
   // Identifying property, the peer id of the other side.
   private final PeerID peerID;
 
   private final byte[] my_id;
   private final byte[] infohash;
   /** will start out null in magnet mode */
-  private MetaInfo metainfo;
+  protected MetaInfo metainfo;
   private Map<String, BEValue> handshakeMap;
 
   // The data in/output streams set during the handshake and used by
@@ -60,8 +61,11 @@ public class Peer implements Comparable<Peer>
   private final AtomicLong downloaded = new AtomicLong();
   private final AtomicLong uploaded = new AtomicLong();
 
-  // Keeps state for in/out connections.  Non-null when the handshake
-  // was successful, the connection setup and runs
+  /**                                                                    `
+   *  Keeps state for in/out connections.  Non-null when the handshake
+   *  was successful, the connection setup and runs.
+   *  Do not access directly. All actions should be through Peer methods.
+   */
   volatile PeerState state;
 
   /** shared across all peers on this torrent */
@@ -76,22 +80,22 @@ public class Peer implements Comparable<Peer>
 
   final static long CHECK_PERIOD = PeerCoordinator.CHECK_PERIOD; // 40 seconds
   final static int RATE_DEPTH = PeerCoordinator.RATE_DEPTH; // make following arrays RATE_DEPTH long
-  private long uploaded_old[] = {-1,-1,-1};
-  private long downloaded_old[] = {-1,-1,-1};
+  private final long uploaded_old[] = {-1,-1,-1};
+  private final long downloaded_old[] = {-1,-1,-1};
 
   private static final byte[] HANDSHAKE = DataHelper.getASCII("BitTorrent protocol");
+  // See BEP 4 for definitions
   //  bytes per bt spec:                         0011223344556677
   private static final long OPTION_EXTENSION = 0x0000000000100000l;
   private static final long OPTION_FAST      = 0x0000000000000004l;
   //private static final long OPTION_DHT       = 0x0000000000000001l;
-  /** we use a different bit since the compact format is different */
-/* no, let's use an extension message
-  static final long OPTION_I2P_DHT   = 0x0000000040000000l;
-*/
   //private static final long OPTION_AZMP      = 0x1000000000000000l;
+  // hybrid support TODO
+  private static final long OPTION_V2        = 0x0000000000000010L;
   private long options;
   private final boolean _isIncoming;
   private int _totalCommentsSent;
+  private int _maxPipeline = PeerState.MIN_PIPELINE;
 
   /**
    * Outgoing connection.
@@ -289,7 +293,7 @@ public class Peer implements Comparable<Peer>
         if ((options & OPTION_EXTENSION) != 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Peer supports extensions, sending reply message");
-            int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
+            int metasize = metainfo != null ? metainfo.getInfoBytesLength() : -1;
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
             boolean dht = util.getDHT() != null;
             boolean comment = util.utCommentsEnabled();
@@ -340,7 +344,6 @@ public class Peer implements Comparable<Peer>
   private byte[] handshake(InputStream in, OutputStream out)
     throws IOException
   {
-    din = new DataInputStream(in);
     dout = new DataOutputStream(out);
     
     // Handshake write - header
@@ -365,6 +368,7 @@ public class Peer implements Comparable<Peer>
         _log.debug("Wrote my shared hash and ID to " + toString());
     
     // Handshake read - header
+    din = new DataInputStream(in);
     byte b = din.readByte();
     if (b != HANDSHAKE.length)
       throw new IOException("Handshake failure, expected 19, got "
@@ -428,9 +432,30 @@ public class Peer implements Comparable<Peer>
       return handshakeMap;
   }
 
-  /** @since 0.8.4 */
+  /**
+   *  @param map non-null
+   *  @since 0.8.4
+   */
   public void setHandshakeMap(Map<String, BEValue> map) {
       handshakeMap = map;
+      BEValue bev = map.get("reqq");
+      if (bev != null) {
+          try {
+              int reqq = bev.getInt();
+              _maxPipeline = Math.min(PeerState.MAX_PIPELINE, Math.max(PeerState.MIN_PIPELINE, reqq));
+          } catch (InvalidBEncodingException ibee) {}
+      } else {
+          // BEP 10 "The default in libtorrent is 250"
+          _maxPipeline = PeerState.MAX_PIPELINE;
+      }
+  }
+
+  /**
+   *  @return min of PeerState.MIN_PIPELINE, max of PeerState.MAX_PIPELINE
+   *  @since 0.9.47
+   */
+  public int getMaxPipeline() {
+      return _maxPipeline;
   }
 
   /** @since 0.8.4 */
@@ -644,7 +669,8 @@ public class Peer implements Comparable<Peer>
 
   /**
    * Returns the number of bytes that have been downloaded.
-   * Can be reset to zero with <code>resetCounters()</code>/
+   * Can be reset to zero with <code>resetCounters()</code>
+   * which is called every CHECK_PERIOD by PeerCheckerTask.
    */
   public long getDownloaded()
   {
@@ -653,7 +679,8 @@ public class Peer implements Comparable<Peer>
 
   /**
    * Returns the number of bytes that have been uploaded.
-   * Can be reset to zero with <code>resetCounters()</code>/
+   * Can be reset to zero with <code>resetCounters()</code>
+   * which is called every CHECK_PERIOD by PeerCheckerTask.
    */
   public long getUploaded()
   {
@@ -713,6 +740,7 @@ public class Peer implements Comparable<Peer>
 
   /**
    * Return how much the peer has
+   * @return number of completed pieces (not bytes)
    */
   public int completed()
   {
@@ -763,5 +791,13 @@ public class Peer implements Comparable<Peer>
   /** @since 0.9.31 */
   void setTotalCommentsSent(int count) {
     _totalCommentsSent = count;
+  }
+
+  /**
+   * @return false
+   * @since 0.9.49
+   */
+  public boolean isWebPeer() {
+      return false;
   }
 }

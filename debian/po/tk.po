@@ -1,0 +1,91 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the i2p package.
+# 
+# Translators:
+# Alperen Yavuz <mingyu@yaani.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2020-08-26 20:44+0000\n"
+"Last-Translator: Alperen Yavuz <mingyu@yaani.com>\n"
+"Language-Team: Turkmen (http://www.transifex.com/otf/I2P/language/tk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tk\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid "Should the I2P router be started at boot?"
+msgstr "I2P marşrutizatoryny bootdan başlamalymy?"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid ""
+"The I2P router can be run as a daemon that starts automatically when your "
+"computer boots up. This is the recommended configuration."
+msgstr "I2P marşrutizatory, kompýuteriňiz açylanda awtomatiki başlaýan daemon hökmünde işledilip bilner. Bu maslahat berilýän konfigurasiýa."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid "I2P daemon user:"
+msgstr "I2P daemon ulanyjy:"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"By default I2P is configured to run under the account i2psvc when running as"
+" a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at "
+"/home/user/i2p, you may enter 'user' here."
+msgstr "Adaty tertipde I2P, daemon hökmünde işledilende i2psvc hasabynyň aşagynda işlemek üçin düzülendir. ** bar bolan ** I2P profilini ulanmak üçin bu ýere başga hasap adyny girizip bilersiňiz. Mysal üçin, öňki I2P gurnama / home / user / i2p bolsa, bu ýere 'ulanyjy' girizip bilersiňiz."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"Very important: If a user other than the default of 'i2psvc' is entered "
+"here, the chosen username *MUST* already exist."
+msgstr "Örän möhüm: Bu ýere 'i2psvc' -den başga ulanyjy girizilen bolsa, saýlanan ulanyjy ady * MUGT * eýýäm bar."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "Memory that can be allocated to I2P:"
+msgstr "I2P-e bölüp boljak ýat:"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
+msgstr "Düzgüne görä, I2P-e diňe 128 MB RAM ulanmaga rugsat berler."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid ""
+"High bandwidth routers, as well as routers with a lot of active torrents / "
+"plugins, may need to have this value increased."
+msgstr "Bandokary zolakly marşrutizatorlar, şeýle hem köp aktiw akymly / pluginli marşrutizatorlar, bu bahanyň ýokarlanmagy üçin zerur bolup biler."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "I2P daimi diňe AppArmor bilen çäklenmelimi?"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr "Bu opsiýa açyk bolsa, I2P haýsy faýllara we kataloglara girip boljakdygyny çäklendirip, “AppArmor” bilen gutular."

@@ -3,7 +3,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <%@include file="css.jsi" %>
-<%@include file="csp-unsafe.jsi" %>
 <%=intl.title("config clients")%>
 <style type='text/css'>
 button span.hide{
@@ -12,6 +11,10 @@ button span.hide{
 input.default { width: 1px; height: 1px; visibility: hidden; }
 </style>
 <%@include file="summaryajax.jsi" %>
+<script nonce="<%=cspNonce%>" type="text/javascript">
+  var deleteMessage = "<%=intl._t("Are you sure you want to delete {0}?")%>";
+</script>
+<script src="/js/configclients.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head><body>
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigClientsHelper" id="clientshelper" scope="request" />
@@ -27,8 +30,20 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <h3 id="i2pclientconfig"><%=intl._t("Client Configuration")%></h3>
  <p class="infohelp" id="clientconf">
  <%=intl._t("The Java clients listed below are started by the router and run in the same JVM.")%>&nbsp;
- <%=intl._t("To change other client options, edit the file")%>
- <tt><%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.</tt>
+<%
+   if (!clientshelper.isAdvanced()) {
+       net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
+       if (net.i2p.router.startup.ClientAppConfig.isSplitConfig(ctx)) {
+%>
+           <%=intl._t("To change client options, edit the files in the directory {0}.", "<tt>" + net.i2p.router.startup.ClientAppConfig.configDir(ctx).getAbsolutePath() + "</tt>")%>
+<%
+       } else {
+%>
+           <%=intl._t("To change client options, edit the file {0}.", "<tt>" + net.i2p.router.startup.ClientAppConfig.configFile(ctx).getAbsolutePath() + "</tt>")%>
+<%
+       }
+   } // !isAdvanced()
+%>
  <%=intl._t("All changes require restart to take effect.")%>
  </p>
  <p class="infowarn" id="clientconf">

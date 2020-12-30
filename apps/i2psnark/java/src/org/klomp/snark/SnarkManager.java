@@ -195,8 +195,10 @@ public class SnarkManager implements CompleteListener, ClientApp {
 //       ,"Exotrack", "http://blbgywsjubw3d2zih2giokakhe3o2cko7jtte4risb3hohbcoyva.b32.i2p/announce.php=http://exotrack.i2p/"
        ,"DgTrack", "http://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p/a=http://opentracker.dg2.i2p/"
        // The following is ECDSA_SHA256_P256
-       ,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
-       ,"psi's open tracker", "http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/announce=http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/"
+//last up Sep. 19 2020
+       //,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
+//down for good
+       //,"psi's open tracker", "http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/announce=http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/"
 //last up May 21 2019
 //     ,"C.Tracker", "http://ri5a27ioqd4vkik72fawbcryglkmwyy4726uu5j3eg6zqh2jswfq.b32.i2p/announce=http://tracker.crypthost.i2p/tracker/index.jsp",
     };
@@ -205,8 +207,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String DEFAULT_BACKUP_TRACKER = "http://opentracker.dg2.i2p/a";
 
     /** URLs, comma-separated. Used for "announce to open trackers also" */
-    private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER +
-                                                       (SigType.ECDSA_SHA256_P256.isAvailable() ? ",http://tracker.thebland.i2p/a" : "");
+    private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER; // +
+                                                       //(SigType.ECDSA_SHA256_P256.isAvailable() ? ",http://tracker.thebland.i2p/a" : "");
 
     public static final Set<String> DEFAULT_TRACKER_ANNOUNCES;
 
@@ -880,6 +882,31 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 theme = "light";
         }
         return theme;
+    }
+    
+    /**
+     * Get the path to the preferred embedded icons for toImg, "solid/" for
+     * dark and light, "" for everything else.
+     *
+     * If you add a theme with a new icon set, then you need to add a
+     * corresponding condition here.
+     *
+     * @return String "solid/" or ""
+     * @since 0.9.48
+     */
+    public String getThemeIconSet() {
+        String iconset;
+        String theme = getTheme();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Theme was: " + theme);
+        if (theme.equals("dark") || theme.equals("light")) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Using solid iconset.");
+            iconset = "solid/";
+        } else {
+            iconset = "";
+        }
+        return iconset;
     }
 
     /**
@@ -1659,8 +1686,9 @@ public class SnarkManager implements CompleteListener, ClientApp {
                     disableTorrentFile(filename);
                     return false;
                 } catch (OutOfMemoryError oom) {
-                    addMessage(_t("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getLocalizedMessage());
-                    return false;
+                    String s = _t("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getLocalizedMessage();
+                    addMessage(s);
+                    throw new Snark.RouterException(s, oom);
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
@@ -2734,6 +2762,10 @@ public class SnarkManager implements CompleteListener, ClientApp {
                         disableTorrentFile(name);
                         rv = false;
                     }
+                } catch (Snark.RouterException e) {
+                    addMessage(_t("Error: Could not add the torrent {0}", name) + ": " + e);
+                    _log.error("Unable to add the torrent " + name, e);
+                    return false;
                 } catch (RuntimeException e) {
                     addMessage(_t("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);

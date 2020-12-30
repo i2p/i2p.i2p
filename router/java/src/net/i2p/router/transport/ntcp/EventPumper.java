@@ -16,6 +16,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.UnresolvedAddressException;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
@@ -56,6 +57,7 @@ class EventPumper implements Runnable {
     private final ObjectCounter<ByteArray> _blockedIPs;
     private long _expireIdleWriteTime;
     private static final boolean _useDirect = false;
+    private final boolean _nodelay;
     
     /**
      *  This probably doesn't need to be bigger than the largest typical
@@ -101,6 +103,7 @@ class EventPumper implements Runnable {
      *  @see java.nio.ByteBuffer
      */
     //private static final String PROP_DIRECT = "i2np.ntcp.useDirectBuffers";
+    private static final String PROP_NODELAY = "i2np.ntcp.nodelay";
 
     private static final int MIN_MINB = 4;
     private static final int MAX_MINB = 12;
@@ -111,6 +114,9 @@ class EventPumper implements Runnable {
     }
     
     private static final TryCache<ByteBuffer> _bufferCache = new TryCache<>(new BufferFactory(), MIN_BUFS);
+
+    private static final Set<Status> STATUS_OK =
+        EnumSet.of(Status.OK, Status.IPV4_OK_IPV6_UNKNOWN, Status.IPV4_OK_IPV6_FIREWALLED);
 
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
         _context = ctx;
@@ -124,6 +130,7 @@ class EventPumper implements Runnable {
         _context.statManager().createRateStat("ntcp.zeroRead", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.zeroReadDrop", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.dropInboundNoMessage", "", "ntcp", new long[] {10*60*1000} );
+        _nodelay = ctx.getBooleanPropertyDefaultTrue(PROP_NODELAY);
     }
     
     public synchronized void startPumping() {
@@ -298,8 +305,8 @@ class EventPumper implements Runnable {
                                 if ( con.getTimeSinceSend(now) > expire &&
                                      con.getTimeSinceReceive(now) > expire) {
                                     // we haven't sent or received anything in a really long time, so lets just close 'er up
+                                    // con will cancel the key
                                     con.sendTerminationAndClose();
-                                    key.cancel();
                                     if (_log.shouldInfo())
                                         _log.info("Failsafe or expire close for " + con);
                                     failsafeCloses++;
@@ -527,6 +534,8 @@ class EventPumper implements Runnable {
 
             if (shouldSetKeepAlive(chan))
                 chan.socket().setKeepAlive(true);
+            if (_nodelay)
+                chan.socket().setTcpNoDelay(true);
 
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
             NTCPConnection con = new NTCPConnection(_context, _transport, chan, ckey);
@@ -547,6 +556,8 @@ class EventPumper implements Runnable {
             if (connected) {
                 if (shouldSetKeepAlive(chan))
                     chan.socket().setKeepAlive(true);
+                if (_nodelay)
+                    chan.socket().setTcpNoDelay(true);
                 // key was already set when the channel was created, why do it again here?
                 con.setKey(key);
                 con.outboundConnected();
@@ -576,11 +587,7 @@ class EventPumper implements Runnable {
         if (chan.socket().getInetAddress() instanceof Inet6Address)
             return false;
         Status status = _context.commSystem().getStatus();
-        if (status == Status.OK ||
-            status == Status.IPV4_OK_IPV6_UNKNOWN ||
-            status == Status.IPV4_OK_IPV6_FIREWALLED)
-            return false;
-        return true;
+        return !STATUS_OK.contains(status);
     }
 
     /**

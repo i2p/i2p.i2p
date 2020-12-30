@@ -30,6 +30,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.crypto.ratchet.ReplyCallback;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
 import net.i2p.util.Log;
 
@@ -100,6 +101,7 @@ class OutboundClientMessageJobHelper {
      *
      * This is called from OCMOSJ
      *
+     * @param dataClove may be null for ECIES-layer ack
      * @param tagsToSendOverride if &gt; 0, use this instead of skm's default
      * @param lowTagsOverride if &gt; 0, use this instead of skm's default
      * @param wrappedKey non-null with null data,
@@ -108,12 +110,14 @@ class OutboundClientMessageJobHelper {
      * @param replyTunnel non-null if requireAck is true or bundledReplyLeaseSet is non-null
      * @param requireAck if true, bundle replyToken in an ack clove
      * @param bundledReplyLeaseSet may be null; if non-null, put it in a clove
+     * @param callback only for ECIES, may be null
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
                                              PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel,
                                              int tagsToSendOverride, int lowTagsOverride, SessionKey wrappedKey, 
-                                             Set<SessionTag> wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
+                                             Set<SessionTag> wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet,
+                                             ReplyCallback callback) {
 
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
         if (skm == null)
@@ -127,27 +131,7 @@ class OutboundClientMessageJobHelper {
             return null;
         GarlicMessage msg;
         if (isECIES) {
-            DeliveryInstructions di;
-            if (requireAck) {
-                // setup reply DI
-                di = new DeliveryInstructions();
-                if (bundledReplyLeaseSet != null) {
-                    di.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
-                    di.setDestination(from);
-                } else if (replyTunnel != null) {
-                    di.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
-                    TunnelId replyToTunnelId = replyTunnel.getReceiveTunnelId(0);
-                    Hash replyToTunnelRouter = replyTunnel.getPeer(0);
-                    di.setRouter(replyToTunnelRouter);
-                    di.setTunnelId(replyToTunnelId);
-                } else {
-                    // shouldn't happen
-                    di = null;
-                }
-            } else {
-                di = null;
-            }
-            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, recipientPK, from, skm, di);
+            msg = GarlicMessageBuilder.buildECIESMessage(ctx, config, from, dest, skm, callback);
         } else {
             // no use sending tags unless we have a reply token set up already
             int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
@@ -162,7 +146,9 @@ class OutboundClientMessageJobHelper {
      * Make the top-level config, with a data clove, an optional ack clove, and
      * an optional leaseset clove.
      *
-     * @param dataClove non-null
+     * The returned GarlicConfig will have the recipientPublicKey set.
+     *
+     * @param dataClove may be null for ECIES-layer ack
      * @param replyTunnel non-null if requireAck is true or bundledReplyLeaseSet is non-null
      * @param requireAck if true, bundle replyToken in an ack clove
      * @param bundledReplyLeaseSet may be null; if non-null, put it in a clove
@@ -200,7 +186,8 @@ class OutboundClientMessageJobHelper {
         // As of 0.9.2, since the receiver processes them in-order,
         // put data clove last to speed up the ack,
         // and get the leaseset stored before handling the data
-        config.addClove(dataClove);
+        if (dataClove != null)
+            config.addClove(dataClove);
 
         config.setRecipientPublicKey(recipientPK);
         
@@ -249,7 +236,7 @@ class OutboundClientMessageJobHelper {
         LeaseSetKeys lsk = ctx.keyManager().getKeys(from);
         I2NPMessage msg;
         if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
-            msg = wrapDSM(ctx, skm, dsm);
+            msg = wrapDSM(ctx, skm, dsm, expiration);
             if (msg == null) {
                 if (log.shouldLog(Log.WARN))
                     log.warn("Failed to wrap ack clove");
@@ -296,12 +283,14 @@ class OutboundClientMessageJobHelper {
      *  @return null on error
      *  @since 0.9.12
      */
-    private static GarlicMessage wrapDSM(RouterContext ctx, SessionKeyManager skm, DeliveryStatusMessage dsm) {
+    private static GarlicMessage wrapDSM(RouterContext ctx, SessionKeyManager skm,
+                                         DeliveryStatusMessage dsm, long expiration) {
         // garlic route that DeliveryStatusMessage to ourselves so the endpoints and gateways
         // can't tell its a test.  to simplify this, we encrypt it with a random key and tag,
         // remembering that key+tag so that we can decrypt it later.  this means we can do the
         // garlic encryption without any ElGamal (yay)
-        MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(ctx, skm);
+        long fromNow = expiration - ctx.clock().now();
+        MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(ctx, skm, fromNow, true);
         GarlicMessage msg = MessageWrapper.wrap(ctx, dsm, sess);
         return msg;
     }

@@ -34,7 +34,6 @@ import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
-import net.i2p.util.InternalSocket;
 
 /**
  * EepGet [-p 127.0.0.1:4444]
@@ -174,6 +173,7 @@ public class EepGet {
         _bytesRemaining = -1;
         _fetchHeaderTimeout = CONNECT_TIMEOUT;
         _listeners = new ArrayList<StatusListener>(1);
+        _allowCaching = allowCaching;
         _etag = etag;
         _lastModified = lastModified;
         _etagOrig = etag;
@@ -429,9 +429,14 @@ public class EepGet {
                            "       (use -c or -p :0 for no proxy)");
     }
     
+    /**
+     *  Callback interface
+     */
     public static interface StatusListener {
         /**
-         *  alreadyTransferred - total of all attempts, not including currentWrite
+         *  Total length should be == alreadyTransferred + currentWrite + bytesRemaining for all calls
+         *
+         *  @param alreadyTransferred total of all attempts, not including currentWrite
          *                       If nonzero on the first call, a partial file of that length was found,
          *                       _and_ the server supports resume.
          *                       If zero on a subsequent call after some bytes are transferred
@@ -441,17 +446,25 @@ public class EepGet {
          *                       the listener should keep its own counter,
          *                       or subtract the initial alreadyTransferred value.
          *                       And watch out for alreadyTransferred resetting if a resume failed...
-         *  currentWrite - since last call to the listener
-         *  bytesTransferred - includes headers, retries, redirects, discarded partial downloads, ...
-         *  bytesRemaining - on this attempt only, currentWrite already subtracted -
+         *  @param currentWrite since last call to the listener
+         *  @param bytesTransferred includes headers, retries, redirects, discarded partial downloads, ...
+         *  @param bytesRemaining on this attempt only, currentWrite already subtracted -
          *                   or -1 if chunked encoding or server does not return a length
-         *
-         *  Total length should be == alreadyTransferred + currentWrite + bytesRemaining for all calls
          *
          */
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url);
+        /**
+         *  @see #bytesTransferred
+         *  @param outputFile null if unknown (output stream constructor)
+         */
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified);
+        /**
+         *  @see #bytesTransferred
+         */
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause);
+        /**
+         *  @see #bytesTransferred
+         */
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt);
 
         /**
@@ -555,7 +568,7 @@ public class EepGet {
                             + " bytes transferred" +
                             (_discarded > 0 ? (" and " + _discarded + " bytes discarded") : ""));
                 }
-                if (transferred > 0) {
+                if (transferred > 0 && outputFile != null) {
                     long sz = (new File(outputFile)).length();
                     if (sz <= 0)
                         sz = alreadyTransferred;

@@ -22,7 +22,7 @@ public class Lease2 extends Lease {
         _gateway = Hash.create(in);
         _tunnelId = new TunnelId();
         _tunnelId.readBytes(in);
-        _end = new Date(DataHelper.readLong(in, 4) * 1000);
+        _end = DataHelper.readLong(in, 4) * 1000;
     }
     
     @Override
@@ -31,7 +31,7 @@ public class Lease2 extends Lease {
             throw new DataFormatException("Not enough data to write out a Lease");
         _gateway.writeBytes(out);
         _tunnelId.writeBytes(out);
-        DataHelper.writeLong(out, 4, _end.getTime() / 1000);
+        DataHelper.writeLong(out, 4, _end / 1000);
     }
     
     @Override
@@ -39,14 +39,14 @@ public class Lease2 extends Lease {
         if (object == this) return true;
         if ((object == null) || !(object instanceof Lease2)) return false;
         Lease2 lse = (Lease2) object;
-        return DataHelper.eq(_end, lse.getEndDate())
+        return _end == lse.getEndTime()
                && DataHelper.eq(_tunnelId, lse.getTunnelId())
                && DataHelper.eq(_gateway, lse.getGateway());
     }
     
     @Override
     public int hashCode() {
-        return (int) _end.getTime() ^ DataHelper.hashCode(_gateway)
+        return (int) _end ^ DataHelper.hashCode(_gateway)
                ^ (int) _tunnelId.getTunnelId();
     }
 }

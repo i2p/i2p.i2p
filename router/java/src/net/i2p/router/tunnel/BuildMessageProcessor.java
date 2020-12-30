@@ -1,6 +1,6 @@
 package net.i2p.router.tunnel;
 
-import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -10,6 +10,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
+import net.i2p.router.RouterContext;
 import net.i2p.router.RouterThrottleImpl;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.DecayingHashSet;
@@ -27,11 +28,11 @@ import net.i2p.util.SystemVersion;
  *
  */
 public class BuildMessageProcessor {
-    private final I2PAppContext ctx;
+    private final RouterContext ctx;
     private final Log log;
     private final DecayingBloomFilter _filter;
     
-    public BuildMessageProcessor(I2PAppContext ctx) {
+    public BuildMessageProcessor(RouterContext ctx) {
         this.ctx = ctx;
         log = ctx.logManager().getLog(getClass());
         _filter = selectFilter();
@@ -96,8 +97,7 @@ public class BuildMessageProcessor {
         long beforeLoop = System.currentTimeMillis();
         for (int i = 0; i < msg.getRecordCount(); i++) {
             EncryptedBuildRecord rec = msg.getRecord(i);
-            int len = BuildRequestRecord.PEER_SIZE;
-            boolean eq = DataHelper.eq(ourHashData, 0, rec.getData(), 0, len);
+            boolean eq = DataHelper.eq(ourHashData, 0, rec.getData(), 0, BuildRequestRecord.PEER_SIZE);
             if (eq) {
                 beforeActualDecrypt = System.currentTimeMillis();
                 try {
@@ -116,7 +116,9 @@ public class BuildMessageProcessor {
                     // The spec says to feed the 32-byte AES-256 reply key into the Bloom filter.
                     // But we were using the first 32 bytes of the encrypted reply.
                     // Fixed in 0.9.24
-                    boolean isDup = _filter.add(rv.getData(), BuildRequestRecord.OFF_REPLY_KEY, 32);
+                    boolean isEC = ctx.keyManager().getPrivateKey().getType() == EncType.ECIES_X25519;
+                    int off = isEC ? BuildRequestRecord.OFF_REPLY_KEY_EC : BuildRequestRecord.OFF_REPLY_KEY;
+                    boolean isDup = _filter.add(rv.getData(), off, 32);
                     if (isDup) {
                         if (log.shouldLog(Log.WARN))
                             log.warn(msg.getUniqueId() + ": Dup record: " + rv);
@@ -130,8 +132,10 @@ public class BuildMessageProcessor {
                     // TODO should we keep looking for a second match and fail if found?
                     break;
                 } catch (DataFormatException dfe) {
+                    // For ECIES routers, this is relatively common due to old routers that don't
+                    // check enc type sending us ElG requests
                     if (log.shouldLog(Log.WARN))
-                        log.warn(msg.getUniqueId() + ": Matching record decrypt failure", dfe);
+                        log.warn(msg.getUniqueId() + ": Matching record decrypt failure " + privKey.getType(), dfe);
                     // on the microscopic chance that there's another router
                     // out there with the same first 16 bytes, go around again
                     continue;
@@ -141,7 +145,7 @@ public class BuildMessageProcessor {
         if (rv == null) {
             // none of the records matched, b0rk
             if (log.shouldLog(Log.WARN))
-                log.warn(msg.getUniqueId() + ": No matching record");
+                log.warn(msg.getUniqueId() + ": No record decrypted");
             return null;
         }
         

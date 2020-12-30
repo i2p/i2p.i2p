@@ -6,17 +6,17 @@ Priority: optional
 Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 9.20160709)
- ,ant (>= 1.8)
+ ,ant (>= 1.9.8)
  ,debconf
  ,openjdk-8-jdk
  ,libjetty9-java (>= 9.4)
  ,libtaglibs-standard-jstlel-java
- ,libtomcat8-java
+ ,libtomcat9-java
  ,dh-apparmor
  ,bash-completion
  ,gettext
  ,libgetopt-java
- ,libjson-simple-java (<< 3)
+ ,libjson-simple-java (>= 2),libjson-simple-java (<< 3)
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
  ,po-debconf
@@ -78,10 +78,10 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  geoip-database,
  gettext-base,
  libgetopt-java,
- libjson-simple-java (<< 3),
+ libjson-simple-java (>= 2),libjson-simple-java (<< 3),
  libjetty9-java (>= 9.4),
  libtaglibs-standard-jstlel-java,
- libtomcat8-java,
+ libtomcat9-java,
  famfamfam-flag-png
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)

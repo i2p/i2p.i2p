@@ -48,6 +48,6 @@ class ThrottledPumpedTunnelGateway extends PumpedTunnelGateway {
     /** @since 0.9.8 */
     @Override
     public String toString() {
-        return "IBGW " + _config.getReceiveTunnel();
+        return "IBGW " + _config.getReceiveTunnelId();
     }
 }

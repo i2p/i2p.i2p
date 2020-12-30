@@ -8,8 +8,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import net.i2p.data.StructureTest;
-import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;
 
 /**
@@ -17,10 +15,10 @@ import net.i2p.data.DataFormatException;
  *
  * @author str4d
  */
-public class SetDateMessageTest extends StructureTest {
-    public DataStructure createDataStructure() throws DataFormatException {
+public class SetDateMessageTest extends I2CPTstBase {
+    public I2CPMessageImpl createDataStructure() throws DataFormatException {
         SetDateMessage msg = new SetDateMessage("0.8.13-0");
         return msg;
     }
-    public DataStructure createStructureToRead() { return new SetDateMessage(); }
+    public I2CPMessageImpl createStructureToRead() { return new SetDateMessage(); }
 }

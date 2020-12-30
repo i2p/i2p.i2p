@@ -136,7 +136,7 @@ class SAMv3Handler extends SAMv1Handler
 	}
 
 	/**
-	 *  For subsessions created by MasterSession
+	 *  For subsessions created by PrimarySession
 	 *  @since 0.9.25
 	 */
 	void setSession(SAMv3RawSession sess) {
@@ -144,7 +144,7 @@ class SAMv3Handler extends SAMv1Handler
 	}
 
 	/**
-	 *  For subsessions created by MasterSession
+	 *  For subsessions created by PrimarySession
 	 *  @since 0.9.25
 	 */
 	void setSession(SAMv3DatagramSession sess) {
@@ -152,7 +152,7 @@ class SAMv3Handler extends SAMv1Handler
 	}	
 
 	/**
-	 *  For subsessions created by MasterSession
+	 *  For subsessions created by PrimarySession
 	 *  @since 0.9.25
 	 */
 	void setSession(SAMv3StreamSession sess) {
@@ -463,7 +463,7 @@ class SAMv3Handler extends SAMv1Handler
 				allProps.putAll(i2cpProps);
 				allProps.putAll(props);
 
-				if (style.equals("MASTER")) {
+				if (style.equals("PRIMARY") || style.equals("MASTER")) {
 					// We must put these here, as SessionRecord.getProps() makes a copy,
 					// and the socket manager is instantiated in the
 					// SAMStreamSession constructor.
@@ -501,9 +501,9 @@ class SAMv3Handler extends SAMv1Handler
 					streamSession = v3;
 					this.session = v3;
 					v3.start();
-				} else if (style.equals("MASTER")) {
+				} else if (style.equals("PRIMARY") || style.equals("MASTER")) {
 					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
-					MasterSession v3 = new MasterSession(nick, dgs, this, allProps);
+					PrimarySession v3 = new PrimarySession(nick, dgs, this, allProps);
 					streamSession = v3;
 					datagramSession = v3;
                                         rawSession = v3;
@@ -521,8 +521,8 @@ class SAMv3Handler extends SAMv1Handler
                                 // prevent trouble in finally block
 				ok = true;
 				if (streamSession == null || datagramSession == null || rawSession == null)
-					return writeString(SESSION_ERROR, "Not a MASTER session");
-				MasterSession msess = (MasterSession) session;
+					return writeString(SESSION_ERROR, "Not a PRIMARY session");
+				PrimarySession msess = (PrimarySession) session;
 				String msg;
 				if (opcode.equals("ADD")) {
 					msg = msess.add(nick, style, props);

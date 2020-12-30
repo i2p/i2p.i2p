@@ -29,7 +29,7 @@ public class BaseBean
     private static final String RC_PROP_THEME_NAME = "routerconsole.theme";
     private static final String PROP_THEME_NAME = "theme";
     private static final String DEFAULT_THEME = "light";
-    private static final String BASE_THEME_PATH = "/themes/susidns/";
+    private static final String BASE_THEME_PATH = "themes/";
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
     private static final boolean DEFAULT_DISABLE_OLD = true;
@@ -79,6 +79,12 @@ public class BaseBean
                 // added in 0.5, for compatibility with 0.4 config.txt
                 if( properties.getProperty(PRIVATE_BOOK) == null)
                     properties.setProperty(PRIVATE_BOOK, DEFAULT_PRIVATE_BOOK);
+                // migrate
+                String local = properties.getProperty("master_addressbook");
+                if (local != null) {
+                    properties.setProperty("local_addressbook", local);
+                    properties.remove("master_addressbook");
+                }
                 configLastLoaded = System.currentTimeMillis();
             }
         }

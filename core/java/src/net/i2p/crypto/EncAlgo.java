@@ -1,8 +1,6 @@
 package net.i2p.crypto;
 
 /**
- * PRELIMINARY - unused - subject to change
- *
  * Base encryption algorithm type
  *
  * @since 0.9.18

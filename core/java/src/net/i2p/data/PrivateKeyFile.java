@@ -2,15 +2,16 @@ package net.i2p.data;
 
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException; 
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -29,12 +30,15 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.crypto.Blinding;
+import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.KeyPair;
+import net.i2p.crypto.SelfSignedGenerator;
 import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
+import net.i2p.crypto.SigUtil;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFileOutputStream;
@@ -98,10 +102,14 @@ public class PrivateKeyFile {
         String ttype = null;
         String hostname = null;
         String offline = null;
-        int days = 365;
+        String signer = null;
+        String signername = null;
+        String signaction = null;
+        String certfile = null;
+        double days = 365;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:p:");
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:p:b:y:z:w:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -136,6 +144,26 @@ public class PrivateKeyFile {
                     error = true;
                 break;
 
+            case 'b':
+                signername = g.getOptarg();
+                break;
+
+            case 'w':
+                certfile = g.getOptarg();
+                if (mode == 0)
+                    mode = c;
+                else
+                    error = true;
+                break;
+
+            case 'y':
+                signer = g.getOptarg();
+                break;
+
+            case 'z':
+                signaction = g.getOptarg();
+                break;
+
             case 'o':
                 offline = g.getOptarg();
                 if (mode == 0)
@@ -149,7 +177,7 @@ public class PrivateKeyFile {
                 break;
 
             case 'd':
-                days = Integer.parseInt(g.getOptarg());
+                days = Double.parseDouble(g.getOptarg());
                 break;
 
             case 'r':
@@ -178,6 +206,9 @@ public class PrivateKeyFile {
             String orig = offline != null ? offline : filearg;
             File f = new File(orig);
             boolean exists = f.exists();
+            if (mode == 'a' && !exists) {
+                throw new I2PException("File for authentication does not exist: " + orig);
+            }
             PrivateKeyFile pkf = new PrivateKeyFile(f, client);
             Destination d;
             if (etype != null && !exists) {
@@ -261,8 +292,25 @@ public class PrivateKeyFile {
                 // addressbook auth
                 OrderedProperties props = new OrderedProperties();
                 HostTxtEntry he = new HostTxtEntry(hostname, d.toBase64(), props);
+                if (signer != null && signername != null && signaction != null) {
+                    File fsigner = new File(signer);
+                    if (!fsigner.exists())
+                        throw new I2PException("Signing file does not exist: " + signer);
+                    if (!signaction.equals(HostTxtEntry.ACTION_ADDSUBDOMAIN))
+                        throw new I2PException("Unsupported action: " + signaction);
+                    if (!hostname.endsWith('.' + signername))
+                        throw new I2PException(hostname + " is not a subdomain of " + signername);
+                    PrivateKeyFile pkf2 = new PrivateKeyFile(fsigner);
+                    props.setProperty(HostTxtEntry.PROP_ACTION, signaction);
+                    props.setProperty(HostTxtEntry.PROP_OLDNAME, signername);
+                    props.setProperty(HostTxtEntry.PROP_OLDDEST, pkf2.getDestination().toBase64());
+                    he.signInner(pkf2.getSigningPrivKey());
+                } else if (signer != null || signername != null || signaction != null) {
+                    usage();
+                    return;
+                }
                 he.sign(pkf.getSigningPrivKey());
-                System.out.println("Addressbook Authentication String:");
+                System.out.println("\nAddressbook Authentication String:");
                 OutputStreamWriter out = new OutputStreamWriter(System.out);
                 he.write(out); 
                 out.flush();
@@ -295,7 +343,7 @@ public class PrivateKeyFile {
                 SigningPublicKey tSigningPubKey = (SigningPublicKey) signingKeys[0];
                 SigningPrivateKey tSigningPrivKey = (SigningPrivateKey) signingKeys[1];
                 // set expires
-                long expires = System.currentTimeMillis() + (days * 24*60*60*1000L);
+                long expires = System.currentTimeMillis() + (long) (days * 24*60*60*1000L);
                 // sign
                 byte[] data = new byte[4 + 2 + tSigningPubKey.length()];
                 DataHelper.toLong(data, 0, 4, expires / 1000);
@@ -313,6 +361,36 @@ public class PrivateKeyFile {
                 return;
               }
 
+              case 'w':
+              {
+                if (pkf.isOffline()) {
+                    System.out.println("Private key is offline, not present in file, export failed");
+                    return;
+                }
+                OutputStream out = null;
+                try {
+                    SigningPrivateKey priv = pkf.getSigningPrivKey();
+                    java.security.PrivateKey jpriv = SigUtil.toJavaKey(priv);
+                    if (signername == null)
+                        signername = "example.i2p";
+                    X509Certificate cert = SelfSignedGenerator.generate(priv, signername, (int) days);
+                    java.security.cert.Certificate[] certs = { cert };
+                    out = new FileOutputStream(certfile);
+                    CertUtil.exportPrivateKey(jpriv, certs, out);
+                    System.out.println("Private key and self-signed certificate exported to " + certfile);
+                } catch (IOException ioe) {
+                    System.out.println("Private key export failed");
+                    ioe.printStackTrace();
+                } catch (GeneralSecurityException gse) {
+                    System.out.println("Private key export failed");
+                    gse.printStackTrace();
+                } finally {
+                    if (out != null) try { out.close(); } catch (IOException ioe) {}
+                }
+                return;
+              }
+
+
               default:
                 // shouldn't happen
                 usage();
@@ -324,9 +402,13 @@ public class PrivateKeyFile {
                 verifySignature(pkf.getDestination());
             }
         } catch (I2PException e) {
+            String orig = offline != null ? offline : filearg;
+            System.out.println("Error processing file: " + orig);
             e.printStackTrace();
             System.exit(1);
         } catch (IOException e) {
+            String orig = offline != null ? offline : filearg;
+            System.out.println("Error processing file: " + orig);
             e.printStackTrace();
             System.exit(1);
         }
@@ -342,6 +424,7 @@ public class PrivateKeyFile {
                            "      -x                   (changes to hidden cert)\n" +
                            "\nother options:\n" +
                            "      -a example.i2p       (generate addressbook authentication string)\n" +
+                           "      -b example.i2p       (hostname of the 2LD dest for signing)\n" +
                            "      -c sigtype           (specify sig type of destination)\n" +
                            "      -d days              (specify expiration in days of offline sig, default 365)\n" +
                            "      -e effort            (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
@@ -349,6 +432,9 @@ public class PrivateKeyFile {
                            "      -p enctype           (specify enc type of destination)\n" +
                            "      -r sigtype           (specify sig type of transient key, default Ed25519)\n" +
                            "      -t sigtype           (changes to KeyCertificate of the given sig type)\n" +
+                           "      -w file.key          (export the private signing key to the file specified, also uses -d and -b options)\n" +
+                           "      -y 2lddestfile       (sign the authentication string with the 2LD key file specified)\n" +
+                           "      -z signaction        (authentication string command, must be \"addsubdomain\"\n" +
                            "");
         StringBuilder buf = new StringBuilder(256);
         buf.append("Available signature types:\n");
@@ -880,7 +966,6 @@ public class PrivateKeyFile {
             SigType type = spk.getType();
             if (type == SigType.EdDSA_SHA512_Ed25519 ||
                 type == SigType.RedDSA_SHA512_Ed25519) {
-                I2PAppContext ctx = I2PAppContext.getGlobalContext();
                 s.append("\nBlinded B32: ").append(Blinding.encode(spk));
                 s.append("\n + auth key: ").append(Blinding.encode(spk, false, true));
                 s.append("\n + password: ").append(Blinding.encode(spk, true, false));
@@ -903,8 +988,8 @@ public class PrivateKeyFile {
             s.append(_transientSigningPrivKey);
         } else {
             s.append(this.signingPrivKey);
-            s.append("\n");
         }
+        s.append("\n");
         return s.toString();
     }
     

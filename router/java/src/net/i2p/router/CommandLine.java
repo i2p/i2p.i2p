@@ -26,6 +26,7 @@ public class CommandLine extends net.i2p.util.CommandLine {
         "net.i2p.router.peermanager.ProfileOrganizer",
         "net.i2p.router.tasks.CryptoChecker",
         "net.i2p.router.time.NtpClient",
+        "net.i2p.router.transport.GeoIP",
         "net.i2p.router.transport.GeoIPv6",
         "net.i2p.router.transport.udp.MTU",
         "net.i2p.router.transport.UPnP"

@@ -47,6 +47,9 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         return rv;
     }
     
+    /**
+     *  @return non-null
+     */
     @Override
     public Properties getOptions() {
         return _pool.getSettings().getUnknownOptions();

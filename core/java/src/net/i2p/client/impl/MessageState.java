@@ -156,6 +156,7 @@ class MessageState {
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
+            case MessageStatusMessage.STATUS_SEND_FAILURE_META_LEASESET:
             case SendMessageStatusListener.STATUS_CANCELLED:
                 // does not trump success
                 if (_state != State.SUCCESS)

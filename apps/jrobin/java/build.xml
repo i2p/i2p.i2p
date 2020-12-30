@@ -18,7 +18,8 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <target name="compile" depends="depend">
@@ -30,6 +31,7 @@
             deprecation="on"
             source="${javac.version}"
             target="${javac.version}"
+            release="${javac.release}"
             destdir="./build/obj"
             includeAntRuntime="false"
             encoding="UTF-8"

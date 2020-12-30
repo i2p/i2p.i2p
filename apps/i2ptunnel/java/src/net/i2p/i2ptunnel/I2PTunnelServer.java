@@ -43,6 +43,7 @@ import net.i2p.client.streaming.IncomingConnectionFilter;
 import net.i2p.client.streaming.StatefulConnectionFilter;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -280,7 +281,27 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         FileInputStream privData = null;
         try {
             privData = new FileInputStream(altFile);
-            return sMgr.addSubsession(privData, props);
+            I2PSession rv = sMgr.addSubsession(privData, props);
+            if (rv.isOffline()) {
+                long exp = rv.getOfflineExpiration();
+                long remaining = exp - getTunnel().getContext().clock().now();
+                // if expires before the LS expires...
+                if (remaining <= 10*60*1000) {
+                    String msg;
+                    if (remaining > 0)
+                        msg = "Offline signature for tunnel alternate destination expires " + DataHelper.formatTime(exp);
+                    else
+                        msg = "Offline signature for tunnel alternate destination expired " + DataHelper.formatTime(exp);
+                    _log.log(Log.CRIT, msg);
+                    throw new IllegalArgumentException(msg);
+                }
+                if (remaining < 60*24*60*60*1000L) {
+                    String msg = "Offline signature for tunnel alternate destination expires in " + DataHelper.formatDuration(remaining);
+                    _log.logAlways(Log.WARN, msg);
+                    l.log("WARNING: " + msg);
+                }
+            }
+            return rv;
         } catch (IOException ioe) {
             _log.error("Failed to add subssession", ioe);
             return null;
@@ -302,9 +323,29 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     private void connectManager() {
         int retries = 0;
-        while (sockMgr.getSession().isClosed()) {
+        I2PSession session = sockMgr.getSession();
+        if (session.isOffline()) {
+            long exp = session.getOfflineExpiration();
+            long remaining = exp - getTunnel().getContext().clock().now();
+            // if expires before the LS expires...
+            if (remaining <= 10*60*1000) {
+                String msg;
+                if (remaining > 0)
+                    msg = "Offline signature for tunnel expires " + DataHelper.formatTime(exp);
+                else
+                    msg = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                _log.log(Log.CRIT, msg);
+                throw new IllegalArgumentException(msg);
+            }
+            if (remaining < 60*24*60*60*1000L) {
+                String msg = "Offline signature for tunnel expires in " + DataHelper.formatDuration(remaining);
+                _log.logAlways(Log.WARN, msg);
+                l.log("WARNING: " + msg);
+            }
+        }
+        while (session.isClosed()) {
             try {
-                sockMgr.getSession().connect();
+                session.connect();
                 // Now connect the subsessions, if any
                 List<I2PSession> subs = sockMgr.getSubsessions();
                 if (!subs.isEmpty()) {
@@ -628,9 +669,15 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 // so sockMgr will call ConnectionManager.setAllowIncomingConnections(true) again
                 i2pss = sockMgr.getServerSocket();
             } catch (I2PException ipe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error accepting - KILLING THE TUNNEL SERVER", ipe);
-                open = false;
+                String s = "Error accepting - KILLING THE TUNNEL SERVER";
+                _log.log(Log.CRIT, s, ipe);
+                l.log(s + ": " + ipe);
+                // Tell TunnelController so it will change state
+                TunnelController tc = getTunnel().getController();
+                if (tc != null)
+                    tc.stopTunnel();
+                else
+                    close(true);
                 if (i2ps != null) try { i2ps.close(); } catch (IOException ioe) {}
                 break;
             } catch (ConnectException ce) {

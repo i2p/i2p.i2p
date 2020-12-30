@@ -11,14 +11,17 @@ package net.i2p.i2ptunnel.web;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
+import net.i2p.crypto.ChaCha20;
 import net.i2p.crypto.Blinding;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
@@ -78,14 +81,13 @@ public class IndexBean {
     /** store nonces in a static FIFO instead of in System Properties @since 0.8.1 */
     private static final List<String> _nonces = new ArrayList<String>(MAX_NONCES + 1);
     private static final UIMessages _messages = new UIMessages(100);
+    private static final Map<Integer, SessionKey> _formKeys = new HashMap<Integer, SessionKey>();
 
     private static final String PROP_THEME_NAME = "routerconsole.theme";
     private static final String DEFAULT_THEME = "light";
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
     private static final boolean DEFAULT_DISABLE_OLD = true;
-    public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
-    public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
     private static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
     
     public IndexBean() {
@@ -349,17 +351,9 @@ public class IndexBean {
             if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
                 theme = "light";
         }
-        return "/themes/console/" + theme + "/";
+        return "themes/" + theme + "/";
     }
 
-    public boolean allowCSS() {
-        return !_context.getBooleanProperty(PROP_CSS_DISABLED);
-    }
-    
-    public boolean allowJS() {
-        return !_context.getBooleanProperty(PROP_JS_DISABLED);
-    }
-    
     public int getTunnelCount() {
         if (_group == null) return 0;
         return _group.getControllers().size();
@@ -383,6 +377,13 @@ public class IndexBean {
      */
     public static boolean isClient(String type) {
         return TunnelController.isClient(type);
+    }
+
+    /**
+     *  @since 0.9.46 moved from subclass
+     */
+    public boolean isSharedClient(int tunnel) {
+        return _helper.isSharedClient(tunnel);
     }
     
     public String getTunnelName(int tunnel) {
@@ -1262,19 +1263,90 @@ public class IndexBean {
      *  @since 0.9.18
      */
     public void setKey1(String s) {
+        s = decrypt("inbound.randomKey", s);
         _config.setInboundRandomKey(s);
     }
 
     public void setKey2(String s) {
+        s = decrypt("outbound.randomKey", s);
         _config.setOutboundRandomKey(s);
     }
 
     public void setKey3(String s) {
+        s = decrypt("i2cp.leaseSetSigningPrivateKey", s);
         _config.setLeaseSetSigningPrivateKey(s);
     }
 
     public void setKey4(String s) {
+        s = decrypt("i2cp.leaseSetPrivateKey", s);
         _config.setLeaseSetPrivateKey(s);
+    }
+
+    /**
+     *  Decrypt a property using an in-memory key, for
+     *  interaction with the UI only, using ChaCha20.
+     *  IV is SHA256(k).
+     *
+     *  These are transient keys by design, but are persisted
+     *  to hide restarts. They are hidden inputs in the edit form.
+     *  Storage in config files is not encrypted.
+     *
+     *  @param k non-null
+     *  @param v Base64, or empty, or null
+     *  @since 0.9.46
+     */
+    private String decrypt(String k, String v) {
+        if (v == null || v.length() <= 0)
+            return v;
+        byte[] enc = Base64.decode(v);
+        if (enc == null)
+            return null;
+        SessionKey key;
+        synchronized(_formKeys) {
+            key = _formKeys.get(Integer.valueOf(_tunnel));
+        }
+        if (key == null)
+            return null;
+        byte[] kb = DataHelper.getUTF8(k);
+        byte[] iv = new byte[32];
+        _context.sha().calculateHash(kb, 0, kb.length, iv, 0);
+        ChaCha20.decrypt(key.getData(), iv, enc, 0, enc, 0, enc.length);
+        return DataHelper.getUTF8(enc);
+    }
+
+    /**
+     *  Encrypt a property using an in-memory key, for
+     *  interaction with the UI only, using ChaCha20.
+     *  IV is SHA256(k).
+     *
+     *  These are transient keys by design, but are persisted
+     *  to hide restarts. They are hidden inputs in the edit form.
+     *  Storage in config files is not encrypted.
+     *
+     *  @param k non-null
+     *  @param v may be empty or null
+     *  @return Base64, or empty, or null
+     *  @since 0.9.46
+     */
+    protected String encrypt(int tunnel, String k, String v) {
+        if (v == null || v.length() <= 0)
+            return v;
+        byte[] dec = DataHelper.getUTF8(v);
+        SessionKey key;
+        synchronized(_formKeys) {
+            key = _formKeys.get(Integer.valueOf(tunnel));
+            if (key == null) {
+                byte[] keyb = new byte[32];
+                _context.random().nextBytes(keyb);
+                key = new SessionKey(keyb);
+                _formKeys.put(Integer.valueOf(tunnel), key);
+            }
+        }
+        byte[] kb = DataHelper.getUTF8(k);
+        byte[] iv = new byte[32];
+        _context.sha().calculateHash(kb, 0, kb.length, iv, 0);
+        ChaCha20.encrypt(key.getData(), iv, dec, 0, dec, 0, dec.length);
+        return Base64.encode(dec);
     }
 
     /** Modify or create a destination */

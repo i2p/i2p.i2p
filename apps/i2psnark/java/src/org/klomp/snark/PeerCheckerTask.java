@@ -184,7 +184,9 @@ class PeerCheckerTask implements Runnable
                     // Put it at the back of the list
                     removed.add(peer);
                   }
-                else if (!peer.isInteresting() && !coordinator.completed())
+                else if (!peer.isInteresting() && !coordinator.completed() &&
+                         // give new peers a better chance to get their first two pieces
+                         (peer.completed() >= 2 || random.nextInt(4) == 0))
                   {
                     // If they aren't interesting make someone else a downloader
                     if (_log.shouldLog(Log.DEBUG))
@@ -221,7 +223,9 @@ class PeerCheckerTask implements Runnable
                     worstdownload = download;
                     worstDownloader = peer;
                   }
-                else if (upload < worstdownload && coordinator.completed())
+                else if (upload < worstdownload && coordinator.completed() &&
+                         // give new peers a better chance to get their first four pieces
+                         (peer.completed() >= 4 || random.nextInt(8) == 0))
                   {
                     // Make sure upload is good if we are seeding
                     worstdownload = upload;

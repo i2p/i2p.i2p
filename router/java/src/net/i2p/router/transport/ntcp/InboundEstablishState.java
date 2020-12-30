@@ -33,6 +33,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.ntcp.OutboundNTCP2State.*;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
@@ -88,6 +89,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     private static final Set<State> STATES_NTCP2 =
         EnumSet.of(State.IB_NTCP2_INIT, State.IB_NTCP2_GOT_X, State.IB_NTCP2_GOT_PADDING,
                    State.IB_NTCP2_SENT_Y, State.IB_NTCP2_GOT_RI, State.IB_NTCP2_READ_RANDOM);
+    private static final Set<State> STATES_MSG3 = EnumSet.of(State.IB_SENT_Y, State.IB_GOT_RI_SIZE, State.IB_GOT_RI);
 
     
     public InboundEstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
@@ -270,9 +272,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         }
 
         // ok, we are onto the encrypted area, i.e. Message #3
-        while ((_state == State.IB_SENT_Y ||
-                _state == State.IB_GOT_RI_SIZE ||
-                _state == State.IB_GOT_RI) && src.hasRemaining()) {
+        while (STATES_MSG3.contains(_state) && src.hasRemaining()) {
 
                 // Collect a 16-byte block
                 if (_received < AES_SIZE && src.hasRemaining()) {
@@ -370,7 +370,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         }
 
         // check for remaining data
-        if ((_state == State.VERIFIED || _state == State.CORRUPT) && src.hasRemaining()) {
+        if (STATES_DONE.contains(_state) && src.hasRemaining()) {
             if (_log.shouldWarn())
                 _log.warn("Received unexpected " + src.remaining() + " on " + this, new Exception());
         }
@@ -457,7 +457,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             long rtt = now - _con.getCreated();
             _peerSkew = (now - (tsA * 1000) - (rtt / 2) + 500) / 1000; 
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(768);
+            ByteArrayStream baos = new ByteArrayStream(256 + 256 + 32 + 4 + 4);
             baos.write(_X);
             baos.write(_Y);
             baos.write(_context.routerHash().getData());
@@ -592,7 +592,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         if (!rv) {
             Hash aliceHash = alice.getHash();
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping inbound connection from wrong network: " + aliceID + ' ' + aliceHash);
+                _log.warn("Not in our network: " + alice, new Exception());
             // So next time we will not accept the con from this IP,
             // rather than doing the whole handshake
             InetAddress addr = _con.getChannel().socket().getInetAddress();
@@ -673,7 +673,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             }
             changeState(State.IB_NTCP2_GOT_X);
             _received = 0;
-
             // replay check using encrypted key
             if (!_transport.isHXHIValid(_X)) {
                 _context.statManager().addRateData("ntcp.replayHXxorBIH", 1);
@@ -681,13 +680,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 return;
             }
 
-            try {
-                _handshakeState = new HandshakeState(HandshakeState.PATTERN_ID_XK, HandshakeState.RESPONDER, _transport.getXDHFactory());
-            } catch (GeneralSecurityException gse) {
-                throw new IllegalStateException("bad proto", gse);
-            }
-            _handshakeState.getLocalKeyPair().setPublicKey(_transport.getNTCP2StaticPubkey(), 0);
-            _handshakeState.getLocalKeyPair().setPrivateKey(_transport.getNTCP2StaticPrivkey(), 0);
             Hash h = _context.routerHash();
             SessionKey bobHash = new SessionKey(h.getData());
             // save encrypted data for CBC for msg 2
@@ -697,6 +689,19 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 fail("Bad msg 1, X = 0");
                 return;
             }
+            // fast MSB check for key < 2^255
+            if ((_X[KEY_SIZE - 1] & 0x80) != 0) {
+                fail("Bad PK msg 1");
+                return;
+            }
+
+            try {
+                _handshakeState = new HandshakeState(HandshakeState.PATTERN_ID_XK, HandshakeState.RESPONDER, _transport.getXDHFactory());
+            } catch (GeneralSecurityException gse) {
+                throw new IllegalStateException("bad proto", gse);
+            }
+            _handshakeState.getLocalKeyPair().setKeys(_transport.getNTCP2StaticPrivkey(), 0,
+                                                      _transport.getNTCP2StaticPubkey(), 0);
             byte options[] = new byte[OPTIONS1_SIZE];
             try {
                 _handshakeState.start();

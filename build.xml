@@ -2,14 +2,17 @@
 <project basedir="." default="all" name="i2p"
     xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
+    <!-- for javac "release" parameter -->
+    <property name="ant.minimumVersion" value="1.9.8"/>
+
     <!-- Include property files so that values can be easily overridden.
          Users should create an override.properties file to make changes.
      -->
     <property file="override.properties"/>
     <property file="build.properties"/>
     <!--  When changing, also change javadoc URL in build.properties, and checksum in apps/jetty/build.xml -->
-    <property name="jetty.ver" value="9.2.29.v20191105" />
-    <property name="tomcat.ver" value="8.5.50" />
+    <property name="jetty.ver" value="9.3.29.v20201019" />
+    <property name="tomcat.ver" value="9.0.40" />
 
     <!-- You probably don't want to change anything from here down -->
     <target name="help" depends="all" />
@@ -27,6 +30,7 @@
         <echo message="  installer5, installer5-linux, installer5-nowindows, installer5-windows: use IzPack 5" />
         <echo message="  osxLauncher: build the Mac OS X router/GUI launcher (OSX only)" />
         <echo message="  bbLauncher: build the Browser Bundle router launcher" />
+        <echo message="  bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  git-bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
         <!--<echo message="  bundleRelease:    (GIT ONLY!) generate a git bundle only up to the most recent tag, and a corresponding torrent." />-->
@@ -139,6 +143,8 @@
                 <arg value="http://tracker2.postman.i2p/announce.php" />
                 <arg value="-c" />
                 <arg value="${build.built-by}" />
+                <arg value="-m" />
+                <arg value="Official torrent for version ${full.version}" />
                 <arg value="@{file}" />
             </java>
         </sequential>
@@ -326,12 +332,12 @@
         </sequential>
     </target>
 
-    <target name="buildBOB" depends="buildStreaming" >
+    <target name="buildBOB" depends="buildMinistreaming" >
         <ant dir="apps/BOB/" target="jar" />
         <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
     </target>
 
-    <target name="buildSAM" depends="buildStreaming" >
+    <target name="buildSAM" depends="buildMinistreaming" >
         <ant dir="apps/sam/java/" target="jar" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
     </target>
@@ -362,7 +368,7 @@
         <copy file="apps/i2pcontrol/build/jsonrpc.war" todir="build/" />
     </target>
 
-    <target name="buildI2PSnark" depends="buildStreaming, buildJetty, buildSystray" >
+    <target name="buildI2PSnark" depends="buildMinistreaming, buildJetty, buildSystray" >
         <ant dir="apps/i2psnark/java/" target="war" />
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
@@ -388,7 +394,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel-ui.jar" todir="build/" />
     </target>
 
-    <target name="buildI2PTunnel" depends="buildStreaming, buildJetty, buildImagegen" >
+    <target name="buildI2PTunnel" depends="buildMinistreaming, buildJetty, buildImagegen" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
@@ -446,7 +452,15 @@
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
 
-    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
+    <target name="buildProperties" depends="getMtnRev, getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
+        <antversion property="antversion"/>
+        <fail message="FATAL: Minimum Ant version is ${ant.minimumVersion} - your Ant version is ${antversion}">
+            <condition>
+                <not>
+                    <antversion atleast="${ant.minimumVersion}"/>
+                </not>
+            </condition>
+        </fail>
         <!-- default if not set above -->
         <property name="workspace.version" value="unknown" />
         <!-- default if not set by setBuildTimestamp -->
@@ -454,7 +468,7 @@
         <!-- default if not set by disableManifestClasspath -->
         <property name="manifest.classpath.name" value="Class-Path" />
         <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
-        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
+        <echo message="Building version ${full.version} (revision ${workspace.version})" />
     </target>
 
     <target name="setBuildTimestamp" unless="${build.reproducible}" >
@@ -487,7 +501,7 @@
     </target>
 
     <target name="failIfNoMtn" depends="checkForMtn">
-        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
+        <fail message="This target cannot be used without Monotone!">
             <condition>
                 <not>
                     <isset property="mtn.available" />
@@ -503,15 +517,7 @@
         </exec>
     </target>
 
-    <target name="trimMtnRev" depends="getMtnRev">
-        <exec executable="cut" inputstring="${workspace.version}" outputproperty="MtnShortHash" errorproperty="cut.error1" failifexecutionfails="true" >
-            <arg value="-c" />
-            <arg value="1-8" />
-        </exec>
-        <echo message="Short version is: ${MtnShortHash}" />
-    </target>
-
-    <target name="checkIfBumped">
+    <target name="checkIfBumpedMtn" depends="checkForMtn" if="mtn.available" >
         <exec executable="mtn" outputproperty="bumped" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="ls" />
             <arg value="ch" />
@@ -524,18 +530,22 @@
         </condition>
     </target>
 
-    <target name="bump" depends="bumpBuild" />
-    <target name="bumpBuild" depends="checkIfBumped, getBuildNumber" unless="bumped.already">
-        <exec executable="dc" outputproperty="new.i2p.build.number" errorproperty="dc.error" failifexecutionfails="true" >
-            <arg value="-e" />
-            <arg value="${i2p.build.number} 1 + n" />
+    <!-- if both present, only mtn will run -->
+    <target name="checkoutFromMtn" depends="checkForMtn" if="mtn.available" >
+        <echo message="Checking out fresh copy into ${checkoutDir}" />
+        <delete dir="${checkoutDir}" />
+        <exec executable="mtn" failonerror="true">
+            <arg value="co" />
+            <!-- w: is the revision of the current workspace -->
+            <arg value="-r" />
+            <arg value="w:" />
+            <arg value="-b" />
+            <arg value="i2p.i2p" />
+            <arg value="${checkoutDir}" />
         </exec>
-        <echo message="Build number is now: ${new.i2p.build.number}${build.extra}" />
-        <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
-            match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
 
-    <target name="revisions" depends="getReleaseNumber, getBuildNumber">
+    <target name="revisionsMtn" depends="checkForMtn, getReleaseNumber, getBuildNumber" if="mtn.available">
         <!-- mtn log __brief __no-graph __to t:i2p-0.9.xx | cut -d ' ' -f 2 | sort | uniq -c | sort -rn -->
         <exec executable="mtn" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
             <arg value="log" />
@@ -563,6 +573,123 @@
     </target>
 
     <!-- end monotone targets -->
+
+    <!-- git targets -->
+
+    <target name="checkForGit" >
+        <available property="git.available" file=".git" type="dir" />
+    </target>
+
+    <target name="getGitRev" depends="checkForGit" if="git.available" >
+        <exec executable="git" outputproperty="workspace.version" errorproperty="git.error1" failifexecutionfails="false" >
+            <arg value="rev-parse" />
+            <arg value="HEAD" />
+        </exec>
+    </target>
+
+    <target name="checkIfBumpedGit" depends="checkForGit" if="git.available" >
+        <exec executable="git" outputproperty="bumped" errorproperty="git.error2" failifexecutionfails="false" >
+            <arg value="status" />
+            <arg value="-s" />
+            <arg value="--porcelain" />
+            <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+        </exec>
+        <condition property="bumped.already">
+            <not>
+                <equals arg1="${bumped}" arg2=""/>
+            </not>
+        </condition>
+    </target>
+
+    <!-- if both present, only mtn will run -->
+    <target name="checkoutFromGit" depends="checkForGit" if="git.available" unless="mtn.available" >
+        <echo message="Checking out fresh copy into ${checkoutDir}" />
+        <delete dir="${checkoutDir}" />
+        <exec executable="git" failonerror="true">
+            <arg value="clone" />
+            <arg value="-l" />
+            <arg value="." />
+            <arg value="${checkoutDir}" />
+        </exec>
+    </target>
+
+    <target name="revisionsGit" depends="checkForGit, getReleaseNumber, getBuildNumber" if="git.available" unless="mtn.available">
+        <!-- git log i2p-0.9.xx | grep '^Author:' | cut -d ' ' -f 2- | sort | uniq -c | sort -rn -->
+        <exec executable="git" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
+            <arg value="log" />
+            <arg value="i2p-${release.number}..HEAD" />
+        </exec>
+        <exec executable="grep" inputstring="${getrevisions1}" outputproperty="getrevisions2" failifexecutionfails="true" >
+            <arg value="^Author:" />
+        </exec>
+        <exec executable="cut" inputstring="${getrevisions2}" outputproperty="getrevisions3" failifexecutionfails="true" >
+            <arg value="-d" />
+            <arg value=" " />
+            <arg value="-f" />
+            <arg value="2-" />
+        </exec>
+        <exec executable="sort" inputstring="${getrevisions3}" outputproperty="getrevisions4" failifexecutionfails="true" >
+        </exec>
+        <exec executable="uniq" inputstring="${getrevisions4}" outputproperty="getrevisions5" failifexecutionfails="true" >
+            <arg value="-c" />
+        </exec>
+        <exec executable="sort" inputstring="${getrevisions5}" outputproperty="getrevisions6" failifexecutionfails="true" >
+            <arg value="-rn" />
+        </exec>
+        <echo message="Revisions since ${release.number}:" />
+        <echo message="${getrevisions6}" />
+    </target>
+
+
+
+    <!-- end git targets -->
+
+    <!-- combined mtn/git targets -->
+
+    <target name="checkForVCS" depends="checkForMtn, checkForGit" />
+
+    <target name="failIfNoVCS" depends="checkForVCS">
+        <fail message="This target cannot be used without Monotone or Git!">
+            <condition>
+                <not>
+                    <or>
+                        <isset property="mtn.available" />
+                        <isset property="git.available" />
+                    </or>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="trimRev" depends="getMtnRev, getGitRev">
+        <exec executable="cut" inputstring="${workspace.version}" outputproperty="shortHash" errorproperty="cut.error1" failifexecutionfails="true" >
+            <arg value="-c" />
+            <arg value="1-8" />
+        </exec>
+        <echo message="Short version is: ${shortHash}" />
+    </target>
+
+    <target name="checkIfBumped" depends="failIfNoVCS, checkIfBumpedMtn, checkIfBumpedGit" />
+
+    <target name="bump" depends="bumpBuild" />
+
+    <target name="bumpBuild" depends="checkIfBumped, getBuildNumber" unless="bumped.already">
+        <exec executable="dc" outputproperty="new.i2p.build.number" errorproperty="dc.error" failifexecutionfails="true" >
+            <arg value="-e" />
+            <arg value="${i2p.build.number} 1 + n" />
+        </exec>
+        <echo message="Build number is now: ${new.i2p.build.number}${build.extra}" />
+        <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
+            match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
+    </target>
+
+    <!-- if both present, only mtn will run -->
+    <target name="checkoutFromVCS" depends="failIfNoVCS, checkoutFromMtn, checkoutFromGit" />
+
+    <!-- if both present, only mtn will run -->
+    <target name="revisions" depends="failIfNoVCS, revisionsMtn, revisionsGit" />
+
+    <!-- end combined mtn/git targets -->
 
     <!-- launch4j targets -->
 
@@ -647,6 +774,7 @@
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.so *.dll *.jnilib" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -662,6 +790,7 @@
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.so *.jnilib" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -677,6 +806,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*bsd*.so" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -691,6 +821,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux*.so" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -705,6 +836,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux*.so" excludes="*linux-arm*.so,*linux-ppc*.so" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -719,6 +851,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux*_64.so libjcpuid-x86_64-linux.so" excludes="*linux-arm*.so,*linux-ppc*.so" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -733,6 +866,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux-arm*.so,*linux-ppc*.so" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -747,6 +881,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.jnilib" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -762,6 +897,7 @@
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -780,8 +916,8 @@
 
     <!-- the apps need to compile the jsps to poupdate -->
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui, buildJrobin" >
-        <echo message="Setting environment variable LG2 to a lang code (eg: de,zh,nl etc)" />
-        <echo message=" will restrict language update to the language you specified, leaving other language untact." />
+        <echo message="Setting environment variable LG2 to a language code (e.g. de)" />
+        <echo message="will restrict language update to the language you specified, leaving other languages unchanged." />
         <!-- set if unset -->
         <property name="lg2" value="" />
         <ant dir="core/java/" target="poupdate" />
@@ -819,6 +955,8 @@
         <ant dir="apps/jetty" target="ensureJettylib" />
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
+        <!-- set if unset -->
+        <property name="javac.version" value="1.8" />
         <javadoc access="package"
             source="${javac.version}"
             destdir="./build/javadoc"
@@ -829,7 +967,7 @@
             additionalparam="-notimestamp"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:org.json.simple.*:com.southernstorm.noise.crypto.x25519:com.southernstorm.noise.crypto.chacha20" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:com.southernstorm.noise.crypto.x25519:com.southernstorm.noise.crypto.chacha20:org.minidns:org.minidns.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.*:com.southernstorm.noise.*" />
             <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:net.i2p.router.sybil:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
@@ -1021,15 +1159,10 @@
     </target>
 
     <target name="-pre-sign">
-            <!-- if you're distributing su3 files to others, at a minimum you should set these -->
+            <!-- if you're distributing su3 files to others, at a minimum you should set this -->
             <fail message="javac.compilerargs must contain a -bootclasspath option in override.properties">
                 <condition>
                     <not><contains string="${javac.compilerargs}" substring="-bootclasspath"/></not>
-                </condition>
-            </fail>
-            <fail message="javac.compilerargs7 must contain a -bootclasspath option in override.properties">
-                <condition>
-                    <not><contains string="${javac.compilerargs7}" substring="-bootclasspath"/></not>
                 </condition>
             </fail>
             <fail message="build.built-by must be set in override.properties">
@@ -1044,7 +1177,7 @@
             </fail>
     </target>
 
-    <target name="-pre-release" depends="-pre-sign, failIfNoMtn">
+    <target name="-pre-release" depends="-pre-sign, failIfNoVCS">
             <echo message="================================================================" />
             <echo message="Did you update these files?" />
             <exec executable="ls" failonerror="true">
@@ -1056,8 +1189,11 @@
                     <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
             </exec>
             <echo message="Everything is checked in, right? Let's be sure:" />
-            <exec executable="mtn" failonerror="true">
+            <exec executable="mtn" failonerror="false" >
                     <arg value="st" />
+            </exec>
+            <exec executable="git" failonerror="false" >
+                    <arg value="status" />
             </exec>
             <echo message="If there are any modified files above, stop now!" />
             <echo message="================================================================" />
@@ -1256,6 +1392,12 @@
         <copy todir="pkg-temp/lib/wrapper/linux-armv6/">
             <fileset dir="installer/lib/wrapper/linux-armv6/" excludes="*.txt" />
         </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
+            <fileset dir="installer/lib/wrapper/linux-armv7/" excludes="*.txt" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux64-armv8/">
+            <fileset dir="installer/lib/wrapper/linux64-armv8/" excludes="*.txt" />
+        </copy>
     </target>
 
     <target name="preppkg-osx" depends="preppkg-unix">
@@ -1305,7 +1447,7 @@
     </target>
 
     <!-- see targets below for conditional copying -->
-    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, copyflags, truncatehistory">
+    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, copyflags, truncatehistory">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
         <delete>
@@ -1350,12 +1492,15 @@
         <copy todir="pkg-temp/eepsite/" >
             <fileset dir="installer/resources/eepsite/" excludes="**/.placeholder" />
         </copy>
-        <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
+        <copy todir="pkg-temp/eepsite-jetty9.3" >
+            <fileset dir="installer/resources/eepsite-jetty9.3" />
+        </copy>
+        <copy file="apps/routerconsole/jsp/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
     </target>
 
     <target name="copyflags" depends="copyflags-unlesspkg" >
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
-            <fileset dir="installer/resources/icons/flags16x11" includes="lang_ar.png" />
+            <fileset dir="apps/routerconsole/resources/docs/icons/flags16x11" includes="lang_ar.png" />
         </copy>
     </target>
 
@@ -1364,7 +1509,7 @@
             <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png hu.png id.png ir.png it.png jp.png nl.png pl.png pt.png ro.png ru.png se.png tr.png us.png" />
         </copy>
         <copy todir="pkg-temp/docs/icons/flags" >
-          <!-- base flags/ dir only. flags16x11/ dir already copied by prepConsoleDocs target -->
+          <!-- base flags/ dir only. flags16x11/ dir now in the war -->
           <fileset dir="installer/resources/icons/flags" />
         </copy>
     </target>
@@ -1451,12 +1596,6 @@
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
 
-    <target name="prepthemeupdates">
-        <copy todir="pkg-temp/docs/themes/" >
-            <fileset dir="installer/resources/themes/" />
-        </copy>
-    </target>
-
     <!-- SSL Certs -->
     <target name="prepCertificates" depends="buildCore">
         <copy todir="pkg-temp/certificates/" >
@@ -1522,29 +1661,8 @@
         <delete dir="./pkg-mavencentral" />
     </target>
 
-    <!-- readme and proxy error page files, initialNews.xml files, GeoIP files, and flag icons -->
-    <target name="prepConsoleDocs" depends="prepConsoleDocUpdates, prepgeoupdate" >
-        <copy todir="pkg-temp/docs/initialNews/">
-          <fileset dir="installer/resources/initialNews/" />
-        </copy>
-        <!-- ensure the proxy files have the correct line endings -->
-        <fixcrlf srcdir="pkg-temp/docs" includes="*.ht" encoding="utf8" eol="crlf" />
-    </target>
-
-    <!-- readme and proxy error page files -->
-    <target name="prepConsoleDocUpdates">
-        <copy todir="pkg-temp/docs/" >
-          <fileset dir="installer/resources/readme/" includes="readme*.html" />
-          <fileset dir="installer/resources/proxy/" includes="*.ht" />
-          <!--
-               As of 0.9.36:
-               All new and changed flags must go in the flags16x11/ dir,
-               which will be checked first by flags.jsp.
-               The flags/ dir is the original set from famfamfam,
-               which may be symlinked in package installs.
-           -->
-          <fileset dir="installer/resources/" includes="icons/flags16x11/*" />
-        </copy>
+    <!-- GeoIP file -->
+    <target name="prepConsoleDocs" depends="prepgeoupdate" >
     </target>
 
     <target name="consoleDocs" depends="deletepkg-temp, prepConsoleDocs">
@@ -1593,6 +1711,12 @@
     <target name="signed-updater200WithJettyAndGeoIP" depends="-pre-sign, updater200WithJettyAndGeoIP, -sign-update" />
     <target name="signed-updater200WithJavadoc" depends="-pre-sign, updater200WithJavadoc, -sign-update" />
     <target name="signed-updater200WithJavadocAndJetty" depends="-pre-sign, updater200WithJavadocAndJetty, -sign-update" />
+
+    <!-- just to test the torrent creation macro -->
+    <target name="updater-torrent" depends="updater">
+        <copy file="i2pupdate.zip" tofile="i2pupdate-${full.version}.zip" />
+        <mktorrent file="i2pupdate-${full.version}.zip" />
+    </target>
 
     <target name="zipit" depends="getReleaseNumber">
         <!--
@@ -1660,7 +1784,7 @@
         </exec>
     </target>
 
-    <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation, truncatehistory">
+    <target name="prepupdate" depends="build2, prepupdateSmall, prepCertificates, prep-script-translation, truncatehistory">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
@@ -1683,6 +1807,7 @@
         <copy todir="pkg-temp/man/">
             <fileset dir="installer/resources/man/" />
         </copy>
+        <copy file="installer/resources/fixperms2.bat" todir="pkg-temp/scripts/" />
     </target>
 
     <target name="truncatehistory">
@@ -1696,7 +1821,7 @@
         <concat append="true" destfile="pkg-temp/history.txt">&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE</concat>
     </target>
 
-    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes, prepthemeupdates">
+    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
@@ -1708,9 +1833,6 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.jar" todir="pkg-temp/lib/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
-        <!-- decapitalized the file in 0.7.8 -->
-        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
         <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
        -->
@@ -1728,8 +1850,6 @@
 
     <!-- GeoIP files -->
     <target name="prepgeoupdate" depends="prepgeoupdate-unlesspkg" >
-        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
         <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
        -->
@@ -1758,6 +1878,9 @@
           -->
         <copy todir="pkg-temp/eepsite-jetty9" >
             <fileset dir="installer/resources/eepsite" includes="*.xml contexts/* etc/*" />
+        </copy>
+        <copy todir="pkg-temp/eepsite-jetty9.3" >
+            <fileset dir="installer/resources/eepsite-jetty9.3" />
         </copy>
     </target>
 
@@ -1975,7 +2098,7 @@
     <!-- end custom installers -->
 
     <!-- unit tests -->
-    <target name="buildCoreTest">
+    <target name="buildCoreTest" depends="buildProperties">
         <ant dir="core/java/" target="jarTest" />
     </target>
     <target name="buildRouterTest" depends="buildCoreTest">
@@ -2211,15 +2334,8 @@
         <!-- TODO if i2pupdate200.zip is present zip it instead -->
         <su3sign infile="i2pupdate.zip" sigtype="ROUTER" outfile="i2pupdate.su3" su3.ver="${release.number}" />
         <!-- this will use the monotonerc file in the current workspace -->
-        <echo message="Checking out fresh copy into ../i2p-${release.number} for tarballing:" />
-        <delete dir="../i2p-${release.number}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="../i2p-${release.number}/" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${release.number}" />
+        <ant target="checkoutFromVCS" />
         <exec executable="tar" failonerror="true">
             <arg value="cjf" />
             <arg value="i2psource_${release.number}.tar.bz2" />
@@ -2227,6 +2343,8 @@
             <arg value=".." />
             <arg value="--exclude" />
             <arg value="i2p-${release.number}/_MTN*" />
+            <arg value="--exclude" />
+            <arg value="i2p-${release.number}/.git" />
             <arg value="i2p-${release.number}/" />
         </exec>
         <echo message="Sign the files:" />
@@ -2288,8 +2406,22 @@
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
 
+    <target name="forceJava7">
+        <!-- must be set for Android -->
+        <fail message="javac.version is set to ${javac.version} - must be 1.7 for Android" >
+            <condition>
+              <and>
+                <isset property="javac.version" />
+                <not><equals arg1="${javac.version}" arg2="1.7"/></not>
+              </and>
+            </condition>
+        </fail>
+        <property name="javac.version" value="1.7" />
+        <property name="javac.release" value="7" />
+    </target>
+
     <!-- depends on buildCoreTest so that the router unit test javadocs can find the core unit test classes -->
-    <target name="mavenCentral.deps" depends="buildRouter, buildStreaming, buildCoreTest">
+    <target name="mavenCentral.deps" depends="forceJava7, buildRouter, buildStreaming, buildCoreTest">
         <ant dir="core/java/">
             <target name="javadocJar" />
             <target name="sourcesJar" />
@@ -2307,6 +2439,9 @@
             <target name="sourcesJar" />
         </ant>
         <ant dir="apps/jetty/">
+            <!-- not used in Android -->
+            <property name="javac.version" value="1.8" />
+            <property name="javac.release" value="8" />
             <target name="servletJar" />
             <target name="servletJavadocJar" />
             <target name="servletSourcesJar" />
@@ -2344,7 +2479,7 @@
                 url="https://geti2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2355,7 +2490,7 @@
                 url="https://geti2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2367,7 +2502,7 @@
                 url="https://geti2p.net/en/docs/api/streaming">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2379,7 +2514,7 @@
                 url="https://geti2p.net/en/docs/api/streaming">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2392,7 +2527,7 @@
                 url="https://geti2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
             <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2519,19 +2654,50 @@
         </copy>
     </target>
 
-    <target name="getExtendedVersion" depends="buildProperties, trimMtnRev">
-        <property name="MtnShortHash" value="unknown" />
-        <condition property="Extended.Version" value="${full.version}-${MtnShortHash}">
+    <target name="getExtendedVersion" depends="buildProperties, trimRev">
+        <property name="shortHash" value="unknown" />
+        <condition property="Extended.Version" value="${full.version}-${shortHash}">
             <not>
                 <or>
-                    <equals arg1="${MtnShortHash}" arg2="" />
-                    <equals arg1="${MtnShortHash}" arg2="unknown" />
+                    <equals arg1="${shortHash}" arg2="" />
+                    <equals arg1="${shortHash}" arg2="unknown" />
                 </or>
             </not>
         </condition>
         <!-- if not set above we'll set it here -->
         <property name="Extended.Version" value="${full.version}" />
     </target>
+
+    <target name="debcheckpatch">
+        <echo message="Checking debian/patches/0001-path-substitution.patch" />
+        <exec executable="patch" failonerror="true" input="debian/patches/0001-path-substitution.patch" >
+            <arg value="--dry-run" />
+            <arg value="-F0" />
+            <arg value="-p1" />
+        </exec>
+        <echo />
+        <echo message="Checking debian/patches/0002-jetty-compatibility.patch" />
+        <exec executable="patch" failonerror="true" input="debian/patches/0002-jetty-compatibility.patch" >
+            <arg value="--dry-run" />
+            <arg value="-F0" />
+            <arg value="-p1" />
+        </exec>
+        <echo />
+        <echo message="Checking debian/patches/0003-json-simple-3.patch" />
+        <exec executable="patch" failonerror="true" input="debian/patches/0003-json-simple-3.patch" >
+            <arg value="--dry-run" />
+            <arg value="-F0" />
+            <arg value="-p1" />
+        </exec>
+        <echo />
+        <echo message="Checking debian-alt/xenial/patches/0002-jetty-old-api.patch" />
+        <exec executable="patch" failonerror="true" input="debian-alt/xenial/patches/0002-jetty-old-api.patch" >
+            <arg value="--dry-run" />
+            <arg value="-F0" />
+            <arg value="-p1" />
+        </exec>
+    </target>
+
 
     <target name="debchange" depends="getExtendedVersion" unless="noAutoDebchange">
         <echo message= "Debian version is ${Extended.Version}-1" />
@@ -2571,18 +2737,11 @@
     </target>
 
     <!-- buster, sid, bionic+ -->
-    <target name="debian-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="debian-tarball" depends="getExtendedVersion, failIfNoVCS">
         <!-- this will use the monotonerc file in the current workspace -->
         <property name="debian.tarball.name" value="i2p_${Extended.Version}.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2595,6 +2754,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
@@ -2650,23 +2810,15 @@
         </tar>
     </target>
 
+    <!-- Precise no longer supported, does not work -->
     <!-- same as debian-release-tarball but with bundled jetty
       -  We add a 'p' to the release name and tarball since the source package is different;
       -  Launchpad does not allow different source packages with the same name.
       -->
-    <target name="precise-release-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="precise-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}p.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2679,6 +2831,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
@@ -2735,25 +2888,17 @@
         </tar>
     </target>
 
+    <!-- Xenial no longer supported, does not work -->
     <!-- xenial/yakkety only -->
     <!-- same as debian-release-tarball but with bundled jstl.jar
          (there's no libtaglibs-standard-* packages)
       -  We add a 'x' to the release name and tarball since the source package is different;
       -  Launchpad does not allow different source packages with the same name.
       -->
-    <target name="xenial-release-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="xenial-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}x.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2766,6 +2911,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
@@ -2784,8 +2930,8 @@
             <file name="../i2p-${Extended.Version}/settings.gradle" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
           <!--
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
@@ -2816,19 +2962,10 @@
 
     <!-- buster, sid, bionic+ -->
     <!-- same as debian-tarball but with a release tar.bz2 file name and tar prefix -->
-    <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoMtn">
+    <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoVCS">
         <property name="debian.tarball.name" value="i2p_${release.number}.orig.tar.bz2" />
-        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
-        <delete dir="../i2p-${Extended.Version}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
-            <arg value="../i2p-${Extended.Version}" />
-        </exec>
+        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
@@ -2841,6 +2978,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
             <file name="../i2p-${Extended.Version}/.mtn-ignore" />
@@ -2941,16 +3079,11 @@
 			<copy file="apps/addressbook/myhosts.txt"  todir="pkg-temp/addressbook/" />
 			<!-- config.txt is in installer/resources/portable -->
 		<mkdir dir="pkg-temp/docs" />
-			<copy file="installer/resources/initialNews/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
-			<copy file="installer/resources/readme/readme.html" tofile="pkg-temp/docs/readme.html" />
 			<copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
 			<!-- HTTP Header files, english only,
 				if you need a different lang do it in a seperate target -->
-			<copy todir="pkg-temp/docs/" >
-				<fileset dir="installer/resources/proxy/"  includes="**-header.ht" />
-			</copy>
 			<!-- Theme light only -->
 			<copy todir="pkg-temp/docs/themes/console/light/" overwrite="true" >
 				<fileset dir="installer/resources/themes/console/light/" includes="**.css" />
@@ -2994,25 +3127,16 @@
 		<checksum file="portable-win32.zip" forceOverwrite="yes"/>
 		<move file="portable" tofile="pkg-temp"/>
 	</target>
-    <target name = "bundle" depends="pkg">
+    <target name="bundle" depends="pkg">
         <exec executable="git" failonerror="true">
             <arg value="bundle" />
             <arg value="create" />
-            <arg value="i2p.i2p.bundle" />
+            <arg value="i2p.i2p.${full.version}.bundle" />
             <arg value="--all" />
             <arg value="--branches" />
             <arg value="--tags" />
         </exec>
-        <mktorrent file="i2p.i2p.bundle" />
+        <mktorrent file="i2p.i2p.${full.version}.bundle" />
     </target>
-    <!--<target name = "bundleRelease" depends="distclean">
-        <exec executable="git" failonerror="true">
-            <arg value="bundle" />
-            <arg value="create" />
-            <arg value="i2p.i2p$(release.number).bundle" />
-            <arg value="all" />
-            <arg value="branches=master" />
-            <arg value="tags=" />
-        </exec>
-    </target>-->
+
 </project>

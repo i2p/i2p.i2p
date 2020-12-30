@@ -56,6 +56,8 @@ public class CreateRouterInfoJob extends JobImpl {
     public static final String KEYS_FILENAME = "router.keys";
     public static final String KEYS2_FILENAME = "router.keys.dat";
     static final String PROP_ROUTER_SIGTYPE = "router.sigType";
+    /** @since 0.9.48 */
+    static final String PROP_ROUTER_ENCTYPE = "router.encType";
     private static final SigType DEFAULT_SIGTYPE = SigType.EdDSA_SHA512_Ed25519;
     private static final EncType DEFAULT_ENCTYPE = EncType.ELGAMAL_2048;
 
@@ -106,8 +108,7 @@ public class CreateRouterInfoJob extends JobImpl {
             // not necessary, in constructor
             //info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(ctx));
-            // TODO
-            EncType etype = DEFAULT_ENCTYPE;
+            EncType etype = getEncTypeConfig(ctx);
             KeyPair keypair = ctx.keyGenerator().generatePKIKeys(etype);
             PublicKey pubkey = keypair.getPublic();
             PrivateKey privkey = keypair.getPrivate();
@@ -193,6 +194,24 @@ public class CreateRouterInfoJob extends JobImpl {
         // fallback?
         if (cstype != SigType.DSA_SHA1 && !cstype.isAvailable())
             cstype = SigType.DSA_SHA1;
+        return cstype;
+    }
+    
+    /**
+     *  The configured EncType to expect on read-in
+     *  @since 0.9.48
+     */
+    public static EncType getEncTypeConfig(RouterContext ctx) {
+        EncType cstype = DEFAULT_ENCTYPE;
+        String sstype = ctx.getProperty(PROP_ROUTER_ENCTYPE);
+        if (sstype != null) {
+            EncType ntype = EncType.parseEncType(sstype);
+            if (ntype != null)
+                cstype = ntype;
+        }
+        // fallback?
+        if (cstype != EncType.ELGAMAL_2048 && !cstype.isAvailable())
+            cstype = EncType.ELGAMAL_2048;
         return cstype;
     }
     

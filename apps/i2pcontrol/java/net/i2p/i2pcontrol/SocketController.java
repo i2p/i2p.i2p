@@ -37,8 +37,8 @@ import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.simple.Jsoner;
+import org.json.simple.DeserializationException;
 
 import net.i2p.i2pcontrol.security.KeyStoreProvider;
 import net.i2p.i2pcontrol.security.SecurityManager;
@@ -194,13 +194,12 @@ public class SocketController implements RouterApp {
         public void run() {
             try {
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"));
-                final JSONParser parser = new JSONParser();
                 while (true) {
-                    Object o = parser.parse(reader);
+                    Object o = Jsoner.deserialize(reader);
                     // TODO
                     System.out.println("i2pcontrol got: " + o);
                 }
-            } catch (ParseException pe) {
+            } catch (DeserializationException pe) {
                 _log.error("i2pcontrol handler", pe);
                 return;
             } catch (IOException ioe) {

@@ -50,7 +50,8 @@
     </target>
 
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
 
     <target name="compile" depends="builddep" >
         <mkdir dir="./build" />
@@ -58,6 +59,7 @@
         <javac 
             srcdir="./java" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" 
@@ -77,6 +79,7 @@
             sourcepath=""
             srcdir="./java" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" 
@@ -90,6 +93,8 @@
     </target>
 
     <target name="jar" depends="compile">
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <jar destfile="build/i2pcontrol.jar" basedir="./build/obj" includes="**/*.class" >
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -104,6 +109,8 @@
     </target>    
 
     <target name="socketJar" depends="compileSocketJar">
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <jar destfile="build/i2pcontrol.jar" basedir="./build/obj" includes="**/*.class" >
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -118,6 +125,8 @@
     </target>    
 
     <target name="war" depends="compile" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <war destfile="build/jsonrpc.war" webxml="web.xml" >
             <classes dir="./build/obj" excludes="net/i2p/i2pcontrol/I2PControlController.class net/i2p/i2pcontrol/HostCheckHandler.class net/i2p/i2pcontrol/SocketController*.class" />
             <manifest>

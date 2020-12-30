@@ -9,6 +9,7 @@ package net.i2p.router.message;
  */
 
 import net.i2p.data.Certificate;
+import net.i2p.data.DataHelper;
 import net.i2p.data.i2np.GarlicClove;
 
 /**
@@ -47,15 +48,21 @@ public class CloveSet {
     @Override
     public String toString() { 
 	StringBuilder buf = new StringBuilder(128);
-	buf.append("{");
+	buf.append("CloveSet: id ").append(_msgId)
+           .append(' ').append(_cert)
+           .append(" expires " ).append(DataHelper.formatTime(_expiration))
+           .append(" cloves: " ).append(_cloves.length)
+	   .append(" {");
 	for (int i = 0; i < _cloves.length; i++) {
 	    GarlicClove clove = _cloves[i];
 	    if (clove.getData() != null)
-		buf.append(clove.getData().getClass().getName()).append(", ");
+		buf.append(clove.getData().getClass().getSimpleName());
 	    else
-		buf.append("[null clove], ");
+		buf.append("[null clove]");
+            if (i < _cloves.length - 1)
+		buf.append(", ");
 	}
-	buf.append("}");
+	buf.append('}');
 	return buf.toString();
     }
 }

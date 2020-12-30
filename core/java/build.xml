@@ -22,7 +22,8 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- fixups if we're using libintl.jar for GettextResource.java -->
@@ -77,6 +78,7 @@
         <mkdir dir="./build/obj" />
         <!-- sourcepath="" necessary for excludes to work, see ant manual for javac -->
         <javac sourcepath="" srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               release="${javac.release}"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
                encoding="UTF-8"
@@ -107,8 +109,12 @@
     <target name="jar" depends="compile, bundle, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
+        <mkdir dir="build/obj/net/i2p/util/resources" />
+        <copy todir="build/obj/net/i2p/util/resources" >
+            <fileset dir="../resources" />
+        </copy>
         <jar destfile="./build/i2p.jar" >
-            <fileset dir="./build/obj" includes="**/*.class" />
+            <fileset dir="./build/obj" />
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
             <manifest>
@@ -149,6 +155,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -219,11 +226,34 @@
     <target name="javadocJar" depends="javadoc">
         <jar jarfile="./build/i2p-${release.number}-javadoc.jar">
             <fileset dir="./build/javadoc" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Core API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Core API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
+
     <target name="sourcesJar">
         <jar jarfile="./build/i2p-${release.number}-sources.jar">
             <fileset dir="./src" />
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Core API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Core API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
         </jar>
     </target>
 
@@ -268,6 +298,7 @@
         <echo message="[DEBUG] junit home after override is ${junit.home}" />
         <echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               release="${javac.release}"
                debuglevel="lines,vars,source"
                includeAntRuntime="true"
                encoding="UTF-8"
@@ -299,8 +330,25 @@
             </fileset>
             <mapper type="glob" from="obj_scala/*" to="*" />
         </copy>
-        <jar destfile="./build/i2pscalatest.jar" basedir="./build/obj_scala_jar" includes="**/*.class" />
+        <jar destfile="./build/i2pscalatest.jar" basedir="./build/obj_scala_jar" includes="**/*.class">
+            <manifest>
+                <attribute name="${manifest.classpath.name}" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
+                <attribute name="Specification-Title" value="I2P Core API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Core API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Main-Class" value="net.i2p.util.CommandLine" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+        </jar>
     </target>
+
     <target name="jarTest" depends="junit.compileTest">
         <!-- warning - The junit.test target below doesn't actually include i2ptest.jar in the classpath,
              only the build/obj directory.
@@ -309,6 +357,21 @@
             <fileset dir="./build/obj" includes="**/*.class **/test.data **/baseDblPrecmp **/basePrecmp" />
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
+            <manifest>
+                <attribute name="${manifest.classpath.name}" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
+                <attribute name="Specification-Title" value="I2P Core API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Core API" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Main-Class" value="net.i2p.util.CommandLine" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
         </jar>
     </target>
     <!-- preparation of code coverage tool of choice -->
@@ -488,6 +551,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj_bench" />
         <javac srcdir="./bench" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               release="${javac.release}"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
                encoding="UTF-8"
@@ -510,7 +574,6 @@
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Main-Class" value="org.openjdk.jmh.Main" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>

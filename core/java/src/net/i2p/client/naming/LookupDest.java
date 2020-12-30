@@ -122,27 +122,16 @@ public class LookupDest {
     }
 
     /**
-     *  TODO: does not support hostnames, extended b32, I2CP options...
+     *  Supports hostnames and extended b32.
+     *  TODO: does not support I2CP options.
      */
     public static void main(String args[]) {
         if (args.length != 1) {
-            System.err.println("Usage: LookupDest base32");
-            System.exit(1);
-        }
-        String arg = args[0];
-        if (arg.endsWith(".b32.i2p"))
-            arg = arg.substring(0, arg.length() - 8);
-        if (arg.length() != 52) {
-            System.err.println("Bad Base32 format");
-            System.exit(1);
-        }
-        byte[] h = Base32.decode(arg);
-        if (h == null) {
-            System.err.println("Bad Base32 format");
+            System.err.println("Usage: LookupDest hostname|b32");
             System.exit(1);
         }
         try {
-            Destination dest = lookupHash(I2PAppContext.getGlobalContext(), h);
+            Destination dest = lookupHostname(I2PAppContext.getGlobalContext(), args[0]);
             if (dest == null)
                 System.err.println("Destination not found!");
             else

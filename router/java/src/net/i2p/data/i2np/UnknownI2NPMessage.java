@@ -100,7 +100,7 @@ public class UnknownI2NPMessage extends FastI2NPMessageImpl {
         if (!eq)
             throw new I2NPMessageException("Bad checksum on " + _data.length + " byte msg type " + _type);
         msg.readMessage(_data, 0, _data.length, _type);
-        msg.setUniqueId(_uniqueId);
+        msg.setUniqueId(getUniqueId());
         msg.setMessageExpiration(_expiration);
         return msg;
     }

@@ -103,7 +103,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *
      * This is also the max idle time for an outbound session.
      */
-    private final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 3 * 60 * 1000;
+    private final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 2 * 60 * 1000;
 
     /**
      * Time to send more if we are this close to expiration
@@ -155,6 +155,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     public static final int DEFAULT_TAGS = 40;
     /** ditto */
     public static final int LOW_THRESHOLD = 30;
+    private static final boolean USE_UNACKED_TAGS = false;
 
     /**
      * The session key manager should only be constructed and accessed through the 
@@ -779,7 +780,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     @Override
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<h3 class=\"debug_inboundsessions\">Inbound sessions</h3>" +
+        buf.append("<h3 class=\"debug_inboundsessions\">ElGamal Inbound Sessions</h3>" +
                    "<table>");
         Map<SessionKey, Set<TagSet>> inboundSets = getInboundTagSetsBySessionKey();
         int total = 0;
@@ -814,7 +815,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
            .append("; sessions: ").append(inboundSets.size())
            .append("</th></tr>\n" +
                    "</table>" +
-                   "<h3 class=\"debug_outboundsessions\">Outbound sessions</h3>" +
+                   "<h3 class=\"debug_outboundsessions\">ElGamal Outbound Sessions</h3>" +
                    "<table>");
         total = 0;
         totalSets = 0;
@@ -1133,7 +1134,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         public void addTags(TagSet set) {
             _lastUsed = _context.clock().now();
             synchronized (_tagSets) {
-                if (_acked)
+                if (USE_UNACKED_TAGS && _acked)
                     _tagSets.add(set);
                 else
                     _unackedTagSets.add(set);

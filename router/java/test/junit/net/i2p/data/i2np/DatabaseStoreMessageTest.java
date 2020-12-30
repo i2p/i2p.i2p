@@ -17,6 +17,7 @@ import org.junit.rules.ExpectedException;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
+import net.i2p.data.Hash;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterInfoTest;
 import net.i2p.data.StructureTest;
@@ -33,7 +34,7 @@ public class DatabaseStoreMessageTest extends StructureTest {
     public ExpectedException exception = ExpectedException.none();
 
     public DataStructure createDataStructure() throws DataFormatException {
-        DatabaseStoreMessage msg = new DatabaseStoreMessage(I2PAppContext.getGlobalContext());
+        DSMStructure msg = new DSMStructure(I2PAppContext.getGlobalContext());
         RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
         msg.setMessageExpiration(Clock.getInstance().now());
         msg.setUniqueId(666);
@@ -42,7 +43,7 @@ public class DatabaseStoreMessageTest extends StructureTest {
     }
     
     public DataStructure createStructureToRead() { 
-    	return new DatabaseStoreMessage(I2PAppContext.getGlobalContext()); 
+    	return new DSMStructure(I2PAppContext.getGlobalContext()); 
     }
     
     @Override
@@ -50,5 +51,13 @@ public class DatabaseStoreMessageTest extends StructureTest {
     public void testStructure() throws Exception {
         exception.expect(UnsupportedOperationException.class);
         super.testStructure();
+    }
+
+    private static class DSMStructure extends DatabaseStoreMessage implements DataStructure {
+        public DSMStructure(I2PAppContext ctx) { super(ctx); }
+        public Hash calculateHash() { return null; }
+        public void fromByteArray(byte[] b) {}
+        public void fromBase64(String s) {}
+        public String toBase64() { return null; }
     }
 }

@@ -15,7 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -839,20 +841,63 @@ public class TunnelConfig {
                 _context.random().nextBytes(rk);
                 config.setProperty(p, Base64.encode(rk));
             }
+
             // As of 0.9.18, add persistent leaseset keys if not present
             // but only if we know the sigtype
-            p = OPT + "i2cp.leaseSetSigningPrivateKey";
-            if (_dest != null && !config.containsKey(p)) {
-                try {
-                    SigType type = _dest.getSigType();
-                    SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
-                    config.setProperty(p, type.name() + ':' + keys[1].toBase64());
-                    p = OPT + "i2cp.leaseSetPrivateKey";
-                    keys = KeyGenerator.getInstance().generatePKIKeys();
-                    config.setProperty(p, "ELGAMAL_2048:" + keys[1].toBase64());
-                    // TODO ECIES key
-                } catch (GeneralSecurityException gse) {
-                    // so much for that
+            // Server enctype migration here
+            String dflt;
+            if (TunnelController.TYPE_HTTP_SERVER.equals(_type) ||
+                TunnelController.TYPE_IRC_SERVER.equals(_type) ||
+                TunnelController.TYPE_STREAMR_SERVER.equals(_type)) {
+                dflt = "4,0";
+            } else {
+                dflt = "0";
+            }
+            String senc = config.getProperty(OPT + "i2cp.leaseSetEncType", dflt);
+            String slstyp = config.getProperty(OPT + "i2cp.leaseSetType", "0");
+            if (senc.equals("0") && slstyp.equals("0")) {
+                // only for LS1
+                p = OPT + "i2cp.leaseSetSigningPrivateKey";
+                if (!config.containsKey(p)) {
+                    SigType type;
+                    if (_dest != null) {
+                        type = _dest.getSigType();
+                    } else {
+                        String ssigtyp = config.getProperty(OPT + "i2cp.destination.sigType", "0");
+                        type = SigType.parseSigType(ssigtyp);
+                    }
+                    if (type != null) {
+                        try {
+                            SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
+                            config.setProperty(p, type.name() + ':' + keys[1].toBase64());
+                        } catch (GeneralSecurityException gse) {
+                            // so much for that
+                        }
+                    }
+                }
+            }
+
+            // persistent LS encryption keys
+            // multiple types as of 0.9.46, add missing ones
+            p = OPT + "i2cp.leaseSetPrivateKey";
+            String skeys = config.getProperty(p);
+            // normalize it first to make the code below easier
+            if (skeys != null && skeys.length() > 0 && !skeys.contains(":"))
+                config.setProperty(p, "ELGAMAL_2048:" + skeys);
+            String[] senca = DataHelper.split(senc, ",");
+            // for each configured enc type, generate a key if we don't have it
+            for (int i = 0; i < senca.length; i++) {
+                EncType type = EncType.parseEncType(senca[i]);
+                if (type != null && type.isAvailable()) {
+                    String stype = type.toString();
+                    skeys = config.getProperty(p, "");
+                    if (!skeys.contains(stype + ':')) {
+                        KeyPair keys = KeyGenerator.getInstance().generatePKIKeys(type);
+                        if (skeys.length() > 0)
+                            config.setProperty(p, skeys + ',' + stype + ':' + keys.getPrivate().toBase64());
+                        else
+                            config.setProperty(p, stype + ':' + keys.getPrivate().toBase64());
+                    }
                 }
             }
         }

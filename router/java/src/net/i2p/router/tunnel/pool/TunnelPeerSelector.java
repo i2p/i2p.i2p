@@ -18,7 +18,9 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
@@ -97,32 +99,29 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
     /**
      *  For debugging, also possibly for restricted routes?
      *  Needs analysis and testing
-     *  @return should always be false
+     *  @return usually false
      */
     protected boolean shouldSelectExplicit(TunnelPoolSettings settings) {
         if (settings.isExploratory()) return false;
         Properties opts = settings.getUnknownOptions();
-        if (opts != null) {
-            String peers = opts.getProperty("explicitPeers");
-            if (peers == null)
-                peers = ctx.getProperty("explicitPeers");
-            // only one out of 4 times so we don't break completely if peer doesn't build one
-            if (peers != null && ctx.random().nextInt(4) == 0)
-                return true;
-        }
+        String peers = opts.getProperty("explicitPeers");
+        if (peers == null)
+            peers = ctx.getProperty("explicitPeers");
+        // only one out of 4 times so we don't break completely if peer doesn't build one
+        if (peers != null && ctx.random().nextInt(4) == 0)
+            return true;
         return false;
     }
     
     /**
      *  For debugging, also possibly for restricted routes?
      *  Needs analysis and testing
-     *  @return should always be false
+     *  @return the peers
      */
     protected List<Hash> selectExplicit(TunnelPoolSettings settings, int length) {
         String peers = null;
         Properties opts = settings.getUnknownOptions();
-        if (opts != null)
-            peers = opts.getProperty("explicitPeers");
+        peers = opts.getProperty("explicitPeers");
         
         if (peers == null)
             peers = ctx.getProperty("explicitPeers");
@@ -138,8 +137,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
                 if (ctx.profileOrganizer().isSelectable(peer)) {
                     rv.add(peer);
                 } else {
-                    if (log.shouldLog(Log.DEBUG))
-                        log.debug("Explicit peer is not selectable: " + peerStr);
+                    log.logAlways(Log.WARN, "Explicit peer is not selectable: " + peerStr);
                 }
             } catch (DataFormatException dfe) {
                 if (log.shouldLog(Log.ERROR))
@@ -148,10 +146,24 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         }
         
         int sz = rv.size();
-        Collections.shuffle(rv, ctx.random());
+        if (sz == 0) {
+            log.logAlways(Log.WARN, "No valid explicit peers found, building zero hop");
+        } else if (sz > 1) {
+            Collections.shuffle(rv, ctx.random());
+        }
         
-        while (rv.size() > length)
+        while (rv.size() > length) {
             rv.remove(0);
+        }
+        if (rv.size() < length) {
+            int more = length - rv.size();
+            Set<Hash> exclude = getExclude(settings.isInbound(), settings.isExploratory());
+            exclude.addAll(rv);
+            Set<Hash> matches = new HashSet<Hash>(more);
+            ctx.profileOrganizer().selectFastPeers(more, exclude, matches, 0);
+            rv.addAll(matches);
+            Collections.shuffle(rv, ctx.random());
+        }
         
         if (log.shouldLog(Log.INFO)) {
             StringBuilder buf = new StringBuilder();
@@ -416,15 +428,15 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         if (known != null) {
             for (int i = 0; i < known.size(); i++) {
                 RouterInfo peer = known.get(i);
-                // we can skip this check now, uncomment if we have some breaking change
-                //String v = peer.getVersion();
-                // RI sigtypes added in 0.9.16
-                // SSU inbound connection bug fixed in 0.9.17, but it won't bid, so NTCP only,
-                // no need to check
-                //if (VersionComparator.comp(v, "0.9.16") < 0)
-                //    rv.add(peer.getIdentity().calculateHash());
-
                 Hash h = peer.getIdentity().calculateHash();
+
+                // Uncomment if stricter than in shouldExclude() below
+                //String v = peer.getVersion();
+                //if (VersionComparator.comp(v, "0.9.16") < 0) {
+                //    rv.add(h);
+                //    continue;
+                //}
+
                 if (connected.contains(h))
                     continue;
                 boolean canConnect = isInbound ? canConnect(peer, ourMask) : canConnect(ourMask, peer);
@@ -451,9 +463,10 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         }
     }
     
-    /** 0.7.8 and earlier had major message corruption bugs */
-    //private static final String MIN_VERSION = "0.7.9";
+    /** NTCP2 */
+    private static final String MIN_VERSION = "0.9.36";
 
+    /** warning, this is also called by ProfileOrganizer.isSelectable() */
     private static boolean shouldExclude(RouterInfo peer, char excl[]) {
         String cap = peer.getCapabilities();
         for (int j = 0; j < excl.length; j++) {
@@ -470,17 +483,20 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             maxLen++;
         if (cap.length() <= maxLen)
             return true;
-        if (peer.getIdentity().getPublicKey().getType() != EncType.ELGAMAL_2048)
+        RouterIdentity ident = peer.getIdentity();
+        if (ident.getSigningPublicKey().getType() == SigType.DSA_SHA1)
+            return true;
+        EncType type = ident.getPublicKey().getType();
+        if (!LeaseSetKeys.SET_BOTH.contains(type))
             return true;
 
         // otherwise, it contains flags we aren't trying to focus on,
         // so don't exclude it based on published capacity
 
         // minimum version check
-        // we can skip this check now
-        //String v = peer.getVersion();
-        //if (VersionComparator.comp(v, MIN_VERSION) < 0)
-        //    return true;
+        String v = peer.getVersion();
+        if (VersionComparator.comp(v, MIN_VERSION) < 0)
+            return true;
 
         // uptime is always spoofed to 90m, so just remove all this
       /******

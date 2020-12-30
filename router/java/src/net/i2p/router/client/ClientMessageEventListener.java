@@ -226,6 +226,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     private void handleCreateSession(CreateSessionMessage message) {
         SessionConfig in = message.getSessionConfig();
         Destination dest = in.getDestination();
+        if (dest.getEncType() != EncType.ELGAMAL_2048) {
+            // Enc type in key cert, proposal 145, unsupported
+            _runner.disconnectClient("Non-ElGamal encryption type in key certificate unsupported");
+            return;
+        }
         if (in.verifySignature()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Signature verified correctly on create session message");
@@ -245,8 +250,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                     msg += DataHelper.formatDuration(0 - skew) + " in the future";
                 _log.error(msg);
                 _runner.disconnectClient(msg);
+            } else if (in.getOfflineSignature() != null && in.getOfflineExpiration() < _context.clock().now()) {
+                String msg = "Offline signature for tunnel expired " + DataHelper.formatTime(in.getOfflineExpiration());
+                _log.log(Log.CRIT, msg);
+                _runner.disconnectClient(msg);
             } else {
-                _log.error("Signature verification failed on a create session message");
+                _log.error("Signature verification failed on a create session message:\n" + in);
                 _runner.disconnectClient("Invalid signature on CreateSessionMessage");
             }
             return;

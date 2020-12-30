@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.net.ConnectException;
@@ -63,7 +64,7 @@ class SAMStreamSession implements SAMMessageSess {
     /** stream id (Long) to StreamSender */
     private final HashMap<Integer,StreamSender> sendersMap = new HashMap<Integer,StreamSender>();
 
-    private final AtomicInteger lastNegativeId = new AtomicInteger();;
+    private final AtomicInteger lastNegativeId = new AtomicInteger();
 
     // Can we create outgoing connections?
     protected final boolean canCreate;
@@ -379,7 +380,7 @@ class SAMStreamSession implements SAMMessageSess {
      *  @since 0.9.25 moved from subclass SAMv3StreamSession to implement SAMMessageSess
      */
     public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws I2PSessionException {
-        throw new I2PSessionException("Unsupported in STREAM or MASTER session");
+        throw new I2PSessionException("Unsupported in STREAM or PRIMARY session");
     }
 
     /**
@@ -391,7 +392,7 @@ class SAMStreamSession implements SAMMessageSess {
                              boolean sendLeaseSet, int sendTags,
                              int tagThreshold, int expiration)
                                  throws I2PSessionException {
-        throw new I2PSessionException("Unsupported in STREAM or MASTER session");
+        throw new I2PSessionException("Unsupported in STREAM or PRIMARY session");
     }
 
     /** 
@@ -692,14 +693,15 @@ class SAMStreamSession implements SAMMessageSess {
                 InputStream in = i2pSocket.getInputStream();
 
                 while (stillRunning) {
-                	data.clear();
+                    ((Buffer)data).clear();
                     read = Channels.newChannel(in).read(data);
                     if (read == -1) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Handler " + id + ": connection closed");
                         break;
                     }
-                    data.flip();
+                    // not ByteBuffer to avoid Java 8/9 issues with flip()
+                    ((Buffer)data).flip();
                     recv.receiveStreamBytes(id, data);
                 }
             } catch (IOException e) {

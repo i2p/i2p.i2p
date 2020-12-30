@@ -6,6 +6,6 @@ log=../log/addrbook_log.txt
 last_modified=../log/addrbook_last_modified.txt
 etags=../log/addrbook_etags.txt
 subscriptions=subscriptions.txt
-master_addressbook=userhosts.txt
+local_addressbook=userhosts.txt
 router_addressbook=../hosts.txt
 published_addressbook=../eepsite/hosts.txt

@@ -1,0 +1,65 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Zagros <zagros21@cmail.nu>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2020-09-28 09:17+0000\n"
+"Last-Translator: Zagros <zagros21@cmail.nu>\n"
+"Language-Team: Kurdish (http://www.transifex.com/otf/I2P/language/ku/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ku\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "پیرۆزبایت لێدەکەین بۆ دامەزراندنی I2P!"
+
+msgid "Welcome to I2P!"
+msgstr "بەخێربێیت بۆ I2P!"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "تکایە {0}ئارام بگرە{1} لەکاتێکدا I2P دەست بەئیشکردن دەکات و هاونشینی تر دەدۆزێتەوە."
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "هەتاکو چاوەڕوانیت بەکۆتادێ، تکایە {0}بەژداری هێڵەکەت دیاریبکە{1} لە {2}پەڕەی سازانەکان{3}."
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr ""
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr "لەناو ڕیکخستنەکانی وێبگەڕەکەتدا، 127.0.0.1 دەرچەی 4444 وەکو کرێگرتەی http دیاری بکە."
+
+msgid "Do not use SOCKS for this."
+msgstr "بۆ ئەمەیان SOCKS بەکارمەهێنە."
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr "زانیاری زیاتر لەسەر {0}پەڕەی دامەزراندنی پڕۆکسیەکانی وێبگەڕی I2P{1} بەردەستە."
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr ""
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "IRC ڕاژەخوازەکەت ئاڕاستەی {0}127.0.0.1:6668{1} بکەو وەرە سڵاوێکمان لێبکە لە {2}#i2p{3}."

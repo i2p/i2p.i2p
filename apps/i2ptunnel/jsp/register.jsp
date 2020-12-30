@@ -27,12 +27,7 @@
     <title><%=intl._t("Hidden Services Manager")%> - <%=intl._t("Registration Helper")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
-
-    <% if (editBean.allowCSS()) {
-  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico" />
     <link href="<%=editBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
-    <% }
-  %>
 <style type='text/css'>
 input.default { width: 1px; height: 1px; visibility: hidden; }
 </style>

@@ -8,8 +8,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import net.i2p.data.StructureTest;
-import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PrivateKeyTest;
@@ -23,8 +21,8 @@ import net.i2p.data.LeaseSetTest;
  *
  * @author jrandom
  */
-public class CreateLeaseSetMessageTest extends StructureTest {
-    public DataStructure createDataStructure() throws DataFormatException {
+public class CreateLeaseSetMessageTest extends I2CPTstBase {
+    public I2CPMessageImpl createDataStructure() throws DataFormatException {
         CreateLeaseSetMessage msg = new CreateLeaseSetMessage();
     	msg.setPrivateKey((PrivateKey)(new PrivateKeyTest()).createDataStructure());
     	msg.setSigningPrivateKey((SigningPrivateKey)(new SigningPrivateKeyTest()).createDataStructure());
@@ -32,5 +30,5 @@ public class CreateLeaseSetMessageTest extends StructureTest {
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
         return msg; 
     }
-    public DataStructure createStructureToRead() { return new CreateLeaseSetMessage(); }
+    public I2CPMessageImpl createStructureToRead() { return new CreateLeaseSetMessage(); }
 }

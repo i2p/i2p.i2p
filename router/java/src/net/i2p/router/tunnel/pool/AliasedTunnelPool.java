@@ -123,7 +123,7 @@ public class AliasedTunnelPool extends TunnelPool {
         for (int i = 0; i < ls.getLeaseCount(); i++) {
             Lease old = ls.getLease(i);
             Lease lease = new Lease();
-            lease.setEndDate(old.getEndDate());
+            lease.setEndDate(old.getEndTime());
             lease.setTunnelId(old.getTunnelId());
             lease.setGateway(old.getGateway());
             rv.addLease(lease);

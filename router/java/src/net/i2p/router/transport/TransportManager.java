@@ -12,7 +12,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.Inet6Address;
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.UnknownHostException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SigType;
@@ -82,6 +85,10 @@ public class TransportManager implements TransportEventListener {
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
+    private static final String PROP_JAVA_PROXY1 = "socksProxyHost";
+    private static final String PROP_JAVA_PROXY2 = "java.net.useSystemProxies";
+    private static final String PROP_JAVA_PROXY3 = "http.proxyHost";
+    private static final String PROP_JAVA_PROXY4 = "https.proxyHost";
 
     /** default true */
     private static final String PROP_NTCP1_ENABLE = "i2np.ntcp1.enable";
@@ -106,17 +113,72 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _transports = new ConcurrentHashMap<String, Transport>(2);
         _pluggableTransports = new HashMap<String, Transport>(2);
-        if (_context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UPNP))
-            _upnpManager = new UPnPManager(context, this);
-        else
-            _upnpManager = null;
+
+        boolean isProxied = isProxied();
+        boolean enableUPnP = !isProxied && _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UPNP);
+        _upnpManager = enableUPnP ? new UPnPManager(context, this) : null;
         _enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
         _enableNTCP1 = isNTCPEnabled(context) &&
                        context.getProperty(PROP_NTCP1_ENABLE, DEFAULT_NTCP1_ENABLE);
         boolean enableNTCP2 = isNTCPEnabled(context) &&
                               context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
         _dhThread = (_enableUDP || enableNTCP2) ? new DHSessionKeyBuilder.PrecalcRunner(context) : null;
-        _xdhThread = enableNTCP2 ? new X25519KeyFactory(context) : null;
+        // always created, even if NTCP2 is not enabled, because ratchet needs it
+        _xdhThread = new X25519KeyFactory(context);
+    }
+
+    /**
+     *  Detect system settings and log warnings.
+     *  ref: https://docs.oracle.com/javase/8/docs/api/java/net/doc-files/net-properties.html
+     *
+     *  @since 0.9.47
+     */
+    private boolean isProxied() {
+        boolean rv = false;
+        // These two affect all standard Sockets (but NOT NIO)
+        String proxy = System.getProperty(PROP_JAVA_PROXY1);
+        if (proxy != null && proxy.length() > 0) {
+            String msg = "UPnP disabled by system property " + PROP_JAVA_PROXY1 + '=' + proxy +
+                         "\nI2P connections will not be proxied." +
+                         "\nReseeding will be proxied.";
+            System.out.println(msg);
+            _log.logAlways(Log.WARN, msg);
+            rv = true;
+        } else if (!SystemVersion.isMac() && Boolean.valueOf(System.getProperty(PROP_JAVA_PROXY2))) {
+            try {
+                // Use ProxySelector to see if we would be proxied
+                // using a dummy address.
+                // This does not actually connect out.
+                ProxySelector ps = ProxySelector.getDefault();
+                List<Proxy> p = ps.select(new URI("socket://192.168.1.1:1234"));
+                if (p.get(0).type() != Proxy.Type.DIRECT) {
+                    String msg = "UPnP disabled by system property " + PROP_JAVA_PROXY2 + "=true" +
+                                 "\nI2P connections will not be proxied." +
+                                 "\nReseeding will be proxied.";
+                    System.out.println(msg);
+                    _log.logAlways(Log.WARN, msg);
+                    rv = true;
+                } else {
+                    String msg = "System property " + PROP_JAVA_PROXY2 + "=true but no system proxy is enabled";
+                    System.out.println(msg);
+                    _log.logAlways(Log.WARN, msg);
+                }
+            } catch (URISyntaxException use) {}
+        }
+        // These only apply to Http/HttpsURLConnection
+        proxy = System.getProperty(PROP_JAVA_PROXY3);
+        if (proxy != null && proxy.length() > 0) {
+            String msg = "Ignoring proxy setting " + PROP_JAVA_PROXY3 + '=' + proxy;
+            System.out.println(msg);
+            _log.logAlways(Log.WARN, msg);
+        }
+        proxy = System.getProperty(PROP_JAVA_PROXY4);
+        if (proxy != null && proxy.length() > 0) {
+            String msg = "Ignoring proxy setting " + PROP_JAVA_PROXY4 + '=' + proxy;
+            System.out.println(msg);
+            _log.logAlways(Log.WARN, msg);
+        }
+        return rv;
     }
 
     /**
@@ -166,6 +228,14 @@ public class TransportManager implements TransportEventListener {
     DHSessionKeyBuilder.Factory getDHFactory() {
         return _dhThread;
     }
+
+    /**
+     *  Factory for making X25519 key pairs.
+     *  @since 0.9.46
+     */
+    X25519KeyFactory getXDHFactory() {
+        return _xdhThread;
+    }
     
     private void addTransport(Transport transport) {
         if (transport == null) return;
@@ -192,7 +262,9 @@ public class TransportManager implements TransportEventListener {
         }
         if (isNTCPEnabled(_context)) {
             DHSessionKeyBuilder.PrecalcRunner dh = _enableNTCP1 ? _dhThread : null;
-            Transport ntcp = new NTCPTransport(_context, dh, _xdhThread);
+            boolean enableNTCP2 = _context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
+            X25519KeyFactory xdh = enableNTCP2 ? _xdhThread : null;
+            Transport ntcp = new NTCPTransport(_context, dh, xdh);
             addTransport(ntcp);
             initializeAddress(ntcp);
             if (udp != null) {
@@ -213,7 +285,9 @@ public class TransportManager implements TransportEventListener {
     }
     
     public static boolean isNTCPEnabled(RouterContext ctx) {
-        return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP);
+        return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP) &&
+               (ctx.getProperty(PROP_NTCP1_ENABLE, DEFAULT_NTCP1_ENABLE) ||
+                ctx.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE));
     }
     
     /**
@@ -525,14 +599,14 @@ public class TransportManager implements TransportEventListener {
     
     /**
      * Return our peer clock skews on all transports.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * A positive number means our clock is ahead of theirs.
      * Note: this method returns them in whimsical order.
      */
-    Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector<Long>();
+    List<Long> getClockSkews() {
+        List<Long> skews = new ArrayList<Long>();
         for (Transport t : _transports.values()) {
-            Vector<Long> tempSkews = t.getClockSkews();
+            List<Long> tempSkews = t.getClockSkews();
             if ((tempSkews == null) || (tempSkews.isEmpty())) continue;
             skews.addAll(tempSkews);
         }

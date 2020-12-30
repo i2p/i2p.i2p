@@ -99,6 +99,7 @@ public class SSLEepGet extends EepGet {
     /** may be null if init failed */
     private SavingTrustManager _stm;
     private final ProxyType _proxyType;
+    private int _forceDoH;
 
     private static final String CERT_DIR = "certificates/ssl";
     private static final String PROP_USE_DNS_OVER_HTTPS = "eepget.useDNSOverHTTPS";
@@ -125,7 +126,18 @@ public class SSLEepGet extends EepGet {
      *  @since 0.8.2
      */
     public SSLEepGet(I2PAppContext ctx, OutputStream outputStream, String url, SSLState state) {
-        this(ctx, null, outputStream, url, null);
+        this(ctx, null, outputStream, url, -1, state);
+    }
+
+    /**
+     *  @param maxSize The maximum size of the response
+     *  @param state an SSLState retrieved from a previous SSLEepGet with getSSLState(), or null.
+     *               This makes repeated fetches from the same host MUCH faster,
+     *               and prevents repeated key store loads even for different hosts.
+     *  @since 0.9.48
+     */
+    public SSLEepGet(I2PAppContext ctx, OutputStream outputStream, String url, long maxSize, SSLState state) {
+        this(ctx, null, outputStream, url, maxSize, state);
     }
 
     /**
@@ -143,7 +155,7 @@ public class SSLEepGet extends EepGet {
      *  @since 0.9.9
      */
     public SSLEepGet(I2PAppContext ctx, String outputFile, String url, SSLState state) {
-        this(ctx, outputFile, null, url, null);
+        this(ctx, outputFile, null, url, -1, state);
     }
 
     /**
@@ -238,10 +250,10 @@ public class SSLEepGet extends EepGet {
      *               and prevents repeated key store loads even for different hosts.
      *  @since 0.9.9
      */
-    private SSLEepGet(I2PAppContext ctx, String outputFile, OutputStream outputStream, String url, SSLState state) {
+    private SSLEepGet(I2PAppContext ctx, String outputFile, OutputStream outputStream, String url, long maxSize, SSLState state) {
         // we're using this constructor:
         // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
-        super(ctx, false, null, -1, 0, -1, -1, outputFile, outputStream, url, true, null, null);
+        super(ctx, false, null, -1, 0, -1, maxSize, outputFile, outputStream, url, true, null, null);
         _proxyType = ProxyType.NONE;
         if (state != null && state.context != null)
             _sslContext = state.context;
@@ -262,8 +274,9 @@ public class SSLEepGet extends EepGet {
         String proxyHost = "127.0.0.1";
         int proxyPort = 0;
         ProxyType ptype = ProxyType.NONE;
+        boolean doh = false;
         boolean error = false;
-        Getopt g = new Getopt("ssleepget", args, "p:y:sz");
+        Getopt g = new Getopt("ssleepget", args, "dp:y:sz");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -307,6 +320,10 @@ public class SSLEepGet extends EepGet {
                     noVerify = true;
                     break;
 
+                case 'd':
+                    doh = true;
+                    break;
+
                 case '?':
                 case ':':
                 default:
@@ -346,6 +363,8 @@ public class SSLEepGet extends EepGet {
             get._saveCerts = saveCerts;
         if (noVerify)
             get._bypassVerification = true;
+        if (doh)
+            get.forceDNSOverHTTPS(true);
         get._commandLine = true;
         get.addStatusListener(get.new CLIStatusListener(1024, 40));
         if(!get.fetch(45*1000, -1, 60*1000))
@@ -353,7 +372,8 @@ public class SSLEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("Usage: SSLEepGet [-psyz] https://url\n" +
+        System.err.println("Usage: SSLEepGet [-dpsyz] https://url\n" +
+                           "  -d use DNSOverHTTPS\n" +
                            "  -p proxyHost[:proxyPort]    // default port 8080 for HTTPS and 1080 for SOCKS; default localhost:4444 for I2P\n" +
                            "  -y HTTPS|SOCKS4|SOCKS5|I2P  // proxy type, default HTTPS if proxyHost is set\n" +
                            "  -s save unknown certs\n" +
@@ -547,6 +567,15 @@ public class SSLEepGet extends EepGet {
         return new SSLState(_sslContext);
     }
 
+    /**
+     *  Override the config setting, force DNSoverHTTPS on or off
+     *  Call before the fetch.
+     *  @since 0.9.49
+     */
+    public void forceDNSOverHTTPS(boolean on) {
+        _forceDoH = on ? 2 : 1;
+    }
+
     ///// end of all the SSL stuff
     ///// start of overrides
 
@@ -732,10 +761,16 @@ public class SSLEepGet extends EepGet {
                     port = 443;
 
                 String originalHost = host;
-                boolean useDNSOverHTTPS = _context.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
+                boolean useDNSOverHTTPS;
+                if (_forceDoH == 2)
+                    useDNSOverHTTPS = true;
+                else if (_forceDoH == 1)
+                    useDNSOverHTTPS = false;
+                else
+                    useDNSOverHTTPS = _context.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
                 // This duplicates checks in DNSOverHTTPS.lookup() but do it here too so
                 // we don't even construct it if we don't need it
-                if (useDNSOverHTTPS && !host.equals("dns.google.com") && !Addresses.isIPAddress(host)) {
+                if (useDNSOverHTTPS && !host.equals("dns.google") && !Addresses.isIPAddress(host)) {
                     DNSOverHTTPS doh = new DNSOverHTTPS(_context, getSSLState());
                     String ip = doh.lookup(host);
                     if (ip != null)

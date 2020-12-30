@@ -36,10 +36,6 @@ Public domain except as listed below:
    Copyright (c) 2003, TheCrypto
    See licenses/LICENSE-ElGamalDSA.txt
 
-   HMAC:
-   Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
-   See licenses/LICENSE-SHA256.txt
-
    ElGamal:
    Copyright (c) 2000 - 2013 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
    See licenses/LICENSE-SHA256.txt
@@ -89,13 +85,20 @@ Public domain except as listed below:
    From Apache HttpClient 4.4.1 and HttpCore 4.4.1
    See licenses/LICENSE-Apache2.0.txt
 
-   json-simple 1.1.1
+   json-simple 2.3.0
    (not included in most distribution packages)
+   Copyright 2016 Clifton Labs
    See licenses/LICENSE-Apache2.0.txt
 
    Noise library:
    Copyright (C) 2016 Southern Storm Software, Pty Ltd.
    See licenses/LICENSE-Noise.txt
+
+   MiniDNS library 1.0.0
+   This software may be used under the terms of (at your choice)
+   - LGPL version 2 (or later) (see licenses/LICENSE-LGPL2.1.txt)
+   - Apache Software licence (see licenses/LICENSE-Apache2.0.txt)
+   - DWTFYWTPL
 
 
 Router (router.jar):
@@ -124,6 +127,10 @@ Public domain except as listed below:
    SparseArray:
    Copyright (C) 2006 The Android Open Source Project
    See licenses/LICENSE-Apache2.0.txt
+
+   SSU HMAC:
+   Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
+   See licenses/LICENSE-SHA256.txt
 
 
 Installer:
@@ -171,18 +178,18 @@ Installer:
 
 GeoIP Data:
    (not included in most distribution packages)
-   This product includes GeoLite2 data created by MaxMind, available from http://www.maxmind.com/
-   See licenses/LICENSE-GeoIP.txt
+   IP Geolocation by DB-IP https://db-ip.com/
+   See https://creativecommons.org/licenses/by/4.0/
 
 Launchers:
    (not included in distribution packages)
    Copyright (c) 2002-2018 EPFL, Lausanne / Lightbend, Inc. , unless otherwise specified.
    See licenses/LICENSE-Scala.md
 
-Java Service Wrapper Community Edition 3.5.39:
+Java Service Wrapper Community Edition 3.5.44:
    (Windows: 3.5.25)
    (not included in most distribution packages)
-   Copyright (C) 1999-2019 Tanuki Software, Ltd. All Rights Reserved.
+   Copyright (C) 1999-2020 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
 
@@ -192,7 +199,7 @@ Jbigi Libraries (jbigi.jar):
    GMP 4.3.2 / 5.0.2:
    Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv3.txt
-   GMP 6.0.0 / 6.1.2:
+   GMP 6.0.0 / 6.1.2 / 6.2.0:
    See licenses/LICENSE-GPLv2.txt
 
 
@@ -254,17 +261,17 @@ Applications:
        Copyright (c) 2000, 2001 Markus Friedl.  All rights reserved.
        Copyright (c) 2008 Alexander von Gernler.  All rights reserved.
        See licenses/LICENSE-BSD.txt
-     Zxing 3.3.0:
+     Zxing 3.4.1:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 9.2.29.v20191105 (jetty-*.jar, org.mortbay.*.jar):
+   Jetty 9.3.29.v20201019 (jetty-*.jar, org.mortbay.*.jar):
    (not included in most distribution packages, except for jetty-i2p.jar)
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
    See licenses/LICENSE-ECLIPSE-1.0.html
 
-   RRD4J 3.5 (jrobin.jar):
+   RRD4J 3.6 (jrobin.jar):
    Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor.
    Copyright (c) 2011 The OpenNMS Group, Inc.
    Copyright 2011 The RRD4J Authors.
@@ -293,6 +300,7 @@ Applications:
        FatCow icons: See licenses/LICENSE-FatCowIcons.txt
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
        Feather icons: Copyright (c) 2013-2017 Cole Bemis; see licenses/LICENSE-Feather.txt
+       Fontawesome icons: Copyright (c) 2018 @fontawesome(company) see licenses/LICENSE-fontawesome.txt
 
    Router Console unthemed, light, and dark theme logos:
    Copyright (c) 2019 The Invisible Internet Project. All rights reserved.
@@ -331,9 +339,9 @@ Applications:
    Systray (systray.jar):
    Public domain.
 
-   Tomcat 8.5.50 (jasper-runtime.jar):
+   Tomcat 9.0.40 (jasper-runtime.jar):
    (not included in most distribution packages)
-   Copyright 1999-2019 The Apache Software Foundation
+   Copyright 1999-2020 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
 

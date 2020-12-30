@@ -130,16 +130,21 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 	public static final String protocolName = "Noise_XKaesobfse+hs2+hs3_25519_ChaChaPoly_SHA256";
 	public static final String protocolName2 = "Noise_IKelg2+hs2_25519_ChaChaPoly_SHA256";
+	public static final String protocolName3 = "Noise_N_25519_ChaChaPoly_SHA256";
 	private static final String prefix;
 	private final String patternId;
 	public static final String PATTERN_ID_XK = "XK";
 	public static final String PATTERN_ID_IK = "IK";
+	public static final String PATTERN_ID_N = "N";
+	/** same as N but no post-mixHash needed */
+	public static final String PATTERN_ID_N_NO_RESPONSE = "N!";
 	private static String dh;
 	private static final String cipher;
 	private static final String hash;
 	private final short[] pattern;
 	private static final short[] PATTERN_XK;
 	private static final short[] PATTERN_IK;
+	private static final short[] PATTERN_N;
 
 	static {
 		// Parse the protocol name into its components.
@@ -169,13 +174,21 @@ public class HandshakeState implements Destroyable, Cloneable {
 		PATTERN_IK = Pattern.lookup(id);
 		if (PATTERN_IK == null)
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		// N
+		components = protocolName3.split("_");
+		id = components[1];
+		if (!PATTERN_ID_N.equals(id))
+			throw new IllegalArgumentException();
+		PATTERN_N = Pattern.lookup(id);
+		if (PATTERN_N == null)
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
 	}
 
 	/**
 	 * Creates a new Noise handshake.
 	 * Noise protocol name is hardcoded.
 	 * 
-	 * @param patternId XK or IK
+	 * @param patternId XK, IK, or N
 	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER.
 	 * @param xdh The key pair factory for ephemeral keys
 	 * 
@@ -192,6 +205,10 @@ public class HandshakeState implements Destroyable, Cloneable {
 			pattern = PATTERN_XK;
 		else if (patternId.equals(PATTERN_ID_IK))
 			pattern = PATTERN_IK;
+		else if (patternId.equals(PATTERN_ID_N))
+			pattern = PATTERN_N;
+		else if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))  // same as N but no post-mixHash needed
+			pattern = PATTERN_N;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		short flags = pattern[0];
@@ -428,7 +445,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 		}
 		
 		// Hash the prologue value.
-		symmetric.mixHash(emptyPrologue, 0, 0);
+		// Now precalculated in SymmetricState.
+		//symmetric.mixHash(emptyPrologue, 0, 0);
 		
 		// Mix the pre-supplied public keys into the handshake hash.
 		if (isInitiator) {
@@ -535,6 +553,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 		// Format the message.
 		try {
 			// Process tokens until the direction changes or the patten ends.
+			loop:
 			for (;;) {
 				if (patternIndex >= pattern.length) {
 					// The pattern has finished, so the next action is "split".
@@ -614,6 +633,11 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 					case Pattern.SS:
 					{
+						// I2P N extension to IK
+						if (patternId.equals(PATTERN_ID_IK) &&
+						    localKeyPair.isNullPublicKey()) {
+							break loop;
+						}
 						// DH operation with initiator and responder static keys.
 						mixDH(localKeyPair, remotePublicKey);
 					}
@@ -628,10 +652,19 @@ public class HandshakeState implements Destroyable, Cloneable {
 			}
 			
 			// Add the payload to the message buffer and encrypt it.
-			if (payload != null)
-				messagePosn += symmetric.encryptAndHash(payload, payloadOffset, message, messagePosn, payloadLength);
-			else
-				messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, 0);
+			if (payload != null) {
+				// no need to hash for N, we don't split() and no more messages follow
+				if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
+					messagePosn += symmetric.encryptOnly(payload, payloadOffset, message, messagePosn, payloadLength);
+				else
+					messagePosn += symmetric.encryptAndHash(payload, payloadOffset, message, messagePosn, payloadLength);
+			} else {
+				// no need to hash for N, we don't split() and no more messages follow
+				if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
+					messagePosn += symmetric.encryptOnly(message, messagePosn, message, messagePosn, 0);
+				else
+					messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, 0);
+			}
 			success = true;
 		} finally {
 			// If we failed, then clear any sensitive data that may have
@@ -689,6 +722,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 		// Process the message.
 		try {
 			// Process tokens until the direction changes or the patten ends.
+			loop:
 			for (;;) {
 				if (patternIndex >= pattern.length) {
 					// The pattern has finished, so the next action is "split".
@@ -779,6 +813,11 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 					case Pattern.SS:
 					{
+						// I2P N extension to IK
+						if (patternId.equals(PATTERN_ID_IK) &&
+						    remotePublicKey.isNullPublicKey()) {
+							break loop;
+						}
 						// DH operation with initiator and responder static keys.
 						mixDH(localKeyPair, remotePublicKey);
 					}
@@ -793,7 +832,12 @@ public class HandshakeState implements Destroyable, Cloneable {
 			}
 			
 			// Decrypt the message payload.
-			int payloadLength = symmetric.decryptAndHash(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
+			int payloadLength;
+			// no need to hash for N, we don't split() and no more messages follow
+			if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
+				payloadLength = symmetric.decryptOnly(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
+			else
+				payloadLength = symmetric.decryptAndHash(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
 			success = true;
 			return payloadLength;
 		} finally {

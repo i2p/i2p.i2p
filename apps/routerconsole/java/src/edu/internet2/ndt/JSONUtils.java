@@ -1,7 +1,7 @@
 package edu.internet2.ndt;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import org.json.simple.JsonObject;
+import org.json.simple.Jsoner;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -27,8 +27,7 @@ public class JSONUtils {
 	 * @return {int} obtained value from JSON map
 	 */
 	public static String getValueFromJsonObj(String jsonTxt, String key) {
-		JSONValue jsonParser = new JSONValue();
-		Map json = (Map)jsonParser.parse(new String(jsonTxt));
+		Map json = (Map)Jsoner.deserialize(new String(jsonTxt), (JsonObject)null);
 		if (json == null)
 			return null;
 		Iterator iter = json.entrySet().iterator();
@@ -49,11 +48,12 @@ public class JSONUtils {
 	 * @return {String} json object with added value.
 	 */
 	public static String addValueToJsonObj(String jsonTxt, String key, String value) {
-		JSONValue jsonParser = new JSONValue();
-		JSONObject json = (JSONObject)jsonParser.parse(new String(jsonTxt));
+		JsonObject json = Jsoner.deserialize(new String(jsonTxt), (JsonObject)null);
+		if (json == null)
+			json = new JsonObject();
 		json.put(key, value);
 
-		return json.toJSONString();
+		return json.toJson();
 	}
 
 	/**
@@ -63,10 +63,10 @@ public class JSONUtils {
 	 * @return {byte[]} json object represented by jsontext and encodes into a sequence of bytes
 	 */
 	public static byte[] createJsonObj(byte[] msg) {
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 		obj.put("msg", new String(msg));
 
-		return obj.toJSONString().getBytes();
+		return obj.toJson().getBytes();
 	}
 
 	/**
@@ -77,9 +77,9 @@ public class JSONUtils {
 	 * @since 0.9.45
 	 */
 	public static byte[] createJsonLoginObj(byte[] msg, byte tests) {
-		JSONObject obj = new JSONObject();
+		JsonObject obj = new JsonObject();
 		obj.put("msg", new String(msg));
 		obj.put("tests", Integer.toString(tests & 0xff));
-		return obj.toJSONString().getBytes();
+		return obj.toJson().getBytes();
 	}
 }

@@ -3,7 +3,7 @@ package net.i2p.router.time;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Locale;
@@ -87,20 +87,14 @@ class Zones {
      *  ref: http://dev.maxmind.com/geoip/legacy/codes/country_continent/
      */
     private void readContinentFile() {
-        String geoDir = _context.getProperty(GeoIP.PROP_GEOIP_DIR, GeoIP.GEOIP_DIR_DEFAULT);
-        File geoFile = new File(geoDir);
-        if (!geoFile.isAbsolute())
-            geoFile = new File(_context.getBaseDir(), geoDir);
-        geoFile = new File(geoFile, CONTINENT_FILE_DEFAULT);
-        if (!geoFile.exists()) {
-            //if (_log.shouldWarn())
-            //    _log.warn("Continent file not found: " + geoFile.getAbsolutePath());
+        InputStream is = Zones.class.getResourceAsStream("/net/i2p/router/util/resources/" + CONTINENT_FILE_DEFAULT);
+        if (is == null) {
+            System.out.println("Continent file not found");
             return;
         }
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(geoFile), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             String line = null;
             while ((line = br.readLine()) != null) {
                 try {
@@ -118,8 +112,9 @@ class Zones {
                 } catch (IndexOutOfBoundsException ioobe) {}
             }
         } catch (IOException ioe) {
-            System.out.println("Error reading the continent file " + geoFile.getAbsolutePath());
+            System.out.println("Error reading the continent file");
         } finally {
+            try { is.close(); } catch (IOException ioe) {}
             if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
     }

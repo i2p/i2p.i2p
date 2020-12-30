@@ -51,6 +51,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * after they're complete, sort via kademlia.
      * Puts the floodfill peers that are directly connected first in the list.
      * List will not include our own hash.
+     * Returns new list, may be modified.
      *
      * @param key the ROUTING key (NOT the original key)
      * @param peersToIgnore can be null
@@ -66,6 +67,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * after they're complete, sort via kademlia.
      * Does not prefer the floodfill peers that are directly connected.
      * List will not include our own hash.
+     * Returns new list, may be modified.
      *
      * @param key the ROUTING key (NOT the original key)
      * @param peersToIgnore can be null
@@ -80,6 +82,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * Pick out peers with the floodfill capacity set, returning them first, but then
      * after they're complete, sort via kademlia.
      * List will not include our own hash.
+     * Returns new list, may be modified.
      *
      * @param key the ROUTING key (NOT the original key)
      * @param peersToIgnore can be null
@@ -103,10 +106,12 @@ class FloodfillPeerSelector extends PeerSelector {
     }
     
     /**
-     *  @param kbuckets now unused
-     *  @return all floodfills not banlisted forever.
      *  List will not include our own hash.
      *  List is not sorted and not shuffled.
+     *  Returns new list, may be modified.
+     *
+     *  @param kbuckets now unused
+     *  @return all floodfills not banlisted forever.
      */
     List<Hash> selectFloodfillParticipants(KBucketSet<Hash> kbuckets) {
         Set<Hash> ignore = Collections.singleton(_context.routerHash());
@@ -114,11 +119,13 @@ class FloodfillPeerSelector extends PeerSelector {
     }
 
     /**
+     *  List MAY INCLUDE our own hash.
+     *  List is not sorted and not shuffled.
+     *  Returns new list, may be modified.
+     *
      *  @param kbuckets now unused
      *  @param toIgnore can be null
      *  @return all floodfills not banlisted forever.
-     *  List MAY INCLUDE our own hash.
-     *  List is not sorted and not shuffled.
      */
     private List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet<Hash> kbuckets) {
       /*****
@@ -145,6 +152,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  at the front and the bad ones at the back. If they are all good or bad,
      *  searches and stores won't work well.
      *  List will not include our own hash.
+     *  Returns new list, may be modified.
      *
      *  @return floodfills closest to the key that are not banlisted forever
      *  @param key the ROUTING key (NOT the original key)
@@ -180,6 +188,8 @@ class FloodfillPeerSelector extends PeerSelector {
     /**
      *  See above for description
      *  List will not include our own hash
+     *  Returns new list, may be modified.
+     *
      *  @param key the ROUTING key (NOT the original key)
      *  @param toIgnore can be null
      *  @param kbuckets now unused
@@ -198,18 +208,16 @@ class FloodfillPeerSelector extends PeerSelector {
     /**
      *  See above for description
      *  List MAY CONTAIN our own hash unless included in toIgnore
+     *  Returns new list, may be modified.
+     *
      *  @param key the ROUTING key (NOT the original key)
      *  @param toIgnore can be null
      *  @param kbuckets now unused
      */
     private List<Hash> selectFloodfillParticipantsIncludingUs(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet<Hash> kbuckets) {
-        List<Hash> ffs = selectFloodfillParticipants(toIgnore, kbuckets);
-        TreeSet<Hash> sorted = new TreeSet<Hash>(new XORComparator<Hash>(key));
-        sorted.addAll(ffs);
+        List<Hash> sorted = selectFloodfillParticipants(toIgnore, kbuckets);
+        Collections.sort(sorted, new XORComparator<Hash>(key));
 
-        List<Hash> rv = new ArrayList<Hash>(howMany);
-        List<Hash> okff = new ArrayList<Hash>(ffs.size());
-        List<Hash> badff = new ArrayList<Hash>(ffs.size());
         int found = 0;
         long now = _context.clock().now();
         long installed = _context.getProperty("router.firstInstalled", 0L);
@@ -228,15 +236,17 @@ class FloodfillPeerSelector extends PeerSelector {
         }
 
         // 5 == FNDF.MAX_TO_FLOOD + 1
-        int limit = Math.max(5, howMany);
-        limit = Math.min(limit, ffs.size());
+        int limit = Math.max(5, howMany + 2);
+        limit = Math.min(limit, sorted.size());
         MaskedIPSet maskedIPs = new MaskedIPSet(limit * 3);
         // split sorted list into 3 sorted lists
+        List<Hash> rv = new ArrayList<Hash>(howMany);
+        List<Hash> okff = new ArrayList<Hash>(limit);
+        List<Hash> badff = new ArrayList<Hash>(limit);
         for (int i = 0; found < howMany && i < limit; i++) {
-            Hash entry = sorted.first();
+            Hash entry = sorted.get(i);
             if (entry == null)
                 break;  // shouldn't happen
-            sorted.remove(entry);
             // put anybody in the same /16 at the end
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
             MaskedIPSet entryIPs = new MaskedIPSet(_context, entry, info, 2);
@@ -312,7 +322,7 @@ class FloodfillPeerSelector extends PeerSelector {
             }
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Good: " + rv + " OK: " + okff + " Bad: " + badff);
+            _log.info("Wanted: " + howMany + " Good: " + rv + " OK: " + okff + " Bad: " + badff);
 
         // Put the ok floodfills after the good floodfills
         for (int i = 0; found < howMany && i < okff.size(); i++) {

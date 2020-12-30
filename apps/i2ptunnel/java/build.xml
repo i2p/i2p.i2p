@@ -28,7 +28,8 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="require.gettext" value="true" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
@@ -40,6 +41,7 @@
             srcdir="./src" 
             excludes="net/i2p/i2ptunnel/web/**/*"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/obj" 
             includeAntRuntime="false"
             encoding="UTF-8"
@@ -56,6 +58,7 @@
             srcdir="./src" 
             includes="net/i2p/i2ptunnel/web/**/*"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             destdir="./build/obj" 
             includeAntRuntime="false"
             encoding="UTF-8"
@@ -83,7 +86,12 @@
     <target name="jar" depends="builddep, compile, bundle-proxy, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
-        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" excludes="**/ui/*.class **/web/*.class" >
+        <mkdir dir="./build/obj/net/i2p/i2ptunnel/resources"/>
+        <copy todir="./build/obj/net/i2p/i2ptunnel/resources">
+            <fileset dir="../../routerconsole/jsp/" includes="themes/console/*/*.css themes/console/images/i2plogo.png themes/console/images/favicon.ico themes/console/images/itoopie_sm.png" />
+            <fileset dir="../resources" includes="**/*.ht" />
+        </copy>
+        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" excludes="**/ui/*.class **/web/*.class" >
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
                 <attribute name="${manifest.classpath.name}" value="i2p.jar mstreaming.jar" />
@@ -167,6 +175,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="../jsp/WEB-INF/classes">
@@ -212,6 +221,7 @@
             <arg value="./bundle-messages-proxy.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-proxy-src" destdir="build/obj">
@@ -225,7 +235,7 @@
                 <pathelement location="../../../build/i2p.jar" />
             </classpath>
             <arg value="tag" />
-            <arg value="../../../installer/resources/proxy/" />
+            <arg value="../resources/proxy/" />
             <arg value="build/Proxy.java" />
         </java>
     </target>
@@ -350,6 +360,7 @@
             <arg value="../jsp/" />
         </java>
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
@@ -415,6 +426,7 @@
         <mkdir dir="./build/obj" />
         <!-- We need the ant runtime, as it includes junit -->
         <javac srcdir="./src:./test/junit" debug="true" source="${javac.version}" target="${javac.version}"
+               release="${javac.release}"
                includeAntRuntime="true"
                encoding="UTF-8"
                deprecation="on" destdir="./build/obj" >

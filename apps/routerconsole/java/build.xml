@@ -48,7 +48,8 @@
 
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <target name="compile" depends="prepare, depend, dependVersion">
@@ -57,6 +58,7 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj">
@@ -95,6 +97,7 @@
             srcdir="./src" 
             includes="net/i2p/router/news/*.java"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj">
@@ -137,7 +140,11 @@
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_nl_NL.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_nl.properties" />
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_pt_BR.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_pt.properties" />
         <copy file="src/edu/internet2/ndt/locale/Tcpbw100_msgs_ru_RU.properties" tofile="build/obj/edu/internet2/ndt/locale/Tcpbw100_msgs_ru.properties" />
-        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*">
+        <mkdir dir="build/obj/net/i2p/router/news/resources" />
+        <copy todir="build/obj/net/i2p/router/news/resources" >
+            <fileset dir="../resources-news" />
+        </copy>
+        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/**/* net/i2p/router/web/servlets/**/* net/i2p/router/web/resources/**/*">
             <manifest>
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <!-- very old installs don't have i2psnark,jstl,standard in the classpath... not added in WebAppConfiguration any more -->
@@ -157,7 +164,11 @@
 
     <!-- newsxml.jar only (subset of routerconsole, no war) for Android -->
     <target name="newsxmljar" depends="compileNewsOnly" >
-        <jar destfile="./build/newsxml.jar" basedir="./build/obj" includes="**/*.class">
+        <mkdir dir="build/obj/net/i2p/router/news/resources" />
+        <copy todir="build/obj/net/i2p/router/news/resources" >
+            <fileset dir="../resources-news" />
+        </copy>
+        <jar destfile="./build/newsxml.jar" basedir="./build/obj" includes="net/i2p/router/news/**/*" >
         </jar>
     </target>
 
@@ -178,6 +189,7 @@
             <arg value="./bundle-messages.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-src" destdir="build/obj">
@@ -236,6 +248,7 @@
             <arg value="./bundle-messages-news.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-news-src" destdir="build/obj">
@@ -256,6 +269,7 @@
             <arg value="./bundle-messages-countries.sh" />
         </exec>
         <javac source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                includeAntRuntime="false"
                encoding="UTF-8"
                srcdir="build/messages-countries-src" destdir="build/obj">
@@ -332,9 +346,13 @@
     <target name="war" depends="precompilejsp, warUpToDate, listChangedFiles2" unless="war.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.w.tr" value="" />
-        <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
+        <copy file="../jsp/themes/console/images/favicon.ico" tofile="../jsp/favicon.ico" />
+        <mkdir dir="build/obj/net/i2p/router/web/resources" />
+        <copy todir="build/obj/net/i2p/router/web/resources" >
+            <fileset dir="../resources" />
+        </copy>
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
-             basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
+             basedir="../jsp/" excludes="web.xml, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
@@ -344,8 +362,9 @@
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
-            <classes dir="./build/obj" includes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/*" />
+            <classes dir="./build/obj" includes="net/i2p/router/web/helpers/* net/i2p/router/web/servlets/* net/i2p/router/web/resources/**/*" />
         </war>
+        <delete file="../jsp/favicon.ico" />
     </target>
 
     <target name="warUpToDate">
@@ -471,6 +490,7 @@
         </java>
         
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+               release="${javac.release}"
                encoding="UTF-8"
                includeAntRuntime="false"
                destdir="../jsp/WEB-INF/classes/" 
@@ -671,6 +691,7 @@
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
         <delete file="../jsp/web-out.xml" />
+        <delete file="../jsp/favicon.ico" />
     </target>
     <target name="cleandep" depends="clean">
     </target>

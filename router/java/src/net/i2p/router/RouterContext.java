@@ -9,7 +9,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
+import net.i2p.crypto.EncType;
 import net.i2p.data.Hash;
+import net.i2p.data.PublicKey;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
@@ -17,6 +19,8 @@ import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.crypto.ElGamalAESEngine;
 import net.i2p.router.crypto.ratchet.ECIESAEADEngine;
+import net.i2p.router.crypto.ratchet.MuxedSKM;
+import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
 import net.i2p.router.message.GarlicMessageParser;
@@ -629,16 +633,25 @@ public class RouterContext extends I2PAppContext {
 
     /**
      *  As of 0.9.15, this returns a dummy SessionKeyManager in I2PAppContext.
-     *  Overridden in RouterContext to return the full TransientSessionKeyManager.
+     *  Overridden in RouterContext to return the full TransientSessionKeyManager
+     *  or MuxedSKM, depending on configured router encryption type.
      *
      *  @since 0.9.15
      */
     @Override
     protected void initializeSessionKeyManager() {
         synchronized (_lock3) {
-            if (_sessionKeyManager == null) 
-                //_sessionKeyManager = new PersistentSessionKeyManager(this);
-                _sessionKeyManager = new TransientSessionKeyManager(this);
+            if (_sessionKeyManager == null) {
+                PublicKey pk = keyManager().getPublicKey();
+                if (pk != null && pk.getType() == EncType.ECIES_X25519) {
+                    RatchetSKM rskm = new RatchetSKM(this);
+                    //_sessionKeyManager = new MuxedSKM(tskm, rskm);
+                    _sessionKeyManager = rskm;
+                } else {
+                    TransientSessionKeyManager tskm = new TransientSessionKeyManager(this);
+                    _sessionKeyManager = tskm;
+                }
+            }
             _sessionKeyManagerInitialized = true;
         }
     }
@@ -705,5 +718,25 @@ public class RouterContext extends I2PAppContext {
      */
     public ECIESAEADEngine eciesEngine() {
         return _eciesEngine;
+    }
+
+    /** 
+     *  How long this router was down before it started, or 0 if unknown.
+     *
+     *  This may be used for a determination of whether to regenerate keys, for example.
+     *  We use the timestamp of the previous ping file left behind on crash,
+     *  as set by isOnlyRouterRunning(), if present.
+     *  Otherwise, the last STOPPED entry in the event log.
+     *
+     *  May take a while to run the first time, if it has to go through the event log.
+     *  Once called, the result is cached.
+     *
+     *  @return downtime in ms or 0 if unknown
+     *  @since 0.0.47
+     */
+    public long getEstimatedDowntime() {
+        if (_router == null)
+            return 0L;
+        return _router.getEstimatedDowntime();
     }
 }

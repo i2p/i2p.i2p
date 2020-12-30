@@ -132,10 +132,6 @@ public class EditBean extends IndexBean {
         return _helper.shouldStartAutomatically(tunnel);
     }
     
-    public boolean isSharedClient(int tunnel) {
-        return _helper.isSharedClient(tunnel);
-    }
-    
     public boolean shouldDelay(int tunnel) {
         return _helper.shouldDelayConnect(tunnel);
     }
@@ -252,10 +248,32 @@ public class EditBean extends IndexBean {
 
     /** @since 0.9.33 */
     public boolean canChangeSigType(int tunnel) {
+        if (!canChangeEncType(tunnel))
+            return false;
+        return getDestination(tunnel) == null;
+    }
+
+    /** @since 0.9.46 */
+    public boolean canChangeEncType(int tunnel) {
         if (tunnel < 0)
             return true;
-        if (getDestination(tunnel) != null)
+        if (getTunnelStatus(tunnel) != GeneralHelper.NOT_RUNNING)
             return false;
+        if (isInitialized() && isSharedClient(tunnel)) {
+            for (TunnelController tc : _group.getControllers()) {
+                if (tc.isClient() &&
+                    Boolean.parseBoolean(tc.getSharedClient()) &&
+                    (tc.getIsRunning() || tc.getIsStarting()))
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** @since 0.9.46 */
+    public boolean canChangePort(int tunnel) {
+        if (tunnel < 0)
+            return true;
         return getTunnelStatus(tunnel) == GeneralHelper.NOT_RUNNING;
     }
 
@@ -272,19 +290,23 @@ public class EditBean extends IndexBean {
      *  @since 0.9.18
      */
     public String getKey1(int tunnel) {
-        return _helper.getInboundRandomKey(tunnel);
+        String v = _helper.getInboundRandomKey(tunnel);
+        return encrypt(tunnel, "inbound.randomKey", v);
     }
 
     public String getKey2(int tunnel) {
-        return _helper.getOutboundRandomKey(tunnel);
+        String v = _helper.getOutboundRandomKey(tunnel);
+        return encrypt(tunnel, "outbound.randomKey", v);
     }
 
     public String getKey3(int tunnel) {
-        return _helper.getLeaseSetSigningPrivateKey(tunnel);
+        String v = _helper.getLeaseSetSigningPrivateKey(tunnel);
+        return encrypt(tunnel, "i2cp.leaseSetSigningPrivateKey", v);
     }
 
     public String getKey4(int tunnel) {
-        return _helper.getLeaseSetPrivateKey(tunnel);
+        String v = _helper.getLeaseSetPrivateKey(tunnel);
+        return encrypt(tunnel, "i2cp.leaseSetPrivateKey", v);
     }
 
     /** @since 0.8.9 */
@@ -508,8 +530,8 @@ public class EditBean extends IndexBean {
     public String getQuantityOptions(int tunnel, int mode) {
         int tunnelQuantity = mode == 2 ? getTunnelQuantityOut(tunnel, DFLT_QUANTITY)
                                        : getTunnelQuantity(tunnel, DFLT_QUANTITY);
-        boolean advanced = _context.getBooleanProperty(PROP_ADVANCED);
-        int maxQuantity = advanced ? MAX_ADVANCED_QUANTITY :
+        boolean adv = isAdvanced();
+        int maxQuantity = adv ? MAX_ADVANCED_QUANTITY :
                                      (isClient(tunnel) ? MAX_CLIENT_QUANTITY : MAX_SERVER_QUANTITY);
         if (tunnelQuantity > maxQuantity)
             maxQuantity = tunnelQuantity;
@@ -525,7 +547,7 @@ public class EditBean extends IndexBean {
                  buf.append(ngettext("{0} outbound tunnel", "{0} outbound tunnels", i));
              else
                  buf.append(ngettext("{0} inbound, {0} outbound tunnel", "{0} inbound, {0} outbound tunnels", i));
-             if (i <= 3) {
+             if (i <= 3 && !adv) {
                  buf.append(" (");
                  if (i == 1)
                      buf.append(_t("lower bandwidth and reliability"));
@@ -538,5 +560,15 @@ public class EditBean extends IndexBean {
              buf.append("</option>\n");
         }
         return buf.toString();
+    }
+
+    /**
+     *  @return translated s or ""
+     *  @since 0.9.47
+     */
+    public String unlessAdvanced(String s) {
+        if (isAdvanced())
+            return "";
+        return " (" + _t(s) + ')';
     }
 }

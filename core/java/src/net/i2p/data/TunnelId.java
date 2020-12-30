@@ -22,9 +22,15 @@ import java.io.OutputStream;
  * as the DatabaseStoreMessage uses a zero ID to request
  * a direct reply.
  *
+ * 4 bytes, usually of random data.
+ *
+ * Not recommended for external use, subject to change.
+ *
+ * As of 0.9.48, does NOT extend DataStructureImpl, to save space
+ *
  * @author jrandom
  */
-public class TunnelId extends DataStructureImpl {
+public class TunnelId {
     private long _tunnelId;
     
     public static final long MAX_ID_VALUE = 0xffffffffL;
@@ -60,26 +66,6 @@ public class TunnelId extends DataStructureImpl {
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_tunnelId < 0) throw new DataFormatException("Invalid tunnel ID: " + _tunnelId);
         DataHelper.writeLong(out, 4, _tunnelId);
-    }
-
-    /**
-     * Overridden for efficiency.
-     */
-    @Override
-    public byte[] toByteArray() {
-        return DataHelper.toLong(4, _tunnelId);
-    }
-
-    /**
-     * Overridden for efficiency.
-     * @param data non-null
-     * @throws DataFormatException if null or wrong length
-     */
-    @Override
-    public void fromByteArray(byte data[]) throws DataFormatException {
-        if (data == null) throw new DataFormatException("Null data passed in");
-        if (data.length != 4) throw new DataFormatException("Bad data length");
-        _tunnelId = (int) DataHelper.fromLong(data, 0, 4);
     }
 
     @Override

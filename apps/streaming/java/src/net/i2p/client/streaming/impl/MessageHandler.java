@@ -2,6 +2,7 @@ package net.i2p.client.streaming.impl;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
@@ -22,7 +23,7 @@ class MessageHandler implements I2PSessionMuxedListener {
     private final I2PAppContext _context;
     private final Log _log;
     private final Set<I2PSocketManager.DisconnectListener> _listeners;
-    private boolean _restartPending;
+    private final AtomicBoolean _restartPending = new AtomicBoolean();
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
@@ -109,9 +110,8 @@ class MessageHandler implements I2PSessionMuxedListener {
             _log.warn("I2PSession disconnected");
         _manager.disconnectAllHard();
         // kill anybody waiting in accept()
-        if (_restartPending) {
+        if (_restartPending.compareAndSet(true, false)) {
             _manager.getConnectionHandler().setRestartPending();
-            _restartPending = false;
         } else {
             _manager.getConnectionHandler().setActive(false);
         }
@@ -130,7 +130,7 @@ class MessageHandler implements I2PSessionMuxedListener {
      * @param error the actual error
      */
     public void errorOccurred(I2PSession session, String message, Throwable error) {
-        _restartPending = message.contains("restart");
+        _restartPending.set(message.contains("restart"));
         if (_log.shouldLog(Log.WARN))
             _log.warn("error occurred: " + message, error); 
         //_manager.disconnectAllHard();

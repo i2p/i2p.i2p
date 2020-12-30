@@ -45,14 +45,17 @@ package net.i2p.router.crypto.ratchet;
  * <code>keyAt(int)</code> with ascending values of the index returns the
  * keys in ascending order. In the case of <code>valueAt(int)</code>, the
  * values corresponding to the keys are returned in ascending order.
+ *
+ * I2P - as of 0.9.48, changed to use chars for the index, max value 65535
+ *
  */
 class SparseArray<E> implements Cloneable {
-    private static final int[] EMPTY_INTS = new int[0];
+    private static final char[] EMPTY_CHARS = new char[0];
     private static final Object[] EMPTY_OBJECTS = new Object[0];
     private static final Object DELETED = new Object();
     private boolean mGarbage = false;
 
-    private int[] mKeys;
+    private char[] mKeys;
     private Object[] mValues;
     private int mSize;
 
@@ -72,11 +75,11 @@ class SparseArray<E> implements Cloneable {
      */
     public SparseArray(int initialCapacity) {
         if (initialCapacity == 0) {
-            mKeys = EMPTY_INTS;
+            mKeys = EMPTY_CHARS;
             mValues = EMPTY_OBJECTS;
         } else {
             mValues = ArrayUtils.newUnpaddedObjectArray(initialCapacity);
-            mKeys = new int[mValues.length];
+            mKeys = new char[mValues.length];
         }
         mSize = 0;
     }
@@ -106,10 +109,14 @@ class SparseArray<E> implements Cloneable {
     /**
      * Gets the Object mapped from the specified key, or the specified Object
      * if no such mapping has been made.
+     *
+     * @param key 0 MIN, 65535 MAX
      */
     @SuppressWarnings("unchecked")
     public E get(int key, E valueIfKeyNotFound) {
-        int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+        if (key < 0 || key > 65535)
+            return valueIfKeyNotFound;
+        int i = ContainerHelpers.binarySearch(mKeys, mSize, (char) key);
 
         if (i < 0 || mValues[i] == DELETED) {
             return valueIfKeyNotFound;
@@ -120,9 +127,13 @@ class SparseArray<E> implements Cloneable {
 
     /**
      * Removes the mapping from the specified key, if there was any.
+     *
+     * @param key 0 MIN, 65535 MAX
      */
     public void delete(int key) {
-        int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+        if (key < 0 || key > 65535)
+            return;
+        int i = ContainerHelpers.binarySearch(mKeys, mSize, (char) key);
 
         if (i >= 0) {
             if (mValues[i] != DELETED) {
@@ -134,10 +145,14 @@ class SparseArray<E> implements Cloneable {
 
     /**
      * Removes the mapping from the specified key, if there was any, returning the old value.
+     *
+     * @param key 0 MIN, 65535 MAX
      */
     @SuppressWarnings("unchecked")
     public E removeReturnOld(int key) {
-        int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+        if (key < 0 || key > 65535)
+            return null;
+        int i = ContainerHelpers.binarySearch(mKeys, mSize, (char) key);
 
         if (i >= 0) {
             if (mValues[i] != DELETED) {
@@ -197,7 +212,7 @@ class SparseArray<E> implements Cloneable {
 
         int n = mSize;
         int o = 0;
-        int[] keys = mKeys;
+        char[] keys = mKeys;
         Object[] values = mValues;
 
         for (int i = 0; i < n; i++) {
@@ -224,9 +239,13 @@ class SparseArray<E> implements Cloneable {
      * Adds a mapping from the specified key to the specified value,
      * replacing the previous mapping from the specified key if there
      * was one.
+     *
+     * @param key 0 MIN, 65535 MAX
      */
     public void put(int key, E value) {
-        int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+        if (key < 0 || key > 65535)
+            throw new IllegalArgumentException();
+        int i = ContainerHelpers.binarySearch(mKeys, mSize, (char) key);
 
         if (i >= 0) {
             mValues[i] = value;
@@ -234,7 +253,7 @@ class SparseArray<E> implements Cloneable {
             i = ~i;
 
             if (i < mSize && mValues[i] == DELETED) {
-                mKeys[i] = key;
+                mKeys[i] = (char) key;
                 mValues[i] = value;
                 return;
             }
@@ -243,10 +262,10 @@ class SparseArray<E> implements Cloneable {
                 gc();
 
                 // Search again because indices may have changed.
-                i = ~ContainerHelpers.binarySearch(mKeys, mSize, key);
+                i = ~ContainerHelpers.binarySearch(mKeys, mSize, (char) key);
             }
 
-            mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, key);
+            mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, (char) key);
             mValues = GrowingArrayUtils.insert(mValues, mSize, i, value);
             mSize++;
         }
@@ -346,13 +365,17 @@ class SparseArray<E> implements Cloneable {
      * Returns the index for which {@link #keyAt} would return the
      * specified key, or a negative number if the specified
      * key is not mapped.
+     *
+     * @param key 0 MIN, 65535 MAX
      */
     public int indexOfKey(int key) {
+        if (key < 0 || key > 65535)
+            return -1;
         if (mGarbage) {
             gc();
         }
 
-        return ContainerHelpers.binarySearch(mKeys, mSize, key);
+        return ContainerHelpers.binarySearch(mKeys, mSize, (char) key);
     }
 
     /**
@@ -425,8 +448,12 @@ class SparseArray<E> implements Cloneable {
     /**
      * Puts a key/value pair into the array, optimizing for the case where
      * the key is greater than all existing keys in the array.
+     *
+     * @param key 0 MIN, 65535 MAX
      */
     public void append(int key, E value) {
+        if (key < 0 || key > 65535)
+            throw new IllegalArgumentException();
         if (mSize != 0 && key <= mKeys[mSize - 1]) {
             put(key, value);
             return;
@@ -436,7 +463,7 @@ class SparseArray<E> implements Cloneable {
             gc();
         }
 
-        mKeys = GrowingArrayUtils.append(mKeys, mSize, key);
+        mKeys = GrowingArrayUtils.append(mKeys, mSize, (char) key);
         mValues = GrowingArrayUtils.append(mValues, mSize, value);
         mSize++;
     }

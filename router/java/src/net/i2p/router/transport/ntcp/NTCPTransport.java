@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.EncType;
@@ -138,6 +137,7 @@ public class NTCPTransport extends TransportImpl {
     private static final int NTCP2_IV_LEN = OutboundNTCP2State.IV_SIZE;
     private static final int NTCP2_KEY_LEN = OutboundNTCP2State.KEY_SIZE;
     private static final long MIN_DOWNTIME_TO_REKEY = 30*24*60*60*1000L;
+    private static final long MIN_DOWNTIME_TO_REKEY_HIDDEN = 24*60*60*1000L;
     private final boolean _enableNTCP1;
     private final boolean _enableNTCP2;
     private final byte[] _ntcp2StaticPubkey;
@@ -253,12 +253,8 @@ public class NTCPTransport extends TransportImpl {
             String b64IV = null;
             String s = null;
             // try to determine if we've been down for 30 days or more
-            // no stopping, no crashes, and only one start (this one)
-            EventLog el = _context.router().eventLog();
-            long since = _context.clock().now() - MIN_DOWNTIME_TO_REKEY;
-            boolean shouldRekey = el.getEvents(EventLog.STOPPED, since).isEmpty() &&
-                                  el.getEvents(EventLog.CRASHED, since).isEmpty() &&
-                                  el.getEvents(EventLog.STARTED, since).size() <= 1;
+            long minDowntime = _context.router().isHidden() ? MIN_DOWNTIME_TO_REKEY_HIDDEN : MIN_DOWNTIME_TO_REKEY;
+            boolean shouldRekey = _context.getEstimatedDowntime() >= minDowntime;
             if (!shouldRekey) {
                 s = ctx.getProperty(PROP_NTCP2_SP);
                 if (s != null) {
@@ -537,6 +533,8 @@ public class NTCPTransport extends TransportImpl {
         }
         if (toAddress.getNetworkId() != _networkID) {
             _context.banlist().banlistRouterForever(peer, "Not in our network: " + toAddress.getNetworkId());
+            if (_log.shouldWarn())
+                _log.warn("Not in our network: " + toAddress, new Exception());
             markUnreachable(peer);
             return null;    
         }
@@ -787,12 +785,12 @@ public class NTCPTransport extends TransportImpl {
 
     /**
      * Return our peer clock skews on this transport.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * A positive number means our clock is ahead of theirs.
      */
     @Override
-    public Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector<Long>();
+    public List<Long> getClockSkews() {
+        List<Long> skews = new ArrayList<Long>(_conByIdent.size());
         // Omit ones established too long ago,
         // since the skew is only set at startup (or after a meta message)
         // and won't include effects of later offset adjustments
@@ -801,13 +799,13 @@ public class NTCPTransport extends TransportImpl {
         for (NTCPConnection con : _conByIdent.values()) {
             // TODO skip isEstablished() check?
             if (con.isEstablished() && con.getCreated() > tooOld)
-                skews.addElement(Long.valueOf(con.getClockSkew()));
+                skews.add(Long.valueOf(con.getClockSkew()));
         }
 
         // If we don't have many peers, maybe it is because of a bad clock, so
         // return the last bad skew we got
         if (skews.size() < 5 && _lastBadSkew != 0)
-            skews.addElement(Long.valueOf(_lastBadSkew));
+            skews.add(Long.valueOf(_lastBadSkew));
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");

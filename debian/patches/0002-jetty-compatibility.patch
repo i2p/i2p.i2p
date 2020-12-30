@@ -23,39 +23,9 @@
      protected void sendDirectory(HttpServletRequest request,
              HttpServletResponse response,
              Resource resource,
---- a/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
-+++ b/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
-@@ -317,7 +317,7 @@
-                 buf.append(request.getMethod());
-                 buf.append(' ');
-                 
--                request.getUri().writeTo(u8buf);
-+                u8buf.append(request.getHttpURI().toString());
-                 
-                 buf.append(' ');
-                 buf.append(request.getProtocol());
---- a/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
-+++ b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
-@@ -15,7 +15,7 @@
- import net.i2p.util.PortMapper;
- 
- import org.eclipse.jetty.server.Request;
--import org.eclipse.jetty.servlets.gzip.GzipHandler;
-+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
- 
- /**
-  * Block certain Host headers to prevent DNS rebinding attacks.
 --- a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
-@@ -22,6 +22,7 @@
- import java.util.SortedSet;
- import java.util.StringTokenizer;
- import java.util.concurrent.LinkedBlockingQueue;
-+import javax.servlet.ServletRequest;
- 
- import net.i2p.I2PAppContext;
- import net.i2p.app.ClientApp;
-@@ -48,6 +49,7 @@
+@@ -49,6 +50,7 @@
  import org.eclipse.jetty.security.HashLoginService;
  import org.eclipse.jetty.security.ConstraintMapping;
  import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -63,7 +33,7 @@
  import org.eclipse.jetty.security.authentication.DigestAuthenticator;
  import org.eclipse.jetty.server.AbstractConnector;
  import org.eclipse.jetty.server.ConnectionFactory;
-@@ -959,6 +961,8 @@
+@@ -989,6 +991,8 @@
              } else {
                  HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
                                                                      ctx.logManager().getLog(RouterConsoleRunner.class));
@@ -72,7 +42,7 @@
                  sec.setLoginService(realm);
                  sec.setAuthenticator(authenticator);
                  String[] role = new String[] {JETTY_ROLE};
-@@ -966,7 +970,7 @@
+@@ -996,7 +1000,7 @@
                      String user = e.getKey();
                      String pw = e.getValue();
                      Credential cred = Credential.getCredential(MD5_CREDENTIAL_TYPE + pw);
@@ -81,7 +51,7 @@
                      Constraint constraint = new Constraint(user, JETTY_ROLE);
                      constraint.setAuthenticate(true);
                      ConstraintMapping cm = new ConstraintMapping();
-@@ -986,7 +990,7 @@
+@@ -1016,7 +1020,7 @@
                          try {
                              // each char truncated to 8 bytes
                              String user2 = new String(b2, "ISO-8859-1");
@@ -90,7 +60,7 @@
                              constraint = new Constraint(user2, JETTY_ROLE);
                              constraint.setAuthenticate(true);
                              cm = new ConstraintMapping();
-@@ -997,7 +1001,7 @@
+@@ -1027,7 +1031,7 @@
                              // each UTF-8 byte as a char
                              // this is what chrome does
                              String user3 = new String(b1, "ISO-8859-1");
@@ -99,20 +69,9 @@
                              constraint = new Constraint(user3, JETTY_ROLE);
                              constraint.setAuthenticate(true);
                              cm = new ConstraintMapping();
-@@ -1072,8 +1076,8 @@
-         }
- 
-         @Override
--        public UserIdentity login(String username, Object credentials) {
--            UserIdentity rv = super.login(username, credentials);
-+        public UserIdentity login(String username, Object credentials, ServletRequest request) {
-+            UserIdentity rv = super.login(username, credentials, request);
-             if (rv == null)
-                 //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
-                 _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);
 --- a/apps/routerconsole/java/src/net/i2p/router/web/LocaleWebAppHandler.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/LocaleWebAppHandler.java
-@@ -85,9 +85,9 @@
+@@ -87,9 +87,9 @@
                      String testPath = pathInContext.substring(0, len - 4) + '_' + lang + ".jsp";
                      // Do we have a servlet for the new path that isn't the catchall *.jsp?
                      @SuppressWarnings("rawtypes")
@@ -124,48 +83,3 @@
                          if (servletPath != null && !servletPath.startsWith("*")) {
                              // success!!
                              //System.err.println("Servlet is: " + servletPath);
---- a/installer/resources/eepsite/contexts/base-context.xml
-+++ b/installer/resources/eepsite/contexts/base-context.xml
-@@ -42,42 +42,5 @@ to serve static html files and images.
-     <Arg>net.i2p.servlet.I2PDefaultServlet</Arg>
-     <Arg>/</Arg>
-   </Call>
--  <Call name="addFilter">
--    <!-- Add a filter to gzip on-the fly, since if we don't do it, I2P will.
--      -  This lowers the resource usage in the Java process on the client side,
--      -  by pushing the decompression out of Java and into the browser.
--      -  For all the reasons noted in the GzipFilter javadocs, this is normally
--      -  a bad idea for static content, but this is I2P.
--      -  See I2PTunnelHTTPServer for the I2P compressor.
--      -->
--    <Arg>
--      <New class="org.eclipse.jetty.servlet.FilterHolder" >
--        <Arg>
--          <New class="org.eclipse.jetty.servlets.GzipFilter" />
--        </Arg>
--        <Call name="setInitParameter">
--          <!-- minimum in Java is 1300 -->
--          <Arg>minGzipSize</Arg>
--          <Arg>512</Arg>
--        </Call>
--        <Call name="setInitParameter">
--          <!-- In Java we have a blacklist. This covers the most common cases. -->
--          <Arg>mimeTypes</Arg>
--          <Arg>application/pdf,application/x-javascript,application/xhtml+xml,application/xml,image/svg+xml,text/css,text/html,text/plain</Arg>
--        </Call>
--      </New>
--    </Arg>
--    <Arg>/*</Arg>
--    <Arg>
--      <!-- just guessing here -->
--      <Call class="java.util.EnumSet" name="of" >
--        <Arg>
--          <Call class="javax.servlet.DispatcherType" name="valueOf" >
--            <Arg>REQUEST</Arg>
--          </Call>
--        </Arg>
--      </Call>
--    </Arg>
--  </Call>
- </Configure>
- 

@@ -6,13 +6,13 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * Response to DestLookupMessage.
@@ -76,7 +76,7 @@ public class DestReplyMessage extends I2CPMessageImpl {
                 return new byte[0];  // null response allowed
             return _hash.getData();
         }
-        ByteArrayOutputStream os = new ByteArrayOutputStream(_dest.size());
+        ByteArrayStream os = new ByteArrayStream(_dest.size());
         try {
             _dest.writeBytes(os);
         } catch (DataFormatException dfe) {

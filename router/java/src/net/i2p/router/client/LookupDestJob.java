@@ -154,6 +154,7 @@ class LookupDestJob extends JobImpl {
                 if (_log.shouldDebug())
                     _log.debug("Failed b33 lookup " + _blindData.getUnblindedPubKey() + " with code " + code);
                 returnFail(code);
+                return;
             }
             // do this after the fail checks above, because even if we
             // have the dest, it won't help get a LS.

@@ -92,7 +92,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                          "\r\n";
     // ESR version of Firefox, same as Tor Browser
     private static final String UA_CLEARNET = "User-Agent: " +
-                                              "Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0" +
+                                              "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0" +
                                               "\r\n";
     // overrides
     private static final String PROP_UA_I2P = "httpclient.userAgent.i2p";
@@ -1460,7 +1460,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 "<h4>" + _t("Save {0} to router address book and continue to website", destination) + "</h4>\n<p>" +
                 _t("This address will be saved to your Router address book where your subscription-based addresses are stored."));
         if(_context.namingService().getName().equals("BlockfileNamingService")) {
-            out.write(" " + _t("If you want to keep track of sites you have added manually, add to your Master or Private address book instead."));
+            out.write(" " + _t("If you want to keep track of sites you have added manually, add to your Local or Private address book instead."));
         }
         // FIXME wasn't escaped
         String label = _t("Save & continue").replace("&", "&amp;");
@@ -1470,9 +1470,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         if(_context.namingService().getName().equals("BlockfileNamingService")) {
             // only blockfile supports multiple books
 
-            out.write("<h4>" + _t("Save {0} to master address book and continue to website", destination) + "</h4>\n<p>" +
-            _t("This address will be saved to your Master address book. Select this option for addresses you wish to keep separate from the main router address book, but don't mind publishing.") +
-            "</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"master\" value=\"master\">" +
+            out.write("<h4>" + _t("Save {0} to local address book and continue to website", destination) + "</h4>\n<p>" +
+            _t("This address will be saved to your Local address book. Select this option for addresses you wish to keep separate from the main router address book, but don't mind publishing.") +
+            "</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"local\" value=\"local\">" +
             label + "</button></div>\n");
 
             out.write("<h4>" + _t("Save {0} to private address book and continue to website", destination) + "</h4>\n<p>" +
@@ -1614,9 +1614,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
     public static final String DEFAULT_JUMP_SERVERS =
             //"http://i2host.i2p/cgi-bin/i2hostjump?," +
-            "http://stats.i2p/cgi-bin/jump.cgi?a=," +
-	    "http://no.i2p/jump/," +
-	    "http://i2pjump.i2p/jump/";
+            "http://stats.i2p/cgi-bin/jump.cgi?a=";
+            //"http://no.i2p/jump/," +
+            //"http://i2pjump.i2p/jump/";
             //"http://i2jump.i2p/";
 
     /** @param host ignored */

@@ -4,6 +4,7 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.concurrent.LinkedBlockingQueue;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,10 +24,19 @@ import net.i2p.data.SessionKey;
  */
 public final class HMAC256Generator extends HMACGenerator {
 
+    private final LinkedBlockingQueue<Mac> _macs;
+
+    private static final boolean CACHE = true;
+    private static final int CACHE_SIZE = 8;
+    private static final SecretKey ZERO_KEY = new HMACKey(new byte[32]);
+
     /**
      *  @param context unused
      */
-    public HMAC256Generator(I2PAppContext context) { super(); }
+    public HMAC256Generator(I2PAppContext context) {
+        super();
+        _macs = new LinkedBlockingQueue<Mac>(CACHE_SIZE);
+    }
     
     /**
      *  Calculate the HMAC of the data with the given key.
@@ -52,13 +62,12 @@ public final class HMAC256Generator extends HMACGenerator {
      */
     public void calculate(byte[] key, byte data[], int offset, int length, byte target[], int targetOffset) {
         try {
-            Mac mac = Mac.getInstance("HmacSHA256");
+            Mac mac = acquire();
             SecretKey keyObj = new HMACKey(key);
             mac.init(keyObj);
             mac.update(data, offset, length);
             mac.doFinal(target, targetOffset);
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnsupportedOperationException("HmacSHA256", e);
+            release(mac);
         } catch (GeneralSecurityException e) {
             throw new IllegalArgumentException("HmacSHA256", e);
         }
@@ -85,7 +94,42 @@ public final class HMAC256Generator extends HMACGenerator {
         releaseTmp(calc);
         return eq;
     }
-
+    
+    /**
+     *  Package private for HKDF.
+     *
+     *  @return cached or Mac.getInstance("HmacSHA256")
+     *  @since 0.9.48
+     */
+    Mac acquire() {
+        Mac rv = _macs.poll();
+        if (rv == null) {
+            try {
+                rv = Mac.getInstance("HmacSHA256");
+            } catch (NoSuchAlgorithmException e) {
+                throw new UnsupportedOperationException("HmacSHA256", e);
+            }
+        }
+        return rv;
+    }
+    
+    /**
+     *  Mac will be reset and initialized with a zero key.
+     *  Package private for HKDF.
+     *
+     *  @since 0.9.48
+     */
+    void release(Mac mac) {
+         if (CACHE) {
+             try {
+                mac.init(ZERO_KEY);
+            } catch (GeneralSecurityException e) {
+                return;
+            }
+            _macs.offer(mac);
+        }
+    }
+    
     /**
      *  Like SecretKeySpec but doesn't copy the key in the construtor, for speed.
      *  It still returns a copy in getEncoded(), because Mac relies
@@ -183,7 +227,8 @@ public final class HMAC256Generator extends HMACGenerator {
 
         // real thing
         System.out.println("Passed");
-        System.out.println("BC Test:");
+        CACHE = false;
+        System.out.println("Without Cache Test:");
         RUNS = 1000000;
         long start = System.currentTimeMillis();
         for (int i = 0; i < RUNS; i++) {
@@ -193,15 +238,11 @@ public final class HMAC256Generator extends HMACGenerator {
         System.out.println("Time for " + RUNS + " HMAC-SHA256 computations:");
         System.out.println("BC time (ms): " + time);
 
-        System.out.println("JVM Test:");
+        CACHE = true;
+        System.out.println("With Cache Test:");
         start = System.currentTimeMillis();
         for (int i = 0; i < RUNS; i++) {
-            try {
-                mac.init(keyObj);
-            } catch (GeneralSecurityException e) {
-                System.err.println("Fatal: " + e);
-            }
-            byte[] sha = mac.doFinal(data);
+            gen.calculate(rand, data, 0, data.length, result, 0);
         }
         time = System.currentTimeMillis() - start;
 

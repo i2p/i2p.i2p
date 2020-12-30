@@ -76,6 +76,7 @@ public class ConfigUIHelper extends HelperBase {
          Set<String> rv = new TreeSet<String>();
          // add a failsafe even if we can't find any themes
          rv.add(CSSHelper.DEFAULT_THEME);
+         rv.add(CSSHelper.ALT_THEME);
          File dir = new File(_context.getBaseDir(), "docs/themes/console");
          File[] files = dir.listFiles();
          if (files == null)
@@ -119,8 +120,10 @@ public class ConfigUIHelper extends HelperBase {
         // New lang_xx flags: Add to top-level build.xml
         // Names must be 18 chars or less (including country if specified)
         //
+        // NOTE: flag field now unused, flags are not displayed
+        //
         { "en", "us", "English", null },
-        { "ar", "lang_ar", "Arabic ﻉﺮﺒﻳﺓ", null },
+        { "ar", "lang_ar", "Arabic عربية", null },
         { "az", "az", "Azerbaijani", null },
         { "cs", "cz", "Čeština", null },
         { "zh", "cn", "Chinese 中文", null },

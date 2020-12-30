@@ -9,7 +9,9 @@ package net.i2p.client.impl;
  *
  */
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +23,7 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.client.SendMessageOptions;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
@@ -64,7 +67,7 @@ class I2CPMessageProducer {
     // Note that some are listed for both client and server side, don't include those below.
     private static final String[] CLIENT_SIDE_OPTIONS = new String[] {
         "i2cp.closeIdleTime", "i2cp.closeOnIdle", "i2cp.encryptLeaseSet",
-        "i2cp.gzip", "i2cp.leaseSetKey", "i2cp.leaseSetPrivateKey",
+        I2PClient.PROP_GZIP, "i2cp.leaseSetKey", "i2cp.leaseSetPrivateKey",
         "i2cp.leaseSetSigningPrivateKey", "i2cp.reduceIdleTime", "i2cp.reduceOnIdle",
         I2PClient.PROP_ENABLE_SSL, I2PClient.PROP_TCP_HOST, I2PClient.PROP_TCP_PORT,
         // long and shouldn't be passed through
@@ -105,11 +108,27 @@ class I2CPMessageProducer {
      * @return a new copy, may be modified
      * @since 0.9.38 
      */
-    private static Properties getRouterOptions(I2PSessionImpl session) {
+    private Properties getRouterOptions(I2PSessionImpl session) {
         Properties props = new Properties();
         props.putAll(session.getOptions());
         for (int i = 0; i < CLIENT_SIDE_OPTIONS.length; i++) {
             props.remove(CLIENT_SIDE_OPTIONS[i]);
+        }
+        for (Iterator<Map.Entry<Object, Object>> iter = props.entrySet().iterator(); iter.hasNext(); ) {
+            // Long strings MUST be removed, even in router context,
+            // as the session config properties must be serialized to be signed.
+            // fixme, bytes could still be over 255 (unlikely)
+            Map.Entry<Object, Object> e = iter.next();
+            String key = (String) e.getKey();
+            String val = (String) e.getValue();
+            if (key.length() > 255 || val.length() > 255) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not passing on property ["
+                              + key
+                              + "] in the session config, key or value is too long (max = 255): "
+                              + val);
+                iter.remove();
+            }
         }
         return props;
     }
@@ -130,7 +149,13 @@ class I2CPMessageProducer {
         }
         cfg.setOptions(p);
         if (isOffline) {
-            cfg.setOfflineSignature(session.getOfflineExpiration(),
+            long exp = session.getOfflineExpiration();
+            if (exp < _context.clock().now()) {
+                String s = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                _log.log(Log.CRIT, s);
+                throw new I2PSessionException(s);
+            }
+            cfg.setOfflineSignature(exp,
                                     session.getTransientSigningPublicKey(),
                                     session.getOfflineSignature());
         }
@@ -196,7 +221,7 @@ class I2CPMessageProducer {
         msg.setDestination(dest);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " send message w/o session", new Exception());
+            _log.error(session.toString() + " cannot send message, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);
@@ -223,7 +248,7 @@ class I2CPMessageProducer {
         msg.setDestination(dest);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " send message w/o session", new Exception());
+            _log.error(session.toString() + " cannot send message, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);
@@ -390,7 +415,7 @@ class I2CPMessageProducer {
         msg.setLeaseSet(leaseSet);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " create LS w/o session", new Exception());
+            _log.error(session.toString() + " cannot create LS, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);
@@ -422,7 +447,7 @@ class I2CPMessageProducer {
         msg.setSessionConfig(cfg);
         SessionId sid = session.getSessionId();
         if (sid == null) {
-            _log.error(session.toString() + " update config w/o session", new Exception());
+            _log.error(session.toString() + " cannot update config, session closed", new Exception());
             return;
         }
         msg.setSessionId(sid);

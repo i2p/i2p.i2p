@@ -23,6 +23,7 @@ import static net.i2p.app.ClientAppState.*;
 import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
+import net.i2p.router.Blocklist;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
@@ -144,7 +145,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         notifyInstalled(ROUTER_DEV_SU3, "", RouterVersion.FULL_VERSION);
         String blist = _context.getProperty(NewsFetcher.PROP_BLOCKLIST_TIME);
         if (blist != null)
-            notifyInstalled(BLOCKLIST, "", blist);
+            notifyInstalled(BLOCKLIST, Blocklist.ID_FEED, blist);
         // hack to init from the current news file... do this before we register Updaters
         // This will not kick off any Updaters as none are yet registered
         (new NewsFetcher(_context, this, Collections.<URI> emptyList())).checkForUpdates();

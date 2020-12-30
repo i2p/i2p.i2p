@@ -174,6 +174,10 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_JAGUAR      = "jaguar";
     /** @since 0.9.41 */
     private final static String JBIGI_OPTIMIZATION_SKYLAKE     = "skylake";
+    /** @since 0.9.48 */
+    private final static String JBIGI_OPTIMIZATION_ZEN         = "zen";
+    /** @since 0.9.48 */
+    private final static String JBIGI_OPTIMIZATION_ZEN2        = "zen2";
 
     /**
      * Non-x86, no fallbacks to older libs or to "none"
@@ -227,7 +231,9 @@ public class NativeBigInteger extends BigInteger {
     private final static String[] JBIGI_COMPAT_LIST_AMD_GEODE     = {JBIGI_OPTIMIZATION_GEODE, JBIGI_OPTIMIZATION_K6_3, JBIGI_OPTIMIZATION_K6_2, JBIGI_OPTIMIZATION_K6,
                                                                      JBIGI_OPTIMIZATION_X86};
     private final static String[] JBIGI_COMPAT_LIST_AMD_APU       = {JBIGI_OPTIMIZATION_JAGUAR, JBIGI_OPTIMIZATION_BOBCAT, JBIGI_OPTIMIZATION_ATHLON64};
-    private final static String[] JBIGI_COMPAT_LIST_AMD_BULLDOZER = {JBIGI_OPTIMIZATION_EXCAVATOR, JBIGI_OPTIMIZATION_STEAMROLLER, JBIGI_OPTIMIZATION_PILEDRIVER,
+    /** the main AMD product line */
+    private final static String[] JBIGI_COMPAT_LIST_AMD_MAIN      = {JBIGI_OPTIMIZATION_ZEN2, JBIGI_OPTIMIZATION_ZEN,
+                                                                     JBIGI_OPTIMIZATION_EXCAVATOR, JBIGI_OPTIMIZATION_STEAMROLLER, JBIGI_OPTIMIZATION_PILEDRIVER,
                                                                      JBIGI_OPTIMIZATION_BULLDOZER, JBIGI_OPTIMIZATION_ATHLON64, JBIGI_OPTIMIZATION_X86};
     private final static String[] JBIGI_COMPAT_LIST_INTEL_ATOM    = {JBIGI_OPTIMIZATION_ATOM, JBIGI_OPTIMIZATION_PENTIUM3, JBIGI_OPTIMIZATION_PENTIUM2,
                                                                      JBIGI_OPTIMIZATION_PENTIUMMMX, JBIGI_OPTIMIZATION_PENTIUM, JBIGI_OPTIMIZATION_X86,
@@ -275,10 +281,12 @@ public class NativeBigInteger extends BigInteger {
         put(JBIGI_OPTIMIZATION_BOBCAT, JBIGI_COMPAT_LIST_AMD_APU);
         put(JBIGI_OPTIMIZATION_JAGUAR, JBIGI_COMPAT_LIST_AMD_APU);
 
-        put(JBIGI_OPTIMIZATION_BULLDOZER,   JBIGI_COMPAT_LIST_AMD_BULLDOZER);
-        put(JBIGI_OPTIMIZATION_PILEDRIVER,  JBIGI_COMPAT_LIST_AMD_BULLDOZER);
-        put(JBIGI_OPTIMIZATION_STEAMROLLER, JBIGI_COMPAT_LIST_AMD_BULLDOZER);
-        put(JBIGI_OPTIMIZATION_EXCAVATOR,   JBIGI_COMPAT_LIST_AMD_BULLDOZER);
+        put(JBIGI_OPTIMIZATION_BULLDOZER,   JBIGI_COMPAT_LIST_AMD_MAIN);
+        put(JBIGI_OPTIMIZATION_PILEDRIVER,  JBIGI_COMPAT_LIST_AMD_MAIN);
+        put(JBIGI_OPTIMIZATION_STEAMROLLER, JBIGI_COMPAT_LIST_AMD_MAIN);
+        put(JBIGI_OPTIMIZATION_EXCAVATOR,   JBIGI_COMPAT_LIST_AMD_MAIN);
+        put(JBIGI_OPTIMIZATION_ZEN,         JBIGI_COMPAT_LIST_AMD_MAIN);
+        put(JBIGI_OPTIMIZATION_ZEN2,        JBIGI_COMPAT_LIST_AMD_MAIN);
 
         put(JBIGI_OPTIMIZATION_ATOM, JBIGI_COMPAT_LIST_INTEL_ATOM);
 
@@ -363,6 +371,10 @@ public class NativeBigInteger extends BigInteger {
                 	return JBIGI_OPTIMIZATION_VIAC3;
                 } else if (c instanceof AMDCPUInfo) {
                     AMDCPUInfo amdcpu = (AMDCPUInfo) c;
+                    if (amdcpu.IsZen2Compatible())
+                        return JBIGI_OPTIMIZATION_ZEN2;
+                    if (amdcpu.IsZenCompatible())
+                        return JBIGI_OPTIMIZATION_ZEN;
                     if (amdcpu.IsExcavatorCompatible())
                         return JBIGI_OPTIMIZATION_EXCAVATOR;
                     if (amdcpu.IsSteamrollerCompatible())

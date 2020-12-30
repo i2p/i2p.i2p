@@ -38,6 +38,18 @@ export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{prin
 export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
+# debian: bullseye - transitioning
+JSON_SIMPLE_VERSION = $(shell dpkg -l libjson-simple-java | grep '^ii' | awk '{print $$3}')
+JSON_SIMPLE_3 = $(shell dpkg --compare-versions '$(JSON_SIMPLE_VERSION)' '>' '3.1.1-1~' && echo yes || echo no)
+ifeq (yes,$(JSON_SIMPLE_3))
+JSON_SIMPLE_PACKAGE = com.github.cliftonlabs.json_simple
+JSON_EXCEPTION = JsonException
+else
+JSON_SIMPLE_PACKAGE = org.json.simple
+JSON_EXCEPTION = DeserializationException
+endif
+
+
 %:
 	dh $@ --with systemd,bash-completion
 
@@ -56,6 +68,8 @@ override_dh_auto_clean:
 	rm -f $(CURDIR)/apps/susidns/src/lib/jstl.jar
 	rm -f $(CURDIR)/apps/susidns/src/lib/jstlel.jar
 	debconf-updatepo
+	find . -type f -name \*.java.json-simple \
+	  -exec sh -c 'file={} && mv $$file $${file%.json-simple}' \; -print
 
 override_dh_auto_build:
 
@@ -79,9 +93,7 @@ else
 	@echo "Already found deb in version, not doing anything"
 endif
 	@# build options
-#	@/bin/echo -e "javac.version=1.8" > $(CURDIR)/override.properties
-#	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
-#	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
+	@/bin/echo -e "javac.release=11" > $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.reproducible=true" >> $(CURDIR)/override.properties
 
@@ -130,20 +142,6 @@ endif
 	ln -sf /usr/share/java/taglibs-standard-jstlel.jar $(CURDIR)/apps/susidns/src/lib/jstlel.jar
 
 	@# debian and ubuntu: everywhere
-	@#/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
-	@# glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
-	@#ln -sf /usr/share/java/glassfish-javaee.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
-	@#ln -sf /usr/share/java/glassfish-appserv-jstl.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
-
-	@# debian and ubuntu: everywhere
-	@#/bin/echo -e "with-libjakarta-taglibs-standard-java=true" >> $(CURDIR)/override.properties
-	@#ln -sf /usr/share/java/standard.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
-
-	@# debian and ubuntu: everywhere
-	@#/bin/echo -e "with-libjstl1.1-java=true" >> $(CURDIR)/override.properties
-	@#ln -sf /usr/share/java/jstl1.1.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
-
-	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-gettext-base=true" >> $(CURDIR)/override.properties
 	@mkdir -p $(CURDIR)/core/java/build
 	ln -sf /usr/share/java/libintl.jar $(CURDIR)/core/java/build/libintl.jar
@@ -158,17 +156,15 @@ endif
 	@mkdir -p $(CURDIR)/core/java/build
 	ln -sf /usr/share/java/json-simple.jar $(CURDIR)/core/java/build/json-simple.jar
 
+	@# debian: bullseye - transitioning
+	find . -type f -name \*.java -exec grep -q 'import @JSON_SIMPLE@' {} \; \
+	  -exec sed -i.json-simple \
+		    -e 's,@JSON_SIMPLE@,$(JSON_SIMPLE_PACKAGE),' \
+		    -e 's/@JSON_EXCEPTION@/$(JSON_EXCEPTION)/' \
+		    {} \; -print
+
 	@# debian: everywhere; ubuntu: trusty+
 	@/bin/echo -e "with-famfamfam-flag-png=true" >> $(CURDIR)/override.properties
-
-	@# 2 MB of dependencies vs. 20 KB of copied source
-	@# Requires 4.4 or higher.
-	@# Debian: Not in wheezy/jessie
-	@# Ubuntu: Only in wily and later
-	@#/bin/echo -e "with-libhttpclient-java=true" >> $(CURDIR)/override.properties
-	@#mkdir -p $(CURDIR)/core/java/build
-	@#ln -sf /usr/share/java/httpclient.jar $(CURDIR)/core/java/build/httpclient.jar
-	@#ln -sf /usr/share/java/httpcore.jar $(CURDIR)/core/java/build/httpcore.jar
 
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config

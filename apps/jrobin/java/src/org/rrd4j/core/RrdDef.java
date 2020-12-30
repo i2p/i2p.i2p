@@ -44,7 +44,7 @@ public class RrdDef {
      * Default RRD step to be used if not specified in constructor (300 seconds).
      */
     public static final long DEFAULT_STEP = 300L;
-    
+
     /**
      * If not specified in constructor, starting timestamp will be set to the
      * current timestamp plus DEFAULT_INITIAL_SHIFT seconds (-10).
@@ -631,37 +631,37 @@ public class RrdDef {
      * @param compatible Compatible with previous versions.
      */
     public void exportXmlTemplate(OutputStream out, boolean compatible) {
-        XmlWriter xml = new XmlWriter(out);
-        xml.startTag("rrd_def");
-        if (compatible) {
-            xml.writeTag("path", getPath());
-        } else {
-            xml.writeTag("uri", getUri());
+        try (XmlWriter xml = new XmlWriter(out)) {
+            xml.startTag("rrd_def");
+            if (compatible) {
+                xml.writeTag("path", getPath());
+            } else {
+                xml.writeTag("uri", getUri());
+            }
+            xml.writeTag("step", getStep());
+            xml.writeTag("start", getStartTime());
+            // datasources
+            DsDef[] dsDefs = getDsDefs();
+            for (DsDef dsDef : dsDefs) {
+                xml.startTag("datasource");
+                xml.writeTag("name", dsDef.getDsName());
+                xml.writeTag("type", dsDef.getDsType());
+                xml.writeTag("heartbeat", dsDef.getHeartbeat());
+                xml.writeTag("min", dsDef.getMinValue(), "U");
+                xml.writeTag("max", dsDef.getMaxValue(), "U");
+                xml.closeTag(); // datasource
+            }
+            ArcDef[] arcDefs = getArcDefs();
+            for (ArcDef arcDef : arcDefs) {
+                xml.startTag("archive");
+                xml.writeTag("cf", arcDef.getConsolFun());
+                xml.writeTag("xff", arcDef.getXff());
+                xml.writeTag("steps", arcDef.getSteps());
+                xml.writeTag("rows", arcDef.getRows());
+                xml.closeTag(); // archive
+            }
+            xml.closeTag(); // rrd_def
         }
-        xml.writeTag("step", getStep());
-        xml.writeTag("start", getStartTime());
-        // datasources
-        DsDef[] dsDefs = getDsDefs();
-        for (DsDef dsDef : dsDefs) {
-            xml.startTag("datasource");
-            xml.writeTag("name", dsDef.getDsName());
-            xml.writeTag("type", dsDef.getDsType());
-            xml.writeTag("heartbeat", dsDef.getHeartbeat());
-            xml.writeTag("min", dsDef.getMinValue(), "U");
-            xml.writeTag("max", dsDef.getMaxValue(), "U");
-            xml.closeTag(); // datasource
-        }
-        ArcDef[] arcDefs = getArcDefs();
-        for (ArcDef arcDef : arcDefs) {
-            xml.startTag("archive");
-            xml.writeTag("cf", arcDef.getConsolFun());
-            xml.writeTag("xff", arcDef.getXff());
-            xml.writeTag("steps", arcDef.getSteps());
-            xml.writeTag("rows", arcDef.getRows());
-            xml.closeTag(); // archive
-        }
-        xml.closeTag(); // rrd_def
-        xml.flush();
     }
 
     /**

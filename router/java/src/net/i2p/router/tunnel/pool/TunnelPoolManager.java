@@ -534,8 +534,20 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
 
     /**
+     *  Must be called AFTER deregistration by the client manager.
+     *
+     *  @since 0.9.48
+     */
+    public void removeTunnels(Destination dest) {
+        removeTunnels(dest.calculateHash());
+    }
+
+    /**
      *  This will be called twice, once by the inbound and once by the outbound pool.
      *  Synched with buildTunnels() above.
+     *
+     *  Must be called AFTER deregistration by the client manager.
+     *
      */
     public synchronized void removeTunnels(Hash destination) {
         if (destination == null) return;
@@ -562,13 +574,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting") ||
              _context.router().isHidden() ||
              _context.router().getRouterInfo().getAddressCount() <= 0)) {
-            Hash client = cfg.getDestination();
-            LeaseSetKeys lsk = client != null ? _context.keyManager().getKeys(client) : null;
-            if (lsk == null || lsk.isSupported(EncType.ELGAMAL_2048)) {
-                TunnelPool pool = cfg.getTunnelPool();
-                _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
-            }
-            // else we don't yet have any way to request/get a ECIES-tagged reply,
+            TunnelPool pool = cfg.getTunnelPool();
+            _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
         }
     }
 

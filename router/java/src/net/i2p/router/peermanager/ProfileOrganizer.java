@@ -21,7 +21,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.NetworkDatabaseFacade;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.pool.TunnelPeerSelector;
 import net.i2p.router.util.MaskedIPSet;
@@ -130,6 +132,15 @@ public class ProfileOrganizer {
         _reorganizeLock.readLock().unlock();
     }
 
+    /**
+     *  Get the lock if we can. Non-blocking.
+     *  @return true if the lock was acquired
+     *  @since 0.9.47
+     */
+    private boolean tryWriteLock() {
+        return _reorganizeLock.writeLock().tryLock();
+    }
+
     /** @return true if the lock was acquired */
     private boolean getWriteLock() {
         try {
@@ -185,6 +196,48 @@ public class ProfileOrganizer {
             } finally { releaseReadLock(); }
         }
         return null;
+    }
+    
+    /**
+     * Retrieve the profile for the given peer, if one exists.
+     * If it does not exist and it can get the lock, it will create and return a new profile.
+     * Non-blocking. Returns null if a reorganize is happening.
+     * @since 0.9.47
+     */
+    PeerProfile getOrCreateProfileNonblocking(Hash peer) {
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who wanted our own profile?", new Exception("I did"));
+            return null;
+        }
+        if (!tryReadLock())
+            return null;
+        PeerProfile rv;
+        try {
+            rv = locked_getProfile(peer);
+        } finally { releaseReadLock(); }
+        if (rv != null)
+            return rv;
+        rv = new PeerProfile(_context, peer);
+        rv.coalesceStats();
+        if (!tryWriteLock())
+            return null;
+        try {
+            // double check
+            PeerProfile old = locked_getProfile(peer);
+            if (old != null)
+                return old;
+            _notFailingPeers.put(peer, rv);
+            _notFailingPeersList.add(peer);
+            // Add to high cap only if we have room. Don't add to Fast; wait for reorg.
+            if (_thresholdCapacityValue <= rv.getCapacityValue() &&
+                isSelectable(peer) &&
+                _highCapacityPeers.size() < getMaximumHighCapPeers()) {
+                _highCapacityPeers.put(peer, rv);
+            }
+            _strictCapacityOrder.add(rv);
+        } finally { releaseWriteLock(); }
+        return rv;
     }
     
     /**
@@ -782,9 +835,9 @@ public class ProfileOrganizer {
      * this method, but the averages are recalculated.
      *
      */
-    void reorganize() { reorganize(false); }
+    void reorganize() { reorganize(false, false); }
 
-    void reorganize(boolean shouldCoalesce) {
+    void reorganize(boolean shouldCoalesce, boolean shouldDecay) {
         long sortTime = 0;
         int coalesceTime = 0;
         long thresholdTime = 0;
@@ -792,7 +845,9 @@ public class ProfileOrganizer {
         int profileCount = 0;
         int expiredCount = 0;
         
-        long uptime = _context.router().getUptime();
+        // null for main()
+        Router r = _context.router();
+        long uptime = (r != null) ? r.getUptime() : 0L;
         long expireOlderThan = -1;
         if (uptime > 60*60*1000) {
             // dynamically adjust expire time to control memory usage
@@ -807,14 +862,14 @@ public class ProfileOrganizer {
         if (shouldCoalesce) {
             getReadLock();
             try {
+                long coalesceStart = System.currentTimeMillis();
                 for (PeerProfile prof : _strictCapacityOrder) {
                     if ( (expireOlderThan > 0) && (prof.getLastSendSuccessful() <= expireOlderThan) ) {
                         continue;
                     }
-                    long coalesceStart = System.currentTimeMillis();
-                    prof.coalesceOnly();
-                    coalesceTime += (int)(System.currentTimeMillis()-coalesceStart);
+                    prof.coalesceOnly(shouldDecay);
                 }
+                coalesceTime = (int)(System.currentTimeMillis()-coalesceStart);
             } finally {
                 releaseReadLock();
             }
@@ -1394,7 +1449,8 @@ public class ProfileOrganizer {
             // don't allow them in the high-cap pool, what would the point of that be?
             if (_thresholdCapacityValue <= profile.getCapacityValue() &&
                 isSelectable(peer) &&
-                !_context.commSystem().isInStrictCountry(peer)) {
+                // null for tests
+                (_context.commSystem() == null || !_context.commSystem().isInStrictCountry(peer))) {
                 _highCapacityPeers.put(peer, profile);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("High capacity: \t" + peer);
@@ -1446,8 +1502,12 @@ public class ProfileOrganizer {
      * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumFastPeers() {
+        // null for main()
+        ClientManagerFacade cm = _context.clientManager();
+        if (cm == null)
+            return DEFAULT_MAXIMUM_FAST_PEERS;
         int def = Math.min(DEFAULT_MAXIMUM_FAST_PEERS,
-                           (6 *_context.clientManager().listClients().size()) + DEFAULT_MINIMUM_FAST_PEERS - 2);
+                           (6 * cm.listClients().size()) + DEFAULT_MINIMUM_FAST_PEERS - 2);
         return _context.getProperty(PROP_MINIMUM_FAST_PEERS, def);
     }
     
@@ -1484,6 +1544,11 @@ public class ProfileOrganizer {
      * </pre>
      */
     public static void main(String args[]) {
+        if (args.length <= 0) {
+            System.err.println("Usage: profileorganizer file.txt.gz [file2.txt.gz] ...");
+            System.exit(1);
+        }
+
         RouterContext ctx = new RouterContext(null); // new net.i2p.router.Router());
         ProfileOrganizer organizer = new ProfileOrganizer(ctx);
         organizer.setUs(Hash.FAKE_HASH);
@@ -1497,27 +1562,26 @@ public class ProfileOrganizer {
             organizer.addProfile(profile);
         }
         organizer.reorganize();
-        DecimalFormat fmt = new DecimalFormat("0,000.0");
-        fmt.setPositivePrefix("+");
+        DecimalFormat fmt = new DecimalFormat("0000.0");
         
         for (Hash peer : organizer.selectAllPeers()) {
             PeerProfile profile = organizer.getProfile(peer);
             if (!profile.getIsActive()) {
-                System.out.println("Peer " + profile.getPeer().toBase64().substring(0,4) 
+                System.out.println("Peer " + peer.toBase64().substring(0,4) 
                            + " [" + (organizer.isFast(peer) ? "IF+R" : 
                                      organizer.isHighCapacity(peer) ? "IR  " :
                                      organizer.isFailing(peer) ? "IX  " : "I   ") + "]: "
-                           + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
+                           + " Speed:\t" + fmt.format(profile.getSpeedValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
                            + " Active?\t" + profile.getIsActive() 
                            + " Failing?\t" + profile.getIsFailing());
             } else {
-                System.out.println("Peer " + profile.getPeer().toBase64().substring(0,4) 
+                System.out.println("Peer " + peer.toBase64().substring(0,4) 
                            + " [" + (organizer.isFast(peer) ? "F+R " : 
                                      organizer.isHighCapacity(peer) ? "R   " :
                                      organizer.isFailing(peer) ? "X   " : "    ") + "]: "
-                           + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
+                           + " Speed:\t" + fmt.format(profile.getSpeedValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
                            + " Active?\t" + profile.getIsActive() 

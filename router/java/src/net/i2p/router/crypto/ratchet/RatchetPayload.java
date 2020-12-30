@@ -8,7 +8,6 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -32,8 +31,8 @@ class RatchetPayload {
     private static final int BLOCK_OPTIONS = 5;
     private static final int BLOCK_MSGNUM = 6;
     private static final int BLOCK_NEXTKEY = 7;
-    private static final int BLOCK_ACKKEY = 8;
-    private static final int BLOCK_REPLYDI = 9;
+    private static final int BLOCK_ACK = 8;
+    private static final int BLOCK_ACKREQ = 9;
     private static final int BLOCK_GARLIC = 11;
     private static final int BLOCK_PADDING = 254;
 
@@ -53,9 +52,14 @@ class RatchetPayload {
         public void gotOptions(byte[] options, boolean isHandshake) throws DataFormatException;
 
         /**
-         *  @param lastReceived in theory could wrap around to negative, but very unlikely
+         *  @param reason 0-255
          */
-        public void gotTermination(int reason, long lastReceived);
+        public void gotTermination(int reason);
+
+        /**
+         *  @param pn 0-65535
+         */
+        public void gotPN(int pn);
 
         /**
          *  @param nextKey the next one
@@ -70,7 +74,7 @@ class RatchetPayload {
         /**
          *  @since 0.9.46
          */
-        public void gotAckRequest(int id, DeliveryInstructions di);
+        public void gotAckRequest();
 
         /**
          *  For stats.
@@ -135,20 +139,28 @@ class RatchetPayload {
 
                 case BLOCK_NEXTKEY:
                   {
-                    if (len != 34)
+                    if (len != 3 && len != 35)
                         throw new IOException("Bad length for NEXTKEY: " + len);
-                    int id = (int) DataHelper.fromLong(payload, i, 2);
-                    byte[] data = new byte[32];
-                    System.arraycopy(payload, i + 2, data, 0, 32);
-                    NextSessionKey nsk = new NextSessionKey(data, id);
+                    boolean hasKey = (payload[i] & 0x01) != 0;
+                    boolean isReverse = (payload[i] & 0x02) != 0;
+                    boolean isRequest = (payload[i] & 0x04) != 0;
+                    int id = (int) DataHelper.fromLong(payload, i + 1, 2);
+                    NextSessionKey nsk;
+                    if (hasKey) {
+                        byte[] data = new byte[32];
+                        System.arraycopy(payload, i + 3, data, 0, 32);
+                        nsk = new NextSessionKey(data, id, isReverse, isRequest);
+                    } else {
+                        nsk = new NextSessionKey(id, isReverse, isRequest);
+                    }
                     cb.gotNextKey(nsk);
                   }
                     break;
 
-                case BLOCK_ACKKEY:
+                case BLOCK_ACK:
                   {
                     if (len < 4 || (len % 4) != 0)
-                        throw new IOException("Bad length for REPLYDI: " + len);
+                        throw new IOException("Bad length for ACK: " + len);
                     for (int j = i; j < i + len; j += 4) {
                         int id = (int) DataHelper.fromLong(payload, j, 2);
                         int n = (int) DataHelper.fromLong(payload, j + 2, 2);
@@ -157,26 +169,29 @@ class RatchetPayload {
                   }
                     break;
 
-                case BLOCK_REPLYDI:
-                  {
-                    if (len < 6)
-                        throw new IOException("Bad length for REPLYDI: " + len);
-                    int id = (int) DataHelper.fromLong(payload, i, 4);
-                    DeliveryInstructions di = new DeliveryInstructions();
-                    di.readBytes(payload, i + 5);
-                    cb.gotAckRequest(id, di);
-                  }
+                case BLOCK_ACKREQ:
+                    if (len < 1)
+                        throw new IOException("Bad length for ACKREQ: " + len);
+                    cb.gotAckRequest();
                     break;
 
                 case BLOCK_TERMINATION:
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len < 9)
+                    if (len < 1)
                         throw new IOException("Bad length for TERMINATION: " + len);
-                    long last = fromLong8(payload, i);
-                    int rsn = payload[i + 8] & 0xff;
-                    cb.gotTermination(rsn, last);
+                    int rsn = payload[i] & 0xff;
+                    cb.gotTermination(rsn);
                     gotTermination = true;
+                    break;
+
+                case BLOCK_MSGNUM:
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    if (len < 2)
+                        throw new IOException("Bad length for PN: " + len);
+                    int pn = (int) DataHelper.fromLong(payload, i, 2);
+                    cb.gotPN(pn);
                     break;
 
                 case BLOCK_PADDING:
@@ -280,6 +295,7 @@ class RatchetPayload {
         }
 
         /** with random data */
+        @Deprecated
         public PaddingBlock(I2PAppContext context, int size) {
             super(BLOCK_PADDING);
             sz = size;
@@ -344,13 +360,22 @@ class RatchetPayload {
         }
 
         public int getDataLength() {
-            return 34;
+            return next.getData() != null ? 35 : 3;
         }
 
         public int writeData(byte[] tgt, int off) {
-            DataHelper.toLong(tgt, off, 2, next.getID());
-            System.arraycopy(next.getData(), 0, tgt, off + 2, 32);
-            return off + 34;
+            if (next.getData() != null)
+                tgt[off] = 0x01;
+            if (next.isReverse())
+                tgt[off] |= 0x02;
+            if (next.isRequest())
+                tgt[off] |= 0x04;
+            DataHelper.toLong(tgt, off + 1, 2, next.getID());
+            if (next.getData() != null) {
+                System.arraycopy(next.getData(), 0, tgt, off + 3, 32);
+                return off + 35;
+            }
+            return off + 3;
         }
     }
 
@@ -361,34 +386,23 @@ class RatchetPayload {
         private final byte[] data;
 
         public AckBlock(int keyID, int n) {
-            super(BLOCK_ACKKEY);
+            super(BLOCK_ACK);
             data = new byte[4];
             DataHelper.toLong(data, 0, 2, keyID);
             DataHelper.toLong(data, 2, 2, n);
         }
 
-        public int getDataLength() {
-            return 4;
-        }
-
-        public int writeData(byte[] tgt, int off) {
-            System.arraycopy(data, 0, tgt, off, data.length);
-            return off + data.length;
-        }
-    }
-
-    /**
-     *  @since 0.9.46
-     */
-    public static class AckRequestBlock extends Block {
-        private final byte[] data;
-
-        public AckRequestBlock(int sessionID, DeliveryInstructions di) {
-            super(BLOCK_REPLYDI);
-            data = new byte[5 + di.getSize()];
-            DataHelper.toLong(data, 0, 4, sessionID);
-            // flag is zero
-            di.writeBytes(data, 5);
+        /**
+         *  @param acks each is id &lt;&lt; 16 | n
+         */
+        public AckBlock(List<Integer> acks) {
+            super(BLOCK_ACK);
+            data = new byte[4 * acks.size()];
+            int i = 0;
+            for (Integer a : acks) {
+                toInt4(data, i, a.intValue());
+                i += 4;
+            }
         }
 
         public int getDataLength() {
@@ -401,51 +415,74 @@ class RatchetPayload {
         }
     }
 
-    public static class TerminationBlock extends Block {
-        private final byte rsn;
-        private final long rcvd;
+    /**
+     *  @since 0.9.46
+     */
+    public static class AckRequestBlock extends Block {
 
-        public TerminationBlock(int reason, long lastReceived) {
-            super(BLOCK_TERMINATION);
-            rsn = (byte) reason;
-            rcvd = lastReceived;
+        public AckRequestBlock() {
+            super(BLOCK_ACKREQ);
+            // flag is zero
         }
 
         public int getDataLength() {
-            return 9;
+            return 1;
         }
 
         public int writeData(byte[] tgt, int off) {
-            toLong8(tgt, off, rcvd);
-            tgt[off + 8] = rsn;
-            return off + 9;
+            tgt[off] = 0;
+            return off + 1;
+        }
+    }
+
+    public static class TerminationBlock extends Block {
+        private final byte rsn;
+
+        public TerminationBlock(int reason) {
+            super(BLOCK_TERMINATION);
+            rsn = (byte) reason;
+        }
+
+        public int getDataLength() {
+            return 1;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            tgt[off] = rsn;
+            return off + 1;
         }
     }
 
     /**
-     * Big endian.
-     * Same as DataHelper.fromLong(src, offset, 8) but allows negative result
-     *
-     * @throws ArrayIndexOutOfBoundsException
+     *  @since 0.9.46
      */
-    static long fromLong8(byte src[], int offset) {
-        long rv = 0;
-        int limit = offset + 8;
-        for (int i = offset; i < limit; i++) {
-            rv <<= 8;
-            rv |= src[i] & 0xFF;
+    public static class PNBlock extends Block {
+        private final int pn;
+
+        public PNBlock(int pn) {
+            super(BLOCK_MSGNUM);
+            this.pn = pn;
         }
-        return rv;
+
+        public int getDataLength() {
+            return 2;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            DataHelper.toLong(tgt, off, 2, pn);
+            return off + 2;
+        }
     }
     
     /**
      * Big endian.
-     * Same as DataHelper.toLong(target, offset, 8, value) but allows negative value
+     * Same as DataHelper.toLong(target, offset, 4, value) but allows negative value
      *
      * @throws ArrayIndexOutOfBoundsException
+     * @since 0.9.46
      */
-    static void toLong8(byte target[], int offset, long value) {
-        for (int i = offset + 7; i >= offset; i--) {
+    private static void toInt4(byte target[], int offset, int value) {
+        for (int i = offset + 3; i >= offset; i--) {
             target[i] = (byte) value;
             value >>= 8;
         }

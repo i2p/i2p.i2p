@@ -317,7 +317,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                 buf.append(request.getMethod());
                 buf.append(' ');
                 
-                request.getUri().writeTo(u8buf);
+                u8buf.append(request.getHttpURI().toString());
                 
                 buf.append(' ');
                 buf.append(request.getProtocol());

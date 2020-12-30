@@ -1,3 +1,15 @@
+i2p (0.9.47x-2~xenial+1) xenial; urgency=medium
+
+  * Backport to Xenial
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 25 Aug 2020 12:12:12 +0000
+
+i2p (0.9.46x-1~xenial+1) xenial; urgency=medium
+
+  * Backport to Xenial
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 26 May 2020 12:12:12 +0000
+
 i2p (0.9.45x-1~xenial+1) xenial; urgency=medium
 
   * Backport to Xenial

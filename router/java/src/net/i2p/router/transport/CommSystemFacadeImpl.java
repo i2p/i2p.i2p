@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.Vector;
 
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -25,6 +24,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
@@ -113,11 +113,11 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *
      * A positive number means our clock is ahead of theirs.
      *
-     * Todo: change Vectors to milliseconds
+     * Todo: change List to milliseconds
      */
     @Override
     public long getFramedAveragePeerClockSkew(int percentToInclude) {
-        Vector<Long> skews = _manager.getClockSkews();
+        List<Long> skews = _manager.getClockSkews();
         if (skews == null ||
             skews.isEmpty() ||
             (skews.size() < 5 && _context.clock().getUpdatedSuccessfully())) {
@@ -365,6 +365,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Override
     public DHSessionKeyBuilder.Factory getDHFactory() {
         return _manager.getDHFactory();
+    }
+
+    /**
+     *  Factory for making X25519 key pairs.
+     *  @since 0.9.46
+     */
+    @Override
+    public X25519KeyFactory getXDHFactory() {
+        return _manager.getXDHFactory();
     }
     
     /*

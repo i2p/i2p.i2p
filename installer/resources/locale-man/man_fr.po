@@ -7,14 +7,15 @@
 # Translators:
 # Towinet, 2017
 # Tilat, 2017
-# AO <ao@localizationlab.org>, 2019
+# zzzi2p, 2019
+# AO <ao@localizationlab.org>, 2020
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:31+0000\n"
-"Last-Translator: AO <ao@localizationlab.org>, 2019\n"
+"Last-Translator: AO <ao@localizationlab.org>, 2020\n"
 "Language-Team: French (https://www.transifex.com/otf/teams/12694/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,8 +88,8 @@ msgid ""
 "continue the download from the point of interruption."
 msgstr ""
 "Eepget peut faire face à des connexions réseau lentes ou instables ; si un "
-"téléchargement ne réussit pas à cause d’un problème de réseau, il ressayera "
-"jusqu’à ce que le fichier entier soit téléchargé (si l’option -n est "
+"téléchargement ne réussit pas à cause d’un problème de réseau, il réessayera"
+" jusqu’à ce que le fichier entier soit téléchargé (si l’option -n est "
 "définie). S’il cela est pris en charge par le serveur distant, Eepget "
 "demandera au serveur de continuer le téléchargement à partir du point "
 "d’interruption."
@@ -176,7 +177,7 @@ msgid ""
 "successful. If this option is not specified, eepget will not retry."
 msgstr ""
 "Indiquer le nombre de relances du téléchargement si le téléchargement ne "
-"réussit pas. Si cette option n’est pas précisée, Eepget ne ressayera pas."
+"réussit pas. Si cette option n’est pas précisée, Eepget ne réessayera pas."
 
 #. type: Plain text
 #: man/eepget.1:61

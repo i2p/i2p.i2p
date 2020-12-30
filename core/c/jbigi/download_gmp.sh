@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-#       This script downloads gmp-6.1.2.tar.bz2 to this directory
+#       This script downloads gmp-6.x.x.tar.bz2 to this directory
 #       (if a different version, change the GMP_VER= line below)
 #
 
-export GMP_VER=6.1.2
+export GMP_VER=6.2.0
 export GMP_TARVER=${GMP_VER}
 export GMP_DIR="gmp-$GMP_VER"
 export GMP_TAR="gmp-$GMP_TARVER.tar.bz2"

@@ -99,7 +99,7 @@ public final class BitArray implements Cloneable {
     int bitsOffset = from / 32;
     int currentBits = bits[bitsOffset];
     // mask off lesser bits first
-    currentBits &= ~((1 << (from & 0x1F)) - 1);
+    currentBits &= -(1 << (from & 0x1F));
     while (currentBits == 0) {
       if (++bitsOffset == bits.length) {
         return size;
@@ -107,7 +107,7 @@ public final class BitArray implements Cloneable {
       currentBits = bits[bitsOffset];
     }
     int result = (bitsOffset * 32) + Integer.numberOfTrailingZeros(currentBits);
-    return result > size ? size : result;
+    return Math.min(result, size);
   }
 
   /**
@@ -122,7 +122,7 @@ public final class BitArray implements Cloneable {
     int bitsOffset = from / 32;
     int currentBits = ~bits[bitsOffset];
     // mask off lesser bits first
-    currentBits &= ~((1 << (from & 0x1F)) - 1);
+    currentBits &= -(1 << (from & 0x1F));
     while (currentBits == 0) {
       if (++bitsOffset == bits.length) {
         return size;
@@ -130,7 +130,7 @@ public final class BitArray implements Cloneable {
       currentBits = ~bits[bitsOffset];
     }
     int result = (bitsOffset * 32) + Integer.numberOfTrailingZeros(currentBits);
-    return result > size ? size : result;
+    return Math.min(result, size);
   }
 
   /**
@@ -339,7 +339,7 @@ public final class BitArray implements Cloneable {
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder(size);
+    StringBuilder result = new StringBuilder(size + (size / 8) + 1);
     for (int i = 0; i < size; i++) {
       if ((i & 0x07) == 0) {
         result.append(' ');

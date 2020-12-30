@@ -79,7 +79,7 @@
   <td>
  <b class="suboption"><%=intl._t("IPv4 Configuration")%>:</b><br>
     <label><input type="checkbox" class="optbox" name="IPv4Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv4FirewalledChecked" /> >
-    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%></label>
+    <%=intl._t("Disable inbound (Firewalled by home network, ISP, DS-Lite, or carrier-grade NAT)")%></label>
   </td>
  </tr>
  <tr>
@@ -97,7 +97,7 @@
     <%=intl._t("Use IPv6 only (disable IPv4)")%>
     <i>(<%=intl._t("Experimental")%>)</i></label><br>
     <label><input type="checkbox" class="optbox" name="IPv6Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv6FirewalledChecked" /> >
-    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%></label>
+    <%=intl._t("Disable inbound (Firewalled)")%></label>
   </td>
  </tr>
  <tr>

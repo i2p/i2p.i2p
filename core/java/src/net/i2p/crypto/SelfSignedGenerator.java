@@ -40,6 +40,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.Addresses;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.HexDump;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFileOutputStream;
@@ -155,6 +156,23 @@ public final class SelfSignedGenerator {
             // PE is unchecked
             throw new GeneralSecurityException(pe);
         }
+    }
+
+    /**
+     *  Create a self-signed certificate for the existing private key.
+     *
+     *  @param cname the common name, non-null. Must be a hostname or email address. IP addresses will not be correctly encoded.
+     *  @return self-signed certificate
+     *  @since 0.9.46
+     */
+    public static X509Certificate generate(SigningPrivateKey priv, String cname,
+                                            int validDays) throws GeneralSecurityException {
+        SigningPublicKey pub = priv.toPublic();
+        PublicKey jpub = SigUtil.toJavaKey(pub);
+        PrivateKey jpriv = SigUtil.toJavaKey(priv);
+        SigType type = priv.getType();
+        Object[] o = generate(jpub, jpriv, priv, type, cname, null, null, null, null, null, null, validDays);
+        return (X509Certificate) o[2];
     }
 
     /**
@@ -887,11 +905,11 @@ public final class SelfSignedGenerator {
      *  @throws IllegalArgumentException
      */
     private static byte[] getEncodedOIDSeq(String oid) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(16);
+        byte[] b = getEncodedOID(oid);
+        ByteArrayStream baos = new ByteArrayStream(4 + b.length);
         baos.write(0x30);
         // len to be filled in later
         baos.write(0);
-        byte[] b = getEncodedOID(oid);
         baos.write(b, 0, b.length);
         // NULL
         baos.write(0x05);

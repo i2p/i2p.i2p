@@ -8,6 +8,7 @@ package net.i2p.router.web.helpers;
  *
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -37,11 +38,13 @@ import net.i2p.data.LeaseSet2;
 import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import static net.i2p.router.sybil.Util.biLog2;
+import net.i2p.router.transport.GeoIP;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.WebAppStarter;
@@ -101,7 +104,7 @@ class NetDbRenderer {
     public void renderRouterInfoHTML(Writer out, int pageSize, int page,
                                      String routerPrefix, String version,
                                      String country, String family, String caps,
-                                     String ip, String sybil, int port, SigType type,
+                                     String ip, String sybil, int port, SigType type, EncType etype,
                                      String mtu, String ipv6, String ssucaps,
                                      String tr, int cost) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
@@ -111,6 +114,38 @@ class NetDbRenderer {
                .append(_t("Never reveal your router identity to anyone, as it is uniquely linked to your IP address in the network database."))
                .append("</td></tr></table>");
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
+        } else if (routerPrefix != null && routerPrefix.length() >= 44) {
+            // easy way, full hash
+            byte[] h = Base64.decode(routerPrefix);
+            if (h != null && h.length == Hash.HASH_LENGTH) {
+                Hash hash = new Hash(h);
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
+                if (ri == null) {
+                    // remote lookup
+                    LookupWaiter lw = new LookupWaiter();
+                    _context.netDb().lookupRouterInfo(hash, lw, lw, 8*1000);
+                    // just wait right here in the middle of the rendering, sure
+                    synchronized(lw) {
+                        try { lw.wait(9*1000); } catch (InterruptedException ie) {}
+                    }
+                    ri = _context.netDb().lookupRouterInfoLocally(hash);
+                }
+                if (ri != null) {
+                   renderRouterInfo(buf, ri, false, true);
+                } else {
+                    buf.append("<div class=\"netdbnotfound\">");
+                    buf.append(_t("Router")).append(' ');
+                    if (routerPrefix != null)
+                        buf.append(routerPrefix);
+                    buf.append(' ').append(_t("not found in network database"));
+                    buf.append("</div>");
+                }
+            } else {
+                buf.append("<div class=\"netdbnotfound\">");
+                buf.append("Bad Base64 router hash").append(' ');
+                buf.append(DataHelper.escapeHTML(routerPrefix));
+                buf.append("</div>");
+            }
         } else {
             StringBuilder ubuf = new StringBuilder();
             if (routerPrefix != null)
@@ -127,6 +162,8 @@ class NetDbRenderer {
                 ubuf.append("&amp;tr=").append(tr);
             if (type != null)
                 ubuf.append("&amp;type=").append(type);
+            if (etype != null)
+                ubuf.append("&amp;etype=").append(etype);
             if (ip != null)
                 ubuf.append("&amp;ip=").append(ip);
             if (port != 0)
@@ -185,7 +222,8 @@ class NetDbRenderer {
                     // 'O' will catch PO and XO also
                     (caps != null && hasCap(ri, caps)) ||
                     (tr != null && ri.getTargetAddress(tr) != null) ||
-                    (type != null && type == ri.getIdentity().getSigType())) {
+                    (type != null && type == ri.getIdentity().getSigType()) ||
+                    (etype != null && etype == ri.getIdentity().getEncType())) {
                     if (skipped < toSkip) {
                         skipped++;
                         continue;
@@ -368,6 +406,19 @@ class NetDbRenderer {
     }
 
     /**
+     *  @since 0.9.48
+     */
+    private class LookupWaiter extends JobImpl {
+        public LookupWaiter() { super(_context); }
+        public void runJob() {
+            synchronized(this) {
+                notifyAll();
+            }
+        }
+        public String getName() { return "Console netdb lookup"; }
+    }
+
+    /**
      *  Special handling for 'O' cap
      *  @param caps non-null
      *  @since 0.9.38
@@ -425,7 +476,7 @@ class NetDbRenderer {
         if (debug) {
             buf.append("<tr><td><b>Published (RAP) Leasesets:</b></td><td colspan=\"3\">").append(netdb.getKnownLeaseSets()).append("</td></tr>\n")
                .append("<tr><td><b>Mod Data:</b></td><td>").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData())).append("</td>")
-               .append("<td><b>Last Changed:</b></td><td>").append(new Date(_context.routerKeyGenerator().getLastChanged())).append("</td></tr>\n")
+               .append("<td><b>Last Changed:</b></td><td>").append(DataHelper.formatTime(_context.routerKeyGenerator().getLastChanged())).append("</td></tr>\n")
                .append("<tr><td><b>Next Mod Data:</b></td><td>").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData())).append("</td>")
                .append("<td><b>Change in:</b></td><td>").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight())).append("</td></tr>\n");
         }
@@ -468,7 +519,7 @@ class NetDbRenderer {
                 buf.append("<b>").append(_t("Destination")).append(":</b> ");
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
                 if (in != null && in.getDestinationNickname() != null)
-                    buf.append(in.getDestinationNickname());
+                    buf.append(DataHelper.escapeHTML(in.getDestinationNickname()));
                 else
                     buf.append(dest.toBase64().substring(0, 6));
                 buf.append("</th></tr>\n");
@@ -549,10 +600,15 @@ class NetDbRenderer {
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;
                     buf.append("&nbsp;&nbsp;<b>Unpublished? </b>").append(ls2.isUnpublished());
-                    boolean isOff = ls2.isOffline();
-                    buf.append("&nbsp;&nbsp;<b>Offline signed? </b>").append(isOff);
-                    if (isOff)
+                    if (ls2.isOffline()) {
+                        buf.append("&nbsp;&nbsp;<b>Offline signed: </b>");
+                        exp = ls2.getTransientExpiration() - now;
+                        if (exp > 0)
+                            buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
+                        else
+                            buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
                         buf.append("&nbsp;&nbsp;<b>Type: </b>").append(ls2.getTransientSigningKey().getType());
+                    }
                 }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
@@ -590,9 +646,7 @@ class NetDbRenderer {
             boolean isMeta = ls.getType() == DatabaseEntry.KEY_TYPE_META_LS2;
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 Lease lease = ls.getLease(i);
-                buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"netdb_gateway\" title=\"")
-                   .append(_t("Gateway")).append("\"><img src=\"themes/console/images/info/gateway.png\" alt=\"")
-                   .append(_t("Gateway")).append("\"></span> <span class=\"tunnel_peer\">");
+                buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"tunnel_peer\">");
                 buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
                 buf.append("</span> ");
                 if (!isMeta) {
@@ -600,7 +654,7 @@ class NetDbRenderer {
                        .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
                 }
                 if (debug) {
-                    long exl = lease.getEndDate().getTime() - now;
+                    long exl = lease.getEndTime() - now;
                     if (exl > 0)
                         buf.append("<b class=\"netdb_expiry\">").append(_t("Expires in {0}", DataHelper.formatDuration2(exl))).append("</b>");
                     else
@@ -807,6 +861,16 @@ class NetDbRenderer {
                 buf.append(getTranslatedCountry(country));
                 buf.append("</a></td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
+            // https://db-ip.com/db/download/ip-to-country-lite
+            String geoDir = _context.getProperty(GeoIP.PROP_GEOIP_DIR, GeoIP.GEOIP_DIR_DEFAULT);
+            File geoFile = new File(geoDir);
+            if (!geoFile.isAbsolute())
+                geoFile = new File(_context.getBaseDir(), geoDir);
+            geoFile = new File(geoFile, GeoIP.GEOIP2_FILE_DEFAULT);
+            if (geoFile.exists()) {
+                // we'll assume we are using it, ignore case where Debian file is newer
+                buf.append("<tr><td colspan=\"2\"><font size=\"-2\"><a href=\"https://db-ip.com/\">IP Geolocation by DB-IP</a></font></td></tr>");
+            }
             buf.append("</table>\n");
         }
 
@@ -882,12 +946,14 @@ class NetDbRenderer {
 
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<table class=\"netdbentry\">")
-           .append("<tr><th colspan=\"2\"><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
+        buf.append("<table class=\"netdbentry\">" +
+                   "<tr id=\"").append(hash.substring(0, 6)).append("\"><th colspan=\"2\"");
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
+            buf.append(" id=\"our-info\"><b>").append(_t("Our Router Identity")).append(":</b> <code>")
+               .append(hash).append("</code></th><th>");
         } else {
-            buf.append("<b>" + _t("Peer info for") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
+            buf.append("><b>").append(_t("Router")).append(":</b> <code>")
+               .append(hash).append("</code></th><th>");
             String country = _context.commSystem().getCountry(info.getIdentity().getHash());
             if (country != null) {
                 buf.append("<a href=\"/netdb?c=").append(country).append("\">");
@@ -907,26 +973,30 @@ class NetDbRenderer {
             buf.append("<td><b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b></td>")
                .append("<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
-               .append("</span>&nbsp;&nbsp;");
+               .append("</span>");
         } else if (age > 0) {
             buf.append("<td><b>").append(_t("Published")).append(":</b></td>")
                .append("<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
-               .append("</span>&nbsp;&nbsp;");
+               .append("</span>");
         } else {
             // shouldnt happen
             buf.append("<td><b>").append(_t("Published")).append("</td><td colspan=\"2\">:</b> in ")
-               .append(DataHelper.formatDuration2(0-age)).append("<span class=\"netdb_info\">???</span>&nbsp;&nbsp;");
+               .append(DataHelper.formatDuration2(0-age)).append("<span class=\"netdb_info\">???</span>");
         }
-        buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
-           .append(info.getIdentity().getSigningPublicKey().getType().toString());
+        if (full) {
+            buf.append("</td></tr><tr><td><b>").append(_t("Signing Key")).append(":</b></td><td colspan=\"2\">")
+               .append(info.getIdentity().getSigningPublicKey().getType());
+            buf.append("</td></tr><tr><td><b>").append(_t("Encryption Key")).append(":</b></td><td colspan=\"2\">")
+               .append(info.getIdentity().getPublicKey().getType());
+        }
         buf.append("</td></tr>\n<tr>")
-           .append("<td><b>" + _t("Addresses") + ":</b></td>")
-           .append("<td colspan=\"2\" class=\"netdb_addresses\">");
+           .append("<td><b>").append(_t("Addresses")).append(":</b></td><td colspan=\"2\"");
         Collection<RouterAddress> addrs = info.getAddresses();
         if (addrs.isEmpty()) {
-            buf.append(_t("none"));
+            buf.append('>').append(_t("none"));
         } else {
+            buf.append(" class=\"netdb_addresses\">");
             if (addrs.size() > 1) {
                 // addrs is unmodifiable
                 List<RouterAddress> laddrs = new ArrayList<RouterAddress>(addrs);

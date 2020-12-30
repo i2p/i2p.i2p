@@ -339,10 +339,10 @@ public abstract class RrdBackend {
     /**
      * Extract a CharBuffer from the backend, used by readString
      * 
-     * @param offset
-     * @param size
-     * @return
-     * @throws IOException
+     * @param offset the offset in the rrd
+     * @param size the size of the buffer, in character
+     * @return a new CharBuffer
+     * @throws IOException if the read fails
      */
     protected CharBuffer getCharBuffer(long offset, int size) throws IOException {
         ByteBuffer bbuf = ByteBuffer.allocate(size * 2);

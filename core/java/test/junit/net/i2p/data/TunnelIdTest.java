@@ -16,9 +16,21 @@ package net.i2p.data;
  */
 public class TunnelIdTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
-        TunnelId id = new TunnelId();
+        TunnelIdStructure id = new TunnelIdStructure();
         id.setTunnelId(42);
         return id; 
     }
-    public DataStructure createStructureToRead() { return new TunnelId(); }
+    public DataStructure createStructureToRead() { return new TunnelIdStructure(); }
+
+    /**
+     * so we can test it as a structure
+     * @since 0.9.48 TunnelId no longer extends DataStructureImpl
+     */
+    private static class TunnelIdStructure extends TunnelId implements DataStructure {
+        public Hash calculateHash() { return null; }
+        public void fromByteArray(byte[] in) {}
+        public byte[] toByteArray() { return null; }
+        public void fromBase64(String in) {}
+        public String toBase64() { return null; }
+    }
 }

@@ -401,9 +401,7 @@ public class ConfigClientsHelper extends HelperBase {
         }
         if (showDeleteButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" title=\"").append(_t("Delete")).append("\" class=\"control delete\" name=\"action\" value=\"Delete ").append(index)
-               .append("\" onclick=\"if (!confirm('")
-               .append(_t("Are you sure you want to delete {0}?", _t(escapedName)))
-               .append("')) { return false; }\">")
+               .append("\" client=\"").append(_t(escapedName)).append("\">")
                .append(_t("Delete")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         buf.append("</td><td align=\"left\">");

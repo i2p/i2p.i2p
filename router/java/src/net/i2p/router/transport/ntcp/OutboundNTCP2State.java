@@ -217,8 +217,8 @@ class OutboundNTCP2State implements EstablishState {
             return;
         }
         _handshakeState.getRemotePublicKey().setPublicKey(bk, 0);
-        _handshakeState.getLocalKeyPair().setPublicKey(_transport.getNTCP2StaticPubkey(), 0);
-        _handshakeState.getLocalKeyPair().setPrivateKey(_transport.getNTCP2StaticPrivkey(), 0);
+        _handshakeState.getLocalKeyPair().setKeys(_transport.getNTCP2StaticPrivkey(), 0,
+                                                  _transport.getNTCP2StaticPubkey(), 0);
         // output to _tmp
         try {
             _handshakeState.start();

@@ -13,14 +13,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.data.DataStructure;
-
 /**
  * Defines the base functionality of API messages
  *
+ * As of 0.9.48, does NOT extend DataStructure.
+ *
  * @author jrandom
  */
-public interface I2CPMessage extends DataStructure {
+public interface I2CPMessage {
     /**
      * Read the contents from the input stream into the current class's format.
      * The stream should be the message body as defined by the client access layer

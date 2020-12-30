@@ -433,20 +433,15 @@ public class I2PSSLSocketFactory {
     */
     private static void addCountries(I2PAppContext ctx, List<String> tlds) {
         Log log = ctx.logManager().getLog(I2PSSLSocketFactory.class);
-        String geoDir = ctx.getProperty(PROP_GEOIP_DIR, GEOIP_DIR_DEFAULT);
-        File geoFile = new File(geoDir);
-        if (!geoFile.isAbsolute())
-            geoFile = new File(ctx.getBaseDir(), geoDir);
-        geoFile = new File(geoFile, COUNTRY_FILE_DEFAULT);
-        if (!geoFile.exists()) {
+        InputStream is = I2PSSLSocketFactory.class.getResourceAsStream("/net/i2p/util/resources/" + COUNTRY_FILE_DEFAULT);
+        if (is == null) {
             if (log.shouldWarn())
-                log.warn("Country file not found: " + geoFile.getAbsolutePath());
+                log.warn("Country file not found");
             return;
         }
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(geoFile), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             String line = null;
             int i = 0;
             while ( (line = br.readLine()) != null) {
@@ -460,10 +455,11 @@ public class I2PSSLSocketFactory {
                 } catch (IndexOutOfBoundsException ioobe) {}
             }
             if (log.shouldInfo())
-                log.info("Loaded " + i + " TLDs from " + geoFile.getAbsolutePath());
+                log.info("Loaded " + i + " TLDs from " + COUNTRY_FILE_DEFAULT);
         } catch (IOException ioe) {
             log.error("Error reading the Country File", ioe);
         } finally {
+            try { is.close(); } catch (IOException ioe) {}
             if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
     }

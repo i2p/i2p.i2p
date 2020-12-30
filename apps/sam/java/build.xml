@@ -23,8 +23,9 @@
     </target>
 
     <!-- only used if not set by a higher build.xml -->
-    <property name="javac.compilerargs7" value="" />
-    <property name="javac.version" value="1.7" />
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- compile everything including client classes -->
@@ -34,23 +35,25 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs7}" />
+            <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
 
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
-            debug="true" deprecation="on" source="1.7" target="1.7" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs7}" />
+            <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
 

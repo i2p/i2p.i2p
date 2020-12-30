@@ -42,42 +42,5 @@ to serve static html files and images.
     <Arg>net.i2p.servlet.I2PDefaultServlet</Arg>
     <Arg>/</Arg>
   </Call>
-  <Call name="addFilter">
-    <!-- Add a filter to gzip on-the fly, since if we don't do it, I2P will.
-      -  This lowers the resource usage in the Java process on the client side,
-      -  by pushing the decompression out of Java and into the browser.
-      -  For all the reasons noted in the GzipFilter javadocs, this is normally
-      -  a bad idea for static content, but this is I2P.
-      -  See I2PTunnelHTTPServer for the I2P compressor.
-      -->
-    <Arg>
-      <New class="org.eclipse.jetty.servlet.FilterHolder" >
-        <Arg>
-          <New class="org.eclipse.jetty.servlets.GzipFilter" />
-        </Arg>
-        <Call name="setInitParameter">
-          <!-- minimum in Java is 1300 -->
-          <Arg>minGzipSize</Arg>
-          <Arg>512</Arg>
-        </Call>
-        <Call name="setInitParameter">
-          <!-- In Java we have a blacklist. This covers the most common cases. -->
-          <Arg>mimeTypes</Arg>
-          <Arg>application/pdf,application/x-javascript,application/xhtml+xml,application/xml,image/svg+xml,text/css,text/html,text/plain</Arg>
-        </Call>
-      </New>
-    </Arg>
-    <Arg>/*</Arg>
-    <Arg>
-      <!-- just guessing here -->
-      <Call class="java.util.EnumSet" name="of" >
-        <Arg>
-          <Call class="javax.servlet.DispatcherType" name="valueOf" >
-            <Arg>REQUEST</Arg>
-          </Call>
-        </Arg>
-      </Call>
-    </Arg>
-  </Call>
 </Configure>
 

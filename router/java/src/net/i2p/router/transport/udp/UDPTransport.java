@@ -16,13 +16,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.i2p.CoreVersion;
 import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base64;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -181,6 +182,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** override the "large" (max) MTU, default is PeerState.LARGE_MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     private static final String PROP_ADVANCED = "routerconsole.advanced";
+    /** @since 0.9.48 */
+    public static final String PROP_INTRO_KEY = "i2np.udp.introKey";
         
     private static final String CAP_TESTING = Character.toString(UDPAddress.CAPACITY_TESTING);
     private static final String CAP_TESTING_INTRO = CAP_TESTING + UDPAddress.CAPACITY_INTRODUCER;
@@ -208,6 +211,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** minimum peers volunteering to be introducers if we need that */
     private static final int MIN_INTRODUCER_POOL = 5;
     static final long INTRODUCER_EXPIRATION_MARGIN = 20*60*1000L;
+    private static final long MIN_DOWNTIME_TO_REKEY = 30*24*60*60*1000L;
     
     private static final int[] BID_VALUES = { 15, 20, 50, 65, 80, 95, 100, 115, TransportBid.TRANSIENT_FAIL };
     private static final int FAST_PREFERRED_BID = 0;
@@ -341,6 +345,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         _context.simpleTimer2().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
+
+    /**
+     * @return the instance of OutboundMessageFragments
+     * @since 0.9.48
+     */
+    OutboundMessageFragments getOMF() {
+        return _fragments;
+    }
     
     /**
      *  Pick a port if not previously configured, so that TransportManager may
@@ -383,8 +395,26 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         UDPPacket.clearCache();
         
         if (_log.shouldLog(Log.WARN)) _log.warn("Starting SSU transport listening");
-        _introKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
-        System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
+        byte[] ikey = new byte[SessionKey.KEYSIZE_BYTES];
+        _introKey = new SessionKey(ikey);
+        if (VersionComparator.comp(CoreVersion.VERSION, "0.9.48") >= 0) {
+            String sikey = _context.getProperty(PROP_INTRO_KEY);
+            if (sikey != null &&
+                _context.getEstimatedDowntime() < MIN_DOWNTIME_TO_REKEY) {
+                byte[] saved = Base64.decode(sikey);
+                if (saved != null && saved.length == SessionKey.KEYSIZE_BYTES) {
+                    System.arraycopy(saved, 0, ikey, 0, SessionKey.KEYSIZE_BYTES);
+                } else {
+                    _context.random().nextBytes(ikey);
+                    _context.router().saveConfig(PROP_INTRO_KEY, Base64.encode(ikey));
+                }
+            } else {
+                _context.random().nextBytes(ikey);
+                _context.router().saveConfig(PROP_INTRO_KEY, Base64.encode(ikey));
+            }
+        } else {
+            System.arraycopy(_context.routerHash().getData(), 0, ikey, 0, SessionKey.KEYSIZE_BYTES);
+        }
         
         // bind host
         // This is not exposed in the UI and in practice is always null.
@@ -1543,9 +1573,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
                 if (peer != null)
                     sendDestroy(peer);
-                dropPeer(peerHash, false, "wrong network");
+                dropPeer(peerHash, false, "Not in our network");
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping the peer " + peerHash + " because they are in the wrong net: " + entry);
+                    _log.warn("Not in our network: " + entry, new Exception());
                 return;
             } else {
                 if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
@@ -2845,12 +2875,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /**
      * Return our peer clock skews on this transport.
-     * Vector composed of Long, each element representing a peer skew in seconds.
+     * List composed of Long, each element representing a peer skew in seconds.
      * A positive number means our clock is ahead of theirs.
      */
     @Override
-    public Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector<Long>();
+    public List<Long> getClockSkews() {
+        List<Long> skews = new ArrayList<Long>(_peersByIdent.size());
 
         // If our clock is way off, we may not have many (or any) successful connections,
         // so try hard in that case to return good data
@@ -2861,7 +2891,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 continue; // skip old peers
             if (peer.getRTT() > 1250)
                 continue; // Big RTT makes for a poor calculation
-            skews.addElement(Long.valueOf(peer.getClockSkew() / 1000));
+            skews.add(Long.valueOf(peer.getClockSkew() / 1000));
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UDP transport returning " + skews.size() + " peer clock skews.");

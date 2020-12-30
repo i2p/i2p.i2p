@@ -37,9 +37,9 @@
                 <input type="submit" class="default" name="action" value="Save changes" />
     <table id="clientTunnelEdit" class="tunnelConfig">
         <tr>
-            <th>
+            <th class="tunnelNameLabel excludeBackgroundImage">
                 <%=intl._t("Name")%>
-            </th><th>
+            </th><th class="excludeBackgroundImage">
                 <%=intl._t("Type")%>
             </th>
         </tr><tr>
@@ -51,7 +51,7 @@
         </tr><tr>
             <th>
                 <%=intl._t("Description")%>
-            </th><th>
+            </th><th class="excludeBackgroundImage">
                 <%=intl._t("Auto Start Tunnel")%>
             </th>
         </tr><tr>
@@ -62,7 +62,19 @@
                 <%=intl._t("Automatically start tunnel when router starts")%></label>
             </td>
         </tr><tr>
-            <th colspan="2">
+<%
+            boolean isShared = editBean.isSharedClient(curTunnel);
+            String aStopFirst = intl._t("The client tunnel and all other shared client tunnels must be stopped to change this setting");
+            String bStopFirst = intl._t("The client tunnel must be stopped to change this setting");
+            String stopFirst = isShared ? aStopFirst : bStopFirst;
+            boolean canChangePort = editBean.canChangePort(curTunnel);
+            String tastopFirst = " title=\"" + aStopFirst + "\" ";
+            String tbstopFirst = " title=\"" + bStopFirst + "\" ";
+            String tstopFirst = isShared ? tastopFirst : tbstopFirst;
+            // we don't actually disable the fields for a new tunnel, but we provide a warning
+            String phdisabled = (canChangePort && isShared) ? "" : tstopFirst;
+%>
+            <th colspan="2" <%=phdisabled%>>
 <%          if ("streamrclient".equals(tunnelType)) { %>
                 <%=intl._t("Target")%>
 <%          } else { %>
@@ -79,8 +91,11 @@
                            out.write(intl._t("required"));
                            out.write(")</font></span>");
                        }
+                      String phelp = intl._t("Specify the local port this service should be accessible from");
+                      String ptext = canChangePort ? phelp : bStopFirst;
+                      String pdisabled = canChangePort ? "" : " readonly=\"readonly\" ";
 %>
-                <input type="text" size="6" maxlength="5" name="port" title="<%=intl._t("Specify the local port this service should be accessible from")%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" />
+                <input type="text" size="6" maxlength="5" name="port" title="<%=ptext%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
             </td>
 <%
             if ("streamrclient".equals(tunnelType)) {
@@ -99,10 +114,12 @@
             </td>
 <%
             } else {
+                      String ihelp = intl._t("Local interface (ip address) the client tunnel will be reachable from");
+                      String itext = canChangePort ? ihelp : bStopFirst;
 %>
             <td>
                 <b><%=intl._t("Reachable by")%>:</b>
-                <select id="reachableBy" name="reachableBy" title="<%=intl._t("Local interface (ip address) the client tunnel will be reachable from")%>" class="selectbox">
+                <select id="reachableBy" name="reachableBy" title="<%=itext%>" class="selectbox" <%=pdisabled%>>
 <%
                     String clientInterface = editBean.getClientInterface(curTunnel);
                     for (String ifc : editBean.interfaceSet()) {
@@ -111,6 +128,8 @@
                         out.write('\"');
                         if (ifc.equals(clientInterface))
                             out.write(" selected=\"selected\"");
+                        else if (!canChangePort)
+                            out.write(" disabled=\"disabled\"");
                         out.write('>');
                         out.write(ifc);
                         out.write("</option>\n");
@@ -189,7 +208,7 @@
                        }
 %>
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the tunnel here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext destination" placeholder="required" />
-                (<%=intl._t("name, name:port, or destination")%>
+                <%=intl._t("name, name:port, or destination")%>
 <%
                         if ("streamrclient".equals(tunnelType)) {
                             /* deferred resolution unimplemented in streamr client */
@@ -197,7 +216,7 @@
                          - <%=intl._t("b32 not recommended")%>
 <%
                         }
-%> )
+%>
             </td>
         </tr>
 <%
@@ -206,13 +225,28 @@
             if (!"streamrclient".equals(tunnelType)) {
 %>
         <tr>
-            <th colspan="2">
+            <th colspan="2" <%=phdisabled%>>
                 <%=intl._t("Shared Client")%>
             </th>
         </tr><tr>
             <td colspan="2">
-                <label title="<%=intl._t("Traffic from all clients with this feature enabled will be routed over the same set of tunnels. This will make profiling the tunnels by an adversary more difficult, but will link the clients together.")%>"><input value="true" type="checkbox" name="shared"<%=(editBean.isSharedClient(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Share tunnels with other clients and irc/httpclients? (Change requires restart of client proxy tunnel)")%></label>
+<%
+                // we don't actually disable the field for a new tunnel, but we provide a warning
+                String shtitle = (canChangePort && isShared) ?
+                                 intl._t("Traffic from all clients with this feature enabled will be routed over the same set of tunnels. This will make profiling the tunnels by an adversary more difficult, but will link the clients together.") :
+                                 (isShared ? bStopFirst : aStopFirst);               
+                String shdisabled = canChangePort ? "" : " disabled=\"disabled\" ";
+%>
+                <label title="<%=shtitle%>">
+                <input value="true" type="checkbox" name="shared" <%=(isShared ? " checked=\"checked\"" : "")%> class="tickbox" <%=shdisabled%>/>
+                <%=intl._t("Share tunnels with other clients?")%></label>
+<%
+                if (isShared && !canChangePort) {
+                    // disabled checkbox won't come back in the form, stuff it in here
+                    // https://stackoverflow.com/questions/155291/can-html-checkboxes-be-set-to-readonly
+                    %><input value="true" type="hidden" name="shared"/><%
+                }
+%>
             </td>
         </tr>
 <%
@@ -235,22 +269,25 @@
 %>
     </table>
     <h3><%=intl._t("Advanced networking options")%></h3>
-    <table class="tunnelConfig">
 <%
-            if (!"streamrclient".equals(tunnelType)) {
+            if (!"streamrclient".equals(tunnelType) && (canChangePort || isShared)) {
                // no shared client tunnels for streamr
+               // If running and not shared, this doesn't apply.
 %>
+    <table class="tunnelConfig">
         <tr>
             <td class="infohelp" colspan="2">
                 <%=intl._t("Note: When this client proxy is configured to share tunnels, then these options are for all the shared proxy clients!")%>
             </td>
         </tr>
+    </table>
 <%
             } // !streamrclient
 %>
+    <table class="tunnelConfig" id="lengthOption">
         <tr>
-            <th colspan="2">
-                <%=intl._t("Tunnel Options")%>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Length Options")%>
             </th>
         </tr><tr>
             <td>
@@ -263,34 +300,40 @@
                 <select id="tunnelDepth" name="tunnelDepth" title="<%=intl._t("Length of each Tunnel")%>" class="selectbox">
 <%
                        int tunnelDepth = editBean.getTunnelDepth(curTunnel, 3);
-                  %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop tunnel (no anonymity)")%></option>
-                    <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 hop tunnel (low anonymity)")%></option>
-                    <option value="2"<%=(tunnelDepth == 2 ? " selected=\"selected\"" : "") %>><%=intl._t("2 hop tunnel (medium anonymity)")%></option>
-                    <option value="3"<%=(tunnelDepth == 3 ? " selected=\"selected\"" : "") %>><%=intl._t("3 hop tunnel (high anonymity)")%></option>
+                  %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 0)%><%=editBean.unlessAdvanced("no anonymity")%></option>
+                    <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 1)%><%=editBean.unlessAdvanced("low anonymity")%></option>
+                    <option value="2"<%=(tunnelDepth == 2 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 2)%><%=editBean.unlessAdvanced("medium anonymity")%></option>
+                    <option value="3"<%=(tunnelDepth == 3 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 3)%><%=editBean.unlessAdvanced("high anonymity")%></option>
 <%                 if (editBean.isAdvanced()) {
-                  %><option value="4"<%=(tunnelDepth == 4 ? " selected=\"selected\"" : "") %>>4 hop tunnel</option>
-                    <option value="5"<%=(tunnelDepth == 5 ? " selected=\"selected\"" : "") %>>5 hop tunnel</option>
-                    <option value="6"<%=(tunnelDepth == 6 ? " selected=\"selected\"" : "") %>>6 hop tunnel</option>
-                    <option value="7"<%=(tunnelDepth == 7 ? " selected=\"selected\"" : "") %>>7 hop tunnel</option>
-<%
-                   } else if (tunnelDepth > 3) { 
-                %>    <option value="<%=tunnelDepth%>" selected="selected"><%=tunnelDepth%> <%=intl._t("hop tunnel (very poor performance)")%></option>
+                  %><option value="4"<%=(tunnelDepth == 4 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 4)%></option>
+                    <option value="5"<%=(tunnelDepth == 5 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 5)%></option>
+                    <option value="6"<%=(tunnelDepth == 6 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 6)%></option>
+                    <option value="7"<%=(tunnelDepth == 7 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", 7)%></option>
+<%                 } else if (tunnelDepth > 3) { 
+                %>    <option value="<%=tunnelDepth%>" selected="selected"><%=intl.ngettext("{0} hop tunnel", "{0} hop tunnel", tunnelDepth)%></option>
 <%
                    }
               %></select>
             </td><td>
                 <select id="tunnelVariance" name="tunnelVariance" title="<%=intl._t("Level of Randomization for Tunnel Length")%>" class="selectbox">
                     <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, 0);
-                  %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop variance (no randomization, consistent performance)")%></option>
-                    <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-1 hop variance (medium additive randomization, subtractive performance)")%></option>
-                    <option value="2"<%=(tunnelVariance  ==  2 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-2 hop variance (high additive randomization, subtractive performance)")%></option>
-                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-1 hop variance (standard randomization, standard performance)")%></option>
-                    <option value="-2"<%=(tunnelVariance == -2 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-2 hop variance (not recommended)")%></option>
+                  %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop variance")%><%=editBean.unlessAdvanced("no randomization, consistent performance")%></option>
+                    <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-1 hop variance")%><%=editBean.unlessAdvanced("medium randomization, lower performance")%></option>
+                    <option value="2"<%=(tunnelVariance  ==  2 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-2 hop variance")%><%=editBean.unlessAdvanced("high randomization, very low performance")%></option>
+                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-1 hop variance")%><%=editBean.unlessAdvanced("standard randomization, standard performance")%></option>
+                    <option value="-2"<%=(tunnelVariance == -2 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-2 hop variance")%><%=editBean.unlessAdvanced("not recommended")%></option>
                 <% if (tunnelVariance > 2 || tunnelVariance < -2) {
                 %>    <option value="<%=tunnelVariance%>" selected="selected"><%= (tunnelVariance > 2 ? "+ " : "+/- ") %>0-<%=tunnelVariance%> <%=intl._t("hop variance")%></option>
                 <% }
               %></select>
             </td>
+        </tr>
+    </table>
+    <table class="tunnelConfig" id="quantityOptions">
+        <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Quantity Options")%>
+            </th>
         </tr><tr>
             <td>
                 <b><%=intl._t("Count")%></b>
@@ -306,17 +349,24 @@
                 <select id="tunnelBackupQuantity" name="tunnelBackupQuantity" title="<%=intl._t("Number of Reserve Tunnels")%>" class="selectbox">
 <%
                        int tunnelBackupQuantity = editBean.getTunnelBackupQuantity(curTunnel, 0);
-                  %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 backup tunnels (0 redundancy, no added resource usage)")%></option>
-                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 backup tunnel each direction (low redundancy, low resource usage)")%></option>
-                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>><%=intl._t("2 backup tunnels each direction (medium redundancy, medium resource usage)")%></option>
-                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>><%=intl._t("3 backup tunnels each direction (high redundancy, high resource usage)")%></option>
+                  %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} backup tunnel", "{0} backup tunnels", 0)%><%=editBean.unlessAdvanced("no redundancy, no added resource usage")%></option>
+                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} backup tunnel", "{0} backup tunnels", 1)%><%=editBean.unlessAdvanced("low redundancy, low resource usage")%></option>
+                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} backup tunnel", "{0} backup tunnels", 2)%><%=editBean.unlessAdvanced("medium redundancy, medium resource usage")%></option>
+                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>><%=intl.ngettext("{0} backup tunnel", "{0} backup tunnels", 3)%><%=editBean.unlessAdvanced("high redundancy, high resource usage")%></option>
 <%
                    if (tunnelBackupQuantity > 3) {
-                %>    <option value="<%=tunnelBackupQuantity%>" selected="selected"><%=tunnelBackupQuantity%> <%=intl._t("backup tunnels")%></option>
+                %>    <option value="<%=tunnelBackupQuantity%>" selected="selected"><%=intl.ngettext("{0} backup tunnel", "{0} backup tunnels", tunnelBackupQuantity)%></option> 
 <%
                    }
               %></select>
             </td>
+        </tr>
+    </table>
+    <table class="tunnelConfig" id="timedOptions">
+        <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Management Options")%>
+            </th>
         </tr>
 <%
             if ("client".equals(tunnelType)) {
@@ -341,25 +391,8 @@
         </tr>
 <%
             } // client
-
-            if (!editBean.isRouterContext()) {
 %>
-        <tr>
-            <th colspan="2">
-                <%=intl._t("Router I2CP Address")%>
-            </th>
-        </tr><tr>
-            <td>
-                <b><%=intl._t("Host")%>:</b>
-                <input type="text" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext host" />
-            </td><td>
-                <b><%=intl._t("Port")%>:</b>
-                <input type="text" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext port" />
-            </td>
-        </tr>
 <%
-            } // !isRouterContext
-
             if (!"streamrclient".equals(tunnelType)) {
                 // streamr client sends pings so it will never be idle
 %>
@@ -408,39 +441,60 @@
                 minutes
             </td>
         </tr><tr>
-            <td colspan="2">
+<%
+            boolean canChangeEncType = editBean.canChangeEncType(curTunnel);
+            boolean isPersistent = editBean.getPersistentClientKey(curTunnel);
+            boolean canChangeRadio = canChangeEncType || !isPersistent;
+            String nhdisabled = canChangeRadio ? "" : tstopFirst;
+            String ndisabled = canChangeRadio ? "" : " disabled=\"disabled\" ";
+            String n1help = intl._t("Change tunnel identity (destination) when tunnels reopen");
+            String n1text = canChangeRadio ? n1help : stopFirst;
+            String n2help = intl._t("Retain tunnel identity (destination) when tunnels reopen");
+            String n2text = canChangeRadio ? n2help : stopFirst;
+%>
+            <td colspan="2" <%=nhdisabled%>>
                 <b><%=intl._t("New Keys on Reopen")%>:</b>
                 <span class="multiOption">
-                    <label title="<%=intl._t("Change tunnel identity (destination) when tunnels reopen")%>"><input value="1" type="radio" name="newDest"
-                        <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label title="<%=n1text%>"><input value="1" type="radio" name="newDest"
+                        <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : ndisabled)%> class="tickbox" />
                     <%=intl._t("Enable")%></label>
                 </span>
                 <span class="multiOption">
-                    <label title="<%=intl._t("Retain tunnel identity (destination) when tunnels reopen")%>"><input value="0" type="radio" name="newDest"
-                        <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />
+                    <label title="<%=n2text%>"><input value="0" type="radio" name="newDest"
+                        <%=(editBean.getNewDest(curTunnel) || isPersistent ? ndisabled : " checked=\"checked\"")%> class="tickbox" />
                     <%=intl._t("Disable")%></label>
                 </span>
             </td>
         </tr>
 <%
+            String ehdisabled = canChangeEncType ? "" : tstopFirst;
+            String edisabled = canChangeEncType ? "" : " disabled=\"disabled\" ";
+            String destb64 = editBean.getDestinationBase64(curTunnel);
+
             if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "socksirctunnel".equals(tunnelType) || "sockstunnel".equals(tunnelType)) {
 %>
         <tr>
-            <th colspan="2">
+            <th colspan="2" <%=ehdisabled%>>
                 <%=intl._t("Persistent private key")%>
             </th>
         </tr><tr>
+<%
+                      String p1help = intl._t("Enabling this feature will ensure your tunnel identity (destination) remains static, for services offering features based on destination e.g. IRC user authentication");
+                      String p1text = canChangeEncType ? p1help : stopFirst;
+                      String p2help = intl._t("Path to Private Key File");
+                      String p2text = canChangeEncType ? p2help : stopFirst;
+                      String p2disabled = canChangeEncType ? "" : " readonly=\"readonly\" ";
+%>
             <td>
-                <label title="<%=intl._t("Enabling this feature will ensure your tunnel identity (destination) remains static, for services offering features based on destination e.g. IRC user authentication")%>"><input value="2" type="radio" name="newDest"
-                     <%=(editBean.getPersistentClientKey(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=p1text%>"><input value="2" type="radio" name="newDest"
+                     <%=(editBean.getPersistentClientKey(curTunnel) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                 <%=intl._t("Generate key to enable persistent client tunnel identity")%></label>
             </td><td>
                 <b><%=intl._t("File")%>:</b>
-                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=intl._t("Path to Private Key File")%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />
+                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=p2text%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" <%=p2disabled%>/>
             </td>
         </tr>
 <%
-            String destb64 = editBean.getDestinationBase64(curTunnel);
             if (destb64.length() > 0) {
 %>
         <tr>
@@ -449,7 +503,7 @@
             </td>
         </tr><tr>
             <td colspan="2">
-                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=destb64%></div>
+                <div class="displayText resetScrollLeft" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0"><%=destb64%></div>
             </td>
         </tr><tr>
             <td colspan="2">
@@ -463,7 +517,13 @@
 
             if ("httpclient".equals(tunnelType)) {
 %>
+    </table>
+    <table class="tunnelConfig" id="filterOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Filtering Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("HTTP Filtering")%>
             </th>
@@ -488,15 +548,25 @@
             } // if httpclient
 
             int currentSigType = editBean.getSigType(curTunnel, tunnelType);
-            String disabled = editBean.canChangeSigType(curTunnel) ? "" : " disabled=\"disabled\" ";
+            boolean isCreated = isPersistent && destb64.length() > 0;
+            boolean canChangeSigType = editBean.canChangeSigType(curTunnel) && !isCreated;
+            String tooLate = "title=\"" + intl._t("Configuration cannot be changed after destination is created") + '"';
+            String shdisabled = canChangeSigType ? "" : (isCreated ? tooLate : tstopFirst);
+            String disabled = canChangeSigType ? "" : " disabled=\"disabled\" ";
 %>
+    </table>
+    <table class="tunnelConfig" id="cryptoOptions">
         <tr>
-            <th colspan="2">
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Cryptography Options")%>
+            </th>
+        </tr><tr>
+            <th colspan="2" <%=shdisabled%>>
                 <%=intl._t("Signature type")%>
             </th>
         </tr><tr>
             <td colspan="2">
-                <select id="sigType" name="sigType" class="selectbox">
+                <select id="sigType" name="sigType" class="selectbox" <%=shdisabled%>>
                     <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="0" <%=(currentSigType==0 ? " selected=\"selected\"" : disabled)%> >
                     DSA-SHA1</option>
 <%
@@ -529,36 +599,39 @@
             </td>
         </tr>
 <%
-            if (editBean.isAdvanced()) {
                 boolean has0 = editBean.hasEncType(curTunnel, 0);
                 boolean has4 = editBean.hasEncType(curTunnel, 4);
 %>
         <tr>
-            <th colspan="2">
+            <th colspan="2" <%=ehdisabled%>>
                 <%=intl._t("Encryption types")%>
             </th>
         </tr><tr>
             <td colspan="2">
-                <span class="multiOption">
-                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=(has0 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <span class="multiOption" <%=ehdisabled%>>
+                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=(has0 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ElGamal-2048</label>
                 </span>
-                <span class="multiOption">
-                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=(has4 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <span class="multiOption" <%=ehdisabled%>>
+                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=(has4 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ECIES-X25519 (<%=intl._t("Experts only!")%>)</label>
                 </span>
-                <span class="multiOption">
-                    <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Both encryption types")%> (<%=intl._t("Experts only!")%>)</label>
+                <span class="multiOption" <%=ehdisabled%>>
+                    <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
+                    <%=intl._t("Both encryption types")%></label>
                 </span>
             </td>
         </tr>
 <%
-            } // isAdvanced
-
             if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
 %>
+    </table>
+    <table class="tunnelConfig" id="authOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Authentication Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("Local Authorization")%>
             </th>
@@ -601,7 +674,13 @@
 
             if ("httpclient".equals(tunnelType)) {
 %>
+    </table>
+    <table class="tunnelConfig" id="jumpOptions">
         <tr>
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Tunnel Address Lookup Options")%>
+            </th>
+        </tr><tr>
             <th colspan="2">
                 <%=intl._t("Jump URL List")%>
             </th>
@@ -613,8 +692,31 @@
 <%
             } // httpclient
 %>
+    </table>
+<%
+            if (!editBean.isRouterContext()) {
+%>
+    <table class="tunnelConfig">
         <tr>
-            <th colspan="2">
+            <th colspan="2" class="tableTop">
+                <%=intl._t("Router I2CP Address")%>
+            </th>
+        </tr><tr>
+            <td>
+                <b><%=intl._t("Host")%>:</b>
+                <input type="text" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext host" />
+            </td><td>
+                <b><%=intl._t("Port")%>:</b>
+                <input type="text" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext port" />
+            </td>
+        </tr>
+    </table>
+<%
+            } // !isRouterContext
+%>
+    <table class="tunnelConfig" id="advancedOptions">
+        <tr>
+            <th colspan="2" class="tableTop">
                 <%=intl._t("Custom options")%>
             </th>
         </tr><tr>
@@ -625,7 +727,7 @@
             <td class="buttons" colspan="2">
                     <input type="hidden" value="true" name="removeConfirm" />
                     <button id="controlCancel" class="control" type="submit" name="action" value=""><%=intl._t("Cancel")%></button>
-                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>class="control" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>"><%=intl._t("Delete")%></button>
+                    <button id="controlDelete" class="control delete" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>"><%=intl._t("Delete")%></button>
                     <button id="controlSave" class="control" type="submit" name="action" value="Save changes"><%=intl._t("Save")%></button>
             </td>
         </tr>

@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -40,6 +41,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.i2cp.MessageStatusMessage;
+import net.i2p.i2ptunnel.localServer.LocalHTTPServer;
 import net.i2p.util.EepGet;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.InternalSocket;
@@ -670,8 +672,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  @since 0.9.4 moved from I2PTunnelHTTPClient
      */
     protected static String getErrorPage(I2PAppContext ctx, String base, String backup) {
-        File errorDir = new File(ctx.getBaseDir(), "docs");
-        File file = new File(errorDir, base + "-header.ht");
+        String file = "proxy/" + base + "-header.ht";
         try {
             return readFile(ctx, file);
         } catch(IOException ioe) {
@@ -683,20 +684,24 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.proxy.messages";
 
     /**
+     *  As of 0.9.49, loads the error pages from the jar, not the file system.
      *  @since 0.9.4 moved from I2PTunnelHTTPClient
      */
-    private static String readFile(I2PAppContext ctx, File file) throws IOException {
+    private static String readFile(I2PAppContext ctx, String file) throws IOException {
         Reader reader = null;
         char[] buf = new char[512];
         StringBuilder out = new StringBuilder(2048);
+        InputStream in = LocalHTTPServer.getResource(file);
+        if (in == null)
+            throw new IOException();
         try {
             boolean hasSusiDNS = ctx.portMapper().isRegistered(PortMapper.SVC_SUSIDNS);
             boolean hasI2PTunnel = ctx.portMapper().isRegistered(PortMapper.SVC_I2PTUNNEL);
             if (hasSusiDNS && hasI2PTunnel) {
-                reader = new TranslateReader(ctx, BUNDLE_NAME, new FileInputStream(file));
+                reader = new TranslateReader(ctx, BUNDLE_NAME, in);
             } else {
                 // strip out the addressbook links
-                reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+                reader = new InputStreamReader(in, "UTF-8");
                 int len;
                 while((len = reader.read(buf)) > 0) {
                     out.append(buf, 0, len);
@@ -734,6 +739,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             String rv = out.toString();
             return rv;
         } finally {
+            try { in.close(); } catch (IOException ioe) {}
             try {
                 if(reader != null)
                     reader.close();
@@ -915,9 +921,10 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         if (outs == null)
             return;
         Writer out = new BufferedWriter(new OutputStreamWriter(outs, "UTF-8"));
-        out.write(errMessage);
         if (targetRequest != null) {
             String uri = DataHelper.escapeHTML(targetRequest);
+            errMessage = errMessage.replace("<a href=\"\">", "<a href=\"" + uri + "\">");
+            out.write(errMessage);
             out.write("<a href=\"");
             out.write(uri);
             out.write("\">");
@@ -982,6 +989,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                     out.write("</div>\n");
                 }
             }
+        } else {
+            out.write(errMessage);
         }
         out.write("</div>\n");
         writeFooter(out);

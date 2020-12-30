@@ -12,10 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.crypto.EncType;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.router.RouterContext;
@@ -86,7 +88,8 @@ class ExploreJob extends SearchJob {
      */
     @Override
     protected I2NPMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration, RouterInfo peer) {
-        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
+        final RouterContext ctx = getContext();
+        DatabaseLookupMessage msg = new DatabaseLookupMessage(ctx, true);
         msg.setSearchKey(getState().getTarget());
         msg.setFrom(replyGateway);
         // Moved below now that DLM makes a copy
@@ -105,7 +108,7 @@ class ExploreJob extends SearchJob {
         }
 
         KBucketSet<Hash> ks = _facade.getKBuckets();
-        Hash rkey = getContext().routingKeyGenerator().getRoutingKey(getState().getTarget());
+        Hash rkey = ctx.routingKeyGenerator().getRoutingKey(getState().getTarget());
         // in a few releases, we can (and should) remove this,
         // as routers will honor the above flag, and we want the table to include
         // only non-floodfills.
@@ -135,23 +138,42 @@ class ExploreJob extends SearchJob {
         msg.setDontIncludePeers(dontIncludePeers);
 
         // Now encrypt if we can
+        RouterIdentity ident = peer.getIdentity();
+        EncType type = ident.getPublicKey().getType();
+        boolean encryptElG = ctx.getProperty(IterativeSearchJob.PROP_ENCRYPT_RI, IterativeSearchJob.DEFAULT_ENCRYPT_RI);
         I2NPMessage outMsg;
         if (replyTunnelId != null &&
-            getContext().getProperty(IterativeSearchJob.PROP_ENCRYPT_RI, IterativeSearchJob.DEFAULT_ENCRYPT_RI)) {
+            ((encryptElG && type == EncType.ELGAMAL_2048) || (type == EncType.ECIES_X25519 && DatabaseLookupMessage.USE_ECIES_FF))) {
+            EncType ourType = ctx.keyManager().getPublicKey().getType();
+            boolean ratchet1 = ourType.equals(EncType.ECIES_X25519);
+            boolean ratchet2 = DatabaseLookupMessage.supportsRatchetReplies(peer);
             // request encrypted reply?
-            if (DatabaseLookupMessage.supportsEncryptedReplies(peer)) {
+            if (DatabaseLookupMessage.supportsEncryptedReplies(peer) &&
+                (ratchet2 || !ratchet1)) {
+                boolean supportsRatchet = ratchet1 && ratchet2;
                 MessageWrapper.OneTimeSession sess;
-                sess = MessageWrapper.generateSession(getContext());
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": Requesting encrypted reply from " + peer.getIdentity().calculateHash() +
-                              ' ' + sess.key + ' ' + sess.tag);
-                msg.setReplySession(sess.key, sess.tag);
+                sess = MessageWrapper.generateSession(ctx, ctx.sessionKeyManager(), MAX_EXPLORE_TIME, !supportsRatchet);
+                if (sess != null) {
+                    if (sess.tag != null) {
+                        if (_log.shouldInfo())
+                            _log.info(getJobId() + ": Requesting AES reply from " + ident.calculateHash() + " with: " + sess.key + ' ' + sess.tag);
+                        msg.setReplySession(sess.key, sess.tag);
+                    } else {
+                        if (_log.shouldInfo())
+                            _log.info(getJobId() + ": Requesting AEAD reply from " + ident.calculateHash() + " with: " + sess.key + ' ' + sess.rtag);
+                        msg.setReplySession(sess.key, sess.rtag);
+                    }
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn(getJobId() + ": Failed encrypt to " + peer);
+                    // client went away, but send it anyway
+                }
             }
             // may be null
-            outMsg = MessageWrapper.wrap(getContext(), msg, peer);
+            outMsg = MessageWrapper.wrap(ctx, msg, peer);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Encrypted exploratory DLM for " + getState().getTarget() + " to " +
-                           peer.getIdentity().calculateHash());
+                           ident.calculateHash());
         } else {
             outMsg = msg;
         }

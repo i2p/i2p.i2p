@@ -547,11 +547,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // server, reads the response headers, rewriting to include Content-Encoding: x-i2p-gzip
             // if it was one of the Accept-Encoding: values, and gzip the payload       
             boolean allowGZIP = true;
-            String val = opts.getProperty("i2ptunnel.gzip");
+            String val = opts.getProperty(TunnelController.PROP_TUN_GZIP);
             if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
                 allowGZIP = false;
-            if (_log.shouldLog(Log.INFO))
-                _log.info("HTTP server encoding header: " + enc + "/" + altEnc);
+            if (_log.shouldDebug())
+                _log.debug("HTTP server encoding header: " + enc + "/" + altEnc);
             boolean alt = (altEnc != null) && (altEnc.indexOf("x-i2p-gzip") >= 0);
             boolean useGZIP = alt || ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) );
             // Don't pass this on, outproxies should strip so I2P traffic isn't so obvious but they probably don't
@@ -570,13 +570,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             else
                 s.setSoTimeout(SERVER_READ_TIMEOUT_POST);
             
-            Runnable t;
-            if (allowGZIP && useGZIP) {
-                t = new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log);
-            } else {
-                t = new I2PTunnelRunner(s, socket, slock, null, DataHelper.getUTF8(modifiedHeader),
-                                               null, (I2PTunnelRunner.FailCallback) null);
-            }
+            boolean compress = allowGZIP && useGZIP;
+            Runnable t = new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log, compress);
             // run in the unlimited client pool
             //t.start();
             _clientExecutor.execute(t);
@@ -634,20 +629,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         private final I2PAppContext _ctx;
         // shadows _log in super()
         private final Log _log;
+        private final boolean _shouldCompress;
 
         private static final int BUF_SIZE = 8*1024;
 
-        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers, I2PAppContext ctx, Log log) {
+        /**
+         *  @param shouldCompress if false, don't compress, just filter server headers
+         */
+        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers,
+                                   I2PAppContext ctx, Log log, boolean shouldCompress) {
             _webserver = webserver;
             _browser = browser;
             _headers = headers;
             _ctx = ctx;
             _log = log;
+            _shouldCompress = shouldCompress;
         }
 
         public void run() {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Compressed requestor running");
             OutputStream serverout = null;
             OutputStream browserout = null;
             InputStream browserin = null;
@@ -691,21 +690,22 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 } catch (NullPointerException npe) {
                     throw new IOException("getInputStream NPE");
                 }
-                CompressedResponseOutputStream compressedOut = new CompressedResponseOutputStream(browserout);
 
                 //Change headers to protect server identity
                 StringBuilder command = new StringBuilder(128);
                 Map<String, List<String>> headers = readHeaders(null, serverin, command,
                     SERVER_SKIPHEADERS, _ctx);
                 String modifiedHeaders = formatHeaders(headers, command);
-                compressedOut.write(DataHelper.getUTF8(modifiedHeaders));
 
-                s = new Sender(compressedOut, serverin, "server: server to browser", _log);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Before pumping the compressed response");
+                if (_shouldCompress) {
+                    CompressedResponseOutputStream compressedOut = new CompressedResponseOutputStream(browserout);
+                    compressedOut.write(DataHelper.getUTF8(modifiedHeaders));
+                    s = new Sender(compressedOut, serverin, "server: server to browser compressor", _log);
+                } else {
+                    browserout.write(DataHelper.getUTF8(modifiedHeaders));
+                    s = new Sender(browserout, serverin, "server: server to browser uncompressed", _log);
+                }
                 s.run(); // same thread
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("After pumping the compressed response: " + compressedOut.getTotalRead() + "/" + compressedOut.getTotalCompressed());
             } catch (SSLException she) {
                 _log.error("SSL error", she);
                 try {
@@ -780,12 +780,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
 
         public void run() {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(_name + ": Begin sending");
+            if (_log.shouldDebug())
+                _log.debug(_name + ": Begin sending");
             try {
                 DataHelper.copy(_in, _out);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(_name + ": Done sending");
+                if (_log.shouldDebug())
+                    _log.debug(_name + ": Done sending");
                 //_out.flush();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.DEBUG))

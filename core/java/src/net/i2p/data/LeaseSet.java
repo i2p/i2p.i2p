@@ -10,7 +10,6 @@ package net.i2p.data;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +21,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
+import net.i2p.util.ByteArrayStream;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
@@ -64,11 +64,13 @@ import net.i2p.util.RandomSource;
 public class LeaseSet extends DatabaseEntry {
     protected Destination _destination;
     protected PublicKey _encryptionKey;
+    // The revocation key for LS1, null for LS2 except blinded key for encrypted LS2
     protected SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
     protected final List<Lease> _leases;
     protected boolean _receivedAsPublished;
     private boolean _receivedAsReply;
+    private Hash _receivedBy;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
     protected long _lastExpiration;
@@ -162,13 +164,14 @@ public class LeaseSet extends DatabaseEntry {
     /**
      *  The revocation key.
      *  Undeprecated as of 0.9.38, used for the blinded key in EncryptedLeaseSet.
+     *  @return the revocation key for LS1, null for LS2 except blinded key for encrypted LS2
      */
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
 
     /**
-     *  The revocation key. Unused.
+     *  The revocation key. Unused except for encrypted LS2.
      *  Must be the same type as the Destination's SigningPublicKey.
      *  @throws IllegalArgumentException if different type
      */
@@ -196,8 +199,29 @@ public class LeaseSet extends DatabaseEntry {
      */
     public boolean getReceivedAsReply() { return _receivedAsReply; }
 
-    /** set to true @since 0.7.14 */
+    /**
+     * set to true
+     * @since 0.7.14
+     */
     public void setReceivedAsReply() { _receivedAsReply = true; }
+
+    /**
+     * The Hash of the local client that received this LS,
+     * null if the router or unknown.
+     *
+     * @since 0.9.47
+     */
+    public Hash getReceivedBy() { return _receivedBy; }
+
+    /**
+     * Also sets receivedAsReply to true
+     * @param localClient may be null
+     * @since 0.9.47
+     */
+    public void setReceivedBy(Hash localClient) {
+        _receivedAsReply = true;
+        _receivedBy = localClient;
+    }
 
     /**
      * @throws IllegalStateException if already signed
@@ -212,7 +236,7 @@ public class LeaseSet extends DatabaseEntry {
         if (_leases.size() >= MAX_LEASES)
             throw new IllegalArgumentException("Too many leases - max is " + MAX_LEASES);
         _leases.add(lease);
-        long expire = lease.getEndDate().getTime();
+        long expire = lease.getEndTime();
         if (expire < _firstExpiration)
             _firstExpiration = expire;
         if (expire > _lastExpiration)
@@ -264,35 +288,33 @@ public class LeaseSet extends DatabaseEntry {
 
     /**
      * Verify that the signature matches the lease set's destination's signing public key.
-     * OR the included revocation key.
+     * As of 0.9.47, revocation is not checked.
      *
      * @return true only if the signature matches
      */
     @Override
     public boolean verifySignature() {
-        if (super.verifySignature())
-            return true;
+        return super.verifySignature();
 
         // Revocation unused (see above)
-        boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), _signingKey);
-        return signedByRevoker;
+        //boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), _signingKey);
+        //return signedByRevoker;
     }
 
     /**
      * Verify that the signature matches the lease set's destination's signing public key.
-     * OR the specified revocation key.
+     * As of 0.9.47, revocation is not checked.
      *
      * @deprecated revocation unused
      * @return true only if the signature matches
      */
     @Deprecated
     public boolean verifySignature(SigningPublicKey signingKey) {
-        if (super.verifySignature())
-            return true;
+        return super.verifySignature();
 
         // Revocation unused (see above)
-        boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), signingKey);
-        return signedByRevoker;
+        //boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), signingKey);
+        //return signedByRevoker;
     }
 
     /**
@@ -313,7 +335,7 @@ public class LeaseSet extends DatabaseEntry {
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null))
             return null;
         int len = size();
-        ByteArrayOutputStream out = new ByteArrayOutputStream(len);
+        ByteArrayStream out = new ByteArrayStream(len);
         try {
             _destination.writeBytes(out);
             _encryptionKey.writeBytes(out);
@@ -424,12 +446,16 @@ public class LeaseSet extends DatabaseEntry {
             buf.append("\n\tDestination: ").append(_destination);
             buf.append("\n\tB32: ").append(_destination.toBase32());
         }
-        buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
-        buf.append("\n\tSigningKey: ").append(_signingKey);
-        buf.append("\n\tSignature: ").append(_signature);
+        if (_encryptionKey != null)
+            buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
+        if (_signingKey != null)
+            buf.append("\n\tSigningKey: ").append(_signingKey);
+        if (_signature != null)
+            buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tLeases: #").append(getLeaseCount());
-        for (int i = 0; i < getLeaseCount(); i++)
+        for (int i = 0; i < getLeaseCount(); i++) {
             buf.append("\n\t\t").append(getLease(i));
+        }
         buf.append("]");
         return buf.toString();
     }
@@ -471,7 +497,7 @@ public class LeaseSet extends DatabaseEntry {
         if (size < 1 || size > MAX_LEASES-1)
             throw new IllegalArgumentException("Bad number of leases for encryption");
         int datalen = ((DATA_LEN * size / 16) + 1) * 16;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
+        ByteArrayStream baos = new ByteArrayStream(datalen);
         for (int i = 0; i < size; i++) {
             _leases.get(i).getGateway().writeBytes(baos);
             _leases.get(i).getTunnelId().writeBytes(baos);
@@ -491,7 +517,7 @@ public class LeaseSet extends DatabaseEntry {
         RandomSource.getInstance().nextBytes(enc, datalen, padlen);
         // add the padded lease...
         Lease padLease = new Lease();
-        padLease.setEndDate(_leases.get(0).getEndDate());
+        padLease.setEndDate(_leases.get(0).getEndTime());
         _leases.add(padLease);
         // ...and replace all the gateways and tunnel ids
         ByteArrayInputStream bais = new ByteArrayInputStream(enc);
@@ -519,7 +545,7 @@ public class LeaseSet extends DatabaseEntry {
             throw new DataFormatException("Bad number of leases decrypting " + _destination.toBase32() +
                                           " - is this destination encrypted?");
         int datalen = DATA_LEN * size;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
+        ByteArrayStream baos = new ByteArrayStream(datalen);
         for (int i = 0; i < size; i++) {
             _leases.get(i).getGateway().writeBytes(baos);
             _leases.get(i).getTunnelId().writeBytes(baos);
@@ -541,7 +567,7 @@ public class LeaseSet extends DatabaseEntry {
             TunnelId t = new TunnelId();
             t.readBytes(bais);
             l.setTunnelId(t);
-            l.setEndDate(_leases.get(i).getEndDate());
+            l.setEndDate(_leases.get(i).getEndTime());
             _decryptedLeases.add(l);
         }
     }

@@ -2,6 +2,7 @@ package net.i2p.router.peermanager;
 
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
@@ -91,9 +92,13 @@ class CapacityCalculator {
 
         // credit non-floodfill to reduce conn limit issues at floodfills
         // TODO only if we aren't floodfill ourselves?
-        RouterInfo ri = context.netDb().lookupRouterInfoLocally(profile.getPeer());
-        if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri))
-            capacity += BONUS_NON_FLOODFILL;
+        // null for tests
+        NetworkDatabaseFacade ndb =  context.netDb();
+        if (ndb != null) {
+            RouterInfo ri = ndb.lookupRouterInfoLocally(profile.getPeer());
+            if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri))
+                capacity += BONUS_NON_FLOODFILL;
+        }
 
         // a tiny tweak to break ties and encourage closeness, -.25 to +.25
         capacity -= profile.getXORDistance() * (BONUS_XOR / 128);

@@ -24,11 +24,11 @@ class BatchedRouterPreprocessor extends BatchedPreprocessor {
     /** This goes in router advanced config */
     public static final String PROP_ROUTER_BATCH_FREQUENCY = "router.batchFrequency";
     /** for client OBGWs only (our data) */
-    public static final int OB_CLIENT_BATCH_FREQ = 75;
+    public static final int OB_CLIENT_BATCH_FREQ = 37;
     /** for exploratory OBGWs only (our tunnel tests and build messages) */
     public static final int OB_EXPL_BATCH_FREQ = 100;
     /** for IBGWs for efficiency (not our data) */
-    public static final int DEFAULT_BATCH_FREQUENCY = 150;
+    public static final int DEFAULT_BATCH_FREQUENCY = 75;
     
     /** for OBGWs */
     public BatchedRouterPreprocessor(RouterContext ctx, TunnelCreatorConfig cfg) {
@@ -48,20 +48,24 @@ class BatchedRouterPreprocessor extends BatchedPreprocessor {
     
     private static String getName(HopConfig cfg) {
         if (cfg == null) return "IB??";
-        if (cfg.getReceiveTunnel() != null)
-            return "IB " + cfg.getReceiveTunnel().getTunnelId();
-        else if (cfg.getSendTunnel() != null)
-            return "IB " + cfg.getSendTunnel().getTunnelId();
+        long id = cfg.getReceiveTunnelId();
+        if (id != 0)
+            return "IB " + id;
+        id = cfg.getSendTunnelId();
+        if (id != 0)
+            return "IB " + id;
         else
             return "IB??";
     }
     
     private static String getName(TunnelCreatorConfig cfg) {
         if (cfg == null) return "OB??";
-        if (cfg.getReceiveTunnelId(0) != null)
-            return "OB " + cfg.getReceiveTunnelId(0).getTunnelId();
-        else if (cfg.getSendTunnelId(0) != null)
-            return "OB " + cfg.getSendTunnelId(0).getTunnelId();
+        long id = cfg.getConfig(0).getReceiveTunnelId();
+        if (id != 0)
+            return "OB " + id;
+        id = cfg.getConfig(0).getSendTunnelId();
+        if (id != 0)
+            return "OB " + id;
         else
             return "OB??";
     }

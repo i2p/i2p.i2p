@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
@@ -511,7 +512,8 @@ class SAMv2StreamSession extends SAMStreamSession
 									break ;
 							}
 							
-							data.clear();
+							// not ByteBuffer to avoid Java 8/9 issues
+							((Buffer)data).clear();
 							read = Channels.newChannel(in).read ( data );
 
 							if ( read == -1 )
@@ -522,7 +524,8 @@ class SAMv2StreamSession extends SAMStreamSession
 							}
 
 							totalReceived += read ;
-							data.flip();
+							// not ByteBuffer to avoid Java 8/9 issues with flip()
+							((Buffer)data).flip();
 							recv.receiveStreamBytes ( id, data );
 						}
 					}

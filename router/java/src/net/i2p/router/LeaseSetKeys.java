@@ -32,9 +32,17 @@ public class LeaseSetKeys {
      * @since 0.9.44
      */
     public static final Set<EncType> SET_ELG = Collections.unmodifiableSet(EnumSet.of(EncType.ELGAMAL_2048));
-    private static final Set<EncType> SET_EC = Collections.unmodifiableSet(EnumSet.of(EncType.ECIES_X25519));
-    private static final Set<EncType> SET_BOTH = Collections.unmodifiableSet(EnumSet.of(EncType.ELGAMAL_2048, EncType.ECIES_X25519));
-    private static final Set<EncType> SET_NONE = Collections.unmodifiableSet(EnumSet.noneOf(EncType.class));
+    /**
+     * Unmodifiable, ECIES-X25519 only
+     * @since public since 0.9.46
+     */
+    public static final Set<EncType> SET_EC = Collections.unmodifiableSet(EnumSet.of(EncType.ECIES_X25519));
+    /**
+     * Unmodifiable, ElGamal and ECIES-X25519.
+     * @since public since 0.9.48
+     */
+    public static final Set<EncType> SET_BOTH = Collections.unmodifiableSet(EnumSet.of(EncType.ELGAMAL_2048, EncType.ECIES_X25519));
+    private static final Set<EncType> SET_NONE = Collections.emptySet();
 
     /**
      *  Client with a single key

@@ -41,6 +41,8 @@ ARM_PLATFORMS="armv5 armv6 armv7a armcortex8 armcortex9 armcortex15"
 # Rename output of armv7a to armv7 since that's what NBI expects.
 # This is due to versions after GMP 6.0.0 changing the target name.
 TRANSLATE_NAME_armv7a="armv7"
+# aarch64
+TRANSLATE_NAME_aarch64="armv8"
 
 #
 # X86_64
@@ -50,7 +52,7 @@ TRANSLATE_NAME_armv7a="armv7"
 # Note! these build on 32bit as 32bit when operating as 32bit...
 # starting with k10 added for 6.0.0
 # As of GMP 6.0.0, libgmp 3,
-X86_64_PLATFORMS="skylake coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
+X86_64_PLATFORMS="zen2 zen silvermont goldmont skylake coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
 TRANSLATE_NAME_x86_64="none" # Rename x86_64 to none_64, since that is what NativeBigInteger refers to it as
 
 # Note! these are 32bit _ONLY_ (after the 64 bit ones)
@@ -84,8 +86,8 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     exit 1
 fi
 
-if ! command m4 > /dev/null; then
-    printf "\aWARNING: \`m4\` not found. Install m4 " >&2
+if [ ! $(which m4) ]; then
+    printf "\aERROR: \`m4\` not found. Install m4 " >&2
     printf "and re-run this script.\n\n\n\a" >&2
     exit 1
 fi
@@ -131,7 +133,7 @@ if [ $BITS -eq 32 ]; then
   fi
 elif [ $BITS -eq 64 ]; then
   export ABI=64
-  if [ "$TARGET" != "android" ]; then
+  if [ "$TARGET" != "android" -a "$UNAME" != "aarch64" ]; then
       export CFLAGS="-m64"
       export LDFLAGS="-m64"
   fi
@@ -140,7 +142,7 @@ else
   exit 1
 fi
 
-if ! command ${CC} > /dev/null; then
+if [ ! $(which ${CC}) ]; then
   echo "The compiler you've selected \"$CC\" does not appear to exist"
   exit 1
 fi
@@ -277,6 +279,8 @@ linux*|*kfreebsd)
                         fi;;
                 arm*)
                         PLATFORM_LIST="${ARM_PLATFORMS}";;
+                aarch64)
+                        PLATFORM_LIST="aarch64";;
                 *)
                         PLATFORM_LIST="${LINUX_PLATFORMS}";;
         esac

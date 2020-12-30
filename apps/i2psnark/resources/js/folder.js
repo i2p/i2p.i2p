@@ -1,6 +1,52 @@
+/* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
+/* see also licenses/LICENSE-GPLv2.txt */
+
 const setupbuttons=()=>{
 	let sp = document.forms[0].savepri;
 	if ( sp ) updatesetallbuttons(), sp.disabled = true, sp.className = 'disabled';
+
+	var buttons = document.getElementsByClassName("prihigh");
+	for(index = 0; index < buttons.length; index++)
+	{
+		var button = buttons[index];
+                if (!button.disabled)
+			addClickHandler(button);
+	}
+	buttons = document.getElementsByClassName("prinorm");
+	for(index = 0; index < buttons.length; index++)
+	{
+		var button = buttons[index];
+                if (!button.disabled)
+	 		addClickHandler(button);
+	}
+	buttons = document.getElementsByClassName("priskip");
+	for(index = 0; index < buttons.length; index++)
+	{
+		var button = buttons[index];
+                if (!button.disabled)
+			addClickHandler(button);
+	}
+	var button = document.getElementById('setallhigh');
+	if (!button.disabled) {
+		button.addEventListener("click", function() {
+			setallhigh();
+			event.preventDefault();
+	        });
+	}
+	button = document.getElementById('setallnorm');
+	if (!button.disabled) {
+		button.addEventListener("click", function() {
+			setallnorm();
+			event.preventDefault();
+	        });
+	}
+	button = document.getElementById('setallskip');
+	if (!button.disabled) {
+		button.addEventListener("click", function() {
+			setallskip();
+			event.preventDefault();
+	        });
+	}
 }
 
 const priorityclicked=()=>{
@@ -61,3 +107,16 @@ const setallskip=()=>{
 	form.savepri.disabled = false;
 	form.savepri.className = 'accept';
 }
+
+function addClickHandler(elem)
+{
+	elem.addEventListener("click", function() {
+		priorityclicked();
+        });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    setupbuttons();
+}, true);
+
+/* @license-end */

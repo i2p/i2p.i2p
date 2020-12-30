@@ -34,6 +34,10 @@ public class HomeHelper extends HelperBase {
     static final String PROP_MONITORING = "routerconsole.monitoring";
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
     private static final String PROP_SEARCH = "routerconsole.showSearch";
+    private static final String bottomWrap = "<br>\n" +
+            "<div class=\"clearer\">&nbsp;</div>\n" +
+                "</div>\n" + 
+                "</div>\n";
 
     // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
@@ -59,15 +63,17 @@ public class HomeHelper extends HelperBase {
 
     // No commas allowed in text strings!
     static final String DEFAULT_FAVORITES =
-        "anoncoin.i2p" + S + _x("The Anoncoin project") + S + "http://anoncoin.i2p/" + S + I + "anoncoin_32.png" + S +
+        //"anoncoin.i2p" + S + _x("The Anoncoin project") + S + "http://anoncoin.i2p/" + S + I + "anoncoin_32.png" + S +
         //"colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
         //_x("Dev Builds") + S + _x("Development builds of I2P") + S + "http://bobthebuilder.i2p/" + S + I + "script_gear.png" + S +
         _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "group_gear.png" + S +
         //_x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "i2psnark.png" + S +
-        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "box_open.png" + S +
+        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "echelon.png" + S +
         //"exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S + "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
         _x("I2P FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/faq" + S + I + "question.png" + S +
         _x("I2P Forum") + S + _x("Community forum") + S + "http://i2pforum.i2p/" + S + I + "group.png" + S +
+        _x("Git Project Hosting") + S + _x("Community git project hosting") + S + "http://git.idk.i2p" + S + I + "i2pgit.png" + S +
+        _x("I2P Pastebin") + S + _x("Pastebin for I2P users") + S + "http://paste.idk.i2p" + S + I + "paste.png" + S +
         //"git.repo.i2p" + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
         //"hiddengate [ru]" + S + _x("Russian I2P-related wiki") + S + "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
         //_x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
@@ -83,10 +89,9 @@ public class HomeHelper extends HelperBase {
         //_x("I2P Plugins") + S + _x("Add-on directory") + S + "http://i2pwiki.i2p/index.php?title=Plugins" + S + I + "info/plugin_link.png" + S +
         //_x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
         //_x("PrivateBin") + S + _x("Encrypted I2P Pastebin") + S + "http://paste.crypthost.i2p/" + S + I + "paste_plain.png" + S +
-        _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "info_rhombus.png" + S +
+        _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "glass.png" + S +
         //_x("lenta news [ru]") + S + _x("Russian News Feed") + S + "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +
         //"Salt" + S + "salt.i2p" + S + "http://salt.i2p/" + S + I + "salt_console.png" + S +
-        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_line.png" + S +
         _x("The Tin Hat") + S + _x("Privacy guides and tutorials") + S + "http://secure.thetinhat.i2p/" + S + I + "thetinhat.png" + S +
         //_x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "billiard_marker.png" + S +
         //"sponge.i2p" + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
@@ -95,11 +100,12 @@ public class HomeHelper extends HelperBase {
     // No commas allowed in text strings!
     /** @since 0.9.44 */
     static final String DEFAULT_MONITORING =
-        _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "billiard_marker.png" + S +
+        _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "info/logs.png" + S +
         _x("Graphs") + S + _x("Visualize information about the router") + S + "/graphs" + S + I + "chart_line.png" + S +
         _x("I2P Technical Docs") + S + _x("Technical documentation") + S + "http://i2p-projekt.i2p/how" + S + I + "education.png" + S +
-        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "billiard_marker.png" + S +
+        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "trac_wiki.png" + S +
         _x("I2P Bug Reports") + S + _x("Bug tracker") + S + "http://trac.i2p2.i2p/report/1" + S + I + "bug.png" + S +
+        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_bar.png" + S +
         "";
 
     public boolean shouldShowWelcome() {
@@ -110,27 +116,87 @@ public class HomeHelper extends HelperBase {
         return _context.getBooleanProperty(PROP_SEARCH);
     }
 
+    /** @since 0.9.47 */
+    private String topWrap(String headline) {
+        String str = "<div class=\"ag2\">\n" +
+            "<h4 class=\"app\">" +
+            headline +
+            "</h4>\n" +
+            "<div class=\"homeapps\">\n";
+        return str;
+    }
+    
     public String getServices() {
+        String table = homeTable(PROP_SERVICES, DEFAULT_SERVICES, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap(_t("Applications")));
+        buf.append(table);
+        buf.append(bottomWrap);
+        return buf.toString();
+    }
+    
+    /** @since 0.9.47 */
+    public String getPlugins() {
         List<App> plugins = NavHelper.getClientApps(_context);
-        return homeTable(PROP_SERVICES, DEFAULT_SERVICES, plugins);
+        String table = pluginTable(plugins);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap(_t("Plugins")));
+        buf.append(table);
+        buf.append(bottomWrap);
+        return buf.toString();
+    }
+    
+    /** @since 0.9.44 */
+    public String getConfig() {
+        String table = homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap(_t("Configuration and Help")));
+        buf.append(table);
+        buf.append(bottomWrap);
+        return buf.toString();
     }
 
     /** @since 0.9.44 */
-    public String getConfig(){
-        return homeTable(PROP_CONFIG, DEFAULT_CONFIG, null);
-    }
-
-    /** @since 0.9.44 */
-    public String getMonitoring(){
-        return homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
+    public String getMonitoring() {
+        String table = homeTable(PROP_MONITORING, DEFAULT_MONITORING, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap(_t("Network Information and Developer Information")));
+        buf.append(table);
+        buf.append(bottomWrap);
+        return buf.toString();
     }
 
     public String getFavorites() {
-        return homeTable(PROP_FAVORITES, DEFAULT_FAVORITES, null);
+        String table = homeTable(PROP_FAVORITES, DEFAULT_FAVORITES, null);
+        if (table.length() == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(1380);
+        buf.append(topWrap(_t("I2P Community Sites")));
+        buf.append(table);
+        buf.append(bottomWrap);
+        return buf.toString();
     }
 
     public String getConfigServices() {
         return configTable(PROP_SERVICES, DEFAULT_SERVICES);
+    }
+
+    /** @since 0.9.47 */
+    public String getConfigPlugins() {
+        return getPlugins();
     }
 
     /** @since 0.9.44 */
@@ -163,6 +229,14 @@ public class HomeHelper extends HelperBase {
                " alt=\"" + _t("Your browser is not properly configured to use the HTTP proxy at {0}",
                              _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST) + ':' + port) +
                "\">";
+    }
+
+
+    private String pluginTable(Collection<App> toAdd) {
+        Collection<App> apps = buildApps(_context, "");
+        if (toAdd != null)
+            apps.addAll(toAdd);
+        return renderApps(apps);
     }
 
     private String homeTable(String prop, String dflt, Collection<App> toAdd) {
@@ -223,6 +297,9 @@ public class HomeHelper extends HelperBase {
     }
 
     private String renderApps(Collection<App> apps) {
+        if (apps.size() == 0) {
+            return "";
+        }
         String website = _t("Web Server");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");

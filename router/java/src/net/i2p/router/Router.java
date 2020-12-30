@@ -105,6 +105,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private boolean _familyKeyCryptoFail;
     public final Object _familyKeyLock = new Object();
     private UPnPScannerCallback _upnpScannerCallback;
+    private long _downtime = -1;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -157,11 +158,14 @@ public class Router implements RouterClock.ClockShiftListener {
             System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
             System.setProperty("networkaddress.cache.negative.ttl", DNS_NEG_CACHE_TIME);
         }
-        if (System.getProperty("I2P_DISABLE_HTTP_AGENT_OVERRIDE") == null) {
-            System.setProperty("http.agent", "I2P");
-        }
+        // ref: https://docs.oracle.com/javase/8/docs/api/java/net/doc-files/net-properties.html#Proxies
+        // This doesn't do what you think, and a bad idea anyway
+        //if (System.getProperty("I2P_DISABLE_HTTP_AGENT_OVERRIDE") == null) {
+        //    System.setProperty("http.agent", "I2P");
+        //}
         if (System.getProperty("I2P_DISABLE_HTTP_KEEPALIVE_OVERRIDE") == null) {
             // (no need for keepalive)
+            // Note that doc link above is wrong, it IS capital A Alive
             System.setProperty("http.keepAlive", "false");
         }
         // Save it for LogManager
@@ -188,6 +192,9 @@ public class Router implements RouterClock.ClockShiftListener {
      *  You must call runRouter() after any constructor to start things up.
      *
      *  Config file name is "router.config" unless router.configLocation set in system properties.
+     *
+     *  See two-arg constructor for more information.
+     *
      *  @throws IllegalStateException since 0.9.19 if another router with this config is running
      */
     public Router() { this(null, null); }
@@ -199,6 +206,8 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  Config file name is "router.config" unless router.configLocation set in envProps or system properties.
      *
+     *  See two-arg constructor for more information.
+     *
      *  @param envProps may be null
      *  @throws IllegalStateException since 0.9.19 if another router with this config is running
      */
@@ -208,6 +217,8 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Instantiation only. Starts no threads. Does not install updates.
      *  RouterContext is created but not initialized.
      *  You must call runRouter() after any constructor to start things up.
+     *
+     *  See two-arg constructor for more information.
      *
      *  @param configFilename may be null
      *  @throws IllegalStateException since 0.9.19 if another router with this config is running
@@ -237,7 +248,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  in this constructor.
      *  If files in an existing config dir indicate that another router is already running
      *  with this directory, the constructor will delay for several seconds to be sure,
-     *  and then call System.exit(-1).
+     *  and then throw an IllegalStateException.
      *
      *  @param configFilename may be null
      *  @param envProps may be null
@@ -460,6 +471,8 @@ public class Router implements RouterClock.ClockShiftListener {
         _watchdogThread.setPriority(Thread.NORM_PRIORITY + 1);
         _watchdogThread.start();
         
+        if (SystemVersion.isWindows())
+            BasePerms.fix(_context);
     }
     
     /**
@@ -488,8 +501,6 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
 
-    /** @deprecated unused */
-    @Deprecated
     public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
     /** @return absolute path */
@@ -701,7 +712,8 @@ public class Router implements RouterClock.ClockShiftListener {
         synchronized(_configFileLock) {
             // persistent key for peer ordering since 0.9.17
             // These will be replaced in CreateRouterInfoJob if we rekey
-            if (!_config.containsKey(PROP_IB_RANDOM_KEY)) {
+            if (!_config.containsKey(PROP_IB_RANDOM_KEY) ||
+                getEstimatedDowntime() > 12*60*60*1000L) {
                 byte rk[] = new byte[32];
                 _context.random().nextBytes(rk);
                 _config.put(PROP_IB_RANDOM_KEY, Base64.encode(rk));
@@ -1255,6 +1267,7 @@ public class Router implements RouterClock.ClockShiftListener {
         synchronized(_configFileLock) {
             removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
             removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+            removeConfigSetting(UDPTransport.PROP_INTRO_KEY);
             removeConfigSetting(NTCPTransport.PROP_I2NP_NTCP_PORT);
             removeConfigSetting(NTCPTransport.PROP_NTCP2_SP);
             removeConfigSetting(NTCPTransport.PROP_NTCP2_IV);
@@ -1476,7 +1489,23 @@ public class Router implements RouterClock.ClockShiftListener {
         }
 
         _context.removeShutdownTasks();
+
+        // All in-JVM clients should be gone by now,
+        // unless they are stuck waiting for tunnels.
+        // If we have any of those, or external clients,
+        // we will wait below for the I2CP disconnect messages to get to them.
+        boolean waitForClients = _killVMOnEnd && !_context.clientManager().listClients().isEmpty();
+        if (_log.shouldWarn())
+            _log.warn("Stopping ClientManager");
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the client manager", t); }
+        if (waitForClients) {
+            // Give time for the disconnect messages to get to them
+            // so they can shut down correctly before the JVM goes away
+            try { Thread.sleep(1500); } catch (InterruptedException ie) {}
+            if (_log.shouldWarn())
+                _log.warn("Done waiting for clients to disconnect");
+        }
+
         try { _context.namingService().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the naming service", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the job queue", t); }
         try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel manager", t); }
@@ -1541,9 +1570,16 @@ public class Router implements RouterClock.ClockShiftListener {
                 killKeys();
         }
 
-        File f = getPingFile();
-        f.delete();
-        if (RouterContext.getContexts().isEmpty())
+        if (!SystemVersion.isAndroid()) {
+            File f = getPingFile();
+            f.delete();
+        }
+
+        // Only do this on Android. On desktop, rogue threads
+        // may create a new I2PAppContext before the JVM stops
+        // if we delete this one.
+        //if (RouterContext.getContexts().isEmpty())
+        if (SystemVersion.isAndroid())
             RouterContext.killGlobalContext();
 
         // Since 0.8.8, for Android and the wrapper
@@ -1776,6 +1812,9 @@ public class Router implements RouterClock.ClockShiftListener {
         ((RouterClock) _context.clock()).removeShiftListener(this);
         // Let's not stop accepting tunnels, etc
         //_started = _context.clock().now();
+        synchronized(_configFileLock) {
+            _downtime = 1;
+        }
         Thread t = new I2PThread(new Restarter(_context), "Router Restart");
         t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();
@@ -1809,7 +1848,7 @@ public class Router implements RouterClock.ClockShiftListener {
             if (remaining > 1) {
                 error = true;
             } else if (remaining == 1) {
-                rebuild = args[g.getOptind()].equals("rebuild");;
+                rebuild = args[g.getOptind()].equals("rebuild");
                 if (!rebuild)
                     error = true;
             }
@@ -1882,7 +1921,12 @@ public class Router implements RouterClock.ClockShiftListener {
         File f = getPingFile();
         if (f.exists()) {
             long lastWritten = f.lastModified();
-            if (System.currentTimeMillis()-lastWritten > LIVELINESS_DELAY) {
+            long downtime = System.currentTimeMillis() - lastWritten;
+            synchronized(_configFileLock) {
+                if (downtime > 0 && _downtime < 0)
+                    _downtime = downtime;
+            }
+            if (downtime > LIVELINESS_DELAY) {
                 System.err.println("WARN: Old router was not shut down gracefully, deleting " + f);
                 f.delete();
             } else {
@@ -1901,6 +1945,49 @@ public class Router implements RouterClock.ClockShiftListener {
         _context.simpleTimer2().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
     }
     
+    /** 
+     *  How long this router was down before it started, or 0 if unknown.
+     *
+     *  This may be used for a determination of whether to regenerate keys, for example.
+     *  We use the timestamp of the previous ping file left behind on crash,
+     *  as set by isOnlyRouterRunning(), if present.
+     *  Otherwise, the last STOPPED entry in the event log.
+     *
+     *  May take a while to run the first time, if it has to go through the event log.
+     *  Once called, the result is cached.
+     *
+     *  @since 0.0.47
+     */
+    public long getEstimatedDowntime() {
+        synchronized(_configFileLock) {
+            if (_downtime >= 0)
+                return _downtime;
+            long begin = System.currentTimeMillis();
+            long stopped = _eventLog.getLastEvent(EventLog.STOPPED, _context.clock().now() - 365*24*60*60*1000L);
+            long downtime = stopped > 0 ? _started - stopped : 0;
+            if (downtime < 0)
+                downtime = 0;
+            if (_log.shouldWarn())
+                _log.warn("Downtime was " + DataHelper.formatDuration(downtime) +
+                          "; calculation took " + DataHelper.formatDuration(System.currentTimeMillis() - begin));
+            _downtime = downtime;
+            return downtime;
+        }
+    }
+    
+    /** 
+     *  Only for soft restart. Not for external use.
+     *
+     *  @since 0.0.47
+     */
+    public void setEstimatedDowntime(long downtime) {
+        if (downtime <= 0)
+            downtime = 1;
+        synchronized(_configFileLock) {
+            _downtime = downtime;
+        }
+    }
+
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
     public static final int DEFAULT_SHARE_PERCENTAGE = 80;
     

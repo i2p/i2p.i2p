@@ -4,11 +4,17 @@ import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import javax.imageio.ImageIO;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
@@ -47,6 +53,49 @@ import org.rrd4j.data.Variable;
  * the string to disable the auto justification.</p>
  */
 public class RrdGraphDef implements RrdGraphConstants {
+
+    /**
+     * <p>Implementations of this class can be used to generate image than can be
+     * layered on graph. The can be used for background image, a background image
+     * draw on canvas or an overlay image.</p>
+     * @author Fabrice Bacchella
+     *
+     */
+    public interface ImageSource {
+        /**
+         * A image of the required size that will be applied. If the generated image is too big, it will be clipped before being applied.
+         * @param w the width of the requested image
+         * @param h the high of the requested image
+         * @return an image to draw.
+         * @throws IOException
+         */
+        BufferedImage apply(int w, int h) throws IOException;
+    }
+
+    private static class FileImageSource implements ImageSource {
+        private final File imagesource;
+
+        FileImageSource(String imagesource) {
+            this.imagesource = new File(imagesource);
+        }
+
+        public BufferedImage apply(int w, int h) throws IOException {
+            return ImageIO.read(imagesource);
+        }
+    }
+
+    private static class UrlImageSource implements ImageSource {
+        private final URL imagesource;
+
+        private UrlImageSource(URL imagesource) {
+            this.imagesource = imagesource;
+        }
+
+        public BufferedImage apply(int w, int h) throws IOException {
+            return ImageIO.read(imagesource);
+        }
+    }
+
     boolean poolUsed = false; // ok
     boolean antiAliasing = false; // ok
     boolean textAntiAliasing = false; // ok
@@ -69,8 +118,9 @@ public class RrdGraphDef implements RrdGraphConstants {
     String imageInfo = null; // ok
     String imageFormat = DEFAULT_IMAGE_FORMAT; // ok
     float imageQuality = DEFAULT_IMAGE_QUALITY; // ok
-    String backgroundImage = null; // ok
-    String overlayImage = null; // ok
+    ImageSource backgroundImage = null; // ok
+    ImageSource canvasImage = null; // ok
+    ImageSource overlayImage = null; // ok
     String unit = null; // ok
     boolean lazy = false; // ok
     double minValue = Double.NaN; // ok
@@ -466,6 +516,7 @@ public class RrdGraphDef implements RrdGraphConstants {
 
     /**
      * Sets image format.
+     * ImageIO is used to save the image, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
      *
      * @param imageFormat Any value as return by {@link javax.imageio.ImageIO#getReaderFormatNames}
      */
@@ -474,22 +525,90 @@ public class RrdGraphDef implements RrdGraphConstants {
     }
 
     /**
-     * Sets background image - currently, only PNG images can be used as background.
+     * Sets background image.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
      *
      * @param backgroundImage Path to background image
      */
     public void setBackgroundImage(String backgroundImage) {
+        this.backgroundImage = new FileImageSource(backgroundImage);
+    }
+
+    /**
+     * Sets background image.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     *
+     * @param backgroundImageUrl URL to background image
+     */
+    public void setBackgroundImage(URL backgroundImageUrl) {
+        this.backgroundImage = new UrlImageSource(backgroundImageUrl);
+    }
+
+    /**
+     * Sets background image.
+     *
+     * @param backgroundImage An {@link ImageSource} that will provides a {@link BufferedImage}
+     */
+    public void setBackgroundImage(ImageSource backgroundImage) {
         this.backgroundImage = backgroundImage;
     }
 
     /**
-     * Sets overlay image - currently, only PNG images can be used as overlay. Overlay image is
-     * printed on the top of the image, once it is completely created.
+     * Sets canvas background image. Canvas image is printed on canvas area, under canvas color and plot.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     *
+     * @param canvasImage Path to canvas image
+     */
+    public void setCanvasImage(String canvasImage) {
+        this.canvasImage = new FileImageSource(canvasImage);
+    }
+
+    /**
+     * Sets canvas background image. Canvas image is printed on canvas area, under canvas color and plot.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     *
+     * @param canvasUrl URL to canvas image
+     */
+    public void setCanvasImage(URL canvasUrl) {
+        this.canvasImage = new UrlImageSource(canvasUrl);
+    }
+
+    /**
+     * Sets canvas background image. Canvas image is printed on canvas area, under canvas color and plot.
+     *
+     * @param canvasImageSource An {@link ImageSource} that will provides a {@link BufferedImage}
+     */
+    public void setCanvasImage(ImageSource canvasImageSource) {
+        this.canvasImage = canvasImageSource;
+    }
+
+    /**
+     * Sets overlay image. Overlay image is printed on the top of the image, once it is completely created.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
      *
      * @param overlayImage Path to overlay image
      */
     public void setOverlayImage(String overlayImage) {
-        this.overlayImage = overlayImage;
+        this.overlayImage = new FileImageSource(overlayImage);
+    }
+
+    /**
+     * Sets overlay image. Overlay image is printed on the top of the image, once it is completely created.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     *
+     * @param overlayImage URL to overlay image
+     */
+    public void setOverlayImage(URL overlayImage) {
+        this.overlayImage = new UrlImageSource(overlayImage);
+    }
+
+    /**
+     * Sets overlay image. Overlay image is printed on the top of the image, once it is completely created.
+     *
+     * @param overlayImageSource An {@link ImageSource} that will provides a {@link BufferedImage}
+     */
+    public void setOverlayImage(ImageSource overlayImageSource) {
+        this.overlayImage = overlayImageSource;
     }
 
     /**
@@ -598,8 +717,8 @@ public class RrdGraphDef implements RrdGraphConstants {
 
     /**
      * Overrides the colors for the standard elements of the graph.
-     * @param colorTag
-     * @param color
+     * @param colorTag The element to change color.
+     * @param color The color of the element.
      */
     public void setColor(ElementsNames colorTag, Paint color) {
         colors[colorTag.ordinal()] = color;

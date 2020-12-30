@@ -256,10 +256,10 @@ public abstract class RrdBackendFactory implements Closeable {
     private static final Pattern URIPATTERN = Pattern.compile("^(?:(?<scheme>[a-zA-Z][a-zA-Z0-9+-\\.]*):)?(?://(?<authority>[^/\\?#]*))?(?<path>[^\\?#]*)(?:\\?(?<query>[^#]*))?(?:#(?<fragment>.*))?$");
 
     /**
-     * Try to detect an URI from a path. It's needed because of windows path that look's like an URI
+     * Try to detect an URI from a path. It's needed because of Microsoft Windows path that look's like an URI
      * and to URL-encode the path.
      * 
-     * @param rrdpath
+     * @param rrdpath a file URI that can be a Windows path
      * @return an URI
      */
     public static URI buildGenericUri(String rrdpath) {
@@ -380,9 +380,9 @@ public abstract class RrdBackendFactory implements Closeable {
      * <li>query and fragment is kept as is.
      * </ul>
      * 
-     * @param rootUri
-     * @param uri
-     * @param relative
+     * @param rootUri the URI to match against
+     * @param uri an URI that the current backend can handle.
+     * @param relative if true, return an URI relative to the {@code rootUri}
      * @return a calculate normalized absolute URI or null if the tried URL don't match against the root.
      */
     protected URI resolve(URI rootUri, URI uri, boolean relative) {
@@ -442,8 +442,8 @@ public abstract class RrdBackendFactory implements Closeable {
     /**
      * Transform an path in a valid URI for this backend.
      * 
-     * @param path
-     * @return
+     * @param path a path local to the current backend.
+     * @return an URI that the current backend can handle.
      */
     public URI getUri(String path) {
         URI rootUri = getRootUri();
@@ -561,7 +561,7 @@ public abstract class RrdBackendFactory implements Closeable {
     /**
      * A generic close handle, default implementation does nothing.
      * @since 3.4
-     * @throws IOException
+     * @throws IOException if the close fails
      */
     public void close() throws IOException {
 

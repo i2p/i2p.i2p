@@ -1,0 +1,66 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Alperen Yavuz <mingyu@yaani.com>, 2020
+# zzzi2p, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2020-10-12 12:47+0000\n"
+"Last-Translator: zzzi2p\n"
+"Language-Team: Turkmen (http://www.transifex.com/otf/I2P/language/tk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tk\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "I2P gurulmagy bilen gutlaýarys!"
+
+msgid "Welcome to I2P!"
+msgstr "I2P-e hoş geldiňiz!"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "I2P köpelip, deň-duşlaryny tapýarka {0} sabyr ediň {1}."
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "Garaşýan wagtyňyz, {2}konfigurasiýa sahypasynda{3} {0}geçirijilik giňligi sazlamalaryny{1} adjust düzediň."
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "Şeýle hem, e2 sahypalaryna ýetmek üçin I2P proksi ulanmak üçin brauzeriňizi sazlap bilersiňiz."
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr "Brauzer sazlamalaryňyza http proksi hökmünde 127.0.0.1 (ýa-da localhost) port 4444 giriziň."
+
+msgid "Do not use SOCKS for this."
+msgstr "Munuň üçin SOCKS ulanmaň."
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr "Has giňişleýin maglumaty {0} I2P brauzeriniň proksi gurmak sahypasynda tapyp bilersiňiz {1}."
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "Çep tarapda \"umumy müşderiler\" barjak ýeriňiz bar bolsa, {0} barlap görüň {1} biziň {2} Sorag {3}."
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "IRC müşderiňizi görkeziň  {0}localhost:6668{1} we {2}#i2p{3} on-da bize salam aýdyň."

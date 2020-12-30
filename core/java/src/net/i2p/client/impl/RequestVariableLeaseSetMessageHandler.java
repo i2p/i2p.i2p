@@ -71,7 +71,7 @@ class RequestVariableLeaseSetMessageHandler extends RequestLeaseSetMessageHandle
                     lease.setTunnelId(old.getTunnelId());
                 }
                 lease.setGateway(old.getGateway());
-                lease.setEndDate(old.getEndDate());
+                lease.setEndDate(old.getEndTime());
             } else {
                 lease = msg.getEndpoint(i);
             }

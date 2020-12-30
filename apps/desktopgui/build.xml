@@ -7,7 +7,8 @@
 	<property name="jar" value="desktopgui.jar"/>
 	<property name="javadoc" value="javadoc"/>
 	<property name="javac.compilerargs" value=""/>
-	<property name="javac.version" value="1.7" />
+	<property name="javac.version" value="1.8" />
+	<property name="javac.release" value="8" />
 	<property name="require.gettext" value="true" />
 
     <condition property="no.bundle">
@@ -27,6 +28,7 @@
 
         <target name="compile" depends="init">
             <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+                       release="${javac.release}"
                        includeAntRuntime="false"
                        encoding="UTF-8"
                        srcdir="${src}" destdir="${build}">
@@ -52,6 +54,7 @@
                 <arg value="./bundle-messages.sh" />
             </exec>
             <javac source="${javac.version}" target="${javac.version}" 
+                   release="${javac.release}"
                    includeAntRuntime="false"
                    encoding="UTF-8"
                    srcdir="${build}/messages-src" destdir="${build}">
@@ -77,12 +80,14 @@
 		<!-- set if unset -->
 		<property name="workspace.changes.tr" value="" />
                 <!-- ideal for linux: 24x24, but transparency doesn't work -->
-                <copy tofile="${build}/desktopgui/resources/images/logo.png" file="../../installer/resources/themes/console/images/itoopie_xsm.png" />
+                <copy tofile="${build}/desktopgui/resources/images/logo.png" file="../../apps/routerconsole/jsp/themes/console/images/itoopie_xsm.png" />
                 <copy todir="${build}/desktopgui/resources/images" file="images/itoopie_black_24.png" />
                 <copy todir="${build}/desktopgui/resources/images" file="images/itoopie_white_24.png" />
 		<jar basedir="${build}" excludes="messages-src/**" destfile="${dist}/${jar}">
 			<manifest>
 				<attribute name="Main-Class" value="net.i2p.desktopgui.Main"/>
+				<attribute name="Implementation-Version" value="${full.version}" />
+				<attribute name="Built-By" value="${build.built-by}" />
 				<attribute name="Build-Date" value="${build.timestamp}" />
 				<attribute name="Base-Revision" value="${workspace.version}" />
 				<attribute name="Workspace-Changes" value="${workspace.changes.tr}" />

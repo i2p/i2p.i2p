@@ -3,14 +3,19 @@
  * http://www.gnu.org/ for further details of the GPL. */
 package net.i2p.router.transport;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -23,6 +28,8 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
+import org.cybergarage.http.HTTPServer;
+import org.cybergarage.http.HTTPServerList;
 import org.cybergarage.upnp.Action;
 import org.cybergarage.upnp.ActionList;
 import org.cybergarage.upnp.Argument;
@@ -37,7 +44,11 @@ import org.cybergarage.upnp.StateVariable;
 import org.cybergarage.upnp.UPnPStatus;
 import org.cybergarage.upnp.device.DeviceChangeListener;
 import org.cybergarage.upnp.event.EventListener;
+import org.cybergarage.upnp.ssdp.SSDPNotifySocket;
+import org.cybergarage.upnp.ssdp.SSDPNotifySocketList;
 import org.cybergarage.upnp.ssdp.SSDPPacket;
+import org.cybergarage.upnp.ssdp.SSDPSearchResponseSocket;
+import org.cybergarage.upnp.ssdp.SSDPSearchResponseSocketList;
 import org.cybergarage.util.Debug;
 import org.freenetproject.DetectedIP;
 import org.freenetproject.ForwardPort;
@@ -68,7 +79,6 @@ import org.freenetproject.ForwardPortStatus;
  */
 
 /* 
- * TODO: Support multiple IGDs ?
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
  *
@@ -93,11 +103,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 
 	private Device _router;
 	private Service _service;
-	// UDN -> friendly name
-	private final Map<String, String> _otherUDNs;
+	// UDN -> device
+	private final Map<String, Device> _otherUDNs;
 	private final Map<String, String> _eventVars;
-	private boolean isDisabled = false; // We disable the plugin if more than one IGD is found
 	private volatile boolean _serviceLacksAPM;
+	private volatile boolean _permanentLeasesOnly;
 	private final Object lock = new Object();
 	// FIXME: detect it for real and deal with it! @see #2524
 	private volatile boolean thinksWeAreDoubleNatted = false;
@@ -114,13 +124,13 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	/** set to true to talk to UPnP on the same host as us, probably for testing */
 	private static final boolean ALLOW_SAME_HOST = false;
 	
-	public UPnP(I2PAppContext context) {
-		super();
+	public UPnP(I2PAppContext context, int ssdpPort, int httpPort, InetAddress[] binds) {
+		super(ssdpPort, httpPort, binds);
 		_context = context;
 		_log = _context.logManager().getLog(UPnP.class);
 		portsToForward = new HashSet<ForwardPort>();
 		portsForwarded = new HashSet<ForwardPort>();
-		_otherUDNs = new HashMap<String, String>(4);
+		_otherUDNs = new HashMap<String, Device>(4);
 		_eventVars = new HashMap<String, String>(4);
 	}
 	
@@ -160,6 +170,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			_router = null;
 			_service = null;
 			_serviceLacksAPM = false;
+			_permanentLeasesOnly = false;
 		}
 	}
 	
@@ -173,23 +184,23 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 */
 	public DetectedIP[] getAddress() {
 		_log.info("UP&P.getAddress() is called \\o/");
-		if(isDisabled) {
-			if (_log.shouldLog(Log.WARN))
-				_log.warn("Plugin has been disabled previously, ignoring request.");
-			return null;
-		} else if(!isNATPresent()) {
-			if (_log.shouldLog(Log.WARN))
-				_log.warn("No UP&P device found, detection of the external ip address using the plugin has failed");
-			return null;
+		Service service;
+		synchronized(lock) {
+			if (!isNATPresent()) {
+				if (_log.shouldLog(Log.WARN))
+					_log.warn("No UP&P device found, detection of the external ip address using the plugin has failed");
+				return null;
+			}
+			service = _service;
 		}
 		
-		DetectedIP result = null;
-		final String natAddress = getNATAddress();
+		final String natAddress = getNATAddress(service);
                 if (natAddress == null || natAddress.length() <= 0) {
 			if (_log.shouldLog(Log.WARN))
 				_log.warn("No external address returned");
 			return null;
 		}
+		DetectedIP result = null;
 		try {
 			InetAddress detectedIP = InetAddress.getByName(natAddress);
 
@@ -217,41 +228,28 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 *  DeviceChangeListener
 	 */
 	public void deviceAdded(Device dev) {
+		if (!dev.hasUDN()) {
+			if (_log.shouldInfo())
+				_log.info("Bad device, no UDN");
+			return;
+		}
                 String udn = dev.getUDN();
-		if (udn == null)
-			udn = "???";
                 String name = dev.getFriendlyName();
 		if (name == null)
-			name = "???";
+			name = udn;
 		String type = dev.getDeviceType();
 		boolean isIGD = (ROUTER_DEVICE.equals(type) || ROUTER_DEVICE_2.equals(type)) && dev.isRootDevice();
 		name += isIGD ? " IGD" : (' ' + type);
 		String ip = getIP(dev);
 		if (ip != null)
 			name += ' ' + ip;
-		synchronized (lock) {
-			if(isDisabled) {
-				if (_log.shouldLog(Log.WARN))
-					_log.warn("Plugin has been disabled previously, ignoring " + name + " UDN: " + udn);
-				_otherUDNs.put(udn, name);
-				return;
-			}
-		}
 		if(!isIGD) {
-			if (_log.shouldLog(Log.WARN))
-				_log.warn("UP&P non-IGD device found, ignoring " + name + ' ' + dev.getDeviceType());
+			if (_log.shouldInfo())
+				_log.info("UP&P non-IGD device found, ignoring " + name + ' ' + dev.getDeviceType());
 			synchronized (lock) {
-				_otherUDNs.put(udn, name);
+				_otherUDNs.put(udn, dev);
 			}
 			return; // ignore non-IGD devices
-		} else if(isNATPresent()) {
-                        // maybe we should see if the old one went away before ignoring the new one?
-			// TODO if old one doesn't have an IP address but new one does, switch
-			_log.logAlways(Log.WARN, "UP&P ignoring additional device " + name + " UDN: " + udn);
-			synchronized (lock) {
-				_otherUDNs.put(udn, name);
-			}
-			return;
 		}
 		
 		boolean ignore = false;
@@ -261,7 +259,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			for (int i = 0; i < ignores.length; i++) {
 				if (ignores[i].equals(udn)) {
 					ignore = true;
-					_log.logAlways(Log.WARN, "Ignoring by config: " + name + " UDN: " + udn);
+					if (_log.shouldWarn())
+						_log.warn("Ignoring by config: " + name + " UDN: " + udn);
 					break;
 				}
 			}
@@ -269,45 +268,150 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		Set<String> myAddresses = Addresses.getAddresses(true, false);  // yes local, no IPv6
 		if (!ignore && !ALLOW_SAME_HOST && ip != null && myAddresses.contains(ip)) {
 			ignore = true;
-			_log.logAlways(Log.WARN, "Ignoring UPnP on same host: " + name + " UDN: " + udn);
+			if (_log.shouldWarn())
+				_log.warn("Ignoring UPnP on same host: " + name + " UDN: " + udn);
 		}
 
 		// IP check
-		SSDPPacket pkt = dev.getSSDPPacket();
-		if (!ignore && pkt != null) {
-			String pktIP = pkt.getRemoteAddress();
-			if (!stringEquals(ip, pktIP)) {
-				ignore = true;
-				_log.logAlways(Log.WARN, "Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn);
+		if (!ignore) {
+			SSDPPacket pkt = dev.getSSDPPacket();
+			if (pkt != null) {
+				String pktIP = pkt.getRemoteAddress();
+				if (!stringEquals(ip, pktIP)) {
+					ignore = true;
+					if (_log.shouldWarn())
+						_log.warn("Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn);
+				}
 			}
 		}
 
-		synchronized(lock) {
-			if (ignore) {
-				_otherUDNs.put(udn, name);
-				return;
+		// Find valid service
+		Service service = null;
+		String extIP = null;
+		boolean subscriptionFailed = false;
+		if (!ignore) {
+			service = discoverService(dev);
+			if (service == null) {
+				ignore = true;
 			} else {
-				_router = dev;
+				// does it have an external IP?
+				extIP = getNATAddress(service);
+				if (extIP == null) {
+					// this would meet all our qualifications if connected.
+					// subscribe to it, in case it becomes connected.
+					boolean ok = subscribe(service);
+					if (ok) {
+						// we can't trust that events will work even if the subscription succeeded.
+						//ignore = true;
+						if (_log.shouldWarn())
+							_log.warn("UPnP subscribed but ignoring disconnected device " + name + " UDN: " + udn);
+					} else {
+						subscriptionFailed = true;
+						// we can't ignore it, as it won't tell us when it connects
+						if (_log.shouldWarn())
+							_log.warn("Failed subscription to disconnected device " + name + " UDN: " + udn);
+					}
+				} else {
+					if (_log.shouldWarn())
+						_log.warn("UPnP found device " + name + " UDN: " + udn + " with external IP: " + extIP);
+				}
 			}
 		}
+
+		ForwardPortCallback fpc = null;
+		Map<ForwardPort, ForwardPortStatus> removeMap = null;
+		synchronized(lock) {
+			if (ignore) {
+				_otherUDNs.put(udn, dev);
+				return;
+			}
+			if (_router != null && _service != null) {
+				if (udn.equals(_router.getUDN())) // oops
+					return;
+				ignore = true;
+				String curIP = null;
+				if (extIP != null) {
+					curIP = getNATAddress(_service);
+					if (curIP == null) {
+						// new one is better
+						ignore = false;
+					} else {
+						byte[] cur = Addresses.getIP(curIP);
+						byte[] ext = Addresses.getIP(extIP);
+						if (cur != null && ext != null &&
+						    TransportUtil.isPubliclyRoutable(ext, false) &&
+						    !TransportUtil.isPubliclyRoutable(cur, false)) {
+							// new one is better
+							ignore = false;
+						}
+					}
+				}
+				if (ignore) {
+					// this meets all our qualifications, but we already have one.
+					// subscribe to it, in case ours goes away
+					if (_log.shouldWarn())
+						_log.warn("UPnP ignoring additional device " + name + " UDN: " + udn);
+					_otherUDNs.put(udn, dev);
+					if (!subscriptionFailed) {
+						boolean ok = subscribe(service);
+						if (_log.shouldInfo()) {
+							if (ok)
+								_log.info("Subscribed to additional device " + name + " UDN: " + udn);
+							else
+								_log.info("Failed subscription to additional device " + name + " UDN: " + udn);
+						}
+						return;
+					}
+				} else {
+			                String oldudn = _router.getUDN();
+					if (_log.shouldWarn()) {
+						String oldname = _router.getFriendlyName();
+						if (oldname == null)
+							oldname = "";
+						oldname += " IGD";
+						String oldip = getIP(_router);
+						if (oldip != null)
+							oldname += ' ' + oldip;
+						_log.warn("Replacing device " + oldname + " (external IP " + curIP + ") with new device " + name + " UDN: " + udn + " external IP: " + extIP);
+					}
+					_otherUDNs.put(oldudn, _router);
+				}
+				if (!portsForwarded.isEmpty()) {
+					fpc = forwardCallback;
+					removeMap = new HashMap<ForwardPort, ForwardPortStatus>(portsForwarded.size());
+					for (ForwardPort port : portsForwarded) {
+						ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
+						                                              "UPnP device changed",
+						                                              port.portNumber);
+						removeMap.put(port, fps);
+					}
+				}
+				portsForwarded.clear();
+			}
+
+			// We have found the device we need
+			_otherUDNs.remove(udn);
+			_eventVars.clear();
+			_router = dev;
+			_service = service;
+			_permanentLeasesOnly = false;
+		}
+		if (fpc != null)
+			fpc.portForwardStatus(removeMap);
 
 		if (_log.shouldLog(Log.WARN))
 			_log.warn("UP&P IGD found : " + name + " UDN: " + udn + " lease time: " + dev.getLeaseTime());
 		
-		discoverService();
-		// We have found the device we need: stop the listener thread
-		/// No, let's stick around to get notifications
-		//stop();
-		synchronized(lock) {
-			/// we should look for the next one
-			if(_service == null) {
-				_log.error("The IGD device we got isn't suiting our needs, let's disable the plugin");
-				//isDisabled = true;
-				_router = null;
-				return;
+		if (!subscriptionFailed) {
+			boolean ok = subscribe(service);
+			if (_log.shouldInfo()) {
+				if (ok)
+					_log.info("Subscribed to our device " + name + " UDN: " + udn);
+				else
+					_log.info("Failed subscription to our device " + name + " UDN: " + udn);
 			}
-			subscribe(_service);
 		}
+
 		registerPortMappings();
 	}
 	
@@ -323,10 +427,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 
 	/**
 	 * Traverses the structure of the router device looking for the port mapping service.
+	 *
+	 * @return the service or null
 	 */
-	private void discoverService() {
-		synchronized (lock) {
-			for (Device current : _router.getDeviceList()) {
+	private Service discoverService(Device router) {
+			for (Device current : router.getDeviceList()) {
 				String type = current.getDeviceType();
 				if (!(WAN_DEVICE.equals(type) || WAN_DEVICE_2.equals(type)))
 					continue;
@@ -338,27 +443,28 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					if (!(WANCON_DEVICE.equals(type) || WANCON_DEVICE_2.equals(type)))
 						continue;
 					
-					_service = current2.getService(WAN_IP_CONNECTION_2);
-					if (_service == null) {
-						_service = current2.getService(WAN_IP_CONNECTION);
-						if (_service == null) {
-							_service = current2.getService(WAN_PPP_CONNECTION);
-							if (_service == null) {
+					Service service = current2.getService(WAN_IP_CONNECTION_2);
+					if (service == null) {
+						service = current2.getService(WAN_IP_CONNECTION);
+						if (service == null) {
+							service = current2.getService(WAN_PPP_CONNECTION);
+							if (service == null) {
 								if (_log.shouldWarn())
 									_log.warn(_router.getFriendlyName() + " doesn't have any recognized connection type; we won't be able to use it!");
 							}
 						}
 					}
-					if (_log.shouldWarn()) {
+					if (_log.shouldInfo()) {
 						Service svc2 = current2.getService(WAN_IPV6_CONNECTION);
 						if (svc2 != null)
-							_log.warn(_router.getFriendlyName() + " supports WANIPv6Connection, but we don't");
+							_log.info(_router.getFriendlyName() + " supports WANIPv6Connection, but we don't");
 					}
-					_serviceLacksAPM = false;
-					return;
+					if (service != null)
+						return service;
 				}
 			}
-		}
+
+		return null;
 	}
 	
 	private boolean tryAddMapping(String protocol, int port, String description, ForwardPort fp) {
@@ -394,16 +500,16 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 *  DeviceChangeListener
 	 */
 	public void deviceRemoved(Device dev ){
+		if (!dev.hasUDN())
+			return;
                 String udn = dev.getUDN();
 		if (_log.shouldLog(Log.WARN))
 			_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + udn);
 		ForwardPortCallback fpc = null;
 		Map<ForwardPort, ForwardPortStatus> removeMap = null;
+		boolean runSearch = false;
 		synchronized (lock) {
-			if (udn != null)
-				_otherUDNs.remove(udn);
-			else
-				_otherUDNs.remove("???");
+			_otherUDNs.remove(udn);
 			if (_router == null) return;
 			// I2P this wasn't working
 			//if(_router.equals(dev)) {
@@ -414,14 +520,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			   stringEquals(_router.getUDN(), udn)) {
 				if (_log.shouldLog(Log.WARN))
 					_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
-				// TODO promote an IGD from _otherUDNs ??
-				// For now, just clear the others so they can be promoted later
-				// after a rescan.
-				_otherUDNs.clear();
+				runSearch = true;
 				_router = null;
 				_service = null;
 				_eventVars.clear();
 				_serviceLacksAPM = false;
+				_permanentLeasesOnly = false;
 				if (!portsForwarded.isEmpty()) {
 					fpc = forwardCallback;
 					removeMap = new HashMap<ForwardPort, ForwardPortStatus>(portsForwarded.size());
@@ -429,6 +533,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 						ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
                                                                       "UPnP device removed",
                                                                       port.portNumber);
+						removeMap.put(port, fps);
 					}
 				}
 				portsForwarded.clear();
@@ -436,6 +541,10 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		}
 		if (fpc != null) {
 			fpc.portForwardStatus(removeMap);
+		}
+		if (runSearch) {
+			retryOtherDevices();
+			search();
 		}
 	}
 	
@@ -449,13 +558,35 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		if (varName.length() > 128 || value.length() > 128)
 			return;
 		String old = null;
+		Device newdev = null;
 		synchronized(lock) {
-			if (_service == null || !uuid.equals(_service.getSID()))
+			if(_eventVars.size() >= 20 && !_eventVars.containsKey(varName)) {
+				if (_log.shouldDebug())
+					_log.debug("Ignoring event from " + uuid + ": " + varName + " changed to " + value);
 				return;
-			if (_eventVars.size() >= 20 && !_eventVars.containsKey(varName))
-				return;
-			old = _eventVars.put(varName, value);
+			}
+			if (_service == null || !uuid.equals(_service.getSID())) {
+				if (varName.equals("ConnectionStatus") && value.equals("Connected")) {
+					newdev = SIDtoDevice(uuid);
+					if (newdev == null && _log.shouldInfo())
+						_log.debug("Can't map event SID " + uuid + " to device");
+				}
+				if (newdev == null) {
+					if (_log.shouldDebug())
+						_log.debug("Ignoring event from " + uuid + ": " + varName + " changed to " + value);
+					return;
+				}
+			}
+			if (newdev == null)
+				old = _eventVars.put(varName, value);
 		}
+		if (newdev != null) {
+			if (_log.shouldWarn())
+				_log.warn("Possibly promoting device on connected event: " + newdev.getUDN());
+			deviceAdded(newdev);
+			return;
+		}
+
 		// The following four variables are "evented":
 		// PossibleConnectionTypes: {Unconfigured IP_Routed IP_Bridged}
 		// ConnectionStatus: {Unconfigured Connecting Connected PendingDisconnect Disconnecting Disconnected}
@@ -464,8 +595,192 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		if (!value.equals(old)) {
 			if (_log.shouldDebug())
 				_log.debug("Event: " + varName + " changed from " + old + " to " + value);
+			if (varName.equals("ConnectionStatus") && "Connected".equals(old)) {
+				if (_log.shouldWarn())
+					_log.warn("Device connection change to: " + value + ", starting search");
+				retryOtherDevices();
+				search();
+			}
 		}
 		// call callback...
+	}
+
+	/**
+	 * @param sid non-null
+	 * @return device or null
+	 * @since 0.9.46
+	 */
+	private Device SIDtoDevice(String sid) {
+		synchronized (lock) {
+			for (Device dev : _otherUDNs.values()) {
+				String type = dev.getDeviceType();
+				boolean isIGD = (ROUTER_DEVICE.equals(type) || ROUTER_DEVICE_2.equals(type)) && dev.isRootDevice();
+				if (!isIGD)
+					continue;
+				Service service = discoverService(dev);
+				if (service == null)
+					continue;
+				if (sid.equals(service.getSID()))
+					return dev;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Go through the other devices, try re-adding them
+	 * @since 0.9.46
+	 */
+	private void retryOtherDevices() {
+		int sz = _otherUDNs.size();
+		if (sz <= 0)
+			return;
+		if (_log.shouldWarn())
+			_log.warn("Device change, retrying " + sz + " other devices");
+                List<Device> others = new ArrayList<Device>(sz);
+		synchronized (lock) {
+			others.addAll(_otherUDNs.values());
+		}
+		for (Device dev : others) {
+			deviceAdded(dev);
+		}
+	}
+
+	/**
+	 * Get the addresses we want to bind to
+	 *
+	 * @since 0.9.46
+	 */
+	static Set<String> getLocalAddresses() {
+		Set<String> addrs = Addresses.getAddresses(true, false, false);
+		// remove public addresses
+		// see TransportManager.startListening()
+		for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
+			String addr = iter.next();
+			byte[] ip = Addresses.getIP(addr);
+			if (ip == null || TransportUtil.isPubliclyRoutable(ip, false))
+				iter.remove();
+		}
+		return addrs;
+	}
+
+	/**
+	 * Update the SSDPSearchResponseSocketList,
+	 * SSDPNotifySocketList, and HTTPServerList every time.
+	 * Otherwise, we are just listening on the interfaces that were present when started.
+	 *
+	 * @since 0.9.46
+	 */
+	private void updateInterfaces() {
+		Set<String> addrs = getLocalAddresses();
+		Set<String> oldaddrs = new HashSet<String>(addrs.size());
+
+		// protect against list mod in super.stop()
+		synchronized(this) {
+			// we do this one first because we can detect failure before adding
+			HTTPServerList hlist = getHTTPServerList();
+			for (Iterator<HTTPServer> iter = hlist.iterator(); iter.hasNext(); ) {
+				HTTPServer skt = iter.next();
+				String addr = skt.getBindAddress();
+				int slash = addr.indexOf('/');
+				if (slash >= 0)
+					addr = addr.substring(slash + 1);
+				if (!addrs.contains(addr)) {
+					iter.remove();
+					skt.close();
+					skt.stop();
+					if (_log.shouldWarn())
+						_log.warn("Closed HTTP server socket: " + addr);
+				}
+				oldaddrs.add(addr);
+			}
+			for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
+				String addr = iter.next();
+				if (!oldaddrs.contains(addr)) {
+					HTTPServer socket = new HTTPServer();
+					boolean ok = socket.open(addr, getHTTPPort());
+					if (ok) {
+						socket.addRequestListener(this);
+						socket.start();
+						hlist.add(socket);
+						if (_log.shouldWarn())
+							_log.warn("Added HTTP server socket: " + addr);
+					} else {
+						// so we don't attempt to add to the other lists below
+						iter.remove();
+						if (_log.shouldWarn())
+							_log.warn("open() failed on new HTTP server socket: " + addr);
+					}
+				}
+			}
+
+			oldaddrs.clear();
+			SSDPSearchResponseSocketList list = getSSDPSearchResponseSocketList();
+			for (Iterator<SSDPSearchResponseSocket> iter = list.iterator(); iter.hasNext(); ) {
+				SSDPSearchResponseSocket skt = iter.next();
+				String addr = skt.getLocalAddress();
+				if (!addrs.contains(addr)) {
+					iter.remove();
+					skt.setControlPoint(null);
+					skt.close();
+					skt.stop();
+					if (_log.shouldWarn())
+						_log.warn("Closed SSDP search response socket: " + addr);
+				}
+				oldaddrs.add(addr);
+			}
+			for (String addr : addrs) {
+				if (!oldaddrs.contains(addr)) {
+					// TODO this calls open() in constructor, fails silently
+					SSDPSearchResponseSocket socket = new SSDPSearchResponseSocket(addr, getSSDPPort());
+					socket.setControlPoint(this);
+					socket.start();
+					list.add(socket);
+					if (_log.shouldWarn())
+						_log.warn("Added SSDP search response socket: " + addr);
+				}
+			}
+
+			oldaddrs.clear();
+			SSDPNotifySocketList nlist = getSSDPNotifySocketList();
+			for (Iterator<SSDPNotifySocket> iter = nlist.iterator(); iter.hasNext(); ) {
+				SSDPNotifySocket skt = iter.next();
+				String addr = skt.getLocalAddress();
+				if (!addrs.contains(addr)) {
+					iter.remove();
+					skt.setControlPoint(null);
+					skt.close();
+					skt.stop();
+					if (_log.shouldWarn())
+						_log.warn("Closed SSDP notify socket: " + addr);
+				}
+				oldaddrs.add(addr);
+			}
+			for (String addr : addrs) {
+				if (!oldaddrs.contains(addr)) {
+					// TODO this calls open() in constructor, fails silently
+					SSDPNotifySocket socket = new SSDPNotifySocket(addr);
+					socket.setControlPoint(this);
+					socket.start();
+					nlist.add(socket);
+					if (_log.shouldWarn())
+						_log.warn("Added SSDP notify socket: " + addr);
+				}
+			}
+		}
+	}
+
+	/**
+	 * We override search() to update the SSDPSearchResponseSocketList,
+	 * SSDPNotifySocketList, and HTTPServerList every time.
+	 * Otherwise, we are just listening on the interfaces that were present when started.
+	 *
+	 * @since 0.9.46
+	 */
+	@Override
+	public void search() {
+		updateInterfaces();
+		super.search();
 	}
 
 	/** compare two strings, either of which could be null */
@@ -485,17 +800,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	}
 
 	/**
-	 * @return the external IPv4 address the NAT thinks we have.  Blocking.
-	 * null if we can't find it.
+	 * Blocking.
+	 *
+	 * @param service non-null
+	 * @return the external IPv4 address the NAT thinks we have.  Null if we can't find it.
 	 */
-	private String getNATAddress() {
-		Service service;
-		synchronized(lock) {
-			if(!isNATPresent())
-				return null;
-			service = _service;
-		}
-
+	private String getNATAddress(Service service) {
 		Action getIP = service.getAction("GetExternalIPAddress");
 		if(getIP == null || !getIP.postControlAction())
 			return null;
@@ -774,7 +1084,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	
 	private void listSubDev(String prefix, Device dev, StringBuilder sb){
                 if (prefix == null)
-			sb.append("<p>").append(_t("Found Device")).append(": ");
+			sb.append("<p><b>").append(_t("Found Device")).append(":</b> ");
 		else
 			sb.append("<li>").append(_t("Subdevice")).append(": ");
 		sb.append(DataHelper.escapeHTML(dev.getFriendlyName()));
@@ -805,38 +1115,53 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		final StringBuilder sb = new StringBuilder();
 		sb.append("<h3 id=\"upnp\">").append(_t("UPnP Status")).append("</h3><div id=\"upnpscan\">");
 		
-		synchronized(_otherUDNs) {
+		Device router;
+		Service service;
+		synchronized(lock) {
 			if (!_otherUDNs.isEmpty()) {
+				sb.append("<b>");
 				sb.append(_t("Disabled UPnP Devices"));
-				sb.append("<ul>");
-				for (Map.Entry<String, String> e : _otherUDNs.entrySet()) {
+				sb.append(":</b>");
+				List<Map.Entry<String, Device>> other = new ArrayList<Map.Entry<String, Device>>(_otherUDNs.entrySet());
+				Collections.sort(other, new UDNComparator());
+				boolean found = false;
+				for (Map.Entry<String, Device> e : other) {
 					String udn = e.getKey();
-					String name = e.getValue();
+					Device dev = e.getValue();
+			                String name = dev.getFriendlyName();
+					if (name == null)
+						name = udn;
+					String type = dev.getDeviceType();
+					boolean isIGD = (ROUTER_DEVICE.equals(type) || ROUTER_DEVICE_2.equals(type)) && dev.isRootDevice();
+					if (!isIGD && !_context.getBooleanProperty(PROP_ADVANCED))
+						continue;
+					if (!found) {
+						found = true;
+						sb.append("<ul>");
+					}
+					name += isIGD ? " IGD" : (' ' + type);
+					String ip = getIP(dev);
+					if (ip != null)
+						name += ' ' + ip;
 					sb.append("<li>").append(DataHelper.escapeHTML(name));
 					sb.append("<br>UDN: ").append(DataHelper.escapeHTML(udn))
 					  .append("</li>");
 				}
-				sb.append("</ul>");
+				if (found)
+					sb.append("</ul>");
+				else
+					sb.append(" none");
 			}
-		}
-
-		if(isDisabled) {
-			sb.append("<p>");
-			sb.append(_t("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?"));
-			return sb.toString();
-		} else if(!isNATPresent()) {
-			sb.append("<p>");
-			sb.append(_t("UPnP has not found any UPnP-aware, compatible device on your LAN."));
-			return sb.toString();
-		}
-		
-		Device router;
-		synchronized(lock) {
+			if (!isNATPresent()) {
+				sb.append("<p>");
+				sb.append(_t("UPnP has not found any UPnP-aware, compatible device on your LAN."));
+				return sb.toString();
+			}
 			router = _router;
+			service = _service;
 		}
-		if (router != null)
-			listSubDev(null, router, sb);
-		String addr = getNATAddress();
+		listSubDev(null, router, sb);
+		String addr = getNATAddress(service);
 		sb.append("<p>");
 		if (addr != null)
 		    sb.append(_t("The current external IP address reported by UPnP is {0}", DataHelper.escapeHTML(addr)));
@@ -864,6 +1189,24 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		sb.append("</p></div>");
 		return sb.toString();
 	}
+
+	/**
+	 *  Compare based on friendly name of the device
+	 *  @since 0.9.46
+	 */
+	private static class UDNComparator implements Comparator<Map.Entry<String, Device>>, Serializable {
+		public int compare(Map.Entry<String, Device> l, Map.Entry<String, Device> r) {
+			Device ld = l.getValue();
+			Device rd = r.getValue();
+                        String ls = ld.getFriendlyName();
+			if (ls == null)
+				ls = ld.getUDN();
+                        String rs = rd.getFriendlyName();
+			if (rs == null)
+				rs = rd.getUDN();
+			return Collator.getInstance().compare(ls, rs);
+		}
+	}
 	
 	/**
 	 *  This always requests that the external port == the internal port, for now.
@@ -872,8 +1215,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	private boolean addMapping(String protocol, int port, String description, ForwardPort fp) {
 		Service service;
 		synchronized(lock) {
-			if(isDisabled || !isNATPresent() || _router == null) {
-				_log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
+			if(!isNATPresent() || _router == null) {
+				_log.error("Can't addMapping: " + isNATPresent() + " " + _router);
 				return false;
 			}
 			service = _service;
@@ -911,7 +1254,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		add.setArgumentValue("NewEnabled","1");
                 // 3 hours
                 // MUST be longer than max RI republish which is 52 minutes
-		add.setArgumentValue("NewLeaseDuration", 3*60*60);
+		int leaseTime = _permanentLeasesOnly ? 0 : 3*60*60;
+		add.setArgumentValue("NewLeaseDuration", leaseTime);
 		
 		boolean rv = add.postControlAction();
 		if(rv) {
@@ -948,11 +1292,24 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 
 		// TODO return error code and description for display
 
+		if (!rv) {
+			UPnPStatus status = add.getControlStatus();
+			if (status != null) {
+				int controlStatus = status.getCode();
+				if (controlStatus == 725) {
+					if (_log.shouldWarn())
+						_log.warn("UPnP device supports permanent leases only");
+					_permanentLeasesOnly = true;
+		                }
+	                }
+		}
+
 		return rv;
 	}
 
 	/**
-	*  @return IP or null
+	 * @param dev non-null
+	 * @return The local IP of the device (NOT the external IP) or null
 	 * @since 0.9.34
 	 */
 	private static String getIP(Device dev) {
@@ -990,11 +1347,18 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 *
 	 * So return the address of ours that is closest to his.
 	 *
+	 * @return our adddress or deflt on failure
 	 * @since 0.8.8
 	 */
 	private String getOurAddress(String deflt) {
 		String rv = deflt;
-		String hisIP = getIP(_router);
+		Device router;
+		synchronized(lock) {
+			router = _router;
+		}
+		if (router == null)
+			return rv;
+		String hisIP = getIP(router);
 		if (hisIP == null)
 			return rv;
 		try {
@@ -1029,13 +1393,13 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	private boolean removeMapping(String protocol, int port, ForwardPort fp, boolean noLog) {
 		Service service;
 		synchronized(lock) {
-			if(isDisabled || !isNATPresent()) {
-				_log.error("Can't removeMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
+			if(!isNATPresent()) {
+				_log.error("Can't removeMapping: " + isNATPresent() + " " + _router);
 				return false;
 			}
 			service = _service;
 		}
-		
+
 		Action remove = service.getAction("DeletePortMapping");
 		if(remove == null) {
 		    if (_log.shouldLog(Log.WARN))
@@ -1227,7 +1591,16 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		Properties props = new Properties();
                 props.setProperty(PROP_ADVANCED, "true");
 		I2PAppContext ctx = new I2PAppContext(props);
-		UPnP cp = new UPnP(ctx);
+		Set<String> addrs = UPnP.getLocalAddresses();
+		List<InetAddress> ias = new ArrayList<InetAddress>(addrs.size());
+		for (String addr : addrs) {
+			    try {
+				InetAddress ia = InetAddress.getByName(addr);
+				ias.add(ia);
+			    } catch (UnknownHostException uhe) {}
+		}
+		InetAddress[] binds = ias.toArray(new InetAddress[ias.size()]);
+		UPnP cp = new UPnP(ctx, 8008, 8058, binds);
 		org.cybergarage.upnp.UPnP.setEnable(org.cybergarage.upnp.UPnP.USE_ONLY_IPV4_ADDR);
 		Debug.initialize(ctx);
 		cp.setHTTPPort(49152 + ctx.random().nextInt(5000));
@@ -1261,6 +1634,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				                   ": " + DataHelper.escapeHTML(device.getFriendlyName()) + "</h3>");
 				System.out.println("<p>UDN: " + DataHelper.escapeHTML(device.getUDN()));
 				System.out.println("<br>IP: " + getIP(device));
+				String loc = device.getLocation();
+				if (loc != null && loc.length() > 0)
+					System.out.println("<br>URL: <a href=\"" + loc + "\">" + loc + "</a>");
 				System.out.println(sb.toString());
 				sb.setLength(0);
 			}

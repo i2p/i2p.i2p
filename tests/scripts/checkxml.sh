@@ -63,6 +63,7 @@ HTMLFILES="\
 ./apps/BOB/src/net/i2p/BOB/package.html \
 ./apps/desktopgui/src/net/i2p/desktopgui/package.html \
 ./apps/ministreaming/java/src/net/i2p/client/streaming/package.html \
+./apps/routerconsole/resources/docs/readme*.html \
 ./apps/susimail/src/index.html \
 ./core/java/src/net/i2p/client/datagram/package.html \
 ./core/java/src/net/i2p/client/naming/package.html \
@@ -78,7 +79,6 @@ HTMLFILES="\
 ./installer/resources/eepsite/docroot/help/index*.html \
 ./installer/resources/eepsite/docroot/help/pagetemplate.html \
 ./installer/resources/eepsite/docroot/index.html \
-./installer/resources/readme/readme*.html \
 ./installer/resources/small/toolbar.html \
 ./installer/resources/startconsole.html \
 ./router/java/src/net/i2p/data/i2np/package.html \

@@ -1,7 +1,5 @@
 # Monotone cheatsheet
 
-**Slogan:** *Saving you hours reading old manuals*
-
 For most of us developers using git, one of the columns will have an example of 
 how certain things are done in git, to easier know what to do in monotone.
 
@@ -20,9 +18,6 @@ Command | Git cmd (which give same info) | Description
 `mtn list tag` | `git tag -l` | List tags in the repo.
 `mtn di -r t:TAGNAME` | `git diff TAGNAME` | Show you the diff between the choosen tag and current head.
 
-TBA... 
-
-Contributions are welcome!
 
 
 

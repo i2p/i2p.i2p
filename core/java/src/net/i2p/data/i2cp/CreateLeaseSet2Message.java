@@ -1,6 +1,5 @@
 package net.i2p.data.i2cp;
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +18,7 @@ import net.i2p.data.LeaseSet2;
 import net.i2p.data.MetaLeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * Like CreateLeaseSetMessage, but supports both old
@@ -174,7 +174,7 @@ public class CreateLeaseSet2Message extends CreateLeaseSetMessage {
                 size += pk.length();
             }
         }
-        ByteArrayOutputStream os = new ByteArrayOutputStream(size);
+        ByteArrayStream os = new ByteArrayStream(size);
         try {
             _sessionId.writeBytes(os);
             os.write(_leaseSet.getType());

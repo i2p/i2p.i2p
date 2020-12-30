@@ -3,6 +3,7 @@ package net.i2p.sam;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -60,8 +61,8 @@ public class UTF8Reader extends Reader {
             _cb = CharBuffer.allocate(1);
             _dc = Charset.forName("UTF-8").newDecoder();
         } else {
-            _bb.clear();
-            _cb.clear();
+            ((Buffer)_bb).clear();
+            ((Buffer)_cb).clear();
         }
         _bb.put((byte) b);
         int end;  // how many more
@@ -88,12 +89,13 @@ public class UTF8Reader extends Reader {
             _bb.put((byte) b);
         }
         _dc.reset();
-        _bb.flip();
+        // not ByteBuffer to avoid Java 8/9 issues with flip()
+        ((Buffer)_bb).flip();
         CoderResult result = _dc.decode(_bb, _cb, true);
         // Overflow and underflow are not errors.
         // It seems to return underflow every time.
         // So just check if we got a character back in the buffer.
-        _cb.flip();
+        ((Buffer)_cb).flip();
         if (result.isError() || !_cb.hasRemaining())
             return REPLACEMENT;
         // let underflow and overflow go, return first

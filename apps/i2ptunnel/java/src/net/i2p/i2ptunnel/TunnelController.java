@@ -20,6 +20,7 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.KeyCertificate;
 import net.i2p.data.PrivateKey;
@@ -35,6 +36,7 @@ import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -56,6 +58,7 @@ public class TunnelController implements Logging {
     private final List<String> _messages;
     private List<I2PSession> _sessions;
     private volatile TunnelState _state;
+    private volatile SimpleTimer2.TimedEvent _pkfc;
 
     /** @since 0.9.19 */
     private enum TunnelState {
@@ -89,6 +92,8 @@ public class TunnelController implements Logging {
     public static final String PROP_FILTER = "filterDefinition";
     /** @since 0.9.42 */
     public static final String PROP_CONFIG_FILE = "configFile";
+    /** @since 0.9.46 */
+    public static final String PROP_TUN_GZIP = "i2ptunnel.gzip";
 
     /**
      * all of these are @since 0.9.33 (moved from TunnelConfig)
@@ -139,6 +144,9 @@ public class TunnelController implements Logging {
 
     /** @since 0.9.34 */
     private static final String OPT_LIMIT_ACTION = PFX_OPTION + PROP_LIMIT_ACTION;
+    private static final String OPT_I2CP_GZIP = PFX_OPTION + I2PClient.PROP_GZIP;
+
+    private static final String OPT_ENCTYPE = PFX_OPTION + "i2cp.leaseSetEncType";
 
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
@@ -208,7 +216,7 @@ public class TunnelController implements Logging {
      *                  overwrite existing ones)
      */
     public TunnelController(Properties config, String prefix, boolean createKey) {
-        _tunnel = new I2PTunnel();
+        _tunnel = new I2PTunnel(this);
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelController.class);
         setConfig(config, prefix);
         _messages = new ArrayList<String>(4);
@@ -480,6 +488,12 @@ public class TunnelController implements Logging {
         }
         acquire();
         changeState(TunnelState.RUNNING);
+        if ((!isClient() || getPersistentClientKey()) && getIsOfflineKeysAnySession()) {
+            File f = getPrivateKeyFile();
+            File f2 = getAlternatePrivateKeyFile();
+            _pkfc = new PKFChecker(f, f2);
+            _pkfc.schedule(5*60*1000L);
+        }
     }
 
     private void startHttpClient() {
@@ -766,6 +780,10 @@ public class TunnelController implements Logging {
                 return;
             changeState(TunnelState.STOPPING);
         }
+        if (_pkfc != null) {
+            _pkfc.cancel();
+            _pkfc = null;
+        }
         // I2PTunnel removes the session in close(),
         // so save the sessions to pass to release() and TCG
         Collection<I2PSession> sessions = getAllSessions();
@@ -786,6 +804,10 @@ public class TunnelController implements Logging {
                 return;
             changeState(TunnelState.DESTROYING);
         }
+        if (_pkfc != null) {
+            _pkfc.cancel();
+            _pkfc = null;
+        }
         // I2PTunnel removes the session in close(),
         // so save the sessions to pass to release() and TCG
         Collection<I2PSession> sessions = getAllSessions();
@@ -795,7 +817,16 @@ public class TunnelController implements Logging {
     }
 
     public void restartTunnel() {
-        stopTunnel();
+        TunnelState oldState;
+        synchronized (this) {
+            oldState = _state;
+            if (oldState != TunnelState.STOPPED)
+                stopTunnel();
+        }
+        if (oldState != TunnelState.STOPPED) {
+            long ms = _tunnel.getContext().isRouterContext() ? 100 : 500;
+            try { Thread.sleep(ms); } catch (InterruptedException ie) {}
+        }
         startTunnel();
     }
 
@@ -836,8 +867,19 @@ public class TunnelController implements Logging {
                     _config.setProperty(OPT_LIMIT_ACTION, "http");
             }
             if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
+                String tgzip = _config.getProperty(PROP_TUN_GZIP);
+                if (tgzip == null || Boolean.valueOf(tgzip)) {
+                    // Web server will gzip
+                    // If web server doesn't gzip, I2PTunnelHTTPServer will.
+                    // Streaming will force gzip on first packet for header compression,
+                    // regardless of this setting
+                    if (!_config.containsKey(OPT_I2CP_GZIP))
+                        _config.setProperty(OPT_I2CP_GZIP, "false");
+                }
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");
+                if (!_config.containsKey(OPT_ENCTYPE))
+                    _config.setProperty(OPT_ENCTYPE, "4,0");
             } else if (!isClient(type)) {
                 // override UI that sets it to false
                 _config.setProperty(OPT_BUNDLE_REPLY, "true");
@@ -848,11 +890,13 @@ public class TunnelController implements Logging {
                     _config.setProperty(OPT_TAGS_SEND, "20");
                 if (!_config.containsKey(OPT_LOW_TAGS))
                     _config.setProperty(OPT_LOW_TAGS, "14");
+                if (!_config.containsKey(OPT_ENCTYPE))
+                    _config.setProperty(OPT_ENCTYPE, "4,0");
             }
-            // same default logic as in EditBean.getSigType()
+            // same default logic as in EditBean.getSigType() and GeneralHelper.getSigType()
             if (!isClient(type) ||
                 type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) ||
-                type.equals(TYPE_SOCKS) ||
+                type.equals(TYPE_SOCKS) || type.equals(TYPE_CONNECT) ||
                 type.equals(TYPE_SOCKS_IRC) || type.equals(TYPE_STREAMR_CLIENT) ||
                 type.equals(TYPE_HTTP_CLIENT)) {
                 if (!_config.containsKey(OPT_SIG_TYPE))
@@ -887,6 +931,12 @@ public class TunnelController implements Logging {
                         _config.setProperty(OPT_POST_TOTAL_MAX, Integer.toString(I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_MAX));
                     }
                 }
+            }
+            if (isClient(type) &&
+                (type.equals(TYPE_HTTP_CLIENT) || Boolean.valueOf(_config.getProperty(PROP_SHARED, "false")))) {
+                // migration: HTTP proxy and shared clients default to both
+                if (!_config.containsKey(OPT_ENCTYPE))
+                    _config.setProperty(OPT_ENCTYPE, "4,0");
             }
         }
 
@@ -999,6 +1049,7 @@ public class TunnelController implements Logging {
      *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
      *
      *  @since 0.9.17 moved from IndexBean
+     *  @return false if type == null
      */
     public static boolean isClient(String type) {
         return TYPE_STD_CLIENT.equals(type) ||
@@ -1044,8 +1095,14 @@ public class TunnelController implements Logging {
     public String getListenPort() { return _config.getProperty(PROP_LISTEN_PORT); }
     public String getTargetDestination() { return _config.getProperty(PROP_DEST); }
     public String getProxyList() { return _config.getProperty(PROP_PROXIES); }
-    /** default true */
-    public String getSharedClient() { return _config.getProperty(PROP_SHARED, "true"); }
+
+    /** default true for clients, always false for servers */
+    public String getSharedClient() {
+         if (!isClient())
+             return "false";
+         return _config.getProperty(PROP_SHARED, "true");
+    }
+
     /** default true */
     public boolean getStartOnLoad() { return Boolean.parseBoolean(_config.getProperty(PROP_START, "true")); }
     public boolean getPersistentClientKey() { return Boolean.parseBoolean(_config.getProperty(OPT_PERSISTENT)); }
@@ -1114,28 +1171,42 @@ public class TunnelController implements Logging {
      *  @since 0.9.17
      */
     public Destination getDestination() {
-        if (_tunnel != null) {
-            List<I2PSession> sessions = _tunnel.getSessions();
-            for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = sessions.get(i);
-                Destination dest = session.getMyDestination();
-                if (dest != null)
-                    return dest;
-            }
+        List<I2PSession> sessions = _tunnel.getSessions();
+        for (int i = 0; i < sessions.size(); i++) {
+            I2PSession session = sessions.get(i);
+            Destination dest = session.getMyDestination();
+            if (dest != null)
+                return dest;
         }
         return null;
     }
 
     /**
      *  Returns false if not running.
-     *  @return true if offline keys or not running
+     *  @return true if the primary session has offline keys
      *  @since 0.9.40
      */
     public boolean getIsOfflineKeys() {
-        if (_tunnel != null) {
-            List<I2PSession> sessions = _tunnel.getSessions();
-            if (!sessions.isEmpty())
-                return sessions.get(0).isOffline();
+        List<I2PSession> sessions = _tunnel.getSessions();
+        if (!sessions.isEmpty())
+            return sessions.get(0).isOffline();
+        return false;
+    }
+
+    /**
+     *  Returns false if not running.
+     *  @return true if ANY session or subsession has offline keys
+     *  @since 0.9.48
+     */
+    private boolean getIsOfflineKeysAnySession() {
+        List<I2PSession> sessions = _tunnel.getSessions();
+        for (I2PSession sess : sessions) {
+            if (sess.isOffline())
+                return true;
+            for (I2PSession sub : sess.getSubsessions()) {
+                if (sub.isOffline())
+                    return true;
+            }
         }
         return false;
     }
@@ -1312,5 +1383,110 @@ public class TunnelController implements Logging {
     @Override
     public String toString() {
         return "TC " + getType() + ' ' + getName() + " for " + _tunnel + ' ' + _state;
+    }
+
+    /**
+     * Periodically check for an updated offline-signed private key file.
+     * Log if about to expire.
+     *
+     * @since 0.9.48
+     */
+    private class PKFChecker extends SimpleTimer2.TimedEvent {
+        private final List<File> files;
+        private final List<Long> stamps;
+        private boolean wasRun;
+
+        /**
+         *  caller must schedule
+         *  @param f2 may be null
+         */
+        public PKFChecker(File f, File f2) {
+            super(SimpleTimer2.getInstance());
+            files = new ArrayList<File>(2);
+            stamps = new ArrayList<Long>(2);
+            files.add(f);
+            stamps.add(Long.valueOf(f.lastModified()));
+            if (f2 != null) {
+                files.add(f2);
+                stamps.add(Long.valueOf(f2.lastModified()));
+            }
+        }
+
+        public void timeReached() {
+            if (!getIsRunning() && !getIsStarting())
+                return;
+            List<I2PSession> sessions = _tunnel.getSessions();
+            if (getIsOfflineKeysAnySession()) {
+                I2PAppContext ctx = _tunnel.getContext();
+                long now = ctx.clock().now();
+                long delay = 2*24*60*60*1000L;
+                for (int i = 0; i < files.size(); i++) {
+                    File f = files.get(i);
+                    long stamp = stamps.get(i).longValue();
+                    if (_log.shouldDebug())
+                        _log.debug("PKFC checking: " + f + " stamp: " + DataHelper.formatTime(stamp));
+                    if (stamp <= 0)
+                        continue;
+                    if (f.lastModified() > stamp) {
+                        String msg = "Private key file " + f + " with offline signature updated, restarting tunnel";
+                        _log.logAlways(Log.WARN, msg);
+                        _tunnel.log(msg);
+                        restartTunnel();
+                        return;
+                    }
+                    if (sessions.isEmpty())
+                        continue;
+                    I2PSession sess = sessions.get(0);
+                    if (i > 0) {
+                        List<I2PSession> subs = sess.getSubsessions();
+                        if (subs.isEmpty())
+                            continue;
+                        sess = subs.get(0);
+                    }
+                    if (!sess.isOffline())
+                        continue;
+                    long exp = sess.getOfflineExpiration();
+                    long remaining = exp - now;
+                    if (remaining <= 11*60*1000) {
+                        // can't sign another LS
+                        String msg;
+                        if (remaining > 0)
+                            msg = "Offline signature in private key file " + f + " for tunnel expires " + DataHelper.formatTime(exp) + ", stopping the tunnel!";
+                        else
+                            msg = "Offline signature in private key file " + f + " for tunnel expired " + DataHelper.formatTime(exp) + ", stopping the tunnel!";
+                        _log.log(Log.CRIT, msg);
+                        _tunnel.log(msg);
+                        stopTunnel();
+                        return;
+                    }
+                    long d;
+                    if (remaining < 24*60*60*1000L) {
+                        d = Math.min(60*60*1000L, remaining - (11*60*1000));
+                    } else if (remaining < 7*24*60*60*1000L) {
+                        d = 6*60*60*1000L;
+                        if (!wasRun) {
+                            d += ctx.random().nextLong(4 * delay);
+                            wasRun = true;
+                        }
+                    } else {
+                        d = 24*60*60*1000L;
+                        if (!wasRun) {
+                            delay += ctx.random().nextLong(delay);
+                            wasRun = true;
+                        }
+                    }
+                    if (remaining < 30*24*60*60*1000L) {
+                        String msg = "Offline signature in private key file " + f + " for tunnel expires in " + DataHelper.formatDuration(remaining);
+                        _log.logAlways(Log.WARN, msg);
+                        _tunnel.log("WARNING: " + msg);
+                    }
+                    if (d < delay)
+                        delay = d;
+                }
+                if (_log.shouldDebug())
+                    _log.debug("PKFC sleeping " + DataHelper.formatDuration(delay));
+                schedule(delay);
+            }
+        }
     }
 }

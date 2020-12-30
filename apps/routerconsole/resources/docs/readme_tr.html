@@ -1,0 +1,192 @@
+<div lang="tr_TR">
+
+<ul class="links">
+<li>
+<b>Başlatma</b><br>
+I2P uygulamasını yeni başlattıysanız, sol taraftaki panoda<i>Eşler</i> bölümü altında görüntülenen <i>Etkin Eş Sayısı</i> bir kaç dakika içinde artmaya başlamalıdır. 
+Yönelticiniz hazır olduğunda, orada listelenen <i>Paylaşılmış İstemciler</i> adında bir <i>Yerel Tünel</i> ile diğer istemci ve sunucuları görebilirsiniz.
+Bunları göremiyorsanız <a href="#trouble">sorun çözme bölümüne</a> bakabilirsiniz. 
+Bu <i>Yerel Tüneller</i> I2P ağıyla bağlantılar kurarak, bittorrent, e-posta, web vekil sunucusu ve diğer hizmetlerinizin çalışmasını sağlar. 
+Ağdaki bilinen tüm eşleri <a href="/netdb">Ağ Veritabanı</a> bölümünde görebilirsiniz. 
+Bunlara ek olarak, var olan <a href="/peers">Eş Bağlantılarını</a> izleyebilir ve var olan <a href="/tunnels">Tüneller</a> ile durumlarını görebilirsiniz. 
+Ayrıntılı bilgi almak için <a href="/help">yardım sayfasına</a> bakabilirsiniz.</li>
+
+<li>
+<b>Ağ Bütünleştirmesi</b><br>
+I2P uygulamasını başlattığınızda, yönelticinizin ağ ile bağlantı kurması (bütünleşmesi) ve diğer eşleri bulması bir kaç dakika sürer. Bu nedenle sabırlı olun. 
+I2P başladıktan sonra ve normal çalışırken, yan panodaki I2P tünel oluşturma göstergesinde "Tüneller Reddediliyor" iletisini görebilirsiniz. Bu durum normaldir.
+<i>Yerel Tünellerinizin</i> yanında yeşil daireler göründüğünde I2P ile pek çok şey yapabilirsiniz. Bunlardan bazılarını aşağıda anlatacağız.</li>
+
+</ul>
+<h3>I2P Hizmetleri</h3>
+
+<ul class="links">
+<li>
+<b>Gizli Hizmetler ve Herkese Açık Web Taraması</b><br>
+I2P üzerinden gizli hizmet web sitelerine ("I2P siteleri") ve diğer hizmetlere erişebilir ve kendi hizmetlerinizi sunabilirsiniz. 
+I2P içindeki vekil sunucuyu (çıkış vekil sunucusu) kullanarak normal web sitelerine anonim olarak erişebilirsiniz. 
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Web tarayıcınızın yapılandırma ayarlarından</a> HTTP vekil sunucusunu <code>127.0.0.1 kapı numarası 4444</code> olarak ayarladıktan sonra, bir I2P sitesine ya da hizmet web sitesine ya da normal şifrelenmemiş<code>http://</code> adresine bakın. 
+Normal İnternet bağlantısını kurarken çıkış sunucusu erişimini devre dışı bırakmak isterseniz, <code>false.i2p</code> dosyasında <i>Outproxies</i> bölümü altındaki çıkış sunucusu (outproxy) kaydını <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Vekil Sunucu Tünel Düzenleyici</a>değiştirin ya da silin. 
+<a href="#eepsites">Aşağıdaki</a> "İlginç Siteler" bölümünde I2P üzerinden sunulan bir kaç örnek site bulabilirsiniz.<br>
+Ayrıca I2P için bazı yarı resmi ya da resmi olmayan tarama araçları geliştirme girişimi var. Bazı örnekler;
+<a href="https://geti2p.net/en/download/firefox">önceden hazırlanmış Firefox tarayıcı profili</a>,
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">kolay kurulan bir web eklentisi</a> ya da
+<a href="https://www.whonix.org/wiki/I2P">Whonix gibi kişisel gizliliğin sağlanmasına odaklanmış Linux dağıtımları için otomatik başlatıcılar</a>.
+Bunlar ilginç projeler olsa da, kendi güvenliğiniz için, karşı karşıya bulunduğunuz tehdit modeline uygun
+olup olmadıklarını anlamak için denedikten sonra kullanmaya karar verin.
+</li>
+
+<li>
+<b>Anonim E-posta Kullanımı</b><br>
+Postman I2P temelli posta sistemine <a href="/webmail">I2P içindeki posta istemcisini</a> ya da herhangi bir dış posta istemcisi kullanılarak erişilebilir. 
+Hesaplar normal İnternet üzerindeki gibi e-posta gönderip alabilir. 
+Bir hesap edinmek için <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a> adresine bakabilirsiniz.</li>
+
+<li>
+<b>Anonim Dosya Aktarımı</b><br><a href="/torrents">I2PSnark</a> I2P ile bütünleşik olarak, anonim ve şifreli BitTorrent aktarımlarının yapılmasını sağlar.</li>
+<li>
+<b>Anonymous Chat</b><br>
+Start your IRC client (e.g. HexChat) and connect to the <a href="irc://127.0.0.1:6668/i2p">server</a> at <code>127.0.0.1 port 6668</code>.
+You do not need to configure a proxy in your IRC client; I2P provides you with a local IRC tunnel (configured in your IRC client as an IRC server or remote host).
+Your local I2P IRC tunnel on <code>localhost:6668</code> will direct you to one of three IRC servers hosted on I2P by Postman, echelon and zl0, but neither you nor they know where the other is, and your communcations are encrypted in transit by I2P to prevent interception.
+Once you're there, <code>#i2p-chat</code> and <code>#i2p-dev</code> are just a few of the available channels you may wish to join.
+I2P is also suitable for unmonitorable and uncensorable anonymous chat, as well as alternative IRC servers, Jabber servers, website-based chat, and more.
+You may run your own servers over I2P in whatever flavor you choose, or if you're a developer write your own <a href="http://i2p-projekt.i2p/applications.html" target="_blank">I2P applications</a>.
+Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">supported</a>.
+We also provide full access to the <a href="http://echelon.i2p/javadoc/" target="_blank">Java API</a>.</li>
+
+<li>
+<b>Forums and Blogging</b><br>
+All normal blogging, forum and CMS software will run over I2P, though you're advised to take extra precautions with security when setting up and to keep all associated software (e.g. Php, MySql, Python, Apache) up to date and locked-down!
+Also, there are quite a few community run forums on I2P in various languages; see <a href="#eepsites">below</a> for some suggestions.</li>
+
+<li>
+<a name="plugins"></a><b>Plugins for I2P</b><br>
+Extend the usefulness of I2P by installing plugins: blogging, chatting, file sharing and other plugins have already been written or ported and await your <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">installation</a>!
+Browse the plugins and related info at <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">wiki.i2p-projekt.i2p</a>.
+If you're a <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">developer</a>, a complete framework for writing your own plugins is provided with <a href="http://i2p-projekt.i2p/plugins.html" target="_blank">documentation</a>.</li>
+
+</ul>
+<h3>ISP Üzerinde Anonim ve Şifreli Web Sitesi Barındırma</h3>
+
+<ul class="links">
+<li>
+<b>Built-in Web-Server</b><br>
+I2P comes with a built-in web server for hosting your own hidden service website ("eepsite") on the I2P network: a <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>.
+To host your own content, simply place your files in the <code>eepsite/docroot/</code> directory (or place any standard JSP/Servlet .war files under <code>eepsite/webapps</code>, or standard CGI scripts under <code>eepsite/cgi-bin</code>) and they'll show up.
+You can also run any alternative web server platform over I2P and replace the built-in server, or run it on another tunnel.</li>
+
+<li>
+<b>Start Your Tunnel</b><br>
+After starting up, your pre-configured <a href="/i2ptunnel/" target="_blank">I2P Webserver Tunnel</a>, your website will be visible (but not discoverable) to others.
+Detailed instructions for starting your website, registering an .i2p domain and promoting your site to others are accessible via your own I2P webserver on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
+
+</ul>
+<a name="eepsites"></a>
+<h3>İlgi Çeken I2P Gizli Hizmetleri</h3>
+
+<ul class="links twocol">
+<li>
+<b>Invisible Internet Projesi (I2P) Resmi Web Sitesi</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a> sitesine güvenli ve anonim bağlantılar. I2P ağının çalışması ve nasıl katkıda bulunabileceğiniz ile ilgili bilgiler almak istiyorsanız ilk bakacağınız yer burasıdır!</li>
+
+<li>
+<b>I2P Topluluk Forumları</b><br><a href="http://zzz.i2p/" target="_blank">zzz geliştirici forumlarında</a> I2P geliştirmesi ile ilgili tartışmaları bulabilirsiniz.
+
+<a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>: I2P ve ilgili diğer konular hakkında sorun ve fikirlerin tartışıldığı bir forum sitesi.</li>
+
+<li>
+<b>Echelon I2P Kaynakları</b><br><a href="http://echelon.i2p/" target="_blank">echelon.i2p</a>: I2P yazılım arşivi, kaynak kodlar, I2P hakkında bilgiler ve <a href="http://echelon.i2p/I2Pguide/index.html" target="_blank">yeni başlayanlar rehberi</a> ile I2P geliştirici sürümlerinin ön yayınları.</li>
+
+<li>
+<b>I2P Planet</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a>: I2P haber ve etkinliklerini tek bir noktada toplayarak yayınlayan bir RSS akışı sitesi. Topluluğu iş başında görmek için bakılması gereken iyi bir site!</li>
+
+<li>
+<b>I2P Ağ Durumu</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: zzz tarafından işletilen bu sitede I2P ağının durumunu çeşitli açılardan görebilirsiniz.</li>
+
+<li>
+<b>I2P Hata İzleyici - Trac</b><br><a href="http://trac.i2p2.i2p/" target="_blank">trac.i2p2.i2p</a>: I2P sorun bildirme ve hata izleme sistemi. Bildirmek istediğiniz bir sorun varsa ziyaret edebilirsiniz. Ayrıca <a href="https://trac.i2p2.de/" target="_blank">https://trac.i2p2.de/</a> adresinden de erişilebilir.</li>
+
+<li>
+<b>I2P Ağını Keşfetmek</b><br>
+İlginizi çekebilecek başka pek çok gizli hizmet var. Görüntülemek istediğiniz bağlantıları izleyin, beğendiklerinizi yer imlerinize ekleyin ve sık sık ziyaret edin!<br>
+</li>
+
+</ul>
+<h2 id="trouble">Sorun Çözme ve Diğer Yardımlar</h2>
+
+<ul class="links">
+<li>
+<b>Be Patient!</b><br>
+I2P may be slow to integrate into network the first time you run it as it bootstraps into the network and finds peers.
+The longer your I2P router is running, the better it will perform, so try and keep your router on as long as you can, 24/7 if possible!
+If, after 30 minutes, your <i>Active: [connected/recent]</i> count still has less than 10 peers, or your total number of <i>Integrated</i> peers is less than 5, there are several things you can do to check for problems:</li>
+
+<li>
+<b>Check Your Configuration and Bandwidth Allocation</b><br>
+I2P functions best when you can accurately reflect the speed of your network connection in the <a href="/config">bandwidth configuration section</a>.
+By default I2P is configured with some fairly conservative values that will not suit many use cases, so please take time to review these settings and correct where necessary.
+The more bandwidth you allocate, <i>specifically</i> upstream bandwidth, the more you will benefit from the network.</li>
+
+<li>
+<b>Firewalls, Modems and Routers</b><br>
+Where possible, please ensure I2P/Java is allowed un-firewalled access from the internet by configuring your modem/router/pc firewall accordingly.
+If you're behind a prohibitive firewall but have unrestricted outbound access, I2P can still function; you can turn off inbound access and rely on <a href="http://i2p-projekt.i2p/udp.html" target="_blank">SSU IP Address Detection</a> (<a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)" target="_blank">firewall hole punching</a>) to connect you to the network, and your network status in the side panel will indicate "Network: Firewalled".
+For optimal performance, please ensure I2P's <a href="/confignet">external port</a> is visible from the internet.
+See below for more information.</li>
+
+<li>
+<b>Check Your Proxy Settings</b><br>
+If you cannot see any websites at all (not even <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), make sure your browser's proxy is set to access http traffic (<i>not</i> https, <i>not</i> socks) via <code>127.0.0.1 port 4444</code>.
+If you need some help, there's <a href="https://geti2p.net/en/about/browser-config" target="_blank">a guide</a> to configuring your browser for I2P use.</li>
+
+<li>
+<b>Check Your Logs</b><br><a href="/logs">Logs</a> may be helpful to resolve a problem.
+You may wish to paste excerpts in our <a href="http://i2pforum.i2p/" target="_blank">forum</a> for help, or perhaps <a href="http://paste.idk.i2p/" target="_blank">paste</a> it instead and reference the link on IRC for help.</li>
+
+<li>
+<b>Java Sürümünüzü Denetleyin</b><br>
+Java sürümünüzün güncel olduğundan emin olun.
+Java sürümünüzü <a href="/logs">günlük sayfasının üzerinde</a> görebilirsiniz.</li>
+<li>
+<b>Problems running on Legacy Hardware</b><br>
+[Linux/BSD] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory.
+Root privileges are never required to run I2P.
+If you need to compile the <a href="http://i2p-projekt.i2p/jbigi.html" target="_blank">jBigi library</a> (which is necessary in rare cases), consult appropriate documentation, visit the forums, or come pay a visit to our <a href="irc://127.0.0.1:6668/i2p-dev">IRC developer channel</a>.</li>
+
+<li>
+<b>Enable Universal Plug and Play (UPnP)</b><br>
+Your modem or router probably supports UPnP for automatic port forwarding.
+Ensure UPnP support is enabled on your modem or router.
+Now try restarting the <a href="/">I2P router</a>.
+If successful, I2P should report "Network: OK" in the side panel once the I2P router completes initial connectivity tests.</li>
+
+<li>
+<b>Port Forwarding</b><br>
+Open <a href="/confignet">I2P's port</a> on your modem, router and/or firewall(s) for better connectivity (ideally both UDP and TCP).
+More information on how to go about port forwarding can be easily found through a web search.
+Should you have any difficulties, you may request assistance in our forums and IRC channels listed below.
+Note that I2P does not support connecting to the internet via an http or socks proxy [patches welcome!], though you can connect to proxies via I2P itself once connected to the network.</li>
+
+<li>
+<b>Getting Support Online</b><br>
+You may also want to review the information on the <a href="http://i2p-projekt.i2p/" target="_blank">I2P website</a>, post messages to the <a href="http://i2pforum.i2p/" target="_blank">I2P discussion forum</a> or swing by <a href="irc://127.0.0.1:6668/i2p">#i2p</a> or <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> on I2P's internal IRC network - Irc2P.
+These channels are also available outside of I2P's encrypted, anonymous network via <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>.</li>
+
+<li>
+<b>Reporting Bugs</b><br>
+To report a bug, please file a ticket on <a href="http://trac.i2p2.i2p/" target="_blank">trac.i2p2.i2p</a> or, over clearnet, <a href="https://trac.i2p2.de/" target="_blank">https://trac.i2p2.de/</a>.
+For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
+Developers can browse source at <a href="https://github.com/i2p/i2p.i2p" target="_blank">Github</a>.
+We use <a href="http://i2p-projekt.i2p/monotone.html" target="_blank">monotone</a> to manage our source code - while you may clone the source code anonymously, commits are accepted only after accepting the developer agreement.</li>
+
+<li>
+<b>Get Involved!</b><br>
+I2P is developed and maintained mostly through unfunded, voluntary participation by community members.
+We're happy to accept <a href="http://i2p-projekt.i2p/donate.html" target="_blank">donations</a>, which go into essential hosting and administrative costs.
+We have <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">cash bounties</a> for aspects of I2P for developers looking for incentives to participate, and we're always looking for more <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java coders</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">translators</a>, promoters and users to help I2P grow.
+The bigger the I2P network, the more everyone benefits, so simply telling all your friends about I2P (and lending a hand with the installation and setup where needed) is helpful.
+For further info on how you can participate, visit the <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">volunteers page</a> on the website.</li>
+
+</ul>
+<div class="topness"><a href="#top">[Başlangıca Dön]</a></div>
+</div>

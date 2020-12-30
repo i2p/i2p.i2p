@@ -67,13 +67,15 @@ class ConnectionManager {
     /** once over throttle limits, respond this many times before just dropping */
     private static final int DROP_OVER_LIMIT = 3;
 
-    // TODO https://stackoverflow.com/questions/16022624/examples-of-http-api-rate-limiting-http-response-headers
+    // https://stackoverflow.com/questions/16022624/examples-of-http-api-rate-limiting-http-response-headers
+    // RFC 6585
     private static final String LIMIT_HTTP_RESPONSE =
          "HTTP/1.1 429 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
+         "Retry-After: 900\r\n"+
          "\r\n"+
          "<html><head><title>429 Denied</title></head>"+
          "<body><h3>429 Denied</h3>" +
@@ -122,7 +124,6 @@ class ConnectionManager {
         _context.statManager().createRateStat("stream.con.lifetimeDupMessagesSent", "How many duplicate messages do we send on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeDupMessagesReceived", "How many duplicate messages do we receive on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeRTT", "What is the final RTT when a stream closes?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("stream.con.lifetimeCongestionSeenAt", "When was the last congestion seen at when a stream closes?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeSendWindowSize", "What is the final send window size when a stream closes?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.receiveActive", "How many streams are active when a new one is received (period being not yet dropped)", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         // Stats for Connection
@@ -231,40 +232,33 @@ class ConnectionManager {
      * Create a new connection based on the SYN packet we received.
      *
      * @param synPacket SYN packet to process
-     * @return created Connection with the packet's data already delivered to
-     *         it, or null if the syn's streamId was already taken
+     * @return created Connection with the packet's data already delivered to it,
+     *         or null if the syn's streamId was already taken,
+     *         or if the connection was rejected
      */
     public Connection receiveConnection(Packet synPacket) {
-        ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
-        opts.setPort(synPacket.getRemotePort());
-        opts.setLocalPort(synPacket.getLocalPort());
         boolean reject = false;
-        int active = 0;
-        int total = 0;
+        int retryAfter = 0;
 
-            // just for the stat
-            //total = _connectionByInboundId.size();
-            //for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
-            //    if ( ((Connection)iter.next()).getIsConnected() )
-            //        active++;
-            //}
             if (locked_tooManyStreams()) {
                 if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                     _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of " 
                               + _defaultOptions.getMaxConns() + " connections");
                 reject = true;
+                retryAfter = 120;
             } else {
                 // this may not be right if more than one is enabled
-                String why = shouldRejectConnection(synPacket);
+                Reason why = shouldRejectConnection(synPacket);
                 if (why != null) {
                     if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                         _log.logAlways(Log.WARN, "Refusing connection since peer is " + why +
                            (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().toBase32()));
                     reject = true;
+                    retryAfter = why.getSeconds();
                 }
             }
         
-        _context.statManager().addRateData("stream.receiveActive", active, total);
+        _context.statManager().addRateData("stream.receiveActive", 1);
         
         if (reject) {
             Destination from = synPacket.getOptionalFrom();
@@ -276,9 +270,7 @@ class ConnectionManager {
                 return null;
             }
             Hash h = from.calculateHash();
-            if (_globalBlacklist.contains(h) ||
-                (_defaultOptions.isAccessListEnabled() && !_defaultOptions.getAccessList().contains(h)) ||
-                (_defaultOptions.isBlacklistEnabled() && _defaultOptions.getBlacklist().contains(h))) {
+            if (retryAfter >= MAX_TIME) {
                 // always drop these regardless of setting
                 return null;
             }
@@ -301,7 +293,10 @@ class ConnectionManager {
             boolean custom = !(reset || http);
             String sendResponse;
             if (http) {
-                sendResponse = LIMIT_HTTP_RESPONSE;
+                if (retryAfter > 0)
+                    sendResponse = LIMIT_HTTP_RESPONSE.replace("900", Integer.toString(retryAfter));
+                else
+                    sendResponse = LIMIT_HTTP_RESPONSE.replace("Retry-After: 900\r\n", "");
             } else if (custom) {
                 sendResponse = resp.replace("\\r", "\r").replace("\\n", "\n");
             } else {
@@ -332,6 +327,40 @@ class ConnectionManager {
             return null;
         }
         
+        ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
+        opts.setPort(synPacket.getRemotePort());
+        opts.setLocalPort(synPacket.getLocalPort());
+
+        // set up the MTU for the connection
+        int size;
+        if (synPacket.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
+            size = synPacket.getOptionalMaxSize();
+            if (size < ConnectionOptions.MIN_MESSAGE_SIZE) {
+                // log.error? connection reset?
+                size = ConnectionOptions.MIN_MESSAGE_SIZE;
+            }
+        } else {
+            // specs not clear if MTU may be omitted from SYN
+            size = ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE;
+        }
+        int mtu = opts.getMaxMessageSize();
+        if (size < mtu) {
+            if (_log.shouldInfo())
+                _log.info("Reducing MTU for IB conn to " + size 
+                          + " from " + mtu);
+            opts.setMaxMessageSize(size);
+            opts.setMaxInitialMessageSize(size);
+        } else if (size > opts.getMaxInitialMessageSize()) {
+            if (size > mtu)
+                size = mtu;
+            if (_log.shouldInfo())
+                _log.info("Increasing MTU for IB conn to " + size 
+                          + " from " + mtu);
+            if (size != mtu)
+                opts.setMaxMessageSize(size);
+            opts.setMaxInitialMessageSize(size);
+        }
+
         Connection con = new Connection(_context, this, synPacket.getSession(), _schedulerChooser,
                                         _timer, _outboundQueue, _conPacketHandler, opts, true);
         _tcbShare.updateOptsFromShare(con);
@@ -368,7 +397,7 @@ class ConnectionManager {
             return false;
         if (con == null) {
             // Use the same throttling as for connections
-            String why = shouldRejectConnection(ping);
+            Reason why = shouldRejectConnection(ping);
             if (why != null) {
                 if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                     _log.logAlways(Log.WARN, "Dropping ping since peer is " + why + ": " + dest.calculateHash());
@@ -568,14 +597,35 @@ class ConnectionManager {
     }
     
     /**
+     *  @since 0.9.49
+     */
+    private static class Reason {
+        private final String txt;
+        private final int seconds;
+
+        public Reason(String text, int secs) {
+            txt = text; seconds = secs;
+        }
+
+        @Override
+        public String toString() { return txt; }
+
+        public int getSeconds() { return seconds; }
+    }
+
+    private static final int MAX_TIME = 9999999;
+
+
+    /**
+     *  Reason time is in seconds for Retry-After header; MAX_TIME for drop, 0 if unknown
      *  @return reason string or null if not rejected
      */
-    private String shouldRejectConnection(Packet syn) {
+    private Reason shouldRejectConnection(Packet syn) {
         // unfortunately we don't have access to the router client manager here,
         // so we can't whitelist local access
         Destination from = syn.getOptionalFrom();
         if (from == null)
-            return "null";
+            return new Reason("null", MAX_TIME);
         Hash h = from.calculateHash();
 
         // As of 0.9.9, run the blacklist checks BEFORE the port counters,
@@ -608,61 +658,61 @@ class ConnectionManager {
             }
         }
         if (hashes.length() > 0 && _globalBlacklist.contains(h))
-            return "blacklisted globally";
+            return new Reason("blacklisted globally", MAX_TIME);
 
         if (_defaultOptions.isAccessListEnabled() &&
             !_defaultOptions.getAccessList().contains(h))
-            return "not whitelisted";
+            return new Reason("not whitelisted", MAX_TIME);
         if (_defaultOptions.isBlacklistEnabled() &&
             _defaultOptions.getBlacklist().contains(h))
-            return "blacklisted";
+            return new Reason("blacklisted", MAX_TIME);
 
 
         if (_dayThrottler != null && _dayThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledDay", 1);
             if (_defaultOptions.getMaxConnsPerDay() <= 0)
-                return "throttled by" +
+                return new Reason("throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
-                        " per day";
+                        " per day", 86400);
             else if (_defaultOptions.getMaxTotalConnsPerDay() <= 0)
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
-                        " per day";
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
+                        " per day", 86400);
             else
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
-                        " per day";
+                        " per day", 86400);
         }
         if (_hourThrottler != null && _hourThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledHour", 1);
             if (_defaultOptions.getMaxConnsPerHour() <= 0)
-                return "throttled by" +
+                return new Reason("throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
-                        " per hour";
+                        " per hour", 3600);
             else if (_defaultOptions.getMaxTotalConnsPerHour() <= 0)
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
-                        " per hour";
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
+                        " per hour", 3600);
             else
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
-                        " per hour";
+                        " per hour", 3600);
         }
         if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledMinute", 1);
             if (_defaultOptions.getMaxConnsPerMinute() <= 0)
-                return "throttled by" +
+                return new Reason("throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
-                        " per minute";
+                        " per minute", 60);
             else if (_defaultOptions.getMaxTotalConnsPerMinute() <= 0)
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
-                        " per minute";
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
+                        " per minute", 60);
             else
-                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
+                return new Reason("throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
-                        " per minute";
+                        " per minute", 60);
         }
 
         if (!_connectionFilter.allowDestination(from)) {
-            return "not allowed by filter";
+            return new Reason("not allowed by filter", 0);
         }
 
         return null;
@@ -765,7 +815,6 @@ class ConnectionManager {
             _context.statManager().addRateData("stream.con.lifetimeDupMessagesSent", con.getLifetimeDupMessagesSent(), con.getLifetime());
             _context.statManager().addRateData("stream.con.lifetimeDupMessagesReceived", con.getLifetimeDupMessagesReceived(), con.getLifetime());
             _context.statManager().addRateData("stream.con.lifetimeRTT", con.getOptions().getRTT(), con.getLifetime());
-            _context.statManager().addRateData("stream.con.lifetimeCongestionSeenAt", con.getLastCongestionSeenAt(), con.getLifetime());
             _context.statManager().addRateData("stream.con.lifetimeSendWindowSize", con.getOptions().getWindowSize(), con.getLifetime());
             if (I2PSocketManagerFull.pcapWriter != null)
                 I2PSocketManagerFull.pcapWriter.flush();

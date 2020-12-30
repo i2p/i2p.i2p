@@ -15,7 +15,7 @@ import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.servlets.gzip.GzipHandler;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 
 /**
  * Block certain Host headers to prevent DNS rebinding attacks.

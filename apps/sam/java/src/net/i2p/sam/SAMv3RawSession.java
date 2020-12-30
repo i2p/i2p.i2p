@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
@@ -121,7 +122,7 @@ class SAMv3RawSession extends SAMRawSession implements Session, SAMRawReceiver {
 				msgBuf = ByteBuffer.allocate(data.length);
 			}
 			msgBuf.put(data);
-			msgBuf.flip();
+			((Buffer)msgBuf).flip();
 			this.server.send(this.clientAddress, msgBuf);
 		}
 	}

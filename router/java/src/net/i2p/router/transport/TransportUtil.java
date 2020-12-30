@@ -187,11 +187,8 @@ public abstract class TransportUtil {
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             if (allowIPv6) {
-                // loopback, broadcast,
-                // IPv4 compat ::xxxx:xxxx
-                if (addr[0] == 0)
-                    return false;
-                if (addr[0] == 0x20) {
+                int a0 = addr[0] & 0xFF;
+                if (a0 == 0x20) {
                     // disallow 2002::/16 (6to4 RFC 3056)
                     if (addr[1] == 0x02)
                         return false;
@@ -203,32 +200,29 @@ public abstract class TransportUtil {
                         if (addr[2] == 0x0d && (addr[3] & 0xff) == 0xb8)
                             return false;
                     }
-                } else if ((addr[0] & 0xfe) == 0xfc) {
-                    // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
-                    // not recognized as local by InetAddress
-                    return false;
-                } else if (addr[0] == 0x26) {
+                    return true;
+                } else if (a0 == 0x26) {
                     // Hamachi IPv6
                     if (addr[1] == 0x20 && addr[2] == 0x00 && (addr[3] & 0xff) == 0x9b)
                         return false;
-                } else if (addr[0] == 0x3f) {
-                    // 6bone RFC 2471
-                    if ((addr[1] & 0xff) == 0xfe)
-                        return false;
-                } else if ((addr[0] & 0xfe) == 0x02) {
+                    return true;
+                } else {
+                    // https://www.iana.org/assignments/ipv6-address-space/ipv6-address-space.xhtml
+                    // Global unicast
+                    if (a0 >= 0x20 && a0 <= 0x3f)
+                        return true;
+                    // 00-1f and 40-ff
+                    // loopback, broadcast,
+                    // IPv4 compat ::xxxx:xxxx
                     // Yggdrasil 0200:/7
                     // https://yggdrasil-network.github.io/faq.html
-                    return false;
+                    // reserved
+                    // 6bone RFC 2471 3ff3::
+                    // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
+                    // not recognized as local by InetAddress
+                    // reserved, unique local, site local, multicast
+                    // fall through return false
                 }
-                try {
-                    InetAddress ia = InetAddress.getByAddress(addr);
-                    return
-                        (!ia.isLinkLocalAddress()) &&
-                        (!ia.isMulticastAddress()) &&
-                        (!ia.isAnyLocalAddress()) &&
-                        (!ia.isLoopbackAddress()) &&
-                        (!ia.isSiteLocalAddress());
-                } catch (UnknownHostException uhe) {}
             }
         }
         return false;
@@ -253,6 +247,8 @@ public abstract class TransportUtil {
                port != 4045 &&  // lockd
                port != 4444 &&  // HTTP
                port != 4445 &&  // HTTPS
+               port != 5060 &&  // SIP https://groups.google.com/a/chromium.org/g/blink-dev/c/tTGznHWRB9U
+               port != 5061 &&  // SIP https://groups.google.com/a/chromium.org/g/blink-dev/c/tTGznHWRB9U
                port != 6000 &&  // lockd
                (!(port >= 6665 && port <= 6669)) && // IRC and alternates
                port != 6697 &&  // IRC+TLS
@@ -274,7 +270,7 @@ public abstract class TransportUtil {
      */
     public static void logInvalidPort(Log log, String transportStyle, int port) {
         log.error("Specified " + transportStyle + " port " + port + " is not valid, selecting a new port");
-        log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
+        log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 5060, 5061, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
     }
 
     /**

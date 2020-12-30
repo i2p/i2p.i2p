@@ -1,6 +1,9 @@
 package net.i2p.router.transport.ntcp;
 
 import java.nio.ByteBuffer;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -106,6 +109,8 @@ abstract class EstablishBase implements EstablishState {
 
     protected final Object _stateLock = new Object();
     protected volatile State _state;
+    private final AtomicBoolean _isCorrupt = new AtomicBoolean();
+    private final AtomicBoolean _isComplete = new AtomicBoolean();
 
     protected enum State {
         OB_INIT,
@@ -173,6 +178,8 @@ abstract class EstablishBase implements EstablishState {
         CORRUPT
     }
 
+    protected static final Set<State> STATES_DONE = EnumSet.of(State.VERIFIED, State.CORRUPT);
+
     private EstablishBase() {
         _context = null;
         _log = null;
@@ -214,6 +221,8 @@ abstract class EstablishBase implements EstablishState {
     protected void changeState(State state) {
         synchronized (_stateLock) {
             _state = state;
+            _isCorrupt.set(state == State.CORRUPT);
+            _isComplete.set(state == State.VERIFIED);
         }
     }
 
@@ -228,7 +237,7 @@ abstract class EstablishBase implements EstablishState {
      */
     public synchronized void receive(ByteBuffer src) {
         synchronized(_stateLock) {    
-            if (_state == State.VERIFIED || _state == State.CORRUPT)
+            if (STATES_DONE.contains(_state))
                 throw new IllegalStateException(prefix() + "received unexpected data on " + _con);
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -244,9 +253,7 @@ abstract class EstablishBase implements EstablishState {
 
     /** did the handshake fail for some reason? */
     public boolean isCorrupt() {
-        synchronized(_stateLock) {
-            return _state == State.CORRUPT;
-        }
+        return _isCorrupt.get();
     }
 
     /**
@@ -257,9 +264,7 @@ abstract class EstablishBase implements EstablishState {
      *  @return is the handshake complete and valid?
      */
     public boolean isComplete() {
-        synchronized(_stateLock) {
-            return _state == State.VERIFIED;
-        }
+        return _isComplete.get();
     }
 
     /**
@@ -287,7 +292,7 @@ abstract class EstablishBase implements EstablishState {
     /** Caller must synch. */
     protected void fail(String reason, Exception e, boolean bySkew) {
         synchronized(_stateLock) {    
-            if (_state == State.CORRUPT || _state == State.VERIFIED)
+            if (STATES_DONE.contains(_state))
                 return;
             changeState(State.CORRUPT);
         }
@@ -348,7 +353,7 @@ abstract class EstablishBase implements EstablishState {
 
         public VerifiedEstablishState() {
             super();
-            _state = State.VERIFIED;
+            changeState(State.VERIFIED);
         }
 
         public int getVersion() { return 1; }
@@ -380,7 +385,7 @@ abstract class EstablishBase implements EstablishState {
 
         public FailedEstablishState() {
             super();
-            _state = State.CORRUPT;
+            changeState(State.CORRUPT);
         }
 
         public int getVersion() { return 1; }

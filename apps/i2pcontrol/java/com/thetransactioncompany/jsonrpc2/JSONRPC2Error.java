@@ -1,7 +1,7 @@
 package com.thetransactioncompany.jsonrpc2;
 
 
-import org.json.simple.JSONObject;
+import org.json.simple.JsonObject;
 
 
 /** 
@@ -220,7 +220,7 @@ public class JSONRPC2Error extends Exception {
 	 * @see #toJSONObject
 	 */
 	@Deprecated
-	public JSONObject toJSON() {
+	public JsonObject toJSON() {
 	
 		return toJSONObject();
 	}
@@ -231,9 +231,9 @@ public class JSONRPC2Error extends Exception {
 	 *
 	 * @return A JSON object representing this error object.
 	 */
-	public JSONObject toJSONObject() {
+	public JsonObject toJSONObject() {
 	
-		JSONObject out = new JSONObject();
+		JsonObject out = new JsonObject();
 		
 		out.put("code", code);
 		out.put("message", super.getMessage());

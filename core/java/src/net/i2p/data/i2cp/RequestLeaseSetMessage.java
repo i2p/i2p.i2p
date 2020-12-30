@@ -9,7 +9,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -21,6 +20,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
+import net.i2p.util.ByteArrayStream;
 
 /**
  * Defines the message a router sends to a client to request that
@@ -38,7 +38,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     private Date _end;
 
     public RequestLeaseSetMessage() {
-        _endpoints = new ArrayList<TunnelEndpoint>();
+        _endpoints = new ArrayList<TunnelEndpoint>(6);
     }
 
     public SessionId getSessionId() {
@@ -119,7 +119,8 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(256);
+        int len = 2 + 1 + (_endpoints.size() * (32 + 4)) + 8;
+        ByteArrayStream os = new ByteArrayStream(len);
         try {
             _sessionId.writeBytes(os);
             os.write((byte) _endpoints.size());

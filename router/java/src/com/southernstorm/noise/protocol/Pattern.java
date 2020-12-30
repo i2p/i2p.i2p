@@ -54,6 +54,15 @@ class Pattern {
 	public static final short FLAG_REMOTE_HYBRID = 0x1000;
 	public static final short FLAG_REMOTE_HYBRID_REQ = 0x2000;
 
+	private static final short[] noise_pattern_N = {
+	    FLAG_LOCAL_EPHEMERAL |
+	    FLAG_REMOTE_STATIC |
+	    FLAG_REMOTE_REQUIRED,
+
+	    E,
+	    ES
+	};
+
 	private static final short[] noise_pattern_XK = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
@@ -96,7 +105,9 @@ class Pattern {
 	 */
 	public static short[] lookup(String name)
 	{
-		if (name.equals("XK"))
+		if (name.equals("N"))
+			return noise_pattern_N;
+		else if (name.equals("XK"))
 			return noise_pattern_XK;
 		else if (name.equals("IK"))
 			return noise_pattern_IK;
