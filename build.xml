@@ -3127,7 +3127,7 @@
 		<checksum file="portable-win32.zip" forceOverwrite="yes"/>
 		<move file="portable" tofile="pkg-temp"/>
 	</target>
-    <target name="bundle" depends="pkg">
+    <target name="git-bundle" depends="pkg">
         <exec executable="git" failonerror="true">
             <arg value="bundle" />
             <arg value="create" />
