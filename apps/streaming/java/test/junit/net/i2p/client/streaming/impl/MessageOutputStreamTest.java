@@ -24,7 +24,7 @@ public class MessageOutputStreamTest extends TestCase {
     @Test
     public void test() throws Exception {
         Receiver receiver = new Receiver();
-        MessageOutputStream out = new MessageOutputStream(_context, _st2, receiver, 100);
+        MessageOutputStream out = new MessageOutputStream(_context, _st2, receiver, 100, 100);
         byte buf[] = new byte[128*1024];
         _context.random().nextBytes(buf);
         out.write(buf);
