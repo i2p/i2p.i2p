@@ -136,6 +136,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 	public static final String PATTERN_ID_XK = "XK";
 	public static final String PATTERN_ID_IK = "IK";
 	public static final String PATTERN_ID_N = "N";
+	/** same as N but no post-mixHash needed */
+	public static final String PATTERN_ID_N_NO_RESPONSE = "N!";
 	private static String dh;
 	private static final String cipher;
 	private static final String hash;
@@ -204,6 +206,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 		else if (patternId.equals(PATTERN_ID_IK))
 			pattern = PATTERN_IK;
 		else if (patternId.equals(PATTERN_ID_N))
+			pattern = PATTERN_N;
+		else if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))  // same as N but no post-mixHash needed
 			pattern = PATTERN_N;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
@@ -650,13 +654,13 @@ public class HandshakeState implements Destroyable, Cloneable {
 			// Add the payload to the message buffer and encrypt it.
 			if (payload != null) {
 				// no need to hash for N, we don't split() and no more messages follow
-				if (patternId.equals(PATTERN_ID_N))
+				if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
 					messagePosn += symmetric.encryptOnly(payload, payloadOffset, message, messagePosn, payloadLength);
 				else
 					messagePosn += symmetric.encryptAndHash(payload, payloadOffset, message, messagePosn, payloadLength);
 			} else {
 				// no need to hash for N, we don't split() and no more messages follow
-				if (patternId.equals(PATTERN_ID_N))
+				if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
 					messagePosn += symmetric.encryptOnly(message, messagePosn, message, messagePosn, 0);
 				else
 					messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, 0);
@@ -830,7 +834,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 			// Decrypt the message payload.
 			int payloadLength;
 			// no need to hash for N, we don't split() and no more messages follow
-			if (patternId.equals(PATTERN_ID_N))
+			if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
 				payloadLength = symmetric.decryptOnly(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
 			else
 				payloadLength = symmetric.decryptAndHash(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);

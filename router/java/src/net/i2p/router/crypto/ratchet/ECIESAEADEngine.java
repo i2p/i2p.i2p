@@ -503,7 +503,7 @@ public final class ECIESAEADEngine {
 
         HandshakeState state;
         try {
-            state = new HandshakeState(HandshakeState.PATTERN_ID_N, HandshakeState.RESPONDER, _context.commSystem().getXDHFactory());
+            state = new HandshakeState(HandshakeState.PATTERN_ID_N_NO_RESPONSE, HandshakeState.RESPONDER, _context.commSystem().getXDHFactory());
         } catch (GeneralSecurityException gse) {
             throw new IllegalStateException("bad proto", gse);
         }
@@ -1009,7 +1009,7 @@ public final class ECIESAEADEngine {
     private byte[] encryptNewSession(CloveSet cloves, PublicKey target) {
         HandshakeState state;
         try {
-            state = new HandshakeState(HandshakeState.PATTERN_ID_N, HandshakeState.INITIATOR, _context.commSystem().getXDHFactory());
+            state = new HandshakeState(HandshakeState.PATTERN_ID_N_NO_RESPONSE, HandshakeState.INITIATOR, _context.commSystem().getXDHFactory());
         } catch (GeneralSecurityException gse) {
             throw new IllegalStateException("bad proto", gse);
         }

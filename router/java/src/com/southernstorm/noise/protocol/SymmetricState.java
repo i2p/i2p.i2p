@@ -121,7 +121,8 @@ class SymmetricState implements Destroyable, Cloneable {
 		} else if (patternId.equals(HandshakeState.PATTERN_ID_IK)) {
 			initCK = INIT_CK_IK;
 			initHash = INIT_HASH_IK;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_N)) {
+		} else if (patternId.equals(HandshakeState.PATTERN_ID_N) ||
+		           patternId.equals(HandshakeState.PATTERN_ID_N_NO_RESPONSE)) {
 			initCK = INIT_CK_N;
 			initHash = INIT_HASH_N;
 		} else {
