@@ -6586,7 +6586,6 @@ h3#displayevents {
 form[action="events"] {
      border: 1px solid #7778bf;
      padding: 10px 10px 10px 50px;
-     margin: -16px 0 -2px 0;
      background: url(/themes/console/images/info/logs.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
