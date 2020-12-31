@@ -49,12 +49,6 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     
     public static final boolean USE_ECIES_FF = true;
 
-    //private static volatile long _currentLookupPeriod = 0;
-    //private static volatile int _currentLookupCount = 0;
-    // if we try to send over 20 netDb lookups in 10 seconds, we're acting up
-    //private static final long LOOKUP_THROTTLE_PERIOD = 10*1000;
-    //private static final long LOOKUP_THROTTLE_MAX = 50;
-
     /** Insanely big. Not much more than 1500 will fit in a message.
         Have to prevent a huge alloc on rcv of a malicious msg though */
     private static final int MAX_NUM_PEERS = 512;
@@ -98,54 +92,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     /** @param locallyCreated ignored */
     public DatabaseLookupMessage(I2PAppContext context, boolean locallyCreated) {
         super(context);
-        //setSearchKey(null);
-        //setFrom(null);
-        //setDontIncludePeers(null);
-        
-        // This is the wrong place for this, any throttling should be in netdb
-        // And it doesnt throttle anyway (that would have to be in netdb), it just increments a stat
-        //context.statManager().createRateStat("router.throttleNetDbDoSSend", "How many netDb lookup messages we are sending during a period with a DoS detected", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        //
-        // only check DoS generation if we are creating the message...
-        //if (locallyCreated) {
-        //    // we do this in the writeMessage so we know that we have all the data
-        //    int dosCount = detectDoS(context);
-        //    if (dosCount > 0) {
-        //        if (_log.shouldLog(Log.WARN))
-        //            _log.warn("Are we flooding the network with NetDb messages?  (" + dosCount 
-        //                      + " messages so far)", new Exception("Flood cause"));
-        //    }
-        //}
         _type = Type.ANY;
     }
-    
-    /**
-     * Return number of netDb messages in this period, if flood, else 0
-     *
-     */
-/*****
-    private static int detectDoS(I2PAppContext context) {
-        int count = _currentLookupCount++;
-        // now lets check for DoS
-        long now = context.clock().now();
-        if (_currentLookupPeriod + LOOKUP_THROTTLE_PERIOD > now) {
-            // same period, check for DoS
-            if (count >= LOOKUP_THROTTLE_MAX) {
-                context.statManager().addRateData("router.throttleNetDbDoSSend", count, 0);
-                return count;
-            } else {
-                // no DoS, at least, not yet
-                return 0;
-            }
-        } else {
-            // on to the next period, reset counter, no DoS
-            // (no, I'm not worried about concurrency here)
-            _currentLookupPeriod = now;
-            _currentLookupCount = 1;
-            return 0;
-        }
-    }
-*****/
     
     /**
      * Defines the key being searched for

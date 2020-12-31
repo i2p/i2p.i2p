@@ -119,8 +119,8 @@ class ExploreJob extends SearchJob {
         //    if (len > 0)
         //        msg.getDontIncludePeers().addAll(peers);
         //}
-        
-        available = MAX_CLOSEST - dontIncludePeers.size();
+        //available = MAX_CLOSEST - dontIncludePeers.size();
+
         if (available > 0) {
             // selectNearestExplicit adds our hash to the dontInclude set (3rd param) ...
             // And we end up with MAX_CLOSEST+1 entries.

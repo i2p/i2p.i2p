@@ -1,3 +1,29 @@
+2020-12-31 zzz
+ * NetDB:
+   - Drop lookups with replies going to us
+   - Extend lookup expire time
+
+2020-12-30 zzz
+ * Ratchet: Fix N pattern for ECIES build replies
+
+2020-12-29 zzz
+ * Crypto: Cache AES Ciphers
+ * i2ptunnel: Disable shared clients (DSA)
+ * NetDB: Verify RI stores for a while after starting
+ * Ratchet: mixHash() not required after message for N pattern
+
+2020-12-28 zzz
+ * Debian: Add Java 15/16 to control
+
+2020-12-27 zzz
+ * SSU: Fix restoration of window after failed message
+
+2020-12-26 zzz
+ * Console:
+   - Move flag overrides to war
+   - Move initial news to jar
+ * Router: Move some geoip files to jars
+
 2020-12-24 zzz
  * I2CP: Fix requesting leasesets for subsessions (ticket #2458)
 

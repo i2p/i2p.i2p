@@ -102,7 +102,7 @@ public class IterativeSearchJob extends FloodSearchJob {
      */
     private static final long SINGLE_SEARCH_TIME = 3*1000;
     /** the actual expire time for a search message */
-    private static final long SINGLE_SEARCH_MSG_TIME = 10*1000;
+    private static final long SINGLE_SEARCH_MSG_TIME = 20*1000;
     /**
      *  Use instead of CONCURRENT_SEARCHES in super() which is final.
      *  For now, we don't do concurrent, but we keep SINGLE_SEARCH_TIME very short,
