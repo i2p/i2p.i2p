@@ -73,22 +73,6 @@ img {
      border: none;
 }
 
-img[src$="bound.png"] {
-     filter: hue-rotate(-40deg);
-}
-
-a img[src$="bound.png"] {
-     filter: hue-rotate(-40deg) drop-shadow(0 0 1px #ccf);
-}
-
-a:hover img[src$="bound.png"] {
-     filter: hue-rotate(-40deg) drop-shadow(0 0 1px #f60);
-}
-
-a img {
-     filter: drop-shadow(0 0 1px #ccf);
-}
-
 a:hover img {
      filter: drop-shadow(0 0 1px #f60);
 }

@@ -11,7 +11,7 @@ matrix:
         sonarcloud:
           organization: "i2p"
       before_install:
-        - sed -i "1iplugins {\n    id 'org.sonarqube' version '3.0.0'\n}\n" build.gradle
+        - sed -i "1iplugins {\n    id 'org.sonarqube' version '2.8.0'\n}\n" build.gradle
     - jdk: openjdk8
 
 before_cache:
