@@ -32,6 +32,7 @@ public class GraphHelper extends FormHandler {
     private int _refreshDelaySeconds;
     private boolean _persistent;
     private boolean _graphHideLegend;
+    private boolean _utc;
     private String _stat;
     private int _end;
 
@@ -131,6 +132,9 @@ public class GraphHelper extends FormHandler {
     /** @since 0.9.32 */
     public void setHideLegend(String foo) { _graphHideLegend = true; }
 
+    /** @since 0.9.49 */
+    public void setUtc(String foo) { _utc = true; }
+
     /**
      *  For single stat page
      *  @since 0.9
@@ -157,6 +161,8 @@ public class GraphHelper extends FormHandler {
                 else if (title.equals("bw.recvRate")) hasRx = true;
             }
             boolean hideLegend = _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND);
+            // param is ignored, we get it from the property, but add it to defeat caching on change
+            boolean utc = _context.getBooleanProperty(PROP_UTC);
 
             if (hasTx && hasRx && !_showEvents) {
                 // remove individual tx/rx graphs if displaying combined
@@ -170,6 +176,7 @@ public class GraphHelper extends FormHandler {
                            + "&amp;c=" + (3 * _periodCount )
                            + "&amp;w=" + (3 * _width)
                            + "&amp;h=" + (3 * _height)
+                           + (utc ? "&amp;utc" : "")
                            + "\">");
                 String title = _t("Combined bandwidth graph");
                 _out.write("<img class=\"statimage\""
@@ -184,6 +191,8 @@ public class GraphHelper extends FormHandler {
                     // no legend, no height difference needed
                     _out.write("&amp;height=" + (_height));
                 }
+                if (utc)
+                    _out.write("&amp;utc");
                 _out.write("&amp;hideLegend=" + hideLegend
                            + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
@@ -199,6 +208,7 @@ public class GraphHelper extends FormHandler {
                            + "&amp;w=" + (3 * _width)
                            + "&amp;h=" + (3 * _height)
                            + (_showEvents ? "&amp;showEvents=1" : "")
+                           + (utc ? "&amp;utc" : "")
                            + "\">");
                 _out.write("<img class=\"statimage\" border=\"0\""
                            + " src=\"viewstat.jsp?stat="
@@ -209,6 +219,7 @@ public class GraphHelper extends FormHandler {
                            + "&amp;width=" + _width
                            + "&amp;height=" + _height
                            + "&amp;hideLegend=" + hideLegend
+                           + (utc ? "&amp;utc" : "")
                            + "\" alt=\"" + title
                            + "\" title=\"" + title + "\"></a>\n");
             }
@@ -417,6 +428,12 @@ public class GraphHelper extends FormHandler {
             if (hideLegend)
                 _out.write(HelperBase.CHECKED);
             _out.write(">" + _t("Do not show legend on graphs") + "</label></span><br><span class=\"nowrap\">\n<b>");
+            _out.write(_t("UTC") + ":</b> ");
+            _out.write("<label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"utc\"");
+            boolean utc = _context.getBooleanProperty(PROP_UTC);
+            if (utc)
+                _out.write(HelperBase.CHECKED);
+            _out.write(">" + _t("Use UTC time on graphs") + "</label></span><br><span class=\"nowrap\">\n<b>");
             _out.write(_t("Persistence") +
                        ":</b> <label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
             boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
@@ -477,6 +494,7 @@ public class GraphHelper extends FormHandler {
             _refreshDelaySeconds != _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH) ||
             _showEvents != _context.getBooleanProperty(PROP_EVENTS) ||
             _graphHideLegend != _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND) ||
+            _utc != _context.getBooleanProperty(PROP_UTC) ||
             _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT)) {
             Map<String, String> changes = new HashMap<String, String>();
             changes.put(PROP_X, Integer.toString(_width));
@@ -486,6 +504,7 @@ public class GraphHelper extends FormHandler {
             changes.put(PROP_EVENTS, Boolean.toString(_showEvents));
             changes.put(PROP_LEGEND, Boolean.toString(_graphHideLegend));
             changes.put(SummaryListener.PROP_PERSISTENT, Boolean.toString(_persistent));
+            changes.put(PROP_UTC, Boolean.toString(_utc));
             boolean warn = _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             _context.router().saveConfig(changes, null);
             addFormNotice(_t("Graph settings saved"));

@@ -13,4 +13,6 @@ public class GraphConstants {
     public static final int DEFAULT_Y = 100;
     public static final int MAX_X = 2048;
     public static final int MAX_Y = 1024;
+
+    public static final String PROP_UTC = "routerconsole.graphUTC";
 }

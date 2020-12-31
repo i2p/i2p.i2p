@@ -162,6 +162,9 @@ class SummaryRenderer {
             def.setFont(RrdGraphDef.FONTTAG_LEGEND, legnd);
             def.setFont(RrdGraphDef.FONTTAG_TITLE, large);
 
+            boolean localTime = !_context.getBooleanProperty(GraphConstants.PROP_UTC);
+            if (localTime)
+                def.setTimeZone(SystemVersion.getSystemTimeZone(_context));
             def.setTimeSpan(start/1000, end/1000);
             def.setMinValue(0d);
             String name = _listener.getRate().getRateStat().getName();
@@ -248,23 +251,39 @@ class SummaryRenderer {
             if (!hideLegend) {
                 // '07 Jul 21:09' with month name in the system locale
                 // TODO: Fix Arabic time display
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm");
                 Map<Long, String> events = ((RouterContext)_context).router().eventLog().getEvents(EventLog.STARTED, start);
-                for (Map.Entry<Long, String> event : events.entrySet()) {
-                    long started = event.getKey().longValue();
-                    if (started > start && started < end) {
-                        // String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\l";
-                        String legend;
-                        if (Messages.isRTL(lang)) {
-                            // RTL languages
-                            legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " - " + event.getValue() + "\\l";
-                        } else {
-                            legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " [" + event.getValue() + "]\\l";
+                if (localTime) {
+                    for (Map.Entry<Long, String> event : events.entrySet()) {
+                        long started = event.getKey().longValue();
+                        if (started > start && started < end) {
+                            String legend;
+                            if (Messages.isRTL(lang)) {
+                                // RTL languages
+                                legend = _t("Restart") + ' ' + DataHelper.formatTime(started) + " - " + event.getValue() + "\\l";
+                            } else {
+                                legend = _t("Restart") + ' ' + DataHelper.formatTime(started) + " [" + event.getValue() + "]\\l";
+                            }
+                            def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 2.0f);
                         }
-                        def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 2.0f);
                     }
+                    def.comment(DataHelper.formatTime(start) + " — " + DataHelper.formatTime(end) + "\\r");
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm");
+                    for (Map.Entry<Long, String> event : events.entrySet()) {
+                        long started = event.getKey().longValue();
+                        if (started > start && started < end) {
+                            String legend;
+                            if (Messages.isRTL(lang)) {
+                                // RTL languages
+                                legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " - " + event.getValue() + "\\l";
+                            } else {
+                                legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " [" + event.getValue() + "]\\l";
+                            }
+                            def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 2.0f);
+                        }
+                    }
+                    def.comment(sdf.format(new Date(start)) + " — " + sdf.format(new Date(end)) + " UTC\\r");
                 }
-                def.comment(sdf.format(new Date(start)) + " — " + sdf.format(new Date(end)) + " UTC\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
