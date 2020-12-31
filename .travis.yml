@@ -1,12 +1,12 @@
 language: java
-dist: trusty
+dist: bionic
 
 jdk:
   - oraclejdk11
 
 matrix:
   include:
-    - jdk: oraclejdk8
+    - jdk: oraclejdk11
       addons:
         sonarcloud:
           organization: "i2p"
@@ -26,7 +26,7 @@ cache:
 
 script:
   - |
-    if [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]; then
+    if [ "$TRAVIS_JDK_VERSION" == "oraclejdk11" ]; then
       ./gradlew sonarqube codeCoverageReport
     else
       ./gradlew check codeCoverageReport
