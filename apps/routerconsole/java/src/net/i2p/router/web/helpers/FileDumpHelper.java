@@ -115,7 +115,7 @@ public class FileDumpHelper extends HelperBase {
                    "<td>");
         long mod = f.lastModified();
         if (mod > 0)
-            buf.append((new Date(mod)).toString());
+            buf.append(DataHelper.formatTime(mod));
         else
             buf.append("<font color=\"red\">Not found</font>");
         buf.append("</td><td align=\"center\">");
