@@ -15,3 +15,6 @@ include 'apps:susimail'
 include 'core'
 include 'installer'
 include 'router'
+// TODO
+//include 'apps:i2pcontrol'
+//include 'apps:imagegen'

@@ -73,6 +73,9 @@ jar {
         attributes 'Implementation-Title': 'I2P Java Core API'
         attributes 'Main-Class': 'net.i2p.util.CommandLine'
     }
+    from ('resources', {
+        into "net/i2p/util/resources"
+    })
 }
 
 configurations {

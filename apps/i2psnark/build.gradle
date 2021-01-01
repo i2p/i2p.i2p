@@ -35,12 +35,18 @@ artifacts {
 }
 
 war {
-    into '.icons', {
-        from 'icons'
-    }
+    rootSpec.exclude('/org/klomp/snark/*.class')
+    rootSpec.exclude('/org/klomp/snark/bencode/**')
+    rootSpec.exclude('/org/klomp/snark/comments/**')
+    rootSpec.exclude('/org/klomp/snark/dht/**')
+    rootSpec.exclude('/org/klomp/snark/standalone/**')
+    from ('resources', {
+        into ".resources"
+    })
     webInf {
         into 'classes/org/klomp/snark/web'
         from 'mime.properties'
     }
     webXml = file('web.xml')
+    // TODO why is this in there? WEB-INF/lib/systray.jar
 }

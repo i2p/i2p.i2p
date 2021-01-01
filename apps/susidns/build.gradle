@@ -18,5 +18,16 @@ dependencies {
 war {
     from 'src/jsp'
     from 'src/index.html'
+    from ('src/js', {
+        into "js"
+    })
+    from ('src/svg', {
+        into "svg"
+    })
+    from ('src/themes', {
+        into "themes"
+    })
+    exclude '*.jsi'
+    exclude '*.jsp'
     webXml = file('src/WEB-INF/web-template.xml')
 }

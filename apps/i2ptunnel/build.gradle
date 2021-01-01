@@ -31,6 +31,16 @@ task i2ptunnelJar(type: Jar) {
         attributes 'Main-Class': 'net.i2p.i2ptunnel.I2PTunnel'
         attributes 'Class-Path': 'i2p.jar mstreaming.jar'
     }
+    from ('resources', {
+        into "net/i2p/i2ptunnel/resources"
+    })
+    from ('../routerconsole/jsp', {
+        include 'themes/console/*/*.css'
+        include 'themes/console/images/i2plogo.png'
+        include 'themes/console/images/favicon.ico'
+        include 'themes/console/images/itoopie_sm.png'
+        into "net/i2p/i2ptunnel/resources"
+    })
 }
 
 task tempBeansJar(type: Jar) {
@@ -56,7 +66,18 @@ artifacts {
 
 war {
     from 'jsp'
+    rootSpec.exclude('/net/i2p/i2ptunnel/*.class')
+    rootSpec.exclude('/net/i2p/i2ptunnel/access')
+    rootSpec.exclude('/net/i2p/i2ptunnel/irc')
+    rootSpec.exclude('/net/i2p/i2ptunnel/localServer')
+    rootSpec.exclude('/net/i2p/i2ptunnel/socks')
+    rootSpec.exclude('/net/i2p/i2ptunnel/streamr')
+    rootSpec.exclude('/net/i2p/i2ptunnel/udp')
+    rootSpec.exclude('/net/i2p/i2ptunnel/udpTunnel')
     exclude 'jsp/web.xml'
+    exclude '*.jsi'
+    exclude '*.jsp'
     webXml = file('jsp/web.xml')
+    // FIXME why is this in there? WEB-INF/lib/mstreaming.jar
 }
 
