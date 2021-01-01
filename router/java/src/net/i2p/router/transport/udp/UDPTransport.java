@@ -395,25 +395,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         UDPPacket.clearCache();
         
         if (_log.shouldLog(Log.WARN)) _log.warn("Starting SSU transport listening");
+
+        // set up random intro key, as of 0.9.48
         byte[] ikey = new byte[SessionKey.KEYSIZE_BYTES];
         _introKey = new SessionKey(ikey);
-        if (VersionComparator.comp(CoreVersion.VERSION, "0.9.48") >= 0) {
-            String sikey = _context.getProperty(PROP_INTRO_KEY);
-            if (sikey != null &&
-                _context.getEstimatedDowntime() < MIN_DOWNTIME_TO_REKEY) {
-                byte[] saved = Base64.decode(sikey);
-                if (saved != null && saved.length == SessionKey.KEYSIZE_BYTES) {
-                    System.arraycopy(saved, 0, ikey, 0, SessionKey.KEYSIZE_BYTES);
-                } else {
-                    _context.random().nextBytes(ikey);
-                    _context.router().saveConfig(PROP_INTRO_KEY, Base64.encode(ikey));
-                }
+        String sikey = _context.getProperty(PROP_INTRO_KEY);
+        if (sikey != null &&
+            _context.getEstimatedDowntime() < MIN_DOWNTIME_TO_REKEY) {
+            byte[] saved = Base64.decode(sikey);
+            if (saved != null && saved.length == SessionKey.KEYSIZE_BYTES) {
+                System.arraycopy(saved, 0, ikey, 0, SessionKey.KEYSIZE_BYTES);
             } else {
                 _context.random().nextBytes(ikey);
                 _context.router().saveConfig(PROP_INTRO_KEY, Base64.encode(ikey));
             }
         } else {
-            System.arraycopy(_context.routerHash().getData(), 0, ikey, 0, SessionKey.KEYSIZE_BYTES);
+            _context.random().nextBytes(ikey);
+            _context.router().saveConfig(PROP_INTRO_KEY, Base64.encode(ikey));
         }
         
         // bind host
