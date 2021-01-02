@@ -39,7 +39,6 @@ class OutboundTunnelEndpoint {
             // If we don't, the data buf won't get released from the cache... that's ok
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid IV, dropping at OBEP " + _config);
-            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
             return;
         }
         _handler.receiveTunnelMessage(msg.getData(), 0, msg.getData().length);

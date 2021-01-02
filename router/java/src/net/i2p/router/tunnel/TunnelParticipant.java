@@ -85,10 +85,11 @@ class TunnelParticipant {
     
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
         boolean ok = false;
+        byte[] data = msg.getData();
         if (_processor != null)
-            ok = _processor.process(msg.getData(), 0, msg.getData().length, recvFrom);
+            ok = _processor.process(data, 0, data.length, recvFrom);
         else if (_inboundEndpointProcessor != null) 
-            ok = _inboundEndpointProcessor.retrievePreprocessedData(msg.getData(), 0, msg.getData().length, recvFrom);
+            ok = _inboundEndpointProcessor.retrievePreprocessedData(data, 0, data.length, recvFrom);
         
         if (!ok) {
             if (_log.shouldLog(Log.WARN))
@@ -96,7 +97,6 @@ class TunnelParticipant {
                            + " inboundEndpoint=" + _inboundEndpointProcessor);
             if (_config != null)
                 _config.incrementProcessedMessages();
-            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
             return;
         }
         
@@ -125,7 +125,7 @@ class TunnelParticipant {
             _inboundEndpointProcessor.getConfig().incrementProcessedMessages();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive fragment: on " + _config + ": " + msg);
-            _handler.receiveTunnelMessage(msg.getData(), 0, msg.getData().length);
+            _handler.receiveTunnelMessage(data, 0, data.length);
         }
     }
     
