@@ -27,7 +27,8 @@ dependencies {
 // We don't support the "slow way"
 task bundle {
     doLast {
-        println "apps/ministreaming/java/bundle-messages.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/client/streaming/messages_de.class")).exists())
+            println "apps/ministreaming/java/bundle-messages.sh".execute().text
     }
 }
 jar.dependsOn bundle

@@ -73,7 +73,8 @@ if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVe
 // We don't support the "slow way"
 task bundle {
     doLast {
-        println "core/java/bundle-messages.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/util/messages_de.class")).exists())
+            println "core/java/bundle-messages.sh".execute().text
     }
 }
 jar.dependsOn bundle

@@ -19,7 +19,8 @@ dependencies {
 // We don't support the "slow way"
 task bundle {
     doLast {
-        println "apps/desktopgui/bundle-messages.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/desktopgui/messages_de.class")).exists())
+            println "apps/desktopgui/bundle-messages.sh".execute().text
     }
 }
 jar.dependsOn bundle

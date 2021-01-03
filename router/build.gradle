@@ -32,7 +32,8 @@ dependencies {
 // We don't support the "slow way"
 task bundle {
     doLast {
-        println "router/java/bundle-messages.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/router/util/messages_de.class")).exists())
+            println "router/java/bundle-messages.sh".execute().text
     }
 }
 jar.dependsOn bundle

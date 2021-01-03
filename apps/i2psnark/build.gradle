@@ -40,7 +40,8 @@ artifacts {
 // We don't support the "slow way"
 task bundle {
     doLast {
-        println "apps/i2psnark/java/bundle-messages.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/org/klomp/snark/web/messages_de.class")).exists())
+            println "apps/i2psnark/java/bundle-messages.sh".execute().text
     }
 }
 war.dependsOn bundle

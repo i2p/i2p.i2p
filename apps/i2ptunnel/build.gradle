@@ -29,13 +29,15 @@ dependencies {
 // We don't support the "slow way"
 task bundleProxy {
     doLast {
-        println "apps/i2ptunnel/java/bundle-messages-proxy.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/i2ptunnel/proxy/messages_de.class")).exists())
+            println "apps/i2ptunnel/java/bundle-messages-proxy.sh".execute().text
     }
 }
 
 task bundle {
     doLast {
-        println "apps/i2ptunnel/java/bundle-messages.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/i2ptunnel/web/messages_de.class")).exists())
+            println "apps/i2ptunnel/java/bundle-messages.sh".execute().text
     }
 }
 

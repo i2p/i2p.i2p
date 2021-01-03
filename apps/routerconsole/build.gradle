@@ -48,13 +48,16 @@ if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVe
 // We don't support the "slow way"
 task bundleJar {
     doLast {
-        println "apps/routerconsole/java/bundle-messages-countries.sh".execute().text
-        println "apps/routerconsole/java/bundle-messages-news.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/router/countries/messages_de.class")).exists())
+            println "apps/routerconsole/java/bundle-messages-countries.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/router/news/messages_de.class")).exists())
+            println "apps/routerconsole/java/bundle-messages-news.sh".execute().text
     }
 }
 task bundle {
     doLast {
-        println "apps/routerconsole/java/bundle-messages.sh".execute().text
+        if (!(new File("$buildDir/classes/java/main/net/i2p/router/web/messages_de.class")).exists())
+            println "apps/routerconsole/java/bundle-messages.sh".execute().text
     }
 }
 
