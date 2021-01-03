@@ -6,6 +6,7 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            srcDir 'java/build/messages-src'
         }
     }
     test {
@@ -25,6 +26,16 @@ dependencies {
     implementation 'gnu.getopt:java-getopt:1.0.13'
     testImplementation project(path: ':core', configuration: 'tests')
 }
+
+// Create the java files from the po files. The jar task will compile them.
+// This requires gettext 0.19 or higher.
+// We don't support the "slow way"
+task bundle {
+    doLast {
+        println "router/java/bundle-messages.sh".execute().text
+    }
+}
+jar.dependsOn bundle
 
 jar {
     manifest {

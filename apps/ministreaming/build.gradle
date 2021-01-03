@@ -8,6 +8,7 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            srcDir 'java/build/messages-src'
         }
     }
     test {
@@ -20,6 +21,16 @@ sourceSets {
 dependencies {
     api project(':core')
 }
+
+// Create the java files from the po files. The jar task will compile them.
+// This requires gettext 0.19 or higher.
+// We don't support the "slow way"
+task bundle {
+    doLast {
+        println "apps/ministreaming/java/bundle-messages.sh".execute().text
+    }
+}
+jar.dependsOn bundle
 
 jar {
     manifest {

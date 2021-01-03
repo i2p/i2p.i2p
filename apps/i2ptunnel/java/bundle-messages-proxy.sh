@@ -10,6 +10,7 @@
 #
 # zzz - public domain
 #
+cd `dirname $0`
 CLASS=net.i2p.i2ptunnel.proxy.messages
 TMPFILE=build/javafiles-proxy.txt
 export TZ=UTC

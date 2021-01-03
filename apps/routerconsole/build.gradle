@@ -7,6 +7,8 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            srcDir 'java/build/messages-countries-src'
+            srcDir 'java/build/messages-news-src'
         }
     }
 }
@@ -40,6 +42,16 @@ if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVe
     test.dependsOn scalaTest
 }
 
+// Create the java files from the po files. The jar task will compile them.
+// This requires gettext 0.19 or higher.
+// We don't support the "slow way"
+task bundleJar {
+    doLast {
+        println "apps/routerconsole/java/bundle-messages-countries.sh".execute().text
+        println "apps/routerconsole/java/bundle-messages-news.sh".execute().text
+    }
+}
+
 task consoleJar(type: Jar) {
     from sourceSets.main.output
     exclude 'net/i2p/router/web/helpers/**'
@@ -56,6 +68,7 @@ task consoleJar(type: Jar) {
         into "net/i2p/router/news/resources"
     })
 }
+consoleJar.dependsOn bundleJar
 
 artifacts {
     archives consoleJar

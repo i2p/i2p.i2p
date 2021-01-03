@@ -10,6 +10,7 @@
 #
 # zzz - public domain
 #
+cd `dirname $0`
 CLASS=net.i2p.router.countries.messages
 TMPFILE=build/javafiles-countries.txt
 export TZ=UTC

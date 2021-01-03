@@ -10,6 +10,7 @@
 #
 # zzz - public domain
 #
+cd `dirname $0`
 CLASS=net.i2p.router.news.messages
 TMPFILE=build/javafiles-news.txt
 export TZ=UTC

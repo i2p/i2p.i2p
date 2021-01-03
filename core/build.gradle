@@ -10,6 +10,7 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            srcDir 'java/build/messages-src'
             exclude 'gnu/getopt'
             exclude 'gnu/gettext'
         }
@@ -66,6 +67,16 @@ if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVe
     }
     test.dependsOn scalaTest
 }
+
+// Create the java files from the po files. The jar task will compile them.
+// This requires gettext 0.19 or higher.
+// We don't support the "slow way"
+task bundle {
+    doLast {
+        println "core/java/bundle-messages.sh".execute().text
+    }
+}
+jar.dependsOn bundle
 
 jar {
     manifest {

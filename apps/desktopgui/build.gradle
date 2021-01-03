@@ -2,6 +2,7 @@ sourceSets {
     main {
         java {
             srcDir 'src'
+            srcDir 'build/messages-src'
         }
     }
 }
@@ -12,3 +13,13 @@ dependencies {
     compile project(':installer')
     compile project(':apps:systray')
 }
+
+// Create the java files from the po files. The jar task will compile them.
+// This requires gettext 0.19 or higher.
+// We don't support the "slow way"
+task bundle {
+    doLast {
+        println "apps/desktopgui/bundle-messages.sh".execute().text
+    }
+}
+jar.dependsOn bundle

@@ -11,6 +11,7 @@
 # zzz - public domain
 # Mathiasdm - modifications for desktopgui
 #
+cd `dirname $0`
 CLASS=net.i2p.desktopgui.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC

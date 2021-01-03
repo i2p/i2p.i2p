@@ -10,6 +10,7 @@
 #
 # zzz - public domain
 #
+cd `dirname $0`
 CLASS=net.i2p.client.streaming.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC
