@@ -7,6 +7,7 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            srcDir 'java/build/messages-src'
             srcDir 'java/build/messages-countries-src'
             srcDir 'java/build/messages-news-src'
         }
@@ -51,6 +52,11 @@ task bundleJar {
         println "apps/routerconsole/java/bundle-messages-news.sh".execute().text
     }
 }
+task bundle {
+    doLast {
+        println "apps/routerconsole/java/bundle-messages.sh".execute().text
+    }
+}
 
 task consoleJar(type: Jar) {
     from sourceSets.main.output
@@ -69,6 +75,7 @@ task consoleJar(type: Jar) {
     })
 }
 consoleJar.dependsOn bundleJar
+war.dependsOn bundle
 
 artifacts {
     archives consoleJar

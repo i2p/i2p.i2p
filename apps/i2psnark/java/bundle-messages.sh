@@ -10,6 +10,7 @@
 #
 # zzz - public domain
 #
+cd `dirname $0`
 CLASS=org.klomp.snark.web.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC

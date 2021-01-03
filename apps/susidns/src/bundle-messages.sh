@@ -10,6 +10,7 @@
 #
 # zzz - public domain
 #
+cd `dirname $0`
 CLASS=i2p.susi.dns.messages
 TMPFILE=tmp/javafiles.txt
 export TZ=UTC

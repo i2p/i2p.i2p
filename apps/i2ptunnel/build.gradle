@@ -6,6 +6,7 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            srcDir 'java/build/messages-src'
             srcDir 'java/build/messages-proxy-src'
         }
     }
@@ -32,8 +33,15 @@ task bundleProxy {
     }
 }
 
+task bundle {
+    doLast {
+        println "apps/i2ptunnel/java/bundle-messages.sh".execute().text
+    }
+}
+
 task i2ptunnelJar(type: Jar) {
     from sourceSets.main.output 
+    exclude '**/web/*.class'
     exclude '**/ui/*.class'
     exclude '**/EditBean.class'
     exclude '**/IndexBean.class'
@@ -53,7 +61,9 @@ task i2ptunnelJar(type: Jar) {
     })
 }
 i2ptunnelJar.dependsOn bundleProxy
+war.dependsOn bundle
 
+// not needed unless we're building for both android and regular
 task tempBeansJar(type: Jar) {
     from sourceSets.main.output
     include '**/EditBean.class'
@@ -62,6 +72,7 @@ task tempBeansJar(type: Jar) {
     baseName = 'temp-beans'
 }
 
+// only for android
 task uiJar(type: Jar) {
     baseName = 'i2ptunnel-ui'
     from sourceSets.main.output
@@ -72,15 +83,19 @@ task uiJar(type: Jar) {
 }
 
 artifacts {
-    archives i2ptunnelJar, tempBeansJar, uiJar
+    archives i2ptunnelJar   //, tempBeansJar, uiJar
 }
 
 war {
+    include '**/EditBean.class'
+    include '**/ui/*.class'
+    include '**/IndexBean.class'
     from 'jsp'
     rootSpec.exclude('/net/i2p/i2ptunnel/*.class')
     rootSpec.exclude('/net/i2p/i2ptunnel/access')
     rootSpec.exclude('/net/i2p/i2ptunnel/irc')
     rootSpec.exclude('/net/i2p/i2ptunnel/localServer')
+    rootSpec.exclude('/net/i2p/i2ptunnel/proxy')
     rootSpec.exclude('/net/i2p/i2ptunnel/socks')
     rootSpec.exclude('/net/i2p/i2ptunnel/streamr')
     rootSpec.exclude('/net/i2p/i2ptunnel/udp')

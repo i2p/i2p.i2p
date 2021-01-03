@@ -6,6 +6,7 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            srcDir 'java/build/messages-src'
         }
     }
 }
@@ -33,6 +34,16 @@ task i2psnarkJar(type: Jar) {
 artifacts {
     archives i2psnarkJar
 }
+
+// Create the java files from the po files. The jar task will compile them.
+// This requires gettext 0.19 or higher.
+// We don't support the "slow way"
+task bundle {
+    doLast {
+        println "apps/i2psnark/java/bundle-messages.sh".execute().text
+    }
+}
+war.dependsOn bundle
 
 war {
     rootSpec.exclude('/org/klomp/snark/*.class')
