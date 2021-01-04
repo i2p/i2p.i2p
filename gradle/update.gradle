@@ -13,7 +13,7 @@ task prepUpdateSmall(type: Copy) {
     dependsOn ':apps:ministreaming:jar', ':apps:streaming:jar'
     dependsOn ':apps:routerconsole:jar', ':apps:i2ptunnel:i2ptunnelJar'
     dependsOn ':apps:routerconsole:war', ':apps:i2ptunnel:war'
-    dependsOn ':apps:addressbook:war'
+    dependsOn ':apps:addressbook:jar'
     // Base dir
     into 'pkg-temp'
     into('lib') {
@@ -22,18 +22,13 @@ task prepUpdateSmall(type: Copy) {
             project(':apps:streaming').jar.archivePath,
             project(':apps:routerconsole').jar.archivePath,
             project(':apps:i2ptunnel').i2ptunnelJar.archivePath,
+            project(':apps:jrobin').jar.archivePath,
         ]}
-        // pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater
-        // name without version so we can overwrite if we upgrade
-        from('apps/jrobin/jrobin-1.5.9.1.jar') {
-            rename { 'jrobin.jar' }
-        }
     }
     into('webapps') {
         from {[
             project(':apps:routerconsole').war.archivePath,
             project(':apps:i2ptunnel').war.archivePath,
-            project(':apps:addressbook').war.archivePath,
         ]}
     }
 }
@@ -42,9 +37,12 @@ task prepUpdate(type: Copy) {
     dependsOn prepUpdateSmall
     dependsOn ':apps:BOB:jar', ':apps:sam:jar'
     dependsOn ':apps:i2psnark:i2psnarkJar', ':apps:systray:jar'
-    //dependsOn ':apps:desktopgui:jar'
+    dependsOn ':apps:jetty:jar'
+    dependsOn ':apps:desktopgui:jar'
     dependsOn ':apps:susidns:war', ':apps:susimail:war'
     dependsOn ':apps:i2psnark:war'
+    dependsOn ':apps:i2pcontrol:war'
+    dependsOn ':apps:imagegen:war'
     // Base dir
     into 'pkg-temp'
     into('lib') {
@@ -52,10 +50,9 @@ task prepUpdate(type: Copy) {
             project(':apps:BOB').jar.archivePath,
             project(':apps:sam').jar.archivePath,
             project(':apps:i2psnark').i2psnarkJar.archivePath,
-            // include systray changes in 0.7.5
             project(':apps:systray').jar.archivePath,
-            // removed from updater in 0.9
-            //project(':apps:desktopgui').jar.archivePath,
+            project(':apps:desktopgui').jar.archivePath,
+            project(':apps:jetty').jar.archivePath,
         ]}
         // as of 0.7.12; someday, we can remove these from the updater
         from 'apps/susidns/src/WEB-INF/lib/jstl.jar'
@@ -66,6 +63,8 @@ task prepUpdate(type: Copy) {
             project(':apps:susidns').war.archivePath,
             project(':apps:susimail').war.archivePath,
             project(':apps:i2psnark').war.archivePath,
+            project(':apps:i2pcontrol').war.archivePath,
+            project(':apps:imagegen').war.archivePath,
         ]}
     }
     from('history.txt') {
@@ -75,4 +74,32 @@ task prepUpdate(type: Copy) {
         String more = '\n\n----------------\n\nEARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE'
         ant.concat(more, append: 'true', destfile: 'pkg-temp/history.txt')
     }
+    from 'LICENSE.txt'
+    into('licenses') { from 'licenses' }
+    from 'installer/resources/blocklist.txt'
+    from 'installer/resources/deletelist.txt'
+    into('certificates') { from 'installer/resources/certificates' }
+    into('locale') { from 'installer/resources/locale' }
+    into('man') { from 'installer/resources/man' }
+}
+
+task updaterRouter(type: Zip) {
+    dependsOn prepUpdateRouter
+    archiveName 'i2pupdate.zip'
+    destinationDir file('.')
+    from 'pkg-temp'
+}
+
+task updaterSmall(type: Zip) {
+    dependsOn prepUpdateSmall
+    archiveName 'i2pupdate.zip'
+    destinationDir file('.')
+    from 'pkg-temp'
+}
+
+task updater(type: Zip) {
+    dependsOn prepUpdate
+    archiveName 'i2pupdate.zip'
+    destinationDir file('.')
+    from 'pkg-temp'
 }
