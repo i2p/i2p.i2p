@@ -1,0 +1,22 @@
+plugins {
+    id 'war'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java'
+        }
+    }
+}
+
+dependencies {
+    providedCompile project(':router')
+    providedCompile project(':apps:jetty')
+    providedCompile files('../../installer/lib/wrapper/all/wrapper.jar')
+}
+
+war {
+    archiveName 'jsonrpc.war'
+    webXml = file('web.xml')
+}
