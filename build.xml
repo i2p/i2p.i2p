@@ -10,7 +10,10 @@
      -->
     <property file="override.properties"/>
     <property file="build.properties"/>
-    <!--  When changing, also change javadoc URL in build.properties, and checksum in apps/jetty/build.xml -->
+    <!--  When changing, also change javadoc URL in build.properties,
+          and checksum in apps/jetty/build.xml
+          and versions in apps/jetty/build.gradle
+     -->
     <property name="jetty.ver" value="9.3.29.v20201019" />
     <property name="tomcat.ver" value="9.0.40" />
 

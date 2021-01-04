@@ -84,6 +84,7 @@ task prepUpdate(type: Copy) {
 }
 
 task updaterRouter(type: Zip) {
+    description 'makes an i2pupdate.zip file containing core and router jars only'
     dependsOn prepUpdateRouter
     archiveName 'i2pupdate.zip'
     destinationDir file('.')
@@ -91,6 +92,7 @@ task updaterRouter(type: Zip) {
 }
 
 task updaterSmall(type: Zip) {
+    description 'makes an i2pupdate.zip file with a subset of the resources'
     dependsOn prepUpdateSmall
     archiveName 'i2pupdate.zip'
     destinationDir file('.')
@@ -98,6 +100,7 @@ task updaterSmall(type: Zip) {
 }
 
 task updater(type: Zip) {
+    description 'makes an i2pupdate.zip file'
     dependsOn prepUpdate
     archiveName 'i2pupdate.zip'
     destinationDir file('.')
