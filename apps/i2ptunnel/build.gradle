@@ -19,7 +19,7 @@ sourceSets {
 
 dependencies {
     compile project(':core')
-    compile project(':apps:ministreaming')
+    providedCompile project(':apps:ministreaming')
     compile 'gnu.getopt:java-getopt:1.0.13'
     providedCompile project(':apps:jetty')
 }
@@ -106,6 +106,5 @@ war {
     exclude '*.jsi'
     exclude '*.jsp'
     webXml = file('jsp/web.xml')
-    // FIXME why is this in there? WEB-INF/lib/mstreaming.jar
 }
 

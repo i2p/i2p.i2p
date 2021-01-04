@@ -13,7 +13,7 @@ sourceSets {
 
 dependencies {
     compile project(':core')
-    compile project(':apps:systray')
+    providedCompile project(':apps:systray')
     compile 'gnu.getopt:java-getopt:1.0.13'
     providedCompile project(':apps:ministreaming')
     providedCompile project(':apps:jetty')
@@ -60,5 +60,4 @@ war {
         from 'mime.properties'
     }
     webXml = file('web.xml')
-    // TODO why is this in there? WEB-INF/lib/systray.jar
 }
