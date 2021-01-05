@@ -133,11 +133,18 @@
 <td><%=intl._t("Added Date")%></td>
 <td><%=addr.getAdded()%></td>
 </tr>
+<%
+       String lastmod = addr.getModded();
+       if (lastmod.length() > 0) {
+%>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Last Modified")%></td>
-<td><%=addr.getModded()%></td>
+<td><%=lastmod%></td>
 </tr>
-<% }  // showNotes  %>
+<%
+       }  // lastmod
+   }  // showNotes
+%>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Destination")%></td>
 <td class="destinations"><div class="destaddress" tabindex="0"><%=addr.getDestination()%></div></td>
