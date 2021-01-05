@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -57,7 +59,6 @@ public class I2PSnarkUtil {
     private int _i2cpPort;
     private final Map<String, String> _opts;
     private volatile I2PSocketManager _manager;
-    private boolean _configured;
     private volatile boolean _connecting;
     private final Set<Hash> _banlist;
     private int _maxUploaders;
@@ -84,6 +85,10 @@ public class I2PSnarkUtil {
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
     public static final boolean DEFAULT_USE_DHT = true;
     public static final String EEPGET_USER_AGENT = "I2PSnark";
+    private static final List<String> HIDDEN_I2CP_OPTS = Arrays.asList(new String[] {
+        PROP_MAX_BW, "inbound.length", "outbound.length", "inbound.quantity", "outbound.quantity"
+    });
+
 
     public I2PSnarkUtil(I2PAppContext ctx) {
         this(ctx, "i2psnark");
@@ -142,25 +147,34 @@ public class I2PSnarkUtil {
     /** @since 0.9.1 */
     public I2PAppContext getContext() { return _context; }
     
-    public boolean configured() { return _configured; }
-    
+    /**
+     *  @param i2cpHost may be null for no change
+     *  @param i2cpPort may be 0 for no change
+     *  @param opts may be null for no change
+     */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void setI2CPConfig(String i2cpHost, int i2cpPort, Map opts) {
         if (i2cpHost != null)
             _i2cpHost = i2cpHost;
         if (i2cpPort > 0)
             _i2cpPort = i2cpPort;
-        // can't remove any options this way...
-        if (opts != null)
-            _opts.putAll(opts);
+        if (opts != null) {
+            synchronized(_opts) {
+                // removed options...
+                for (Iterator<String> iter = _opts.keySet().iterator(); iter.hasNext(); ) {
+                    String k = iter.next();
+                    if (!HIDDEN_I2CP_OPTS.contains(k) && !opts.containsKey(k))
+                        iter.remove();
+                }
+                _opts.putAll(opts);
+            }
+        }
         // this updates the session options and tells the router
         setMaxUpBW(_maxUpBW);
-        _configured = true;
     }
     
     public void setMaxUploaders(int limit) {
         _maxUploaders = limit;
-        _configured = true;
     }
     
     /**
@@ -169,13 +183,16 @@ public class I2PSnarkUtil {
      */
     public void setMaxUpBW(int limit) {
         _maxUpBW = limit;
-        _opts.put(PROP_MAX_BW, Integer.toString(limit * (1024 * 6 / 5)));   // add a little for overhead
-        _configured = true;
+        synchronized(_opts) {
+            _opts.put(PROP_MAX_BW, Integer.toString(limit * (1024 * 6 / 5)));   // add a little for overhead
+        }
         if (_manager != null) {
             I2PSession sess = _manager.getSession();
             if (sess != null) {
                 Properties newProps = new Properties();
-                newProps.putAll(_opts);
+                synchronized(_opts) {
+                    newProps.putAll(_opts);
+                }
                 sess.updateOptions(newProps);
             }
         }
@@ -183,17 +200,24 @@ public class I2PSnarkUtil {
     
     public void setMaxConnections(int limit) {
         _maxConnections = limit;
-        _configured = true;
     }
 
     public void setStartupDelay(int minutes) {
 	_startupDelay = minutes;
-	_configured = true;
     }
     
     public String getI2CPHost() { return _i2cpHost; }
     public int getI2CPPort() { return _i2cpPort; }
-    public Map<String, String> getI2CPOptions() { return _opts; }
+
+    /**
+     *  @return a copy
+     */
+    public Map<String, String> getI2CPOptions() {
+        synchronized(_opts) {
+            return new HashMap<String, String>(_opts);
+        }
+    }
+
     public String getEepProxyHost() { return _proxyHost; }
     public int getEepProxyPort() { return _proxyPort; }
     public boolean getEepProxySet() { return _shouldProxy; }
@@ -225,9 +249,8 @@ public class I2PSnarkUtil {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connecting to I2P", new Exception("I did it"));
             Properties opts = _context.getProperties();
-            if (_opts != null) {
-                for (Map.Entry<String, String> entry : _opts.entrySet() )
-                    opts.setProperty(entry.getKey(), entry.getValue());
+            synchronized(_opts) {
+                opts.putAll(_opts);
             }
             // override preference and start with two tunnels. IdleChecker will ramp up/down as necessary
             String sin = opts.getProperty("inbound.quantity");
