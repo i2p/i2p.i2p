@@ -4150,12 +4150,13 @@ button.download.control:hover, button.download.control:focus {
      text-indent: 0;
      text-align: left;
      min-width: 0 !important;
-     padding: 5px 7px 5px 22px !important;
+     padding: 5px 7px 1px 22px !important;
      text-transform: capitalize;
 }
 
 .routersummary .cancel {
      text-transform: capitalize;
+     padding: 5px 7px 1px 22px !important;
 }
 
 .routersummary .reload[value="restartImmediate"] {
