@@ -1,4 +1,22 @@
+2021-01-07 zzz
+ * SSU: Implement fast retransmit (ticket #2427)
+
+2021-01-05 zzz
+ * Console: Reduce limit of concurrent graph generation on slow devices
+ * i2psnark: Add ability to remove I2CP options
+ * SusiDNS: Hide last-modified on details page if empty
+
+2021-01-04 zzz
+ * Build:
+   - Gradle build fixes
+   - Update external javadoc links
+
+2021-01-02 zzz
+ * Sybil: Reduce default threshold
+ * Tunnels: Improve error handling at OBEP
+
 2020-12-31 zzz
+ * Console: Use local time on graphs by default
  * NetDB:
    - Drop lookups with replies going to us
    - Extend lookup expire time

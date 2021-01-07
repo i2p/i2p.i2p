@@ -213,6 +213,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
     private int receiveACKs(PeerState from, UDPPacketReader.DataReader data) throws DataFormatException {
         int rv = 0;
         boolean newAck = false;
+        ModifiableLong highestSeqNumAcked = new ModifiableLong(-1);
         if (data.readACKsIncluded()) {
             int ackCount = data.readACKCount();
             if (ackCount > 0) {
@@ -222,7 +223,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
 
                 for (int i = 0; i < ackCount; i++) {
                     long id = data.readACK(i);
-                    if (from.acked(id)) {
+                    if (from.acked(id, highestSeqNumAcked)) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("First full ACK of message " + id + " received from " + from.getRemotePeer());
                         newAck = true;
@@ -241,12 +242,10 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receivePartialACKCount", bitfields.length, 0);
 
                 for (int i = 0; i < bitfields.length; i++) {
-                    if (from.acked(bitfields[i])) {
+                    if (from.acked(bitfields[i], highestSeqNumAcked)) {
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Final partial ACK received: " + bitfields[i] + " from " + from.getRemotePeer());
+                            _log.debug("Partial ACK received: " + bitfields[i] + " from " + from.getRemotePeer());
                         newAck = true;
-                    } else if (_log.shouldLog(Log.DEBUG)) {
-                        _log.debug("Partial ACK received: " + bitfields[i] + " from " + from.getRemotePeer());
                     }
                 }
             }
@@ -256,12 +255,30 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         else
             from.dataReceived();
 
+        long highest = highestSeqNumAcked.value;
+        if (highest >= 0) {
+            boolean retx = from.highestSeqNumAcked(highest);
+            if (retx)
+                newAck = true;
+        }
+
         // Wake up the packet pusher if it is sleeping.
         // By calling add(), this also is a failsafe against possible
         // races in OutboundMessageFragments.
+/*
         if (newAck && from.getOutboundMessageCount() > 0)
             _outbound.add(from, 0);
+*/
 
         return rv;
+    }
+
+    /**
+     * Modifiable Long, no locking
+     * @since 0.9.49
+     */
+    public static class ModifiableLong {
+        public long value;
+        public ModifiableLong(long val) { value = val; }
     }
 }

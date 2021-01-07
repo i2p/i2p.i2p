@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -38,9 +39,10 @@ class OutboundMessageState implements CDPQEntry {
     private int _maxSends;
     // we can't use the ones in _message since it is null for injections
     private long _enqueueTime;
-    private long _seqNum;
+    private volatile long _seqNum;
     /** how many bytes push() is allowed to send */
     private int _allowedSendBytes;
+    private final AtomicInteger _nacks = new AtomicInteger();
 
     public static final int MAX_MSG_SIZE = 32 * 1024;
 
@@ -113,6 +115,22 @@ class OutboundMessageState implements CDPQEntry {
     public OutNetMessage getMessage() { return _message; }
 
     public long getMessageId() { return _i2npMessage.getUniqueId(); }
+
+    /**
+     * @return new value
+     * @since 0.9.49
+     */
+    public int incrementNACKs() { return _nacks.incrementAndGet(); }
+
+    /**
+     * @since 0.9.49
+     */
+    public int getNACKs() { return _nacks.get(); }
+
+    /**
+     * @since 0.9.49
+     */
+    public void clearNACKs() { _nacks.set(0); }
 
     public PeerState getPeer() { return _peer; }
 
@@ -489,6 +507,7 @@ class OutboundMessageState implements CDPQEntry {
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
         buf.append("OB Message ").append(_i2npMessage.getUniqueId());
+        buf.append(" seq ").append(_seqNum);
         buf.append(" type ").append(_i2npMessage.getType());
         buf.append(" size ").append(_messageBuf.length);
         if (_numFragments > 1)
@@ -496,6 +515,8 @@ class OutboundMessageState implements CDPQEntry {
         buf.append(" volleys: ").append(_maxSends);
         buf.append(" lifetime: ").append(getLifetime());
         if (!isComplete()) {
+            if (_nacks.get() > 0)
+                buf.append(" NACKs: ").append(_nacks);
             if (_fragmentSends != null) {
                 buf.append(" unacked fragments: ");
                 for (int i = 0; i < _numFragments; i++) {
