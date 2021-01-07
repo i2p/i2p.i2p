@@ -87,7 +87,8 @@ public class RouterTimestamper extends Timestamper {
         // This means we no longer check every 5 minutes to see if we got enabled,
         // so the property must be set at startup.
         // We still need to be instantiated since the router calls clock().getTimestamper().waitForInitialization()
-        _disabled = ctx.getProperty(PROP_DISABLED, DEFAULT_DISABLED);
+        _disabled = ctx.getProperty(PROP_DISABLED, DEFAULT_DISABLED) ||
+                    ctx.getBooleanProperty("i2p.vmCommSystem");
         if (_disabled) {
             _initialized = true;
             _zones = null;

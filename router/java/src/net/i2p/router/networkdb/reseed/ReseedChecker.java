@@ -66,7 +66,8 @@ public class ReseedChecker {
                 return false;
         }
 
-        if (_context.getBooleanProperty(Reseeder.PROP_DISABLE)) {
+        if (_context.getBooleanProperty(Reseeder.PROP_DISABLE) ||
+            _context.getBooleanProperty("i2p.vmCommSystem")) {
             int x = count - 1;  // us
             // no ngettext, this is rare
             String s;
