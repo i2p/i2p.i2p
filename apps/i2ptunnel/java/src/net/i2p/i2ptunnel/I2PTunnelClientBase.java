@@ -291,10 +291,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 _socketManagerState = SocketManagerState.INIT;
                 // We could be here a LONG time, holding the lock
                 socketManager = buildSocketManager(tunnel, pkf);
+/*
+   since we enabled ratchet by default, we're not compatible with ancient servers anyway.
                 // FIXME may not be the right place for this
                 I2PSession sub = addSubsession(tunnel);
                 if (sub != null && _log.shouldLog(Log.WARN))
                     _log.warn("Added subsession " + sub);
+*/
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Not building a new socket manager since the old one is open [s=" + s + "]");
