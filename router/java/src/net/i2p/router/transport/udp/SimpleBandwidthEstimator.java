@@ -25,6 +25,7 @@ class SimpleBandwidthEstimator implements BandwidthEstimator {
 
     private final I2PAppContext _context;
     private final Log _log;
+    // access outside lock on SBE to avoid deadlock
     private final PeerState _state;
 
     private long _tAck;
@@ -51,8 +52,14 @@ class SimpleBandwidthEstimator implements BandwidthEstimator {
      * Records an arriving ack.
      * @param acked how many bytes were acked with this ack
      */
-    public synchronized void addSample(int acked) {
+    public void addSample(int acked) {
         long now = _context.clock().now();
+        // avoid deadlock
+        int rtt = _state.getRTT();
+        addSample(acked, now, rtt);
+    }
+
+    private synchronized void addSample(int acked, long now, int rtt) {
         if (_acked < 0) {
             // first sample
             // use time since constructed as the RTT
@@ -64,34 +71,38 @@ class SimpleBandwidthEstimator implements BandwidthEstimator {
             _acked = 0;
             _tAck = now;
             if (_log.shouldDebug())
-                _log.debug("first sample packets: " + acked + " deltaT: " + deltaT + ' ' + this);
+                _log.debug("first sample bytes: " + acked + " deltaT: " + deltaT + ' ' + this);
         } else {
             _acked += acked;
             // anti-aliasing filter
             // As in kernel tcp_westwood.c
             // and the Westwood+ paper
-            if (now - _tAck >= Math.max(_state.getRTT(), WESTWOOD_RTT_MIN))
-                computeBWE(now);
+            if (now - _tAck >= Math.max(rtt, WESTWOOD_RTT_MIN))
+                computeBWE(now, rtt);
         }
     }
 
     /**
      * @return the current bandwidth estimate in bytes/ms.
      */
-    public synchronized float getBandwidthEstimate() {
+    public float getBandwidthEstimate() {
         long now = _context.clock().now();
+        // avoid deadlock
+        int rtt = _state.getRTT();
         // anti-aliasing filter
         // As in kernel tcp_westwood.c
         // and the Westwood+ paper
-        if (now - _tAck >= Math.max(_state.getRTT(), WESTWOOD_RTT_MIN))
-            return computeBWE(now);
-        return _bKFiltered;
+        synchronized(this) {
+            if (now - _tAck >= Math.max(rtt, WESTWOOD_RTT_MIN))
+                return computeBWE(now, rtt);
+            return _bKFiltered;
+        }
     }
 
-    private synchronized float computeBWE(final long now) {
+    private synchronized float computeBWE(final long now, final int rtt) {
         if (_acked < 0)
             return 0.0f; // nothing ever sampled
-        updateBK(now, _acked);
+        updateBK(now, _acked, rtt);
         _acked = 0;
         return _bKFiltered;
     }
@@ -110,11 +121,13 @@ class SimpleBandwidthEstimator implements BandwidthEstimator {
      * time-varying filter, as in kernel tcp_westwood.c
      * 
      * @param time the time of the measurement
-     * @param packets number of packets acked
+     * @param packets number of bytes acked
+     * @param rtt current rtt
      */
-    private void updateBK(long time, int packets) {
+    private void updateBK(long time, int packets, int rtt) {
         long deltaT = time - _tAck;
-        int rtt = Math.max(_state.getRTT(), WESTWOOD_RTT_MIN);
+        if (rtt < WESTWOOD_RTT_MIN)
+            rtt = WESTWOOD_RTT_MIN;
         if (deltaT > 2 * rtt) {
             // Decay with virtual null samples as in the Westwood paper
             int numrtts = Math.min((int) ((deltaT / rtt) - 1), 2 * DECAY_FACTOR);
@@ -137,7 +150,7 @@ class SimpleBandwidthEstimator implements BandwidthEstimator {
         }
         _tAck = time;
         if (_log.shouldDebug())
-            _log.debug("computeBWE packets: " + packets + " deltaT: " + deltaT +
+            _log.debug("computeBWE bytes: " + packets + " deltaT: " + deltaT +
                        " bk/deltaT: " + bkdt + " _bK_ns_est: " + _bK_ns_est + ' ' + this);
     }
 
@@ -153,7 +166,7 @@ class SimpleBandwidthEstimator implements BandwidthEstimator {
         return "SBE[" +
                 " _bKFiltered " + _bKFiltered +
                 " _tAck " + _tAck + "; " +
-                DataHelper.formatSize2Decimal((long) (_bKFiltered * 1000 * _state.getMTU()), false) +
+                DataHelper.formatSize2Decimal((long) (_bKFiltered * 1000), false) +
                 "Bps]";
     }
 }

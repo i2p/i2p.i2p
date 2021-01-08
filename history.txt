@@ -1,4 +1,9 @@
+2021-01-08 zzz
+ * i2ptunnel: Disable shared clients (DSA) (part 2)
+ * SSU: Fix bandwidth estimator deadlock (ticket #2798)
+
 2021-01-07 zzz
+ * Router: Disable reseeding and NTP in vmCommSystem
  * SSU: Implement fast retransmit (ticket #2427)
 
 2021-01-05 zzz
