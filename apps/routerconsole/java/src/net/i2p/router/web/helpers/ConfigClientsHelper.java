@@ -302,10 +302,19 @@ public class ConfigClientsHelper extends HelperBase {
                 }
                 s = stripHTML(appProps, "author");
                 if (s != null) {
+                    String[] authors = DataHelper.split(s, "[,; \r\n\t]");
+                    String author = null;
+                    for (int i = 0; i < authors.length; i++) {
+                        String a = authors[i];
+                        if (a.indexOf('@') > 0 && a.indexOf('.') > 0) {
+                            author = a;
+                            break;
+                        }
+                    }
                     desc.append("<tr><td><b>")
                         .append(_t("Author")).append("</b></td><td>");
-                    if (s.indexOf('@') > 0)
-                        desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
+                    if (author != null)
+                        desc.append("<a href=\"mailto:").append(author).append("\">").append(s).append("</a>");
                     else
                         desc.append(s);
                 }
