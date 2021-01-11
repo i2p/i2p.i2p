@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import net.i2p.router.RouterContext;
 import static net.i2p.router.web.GraphConstants.*;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -91,6 +93,24 @@ public class StatSummarizer implements Runnable, ClientApp {
             String spec = _context.getProperty("stat.summaries", DEFAULT_DATABASES);
             String[] rates = DataHelper.split(spec, ",");
             syncThreads = Math.min(rates.length / 2, 4);
+            // delete files for unconfigured rates
+            Set<String> configured = new HashSet<String>(rates.length);
+            for (String r : rates) {
+                configured.add(SummaryListener.createName(_context, r));
+            }
+            File rrdDir = new File(_context.getRouterDir(), SummaryListener.RRD_DIR);
+            FileFilter filter = new FileSuffixFilter(SummaryListener.RRD_PREFIX, SummaryListener.RRD_SUFFIX);
+            File[] files = rrdDir.listFiles(filter);
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    File f = files[i];
+                    String name = f.getName();
+                    String hash = name.substring(SummaryListener.RRD_PREFIX.length(), name.length() - SummaryListener.RRD_SUFFIX.length());
+                    if (!configured.contains(hash)) {
+                        f.delete();
+                    }
+                }
+            }
         } else {
             syncThreads = 0;
             deleteOldRRDs();
