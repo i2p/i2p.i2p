@@ -955,6 +955,7 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
 
 #customOptions {
     margin-top: 15px !important;
+    width: 99%;
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
