@@ -1068,7 +1068,8 @@ class PeerCoordinator implements PeerListener
                 // just in case
                 removePartialPiece(piece);
                 // Oops. We didn't actually download this then... :(
-                downloaded.addAndGet(0 - metainfo.getPieceLength(piece));
+                // Reports of counter going negative?
+                //downloaded.addAndGet(0 - metainfo.getPieceLength(piece));
                 // Mark this peer as not having the piece. PeerState will update its bitfield.
                 for (Piece pc : wantedPieces) {
                     if (pc.getId() == piece) {
