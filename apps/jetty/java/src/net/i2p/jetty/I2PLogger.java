@@ -14,6 +14,8 @@
 
 package net.i2p.jetty;
 
+import java.nio.channels.ClosedChannelException;
+
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
@@ -127,7 +129,7 @@ public class I2PLogger implements Logger
         if (th != null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(msg, th);
-            else
+            else if (!(th instanceof ClosedChannelException))
                 _log.logAlways(Log.WARN, msg + ": " + th);
         } else {
             _log.logAlways(Log.WARN, msg);
