@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import net.i2p.CoreVersion;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
@@ -41,6 +42,7 @@ import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.VersionComparator;
 
 /**
  *  Warning - misnamed. This creates a new RouterIdentity, i.e.
@@ -59,7 +61,9 @@ public class CreateRouterInfoJob extends JobImpl {
     /** @since 0.9.48 */
     static final String PROP_ROUTER_ENCTYPE = "router.encType";
     private static final SigType DEFAULT_SIGTYPE = SigType.EdDSA_SHA512_Ed25519;
-    private static final EncType DEFAULT_ENCTYPE = EncType.ELGAMAL_2048;
+    private static final EncType DEFAULT_ENCTYPE = (VersionComparator.comp(CoreVersion.VERSION, "0.9.49") >= 0) ?
+                                                   EncType.ECIES_X25519 :
+                                                   EncType.ELGAMAL_2048;
 
     CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);

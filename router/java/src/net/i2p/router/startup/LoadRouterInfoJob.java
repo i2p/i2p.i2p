@@ -44,6 +44,8 @@ class LoadRouterInfoJob extends JobImpl {
     private final Log _log;
     private RouterInfo _us;
     private static final AtomicBoolean _keyLengthChecked = new AtomicBoolean();
+    // 1 chance in this many to rekey if the defaults changed
+    private static final int REKEY_PROBABILITY = 128;
     
     public LoadRouterInfoJob(RouterContext ctx) {
         super(ctx);
@@ -126,13 +128,12 @@ class LoadRouterInfoJob extends JobImpl {
                 if ((sigTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_SIGTYPE) == null) ||
                     (encTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_ENCTYPE) == null)) {
                     // Not explicitly configured, and default has changed
-                    // Give a 25% chance of rekeying for each restart
-                    // TODO reduce to ~3 (i.e. increase probability) in future release
-                    if (getContext().random().nextInt(16) > 0) {
+                    // Give a chance of rekeying for each restart
+                    if (getContext().random().nextInt(REKEY_PROBABILITY) > 0) {
                         sigTypeChanged = false;
                         encTypeChanged = false;
                         if (_log.shouldWarn())
-                            _log.warn("Deferring RI rekey from " + stype + " to " + cstype);
+                            _log.warn("Deferring RI rekey from " + stype + '/' + etype + " to " + cstype + '/' + cetype);
                     }
                 }
 
