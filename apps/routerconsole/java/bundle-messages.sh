@@ -40,6 +40,7 @@ fi
 ROUTERFILES="\
    ../../../router/java/src/net/i2p/router/Blocklist.java \
    ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java \
+   ../../../router/java/src/net/i2p/router/sybil/Analysis.java \
    ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
    ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java \
    ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \

@@ -23,7 +23,6 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.router.web.helpers.SybilRenderer;
 import net.i2p.util.Log;
 import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.SecureDirectory;

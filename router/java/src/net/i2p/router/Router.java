@@ -50,6 +50,7 @@ import net.i2p.router.startup.CreateRouterInfoJob;
 import net.i2p.router.startup.PortableWorkingDir;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
+import net.i2p.router.sybil.Analysis;
 import net.i2p.router.tasks.*;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.UPnPScannerCallback;
@@ -928,6 +929,12 @@ public class Router implements RouterClock.ClockShiftListener {
             // but just to be safe
             _context.simpleTimer2().addEvent(r, 0);
             _context.commSystem().initGeoIP();
+
+            if (!SystemVersion.isSlow() &&
+                _context.getProperty(Analysis.PROP_FREQUENCY, Analysis.DEFAULT_FREQUENCY) > 0) {
+                // registers and starts itself
+                Analysis.getInstance(_context);
+            }
         }
     }
 

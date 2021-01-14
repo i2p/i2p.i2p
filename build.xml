@@ -973,7 +973,7 @@
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:com.southernstorm.noise.crypto.x25519:com.southernstorm.noise.crypto.chacha20:org.minidns:org.minidns.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.*:com.southernstorm.noise.*" />
-            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:net.i2p.router.sybil:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
+            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook:net.i2p.router.naming:net.metanotion:net.metanotion.*" />
             <group title="BOB Bridge" packages="net.i2p.BOB" />

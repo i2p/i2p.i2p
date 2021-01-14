@@ -35,7 +35,6 @@ import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
 import net.i2p.router.news.NewsManager;
-import net.i2p.router.sybil.Analysis;
 import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileSuffixFilter;
@@ -901,14 +900,6 @@ public class RouterConsoleRunner implements RouterApp {
             if (_mgr == null)
                 _context.addShutdownTask(new ServerShutdown());
             ConfigServiceHandler.registerSignalHandler(_context);
-
-            if (_mgr != null &&
-                //_context.getBooleanProperty(HelperBase.PROP_ADVANCED) &&
-                !SystemVersion.isSlow() &&
-                _context.getProperty(Analysis.PROP_FREQUENCY, Analysis.DEFAULT_FREQUENCY) > 0) {
-                // registers and starts itself
-                Analysis.getInstance(_context);
-            }
     }
     
     /**
