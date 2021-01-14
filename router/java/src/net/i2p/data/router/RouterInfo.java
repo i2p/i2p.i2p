@@ -85,6 +85,7 @@ public class RouterInfo extends DatabaseEntry {
     public static final String PROP_NETWORK_ID = "netId";
     public static final String PROP_CAPABILITIES = "caps";
     public static final char CAPABILITY_HIDDEN = 'H';
+    private static final int MAX_ADDRESSES = 16;
 
     /** Public string of chars which serve as bandwidth capacity markers
      * NOTE: individual chars defined in Router.java
@@ -203,11 +204,14 @@ public class RouterInfo extends DatabaseEntry {
      *
      * @param addresses may be null
      * @throws IllegalStateException if RouterInfo is already signed or addresses previously set
+     * @throws IllegalArgumentException if too many addresses
      */
     public void setAddresses(Collection<RouterAddress> addresses) {
         if (_signature != null || !_addresses.isEmpty())
             throw new IllegalStateException();
         if (addresses != null) {
+            if (addresses.size() > MAX_ADDRESSES)
+                throw new IllegalArgumentException("too many addresses");
             _addresses.addAll(addresses);
         }
     }
@@ -575,6 +579,8 @@ public class RouterInfo extends DatabaseEntry {
         _published = DataHelper.readLong(din, 8);
         // EOF will be thrown in properties read below
         int numAddresses = din.read();
+        if (numAddresses > MAX_ADDRESSES)
+            throw new DataFormatException("too many addresses");
         for (int i = 0; i < numAddresses; i++) {
             RouterAddress address = new RouterAddress();
             address.readBytes(din);
