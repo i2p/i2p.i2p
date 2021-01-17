@@ -60,6 +60,6 @@ public class I2PSocketExceptionTest {
     public void testUnknownStatus() {
         I2PSocketException e = new I2PSocketException(255);
         assertThat(e.getStatus(), is(255));
-        assertThat(e.getMessage(), is("Failure code: 255"));
+        assertThat(e.getMessage(), endsWith(": 255"));
     }
 }
