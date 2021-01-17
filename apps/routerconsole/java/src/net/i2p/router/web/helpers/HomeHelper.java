@@ -68,7 +68,7 @@ public class HomeHelper extends HelperBase {
         //_x("Dev Builds") + S + _x("Development builds of I2P") + S + "http://bobthebuilder.i2p/" + S + I + "script_gear.png" + S +
         _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "group_gear.png" + S +
         //_x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "i2psnark.png" + S +
-        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "echelon.png" + S +
+        //"echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "echelon.png" + S +
         //"exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S + "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
         _x("I2P FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/faq" + S + I + "question.png" + S +
         _x("I2P Forum") + S + _x("Community forum") + S + "http://i2pforum.i2p/" + S + I + "group.png" + S +
